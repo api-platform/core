@@ -15,11 +15,11 @@ namespace ApiPlatform\Tests\Functional\Parameters;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 
-final class HydraTests extends ApiTestCase
+final class HydraTest extends ApiTestCase
 {
     public function testHydraTemplate(): void
     {
-        $response = self::createClient()->request('GET', 'with_parameters_collection');
+        $response = self::createClient()->request('GET', 'with_parameters_collection?hydra=1');
         $this->assertArraySubset(['hydra:search' => [
             'hydra:template' => '/with_parameters_collection{?hydra}',
             'hydra:mapping' => [

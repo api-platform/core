@@ -13,16 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\Provider;
 
-use ApiPlatform\Metadata\HeaderParameterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\State\Exception\ProviderNotFoundException;
 use ApiPlatform\State\ParameterProviderInterface;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\State\Util\ParameterParserTrait;
 use ApiPlatform\State\Util\RequestParser;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Loops over parameters to:
@@ -33,6 +32,8 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class ParameterProvider implements ProviderInterface
 {
+    use ParameterParserTrait;
+
     public function __construct(private readonly ?ProviderInterface $decorated = null, private readonly ?ContainerInterface $locator = null)
     {
     }
@@ -50,23 +51,19 @@ final class ParameterProvider implements ProviderInterface
         }
 
         $context = ['operation' => $operation] + $context;
-        $parameters = $operation->getParameters() ?? [];
-        $operationParameters = $parameters instanceof Parameters ? iterator_to_array($parameters) : $parameters;
-        foreach ($operationParameters as $parameter) {
+        $p = $operation->getParameters() ?? [];
+        $parameters = $p instanceof Parameters ? iterator_to_array($p) : $p;
+        foreach ($parameters as $parameter) {
             $key = $parameter->getKey();
-            $parameters = $this->extractParameterValues($parameter, $request, $context);
-            $parsedKey = explode('[:property]', $key);
+            $values = $this->extractParameterValues($parameter, $request, $context);
+            $key = $this->getParameterFlattenKey($key, $values);
 
-            if (isset($parsedKey[0]) && isset($parameters[$parsedKey[0]])) {
-                $key = $parsedKey[0];
-            }
-
-            if (!isset($parameters[$key])) {
+            if (!isset($values[$key])) {
                 continue;
             }
 
-            $operationParameters[$parameter->getKey()] = $parameter = $parameter->withExtraProperties(
-                $parameter->getExtraProperties() + ['_api_values' => [$key => $parameters[$key]]]
+            $parameters[$parameter->getKey()] = $parameter = $parameter->withExtraProperties(
+                $parameter->getExtraProperties() + ['_api_values' => [$key => $values[$key]]]
             );
 
             if (null === ($provider = $parameter->getProvider())) {
@@ -74,7 +71,7 @@ final class ParameterProvider implements ProviderInterface
             }
 
             if (\is_callable($provider)) {
-                if (($op = $provider($parameter, $parameters, $context)) instanceof Operation) {
+                if (($op = $provider($parameter, $values, $context)) instanceof Operation) {
                     $operation = $op;
                 }
 
@@ -87,28 +84,15 @@ final class ParameterProvider implements ProviderInterface
 
             /** @var ParameterProviderInterface $providerInstance */
             $providerInstance = $this->locator->get($provider);
-            if (($op = $providerInstance->provide($parameter, $parameters, $context)) instanceof Operation) {
+            if (($op = $providerInstance->provide($parameter, $values, $context)) instanceof Operation) {
                 $operation = $op;
             }
         }
 
-        $operation = $operation->withParameters(new Parameters($operationParameters));
+        $operation = $operation->withParameters(new Parameters($parameters));
         $request?->attributes->set('_api_operation', $operation);
         $context['operation'] = $operation;
 
         return $this->decorated?->provide($operation, $uriVariables, $context);
-    }
-
-    /**
-     * @param array<string, mixed> $context
-     */
-    private function extractParameterValues(Parameter $parameter, ?Request $request, array $context)
-    {
-        if ($request) {
-            return $parameter instanceof HeaderParameterInterface ? $request->attributes->get('_api_header_parameters') : $request->attributes->get('_api_query_parameters');
-        }
-
-        // GraphQl
-        return $context['args'] ?? [];
     }
 }

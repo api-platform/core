@@ -15,7 +15,7 @@ namespace ApiPlatform\Tests\Functional\Parameters;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 
-final class ValidationTests extends ApiTestCase
+final class ValidationTest extends ApiTestCase
 {
     public function testWithGroupFilter(): void
     {
@@ -103,5 +103,35 @@ final class ValidationTests extends ApiTestCase
     {
         $response = self::createClient()->request('GET', 'validate_parameters?blank=f');
         $this->assertResponseIsSuccessful();
+    }
+
+    public function testValidateBeforeRead(): void
+    {
+        $response = self::createClient()->request('GET', 'query_parameter_validate_before_read');
+        $this->assertArraySubset(['violations' => [['propertyPath' => 'search', 'message' => 'This value should not be blank.']]], $response->toArray(false));
+    }
+
+    public function testValidatePropertyPlaceholder(): void
+    {
+        self::createClient()->request('GET', 'query_parameter_validate_before_read?search=t&sort[id]=asc');
+        $this->assertResponseIsSuccessful();
+        $response = self::createClient()->request('GET', 'query_parameter_validate_before_read?search=t&sort[bar]=asc');
+        $this->assertArraySubset([
+            'violations' => [
+                [
+                    'propertyPath' => 'sort[bar]',
+                    'message' => 'This field was not expected.',
+                ],
+            ],
+        ], $response->toArray(false));
+        $response = self::createClient()->request('GET', 'query_parameter_validate_before_read?search=t&sort[id]=foo');
+        $this->assertArraySubset([
+            'violations' => [
+                [
+                    'propertyPath' => 'sort[id]',
+                    'message' => 'The value you selected is not a valid choice.',
+                ],
+            ],
+        ], $response->toArray(false));
     }
 }
