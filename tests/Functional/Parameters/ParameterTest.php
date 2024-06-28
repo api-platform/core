@@ -15,7 +15,7 @@ namespace ApiPlatform\Tests\Functional\Parameters;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 
-final class ParameterTests extends ApiTestCase
+final class ParameterTest extends ApiTestCase
 {
     public function testWithGroupFilter(): void
     {
@@ -47,5 +47,21 @@ final class ParameterTests extends ApiTestCase
     {
         self::createClient()->request('GET', 'with_parameters/1?service=blabla', ['headers' => ['auth' => 'foo']]);
         $this->assertResponseStatusCodeSame(403);
+    }
+
+    /**
+     * Because of the openapiContext deprecation.
+     *
+     * @group legacy
+     */
+    public function testDisableOpenApi(): void
+    {
+        $response = self::createClient()->request('GET', 'docs', ['headers' => ['accept' => 'application/vnd.openapi+json']]);
+        $keys = [];
+        foreach ($response->toArray(false)['paths']['/with_parameters/{id}']['get']['parameters'] as $parameter) {
+            $keys[] = $parameter['name'];
+        }
+
+        $this->assertNotContains('array', $keys);
     }
 }

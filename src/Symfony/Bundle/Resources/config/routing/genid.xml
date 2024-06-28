@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://symfony.com/schema/routing
         http://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <route id="api_genid" path="/.well-known/genid/{id}">
+    <route id="api_genid" path="/.well-known/genid/{id}" methods="GET|HEAD">
         <default key="_controller">api_platform.action.not_exposed</default>
         <default key="_api_respond">true</default>
     </route>

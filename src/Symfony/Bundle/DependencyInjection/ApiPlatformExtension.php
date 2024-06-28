@@ -827,7 +827,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $container->setParameter('api_platform.validator.legacy_validation_exception', $config['validator']['legacy_validation_exception'] ?? true);
             $loader->load('metadata/validator.xml');
             $loader->load('validator/validator.xml');
-            $loader->load('symfony/parameter_validator.xml');
 
             if ($this->isConfigEnabled($container, $config['graphql'])) {
                 $loader->load('graphql/validator.xml');

@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://symfony.com/schema/routing
         http://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <route id="api_graphql_graphql_playground" path="/graphql/graphql_playground">
+    <route id="api_graphql_graphql_playground" path="/graphql/graphql_playground" methods="GET|HEAD">
         <default key="_controller">api_platform.graphql.action.graphql_playground</default>
     </route>
 
