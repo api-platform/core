@@ -19,5 +19,11 @@
             <argument type="service" id="api_platform.security.resource_access_checker" />
             <argument>post_validate</argument>
         </service>
+
+        <service id="api_platform.graphql.state_provider.access_checker.after_resolver" class="ApiPlatform\Symfony\Security\State\AccessCheckerProvider" decorates="api_platform.graphql.state_provider" decoration-priority="170">
+            <argument type="service" id="api_platform.graphql.state_provider.access_checker.after_resolver.inner" />
+            <argument type="service" id="api_platform.security.resource_access_checker" />
+            <argument>after_resolver</argument>
+        </service>
     </services>
 </container>

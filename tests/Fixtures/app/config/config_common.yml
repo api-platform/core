@@ -464,3 +464,8 @@ services:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6354\CreateActivityLogResolver'
         tags:
             - name: 'api_platform.graphql.resolver'
+
+    app.graphql.query_resolver.security_after_resolver:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6427\SecurityAfterResolverResolver'
+        tags:
+            - name: 'api_platform.graphql.resolver'
