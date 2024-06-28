@@ -40,7 +40,6 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
     /**
      * This constant must be overridden in the child class.
      */
-    // @noRector \Rector\Php81\Rector\ClassConst\FinalizePublicClassConstantRector
     public const FORMAT = 'to-override';
 
     public function __construct(protected ResourceClassResolverInterface|LegacyResourceClassResolverInterface $resourceClassResolver, protected string $pageParameterName, protected ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null)

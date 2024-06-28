@@ -224,11 +224,8 @@ use Symfony\Component\Uid\Uuid as SymfonyUuid;
  */
 final class DoctrineContext implements Context
 {
-    // @noRector \Rector\Php81\Rector\Property\ReadOnlyPropertyRector
     private ObjectManager $manager;
-    // @noRector \Rector\Php81\Rector\Property\ReadOnlyPropertyRector
     private ?SchemaTool $schemaTool;
-    // @noRector \Rector\Php81\Rector\Property\ReadOnlyPropertyRector
     private ?SchemaManager $schemaManager;
 
     /**

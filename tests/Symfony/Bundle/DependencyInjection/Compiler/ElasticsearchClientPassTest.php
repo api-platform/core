@@ -56,7 +56,6 @@ class ElasticsearchClientPassTest extends TestCase
         }
 
         $clientDefinitionProphecy = $this->prophesize(Definition::class);
-        // @noRector \Rector\Php81\Rector\Array_\FirstClassCallableRector
         $clientDefinitionProphecy->setFactory([$clientBuilder, 'fromConfig'])->willReturn($clientDefinitionProphecy->reveal())->shouldBeCalled();
         $clientDefinitionProphecy->setArguments(
             Argument::allOf(
@@ -79,7 +78,6 @@ class ElasticsearchClientPassTest extends TestCase
         $clientBuilder = class_exists(\Elasticsearch\ClientBuilder::class) ? \Elasticsearch\ClientBuilder::class : \Elastic\Elasticsearch\ClientBuilder::class;
 
         $clientDefinitionProphecy = $this->prophesize(Definition::class);
-        // @noRector \Rector\Php81\Rector\Array_\FirstClassCallableRector
         $clientDefinitionProphecy->setFactory([$clientBuilder, 'build'])->willReturn($clientDefinitionProphecy->reveal())->shouldBeCalled();
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);

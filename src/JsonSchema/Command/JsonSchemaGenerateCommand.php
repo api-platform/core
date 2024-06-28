@@ -31,7 +31,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 final class JsonSchemaGenerateCommand extends Command
 {
-    // @noRector \Rector\Php81\Rector\Property\ReadOnlyPropertyRector
     private array $formats;
 
     public function __construct(private readonly SchemaFactoryInterface $schemaFactory, array $formats)
