@@ -1,5 +1,17 @@
 # Changelog
 
+## v3.3.7
+
+### Bug fixes
+
+* [0ed1b637a](https://github.com/api-platform/core/commit/0ed1b637a84d0860c2e014e2473b52d17de9276b) fix(metadata): wrong schema generated if openapicontext set on array (#6431)
+* [57f930c65](https://github.com/api-platform/core/commit/57f930c65cb067b1727488ba6db6188c6c5a01c6) fix(openapi): parameters can disable openapi (#6440)
+* [69b4d35b9](https://github.com/api-platform/core/commit/69b4d35b9764e36dab0484e1a7332886e1de9b2c) fix(state): provider as ParameterProviderInterface (#6430)
+* [842091ddf](https://github.com/api-platform/core/commit/842091ddf5b41c7a0d76bfbcddccff2920a84c35) fix(jsonschema): make all required properties optional in PATCH operation with 'json' format (#6394)
+* [af34e72ed](https://github.com/api-platform/core/commit/af34e72ed6bb0d5f7235fcc9c2a6c7810ba4f9c2) fix(openapi): yaml openapi export should have numeric keys as string (#6436)
+* [b42e25f2d](https://github.com/api-platform/core/commit/b42e25f2dcb5e0c1759c9482c08c9929ef86dc90) fix(state): parameter decorates main chain (#6434)
+* [c922ba3f5](https://github.com/api-platform/core/commit/c922ba3f5cf6117e85548697a982fb1cbe3dde2e) fix(symfony): check method for readonly routes (#6437)
+
 ## v3.3.6
 
 ### Bug fixes
