@@ -17,12 +17,15 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\QueryParameter;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Validator\Constraints\Choice;
+use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[GetCollection(
     uriTemplate: 'query_parameter_validate_before_read',
     parameters: [
         'search' => new QueryParameter(constraints: [new NotBlank()]),
+        'sort[:property]' => new QueryParameter(constraints: [new NotBlank(), new Collection(['id' => new Choice(['asc', 'desc'])], allowMissingFields: true)]),
     ],
     provider: [self::class, 'provide']
 )]
