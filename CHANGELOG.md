@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.2.25
+
+### Bug fixes
+
+* [0ed1b637a](https://github.com/api-platform/core/commit/0ed1b637a84d0860c2e014e2473b52d17de9276b) fix(metadata): wrong schema generated if openapicontext set on array (#6431)
+
 ## v3.2.24
 
 ### Bug fixes
