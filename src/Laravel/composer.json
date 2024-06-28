@@ -38,13 +38,13 @@
         "illuminate/support": "^11.0",
         "illuminate/container": "^11.0",
         "symfony/web-link": "^6.3",
-        "willdurand/negotiation": "^3.1"
+        "willdurand/negotiation": "^3.1",
+        "phpstan/phpdoc-parser": "^1.29"
     },
     "require-dev": {
         "doctrine/dbal": "^3.7",
         "larastan/larastan": "^2.0",
         "orchestra/testbench": "^9.12",
-        "phpstan/phpdoc-parser": "^1.29",
         "phpunit/phpunit": "^10"
     },
     "autoload": {
