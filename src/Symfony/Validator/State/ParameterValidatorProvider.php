@@ -44,6 +44,7 @@ final class ParameterValidatorProvider implements ProviderInterface
         }
 
         $operation = $request->attributes->get('_api_operation') ?? $operation;
+        $constraintViolationList = new ConstraintViolationList();
         foreach ($operation->getParameters() ?? [] as $parameter) {
             if (!$constraints = $parameter->getConstraints()) {
                 continue;
@@ -52,26 +53,25 @@ final class ParameterValidatorProvider implements ProviderInterface
             $key = $this->getParameterFlattenKey($parameter->getKey(), $this->extractParameterValues($parameter, $request, $context));
             $value = $parameter->getExtraProperties()['_api_values'][$key] ?? null;
             $violations = $this->validator->validate($value, $constraints);
-            if (0 !== \count($violations)) {
-                $constraintViolationList = new ConstraintViolationList();
-                foreach ($violations as $violation) {
-                    $propertyPath = $key !== $parameter->getKey() ? $key.$violation->getPropertyPath() : ($parameter->getProperty() ?? $key);
-                    $constraintViolationList->add(new ConstraintViolation(
-                        $violation->getMessage(),
-                        $violation->getMessageTemplate(),
-                        $violation->getParameters(),
-                        $violation->getRoot(),
-                        $propertyPath,
-                        $violation->getInvalidValue(),
-                        $violation->getPlural(),
-                        $violation->getCode(),
-                        $violation->getConstraint(),
-                        $violation->getCause()
-                    ));
-                }
-
-                throw new ValidationException($constraintViolationList);
+            foreach ($violations as $violation) {
+                $propertyPath = $key !== $parameter->getKey() ? $key.$violation->getPropertyPath() : ($parameter->getProperty() ?? $key);
+                $constraintViolationList->add(new ConstraintViolation(
+                    $violation->getMessage(),
+                    $violation->getMessageTemplate(),
+                    $violation->getParameters(),
+                    $violation->getRoot(),
+                    $propertyPath,
+                    $violation->getInvalidValue(),
+                    $violation->getPlural(),
+                    $violation->getCode(),
+                    $violation->getConstraint(),
+                    $violation->getCause()
+                ));
             }
+        }
+
+        if (0 !== \count($constraintViolationList)) {
+            throw new ValidationException($constraintViolationList);
         }
 
         return $this->decorated->provide($operation, $uriVariables, $context);
