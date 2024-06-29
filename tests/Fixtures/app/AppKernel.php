@@ -57,12 +57,6 @@ class AppKernel extends Kernel
 
         // patch for behat/symfony2-extension not supporting %env(APP_ENV)%
         $this->environment = $_SERVER['APP_ENV'] ?? $environment;
-
-        // patch for old versions of Doctrine Inflector, to delete when we'll drop support for v1
-        // see https://github.com/doctrine/inflector/issues/147#issuecomment-628807276
-        if (!class_exists(InflectorFactory::class)) { // @phpstan-ignore-next-line
-            Inflector::rules('plural', ['/taxon/i' => 'taxa']);
-        }
     }
 
     public function registerBundles(): array
