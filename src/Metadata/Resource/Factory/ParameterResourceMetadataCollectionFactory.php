@@ -156,8 +156,12 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
     {
         $assertions = [];
 
-        if ($required) {
+        if ($required && false !== ($allowEmptyValue = $openApi?->getAllowEmptyValue())) {
             $assertions[] = new NotNull(message: sprintf('The parameter "%s" is required.', $parameter->getKey()));
+        }
+
+        if (false === ($allowEmptyValue ?? $openApi?->getAllowEmptyValue())) {
+            $assertions[] = new NotBlank(allowNull: !$required);
         }
 
         if (isset($schema['exclusiveMinimum'])) {
@@ -198,10 +202,6 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
 
         if (isset($schema['enum'])) {
             $assertions[] = new Choice(choices: $schema['enum']);
-        }
-
-        if (false === $openApi?->getAllowEmptyValue()) {
-            $assertions[] = new NotBlank(allowNull: !$required);
         }
 
         if (!$assertions) {
