@@ -30,7 +30,7 @@ class BrokenDocs
     public ?int $id = null;
 
     /**
-     * @var ?ArrayCollection<Related>
+     * @var ?Related[]
      */
     #[Groups(['location:write', 'location:read_collection'])]
     public ?ArrayCollection $locations;
