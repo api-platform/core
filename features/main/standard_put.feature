@@ -26,6 +26,32 @@ Feature: Spec-compliant PUT support
     }
     """
 
+  Scenario: Create a new resource with json-ld attributes
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "PUT" request to "/standard_puts/6" with body:
+    """
+    {
+      "@id": "/standard_puts/6",
+      "@context": "/contexts/StandardPut",
+      "@type": "StandardPut",
+      "foo": "a",
+      "bar": "b"
+    }
+    """
+    Then the response status code should be 201
+    And the response should be in JSON
+    And the JSON should be equal to:
+    """
+    {
+      "@context": "/contexts/StandardPut",
+      "@id": "/standard_puts/6",
+      "@type": "StandardPut",
+      "id": 6,
+      "foo": "a",
+      "bar": "b"
+    }
+    """
+
   Scenario: Replace an existing resource
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/standard_puts/5" with body:
