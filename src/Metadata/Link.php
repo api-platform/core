@@ -56,6 +56,7 @@ final class Link extends Parameter
             description: $description,
             required: $required,
             security: $security,
+            securityMessage: $securityMessage,
             extraProperties: $extraProperties
         );
     }
