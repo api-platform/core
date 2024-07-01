@@ -26,7 +26,6 @@ use ApiPlatform\Symfony\Action\DocumentationAction;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -42,48 +41,21 @@ class DocumentationActionTest extends TestCase
         $openApi = new OpenApi(new Info('my api', '1.0.0'), [], new Paths());
         $openApiFactoryProphecy = $this->prophesize(OpenApiFactoryInterface::class);
         $openApiFactoryProphecy->__invoke(Argument::any())->shouldBeCalled()->willReturn($openApi);
-        $requestProphecy = $this->prophesize(Request::class);
-        $requestProphecy->getMimeType('json')->willReturn('application/json');
-        $requestProphecy->getRequestFormat('')->willReturn('json');
-        $attributesProphecy = $this->prophesize(ParameterBagInterface::class);
-        $queryProphecy = $this->prophesize(ParameterBag::class);
-        $requestProphecy->attributes = $attributesProphecy->reveal();
-        $requestProphecy->query = $queryProphecy->reveal();
-        $requestProphecy->headers = $this->prophesize(ParameterBagInterface::class)->reveal();
-        $requestProphecy->getBaseUrl()->willReturn('/api')->shouldBeCalledTimes(1);
-        $queryProphecy->getBoolean('api_gateway')->willReturn(true)->shouldBeCalledTimes(1);
-        $queryProphecy->get('spec_version')->willReturn('3.1.0')->shouldBeCalledTimes(1);
-        $attributesProphecy->get('_api_normalization_context', [])->willReturn(['foo' => 'bar'])->shouldBeCalledTimes(1);
-        $attributesProphecy->get('_format')->willReturn(null)->shouldBeCalledTimes(1);
-        $attributesProphecy->set('_api_normalization_context', ['foo' => 'bar', 'base_url' => '/api', 'api_gateway' => true, 'spec_version' => '3.1.0'])->shouldBeCalledTimes(1);
-
         $documentation = new DocumentationAction($this->prophesize(ResourceNameCollectionFactoryInterface::class)->reveal(), 'my api', '', '1.0.0', $openApiFactoryProphecy->reveal());
-        $this->assertInstanceOf(OpenApi::class, $documentation($requestProphecy->reveal()));
+        $this->assertInstanceOf(OpenApi::class, $documentation(
+            new Request(query: ['api_gateway' => true, 'spec_version' => '3.1.0'], server: ['REQUEST_URI' => '/api'], attributes: ['_api_normalization_context' => ['foo' => 'bar'], '_format' => null, '_api_normalization_context' => ['foo' => 'bar', 'base_url' => '/api', 'api_gateway' => true, 'spec_version' => '3.1.0']])
+        ));
     }
 
     public function testDocumentationActionWithoutOpenApiFactory(): void
     {
         $openApiFactoryProphecy = $this->prophesize(OpenApiFactoryInterface::class);
         $openApiFactoryProphecy->__invoke(Argument::any())->shouldNotBeCalled();
-        $requestProphecy = $this->prophesize(Request::class);
-        $requestProphecy->getRequestFormat('')->willReturn('json');
-        $requestProphecy->headers = $this->prophesize(ParameterBagInterface::class)->reveal();
-        $requestProphecy->getMimeType('json')->willReturn('application/json');
-        $attributesProphecy = $this->prophesize(ParameterBagInterface::class);
-        $attributesProphecy->get('_format')->willReturn(null)->shouldBeCalledTimes(1);
-        $queryProphecy = $this->prophesize(ParameterBag::class);
-        $requestProphecy->attributes = $attributesProphecy->reveal();
-        $requestProphecy->query = $queryProphecy->reveal();
-        $requestProphecy->getBaseUrl()->willReturn('/api')->shouldBeCalledTimes(1);
-        $queryProphecy->getBoolean('api_gateway')->willReturn(true)->shouldBeCalledTimes(1);
-        $queryProphecy->get('spec_version')->willReturn('3.1.0')->shouldBeCalledTimes(1);
-        $attributesProphecy->get('_api_normalization_context', [])->willReturn(['foo' => 'bar'])->shouldBeCalledTimes(1);
-        $attributesProphecy->set('_api_normalization_context', ['foo' => 'bar', 'base_url' => '/api', 'api_gateway' => true, 'spec_version' => '3.1.0'])->shouldBeCalledTimes(1);
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['dummies']))->shouldBeCalled();
 
         $documentation = new DocumentationAction($resourceNameCollectionFactoryProphecy->reveal(), 'my api', '', '1.0.0');
-        $this->assertInstanceOf(Documentation::class, $documentation($requestProphecy->reveal()));
+        $this->assertInstanceOf(Documentation::class, $documentation(new Request(query: ['api_gateway' => true, 'spec_version' => '3.1.0'], server: ['REQUEST_URI' => '/api'], attributes: ['_api_normalization_context' => ['foo' => 'bar'], '_format' => null, '_api_normalization_context' => ['foo' => 'bar', 'base_url' => '/api', 'api_gateway' => true, 'spec_version' => '3.1.0']])));
     }
 
     public static function getOpenApiContentTypes(): array
@@ -98,10 +70,9 @@ class DocumentationActionTest extends TestCase
     {
         $request = new Request(server: ['CONTENT_TYPE' => $contentType]);
         $openApiFactory = $this->createMock(OpenApiFactoryInterface::class);
-        $openApiFactory->expects($this->once())->method('__invoke')->willReturn(new OpenApi(new Info('a', 'v'), [], new Paths()));
         $resourceNameCollectionFactory = $this->createMock(ResourceNameCollectionFactoryInterface::class);
         $provider = $this->createMock(ProviderInterface::class);
-        $provider->expects($this->once())->method('provide')->willReturnCallback(fn ($operation, $uriVariables, $context) => $operation->getProvider()(...\func_get_args()));
+        $provider->expects($this->once())->method('provide')->willReturnCallback(fn ($operation, $uriVariables, $context) => new OpenApi(new Info('title', '1.0.0'), [], new Paths()));
         $processor = $this->createMock(ProcessorInterface::class);
         $processor->expects($this->once())->method('process')->willReturnArgument(0);
         $entrypoint = new DocumentationAction($resourceNameCollectionFactory, provider: $provider, processor: $processor, openApiFactory: $openApiFactory);
