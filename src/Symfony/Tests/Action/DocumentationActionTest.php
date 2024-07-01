@@ -26,7 +26,6 @@ use ApiPlatform\Symfony\Action\DocumentationAction;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -43,7 +42,7 @@ class DocumentationActionTest extends TestCase
         $openApiFactoryProphecy->__invoke(Argument::any())->shouldBeCalled()->willReturn($openApi);
         $documentation = new DocumentationAction($this->prophesize(ResourceNameCollectionFactoryInterface::class)->reveal(), 'my api', '', '1.0.0', $openApiFactoryProphecy->reveal());
         $this->assertInstanceOf(OpenApi::class, $documentation(
-            new Request(query: ['api_gateway' => true, 'spec_version' => '3.1.0'], server: ['REQUEST_URI' => '/api'], attributes: ['_api_normalization_context' => ['foo' => 'bar'], '_format' => null, '_api_normalization_context' => ['foo' => 'bar', 'base_url' => '/api', 'api_gateway' => true, 'spec_version' => '3.1.0']])
+            new Request(query: ['api_gateway' => true, 'spec_version' => '3.1.0'], server: ['REQUEST_URI' => '/api'], attributes: ['_format' => null, '_api_normalization_context' => ['foo' => 'bar', 'base_url' => '/api', 'api_gateway' => true, 'spec_version' => '3.1.0']])
         ));
     }
 
@@ -55,7 +54,7 @@ class DocumentationActionTest extends TestCase
         $resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection(['dummies']))->shouldBeCalled();
 
         $documentation = new DocumentationAction($resourceNameCollectionFactoryProphecy->reveal(), 'my api', '', '1.0.0');
-        $this->assertInstanceOf(Documentation::class, $documentation(new Request(query: ['api_gateway' => true, 'spec_version' => '3.1.0'], server: ['REQUEST_URI' => '/api'], attributes: ['_api_normalization_context' => ['foo' => 'bar'], '_format' => null, '_api_normalization_context' => ['foo' => 'bar', 'base_url' => '/api', 'api_gateway' => true, 'spec_version' => '3.1.0']])));
+        $this->assertInstanceOf(Documentation::class, $documentation(new Request(query: ['api_gateway' => true, 'spec_version' => '3.1.0'], server: ['REQUEST_URI' => '/api'], attributes: ['_format' => null, '_api_normalization_context' => ['foo' => 'bar', 'base_url' => '/api', 'api_gateway' => true, 'spec_version' => '3.1.0']])));
     }
 
     public static function getOpenApiContentTypes(): array

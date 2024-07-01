@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
-use ApiPlatform\ParameterValidator\Exception\ValidationExceptionInterface;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Configuration;
 use Doctrine\ORM\OptimisticLockException;
 use PHPUnit\Framework\TestCase;
@@ -101,7 +100,6 @@ class ConfigurationTest extends TestCase
             'exception_to_status' => [
                 ExceptionInterface::class => Response::HTTP_BAD_REQUEST,
                 InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
-                ValidationExceptionInterface::class => Response::HTTP_BAD_REQUEST,
                 OptimisticLockException::class => Response::HTTP_CONFLICT,
             ],
             'path_segment_name_generator' => 'api_platform.metadata.path_segment_name_generator.underscore',

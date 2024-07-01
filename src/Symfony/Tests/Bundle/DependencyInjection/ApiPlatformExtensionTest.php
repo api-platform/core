@@ -282,7 +282,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.action.patch_item',
             'api_platform.action.post_collection',
             'api_platform.action.put_item',
-
         ];
 
         $this->assertContainerHas($services, $aliases);
