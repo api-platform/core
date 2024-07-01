@@ -64,6 +64,13 @@
             <argument>%api_platform.url_generation_strategy%</argument>
         </service>
 
+        <service id="api_platform.hydra.normalizer.cursor_based_partial_collection_view" class="ApiPlatform\Hydra\Serializer\CursorBasedPartialCollectionViewNormalizer" decorates="api_platform.hydra.normalizer.collection" public="false">
+            <argument type="service" id="api_platform.hydra.normalizer.cursor_based_partial_collection_view.inner" />
+            <argument>%api_platform.collection.pagination.page_parameter_name%</argument>
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument>%api_platform.url_generation_strategy%</argument>
+        </service>
+
         <service id="api_platform.hydra.normalizer.collection_filters" class="ApiPlatform\Hydra\Serializer\CollectionFiltersNormalizer" decorates="api_platform.hydra.normalizer.collection" public="false">
             <argument type="service" id="api_platform.hydra.normalizer.collection_filters.inner" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />

@@ -675,7 +675,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         $parameters = [];
 
         if ($operation->getPaginationEnabled() ?? $this->paginationOptions->isPaginationEnabled()) {
-            $parameters[] = new Parameter($this->paginationOptions->getPaginationPageParameterName(), 'query', 'The collection page number', false, false, true, ['type' => 'integer', 'default' => 1]);
+            $parameters[] = new Parameter($this->paginationOptions->getPaginationPageParameterName(), 'query', 'The collection page identifier', false, false, true, ['type' => 'string']);
 
             if ($operation->getPaginationClientItemsPerPage() ?? $this->paginationOptions->getClientItemsPerPage()) {
                 $schema = [
