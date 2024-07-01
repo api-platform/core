@@ -526,6 +526,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $loader->load('openapi.xml');
+
+        if (class_exists(Yaml::class)) {
+            $loader->load('openapi/yaml.xml');
+        }
+
         $loader->load('swagger_ui.xml');
 
         if ($config['event_listeners_backward_compatibility_layer']) {

@@ -15,7 +15,9 @@ namespace ApiPlatform\Metadata\Property\Factory;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Exception\PropertyNotFoundException;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
+use Symfony\Component\PropertyInfo\Type;
 
 /**
  * PropertyInfo metadata loader decorator.
@@ -44,7 +46,16 @@ final class PropertyInfoPropertyMetadataFactory implements PropertyMetadataFacto
         }
 
         if (!$propertyMetadata->getBuiltinTypes()) {
-            $propertyMetadata = $propertyMetadata->withBuiltinTypes($this->propertyInfo->getTypes($resourceClass, $property, $options) ?? []);
+            $types = $this->propertyInfo->getTypes($resourceClass, $property, $options) ?? [];
+
+            foreach ($types as $i => $type) {
+                // Temp fix for https://github.com/symfony/symfony/pull/52699
+                if (ArrayCollection::class === $type->getClassName()) {
+                    $types[$i] = new Type($type->getBuiltinType(), $type->isNullable(), $type->getClassName(), true, $type->getCollectionKeyTypes(), $type->getCollectionValueTypes());
+                }
+            }
+
+            $propertyMetadata = $propertyMetadata->withBuiltinTypes($types);
         }
 
         if (null === $propertyMetadata->getDescription() && null !== $description = $this->propertyInfo->getShortDescription($resourceClass, $property, $options)) {

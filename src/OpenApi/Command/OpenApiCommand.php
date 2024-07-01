@@ -56,6 +56,13 @@ final class OpenApiCommand extends Command
         $data = $this->normalizer->normalize($this->openApiFactory->__invoke(), 'json', [
             'spec_version' => $input->getOption('spec-version'),
         ]);
+
+        if ($input->getOption('yaml') && !class_exists(Yaml::class)) {
+            $output->writeln('The "symfony/yaml" component is not installed.');
+
+            return 1;
+        }
+
         $content = $input->getOption('yaml')
             ? Yaml::dump($data, 10, 2, Yaml::DUMP_OBJECT_AS_MAP | Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE | Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK | Yaml::DUMP_NUMERIC_KEY_AS_STRING)
             : (json_encode($data, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES) ?: '');

@@ -664,3 +664,16 @@ Feature: GraphQL query support
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.dummyDifferentGraphQlSerializationGroup.name" should be equal to "Name #1"
     And the JSON node "data.dummyDifferentGraphQlSerializationGroup.title" should be equal to "Title #1"
+
+  Scenario: Call security after resolver
+    When I send the following GraphQL request:
+    """
+    {
+      getSecurityAfterResolver(id: "/security_after_resolvers/1") {
+        name
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "data.getSecurityAfterResolver.name" should be equal to "test"
