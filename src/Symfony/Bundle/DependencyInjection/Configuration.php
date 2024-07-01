@@ -20,9 +20,7 @@ use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use ApiPlatform\ParameterValidator\Exception\ValidationExceptionInterface;
 use ApiPlatform\Symfony\Controller\MainController;
-use ApiPlatform\Symfony\Validator\Exception\ValidationException as LegacyValidationException;
 use ApiPlatform\Validator\Exception\ValidationException;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
@@ -96,7 +94,6 @@ final class Configuration implements ConfigurationInterface
                     ->children()
                         ->variableNode('serialize_payload_fields')->defaultValue([])->info('Set to null to serialize all payload fields when a validation error is thrown, or set the fields you want to include explicitly.')->end()
                         ->booleanNode('query_parameter_validation')->defaultValue(true)->end()
-                        ->booleanNode('legacy_validation_exception')->defaultValue(true)->info('Uses the legacy "%s" instead of "%s".', LegacyValidationException::class, ValidationException::class)->end()
                     ->end()
                 ->end()
                 ->arrayNode('eager_loading')
@@ -515,7 +512,6 @@ final class Configuration implements ConfigurationInterface
                     ->defaultValue([
                         SerializerExceptionInterface::class => Response::HTTP_BAD_REQUEST,
                         InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
-                        ValidationExceptionInterface::class => Response::HTTP_BAD_REQUEST,
                         OptimisticLockException::class => Response::HTTP_CONFLICT,
                     ])
                     ->info('The list of exceptions mapped to their HTTP status code.')
