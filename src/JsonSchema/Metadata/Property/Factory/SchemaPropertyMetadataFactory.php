@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
+use Doctrine\Common\Collections\ArrayCollection;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Uid\Ulid;
@@ -110,6 +111,11 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
 
         $valueSchema = [];
         foreach ($types as $type) {
+            // Temp fix for https://github.com/symfony/symfony/pull/52699
+            if (ArrayCollection::class === $type->getClassName()) {
+                $type = new Type($type->getBuiltinType(), $type->isNullable(), $type->getClassName(), true, $type->getCollectionKeyTypes(), $type->getCollectionValueTypes());
+            }
+
             if ($isCollection = $type->isCollection()) {
                 $keyType = $type->getCollectionKeyTypes()[0] ?? null;
                 $valueType = $type->getCollectionValueTypes()[0] ?? null;
