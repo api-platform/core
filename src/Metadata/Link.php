@@ -27,7 +27,7 @@ final class Link extends Parameter
         private ?array $identifiers = null,
         private ?bool $compositeIdentifier = null,
         private ?string $expandedValue = null,
-        private ?string $security = null,
+        ?string $security = null,
         private ?string $securityMessage = null,
         private ?string $securityObjectName = null,
 
@@ -55,6 +55,7 @@ final class Link extends Parameter
             property: $property,
             description: $description,
             required: $required,
+            security: $security,
             extraProperties: $extraProperties
         );
     }
@@ -171,14 +172,6 @@ final class Link extends Parameter
     public function getSecurityMessage(): ?string
     {
         return $this->securityMessage;
-    }
-
-    public function withSecurity(?string $security): self
-    {
-        $self = clone $this;
-        $self->security = $security;
-
-        return $self;
     }
 
     public function withSecurityMessage(?string $securityMessage): self
