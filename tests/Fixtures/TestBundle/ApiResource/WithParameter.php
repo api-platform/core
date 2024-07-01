@@ -38,7 +38,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'auth' => new HeaderParameter(provider: [self::class, 'restrictAccess']),
         'priority' => new QueryParameter(provider: [self::class, 'assertSecond'], priority: 10),
         'priorityb' => new QueryParameter(provider: [self::class, 'assertFirst'], priority: 20),
-        'array' => new QueryParameter(provider: [self::class, 'assertArray']),
+        'array' => new QueryParameter(provider: [self::class, 'assertArray'], openApi: false),
     ],
     provider: [self::class, 'provide']
 )]

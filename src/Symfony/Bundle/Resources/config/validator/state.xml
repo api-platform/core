@@ -14,5 +14,10 @@
             <argument type="service" id="api_platform.state_provider.validate.inner" />
             <argument type="service" id="api_platform.validator" />
         </service>
+
+        <service id="api_platform.state_provider.parameter_validator" class="ApiPlatform\Symfony\Validator\State\ParameterValidatorProvider" public="true" decorates="api_platform.state_provider.main" decoration-priority="191">
+            <argument type="service" id="validator" />
+            <argument type="service" id="api_platform.state_provider.parameter_validator.inner" />
+        </service>
     </services>
 </container>

@@ -19,7 +19,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SearchFilterParameter;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 
-final class DoctrineTests extends ApiTestCase
+final class DoctrineTest extends ApiTestCase
 {
     public function testDoctrineEntitySearchFilter(): void
     {
@@ -55,8 +55,15 @@ final class DoctrineTests extends ApiTestCase
         $this->assertArraySubset(['foo' => 'bar', 'createdAt' => '2024-01-21T00:00:00+00:00'], $members[0]);
     }
 
+    /**
+     * @group legacy
+     */
     public function testGraphQl(): void
     {
+        if ($_SERVER['EVENT_LISTENERS_BACKWARD_COMPATIBILITY_LAYER'] ?? false) {
+            $this->markTestSkipped('Parameters are not supported in BC mode.');
+        }
+
         $this->recreateSchema();
         $container = static::getContainer();
         $object = 'mongodb' === $container->getParameter('kernel.environment') ? 'searchFilterParameterDocuments' : 'searchFilterParameters';

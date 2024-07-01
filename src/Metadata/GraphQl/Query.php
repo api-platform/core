@@ -24,6 +24,8 @@ class Query extends Operation
         ?array $args = null,
         ?array $extraArgs = null,
         ?array $links = null,
+        ?string $securityAfterResolver = null,
+        ?string $securityMessageAfterResolver = null,
 
         ?string $shortName = null,
         ?string $class = null,
@@ -79,6 +81,8 @@ class Query extends Operation
             args: $args,
             extraArgs: $extraArgs,
             links: $links,
+            securityAfterResolver: $securityAfterResolver,
+            securityMessageAfterResolver: $securityMessageAfterResolver,
             shortName: $shortName,
             class: $class,
             paginationEnabled: $paginationEnabled,

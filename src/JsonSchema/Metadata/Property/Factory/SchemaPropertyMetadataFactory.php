@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
+use Doctrine\Common\Collections\ArrayCollection;
 use Ramsey\Uuid\UuidInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Uid\Ulid;
@@ -100,15 +101,21 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             $propertySchema['example'] = $propertySchema['default'];
         }
 
-        // never override the following keys if at least one is already set
+        // never override the following keys if at least one is already set or if there's a custom openapi context
         if ([] === $types
             || ($propertySchema['type'] ?? $propertySchema['$ref'] ?? $propertySchema['anyOf'] ?? $propertySchema['allOf'] ?? $propertySchema['oneOf'] ?? false)
+            || ($propertyMetadata->getOpenapiContext() ?? false)
         ) {
             return $propertyMetadata->withSchema($propertySchema);
         }
 
         $valueSchema = [];
         foreach ($types as $type) {
+            // Temp fix for https://github.com/symfony/symfony/pull/52699
+            if (ArrayCollection::class === $type->getClassName()) {
+                $type = new Type($type->getBuiltinType(), $type->isNullable(), $type->getClassName(), true, $type->getCollectionKeyTypes(), $type->getCollectionValueTypes());
+            }
+
             if ($isCollection = $type->isCollection()) {
                 $keyType = $type->getCollectionKeyTypes()[0] ?? null;
                 $valueType = $type->getCollectionValueTypes()[0] ?? null;

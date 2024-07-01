@@ -100,12 +100,6 @@
             <tag name="serializer.encoder" />
         </service>
 
-        <service id="api_platform.yamlopenapi.encoder" class="ApiPlatform\Serializer\YamlEncoder" public="false">
-            <argument>yamlopenapi</argument>
-            <argument type="service" id="serializer.encoder.yaml" on-invalid="null" />
-
-            <tag name="serializer.encoder" />
-        </service>
     </services>
 
 </container>

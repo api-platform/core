@@ -41,6 +41,8 @@ class Operation extends AbstractOperation
         protected ?array $extraArgs = null,
         protected ?array $links = null,
         protected ?bool $validateAfterResolver = null,
+        protected ?string $securityAfterResolver = null,
+        protected ?string $securityMessageAfterResolver = null,
 
         ?string $shortName = null,
         ?string $class = null,
@@ -206,6 +208,32 @@ class Operation extends AbstractOperation
     {
         $self = clone $this;
         $self->validateAfterResolver = $validateAfterResolver;
+
+        return $self;
+    }
+
+    public function getSecurityAfterResolver(): ?string
+    {
+        return $this->securityAfterResolver;
+    }
+
+    public function withSecurityAfterResolver(string $securityAfterResolver): self
+    {
+        $self = clone $this;
+        $self->securityAfterResolver = $securityAfterResolver;
+
+        return $self;
+    }
+
+    public function getSecurityMessageAfterResolver(): ?string
+    {
+        return $this->securityMessageAfterResolver;
+    }
+
+    public function withSecurityMessageAfterResolver(string $securityMessageAfterResolver): self
+    {
+        $self = clone $this;
+        $self->securityMessageAfterResolver = $securityMessageAfterResolver;
 
         return $self;
     }
