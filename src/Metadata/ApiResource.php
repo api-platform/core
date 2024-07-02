@@ -321,7 +321,6 @@ class ApiResource extends Metadata
         protected ?array $denormalizationContext = null,
         protected ?bool $collectDenormalizationErrors = null,
         protected ?array $hydraContext = null,
-        protected ?array $openapiContext = null, // TODO Remove in 4.0
         protected bool|OpenApiOperation|null $openapi = null,
         /**
          * The `validationContext` option configures the context of validation for the current ApiResource.
@@ -1325,29 +1324,6 @@ class ApiResource extends Metadata
     {
         $self = clone $this;
         $self->hydraContext = $hydraContext;
-
-        return $self;
-    }
-
-    /**
-     * TODO Remove in 4.0.
-     *
-     * @deprecated
-     */
-    public function getOpenapiContext(): ?array
-    {
-        return $this->openapiContext;
-    }
-
-    /**
-     * TODO Remove in 4.0.
-     *
-     * @deprecated
-     */
-    public function withOpenapiContext(array $openapiContext): self
-    {
-        $self = clone $this;
-        $self->openapiContext = $openapiContext;
 
         return $self;
     }

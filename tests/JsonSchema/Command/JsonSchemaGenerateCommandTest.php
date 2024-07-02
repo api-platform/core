@@ -15,8 +15,8 @@ namespace ApiPlatform\Tests\JsonSchema\Command;
 
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DocumentDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Tests\KernelTestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
 /**

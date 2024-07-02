@@ -37,7 +37,7 @@ final class ValidationTest extends ApiTestCase
         ], $response->toArray(false));
     }
 
-    public function provideQueryStrings(): array
+    public static function provideQueryStrings(): array
     {
         return [
             [

@@ -25,7 +25,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ResourceImplementation;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ResourceInterface;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use ApiPlatform\Tests\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 

@@ -49,30 +49,4 @@ class GraphQlResolverPassTest extends TestCase
 
         $filterPass->process($containerBuilder);
     }
-
-    #[\PHPUnit\Framework\Attributes\Group('legacy')]
-    public function testProcessDeprecated(): void
-    {
-        $this->expectDeprecation('Since api-platform/core 3.2: The tag "api_platform.graphql.query_resolver" is deprecated use "api_platform.graphql.resolver" instead.');
-        $this->expectDeprecation('Since api-platform/core 3.2: The tag "api_platform.graphql.mutation_resolver" is deprecated use "api_platform.graphql.resolver" instead.');
-        $filterPass = new GraphQlResolverPass();
-
-        $this->assertInstanceOf(CompilerPassInterface::class, $filterPass);
-
-        $typeLocatorDefinition = $this->createMock(Definition::class);
-        $typeLocatorDefinition->expects($this->once())->method('addArgument')->with($this->callback(function () {
-            return true;
-        }));
-
-        $containerBuilder = $this->createMock(ContainerBuilder::class);
-        $containerBuilder->expects($this->once())->method('getParameter')->with('api_platform.graphql.enabled')->willReturn(true);
-        $containerBuilder->method('findTaggedServiceIds')->willReturnOnConsecutiveCalls(
-            ['a' => []],
-            ['b' => []],
-            []
-        );
-        $containerBuilder->method('getDefinition')->with('api_platform.graphql.resolver_locator')->willReturn($typeLocatorDefinition);
-
-        $filterPass->process($containerBuilder);
-    }
 }

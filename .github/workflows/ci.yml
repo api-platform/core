@@ -134,7 +134,6 @@ jobs:
       fail-fast: false
     env:
       APP_DEBUG: '1' # https://github.com/phpstan/phpstan-symfony/issues/37
-      SYMFONY_PHPUNIT_VERSION: '9.5'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -158,8 +157,6 @@ jobs:
       - name: Update project dependencies
         run: |
           composer update --no-interaction --no-progress --ansi
-      - name: Install PHPUnit
-        run: vendor/bin/simple-phpunit --version
       - name: Cache PHPStan results
         uses: actions/cache@v4
         with:
@@ -223,12 +220,10 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Install PHPUnit
-        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
-        run: vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml ${{ matrix.coverage && '--coverage-clover build/logs/phpunit/clover.xml' || '' }}
+        run: vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml ${{ matrix.coverage && '--coverage-clover build/logs/phpunit/clover.xml' || '' }}
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -368,8 +363,6 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Install PHPUnit
-        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests (PHP ${{ matrix.php }})
@@ -471,8 +464,6 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Install PHPUnit
-        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
@@ -521,8 +512,6 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Install PHPUnit
-        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
@@ -574,12 +563,10 @@ jobs:
         run: |
           composer update --no-interaction --no-progress --ansi
           composer require --dev doctrine/mongodb-odm-bundle
-      - name: Install PHPUnit
-        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
-        run: vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml --coverage-clover build/logs/phpunit/clover.xml --group mongodb
+        run: vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --coverage-clover build/logs/phpunit/clover.xml --group mongodb
       - name: Run Behat tests
         run: |
           mkdir -p build/logs/behat
@@ -664,12 +651,10 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Install PHPUnit
-        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
-        run: vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml --coverage-clover build/logs/phpunit/clover.xml --group mercure
+        run: vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --coverage-clover build/logs/phpunit/clover.xml --group mercure
       - name: Run Behat tests
         run: |
           mkdir -p build/logs/behat
@@ -749,8 +734,6 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Install PHPUnit
-        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
@@ -835,12 +818,10 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Install PHPUnit
-        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
-        run: vendor/bin/simple-phpunit
+        run: vendor/bin/phpunit
 
   phpunit-symfony-next:
     name: PHPUnit (PHP ${{ matrix.php }}) (Symfony dev)
@@ -877,8 +858,6 @@ jobs:
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Install PHPUnit
-        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
@@ -922,8 +901,6 @@ jobs:
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Install PHPUnit
-        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
@@ -971,59 +948,6 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Install phpunit
-        run: vendor/bin/simple-phpunit --version
-      - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
-      - name: Run PHPUnit tests
-        run: vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml
-        env:
-          SYMFONY_DEPRECATIONS_HELPER: max[direct]=0&ignoreFile=./tests/.ignored-deprecations
-
-  windows-behat:
-    name: Windows Behat (PHP ${{ matrix.php }}) (SQLite)
-    runs-on: windows-latest
-    timeout-minutes: 20
-    strategy:
-      matrix:
-        php:
-          - '8.3'
-      fail-fast: false
-    env:
-      APP_ENV: sqlite
-      DATABASE_URL: sqlite:///%kernel.project_dir%/var/data.db
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup PHP with pre-release PECL extension
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, fileinfo
-          coverage: none
-          ini-values: memory_limit=-1
-      # Not in pecl
-      - name: Setup mongodb
-        run: |
-          curl -sLO https://github.com/mongodb/mongo-php-driver/releases/download/1.17.2/php_mongodb-1.17.2-8.3-nts-x64.zip
-          unzip -q php_mongodb-1.17.2-8.3-nts-x64.zip php_mongodb.dll
-          mv php_mongodb.dll C:\tools\php\ext
-          echo "extension=php_mongodb.dll" >> C:\tools\php\php.ini
-      - name: Get composer cache directory
-        id: composercache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-        shell: bash
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.composercache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
-          restore-keys: ${{ runner.os }}-composer-
-      - name: Update project dependencies
-        run: composer update --no-interaction --no-progress --ansi
-      - name: Install phpunit
-        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
@@ -1062,12 +986,10 @@ jobs:
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Update project dependencies
         run: composer update --prefer-lowest --no-interaction --no-progress --ansi
-      - name: Install PHPUnit
-        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
-        run: vendor/bin/simple-phpunit
+        run: vendor/bin/phpunit
         env:
           SYMFONY_DEPRECATIONS_HELPER: max[self]=0&ignoreFile=./tests/.ignored-deprecations
 
@@ -1150,17 +1072,15 @@ jobs:
         run: echo "COVERAGE=1" >> $GITHUB_ENV
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Install PHPUnit
-        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
         run: |
           mkdir -p build/logs/phpunit
           if [ "$COVERAGE" = '1' ]; then
-            vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml --coverage-clover build/logs/phpunit/clover.xml
+            vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --coverage-clover build/logs/phpunit/clover.xml
           else
-            vendor/bin/simple-phpunit --log-junit build/logs/phpunit/junit.xml
+            vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml
           fi
       - name: Upload test artifacts
         if: always()
@@ -1221,8 +1141,6 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: composer update --no-interaction --no-progress --ansi
-      - name: Install PHPUnit
-        run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests (PHP 8)

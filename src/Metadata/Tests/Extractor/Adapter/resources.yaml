@@ -66,8 +66,6 @@ resources:
                     hydraContext:
                         foo:
                             bar: baz
-                    openapiContext:
-                        bar: baz
                     openapi:
                         extensionProperties:
                             bar: baz
@@ -189,8 +187,6 @@ resources:
             hydraContext:
                 foo:
                     bar: baz
-            openapiContext:
-                bar: baz
             openapi:
                 extensionProperties:
                     bar: baz
