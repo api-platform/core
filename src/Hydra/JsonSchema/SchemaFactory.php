@@ -74,6 +74,19 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             return $schema;
         }
 
+        if (($key = $schema->getRootDefinitionKey() ?? $schema->getItemsDefinitionKey()) !== null) {
+            $postfix = '.'.$type;
+            $definitions = $schema->getDefinitions();
+            $definitions[$key.$postfix] = $definitions[$key];
+            unset($definitions[$key]);
+
+            if (($schema['type'] ?? '') === 'array') {
+                $schema['items']['$ref'] .= $postfix;
+            } else {
+                $schema['$ref'] .= $postfix;
+            }
+        }
+
         if ('input' === $type) {
             return $schema;
         }
@@ -81,11 +94,23 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         $definitions = $schema->getDefinitions();
         if ($key = $schema->getRootDefinitionKey()) {
             $definitions[$key]['properties'] = self::BASE_ROOT_PROPS + ($definitions[$key]['properties'] ?? []);
+            foreach (array_keys(self::BASE_ROOT_PROPS) as $property) {
+                $definitions[$key]['required'] ??= [];
+                if (!\in_array($property, $definitions[$key]['required'], true)) {
+                    $definitions[$key]['required'][] = $property;
+                }
+            }
 
             return $schema;
         }
         if ($key = $schema->getItemsDefinitionKey()) {
             $definitions[$key]['properties'] = self::BASE_PROPS + ($definitions[$key]['properties'] ?? []);
+            foreach (array_keys(self::BASE_PROPS) as $property) {
+                $definitions[$key]['required'] ??= [];
+                if (!\in_array($property, $definitions[$key]['required'], true)) {
+                    $definitions[$key]['required'][] = $property;
+                }
+            }
         }
 
         if (($schema['type'] ?? '') === 'array') {
