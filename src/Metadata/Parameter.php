@@ -209,7 +209,7 @@ abstract class Parameter
         return $self;
     }
 
-    public function withSecurity(?string $security): self
+    public function withSecurity(string|\Stringable|null $security): self
     {
         $self = clone $this;
         $self->security = $security;
