@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Operation;
 
+use ApiPlatform\Metadata\InflectorInterface;
 use ApiPlatform\Metadata\Util\Inflector;
 
 /**
@@ -22,12 +23,16 @@ use ApiPlatform\Metadata\Util\Inflector;
  */
 final class DashPathSegmentNameGenerator implements PathSegmentNameGeneratorInterface
 {
+    public function __construct(private readonly ?InflectorInterface $inflector = new Inflector())
+    {
+    }
+
     /**
      * {@inheritdoc}
      */
     public function getSegmentName(string $name, bool $collection = true): string
     {
-        return $collection ? $this->dashize(Inflector::pluralize($name)) : $this->dashize($name);
+        return $collection ? $this->dashize($this->inflector->pluralize($name)) : $this->dashize($name);
     }
 
     private function dashize(string $string): string

@@ -17,6 +17,7 @@ use ApiPlatform\Elasticsearch\State\CollectionProvider;
 use ApiPlatform\Elasticsearch\State\ItemProvider;
 use ApiPlatform\Elasticsearch\State\Options;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\InflectorInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -27,7 +28,7 @@ use Elasticsearch\Common\Exceptions\NoNodesAvailableException;
 
 final class ElasticsearchProviderResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    public function __construct(private readonly ?Client $client, private readonly ResourceMetadataCollectionFactoryInterface $decorated, private readonly bool $triggerDeprecation = true) // @phpstan-ignore-line
+    public function __construct(private readonly ?Client $client, private readonly ResourceMetadataCollectionFactoryInterface $decorated, private readonly bool $triggerDeprecation = true, private readonly ?InflectorInterface $inflector = new Inflector()) // @phpstan-ignore-line
     {
     }
 
@@ -106,7 +107,7 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
     private function hasIndices(Operation $operation): bool
     {
         $shortName = $operation->getShortName();
-        $index = Inflector::tableize($shortName);
+        $index = $this->inflector->tableize($shortName);
 
         try {
             $this->client->cat()->indices(['index' => $index]); // @phpstan-ignore-line
