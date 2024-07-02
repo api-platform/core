@@ -23,9 +23,9 @@ use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Symfony\Bundle\ArgumentResolver\PayloadArgumentResolver;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ResourceImplementation;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ResourceInterface;
+use ApiPlatform\Tests\KernelTestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
-use ApiPlatform\Tests\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 

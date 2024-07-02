@@ -24,7 +24,7 @@
     </exclude>
   </groups>
 
-  <source ignoreIndirectDeprecations="true" baseline="phpunit.baseline.xml">
+  <source ignoreIndirectDeprecations="true">
     <include>
       <directory>.</directory>
     </include>

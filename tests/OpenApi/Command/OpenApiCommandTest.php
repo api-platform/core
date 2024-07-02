@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\OpenApi\Command;
 
 use ApiPlatform\OpenApi\OpenApi;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
 use ApiPlatform\Tests\KernelTestCase;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;

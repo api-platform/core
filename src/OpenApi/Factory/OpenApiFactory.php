@@ -31,7 +31,6 @@ use ApiPlatform\OpenApi\Attributes\Webhook;
 use ApiPlatform\OpenApi\Model;
 use ApiPlatform\OpenApi\Model\Components;
 use ApiPlatform\OpenApi\Model\Contact;
-use ApiPlatform\OpenApi\Model\ExternalDocumentation;
 use ApiPlatform\OpenApi\Model\Info;
 use ApiPlatform\OpenApi\Model\License;
 use ApiPlatform\OpenApi\Model\Link;

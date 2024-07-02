@@ -141,10 +141,6 @@ final class ResourceMetadataCompatibilityTest extends TestCase
             'hydraContext' => [
                 'foo' => ['bar' => 'baz'],
             ],
-            // TODO Remove in 4.0
-            'openapiContext' => [
-                'bar' => 'baz',
-            ],
             'openapi' => [
                 'extensionProperties' => [
                     'bar' => 'baz',

@@ -498,7 +498,6 @@ GRAPHQL;
         }
     }
 
-    
     #[\PHPUnit\Framework\Attributes\DataProvider('providerEnumItemsGraphQl')]
     #[\PHPUnit\Framework\Attributes\Group('legacy')]
     public function testItemGraphql(string $query, array $variables, array $expected): void
