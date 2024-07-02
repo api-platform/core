@@ -40,6 +40,8 @@ abstract class Parameter
         protected ?bool $required = null,
         protected ?int $priority = null,
         protected Constraint|array|null $constraints = null,
+        protected string|\Stringable|null $security = null,
+        protected ?string $securityMessage = null,
         protected ?array $extraProperties = [],
     ) {
     }
@@ -98,6 +100,16 @@ abstract class Parameter
     public function getConstraints(): Constraint|array|null
     {
         return $this->constraints;
+    }
+
+    public function getSecurity(): string|\Stringable|null
+    {
+        return $this->security;
+    }
+
+    public function getSecurityMessage(): ?string
+    {
+        return $this->securityMessage;
     }
 
     /**
@@ -193,6 +205,22 @@ abstract class Parameter
     {
         $self = clone $this;
         $self->constraints = $constraints;
+
+        return $self;
+    }
+
+    public function withSecurity(string|\Stringable|null $security): self
+    {
+        $self = clone $this;
+        $self->security = $security;
+
+        return $self;
+    }
+
+    public function withSecurityMessage(?string $securityMessage): self
+    {
+        $self = clone $this;
+        $self->securityMessage = $securityMessage;
 
         return $self;
     }

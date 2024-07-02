@@ -48,5 +48,10 @@
             <argument type="service" id="api_platform.state_provider.parameter.inner" />
             <argument type="tagged_locator" tag="api_platform.parameter_provider" index-by="key" />
         </service>
+
+        <service id="api_platform.state_provider.security_parameter" class="ApiPlatform\State\Provider\SecurityParameterProvider" decorates="api_platform.state_provider.main" decoration-priority="200">
+            <argument type="service" id="api_platform.state_provider.security_parameter.inner" />
+            <argument type="service" id="api_platform.security.resource_access_checker" />
+        </service>
     </services>
 </container>
