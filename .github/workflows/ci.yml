@@ -193,12 +193,9 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.1'
           - '8.2'
           - '8.3'
         include:
-          - php: '8.1'
-            coverage: true
           - php: '8.2'
             coverage: true
           - php: '8.3'
@@ -265,7 +262,6 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.1'
           - '8.2'
           - '8.3'
         component:
@@ -285,8 +281,6 @@ jobs:
           - api-platform/symfony
           - api-platform/validator
         include:
-          - php: '8.1'
-            coverage: true
           - php: '8.2'
             coverage: true
           - php: '8.3'
@@ -306,10 +300,6 @@ jobs:
         run: |
           composer update
           composer ${{matrix.component}} update
-      - name: PHP version tweaks
-        if: matrix.component == 'api-platform/metadata' && matrix.php != '8.1'
-        run: composer require symfony/type-info
-        working-directory: 'src/Metadata'
       - name: Run ${{ matrix.component }} tests
         run: |
           mkdir -p /tmp/build/logs/phpunit
@@ -347,12 +337,9 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.1'
           - '8.2'
           - '8.3'
         include:
-          - php: '8.1'
-            coverage: true
           - php: '8.2'
             coverage: true
           - php: '8.3'
@@ -547,7 +534,6 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.1'
           - '8.2'
           - '8.3'
       fail-fast: false
@@ -635,7 +621,6 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.1'
           - '8.2'
           - '8.3'
       fail-fast: false
