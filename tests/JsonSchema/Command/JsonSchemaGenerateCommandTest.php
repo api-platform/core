@@ -174,9 +174,8 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
 
     /**
      * TODO: add deprecation (TypeFactory will be deprecated in api platform 3.3).
-     *
-     * @group legacy
      */
+    #[\PHPUnit\Framework\Attributes\Group('legacy')]
     public function testArraySchemaWithTypeFactory(): void
     {
         $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5896\Foo', '--type' => 'output']);

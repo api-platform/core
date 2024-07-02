@@ -92,9 +92,7 @@ class ClientTest extends ApiTestCase
         $this->assertStringContainsString('<name>Kevin</name>', $response->getContent());
     }
 
-    /**
-     * @dataProvider authBasicProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('authBasicProvider')]
     public function testAuthBasic($basic): void
     {
         $client = self::createClient();

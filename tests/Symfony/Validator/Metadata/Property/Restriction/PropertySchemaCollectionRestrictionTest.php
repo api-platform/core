@@ -54,9 +54,7 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
         ]);
     }
 
-    /**
-     * @dataProvider supportsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('supportsProvider')]
     public function testSupports(Constraint $constraint, ApiProperty $propertyMetadata, bool $expectedResult): void
     {
         self::assertSame($expectedResult, $this->propertySchemaCollectionRestriction->supports($constraint, $propertyMetadata));
@@ -69,9 +67,7 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
         yield 'not supported' => [new Positive(), new ApiProperty(), false];
     }
 
-    /**
-     * @dataProvider createProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('createProvider')]
     public function testCreate(Constraint $constraint, ApiProperty $propertyMetadata, array $expectedResult): void
     {
         self::assertEquals($expectedResult, $this->propertySchemaCollectionRestriction->create($constraint, $propertyMetadata));

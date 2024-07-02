@@ -59,9 +59,7 @@ class ArraySubsetTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider evaluateDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('evaluateDataProvider')]
     public function testEvaluate(bool $expected, iterable $subset, iterable $other, bool $strict): void
     {
         $constraint = new ArraySubset($subset, $strict);

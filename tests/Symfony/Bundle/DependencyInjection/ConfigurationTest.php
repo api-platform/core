@@ -49,9 +49,7 @@ class ConfigurationTest extends TestCase
         $this->runDefaultConfigTests();
     }
 
-    /**
-     * @group mongodb
-     */
+    #[\PHPUnit\Framework\Attributes\Group('mongodb')]
     public function testDefaultConfigWithMongoDbOdm(): void
     {
         $this->runDefaultConfigTests(['orm', 'odm']);
@@ -240,9 +238,7 @@ class ConfigurationTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider invalidHttpStatusCodeProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('invalidHttpStatusCodeProvider')]
     public function testExceptionToStatusConfigWithInvalidHttpStatusCode($invalidHttpStatusCode): void
     {
         $this->expectException(InvalidConfigurationException::class);
@@ -269,9 +265,7 @@ class ConfigurationTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider invalidHttpStatusCodeValueProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('invalidHttpStatusCodeValueProvider')]
     public function testExceptionToStatusConfigWithInvalidHttpStatusCodeValue($invalidHttpStatusCodeValue): void
     {
         $this->expectException(InvalidTypeException::class);

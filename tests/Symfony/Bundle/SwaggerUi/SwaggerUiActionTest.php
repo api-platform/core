@@ -47,9 +47,7 @@ class SwaggerUiActionTest extends TestCase
         ],
     ];
 
-    /**
-     * @dataProvider getInvokeParameters
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getInvokeParameters')]
     public function testInvoke(Request $request, callable $twigFactory): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
@@ -173,9 +171,7 @@ class SwaggerUiActionTest extends TestCase
         yield [new Request([], [], ['_api_resource_class' => 'Foo'], [], [], ['REQUEST_URI' => '/docs', 'SCRIPT_FILENAME' => '/docs']), $twigItemFactory];
     }
 
-    /**
-     * @dataProvider getDoNotRunCurrentRequestParameters
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getDoNotRunCurrentRequestParameters')]
     public function testDoNotRunCurrentRequest(Request $request): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);

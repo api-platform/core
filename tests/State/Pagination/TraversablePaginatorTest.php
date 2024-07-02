@@ -18,9 +18,7 @@ use PHPUnit\Framework\TestCase;
 
 class TraversablePaginatorTest extends TestCase
 {
-    /**
-     * @dataProvider initializeProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('initializeProvider')]
     public function testInitialize(
         array $results,
         float $currentPage,

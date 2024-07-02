@@ -25,9 +25,8 @@ use Symfony\Component\Yaml\Yaml;
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  *
  * TODO Remove group legacy in 4.0
- *
- * @group legacy
  */
+#[\PHPUnit\Framework\Attributes\Group('legacy')]
 class OpenApiCommandTest extends KernelTestCase
 {
     use ExpectDeprecationTrait;

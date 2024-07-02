@@ -32,9 +32,7 @@ class ConstraintViolationNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
-    /**
-     * @group legacy
-     */
+    #[\PHPUnit\Framework\Attributes\Group('legacy')]
     public function testSupportNormalization(): void
     {
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
@@ -52,9 +50,7 @@ class ConstraintViolationNormalizerTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider nameConverterProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('nameConverterProvider')]
     public function testNormalize(callable $nameConverterFactory, array $expected): void
     {
         $normalizer = new ConstraintViolationListNormalizer(['severity', 'anotherField1'], $nameConverterFactory($this));

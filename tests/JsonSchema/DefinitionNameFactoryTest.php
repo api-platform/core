@@ -62,7 +62,7 @@ final class DefinitionNameFactoryTest extends TestCase
         yield ['Bar.DtoOutput.jsonld-read_write', Dummy::class, 'jsonld', DtoOutput::class, new Get(shortName: 'Bar'), [AbstractNormalizer::GROUPS => ['read', 'write']]];
     }
 
-    /** @dataProvider providerDefinitions */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDefinitions')]
     public function testCreate(string $expected, string $className, string $format = 'json', ?string $inputOrOutputClass = null, ?Operation $operation = null, array $serializerContext = []): void
     {
         $definitionNameFactory = new DefinitionNameFactory(['jsonapi' => true, 'jsonhal' => true, 'jsonld' => true]);

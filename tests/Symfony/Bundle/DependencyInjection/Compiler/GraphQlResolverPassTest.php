@@ -50,9 +50,7 @@ class GraphQlResolverPassTest extends TestCase
         $filterPass->process($containerBuilder);
     }
 
-    /**
-     * @group legacy
-     */
+    #[\PHPUnit\Framework\Attributes\Group('legacy')]
     public function testProcessDeprecated(): void
     {
         $this->expectDeprecation('Since api-platform/core 3.2: The tag "api_platform.graphql.query_resolver" is deprecated use "api_platform.graphql.resolver" instead.');

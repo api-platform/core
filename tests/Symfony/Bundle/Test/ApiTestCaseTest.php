@@ -117,18 +117,14 @@ JSON;
         $this->assertMatchesJsonSchema(json_decode($jsonSchema, true));
     }
 
-    /**
-     * @dataProvider providerFormats
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerFormats')]
     public function testAssertMatchesResourceCollectionJsonSchema(string $format, string $mimeType): void
     {
         self::createClient()->request('GET', '/resource_interfaces', ['headers' => ['Accept' => $mimeType]]);
         $this->assertMatchesResourceCollectionJsonSchema(ResourceInterface::class, format: $format);
     }
 
-    /**
-     * @dataProvider providerFormats
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerFormats')]
     public function testAssertMatchesResourceCollectionJsonSchemaKeepSerializationContext(string $format, string $mimeType): void
     {
         $this->recreateSchema();
@@ -154,18 +150,14 @@ JSON;
         $this->assertMatchesResourceCollectionJsonSchema(Issue6146Parent::class, format: $format);
     }
 
-    /**
-     * @dataProvider providerFormats
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerFormats')]
     public function testAssertMatchesResourceItemJsonSchema(string $format, string $mimeType): void
     {
         self::createClient()->request('GET', '/resource_interfaces/some-id', ['headers' => ['Accept' => $mimeType]]);
         $this->assertMatchesResourceItemJsonSchema(ResourceInterface::class, format: $format);
     }
 
-    /**
-     * @dataProvider providerFormats
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerFormats')]
     public function testAssertMatchesResourceItemJsonSchemaWithCustomJson(string $format, string $mimeType): void
     {
         $this->recreateSchema();
@@ -180,9 +172,7 @@ JSON;
         $this->assertMatchesResourceItemJsonSchema(JsonSchemaContextDummy::class, format: $format);
     }
 
-    /**
-     * @dataProvider providerFormats
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerFormats')]
     public function testAssertMatchesResourceItemJsonSchemaOutput(string $format, string $mimeType): void
     {
         $this->recreateSchema();
@@ -198,9 +188,7 @@ JSON;
         $this->assertMatchesResourceItemJsonSchema(DummyDtoInputOutput::class, format: $format);
     }
 
-    /**
-     * @dataProvider providerFormats
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerFormats')]
     public function testAssertMatchesResourceItemAndCollectionJsonSchemaOutputWithContext(string $format, string $mimeType): void
     {
         $this->recreateSchema();
@@ -290,9 +278,7 @@ JSON;
         $this->assertResponseIsSuccessful();
     }
 
-    /**
-     * @group mercure
-     */
+    #[\PHPUnit\Framework\Attributes\Group('mercure')]
     public function testGetMercureMessages(): void
     {
         $this->recreateSchema(['environment' => 'mercure']);

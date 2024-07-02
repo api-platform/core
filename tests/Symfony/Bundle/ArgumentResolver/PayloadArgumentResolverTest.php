@@ -75,9 +75,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
         $this->assertTrue($resolver->supports($request, $argument));
     }
 
-    /**
-     * @dataProvider provideUnsupportedArguments
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideUnsupportedArguments')]
     public function testItDoesNotSupportArgumentThatCannotBeResolved(ArgumentMetadata $argument): void
     {
         $resolver = $this->createArgumentResolver();
@@ -91,9 +89,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
         $this->assertFalse($resolver->supports($request, $argument));
     }
 
-    /**
-     * @dataProvider provideUnsupportedRequests
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideUnsupportedRequests')]
     public function testItDoesNotSupportRequestWithoutPayloadOfExpectedType(Request $request): void
     {
         $resolver = $this->createArgumentResolver();
@@ -183,9 +179,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
         yield 'variadic argument' => [self::createArgumentMetadata(ResourceImplementation::class, true)];
     }
 
-    /**
-     * @dataProvider provideIntegrationCases
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideIntegrationCases')]
     public function testIntegration(Request $request, callable $controller, array $expectedArguments): void
     {
         self::bootKernel();

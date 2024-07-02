@@ -90,7 +90,7 @@ final class BackedEnumResourceTest extends ApiTestCase
         }
     }
 
-    /** @dataProvider providerEnumItemsJson */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerEnumItemsJson')]
     public function testItemJson(string $uri, string $mimeType, array $expected): void
     {
         self::createClient()->request('GET', $uri, ['headers' => ['Accept' => $mimeType]]);
@@ -230,7 +230,7 @@ final class BackedEnumResourceTest extends ApiTestCase
         yield 'String enum item' => [BackedEnumStringResource::class, Get::class, '_api_/backed_enum_string_resources/{id}{._format}_get'];
     }
 
-    /** @dataProvider providerEnums */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerEnums')]
     public function testOnlyGetOperationsAddedWhenNonSpecified(string $resourceClass, string $operationClass, string $operationName): void
     {
         $factory = self::getContainer()->get('api_platform.metadata.resource.metadata_collection_factory');
@@ -398,7 +398,7 @@ final class BackedEnumResourceTest extends ApiTestCase
         ]];
     }
 
-    /** @dataProvider providerCollection */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerCollection')]
     public function testCollection(string $mimeType, array $expected): void
     {
         self::createClient()->request('GET', '/backed_enum_integer_resources', ['headers' => ['Accept' => $mimeType]]);
@@ -448,7 +448,7 @@ final class BackedEnumResourceTest extends ApiTestCase
         ]];
     }
 
-    /** @dataProvider providerItem */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerItem')]
     public function testItem(string $mimeType, array $expected): void
     {
         self::createClient()->request('GET', '/backed_enum_integer_resources/1', ['headers' => ['Accept' => $mimeType]]);
@@ -463,7 +463,7 @@ final class BackedEnumResourceTest extends ApiTestCase
         yield ['/backed_enum_integer_resources/fortytwo'];
     }
 
-    /** @dataProvider provider404s */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider404s')]
     public function testItem404(string $uri): void
     {
         self::createClient()->request('GET', $uri);
@@ -498,11 +498,9 @@ GRAPHQL;
         }
     }
 
-    /**
-     * @dataProvider providerEnumItemsGraphQl
-     *
-     * @group legacy
-     */
+    
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerEnumItemsGraphQl')]
+    #[\PHPUnit\Framework\Attributes\Group('legacy')]
     public function testItemGraphql(string $query, array $variables, array $expected): void
     {
         $options = (new HttpOptions())
@@ -514,9 +512,7 @@ GRAPHQL;
         $this->assertJsonEquals($expected);
     }
 
-    /**
-     * @group legacy
-     */
+    #[\PHPUnit\Framework\Attributes\Group('legacy')]
     public function testCollectionGraphQl(): void
     {
         $query = <<<'GRAPHQL'
@@ -543,9 +539,7 @@ GRAPHQL;
         ]);
     }
 
-    /**
-     * @group legacy
-     */
+    #[\PHPUnit\Framework\Attributes\Group('legacy')]
     public function testItemGraphQlInteger(): void
     {
         $query = <<<'GRAPHQL'

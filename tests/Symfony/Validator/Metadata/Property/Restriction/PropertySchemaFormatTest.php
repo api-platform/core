@@ -37,9 +37,7 @@ final class PropertySchemaFormatTest extends TestCase
         $this->propertySchemaFormatRestriction = new PropertySchemaFormat();
     }
 
-    /**
-     * @dataProvider supportsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('supportsProvider')]
     public function testSupports(Constraint $constraint, ApiProperty $propertyMetadata, bool $expectedResult): void
     {
         self::assertSame($expectedResult, $this->propertySchemaFormatRestriction->supports($constraint, $propertyMetadata));
@@ -60,9 +58,7 @@ final class PropertySchemaFormatTest extends TestCase
         yield 'not supported' => [new Positive(), new ApiProperty(), false];
     }
 
-    /**
-     * @dataProvider createProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('createProvider')]
     public function testCreate(Constraint $constraint, ApiProperty $propertyMetadata, array $expectedResult): void
     {
         self::assertSame($expectedResult, $this->propertySchemaFormatRestriction->create($constraint, $propertyMetadata));

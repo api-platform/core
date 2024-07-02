@@ -34,7 +34,7 @@ final class BackedEnumProviderTest extends TestCase
         yield 'String case enum' => [BackedEnumStringResource::class, BackedEnumStringResource::cases()];
     }
 
-    /** @dataProvider provideCollection */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCollection')]
     public function testProvideCollection(string $class, array $expected): void
     {
         $operation = new GetCollection(class: $class);
@@ -48,7 +48,7 @@ final class BackedEnumProviderTest extends TestCase
         yield 'String case enum' => [BackedEnumStringResource::class, 'yes', BackedEnumStringResource::Yes];
     }
 
-    /** @dataProvider provideItem */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideItem')]
     public function testProvideItem(string $class, string|int $id, \BackedEnum $expected): void
     {
         $operation = new Get(class: $class);
