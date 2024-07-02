@@ -276,7 +276,6 @@ jobs:
           - api-platform/openapi
           - api-platform/graphql
           - api-platform/http-cache
-          - api-platform/parameter-validator
           - api-platform/ramsey-uuid
           - api-platform/serializer
           - api-platform/state
