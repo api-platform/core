@@ -34,7 +34,6 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\UriVariableTransformerInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
-use ApiPlatform\Metadata\Util\Inflector;
 use ApiPlatform\Problem\Serializer\ConstraintViolationListNormalizer;
 use ApiPlatform\State\ApiResource\Error;
 use ApiPlatform\State\ParameterProviderInterface;
@@ -207,7 +206,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $container->setAlias('api_platform.state.item_provider', 'api_platform.state_provider.object');
         }
 
-        $this->registerInflectorConfiguration($config);
+        $this->registerInflectorConfiguration($container, $config);
     }
 
     private function registerCommonConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $formats, array $patchFormats, array $errorFormats, array $docsFormats, array $jsonSchemaFormats): void
@@ -294,6 +293,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.http_cache.invalidation.xkey.glue', $config['defaults']['cache_headers']['invalidation']['xkey']['glue'] ?? $config['http_cache']['invalidation']['xkey']['glue']);
 
         $container->setAlias('api_platform.path_segment_name_generator', $config['path_segment_name_generator']);
+        $container->setAlias('api_platform.inflector', $config['inflector']);
 
         if ($config['name_converter']) {
             $container->setAlias('api_platform.name_converter', $config['name_converter']);
@@ -991,13 +991,12 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('argument_resolver.xml');
     }
 
-    private function registerInflectorConfiguration(array $config): void
+    private function registerInflectorConfiguration(ContainerBuilder $container, array $config): void
     {
+        $container->setParameter('api_platform.keep_legacy_inflector', $config['keep_legacy_inflector'] ?? false);
+
         if ($config['keep_legacy_inflector']) {
-            Inflector::keepLegacyInflector(true);
             trigger_deprecation('api-platform/core', '3.2', 'Using doctrine/inflector is deprecated since API Platform 3.2 and will be removed in API Platform 4. Use symfony/string instead. Run "composer require symfony/string" and set "keep_legacy_inflector" to false in config.');
-        } else {
-            Inflector::keepLegacyInflector(false);
         }
     }
 

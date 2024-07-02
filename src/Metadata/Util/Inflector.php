@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Util;
 
+use ApiPlatform\Metadata\InflectorInterface;
 use Doctrine\Inflector\Inflector as LegacyInflector;
 use Doctrine\Inflector\InflectorFactory;
 use Symfony\Component\String\Inflector\EnglishInflector;
@@ -21,9 +22,12 @@ use Symfony\Component\String\UnicodeString;
 /**
  * @internal
  */
-final class Inflector
+final class Inflector implements InflectorInterface
 {
-    private static bool $keepLegacyInflector = true;
+    public function __construct(private bool $keepLegacyInflector = true)
+    {
+    }
+
     private static ?LegacyInflector $instance = null;
 
     private static function getInstance(): LegacyInflector
@@ -32,17 +36,12 @@ final class Inflector
             ?? static::$instance = InflectorFactory::create()->build();
     }
 
-    public static function keepLegacyInflector(bool $keepLegacyInflector): void
-    {
-        static::$keepLegacyInflector = $keepLegacyInflector;
-    }
-
     /**
      * @see InflectorObject::tableize()
      */
-    public static function tableize(string $word): string
+    public function tableize(string $word): string
     {
-        if (!static::$keepLegacyInflector) {
+        if (!$this->keepLegacyInflector) {
             return (new UnicodeString($word))->snake()->toString();
         }
 
@@ -52,9 +51,9 @@ final class Inflector
     /**
      * @see InflectorObject::pluralize()
      */
-    public static function pluralize(string $word): string
+    public function pluralize(string $word): string
     {
-        if (!static::$keepLegacyInflector) {
+        if (!$this->keepLegacyInflector) {
             $pluralize = (new EnglishInflector())->pluralize($word);
 
             return end($pluralize);

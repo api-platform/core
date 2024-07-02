@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Operation;
 
+use ApiPlatform\Metadata\InflectorInterface;
 use ApiPlatform\Metadata\Util\Inflector;
 
 /**
@@ -22,13 +23,17 @@ use ApiPlatform\Metadata\Util\Inflector;
  */
 final class UnderscorePathSegmentNameGenerator implements PathSegmentNameGeneratorInterface
 {
+    public function __construct(private readonly ?InflectorInterface $inflector = new Inflector())
+    {
+    }
+
     /**
      * {@inheritdoc}
      */
     public function getSegmentName(string $name, bool $collection = true): string
     {
-        $name = Inflector::tableize($name);
+        $name = $this->inflector->tableize($name);
 
-        return $collection ? Inflector::pluralize($name) : $name;
+        return $collection ? $this->inflector->pluralize($name) : $name;
     }
 }

@@ -91,6 +91,7 @@ final class Configuration implements ConfigurationInterface
                 ->scalarNode('name_converter')->defaultNull()->info('Specify a name converter to use.')->end()
                 ->scalarNode('asset_package')->defaultNull()->info('Specify an asset package name to use.')->end()
                 ->scalarNode('path_segment_name_generator')->defaultValue('api_platform.metadata.path_segment_name_generator.underscore')->info('Specify a path name generator to use.')->end()
+                ->scalarNode('inflector')->defaultValue('api_platform.metadata.inflector')->info('Specify an inflector to use.')->end()
                 ->arrayNode('validator')
                     ->addDefaultsIfNotSet()
                     ->children()
