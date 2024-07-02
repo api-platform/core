@@ -89,8 +89,17 @@
         <service id="api_platform.path_segment_name_generator.underscore" class="ApiPlatform\Operation\UnderscorePathSegmentNameGenerator" public="false" />
         <service id="api_platform.path_segment_name_generator.dash" class="ApiPlatform\Operation\DashPathSegmentNameGenerator" public="false" />
 
-        <service id="api_platform.metadata.path_segment_name_generator.underscore" class="ApiPlatform\Metadata\Operation\UnderscorePathSegmentNameGenerator" public="false" />
-        <service id="api_platform.metadata.path_segment_name_generator.dash" class="ApiPlatform\Metadata\Operation\DashPathSegmentNameGenerator" public="false" />
+        <service id="api_platform.metadata.path_segment_name_generator.underscore" class="ApiPlatform\Metadata\Operation\UnderscorePathSegmentNameGenerator" public="false">
+            <argument type="service" id="api_platform.inflector" on-invalid="null" />
+        </service>
+
+        <service id="api_platform.metadata.path_segment_name_generator.dash" class="ApiPlatform\Metadata\Operation\DashPathSegmentNameGenerator" public="false">
+            <argument type="service" id="api_platform.inflector" on-invalid="null" />
+        </service>
+
+        <service id="api_platform.metadata.inflector" class="ApiPlatform\Metadata\Util\Inflector" public="false">
+            <argument>%api_platform.keep_legacy_inflector%</argument>
+        </service>
 
         <!-- Action -->
         <service id="api_platform.action.exception" class="ApiPlatform\Action\ExceptionAction" public="true">

@@ -24,6 +24,7 @@
             <argument type="service" id="api_platform.elasticsearch.client" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.elasticsearch.metadata.document.metadata_factory.cat.inner" />
+            <argument type="service" id="api_platform.inflector" on-invalid="null" />
         </service>
 
         <service id="api_platform.elasticsearch.metadata.document.metadata_factory.cached" class="ApiPlatform\Elasticsearch\Metadata\Document\Factory\CachedDocumentMetadataFactory" decorates="api_platform.elasticsearch.metadata.document.metadata_factory" decoration-priority="-10" public="false">

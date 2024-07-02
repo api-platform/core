@@ -106,6 +106,7 @@ class ConfigurationTest extends TestCase
                 OptimisticLockException::class => Response::HTTP_CONFLICT,
             ],
             'path_segment_name_generator' => 'api_platform.metadata.path_segment_name_generator.underscore',
+            'inflector' => 'api_platform.metadata.inflector',
             'validator' => [
                 'serialize_payload_fields' => [],
                 'query_parameter_validation' => true,
