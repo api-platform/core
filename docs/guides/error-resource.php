@@ -7,13 +7,6 @@
 // tags: design, state
 // ---
 
-// Note that we use the following configuration:
-// ```
-// api_platform:
-//    defaults:
-//            rfc_7807_compliant_errors: true
-// ```
-
 namespace App\ApiResource {
     use ApiPlatform\Metadata\ErrorResource;
     use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;

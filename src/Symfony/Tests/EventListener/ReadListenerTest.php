@@ -110,7 +110,7 @@ class ReadListenerTest extends TestCase
         $uriVariablesConverter = $this->createMock(UriVariablesConverterInterface::class);
         $uriVariablesConverter->expects($this->once())->method('convert')->with(['id' => '3'], 'class')->willReturn(['id' => 3]);
         $request = new Request([], [], ['_api_operation' => $operation, '_api_operation_name' => 'operation', '_api_resource_class' => 'class', 'id' => '3']);
-        $listener = new ReadListener($provider, $metadata, null, $uriVariablesConverter);
+        $listener = new ReadListener($provider, $metadata, $uriVariablesConverter);
         $listener->onKernelRequest(
             new RequestEvent(
                 $this->createStub(HttpKernelInterface::class),

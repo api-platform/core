@@ -56,7 +56,6 @@ final class NotExposed extends HttpOperation
         ?array $paginationViaCursor = null,
 
         ?array $hydraContext = null,
-        ?array $openapiContext = null,
         bool|OpenApiOperation|Webhook|null $openapi = false,
         ?array $exceptionToStatus = null,
 
@@ -134,7 +133,6 @@ final class NotExposed extends HttpOperation
             cacheHeaders: $cacheHeaders,
             paginationViaCursor: $paginationViaCursor,
             hydraContext: $hydraContext,
-            openapiContext: $openapiContext,
             openapi: $openapi,
             exceptionToStatus: $exceptionToStatus,
             queryParameterValidationEnabled: $queryParameterValidationEnabled,

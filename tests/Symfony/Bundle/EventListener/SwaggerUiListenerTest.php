@@ -26,9 +26,7 @@ class SwaggerUiListenerTest extends TestCase
 {
     use ProphecyTrait;
 
-    /**
-     * @dataProvider getParameters
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getParameters')]
     public function testOnKernelRequest(Request $request, ?string $controller = null): void
     {
         $eventProphecy = $this->prophesize(RequestEvent::class);

@@ -26,10 +26,9 @@ final class ValidationTest extends ApiTestCase
     }
 
     /**
-     * @dataProvider provideQueryStrings
-     *
      * @param array<int,array{propertyPath: string, message: string}> $expectedViolations
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideQueryStrings')]
     public function testValidation(string $queryString, array $expectedViolations): void
     {
         $response = self::createClient()->request('GET', 'validate_parameters?'.$queryString);
@@ -38,7 +37,7 @@ final class ValidationTest extends ApiTestCase
         ], $response->toArray(false));
     }
 
-    public function provideQueryStrings(): array
+    public static function provideQueryStrings(): array
     {
         return [
             [

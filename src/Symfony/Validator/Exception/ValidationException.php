@@ -44,7 +44,6 @@ use Symfony\Component\WebLink\Link;
             outputFormats: ['json' => ['application/problem+json']],
             normalizationContext: ['groups' => ['json'],
                 'skip_null_values' => true,
-                'rfc_7807_compliant_errors' => true,
             ]
         ),
         new ErrorOperation(
@@ -55,14 +54,13 @@ use Symfony\Component\WebLink\Link;
             normalizationContext: [
                 'groups' => ['jsonld'],
                 'skip_null_values' => true,
-                'rfc_7807_compliant_errors' => true,
             ]
         ),
         new ErrorOperation(
             name: '_api_validation_errors_jsonapi',
             routeName: 'api_validation_errors',
             outputFormats: ['jsonapi' => ['application/vnd.api+json']],
-            normalizationContext: ['groups' => ['jsonapi'], 'skip_null_values' => true, 'rfc_7807_compliant_errors' => true]
+            normalizationContext: ['groups' => ['jsonapi'], 'skip_null_values' => true]
         ),
         new ErrorOperation(
             name: '_api_validation_errors',

@@ -19,8 +19,6 @@ properties:
                 bar:
                     foo:
                         bar: baz
-            openapiContext:
-                foo: bar
             jsonSchemaContext:
                 lorem: ipsum
             push: true

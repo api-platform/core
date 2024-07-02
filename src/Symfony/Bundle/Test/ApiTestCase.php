@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Bundle\Test;
 
 use ApiPlatform\Metadata\IriConverterInterface;
+use PHPUnit\Framework\Attributes\BeforeClass;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
@@ -27,6 +28,12 @@ use Symfony\Component\HttpClient\HttpClientTrait;
 abstract class ApiTestCase extends KernelTestCase
 {
     use ApiTestAssertionsTrait;
+
+    #[BeforeClass]
+    public static function before(): void
+    {
+        static::bootKernel();
+    }
 
     /**
      * {@inheritdoc}

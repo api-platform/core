@@ -31,7 +31,6 @@ use ApiPlatform\OpenApi\Attributes\Webhook;
 use ApiPlatform\OpenApi\Model;
 use ApiPlatform\OpenApi\Model\Components;
 use ApiPlatform\OpenApi\Model\Contact;
-use ApiPlatform\OpenApi\Model\ExternalDocumentation;
 use ApiPlatform\OpenApi\Model\Info;
 use ApiPlatform\OpenApi\Model\License;
 use ApiPlatform\OpenApi\Model\Link;
@@ -200,48 +199,6 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             [$requestMimeTypes, $responseMimeTypes] = $this->getMimeTypes($operation);
 
-            // TODO Remove in 4.0
-            foreach (['operationId', 'tags', 'summary', 'description', 'security', 'servers'] as $key) {
-                if (null !== ($operation->getOpenapiContext()[$key] ?? null)) {
-                    trigger_deprecation(
-                        'api-platform/core',
-                        '3.1',
-                        'The "openapiContext" option is deprecated, use "openapi" instead.'
-                    );
-                    $openapiOperation = $openapiOperation->{'with'.ucfirst($key)}($operation->getOpenapiContext()[$key]);
-                }
-            }
-
-            // TODO Remove in 4.0
-            if (null !== ($operation->getOpenapiContext()['externalDocs'] ?? null)) {
-                trigger_deprecation(
-                    'api-platform/core',
-                    '3.1',
-                    'The "openapiContext" option is deprecated, use "openapi" instead.'
-                );
-                $openapiOperation = $openapiOperation->withExternalDocs(new ExternalDocumentation($operation->getOpenapiContext()['externalDocs']['description'] ?? null, $operation->getOpenapiContext()['externalDocs']['url']));
-            }
-
-            // TODO Remove in 4.0
-            if (null !== ($operation->getOpenapiContext()['callbacks'] ?? null)) {
-                trigger_deprecation(
-                    'api-platform/core',
-                    '3.1',
-                    'The "openapiContext" option is deprecated, use "openapi" instead.'
-                );
-                $openapiOperation = $openapiOperation->withCallbacks(new \ArrayObject($operation->getOpenapiContext()['callbacks']));
-            }
-
-            // TODO Remove in 4.0
-            if (null !== ($operation->getOpenapiContext()['deprecated'] ?? null)) {
-                trigger_deprecation(
-                    'api-platform/core',
-                    '3.1',
-                    'The "openapiContext" option is deprecated, use "openapi" instead.'
-                );
-                $openapiOperation = $openapiOperation->withDeprecated((bool) $operation->getOpenapiContext()['deprecated']);
-            }
-
             if ($path) {
                 $pathItem = $paths->getPath($path) ?: new PathItem();
             } elseif (!$pathItem) {
@@ -258,20 +215,6 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $operationOutputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_OUTPUT, $operation, $schema, null, $forceSchemaCollection);
                 $operationOutputSchemas[$operationFormat] = $operationOutputSchema;
                 $this->appendSchemaDefinitions($schemas, $operationOutputSchema->getDefinitions());
-            }
-
-            // TODO Remove in 4.0
-            if ($operation->getOpenapiContext()['parameters'] ?? false) {
-                trigger_deprecation(
-                    'api-platform/core',
-                    '3.1',
-                    'The "openapiContext" option is deprecated, use "openapi" instead.'
-                );
-                $parameters = [];
-                foreach ($operation->getOpenapiContext()['parameters'] as $parameter) {
-                    $parameters[] = new Parameter($parameter['name'], $parameter['in'], $parameter['description'] ?? '', $parameter['required'] ?? false, $parameter['deprecated'] ?? false, $parameter['allowEmptyValue'] ?? false, $parameter['schema'] ?? [], $parameter['style'] ?? null, $parameter['explode'] ?? false, $parameter['allowReserved '] ?? false, $parameter['example'] ?? null, isset($parameter['examples']) ? new \ArrayObject($parameter['examples']) : null, isset($parameter['content']) ? new \ArrayObject($parameter['content']) : null);
-                }
-                $openapiOperation = $openapiOperation->withParameters($parameters);
             }
 
             // Set up parameters
@@ -377,27 +320,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $openapiOperation = $openapiOperation->withResponse('default', new Response('Unexpected error'));
             }
 
-            if ($contextResponses = $operation->getOpenapiContext()['responses'] ?? false) {
-                // TODO Remove this "elseif" in 4.0
-                trigger_deprecation(
-                    'api-platform/core',
-                    '3.1',
-                    'The "openapiContext" option is deprecated, use "openapi" instead.'
-                );
-                foreach ($contextResponses as $statusCode => $contextResponse) {
-                    $openapiOperation = $openapiOperation->withResponse($statusCode, new Response($contextResponse['description'] ?? '', isset($contextResponse['content']) ? new \ArrayObject($contextResponse['content']) : null, isset($contextResponse['headers']) ? new \ArrayObject($contextResponse['headers']) : null, isset($contextResponse['links']) ? new \ArrayObject($contextResponse['links']) : null));
-                }
-            }
-
-            if ($contextRequestBody = $operation->getOpenapiContext()['requestBody'] ?? false) {
-                // TODO Remove this "elseif" in 4.0
-                trigger_deprecation(
-                    'api-platform/core',
-                    '3.1',
-                    'The "openapiContext" option is deprecated, use "openapi" instead.'
-                );
-                $openapiOperation = $openapiOperation->withRequestBody(new RequestBody($contextRequestBody['description'] ?? '', new \ArrayObject($contextRequestBody['content']), $contextRequestBody['required'] ?? false));
-            } elseif (
+            if (
                 \in_array($method, ['PATCH', 'PUT', 'POST'], true)
                 && !(false === ($input = $operation->getInput()) || (\is_array($input) && null === $input['class']))
             ) {
@@ -417,32 +340,6 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     content: $content,
                     required: $openapiOperation->getRequestBody()?->getRequired() ?? true,
                 ));
-            }
-
-            // TODO Remove in 4.0
-            if (null !== $operation->getOpenapiContext() && \count($operation->getOpenapiContext())) {
-                trigger_deprecation(
-                    'api-platform/core',
-                    '3.1',
-                    'The "openapiContext" option is deprecated, use "openapi" instead.'
-                );
-                $allowedProperties = array_map(fn (\ReflectionProperty $reflProperty): string => $reflProperty->getName(), (new \ReflectionClass(Model\Operation::class))->getProperties());
-                foreach ($operation->getOpenapiContext() as $key => $value) {
-                    $value = match ($key) {
-                        'externalDocs' => new ExternalDocumentation(description: $value['description'] ?? '', url: $value['url'] ?? ''),
-                        'requestBody' => new RequestBody(description: $value['description'] ?? '', content: isset($value['content']) ? new \ArrayObject($value['content'] ?? []) : null, required: $value['required'] ?? false),
-                        'callbacks' => new \ArrayObject($value ?? []),
-                        'parameters' => $openapiOperation->getParameters(),
-                        default => $value,
-                    };
-
-                    if (\in_array($key, $allowedProperties, true)) {
-                        $openapiOperation = $openapiOperation->{'with'.ucfirst($key)}($value);
-                        continue;
-                    }
-
-                    $openapiOperation = $openapiOperation->withExtensionProperty((string) $key, $value);
-                }
             }
 
             if ($openapiAttribute instanceof Webhook) {

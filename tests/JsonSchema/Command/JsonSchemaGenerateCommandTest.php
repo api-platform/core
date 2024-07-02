@@ -15,8 +15,8 @@ namespace ApiPlatform\Tests\JsonSchema\Command;
 
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DocumentDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Tests\KernelTestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
 /**
@@ -174,9 +174,8 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
 
     /**
      * TODO: add deprecation (TypeFactory will be deprecated in api platform 3.3).
-     *
-     * @group legacy
      */
+    #[\PHPUnit\Framework\Attributes\Group('legacy')]
     public function testArraySchemaWithTypeFactory(): void
     {
         $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5896\Foo', '--type' => 'output']);

@@ -32,9 +32,7 @@ class ResourceAccessCheckerTest extends TestCase
 {
     use ProphecyTrait;
 
-    /**
-     * @dataProvider getGranted
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getGranted')]
     public function testIsGranted(bool $granted): void
     {
         $expressionLanguageProphecy = $this->prophesize(ExpressionLanguage::class);

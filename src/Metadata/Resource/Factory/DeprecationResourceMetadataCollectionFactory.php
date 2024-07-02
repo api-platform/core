@@ -21,11 +21,9 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 /**
  * Triggers resource deprecations.
  *
- * @final
- *
  * @internal
  */
-class DeprecationResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
+final class DeprecationResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
     // Hashmap to avoid triggering too many deprecations
     private array $deprecated;

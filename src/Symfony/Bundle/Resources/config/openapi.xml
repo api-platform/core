@@ -62,7 +62,7 @@
         </service>
         <service id="ApiPlatform\OpenApi\Options" alias="api_platform.openapi.options" />
 
-        <service id="api_platform.openapi.command" class="ApiPlatform\Symfony\Bundle\Command\OpenApiCommand">
+        <service id="api_platform.openapi.command" class="ApiPlatform\OpenApi\Command\OpenApiCommand">
             <argument type="service" id="api_platform.openapi.factory" />
             <argument type="service" id="api_platform.serializer" />
             <tag name="console.command" />

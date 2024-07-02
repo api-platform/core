@@ -38,7 +38,7 @@ final class BackedEnumPropertyTest extends ApiTestCase
         ]);
     }
 
-    /** @group legacy */
+    #[\PHPUnit\Framework\Attributes\Group('legacy')]
     public function testGraphQl(): void
     {
         $person = $this->createPerson();

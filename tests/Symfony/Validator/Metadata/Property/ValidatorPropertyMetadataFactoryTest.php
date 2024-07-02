@@ -318,9 +318,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals('^(dummy)$', $schema['pattern']);
     }
 
-    /**
-     * @dataProvider providePropertySchemaFormatCases
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providePropertySchemaFormatCases')]
     public function testCreateWithPropertyFormatRestriction(string $property, string $class, array $expectedSchema): void
     {
         $validatorClassMetadata = new ClassMetadata($class);
@@ -471,9 +469,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals(['uniqueItems' => true], $schema);
     }
 
-    /**
-     * @dataProvider provideRangeConstraintCases
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideRangeConstraintCases')]
     public function testCreateWithRangeConstraint(Type $type, string $property, array $expectedSchema): void
     {
         $validatorClassMetadata = new ClassMetadata(DummyRangeValidatedEntity::class);
@@ -508,9 +504,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         yield 'min/max float' => ['type' => new Type(Type::BUILTIN_TYPE_FLOAT), 'property' => 'dummyFloatMinMax', 'expectedSchema' => ['minimum' => 1.5, 'maximum' => 10.5]];
     }
 
-    /**
-     * @dataProvider provideChoiceConstraintCases
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideChoiceConstraintCases')]
     public function testCreateWithPropertyChoiceRestriction(ApiProperty $propertyMetadata, string $property, array $expectedSchema): void
     {
         $validatorClassMetadata = new ClassMetadata(DummyValidatedChoiceEntity::class);
@@ -547,9 +541,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         yield 'multi choice min/max' => ['propertyMetadata' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)]), 'property' => 'dummyMultiChoiceMinMax', 'expectedSchema' => ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']], 'minItems' => 2, 'maxItems' => 4]];
     }
 
-    /**
-     * @dataProvider provideCountConstraintCases
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCountConstraintCases')]
     public function testCreateWithPropertyCountRestriction(string $property, array $expectedSchema): void
     {
         $validatorClassMetadata = new ClassMetadata(DummyCountValidatedEntity::class);
@@ -651,9 +643,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         ], $schema);
     }
 
-    /**
-     * @dataProvider provideNumericConstraintCases
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideNumericConstraintCases')]
     public function testCreateWithPropertyNumericRestriction(ApiProperty $propertyMetadata, string $property, array $expectedSchema): void
     {
         $validatorClassMetadata = new ClassMetadata(DummyNumericValidatedEntity::class);

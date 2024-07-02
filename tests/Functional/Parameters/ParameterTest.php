@@ -51,9 +51,8 @@ final class ParameterTest extends ApiTestCase
 
     /**
      * Because of the openapiContext deprecation.
-     *
-     * @group legacy
      */
+    #[\PHPUnit\Framework\Attributes\Group('legacy')]
     public function testDisableOpenApi(): void
     {
         $response = self::createClient()->request('GET', 'docs', ['headers' => ['accept' => 'application/vnd.openapi+json']]);

@@ -37,7 +37,7 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
     use ResourceClassInfoTrait;
     use SortTrait;
 
-    public function __construct(private readonly CacheItemPoolInterface $subscriptionsCache, private readonly SubscriptionIdentifierGeneratorInterface $subscriptionIdentifierGenerator, private readonly ?SerializeStageInterface $serializeStage, private readonly IriConverterInterface $iriConverter, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ?ProcessorInterface $normalizeProcessor = null)
+    public function __construct(private readonly CacheItemPoolInterface $subscriptionsCache, private readonly SubscriptionIdentifierGeneratorInterface $subscriptionIdentifierGenerator, private readonly ProcessorInterface $normalizeProcessor, private readonly IriConverterInterface $iriConverter, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory)
     {
     }
 
@@ -85,13 +85,7 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
             $resolverContext = ['fields' => $subscriptionFields, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true];
             /** @var Operation */
             $operation = (new Subscription())->withName('update_subscription')->withShortName($shortName);
-            if ($this->normalizeProcessor) {
-                $data = $this->normalizeProcessor->process($object, $operation, [], $resolverContext);
-            } elseif ($this->serializeStage) {
-                $data = ($this->serializeStage)($object, $resourceClass, $operation, $resolverContext);
-            } else {
-                throw new \LogicException();
-            }
+            $data = $this->normalizeProcessor->process($object, $operation, [], $resolverContext);
 
             unset($data['clientSubscriptionId']);
 

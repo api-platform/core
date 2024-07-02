@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Maker;
 
+use ApiPlatform\Tests\KernelTestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -25,7 +25,7 @@ class MakeStateProviderTest extends KernelTestCase
         (new Filesystem())->remove(self::tempDir());
     }
 
-    /** @dataProvider stateProviderDataProvider */
+    #[\PHPUnit\Framework\Attributes\DataProvider('stateProviderDataProvider')]
     public function testMakeStateProvider(bool $isInteractive): void
     {
         $inputs = ['name' => 'CustomStateProvider'];

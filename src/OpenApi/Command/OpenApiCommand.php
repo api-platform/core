@@ -85,5 +85,3 @@ final class OpenApiCommand extends Command
         return 'api:openapi:export';
     }
 }
-
-class_alias(OpenApiCommand::class, \ApiPlatform\Symfony\Bundle\Command\OpenApiCommand::class);

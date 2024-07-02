@@ -61,9 +61,8 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
     /**
      * TODO: remove openapiContext to get rid of the legacy.
-     *
-     * @group legacy
      */
+    #[\PHPUnit\Framework\Attributes\Group('legacy')]
     public function testDebugBarContentNotResourceClass(): void
     {
         $client = static::createClient();
@@ -83,9 +82,7 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertSame('Not an API Platform resource', $block->filterXPath('//div[@class="sf-toolbar-info-piece"][./b[contains(., "Resource Class")]]/span')->html());
     }
 
-    /**
-     * @group legacy
-     */
+    #[\PHPUnit\Framework\Attributes\Group('legacy')]
     public function testDebugBarContent(): void
     {
         $client = static::createClient();
@@ -106,9 +103,8 @@ class ApiPlatformProfilerPanelTest extends WebTestCase
 
     /**
      * TODO: remove openapiContext to get rid of the legacy.
-     *
-     * @group legacy
      */
+    #[\PHPUnit\Framework\Attributes\Group('legacy')]
     public function testProfilerGeneralLayoutNotResourceClass(): void
     {
         $client = static::createClient();

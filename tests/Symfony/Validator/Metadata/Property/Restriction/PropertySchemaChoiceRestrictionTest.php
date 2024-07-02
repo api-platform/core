@@ -36,9 +36,7 @@ final class PropertySchemaChoiceRestrictionTest extends TestCase
         $this->propertySchemaChoiceRestriction = new PropertySchemaChoiceRestriction();
     }
 
-    /**
-     * @dataProvider supportsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('supportsProvider')]
     public function testSupports(Constraint $constraint, ApiProperty $propertyMetadata, bool $expectedResult): void
     {
         self::assertSame($expectedResult, $this->propertySchemaChoiceRestriction->supports($constraint, $propertyMetadata));
@@ -59,9 +57,7 @@ final class PropertySchemaChoiceRestrictionTest extends TestCase
         yield 'not supported type' => [new Choice(['choices' => [new \stdClass(), new \stdClass()]]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT)]), false];
     }
 
-    /**
-     * @dataProvider createProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('createProvider')]
     public function testCreate(Constraint $constraint, ApiProperty $propertyMetadata, array $expectedResult): void
     {
         self::assertSame($expectedResult, $this->propertySchemaChoiceRestriction->create($constraint, $propertyMetadata));
