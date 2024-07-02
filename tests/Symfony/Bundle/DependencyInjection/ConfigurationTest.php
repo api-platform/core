@@ -224,7 +224,6 @@ class ConfigurationTest extends TestCase
             'maker' => [
                 'enabled' => true,
             ],
-            'keep_legacy_inflector' => true,
             'use_symfony_listeners' => false,
             'handle_symfony_errors' => false,
             'enable_link_security' => false,

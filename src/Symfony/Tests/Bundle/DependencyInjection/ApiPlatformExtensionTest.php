@@ -110,7 +110,6 @@ class ApiPlatformExtensionTest extends TestCase
             'graphql_playground' => ['enabled' => false],
         ],
         'use_symfony_listeners' => false,
-        'keep_legacy_inflector' => false,
     ]];
 
     private ContainerBuilder $container;

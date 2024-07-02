@@ -95,9 +95,7 @@
             <argument type="service" id="api_platform.inflector" on-invalid="null" />
         </service>
 
-        <service id="api_platform.metadata.inflector" class="ApiPlatform\Metadata\Util\Inflector" public="false">
-            <argument>%api_platform.keep_legacy_inflector%</argument>
-        </service>
+        <service id="api_platform.metadata.inflector" class="ApiPlatform\Metadata\Util\Inflector" public="false" />
 
         <!-- Action -->
         <service id="api_platform.action.exception" class="ApiPlatform\Action\ExceptionAction" public="true">
