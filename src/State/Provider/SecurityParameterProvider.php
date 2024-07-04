@@ -37,29 +37,28 @@ final class SecurityParameterProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         if (!($request = $context['request']) instanceof Request) {
-            return $this->decorated->provide($operation, $uriVariables, $context);
+            return $this->decorated?->provide($operation, $uriVariables, $context) ?? null;
         }
 
-        /** @var Operation $apiOperation */
-        $apiOperation = $request->attributes->get('_api_operation');
-
-        foreach ($apiOperation->getParameters() ?? [] as $parameter) {
+        /** @var Operation $operation */
+        $operation = $request->attributes->get('_api_operation') ?? $operation;
+        foreach ($operation->getParameters() ?? [] as $parameter) {
             if (null === $security = $parameter->getSecurity()) {
                 continue;
             }
 
-            $key = $this->getParameterFlattenKey($parameter->getKey(), $this->extractParameterValues($parameter, $request, $context));
-            $apiValues = $parameter->getExtraProperties()['_api_values'] ?? [];
-            if (!isset($apiValues[$key])) {
+            $key = $parameter->getKey();
+            $values = $parameter->getValue()[$key] ?? null;
+            if (!isset($values[$key])) {
                 continue;
             }
-            $value = $apiValues[$key];
+            $value = $values[$key];
 
             if (!$this->resourceAccessChecker->isGranted($context['resource_class'], $security, [$key => $value])) {
                 throw $operation instanceof GraphQlOperation ? new AccessDeniedHttpException($parameter->getSecurityMessage() ?? 'Access Denied.') : new AccessDeniedException($parameter->getSecurityMessage() ?? 'Access Denied.');
             }
         }
 
-        return $this->decorated->provide($operation, $uriVariables, $context);
+        return $this->decorated?->provide($operation, $uriVariables, $context) ?? null;
     }
 }

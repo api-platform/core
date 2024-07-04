@@ -67,6 +67,10 @@ final class QueryParameterValidateListener
             return;
         }
 
+        if (!($operation->getExtraProperties()['use_legacy_parameter_validator'] ?? true)) {
+            return;
+        }
+
         if (!($operation?->getQueryParameterValidationEnabled() ?? true) || !$operation instanceof HttpOperation) {
             return;
         }

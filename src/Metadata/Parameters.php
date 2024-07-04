@@ -23,7 +23,7 @@ final class Parameters implements \IteratorAggregate, \Countable
     private array $parameters = [];
 
     /**
-     * @param array<string, Parameter> $parameters
+     * @param array<int|string, Parameter> $parameters
      */
     public function __construct(array $parameters = [])
     {
@@ -53,7 +53,7 @@ final class Parameters implements \IteratorAggregate, \Countable
     public function add(string $key, Parameter $value): self
     {
         foreach ($this->parameters as $i => [$parameterName, $parameter]) {
-            if ($parameterName === $key) {
+            if ($parameterName === $key && $value::class === $parameter::class) {
                 $this->parameters[$i] = [$key, $value];
 
                 return $this;
@@ -65,21 +65,13 @@ final class Parameters implements \IteratorAggregate, \Countable
         return $this;
     }
 
-    public function get(string $key): ?Parameter
+    /**
+     * @param class-string $parameterClass
+     */
+    public function remove(string $key, string $parameterClass): self
     {
         foreach ($this->parameters as $i => [$parameterName, $parameter]) {
-            if ($parameterName === $key) {
-                return $parameter;
-            }
-        }
-
-        return null;
-    }
-
-    public function remove(string $key): self
-    {
-        foreach ($this->parameters as $i => [$parameterName, $parameter]) {
-            if ($parameterName === $key) {
+            if ($parameterName === $key && $parameterClass === $parameter::class) {
                 unset($this->parameters[$i]);
 
                 return $this;
@@ -89,10 +81,27 @@ final class Parameters implements \IteratorAggregate, \Countable
         throw new \RuntimeException(sprintf('Could not remove parameter "%s".', $key));
     }
 
-    public function has(string $key): bool
+    /**
+     * @param class-string $parameterClass
+     */
+    public function get(string $key, string $parameterClass): ?Parameter
     {
-        foreach ($this->parameters as $i => [$parameterName, $parameter]) {
-            if ($parameterName === $key) {
+        foreach ($this->parameters as [$parameterName, $parameter]) {
+            if ($parameterName === $key && $parameterClass === $parameter::class) {
+                return $parameter;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param class-string $parameterClass
+     */
+    public function has(string $key, string $parameterClass): bool
+    {
+        foreach ($this->parameters as [$parameterName, $parameter]) {
+            if ($parameterName === $key && $parameterClass === $parameter::class) {
                 return true;
             }
         }

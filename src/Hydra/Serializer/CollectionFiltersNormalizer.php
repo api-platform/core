@@ -163,7 +163,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
 
         foreach ($parameters ?? [] as $key => $parameter) {
             // Each IriTemplateMapping maps a variable used in the template to a property
-            if (!$parameter instanceof QueryParameterInterface) {
+            if (!$parameter instanceof QueryParameterInterface || false === $parameter->getHydra()) {
                 continue;
             }
 
