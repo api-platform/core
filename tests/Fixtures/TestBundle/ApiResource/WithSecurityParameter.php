@@ -22,7 +22,7 @@ use ApiPlatform\Metadata\QueryParameter;
     parameters: [
         'name' => new QueryParameter(security: 'is_granted("ROLE_ADMIN")'),
         'auth' => new HeaderParameter(security: '"secured" == auth[0]'),
-        'secret' => new QueryParameter(security: '"secured" == secret')
+        'secret' => new QueryParameter(security: '"secured" == secret'),
     ],
     provider: [self::class, 'collectionProvider'],
 )]
