@@ -72,6 +72,7 @@ class Query extends Operation
         $processor = null,
         ?OptionsInterface $stateOptions = null,
         array|Parameters|null $parameters = null,
+        ?bool $queryParameterValidationEnabled = null,
         array $extraProperties = [],
 
         protected ?bool $nested = null,
@@ -128,6 +129,7 @@ class Query extends Operation
             processor: $processor,
             stateOptions: $stateOptions,
             parameters: $parameters,
+            queryParameterValidationEnabled: $queryParameterValidationEnabled,
             extraProperties: $extraProperties
         );
     }

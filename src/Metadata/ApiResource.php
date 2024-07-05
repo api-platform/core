@@ -960,7 +960,7 @@ class ApiResource extends Metadata
         $provider = null,
         $processor = null,
         protected ?OptionsInterface $stateOptions = null,
-        protected array|Parameters|null $parameters = null,
+        array|Parameters|null $parameters = null,
         protected array $extraProperties = [],
     ) {
         parent::__construct(
@@ -1385,19 +1385,6 @@ class ApiResource extends Metadata
     {
         $self = clone $this;
         $self->exceptionToStatus = $exceptionToStatus;
-
-        return $self;
-    }
-
-    public function getQueryParameterValidationEnabled(): ?bool
-    {
-        return $this->queryParameterValidationEnabled;
-    }
-
-    public function withQueryParameterValidationEnabled(bool $queryParameterValidationEnabled): self
-    {
-        $self = clone $this;
-        $self->queryParameterValidationEnabled = $queryParameterValidationEnabled;
 
         return $self;
     }
