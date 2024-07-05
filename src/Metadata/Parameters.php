@@ -23,7 +23,7 @@ final class Parameters implements \IteratorAggregate, \Countable
     private array $parameters = [];
 
     /**
-     * @param array<string, Parameter> $parameters
+     * @param array<int|string, Parameter> $parameters
      */
     public function __construct(array $parameters = [])
     {

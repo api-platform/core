@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Metadata;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Parameter;
+use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Util\CamelCaseToSnakeCaseNameConverter;
 use Psr\Log\LoggerInterface;
@@ -86,7 +87,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
         $index = -1;
         $operationPriority = 0;
         $hasApiResource = false;
-        $globalParameters = [];
+        $globalParameters = new Parameters();
 
         foreach ($attributes as $attribute) {
             if (is_a($attribute->getName(), Parameter::class, true)) {
@@ -94,7 +95,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
                 if (!$k = $parameter->getKey()) {
                     throw new RuntimeException('Parameter "key" is mandatory when used on a class.');
                 }
-                $globalParameters[$k] = $parameter;
+                $globalParameters->add($k, $parameter);
                 continue;
             }
 
@@ -141,7 +142,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
 
         // Loop again and set default operations if none where found
         foreach ($resources as $index => $resource) {
-            if ($globalParameters) {
+            if (\count($globalParameters) > 0) {
                 $resources[$index] = $resource = $this->mergeOperationParameters($resource, $globalParameters);
             }
 
@@ -232,17 +233,23 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
     /**
      * @template T of Metadata
      *
-     * @param Parameter[] $globalParameters
-     * @param T           $resource
+     * @param T $resource
      *
      * @return T
      */
-    private function mergeOperationParameters(Metadata $resource, array $globalParameters): Metadata
+    private function mergeOperationParameters(Metadata $resource, Parameters $globalParameters): Metadata
     {
-        $parameters = $resource->getParameters() ?? [];
+        $parameters = $resource->getParameters() ?? new Parameters();
+        foreach ($globalParameters as $parameterName => $parameter) {
+            if ($key = $parameter->getKey()) {
+                $parameterName = $key;
+            }
 
-        return $resource->withParameters(
-            (\is_array($parameters) ? $parameters : iterator_to_array($parameters)) + $globalParameters
-        );
+            if (!$parameters->has($parameterName)) {
+                $parameters->add($parameterName, $parameter);
+            }
+        }
+
+        return $resource->withParameters($parameters);
     }
 }

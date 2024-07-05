@@ -49,6 +49,12 @@ final class ParameterTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(403);
     }
 
+    public function testDisabled(): void
+    {
+        self::createClient()->request('GET', 'with_disabled_parameter_validation');
+        $this->assertResponseStatusCodeSame(200);
+    }
+
     /**
      * Because of the openapiContext deprecation.
      *

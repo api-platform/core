@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\HeaderParameter;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Parameter;
+use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use ApiPlatform\Serializer\Filter\GroupFilter;
@@ -61,6 +62,12 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'multipleOf' => new QueryParameter(schema: ['multipleOf' => 2]),
         'pattern' => new QueryParameter(schema: ['pattern' => '/\d/']),
     ],
+    provider: [self::class, 'collectionProvider']
+)]
+#[GetCollection(
+    uriTemplate: 'with_disabled_parameter_validation{._format}',
+    parameters: new Parameters([new QueryParameter(key: 'bla', required: true)]),
+    queryParameterValidationEnabled: false,
     provider: [self::class, 'collectionProvider']
 )]
 #[QueryParameter(key: 'everywhere')]
