@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
+use ApiPlatform\Metadata\Exception\RuntimeException;
+
 /**
  * A parameter dictionnary.
  *
@@ -53,7 +55,7 @@ final class Parameters implements \IteratorAggregate, \Countable
     public function add(string $key, Parameter $value): self
     {
         foreach ($this->parameters as $i => [$parameterName, $parameter]) {
-            if ($parameterName === $key) {
+            if ($parameterName === $key && $value::class === $parameter::class) {
                 $this->parameters[$i] = [$key, $value];
 
                 return $this;
@@ -65,10 +67,29 @@ final class Parameters implements \IteratorAggregate, \Countable
         return $this;
     }
 
-    public function get(string $key): ?Parameter
+    /**
+     * @param class-string $parameterClass
+     */
+    public function remove(string $key, string $parameterClass): self
     {
         foreach ($this->parameters as $i => [$parameterName, $parameter]) {
-            if ($parameterName === $key) {
+            if ($parameterName === $key && $parameterClass === $parameter::class) {
+                unset($this->parameters[$i]);
+
+                return $this;
+            }
+        }
+
+        throw new RuntimeException(sprintf('Could not remove parameter "%s".', $key));
+    }
+
+    /**
+     * @param class-string $parameterClass
+     */
+    public function get(string $key, string $parameterClass): ?Parameter
+    {
+        foreach ($this->parameters as [$parameterName, $parameter]) {
+            if ($parameterName === $key && $parameterClass === $parameter::class) {
                 return $parameter;
             }
         }
@@ -76,23 +97,13 @@ final class Parameters implements \IteratorAggregate, \Countable
         return null;
     }
 
-    public function remove(string $key): self
+    /**
+     * @param class-string $parameterClass
+     */
+    public function has(string $key, string $parameterClass): bool
     {
-        foreach ($this->parameters as $i => [$parameterName, $parameter]) {
-            if ($parameterName === $key) {
-                unset($this->parameters[$i]);
-
-                return $this;
-            }
-        }
-
-        throw new \RuntimeException(sprintf('Could not remove parameter "%s".', $key));
-    }
-
-    public function has(string $key): bool
-    {
-        foreach ($this->parameters as $i => [$parameterName, $parameter]) {
-            if ($parameterName === $key) {
+        foreach ($this->parameters as [$parameterName, $parameter]) {
+            if ($parameterName === $key && $parameterClass === $parameter::class) {
                 return true;
             }
         }

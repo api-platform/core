@@ -50,17 +50,18 @@ final class ParameterValidatorProvider implements ProviderInterface
                 continue;
             }
 
-            $key = $this->getParameterFlattenKey($parameter->getKey(), $this->extractParameterValues($parameter, $request, $context));
-            $value = $parameter->getExtraProperties()['_api_values'][$key] ?? null;
+            $key = $parameter->getKey();
+            $value = $parameter->getValue()[$key] ?? null;
             $violations = $this->validator->validate($value, $constraints);
             foreach ($violations as $violation) {
-                $propertyPath = $key !== $parameter->getKey() ? $key.$violation->getPropertyPath() : ($parameter->getProperty() ?? $key);
                 $constraintViolationList->add(new ConstraintViolation(
                     $violation->getMessage(),
                     $violation->getMessageTemplate(),
                     $violation->getParameters(),
                     $violation->getRoot(),
-                    $propertyPath,
+                    $parameter->getProperty() ?? (
+                        str_contains($key, ':property') ? str_replace('[:property]', $violation->getPropertyPath(), $key) : $key.$violation->getPropertyPath()
+                    ),
                     $violation->getInvalidValue(),
                     $violation->getPlural(),
                     $violation->getCode(),

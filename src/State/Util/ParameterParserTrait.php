@@ -15,6 +15,7 @@ namespace ApiPlatform\State\Util;
 
 use ApiPlatform\Metadata\HeaderParameterInterface;
 use ApiPlatform\Metadata\Parameter;
+use ApiPlatform\State\ParameterNotFound;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -23,31 +24,54 @@ use Symfony\Component\HttpFoundation\Request;
 trait ParameterParserTrait
 {
     /**
-     * @param array<string, mixed> $values
-     */
-    private function getParameterFlattenKey(string $key, array $values): string
-    {
-        $parsedKey = explode('[:property]', $key);
-
-        if (isset($parsedKey[0]) && isset($values[$parsedKey[0]])) {
-            return $parsedKey[0];
-        }
-
-        return $key;
-    }
-
-    /**
      * @param array<string, mixed> $context
      *
      * @return array<string, mixed>
      */
-    private function extractParameterValues(Parameter $parameter, ?Request $request, array $context): array
+    private function getParameterValues(Parameter $parameter, ?Request $request, array $context): array
     {
         if ($request) {
             return ($parameter instanceof HeaderParameterInterface ? $request->attributes->get('_api_header_parameters') : $request->attributes->get('_api_query_parameters')) ?? [];
         }
 
-        // GraphQl
         return $context['args'] ?? [];
+    }
+
+    /**
+     * @param array<string, mixed> $values
+     *
+     * @return array<mixed, mixed>|ParameterNotFound|array
+     */
+    private function extractParameterValues(Parameter $parameter, array $values): string|ParameterNotFound|array
+    {
+        $accessors = null;
+        $key = $parameter->getKey();
+        $parsedKey = explode('[:property]', $key);
+        if (isset($parsedKey[0]) && isset($values[$parsedKey[0]])) {
+            $key = $parsedKey[0];
+        } elseif (str_contains($key, '[')) {
+            preg_match_all('/[^\[\]]+/', $key, $matches);
+            if (isset($matches[0])) {
+                $key = array_shift($matches[0]);
+                $accessors = $matches[0];
+            }
+        }
+
+        if (!$accessors) {
+            return $values[$key] ?? new ParameterNotFound();
+        }
+
+        $value = $values[$key] ?? new ParameterNotFound();
+
+        foreach ($accessors as $accessor) {
+            if (\is_array($value) && isset($value[$accessor])) {
+                $value = $value[$accessor];
+            } else {
+                $value = new ParameterNotFound();
+                continue;
+            }
+        }
+
+        return $value;
     }
 }

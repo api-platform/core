@@ -15,6 +15,7 @@ namespace ApiPlatform\Metadata\Tests\Resource\Factory;
 
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\Parameters;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\Resource\Factory\AttributesResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\ParameterResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\WithParameter;
@@ -50,10 +51,10 @@ class ParameterResourceMetadataCollectionFactoryTests extends TestCase
         $parameter = new ParameterResourceMetadataCollectionFactory(new AttributesResourceMetadataCollectionFactory(), $filterLocator);
         $operation = $parameter->create(WithParameter::class)->getOperation('collection');
         $this->assertInstanceOf(Parameters::class, $parameters = $operation->getParameters());
-        $hydraParameter = $parameters->get('hydra');
+        $hydraParameter = $parameters->get('hydra', QueryParameter::class);
         $this->assertEquals(['type' => 'foo'], $hydraParameter->getSchema());
         $this->assertEquals(new Parameter('test', 'query'), $hydraParameter->getOpenApi());
-        $everywhere = $parameters->get('everywhere');
+        $everywhere = $parameters->get('everywhere', QueryParameter::class);
         $this->assertEquals(new Parameter('everywhere', 'query', allowEmptyValue: true), $everywhere->getOpenApi());
     }
 }

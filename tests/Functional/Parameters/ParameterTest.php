@@ -70,4 +70,13 @@ final class ParameterTest extends ApiTestCase
 
         $this->assertNotContains('array', $keys);
     }
+
+    public function testHeaderAndQuery(): void
+    {
+        $response = self::createClient()->request('GET', 'with_parameters_header_and_query?q=blabla', ['headers' => ['q' => '(complex stuff)']]);
+        $this->assertEquals($response->toArray(), [
+            ['q' => ['(complex stuff)']],
+            ['q' => 'blabla'],
+        ]);
+    }
 }
