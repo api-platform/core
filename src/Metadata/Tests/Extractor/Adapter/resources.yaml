@@ -241,6 +241,7 @@ resources:
                         bar:
                             type: custom
                             baz: qux
+                    queryParameterValidationEnabled: true
                     shortName: Comment
                     description: 'Creates a Comment.'
                     class: ApiPlatform\Metadata\GraphQl\Mutation
@@ -298,6 +299,7 @@ resources:
                             type: foo_type
                 -
                     class: ApiPlatform\Metadata\GraphQl\Query
+                    queryParameterValidationEnabled: true
                     extraProperties:
                         route_prefix: /v1
                         custom_property: 'Lorem ipsum dolor sit amet'
@@ -309,6 +311,7 @@ resources:
                             type: foo_type
                 -
                     class: ApiPlatform\Metadata\GraphQl\QueryCollection
+                    queryParameterValidationEnabled: true
                     extraProperties:
                         route_prefix: /v1
                         custom_property: 'Lorem ipsum dolor sit amet'
@@ -320,6 +323,7 @@ resources:
                             type: foo_type
                 -
                     class: ApiPlatform\Metadata\GraphQl\Subscription
+                    queryParameterValidationEnabled: true
                     extraProperties:
                         route_prefix: /v1
                         custom_property: 'Lorem ipsum dolor sit amet'

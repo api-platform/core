@@ -20,6 +20,8 @@ use ApiPlatform\State\OptionsInterface;
  */
 abstract class Metadata
 {
+    protected ?Parameters $parameters = null;
+
     /**
      * @param string|null                         $deprecationReason       https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
      * @param string|\Stringable|null             $security                https://api-platform.com/docs/core/security
@@ -70,12 +72,18 @@ abstract class Metadata
         protected $provider = null,
         protected $processor = null,
         protected ?OptionsInterface $stateOptions = null,
-        /**
+        /*
          * @experimental
          */
-        protected array|Parameters|null $parameters = [],
+        array|Parameters|null $parameters = null,
+        protected ?bool $queryParameterValidationEnabled = null,
         protected array $extraProperties = []
     ) {
+        if (\is_array($parameters) && $parameters) {
+            $parameters = new Parameters($parameters);
+        }
+
+        $this->parameters = $parameters;
     }
 
     public function getShortName(): ?string
@@ -571,10 +579,7 @@ abstract class Metadata
         return $self;
     }
 
-    /**
-     * @return array<string, Parameter>
-     */
-    public function getParameters(): array|Parameters|null
+    public function getParameters(): ?Parameters
     {
         return $this->parameters;
     }
@@ -582,7 +587,20 @@ abstract class Metadata
     public function withParameters(array|Parameters $parameters): static
     {
         $self = clone $this;
-        $self->parameters = $parameters;
+        $self->parameters = \is_array($parameters) ? new Parameters($parameters) : $parameters;
+
+        return $self;
+    }
+
+    public function getQueryParameterValidationEnabled(): ?bool
+    {
+        return $this->queryParameterValidationEnabled;
+    }
+
+    public function withQueryParameterValidationEnabled(bool $queryParameterValidationEnabled): static
+    {
+        $self = clone $this;
+        $self->queryParameterValidationEnabled = $queryParameterValidationEnabled;
 
         return $self;
     }

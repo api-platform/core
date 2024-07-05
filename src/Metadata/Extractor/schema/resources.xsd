@@ -66,6 +66,7 @@
         <xsd:attributeGroup ref="base"/>
         <xsd:attribute type="xsd:string" name="resolver"/>
         <xsd:attribute type="xsd:string" name="class" use="required"/>
+        <xsd:attribute type="xsd:boolean" name="queryParameterValidationEnabled"/>
         <xsd:attribute type="xsd:boolean" name="read"/>
         <xsd:attribute type="xsd:boolean" name="deserialize"/>
         <xsd:attribute type="xsd:boolean" name="validate"/>

@@ -52,7 +52,7 @@ abstract class Parameter
     }
 
     /**
-     * @return array{type?: string}|null $schema
+     * @return (array<string, mixed>&array{type?: string, default?: string})|null $schema
      */
     public function getSchema(): ?array
     {
@@ -110,6 +110,16 @@ abstract class Parameter
     public function getSecurityMessage(): ?string
     {
         return $this->securityMessage;
+    }
+
+    /**
+     * The computed value of this parameter, located into extraProperties['_api_values'].
+     *
+     * @readonly
+     */
+    public function getValue(): mixed
+    {
+        return $this->extraProperties['_api_values'] ?? null;
     }
 
     /**

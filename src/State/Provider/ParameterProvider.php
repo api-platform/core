@@ -14,9 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\State\Provider;
 
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Metadata\Parameter;
-use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\State\Exception\ProviderNotFoundException;
+use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ParameterProviderInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\Util\ParameterParserTrait;
@@ -51,20 +50,22 @@ final class ParameterProvider implements ProviderInterface
         }
 
         $context = ['operation' => $operation] + $context;
-        $p = $operation->getParameters() ?? [];
-        $parameters = $p instanceof Parameters ? iterator_to_array($p) : $p;
-        foreach ($parameters as $parameter) {
-            $key = $parameter->getKey();
-            $values = $this->extractParameterValues($parameter, $request, $context);
-            $key = $this->getParameterFlattenKey($key, $values);
+        $parameters = $operation->getParameters();
+        foreach ($parameters ?? [] as $parameter) {
+            $values = $this->getParameterValues($parameter, $request, $context);
+            $value = $this->extractParameterValues($parameter, $values);
 
-            if (!isset($values[$key])) {
+            if ((!$value || $value instanceof ParameterNotFound) && ($default = $parameter->getSchema()['default'] ?? false)) {
+                $value = $default;
+            }
+
+            if ($value instanceof ParameterNotFound) {
                 continue;
             }
 
-            $parameters[$parameter->getKey()] = $parameter = $parameter->withExtraProperties(
-                $parameter->getExtraProperties() + ['_api_values' => [$key => $values[$key]]]
-            );
+            $parameters->add($parameter->getKey(), $parameter = $parameter->withExtraProperties(
+                $parameter->getExtraProperties() + ['_api_values' => [$parameter->getKey() => $value]]
+            ));
 
             if (null === ($provider = $parameter->getProvider())) {
                 continue;
@@ -89,7 +90,9 @@ final class ParameterProvider implements ProviderInterface
             }
         }
 
-        $operation = $operation->withParameters(new Parameters($parameters));
+        if ($parameters) {
+            $operation = $operation->withParameters($parameters);
+        }
         $request?->attributes->set('_api_operation', $operation);
         $context['operation'] = $operation;
 

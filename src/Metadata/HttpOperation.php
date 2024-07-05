@@ -153,7 +153,6 @@ class HttpOperation extends Operation
         protected ?array $openapiContext = null, // TODO Remove in 4.0
         protected bool|OpenApiOperation|Webhook|null $openapi = null,
         protected ?array $exceptionToStatus = null,
-        protected ?bool $queryParameterValidationEnabled = null,
         protected ?array $links = null,
 
         ?string $shortName = null,
@@ -201,6 +200,7 @@ class HttpOperation extends Operation
         $processor = null,
         ?OptionsInterface $stateOptions = null,
         array|Parameters|null $parameters = null,
+        ?bool $queryParameterValidationEnabled = null,
         array $extraProperties = [],
     ) {
         parent::__construct(
@@ -249,6 +249,7 @@ class HttpOperation extends Operation
             processor: $processor,
             stateOptions: $stateOptions,
             parameters: $parameters,
+            queryParameterValidationEnabled: $queryParameterValidationEnabled,
             extraProperties: $extraProperties
         );
     }
@@ -603,19 +604,6 @@ class HttpOperation extends Operation
     {
         $self = clone $this;
         $self->exceptionToStatus = $exceptionToStatus;
-
-        return $self;
-    }
-
-    public function getQueryParameterValidationEnabled(): ?bool
-    {
-        return $this->queryParameterValidationEnabled;
-    }
-
-    public function withQueryParameterValidationEnabled(bool $queryParameterValidationEnabled): self
-    {
-        $self = clone $this;
-        $self->queryParameterValidationEnabled = $queryParameterValidationEnabled;
 
         return $self;
     }
