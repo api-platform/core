@@ -245,7 +245,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
                 $parameterName = $key;
             }
 
-            if (!$parameters->has($parameterName)) {
+            if (!$parameters->has($parameterName, $parameter::class)) {
                 $parameters->add($parameterName, $parameter);
             }
         }

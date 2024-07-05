@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Extension;
 
+use ApiPlatform\Doctrine\Common\ParameterValueExtractorTrait;
 use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
@@ -26,6 +27,8 @@ use Psr\Container\ContainerInterface;
  */
 final class ParameterExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
+    use ParameterValueExtractorTrait;
+
     public function __construct(private readonly ContainerInterface $filterLocator)
     {
     }
@@ -36,7 +39,7 @@ final class ParameterExtension implements QueryCollectionExtensionInterface, Que
     private function applyFilter(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         foreach ($operation?->getParameters() ?? [] as $parameter) {
-            $values = $parameter->getExtraProperties()['_api_values'] ?? [];
+            $values = $this->extractParameterValue($parameter->getValue() ?? []);
             if (!$values) {
                 continue;
             }

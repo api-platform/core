@@ -17,12 +17,14 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\HeaderParameter;
 use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use ApiPlatform\Serializer\Filter\GroupFilter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Parameter\CustomGroupParameterProvider;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Serializer\Attribute\Groups;
 
@@ -70,6 +72,11 @@ use Symfony\Component\Serializer\Attribute\Groups;
     queryParameterValidationEnabled: false,
     provider: [self::class, 'collectionProvider']
 )]
+#[GetCollection(
+    uriTemplate: 'with_parameters_header_and_query{._format}',
+    parameters: new Parameters([new QueryParameter(key: 'q'), new HeaderParameter(key: 'q')]),
+    provider: [self::class, 'headerAndQueryProvider']
+)]
 #[QueryParameter(key: 'everywhere')]
 class WithParameter
 {
@@ -116,5 +123,13 @@ class WithParameter
     public static function restrictAccess(): void
     {
         throw new AccessDeniedHttpException();
+    }
+
+    public static function headerAndQueryProvider(Operation $operation, array $uriVariables = [], array $context = [])
+    {
+        $parameters = $operation->getParameters();
+        $values = [$parameters->get('q', HeaderParameter::class)->getValue(), $parameters->get('q', QueryParameter::class)->getValue()];
+
+        return new JsonResponse($values);
     }
 }

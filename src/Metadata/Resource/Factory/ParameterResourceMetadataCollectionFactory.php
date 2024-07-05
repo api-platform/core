@@ -55,34 +55,38 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
 
             $internalPriority = -1;
             foreach ($operations as $operationName => $operation) {
-                $parameters = [];
-                foreach ($operation->getParameters() ?? [] as $key => $parameter) {
+                $parameters = $operation->getParameters() ?? new Parameters();
+                foreach ($parameters as $key => $parameter) {
+                    $key = $parameter->getKey() ?? $key;
                     $parameter = $this->setDefaults($key, $parameter, $resourceClass);
                     $priority = $parameter->getPriority() ?? $internalPriority--;
-                    $parameters[$key] = $parameter->withPriority($priority);
+                    $parameters->add($key, $parameter->withPriority($priority));
                 }
 
-                $operations->add($operationName, $operation->withParameters(new Parameters($parameters)));
+                $operations->add($operationName, $operation->withParameters($parameters));
             }
 
             $resourceMetadataCollection[$i] = $resource->withOperations($operations->sort());
 
-            $internalPriority = -1;
             $graphQlOperations = $resource->getGraphQlOperations();
-            foreach ($graphQlOperations ?? [] as $operationName => $operation) {
-                $parameters = [];
+            if (!$graphQlOperations) {
+                continue;
+            }
+
+            $internalPriority = -1;
+            foreach ($graphQlOperations as $operationName => $operation) {
+                $parameters = $operation->getParameters() ?? new Parameters();
                 foreach ($operation->getParameters() ?? [] as $key => $parameter) {
+                    $key = $parameter->getKey() ?? $key;
                     $parameter = $this->setDefaults($key, $parameter, $resourceClass);
                     $priority = $parameter->getPriority() ?? $internalPriority--;
-                    $parameters[$key] = $parameter->withPriority($priority);
+                    $parameters->add($key, $parameter->withPriority($priority));
                 }
 
-                $graphQlOperations[$operationName] = $operation->withParameters(new Parameters($parameters));
+                $graphQlOperations[$operationName] = $operation->withParameters($parameters);
             }
 
-            if ($graphQlOperations) {
-                $resourceMetadataCollection[$i] = $resource->withGraphQlOperations($graphQlOperations);
-            }
+            $resourceMetadataCollection[$i] = $resource->withGraphQlOperations($graphQlOperations);
         }
 
         return $resourceMetadataCollection;
