@@ -24,11 +24,11 @@ use Symfony\Component\Validator\Constraint;
 abstract class Parameter
 {
     /**
-     * @param array{type?: string}|null                       $schema
-     * @param array<string, mixed>                            $extraProperties
-     * @param ParameterProviderInterface|callable|string|null $provider
-     * @param FilterInterface|string|null                     $filter
-     * @param Constraint|Constraint[]|null                    $constraints
+     * @param (array<string, mixed>&array{type?: string, default?: string})|null $schema
+     * @param array<string, mixed>                                               $extraProperties
+     * @param ParameterProviderInterface|callable|string|null                    $provider
+     * @param FilterInterface|string|null                                        $filter
+     * @param Constraint|Constraint[]|null                                       $constraints
      */
     public function __construct(
         protected ?string $key = null,
@@ -40,6 +40,7 @@ abstract class Parameter
         protected ?string $description = null,
         protected ?bool $required = null,
         protected ?int $priority = null,
+        protected ?bool $hydra = null,
         protected Constraint|array|null $constraints = null,
         protected string|\Stringable|null $security = null,
         protected ?string $securityMessage = null,
@@ -93,6 +94,11 @@ abstract class Parameter
     public function getPriority(): ?int
     {
         return $this->priority;
+    }
+
+    public function getHydra(): ?bool
+    {
+        return $this->hydra;
     }
 
     /**
@@ -208,6 +214,14 @@ abstract class Parameter
     {
         $self = clone $this;
         $self->required = $required;
+
+        return $self;
+    }
+
+    public function withHydra(bool $hydra): static
+    {
+        $self = clone $this;
+        $self->hydra = $hydra;
 
         return $self;
     }

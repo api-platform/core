@@ -54,6 +54,7 @@ trait OrderFilterTrait
                 'required' => false,
                 'schema' => [
                     'type' => 'string',
+                    'default' => strtolower($propertyOptions['default_direction'] ?? OrderFilterInterface::DIRECTION_ASC),
                     'enum' => [
                         strtolower(OrderFilterInterface::DIRECTION_ASC),
                         strtolower(OrderFilterInterface::DIRECTION_DESC),
