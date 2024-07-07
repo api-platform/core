@@ -15,8 +15,6 @@ namespace ApiPlatform\State;
 
 /**
  * @experimental
- *
- * @internal
  */
 final class ParameterNotFound
 {
