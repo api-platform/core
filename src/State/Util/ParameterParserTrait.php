@@ -57,11 +57,10 @@ trait ParameterParserTrait
             }
         }
 
-        if (!$accessors) {
-            return $values[$key] ?? new ParameterNotFound();
-        }
-
         $value = $values[$key] ?? new ParameterNotFound();
+        if (!$accessors) {
+            return $value;
+        }
 
         foreach ($accessors as $accessor) {
             if (\is_array($value) && isset($value[$accessor])) {
