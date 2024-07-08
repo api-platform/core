@@ -16,3 +16,11 @@
 %Since symfony/validator 7.1: Not passing a value for the "requireTld" option to the Url constraint is deprecated. Its default value will change to "true".%
 
 %$fieldsBuilder argument of SchemaBuilder implementing "ApiPlatform\\GraphQl\\Type\\FieldsBuilderInterface" is deprecated since API Platform 3.1. It has to implement "ApiPlatform\\GraphQl\\Type\\FieldsBuilderEnumInterface" instead.%
+
+# old test filters will be removed in 4.0
+%Since api-platform/core 3.4: The key "swagger" in a filter description is deprecated, use "schema" or "openapi" instead.%
+%Since api-platform/core 3.4: The key "openapi" in a filter description should be a "ApiPlatform\\OpenApi\\Model\\Parameter" class or use "schema" to specify the JSON Schema.%
+%Since api-platform/core 3.4: The "exclusiveMaximum" schema value should be a number not a boolean.%
+%Since api-platform/core 3.4: The "exclusiveMinimum" schema value should be a number not a boolean.%
+%Since api-platform/core 3.4: The "allowEmptyValue" option should be declared using an "openapi" parameter.%
+

@@ -38,6 +38,10 @@ final class QueryParameterValidateProvider implements ProviderInterface
             return $this->decorated?->provide($operation, $uriVariables, $context);
         }
 
+        if (!($operation->getExtraProperties()['use_legacy_parameter_validator'] ?? true)) {
+            return $this->decorated?->provide($operation, $uriVariables, $context);
+        }
+
         if (!($operation->getQueryParameterValidationEnabled() ?? true) || !$operation instanceof CollectionOperationInterface) {
             return $this->decorated?->provide($operation, $uriVariables, $context);
         }

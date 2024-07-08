@@ -16,7 +16,7 @@ default:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
       filters:
-        tags: '~@postgres&&~@mongodb&&~@elasticsearch&&~@controller&&~@mercure'
+        tags: '~@postgres&&~@mongodb&&~@elasticsearch&&~@controller&&~@mercure&&~@query_parameter_validator'
   extensions:
     'FriendsOfBehat\SymfonyExtension':
       bootstrap: 'tests/Fixtures/app/bootstrap.php'
@@ -52,7 +52,7 @@ postgres:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
       filters:
-        tags: '~@sqlite&&~@mongodb&&~@elasticsearch&&~@controller&&~@mercure'
+        tags: '~@sqlite&&~@mongodb&&~@elasticsearch&&~@controller&&~@mercure&&~@query_parameter_validator'
 
 mongodb:
   suites:
@@ -73,7 +73,7 @@ mongodb:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
       filters:
-        tags: '~@sqlite&&~@elasticsearch&&~@!mongodb&&~@mercure&&~@controller'
+        tags: '~@sqlite&&~@elasticsearch&&~@!mongodb&&~@mercure&&~@controller&&~@query_parameter_validator'
 
 mercure:
   suites:
@@ -109,7 +109,7 @@ elasticsearch:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
       filters:
-        tags: '@elasticsearch&&~@mercure'
+        tags: '@elasticsearch&&~@mercure&&~@query_parameter_validator'
 
 default-coverage:
   suites:
@@ -203,7 +203,7 @@ legacy:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
       filters:
-        tags: '~@postgres&&~@mongodb&&~@elasticsearch&&~@link_security&&~@use_listener'
+        tags: '~@postgres&&~@mongodb&&~@elasticsearch&&~@link_security&&~@use_listener&&~@query_parameter_validator'
   extensions:
     'FriendsOfBehat\SymfonyExtension':
       bootstrap: 'tests/Fixtures/app/bootstrap.php'
@@ -238,7 +238,7 @@ symfony_listeners:
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
       filters:
-        tags: '~@postgres&&~@mongodb&&~@elasticsearch&&~@mercure'
+        tags: '~@postgres&&~@mongodb&&~@elasticsearch&&~@mercure&&~@query_parameter_validator'
   extensions:
     'FriendsOfBehat\SymfonyExtension':
       bootstrap: 'tests/Fixtures/app/bootstrap.php'

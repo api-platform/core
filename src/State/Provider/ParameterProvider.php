@@ -55,7 +55,7 @@ final class ParameterProvider implements ProviderInterface
             $values = $this->getParameterValues($parameter, $request, $context);
             $value = $this->extractParameterValues($parameter, $values);
 
-            if ((!$value || $value instanceof ParameterNotFound) && ($default = $parameter->getSchema()['default'] ?? false)) {
+            if (($default = $parameter->getSchema()['default'] ?? false) && ($value instanceof ParameterNotFound || !$value)) {
                 $value = $default;
             }
 
