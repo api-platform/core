@@ -13,24 +13,20 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Common;
 
+use ApiPlatform\Metadata\Parameter;
+
 trait ParameterValueExtractorTrait
 {
     /**
-     * @param array<string, mixed> $values
-     *
      * @return array<string, mixed>
      */
-    private function extractParameterValue(array $values): array
+    private function extractParameterValue(Parameter $parameter, mixed $value): array
     {
-        if (!$values) {
-            return $values;
-        }
-
-        $key = key($values);
+        $key = $parameter->getKey();
         if (!str_contains($key, ':property')) {
-            return $values;
+            return [$key => $value];
         }
 
-        return [str_replace('[:property]', '', $key) => $values[$key]];
+        return [str_replace('[:property]', '', $key) => $value];
     }
 }

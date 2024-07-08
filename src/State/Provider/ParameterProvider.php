@@ -64,7 +64,7 @@ final class ParameterProvider implements ProviderInterface
             }
 
             $parameters->add($parameter->getKey(), $parameter = $parameter->withExtraProperties(
-                $parameter->getExtraProperties() + ['_api_values' => [$parameter->getKey() => $value]]
+                $parameter->getExtraProperties() + ['_api_values' => $value]
             ));
 
             if (null === ($provider = $parameter->getProvider())) {
