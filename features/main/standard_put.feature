@@ -26,7 +26,7 @@ Feature: Spec-compliant PUT support
     }
     """
 
-  Scenario: Create a new resource with json-ld attributes
+  Scenario: Create a new resource with JSON-LD attributes
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/standard_puts/6" with body:
     """
