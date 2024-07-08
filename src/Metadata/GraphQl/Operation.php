@@ -89,6 +89,7 @@ class Operation extends AbstractOperation
         $processor = null,
         ?OptionsInterface $stateOptions = null,
         array|Parameters|null $parameters = null,
+        ?bool $queryParameterValidationEnabled = null,
         array $extraProperties = []
     ) {
         parent::__construct(
@@ -137,6 +138,7 @@ class Operation extends AbstractOperation
             processor: $processor,
             stateOptions: $stateOptions,
             parameters: $parameters,
+            queryParameterValidationEnabled: $queryParameterValidationEnabled,
             extraProperties: $extraProperties
         );
     }

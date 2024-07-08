@@ -30,6 +30,7 @@ trait OrderFilterTestTrait
                 'required' => false,
                 'schema' => [
                     'type' => 'string',
+                    'default' => 'asc',
                     'enum' => [
                         'asc',
                         'desc',
@@ -42,6 +43,7 @@ trait OrderFilterTestTrait
                 'required' => false,
                 'schema' => [
                     'type' => 'string',
+                    'default' => 'asc',
                     'enum' => [
                         'asc',
                         'desc',

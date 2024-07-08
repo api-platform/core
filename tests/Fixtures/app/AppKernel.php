@@ -234,6 +234,7 @@ class AppKernel extends Kernel
         $metadataBackwardCompatibilityLayer = (bool) ($_SERVER['EVENT_LISTENERS_BACKWARD_COMPATIBILITY_LAYER'] ?? false);
         $useSymfonyListeners = (bool) ($_SERVER['USE_SYMFONY_LISTENERS'] ?? false);
         $rfc7807CompliantErrors = (bool) ($_SERVER['RFC_7807_COMPLIANT_ERRORS'] ?? true);
+        $useQueryParameterValidator = (bool) ($_SERVER['QUERY_PARAMETER_VALIDATOR'] ?? false);
 
         $legacyConfig = [];
         if ($metadataBackwardCompatibilityLayer) {
@@ -263,6 +264,7 @@ class AppKernel extends Kernel
                 'extra_properties' => [
                     'rfc_7807_compliant_errors' => $rfc7807CompliantErrors,
                     'standard_put' => true,
+                    'use_legacy_parameter_validator' => $useQueryParameterValidator,
                 ],
             ],
         ]);

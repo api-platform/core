@@ -72,6 +72,7 @@ final class Subscription extends Operation
         $processor = null,
         ?OptionsInterface $stateOptions = null,
         array|Parameters|null $parameters = null,
+        ?bool $queryParameterValidationEnabled = null,
         array $extraProperties = [],
     ) {
         parent::__construct(
@@ -126,6 +127,7 @@ final class Subscription extends Operation
             processor: $processor,
             stateOptions: $stateOptions,
             parameters: $parameters,
+            queryParameterValidationEnabled: $queryParameterValidationEnabled,
             extraProperties: $extraProperties,
         );
     }

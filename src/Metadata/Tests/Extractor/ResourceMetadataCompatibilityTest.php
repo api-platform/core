@@ -188,6 +188,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                             'baz' => 'qux',
                         ],
                     ],
+                    'queryParameterValidationEnabled' => true,
                     'shortName' => self::SHORT_NAME,
                     'description' => 'Creates a Comment.',
                     'class' => Mutation::class,
@@ -251,6 +252,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                 ],
                 [
                     'class' => Query::class,
+                    'queryParameterValidationEnabled' => true,
                     'extraProperties' => [
                         'route_prefix' => '/v1',
                         'custom_property' => 'Lorem ipsum dolor sit amet',
@@ -267,6 +269,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                 ],
                 [
                     'class' => QueryCollection::class,
+                    'queryParameterValidationEnabled' => true,
                     'extraProperties' => [
                         'route_prefix' => '/v1',
                         'custom_property' => 'Lorem ipsum dolor sit amet',
@@ -283,6 +286,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                 ],
                 [
                     'class' => Subscription::class,
+                    'queryParameterValidationEnabled' => true,
                     'extraProperties' => [
                         'route_prefix' => '/v1',
                         'custom_property' => 'Lorem ipsum dolor sit amet',
