@@ -17,7 +17,7 @@ use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 
-class SecurityTests extends ApiTestCase
+class SecurityTest extends ApiTestCase
 {
     public function dataUserAuthorization(): iterable
     {
