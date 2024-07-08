@@ -75,8 +75,8 @@ final class ParameterTest extends ApiTestCase
     {
         $response = self::createClient()->request('GET', 'with_parameters_header_and_query?q=blabla', ['headers' => ['q' => '(complex stuff)']]);
         $this->assertEquals($response->toArray(), [
-            ['q' => ['(complex stuff)']],
-            ['q' => 'blabla'],
+            ['(complex stuff)'],
+            'blabla',
         ]);
     }
 }
