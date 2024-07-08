@@ -16,6 +16,7 @@ namespace ApiPlatform\Doctrine\Odm\Extension;
 use ApiPlatform\Doctrine\Common\ParameterValueExtractorTrait;
 use ApiPlatform\Doctrine\Odm\Filter\FilterInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\ParameterNotFound;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Psr\Container\ContainerInterface;
 
@@ -35,11 +36,11 @@ final class ParameterExtension implements AggregationCollectionExtensionInterfac
     private function applyFilter(Builder $aggregationBuilder, ?string $resourceClass = null, ?Operation $operation = null, array &$context = []): void
     {
         foreach ($operation->getParameters() ?? [] as $parameter) {
-            $values = $this->extractParameterValue($parameter->getValue() ?? []);
-            if (!$values) {
+            if (!($v = $parameter->getValue()) || $v instanceof ParameterNotFound) {
                 continue;
             }
 
+            $values = $this->extractParameterValue($parameter, $v);
             if (null === ($filterId = $parameter->getFilter())) {
                 continue;
             }

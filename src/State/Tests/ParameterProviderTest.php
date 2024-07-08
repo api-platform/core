@@ -59,8 +59,8 @@ final class ParameterProviderTest extends TestCase
         $operation = $request->attributes->get('_api_operation');
 
         $this->assertEquals('ok', $operation->getName());
-        $this->assertEquals(['order' => ['foo' => 'asc']], $operation->getParameters()->get('order', QueryParameter::class)->getValue());
-        $this->assertEquals(['search[:property]' => ['a' => 'bar']], $operation->getParameters()->get('search[:property]', QueryParameter::class)->getValue());
+        $this->assertEquals(['foo' => 'asc'], $operation->getParameters()->get('order', QueryParameter::class)->getValue());
+        $this->assertEquals(['a' => 'bar'], $operation->getParameters()->get('search[:property]', QueryParameter::class)->getValue());
     }
 
     public static function provide(): void

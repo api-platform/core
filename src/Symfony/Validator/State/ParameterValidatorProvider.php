@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Validator\State;
 
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\Util\ParameterParserTrait;
 use ApiPlatform\Validator\Exception\ValidationException;
@@ -39,11 +40,15 @@ final class ParameterValidatorProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        if (!($request = $context['request']) instanceof Request || false === $operation->getQueryParameterValidationEnabled()) {
+        if (!($request = $context['request']) instanceof Request) {
             return $this->decorated->provide($operation, $uriVariables, $context);
         }
 
         $operation = $request->attributes->get('_api_operation') ?? $operation;
+        if (!($operation->getQueryParameterValidationEnabled() ?? true)) {
+            return $this->decorated->provide($operation, $uriVariables, $context);
+        }
+
         $constraintViolationList = new ConstraintViolationList();
         foreach ($operation->getParameters() ?? [] as $parameter) {
             if (!$constraints = $parameter->getConstraints()) {
@@ -51,7 +56,11 @@ final class ParameterValidatorProvider implements ProviderInterface
             }
 
             $key = $parameter->getKey();
-            $value = $parameter->getValue()[$key] ?? null;
+            $value = $parameter->getValue();
+            if ($value instanceof ParameterNotFound) {
+                $value = null;
+            }
+
             $violations = $this->validator->validate($value, $constraints);
             foreach ($violations as $violation) {
                 $constraintViolationList->add(new ConstraintViolation(
