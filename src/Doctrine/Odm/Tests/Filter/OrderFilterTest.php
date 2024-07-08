@@ -42,6 +42,7 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'type' => 'string',
                 'required' => false,
                 'schema' => [
+                    'default' => 'asc',
                     'type' => 'string',
                     'enum' => [
                         'asc',
@@ -54,6 +55,7 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'type' => 'string',
                 'required' => false,
                 'schema' => [
+                    'default' => 'asc',
                     'type' => 'string',
                     'enum' => [
                         'asc',
@@ -66,6 +68,7 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'type' => 'string',
                 'required' => false,
                 'schema' => [
+                    'default' => 'asc',
                     'type' => 'string',
                     'enum' => [
                         'asc',
@@ -78,6 +81,7 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'type' => 'string',
                 'required' => false,
                 'schema' => [
+                    'default' => 'asc',
                     'type' => 'string',
                     'enum' => [
                         'asc',
@@ -90,6 +94,7 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'type' => 'string',
                 'required' => false,
                 'schema' => [
+                    'default' => 'asc',
                     'type' => 'string',
                     'enum' => [
                         'asc',
@@ -102,6 +107,7 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'type' => 'string',
                 'required' => false,
                 'schema' => [
+                    'default' => 'asc',
                     'type' => 'string',
                     'enum' => [
                         'asc',
@@ -114,6 +120,7 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'type' => 'string',
                 'required' => false,
                 'schema' => [
+                    'default' => 'asc',
                     'type' => 'string',
                     'enum' => [
                         'asc',
@@ -126,6 +133,7 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'type' => 'string',
                 'required' => false,
                 'schema' => [
+                    'default' => 'asc',
                     'type' => 'string',
                     'enum' => [
                         'asc',
@@ -138,6 +146,7 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'type' => 'string',
                 'required' => false,
                 'schema' => [
+                    'default' => 'asc',
                     'type' => 'string',
                     'enum' => [
                         'asc',
@@ -150,6 +159,7 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'type' => 'string',
                 'required' => false,
                 'schema' => [
+                    'default' => 'asc',
                     'type' => 'string',
                     'enum' => [
                         'asc',
@@ -162,6 +172,7 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'type' => 'string',
                 'required' => false,
                 'schema' => [
+                    'default' => 'asc',
                     'type' => 'string',
                     'enum' => [
                         'asc',
@@ -174,6 +185,7 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'type' => 'string',
                 'required' => false,
                 'schema' => [
+                    'default' => 'asc',
                     'type' => 'string',
                     'enum' => [
                         'asc',
@@ -187,6 +199,7 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'required' => false,
                 'schema' => [
                     'type' => 'string',
+                    'default' => 'asc',
                     'enum' => [
                         'asc',
                         'desc',
@@ -198,6 +211,7 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'type' => 'string',
                 'required' => false,
                 'schema' => [
+                    'default' => 'asc',
                     'type' => 'string',
                     'enum' => [
                         'asc',
@@ -210,6 +224,7 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'type' => 'string',
                 'required' => false,
                 'schema' => [
+                    'default' => 'asc',
                     'type' => 'string',
                     'enum' => [
                         'asc',
@@ -222,6 +237,7 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
                 'type' => 'string',
                 'required' => false,
                 'schema' => [
+                    'default' => 'asc',
                     'type' => 'string',
                     'enum' => [
                         'asc',

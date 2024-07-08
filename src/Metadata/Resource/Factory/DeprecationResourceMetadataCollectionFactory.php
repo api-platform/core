@@ -46,6 +46,10 @@ class DeprecationResourceMetadataCollectionFactory implements ResourceMetadataCo
                     $this->triggerDeprecationOnce($operation, 'extraProperties["standard_put"]', 'In API Platform 4 PUT will always replace the data, use extraProperties["standard_put"] to "true" on every operation to avoid breaking PUT\'s behavior. Use PATCH to use the old behavior.');
                 }
 
+                if (true === ($extraProperties['use_legacy_parameter_validator'] ?? null)) {
+                    $this->triggerDeprecationOnce($operation, 'extraProperties["use_legacy_parameter_validator"]', 'In API Platform 4 the query_parameter_validator will be removed in favor of Parameter constraints, set "use_legacy_parameter_validator" to false.');
+                }
+
                 $newOperations[$operationName] = $operation;
             }
 
