@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata;
 
 use ApiPlatform\OpenApi;
+use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ParameterProviderInterface;
 use Symfony\Component\Validator\Constraint;
 
@@ -107,7 +108,7 @@ abstract class Parameter
      */
     public function getValue(): mixed
     {
-        return $this->extraProperties['_api_values'] ?? null;
+        return $this->extraProperties['_api_values'] ?? new ParameterNotFound();
     }
 
     /**
