@@ -49,6 +49,29 @@ final class ItemNormalizer extends AbstractItemNormalizer
     use JsonLdContextTrait;
 
     public const FORMAT = 'jsonld';
+    public const JSONLD_KEYWORDS = [
+        '@context',
+        '@direction',
+        '@graph',
+        '@id',
+        '@import',
+        '@included',
+        '@index',
+        '@json',
+        '@language',
+        '@list',
+        '@nest',
+        '@none',
+        '@prefix',
+        '@propagate',
+        '@protected',
+        '@reverse',
+        '@set',
+        '@type',
+        '@value',
+        '@version',
+        '@vocab',
+    ];
 
     public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface|LegacyIriConverterInterface $iriConverter, ResourceClassResolverInterface|LegacyResourceClassResolverInterface $resourceClassResolver, private readonly ContextBuilderInterface $contextBuilder, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ?ResourceAccessCheckerInterface $resourceAccessChecker = null, protected ?TagCollectorInterface $tagCollector = null)
     {
@@ -151,7 +174,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             }
 
             try {
-                $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri($data['@id'], $context + ['fetch_data' => true]);
+                $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri($data['@id'], $context + ['fetch_data' => true], $context['operation'] ?? null);
             } catch (ItemNotFoundException $e) {
                 $operation = $context['operation'] ?? null;
                 if (!($operation instanceof Put && ($operation->getExtraProperties()['standard_put'] ?? false))) {
@@ -167,7 +190,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     {
         $allowedAttributes = parent::getAllowedAttributes($classOrObject, $context, $attributesAsString);
         if (\is_array($allowedAttributes) && ($context['api_denormalize'] ?? false)) {
-            $allowedAttributes = array_merge($allowedAttributes, ['@id', '@type', '@context']);
+            $allowedAttributes = array_merge($allowedAttributes, self::JSONLD_KEYWORDS);
         }
 
         return $allowedAttributes;

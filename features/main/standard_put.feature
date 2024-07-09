@@ -52,6 +52,20 @@ Feature: Spec-compliant PUT support
     }
     """
 
+  Scenario: Fails to create a new resource with the wrong JSON-LD @id
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "PUT" request to "/standard_puts/7" with body:
+    """
+    {
+      "@id": "/dummies/6",
+      "@context": "/contexts/StandardPut",
+      "@type": "StandardPut",
+      "foo": "a",
+      "bar": "b"
+    }
+    """
+    Then the response status code should be 400
+
   Scenario: Replace an existing resource
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/standard_puts/5" with body:
