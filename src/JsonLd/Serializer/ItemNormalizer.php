@@ -17,10 +17,12 @@ use ApiPlatform\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
 use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
+use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
@@ -47,6 +49,29 @@ final class ItemNormalizer extends AbstractItemNormalizer
     use JsonLdContextTrait;
 
     public const FORMAT = 'jsonld';
+    private const JSONLD_KEYWORDS = [
+        '@context',
+        '@direction',
+        '@graph',
+        '@id',
+        '@import',
+        '@included',
+        '@index',
+        '@json',
+        '@language',
+        '@list',
+        '@nest',
+        '@none',
+        '@prefix',
+        '@propagate',
+        '@protected',
+        '@reverse',
+        '@set',
+        '@type',
+        '@value',
+        '@version',
+        '@vocab',
+    ];
 
     public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface|LegacyIriConverterInterface $iriConverter, ResourceClassResolverInterface|LegacyResourceClassResolverInterface $resourceClassResolver, private readonly ContextBuilderInterface $contextBuilder, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ?ResourceAccessCheckerInterface $resourceAccessChecker = null, protected ?TagCollectorInterface $tagCollector = null)
     {
@@ -148,9 +173,26 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 throw new NotNormalizableValueException('Update is not allowed for this operation.');
             }
 
-            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri($data['@id'], $context + ['fetch_data' => true]);
+            try {
+                $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri($data['@id'], $context + ['fetch_data' => true], $context['operation'] ?? null);
+            } catch (ItemNotFoundException $e) {
+                $operation = $context['operation'] ?? null;
+                if (!($operation instanceof Put && ($operation->getExtraProperties()['standard_put'] ?? false))) {
+                    throw $e;
+                }
+            }
         }
 
         return parent::denormalize($data, $class, $format, $context);
+    }
+
+    protected function getAllowedAttributes(string|object $classOrObject, array $context, bool $attributesAsString = false): array|bool
+    {
+        $allowedAttributes = parent::getAllowedAttributes($classOrObject, $context, $attributesAsString);
+        if (\is_array($allowedAttributes) && ($context['api_denormalize'] ?? false)) {
+            $allowedAttributes = array_merge($allowedAttributes, self::JSONLD_KEYWORDS);
+        }
+
+        return $allowedAttributes;
     }
 }
