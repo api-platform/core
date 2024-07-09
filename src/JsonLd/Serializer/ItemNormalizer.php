@@ -177,7 +177,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri($data['@id'], $context + ['fetch_data' => true], $context['operation'] ?? null);
             } catch (ItemNotFoundException $e) {
                 $operation = $context['operation'] ?? null;
-                if (!($operation instanceof Put && ($operation->getExtraProperties()['standard_put'] ?? false))) {
+                if ($operation instanceof HttpOperation && !($operation->getMethod() === 'PUT' && ($operation->getExtraProperties()['standard_put'] ?? false))) {
                     throw $e;
                 }
             }
