@@ -78,7 +78,13 @@ final class IriConverter implements IriConverterInterface
             throw new InvalidArgumentException(sprintf('No resource associated to "%s".', $iri));
         }
 
-        if ($operation && $operation->getClass() !== $parameters['_api_resource_class']) {
+        foreach ($context['uri_variables'] ?? [] as $key => $value) {
+            if (!isset($parameters[$key]) || $parameters[$key] !== (string) $value) {
+                throw new InvalidArgumentException(sprintf('The iri "%s" does not reference the correct resource.', $iri));
+            }
+        }
+
+        if ($operation && !is_a($parameters['_api_resource_class'], $operation->getClass(), true)) {
             throw new InvalidArgumentException(sprintf('The iri "%s" does not reference the correct resource.', $iri));
         }
 

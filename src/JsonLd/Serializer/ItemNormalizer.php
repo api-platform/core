@@ -49,7 +49,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     use JsonLdContextTrait;
 
     public const FORMAT = 'jsonld';
-    public const JSONLD_KEYWORDS = [
+    private const JSONLD_KEYWORDS = [
         '@context',
         '@direction',
         '@graph',
