@@ -22,7 +22,6 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
-use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
@@ -178,7 +177,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             } catch (ItemNotFoundException $e) {
                 $operation = $context['operation'] ?? null;
 
-                if (!($operation?->getMethod() === 'PUT' && ($operation?->getExtraProperties()['standard_put'] ?? false))) {
+                if (!('PUT' === $operation?->getMethod() && ($operation->getExtraProperties()['standard_put'] ?? false))) {
                     throw $e;
                 }
             }
