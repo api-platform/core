@@ -45,7 +45,7 @@ final class ValidationTest extends ApiTestCase
                 'enum[]=c&enum[]=c',
                 [
                     [
-                        'propertyPath' => 'enum', 'message' => 'This collection should contain only unique elements.',
+                        'message' => 'This collection should contain only unique elements.',
                     ],
                     [
                         'propertyPath' => 'enum', 'message' => 'The value you selected is not a valid choice.',
