@@ -448,8 +448,9 @@ services:
             $decorated: '@.inner'
 
     ApiPlatform\Tests\Fixtures\TestBundle\Serializer\ErrorNormalizer:
-        decorates: 'api_platform.problem.normalizer.error'
-        arguments: [ '@.inner' ]
+        arguments: [ '@serializer.normalizer.problem' ]
+        tags:
+            - name: 'serializer.normalizer'
 
     api_platform.http_cache.tag_collector:
         class: ApiPlatform\Tests\Fixtures\TestBundle\HttpCache\TagCollectorDefault
