@@ -1,5 +1,27 @@
 # Changelog
 
+## v3.3.8
+
+### Bug fixes
+
+* [0edc73806](https://github.com/api-platform/core/commit/0edc73806c047b04c452a1cd7bc1132106906d02) fix(state): allow to skip parameter validator provider (#6452)
+* [25c5f222d](https://github.com/api-platform/core/commit/25c5f222dbe24ff111d2ba2b19556112a50ed87a) fix(graphql): security after resolver (#6444)
+* [32ef3d4e2](https://github.com/api-platform/core/commit/32ef3d4e24f14b361e2c67efb2494b8494a87b12) fix(jsonld): allow @id, @context and @type on denormalization 2 (#6451)
+* [4de43bab9](https://github.com/api-platform/core/commit/4de43bab9fbcafcd79ceac9bbe3a1293b56303c4) fix: swagger ui provider accept html (#6449)
+* [65ac0d228](https://github.com/api-platform/core/commit/65ac0d22885c8c9b68df9f3becd1b004746ce019) fix(symfony): property info with doctrine collections
+* [7926dc68d](https://github.com/api-platform/core/commit/7926dc68d1d0e9df7ff6439487beb782dd124671) fix: parameter not found when no value (#6458)
+* [93e4b3d70](https://github.com/api-platform/core/commit/93e4b3d709a6a9bbfb4fd0722f7aa5b01efa57d7) fix(state): store parameter value without its key (#6456)
+* [c086dfe9d](https://github.com/api-platform/core/commit/c086dfe9dd516e5fa26e1a819ba0477c50b4ffda) fix(openapi): optional yaml component (#6445)
+* [c473b2efe](https://github.com/api-platform/core/commit/c473b2efec4e53929fbe2832452894d489002455) fix(state): query and header parameter with the same name (#6453)
+
+
+### Features
+
+These are enhancement to the experimental Parameter feature:
+
+* [9ac50d294](https://github.com/api-platform/core/commit/9ac50d294f95a0c34baf67aebf3ea5623bc1be4c) feat(state): review validation for required parameters (#6441)
+* [c2d3aeb91](https://github.com/api-platform/core/commit/c2d3aeb91764e5fa1f8f56de3a800cc69364a9b0) feat(state): list all violations during query parameters validation (#6442)
+
 ## v3.3.7
 
 ### Bug fixes
