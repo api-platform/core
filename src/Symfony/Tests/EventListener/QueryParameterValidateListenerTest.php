@@ -204,7 +204,7 @@ class QueryParameterValidateListenerTest extends TestCase
         $event = new RequestEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             new Request([], [], ['_api_resource_class' => Dummy::class, '_api_operation_name' => 'get', '_api_platform_disable_listeners' => true]),
-            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
+            HttpKernelInterface::MAIN_REQUEST,
         );
 
         $listener->onKernelRequest($event);

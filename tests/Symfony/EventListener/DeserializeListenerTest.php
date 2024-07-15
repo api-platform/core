@@ -416,7 +416,7 @@ class DeserializeListenerTest extends TestCase
         $event = new RequestEvent(
             $this->prophesize(HttpKernelInterface::class)->reveal(),
             $request,
-            \defined(HttpKernelInterface::class.'::MAIN_REQUEST') ? HttpKernelInterface::MAIN_REQUEST : HttpKernelInterface::MASTER_REQUEST,
+            HttpKernelInterface::MAIN_REQUEST,
         );
 
         $this->expectException(UnsupportedMediaTypeHttpException::class);

@@ -30,7 +30,7 @@
         "php": ">=8.1",
         "api-platform/state": "*@dev || ^3.1",
         "api-platform/metadata": "*@dev || ^3.1",
-        "psr/container": "1.1|2.0",
+        "psr/container": "^1.0 || ^2.0",
         "symfony/deprecation-contracts": "^3.1"
     },
     "require-dev": {
@@ -38,7 +38,6 @@
         "sebastian/comparator": "<5.0",
         "symfony/phpunit-bridge": "^6.4 || ^7.0"
     },
-    "suggest": {},
     "autoload": {
         "psr-4": {
             "ApiPlatform\\ParameterValidator\\": ""
@@ -59,10 +58,11 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "3.3.x-dev"
+            "dev-main": "4.0.x-dev",
+            "dev-3.4": "3.4.x-dev"
         },
         "symfony": {
-            "require": "^6.4"
+            "require": "^6.4 || ^7.1"
         }
     },
     "scripts": {
