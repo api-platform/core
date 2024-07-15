@@ -78,6 +78,17 @@ final class IriConverter implements IriConverterInterface
             throw new InvalidArgumentException(sprintf('No resource associated to "%s".', $iri));
         }
 
+        // uri_variables come from the Request context and may not be available
+        foreach ($context['uri_variables'] ?? [] as $key => $value) {
+            if (!isset($parameters[$key]) || $parameters[$key] !== (string) $value) {
+                throw new InvalidArgumentException(sprintf('The iri "%s" does not reference the correct resource.', $iri));
+            }
+        }
+
+        if ($operation && !is_a($parameters['_api_resource_class'], $operation->getClass(), true)) {
+            throw new InvalidArgumentException(sprintf('The iri "%s" does not reference the correct resource.', $iri));
+        }
+
         $operation = $parameters['_api_operation'] = $this->resourceMetadataCollectionFactory->create($parameters['_api_resource_class'])->getOperation($parameters['_api_operation_name']);
 
         if ($operation instanceof CollectionOperationInterface) {

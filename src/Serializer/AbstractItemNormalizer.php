@@ -220,7 +220,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 throw new LogicException('Cannot denormalize the input because the injected serializer is not a denormalizer');
             }
 
-            unset($context['input'], $context['operation'], $context['operation_name']);
+            unset($context['input'], $context['operation'], $context['operation_name'], $context['uri_variables']);
             $context['resource_class'] = $inputClass;
 
             try {
