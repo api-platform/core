@@ -272,7 +272,7 @@ class AppKernel extends Kernel
             $c->prependExtensionConfig('doctrine', [
                 'orm' => [
                     'report_fields_where_declared' => true,
-                    'controller_resolver' => ['auto_mapping' => true],
+                    'controller_resolver' => ['auto_mapping' => false],
                     'enable_lazy_ghost_objects' => true,
                 ],
             ]);
