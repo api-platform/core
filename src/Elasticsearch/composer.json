@@ -28,9 +28,9 @@
         "elasticsearch/elasticsearch": "^8.9",
         "symfony/cache": "^6.4 || ^7.0",
         "symfony/console": "^6.4 || ^7.0",
-        "symfony/property-access": "^6.4 || ^7.0",
-        "symfony/property-info": "^6.4 || ^7.0",
-        "symfony/serializer": "^6.4 || ^7.0",
+        "symfony/property-access": "^6.4 || ^7.1",
+        "symfony/property-info": "^6.4 || ^7.1",
+        "symfony/serializer": "^6.4 || ^7.1",
         "symfony/uid": "^6.4 || ^7.0"
     },
     "require-dev": {
@@ -59,10 +59,11 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "3.3.x-dev"
+            "dev-main": "4.0.x-dev",
+            "dev-3.4": "3.4.x-dev"
         },
         "symfony": {
-            "require": "^6.4"
+            "require": "^6.4 || ^7.1"
         }
     },
     "scripts": {

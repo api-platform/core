@@ -27,7 +27,7 @@
         "api-platform/state": "*@dev || ^3.1",
         "doctrine/mongodb-odm": "^2.2",
         "doctrine/mongodb-odm-bundle": "^5.0",
-        "symfony/property-info": "^6.4 || ^7.0"
+        "symfony/property-info": "^6.4 || ^7.1"
     },
     "require-dev": {
         "api-platform/parameter-validator": "*@dev || ^3.2",
@@ -59,10 +59,11 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "3.3.x-dev"
+            "dev-main": "4.0.x-dev",
+            "dev-3.4": "3.4.x-dev"
         },
         "symfony": {
-            "require": "^6.4"
+            "require": "^6.4 || ^7.1"
         }
     },
     "scripts": {
