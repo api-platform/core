@@ -141,9 +141,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         // Never remove this, with `application/json` we don't use our AbstractCollectionNormalizer and we need
         // to remove the collection operation from our context or we'll introduce security issues
         if (isset($context['operation']) && $context['operation'] instanceof CollectionOperationInterface) {
-            unset($context['operation_name']);
-            unset($context['operation']);
-            unset($context['iri']);
+            unset($context['operation_name'], $context['operation'], $context['iri']);
         }
 
         if ($this->resourceClassResolver->isResourceClass($resourceClass)) {
@@ -176,8 +174,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $data = parent::normalize($object, $format, $context);
 
         $context['data'] = $data;
-        unset($context['property_metadata']);
-        unset($context['api_attribute']);
+        unset($context['property_metadata'], $context['api_attribute']);
 
         if ($emptyResourceAsIri && \is_array($data) && 0 === \count($data)) {
             $context['data'] = $iri;
@@ -761,6 +758,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             unset(
                 $context['resource_class'],
                 $context['force_resource_class'],
+                $context['uri_variables'],
             );
 
             // Anonymous resources
@@ -791,8 +789,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
         }
 
-        unset($context['resource_class']);
-        unset($context['force_resource_class']);
+        unset(
+            $context['resource_class'],
+            $context['force_resource_class'],
+            $context['uri_variables']
+        );
 
         $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
 
@@ -850,8 +851,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $context['iri'] = $iri = $this->iriConverter->getIriFromResource(resource: $relatedObject, context: $context);
         $context['data'] = $iri;
         $context['object'] = $relatedObject;
-        unset($context['property_metadata']);
-        unset($context['api_attribute']);
+        unset($context['property_metadata'], $context['api_attribute']);
 
         if ($this->tagCollector) {
             $this->tagCollector->collect($context);
@@ -909,6 +909,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             ) {
                 $resourceClass = $this->resourceClassResolver->getResourceClass(null, $className);
                 $context['resource_class'] = $resourceClass;
+                unset($context['uri_variables']);
 
                 return $this->denormalizeCollection($attribute, $propertyMetadata, $type, $resourceClass, $value, $format, $context);
             }
@@ -933,7 +934,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                     throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', DenormalizerInterface::class));
                 }
 
-                unset($context['resource_class']);
+                unset($context['resource_class'], $context['uri_variables']);
 
                 return $this->serializer->denormalize($value, $className.'[]', $format, $context);
             }
@@ -943,7 +944,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                     throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', DenormalizerInterface::class));
                 }
 
-                unset($context['resource_class']);
+                unset($context['resource_class'], $context['uri_variables']);
 
                 return $this->serializer->denormalize($value, $className, $format, $context);
             }
