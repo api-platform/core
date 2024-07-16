@@ -1,5 +1,12 @@
 # Changelog
 
+## v3.3.9
+
+### Bug fixes
+
+* [84df46786](https://github.com/api-platform/core/commit/84df4678618869f439a7995a2534440c031e10f3) fix(jsonld): remove request uri variables when denormalizing output (#6467)
+* [ffb4ad31f](https://github.com/api-platform/core/commit/ffb4ad31f30b531a5102da8cd92235e070f43b86) fix(jsonld): mitigate #6465 (#6469)
+
 ## v3.3.8
 
 ### Bug fixes
