@@ -28,7 +28,6 @@ final class ApiProperty
      * @param bool|null               $writableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
      * @param bool|null               $required                https://api-platform.com/docs/admin/validation/#client-side-validation
      * @param bool|null               $identifier              https://api-platform.com/docs/core/identifiers/
-     * @param string|null             $default
      * @param mixed                   $example                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
      * @param string|null             $deprecationReason       https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
      * @param bool|null               $fetchEager              https://api-platform.com/docs/core/performance/#eager-loading
@@ -50,7 +49,7 @@ final class ApiProperty
         private ?bool $writableLink = null,
         private ?bool $required = null,
         private ?bool $identifier = null,
-        private $default = null,
+        private mixed $default = null,
         private mixed $example = null,
         /**
          * The `deprecationReason` option deprecates the current operation with a deprecation message.
