@@ -27,7 +27,6 @@ use ApiPlatform\Metadata\Operation;
 final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareInterface
 {
     private const BASE_PROP = [
-        'readOnly' => true,
         'type' => 'string',
     ];
     private const BASE_PROPS = [
@@ -36,7 +35,6 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     ];
     private const BASE_ROOT_PROPS = [
         '@context' => [
-            'readOnly' => true,
             'oneOf' => [
                 ['type' => 'string'],
                 [
@@ -87,17 +85,15 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             }
         }
 
-        if ('input' === $type) {
-            return $schema;
-        }
-
         $definitions = $schema->getDefinitions();
         if ($key = $schema->getRootDefinitionKey()) {
             $definitions[$key]['properties'] = self::BASE_ROOT_PROPS + ($definitions[$key]['properties'] ?? []);
-            foreach (array_keys(self::BASE_ROOT_PROPS) as $property) {
-                $definitions[$key]['required'] ??= [];
-                if (!\in_array($property, $definitions[$key]['required'], true)) {
-                    $definitions[$key]['required'][] = $property;
+            if (Schema::TYPE_OUTPUT === $type) {
+                foreach (array_keys(self::BASE_ROOT_PROPS) as $property) {
+                    $definitions[$key]['required'] ??= [];
+                    if (!\in_array($property, $definitions[$key]['required'], true)) {
+                        $definitions[$key]['required'][] = $property;
+                    }
                 }
             }
 
@@ -105,10 +101,12 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
         if ($key = $schema->getItemsDefinitionKey()) {
             $definitions[$key]['properties'] = self::BASE_PROPS + ($definitions[$key]['properties'] ?? []);
-            foreach (array_keys(self::BASE_PROPS) as $property) {
-                $definitions[$key]['required'] ??= [];
-                if (!\in_array($property, $definitions[$key]['required'], true)) {
-                    $definitions[$key]['required'][] = $property;
+            if (Schema::TYPE_OUTPUT === $type) {
+                foreach (array_keys(self::BASE_PROPS) as $property) {
+                    $definitions[$key]['required'] ??= [];
+                    if (!\in_array($property, $definitions[$key]['required'], true)) {
+                        $definitions[$key]['required'][] = $property;
+                    }
                 }
             }
         }

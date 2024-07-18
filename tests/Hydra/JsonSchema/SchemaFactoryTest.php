@@ -101,7 +101,6 @@ class SchemaFactoryTest extends TestCase
         $this->assertArrayHasKey('@context', $properties);
         $this->assertEquals(
             [
-                'readOnly' => true,
                 'oneOf' => [
                     ['type' => 'string'],
                     [

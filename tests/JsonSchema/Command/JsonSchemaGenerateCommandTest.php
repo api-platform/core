@@ -76,9 +76,9 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--operation' => '_api_/dummies{._format}_post', '--format' => 'jsonld', '--type' => 'input']);
         $result = $this->tester->getDisplay();
 
-        $this->assertStringNotContainsString('@id', $result);
-        $this->assertStringNotContainsString('@context', $result);
-        $this->assertStringNotContainsString('@type', $result);
+        $this->assertStringContainsString('@id', $result);
+        $this->assertStringContainsString('@context', $result);
+        $this->assertStringContainsString('@type', $result);
     }
 
     /**
