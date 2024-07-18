@@ -163,10 +163,10 @@ class OpenApiFactoryTest extends TestCase
                     new Parameter(
                         name: 'page',
                         in: 'query',
-                        description: 'Test modified collection page number',
+                        description: 'Test modified collection page identifier',
                         required: false,
                         allowEmptyValue: true,
-                        schema: ['type' => 'integer', 'default' => 1],
+                        schema: ['type' => 'string'],
                     ),
                 ],
             ))->withOperation($baseOperation),
@@ -571,9 +571,8 @@ class OpenApiFactoryTest extends TestCase
             'Retrieves the collection of Dummy resources.',
             null,
             [
-                new Parameter('page', 'query', 'Test modified collection page number', false, false, true, [
-                    'type' => 'integer',
-                    'default' => 1,
+                new Parameter('page', 'query', 'Test modified collection page identifier', false, false, true, [
+                    'type' => 'string',
                 ]),
                 new Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, true, [
                     'type' => 'integer',
@@ -772,9 +771,8 @@ class OpenApiFactoryTest extends TestCase
             'Retrieves the collection of Dummy resources.',
             null,
             [
-                new Parameter('page', 'query', 'The collection page number', false, false, true, [
-                    'type' => 'integer',
-                    'default' => 1,
+                new Parameter('page', 'query', 'The collection page identifier', false, false, true, [
+                    'type' => 'string',
                 ]),
                 new Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, true, [
                     'type' => 'integer',
@@ -817,9 +815,8 @@ class OpenApiFactoryTest extends TestCase
             'Retrieves the collection of Dummy resources.',
             null,
             [
-                new Parameter('page', 'query', 'The collection page number', false, false, true, [
-                    'type' => 'integer',
-                    'default' => 1,
+                new Parameter('page', 'query', 'The collection page identifier', false, false, true, [
+                    'type' => 'string',
                 ]),
                 new Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, true, [
                     'type' => 'integer',
@@ -994,9 +991,8 @@ class OpenApiFactoryTest extends TestCase
             'Retrieves the collection of Dummy resources.',
             null,
             [
-                new Parameter('page', 'query', 'The collection page number', false, false, true, [
-                    'type' => 'integer',
-                    'default' => 1,
+                new Parameter('page', 'query', 'The collection page identifier', false, false, true, [
+                    'type' => 'string',
                 ]),
                 new Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, true, [
                     'type' => 'integer',
