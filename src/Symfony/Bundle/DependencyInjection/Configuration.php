@@ -88,6 +88,7 @@ final class Configuration implements ConfigurationInterface
                 ->booleanNode('show_webby')->defaultTrue()->info('If true, show Webby on the documentation page')->end()
                 ->booleanNode('event_listeners_backward_compatibility_layer')->defaultNull()->info('If true API Platform uses Symfony event listeners instead of providers and processors.')->end()
                 ->booleanNode('use_symfony_listeners')->defaultNull()->info(sprintf('Uses Symfony event listeners instead of the %s.', MainController::class))->end()
+                ->booleanNode('normalize_child_class_attribute_groups')->defaultNull()->info('Search in child classes groups for normalization')->end()
                 ->scalarNode('name_converter')->defaultNull()->info('Specify a name converter to use.')->end()
                 ->scalarNode('asset_package')->defaultNull()->info('Specify an asset package name to use.')->end()
                 ->scalarNode('path_segment_name_generator')->defaultValue('api_platform.metadata.path_segment_name_generator.underscore')->info('Specify a path name generator to use.')->end()
