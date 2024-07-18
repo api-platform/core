@@ -18,7 +18,6 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -34,9 +33,6 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareInterface
 {
     use ResourceMetadataTrait;
-
-    private const PATCH_SCHEMA_POSTFIX = '.patch';
-
     private ?TypeFactoryInterface $typeFactory = null;
     private ?SchemaFactoryInterface $schemaFactory = null;
     // Edge case where the related resource is not readable (for example: NotExposed) but we have groups to read the whole related object
@@ -92,12 +88,6 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             return $schema;
         }
 
-        $isJsonMergePatch = 'json' === $format && $operation instanceof Patch && Schema::TYPE_INPUT === $type;
-
-        if ($isJsonMergePatch) {
-            $definitionName .= self::PATCH_SCHEMA_POSTFIX;
-        }
-
         if (!isset($schema['$ref']) && !isset($schema['type'])) {
             $ref = Schema::VERSION_OPENAPI === $version ? '#/components/schemas/'.$definitionName : '#/definitions/'.$definitionName;
             if ($forceCollection || ('POST' !== $method && $operation instanceof CollectionOperationInterface)) {
@@ -146,7 +136,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             }
 
             $normalizedPropertyName = $this->nameConverter ? $this->nameConverter->normalize($propertyName, $inputOrOutputClass, $format, $serializerContext) : $propertyName;
-            if ($propertyMetadata->isRequired() && !$isJsonMergePatch) {
+            if ($propertyMetadata->isRequired()) {
                 $definition['required'][] = $normalizedPropertyName;
             }
 
