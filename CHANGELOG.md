@@ -1,5 +1,15 @@
 # Changelog
 
+## v3.3.10
+
+### Bug fixes
+
+* [6776231ed](https://github.com/api-platform/core/commit/6776231eddebb8dbb9efdc66dec29247172cf0ea) fix: remove useless deprecation (#6481)
+* [71dbfb1af](https://github.com/api-platform/core/commit/71dbfb1af029b4c9e7d53d9e5c2b38ff97ac68a7) fix: property called default in ApiProperty has incorrect type (#6471) (#6472)
+* [c3e2e5b82](https://github.com/api-platform/core/commit/c3e2e5b8298f187f34e091af0f0a58e671ae853c) fix(symfony): securityPostValidation when use_symfony_listeners (#6479)
+* [e3013d40d](https://github.com/api-platform/core/commit/e3013d40dc601ff580d2d69d3228c36af3f457b6) Revert "fix(jsonschema): make all required properties optional in PATCH opera…" (#6476)
+* [aeca0149d](https://github.com/api-platform/core/commit/aeca0149dc488ac0fefd90adaae4a65df49bab1a) fix(jsonschema): make JSON-LD specific properties required in the output schema (#6366)
+
 ## v3.3.9
 
 ### Bug fixes
