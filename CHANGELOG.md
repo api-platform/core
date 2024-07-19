@@ -264,6 +264,12 @@ api_platform:
         form: ['multipart/form-data']
 ```
 
+## v3.2.26
+
+### Bug fixes
+
+* [6776231ed](https://github.com/api-platform/core/commit/6776231eddebb8dbb9efdc66dec29247172cf0ea) fix: remove useless deprecation (#6481)
+
 ## v3.2.25
 
 ### Bug fixes
