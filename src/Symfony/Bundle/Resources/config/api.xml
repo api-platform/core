@@ -5,14 +5,18 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="api_platform.action.not_found" class="ApiPlatform\Action\NotFoundAction" public="true" />
-        <service id="api_platform.action.not_exposed" class="ApiPlatform\Action\NotExposedAction" public="true" />
-        <service id="ApiPlatform\Action\NotFoundAction" alias="api_platform.action.not_found" public="true" />
-        <service id="ApiPlatform\Action\NotExposedAction" alias="api_platform.action.not_exposed" public="true" />
+        <service id="api_platform.action.not_found" class="ApiPlatform\Symfony\Action\NotFoundAction" public="true" />
+        <service id="api_platform.action.not_exposed" class="ApiPlatform\Symfony\Action\NotExposedAction" public="true" />
+        <service id="ApiPlatform\Symfony\Action\NotFoundAction" alias="api_platform.action.not_found" public="true" />
+        <service id="ApiPlatform\Symfony\Action\NotExposedAction" alias="api_platform.action.not_exposed" public="true" />
         <service id="api_platform.serializer" alias="serializer" />
         <service id="api_platform.property_accessor" alias="property_accessor" public="false" />
         <service id="api_platform.property_info" alias="property_info" public="false" />
         <service id="api_platform.negotiator" class="Negotiation\Negotiator" public="false" />
+
+        <!-- deprecated -->
+        <service id="ApiPlatform\Action\NotFoundAction" alias="api_platform.action.not_found" public="true" />
+        <service id="ApiPlatform\Action\NotExposedAction" alias="api_platform.action.not_exposed" public="true" />
 
         <service id="api_platform.resource_class_resolver" class="ApiPlatform\Metadata\ResourceClassResolver" public="false">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />

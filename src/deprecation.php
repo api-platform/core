@@ -24,7 +24,30 @@ $deprecatedClassesWithAliases = [
     ApiPlatform\Api\QueryParameterValidator\Validator\Required::class => ApiPlatform\ParameterValidator\Validator\Required::class,
 ];
 
-spl_autoload_register(function ($className) use ($deprecatedClassesWithAliases): void {
+$movedClasses = [
+    ApiPlatform\Action\EntrypointAction::class => ApiPlatform\Symfony\Action\EntrypointAction::class,
+    ApiPlatform\Action\NotExposedAction::class => ApiPlatform\Symfony\Action\NotExposedAction::class,
+    ApiPlatform\Action\NotFoundAction::class => ApiPlatform\Symfony\Action\NotFoundAction::class,
+    ApiPlatform\Action\PlaceholderAction::class => ApiPlatform\Symfony\Action\PlaceholderAction::class,
+];
+
+$removedClasses = [
+    ApiPlatform\Action\ExceptionAction::class => true,
+];
+
+spl_autoload_register(function ($className) use ($deprecatedClassesWithAliases, $movedClasses, $removedClasses): void {
+    if (isset($removedClasses[$className])) {
+        trigger_deprecation('api-platform/core', '4.0', sprintf('The class %s is deprecated and will be removed.', $className));
+
+        return;
+    }
+
+    if (isset($movedClasses[$className])) {
+        trigger_deprecation('api-platform/core', '4.0', sprintf('The class %s is deprecated, use %s instead.', $className, $movedClasses[$className]));
+
+        return;
+    }
+
     if (isset($deprecatedClassesWithAliases[$className])) {
         trigger_deprecation('api-platform/core', '4.0', sprintf('The class %s is deprecated, use %s instead.', $className, $deprecatedClassesWithAliases[$className]));
 
