@@ -21,6 +21,9 @@ use ApiPlatform\ParameterValidator\ParameterValidator;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\Util\RequestParser;
 
+/**
+ * @deprecated the query parameter validator is deprecated
+ */
 final class QueryParameterValidateProvider implements ProviderInterface
 {
     public function __construct(private readonly ?ProviderInterface $decorated, private readonly ParameterValidator $parameterValidator)

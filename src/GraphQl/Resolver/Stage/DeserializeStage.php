@@ -23,6 +23,8 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  * Deserialize stage of GraphQL resolvers.
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
+ *
+ * @deprecated
  */
 final class DeserializeStage implements DeserializeStageInterface
 {

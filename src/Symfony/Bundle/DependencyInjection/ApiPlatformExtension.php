@@ -527,6 +527,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('openapi.xml');
 
+        if ($config['use_deprecated_json_schema_type_factory'] ?? false) {
+            $container->getDefinition('api_platform.openapi.factory')->setArgument('$jsonSchemaTypeFactory', new Reference('api_platform.json_schema.type_factory'));
+        }
+
         if (class_exists(Yaml::class)) {
             $loader->load('openapi/yaml.xml');
         }
@@ -975,6 +979,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.openapi.overrideResponses', $config['openapi']['overrideResponses']);
 
         $loader->load('json_schema.xml');
+
+        if ($config['use_deprecated_json_schema_type_factory'] ?? false) {
+            $container->getDefinition('api_platform.json_schema.schema_factory')->setArgument('$typeFactory', new Reference('api_platform.json_schema.type_factory'));
+        }
     }
 
     private function registerMakerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void

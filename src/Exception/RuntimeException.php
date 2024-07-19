@@ -17,6 +17,8 @@ namespace ApiPlatform\Exception;
  * Runtime exception.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @deprecated use ApiPlatform\Metadata\Exception\RuntimeException
  */
 class RuntimeException extends \RuntimeException implements ExceptionInterface
 {

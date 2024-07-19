@@ -18,6 +18,8 @@ use Symfony\Component\PropertyInfo\Type;
 /**
  * Factory for creating the JSON Schema document which specifies the data type corresponding to a PHP type.
  *
+ * @deprecated
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 interface TypeFactoryInterface

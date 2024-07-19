@@ -28,6 +28,8 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
  * Validates query parameters depending on filter description.
  *
  * @author Julien Deniau <julien.deniau@mapado.com>
+ *
+ * @deprecated
  */
 final class QueryParameterValidateListener
 {

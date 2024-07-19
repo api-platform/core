@@ -84,7 +84,7 @@
         "symfony/config": "^6.4 || ^7.1",
         "symfony/console": "^6.4 || ^7.1",
         "symfony/css-selector": "^6.4 || ^7.1",
-        "symfony/dependency-injection": "^6.4 || ^7.1.12",
+        "symfony/dependency-injection": "^6.4 || ^7.1",
         "symfony/doctrine-bridge": "^6.4 || ^7.1",
         "symfony/dom-crawler": "^6.4 || ^7.1",
         "symfony/error-handler": "^6.4 || ^7.1",

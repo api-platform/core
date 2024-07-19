@@ -17,6 +17,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * An action which always returns HTTP 404 Not Found. Useful for disabling an operation.
+ *
+ * @deprecated use ApiPlatform\Symfony\Action\NotFoundAction
  */
 final class NotFoundAction
 {

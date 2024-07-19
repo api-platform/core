@@ -11,14 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Action;
+namespace ApiPlatform\Symfony\Action;
 
 /**
  * Placeholder returning the data passed in parameter.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @deprecated use ApiPlatform\Symfony\Action\PlaceholderAction
  */
 final class PlaceholderAction
 {

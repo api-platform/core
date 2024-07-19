@@ -60,12 +60,14 @@ use Symfony\Component\Routing\RouterInterface;
 final class OpenApiFactory implements OpenApiFactoryInterface
 {
     use NormalizeOperationNameTrait;
+    use TypeFactoryTrait;
 
     public const BASE_URL = 'base_url';
     public const OVERRIDE_OPENAPI_RESPONSES = 'open_api_override_responses';
     private readonly Options $openApiOptions;
     private readonly PaginationOptions $paginationOptions;
     private ?RouteCollection $routeCollection = null;
+    private ?TypeFactoryInterface $jsonSchemaTypeFactory = null;
     private ?ContainerInterface $filterLocator = null;
 
     /**
@@ -73,11 +75,16 @@ final class OpenApiFactory implements OpenApiFactoryInterface
      */
     public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
 
-    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly SchemaFactoryInterface $jsonSchemaFactory, private readonly TypeFactoryInterface $jsonSchemaTypeFactory, ContainerInterface $filterLocator, private readonly array $formats = [], ?Options $openApiOptions = null, ?PaginationOptions $paginationOptions = null, private readonly ?RouterInterface $router = null)
+    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly SchemaFactoryInterface $jsonSchemaFactory, ?TypeFactoryInterface $jsonSchemaTypeFactory, ContainerInterface $filterLocator, private readonly array $formats = [], ?Options $openApiOptions = null, ?PaginationOptions $paginationOptions = null, private readonly ?RouterInterface $router = null)
     {
         $this->filterLocator = $filterLocator;
         $this->openApiOptions = $openApiOptions ?: new Options('API Platform');
         $this->paginationOptions = $paginationOptions ?: new PaginationOptions();
+
+        if ($jsonSchemaTypeFactory) {
+            trigger_deprecation('api-platform/core', '3.4', sprintf('Injecting the "%s" inside "%s" is deprecated and "%s" will be removed in 4.x.', TypeFactoryInterface::class, self::class, TypeFactoryInterface::class));
+            $this->jsonSchemaTypeFactory = $jsonSchemaTypeFactory;
+        }
     }
 
     /**
@@ -638,7 +645,47 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             }
 
             foreach ($filter->getDescription($entityClass) as $name => $data) {
-                $schema = $data['schema'] ?? (\in_array($data['type'], Type::$builtinTypes, true) ? $this->jsonSchemaTypeFactory->getType(new Type($data['type'], false, null, $data['is_collection'] ?? false), 'openapi') : ['type' => 'string']);
+                if (isset($data['swagger'])) {
+                    trigger_deprecation('api-platform/core', '4.0', sprintf('Using the "swagger" field of the %s::getDescription() (%s) is deprecated.', $filter::class, $operation->getShortName()));
+                }
+
+                if (!isset($data['openapi']) || $data['openapi'] instanceof Parameter) {
+                    $schema = $data['schema'] ?? [];
+
+                    if (isset($data['type']) && \in_array($data['type'] ?? null, Type::$builtinTypes, true) && !isset($schema['type'])) {
+                        $schema += $this->jsonSchemaTypeFactory ? $this->jsonSchemaTypeFactory->getType(new Type($data['type'], false, null, $data['is_collection'] ?? false)) : $this->getType(new Type($data['type'], false, null, $data['is_collection'] ?? false));
+                    }
+
+                    if (!isset($schema['type'])) {
+                        $schema['type'] = 'string';
+                    }
+
+                    $style = 'array' === ($schema['type'] ?? null) && \in_array(
+                        $data['type'],
+                        [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_OBJECT],
+                        true
+                    ) ? 'deepObject' : 'form';
+
+                    $parameter = isset($data['openapi']) && $data['openapi'] instanceof Parameter ? $data['openapi'] : new Parameter(in: 'query', name: $name, style: $style, explode: $data['is_collection'] ?? false);
+
+                    if ('' === $parameter->getDescription() && ($description = $data['description'] ?? '')) {
+                        $parameter = $parameter->withDescription($description);
+                    }
+
+                    if (false === $parameter->getRequired() && false !== ($required = $data['required'] ?? false)) {
+                        $parameter = $parameter->withRequired($required);
+                    }
+
+                    $parameters[] = $parameter->withSchema($schema);
+                    continue;
+                }
+
+                trigger_deprecation('api-platform/core', '4.0', sprintf('Not using "%s" on the "openapi" field of the %s::getDescription() (%s) is deprecated.', Parameter::class, $filter::class, $operation->getShortName()));
+                if ($this->jsonSchemaTypeFactory) {
+                    $schema = $data['schema'] ?? (\in_array($data['type'], Type::$builtinTypes, true) ? $this->jsonSchemaTypeFactory->getType(new Type($data['type'], false, null, $data['is_collection'] ?? false), 'openapi') : ['type' => 'string']);
+                } else {
+                    $schema = $data['schema'] ?? (\in_array($data['type'], Type::$builtinTypes, true) ? $this->getType(new Type($data['type'], false, null, $data['is_collection'] ?? false)) : ['type' => 'string']);
+                }
 
                 $parameters[] = new Parameter(
                     $name,

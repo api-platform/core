@@ -224,7 +224,7 @@ class OpenApiNormalizerTest extends TestCase
             $propertyNameCollectionFactory,
             $propertyMetadataFactory,
             $schemaFactory,
-            $typeFactory,
+            null,
             $filterLocatorProphecy->reveal(),
             [],
             new Options('Test API', 'This is a test API.', '1.2.3', true, 'oauth2', 'authorizationCode', '/oauth/v2/token', '/oauth/v2/auth', '/oauth/v2/refresh', ['scope param'], [

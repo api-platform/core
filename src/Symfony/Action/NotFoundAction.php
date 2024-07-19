@@ -11,15 +11,17 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Exception;
+namespace ApiPlatform\Symfony\Action;
 
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * @author Vincent Chalamon <vincentchalamon@gmail.com>
- *
- * @deprecated use ApiPlatform\Metadata\Exception\NotExposedHttpException
+ * An action which always returns HTTP 404 Not Found. Useful for disabling an operation.
  */
-class NotExposedHttpException extends NotFoundHttpException
+final class NotFoundAction
 {
+    public function __invoke(): void
+    {
+        throw new NotFoundHttpException();
+    }
 }

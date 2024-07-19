@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Exception;
 
+/**
+ * @deprecated
+ */
 class InvalidValueException extends InvalidArgumentException
 {
 }

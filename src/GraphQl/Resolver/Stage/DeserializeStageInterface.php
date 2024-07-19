@@ -19,6 +19,8 @@ use ApiPlatform\Metadata\GraphQl\Operation;
  * Deserialize stage of GraphQL resolvers.
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
+ *
+ * @deprecated
  */
 interface DeserializeStageInterface
 {

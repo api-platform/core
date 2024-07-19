@@ -18,7 +18,6 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -34,9 +33,6 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareInterface
 {
     use ResourceMetadataTrait;
-
-    private const PATCH_SCHEMA_POSTFIX = '.patch';
-
     private ?TypeFactoryInterface $typeFactory = null;
     private ?SchemaFactoryInterface $schemaFactory = null;
     // Edge case where the related resource is not readable (for example: NotExposed) but we have groups to read the whole related object
@@ -46,6 +42,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     public function __construct(?TypeFactoryInterface $typeFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null, ?ResourceClassResolverInterface $resourceClassResolver = null, private readonly ?array $distinctFormats = null, private ?DefinitionNameFactoryInterface $definitionNameFactory = null)
     {
         if ($typeFactory) {
+            trigger_deprecation('api-platform/core', '3.4', sprintf('Injecting the "%s" inside "%s" is deprecated and "%s" will be removed in 4.x.', TypeFactoryInterface::class, self::class, TypeFactoryInterface::class));
             $this->typeFactory = $typeFactory;
         }
         if (!$definitionNameFactory) {
@@ -90,12 +87,6 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         // In case of FORCE_SUBSCHEMA an object can be writable through another class even though it has no POST operation
         if (!($serializerContext[self::FORCE_SUBSCHEMA] ?? false) && Schema::TYPE_OUTPUT !== $type && !\in_array($method, ['POST', 'PATCH', 'PUT'], true)) {
             return $schema;
-        }
-
-        $isJsonMergePatch = 'json' === $format && $operation instanceof Patch && Schema::TYPE_INPUT === $type;
-
-        if ($isJsonMergePatch) {
-            $definitionName .= self::PATCH_SCHEMA_POSTFIX;
         }
 
         if (!isset($schema['$ref']) && !isset($schema['type'])) {
@@ -146,7 +137,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             }
 
             $normalizedPropertyName = $this->nameConverter ? $this->nameConverter->normalize($propertyName, $inputOrOutputClass, $format, $serializerContext) : $propertyName;
-            if ($propertyMetadata->isRequired() && !$isJsonMergePatch) {
+            if ($propertyMetadata->isRequired()) {
                 $definition['required'][] = $normalizedPropertyName;
             }
 
