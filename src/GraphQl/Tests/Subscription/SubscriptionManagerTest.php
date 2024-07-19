@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Tests\Subscription;
 
-use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\GraphQl\Subscription\SubscriptionIdentifierGeneratorInterface;
 use ApiPlatform\GraphQl\Subscription\SubscriptionManager;
 use ApiPlatform\GraphQl\Tests\Fixtures\ApiResource\Dummy;
@@ -24,6 +23,7 @@ use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\State\ProcessorInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -40,7 +40,7 @@ class SubscriptionManagerTest extends TestCase
 
     private ObjectProphecy $subscriptionsCacheProphecy;
     private ObjectProphecy $subscriptionIdentifierGeneratorProphecy;
-    private ObjectProphecy $serializeStageProphecy;
+    private ObjectProphecy $normalizeProcessor;
     private ObjectProphecy $iriConverterProphecy;
     private SubscriptionManager $subscriptionManager;
     private ObjectProphecy $resourceMetadataCollectionFactory;
@@ -52,10 +52,10 @@ class SubscriptionManagerTest extends TestCase
     {
         $this->subscriptionsCacheProphecy = $this->prophesize(CacheItemPoolInterface::class);
         $this->subscriptionIdentifierGeneratorProphecy = $this->prophesize(SubscriptionIdentifierGeneratorInterface::class);
-        $this->serializeStageProphecy = $this->prophesize(SerializeStageInterface::class);
+        $this->normalizeProcessor = $this->prophesize(ProcessorInterface::class);
         $this->iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $this->resourceMetadataCollectionFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $this->subscriptionManager = new SubscriptionManager($this->subscriptionsCacheProphecy->reveal(), $this->subscriptionIdentifierGeneratorProphecy->reveal(), $this->serializeStageProphecy->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceMetadataCollectionFactory->reveal());
+        $this->subscriptionManager = new SubscriptionManager($this->subscriptionsCacheProphecy->reveal(), $this->subscriptionIdentifierGeneratorProphecy->reveal(), $this->normalizeProcessor->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceMetadataCollectionFactory->reveal());
     }
 
     public function testRetrieveSubscriptionIdNoIdentifier(): void
@@ -206,8 +206,23 @@ class SubscriptionManagerTest extends TestCase
         ]);
         $this->subscriptionsCacheProphecy->getItem('_dummies_2')->willReturn($cacheItemProphecy->reveal());
 
-        $this->serializeStageProphecy->__invoke($object, Dummy::class, (new Subscription())->withName('update_subscription')->withShortName('Dummy'), ['fields' => ['fieldsFoo'], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true])->willReturn(['newResultFoo', 'clientSubscriptionId' => 'client-subscription-id']);
-        $this->serializeStageProphecy->__invoke($object, Dummy::class, (new Subscription())->withName('update_subscription')->withShortName('Dummy'), ['fields' => ['fieldsBar'], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true])->willReturn(['resultBar', 'clientSubscriptionId' => 'client-subscription-id']);
+        $this->normalizeProcessor->process(
+            $object,
+            (new Subscription())->withName('update_subscription')->withShortName('Dummy'),
+            [],
+            ['fields' => ['fieldsFoo'], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true]
+        )->willReturn(
+            ['newResultFoo', 'clientSubscriptionId' => 'client-subscription-id']
+        );
+
+        $this->normalizeProcessor->process(
+            $object,
+            (new Subscription())->withName('update_subscription')->withShortName('Dummy'),
+            [],
+            ['fields' => ['fieldsBar'], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true]
+        )->willReturn(
+            ['resultBar', 'clientSubscriptionId' => 'client-subscription-id']
+        );
 
         $this->assertEquals([['subscriptionIdFoo', ['newResultFoo']]], $this->subscriptionManager->getPushPayloads($object));
     }

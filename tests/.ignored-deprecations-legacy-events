@@ -26,3 +26,5 @@
 
 %The "Symfony\\Bundle\\MakerBundle\\Maker\\MakeAuthenticator" class is deprecated, use any of the Security\\Make\* commands instead%
 %Since symfony/validator 7.1: Not passing a value for the "requireTld" option to the Url constraint is deprecated. Its default value will change to "true".%
+%Since api-platform/core 3.4: Injecting the "ApiPlatform\\JsonSchema\\TypeFactoryInterface" inside "ApiPlatform\\JsonSchema\\SchemaFactory" is deprecated and "ApiPlatform\\JsonSchema\\TypeFactoryInterface" will be removed in 4.x.%
+%Since api-platform/core 3.4: Injecting the "ApiPlatform\\JsonSchema\\TypeFactoryInterface" inside "ApiPlatform\\OpenApi\\Factory\\OpenApiFactory" is deprecated and "ApiPlatform\\JsonSchema\\TypeFactoryInterface" will be removed in 4.x.%

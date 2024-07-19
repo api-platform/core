@@ -80,7 +80,6 @@ $removedClasses = [
     ApiPlatform\GraphQl\Resolver\Stage\WriteStage::class => true,
     ApiPlatform\GraphQl\Resolver\Stage\WriteStageInterface::class => true,
     ApiPlatform\HttpCache\EventListener\AddHeadersListener::class => true,
-    ApiPlatform\Symfony\EventListener\AddHeadersListener::class => true,
     ApiPlatform\HttpCache\EventListener\AddTagsListener::class => true,
     ApiPlatform\Hydra\EventListener\AddLinkHeaderListener::class => true,
     ApiPlatform\Hydra\Serializer\ErrorNormalizer::class => true,
