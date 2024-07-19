@@ -80,7 +80,6 @@ api_platform:
     http_cache:
         invalidation:
             enabled: true
-    keep_legacy_inflector: false
     enable_link_security: true
     # see also defaults in AppKernel
     doctrine_mongodb_odm: false
@@ -441,11 +440,6 @@ services:
     ApiPlatform\Tests\Fixtures\TestBundle\State\ODMLinkHandledDummyLinksHandler:
         tags:
             - name: 'api_platform.doctrine.odm.links_handler'
-
-    ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5896\TypeFactoryDecorator:
-        decorates: 'api_platform.json_schema.type_factory'
-        arguments:
-            $decorated: '@.inner'
 
     ApiPlatform\Tests\Fixtures\TestBundle\Serializer\ErrorNormalizer:
         arguments: [ '@serializer.normalizer.problem' ]

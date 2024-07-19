@@ -36,9 +36,7 @@ final class LinkFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    /**
-     * @dataProvider provideCreateLinksFromIdentifiersCases
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCreateLinksFromIdentifiersCases')]
     public function testCreateLinksFromIdentifiers(array $propertyNames, bool $compositeIdentifier, array $expectedLinks, ?bool $idAsIdentifier = null): void
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
@@ -62,41 +60,39 @@ final class LinkFactoryTest extends TestCase
     {
         yield 'no identifiers no id' => [
             ['slug'],
-            'compositeIdentifier' => false,
+            false,
             [],
         ];
         yield 'id detected as identifier' => [
             ['id'],
-            'compositeIdentifier' => false,
+            false,
             [(new Link())->withFromClass(AttributeResource::class)->withParameterName('id')->withIdentifiers(['id'])],
         ];
         yield 'id forced as identifier' => [
             ['id'],
-            'compositeIdentifier' => false,
+            false,
             [(new Link())->withFromClass(AttributeResource::class)->withParameterName('id')->withIdentifiers(['id'])],
             true,
         ];
         yield 'id forced as no identifier' => [
             ['id'],
-            'compositeIdentifier' => false,
+            false,
             [],
             false,
         ];
         yield 'name identifier' => [
             ['id', 'name'],
-            'compositeIdentifier' => false,
+            false,
             [(new Link())->withFromClass(AttributeResource::class)->withParameterName('name')->withIdentifiers(['name'])],
         ];
         yield 'composite identifier' => [
             ['composite1', 'composite2'],
-            'compositeIdentifier' => true,
+            true,
             [(new Link())->withFromClass(AttributeResource::class)->withParameterName('id')->withIdentifiers(['composite1', 'composite2'])->withCompositeIdentifier(true)],
         ];
     }
 
-    /**
-     * @dataProvider provideCreateLinksFromAttributesCases
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideCreateLinksFromAttributesCases')]
     public function testCreateLinksFromAttributes(array $builtinTypes, array $expectedLinks): void
     {
         $propertyNameCollectionFactory = new PropertyInfoPropertyNameCollectionFactory(new PropertyInfoExtractor([new ReflectionExtractor()]));

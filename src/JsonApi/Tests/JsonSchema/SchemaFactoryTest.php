@@ -53,7 +53,6 @@ class SchemaFactoryTest extends TestCase
         $definitionNameFactory = new DefinitionNameFactory(['jsonapi' => true]);
 
         $baseSchemaFactory = new BaseSchemaFactory(
-            typeFactory: null,
             resourceMetadataFactory: $resourceMetadataFactory->reveal(),
             propertyNameCollectionFactory: $propertyNameCollectionFactory->reveal(),
             propertyMetadataFactory: $propertyMetadataFactory->reveal(),

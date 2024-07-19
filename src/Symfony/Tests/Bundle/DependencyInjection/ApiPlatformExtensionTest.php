@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Tests\Bundle\DependencyInjection;
 
-use ApiPlatform\Action\NotFoundAction;
 use ApiPlatform\Metadata\Exception\ExceptionInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
@@ -25,6 +24,7 @@ use ApiPlatform\Serializer\Filter\PropertyFilter;
 use ApiPlatform\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginationOptions;
+use ApiPlatform\Symfony\Action\NotFoundAction;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
 use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
@@ -109,9 +109,7 @@ class ApiPlatformExtensionTest extends TestCase
         'graphql' => [
             'graphql_playground' => ['enabled' => false],
         ],
-        'event_listeners_backward_compatibility_layer' => false,
         'use_symfony_listeners' => false,
-        'keep_legacy_inflector' => false,
     ]];
 
     private ContainerBuilder $container;
@@ -177,9 +175,7 @@ class ApiPlatformExtensionTest extends TestCase
         $services = [
             'api_platform.action.documentation',
             'api_platform.action.entrypoint',
-            'api_platform.action.exception',
             'api_platform.action.not_found',
-            'api_platform.action.placeholder',
             'api_platform.api.identifiers_extractor',
             'api_platform.filter_locator',
             'api_platform.negotiator',
@@ -221,12 +217,6 @@ class ApiPlatformExtensionTest extends TestCase
             SerializerContextBuilderInterface::class,
             Pagination::class,
             PaginationOptions::class,
-            'api_platform.action.delete_item',
-            'api_platform.action.get_collection',
-            'api_platform.action.get_item',
-            'api_platform.action.patch_item',
-            'api_platform.action.post_collection',
-            'api_platform.action.put_item',
             'api_platform.identifiers_extractor',
             'api_platform.iri_converter',
             'api_platform.path_segment_name_generator',
@@ -283,6 +273,15 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.state_processor.serialize',
         ];
 
-        $this->assertContainerHas($services, []);
+        $aliases = [
+            'api_platform.action.delete_item',
+            'api_platform.action.get_collection',
+            'api_platform.action.get_item',
+            'api_platform.action.patch_item',
+            'api_platform.action.post_collection',
+            'api_platform.action.put_item',
+        ];
+
+        $this->assertContainerHas($services, $aliases);
     }
 }

@@ -35,9 +35,7 @@ class HttpExceptionNormalizerTest extends TestCase
         $this->httpExceptionNormalizer = new HttpExceptionNormalizer();
     }
 
-    /**
-     * @dataProvider exceptionProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('exceptionProvider')]
     public function testNormalize(HttpException $exception, string $expectedExceptionMessage, int $expectedStatus, string $expectedCategory): void
     {
         $error = new Error('test message', null, null, [], null, $exception);

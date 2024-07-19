@@ -46,17 +46,13 @@ class ReservedAttributeNameConverterTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider propertiesProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('propertiesProvider')]
     public function testNormalize(string $propertyName, string $expectedPropertyName): void
     {
         $this->assertSame($expectedPropertyName, $this->reservedAttributeNameConverter->normalize($propertyName));
     }
 
-    /**
-     * @dataProvider propertiesProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('propertiesProvider')]
     public function testDenormalize(string $expectedPropertyName, string $propertyName): void
     {
         $this->assertSame($expectedPropertyName, $this->reservedAttributeNameConverter->denormalize($propertyName));

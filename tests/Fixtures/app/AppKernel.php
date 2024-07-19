@@ -34,6 +34,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
 use Symfony\Component\HttpClient\Messenger\PingWebhookMessageHandler;
 use Symfony\Component\HttpFoundation\Session\SessionFactory;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 use Symfony\Component\Security\Core\Authorization\Strategy\AccessDecisionStrategyInterface;
@@ -68,6 +69,12 @@ class AppKernel extends Kernel
             new WebProfilerBundle(),
             new FrameworkBundle(),
             new MakerBundle(),
+            new class() extends Bundle {
+                public function shutdown(): void
+                {
+                    restore_exception_handler();
+                }
+            },
         ];
 
         if (null === ($_ENV['APP_PHPUNIT'] ?? null)) {
@@ -231,24 +238,15 @@ class AppKernel extends Kernel
         }
         $c->prependExtensionConfig('twig', $twigConfig);
 
-        $metadataBackwardCompatibilityLayer = (bool) ($_SERVER['EVENT_LISTENERS_BACKWARD_COMPATIBILITY_LAYER'] ?? false);
         $useSymfonyListeners = (bool) ($_SERVER['USE_SYMFONY_LISTENERS'] ?? false);
-        $rfc7807CompliantErrors = (bool) ($_SERVER['RFC_7807_COMPLIANT_ERRORS'] ?? true);
-        $useQueryParameterValidator = (bool) ($_SERVER['QUERY_PARAMETER_VALIDATOR'] ?? false);
 
-        $legacyConfig = [];
-        if ($metadataBackwardCompatibilityLayer) {
-            $legacyConfig = ['event_listeners_backward_compatibility_layer' => $metadataBackwardCompatibilityLayer];
-        }
-
-        $c->prependExtensionConfig('api_platform', $legacyConfig + [
+        $c->prependExtensionConfig('api_platform', [
             'mapping' => [
                 'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources'],
             ],
             'graphql' => [
                 'graphql_playground' => false,
             ],
-            'use_deprecated_json_schema_type_factory' => true,
             'use_symfony_listeners' => $useSymfonyListeners,
             'defaults' => [
                 'pagination_client_enabled' => true,
@@ -263,9 +261,7 @@ class AppKernel extends Kernel
                 ],
                 'normalization_context' => ['skip_null_values' => false],
                 'extra_properties' => [
-                    'rfc_7807_compliant_errors' => $rfc7807CompliantErrors,
                     'standard_put' => true,
-                    'use_legacy_parameter_validator' => $useQueryParameterValidator,
                 ],
             ],
         ]);
@@ -282,6 +278,11 @@ class AppKernel extends Kernel
         }
 
         $loader->load(__DIR__.'/config/config_swagger.php');
+
+        // We reduce the amount of resources to the strict minimum to speed up tests
+        if (null !== ($_ENV['APP_PHPUNIT'] ?? null)) {
+            $loader->load(__DIR__.'/config/phpunit.yml');
+        }
 
         if ('mongodb' === $this->environment) {
             $c->prependExtensionConfig('api_platform', [

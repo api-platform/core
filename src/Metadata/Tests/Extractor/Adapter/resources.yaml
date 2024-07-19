@@ -66,8 +66,6 @@ resources:
                     hydraContext:
                         foo:
                             bar: baz
-                    openapiContext:
-                        bar: baz
                     openapi:
                         extensionProperties:
                             bar: baz
@@ -189,8 +187,6 @@ resources:
             hydraContext:
                 foo:
                     bar: baz
-            openapiContext:
-                bar: baz
             openapi:
                 extensionProperties:
                     bar: baz
@@ -339,8 +335,8 @@ resources:
                 elasticsearchOptions:
                     index: foo_index
                     type: foo_type
-            parameters: null
             rules: null
+            parameters: null
             extraProperties:
                 custom_property: 'Lorem ipsum dolor sit amet'
                 another_custom_property:

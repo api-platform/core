@@ -17,6 +17,7 @@ use ApiPlatform\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\OpenApi\Model\Parameter;
 use Doctrine\ORM\QueryBuilder;
 
 class RequiredAllowEmptyFilter extends AbstractFilter
@@ -35,9 +36,7 @@ class RequiredAllowEmptyFilter extends AbstractFilter
                 'property' => 'required-allow-empty',
                 'type' => 'string',
                 'required' => true,
-                'swagger' => [
-                    'allowEmptyValue' => true,
-                ],
+                'openapi' => new Parameter(in: 'query', name: 'required-allow-empty', allowEmptyValue: true),
             ],
         ];
     }

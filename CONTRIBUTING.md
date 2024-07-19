@@ -117,11 +117,11 @@ Only the first commit on a Pull Request need to use a conventional commit, other
 
 ### Tests
 
-On `api-platform/core` there are two kinds of tests: unit (`phpunit` through `simple-phpunit`) and integration tests (`behat`).
+On `api-platform/core` there are two kinds of tests: unit (`phpunit`) and integration tests (`behat`).
 
 Note that we stopped using `prophesize` for new tests since 3.2, use `phpunit` stub system.
 
-Both `simple-phpunit` and `behat` are development dependencies and should be available in the `vendor` directory.
+Both `phpunit` and `behat` are development dependencies and should be available in the `vendor` directory.
 
 Recommendations:
 
@@ -129,6 +129,7 @@ Recommendations:
 * always add a new `ApiResource` or a new `Entity/Document` to add a new test instead of changing an existing class
 * as of API Platform 3 each component has it's own test directory, avoid the `tests/` directory except for functional tests
 * dependencies between components must be kept at its minimal (`api-platform/metadata`, `api-platform/state`) except for bridges (Doctrine, Symfony, Laravel etc.)
+* for functional testing with phpunit (see `tests/Functional`, add your ApiResource to `ApiPlatform\Tests\Fixtures\PhpUnitResourceNameCollectionFactory`)
 
 Note that in most of the testing, you don't need Doctrine take a look at how we write fixtures at: 
 

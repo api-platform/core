@@ -18,12 +18,11 @@ use ApiPlatform\OpenApi\OpenApi;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Serializer;
 
 /**
  * Generates an OpenAPI v3 specification.
  */
-final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
+final class OpenApiNormalizer implements NormalizerInterface
 {
     public const FORMAT = 'json';
     public const JSON_FORMAT = 'jsonopenapi';
@@ -80,19 +79,5 @@ final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsM
     public function getSupportedTypes($format): array
     {
         return (self::FORMAT === $format || self::JSON_FORMAT === $format || self::YAML_FORMAT === $format) ? [OpenApi::class => true] : [];
-    }
-
-    public function hasCacheableSupportsMethod(): bool
-    {
-        if (method_exists(Serializer::class, 'getSupportedTypes')) {
-            trigger_deprecation(
-                'api-platform/core',
-                '3.1',
-                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
-                __METHOD__
-            );
-        }
-
-        return true;
     }
 }

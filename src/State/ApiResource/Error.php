@@ -37,7 +37,6 @@ use Symfony\Component\WebLink\Link;
             normalizationContext: [
                 'groups' => ['jsonproblem'],
                 'skip_null_values' => true,
-                'rfc_7807_compliant_errors' => true,
             ],
         ),
         new Operation(
@@ -47,7 +46,6 @@ use Symfony\Component\WebLink\Link;
             normalizationContext: [
                 'groups' => ['jsonld'],
                 'skip_null_values' => true,
-                'rfc_7807_compliant_errors' => true,
             ],
             links: [new Link(rel: 'http://www.w3.org/ns/json-ld#error', href: 'http://www.w3.org/ns/hydra/error')],
         ),
@@ -58,7 +56,6 @@ use Symfony\Component\WebLink\Link;
             normalizationContext: [
                 'groups' => ['jsonapi'],
                 'skip_null_values' => true,
-                'rfc_7807_compliant_errors' => true,
             ],
         ),
         new Operation(

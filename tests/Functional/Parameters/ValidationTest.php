@@ -14,9 +14,22 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional\Parameters;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ValidateParameterBeforeProvider;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\WithParameter;
+use ApiPlatform\Tests\SetupClassResourcesTrait;
 
 final class ValidationTest extends ApiTestCase
 {
+    use SetupClassResourcesTrait;
+
+    /**
+     * @return class-string[]
+     */
+    public static function getResources(): array
+    {
+        return [WithParameter::class, ValidateParameterBeforeProvider::class];
+    }
+
     public function testWithGroupFilter(): void
     {
         $response = self::createClient()->request('GET', 'with_parameters_collection');
@@ -26,10 +39,9 @@ final class ValidationTest extends ApiTestCase
     }
 
     /**
-     * @dataProvider provideQueryStrings
-     *
      * @param array<int,array{propertyPath: string, message: string}> $expectedViolations
      */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideQueryStrings')]
     public function testValidation(string $queryString, array $expectedViolations): void
     {
         $response = self::createClient()->request('GET', 'validate_parameters?'.$queryString);
@@ -38,7 +50,7 @@ final class ValidationTest extends ApiTestCase
         ], $response->toArray(false));
     }
 
-    public function provideQueryStrings(): array
+    public static function provideQueryStrings(): array
     {
         return [
             [

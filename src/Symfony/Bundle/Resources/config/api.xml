@@ -6,17 +6,13 @@
 
     <services>
         <service id="api_platform.action.not_found" class="ApiPlatform\Symfony\Action\NotFoundAction" public="true" />
-        <service id="api_platform.action.not_exposed" class="ApiPlatform\Symfony\Action\NotExposedAction" public="true" />
         <service id="ApiPlatform\Symfony\Action\NotFoundAction" alias="api_platform.action.not_found" public="true" />
+        <service id="api_platform.action.not_exposed" class="ApiPlatform\Symfony\Action\NotExposedAction" public="true" />
         <service id="ApiPlatform\Symfony\Action\NotExposedAction" alias="api_platform.action.not_exposed" public="true" />
         <service id="api_platform.serializer" alias="serializer" />
         <service id="api_platform.property_accessor" alias="property_accessor" public="false" />
         <service id="api_platform.property_info" alias="property_info" public="false" />
         <service id="api_platform.negotiator" class="Negotiation\Negotiator" public="false" />
-
-        <!-- deprecated -->
-        <service id="ApiPlatform\Action\NotFoundAction" alias="api_platform.action.not_found" public="true" />
-        <service id="ApiPlatform\Action\NotExposedAction" alias="api_platform.action.not_exposed" public="true" />
 
         <service id="api_platform.resource_class_resolver" class="ApiPlatform\Metadata\ResourceClassResolver" public="false">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
@@ -99,17 +95,7 @@
             <argument type="service" id="api_platform.inflector" on-invalid="null" />
         </service>
 
-        <service id="api_platform.metadata.inflector" class="ApiPlatform\Metadata\Util\Inflector" public="false">
-            <argument>%api_platform.keep_legacy_inflector%</argument>
-        </service>
-
-        <!-- Action -->
-        <service id="api_platform.action.exception" class="ApiPlatform\Action\ExceptionAction" public="true">
-            <argument type="service" id="api_platform.serializer" />
-            <argument>%api_platform.error_formats%</argument>
-            <argument>%api_platform.exception_to_status%</argument>
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-        </service>
+        <service id="api_platform.metadata.inflector" class="ApiPlatform\Metadata\Util\Inflector" public="false" />
 
         <!-- Cache -->
         <service id="api_platform.cache.route_name_resolver" parent="cache.system" public="false">

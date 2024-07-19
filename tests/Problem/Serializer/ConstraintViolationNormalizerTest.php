@@ -19,7 +19,6 @@ use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -32,9 +31,7 @@ class ConstraintViolationNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
-    /**
-     * @group legacy
-     */
+    #[\PHPUnit\Framework\Attributes\Group('legacy')]
     public function testSupportNormalization(): void
     {
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);
@@ -46,15 +43,9 @@ class ConstraintViolationNormalizerTest extends TestCase
         $this->assertFalse($normalizer->supportsNormalization(new \stdClass(), ConstraintViolationListNormalizer::FORMAT));
         $this->assertEmpty($normalizer->getSupportedTypes('json'));
         $this->assertSame([ConstraintViolationListInterface::class => true], $normalizer->getSupportedTypes($normalizer::FORMAT));
-
-        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
-            $this->assertTrue($normalizer->hasCacheableSupportsMethod());
-        }
     }
 
-    /**
-     * @dataProvider nameConverterProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('nameConverterProvider')]
     public function testNormalize(callable $nameConverterFactory, array $expected): void
     {
         $normalizer = new ConstraintViolationListNormalizer(['severity', 'anotherField1'], $nameConverterFactory($this));
@@ -73,23 +64,18 @@ class ConstraintViolationNormalizerTest extends TestCase
     public static function nameConverterProvider(): iterable
     {
         $expected = [
-            'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
-            'title' => 'An error occurred',
-            'detail' => "_d: a\n_4: 1",
-            'violations' => [
-                [
-                    'propertyPath' => '_d',
-                    'message' => 'a',
-                    'code' => 'f24bdbad0becef97a6887238aa58221c',
-                    'payload' => [
-                        'severity' => 'warning',
-                    ],
+            [
+                'propertyPath' => '_d',
+                'message' => 'a',
+                'code' => 'f24bdbad0becef97a6887238aa58221c',
+                'payload' => [
+                    'severity' => 'warning',
                 ],
-                [
-                    'propertyPath' => '_4',
-                    'message' => '1',
-                    'code' => null,
-                ],
+            ],
+            [
+                'propertyPath' => '_4',
+                'message' => '1',
+                'code' => null,
             ],
         ];
 
@@ -112,23 +98,18 @@ class ConstraintViolationNormalizerTest extends TestCase
         yield [$nameConverterFactory, $expected];
 
         $expected = [
-            'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
-            'title' => 'An error occurred',
-            'detail' => "d: a\n4: 1",
-            'violations' => [
-                [
-                    'propertyPath' => 'd',
-                    'message' => 'a',
-                    'code' => 'f24bdbad0becef97a6887238aa58221c',
-                    'payload' => [
-                        'severity' => 'warning',
-                    ],
+            [
+                'propertyPath' => 'd',
+                'message' => 'a',
+                'code' => 'f24bdbad0becef97a6887238aa58221c',
+                'payload' => [
+                    'severity' => 'warning',
                 ],
-                [
-                    'propertyPath' => '4',
-                    'message' => '1',
-                    'code' => null,
-                ],
+            ],
+            [
+                'propertyPath' => '4',
+                'message' => '1',
+                'code' => null,
             ],
         ];
         yield [fn () => null, $expected];

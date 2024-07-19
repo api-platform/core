@@ -30,10 +30,9 @@
         "symfony/property-info": "^6.4 || ^7.1"
     },
     "require-dev": {
-        "api-platform/parameter-validator": "*@dev || ^3.2",
         "doctrine/doctrine-bundle": "^2.11",
         "phpspec/prophecy-phpunit": "^2.0",
-        "phpunit/phpunit": "^10.0",
+        "phpunit/phpunit": "^11.2",
         "symfony/cache": "^6.4 || ^7.0",
         "symfony/framework-bundle": "^6.4 || ^7.0",
         "symfony/phpunit-bridge": "^6.4 || ^7.0",

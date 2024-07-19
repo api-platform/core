@@ -26,7 +26,7 @@ Feature: Using validations groups
     """
     Then the response status code should be 422
     And the response should be in JSON
-    And the JSON should be equal to:
+    And the JSON should be a superset of:
     """
     {
       "@context": "/contexts/ConstraintViolationList",
@@ -42,7 +42,7 @@ Feature: Using validations groups
       ]
     }
     """
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
 
   @createSchema
   Scenario: Create a resource with validation group sequence
@@ -55,7 +55,7 @@ Feature: Using validations groups
     """
     Then the response status code should be 422
     And the response should be in JSON
-    And the JSON should be equal to:
+    And the JSON should be a superset of:
     """
     {
       "@context": "/contexts/ConstraintViolationList",
@@ -71,7 +71,7 @@ Feature: Using validations groups
       ]
     }
     """
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
 
   @createSchema
   Scenario: Create a resource with serializedName property
@@ -107,8 +107,8 @@ Feature: Using validations groups
     """
     Then the response status code should be 422
     And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
+    And the JSON should be a superset of:
     """
     {
       "@context": "/contexts/ConstraintViolationList",

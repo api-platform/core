@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Elasticsearch\State;
 
 use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInterface;
-use ApiPlatform\Elasticsearch\Metadata\Document\DocumentMetadata;
-use ApiPlatform\Elasticsearch\Metadata\Document\Factory\DocumentMetadataFactoryInterface;
 use ApiPlatform\Elasticsearch\Paginator;
 use ApiPlatform\Metadata\InflectorInterface;
 use ApiPlatform\Metadata\Operation;
@@ -26,7 +24,6 @@ use ApiPlatform\State\ProviderInterface;
 use Elastic\Elasticsearch\Client;
 use Elastic\Elasticsearch\Exception\ClientResponseException;
 use Elastic\Elasticsearch\Response\Elasticsearch;
-use Elasticsearch\Client as LegacyClient;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
@@ -40,7 +37,7 @@ final class CollectionProvider implements ProviderInterface
     /**
      * @param RequestBodySearchCollectionExtensionInterface[] $collectionExtensions
      */
-    public function __construct(private readonly LegacyClient|Client $client, private readonly ?DocumentMetadataFactoryInterface $documentMetadataFactory = null, private readonly ?DenormalizerInterface $denormalizer = null, private readonly ?Pagination $pagination = null, private readonly iterable $collectionExtensions = [], private readonly ?InflectorInterface $inflector = new Inflector()) // @phpstan-ignore-line
+    public function __construct(private readonly Client $client, private readonly ?DenormalizerInterface $denormalizer = null, private readonly ?Pagination $pagination = null, private readonly iterable $collectionExtensions = [], private readonly ?InflectorInterface $inflector = new Inflector())
     {
     }
 
@@ -65,18 +62,13 @@ final class CollectionProvider implements ProviderInterface
 
         $options = $operation->getStateOptions() instanceof Options ? $operation->getStateOptions() : new Options(index: $this->getIndex($operation));
 
-        // TODO: remove in 4.x
-        if ($this->documentMetadataFactory && $operation->getElasticsearch() && !$operation->getStateOptions()) {
-            $options = $this->convertDocumentMetadata($this->documentMetadataFactory->create($resourceClass));
-        }
-
         $params = [
             'index' => $options->getIndex() ?? $this->getIndex($operation),
             'body' => $body,
         ];
 
         try {
-            $documents = $this->client->search($params); // @phpstan-ignore-line
+            $documents = $this->client->search($params);
         } catch (ClientResponseException $e) {
             $response = $e->getResponse();
             throw new Error(status: $response->getStatusCode(), detail: (string) $response->getBody(), title: $response->getReasonPhrase(), originalTrace: $e->getTrace());
@@ -94,11 +86,6 @@ final class CollectionProvider implements ProviderInterface
             $offset,
             $context
         );
-    }
-
-    private function convertDocumentMetadata(DocumentMetadata $documentMetadata): Options
-    {
-        return new Options($documentMetadata->getIndex(), $documentMetadata->getType());
     }
 
     private function getIndex(Operation $operation): string

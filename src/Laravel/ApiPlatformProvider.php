@@ -38,8 +38,6 @@ use ApiPlatform\JsonSchema\DefinitionNameFactoryInterface;
 use ApiPlatform\JsonSchema\Metadata\Property\Factory\SchemaPropertyMetadataFactory;
 use ApiPlatform\JsonSchema\SchemaFactory;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
-use ApiPlatform\JsonSchema\TypeFactory;
-use ApiPlatform\JsonSchema\TypeFactoryInterface;
 use ApiPlatform\Laravel\ApiResource\Error;
 use ApiPlatform\Laravel\Controller\ApiPlatformController;
 use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentAttributePropertyMetadataFactory;
@@ -533,7 +531,6 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(PropertyNameCollectionFactoryInterface::class),
                 $app->make(PropertyMetadataFactoryInterface::class),
                 $app->make(SchemaFactoryInterface::class),
-                $app->make(TypeFactoryInterface::class),
                 $app->make(FilterLocator::class),
                 $config->get('api-platform.formats'),
                 null, // ?Options $openApiOptions = null,
@@ -549,7 +546,6 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->singleton(SchemaFactory::class, function (Application $app) use ($config) {
             return new SchemaFactory(
-                $app->make(TypeFactoryInterface::class),
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(PropertyNameCollectionFactoryInterface::class),
                 $app->make(PropertyMetadataFactoryInterface::class),
@@ -575,10 +571,6 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->bind(SchemaFactoryInterface::class, HydraSchemaFactory::class);
-        $this->app->bind(TypeFactoryInterface::class, TypeFactory::class);
-        $this->app->singleton(TypeFactory::class, function (Application $app) {
-            return new TypeFactory($app->make(ResourceClassResolverInterface::class));
-        });
 
         $this->app->singleton(OpenApiNormalizer::class, function (Application $app) {
             return new OpenApiNormalizer($app->make(ObjectNormalizer::class));

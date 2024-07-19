@@ -39,9 +39,7 @@ final class OperationTest extends TestCase
         $this->assertSame($operation instanceof CollectionOperationInterface, true);
     }
 
-    /**
-     * @dataProvider operationProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('operationProvider')]
     public function testOperationConstructor(Operation $operation): void
     {
         $this->assertInstanceOf(Operation::class, $operation);

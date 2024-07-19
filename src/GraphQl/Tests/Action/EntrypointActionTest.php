@@ -92,9 +92,7 @@ class EntrypointActionTest extends TestCase
         $this->assertEqualsWithoutDateHeader(new JsonResponse(['GraphQL']), $mockedEntrypoint($request));
     }
 
-    /**
-     * @dataProvider multipartRequestProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('multipartRequestProvider')]
     public function testMultipartRequestAction(?string $operations, ?string $map, array $files, array $variables, Response $expectedResponse): void
     {
         $requestParams = [];

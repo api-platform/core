@@ -29,16 +29,6 @@ abstract class ApiTestCase extends KernelTestCase
     use ApiTestAssertionsTrait;
 
     /**
-     * {@inheritdoc}
-     */
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        self::getClient(null);
-    }
-
-    /**
      * Creates a Client.
      *
      * @param array $kernelOptions  Options to pass to the createKernel method

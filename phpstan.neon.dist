@@ -11,7 +11,6 @@ parameters:
 	doctrine:
 		objectManagerLoader: tests/Fixtures/app/object-manager.php
 	bootstrapFiles:
-		- vendor/bin/.phpunit/phpunit/vendor/autoload.php
 		# We're aliasing classes for phpunit in this file, it needs to be added here see phpstan/#2194
 		- src/Symfony/Bundle/Test/Constraint/ArraySubset.php
 		- tests/Fixtures/app/AppKernel.php
@@ -67,15 +66,7 @@ parameters:
 			message: '#Parameter \#1 \$constraint of method#'
 			paths:
 				- tests/Symfony/Validator/Metadata/Property/Restriction/
-		-
-			message: '#expects ApiPlatform\\Metadata\\GraphQl\\Operation\|null, ApiPlatform\\Metadata\\Operation given#'
-			paths:
-				- src/GraphQl/Tests/Resolver/Factory/
 		- '#Access to an undefined property Prophecy\\Prophecy\\ObjectProphecy<(\\?[a-zA-Z0-9_]+)+>::\$[a-zA-Z0-9_]+#'
-		# https://github.com/willdurand/Negotiation/issues/89#issuecomment-513283286
-		-
-			message: '#Call to an undefined method Negotiation\\AcceptHeader::getType\(\)\.#'
-			path: src/Symfony/EventListener/AddFormatListener.php
 		# https://github.com/phpstan/phpstan-symfony/issues/76
 		-
 			message: '#Service "test" is not registered in the container\.#'
@@ -95,10 +86,4 @@ parameters:
 		-
 			message: '#^Service "[^"]+" is private.$#'
 			path: src
-		-
-			message: '#^Class .+ not found.$#'
-			path: src/Elasticsearch/Tests
-		# Backward compatibility
-		- '#Call to method hasCacheableSupportsMethod\(\) on an unknown class Symfony\\Component\\Serializer\\Normalizer\\CacheableSupportsMethodInterface\.#'
-		- '#Class Symfony\\Component\\Serializer\\Normalizer\\CacheableSupportsMethodInterface not found\.#'
-		- '#Attribute class PHPUnit\\Framework\\Attributes\\DataProvider does not exist.#'
+		- '#Call to an undefined method Symfony\\Component\\HttpFoundation\\Request::getContentType\(\)\.#'

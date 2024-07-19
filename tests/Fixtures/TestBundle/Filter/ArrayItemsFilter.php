@@ -35,7 +35,7 @@ class ArrayItemsFilter extends AbstractFilter
                 'property' => 'csv-min-2',
                 'type' => 'array',
                 'required' => false,
-                'swagger' => [
+                'schema' => [
                     'minItems' => 2,
                 ],
             ],
@@ -43,7 +43,7 @@ class ArrayItemsFilter extends AbstractFilter
                 'property' => 'csv-max-3',
                 'type' => 'array',
                 'required' => false,
-                'swagger' => [
+                'schema' => [
                     'maxItems' => 3,
                 ],
             ],
@@ -51,7 +51,7 @@ class ArrayItemsFilter extends AbstractFilter
                 'property' => 'ssv-min-2',
                 'type' => 'array',
                 'required' => false,
-                'swagger' => [
+                'schema' => [
                     'collectionFormat' => 'ssv',
                     'minItems' => 2,
                 ],
@@ -60,7 +60,7 @@ class ArrayItemsFilter extends AbstractFilter
                 'property' => 'tsv-min-2',
                 'type' => 'array',
                 'required' => false,
-                'swagger' => [
+                'schema' => [
                     'collectionFormat' => 'tsv',
                     'minItems' => 2,
                 ],
@@ -69,7 +69,7 @@ class ArrayItemsFilter extends AbstractFilter
                 'property' => 'pipes-min-2',
                 'type' => 'array',
                 'required' => false,
-                'swagger' => [
+                'schema' => [
                     'collectionFormat' => 'pipes',
                     'minItems' => 2,
                 ],
@@ -78,7 +78,7 @@ class ArrayItemsFilter extends AbstractFilter
                 'property' => 'csv-uniques',
                 'type' => 'array',
                 'required' => false,
-                'swagger' => [
+                'schema' => [
                     'uniqueItems' => true,
                 ],
             ],

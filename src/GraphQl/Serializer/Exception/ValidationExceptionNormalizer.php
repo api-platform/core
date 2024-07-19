@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\GraphQl\Serializer\Exception;
 
 use ApiPlatform\Metadata\Exception\RuntimeException;
-use ApiPlatform\Symfony\Validator\Exception\ConstraintViolationListAwareExceptionInterface as LegacyConstraintViolationListAwareExceptionInterface;
 use ApiPlatform\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
 use GraphQL\Error\Error;
 use GraphQL\Error\FormattedError;
@@ -39,7 +38,7 @@ final class ValidationExceptionNormalizer implements NormalizerInterface
     public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
         $validationException = $object->getPrevious();
-        if (!($validationException instanceof ConstraintViolationListAwareExceptionInterface || $validationException instanceof LegacyConstraintViolationListAwareExceptionInterface)) {
+        if (!$validationException instanceof ConstraintViolationListAwareExceptionInterface) {
             throw new RuntimeException(sprintf('Object is not a "%s".', ConstraintViolationListAwareExceptionInterface::class));
         }
 

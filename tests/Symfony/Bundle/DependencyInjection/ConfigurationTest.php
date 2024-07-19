@@ -14,11 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
-use ApiPlatform\ParameterValidator\Exception\ValidationExceptionInterface;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Configuration;
 use Doctrine\ORM\OptimisticLockException;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -33,8 +31,6 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
  */
 class ConfigurationTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     private Configuration $configuration;
 
     private Processor $processor;
@@ -50,9 +46,6 @@ class ConfigurationTest extends TestCase
         $this->runDefaultConfigTests();
     }
 
-    /**
-     * @group mongodb
-     */
     public function testDefaultConfigWithMongoDbOdm(): void
     {
         $this->runDefaultConfigTests(['orm', 'odm']);
@@ -86,7 +79,6 @@ class ConfigurationTest extends TestCase
             'docs_formats' => [
                 'jsonopenapi' => ['mime_types' => ['application/vnd.openapi+json']],
                 'yamlopenapi' => ['mime_types' => ['application/vnd.openapi+yaml']],
-                'json' => ['mime_types' => ['application/json']],
                 'jsonld' => ['mime_types' => ['application/ld+json']],
                 'html' => ['mime_types' => ['text/html']],
             ],
@@ -102,7 +94,6 @@ class ConfigurationTest extends TestCase
             'exception_to_status' => [
                 ExceptionInterface::class => Response::HTTP_BAD_REQUEST,
                 InvalidArgumentException::class => Response::HTTP_BAD_REQUEST,
-                ValidationExceptionInterface::class => Response::HTTP_BAD_REQUEST,
                 OptimisticLockException::class => Response::HTTP_CONFLICT,
             ],
             'path_segment_name_generator' => 'api_platform.metadata.path_segment_name_generator.underscore',
@@ -110,7 +101,6 @@ class ConfigurationTest extends TestCase
             'validator' => [
                 'serialize_payload_fields' => [],
                 'query_parameter_validation' => true,
-                'legacy_validation_exception' => true,
             ],
             'name_converter' => null,
             'enable_swagger' => true,
@@ -141,7 +131,6 @@ class ConfigurationTest extends TestCase
             'elasticsearch' => [
                 'enabled' => false,
                 'hosts' => [],
-                'mapping' => [],
             ],
             'oauth' => [
                 'enabled' => false,
@@ -228,10 +217,7 @@ class ConfigurationTest extends TestCase
             'maker' => [
                 'enabled' => true,
             ],
-            'keep_legacy_inflector' => true,
-            'event_listeners_backward_compatibility_layer' => null,
             'use_symfony_listeners' => false,
-            'use_deprecated_json_schema_type_factory' => null,
             'handle_symfony_errors' => false,
             'enable_link_security' => false,
         ], $config);
@@ -247,9 +233,7 @@ class ConfigurationTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider invalidHttpStatusCodeProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('invalidHttpStatusCodeProvider')]
     public function testExceptionToStatusConfigWithInvalidHttpStatusCode($invalidHttpStatusCode): void
     {
         $this->expectException(InvalidConfigurationException::class);
@@ -276,9 +260,7 @@ class ConfigurationTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider invalidHttpStatusCodeValueProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('invalidHttpStatusCodeValueProvider')]
     public function testExceptionToStatusConfigWithInvalidHttpStatusCodeValue($invalidHttpStatusCodeValue): void
     {
         $this->expectException(InvalidTypeException::class);

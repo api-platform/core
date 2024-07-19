@@ -15,7 +15,6 @@ namespace ApiPlatform\Tests\Behat;
 
 use Behat\Behat\Context\Context;
 use Elastic\Elasticsearch\Client;
-use Elasticsearch\Client as LegacyClient;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -25,7 +24,7 @@ use Symfony\Component\Finder\Finder;
  */
 final class ElasticsearchContext implements Context
 {
-    public function __construct(private readonly LegacyClient|Client $client, private readonly string $elasticsearchMappingsPath, private readonly string $elasticsearchFixturesPath) // @phpstan-ignore-line
+    public function __construct(private readonly Client $client, private readonly string $elasticsearchMappingsPath, private readonly string $elasticsearchFixturesPath)
     {
     }
 
@@ -77,7 +76,6 @@ final class ElasticsearchContext implements Context
         $finder->files()->in($this->elasticsearchMappingsPath);
 
         foreach ($finder as $file) {
-            // @phpstan-ignore-next-line
             $this->client->indices()->create([
                 'index' => $file->getBasename('.json'),
                 'body' => json_decode($file->getContents(), true, 512, \JSON_THROW_ON_ERROR),
@@ -97,7 +95,6 @@ final class ElasticsearchContext implements Context
         }
 
         if ([] !== $indexes) {
-            // @phpstan-ignore-next-line
             $this->client->indices()->delete([
                 'index' => implode(',', $indexes),
                 'ignore_unavailable' => true,
@@ -110,7 +107,6 @@ final class ElasticsearchContext implements Context
         $finder = new Finder();
         $finder->files()->in($this->elasticsearchFixturesPath)->name('*.json');
 
-        // @phpstan-ignore-next-line
         $indexClient = $this->client->indices();
 
         foreach ($finder as $file) {
@@ -127,14 +123,12 @@ final class ElasticsearchContext implements Context
                 $bulk[] = $document;
 
                 if (0 === (\count($bulk) % 50)) {
-                    // @phpstan-ignore-next-line
                     $this->client->bulk(['body' => $bulk]);
                     $bulk = [];
                 }
             }
 
             if ($bulk) {
-                // @phpstan-ignore-next-line
                 $this->client->bulk(['body' => $bulk]);
             }
 

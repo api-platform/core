@@ -7,16 +7,7 @@
     <services>
         <defaults public="false" />
 
-        <service id="api_platform.json_schema.type_factory" class="ApiPlatform\JsonSchema\TypeFactory">
-            <argument type="service" id="api_platform.resource_class_resolver" />
-            <call method="setSchemaFactory">
-                <argument type="service" id="api_platform.json_schema.schema_factory"/>
-            </call>
-        </service>
-        <service id="ApiPlatform\JsonSchema\TypeFactoryInterface" alias="api_platform.json_schema.type_factory" />
-
         <service id="api_platform.json_schema.schema_factory" class="ApiPlatform\JsonSchema\SchemaFactory">
-            <argument>null</argument>
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />

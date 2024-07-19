@@ -35,7 +35,7 @@ class BoundsFilter extends AbstractFilter
                 'property' => 'maximum',
                 'type' => 'float',
                 'required' => false,
-                'swagger' => [
+                'schema' => [
                     'maximum' => 10,
                 ],
             ],
@@ -43,16 +43,15 @@ class BoundsFilter extends AbstractFilter
                 'property' => 'maximum',
                 'type' => 'float',
                 'required' => false,
-                'swagger' => [
-                    'maximum' => 10,
-                    'exclusiveMaximum' => true,
+                'schema' => [
+                    'exclusiveMaximum' => 10,
                 ],
             ],
             'minimum' => [
                 'property' => 'minimum',
                 'type' => 'float',
                 'required' => false,
-                'swagger' => [
+                'schema' => [
                     'minimum' => 5,
                 ],
             ],
@@ -60,9 +59,8 @@ class BoundsFilter extends AbstractFilter
                 'property' => 'exclusiveMinimum',
                 'type' => 'float',
                 'required' => false,
-                'swagger' => [
-                    'minimum' => 5,
-                    'exclusiveMinimum' => true,
+                'schema' => [
+                    'exclusiveMinimum' => 5,
                 ],
             ],
         ];

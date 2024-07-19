@@ -21,7 +21,6 @@
 
         <!-- Serializer -->
         <service id="api_platform.hydra.normalizer.constraint_violation_list" class="ApiPlatform\Hydra\Serializer\ConstraintViolationListNormalizer" public="false">
-            <argument type="service" id="api_platform.router" />
             <argument>%api_platform.validator.serialize_payload_fields%</argument>
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
 
@@ -32,15 +31,6 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.router" />
-
-            <tag name="serializer.normalizer" priority="-800" />
-        </service>
-
-        <!-- deprecated -->
-        <service id="api_platform.hydra.normalizer.error" class="ApiPlatform\Hydra\Serializer\ErrorNormalizer" public="false">
-            <argument type="service" id="api_platform.router" />
-            <argument>%kernel.debug%</argument>
-            <argument type="collection"></argument>
 
             <tag name="serializer.normalizer" priority="-800" />
         </service>

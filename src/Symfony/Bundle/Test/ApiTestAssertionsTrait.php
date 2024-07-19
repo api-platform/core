@@ -97,7 +97,6 @@ trait ApiTestAssertionsTrait
      * @see https://github.com/sebastianbergmann/phpunit/issues/3494
      *
      * @throws ExpectationFailedException
-     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      * @throws \Exception
      */
     public static function assertArraySubset(iterable $subset, iterable $array, bool $checkForObjectIdentity = false, string $message = ''): void

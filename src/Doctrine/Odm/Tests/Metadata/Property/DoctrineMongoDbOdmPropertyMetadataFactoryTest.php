@@ -24,8 +24,6 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
- * @group mongodb
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 class DoctrineMongoDbOdmPropertyMetadataFactoryTest extends TestCase

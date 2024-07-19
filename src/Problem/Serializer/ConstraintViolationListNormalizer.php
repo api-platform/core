@@ -48,16 +48,6 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
     {
         [$messages, $violations] = $this->getMessagesAndViolations($object);
 
-        // TODO: in api platform 4 this will be the default, as right now we serialize a ValidationException instead of a ConstraintViolationList
-        if ($context['rfc_7807_compliant_errors'] ?? false) {
-            return $violations;
-        }
-
-        return [
-            'type' => $context[self::TYPE] ?? $this->defaultContext[self::TYPE],
-            'title' => $context[self::TITLE] ?? $this->defaultContext[self::TITLE],
-            'detail' => $messages ? implode("\n", $messages) : (string) $object,
-            'violations' => $violations,
-        ];
+        return $violations;
     }
 }

@@ -42,9 +42,7 @@ class ResponseTest extends TestCase
         $this->assertSame('', $response->getContent());
     }
 
-    /**
-     * @dataProvider errorProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('errorProvider')]
     public function testCheckStatus(string $expectedException, int $status): void
     {
         $this->expectException($expectedException);
