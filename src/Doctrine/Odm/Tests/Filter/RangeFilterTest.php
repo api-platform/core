@@ -18,8 +18,6 @@ use ApiPlatform\Doctrine\Odm\Tests\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document\Dummy;
 
 /**
- * @group mongodb
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 class RangeFilterTest extends DoctrineMongoDbOdmFilterTestCase

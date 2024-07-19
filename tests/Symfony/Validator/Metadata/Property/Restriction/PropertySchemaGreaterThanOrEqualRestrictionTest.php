@@ -37,9 +37,7 @@ final class PropertySchemaGreaterThanOrEqualRestrictionTest extends TestCase
         $this->propertySchemaGreaterThanOrEqualRestriction = new PropertySchemaGreaterThanOrEqualRestriction();
     }
 
-    /**
-     * @dataProvider supportsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('supportsProvider')]
     public function testSupports(Constraint $constraint, ApiProperty $propertyMetadata, bool $expectedResult): void
     {
         self::assertSame($expectedResult, $this->propertySchemaGreaterThanOrEqualRestriction->supports($constraint, $propertyMetadata));

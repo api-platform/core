@@ -20,16 +20,14 @@ use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
-use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Serializer;
 
 /**
  * Normalizes the API entrypoint.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class EntrypointNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
+final class EntrypointNormalizer implements NormalizerInterface
 {
     public const FORMAT = 'jsonhal';
 
@@ -78,19 +76,5 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
     public function getSupportedTypes($format): array
     {
         return self::FORMAT === $format ? [Entrypoint::class => true] : [];
-    }
-
-    public function hasCacheableSupportsMethod(): bool
-    {
-        if (method_exists(Serializer::class, 'getSupportedTypes')) {
-            trigger_deprecation(
-                'api-platform/core',
-                '3.1',
-                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
-                __METHOD__
-            );
-        }
-
-        return true;
     }
 }

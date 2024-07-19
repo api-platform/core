@@ -84,7 +84,6 @@ class YamlExtractorTest extends TestCase
                     'denormalizationContext' => null,
                     'collectDenormalizationErrors' => null,
                     'hydraContext' => null,
-                    'openapiContext' => null,
                     'openapi' => null,
                     'validationContext' => null,
                     'filters' => null,
@@ -157,7 +156,6 @@ class YamlExtractorTest extends TestCase
                     'denormalizationContext' => null,
                     'collectDenormalizationErrors' => null,
                     'hydraContext' => null,
-                    'openapiContext' => null,
                     'openapi' => null,
                     'validationContext' => null,
                     'filters' => null,
@@ -231,7 +229,6 @@ class YamlExtractorTest extends TestCase
                     'denormalizationContext' => null,
                     'collectDenormalizationErrors' => null,
                     'hydraContext' => null,
-                    'openapiContext' => null,
                     'openapi' => null,
                     'validationContext' => null,
                     'filters' => null,
@@ -297,7 +294,6 @@ class YamlExtractorTest extends TestCase
                             'denormalizationContext' => null,
                             'collectDenormalizationErrors' => null,
                             'hydraContext' => null,
-                            'openapiContext' => null,
                             'openapi' => null,
                             'validationContext' => null,
                             'filters' => null,
@@ -380,7 +376,6 @@ class YamlExtractorTest extends TestCase
                             'denormalizationContext' => null,
                             'collectDenormalizationErrors' => null,
                             'hydraContext' => null,
-                            'openapiContext' => null,
                             'openapi' => null,
                             'validationContext' => null,
                             'filters' => null,
@@ -470,7 +465,6 @@ class YamlExtractorTest extends TestCase
                     'denormalizationContext' => null,
                     'collectDenormalizationErrors' => null,
                     'hydraContext' => null,
-                    'openapiContext' => null,
                     'openapi' => null,
                     'validationContext' => null,
                     'filters' => null,
@@ -547,9 +541,7 @@ class YamlExtractorTest extends TestCase
         $this->assertSame(Program::class.'Output', $resources[Program::class][0]['operations'][0]['output']);
     }
 
-    /**
-     * @dataProvider getInvalidPaths
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getInvalidPaths')]
     public function testInvalidYaml(string $path, string $error): void
     {
         $this->expectException(InvalidArgumentException::class);

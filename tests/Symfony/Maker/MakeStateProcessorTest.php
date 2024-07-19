@@ -25,7 +25,7 @@ class MakeStateProcessorTest extends KernelTestCase
         (new Filesystem())->remove(self::tempDir());
     }
 
-    /** @dataProvider stateProcessorProvider */
+    #[\PHPUnit\Framework\Attributes\DataProvider('stateProcessorProvider')]
     public function testMakeStateProcessor(bool $isInteractive): void
     {
         $inputs = ['name' => 'CustomStateProcessor'];

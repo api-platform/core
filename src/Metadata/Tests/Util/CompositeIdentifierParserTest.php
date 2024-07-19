@@ -18,9 +18,7 @@ use PHPUnit\Framework\TestCase;
 
 class CompositeIdentifierParserTest extends TestCase
 {
-    /**
-     * @dataProvider variousIdentifiers
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('variousIdentifiers')]
     public function testNormalizeCompositeCorrectly(array $identifiers): void
     {
         foreach ($identifiers as $string => $expected) {
@@ -42,9 +40,7 @@ class CompositeIdentifierParserTest extends TestCase
         ]]];
     }
 
-    /**
-     * @dataProvider compositeIdentifiers
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('compositeIdentifiers')]
     public function testStringify(array $identifiers): void
     {
         foreach ($identifiers as $string => $arr) {

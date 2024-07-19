@@ -61,9 +61,7 @@ class TypeConverterTest extends TestCase
         $this->typeConverter = new TypeConverter($this->typeBuilderProphecy->reveal(), $this->typesContainerProphecy->reveal(), $this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->propertyMetadataFactoryProphecy->reveal());
     }
 
-    /**
-     * @dataProvider convertTypeProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('convertTypeProvider')]
     public function testConvertType(Type $type, bool $input, int $depth, GraphQLType|string|null $expectedGraphqlType): void
     {
         $this->typeBuilderProphecy->isCollection($type)->willReturn(false);
@@ -169,9 +167,7 @@ class TypeConverterTest extends TestCase
         $this->assertSame($expectedGraphqlType, $graphqlType);
     }
 
-    /**
-     * @dataProvider convertTypeResourceProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('convertTypeResourceProvider')]
     public function testConvertTypeCollectionResource(Type $type, ObjectType $expectedGraphqlType): void
     {
         $collectionOperation = new QueryCollection();
@@ -215,9 +211,7 @@ class TypeConverterTest extends TestCase
         $this->assertSame($expectedGraphqlType, $graphqlType);
     }
 
-    /**
-     * @dataProvider resolveTypeProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('resolveTypeProvider')]
     public function testResolveType(string $type, string|GraphQLType $expectedGraphqlType): void
     {
         $this->typesContainerProphecy->has(\DateTime::class)->willReturn(true);
@@ -242,9 +236,7 @@ class TypeConverterTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider resolveTypeInvalidProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('resolveTypeInvalidProvider')]
     public function testResolveTypeInvalid(string $type, string $expectedExceptionMessage): void
     {
         $this->typesContainerProphecy->has('UnknownType')->willReturn(false);

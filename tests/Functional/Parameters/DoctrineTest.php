@@ -14,18 +14,30 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional\Parameters;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use ApiPlatform\Tests\Fixtures\TestBundle\Document\SearchFilterParameterDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\SearchFilterParameter as SearchFilterParameterDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SearchFilterParameter;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Tools\SchemaTool;
+use ApiPlatform\Tests\RecreateSchemaTrait;
+use ApiPlatform\Tests\SetupClassResourcesTrait;
 
 final class DoctrineTest extends ApiTestCase
 {
+    use RecreateSchemaTrait;
+    use SetupClassResourcesTrait;
+
+    /**
+     * @return class-string[]
+     */
+    public static function getResources(): array
+    {
+        return [SearchFilterParameter::class];
+    }
+
     public function testDoctrineEntitySearchFilter(): void
     {
-        $this->recreateSchema();
-        $container = static::getContainer();
-        $route = 'mongodb' === $container->getParameter('kernel.environment') ? 'search_filter_parameter_document' : 'search_filter_parameter';
+        $resource = $this->isMongoDB() ? SearchFilterParameterDocument::class : SearchFilterParameter::class;
+        $this->recreateSchema([$resource]);
+        $this->loadFixtures($resource);
+        $route = 'search_filter_parameter';
         $response = self::createClient()->request('GET', $route.'?foo=bar');
         $a = $response->toArray();
         $this->assertCount(2, $a['hydra:member']);
@@ -55,18 +67,11 @@ final class DoctrineTest extends ApiTestCase
         $this->assertArraySubset(['foo' => 'bar', 'createdAt' => '2024-01-21T00:00:00+00:00'], $members[0]);
     }
 
-    /**
-     * @group legacy
-     */
     public function testGraphQl(): void
     {
-        if ($_SERVER['EVENT_LISTENERS_BACKWARD_COMPATIBILITY_LAYER'] ?? false) {
-            $this->markTestSkipped('Parameters are not supported in BC mode.');
-        }
-
-        $this->recreateSchema();
-        $container = static::getContainer();
-        $object = 'mongodb' === $container->getParameter('kernel.environment') ? 'searchFilterParameterDocuments' : 'searchFilterParameters';
+        $this->recreateSchema([SearchFilterParameter::class]);
+        $this->loadFixtures($this->isMongoDB() ? SearchFilterParameterDocument::class : SearchFilterParameter::class);
+        $object = 'searchFilterParameters';
         $response = self::createClient()->request('POST', '/graphql', ['json' => [
             'query' => sprintf('{ %s(foo: "bar") { edges { node { id foo createdAt } } } }', $object),
         ]]);
@@ -89,27 +94,11 @@ final class DoctrineTest extends ApiTestCase
     }
 
     /**
-     * @param array<string, mixed> $options kernel options
+     * @param class-string $resource
      */
-    private function recreateSchema(array $options = []): void
+    private function loadFixtures(string $resource): void
     {
-        self::bootKernel($options);
-
-        $container = static::getContainer();
-        $registry = $this->getContainer()->get('mongodb' === $container->getParameter('kernel.environment') ? 'doctrine_mongodb' : 'doctrine');
-        $resource = 'mongodb' === $container->getParameter('kernel.environment') ? SearchFilterParameterDocument::class : SearchFilterParameter::class;
-        $manager = $registry->getManager();
-
-        if ($manager instanceof EntityManagerInterface) {
-            $classes = $manager->getClassMetadata($resource);
-            $schemaTool = new SchemaTool($manager);
-            @$schemaTool->dropSchema([$classes]);
-            @$schemaTool->createSchema([$classes]);
-        } else {
-            $schemaManager = $manager->getSchemaManager();
-            $schemaManager->dropCollections();
-        }
-
+        $manager = $this->getManager();
         $date = new \DateTimeImmutable('2024-01-21');
         foreach (['foo', 'foo', 'foo', 'bar', 'bar', 'baz'] as $t) {
             $s = new $resource();
@@ -121,6 +110,7 @@ final class DoctrineTest extends ApiTestCase
 
             $manager->persist($s);
         }
+
         $manager->flush();
     }
 }

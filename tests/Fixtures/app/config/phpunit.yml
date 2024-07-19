@@ -1,0 +1,11 @@
+parameters:
+    env(RESOURCES): '%kernel.project_dir%/var/resources.php'
+services:
+    phpunit_resource_name_collection:
+        class: ApiPlatform\Tests\PhpUnitResourceNameCollectionFactory
+        decorates: 'api_platform.metadata.resource.name_collection_factory.cached'
+        arguments:
+            $env: '%kernel.environment%'
+            $classes: '%env(require:RESOURCES)%'
+    config_cache_factory:
+        class: ApiPlatform\Tests\ConfigCacheFactory

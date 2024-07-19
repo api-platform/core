@@ -91,9 +91,7 @@ class PersistProcessorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getTrackingPolicyParameters
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getTrackingPolicyParameters')]
     public function testTrackingPolicy(string $metadataClass, bool $deferredExplicit, bool $persisted): void
     {
         $dummy = new Dummy();

@@ -38,6 +38,7 @@ trait OperationRequestInitiatorTrait
         }
 
         $operationName = $request->attributes->get('_api_operation_name');
+
         /** @var HttpOperation $operation */
         $operation = $this->resourceMetadataCollectionFactory->create($request->attributes->get('_api_resource_class'))->getOperation($operationName);
         $request->attributes->set('_api_operation', $operation);

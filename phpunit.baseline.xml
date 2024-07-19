@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<files version="1">
+ <file path="src/GraphQl/Type/SchemaBuilder.php">
+  <line number="38" hash="7d00ace41a693456ebf14737d43e79ae5f77c386">
+   <issue><![CDATA[$fieldsBuilder argument of SchemaBuilder implementing "ApiPlatform\GraphQl\Type\FieldsBuilderInterface" is deprecated since API Platform 3.1. It has to implement "ApiPlatform\GraphQl\Type\FieldsBuilderEnumInterface" instead.]]></issue>
+  </line>
+ </file>
+ <file path="vendor/symfony/deprecation-contracts/function.php">
+  <line number="25" hash="c6af5d66288d0667e424978000f29571e4954b81">
+   <issue><![CDATA[Since symfony/validator 7.1: Not passing a value for the "requireTld" option to the Url constraint is deprecated. Its default value will change to "true".]]></issue>
+  </line>
+ </file>
+</files>

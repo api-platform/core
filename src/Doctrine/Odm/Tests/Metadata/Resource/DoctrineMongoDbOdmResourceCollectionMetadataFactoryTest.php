@@ -70,9 +70,7 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactoryTest extends Test
         $this->assertNull($resourceMetadataCollection->getOperation('graphql_get')->getProvider());
     }
 
-    /**
-     * @dataProvider operationProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('operationProvider')]
     public function testWithProvider(Operation $operation, ?string $expectedProvider = null, ?string $expectedProcessor = null): void
     {
         if (!class_exists(DocumentManager::class)) {

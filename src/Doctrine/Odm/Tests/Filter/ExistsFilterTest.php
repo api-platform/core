@@ -19,8 +19,6 @@ use ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document\Dummy;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @group mongodb
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 class ExistsFilterTest extends DoctrineMongoDbOdmFilterTestCase

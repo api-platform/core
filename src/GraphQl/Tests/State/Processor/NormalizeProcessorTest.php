@@ -42,9 +42,7 @@ class NormalizeProcessorTest extends TestCase
         $this->resolveInfoProphecy = $this->prophesize(ResolveInfo::class);
     }
 
-    /**
-     * @dataProvider processItems
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('processItems')]
     public function testProcess($body, $operation): void
     {
         $context = ['args' => []];
@@ -66,9 +64,7 @@ class NormalizeProcessorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider processCollection
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('processCollection')]
     public function testProcessCollection($collection, $operation, $args, ?array $expectedResult, array $getFieldSelection, ?string $expectedExceptionClass = null, ?string $expectedExceptionMessage = null): void
     {
         $this->resolveInfoProphecy->getFieldSelection(1)->willReturn($getFieldSelection);

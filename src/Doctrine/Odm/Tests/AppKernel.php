@@ -18,6 +18,7 @@ use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\Kernel;
 
 /**
@@ -42,6 +43,12 @@ class AppKernel extends Kernel
         return [
             new FrameworkBundle(),
             new DoctrineMongoDBBundle(),
+            new class() extends Bundle {
+                public function shutdown(): void
+                {
+                    restore_exception_handler();
+                }
+            },
         ];
     }
 

@@ -28,7 +28,6 @@
         "phpspec/prophecy-phpunit": "^2.0",
         "symfony/phpunit-bridge": "^6.4 || ^7.0",
         "symfony/serializer": "^6.4 || ^7.0",
-        "sebastian/comparator": "<5.0",
         "symfony/validator": "^6.4 || ^7.0",
         "symfony/http-kernel": "^6.4 || ^7.0"
     },

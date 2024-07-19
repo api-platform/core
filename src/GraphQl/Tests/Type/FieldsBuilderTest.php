@@ -119,9 +119,7 @@ class FieldsBuilderTest extends TestCase
         $this->assertSame($itemResolver, $nodeQueryFields['resolve']);
     }
 
-    /**
-     * @dataProvider itemQueryFieldsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('itemQueryFieldsProvider')]
     public function testGetItemQueryFields(string $resourceClass, Operation $operation, array $configuration, ?GraphQLType $graphqlType, ?callable $resolver, array $expectedQueryFields): void
     {
         $this->resourceClassResolverProphecy->isResourceClass($resourceClass)->willReturn(true);
@@ -200,9 +198,7 @@ class FieldsBuilderTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider collectionQueryFieldsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('collectionQueryFieldsProvider')]
     public function testGetCollectionQueryFields(string $resourceClass, Operation $operation, array $configuration, ?GraphQLType $graphqlType, ?callable $resolver, array $expectedQueryFields): void
     {
         $this->resourceClassResolverProphecy->isResourceClass($resourceClass)->willReturn(true);
@@ -353,9 +349,7 @@ class FieldsBuilderTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider mutationFieldsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('mutationFieldsProvider')]
     public function testGetMutationFields(string $resourceClass, Operation $operation, GraphQLType $graphqlType, GraphQLType $inputGraphqlType, ?callable $mutationResolver, array $expectedMutationFields): void
     {
         $this->resourceClassResolverProphecy->isResourceClass($resourceClass)->willReturn(true);
@@ -415,9 +409,7 @@ class FieldsBuilderTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider subscriptionFieldsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('subscriptionFieldsProvider')]
     public function testGetSubscriptionFields(string $resourceClass, Operation $operation, GraphQLType $graphqlType, GraphQLType $inputGraphqlType, ?callable $subscriptionResolver, array $expectedSubscriptionFields): void
     {
         $this->resourceClassResolverProphecy->isResourceClass($resourceClass)->willReturn(true);
@@ -480,9 +472,7 @@ class FieldsBuilderTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider resourceObjectTypeFieldsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('resourceObjectTypeFieldsProvider')]
     public function testGetResourceObjectTypeFields(string $resourceClass, Operation $operation, array $properties, bool $input, int $depth, ?array $ioMetadata, array $expectedResourceObjectTypeFields, ?callable $advancedNameConverterFactory = null): void
     {
         $this->resourceClassResolverProphecy->isResourceClass($resourceClass)->willReturn(true);
@@ -869,9 +859,7 @@ class FieldsBuilderTest extends TestCase
         ], $enumFields);
     }
 
-    /**
-     * @dataProvider resolveResourceArgsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('resolveResourceArgsProvider')]
     public function testResolveResourceArgs(array $args, array $expectedResolvedArgs, ?string $expectedExceptionMessage = null): void
     {
         if (null !== $expectedExceptionMessage) {

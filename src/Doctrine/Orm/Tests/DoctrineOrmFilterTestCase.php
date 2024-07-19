@@ -45,9 +45,7 @@ abstract class DoctrineOrmFilterTestCase extends KernelTestCase
         $this->repository = $this->managerRegistry->getManagerForClass(Dummy::class)->getRepository(Dummy::class);
     }
 
-    /**
-     * @dataProvider provideApplyTestData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideApplyTestData')]
     public function testApply(?array $properties, array $filterParameters, string $expectedDql, ?array $expectedParameters = null, ?callable $factory = null, ?string $resourceClass = null): void
     {
         $this->doTestApply($properties, $filterParameters, $expectedDql, $expectedParameters, $factory, $resourceClass);

@@ -27,8 +27,6 @@ use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
- *
- * @group mongodb
  */
 class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
 {

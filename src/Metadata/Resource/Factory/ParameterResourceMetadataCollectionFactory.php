@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\FilterInterface;
-use ApiPlatform\Metadata\HeaderParameterInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Parameters;
@@ -67,7 +66,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                 }
 
                 // As we deprecate the parameter validator, we declare a parameter for each filter transfering validation to the new system
-                if ($operation->getFilters() && 0 === $parameters->count() && false === ($operation->getExtraProperties()['use_legacy_parameter_validator'] ?? true)) {
+                if ($operation->getFilters() && 0 === $parameters->count()) {
                     $parameters = $this->addFilterValidation($operation);
                 }
 
@@ -130,28 +129,8 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             $parameter = $parameter->withRequired($required);
         }
 
-        if (null === $parameter->getOpenApi() && $openApi = $description[$key]['openapi'] ?? null) {
-            if ($openApi instanceof OpenApiParameter) {
-                $parameter = $parameter->withOpenApi($openApi);
-            } elseif (\is_array($openApi)) {
-                $schema = $schema ?? $openApi['schema'] ?? [];
-                $parameter = $parameter->withOpenApi(new OpenApiParameter(
-                    $key,
-                    $parameter instanceof HeaderParameterInterface ? 'header' : 'query',
-                    $description[$key]['description'] ?? '',
-                    $description[$key]['required'] ?? $openApi['required'] ?? false,
-                    $openApi['deprecated'] ?? false,
-                    $openApi['allowEmptyValue'] ?? true,
-                    $schema,
-                    $openApi['style'] ?? null,
-                    $openApi['explode'] ?? ('array' === ($schema['type'] ?? null)),
-                    $openApi['allowReserved'] ?? false,
-                    $openApi['example'] ?? null,
-                    isset(
-                        $openApi['examples']
-                    ) ? new \ArrayObject($openApi['examples']) : null
-                ));
-            }
+        if (null === $parameter->getOpenApi() && ($openApi = $description[$key]['openapi'] ?? null) && $openApi instanceof OpenApiParameter) {
+            $parameter = $parameter->withOpenApi($openApi);
         }
 
         $schema = $parameter->getSchema() ?? (($openApi = $parameter->getOpenApi()) ? $openApi->getSchema() : null);
@@ -247,41 +226,14 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                 $required = $definition['required'] ?? false;
                 $schema = $definition['schema'] ?? null;
 
-                if (isset($definition['swagger'])) {
-                    trigger_deprecation('api-platform/core', '3.4', 'The key "swagger" in a filter description is deprecated, use "schema" or "openapi" instead.');
-                    $schema = $schema ?? $definition['swagger'];
-                }
-
                 $openApi = null;
-                if (isset($definition['openapi'])) {
-                    trigger_deprecation('api-platform/core', '3.4', sprintf('The key "openapi" in a filter description should be a "%s" class or use "schema" to specify the JSON Schema.', OpenApiParameter::class));
-                    if ($definition['openapi'] instanceof OpenApiParameter) {
-                        $openApi = $definition['openapi'];
-                    } else {
-                        $schema = $schema ?? $openApi;
-                    }
-                }
-
-                if (isset($schema['allowEmptyValue']) && !$openApi) {
-                    trigger_deprecation('api-platform/core', '3.4', 'The "allowEmptyValue" option should be declared using an "openapi" parameter.');
-                    $openApi = new OpenApiParameter(name: $key, in: 'query', allowEmptyValue: $schema['allowEmptyValue']);
+                if (isset($definition['openapi']) && $definition['openapi'] instanceof OpenApiParameter) {
+                    $openApi = $definition['openapi'];
                 }
 
                 // The query parameter validator forced this, lets maintain BC on filters
                 if (true === $required && !$openApi) {
                     $openApi = new OpenApiParameter(name: $key, in: 'query', allowEmptyValue: false);
-                }
-
-                if (\is_bool($schema['exclusiveMinimum'] ?? null)) {
-                    trigger_deprecation('api-platform/core', '3.4', 'The "exclusiveMinimum" schema value should be a number not a boolean.');
-                    $schema['exclusiveMinimum'] = $schema['minimum'];
-                    unset($schema['minimum']);
-                }
-
-                if (\is_bool($schema['exclusiveMaximum'] ?? null)) {
-                    trigger_deprecation('api-platform/core', '3.4', 'The "exclusiveMaximum" schema value should be a number not a boolean.');
-                    $schema['exclusiveMaximum'] = $schema['maximum'];
-                    unset($schema['maximum']);
                 }
 
                 $parameters->add($key, $this->addSchemaValidation(

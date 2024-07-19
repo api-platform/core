@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Serializer\Tests\Filter;
 
+use ApiPlatform\OpenApi\Model\Parameter;
 use ApiPlatform\Serializer\Filter\PropertyFilter;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\DummyProperty;
 use ApiPlatform\Serializer\Tests\Fixtures\Serializer\NameConverter\CustomConverter;
@@ -218,27 +219,20 @@ class PropertyFilterTest extends TestCase
                 'is_collection' => true,
                 'required' => false,
                 'description' => 'Allows you to reduce the response to contain only the properties you need. If your desired property is nested, you can address it using nested arrays. Example: custom_properties[]={propertyName}&custom_properties[]={anotherPropertyName}&custom_properties[{nestedPropertyParent}][]={nestedProperty}',
-                'swagger' => [
-                    'description' => 'Allows you to reduce the response to contain only the properties you need. If your desired property is nested, you can address it using nested arrays. Example: custom_properties[]={propertyName}&custom_properties[]={anotherPropertyName}&custom_properties[{nestedPropertyParent}][]={nestedProperty}',
-                    'name' => 'custom_properties[]',
-                    'type' => 'array',
-                    'items' => [
-                        'type' => 'string',
-                    ],
-                ],
-                'openapi' => [
-                    'description' => 'Allows you to reduce the response to contain only the properties you need. If your desired property is nested, you can address it using nested arrays. Example: custom_properties[]={propertyName}&custom_properties[]={anotherPropertyName}&custom_properties[{nestedPropertyParent}][]={nestedProperty}',
-                    'name' => 'custom_properties[]',
-                    'schema' => [
+                'openapi' => new Parameter(
+                    in: 'query',
+                    description: 'Allows you to reduce the response to contain only the properties you need. If your desired property is nested, you can address it using nested arrays. Example: custom_properties[]={propertyName}&custom_properties[]={anotherPropertyName}&custom_properties[{nestedPropertyParent}][]={nestedProperty}',
+                    name: 'custom_properties[]',
+                    schema: [
                         'type' => 'array',
                         'items' => [
                             'type' => 'string',
                         ],
-                    ],
-                ],
+                    ]
+                ),
             ],
         ];
 
-        $this->assertSame($expectedDescription, $propertyFilter->getDescription(DummyProperty::class));
+        $this->assertEquals($expectedDescription, $propertyFilter->getDescription(DummyProperty::class));
     }
 }

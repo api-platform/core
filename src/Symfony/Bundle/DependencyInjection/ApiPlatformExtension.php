@@ -29,22 +29,14 @@ use ApiPlatform\GraphQl\Resolver\MutationResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryItemResolverInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
-use ApiPlatform\Hydra\EventListener\AddLinkHeaderListener as HydraAddLinkHeaderListener;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\UriVariableTransformerInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
-use ApiPlatform\Problem\Serializer\ConstraintViolationListNormalizer;
 use ApiPlatform\State\ApiResource\Error;
 use ApiPlatform\State\ParameterProviderInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
-use ApiPlatform\Symfony\EventListener\AddHeadersListener;
-use ApiPlatform\Symfony\EventListener\AddLinkHeaderListener;
-use ApiPlatform\Symfony\EventListener\AddTagsListener;
-use ApiPlatform\Symfony\EventListener\DenyAccessListener;
-use ApiPlatform\Symfony\GraphQl\Resolver\Factory\DataCollectorResolverFactory;
-use ApiPlatform\Symfony\Validator\Exception\ValidationException as SymfonyValidationException;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRestrictionMetadataInterface;
 use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
@@ -55,7 +47,6 @@ use Ramsey\Uuid\Uuid;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -112,22 +103,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
-
-        if (null === $config['use_symfony_listeners']) {
-            $config['use_symfony_listeners'] = true;
-            trigger_deprecation('api-platform/core', '3.3', 'Setting the value of "use_symfony_listeners" will be mandatory in 4.0 as it will default to "false". Use "true" if you use Symfony Controllers or Event Listeners.');
-        }
-
         $container->setParameter('api_platform.use_symfony_listeners', $config['use_symfony_listeners']);
-
-        if (!$config['formats']) {
-            trigger_deprecation('api-platform/core', '3.2', 'Setting the "formats" section will be mandatory in API Platform 4.');
-            $config['formats'] = [
-                'jsonld' => ['mime_types' => ['application/ld+json']],
-                // Note that in API Platform 4 this will be removed as it was used for documentation only and are is now present in the docsFormats
-                'json' => ['mime_types' => ['application/json']], // Swagger support
-            ];
-        }
 
         $formats = $this->getFormats($config['formats']);
         $patchFormats = $this->getFormats($config['patch_formats']);
@@ -152,19 +128,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $errorFormats['jsonproblem'] = ['application/problem+json'];
         }
 
-        if ($this->isConfigEnabled($container, $config['graphql']) && !isset($formats['json'])) {
-            trigger_deprecation('api-platform/core', '3.2', 'Add the "json" format to the configuration to use GraphQL.');
-            $formats['json'] = ['application/json'];
-        }
-
-        // Backward Compatibility layer
         if (isset($formats['jsonapi']) && !isset($patchFormats['jsonapi'])) {
             $patchFormats['jsonapi'] = ['application/vnd.api+json'];
-        }
-
-        if (isset($docsFormats['json']) && !isset($docsFormats['jsonopenapi'])) {
-            trigger_deprecation('api-platform/core', '3.2', 'The "json" format is too broad, use ["jsonopenapi" => ["application/vnd.openapi+json"]] instead.');
-            $docsFormats['jsonopenapi'] = ['application/vnd.openapi+json'];
         }
 
         $this->registerCommonConfiguration($container, $config, $loader, $formats, $patchFormats, $errorFormats, $docsFormats, $jsonSchemaFormats);
@@ -205,8 +170,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if (!$container->has('api_platform.state.item_provider')) {
             $container->setAlias('api_platform.state.item_provider', 'api_platform.state_provider.object');
         }
-
-        $this->registerInflectorConfiguration($container, $config);
     }
 
     private function registerCommonConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $formats, array $patchFormats, array $errorFormats, array $docsFormats, array $jsonSchemaFormats): void
@@ -224,23 +187,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('symfony/uid.xml');
         }
 
-        // TODO: remove in 4.x
-        $container->setParameter('api_platform.event_listeners_backward_compatibility_layer', $config['event_listeners_backward_compatibility_layer']);
-
-        if ($config['event_listeners_backward_compatibility_layer']) {
-            trigger_deprecation('api-platform/core', '3.3', sprintf('The "event_listeners_backward_compatibility_layer" will be removed in 4.0. Use the configuration "use_symfony_listeners" to use Symfony listeners. The following listeners are deprecated and will be removed in API Platform 4.0: "%s"', implode(', ', [
-                AddHeadersListener::class,
-                AddTagsListener::class,
-                AddLinkHeaderListener::class,
-                HydraAddLinkHeaderListener::class,
-                DenyAccessListener::class,
-            ])));
-        }
-
-        if ($config['event_listeners_backward_compatibility_layer']) {
-            $loader->load('legacy/events.xml');
-        }
-
         if ($config['use_symfony_listeners']) {
             $loader->load('symfony/events.xml');
         } else {
@@ -251,7 +197,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $container->setParameter('api_platform.enable_entrypoint', $config['enable_entrypoint']);
         $container->setParameter('api_platform.enable_docs', $config['enable_docs']);
-        $container->setParameter('api_platform.keep_legacy_inflector', $config['keep_legacy_inflector']);
         $container->setParameter('api_platform.title', $config['title']);
         $container->setParameter('api_platform.description', $config['description']);
         $container->setParameter('api_platform.version', $config['version']);
@@ -300,7 +245,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
         $container->setParameter('api_platform.asset_package', $config['asset_package']);
         $container->setParameter('api_platform.defaults', $this->normalizeDefaults($config['defaults'] ?? []));
-        $container->setParameter('api_platform.rfc_7807_compliant_errors', $config['defaults']['extra_properties']['rfc_7807_compliant_errors'] ?? false);
 
         if ($container->getParameter('kernel.debug')) {
             $container->removeDefinition('api_platform.serializer.mapping.cache_class_metadata_factory');
@@ -391,7 +335,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         return [
             Error::class,
-            SymfonyValidationException::class,
             ValidationException::class,
         ];
     }
@@ -527,19 +470,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('openapi.xml');
 
-        if ($config['use_deprecated_json_schema_type_factory'] ?? false) {
-            $container->getDefinition('api_platform.openapi.factory')->setArgument('$jsonSchemaTypeFactory', new Reference('api_platform.json_schema.type_factory'));
-        }
-
         if (class_exists(Yaml::class)) {
             $loader->load('openapi/yaml.xml');
         }
 
         $loader->load('swagger_ui.xml');
-
-        if ($config['event_listeners_backward_compatibility_layer']) {
-            $loader->load('legacy/swagger_ui.xml');
-        }
 
         if ($config['use_symfony_listeners']) {
             $loader->load('symfony/swagger_ui.xml');
@@ -569,10 +504,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             return;
         }
 
-        if ($config['event_listeners_backward_compatibility_layer']) {
-            $loader->load('legacy/jsonapi.xml');
-        }
-
         $loader->load('jsonapi.xml');
         $loader->load('state/jsonapi.xml');
     }
@@ -587,10 +518,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('symfony/jsonld.xml');
         } else {
             $loader->load('state/jsonld.xml');
-        }
-
-        if ($config['event_listeners_backward_compatibility_layer']) {
-            $loader->load('legacy/hydra.xml');
         }
 
         $loader->load('state/hydra.xml');
@@ -620,10 +547,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         if (!isset($errorFormats['jsonproblem'])) {
             return;
-        }
-
-        if (class_exists(ConstraintViolationListNormalizer::class)) {
-            $loader->load('legacy/problem.xml');
         }
 
         $loader->load('problem.xml');
@@ -675,41 +598,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.graphql.type');
         $container->registerForAutoconfiguration(ErrorHandlerInterface::class)
             ->addTag('api_platform.graphql.error_handler');
-
-        /* TODO: remove these in 4.x only one resolver factory is used and we're using providers/processors */
-        if ($config['event_listeners_backward_compatibility_layer']) {
-            // @TODO: API Platform 3.3 trigger_deprecation('api-platform/core', '3.3', 'In API Platform 4 only one factory "api_platform.graphql.resolver.factory.item" will remain. Stages are deprecated in favor of using a provider/processor.');
-            // + deprecate every service from legacy/graphql.xml
-            $loader->load('legacy/graphql.xml');
-
-            if (!$container->getParameter('kernel.debug')) {
-                return;
-            }
-
-            $requestStack = new Reference('request_stack', ContainerInterface::NULL_ON_INVALID_REFERENCE);
-            $collectionDataCollectorResolverFactory = (new Definition(DataCollectorResolverFactory::class))
-                ->setDecoratedService('api_platform.graphql.resolver.factory.collection')
-                ->setArguments([new Reference('api_platform.graphql.data_collector.resolver.factory.collection.inner'), $requestStack]);
-
-            $itemDataCollectorResolverFactory = (new Definition(DataCollectorResolverFactory::class))
-                ->setDecoratedService('api_platform.graphql.resolver.factory.item')
-                ->setArguments([new Reference('api_platform.graphql.data_collector.resolver.factory.item.inner'), $requestStack]);
-
-            $itemMutationDataCollectorResolverFactory = (new Definition(DataCollectorResolverFactory::class))
-                ->setDecoratedService('api_platform.graphql.resolver.factory.item_mutation')
-                ->setArguments([new Reference('api_platform.graphql.data_collector.resolver.factory.item_mutation.inner'), $requestStack]);
-
-            $itemSubscriptionDataCollectorResolverFactory = (new Definition(DataCollectorResolverFactory::class))
-                ->setDecoratedService('api_platform.graphql.resolver.factory.item_subscription')
-                ->setArguments([new Reference('api_platform.graphql.data_collector.resolver.factory.item_subscription.inner'), $requestStack]);
-
-            $container->addDefinitions([
-                'api_platform.graphql.data_collector.resolver.factory.collection' => $collectionDataCollectorResolverFactory,
-                'api_platform.graphql.data_collector.resolver.factory.item' => $itemDataCollectorResolverFactory,
-                'api_platform.graphql.data_collector.resolver.factory.item_mutation' => $itemMutationDataCollectorResolverFactory,
-                'api_platform.graphql.data_collector.resolver.factory.item_subscription' => $itemSubscriptionDataCollectorResolverFactory,
-            ]);
-        }
     }
 
     private function registerCacheConfiguration(ContainerBuilder $container): void
@@ -773,20 +661,12 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         $loader->load('http_cache.xml');
 
-        if ($config['event_listeners_backward_compatibility_layer']) {
-            $loader->load('legacy/http_cache.xml');
-        }
-
         if (!$this->isConfigEnabled($container, $config['http_cache']['invalidation'])) {
             return;
         }
 
         if ($this->isConfigEnabled($container, $config['doctrine'])) {
             $loader->load('doctrine_orm_http_cache_purger.xml');
-        }
-
-        if ($config['event_listeners_backward_compatibility_layer']) {
-            $loader->load('legacy/http_cache_purger.xml');
         }
 
         $loader->load('state/http_cache_purger.xml');
@@ -833,16 +713,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     private function registerValidatorConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
     {
         if (interface_exists(ValidatorInterface::class)) {
-            $container->setParameter('api_platform.validator.legacy_validation_exception', $config['validator']['legacy_validation_exception'] ?? true);
             $loader->load('metadata/validator.xml');
             $loader->load('validator/validator.xml');
 
             if ($this->isConfigEnabled($container, $config['graphql'])) {
                 $loader->load('graphql/validator.xml');
-            }
-
-            if ($config['event_listeners_backward_compatibility_layer']) {
-                $loader->load('legacy/validator.xml');
             }
 
             $loader->load($config['use_symfony_listeners'] ? 'validator/events.xml' : 'validator/state.xml');
@@ -887,11 +762,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $container->setParameter('api_platform.mercure.include_type', $config['mercure']['include_type']);
-
-        if ($config['event_listeners_backward_compatibility_layer']) {
-            $loader->load('legacy/mercure.xml');
-        }
-
         $loader->load('state/mercure.xml');
 
         if ($this->isConfigEnabled($container, $config['doctrine'])) {
@@ -933,13 +803,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.elasticsearch.request_body_search_extension.collection');
         $container->setParameter('api_platform.elasticsearch.hosts', $config['elasticsearch']['hosts']);
         $loader->load('elasticsearch.xml');
-
-        // @phpstan-ignore-next-line
-        if (\Elasticsearch\Client::class === $clientClass) {
-            $loader->load('legacy/elasticsearch.xml');
-            $container->setParameter('api_platform.elasticsearch.mapping', $config['elasticsearch']['mapping']);
-            $container->setDefinition('api_platform.elasticsearch.client_for_metadata', $clientDefinition);
-        }
     }
 
     private function registerSecurityConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
@@ -952,10 +815,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $loader->load('security.xml');
-
-        if ($config['event_listeners_backward_compatibility_layer']) {
-            $loader->load('legacy/security.xml');
-        }
 
         $loader->load('state/security.xml');
 
@@ -979,10 +838,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.openapi.overrideResponses', $config['openapi']['overrideResponses']);
 
         $loader->load('json_schema.xml');
-
-        if ($config['use_deprecated_json_schema_type_factory'] ?? false) {
-            $container->getDefinition('api_platform.json_schema.schema_factory')->setArgument('$typeFactory', new Reference('api_platform.json_schema.type_factory'));
-        }
     }
 
     private function registerMakerConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
@@ -997,15 +852,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     private function registerArgumentResolverConfiguration(XmlFileLoader $loader): void
     {
         $loader->load('argument_resolver.xml');
-    }
-
-    private function registerInflectorConfiguration(ContainerBuilder $container, array $config): void
-    {
-        $container->setParameter('api_platform.keep_legacy_inflector', $config['keep_legacy_inflector'] ?? false);
-
-        if ($config['keep_legacy_inflector']) {
-            trigger_deprecation('api-platform/core', '3.2', 'Using doctrine/inflector is deprecated since API Platform 3.2 and will be removed in API Platform 4. Use symfony/string instead. Run "composer require symfony/string" and set "keep_legacy_inflector" to false in config.');
-        }
     }
 
     private function registerLinkSecurityConfiguration(XmlFileLoader $loader, array $config): void

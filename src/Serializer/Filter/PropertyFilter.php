@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Serializer\Filter;
 
+use ApiPlatform\OpenApi\Model\Parameter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -167,24 +168,17 @@ final class PropertyFilter implements FilterInterface
                 'is_collection' => true,
                 'required' => false,
                 'description' => 'Allows you to reduce the response to contain only the properties you need. If your desired property is nested, you can address it using nested arrays. Example: '.$example,
-                'swagger' => [
-                    'description' => 'Allows you to reduce the response to contain only the properties you need. If your desired property is nested, you can address it using nested arrays. Example: '.$example,
-                    'name' => "$this->parameterName[]",
-                    'type' => 'array',
-                    'items' => [
-                        'type' => 'string',
-                    ],
-                ],
-                'openapi' => [
-                    'description' => 'Allows you to reduce the response to contain only the properties you need. If your desired property is nested, you can address it using nested arrays. Example: '.$example,
-                    'name' => "$this->parameterName[]",
-                    'schema' => [
+                'openapi' => new Parameter(
+                    in: 'query',
+                    name: "$this->parameterName[]",
+                    description: 'Allows you to reduce the response to contain only the properties you need. If your desired property is nested, you can address it using nested arrays. Example: '.$example,
+                    schema: [
                         'type' => 'array',
                         'items' => [
                             'type' => 'string',
                         ],
-                    ],
-                ],
+                    ]
+                ),
             ],
         ];
     }

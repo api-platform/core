@@ -27,9 +27,7 @@ class FormatsResourceMetadataCollectionFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    /**
-     * @dataProvider createProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('createProvider')]
     public function testCreate(ApiResource $previous, ApiResource $expected, array $formats = [], array $patchFormats = []): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);

@@ -125,9 +125,7 @@ class TypeBuilderTest extends TestCase
         $resourceObjectType->config['fields']();
     }
 
-    /**
-     * @dataProvider resourceObjectTypeQuerySerializationGroupsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('resourceObjectTypeQuerySerializationGroupsProvider')]
     public function testGetResourceObjectTypeQuerySerializationGroups(string $itemSerializationGroup, string $collectionSerializationGroup, Operation $operation, string $shortName): void
     {
         $resourceMetadata = new ResourceMetadataCollection('resourceClass', [(new ApiResource())->withGraphQlOperations([
@@ -624,9 +622,7 @@ class TypeBuilderTest extends TestCase
         ]), $this->typeBuilder->getEnumType($operation));
     }
 
-    /**
-     * @dataProvider typesProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('typesProvider')]
     public function testIsCollection(Type $type, bool $expectedIsCollection): void
     {
         $this->assertSame($expectedIsCollection, $this->typeBuilder->isCollection($type));

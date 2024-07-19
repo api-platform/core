@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Subscription;
 
-use ApiPlatform\GraphQl\Resolver\Stage\SerializeStage;
-use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\GraphQl\Resolver\Util\IdentifierTrait;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Subscription;
@@ -38,11 +36,8 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
     use ResourceClassInfoTrait;
     use SortTrait;
 
-    public function __construct(private readonly CacheItemPoolInterface $subscriptionsCache, private readonly SubscriptionIdentifierGeneratorInterface $subscriptionIdentifierGenerator, private readonly SerializeStageInterface|ProcessorInterface|null $serializeStage = null, private readonly ?IriConverterInterface $iriConverter = null, private readonly ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null)
+    public function __construct(private readonly CacheItemPoolInterface $subscriptionsCache, private readonly SubscriptionIdentifierGeneratorInterface $subscriptionIdentifierGenerator, private readonly ProcessorInterface $normalizeProcessor, private readonly IriConverterInterface $iriConverter, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory)
     {
-        if (!$serializeStage instanceof ProcessorInterface) {
-            trigger_deprecation('api-platform/core', '4.0', sprintf('Using an instanceof "%s" is deprecated, use "%s" instead.', SerializeStageInterface::class, ProcessorInterface::class));
-        }
     }
 
     public function retrieveSubscriptionId(array $context, ?array $result, ?Operation $operation = null): ?string
@@ -89,13 +84,7 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
             $resolverContext = ['fields' => $subscriptionFields, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true];
             /** @var Operation */
             $operation = (new Subscription())->withName('update_subscription')->withShortName($shortName);
-            if ($this->serializeStage instanceof ProcessorInterface) {
-                $data = $this->serializeStage->process($object, $operation, [], $resolverContext);
-            } elseif ($this->serializeStage instanceof SerializeStage) {
-                $data = ($this->serializeStage)($object, $resourceClass, $operation, $resolverContext);
-            } else {
-                throw new \LogicException();
-            }
+            $data = $this->normalizeProcessor->process($object, $operation, [], $resolverContext);
 
             unset($data['clientSubscriptionId']);
 

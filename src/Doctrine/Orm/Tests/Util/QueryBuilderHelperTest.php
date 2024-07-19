@@ -29,9 +29,7 @@ class QueryBuilderHelperTest extends TestCase
 {
     use ProphecyTrait;
 
-    /**
-     * @dataProvider provideAddJoinOnce
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideAddJoinOnce')]
     public function testAddJoinOnce(?string $originAliasForJoinOnce, string $expectedAlias): void
     {
         $queryBuilder = new QueryBuilder($this->prophesize(EntityManagerInterface::class)->reveal());
@@ -57,9 +55,7 @@ class QueryBuilderHelperTest extends TestCase
             $queryBuilder->getDQLPart('join')[$originAliasForJoinOnce ?? 'f'][0]->getAlias());
     }
 
-    /**
-     * @dataProvider provideAddJoinOnce
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideAddJoinOnce')]
     public function testAddJoinOnceWithSpecifiedNewAlias(): void
     {
         $queryBuilder = new QueryBuilder($this->prophesize(EntityManagerInterface::class)->reveal());

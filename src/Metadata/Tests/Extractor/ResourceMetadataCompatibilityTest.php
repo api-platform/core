@@ -141,10 +141,6 @@ final class ResourceMetadataCompatibilityTest extends TestCase
             'hydraContext' => [
                 'foo' => ['bar' => 'baz'],
             ],
-            // TODO Remove in 4.0
-            'openapiContext' => [
-                'bar' => 'baz',
-            ],
             'openapi' => [
                 'extensionProperties' => [
                     'bar' => 'baz',
@@ -364,10 +360,6 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     'hydraContext' => [
                         'foo' => ['bar' => 'baz'],
                     ],
-                    // TODO Remove in 4.0
-                    'openapiContext' => [
-                        'bar' => 'baz',
-                    ],
                     'openapi' => [
                         'extensionProperties' => [
                             'bar' => 'baz',
@@ -507,8 +499,6 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         'schemes',
         'cacheHeaders',
         'hydraContext',
-        // TODO Remove in 4.0
-        'openapiContext',
         'openapi',
         'paginationViaCursor',
         'stateOptions',
@@ -518,9 +508,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         'parameters',
     ];
 
-    /**
-     * @dataProvider getExtractors
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getExtractors')]
     public function testValidMetadata(string $extractorClass, ResourceAdapterInterface $adapter): void
     {
         $reflClass = new \ReflectionClass(ApiResource::class);

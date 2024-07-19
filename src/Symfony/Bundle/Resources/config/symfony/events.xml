@@ -27,7 +27,6 @@
         <service id="api_platform.listener.request.read" class="ApiPlatform\Symfony\EventListener\ReadListener">
             <argument type="service" id="api_platform.state_provider.read" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-            <argument>null</argument>
             <argument type="service" id="api_platform.uri_variables.converter" />
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="4" />
@@ -82,8 +81,8 @@
         </service>
 
         <service id="api_platform.listener.view.respond" class="ApiPlatform\Symfony\EventListener\RespondListener">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.state_processor.respond" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
 
             <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="8" />
         </service>
@@ -98,8 +97,7 @@
             <argument key="$exceptionToStatus">%api_platform.exception_to_status%</argument>
             <argument key="$identifiersExtractor">null</argument>
             <argument key="$resourceClassResolver" type="service" id="api_platform.resource_class_resolver"/>
-            <argument key="$negotiator">null</argument>
-            <argument key="$problemCompliantErrors">%api_platform.rfc_7807_compliant_errors%</argument>
+            <argument key="$negotiator" type="service" id="api_platform.negotiator"/>
         </service>
 
         <service id="api_platform.state_provider.parameter" class="ApiPlatform\State\Provider\ParameterProvider" decorates="api_platform.state_provider.read" decoration-priority="100">
@@ -153,5 +151,13 @@
             <argument>%api_platform.docs_formats%</argument>
         </service>
 
+        <service id="api_platform.action.placeholder" class="ApiPlatform\Symfony\Action\PlaceholderAction" public="true" />
+        <service id="ApiPlatform\Symfony\Action\PlaceholderAction" alias="api_platform.action.placeholder" public="true" />
+        <service id="api_platform.action.get_collection" alias="api_platform.action.placeholder" public="true" />
+        <service id="api_platform.action.post_collection" alias="api_platform.action.placeholder" public="true" />
+        <service id="api_platform.action.get_item" alias="api_platform.action.placeholder" public="true" />
+        <service id="api_platform.action.patch_item" alias="api_platform.action.placeholder" public="true" />
+        <service id="api_platform.action.put_item" alias="api_platform.action.placeholder" public="true" />
+        <service id="api_platform.action.delete_item" alias="api_platform.action.placeholder" public="true" />
     </services>
 </container>

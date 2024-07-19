@@ -74,6 +74,7 @@ class ReadListenerTest extends TestCase
         $provider = $this->createMock(ProviderInterface::class);
         $provider->expects($this->never())->method('provide');
         $metadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $metadata->method('create')->willReturn(new ResourceMetadataCollection('class'));
         $listener = new ReadListener($provider, $metadata);
         $listener->onKernelRequest(
             new RequestEvent(
@@ -82,6 +83,14 @@ class ReadListenerTest extends TestCase
                 HttpKernelInterface::MAIN_REQUEST
             )
         );
+    }
+
+    public static function provideNonApiAttributes(): array
+    {
+        return [
+            ['_api_receive' => false, '_api_operation_name' => 'dummy'],
+            [],
+        ];
     }
 
     public function testReadFalse(): void
@@ -110,7 +119,7 @@ class ReadListenerTest extends TestCase
         $uriVariablesConverter = $this->createMock(UriVariablesConverterInterface::class);
         $uriVariablesConverter->expects($this->once())->method('convert')->with(['id' => '3'], 'class')->willReturn(['id' => 3]);
         $request = new Request([], [], ['_api_operation' => $operation, '_api_operation_name' => 'operation', '_api_resource_class' => 'class', 'id' => '3']);
-        $listener = new ReadListener($provider, $metadata, null, $uriVariablesConverter);
+        $listener = new ReadListener($provider, $metadata, $uriVariablesConverter);
         $listener->onKernelRequest(
             new RequestEvent(
                 $this->createStub(HttpKernelInterface::class),
@@ -136,15 +145,5 @@ class ReadListenerTest extends TestCase
                 HttpKernelInterface::MAIN_REQUEST
             )
         );
-    }
-
-    public static function provideNonApiAttributes(): array
-    {
-        return [
-            ['_api_resource_class' => 'dummy'],
-            ['_api_resource_class' => 'dummy', '_api_operation_name' => 'dummy'],
-            ['_api_receive' => false, '_api_operation_name' => 'dummy'],
-            [],
-        ];
     }
 }
