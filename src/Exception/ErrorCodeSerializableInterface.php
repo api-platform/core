@@ -15,6 +15,8 @@ namespace ApiPlatform\Exception;
 
 /**
  * An exception which has a serializable application-specific error code.
+ *
+ * @deprecated
  */
 interface ErrorCodeSerializableInterface
 {

@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Util;
+namespace ApiPlatform\Metadata\Util;
 
-use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\State\Util\RequestParser;
 
@@ -21,8 +21,6 @@ use ApiPlatform\State\Util\RequestParser;
  * Parses and creates IRIs.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @deprecated use ApiPlatform\Metadata\Util\IriHelper instead
  *
  * @internal
  */

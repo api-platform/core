@@ -21,6 +21,8 @@ use ApiPlatform\State\ProcessorInterface;
  * Write stage of GraphQL resolvers.
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
+ *
+ * @deprecated
  */
 final class WriteStage implements WriteStageInterface
 {

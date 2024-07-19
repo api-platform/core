@@ -17,6 +17,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
+ *
+ * @deprecated use ApiPlatform\Metadata\Exception\NotExposedHttpException
  */
 class NotExposedHttpException extends NotFoundHttpException
 {

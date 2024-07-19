@@ -37,8 +37,11 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
     use ResourceClassInfoTrait;
     use SortTrait;
 
-    public function __construct(private readonly CacheItemPoolInterface $subscriptionsCache, private readonly SubscriptionIdentifierGeneratorInterface $subscriptionIdentifierGenerator, private readonly ?SerializeStageInterface $serializeStage, private readonly IriConverterInterface $iriConverter, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ?ProcessorInterface $normalizeProcessor = null)
+    public function __construct(private readonly CacheItemPoolInterface $subscriptionsCache, private readonly SubscriptionIdentifierGeneratorInterface $subscriptionIdentifierGenerator, private readonly SerializeStageInterface|ProcessorInterface|null $serializeStage = null, private readonly IriConverterInterface $iriConverter, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ?ProcessorInterface $normalizeProcessor = null)
     {
+        if (!$serializeStage instanceof ProcessorInterface) {
+            trigger_deprecation('api-platform/core', '4.0', sprintf('Using an instanceof "%s" is deprecated, use "%s" instead.', SerializeStageInterface::class, ProcessorInterface::class));
+        }
     }
 
     public function retrieveSubscriptionId(array $context, ?array $result, ?Operation $operation = null): ?string

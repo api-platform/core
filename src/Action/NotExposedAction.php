@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * An action which always returns HTTP 404 Not Found with an explanation for why the operation is not exposed.
+ *
+ * @deprecated use ApiPlatform\Symfony\Action\NotExposedAction
  */
 final class NotExposedAction
 {

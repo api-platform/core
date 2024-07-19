@@ -17,6 +17,8 @@ namespace ApiPlatform\Exception;
  * Invalid argument exception.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @deprecated use ApiPlatform\Metadata\Exception\InvalidArgumentException
  */
 class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
 {
