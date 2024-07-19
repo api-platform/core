@@ -5,14 +5,17 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
         <!-- TODO: move this to events.xml in API Platform 4 to lighten the container -->
-        <service id="api_platform.action.placeholder" class="ApiPlatform\Action\PlaceholderAction" public="true" />
-        <service id="ApiPlatform\Action\PlaceholderAction" alias="api_platform.action.placeholder" public="true" />
+        <service id="api_platform.action.placeholder" class="ApiPlatform\Symfony\Action\PlaceholderAction" public="true" />
+        <service id="ApiPlatform\Symfony\Action\PlaceholderAction" alias="api_platform.action.placeholder" public="true" />
         <service id="api_platform.action.get_collection" alias="api_platform.action.placeholder" public="true" />
         <service id="api_platform.action.post_collection" alias="api_platform.action.placeholder" public="true" />
         <service id="api_platform.action.get_item" alias="api_platform.action.placeholder" public="true" />
         <service id="api_platform.action.patch_item" alias="api_platform.action.placeholder" public="true" />
         <service id="api_platform.action.put_item" alias="api_platform.action.placeholder" public="true" />
         <service id="api_platform.action.delete_item" alias="api_platform.action.placeholder" public="true" />
+
+        <!-- Deprecated -->
+        <service id="ApiPlatform\Action\PlaceholderAction" alias="api_platform.action.placeholder" public="true" />
 
         <service id="api_platform.listener.exception" class="ApiPlatform\Symfony\EventListener\ExceptionListener">
             <argument type="service" id="api_platform.error_listener" on-invalid="null" />

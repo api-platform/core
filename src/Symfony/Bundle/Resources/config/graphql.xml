@@ -237,10 +237,9 @@
         <service id="api_platform.graphql.subscription.subscription_manager" class="ApiPlatform\GraphQl\Subscription\SubscriptionManager">
             <argument type="service" id="api_platform.graphql.cache.subscription" />
             <argument type="service" id="api_platform.graphql.subscription.subscription_identifier_generator" />
-            <argument type="service" id="api_platform.graphql.resolver.stage.serialize" on-invalid="ignore" />
+            <argument type="service" id="api_platform.graphql.state_processor.normalize" on-invalid="ignore" />
             <argument type="service" id="api_platform.symfony.iri_converter" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-            <argument type="service" id="api_platform.graphql.state_processor.normalize" on-invalid="ignore" />
         </service>
 
         <!-- Serializer -->

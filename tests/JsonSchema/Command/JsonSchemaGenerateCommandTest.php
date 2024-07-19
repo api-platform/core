@@ -179,6 +179,8 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
      */
     public function testArraySchemaWithTypeFactory(): void
     {
+        $container = static::getContainer();
+
         $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5896\Foo', '--type' => 'output']);
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
@@ -278,7 +280,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6317\Issue6317', '--type' => 'output', '--format' => 'jsonld']);
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
-        $properties = $json['definitions']['Issue6317.jsonld']['properties'];
+        $properties = $json['definitions']['Issue6317.jsonld.output']['properties'];
 
         $this->assertArrayHasKey('example', $properties['id']);
         $this->assertArrayHasKey('example', $properties['name']);
@@ -293,7 +295,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ResourceWithEnumProperty', '--type' => 'output', '--format' => 'jsonld']);
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
-        $properties = $json['definitions']['ResourceWithEnumProperty.jsonld']['properties'];
+        $properties = $json['definitions']['ResourceWithEnumProperty.jsonld.output']['properties'];
 
         $this->assertSame(
             [

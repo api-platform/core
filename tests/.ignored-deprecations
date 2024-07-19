@@ -23,4 +23,5 @@
 %Since api-platform/core 3.4: The "exclusiveMaximum" schema value should be a number not a boolean.%
 %Since api-platform/core 3.4: The "exclusiveMinimum" schema value should be a number not a boolean.%
 %Since api-platform/core 3.4: The "allowEmptyValue" option should be declared using an "openapi" parameter.%
-
+%Since api-platform/core 3.4: Injecting the "ApiPlatform\\JsonSchema\\TypeFactoryInterface" inside "ApiPlatform\\JsonSchema\\SchemaFactory" is deprecated and "ApiPlatform\\JsonSchema\\TypeFactoryInterface" will be removed in 4.x.%
+%Since api-platform/core 3.4: Injecting the "ApiPlatform\\JsonSchema\\TypeFactoryInterface" inside "ApiPlatform\\OpenApi\\Factory\\OpenApiFactory" is deprecated and "ApiPlatform\\JsonSchema\\TypeFactoryInterface" will be removed in 4.x.%

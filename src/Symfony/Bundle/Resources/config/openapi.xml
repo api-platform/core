@@ -85,7 +85,7 @@
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="service" id="api_platform.json_schema.schema_factory" />
-            <argument type="service" id="api_platform.json_schema.type_factory" />
+            <argument>null</argument>
             <argument type="service" id="api_platform.filter_locator" />
             <argument>%api_platform.formats%</argument>
             <argument type="service" id="api_platform.openapi.options" />

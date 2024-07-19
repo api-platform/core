@@ -61,7 +61,7 @@ final class ErrorListener extends SymfonyErrorListener
         private readonly IdentifiersExtractorInterface|LegacyIdentifiersExtractorInterface|null $identifiersExtractor = null,
         private readonly ResourceClassResolverInterface|LegacyResourceClassResolverInterface|null $resourceClassResolver = null,
         ?Negotiator $negotiator = null,
-        private readonly bool $problemCompliantErrors = true,
+        private readonly ?bool $problemCompliantErrors = true,
     ) {
         parent::__construct($controller, $logger, $debug, $exceptionsMapping);
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
@@ -90,7 +90,7 @@ final class ErrorListener extends SymfonyErrorListener
         $legacy = $apiOperation ? ($apiOperation->getExtraProperties()['rfc_7807_compliant_errors'] ?? false) : $this->problemCompliantErrors;
 
         if (!$this->problemCompliantErrors || !$legacy) {
-            // TODO: deprecate in API Platform 3.3
+            trigger_deprecation('api-platform/core', '3.4', "rfc_7807_compliant_errors flag will be removed in 4.0, to handle errors yourself use extraProperties: ['rfc_7807_compliant_errors' => false]");
             $this->controller = 'api_platform.action.exception';
             $dup = parent::duplicateRequest($exception, $request);
             $dup->attributes->set('_api_operation', $apiOperation);

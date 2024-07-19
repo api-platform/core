@@ -20,6 +20,8 @@ use ApiPlatform\Validator\ValidatorInterface;
  * Validate stage of GraphQL resolvers.
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
+ *
+ * @deprecated
  */
 final class ValidateStage implements ValidateStageInterface
 {

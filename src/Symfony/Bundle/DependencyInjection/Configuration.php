@@ -87,6 +87,7 @@ final class Configuration implements ConfigurationInterface
                 ->end()
                 ->booleanNode('show_webby')->defaultTrue()->info('If true, show Webby on the documentation page')->end()
                 ->booleanNode('event_listeners_backward_compatibility_layer')->defaultNull()->info('If true API Platform uses Symfony event listeners instead of providers and processors.')->end()
+                ->booleanNode('use_deprecated_json_schema_type_factory')->defaultNull()->info('Use the deprecated type factory, this option will be removed in 4.0.')->end()
                 ->booleanNode('use_symfony_listeners')->defaultNull()->info(sprintf('Uses Symfony event listeners instead of the %s.', MainController::class))->end()
                 ->scalarNode('name_converter')->defaultNull()->info('Specify a name converter to use.')->end()
                 ->scalarNode('asset_package')->defaultNull()->info('Specify an asset package name to use.')->end()

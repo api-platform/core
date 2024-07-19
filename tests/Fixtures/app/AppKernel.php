@@ -248,6 +248,7 @@ class AppKernel extends Kernel
             'graphql' => [
                 'graphql_playground' => false,
             ],
+            'use_deprecated_json_schema_type_factory' => true,
             'use_symfony_listeners' => $useSymfonyListeners,
             'defaults' => [
                 'pagination_client_enabled' => true,

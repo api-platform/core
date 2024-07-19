@@ -17,6 +17,8 @@ namespace ApiPlatform\Exception;
  * Property not found exception.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @deprecated use ApiPlatform\Metadata\Exception\PropertyNotFoundException
  */
 class PropertyNotFoundException extends \Exception implements ExceptionInterface
 {

@@ -23,6 +23,7 @@ use Symfony\Component\Serializer\Serializer;
  * Normalizes errors according to the API Problem spec (RFC 7807).
  *
  * @see https://tools.ietf.org/html/rfc7807
+ * @deprecated
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

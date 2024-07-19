@@ -30,6 +30,8 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  * Serialize stage of GraphQL resolvers.
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
+ *
+ * @deprecated
  */
 final class SerializeStage implements SerializeStageInterface
 {

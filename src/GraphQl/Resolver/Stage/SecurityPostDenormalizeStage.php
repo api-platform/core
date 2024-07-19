@@ -22,6 +22,8 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  * Security post denormalize stage of GraphQL resolvers.
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
+ *
+ * @deprecated
  */
 final class SecurityPostDenormalizeStage implements SecurityPostDenormalizeStageInterface
 {

@@ -32,6 +32,8 @@ use Psr\Container\ContainerInterface;
  * @author Alan Poulain <contact@alanpoulain.eu>
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
+ *
+ * @deprecated
  */
 final class ItemResolverFactory implements ResolverFactoryInterface
 {

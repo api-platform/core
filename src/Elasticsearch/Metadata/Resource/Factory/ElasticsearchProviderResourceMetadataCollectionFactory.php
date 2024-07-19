@@ -21,15 +21,17 @@ use ApiPlatform\Metadata\InflectorInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Metadata\Util\Inflector;
 use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception;
 use Elasticsearch\Common\Exceptions\NoNodesAvailableException;
 
 final class ElasticsearchProviderResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    public function __construct(private readonly ?Client $client, private readonly ResourceMetadataCollectionFactoryInterface $decorated, private readonly bool $triggerDeprecation = true, private readonly ?InflectorInterface $inflector = new Inflector()) // @phpstan-ignore-line
+    public function __construct(private readonly ?Client $client, private readonly ResourceMetadataCollectionFactoryInterface $decorated, private readonly bool $triggerDeprecation = true, private readonly ?InflectorInterface $inflector = null) // @phpstan-ignore-line
     {
+        if ($client) {
+            trigger_deprecation('api-platform/core', '4.0', sprintf('Using $client at "%s" is deprecated and the argument will be removed.', self::class));
+        }
     }
 
     /**

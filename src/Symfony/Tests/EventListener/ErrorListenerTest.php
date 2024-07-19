@@ -137,24 +137,4 @@ class ErrorListenerTest extends TestCase
         $errorListener = new ErrorListener('action', null, true, [], $resourceMetadataCollectionFactory, ['jsonld' => ['application/ld+json']], [], $identifiersExtractor, $resourceClassResolver);
         $errorListener->onKernelException($exceptionEvent);
     }
-
-    public function testDisableErrorResourceHandling(): void
-    {
-        $exception = Error::createFromException(new \Exception(), 400);
-        $resourceMetadataCollectionFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
-        $resourceMetadataCollectionFactory->expects($this->never())->method('create');
-        $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
-        $resourceClassResolver->expects($this->never())->method('isResourceClass');
-        $kernel = $this->createStub(KernelInterface::class);
-        $kernel->method('handle')->willReturnCallback(function ($request) {
-            $this->assertEquals($request->attributes->get('_api_operation'), null);
-
-            return new Response();
-        });
-
-        $exceptionEvent = new ExceptionEvent($kernel, Request::create('/'), HttpKernelInterface::SUB_REQUEST, $exception);
-        $identifiersExtractor = $this->createStub(IdentifiersExtractorInterface::class);
-        $errorListener = new ErrorListener('action', null, true, [], $resourceMetadataCollectionFactory, ['jsonld' => ['application/ld+json']], [], $identifiersExtractor, $resourceClassResolver, null, false);
-        $errorListener->onKernelException($exceptionEvent);
-    }
 }
