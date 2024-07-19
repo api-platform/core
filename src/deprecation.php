@@ -29,10 +29,28 @@ $movedClasses = [
     ApiPlatform\Action\NotExposedAction::class => ApiPlatform\Symfony\Action\NotExposedAction::class,
     ApiPlatform\Action\NotFoundAction::class => ApiPlatform\Symfony\Action\NotFoundAction::class,
     ApiPlatform\Action\PlaceholderAction::class => ApiPlatform\Symfony\Action\PlaceholderAction::class,
+    ApiPlatform\Api\Entrypoint::class => ApiPlatform\Documentation\Entrypoint::class,
+    ApiPlatform\Exception\ExceptionInterface::class => ApiPlatform\Metadata\Exception\ExceptionInterface::class,
+    ApiPlatform\Exception\InvalidArgumentException::class => ApiPlatform\Metadata\Exception\InvalidArgumentException::class,
+    ApiPlatform\Exception\InvalidIdentifierException::class => ApiPlatform\Metadata\Exception\InvalidIdentifierException::class,
+    ApiPlatform\Exception\InvalidUriVariableException::class => ApiPlatform\Metadata\Exception\InvalidUriVariableException::class,
+    ApiPlatform\Exception\ItemNotFoundException::class => ApiPlatform\Metadata\Exception\ItemNotFoundException::class,
+    ApiPlatform\Exception\NotExposedHttpException::class => ApiPlatform\Metadata\Exception\NotExposedHttpException::class,
+    ApiPlatform\Exception\OperationNotFoundException::class => ApiPlatform\Metadata\Exception\OperationNotFoundException::class,
+    ApiPlatform\Exception\PropertyNotFoundException::class => ApiPlatform\Metadata\Exception\PropertyNotFoundException::class,
+    ApiPlatform\Exception\ResourceClassNotFoundException::class => ApiPlatform\Metadata\Exception\ResourceClassNotFoundException::class,
+    ApiPlatform\Exception\RuntimeException::class=> ApiPlatform\Metadata\Exception\RuntimeException::class,
+
 ];
 
 $removedClasses = [
     ApiPlatform\Action\ExceptionAction::class => true,
+    ApiPlatform\Exception\DeserializationException::class => true,
+    ApiPlatform\Exception\ErrorCodeSerializableInterface::class => true,
+    ApiPlatform\Exception\FilterValidationException::class => true,
+    ApiPlatform\Exception\InvalidResourceException::class => true,
+    ApiPlatform\Exception\InvalidValueException::class => true,
+    ApiPlatform\Exception\ResourceClassNotSupportedException::class
 ];
 
 spl_autoload_register(function ($className) use ($deprecatedClassesWithAliases, $movedClasses, $removedClasses): void {
