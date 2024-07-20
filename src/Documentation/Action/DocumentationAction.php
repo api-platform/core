@@ -101,9 +101,6 @@ final class DocumentationAction
                 // TODO: support laravel this bounds Documentation with Symfony so it's not perfect
                 $operation = $operation->withProcessor('api_platform.swagger_ui.processor')->withWrite(true);
             }
-            if ('json' === $format) {
-                trigger_deprecation('api-platform/core', '3.2', 'The "json" format is too broad, use "jsonopenapi" instead.');
-            }
 
             return $this->processor->process($this->provider->provide($operation, [], $context), $operation, [], $context);
         }

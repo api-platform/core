@@ -305,3 +305,15 @@ Feature: Authorization checking
     Then the response status code should be 200
     And the response should contain "ownerOnlyProperty"
     And the response should contain "attributeBasedProperty"
+
+  Scenario: Security post validation should be hit
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I add "Authorization" header equal to "Basic ZHVuZ2xhczprZXZpbg=="
+    And I send a "POST" request to "/issue_6446" with body:
+    """
+    {
+      "title": ""
+    }
+    """
+    Then the response status code should be 403
+

@@ -818,7 +818,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('state/security.xml');
 
-        if (interface_exists(ValidatorInterface::class) && !$config['use_symfony_listeners']) {
+        if (interface_exists(ValidatorInterface::class)) {
             $loader->load('state/security_validator.xml');
         }
 
