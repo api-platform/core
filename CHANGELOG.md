@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.3.11
+
+### Features
+
+* [344b8b245](https://github.com/api-platform/core/commit/344b8b245ac2a77e0b22b69e7976456c024a5dcb) Revert "feat(jsonschema): make JSON-LD specific properties required (#6366)" (#6484)
+
 ## v3.3.10
 
 ### Bug fixes
