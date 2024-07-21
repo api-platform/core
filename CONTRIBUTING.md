@@ -127,7 +127,7 @@ Recommendations:
 
 * don't change existing tests if possible
 * always add a new `ApiResource` or a new `Entity/Document` to add a new test instead of changing an existing class
-* as of API Platform 3 each component has it's own test directory, avoid the `tests/` directory except for functional tests
+* as of API Platform 3 each component has its own test directory, avoid the `tests/` directory except for functional tests
 * dependencies between components must be kept at its minimal (`api-platform/metadata`, `api-platform/state`) except for bridges (Doctrine, Symfony, Laravel etc.)
 * for functional testing with phpunit (see `tests/Functional`, add your ApiResource to `ApiPlatform\Tests\Fixtures\PhpUnitResourceNameCollectionFactory`)
 
@@ -139,11 +139,11 @@ https://github.com/api-platform/core/blob/002c8b25283c9c06a085945f6206052a99a5fb
 
 To launch unit tests:
 
-    vendor/bin/simple-phpunit --stop-on-defect -vvv
+    vendor/bin/phpunit --stop-on-defect
 
 If you want coverage, you will need the `pcov` PHP extension and run:
 
-    vendor/bin/simple-phpunit --coverage-html coverage -vvv --stop-on-failure
+    vendor/bin/phpunit --coverage-html coverage --stop-on-defect
 
 Sometimes there might be an error with too many open files when generating coverage. To fix this, you can increase the `ulimit`, for example:
 

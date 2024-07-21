@@ -92,6 +92,6 @@ class CachedPropertyNameCollectionFactoryTest extends TestCase
 
     private function generateCacheKey(string $resourceClass = Dummy::class, array $options = []): string
     {
-        return CachedPropertyNameCollectionFactory::CACHE_KEY_PREFIX.md5(serialize([$resourceClass, $options]));
+        return CachedPropertyNameCollectionFactory::CACHE_KEY_PREFIX.hash('xxh3', serialize([$resourceClass, $options]));
     }
 }

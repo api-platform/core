@@ -53,7 +53,7 @@ final class AddHeadersProcessor implements ProcessorInterface
         $resourceCacheHeaders = $operation->getCacheHeaders() ?? [];
 
         if ($this->etag && !$response->getEtag()) {
-            $response->setEtag(md5((string) $content));
+            $response->setEtag(hash('xxh3', (string) $content));
         }
 
         if (null !== ($maxAge = $resourceCacheHeaders['max_age'] ?? $this->maxAge) && !$response->headers->hasCacheControlDirective('max-age')) {
