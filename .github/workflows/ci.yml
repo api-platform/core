@@ -861,8 +861,8 @@ jobs:
       - name: Run Behat tests
         run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction
 
-  windows-phpunit:
-    name: Windows PHPUnit (PHP ${{ matrix.php }}) (SQLite)
+  windows-behat:
+    name: Windows Behat (PHP ${{ matrix.php }}) (SQLite)
     runs-on: windows-latest
     timeout-minutes: 20
     strategy:
