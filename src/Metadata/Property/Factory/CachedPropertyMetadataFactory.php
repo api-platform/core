@@ -38,7 +38,7 @@ final class CachedPropertyMetadataFactory implements PropertyMetadataFactoryInte
      */
     public function create(string $resourceClass, string $property, array $options = []): ApiProperty
     {
-        $cacheKey = self::CACHE_KEY_PREFIX.md5(serialize([$resourceClass, $property, $options]));
+        $cacheKey = self::CACHE_KEY_PREFIX.hash('xxh3', serialize([$resourceClass, $property, $options]));
 
         return $this->getCached($cacheKey, fn (): ApiProperty => $this->decorated->create($resourceClass, $property, $options));
     }

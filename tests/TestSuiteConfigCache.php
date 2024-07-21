@@ -18,7 +18,7 @@ use Symfony\Component\Config\ConfigCacheInterface;
 final class TestSuiteConfigCache implements ConfigCacheInterface
 {
     /** @var array<string, string> */
-    public static $md5 = [];
+    public static array $hashes = [];
 
     public function __construct(private readonly ConfigCacheInterface $decorated)
     {
@@ -32,8 +32,8 @@ final class TestSuiteConfigCache implements ConfigCacheInterface
     public function isFresh(): bool
     {
         $p = $this->getPath();
-        if (!isset(static::$md5[$p]) || static::$md5[$p] !== $this->getHash()) {
-            static::$md5[$p] = $this->getHash();
+        if (!isset(self::$hashes[$p]) || self::$hashes[$p] !== $this->getHash()) {
+            self::$hashes[$p] = $this->getHash();
 
             return false;
         }
@@ -48,6 +48,6 @@ final class TestSuiteConfigCache implements ConfigCacheInterface
 
     private function getHash(): string
     {
-        return md5_file(__DIR__.'/Fixtures/app/var/resources.php');
+        return hash_file('xxh3', __DIR__.'/Fixtures/app/var/resources.php');
     }
 }
