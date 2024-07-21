@@ -91,7 +91,7 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         $data['hydra:view'] = ['@id' => null, '@type' => 'hydra:PartialCollectionView'];
 
         if ($isPaginatedWithCursor) {
-            return $this->populateDataWithCursorBasedPagination($data, $parsed, $object, $cursorPaginationAttribute, $operation?->getUrlGenerationStrategy() ?? $this->urlGenerationStrategy);
+            return $this->populateDataWithCursorBasedPagination($data, $parsed, $object, $cursorPaginationAttribute, $operation?->getUrlGenerationStrategy() ?? $this->urlGenerationStrategy, $itemsPerPage, $pageTotalItems);
         }
 
         $data['hydra:view']['@id'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated ? $currentPage : null, $operation?->getUrlGenerationStrategy() ?? $this->urlGenerationStrategy);
@@ -144,7 +144,7 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         return $paginationFilters;
     }
 
-    private function populateDataWithCursorBasedPagination(array $data, array $parsed, \Traversable $object, ?array $cursorPaginationAttribute, ?int $urlGenerationStrategy): array
+    private function populateDataWithCursorBasedPagination(array $data, array $parsed, \Traversable $object, ?array $cursorPaginationAttribute, ?int $urlGenerationStrategy, ?float $itemsPerPage, ?float $pageTotalItems): array
     {
         $objects = iterator_to_array($object);
         $firstObject = current($objects);
@@ -152,7 +152,7 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
 
         $data['hydra:view']['@id'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], urlGenerationStrategy: $urlGenerationStrategy);
 
-        if (false !== $lastObject && \is_array($cursorPaginationAttribute)) {
+        if (false !== $lastObject && \is_array($cursorPaginationAttribute) && $pageTotalItems >= $itemsPerPage) {
             $data['hydra:view']['hydra:next'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], $this->cursorPaginationFields($cursorPaginationAttribute, 1, $lastObject)), urlGenerationStrategy: $urlGenerationStrategy);
         }
 
