@@ -88,27 +88,13 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         $definitions = $schema->getDefinitions();
         if ($key = $schema->getRootDefinitionKey()) {
             $definitions[$key]['properties'] = self::BASE_ROOT_PROPS + ($definitions[$key]['properties'] ?? []);
-            if (Schema::TYPE_OUTPUT === $type) {
-                foreach (array_keys(self::BASE_ROOT_PROPS) as $property) {
-                    $definitions[$key]['required'] ??= [];
-                    if (!\in_array($property, $definitions[$key]['required'], true)) {
-                        $definitions[$key]['required'][] = $property;
-                    }
-                }
-            }
+            $this->makeJsonLdKeywordPropertiesRequired($definitions, $key, $type, true, null === $operation);
 
             return $schema;
         }
         if ($key = $schema->getItemsDefinitionKey()) {
             $definitions[$key]['properties'] = self::BASE_PROPS + ($definitions[$key]['properties'] ?? []);
-            if (Schema::TYPE_OUTPUT === $type) {
-                foreach (array_keys(self::BASE_PROPS) as $property) {
-                    $definitions[$key]['required'] ??= [];
-                    if (!\in_array($property, $definitions[$key]['required'], true)) {
-                        $definitions[$key]['required'][] = $property;
-                    }
-                }
-            }
+            $this->makeJsonLdKeywordPropertiesRequired($definitions, $key, $type, false, null === $operation);
         }
 
         if (($schema['type'] ?? '') === 'array') {
@@ -209,6 +195,27 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     {
         if ($this->schemaFactory instanceof SchemaFactoryAwareInterface) {
             $this->schemaFactory->setSchemaFactory($schemaFactory);
+        }
+    }
+
+    private function makeJsonLdKeywordPropertiesRequired(\ArrayObject $definitions, string $key, string $type, bool $isRoot, bool $isSubSchema): void
+    {
+        if (Schema::TYPE_INPUT === $type) {
+            return;
+        }
+
+        $definitions[$key]['required'] ??= [];
+
+        $requiredProperties = match (true) {
+            $isSubSchema => ['@type'],
+            $isRoot => ['@context', '@id', '@type'],
+            default => ['@id', '@type'],
+        };
+
+        foreach ($requiredProperties as $property) {
+            if (!\in_array($property, $definitions[$key]['required'], true)) {
+                $definitions[$key]['required'][] = $property;
+            }
         }
     }
 }

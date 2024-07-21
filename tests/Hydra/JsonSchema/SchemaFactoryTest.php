@@ -190,8 +190,8 @@ class SchemaFactoryTest extends TestCase
         $this->assertTrue(isset($definitions[$rootDefinitionKey]));
         $this->assertTrue(isset($definitions[$rootDefinitionKey]['required']));
         $requiredProperties = $resultSchema['definitions'][$rootDefinitionKey]['required'];
-        $this->assertContains('@context', $requiredProperties);
-        $this->assertContains('@id', $requiredProperties);
+        $this->assertNotContains('@context', $requiredProperties);
+        $this->assertNotContains('@id', $requiredProperties);
         $this->assertContains('@type', $requiredProperties);
 
         $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_OUTPUT, new GetCollection());
