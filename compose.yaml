@@ -1,0 +1,12 @@
+services:
+    php:
+        build:
+            dockerfile: php-dev.dockerfile
+        volumes:
+            - .:/app
+            - ./.cache/composer:/tmp/composer/cache:delegated
+        working_dir: /app
+        profiles:
+            - php
+        user: ${USER_ID:-1000}
+        network_mode: host
