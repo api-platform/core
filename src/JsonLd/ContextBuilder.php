@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonLd;
 
+use ApiPlatform\Hydra\Serializer\HydraPrefixTrait;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
@@ -32,6 +33,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 final class ContextBuilder implements AnonymousContextBuilderInterface
 {
     use ClassInfoTrait;
+    use HydraPrefixTrait;
 
     public const FORMAT = 'jsonld';
 
@@ -81,9 +83,10 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
             return [];
         }
 
-        if ($operation->getNormalizationContext()['iri_only'] ?? false) {
+        $context = $operation->getNormalizationContext();
+        if ($context['iri_only'] ?? false) {
             $context = $this->getBaseContext($referenceType);
-            $context['hydra:member']['@type'] = '@id';
+            $context[$this->getHydraPrefix($context).'member']['@type'] = '@id';
 
             return $context;
         }

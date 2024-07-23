@@ -34,6 +34,7 @@ use ApiPlatform\State\Pagination\PartialPaginatorInterface;
 final class CollectionNormalizer extends AbstractCollectionNormalizer
 {
     use JsonLdContextTrait;
+    use HydraPrefixTrait;
 
     public const FORMAT = 'jsonld';
     public const IRI_ONLY = 'iri_only';
@@ -58,18 +59,19 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
     protected function getPaginationData(iterable $object, array $context = []): array
     {
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class']);
+        $hydraPrefix = $this->getHydraPrefix($context);
         // This adds "jsonld_has_context" by reference, we moved the code to this class.
         // To follow a note I wrote in the ItemNormalizer, we need to change the JSON-LD context generation as it is more complicated then it should.
         $data = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
         $data['@id'] = $this->iriConverter->getIriFromResource($resourceClass, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context);
-        $data['@type'] = 'hydra:Collection';
+        $data['@type'] = $hydraPrefix.'Collection';
 
         if ($object instanceof PaginatorInterface) {
-            $data['hydra:totalItems'] = $object->getTotalItems();
+            $data[$hydraPrefix.'totalItems'] = $object->getTotalItems();
         }
 
         if (\is_array($object) || ($object instanceof \Countable && !$object instanceof PartialPaginatorInterface)) {
-            $data['hydra:totalItems'] = \count($object);
+            $data[$hydraPrefix.'totalItems'] = \count($object);
         }
 
         return $data;
@@ -80,15 +82,15 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
      */
     protected function getItemsData(iterable $object, ?string $format = null, array $context = []): array
     {
-        $data = [];
-        $data['hydra:member'] = [];
+        $hydraPrefix = $this->getHydraPrefix($context);
+        $data = [$hydraPrefix.'member' => []];
         $iriOnly = $context[self::IRI_ONLY] ?? $this->defaultContext[self::IRI_ONLY];
 
         foreach ($object as $obj) {
             if ($iriOnly) {
-                $data['hydra:member'][] = $this->iriConverter->getIriFromResource($obj);
+                $data[$hydraPrefix.'member'][] = $this->iriConverter->getIriFromResource($obj);
             } else {
-                $data['hydra:member'][] = $this->normalizer->normalize($obj, $format, $context + ['jsonld_has_context' => true]);
+                $data[$hydraPrefix.'member'][] = $this->normalizer->normalize($obj, $format, $context + ['jsonld_has_context' => true]);
             }
         }
 
