@@ -29,6 +29,8 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Uid\Ulid;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * The search filter allows to filter a collection by given properties.
@@ -219,7 +221,14 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
             return;
         }
 
-        $values = array_map($this->getIdFromValue(...), $values);
+        $values = array_map(function ($value) {
+            $id = $this->getIdFromValue($value);
+            if ($id instanceof Uuid || $id instanceof Ulid) {
+                return $id->toBinary();
+            }
+
+            return $id;
+        }, $values);
 
         $associationResourceClass = $metadata->getAssociationTargetClass($field);
         $associationFieldIdentifier = $metadata->getIdentifierFieldNames()[0];
