@@ -31,7 +31,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 final class JsonSchemaGenerateCommand extends Command
 {
-    // @noRector \Rector\Php81\Rector\Property\ReadOnlyPropertyRector
     private array $formats;
 
     public function __construct(private readonly SchemaFactoryInterface $schemaFactory, array $formats)
@@ -51,7 +50,7 @@ final class JsonSchemaGenerateCommand extends Command
             ->addArgument('resource', InputArgument::REQUIRED, 'The Fully Qualified Class Name (FQCN) of the resource')
             ->addOption('operation', null, InputOption::VALUE_REQUIRED, 'The operation name')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The response format', (string) $this->formats[0])
-            ->addOption('type', null, InputOption::VALUE_REQUIRED, sprintf('The type of schema to generate (%s or %s)', Schema::TYPE_INPUT, Schema::TYPE_OUTPUT), Schema::TYPE_INPUT);
+            ->addOption('type', null, InputOption::VALUE_REQUIRED, \sprintf('The type of schema to generate (%s or %s)', Schema::TYPE_INPUT, Schema::TYPE_OUTPUT), Schema::TYPE_INPUT);
     }
 
     /**
@@ -70,19 +69,19 @@ final class JsonSchemaGenerateCommand extends Command
         $type = $input->getOption('type');
 
         if (!\in_array($type, [Schema::TYPE_INPUT, Schema::TYPE_OUTPUT], true)) {
-            $io->error(sprintf('You can only use "%s" or "%s" for the "type" option', Schema::TYPE_INPUT, Schema::TYPE_OUTPUT));
+            $io->error(\sprintf('You can only use "%s" or "%s" for the "type" option', Schema::TYPE_INPUT, Schema::TYPE_OUTPUT));
 
             return 1;
         }
 
         if (!\in_array($format, $this->formats, true)) {
-            throw new InvalidOptionException(sprintf('The response format "%s" is not supported. Supported formats are : %s.', $format, implode(', ', $this->formats)));
+            throw new InvalidOptionException(\sprintf('The response format "%s" is not supported. Supported formats are : %s.', $format, implode(', ', $this->formats)));
         }
 
-        $schema = $this->schemaFactory->buildSchema($resource, $format, $type, $operation ? (new class() extends HttpOperation {})->withName($operation) : null);
+        $schema = $this->schemaFactory->buildSchema($resource, $format, $type, $operation ? (new class extends HttpOperation {})->withName($operation) : null);
 
         if (!$schema->isDefined()) {
-            $io->error(sprintf('There is no %s defined for the operation "%s" of the resource "%s".', $type, $operation, $resource));
+            $io->error(\sprintf('There is no %s defined for the operation "%s" of the resource "%s".', $type, $operation, $resource));
 
             return 1;
         }

@@ -38,7 +38,7 @@ final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInte
         $metadata = $this->propertyMetadataFactory->create($resourceClass = $operation->getClass(), $property);
         $relationClass = $this->getPropertyClassType($metadata->getBuiltinTypes());
         if (!$relationClass) {
-            throw new RuntimeException(sprintf('We could not find a class matching the uriVariable "%s" on "%s".', $property, $resourceClass));
+            throw new RuntimeException(\sprintf('We could not find a class matching the uriVariable "%s" on "%s".', $property, $resourceClass));
         }
 
         $identifiers = $this->resourceClassResolver->isResourceClass($relationClass) ? $this->getIdentifiersFromResourceClass($relationClass) : ['id'];

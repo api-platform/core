@@ -124,14 +124,14 @@ final class FormatsResourceMetadataCollectionFactory implements ResourceMetadata
                 continue;
             }
             if (!\is_string($value)) {
-                throw new InvalidArgumentException(sprintf("The 'formats' attributes value must be a string when trying to include an already configured format, %s given.", \gettype($value)));
+                throw new InvalidArgumentException(\sprintf("The 'formats' attributes value must be a string when trying to include an already configured format, %s given.", \gettype($value)));
             }
             if (\array_key_exists($value, $this->formats)) {
                 $normalizedFormats[$value] = $this->formats[$value];
                 continue;
             }
 
-            throw new InvalidArgumentException(sprintf("You either need to add the format '%s' to your project configuration or declare a mime type for it in your annotation.", $value));
+            throw new InvalidArgumentException(\sprintf("You either need to add the format '%s' to your project configuration or declare a mime type for it in your annotation.", $value));
         }
 
         return $normalizedFormats;

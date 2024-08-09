@@ -28,11 +28,11 @@ final class ParameterProviderTest extends TestCase
 {
     public function testExtractValues(): void
     {
-        $locator = new class() implements ContainerInterface {
+        $locator = new class implements ContainerInterface {
             public function get(string $id)
             {
                 if ('test' === $id) {
-                    return new class() implements ParameterProviderInterface {
+                    return new class implements ParameterProviderInterface {
                         public function provide(Parameter $parameter, array $parameters = [], array $context = []): ?Operation
                         {
                             return new Get(name: 'ok');

@@ -169,7 +169,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         $assertions = [];
 
         if ($required && false !== ($allowEmptyValue = $openApi?->getAllowEmptyValue())) {
-            $assertions[] = new NotNull(message: sprintf('The parameter "%s" is required.', $parameter->getKey()));
+            $assertions[] = new NotNull(message: \sprintf('The parameter "%s" is required.', $parameter->getKey()));
         }
 
         if (false === ($allowEmptyValue ?? $openApi?->getAllowEmptyValue())) {

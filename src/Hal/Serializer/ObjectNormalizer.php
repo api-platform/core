@@ -117,6 +117,6 @@ final class ObjectNormalizer implements NormalizerInterface, DenormalizerInterfa
      */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
-        throw new LogicException(sprintf('%s is a read-only format.', self::FORMAT));
+        throw new LogicException(\sprintf('%s is a read-only format.', self::FORMAT));
     }
 }

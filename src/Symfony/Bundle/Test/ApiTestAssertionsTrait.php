@@ -203,7 +203,7 @@ trait ApiTestAssertionsTrait
         }
 
         if (!$client instanceof Client) {
-            static::fail(sprintf('A client must be set to make assertions on it. Did you forget to call "%s::createClient()"?', self::class));
+            static::fail(\sprintf('A client must be set to make assertions on it. Did you forget to call "%s::createClient()"?', self::class));
         }
 
         return $client;

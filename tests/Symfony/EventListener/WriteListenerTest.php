@@ -92,7 +92,7 @@ class WriteListenerTest extends TestCase
 
         foreach (['PATCH', 'PUT', 'POST'] as $httpMethod) {
             $request->setMethod($httpMethod);
-            $request->attributes->set('_api_operation_name', sprintf('_api_%s_%s%s', 'OperationResource', strtolower($httpMethod), 'POST' === $httpMethod ? '_collection' : ''));
+            $request->attributes->set('_api_operation_name', \sprintf('_api_%s_%s%s', 'OperationResource', strtolower($httpMethod), 'POST' === $httpMethod ? '_collection' : ''));
 
             (new WriteListener($this->processorProphecy->reveal(), $this->iriConverterProphecy->reveal(), $this->resourceClassResolver->reveal(), $this->resourceMetadataCollectionFactory->reveal()))->onKernelView($event);
             $this->assertSame($operationResource, $event->getControllerResult());
@@ -301,7 +301,7 @@ class WriteListenerTest extends TestCase
         );
 
         $request->setMethod('POST');
-        $request->attributes->set('_api_operation_name', sprintf('_api_%s_%s%s', 'OperationResource', 'post', '_collection'));
+        $request->attributes->set('_api_operation_name', \sprintf('_api_%s_%s%s', 'OperationResource', 'post', '_collection'));
 
         (new WriteListener($this->processorProphecy->reveal(), null, $this->resourceClassResolver->reveal(), $this->resourceMetadataCollectionFactory->reveal()))->onKernelView($event);
         $this->assertEquals($operationResource, $request->attributes->get('original_data'));

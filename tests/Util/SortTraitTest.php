@@ -23,7 +23,7 @@ class SortTraitTest extends TestCase
 {
     private function getSortTraitImplementation(): object
     {
-        return new class() {
+        return new class {
             use SortTrait {
                 SortTrait::arrayRecursiveSort as public;
             }

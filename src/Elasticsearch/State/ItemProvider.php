@@ -57,7 +57,7 @@ final class ItemProvider implements ProviderInterface
         }
 
         if (!$options instanceof Options) {
-            throw new RuntimeException(sprintf('The "%s" provider was called without "%s".', self::class, Options::class));
+            throw new RuntimeException(\sprintf('The "%s" provider was called without "%s".', self::class, Options::class));
         }
 
         $params = [

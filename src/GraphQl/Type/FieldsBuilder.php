@@ -54,10 +54,10 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
     public function __construct(private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ResourceClassResolverInterface $resourceClassResolver, private readonly TypesContainerInterface $typesContainer, ContextAwareTypeBuilderInterface|TypeBuilderEnumInterface|TypeBuilderInterface $typeBuilder, private readonly TypeConverterInterface $typeConverter, private readonly ResolverFactoryInterface $itemResolverFactory, private readonly ?ResolverFactoryInterface $collectionResolverFactory, private readonly ?ResolverFactoryInterface $itemMutationResolverFactory, private readonly ?ResolverFactoryInterface $itemSubscriptionResolverFactory, private readonly ContainerInterface $filterLocator, private readonly Pagination $pagination, private readonly ?NameConverterInterface $nameConverter, private readonly string $nestingSeparator, private readonly ?InflectorInterface $inflector = new Inflector())
     {
         if ($typeBuilder instanceof TypeBuilderInterface) {
-            @trigger_error(sprintf('$typeBuilder argument of FieldsBuilder implementing "%s" is deprecated since API Platform 3.1. It has to implement "%s" instead.', TypeBuilderInterface::class, TypeBuilderEnumInterface::class), \E_USER_DEPRECATED);
+            @trigger_error(\sprintf('$typeBuilder argument of FieldsBuilder implementing "%s" is deprecated since API Platform 3.1. It has to implement "%s" instead.', TypeBuilderInterface::class, TypeBuilderEnumInterface::class), \E_USER_DEPRECATED);
         }
         if ($typeBuilder instanceof TypeBuilderEnumInterface) {
-            @trigger_error(sprintf('$typeBuilder argument of TypeConverter implementing "%s" is deprecated since API Platform 3.3. It has to implement "%s" instead.', TypeBuilderEnumInterface::class, ContextAwareTypeBuilderInterface::class), \E_USER_DEPRECATED);
+            @trigger_error(\sprintf('$typeBuilder argument of TypeConverter implementing "%s" is deprecated since API Platform 3.3. It has to implement "%s" instead.', TypeBuilderEnumInterface::class, ContextAwareTypeBuilderInterface::class), \E_USER_DEPRECATED);
         }
         $this->typeBuilder = $typeBuilder;
     }
@@ -145,7 +145,7 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
     {
         $subscriptionFields = [];
         $resourceType = new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass);
-        $description = $operation->getDescription() ?? sprintf('Subscribes to the action event of a %s.', $operation->getShortName());
+        $description = $operation->getDescription() ?? \sprintf('Subscribes to the action event of a %s.', $operation->getShortName());
 
         if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $description, $operation->getDeprecationReason(), $resourceType, $resourceClass, false, $operation)) {
             $fieldConfiguration['args'] += ['input' => $this->getResourceFieldConfiguration(null, null, $operation->getDeprecationReason(), $resourceType, $resourceClass, true, $operation)];
@@ -286,7 +286,7 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
     {
         foreach ($args as $id => $arg) {
             if (!isset($arg['type'])) {
-                throw new \InvalidArgumentException(sprintf('The argument "%s" of the custom operation "%s" in %s needs a "type" option.', $id, $operation->getName(), $operation->getShortName()));
+                throw new \InvalidArgumentException(\sprintf('The argument "%s" of the custom operation "%s" in %s needs a "type" option.', $id, $operation->getName(), $operation->getShortName()));
             }
 
             $args[$id]['type'] = $this->typeConverter->resolveType($arg['type']);
@@ -650,12 +650,12 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
         $graphqlType = $this->typeConverter->convertType($type, $input, $rootOperation, $resourceClass, $rootResource, $property, $depth);
 
         if (null === $graphqlType) {
-            throw new InvalidTypeException(sprintf('The type "%s" is not supported.', $type->getBuiltinType()));
+            throw new InvalidTypeException(\sprintf('The type "%s" is not supported.', $type->getBuiltinType()));
         }
 
         if (\is_string($graphqlType)) {
             if (!$this->typesContainer->has($graphqlType)) {
-                throw new InvalidTypeException(sprintf('The GraphQL type %s is not valid. Valid types are: %s. Have you registered this type by implementing %s?', $graphqlType, implode(', ', array_keys($this->typesContainer->all())), TypeInterface::class));
+                throw new InvalidTypeException(\sprintf('The GraphQL type %s is not valid. Valid types are: %s. Have you registered this type by implementing %s?', $graphqlType, implode(', ', array_keys($this->typesContainer->all())), TypeInterface::class));
             }
 
             $graphqlType = $this->typesContainer->get($graphqlType);

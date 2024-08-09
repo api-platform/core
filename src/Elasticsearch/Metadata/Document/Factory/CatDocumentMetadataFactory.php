@@ -84,6 +84,6 @@ final class CatDocumentMetadataFactory implements DocumentMetadataFactoryInterfa
             return $documentMetadata;
         }
 
-        throw new IndexNotFoundException(sprintf('No index associated with the "%s" resource class.', $resourceClass));
+        throw new IndexNotFoundException(\sprintf('No index associated with the "%s" resource class.', $resourceClass));
     }
 }

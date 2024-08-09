@@ -52,7 +52,7 @@ final class DateTimeType extends ScalarType implements TypeInterface
         }
 
         if (!($value instanceof \DateTime)) {
-            throw new Error(sprintf('Value must be an instance of DateTime to be represented by DateTime: %s', Utils::printSafe($value)));
+            throw new Error(\sprintf('Value must be an instance of DateTime to be represented by DateTime: %s', Utils::printSafe($value)));
         }
 
         return $value->format(\DateTime::ATOM);
@@ -64,11 +64,11 @@ final class DateTimeType extends ScalarType implements TypeInterface
     public function parseValue($value): string
     {
         if (!\is_string($value)) {
-            throw new Error(sprintf('DateTime cannot represent non string value: %s', Utils::printSafeJson($value)));
+            throw new Error(\sprintf('DateTime cannot represent non string value: %s', Utils::printSafeJson($value)));
         }
 
         if (false === \DateTime::createFromFormat(\DateTime::ATOM, $value)) {
-            throw new Error(sprintf('DateTime cannot represent non date value: %s', Utils::printSafeJson($value)));
+            throw new Error(\sprintf('DateTime cannot represent non date value: %s', Utils::printSafeJson($value)));
         }
 
         // Will be denormalized into a \DateTime.

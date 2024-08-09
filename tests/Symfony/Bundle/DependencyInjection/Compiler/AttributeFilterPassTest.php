@@ -60,7 +60,7 @@ class AttributeFilterPassTest extends TestCase
     public function testProcessInvalidFilterClass(): void
     {
         $this->expectException(DependencyInjectionInvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('Class "%s" used for service "annotated_api_platform_tests_fixtures_test_bundle_entity_converted_boolean_api_platform_doctrine_orm_filter_boolean_filter" cannot be found.', BooleanFilter::class));
+        $this->expectExceptionMessage(\sprintf('Class "%s" used for service "annotated_api_platform_tests_fixtures_test_bundle_entity_converted_boolean_api_platform_doctrine_orm_filter_boolean_filter" cannot be found.', BooleanFilter::class));
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getParameter('api_platform.resource_class_directories')->willReturn([

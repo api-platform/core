@@ -73,7 +73,7 @@ trait DateFilterTrait
         $propertyName = $this->normalizePropertyName($property);
 
         return [
-            sprintf('%s[%s]', $propertyName, $period) => [
+            \sprintf('%s[%s]', $propertyName, $period) => [
                 'property' => $propertyName,
                 'type' => \DateTimeInterface::class,
                 'required' => false,
@@ -85,7 +85,7 @@ trait DateFilterTrait
     {
         if (false === \is_string($value)) {
             $this->getLogger()->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(sprintf('Invalid value for "[%s]", expected string', $operator)),
+                'exception' => new InvalidArgumentException(\sprintf('Invalid value for "[%s]", expected string', $operator)),
             ]);
 
             return null;

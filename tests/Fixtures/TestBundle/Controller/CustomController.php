@@ -25,6 +25,6 @@ class CustomController extends AbstractController
 {
     public function customAction(int $id): JsonResponse
     {
-        return new JsonResponse(sprintf('This is a custom action for %d.', $id), 200, ['Content-Type' => 'application/ld+json; charset=utf-8']);
+        return new JsonResponse(\sprintf('This is a custom action for %d.', $id), 200, ['Content-Type' => 'application/ld+json; charset=utf-8']);
     }
 }

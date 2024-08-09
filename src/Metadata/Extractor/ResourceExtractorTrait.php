@@ -38,7 +38,7 @@ trait ResourceExtractorTrait
         }
 
         if (!\is_array($resource[$key])) {
-            throw new InvalidArgumentException(sprintf('"%s" setting is expected to be an array, %s given', $key, \gettype($resource[$key])));
+            throw new InvalidArgumentException(\sprintf('"%s" setting is expected to be an array, %s given', $key, \gettype($resource[$key])));
         }
 
         return $resource[$key];
@@ -68,7 +68,7 @@ trait ResourceExtractorTrait
                 return \in_array($resource[$key], ['1', 'true', 1, true], false);
         }
 
-        throw new InvalidArgumentException(sprintf('The property "%s" must be a "%s", "%s" given.', $key, $type, \gettype($resource[$key])));
+        throw new InvalidArgumentException(\sprintf('The property "%s" must be a "%s", "%s" given.', $key, $type, \gettype($resource[$key])));
     }
 
     private function buildArgs(\SimpleXMLElement $resource): ?array

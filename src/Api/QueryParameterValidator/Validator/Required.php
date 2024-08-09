@@ -37,7 +37,7 @@ final class Required implements ValidatorInterface
         // if query param is not given, then break
         if (!$this->requestHasQueryParameter($queryParameters, $name)) {
             return [
-                sprintf('Query parameter "%s" is required', $name),
+                \sprintf('Query parameter "%s" is required', $name),
             ];
         }
 
@@ -46,7 +46,7 @@ final class Required implements ValidatorInterface
         // if query param is empty and the configuration does not allow it
         if (!($filterDescription['openapi']['allowEmptyValue'] ?? $filterDescription['swagger']['allowEmptyValue'] ?? false) && empty($this->requestGetQueryParameter($queryParameters, $name))) {
             return [
-                sprintf('Query parameter "%s" does not allow empty value', $name),
+                \sprintf('Query parameter "%s" does not allow empty value', $name),
             ];
         }
 

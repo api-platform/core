@@ -46,7 +46,7 @@ final class Response implements ResponseInterface
         $responseHeaders = [];
         foreach ($this->headers as $key => $values) {
             foreach ($values as $value) {
-                $responseHeaders[] = sprintf('%s: %s', $key, $value);
+                $responseHeaders[] = \sprintf('%s: %s', $key, $value);
             }
         }
 
@@ -133,7 +133,7 @@ final class Response implements ResponseInterface
         $contentType = $this->headers['content-type'][0] ?? 'application/json';
 
         if (!preg_match('/\bjson\b/i', $contentType)) {
-            throw new JsonException(sprintf('Response content-type is "%s" while a JSON-compatible one was expected.', $contentType));
+            throw new JsonException(\sprintf('Response content-type is "%s" while a JSON-compatible one was expected.', $contentType));
         }
 
         try {
@@ -143,7 +143,7 @@ final class Response implements ResponseInterface
         }
 
         if (!\is_array($content)) {
-            throw new JsonException(sprintf('JSON content was expected to decode to an array, %s returned.', \gettype($content)));
+            throw new JsonException(\sprintf('JSON content was expected to decode to an array, %s returned.', \gettype($content)));
         }
 
         return $this->jsonData = $content;

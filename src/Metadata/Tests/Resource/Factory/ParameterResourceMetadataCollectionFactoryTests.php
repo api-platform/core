@@ -29,7 +29,7 @@ class ParameterResourceMetadataCollectionFactoryTests extends TestCase
     {
         $filterLocator = $this->createStub(ContainerInterface::class);
         $filterLocator->method('has')->willReturn(true);
-        $filterLocator->method('get')->willReturn(new class() implements FilterInterface {
+        $filterLocator->method('get')->willReturn(new class implements FilterInterface {
             public function getDescription(string $resourceClass): array
             {
                 return [

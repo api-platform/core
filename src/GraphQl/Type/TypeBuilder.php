@@ -96,7 +96,7 @@ final class TypeBuilder implements ContextAwareTypeBuilderInterface
 
         $resourceObjectType = $resourceObjectType ?? $this->typesContainer->get($shortName);
         if (!($resourceObjectType instanceof ObjectType || $resourceObjectType instanceof NonNull || $resourceObjectType instanceof InputObjectType)) {
-            throw new \LogicException(sprintf('Expected GraphQL type "%s" to be %s.', $shortName, implode('|', [ObjectType::class, NonNull::class, InputObjectType::class])));
+            throw new \LogicException(\sprintf('Expected GraphQL type "%s" to be %s.', $shortName, implode('|', [ObjectType::class, NonNull::class, InputObjectType::class])));
         }
 
         $required = $propertyMetadata?->isRequired() ?? true;
@@ -115,7 +115,7 @@ final class TypeBuilder implements ContextAwareTypeBuilderInterface
         if ($this->typesContainer->has('Node')) {
             $nodeInterface = $this->typesContainer->get('Node');
             if (!$nodeInterface instanceof InterfaceType) {
-                throw new \LogicException(sprintf('Expected GraphQL type "Node" to be %s.', InterfaceType::class));
+                throw new \LogicException(\sprintf('Expected GraphQL type "Node" to be %s.', InterfaceType::class));
             }
 
             return $nodeInterface;
@@ -166,7 +166,7 @@ final class TypeBuilder implements ContextAwareTypeBuilderInterface
         $shortName = method_exists($namedType, 'name') ? $namedType->name() : $namedType->name;
         $paginationType = $this->pagination->getGraphQlPaginationType($operation);
 
-        $connectionTypeKey = sprintf('%s%sConnection', $shortName, ucfirst($paginationType));
+        $connectionTypeKey = \sprintf('%s%sConnection', $shortName, ucfirst($paginationType));
         if ($this->typesContainer->has($connectionTypeKey)) {
             return $this->typesContainer->get($connectionTypeKey);
         }
@@ -177,7 +177,7 @@ final class TypeBuilder implements ContextAwareTypeBuilderInterface
 
         $configuration = [
             'name' => $connectionTypeKey,
-            'description' => sprintf("%s connection for $shortName.", ucfirst($paginationType)),
+            'description' => \sprintf("%s connection for $shortName.", ucfirst($paginationType)),
             'fields' => $fields,
         ];
 
@@ -202,7 +202,7 @@ final class TypeBuilder implements ContextAwareTypeBuilderInterface
         if ($fieldsBuilder instanceof FieldsBuilderEnumInterface) {
             $enumCases = $fieldsBuilder->getEnumFields($operation->getClass());
         } else {
-            @trigger_error(sprintf('api_platform.graphql.fields_builder service implementing "%s" is deprecated since API Platform 3.1. It has to implement "%s" instead.', FieldsBuilderInterface::class, FieldsBuilderEnumInterface::class), \E_USER_DEPRECATED);
+            @trigger_error(\sprintf('api_platform.graphql.fields_builder service implementing "%s" is deprecated since API Platform 3.1. It has to implement "%s" instead.', FieldsBuilderInterface::class, FieldsBuilderEnumInterface::class), \E_USER_DEPRECATED);
         }
 
         $enumConfig = [

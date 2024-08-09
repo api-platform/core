@@ -37,7 +37,6 @@ class Content implements \JsonSerializable
     #[ORM\OrderBy(['id' => 'ASC'])]
     private Collection|iterable $fields;
     #[ORM\Column(type: 'string')]
-    // @noRector \Rector\Php81\Rector\Property\ReadOnlyPropertyRector
     private string $status = ContentStatus::DRAFT;
 
     public function __construct()
@@ -78,7 +77,7 @@ class Content implements \JsonSerializable
     public function addField(Field $field): void
     {
         if ($this->hasField($field->getName())) {
-            throw new \InvalidArgumentException(sprintf("Content already has '%s' field", $field->getName()));
+            throw new \InvalidArgumentException(\sprintf("Content already has '%s' field", $field->getName()));
         }
         $this->fields[$field->getName()] = $field;
         $field->setContent($this);

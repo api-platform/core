@@ -79,7 +79,7 @@ XML_WRAP
                 continue;
             }
 
-            throw new \LogicException(sprintf('Cannot adapt attribute or child "%s". Please add fixtures in '.PropertyMetadataCompatibilityTest::class.' and create a "%s" method in %s.', $parameterName, 'build'.ucfirst($parameterName), self::class));
+            throw new \LogicException(\sprintf('Cannot adapt attribute or child "%s". Please add fixtures in '.PropertyMetadataCompatibilityTest::class.' and create a "%s" method in %s.', $parameterName, 'build'.ucfirst($parameterName), self::class));
         }
 
         $filename = __DIR__.'/properties.xml';

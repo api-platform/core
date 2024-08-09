@@ -96,7 +96,7 @@ abstract class AbstractResourceExtractor implements ResourceExtractorInterface
             }
 
             if (preg_match('/^env\(\w+\)$/', $parameter)) {
-                throw new \RuntimeException(sprintf('Using "%%%s%%" is not allowed in routing configuration.', $parameter));
+                throw new \RuntimeException(\sprintf('Using "%%%s%%" is not allowed in routing configuration.', $parameter));
             }
 
             if (\array_key_exists($parameter, $this->collectedParameters)) {
@@ -115,7 +115,7 @@ abstract class AbstractResourceExtractor implements ResourceExtractorInterface
                 return (string) $resolved;
             }
 
-            throw new \RuntimeException(sprintf('The container parameter "%s", used in the resource configuration value "%s", must be a string or numeric, but it is of type %s.', $parameter, $value, \gettype($resolved)));
+            throw new \RuntimeException(\sprintf('The container parameter "%s", used in the resource configuration value "%s", must be a string or numeric, but it is of type %s.', $parameter, $value, \gettype($resolved)));
         }, $value);
 
         return str_replace('%%', '%', $escapedValue);

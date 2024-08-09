@@ -70,7 +70,7 @@ final class DeserializeListener
 
         $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
         if (null === $this->translator) {
-            $this->translator = new class() implements TranslatorInterface, LocaleAwareInterface {
+            $this->translator = new class implements TranslatorInterface, LocaleAwareInterface {
                 use TranslatorTrait;
             };
             $this->translator->setLocale('en');
@@ -194,7 +194,7 @@ final class DeserializeListener
                 }
             }
 
-            throw new UnsupportedMediaTypeHttpException(sprintf('The content-type "%s" is not supported. Supported MIME types are "%s".', $contentType, implode('", "', $supportedMimeTypes)));
+            throw new UnsupportedMediaTypeHttpException(\sprintf('The content-type "%s" is not supported. Supported MIME types are "%s".', $contentType, implode('", "', $supportedMimeTypes)));
         }
 
         return $format;

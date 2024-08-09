@@ -103,7 +103,7 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
             return $parentPropertyMetadata;
         }
 
-        throw new PropertyNotFoundException(sprintf('Property "%s" of class "%s" not found.', $property, $resourceClass));
+        throw new PropertyNotFoundException(\sprintf('Property "%s" of class "%s" not found.', $property, $resourceClass));
     }
 
     private function createMetadata(ApiProperty $attribute, ?ApiProperty $propertyMetadata = null): ApiProperty

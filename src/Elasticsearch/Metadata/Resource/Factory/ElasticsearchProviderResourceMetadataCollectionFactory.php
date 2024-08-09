@@ -51,7 +51,7 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
                     }
 
                     if (null !== ($elasticsearch = $operation->getElasticsearch())) {
-                        trigger_deprecation('api-platform/core', '3.1', sprintf('The "elasticsearch" property is deprecated. Use a stateOptions: "%s" instead.', Options::class));
+                        trigger_deprecation('api-platform/core', '3.1', \sprintf('The "elasticsearch" property is deprecated. Use a stateOptions: "%s" instead.', Options::class));
                     }
 
                     $hasElasticsearch = true === $elasticsearch || $operation->getStateOptions() instanceof Options;
@@ -80,7 +80,7 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
                     }
 
                     if (null !== ($elasticsearch = $graphQlOperation->getElasticsearch())) {
-                        trigger_deprecation('api-platform/core', '3.1', sprintf('The "elasticsearch" property is deprecated. Use a stateOptions: "%s" instead.', Options::class));
+                        trigger_deprecation('api-platform/core', '3.1', \sprintf('The "elasticsearch" property is deprecated. Use a stateOptions: "%s" instead.', Options::class));
                     }
 
                     $hasElasticsearch = true === $elasticsearch || $graphQlOperation->getStateOptions() instanceof Options;

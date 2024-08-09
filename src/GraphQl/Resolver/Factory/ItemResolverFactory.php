@@ -71,7 +71,7 @@ final class ItemResolverFactory implements ResolverFactoryInterface
                 /** @var QueryItemResolverInterface $queryResolver */
                 $queryResolver = $this->queryResolverLocator->get($queryResolverId);
                 $item = $queryResolver($item, $resolverContext);
-                $resourceClass = $this->getResourceClass($item, $resourceClass, sprintf('Custom query resolver "%s"', $queryResolverId).' has to return an item of class %s but returned an item of class %s.');
+                $resourceClass = $this->getResourceClass($item, $resourceClass, \sprintf('Custom query resolver "%s"', $queryResolverId).' has to return an item of class %s but returned an item of class %s.');
             }
 
             ($this->securityStage)($resourceClass, $operation, $resolverContext + [
@@ -110,7 +110,7 @@ final class ItemResolverFactory implements ResolverFactoryInterface
         }
 
         if ($resourceClass !== $itemClass && !$item instanceof $resourceClass) {
-            throw new \UnexpectedValueException(sprintf($errorMessage, (new \ReflectionClass($resourceClass))->getShortName(), (new \ReflectionClass($itemClass))->getShortName()));
+            throw new \UnexpectedValueException(\sprintf($errorMessage, (new \ReflectionClass($resourceClass))->getShortName(), (new \ReflectionClass($itemClass))->getShortName()));
         }
 
         return $resourceClass;

@@ -231,7 +231,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.event_listeners_backward_compatibility_layer', $config['event_listeners_backward_compatibility_layer']);
 
         if ($config['event_listeners_backward_compatibility_layer']) {
-            trigger_deprecation('api-platform/core', '3.3', sprintf('The "event_listeners_backward_compatibility_layer" will be removed in 4.0. Use the configuration "use_symfony_listeners" to use Symfony listeners. The following listeners are deprecated and will be removed in API Platform 4.0: "%s"', implode(', ', [
+            trigger_deprecation('api-platform/core', '3.3', \sprintf('The "event_listeners_backward_compatibility_layer" will be removed in 4.0. Use the configuration "use_symfony_listeners" to use Symfony listeners. The following listeners are deprecated and will be removed in API Platform 4.0: "%s"', implode(', ', [
                 AddHeadersListener::class,
                 AddTagsListener::class,
                 AddLinkHeaderListener::class,
@@ -469,7 +469,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
             if ($container->fileExists($path, false)) {
                 if (!preg_match('/\.(xml|ya?ml)$/', (string) $path, $matches)) {
-                    throw new RuntimeException(sprintf('Unsupported mapping type in "%s", supported types are XML & YAML.', $path));
+                    throw new RuntimeException(\sprintf('Unsupported mapping type in "%s", supported types are XML & YAML.', $path));
                 }
 
                 $resources['yaml' === $matches[1] ? 'yml' : $matches[1]][] = $path;
@@ -477,7 +477,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
                 continue;
             }
 
-            throw new RuntimeException(sprintf('Could not open file or directory "%s".', $path));
+            throw new RuntimeException(\sprintf('Could not open file or directory "%s".', $path));
         }
 
         $container->setParameter('api_platform.resource_class_directories', $resources['dir']);
@@ -514,7 +514,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         foreach (array_keys($config['swagger']['api_keys']) as $keyName) {
             if (!preg_match('/^[a-zA-Z0-9._-]+$/', $keyName)) {
-                trigger_deprecation('api-platform/core', '3.1', sprintf('The swagger api_keys key "%s" is not valid with OpenAPI 3.1 it should match "^[a-zA-Z0-9._-]+$"', $keyName));
+                trigger_deprecation('api-platform/core', '3.1', \sprintf('The swagger api_keys key "%s" is not valid with OpenAPI 3.1 it should match "^[a-zA-Z0-9._-]+$"', $keyName));
             }
         }
 
@@ -662,7 +662,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         // @phpstan-ignore-next-line because PHPStan uses the container of the test env cache and in test the parameter kernel.bundles always contains the key TwigBundle
         if (!class_exists(Environment::class) || !isset($container->getParameter('kernel.bundles')['TwigBundle'])) {
             if ($graphiqlEnabled || $graphqlPlayGroundEnabled) {
-                throw new RuntimeException(sprintf('GraphiQL and GraphQL Playground interfaces depend on Twig. Please activate TwigBundle for the %s environnement or disable GraphiQL and GraphQL Playground.', $container->getParameter('kernel.environment')));
+                throw new RuntimeException(\sprintf('GraphiQL and GraphQL Playground interfaces depend on Twig. Please activate TwigBundle for the %s environnement or disable GraphiQL and GraphQL Playground.', $container->getParameter('kernel.environment')));
             }
             $container->removeDefinition('api_platform.graphql.action.graphiql');
             $container->removeDefinition('api_platform.graphql.action.graphql_playground');

@@ -164,7 +164,7 @@ final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
         if ($metadata->hasAssociation($field)) {
             if ($metadata->isCollectionValuedAssociation($field)) {
                 $queryBuilder
-                    ->andWhere(sprintf('%s.%s %s EMPTY', $alias, $field, $value ? 'IS NOT' : 'IS'));
+                    ->andWhere(\sprintf('%s.%s %s EMPTY', $alias, $field, $value ? 'IS NOT' : 'IS'));
 
                 return;
             }
@@ -173,20 +173,20 @@ final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
                 $alias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $field, Join::LEFT_JOIN);
 
                 $queryBuilder
-                    ->andWhere(sprintf('%s %s NULL', $alias, $value ? 'IS NOT' : 'IS'));
+                    ->andWhere(\sprintf('%s %s NULL', $alias, $value ? 'IS NOT' : 'IS'));
 
                 return;
             }
 
             $queryBuilder
-                ->andWhere(sprintf('%s.%s %s NULL', $alias, $field, $value ? 'IS NOT' : 'IS'));
+                ->andWhere(\sprintf('%s.%s %s NULL', $alias, $field, $value ? 'IS NOT' : 'IS'));
 
             return;
         }
 
         if ($metadata->hasField($field)) {
             $queryBuilder
-                ->andWhere(sprintf('%s.%s %s NULL', $alias, $field, $value ? 'IS NOT' : 'IS'));
+                ->andWhere(\sprintf('%s.%s %s NULL', $alias, $field, $value ? 'IS NOT' : 'IS'));
         }
     }
 

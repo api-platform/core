@@ -186,7 +186,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 $method = $isLeftJoin ? 'leftJoin' : 'innerJoin';
 
                 $associationAlias = $queryNameGenerator->generateJoinAlias($association);
-                $queryBuilder->{$method}(sprintf('%s.%s', $parentAlias, $association), $associationAlias);
+                $queryBuilder->{$method}(\sprintf('%s.%s', $parentAlias, $association), $associationAlias);
                 ++$joinCount;
             }
 
@@ -264,7 +264,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             }
         }
 
-        $queryBuilder->addSelect(sprintf('partial %s.{%s}', $associationAlias, implode(',', $select)));
+        $queryBuilder->addSelect(\sprintf('partial %s.{%s}', $associationAlias, implode(',', $select)));
     }
 
     private function addSelectOnce(QueryBuilder $queryBuilder, string $alias): void

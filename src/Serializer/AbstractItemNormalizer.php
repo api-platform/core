@@ -245,12 +245,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             } catch (ItemNotFoundException $e) {
                 throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
             } catch (InvalidArgumentException $e) {
-                throw new UnexpectedValueException(sprintf('Invalid IRI "%s".', $data), $e->getCode(), $e);
+                throw new UnexpectedValueException(\sprintf('Invalid IRI "%s".', $data), $e->getCode(), $e);
             }
         }
 
         if (!\is_array($data)) {
-            throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the "%s" resource must be "array" (nested document) or "string" (IRI), "%s" given.', $resourceClass, \gettype($data)), $data, [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null);
+            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the "%s" resource must be "array" (nested document) or "string" (IRI), "%s" given.', $resourceClass, \gettype($data)), $data, [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null);
         }
 
         $previousObject = $this->clone($objectToPopulate);
@@ -323,7 +323,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 if ($constructorParameter->isVariadic()) {
                     if ($allowed && !$ignored && (isset($data[$key]) || \array_key_exists($key, $data))) {
                         if (!\is_array($data[$paramName])) {
-                            throw new RuntimeException(sprintf('Cannot create an instance of %s from serialized data because the variadic parameter %s can only accept an array.', $class, $constructorParameter->name));
+                            throw new RuntimeException(\sprintf('Cannot create an instance of %s from serialized data because the variadic parameter %s can only accept an array.', $class, $constructorParameter->name));
                         }
 
                         $params[] = $data[$paramName];
@@ -351,13 +351,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                         $missingConstructorArguments[] = $constructorParameter->name;
                     }
 
-                    $exception = NotNormalizableValueException::createForUnexpectedDataType(sprintf('Failed to create object because the class misses the "%s" property.', $constructorParameter->name), $data, ['unknown'], $context['deserialization_path'] ?? null, true);
+                    $exception = NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Failed to create object because the class misses the "%s" property.', $constructorParameter->name), $data, ['unknown'], $context['deserialization_path'] ?? null, true);
                     $context['not_normalizable_value_exceptions'][] = $exception;
                 }
             }
 
             if ($missingConstructorArguments) {
-                throw new MissingConstructorArgumentsException(sprintf('Cannot create an instance of "%s" from serialized data because its constructor requires the following parameters to be present : "$%s".', $class, implode('", "$', $missingConstructorArguments)), 0, null, $missingConstructorArguments, $class);
+                throw new MissingConstructorArgumentsException(\sprintf('Cannot create an instance of "%s" from serialized data because its constructor requires the following parameters to be present : "$%s".', $class, implode('", "$', $missingConstructorArguments)), 0, null, $missingConstructorArguments, $class);
             }
 
             if (\count($context['not_normalizable_value_exceptions'] ?? []) > 0) {
@@ -381,12 +381,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         if (!isset($data[$mapping->getTypeProperty()])) {
-            throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('Type property "%s" not found for the abstract object "%s".', $mapping->getTypeProperty(), $class), null, ['string'], isset($context['deserialization_path']) ? $context['deserialization_path'].'.'.$mapping->getTypeProperty() : $mapping->getTypeProperty());
+            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Type property "%s" not found for the abstract object "%s".', $mapping->getTypeProperty(), $class), null, ['string'], isset($context['deserialization_path']) ? $context['deserialization_path'].'.'.$mapping->getTypeProperty() : $mapping->getTypeProperty());
         }
 
         $type = $data[$mapping->getTypeProperty()];
         if (null === ($mappedClass = $mapping->getClassForType($type))) {
-            throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type "%s" is not a valid value.', $type), $type, ['string'], isset($context['deserialization_path']) ? $context['deserialization_path'].'.'.$mapping->getTypeProperty() : $mapping->getTypeProperty(), true);
+            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type "%s" is not a valid value.', $type), $type, ['string'], isset($context['deserialization_path']) ? $context['deserialization_path'].'.'.$mapping->getTypeProperty() : $mapping->getTypeProperty(), true);
         }
 
         return $mappedClass;
@@ -522,7 +522,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         if (!$isValid) {
-            throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the "%s" attribute must be "%s", "%s" given.', $attribute, $builtinType, \gettype($value)), $value, [$builtinType], $context['deserialization_path'] ?? null);
+            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the "%s" attribute must be "%s", "%s" given.', $attribute, $builtinType, \gettype($value)), $value, [$builtinType], $context['deserialization_path'] ?? null);
         }
     }
 
@@ -534,7 +534,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected function denormalizeCollection(string $attribute, ApiProperty $propertyMetadata, Type $type, string $className, mixed $value, ?string $format, array $context): array
     {
         if (!\is_array($value)) {
-            throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the "%s" attribute must be "array", "%s" given.', $attribute, \gettype($value)), $value, [Type::BUILTIN_TYPE_ARRAY], $context['deserialization_path'] ?? null);
+            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the "%s" attribute must be "array", "%s" given.', $attribute, \gettype($value)), $value, [Type::BUILTIN_TYPE_ARRAY], $context['deserialization_path'] ?? null);
         }
 
         $values = [];
@@ -557,7 +557,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 $values[$index] = $this->denormalizeRelation($attribute, $propertyMetadata, $className, $obj, $format, $childContext);
                 continue 2;
             }
-            throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the key "%s" must be "%s", "%s" given.', $index, $collectionKeyTypes[0]->getBuiltinType(), \gettype($index)), $index, [$collectionKeyTypes[0]->getBuiltinType()], ($context['deserialization_path'] ?? false) ? sprintf('key(%s)', $context['deserialization_path']) : null, true);
+            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the key "%s" must be "%s", "%s" given.', $index, $collectionKeyTypes[0]->getBuiltinType(), \gettype($index)), $index, [$collectionKeyTypes[0]->getBuiltinType()], ($context['deserialization_path'] ?? false) ? \sprintf('key(%s)', $context['deserialization_path']) : null, true);
         }
 
         return $values;
@@ -592,7 +592,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 return null;
             } catch (InvalidArgumentException $e) {
                 if (!isset($context['not_normalizable_value_exceptions'])) {
-                    throw new UnexpectedValueException(sprintf('Invalid IRI "%s".', $value), $e->getCode(), $e);
+                    throw new UnexpectedValueException(\sprintf('Invalid IRI "%s".', $value), $e->getCode(), $e);
                 }
                 $context['not_normalizable_value_exceptions'][] = NotNormalizableValueException::createForUnexpectedDataType(
                     $e->getMessage(),
@@ -612,7 +612,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $context['api_allow_update'] = true;
 
             if (!$this->serializer instanceof DenormalizerInterface) {
-                throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', DenormalizerInterface::class));
+                throw new LogicException(\sprintf('The injected serializer must be an instance of "%s".', DenormalizerInterface::class));
             }
 
             $item = $this->serializer->denormalize($value, $className, $format, $context);
@@ -624,10 +624,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         if (!\is_array($value)) {
-            throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the "%s" attribute must be "array" (nested document) or "string" (IRI), "%s" given.', $attributeName, \gettype($value)), $value, [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null, true);
+            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the "%s" attribute must be "array" (nested document) or "string" (IRI), "%s" given.', $attributeName, \gettype($value)), $value, [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null, true);
         }
 
-        throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('Nested documents for attribute "%s" are not allowed. Use IRIs instead.', $attributeName), $value, [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null, true);
+        throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Nested documents for attribute "%s" are not allowed. Use IRIs instead.', $attributeName), $value, [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_STRING], $context['deserialization_path'] ?? null, true);
     }
 
     /**
@@ -752,7 +752,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             }
 
             if (!$this->serializer instanceof NormalizerInterface) {
-                throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
+                throw new LogicException(\sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
             }
 
             unset(
@@ -786,7 +786,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         if (!$this->serializer instanceof NormalizerInterface) {
-            throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
+            throw new LogicException(\sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
         }
 
         unset(
@@ -836,7 +836,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     {
         if (null === $relatedObject || !empty($context['attributes']) || $propertyMetadata->isReadableLink()) {
             if (!$this->serializer instanceof NormalizerInterface) {
-                throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
+                throw new LogicException(\sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
             }
 
             $relatedContext = $this->createOperationContext($context, $resourceClass);
@@ -931,7 +931,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 && \is_array($value)
             ) {
                 if (!$this->serializer instanceof DenormalizerInterface) {
-                    throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', DenormalizerInterface::class));
+                    throw new LogicException(\sprintf('The injected serializer must be an instance of "%s".', DenormalizerInterface::class));
                 }
 
                 unset($context['resource_class'], $context['uri_variables']);
@@ -941,7 +941,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
             if (null !== $className = $type->getClassName()) {
                 if (!$this->serializer instanceof DenormalizerInterface) {
-                    throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', DenormalizerInterface::class));
+                    throw new LogicException(\sprintf('The injected serializer must be an instance of "%s".', DenormalizerInterface::class));
                 }
 
                 unset($context['resource_class'], $context['uri_variables']);
@@ -970,7 +970,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                             if ($isMultipleTypes) {
                                 break 2;
                             }
-                            throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the "%s" attribute for class "%s" must be bool ("%s" given).', $attribute, $className, $value), $value, [Type::BUILTIN_TYPE_BOOL], $context['deserialization_path'] ?? null);
+                            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the "%s" attribute for class "%s" must be bool ("%s" given).', $attribute, $className, $value), $value, [Type::BUILTIN_TYPE_BOOL], $context['deserialization_path'] ?? null);
                         }
                         break;
                     case Type::BUILTIN_TYPE_INT:
@@ -981,7 +981,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                             if ($isMultipleTypes) {
                                 break 2;
                             }
-                            throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the "%s" attribute for class "%s" must be int ("%s" given).', $attribute, $className, $value), $value, [Type::BUILTIN_TYPE_INT], $context['deserialization_path'] ?? null);
+                            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the "%s" attribute for class "%s" must be int ("%s" given).', $attribute, $className, $value), $value, [Type::BUILTIN_TYPE_INT], $context['deserialization_path'] ?? null);
                         }
                         break;
                     case Type::BUILTIN_TYPE_FLOAT:
@@ -1001,7 +1001,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                                 if ($isMultipleTypes) {
                                     break 3;
                                 }
-                                throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the "%s" attribute for class "%s" must be float ("%s" given).', $attribute, $className, $value), $value, [Type::BUILTIN_TYPE_FLOAT], $context['deserialization_path'] ?? null);
+                                throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the "%s" attribute for class "%s" must be float ("%s" given).', $attribute, $className, $value), $value, [Type::BUILTIN_TYPE_FLOAT], $context['deserialization_path'] ?? null);
                         }
                 }
             }
