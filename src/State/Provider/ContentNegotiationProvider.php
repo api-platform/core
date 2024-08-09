@@ -116,7 +116,7 @@ final class ContentNegotiationProvider implements ProviderInterface
         }
 
         if (!$request->isMethodSafe() && 'DELETE' !== $request->getMethod()) {
-            throw new UnsupportedMediaTypeHttpException(sprintf('The content-type "%s" is not supported. Supported MIME types are "%s".', $contentType, implode('", "', $supportedMimeTypes)));
+            throw new UnsupportedMediaTypeHttpException(\sprintf('The content-type "%s" is not supported. Supported MIME types are "%s".', $contentType, implode('", "', $supportedMimeTypes)));
         }
 
         return null;

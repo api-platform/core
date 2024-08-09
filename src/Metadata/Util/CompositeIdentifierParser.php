@@ -57,7 +57,7 @@ final class CompositeIdentifierParser
     {
         $composite = [];
         foreach ($identifiers as $name => $value) {
-            $composite[] = sprintf('%s=%s', $name, $value);
+            $composite[] = \sprintf('%s=%s', $name, $value);
         }
 
         return implode(';', $composite);

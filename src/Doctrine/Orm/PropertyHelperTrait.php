@@ -73,7 +73,7 @@ trait PropertyHelperTrait
         }
 
         if (null === $alias) {
-            throw new InvalidArgumentException(sprintf('Cannot add joins for property "%s" - property is not nested.', $property));
+            throw new InvalidArgumentException(\sprintf('Cannot add joins for property "%s" - property is not nested.', $property));
         }
 
         return [$alias, $propertyParts['field'], $propertyParts['associations']];

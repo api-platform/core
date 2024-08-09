@@ -113,7 +113,7 @@ final class ItemNormalizerTest extends TestCase
     public function testHasCacheableSupportsMethodWithDecoratedNormalizerNotAnInstanceOfCacheableSupportsMethodInterface(): void
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(sprintf('The decorated normalizer must be an instance of "%s".', CacheableSupportsMethodInterface::class));
+        $this->expectExceptionMessage(\sprintf('The decorated normalizer must be an instance of "%s".', CacheableSupportsMethodInterface::class));
 
         (new ItemNormalizer($this->prophesize(NormalizerInterface::class)->reveal()))->hasCacheableSupportsMethod();
     }
@@ -121,7 +121,7 @@ final class ItemNormalizerTest extends TestCase
     public function testDenormalizeWithDecoratedNormalizerNotAnInstanceOfDenormalizerInterface(): void
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(sprintf('The decorated normalizer must be an instance of "%s".', DenormalizerInterface::class));
+        $this->expectExceptionMessage(\sprintf('The decorated normalizer must be an instance of "%s".', DenormalizerInterface::class));
 
         (new ItemNormalizer($this->prophesize(NormalizerInterface::class)->reveal()))->denormalize('foo', 'string');
     }
@@ -129,7 +129,7 @@ final class ItemNormalizerTest extends TestCase
     public function testSupportsDenormalizationWithDecoratedNormalizerNotAnInstanceOfDenormalizerInterface(): void
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(sprintf('The decorated normalizer must be an instance of "%s".', DenormalizerInterface::class));
+        $this->expectExceptionMessage(\sprintf('The decorated normalizer must be an instance of "%s".', DenormalizerInterface::class));
 
         (new ItemNormalizer($this->prophesize(NormalizerInterface::class)->reveal()))->supportsDenormalization('foo', 'string');
     }
@@ -137,7 +137,7 @@ final class ItemNormalizerTest extends TestCase
     public function testSetSerializerWithDecoratedNormalizerNotAnInstanceOfSerializerAwareInterface(): void
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(sprintf('The decorated normalizer must be an instance of "%s".', SerializerAwareInterface::class));
+        $this->expectExceptionMessage(\sprintf('The decorated normalizer must be an instance of "%s".', SerializerAwareInterface::class));
 
         (new ItemNormalizer($this->prophesize(NormalizerInterface::class)->reveal()))->setSerializer($this->prophesize(SerializerInterface::class)->reveal());
     }
@@ -149,7 +149,7 @@ final class ItemNormalizerTest extends TestCase
         }
 
         // TODO: use prophecy when getSupportedTypes() will be added to the interface
-        $this->itemNormalizer = new ItemNormalizer(new class() implements NormalizerInterface {
+        $this->itemNormalizer = new ItemNormalizer(new class implements NormalizerInterface {
             public function normalize(mixed $object, ?string $format = null, array $context = []): \ArrayObject|array|string|int|float|bool|null
             {
                 return null;

@@ -110,7 +110,7 @@ XML_WRAP
                     continue;
                 }
 
-                throw new \LogicException(sprintf('Cannot adapt attribute or child "%s". Please add fixtures in '.ResourceMetadataCompatibilityTest::class.' and create a "%s" method in %s.', $parameterName, 'build'.ucfirst($parameterName), self::class));
+                throw new \LogicException(\sprintf('Cannot adapt attribute or child "%s". Please add fixtures in '.ResourceMetadataCompatibilityTest::class.' and create a "%s" method in %s.', $parameterName, 'build'.ucfirst($parameterName), self::class));
             }
         }
 
@@ -438,7 +438,7 @@ XML_WRAP
                     continue;
                 }
 
-                throw new \LogicException(sprintf('Cannot adapt graphQlOperation attribute or child "%s". Please create a "%s" method in %s.', $index, 'build'.ucfirst($index), self::class));
+                throw new \LogicException(\sprintf('Cannot adapt graphQlOperation attribute or child "%s". Please create a "%s" method in %s.', $index, 'build'.ucfirst($index), self::class));
             }
         }
     }
@@ -459,7 +459,7 @@ XML_WRAP
                     continue;
                 }
 
-                throw new \LogicException(sprintf('Cannot adapt operation attribute or child "%s". Please create a "%s" method in %s.', $index, 'build'.ucfirst($index), self::class));
+                throw new \LogicException(\sprintf('Cannot adapt operation attribute or child "%s". Please create a "%s" method in %s.', $index, 'build'.ucfirst($index), self::class));
             }
         }
     }

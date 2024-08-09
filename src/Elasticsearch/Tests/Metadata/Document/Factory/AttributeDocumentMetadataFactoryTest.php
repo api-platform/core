@@ -63,7 +63,7 @@ class AttributeDocumentMetadataFactoryTest extends TestCase
     public function testCreateWithNoParentDocumentMetadataAndNoAttributes(): void
     {
         $this->expectException(IndexNotFoundException::class);
-        $this->expectExceptionMessage(sprintf('No index associated with the "%s" resource class.', Foo::class));
+        $this->expectExceptionMessage(\sprintf('No index associated with the "%s" resource class.', Foo::class));
 
         $decoratedProphecy = $this->prophesize(DocumentMetadataFactoryInterface::class);
         $decoratedProphecy->create(Foo::class)->willThrow(new IndexNotFoundException())->shouldBeCalled();

@@ -115,7 +115,7 @@ final class SerializeStage implements SerializeStageInterface
         $args = $context['args'];
 
         if (!($collection instanceof PartialPaginatorInterface)) {
-            throw new \LogicException(sprintf('Collection returned by the collection data provider must implement %s or %s.', PaginatorInterface::class, PartialPaginatorInterface::class));
+            throw new \LogicException(\sprintf('Collection returned by the collection data provider must implement %s or %s.', PaginatorInterface::class, PartialPaginatorInterface::class));
         }
 
         $selection = $context['info']->getFieldSelection(1);
@@ -128,7 +128,7 @@ final class SerializeStage implements SerializeStageInterface
             if (isset($args['after'])) {
                 $after = base64_decode($args['after'], true);
                 if (false === $after || '' === $args['after']) {
-                    throw new \UnexpectedValueException('' === $args['after'] ? 'Empty cursor is invalid' : sprintf('Cursor %s is invalid', $args['after']));
+                    throw new \UnexpectedValueException('' === $args['after'] ? 'Empty cursor is invalid' : \sprintf('Cursor %s is invalid', $args['after']));
                 }
                 $offset = 1 + (int) $after;
             }
@@ -138,7 +138,7 @@ final class SerializeStage implements SerializeStageInterface
                 if (isset($args['before'])) {
                     $before = base64_decode($args['before'], true);
                     if (false === $before || '' === $args['before']) {
-                        throw new \UnexpectedValueException('' === $args['before'] ? 'Empty cursor is invalid' : sprintf('Cursor %s is invalid', $args['before']));
+                        throw new \UnexpectedValueException('' === $args['before'] ? 'Empty cursor is invalid' : \sprintf('Cursor %s is invalid', $args['before']));
                     }
                     $offset = (int) $before - $nbPageItems;
                 }
@@ -191,25 +191,25 @@ final class SerializeStage implements SerializeStageInterface
             $data['paginationInfo'] = [];
             if (isset($selection['paginationInfo']['itemsPerPage'])) {
                 if (!($collection instanceof PartialPaginatorInterface)) {
-                    throw new \LogicException(sprintf('Collection returned by the collection data provider must implement %s to return itemsPerPage field.', PartialPaginatorInterface::class));
+                    throw new \LogicException(\sprintf('Collection returned by the collection data provider must implement %s to return itemsPerPage field.', PartialPaginatorInterface::class));
                 }
                 $data['paginationInfo']['itemsPerPage'] = $collection->getItemsPerPage();
             }
             if (isset($selection['paginationInfo']['totalCount'])) {
                 if (!($collection instanceof PaginatorInterface)) {
-                    throw new \LogicException(sprintf('Collection returned by the collection data provider must implement %s to return totalCount field.', PaginatorInterface::class));
+                    throw new \LogicException(\sprintf('Collection returned by the collection data provider must implement %s to return totalCount field.', PaginatorInterface::class));
                 }
                 $data['paginationInfo']['totalCount'] = $collection->getTotalItems();
             }
             if (isset($selection['paginationInfo']['lastPage'])) {
                 if (!($collection instanceof PaginatorInterface)) {
-                    throw new \LogicException(sprintf('Collection returned by the collection data provider must implement %s to return lastPage field.', PaginatorInterface::class));
+                    throw new \LogicException(\sprintf('Collection returned by the collection data provider must implement %s to return lastPage field.', PaginatorInterface::class));
                 }
                 $data['paginationInfo']['lastPage'] = $collection->getLastPage();
             }
             if (isset($selection['paginationInfo']['hasNextPage'])) {
                 if (!($collection instanceof HasNextPagePaginatorInterface)) {
-                    throw new \LogicException(sprintf('Collection returned by the collection data provider must implement %s to return hasNextPage field.', HasNextPagePaginatorInterface::class));
+                    throw new \LogicException(\sprintf('Collection returned by the collection data provider must implement %s to return hasNextPage field.', HasNextPagePaginatorInterface::class));
                 }
                 $data['paginationInfo']['hasNextPage'] = $collection->hasNextPage();
             }

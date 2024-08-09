@@ -40,11 +40,11 @@ final class TypeConverter implements TypeConverterInterface
     public function __construct(private readonly ContextAwareTypeBuilderInterface|TypeBuilderEnumInterface|TypeBuilderInterface $typeBuilder, private readonly TypesContainerInterface $typesContainer, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory)
     {
         if ($typeBuilder instanceof TypeBuilderInterface) {
-            @trigger_error(sprintf('$typeBuilder argument of TypeConverter implementing "%s" is deprecated since API Platform 3.1. It has to implement "%s" instead.', TypeBuilderInterface::class, TypeBuilderEnumInterface::class), \E_USER_DEPRECATED);
+            @trigger_error(\sprintf('$typeBuilder argument of TypeConverter implementing "%s" is deprecated since API Platform 3.1. It has to implement "%s" instead.', TypeBuilderInterface::class, TypeBuilderEnumInterface::class), \E_USER_DEPRECATED);
         }
 
         if ($typeBuilder instanceof TypeBuilderEnumInterface) {
-            @trigger_error(sprintf('$typeBuilder argument of TypeConverter implementing "%s" is deprecated since API Platform 3.3. It has to implement "%s" instead.', TypeBuilderEnumInterface::class, ContextAwareTypeBuilderInterface::class), \E_USER_DEPRECATED);
+            @trigger_error(\sprintf('$typeBuilder argument of TypeConverter implementing "%s" is deprecated since API Platform 3.3. It has to implement "%s" instead.', TypeBuilderEnumInterface::class, ContextAwareTypeBuilderInterface::class), \E_USER_DEPRECATED);
         }
     }
 
@@ -88,14 +88,14 @@ final class TypeConverter implements TypeConverterInterface
         try {
             $astTypeNode = Parser::parseType($type);
         } catch (SyntaxError $e) {
-            throw new InvalidArgumentException(sprintf('"%s" is not a valid GraphQL type.', $type), 0, $e);
+            throw new InvalidArgumentException(\sprintf('"%s" is not a valid GraphQL type.', $type), 0, $e);
         }
 
         if ($graphQlType = $this->resolveAstTypeNode($astTypeNode, $type)) {
             return $graphQlType;
         }
 
-        throw new InvalidArgumentException(sprintf('The type "%s" was not resolved.', $type));
+        throw new InvalidArgumentException(\sprintf('The type "%s" was not resolved.', $type));
     }
 
     private function getResourceType(Type $type, bool $input, Operation $rootOperation, string $rootResource, ?string $property, int $depth): ?GraphQLType

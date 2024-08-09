@@ -56,7 +56,7 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
 
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
         if (!$manager instanceof DocumentManager) {
-            throw new RuntimeException(sprintf('The manager for "%s" must be an instance of "%s".', $resourceClass, DocumentManager::class));
+            throw new RuntimeException(\sprintf('The manager for "%s" must be an instance of "%s".', $resourceClass, DocumentManager::class));
         }
 
         /**
@@ -103,7 +103,7 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
     {
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
         if (!$manager instanceof DocumentManager) {
-            throw new RuntimeException(sprintf('The manager for "%s" must be an instance of "%s".', $resourceClass, DocumentManager::class));
+            throw new RuntimeException(\sprintf('The manager for "%s" must be an instance of "%s".', $resourceClass, DocumentManager::class));
         }
 
         $attribute = $operation?->getExtraProperties()['doctrine_mongodb'] ?? [];

@@ -39,7 +39,7 @@ final class IriHelper
     {
         $parts = parse_url($iri);
         if (false === $parts) {
-            throw new InvalidArgumentException(sprintf('The request URI "%s" is malformed.', $iri));
+            throw new InvalidArgumentException(\sprintf('The request URI "%s" is malformed.', $iri));
         }
 
         $parameters = [];

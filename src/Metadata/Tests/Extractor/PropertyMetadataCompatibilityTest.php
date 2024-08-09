@@ -118,7 +118,7 @@ final class PropertyMetadataCompatibilityTest extends TestCase
                 continue;
             }
 
-            throw new \RuntimeException(sprintf('Unknown ApiProperty parameter "%s".', $parameter));
+            throw new \RuntimeException(\sprintf('Unknown ApiProperty parameter "%s".', $parameter));
         }
 
         return $property;

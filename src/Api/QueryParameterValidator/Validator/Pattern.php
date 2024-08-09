@@ -39,7 +39,7 @@ final class Pattern implements ValidatorInterface
 
         if (null !== $pattern && !preg_match($pattern, $value)) {
             return [
-                sprintf('Query parameter "%s" must match pattern %s', $name, $pattern),
+                \sprintf('Query parameter "%s" must match pattern %s', $name, $pattern),
             ];
         }
 

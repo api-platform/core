@@ -36,7 +36,7 @@ final class ApiFilter
         public ?string $alias = null,
     ) {
         if (!is_a($this->filterClass, FilterInterface::class, true)) {
-            throw new InvalidArgumentException(sprintf('The filter class "%s" does not implement "%s". Did you forget a use statement?', $this->filterClass, FilterInterface::class));
+            throw new InvalidArgumentException(\sprintf('The filter class "%s" does not implement "%s". Did you forget a use statement?', $this->filterClass, FilterInterface::class));
         }
     }
 }

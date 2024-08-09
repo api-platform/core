@@ -154,7 +154,7 @@ final class GraphqlContext implements Context
             }
         }
 
-        throw new ExpectationFailedException(sprintf('The field "%s" is not deprecated.', $fieldName));
+        throw new ExpectationFailedException(\sprintf('The field "%s" is not deprecated.', $fieldName));
     }
 
     /**

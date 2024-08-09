@@ -160,7 +160,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
             }
 
             if (!$id) {
-                $id = sprintf('%s/%s', $shortName, $convertedName);
+                $id = \sprintf('%s/%s', $shortName, $convertedName);
             }
 
             if (false === $propertyMetadata->isReadableLink()) {

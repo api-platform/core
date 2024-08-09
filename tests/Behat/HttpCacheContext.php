@@ -55,7 +55,7 @@ final class HttpCacheContext implements Context
         $purger->clear();
 
         if ($iris !== $purgedIris) {
-            throw new ExpectationFailedException(sprintf('IRIs "%s" does not match expected "%s".', $purgedIris, $iris));
+            throw new ExpectationFailedException(\sprintf('IRIs "%s" does not match expected "%s".', $purgedIris, $iris));
         }
     }
 

@@ -138,7 +138,7 @@ class CachedDocumentMetadataFactoryTest extends TestCase
     public function testCreateWithIndexNotDefined(): void
     {
         $this->expectException(IndexNotFoundException::class);
-        $this->expectExceptionMessage(sprintf('No index associated with the "%s" resource class.', Foo::class));
+        $this->expectExceptionMessage(\sprintf('No index associated with the "%s" resource class.', Foo::class));
 
         $originalDocumentMetadata = new DocumentMetadata();
 

@@ -83,7 +83,7 @@ trait LinksHandlerTrait
         }
 
         if (!$newLink) {
-            throw new RuntimeException(sprintf('The class "%s" cannot be retrieved from "%s".', $resourceClass, $linkClass));
+            throw new RuntimeException(\sprintf('The class "%s" cannot be retrieved from "%s".', $resourceClass, $linkClass));
         }
 
         return [$newLink];

@@ -337,12 +337,12 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 switch ($method) {
                     case 'GET':
                         $successStatus = (string) $operation->getStatus() ?: 200;
-                        $openapiOperation = $this->buildOpenApiResponse($existingResponses, $successStatus, sprintf('%s %s', $resourceShortName, $operation instanceof CollectionOperationInterface ? 'collection' : 'resource'), $openapiOperation, $operation, $responseMimeTypes, $operationOutputSchemas);
+                        $openapiOperation = $this->buildOpenApiResponse($existingResponses, $successStatus, \sprintf('%s %s', $resourceShortName, $operation instanceof CollectionOperationInterface ? 'collection' : 'resource'), $openapiOperation, $operation, $responseMimeTypes, $operationOutputSchemas);
                         break;
                     case 'POST':
                         $successStatus = (string) $operation->getStatus() ?: 201;
 
-                        $openapiOperation = $this->buildOpenApiResponse($existingResponses, $successStatus, sprintf('%s resource created', $resourceShortName), $openapiOperation, $operation, $responseMimeTypes, $operationOutputSchemas, $resourceMetadataCollection);
+                        $openapiOperation = $this->buildOpenApiResponse($existingResponses, $successStatus, \sprintf('%s resource created', $resourceShortName), $openapiOperation, $operation, $responseMimeTypes, $operationOutputSchemas, $resourceMetadataCollection);
 
                         $openapiOperation = $this->buildOpenApiResponse($existingResponses, '400', 'Invalid input', $openapiOperation);
 
@@ -351,7 +351,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     case 'PATCH':
                     case 'PUT':
                         $successStatus = (string) $operation->getStatus() ?: 200;
-                        $openapiOperation = $this->buildOpenApiResponse($existingResponses, $successStatus, sprintf('%s resource updated', $resourceShortName), $openapiOperation, $operation, $responseMimeTypes, $operationOutputSchemas, $resourceMetadataCollection);
+                        $openapiOperation = $this->buildOpenApiResponse($existingResponses, $successStatus, \sprintf('%s resource updated', $resourceShortName), $openapiOperation, $operation, $responseMimeTypes, $operationOutputSchemas, $resourceMetadataCollection);
                         $openapiOperation = $this->buildOpenApiResponse($existingResponses, '400', 'Invalid input', $openapiOperation);
                         if (!isset($existingResponses[400])) {
                             $openapiOperation = $openapiOperation->withResponse(400, new Response('Invalid input'));
@@ -361,7 +361,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     case 'DELETE':
                         $successStatus = (string) $operation->getStatus() ?: 204;
 
-                        $openapiOperation = $this->buildOpenApiResponse($existingResponses, $successStatus, sprintf('%s resource deleted', $resourceShortName), $openapiOperation);
+                        $openapiOperation = $this->buildOpenApiResponse($existingResponses, $successStatus, \sprintf('%s resource deleted', $resourceShortName), $openapiOperation);
 
                         break;
                 }
@@ -408,7 +408,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $this->appendSchemaDefinitions($schemas, $operationInputSchema->getDefinitions());
                 }
 
-                $openapiOperation = $openapiOperation->withRequestBody(new RequestBody(sprintf('The %s %s resource', 'POST' === $method ? 'new' : 'updated', $resourceShortName), $this->buildContent($requestMimeTypes, $operationInputSchemas), true));
+                $openapiOperation = $openapiOperation->withRequestBody(new RequestBody(\sprintf('The %s %s resource', 'POST' === $method ? 'new' : 'updated', $resourceShortName), $this->buildContent($requestMimeTypes, $operationInputSchemas), true));
             }
 
             // TODO Remove in 4.0
@@ -539,7 +539,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 return $resourceShortName;
         }
 
-        return sprintf($pathSummary, $resourceShortName);
+        return \sprintf($pathSummary, $resourceShortName);
     }
 
     /**
@@ -694,7 +694,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     private function getOauthSecurityScheme(): SecurityScheme
     {
         $oauthFlow = new OAuthFlow($this->openApiOptions->getOAuthAuthorizationUrl(), $this->openApiOptions->getOAuthTokenUrl() ?: null, $this->openApiOptions->getOAuthRefreshUrl() ?: null, new \ArrayObject($this->openApiOptions->getOAuthScopes()));
-        $description = sprintf(
+        $description = \sprintf(
             'OAuth 2.0 %s Grant',
             strtolower(preg_replace('/[A-Z]/', ' \\0', lcfirst($this->openApiOptions->getOAuthFlow())))
         );
@@ -731,7 +731,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         }
 
         foreach ($this->openApiOptions->getApiKeys() as $key => $apiKey) {
-            $description = sprintf('Value for the %s %s parameter.', $apiKey['name'], $apiKey['type']);
+            $description = \sprintf('Value for the %s %s parameter.', $apiKey['name'], $apiKey['type']);
             $securitySchemes[$key] = new SecurityScheme('apiKey', $description, $apiKey['name'], $apiKey['type']);
         }
 

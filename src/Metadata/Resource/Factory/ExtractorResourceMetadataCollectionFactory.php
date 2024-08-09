@@ -111,7 +111,7 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
 
         foreach ($data as $attributes) {
             if (!class_exists($attributes['class'])) {
-                throw new \InvalidArgumentException(sprintf('Operation "%s" does not exist.', $attributes['class']));
+                throw new \InvalidArgumentException(\sprintf('Operation "%s" does not exist.', $attributes['class']));
             }
 
             /** @var HttpOperation $operation */
@@ -150,7 +150,7 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
 
         foreach ($data as $attributes) {
             if (!class_exists($attributes['class'])) {
-                throw new \InvalidArgumentException(sprintf('Operation "%s" does not exist.', $attributes['class']));
+                throw new \InvalidArgumentException(\sprintf('Operation "%s" does not exist.', $attributes['class']));
             }
 
             /** @var GraphQlOperation $operation */

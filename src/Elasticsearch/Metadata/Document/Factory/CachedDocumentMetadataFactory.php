@@ -67,7 +67,7 @@ final class CachedDocumentMetadataFactory implements DocumentMetadataFactoryInte
     private function handleNotFound(DocumentMetadata $documentMetadata, string $resourceClass): DocumentMetadata
     {
         if (null === $documentMetadata->getIndex()) {
-            throw new IndexNotFoundException(sprintf('No index associated with the "%s" resource class.', $resourceClass));
+            throw new IndexNotFoundException(\sprintf('No index associated with the "%s" resource class.', $resourceClass));
         }
 
         return $documentMetadata;

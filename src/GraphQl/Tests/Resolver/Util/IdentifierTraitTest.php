@@ -23,7 +23,7 @@ class IdentifierTraitTest extends TestCase
 {
     private function getIdentifierTraitImplementation()
     {
-        return new class() {
+        return new class {
             use IdentifierTrait {
                 IdentifierTrait::getIdentifierFromContext as public;
             }

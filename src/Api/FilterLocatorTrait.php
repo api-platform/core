@@ -37,7 +37,7 @@ trait FilterLocatorTrait
         if ($filterLocator instanceof ContainerInterface || (null === $filterLocator && $allowNull)) {
             $this->filterLocator = $filterLocator;
         } else {
-            throw new InvalidArgumentException(sprintf('The "$filterLocator" argument is expected to be an implementation of the "%s" interface%s.', ContainerInterface::class, $allowNull ? ' or null' : ''));
+            throw new InvalidArgumentException(\sprintf('The "$filterLocator" argument is expected to be an implementation of the "%s" interface%s.', ContainerInterface::class, $allowNull ? ' or null' : ''));
         }
     }
 

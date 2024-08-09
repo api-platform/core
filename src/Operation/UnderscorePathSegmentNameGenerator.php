@@ -26,7 +26,7 @@ final class UnderscorePathSegmentNameGenerator implements PathSegmentNameGenerat
 {
     public function __construct()
     {
-        trigger_deprecation('api-platform', '3.1', sprintf('%s is deprecated in favor of %s. This class will be removed in 4.0.', self::class, \ApiPlatform\Metadata\Operation\UnderscorePathSegmentNameGenerator::class));
+        trigger_deprecation('api-platform', '3.1', \sprintf('%s is deprecated in favor of %s. This class will be removed in 4.0.', self::class, \ApiPlatform\Metadata\Operation\UnderscorePathSegmentNameGenerator::class));
     }
 
     /**

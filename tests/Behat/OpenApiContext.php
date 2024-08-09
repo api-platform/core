@@ -52,7 +52,7 @@ final class OpenApiContext implements Context
         try {
             $this->getClassInfo($className);
         } catch (\InvalidArgumentException $e) {
-            throw new ExpectationFailedException(sprintf('The class "%s" doesn\'t exist.', $className), null, $e);
+            throw new ExpectationFailedException(\sprintf('The class "%s" doesn\'t exist.', $className), null, $e);
         }
     }
 
@@ -67,7 +67,7 @@ final class OpenApiContext implements Context
             return;
         }
 
-        throw new ExpectationFailedException(sprintf('The class "%s" exists.', $className));
+        throw new ExpectationFailedException(\sprintf('The class "%s" exists.', $className));
     }
 
     /**
@@ -88,7 +88,7 @@ final class OpenApiContext implements Context
         try {
             $this->getPropertyInfo($propertyName, $className);
         } catch (\InvalidArgumentException $e) {
-            throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" doesn\'t exist.', $propertyName, $className), null, $e);
+            throw new ExpectationFailedException(\sprintf('Property "%s" of class "%s" doesn\'t exist.', $propertyName, $className), null, $e);
         }
     }
 
@@ -98,7 +98,7 @@ final class OpenApiContext implements Context
     public function assertThePropertyIsRequiredForTheOpenAPIClass(string $propertyName, string $className): void
     {
         if (!\in_array($propertyName, $this->getClassInfo($className)->required, true)) {
-            throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" should be required', $propertyName, $className));
+            throw new ExpectationFailedException(\sprintf('Property "%s" of class "%s" should be required', $propertyName, $className));
         }
     }
 
@@ -109,7 +109,7 @@ final class OpenApiContext implements Context
     {
         $propertyInfo = $this->getPropertyInfo($propertyName, $className);
         if (property_exists($propertyInfo, 'readOnly') && $propertyInfo->readOnly) {
-            throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" should not be read only', $propertyName, $className));
+            throw new ExpectationFailedException(\sprintf('Property "%s" of class "%s" should not be read only', $propertyName, $className));
         }
     }
 
@@ -122,7 +122,7 @@ final class OpenApiContext implements Context
         $propertyInfoJson = new Json(json_encode($propertyInfo));
 
         if (new Json($propertyContent) != $propertyInfoJson) {
-            throw new ExpectationFailedException(sprintf("Property \"%s\" of class \"%s\" is '%s'", $propertyName, $className, $propertyInfoJson));
+            throw new ExpectationFailedException(\sprintf("Property \"%s\" of class \"%s\" is '%s'", $propertyName, $className, $propertyInfoJson));
         }
     }
 
@@ -141,7 +141,7 @@ final class OpenApiContext implements Context
             }
         }
 
-        throw new \InvalidArgumentException(sprintf('The property "%s" for the class "%s" doesn\'t exist.', $propertyName, $className));
+        throw new \InvalidArgumentException(\sprintf('The property "%s" for the class "%s" doesn\'t exist.', $propertyName, $className));
     }
 
     /**
@@ -166,7 +166,7 @@ final class OpenApiContext implements Context
             }
         }
 
-        throw new \InvalidArgumentException(sprintf('Class %s cannot be found in the vocabulary', $className));
+        throw new \InvalidArgumentException(\sprintf('Class %s cannot be found in the vocabulary', $className));
     }
 
     /**

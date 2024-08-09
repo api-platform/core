@@ -142,7 +142,7 @@ class ApiPlatformExtensionTest extends TestCase
     private function assertContainerHas(array $services, array $aliases = []): void
     {
         foreach ($services as $service) {
-            $this->assertTrue($this->container->hasDefinition($service), sprintf('Definition "%s" not found.', $service));
+            $this->assertTrue($this->container->hasDefinition($service), \sprintf('Definition "%s" not found.', $service));
         }
 
         foreach ($aliases as $alias) {
@@ -152,12 +152,12 @@ class ApiPlatformExtensionTest extends TestCase
 
     private function assertNotContainerHasService(string $service): void
     {
-        $this->assertFalse($this->container->hasDefinition($service), sprintf('Service "%s" found.', $service));
+        $this->assertFalse($this->container->hasDefinition($service), \sprintf('Service "%s" found.', $service));
     }
 
     private function assertContainerHasAlias(string $alias): void
     {
-        $this->assertTrue($this->container->hasAlias($alias), sprintf('Alias "%s" not found.', $alias));
+        $this->assertTrue($this->container->hasAlias($alias), \sprintf('Alias "%s" not found.', $alias));
     }
 
     private function assertServiceHasTags(string $service, array $tags = []): void
@@ -165,7 +165,7 @@ class ApiPlatformExtensionTest extends TestCase
         $serviceTags = $this->container->getDefinition($service)->getTags();
 
         foreach ($tags as $tag) {
-            $this->assertArrayHasKey($tag, $serviceTags, sprintf('Tag "%s" not found on the service "%s".', $tag, $service));
+            $this->assertArrayHasKey($tag, $serviceTags, \sprintf('Tag "%s" not found on the service "%s".', $tag, $service));
         }
     }
 

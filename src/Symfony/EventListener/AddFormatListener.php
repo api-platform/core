@@ -120,7 +120,7 @@ final class AddFormatListener
             $mimeTypes = array_keys($flattenedMimeTypes);
         } elseif (!isset($formats[$routeFormat])) {
             if (!$request->attributes->get('data') instanceof \Exception) {
-                throw new NotFoundHttpException(sprintf('Format "%s" is not supported', $routeFormat));
+                throw new NotFoundHttpException(\sprintf('Format "%s" is not supported', $routeFormat));
             }
             $this->setRequestErrorFormat($operation, $request);
 
@@ -215,7 +215,7 @@ final class AddFormatListener
      */
     private function getNotAcceptableHttpException(string $accept, array $mimeTypes): NotAcceptableHttpException
     {
-        return new NotAcceptableHttpException(sprintf(
+        return new NotAcceptableHttpException(\sprintf(
             'Requested format "%s" is not supported. Supported MIME types are "%s".',
             $accept,
             implode('", "', array_keys($mimeTypes))

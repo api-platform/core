@@ -80,7 +80,7 @@ final class Parameters implements \IteratorAggregate, \Countable
             }
         }
 
-        throw new RuntimeException(sprintf('Could not remove parameter "%s".', $key));
+        throw new RuntimeException(\sprintf('Could not remove parameter "%s".', $key));
     }
 
     /**

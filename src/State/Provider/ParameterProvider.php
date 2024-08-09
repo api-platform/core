@@ -80,7 +80,7 @@ final class ParameterProvider implements ProviderInterface
             }
 
             if (!\is_string($provider) || !$this->locator->has($provider)) {
-                throw new ProviderNotFoundException(sprintf('Provider "%s" not found on operation "%s"', $provider, $operation->getName()));
+                throw new ProviderNotFoundException(\sprintf('Provider "%s" not found on operation "%s"', $provider, $operation->getName()));
             }
 
             /** @var ParameterProviderInterface $providerInstance */

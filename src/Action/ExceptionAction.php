@@ -72,7 +72,7 @@ final class ExceptionAction
 
         $headers = $exception->getHeaders();
         $format = ErrorFormatGuesser::guessErrorFormat($request, $this->errorFormats);
-        $headers['Content-Type'] = sprintf('%s; charset=utf-8', $format['value'][0]);
+        $headers['Content-Type'] = \sprintf('%s; charset=utf-8', $format['value'][0]);
         $headers['X-Content-Type-Options'] = 'nosniff';
         $headers['X-Frame-Options'] = 'deny';
 

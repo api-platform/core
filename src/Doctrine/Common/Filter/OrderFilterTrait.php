@@ -48,7 +48,7 @@ trait OrderFilterTrait
                 continue;
             }
             $propertyName = $this->normalizePropertyName($property);
-            $description[sprintf('%s[%s]', $this->orderParameterName, $propertyName)] = [
+            $description[\sprintf('%s[%s]', $this->orderParameterName, $propertyName)] = [
                 'property' => $propertyName,
                 'type' => 'string',
                 'required' => false,

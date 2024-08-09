@@ -49,19 +49,19 @@ final class StringableSecurityParameterTest extends TestCase
 
     public static function metadataProvider(): \Generator
     {
-        $stringableSecurity = new class() implements \Stringable {
+        $stringableSecurity = new class implements \Stringable {
             public function __toString(): string
             {
                 return 'stringable_security';
             }
         };
-        $stringableSecurityPostDenormalize = new class() implements \Stringable {
+        $stringableSecurityPostDenormalize = new class implements \Stringable {
             public function __toString(): string
             {
                 return 'stringable_security_post_denormalize';
             }
         };
-        $stringableSecurityPostValidation = new class() implements \Stringable {
+        $stringableSecurityPostValidation = new class implements \Stringable {
             public function __toString(): string
             {
                 return 'stringable_security_post_validation';
@@ -92,13 +92,13 @@ final class StringableSecurityParameterTest extends TestCase
 
     public function testOnApiProperty(): void
     {
-        $stringableSecurity = new class() implements \Stringable {
+        $stringableSecurity = new class implements \Stringable {
             public function __toString(): string
             {
                 return 'stringable_security';
             }
         };
-        $stringableSecurityPostDenormalize = new class() implements \Stringable {
+        $stringableSecurityPostDenormalize = new class implements \Stringable {
             public function __toString(): string
             {
                 return 'stringable_security_post_denormalize';

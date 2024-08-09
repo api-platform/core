@@ -31,7 +31,7 @@ JSON;
 
         try {
             $constraint->evaluate(['foo' => 'bar']);
-            $this->fail(sprintf('Expected %s to be thrown.', ExpectationFailedException::class));
+            $this->fail(\sprintf('Expected %s to be thrown.', ExpectationFailedException::class));
         } catch (ExpectationFailedException $expectedException) {
             $this->assertStringContainsString('notexist: The property notexist is required', $expectedException->getMessage());
         }

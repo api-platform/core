@@ -205,7 +205,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
             if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
                 $this->logger->notice('Invalid filter ignored', [
-                    'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
+                    'exception' => new InvalidArgumentException(\sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
                 ]);
 
                 return;
@@ -229,7 +229,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
         if (!$this->hasValidValues($values, $doctrineTypeField)) {
             $this->logger->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $property)),
+                'exception' => new InvalidArgumentException(\sprintf('Values for field "%s" are not valid according to the doctrine type.', $property)),
             ]);
 
             return;
@@ -278,7 +278,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
             self::STRATEGY_START => new Regex("^$quotedValue", $caseSensitive ? '' : 'i'),
             self::STRATEGY_END => new Regex("$quotedValue$", $caseSensitive ? '' : 'i'),
             self::STRATEGY_WORD_START => new Regex("(^$quotedValue.*|.*\s$quotedValue.*)", $caseSensitive ? '' : 'i'),
-            default => throw new InvalidArgumentException(sprintf('strategy %s does not exist.', $strategy)),
+            default => throw new InvalidArgumentException(\sprintf('strategy %s does not exist.', $strategy)),
         };
     }
 

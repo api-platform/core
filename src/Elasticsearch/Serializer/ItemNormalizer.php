@@ -51,7 +51,7 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
         }
 
         if (!$this->decorated instanceof BaseCacheableSupportsMethodInterface) {
-            throw new LogicException(sprintf('The decorated normalizer must be an instance of "%s".', BaseCacheableSupportsMethodInterface::class));
+            throw new LogicException(\sprintf('The decorated normalizer must be an instance of "%s".', BaseCacheableSupportsMethodInterface::class));
         }
 
         return $this->decorated->hasCacheableSupportsMethod();
@@ -65,7 +65,7 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         if (!$this->decorated instanceof DenormalizerInterface) {
-            throw new LogicException(sprintf('The decorated normalizer must be an instance of "%s".', DenormalizerInterface::class));
+            throw new LogicException(\sprintf('The decorated normalizer must be an instance of "%s".', DenormalizerInterface::class));
         }
 
         return $this->decorated->denormalize($data, $type, $format, $context);
@@ -79,7 +79,7 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         if (!$this->decorated instanceof DenormalizerInterface) {
-            throw new LogicException(sprintf('The decorated normalizer must be an instance of "%s".', DenormalizerInterface::class));
+            throw new LogicException(\sprintf('The decorated normalizer must be an instance of "%s".', DenormalizerInterface::class));
         }
 
         return DocumentNormalizer::FORMAT !== $format && $this->decorated->supportsDenormalization($data, $type, $format, $context);
@@ -122,7 +122,7 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
     public function setSerializer(SerializerInterface $serializer): void
     {
         if (!$this->decorated instanceof SerializerAwareInterface) {
-            throw new LogicException(sprintf('The decorated normalizer must be an instance of "%s".', SerializerAwareInterface::class));
+            throw new LogicException(\sprintf('The decorated normalizer must be an instance of "%s".', SerializerAwareInterface::class));
         }
 
         $this->decorated->setSerializer($serializer);

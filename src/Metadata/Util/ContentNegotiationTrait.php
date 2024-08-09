@@ -84,7 +84,7 @@ trait ContentNegotiationTrait
                 $mimeTypes = Request::getMimeTypes($routeFormat);
                 $flattenedMimeTypes = $this->flattenMimeTypes([$routeFormat => $mimeTypes]);
             } elseif ($throw) {
-                throw new NotFoundHttpException(sprintf('Format "%s" is not supported', $routeFormat));
+                throw new NotFoundHttpException(\sprintf('Format "%s" is not supported', $routeFormat));
             }
         }
 
@@ -129,7 +129,7 @@ trait ContentNegotiationTrait
      */
     private function getNotAcceptableHttpException(string $accept, array $mimeTypes): NotAcceptableHttpException
     {
-        return new NotAcceptableHttpException(sprintf(
+        return new NotAcceptableHttpException(\sprintf(
             'Requested format "%s" is not supported. Supported MIME types are "%s".',
             $accept,
             implode('", "', array_keys($mimeTypes))
