@@ -62,13 +62,13 @@ final class DebugResourceCommand extends Command
         $resources = [];
         foreach ($resourceCollection as $resource) {
             if ($resource->getUriTemplate()) {
-                $resources[] = $resource->getUriTemplate();
+                $resources[] = ($resource->getRoutePrefix() ?? '').$resource->getUriTemplate();
                 continue;
             }
 
             foreach ($resource->getOperations() as $operation) {
                 if ($operation->getUriTemplate()) {
-                    $resources[] = $operation->getUriTemplate();
+                    $resources[] = ($resource->getRoutePrefix() ?? '').$operation->getUriTemplate();
                     break;
                 }
             }
