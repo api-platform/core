@@ -82,7 +82,7 @@ class ArraySubsetTest extends TestCase
 
         try {
             $constraint->evaluate(['baz' => 'bar'], '', false);
-            $this->fail(sprintf('Expected %s to be thrown.', ExpectationFailedException::class));
+            $this->fail(\sprintf('Expected %s to be thrown.', ExpectationFailedException::class));
         } catch (ExpectationFailedException $expectedException) {
             $comparisonFailure = $expectedException->getComparisonFailure();
             $this->assertNotNull($comparisonFailure);
@@ -97,7 +97,7 @@ class ArraySubsetTest extends TestCase
 
         $this->assertTrue(
             $reflection->implementsInterface(\Countable::class),
-            sprintf(
+            \sprintf(
                 'Failed to assert that ArraySubset implements "%s".',
                 \Countable::class
             )
@@ -110,7 +110,7 @@ class ArraySubsetTest extends TestCase
 
         $this->assertTrue(
             $reflection->implementsInterface(SelfDescribing::class),
-            sprintf(
+            \sprintf(
                 'Failed to assert that Array implements "%s".',
                 SelfDescribing::class
             )

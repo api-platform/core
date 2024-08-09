@@ -191,6 +191,6 @@ class Handler extends ExceptionsHandler
             return $data;
         }
 
-        throw new \LogicException(sprintf('We could not find the thrown exception in the %s.', self::class));
+        throw new \LogicException(\sprintf('We could not find the thrown exception in the %s.', self::class));
     }
 }

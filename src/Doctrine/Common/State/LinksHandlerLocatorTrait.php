@@ -39,6 +39,6 @@ trait LinksHandlerLocatorTrait
             return [$this->handleLinksLocator->get($handleLinks), 'handleLinks'];
         }
 
-        throw new RuntimeException(sprintf('Could not find handleLinks service "%s"', $handleLinks));
+        throw new RuntimeException(\sprintf('Could not find handleLinks service "%s"', $handleLinks));
     }
 }

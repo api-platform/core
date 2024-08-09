@@ -43,7 +43,7 @@ class AppKernel extends Kernel
         return [
             new FrameworkBundle(),
             new DoctrineMongoDBBundle(),
-            new class() extends Bundle {
+            new class extends Bundle {
                 public function shutdown(): void
                 {
                     restore_exception_handler();

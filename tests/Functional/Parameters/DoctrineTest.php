@@ -45,7 +45,7 @@ final class DoctrineTest extends ApiTestCase
         $this->assertEquals('bar', $a['hydra:member'][1]['foo']);
 
         $this->assertArraySubset(['hydra:search' => [
-            'hydra:template' => sprintf('/%s{?foo,order[order[id]],order[order[foo]],searchPartial[foo],searchExact[foo],searchOnTextAndDate[foo],searchOnTextAndDate[createdAt][before],searchOnTextAndDate[createdAt][strictly_before],searchOnTextAndDate[createdAt][after],searchOnTextAndDate[createdAt][strictly_after],q}', $route),
+            'hydra:template' => \sprintf('/%s{?foo,order[order[id]],order[order[foo]],searchPartial[foo],searchExact[foo],searchOnTextAndDate[foo],searchOnTextAndDate[createdAt][before],searchOnTextAndDate[createdAt][strictly_before],searchOnTextAndDate[createdAt][after],searchOnTextAndDate[createdAt][strictly_after],q}', $route),
             'hydra:mapping' => [
                 ['@type' => 'IriTemplateMapping', 'variable' => 'foo', 'property' => 'foo'],
             ],
@@ -73,22 +73,22 @@ final class DoctrineTest extends ApiTestCase
         $this->loadFixtures($this->isMongoDB() ? SearchFilterParameterDocument::class : SearchFilterParameter::class);
         $object = 'searchFilterParameters';
         $response = self::createClient()->request('POST', '/graphql', ['json' => [
-            'query' => sprintf('{ %s(foo: "bar") { edges { node { id foo createdAt } } } }', $object),
+            'query' => \sprintf('{ %s(foo: "bar") { edges { node { id foo createdAt } } } }', $object),
         ]]);
         $this->assertEquals('bar', $response->toArray()['data'][$object]['edges'][0]['node']['foo']);
 
         $response = self::createClient()->request('POST', '/graphql', ['json' => [
-            'query' => sprintf('{ %s(searchPartial: {foo: "az"}) { edges { node { id foo createdAt } } } }', $object),
+            'query' => \sprintf('{ %s(searchPartial: {foo: "az"}) { edges { node { id foo createdAt } } } }', $object),
         ]]);
         $this->assertEquals('baz', $response->toArray()['data'][$object]['edges'][0]['node']['foo']);
 
         $response = self::createClient()->request('POST', '/graphql', ['json' => [
-            'query' => sprintf('{ %s(searchExact: {foo: "baz"}) { edges { node { id foo createdAt } } } }', $object),
+            'query' => \sprintf('{ %s(searchExact: {foo: "baz"}) { edges { node { id foo createdAt } } } }', $object),
         ]]);
         $this->assertEquals('baz', $response->toArray()['data'][$object]['edges'][0]['node']['foo']);
 
         $response = self::createClient()->request('POST', '/graphql', ['json' => [
-            'query' => sprintf('{ %s(searchOnTextAndDate: {foo: "bar", createdAt: {before: "2024-01-21"}}) { edges { node { id foo createdAt } } } }', $object),
+            'query' => \sprintf('{ %s(searchOnTextAndDate: {foo: "bar", createdAt: {before: "2024-01-21"}}) { edges { node { id foo createdAt } } } }', $object),
         ]]);
         $this->assertArraySubset(['foo' => 'bar', 'createdAt' => '2024-01-21T00:00:00+00:00'], $response->toArray()['data'][$object]['edges'][0]['node']);
     }

@@ -139,7 +139,7 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
     {
         $subscriptionFields = [];
         $resourceType = new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass);
-        $description = $operation->getDescription() ?? sprintf('Subscribes to the action event of a %s.', $operation->getShortName());
+        $description = $operation->getDescription() ?? \sprintf('Subscribes to the action event of a %s.', $operation->getShortName());
 
         if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $description, $operation->getDeprecationReason(), $resourceType, $resourceClass, false, $operation)) {
             $fieldConfiguration['args'] += ['input' => $this->getResourceFieldConfiguration(null, null, $operation->getDeprecationReason(), $resourceType, $resourceClass, true, $operation)];
@@ -280,7 +280,7 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
     {
         foreach ($args as $id => $arg) {
             if (!isset($arg['type'])) {
-                throw new \InvalidArgumentException(sprintf('The argument "%s" of the custom operation "%s" in %s needs a "type" option.', $id, $operation->getName(), $operation->getShortName()));
+                throw new \InvalidArgumentException(\sprintf('The argument "%s" of the custom operation "%s" in %s needs a "type" option.', $id, $operation->getName(), $operation->getShortName()));
             }
 
             $args[$id]['type'] = $this->typeConverter->resolveType($arg['type']);
@@ -644,12 +644,12 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
         $graphqlType = $this->typeConverter->convertType($type, $input, $rootOperation, $resourceClass, $rootResource, $property, $depth);
 
         if (null === $graphqlType) {
-            throw new InvalidTypeException(sprintf('The type "%s" is not supported.', $type->getBuiltinType()));
+            throw new InvalidTypeException(\sprintf('The type "%s" is not supported.', $type->getBuiltinType()));
         }
 
         if (\is_string($graphqlType)) {
             if (!$this->typesContainer->has($graphqlType)) {
-                throw new InvalidTypeException(sprintf('The GraphQL type %s is not valid. Valid types are: %s. Have you registered this type by implementing %s?', $graphqlType, implode(', ', array_keys($this->typesContainer->all())), TypeInterface::class));
+                throw new InvalidTypeException(\sprintf('The GraphQL type %s is not valid. Valid types are: %s. Have you registered this type by implementing %s?', $graphqlType, implode(', ', array_keys($this->typesContainer->all())), TypeInterface::class));
             }
 
             $graphqlType = $this->typesContainer->get($graphqlType);

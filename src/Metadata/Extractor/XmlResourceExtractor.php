@@ -51,7 +51,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             try {
                 simplexml_import_dom(XmlUtils::loadFile($path, XmlPropertyExtractor::SCHEMA));
             } catch (\InvalidArgumentException) {
-                throw new InvalidArgumentException(sprintf('Error while parsing %s: %s', $path, $e->getMessage()), $e->getCode(), $e);
+                throw new InvalidArgumentException(\sprintf('Error while parsing %s: %s', $path, $e->getMessage()), $e->getCode(), $e);
             }
 
             // It's a property: ignore error
@@ -392,7 +392,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             if (\in_array((string) $operation['class'], [GetCollection::class, Post::class], true)) {
                 $datum['itemUriTemplate'] = $this->phpize($operation, 'itemUriTemplate', 'string');
             } elseif (isset($operation['itemUriTemplate'])) {
-                throw new InvalidArgumentException(sprintf('"itemUriTemplate" option is not allowed on a %s operation.', $operation['class']));
+                throw new InvalidArgumentException(\sprintf('"itemUriTemplate" option is not allowed on a %s operation.', $operation['class']));
             }
 
             $data[] = array_merge($datum, [

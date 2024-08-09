@@ -49,7 +49,7 @@ trait ExistsFilterTrait
                 continue;
             }
             $propertyName = $this->normalizePropertyName($property);
-            $description[sprintf('%s[%s]', $this->existsParameterName, $propertyName)] = [
+            $description[\sprintf('%s[%s]', $this->existsParameterName, $propertyName)] = [
                 'property' => $propertyName,
                 'type' => 'bool',
                 'required' => false,
@@ -81,7 +81,7 @@ trait ExistsFilterTrait
         }
 
         $this->getLogger()->notice('Invalid filter ignored', [
-            'exception' => new InvalidArgumentException(sprintf('Invalid value for "%s[%s]", expected one of ( "%s" )', $this->existsParameterName, $property, implode('" | "', [
+            'exception' => new InvalidArgumentException(\sprintf('Invalid value for "%s[%s]", expected one of ( "%s" )', $this->existsParameterName, $property, implode('" | "', [
                 'true',
                 'false',
                 '1',

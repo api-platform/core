@@ -67,7 +67,7 @@ class Product implements ProductInterface
     public function setMainTaxon(?TaxonInterface $mainTaxon): void
     {
         if (!$mainTaxon instanceof Taxon) {
-            throw new \InvalidArgumentException(sprintf('$mainTaxon must be of type "%s".', Taxon::class));
+            throw new \InvalidArgumentException(\sprintf('$mainTaxon must be of type "%s".', Taxon::class));
         }
 
         $this->mainTaxon = $mainTaxon;

@@ -112,7 +112,7 @@ trait PropertyHelperTrait
         }
 
         if ('' === $alias) {
-            throw new InvalidArgumentException(sprintf('Cannot add lookups for property "%s" - property is not nested.', $property));
+            throw new InvalidArgumentException(\sprintf('Cannot add lookups for property "%s" - property is not nested.', $property));
         }
 
         return [$property, $propertyParts['field'], $propertyParts['associations']];

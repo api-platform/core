@@ -71,7 +71,7 @@ final class ApiLoader extends Loader
                             continue;
                         }
 
-                        $path = str_replace(sprintf('{%s}', $parameterName), $expandedValue, $path);
+                        $path = str_replace(\sprintf('{%s}', $parameterName), $expandedValue, $path);
                     }
 
                     // Within Symfony .{_format} is a special parameter but the rfc6570 specifies label expansion with a dot operator
@@ -82,7 +82,7 @@ final class ApiLoader extends Loader
                     if ($controller = $operation->getController()) {
                         $controllerId = explode('::', $controller, 2)[0];
                         if (!$this->container->has($controllerId)) {
-                            throw new RuntimeException(sprintf('Operation "%s" is defining an unknown service as controller "%s". Make sure it is properly registered in the dependency injection container.', $operationName, $controllerId));
+                            throw new RuntimeException(\sprintf('Operation "%s" is defining an unknown service as controller "%s". Make sure it is properly registered in the dependency injection container.', $operationName, $controllerId));
                         }
                     }
 

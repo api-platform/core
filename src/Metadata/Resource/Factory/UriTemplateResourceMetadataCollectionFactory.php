@@ -95,7 +95,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
 
     private function generateUriTemplate(HttpOperation $operation): string
     {
-        $uriTemplate = $operation->getUriTemplate() ?? sprintf('/%s', $this->pathSegmentNameGenerator->getSegmentName($operation->getShortName()));
+        $uriTemplate = $operation->getUriTemplate() ?? \sprintf('/%s', $this->pathSegmentNameGenerator->getSegmentName($operation->getShortName()));
         $uriVariables = $operation->getUriVariables() ?? [];
 
         if (str_ends_with($uriTemplate, '{._format}')) {
@@ -104,14 +104,14 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
 
         if ($parameters = array_keys($uriVariables)) {
             foreach ($parameters as $parameterName) {
-                $part = sprintf('/{%s}', $parameterName);
+                $part = \sprintf('/{%s}', $parameterName);
                 if (!str_contains($uriTemplate, $part)) {
-                    $uriTemplate .= sprintf('/{%s}', $parameterName);
+                    $uriTemplate .= \sprintf('/{%s}', $parameterName);
                 }
             }
         }
 
-        return sprintf('%s%s', $uriTemplate, '{._format}');
+        return \sprintf('%s%s', $uriTemplate, '{._format}');
     }
 
     private function configureUriVariables(ApiResource|HttpOperation $operation): ApiResource|HttpOperation

@@ -70,11 +70,11 @@ final class ReadProvider implements ProviderInterface
 
             if ($operation instanceof Subscription || $operation instanceof Mutation) {
                 if (null === $item) {
-                    throw new NotFoundHttpException(sprintf('Item "%s" not found.', $args['input']['id']));
+                    throw new NotFoundHttpException(\sprintf('Item "%s" not found.', $args['input']['id']));
                 }
 
                 if ($operation->getClass() !== $this->getObjectClass($item)) {
-                    throw new \UnexpectedValueException(sprintf('Item "%s" did not match expected type "%s".', $args['input']['id'], $operation->getShortName()));
+                    throw new \UnexpectedValueException(\sprintf('Item "%s" did not match expected type "%s".', $args['input']['id'], $operation->getShortName()));
                 }
             }
 

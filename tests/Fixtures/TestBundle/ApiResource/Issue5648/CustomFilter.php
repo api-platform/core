@@ -30,9 +30,9 @@ class CustomFilter extends AbstractFilter
         $alias = $queryBuilder->getRootAliases()[0];
         $secondAlias = $queryNameGenerator->generateJoinAlias('relatedDummies');
 
-        $joinCondition = $queryBuilder->expr()->like(sprintf('%s.name', $secondAlias), ':param');
+        $joinCondition = $queryBuilder->expr()->like(\sprintf('%s.name', $secondAlias), ':param');
 
-        $queryBuilder->join(sprintf('%s.relatedDummies', $alias), $secondAlias, Join::WITH, $joinCondition)
+        $queryBuilder->join(\sprintf('%s.relatedDummies', $alias), $secondAlias, Join::WITH, $joinCondition)
         ->setParameter('param', '%'.$value.'%')
         ->andWhere('1=1'); // problem only gets triggered when there is a where part.
     }

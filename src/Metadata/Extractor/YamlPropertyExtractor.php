@@ -42,7 +42,7 @@ final class YamlPropertyExtractor extends AbstractPropertyExtractor
         }
 
         if (!\is_array($propertiesYaml)) {
-            throw new InvalidArgumentException(sprintf('"properties" setting is expected to be null or an array, %s given in "%s".', \gettype($propertiesYaml), $path));
+            throw new InvalidArgumentException(\sprintf('"properties" setting is expected to be null or an array, %s given in "%s".', \gettype($propertiesYaml), $path));
         }
 
         $this->buildProperties($propertiesYaml);
@@ -64,7 +64,7 @@ final class YamlPropertyExtractor extends AbstractPropertyExtractor
                 }
 
                 if (!\is_array($propertyValues)) {
-                    throw new InvalidArgumentException(sprintf('"%s" setting is expected to be null or an array, %s given.', $propertyName, \gettype($propertyValues)));
+                    throw new InvalidArgumentException(\sprintf('"%s" setting is expected to be null or an array, %s given.', $propertyName, \gettype($propertyValues)));
                 }
 
                 $this->properties[$resourceName][$propertyName] = [
@@ -107,7 +107,7 @@ final class YamlPropertyExtractor extends AbstractPropertyExtractor
         }
 
         if (!\is_array($resource[$key])) {
-            throw new InvalidArgumentException(sprintf('"%s" setting is expected to be an array, %s given', $key, \gettype($resource[$key])));
+            throw new InvalidArgumentException(\sprintf('"%s" setting is expected to be an array, %s given', $key, \gettype($resource[$key])));
         }
 
         return $resource[$key];
@@ -127,7 +127,7 @@ final class YamlPropertyExtractor extends AbstractPropertyExtractor
             'string' => (string) $resource[$key],
             'integer' => (int) $resource[$key],
             'bool' => \in_array($resource[$key], ['1', 'true', 1, true], false),
-            default => throw new InvalidArgumentException(sprintf('The property "%s" must be a "%s", "%s" given.', $key, $type, \gettype($resource[$key]))),
+            default => throw new InvalidArgumentException(\sprintf('The property "%s" must be a "%s", "%s" given.', $key, $type, \gettype($resource[$key]))),
         };
     }
 }

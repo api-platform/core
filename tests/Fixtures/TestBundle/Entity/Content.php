@@ -78,7 +78,7 @@ class Content implements \JsonSerializable
     public function addField(Field $field): void
     {
         if ($this->hasField($field->getName())) {
-            throw new \InvalidArgumentException(sprintf("Content already has '%s' field", $field->getName()));
+            throw new \InvalidArgumentException(\sprintf("Content already has '%s' field", $field->getName()));
         }
         $this->fields[$field->getName()] = $field;
         $field->setContent($this);

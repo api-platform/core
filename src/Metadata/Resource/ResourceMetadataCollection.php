@@ -108,6 +108,6 @@ final class ResourceMetadataCollection extends \ArrayObject
             $shortName = substr($shortName, $pos + 1);
         }
 
-        throw new OperationNotFoundException(sprintf('Operation "%s" not found for resource "%s".', $operationName, $shortName));
+        throw new OperationNotFoundException(\sprintf('Operation "%s" not found for resource "%s".', $operationName, $shortName));
     }
 }

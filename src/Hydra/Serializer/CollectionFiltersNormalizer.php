@@ -177,7 +177,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
             $mapping[] = $m;
         }
 
-        return ['@type' => 'hydra:IriTemplate', 'hydra:template' => sprintf('%s{?%s}', $parts['path'], implode(',', $variables)), 'hydra:variableRepresentation' => 'BasicRepresentation', 'hydra:mapping' => $mapping];
+        return ['@type' => 'hydra:IriTemplate', 'hydra:template' => \sprintf('%s{?%s}', $parts['path'], implode(',', $variables)), 'hydra:variableRepresentation' => 'BasicRepresentation', 'hydra:mapping' => $mapping];
     }
 
     /**

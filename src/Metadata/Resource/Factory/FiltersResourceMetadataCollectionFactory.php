@@ -44,7 +44,7 @@ final class FiltersResourceMetadataCollectionFactory implements ResourceMetadata
         try {
             $reflectionClass = new \ReflectionClass($resourceClass);
         } catch (\ReflectionException) {
-            throw new ResourceClassNotFoundException(sprintf('Resource "%s" not found.', $resourceClass));
+            throw new ResourceClassNotFoundException(\sprintf('Resource "%s" not found.', $resourceClass));
         }
 
         $classFilters = $this->readFilterAttributes($reflectionClass);

@@ -89,7 +89,7 @@ final class Client implements HttpClientInterface
         // Convert headers to a $_SERVER-like array
         foreach (self::extractHeaders($options) as $key => $value) {
             $normalizedHeaderName = strtoupper(str_replace('-', '_', $key));
-            $header = \in_array($normalizedHeaderName, ['CONTENT_TYPE', 'REMOTE_ADDR'], true) ? $normalizedHeaderName : sprintf('HTTP_%s', $normalizedHeaderName);
+            $header = \in_array($normalizedHeaderName, ['CONTENT_TYPE', 'REMOTE_ADDR'], true) ? $normalizedHeaderName : \sprintf('HTTP_%s', $normalizedHeaderName);
             // BrowserKit doesn't support setting several headers with the same name
             $server[$header] = $value[0] ?? '';
         }

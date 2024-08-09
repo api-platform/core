@@ -152,11 +152,11 @@ final class NumericFilter extends AbstractFilter
 
         if (1 === \count($values)) {
             $queryBuilder
-                ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
+                ->andWhere(\sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
                 ->setParameter($valueParameter, $values[0], (string) $this->getDoctrineFieldType($property, $resourceClass));
         } else {
             $queryBuilder
-                ->andWhere(sprintf('%s.%s IN (:%s)', $alias, $field, $valueParameter))
+                ->andWhere(\sprintf('%s.%s IN (:%s)', $alias, $field, $valueParameter))
                 ->setParameter($valueParameter, $values);
         }
     }

@@ -95,7 +95,7 @@ final class DocumentNormalizerTest extends TestCase
     public function testNormalize(): void
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(sprintf('%s is a write-only format.', DocumentNormalizer::FORMAT));
+        $this->expectExceptionMessage(\sprintf('%s is a write-only format.', DocumentNormalizer::FORMAT));
 
         (new DocumentNormalizer($this->prophesize(ResourceMetadataCollectionFactoryInterface::class)->reveal()))->normalize(new Foo(), DocumentNormalizer::FORMAT);
     }

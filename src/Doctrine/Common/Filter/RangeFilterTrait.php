@@ -68,7 +68,7 @@ trait RangeFilterTrait
         $propertyName = $this->normalizePropertyName($fieldName);
 
         return [
-            sprintf('%s[%s]', $propertyName, $operator) => [
+            \sprintf('%s[%s]', $propertyName, $operator) => [
                 'property' => $propertyName,
                 'type' => 'string',
                 'required' => false,
@@ -88,7 +88,7 @@ trait RangeFilterTrait
 
         if (empty($values)) {
             $this->getLogger()->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(sprintf('At least one valid operator ("%s") is required for "%s" property', implode('", "', $operators), $property)),
+                'exception' => new InvalidArgumentException(\sprintf('At least one valid operator ("%s") is required for "%s" property', implode('", "', $operators), $property)),
             ]);
 
             return null;
@@ -104,7 +104,7 @@ trait RangeFilterTrait
     {
         if (2 !== \count($values)) {
             $this->getLogger()->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(sprintf('Invalid format for "[%s]", expected "<min>..<max>"', self::PARAMETER_BETWEEN)),
+                'exception' => new InvalidArgumentException(\sprintf('Invalid format for "[%s]", expected "<min>..<max>"', self::PARAMETER_BETWEEN)),
             ]);
 
             return null;
@@ -112,7 +112,7 @@ trait RangeFilterTrait
 
         if (!is_numeric($values[0]) || !is_numeric($values[1])) {
             $this->getLogger()->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(sprintf('Invalid values for "[%s]" range, expected numbers', self::PARAMETER_BETWEEN)),
+                'exception' => new InvalidArgumentException(\sprintf('Invalid values for "[%s]" range, expected numbers', self::PARAMETER_BETWEEN)),
             ]);
 
             return null;
@@ -128,7 +128,7 @@ trait RangeFilterTrait
     {
         if (!is_numeric($value)) {
             $this->getLogger()->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(sprintf('Invalid value for "[%s]", expected number', $operator)),
+                'exception' => new InvalidArgumentException(\sprintf('Invalid value for "[%s]", expected number', $operator)),
             ]);
 
             return null;

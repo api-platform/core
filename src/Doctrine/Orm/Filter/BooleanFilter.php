@@ -142,7 +142,7 @@ final class BooleanFilter extends AbstractFilter
         $valueParameter = $queryNameGenerator->generateParameterName($field);
 
         $queryBuilder
-            ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
+            ->andWhere(\sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
             ->setParameter($valueParameter, $value);
     }
 }

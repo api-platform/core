@@ -81,14 +81,14 @@ final class TypeConverter implements TypeConverterInterface
         try {
             $astTypeNode = Parser::parseType($type);
         } catch (SyntaxError $e) {
-            throw new InvalidArgumentException(sprintf('"%s" is not a valid GraphQL type.', $type), 0, $e);
+            throw new InvalidArgumentException(\sprintf('"%s" is not a valid GraphQL type.', $type), 0, $e);
         }
 
         if ($graphQlType = $this->resolveAstTypeNode($astTypeNode, $type)) {
             return $graphQlType;
         }
 
-        throw new InvalidArgumentException(sprintf('The type "%s" was not resolved.', $type));
+        throw new InvalidArgumentException(\sprintf('The type "%s" was not resolved.', $type));
     }
 
     private function getResourceType(Type $type, bool $input, Operation $rootOperation, string $rootResource, ?string $property, int $depth): ?GraphQLType

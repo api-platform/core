@@ -56,7 +56,7 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
         try {
             $reflectionClass = new \ReflectionClass($resourceClass);
         } catch (\ReflectionException) {
-            throw new ResourceClassNotFoundException(sprintf('Resource "%s" not found.', $resourceClass));
+            throw new ResourceClassNotFoundException(\sprintf('Resource "%s" not found.', $resourceClass));
         }
 
         if ($this->hasResourceAttributes($reflectionClass)) {

@@ -84,7 +84,7 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
             return $parentPropertyMetadata;
         }
 
-        throw new PropertyNotFoundException(sprintf('Property "%s" of the resource class "%s" not found.', $property, $resourceClass));
+        throw new PropertyNotFoundException(\sprintf('Property "%s" of the resource class "%s" not found.', $property, $resourceClass));
     }
 
     /**

@@ -90,7 +90,7 @@ class ValidatorTest extends TestCase
 
         $containerProphecy = $this->prophesize(ContainerInterface::class);
         $containerProphecy->has('groups_builder')->willReturn(true);
-        $containerProphecy->get('groups_builder')->willReturn(new class() implements ValidationGroupsGeneratorInterface {
+        $containerProphecy->get('groups_builder')->willReturn(new class implements ValidationGroupsGeneratorInterface {
             public function __invoke(object $object): array
             {
                 return $object instanceof DummyEntity ? ['a', 'b', 'c'] : [];

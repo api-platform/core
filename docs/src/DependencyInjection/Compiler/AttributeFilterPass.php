@@ -53,7 +53,7 @@ final class AttributeFilterPass implements CompilerPassInterface
             }
 
             if (null === $filterReflectionClass = $container->getReflectionClass($filterClass, false)) {
-                throw new InvalidArgumentException(sprintf('Class "%s" used for service "%s" cannot be found.', $filterClass, $id));
+                throw new InvalidArgumentException(\sprintf('Class "%s" used for service "%s" cannot be found.', $filterClass, $id));
             }
 
             if ($container->has($filterClass) && ($parentDefinition = $container->findDefinition($filterClass))->isAbstract()) {
@@ -75,7 +75,7 @@ final class AttributeFilterPass implements CompilerPassInterface
 
             foreach ($arguments as $key => $value) {
                 if (!isset($parameterNames[$key])) {
-                    throw new InvalidArgumentException(sprintf('Class "%s" does not have argument "$%s".', $filterClass, $key));
+                    throw new InvalidArgumentException(\sprintf('Class "%s" does not have argument "$%s".', $filterClass, $key));
                 }
 
                 $definition->setArgument("$$key", $value);

@@ -43,7 +43,7 @@ final class SkolemIriConverter implements IriConverterInterface
      */
     public function getResourceFromIri(string $iri, array $context = [], ?Operation $operation = null): object
     {
-        throw new ItemNotFoundException(sprintf('Item not found for "%s".', $iri));
+        throw new ItemNotFoundException(\sprintf('Item not found for "%s".', $iri));
     }
 
     /**

@@ -45,7 +45,7 @@ final class MercureContext implements Context
             throw new \RuntimeException('No Mercure update has been sent.');
         }
 
-        Assert::assertEquals($number, $total, sprintf('Expected %d Mercure updates to be sent, got %d.', $number, $total));
+        Assert::assertEquals($number, $total, \sprintf('Expected %d Mercure updates to be sent, got %d.', $number, $total));
     }
 
     /**
@@ -79,7 +79,7 @@ final class MercureContext implements Context
         }
 
         if (!isset($updates[$index - 1])) {
-            throw new \RuntimeException(sprintf('Mercure update #%d does not exist.', $index));
+            throw new \RuntimeException(\sprintf('Mercure update #%d does not exist.', $index));
         }
         /** @var Update $update */
         $update = $updates[$index - 1];
@@ -99,7 +99,7 @@ final class MercureContext implements Context
         }
 
         if (!isset($updates[$index - 1])) {
-            throw new \RuntimeException(sprintf('Mercure update #%d does not exist.', $index));
+            throw new \RuntimeException(\sprintf('Mercure update #%d does not exist.', $index));
         }
         /** @var Update $update */
         $update = $updates[$index - 1];

@@ -254,7 +254,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         if (null === $relatedObject || isset($context['api_included'])) {
             if (!$this->serializer instanceof NormalizerInterface) {
-                throw new LogicException(sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
+                throw new LogicException(\sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
             }
 
             $normalizedRelatedObject = $this->serializer->normalize($relatedObject, $format, $context);
@@ -420,7 +420,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             // Many to many relationship
             foreach ($attributeValue as $attributeValueElement) {
                 if (!isset($attributeValueElement['data'])) {
-                    throw new UnexpectedValueException(sprintf('The JSON API attribute \'%s\' must contain a "data" key.', $relationshipName));
+                    throw new UnexpectedValueException(\sprintf('The JSON API attribute \'%s\' must contain a "data" key.', $relationshipName));
                 }
                 unset($attributeValueElement['data']['attributes']);
                 $data[$relationshipName]['data'][] = $attributeValueElement['data'];

@@ -40,7 +40,7 @@ final class DeserializeProvider implements ProviderInterface
         private ?TranslatorInterface $translator = null
     ) {
         if (null === $this->translator) {
-            $this->translator = new class() implements TranslatorInterface, LocaleAwareInterface {
+            $this->translator = new class implements TranslatorInterface, LocaleAwareInterface {
                 use TranslatorTrait;
             };
             $this->translator->setLocale('en');

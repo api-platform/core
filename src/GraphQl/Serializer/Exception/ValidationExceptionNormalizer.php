@@ -39,7 +39,7 @@ final class ValidationExceptionNormalizer implements NormalizerInterface
     {
         $validationException = $object->getPrevious();
         if (!$validationException instanceof ConstraintViolationListAwareExceptionInterface) {
-            throw new RuntimeException(sprintf('Object is not a "%s".', ConstraintViolationListAwareExceptionInterface::class));
+            throw new RuntimeException(\sprintf('Object is not a "%s".', ConstraintViolationListAwareExceptionInterface::class));
         }
 
         $error = FormattedError::createFromException($object);

@@ -46,7 +46,7 @@ final class ItemProvider implements ProviderInterface
         $resourceClass = $operation->getClass();
         $options = $operation->getStateOptions() instanceof Options ? $operation->getStateOptions() : new Options(index: $this->getIndex($operation));
         if (!$options instanceof Options) {
-            throw new RuntimeException(sprintf('The "%s" provider was called without "%s".', self::class, Options::class));
+            throw new RuntimeException(\sprintf('The "%s" provider was called without "%s".', self::class, Options::class));
         }
 
         $params = [

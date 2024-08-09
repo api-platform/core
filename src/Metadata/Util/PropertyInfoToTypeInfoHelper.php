@@ -106,7 +106,7 @@ final class PropertyInfoToTypeInfoHelper
         try {
             $type = null !== $class ? Type::object($class) : Type::builtin(TypeIdentifier::from($builtinType));
         } catch (\ValueError) {
-            throw new InvalidArgumentException(sprintf('"%s" is not a valid PHP type.', $builtinType));
+            throw new InvalidArgumentException(\sprintf('"%s" is not a valid PHP type.', $builtinType));
         }
 
         if (\count($variableTypes)) {

@@ -70,7 +70,7 @@ final class OpenApiCommand extends Command
         $filename = $input->getOption('output');
         if ($filename && \is_string($filename)) {
             $filesystem->dumpFile($filename, $content);
-            $io->success(sprintf('Data written to %s.', $filename));
+            $io->success(\sprintf('Data written to %s.', $filename));
 
             return \defined(Command::class.'::SUCCESS') ? Command::SUCCESS : 0;
         }

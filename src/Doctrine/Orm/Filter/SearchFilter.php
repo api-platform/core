@@ -203,7 +203,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
             if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
                 $this->logger->notice('Invalid filter ignored', [
-                    'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
+                    'exception' => new InvalidArgumentException(\sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
                 ]);
 
                 return;
@@ -241,7 +241,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
                  */
                 if (!$this->hasValidValues([$value], $doctrineTypeField)) {
                     $this->logger->notice('Invalid filter ignored', [
-                        'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $associationFieldIdentifier)),
+                        'exception' => new InvalidArgumentException(\sprintf('Values for field "%s" are not valid according to the doctrine type.', $associationFieldIdentifier)),
                     ]);
 
                     return null;
@@ -258,7 +258,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
              * Shouldn't this actually fail harder?
              */
             $this->logger->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
+                'exception' => new InvalidArgumentException(\sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
             ]);
 
             return;
@@ -287,7 +287,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
         $wrapCase = $this->createWrapCase($caseSensitive);
         $valueParameter = ':'.$queryNameGenerator->generateParameterName($field);
-        $aliasedField = sprintf('%s.%s', $alias, $field);
+        $aliasedField = \sprintf('%s.%s', $alias, $field);
 
         if (!$strategy || self::STRATEGY_EXACT === $strategy) {
             if (1 === \count($values)) {
@@ -308,7 +308,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
         $ors = [];
         $parameters = [];
         foreach ($values as $key => $value) {
-            $keyValueParameter = sprintf('%s_%s', $valueParameter, $key);
+            $keyValueParameter = \sprintf('%s_%s', $valueParameter, $key);
             $parameters[] = [$caseSensitive ? $value : strtolower($value), $keyValueParameter];
 
             $ors[] = match ($strategy) {
@@ -334,7 +334,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
                         $wrapCase((string) $queryBuilder->expr()->concat("'% '", $keyValueParameter, "'%'"))
                     )
                 ),
-                default => throw new InvalidArgumentException(sprintf('strategy %s does not exist.', $strategy)),
+                default => throw new InvalidArgumentException(\sprintf('strategy %s does not exist.', $strategy)),
             };
         }
 
@@ -358,7 +358,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
                 return $expr;
             }
 
-            return sprintf('LOWER(%s)', $expr);
+            return \sprintf('LOWER(%s)', $expr);
         };
     }
 

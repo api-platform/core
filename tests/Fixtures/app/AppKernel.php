@@ -69,7 +69,7 @@ class AppKernel extends Kernel
             new WebProfilerBundle(),
             new FrameworkBundle(),
             new MakerBundle(),
-            new class() extends Bundle {
+            new class extends Bundle {
                 public function shutdown(): void
                 {
                     restore_exception_handler();
@@ -303,7 +303,7 @@ class AppKernel extends Kernel
 
     protected function build(ContainerBuilder $container): void
     {
-        $container->addCompilerPass(new class() implements CompilerPassInterface {
+        $container->addCompilerPass(new class implements CompilerPassInterface {
             public function process(ContainerBuilder $container): void
             {
                 if ($container->hasDefinition(TailCursorDoctrineODMCommand::class)) { // @phpstan-ignore-line

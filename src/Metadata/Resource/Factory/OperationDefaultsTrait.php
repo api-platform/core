@@ -204,7 +204,7 @@ trait OperationDefaultsTrait
         }
 
         if (!$operation instanceof HttpOperation) {
-            throw new RuntimeException(sprintf('Operation should be an instance of "%s"', HttpOperation::class));
+            throw new RuntimeException(\sprintf('Operation should be an instance of "%s"', HttpOperation::class));
         }
 
         if (!$operation->getName() && $operation->getRouteName()) {
@@ -229,7 +229,7 @@ trait OperationDefaultsTrait
     {
         $path = ($operation->getRoutePrefix() ?? '').($operation->getUriTemplate() ?? '');
 
-        return sprintf(
+        return \sprintf(
             '_api_%s_%s%s',
             $path ?: ($operation->getShortName() ?? $this->getDefaultShortname($resourceClass)),
             strtolower($operation->getMethod()),

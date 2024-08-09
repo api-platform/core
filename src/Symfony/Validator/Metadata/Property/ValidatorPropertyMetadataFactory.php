@@ -101,7 +101,7 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
         $validatorClassMetadata = $this->validatorMetadataFactory->getMetadataFor($resourceClass);
 
         if (!$validatorClassMetadata instanceof ValidatorClassMetadataInterface) {
-            throw new \UnexpectedValueException(sprintf('Validator class metadata expected to be of type "%s".', ValidatorClassMetadataInterface::class));
+            throw new \UnexpectedValueException(\sprintf('Validator class metadata expected to be of type "%s".', ValidatorClassMetadataInterface::class));
         }
 
         $validationGroups = $this->getValidationGroups($validatorClassMetadata, $options);
@@ -156,7 +156,7 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
         }
 
         if (!method_exists($classMetadata, 'getDefaultGroup')) {
-            throw new \UnexpectedValueException(sprintf('Validator class metadata expected to have method "%s".', 'getDefaultGroup'));
+            throw new \UnexpectedValueException(\sprintf('Validator class metadata expected to have method "%s".', 'getDefaultGroup'));
         }
 
         return [$classMetadata->getDefaultGroup()];

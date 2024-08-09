@@ -120,7 +120,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
                     $collectionValueType = $type->getCollectionValueTypes()[0] ?? null;
 
                     if (null !== $collectionValueType && $collectionValueType->getClassName() === $class) {
-                        return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, sprintf('%s[0].%s', $propertyName, $property)), $parameterName);
+                        return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, \sprintf('%s[0].%s', $propertyName, $property)), $parameterName);
                     }
                 }
 
@@ -158,6 +158,6 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
             return (string) $identifierValue->value;
         }
 
-        throw new RuntimeException(sprintf('We were not able to resolve the identifier matching parameter "%s".', $parameterName));
+        throw new RuntimeException(\sprintf('We were not able to resolve the identifier matching parameter "%s".', $parameterName));
     }
 }

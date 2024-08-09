@@ -86,7 +86,7 @@ trait BooleanFilterTrait
         }
 
         $this->getLogger()->notice('Invalid filter ignored', [
-            'exception' => new InvalidArgumentException(sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $property, implode('" | "', [
+            'exception' => new InvalidArgumentException(\sprintf('Invalid boolean value for "%s" property, expected one of ( "%s" )', $property, implode('" | "', [
                 'true',
                 'false',
                 '1',

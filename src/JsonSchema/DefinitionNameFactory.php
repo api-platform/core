@@ -48,10 +48,10 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
 
         $definitionName = $serializerContext[SchemaFactory::OPENAPI_DEFINITION_NAME] ?? null;
         if ($definitionName) {
-            $name = sprintf('%s-%s', $prefix, $definitionName);
+            $name = \sprintf('%s-%s', $prefix, $definitionName);
         } else {
             $groups = (array) ($serializerContext[AbstractNormalizer::GROUPS] ?? []);
-            $name = $groups ? sprintf('%s-%s', $prefix, implode('_', $groups)) : $prefix;
+            $name = $groups ? \sprintf('%s-%s', $prefix, implode('_', $groups)) : $prefix;
         }
 
         return $this->encodeDefinitionName($name);

@@ -66,24 +66,24 @@ class IriConverter implements IriConverterInterface
     {
         $parameters = $this->router->match($iri);
         if (!isset($parameters['_api_resource_class'], $parameters['_api_operation_name'], $parameters['uri_variables'])) {
-            throw new InvalidArgumentException(sprintf('No resource associated to "%s".', $iri));
+            throw new InvalidArgumentException(\sprintf('No resource associated to "%s".', $iri));
         }
 
         $operation = $parameters['_api_operation'] = $this->resourceMetadataCollectionFactory->create($parameters['_api_resource_class'])->getOperation($parameters['_api_operation_name']);
 
         if ($operation instanceof CollectionOperationInterface) {
-            throw new InvalidArgumentException(sprintf('The iri "%s" references a collection not an item.', $iri));
+            throw new InvalidArgumentException(\sprintf('The iri "%s" references a collection not an item.', $iri));
         }
 
         if (!$operation instanceof HttpOperation) {
-            throw new RuntimeException(sprintf('The iri "%s" does not reference an HTTP operation.', $iri));
+            throw new RuntimeException(\sprintf('The iri "%s" does not reference an HTTP operation.', $iri));
         }
 
         if ($item = $this->provider->provide($operation, $parameters['uri_variables'], $context)) {
             return $item; // @phpstan-ignore-line
         }
 
-        throw new ItemNotFoundException(sprintf('Item not found for "%s".', $iri));
+        throw new ItemNotFoundException(\sprintf('Item not found for "%s".', $iri));
     }
 
     /**
@@ -160,7 +160,7 @@ class IriConverter implements IriConverterInterface
             } catch (InvalidArgumentException|RuntimeException $e) {
                 // We can try using context uri variables if any
                 if (!$identifiers) {
-                    throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $operation->getClass()), $e->getCode(), $e);
+                    throw new InvalidArgumentException(\sprintf('Unable to generate an IRI for the item of type "%s"', $operation->getClass()), $e->getCode(), $e);
                 }
             }
         }
@@ -168,7 +168,7 @@ class IriConverter implements IriConverterInterface
         try {
             return $this->router->generate($operation->getName(), $identifiers, $operation->getUrlGenerationStrategy() ?? $referenceType);
         } catch (RoutingExceptionInterface $e) {
-            throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $operation->getClass()), $e->getCode(), $e);
+            throw new InvalidArgumentException(\sprintf('Unable to generate an IRI for the item of type "%s"', $operation->getClass()), $e->getCode(), $e);
         }
     }
 
@@ -179,7 +179,7 @@ class IriConverter implements IriConverterInterface
     private function generateSkolemIri(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, ?Operation $operation = null, array $context = [], ?string $resourceClass = null): string
     {
         if (!$this->decorated) {
-            throw new InvalidArgumentException(sprintf('Unable to generate an IRI for the item of type "%s"', $resourceClass));
+            throw new InvalidArgumentException(\sprintf('Unable to generate an IRI for the item of type "%s"', $resourceClass));
         }
 
         // Use a skolem iri, the route is defined in genid.xml
