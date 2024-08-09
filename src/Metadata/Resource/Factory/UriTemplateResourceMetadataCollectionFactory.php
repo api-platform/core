@@ -97,7 +97,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
 
     private function generateUriTemplate(HttpOperation $operation): string
     {
-        $uriTemplate = $operation->getUriTemplate() ?? sprintf('/%s', $this->pathSegmentNameGenerator->getSegmentName($operation->getShortName()));
+        $uriTemplate = $operation->getUriTemplate() ?? \sprintf('/%s', $this->pathSegmentNameGenerator->getSegmentName($operation->getShortName()));
         $uriVariables = $operation->getUriVariables() ?? [];
         $legacyFormat = null;
 
@@ -107,19 +107,19 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
 
         if ($legacyFormat && ($this->triggerLegacyFormatOnce[$operation->getClass()] ?? true)) {
             $this->triggerLegacyFormatOnce[$operation->getClass()] = false;
-            trigger_deprecation('api-platform/core', '3.0', sprintf('The special Symfony parameter ".{_format}" in your URI Template is deprecated, use an RFC6570 variable "{._format}" on the class "%s" instead. We will only use the RFC6570 compatible variable in 4.0.', $operation->getClass()));
+            trigger_deprecation('api-platform/core', '3.0', \sprintf('The special Symfony parameter ".{_format}" in your URI Template is deprecated, use an RFC6570 variable "{._format}" on the class "%s" instead. We will only use the RFC6570 compatible variable in 4.0.', $operation->getClass()));
         }
 
         if ($parameters = array_keys($uriVariables)) {
             foreach ($parameters as $parameterName) {
-                $part = sprintf('/{%s}', $parameterName);
+                $part = \sprintf('/{%s}', $parameterName);
                 if (!str_contains($uriTemplate, $part)) {
-                    $uriTemplate .= sprintf('/{%s}', $parameterName);
+                    $uriTemplate .= \sprintf('/{%s}', $parameterName);
                 }
             }
         }
 
-        return sprintf('%s%s', $uriTemplate, $legacyFormat ? '.{_format}' : '{._format}');
+        return \sprintf('%s%s', $uriTemplate, $legacyFormat ? '.{_format}' : '{._format}');
     }
 
     private function configureUriVariables(ApiResource|HttpOperation $operation): ApiResource|HttpOperation

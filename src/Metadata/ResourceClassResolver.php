@@ -50,15 +50,15 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
         }
 
         if (null !== $actualClass && !$this->isResourceClass($actualClass)) {
-            throw new InvalidArgumentException(sprintf('No resource class found for object of type "%s".', $actualClass));
+            throw new InvalidArgumentException(\sprintf('No resource class found for object of type "%s".', $actualClass));
         }
 
         if (null !== $resourceClass && !$this->isResourceClass($resourceClass)) {
-            throw new InvalidArgumentException(sprintf('Specified class "%s" is not a resource class.', $resourceClass));
+            throw new InvalidArgumentException(\sprintf('Specified class "%s" is not a resource class.', $resourceClass));
         }
 
         if ($strict && null !== $actualClass && !is_a($actualClass, $resourceClass, true)) {
-            throw new InvalidArgumentException(sprintf('Object of type "%s" does not match "%s" resource class.', $actualClass, $resourceClass));
+            throw new InvalidArgumentException(\sprintf('Object of type "%s" does not match "%s" resource class.', $actualClass, $resourceClass));
         }
 
         $targetClass = $actualClass ?? $resourceClass;

@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Api;
 
 if (interface_exists(\ApiPlatform\Metadata\FilterInterface::class)) {
-    trigger_deprecation('api-platform', '3.3', sprintf('%s is deprecated in favor of %s. This class will be removed in 4.0.', FilterInterface::class, \ApiPlatform\Metadata\FilterInterface::class));
+    trigger_deprecation('api-platform', '3.3', \sprintf('%s is deprecated in favor of %s. This class will be removed in 4.0.', FilterInterface::class, \ApiPlatform\Metadata\FilterInterface::class));
     class_alias(
         \ApiPlatform\Metadata\FilterInterface::class,
         __NAMESPACE__.'\FilterInterface'

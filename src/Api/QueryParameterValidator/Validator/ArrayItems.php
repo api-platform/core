@@ -44,15 +44,15 @@ final class ArrayItems implements ValidatorInterface
         $nbItems = \count($value);
 
         if (null !== $maxItems && $nbItems > $maxItems) {
-            $errorList[] = sprintf('Query parameter "%s" must contain less than %d values', $name, $maxItems);
+            $errorList[] = \sprintf('Query parameter "%s" must contain less than %d values', $name, $maxItems);
         }
 
         if (null !== $minItems && $nbItems < $minItems) {
-            $errorList[] = sprintf('Query parameter "%s" must contain more than %d values', $name, $minItems);
+            $errorList[] = \sprintf('Query parameter "%s" must contain more than %d values', $name, $minItems);
         }
 
         if (true === $uniqueItems && $nbItems > \count(array_unique($value))) {
-            $errorList[] = sprintf('Query parameter "%s" must contain unique values', $name);
+            $errorList[] = \sprintf('Query parameter "%s" must contain unique values', $name);
         }
 
         return $errorList;
@@ -85,7 +85,7 @@ final class ArrayItems implements ValidatorInterface
             'ssv' => ' ',
             'tsv' => '\t',
             'pipes' => '|',
-            default => throw new \InvalidArgumentException(sprintf('Unknown collection format %s', $collectionFormat)),
+            default => throw new \InvalidArgumentException(\sprintf('Unknown collection format %s', $collectionFormat)),
         };
     }
 }

@@ -36,7 +36,7 @@ final class MultipleOf implements ValidatorInterface
 
         if (null !== $multipleOf && 0 !== ($value % $multipleOf)) {
             return [
-                sprintf('Query parameter "%s" must multiple of %s', $name, $multipleOf),
+                \sprintf('Query parameter "%s" must multiple of %s', $name, $multipleOf),
             ];
         }
 

@@ -51,7 +51,7 @@ class SouinPurgerTest extends TestCase
         $stack = [];
 
         for ($i = $minimum; $i < $number; ++$i) {
-            $stack[] = sprintf('/tags/%d', $i);
+            $stack[] = \sprintf('/tags/%d', $i);
         }
 
         return $stack;
@@ -60,7 +60,7 @@ class SouinPurgerTest extends TestCase
     public function testMultiChunkedTags(): void
     {
         /** @var HttpClientInterface $client */
-        $client = new class() implements ClientInterface {
+        $client = new class implements ClientInterface {
             public array $sentRegexes = [];
 
             public function send(RequestInterface $request, array $options = []): ResponseInterface
@@ -102,7 +102,7 @@ class SouinPurgerTest extends TestCase
     public function testPurgeWithMultipleClients(): void
     {
         /** @var HttpClientInterface $client1 */
-        $client1 = new class() implements ClientInterface {
+        $client1 = new class implements ClientInterface {
             public $requests = [];
 
             public function send(RequestInterface $request, array $options = []): ResponseInterface
@@ -133,7 +133,7 @@ class SouinPurgerTest extends TestCase
             }
         };
         /** @var HttpClientInterface $client2 */
-        $client2 = new class() implements ClientInterface {
+        $client2 = new class implements ClientInterface {
             public $requests = [];
 
             public function send(RequestInterface $request, array $options = []): ResponseInterface

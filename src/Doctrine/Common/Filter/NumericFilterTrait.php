@@ -83,7 +83,7 @@ trait NumericFilterTrait
     {
         if (!is_numeric($value) && (!\is_array($value) || !$this->isNumericArray($value))) {
             $this->getLogger()->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(sprintf('Invalid numeric value for "%s" property', $property)),
+                'exception' => new InvalidArgumentException(\sprintf('Invalid numeric value for "%s" property', $property)),
             ]);
 
             return null;
@@ -102,7 +102,7 @@ trait NumericFilterTrait
 
         if (empty($values)) {
             $this->getLogger()->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(sprintf('At least one value is required, multiple values should be in "%1$s[]=firstvalue&%1$s[]=secondvalue" format', $property)),
+                'exception' => new InvalidArgumentException(\sprintf('At least one value is required, multiple values should be in "%1$s[]=firstvalue&%1$s[]=secondvalue" format', $property)),
             ]);
 
             return null;

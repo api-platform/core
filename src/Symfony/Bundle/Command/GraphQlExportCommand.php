@@ -67,7 +67,7 @@ class GraphQlExportCommand extends Command
         $filename = $input->getOption('output');
         if (\is_string($filename)) {
             file_put_contents($filename, $schemaExport);
-            $io->success(sprintf('Data written to %s.', $filename));
+            $io->success(\sprintf('Data written to %s.', $filename));
         } else {
             $output->writeln($schemaExport);
         }

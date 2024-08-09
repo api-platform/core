@@ -74,6 +74,6 @@ class MakeStateProviderTest extends KernelTestCase
 
     private static function tempFile(string $path): string
     {
-        return sprintf('%s/%s', self::tempDir(), $path);
+        return \sprintf('%s/%s', self::tempDir(), $path);
     }
 }

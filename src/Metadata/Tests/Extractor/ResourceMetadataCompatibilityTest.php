@@ -590,7 +590,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     continue;
                 }
 
-                throw new \RuntimeException(sprintf('Unknown ApiResource parameter "%s".', $parameter));
+                throw new \RuntimeException(\sprintf('Unknown ApiResource parameter "%s".', $parameter));
             }
 
             $resources[] = $resource;
@@ -681,7 +681,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     continue;
                 }
 
-                throw new \RuntimeException(sprintf('Unknown Operation parameter "%s".', $parameter));
+                throw new \RuntimeException(\sprintf('Unknown Operation parameter "%s".', $parameter));
             }
 
             $operationName = $operation->getName() ?? $this->getDefaultOperationName($operation, self::RESOURCE_CLASS);
@@ -715,7 +715,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     continue;
                 }
 
-                throw new \RuntimeException(sprintf('Unknown GraphQlOperation parameter "%s".', $parameter));
+                throw new \RuntimeException(\sprintf('Unknown GraphQlOperation parameter "%s".', $parameter));
             }
 
             $operationName = $operation->getName();
@@ -741,7 +741,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                 return null;
         }
 
-        throw new \LogicException(sprintf('Unsupported "%s" state options.', key($values)));
+        throw new \LogicException(\sprintf('Unsupported "%s" state options.', key($values)));
     }
 
     private function withLinks(array $values): ?array

@@ -55,7 +55,7 @@ final class CollectionProvider implements ProviderInterface
 
         $repository = $manager->getRepository($documentClass);
         if (!$repository instanceof DocumentRepository) {
-            throw new RuntimeException(sprintf('The repository for "%s" must be an instance of "%s".', $documentClass, DocumentRepository::class));
+            throw new RuntimeException(\sprintf('The repository for "%s" must be an instance of "%s".', $documentClass, DocumentRepository::class));
         }
 
         $aggregationBuilder = $repository->createAggregationBuilder();

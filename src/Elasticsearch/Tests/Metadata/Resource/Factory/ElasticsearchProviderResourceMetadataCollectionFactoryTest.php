@@ -54,9 +54,9 @@ class ElasticsearchProviderResourceMetadataCollectionFactoryTest extends TestCas
 
         if (null !== $elasticsearchFlag) {
             $solution = $elasticsearchFlag
-                ? sprintf('Pass an instance of %s to $stateOptions instead', Options::class)
+                ? \sprintf('Pass an instance of %s to $stateOptions instead', Options::class)
                 : 'You will have to remove it when upgrading to v4';
-            $this->expectDeprecation(sprintf('Since api-platform/core 3.1: Setting "elasticsearch" in Operation is deprecated. %s', $solution));
+            $this->expectDeprecation(\sprintf('Since api-platform/core 3.1: Setting "elasticsearch" in Operation is deprecated. %s', $solution));
         }
         $get = (new Get(elasticsearch: $elasticsearchFlag, shortName: 'Foo'));
         $resource = (new ApiResource(operations: ['foo_get' => $get]));

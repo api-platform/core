@@ -114,7 +114,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): never
     {
-        throw new LogicException(sprintf('%s is a read-only format.', self::FORMAT));
+        throw new LogicException(\sprintf('%s is a read-only format.', self::FORMAT));
     }
 
     /**
@@ -305,7 +305,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             return false;
         }
 
-        $key = sprintf(self::DEPTH_KEY_PATTERN, $class, $attribute);
+        $key = \sprintf(self::DEPTH_KEY_PATTERN, $class, $attribute);
         if (!isset($context[$key])) {
             $context[$key] = 1;
 

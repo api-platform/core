@@ -89,7 +89,7 @@ final class JsonApiContext implements Context
     {
         $actual = $this->getValueOfNode($node);
         if (null !== $actual && [] !== $actual) {
-            throw new ExpectationFailedException(sprintf('The node value is `%s`', json_encode($actual, \JSON_THROW_ON_ERROR)));
+            throw new ExpectationFailedException(\sprintf('The node value is `%s`', json_encode($actual, \JSON_THROW_ON_ERROR)));
         }
     }
 
@@ -99,7 +99,7 @@ final class JsonApiContext implements Context
     public function theJsonNodeShouldBeANumber(string $node): void
     {
         if (!is_numeric($actual = $this->getValueOfNode($node))) {
-            throw new ExpectationFailedException(sprintf('The node value is `%s`', json_encode($actual, \JSON_THROW_ON_ERROR)));
+            throw new ExpectationFailedException(\sprintf('The node value is `%s`', json_encode($actual, \JSON_THROW_ON_ERROR)));
         }
     }
 
@@ -109,7 +109,7 @@ final class JsonApiContext implements Context
     public function theJsonNodeShouldNotBeAnEmptyString(string $node): void
     {
         if ('' === $actual = $this->getValueOfNode($node)) {
-            throw new ExpectationFailedException(sprintf('The node value is `%s`', json_encode($actual)));
+            throw new ExpectationFailedException(\sprintf('The node value is `%s`', json_encode($actual)));
         }
     }
 
@@ -122,14 +122,14 @@ final class JsonApiContext implements Context
         $actual = (array) $this->getValueOfNode($node);
 
         if (!\is_array($actual)) {
-            throw new \Exception(sprintf('The "%s" node value is not an array', $node));
+            throw new \Exception(\sprintf('The "%s" node value is not an array', $node));
         }
 
         $expected = $actual;
         ksort($expected);
 
         if ($actual !== $expected) {
-            throw new ExpectationFailedException(sprintf('The json node "%s" is not sorted by keys', $node));
+            throw new ExpectationFailedException(\sprintf('The json node "%s" is not sorted by keys', $node));
         }
     }
 

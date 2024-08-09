@@ -88,7 +88,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
         $entrypointProperty = [
             '@type' => 'hydra:SupportedProperty',
             'hydra:property' => [
-                '@id' => sprintf('#Entrypoint/%s', lcfirst($shortName)),
+                '@id' => \sprintf('#Entrypoint/%s', lcfirst($shortName)),
                 '@type' => 'hydra:Link',
                 'domain' => '#Entrypoint',
                 'rdfs:label' => "The collection of $shortName resources",

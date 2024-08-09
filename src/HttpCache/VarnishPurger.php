@@ -93,7 +93,7 @@ final class VarnishPurger implements PurgerInterface
 preg_quote($iri), $iris);
 
         foreach ($this->chunkRegexParts($parts) as $regex) {
-            $regex = sprintf(self::REGEXP_PATTERN, $regex);
+            $regex = \sprintf(self::REGEXP_PATTERN, $regex);
             $this->banRegex($regex);
         }
     }

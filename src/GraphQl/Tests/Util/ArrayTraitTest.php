@@ -22,7 +22,7 @@ class ArrayTraitTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->arrayTraitClass = (new class() {
+        $this->arrayTraitClass = (new class {
             use ArrayTrait;
         });
     }

@@ -58,7 +58,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
         }
 
         if (!\is_array($resourcesYaml)) {
-            throw new InvalidArgumentException(sprintf('"resources" setting is expected to be null or an array, %s given in "%s".', \gettype($resourcesYaml), $path));
+            throw new InvalidArgumentException(\sprintf('"resources" setting is expected to be null or an array, %s given in "%s".', \gettype($resourcesYaml), $path));
         }
 
         $this->buildResources($resourcesYaml, $path);
@@ -89,7 +89,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                         'graphQlOperations' => $this->buildGraphQlOperations($resourceYamlDatum, $base),
                     ]);
                 } catch (InvalidArgumentException $exception) {
-                    throw new InvalidArgumentException(sprintf('%s in "%s" (%s).', $exception->getMessage(), $resourceName, $path));
+                    throw new InvalidArgumentException(\sprintf('%s in "%s" (%s).', $exception->getMessage(), $resourceName, $path));
                 }
             }
         }
@@ -316,7 +316,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             }
 
             if (!class_exists($class)) {
-                throw new InvalidArgumentException(sprintf('Operation class "%s" does not exist', $class));
+                throw new InvalidArgumentException(\sprintf('Operation class "%s" does not exist', $class));
             }
 
             $datum = $this->buildExtendedBase($operation);
@@ -329,7 +329,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             if (\in_array((string) $class, [GetCollection::class, Post::class], true)) {
                 $datum['itemUriTemplate'] = $this->phpize($operation, 'itemUriTemplate', 'string');
             } elseif (isset($operation['itemUriTemplate'])) {
-                throw new InvalidArgumentException(sprintf('"itemUriTemplate" option is not allowed on a %s operation.', $class));
+                throw new InvalidArgumentException(\sprintf('"itemUriTemplate" option is not allowed on a %s operation.', $class));
             }
 
             $data[] = array_merge($datum, [
@@ -372,7 +372,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             }
 
             if (!class_exists($class)) {
-                throw new InvalidArgumentException(sprintf('Operation class "%s" does not exist', $class));
+                throw new InvalidArgumentException(\sprintf('Operation class "%s" does not exist', $class));
             }
 
             $datum = $this->buildBase($operation);

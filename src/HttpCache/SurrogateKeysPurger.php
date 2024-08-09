@@ -46,7 +46,7 @@ class SurrogateKeysPurger implements PurgerInterface
 
         $chunk = array_shift($iris);
         foreach ($iris as $iri) {
-            $nextChunk = sprintf('%s%s%s', $chunk, $this->separator, $iri);
+            $nextChunk = \sprintf('%s%s%s', $chunk, $this->separator, $iri);
             if (\strlen($nextChunk) <= $this->maxHeaderLength) {
                 $chunk = $nextChunk;
                 continue;
@@ -66,7 +66,7 @@ class SurrogateKeysPurger implements PurgerInterface
     {
         foreach ($this->getChunkedIris($iris) as $chunk) {
             if (\strlen((string) $chunk) > $this->maxHeaderLength) {
-                throw new RuntimeException(sprintf('IRI "%s" is too long to fit current max header length (currently set to "%s"). You can increase it using the "api_platform.http_cache.invalidation.max_header_length" parameter.', $chunk, $this->maxHeaderLength));
+                throw new RuntimeException(\sprintf('IRI "%s" is too long to fit current max header length (currently set to "%s"). You can increase it using the "api_platform.http_cache.invalidation.max_header_length" parameter.', $chunk, $this->maxHeaderLength));
             }
 
             foreach ($this->clients as $client) {

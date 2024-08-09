@@ -86,7 +86,7 @@ abstract class ApiTestCase extends KernelTestCase
                 || null === $objectManager = $container->get('doctrine_mongodb')->getManagerForClass($resourceClass)
             )
         ) {
-            throw new \RuntimeException(sprintf('"%s" only supports classes managed by Doctrine ORM or Doctrine MongoDB ODM. Override this method to implement your own retrieval logic if you don\'t use those libraries.', __METHOD__));
+            throw new \RuntimeException(\sprintf('"%s" only supports classes managed by Doctrine ORM or Doctrine MongoDB ODM. Override this method to implement your own retrieval logic if you don\'t use those libraries.', __METHOD__));
         }
 
         $item = $objectManager->getRepository($resourceClass)->findOneBy($criteria);

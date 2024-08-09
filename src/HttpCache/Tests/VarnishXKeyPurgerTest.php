@@ -104,7 +104,7 @@ class VarnishXKeyPurgerTest extends TestCase
     public function testItChunksHeaderToAvoidHittingVarnishLimit(int $maxHeaderLength, array $iris, array $keysToSend): void
     {
         /** @var HttpClientInterface $client */
-        $client = new class() implements ClientInterface {
+        $client = new class implements ClientInterface {
             public array $sentKeys = [];
 
             public function send(RequestInterface $request, array $options = []): ResponseInterface

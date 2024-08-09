@@ -299,7 +299,7 @@ class AppKernel extends Kernel
 
     protected function build(ContainerBuilder $container): void
     {
-        $container->addCompilerPass(new class() implements CompilerPassInterface {
+        $container->addCompilerPass(new class implements CompilerPassInterface {
             public function process(ContainerBuilder $container): void
             {
                 if ($container->hasDefinition(TailCursorDoctrineODMCommand::class)) { // @phpstan-ignore-line

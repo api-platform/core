@@ -55,7 +55,7 @@ final class HydraContext implements Context
         try {
             $this->getClassInfo($className);
         } catch (\InvalidArgumentException $e) {
-            throw new ExpectationFailedException(sprintf('The class "%s" doesn\'t exist.', $className), null, $e);
+            throw new ExpectationFailedException(\sprintf('The class "%s" doesn\'t exist.', $className), null, $e);
         }
     }
 
@@ -70,7 +70,7 @@ final class HydraContext implements Context
             return;
         }
 
-        throw new ExpectationFailedException(sprintf('The class "%s" exists.', $className));
+        throw new ExpectationFailedException(\sprintf('The class "%s" exists.', $className));
     }
 
     /**
@@ -167,7 +167,7 @@ final class HydraContext implements Context
             return;
         }
 
-        throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" exists.', $propertyName, $className));
+        throw new ExpectationFailedException(\sprintf('Property "%s" of class "%s" exists.', $propertyName, $className));
     }
 
     /**
@@ -176,7 +176,7 @@ final class HydraContext implements Context
     public function assertPropertyIsReadable(string $propertyName, string $className): void
     {
         if (!$this->getPropertyInfo($propertyName, $className)->{'hydra:readable'}) {
-            throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" is not readable', $propertyName, $className));
+            throw new ExpectationFailedException(\sprintf('Property "%s" of class "%s" is not readable', $propertyName, $className));
         }
     }
 
@@ -186,7 +186,7 @@ final class HydraContext implements Context
     public function assertPropertyIsNotReadable(string $propertyName, string $className): void
     {
         if ($this->getPropertyInfo($propertyName, $className)->{'hydra:readable'}) {
-            throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" is readable', $propertyName, $className));
+            throw new ExpectationFailedException(\sprintf('Property "%s" of class "%s" is readable', $propertyName, $className));
         }
     }
 
@@ -196,7 +196,7 @@ final class HydraContext implements Context
     public function assertPropertyIsWritable(string $propertyName, string $className): void
     {
         if (!$this->getPropertyInfo($propertyName, $className)->{'hydra:writeable'}) {
-            throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" is not writable', $propertyName, $className));
+            throw new ExpectationFailedException(\sprintf('Property "%s" of class "%s" is not writable', $propertyName, $className));
         }
     }
 
@@ -206,7 +206,7 @@ final class HydraContext implements Context
     public function assertPropertyIsRequired(string $propertyName, string $className): void
     {
         if (!$this->getPropertyInfo($propertyName, $className)->{'hydra:required'}) {
-            throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" is not required', $propertyName, $className));
+            throw new ExpectationFailedException(\sprintf('Property "%s" of class "%s" is not required', $propertyName, $className));
         }
     }
 
@@ -216,7 +216,7 @@ final class HydraContext implements Context
     public function assertPropertyIsNotRequired(string $propertyName, string $className): void
     {
         if ($this->getPropertyInfo($propertyName, $className)->{'hydra:required'}) {
-            throw new ExpectationFailedException(sprintf('Property "%s" of class "%s" is required', $propertyName, $className));
+            throw new ExpectationFailedException(\sprintf('Property "%s" of class "%s" is required', $propertyName, $className));
         }
     }
 
@@ -233,7 +233,7 @@ final class HydraContext implements Context
             }
         }
 
-        throw new \InvalidArgumentException(sprintf('Property "%s" of class "%s" doesn\'t exist', $propertyName, $className));
+        throw new \InvalidArgumentException(\sprintf('Property "%s" of class "%s" doesn\'t exist', $propertyName, $className));
     }
 
     /**
@@ -249,7 +249,7 @@ final class HydraContext implements Context
             }
         }
 
-        throw new \InvalidArgumentException(sprintf('Operation "%s" of class "%s" doesn\'t exist.', $method, $className));
+        throw new \InvalidArgumentException(\sprintf('Operation "%s" of class "%s" doesn\'t exist.', $method, $className));
     }
 
     /**
@@ -285,7 +285,7 @@ final class HydraContext implements Context
             }
         }
 
-        throw new \InvalidArgumentException(sprintf('Class %s cannot be found in the vocabulary', $className));
+        throw new \InvalidArgumentException(\sprintf('Class %s cannot be found in the vocabulary', $className));
     }
 
     /**

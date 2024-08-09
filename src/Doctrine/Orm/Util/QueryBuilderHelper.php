@@ -57,7 +57,7 @@ final class QueryBuilderHelper
     public static function getEntityClassByAlias(string $alias, QueryBuilder $queryBuilder, ManagerRegistry $managerRegistry): string
     {
         if (!\in_array($alias, $queryBuilder->getAllAliases(), true)) {
-            throw new \LogicException(sprintf('The alias "%s" does not exist in the QueryBuilder.', $alias));
+            throw new \LogicException(\sprintf('The alias "%s" does not exist in the QueryBuilder.', $alias));
         }
 
         $rootAliasMap = self::mapRootAliases($queryBuilder->getRootAliases(), $queryBuilder->getRootEntities());
@@ -73,7 +73,7 @@ final class QueryBuilderHelper
         }
 
         if (null === $metadata) {
-            throw new \LogicException(sprintf('The alias "%s" does not exist in the QueryBuilder.', $alias));
+            throw new \LogicException(\sprintf('The alias "%s" does not exist in the QueryBuilder.', $alias));
         }
 
         return $metadata->getName();
@@ -96,7 +96,7 @@ final class QueryBuilderHelper
             }
         }
 
-        throw new \LogicException(sprintf('The alias "%s" does not exist in the QueryBuilder.', $alias));
+        throw new \LogicException(\sprintf('The alias "%s" does not exist in the QueryBuilder.', $alias));
     }
 
     /**
@@ -122,7 +122,7 @@ final class QueryBuilderHelper
 
         while (null === $apexEntityClass) {
             if (!isset($aliasMap[$currentAlias])) {
-                throw new \LogicException(sprintf('Unknown alias "%s".', $currentAlias));
+                throw new \LogicException(\sprintf('Unknown alias "%s".', $currentAlias));
             }
 
             if (\is_string($aliasMap[$currentAlias])) {
@@ -171,7 +171,7 @@ final class QueryBuilderHelper
 
         foreach ($parts[$rootAlias] as $join) {
             /** @var Join $join */
-            if (sprintf('%s.%s', $alias, $association) === $join->getJoin()) {
+            if (\sprintf('%s.%s', $alias, $association) === $join->getJoin()) {
                 return $join;
             }
         }

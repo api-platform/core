@@ -197,7 +197,7 @@ final class SerializeListener
         }
 
         if (!$this->serializer instanceof EncoderInterface) {
-            throw new RuntimeException(sprintf('The serializer must implement the "%s" interface.', EncoderInterface::class));
+            throw new RuntimeException(\sprintf('The serializer must implement the "%s" interface.', EncoderInterface::class));
         }
 
         $event->setControllerResult($this->serializer->encode($controllerResult, $request->getRequestFormat()));

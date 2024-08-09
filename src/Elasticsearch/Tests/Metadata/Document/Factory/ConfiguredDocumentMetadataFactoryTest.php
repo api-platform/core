@@ -65,7 +65,7 @@ class ConfiguredDocumentMetadataFactoryTest extends TestCase
         $decoratedProphecy->create(Foo::class)->willThrow(new IndexNotFoundException())->shouldBeCalled();
 
         $this->expectException(IndexNotFoundException::class);
-        $this->expectExceptionMessage(sprintf('No index associated with the "%s" resource class.', Foo::class));
+        $this->expectExceptionMessage(\sprintf('No index associated with the "%s" resource class.', Foo::class));
 
         (new ConfiguredDocumentMetadataFactory([], $decoratedProphecy->reveal()))->create(Foo::class);
     }

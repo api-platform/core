@@ -263,12 +263,12 @@ final class OrderFilter extends AbstractFilter implements OrderFilterInterface
         if (null !== $nullsComparison = $this->properties[$property]['nulls_comparison'] ?? $this->orderNullsComparison) {
             $nullsDirection = self::NULLS_DIRECTION_MAP[$nullsComparison][$direction];
 
-            $nullRankHiddenField = sprintf('_%s_%s_null_rank', $alias, str_replace('.', '_', $field));
+            $nullRankHiddenField = \sprintf('_%s_%s_null_rank', $alias, str_replace('.', '_', $field));
 
-            $queryBuilder->addSelect(sprintf('CASE WHEN %s.%s IS NULL THEN 0 ELSE 1 END AS HIDDEN %s', $alias, $field, $nullRankHiddenField));
+            $queryBuilder->addSelect(\sprintf('CASE WHEN %s.%s IS NULL THEN 0 ELSE 1 END AS HIDDEN %s', $alias, $field, $nullRankHiddenField));
             $queryBuilder->addOrderBy($nullRankHiddenField, $nullsDirection);
         }
 
-        $queryBuilder->addOrderBy(sprintf('%s.%s', $alias, $field), $direction);
+        $queryBuilder->addOrderBy(\sprintf('%s.%s', $alias, $field), $direction);
     }
 }
