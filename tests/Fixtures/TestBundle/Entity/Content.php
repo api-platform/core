@@ -37,7 +37,6 @@ class Content implements \JsonSerializable
     #[ORM\OrderBy(['id' => 'ASC'])]
     private Collection|iterable $fields;
     #[ORM\Column(type: 'string')]
-    // @noRector \Rector\Php81\Rector\Property\ReadOnlyPropertyRector
     private string $status = ContentStatus::DRAFT;
 
     public function __construct()
