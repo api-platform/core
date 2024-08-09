@@ -224,11 +224,8 @@ use Symfony\Component\Uid\Uuid as SymfonyUuid;
  */
 final class DoctrineContext implements Context
 {
-    // @noRector \Rector\Php81\Rector\Property\ReadOnlyPropertyRector
     private ObjectManager $manager;
-    // @noRector \Rector\Php81\Rector\Property\ReadOnlyPropertyRector
     private ?SchemaTool $schemaTool;
-    // @noRector \Rector\Php81\Rector\Property\ReadOnlyPropertyRector
     private ?SchemaManager $schemaManager;
 
     /**
@@ -1470,7 +1467,7 @@ final class DoctrineContext implements Context
                 ->count()->getQuery()->execute();
         }
 
-        for ($i = $count + 1; $i <= $nb; ++$i) {
+        for ($i = (int) $count + 1; $i <= $nb; ++$i) {
             $program = $this->isOrm() ? new Program() : new ProgramDocument();
             $program->name = "Lorem ipsum $i";
             $program->date = new \DateTimeImmutable(\sprintf('2015-03-0%dT10:00:00+00:00', $i));
@@ -1518,7 +1515,7 @@ final class DoctrineContext implements Context
                 ->count()->getQuery()->execute();
         }
 
-        for ($i = $count + 1; $i <= $nb; ++$i) {
+        for ($i = (int) $count + 1; $i <= $nb; ++$i) {
             $comment = $this->isOrm() ? new Comment() : new CommentDocument();
             $comment->comment = "Lorem ipsum dolor sit amet $i";
             $comment->date = new \DateTimeImmutable(\sprintf('2015-03-0%dT10:00:00+00:00', $i));

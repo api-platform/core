@@ -95,9 +95,7 @@ class SchemaFactoryTest extends TestCase
         $definitions = $resultSchema->getDefinitions();
         $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
 
-        // @noRector
         $this->assertTrue(isset($definitions[$rootDefinitionKey]));
-        // @noRector
         $this->assertTrue(isset($definitions[$rootDefinitionKey]['properties']));
         $properties = $resultSchema['definitions'][$rootDefinitionKey]['properties'];
         $this->assertArrayHasKey('data', $properties);
@@ -132,7 +130,6 @@ class SchemaFactoryTest extends TestCase
         $definitionName = 'Dummy.jsonapi';
 
         $this->assertNull($resultSchema->getRootDefinitionKey());
-        // @noRector
         $this->assertTrue(isset($resultSchema['properties']));
         $this->assertArrayHasKey('links', $resultSchema['properties']);
         $this->assertArrayHasKey('self', $resultSchema['properties']['links']['properties']);
@@ -160,7 +157,6 @@ class SchemaFactoryTest extends TestCase
         $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonapi', Schema::TYPE_OUTPUT, forceCollection: true);
 
         $this->assertNull($resultSchema->getRootDefinitionKey());
-        // @noRector
         $this->assertTrue(isset($resultSchema['properties']));
         $this->assertArrayHasKey('links', $resultSchema['properties']);
         $this->assertArrayHasKey('self', $resultSchema['properties']['links']['properties']);
