@@ -64,7 +64,7 @@ class SecurityTest extends ApiTestCase
     /** @dataProvider dataSecurityValues */
     public function testSecurityQueryValues(string $parameterValue, int $expectedStatusCode): void
     {
-        self::createClient()->request('GET', sprintf('with_security_parameters_collection?secret=%s', $parameterValue));
+        self::createClient()->request('GET', \sprintf('with_security_parameters_collection?secret=%s', $parameterValue));
         $this->assertResponseStatusCodeSame($expectedStatusCode);
     }
 }

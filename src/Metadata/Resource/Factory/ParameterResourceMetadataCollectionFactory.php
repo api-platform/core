@@ -254,7 +254,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
 
                 $openApi = null;
                 if (isset($definition['openapi'])) {
-                    trigger_deprecation('api-platform/core', '3.4', sprintf('The key "openapi" in a filter description should be a "%s" class or use "schema" to specify the JSON Schema.', OpenApiParameter::class));
+                    trigger_deprecation('api-platform/core', '3.4', \sprintf('The key "openapi" in a filter description should be a "%s" class or use "schema" to specify the JSON Schema.', OpenApiParameter::class));
                     if ($definition['openapi'] instanceof OpenApiParameter) {
                         $openApi = $definition['openapi'];
                     } else {

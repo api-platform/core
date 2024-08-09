@@ -30,7 +30,7 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
     public function __construct(private readonly ?Client $client, private readonly ResourceMetadataCollectionFactoryInterface $decorated, private readonly bool $triggerDeprecation = true, private readonly ?InflectorInterface $inflector = null) // @phpstan-ignore-line
     {
         if ($client) {
-            trigger_deprecation('api-platform/core', '4.0', sprintf('Using $client at "%s" is deprecated and the argument will be removed.', self::class));
+            trigger_deprecation('api-platform/core', '4.0', \sprintf('Using $client at "%s" is deprecated and the argument will be removed.', self::class));
         }
     }
 

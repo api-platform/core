@@ -41,7 +41,7 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
     public function __construct(private readonly CacheItemPoolInterface $subscriptionsCache, private readonly SubscriptionIdentifierGeneratorInterface $subscriptionIdentifierGenerator, private readonly SerializeStageInterface|ProcessorInterface|null $serializeStage = null, private readonly ?IriConverterInterface $iriConverter = null, private readonly ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null)
     {
         if (!$serializeStage instanceof ProcessorInterface) {
-            trigger_deprecation('api-platform/core', '4.0', sprintf('Using an instanceof "%s" is deprecated, use "%s" instead.', SerializeStageInterface::class, ProcessorInterface::class));
+            trigger_deprecation('api-platform/core', '4.0', \sprintf('Using an instanceof "%s" is deprecated, use "%s" instead.', SerializeStageInterface::class, ProcessorInterface::class));
         }
     }
 

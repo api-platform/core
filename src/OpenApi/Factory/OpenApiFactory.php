@@ -82,7 +82,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         $this->paginationOptions = $paginationOptions ?: new PaginationOptions();
 
         if ($jsonSchemaTypeFactory) {
-            trigger_deprecation('api-platform/core', '3.4', sprintf('Injecting the "%s" inside "%s" is deprecated and "%s" will be removed in 4.x.', TypeFactoryInterface::class, self::class, TypeFactoryInterface::class));
+            trigger_deprecation('api-platform/core', '3.4', \sprintf('Injecting the "%s" inside "%s" is deprecated and "%s" will be removed in 4.x.', TypeFactoryInterface::class, self::class, TypeFactoryInterface::class));
             $this->jsonSchemaTypeFactory = $jsonSchemaTypeFactory;
         }
     }
@@ -646,7 +646,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             foreach ($filter->getDescription($entityClass) as $name => $data) {
                 if (isset($data['swagger'])) {
-                    trigger_deprecation('api-platform/core', '4.0', sprintf('Using the "swagger" field of the %s::getDescription() (%s) is deprecated.', $filter::class, $operation->getShortName()));
+                    trigger_deprecation('api-platform/core', '4.0', \sprintf('Using the "swagger" field of the %s::getDescription() (%s) is deprecated.', $filter::class, $operation->getShortName()));
                 }
 
                 if (!isset($data['openapi']) || $data['openapi'] instanceof Parameter) {
@@ -680,7 +680,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     continue;
                 }
 
-                trigger_deprecation('api-platform/core', '4.0', sprintf('Not using "%s" on the "openapi" field of the %s::getDescription() (%s) is deprecated.', Parameter::class, $filter::class, $operation->getShortName()));
+                trigger_deprecation('api-platform/core', '4.0', \sprintf('Not using "%s" on the "openapi" field of the %s::getDescription() (%s) is deprecated.', Parameter::class, $filter::class, $operation->getShortName()));
                 if ($this->jsonSchemaTypeFactory) {
                     $schema = $data['schema'] ?? (\in_array($data['type'], Type::$builtinTypes, true) ? $this->jsonSchemaTypeFactory->getType(new Type($data['type'], false, null, $data['is_collection'] ?? false), 'openapi') : ['type' => 'string']);
                 } else {
