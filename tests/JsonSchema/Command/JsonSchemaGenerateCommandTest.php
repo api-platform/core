@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\JsonSchema\Command;
 
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DocumentDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\ApplicationTester;
@@ -24,6 +25,7 @@ use Symfony\Component\Console\Tester\ApplicationTester;
  */
 class JsonSchemaGenerateCommandTest extends KernelTestCase
 {
+    use ExpectDeprecationTrait;
     private ApplicationTester $tester;
 
     private string $entityClass;
@@ -333,5 +335,18 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
             ],
             $properties['genders']
         );
+    }
+
+    /**
+     * @group legacy
+     * TODO: find a way to keep required properties if needed
+     */
+    public function testPatchSchemaRequiredProperties(): void
+    {
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\PatchRequired\PatchMe', '--format' => 'json']);
+        $result = $this->tester->getDisplay();
+        $json = json_decode($result, associative: true);
+
+        $this->assertEquals(['b'], $json['definitions']['PatchMe']['required']);
     }
 }
