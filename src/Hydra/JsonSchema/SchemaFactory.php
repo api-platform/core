@@ -27,7 +27,6 @@ use ApiPlatform\Metadata\Operation;
 final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareInterface
 {
     private const BASE_PROP = [
-        'readOnly' => true,
         'type' => 'string',
     ];
     private const BASE_PROPS = [
@@ -36,7 +35,6 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     ];
     private const BASE_ROOT_PROPS = [
         '@context' => [
-            'readOnly' => true,
             'oneOf' => [
                 ['type' => 'string'],
                 [
@@ -74,18 +72,29 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             return $schema;
         }
 
-        if ('input' === $type) {
-            return $schema;
+        if (($key = $schema->getRootDefinitionKey() ?? $schema->getItemsDefinitionKey()) !== null) {
+            $postfix = '.'.$type;
+            $definitions = $schema->getDefinitions();
+            $definitions[$key.$postfix] = $definitions[$key];
+            unset($definitions[$key]);
+
+            if (($schema['type'] ?? '') === 'array') {
+                $schema['items']['$ref'] .= $postfix;
+            } else {
+                $schema['$ref'] .= $postfix;
+            }
         }
 
         $definitions = $schema->getDefinitions();
         if ($key = $schema->getRootDefinitionKey()) {
             $definitions[$key]['properties'] = self::BASE_ROOT_PROPS + ($definitions[$key]['properties'] ?? []);
+            $this->makeJsonLdKeywordPropertiesRequired($definitions, $key, $type, true, null === $operation);
 
             return $schema;
         }
         if ($key = $schema->getItemsDefinitionKey()) {
             $definitions[$key]['properties'] = self::BASE_PROPS + ($definitions[$key]['properties'] ?? []);
+            $this->makeJsonLdKeywordPropertiesRequired($definitions, $key, $type, false, null === $operation);
         }
 
         if (($schema['type'] ?? '') === 'array') {
@@ -186,6 +195,27 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     {
         if ($this->schemaFactory instanceof SchemaFactoryAwareInterface) {
             $this->schemaFactory->setSchemaFactory($schemaFactory);
+        }
+    }
+
+    private function makeJsonLdKeywordPropertiesRequired(\ArrayObject $definitions, string $key, string $type, bool $isRoot, bool $isSubSchema): void
+    {
+        if (Schema::TYPE_INPUT === $type) {
+            return;
+        }
+
+        $definitions[$key]['required'] ??= [];
+
+        $requiredProperties = match (true) {
+            $isSubSchema => ['@type'],
+            $isRoot => ['@context', '@id', '@type'],
+            default => ['@id', '@type'],
+        };
+
+        foreach ($requiredProperties as $property) {
+            if (!\in_array($property, $definitions[$key]['required'], true)) {
+                $definitions[$key]['required'][] = $property;
+            }
         }
     }
 }

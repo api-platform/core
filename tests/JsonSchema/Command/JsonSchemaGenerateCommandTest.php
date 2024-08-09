@@ -76,9 +76,9 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--operation' => '_api_/dummies{._format}_post', '--format' => 'jsonld', '--type' => 'input']);
         $result = $this->tester->getDisplay();
 
-        $this->assertStringNotContainsString('@id', $result);
-        $this->assertStringNotContainsString('@context', $result);
-        $this->assertStringNotContainsString('@type', $result);
+        $this->assertStringContainsString('@id', $result);
+        $this->assertStringContainsString('@context', $result);
+        $this->assertStringContainsString('@type', $result);
     }
 
     /**
@@ -103,24 +103,24 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
 
-        $this->assertEquals($json['definitions']['BagOfTests.jsonld-write']['properties']['tests'], [
+        $this->assertEquals($json['definitions']['BagOfTests.jsonld-write.input']['properties']['tests'], [
             'type' => 'string',
             'foo' => 'bar',
         ]);
 
-        $this->assertEquals($json['definitions']['BagOfTests.jsonld-write']['properties']['nonResourceTests'], [
+        $this->assertEquals($json['definitions']['BagOfTests.jsonld-write.input']['properties']['nonResourceTests'], [
             'type' => 'array',
             'items' => [
-                '$ref' => '#/definitions/NonResourceTestEntity.jsonld-write',
+                '$ref' => '#/definitions/NonResourceTestEntity.jsonld-write.input',
             ],
         ]);
 
-        $this->assertEquals($json['definitions']['BagOfTests.jsonld-write']['properties']['description'], [
+        $this->assertEquals($json['definitions']['BagOfTests.jsonld-write.input']['properties']['description'], [
             'maxLength' => 255,
         ]);
 
-        $this->assertEquals($json['definitions']['BagOfTests.jsonld-write']['properties']['type'], [
-            '$ref' => '#/definitions/TestEntity.jsonld-write',
+        $this->assertEquals($json['definitions']['BagOfTests.jsonld-write.input']['properties']['type'], [
+            '$ref' => '#/definitions/TestEntity.jsonld-write.input',
         ]);
     }
 
@@ -130,14 +130,14 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
 
-        $this->assertEquals($json['definitions']['Nest.jsonld']['properties']['owner']['anyOf'], [
-            ['$ref' => '#/definitions/Wren.jsonld'],
-            ['$ref' => '#/definitions/Robin.jsonld'],
+        $this->assertEquals($json['definitions']['Nest.jsonld.output']['properties']['owner']['anyOf'], [
+            ['$ref' => '#/definitions/Wren.jsonld.output'],
+            ['$ref' => '#/definitions/Robin.jsonld.output'],
             ['type' => 'null'],
         ]);
 
-        $this->assertArrayHasKey('Wren.jsonld', $json['definitions']);
-        $this->assertArrayHasKey('Robin.jsonld', $json['definitions']);
+        $this->assertArrayHasKey('Wren.jsonld.output', $json['definitions']);
+        $this->assertArrayHasKey('Robin.jsonld.output', $json['definitions']);
     }
 
     public function testArraySchemaWithMultipleUnionTypesJsonApi(): void
@@ -185,7 +185,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
 
-        $this->assertEquals($json['definitions']['Foo.jsonld']['properties']['expiration'], ['type' => 'string', 'format' => 'date']);
+        $this->assertEquals($json['definitions']['Foo.jsonld.output']['properties']['expiration'], ['type' => 'string', 'format' => 'date']);
     }
 
     /**
@@ -197,7 +197,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
 
-        $this->assertEquals($json['definitions']['SaveProduct.jsonld']['properties']['codes']['items']['$ref'], '#/definitions/ProductCode.jsonld');
+        $this->assertEquals($json['definitions']['SaveProduct.jsonld.input']['properties']['codes']['items']['$ref'], '#/definitions/ProductCode.jsonld.input');
     }
 
     /**
@@ -209,8 +209,8 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
 
-        $this->assertEquals('#/definitions/DummyFriend', $json['definitions']['Issue6299.Issue6299OutputDto.jsonld']['properties']['itemDto']['$ref']);
-        $this->assertEquals('#/definitions/DummyDate', $json['definitions']['Issue6299.Issue6299OutputDto.jsonld']['properties']['collectionDto']['items']['$ref']);
+        $this->assertEquals('#/definitions/DummyFriend', $json['definitions']['Issue6299.Issue6299OutputDto.jsonld.output']['properties']['itemDto']['$ref']);
+        $this->assertEquals('#/definitions/DummyDate', $json['definitions']['Issue6299.Issue6299OutputDto.jsonld.output']['properties']['collectionDto']['items']['$ref']);
     }
 
     /**
@@ -222,7 +222,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
 
-        $this->assertArrayHasKey('@id', $json['definitions']['ThirdLevel.jsonld-friends']['properties']);
+        $this->assertArrayHasKey('@id', $json['definitions']['ThirdLevel.jsonld-friends.output']['properties']);
     }
 
     public function testJsonApiIncludesSchema(): void
@@ -280,7 +280,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6317\Issue6317', '--type' => 'output', '--format' => 'jsonld']);
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
-        $properties = $json['definitions']['Issue6317.jsonld']['properties'];
+        $properties = $json['definitions']['Issue6317.jsonld.output']['properties'];
 
         $this->assertArrayHasKey('example', $properties['id']);
         $this->assertArrayHasKey('example', $properties['name']);
@@ -295,7 +295,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ResourceWithEnumProperty', '--type' => 'output', '--format' => 'jsonld']);
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
-        $properties = $json['definitions']['ResourceWithEnumProperty.jsonld']['properties'];
+        $properties = $json['definitions']['ResourceWithEnumProperty.jsonld.output']['properties'];
 
         $this->assertSame(
             [

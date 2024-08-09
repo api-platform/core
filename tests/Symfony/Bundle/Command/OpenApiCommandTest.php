@@ -134,7 +134,7 @@ YAML;
         };
 
         $assertExample($json['components']['schemas']['Issue6317']['properties'], 'id');
-        $assertExample($json['components']['schemas']['Issue6317.jsonld']['properties'], 'id');
+        $assertExample($json['components']['schemas']['Issue6317.jsonld.output']['properties'], 'id');
         $assertExample($json['components']['schemas']['Issue6317.jsonapi']['properties']['data']['properties']['attributes']['properties'], '_id');
         $assertExample($json['components']['schemas']['Issue6317.jsonhal']['properties'], 'id');
     }
