@@ -1,5 +1,15 @@
 # Changelog
 
+## v4.0.0-alpha.1
+
+### Bug fixes
+
+* [f7f9f5427](https://github.com/api-platform/core/commit/f7f9f542719ad43d6e0fe74024a2fa05c11cb6fa) fix(laravel): phpstan/doc-parser is mandatory
+
+### Features
+
+* [0d5f35683](https://github.com/api-platform/core/commit/0d5f356839eb6aa9f536044abe4affa736553e76) feat(laravel): laravel component (#5882)
+
 ## v3.4.0-alpha.1
 
 ### Bug fixes
