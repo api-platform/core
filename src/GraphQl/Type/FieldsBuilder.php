@@ -47,7 +47,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumInterface
+final class FieldsBuilder implements FieldsBuilderEnumInterface
 {
     private readonly ContextAwareTypeBuilderInterface $typeBuilder;
 

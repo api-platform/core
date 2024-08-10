@@ -195,15 +195,10 @@ final class TypeBuilder implements ContextAwareTypeBuilderInterface
             return $this->typesContainer->get($enumName);
         }
 
-        /** @var FieldsBuilderEnumInterface|FieldsBuilderInterface $fieldsBuilder */
+        /** @var FieldsBuilderEnumInterface $fieldsBuilder */
         $fieldsBuilder = $this->fieldsBuilderLocator->get('api_platform.graphql.fields_builder');
         $enumCases = [];
-        // Remove the condition in API Platform 4.
-        if ($fieldsBuilder instanceof FieldsBuilderEnumInterface) {
-            $enumCases = $fieldsBuilder->getEnumFields($operation->getClass());
-        } else {
-            @trigger_error(\sprintf('api_platform.graphql.fields_builder service implementing "%s" is deprecated since API Platform 3.1. It has to implement "%s" instead.', FieldsBuilderInterface::class, FieldsBuilderEnumInterface::class), \E_USER_DEPRECATED);
-        }
+        $enumCases = $fieldsBuilder->getEnumFields($operation->getClass());
 
         $enumConfig = [
             'name' => $enumName,
