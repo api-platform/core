@@ -23,8 +23,8 @@
     ],
     "require": {
         "php": ">=8.1",
-        "api-platform/metadata": "*@dev || ^3.2 || ^4.0",
-        "api-platform/state": "*@dev || ^3.2 || ^4.0",
+        "api-platform/metadata": "@dev || ^3.2 || ^4.0",
+        "api-platform/state": "@dev || ^3.2 || ^4.0",
         "doctrine/collections": "^2.1",
         "doctrine/common": "^3.2.2",
         "doctrine/persistence": "^3.2"
@@ -32,7 +32,7 @@
     "require-dev": {
         "doctrine/mongodb-odm": "^2.6",
         "doctrine/orm": "^2.17 || ^3.0",
-        "phpspec/prophecy-phpunit": "^2.0",
+        "phpspec/prophecy-phpunit": "^2.2",
         "phpunit/phpunit": "^11.2",
         "symfony/phpunit-bridge": "^6.4 || ^7.0"
     },

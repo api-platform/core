@@ -36,17 +36,17 @@
         "symfony/type-info": "^7.1"
     },
     "require-dev": {
-        "api-platform/json-schema": "*@dev || ^3.1 || ^4.0",
-        "api-platform/openapi": "*@dev || ^3.1 || ^4.0",
-        "api-platform/state": "*@dev || ^3.1 || ^4.0",
-        "phpspec/prophecy-phpunit": "^2.0",
-        "phpstan/phpdoc-parser": "^1.16",
+        "api-platform/json-schema": "@dev || ^3.2 || ^4.0",
+        "api-platform/openapi": "@dev || ^3.2 || ^4.0",
+        "api-platform/state": "@dev || ^3.2 || ^4.0",
+        "phpspec/prophecy-phpunit": "^2.2",
+        "phpstan/phpdoc-parser": "^1.13",
         "phpunit/phpunit": "^11.2",
-        "symfony/config": "^6.4 || 7.0",
-        "symfony/routing": "^6.4 || ^7.0",
+        "symfony/config": "^6.4 || ^7.1",
+        "symfony/routing": "^6.4 || ^7.1",
         "symfony/var-dumper": "^6.4 || ^7.0",
         "symfony/web-link": "^6.4 || ^7.0",
-        "symfony/yaml": "^6.4 || ^7.0"
+        "symfony/yaml": "^6.4 || ^7.1"
     },
     "suggest": {
         "phpstan/phpdoc-parser": "For PHP documentation support.",
