@@ -36,9 +36,9 @@
         "symfony/serializer": "^6.4 || ^7.1"
     },
     "require-dev": {
-        "api-platform/doctrine-common": "*@dev || ^3.2",
-        "api-platform/doctrine-odm": "*@dev || ^3.2",
-        "api-platform/doctrine-orm": "*@dev || ^3.2",
+        "api-platform/doctrine-common": "*@dev || ^3.2 || ^4.0",
+        "api-platform/doctrine-odm": "*@dev || ^3.2 || ^4.0",
+        "api-platform/doctrine-orm": "*@dev || ^3.2 || ^4.0",
         "phpspec/prophecy-phpunit": "^2.0",
         "phpunit/phpunit": "^11.2",
         "symfony/phpunit-bridge": "^6.4 || ^7.0"

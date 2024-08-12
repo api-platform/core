@@ -29,7 +29,7 @@
         "symfony/property-info": "^6.4 || ^7.1"
     },
     "require-dev": {
-        "api-platform/parameter-validator": "*@dev || ^3.2",
+        "api-platform/parameter-validator": "*@dev || ^3.2 || ^4.0",
         "phpspec/prophecy-phpunit": "^2.0",
         "phpunit/phpunit": "^11.2",
         "ramsey/uuid": "^4.7",
