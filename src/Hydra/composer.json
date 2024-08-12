@@ -28,21 +28,21 @@
     ],
     "require": {
         "php": ">=8.1",
-        "api-platform/documentation": "*@dev || ^3.2 || ^4.0",
-        "api-platform/json-schema": "*@dev || ^3.2 || ^4.0",
-        "api-platform/jsonld": "*@dev || ^3.2 || ^4.0",
-        "api-platform/metadata": "*@dev || ^3.2 || ^4.0",
-        "api-platform/serializer": "*@dev || ^3.2 || ^4.0",
-        "api-platform/state": "*@dev || ^3.2 || ^4.0",
+        "api-platform/documentation": "@dev || ^3.2 || ^4.0",
+        "api-platform/json-schema": "@dev || ^3.2 || ^4.0",
+        "api-platform/jsonld": "@dev || ^3.2 || ^4.0",
+        "api-platform/metadata": "@dev || ^3.2 || ^4.0",
+        "api-platform/serializer": "@dev || ^3.2 || ^4.0",
+        "api-platform/state": "@dev || ^3.2 || ^4.0",
         "symfony/web-link": "^6.4 || ^7.1"
     },
     "require-dev": {
-        "api-platform/doctrine-common": "*@dev || ^3.2 || ^4.0",
-        "api-platform/doctrine-odm": "*@dev || ^3.2 || ^4.0",
-        "api-platform/doctrine-orm": "*@dev || ^3.2 || ^4.0",
+        "api-platform/doctrine-common": "@dev || ^3.2 || ^4.0",
+        "api-platform/doctrine-odm": "@dev || ^3.2 || ^4.0",
+        "api-platform/doctrine-orm": "@dev || ^3.2 || ^4.0",
         "phpspec/prophecy": "^1.19",
         "phpspec/prophecy-phpunit": "^2.2",
-        "phpunit/phpunit": "^10"
+        "phpunit/phpunit": "^11.2"
     },
     "autoload": {
         "psr-4": {

@@ -19,15 +19,15 @@
     ],
     "require": {
         "php": ">=8.1",
-        "api-platform/documentation": "*@dev || ^4.0",
-        "api-platform/hydra": "*@dev || ^4.0",
-        "api-platform/json-schema": "*@dev || ^4.0",
-        "api-platform/jsonld": "*@dev || ^4.0",
-        "api-platform/json-api": "*@dev || ^4.0",
-        "api-platform/metadata": "*@dev || ^4.0",
-        "api-platform/openapi": "*@dev || ^4.0",
-        "api-platform/serializer": "*@dev || ^4.0",
-        "api-platform/state": "*@dev || ^4.0",
+        "api-platform/documentation": "@dev || ^4.0",
+        "api-platform/hydra": "@dev || ^4.0",
+        "api-platform/json-schema": "@dev || ^4.0",
+        "api-platform/jsonld": "@dev || ^4.0",
+        "api-platform/json-api": "@dev || ^4.0",
+        "api-platform/metadata": "@dev || ^4.0",
+        "api-platform/openapi": "@dev || ^4.0",
+        "api-platform/serializer": "@dev || ^4.0",
+        "api-platform/state": "@dev || ^4.0",
         "illuminate/config": "^11.0",
         "laravel/framework": "^11.0",
         "illuminate/contracts": "^11.0",
@@ -42,10 +42,10 @@
         "phpstan/phpdoc-parser": "^1.29"
     },
     "require-dev": {
-        "doctrine/dbal": "^3.7",
+        "doctrine/dbal": "^4.0",
         "larastan/larastan": "^2.0",
-        "orchestra/testbench": "^9.12",
-        "phpunit/phpunit": "^10"
+        "orchestra/testbench": "^9.1",
+        "phpunit/phpunit": "^11.2"
     },
     "autoload": {
         "psr-4": {
@@ -73,42 +73,6 @@
             "dev-3.4": "3.4.x-dev"
         }
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../Metadata"
-        },
-        {
-            "type": "path",
-            "url": "../State"
-        },
-        {
-            "type": "path",
-            "url": "../Serializer"
-        },
-        {
-            "type": "path",
-            "url": "../Hydra"
-        },
-        {
-            "type": "path",
-            "url": "../JsonLd"
-        },
-        {
-            "type": "path",
-            "url": "../Documentation"
-        },
-        {
-            "type": "path",
-            "url": "../OpenApi"
-        },
-        {
-            "type": "path",
-            "url": "../JsonSchema"
-        }
-    ],
     "autoload-dev": {
         "psr-4": {
             "Workbench\\App\\": "workbench/app/",
