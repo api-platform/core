@@ -45,9 +45,9 @@
         "symfony/validator": "^6.4 || ^7.0",
         "symfony/mercure-bundle": "*",
         "webonyx/graphql-php": "^14.0 || ^15.0",
-        "api-platform/doctrine-common": "*@dev || ^3.2",
-        "api-platform/doctrine-orm": "*@dev || ^3.2",
-        "api-platform/doctrine-odm": "*@dev || ^3.2"
+        "api-platform/doctrine-common": "*@dev || ^3.2 || ^4.0",
+        "api-platform/doctrine-orm": "*@dev || ^3.2 || ^4.0",
+        "api-platform/doctrine-odm": "*@dev || ^3.2 || ^4.0"
     },
     "autoload": {
         "psr-4": {
