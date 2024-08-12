@@ -61,7 +61,8 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "3.3.x-dev"
+            "dev-main": "4.0.x-dev",
+            "dev-3.4": "3.4.x-dev"
         },
         "symfony": {
             "require": "^6.1"

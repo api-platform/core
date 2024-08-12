@@ -67,6 +67,10 @@
             "providers": [
                 "ApiPlatform\\Laravel\\ApiPlatformProvider"
             ]
+        },
+        "branch-alias": {
+            "dev-main": "4.0.x-dev",
+            "dev-3.4": "3.4.x-dev"
         }
     },
     "minimum-stability": "dev",
