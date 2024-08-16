@@ -14,18 +14,45 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\PostWithCollectionIri;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\PostWithCollectionIriItem;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6465\Bar;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6465\Foo;
+use ApiPlatform\Tests\RecreateSchemaTrait;
+use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 
 class JsonLd extends ApiTestCase
 {
+    use RecreateSchemaTrait;
+    use SetupClassResourcesTrait;
+
+    /**
+     * @return class-string[]
+     */
+    public static function getResources(): array
+    {
+        return [Foo::class, Bar::class, PostWithCollectionIri::class, PostWithCollectionIriItem::class];
+    }
+
     /**
      * The input DTO denormalizes an existing Doctrine entity.
      */
     public function testIssue6465(): void
     {
+        $this->recreateSchema([Foo::class, Bar::class]);
+        $registry = static::getContainer()->get('doctrine')->getManager();
+        $foo->title = 'Foo';
+        $manager->persist($foo);
+        $bar = new Bar();
+        $bar->title = 'Bar one';
+        $manager->persist($bar);
+        $bar2 = new Bar();
+        $bar2->title = 'Bar two';
+        $manager->persist($bar2);
+        $manager->flush();
+
         $container = static::getContainer();
         if ('mongodb' === $container->getParameter('kernel.environment')) {
             $this->markTestSkipped();
@@ -39,53 +66,16 @@ class JsonLd extends ApiTestCase
         $this->assertEquals('Bar two', $res['title']);
     }
 
-    protected function setUp(): void
+    public function testPostWithCollectionIri(): void
     {
-        self::bootKernel();
+        $response = self::createClient()->request('POST', '/post_with_iri_collection/1/slug', [
+            'json' => [],
+        ]);
 
-        $container = static::getContainer();
-        $registry = $container->get('doctrine');
-        $manager = $registry->getManager();
-        if (!$manager instanceof EntityManagerInterface) {
-            return;
-        }
-
-        $classes = [];
-        foreach ([Foo::class, Bar::class] as $entityClass) {
-            $classes[] = $manager->getClassMetadata($entityClass);
-        }
-
-        $schemaTool = new SchemaTool($manager);
-        @$schemaTool->createSchema($classes);
-
-        $foo = new Foo();
-        $foo->title = 'Foo';
-        $manager->persist($foo);
-        $bar = new Bar();
-        $bar->title = 'Bar one';
-        $manager->persist($bar);
-        $bar2 = new Bar();
-        $bar2->title = 'Bar two';
-        $manager->persist($bar2);
-        $manager->flush();
-    }
-
-    protected function tearDown(): void
-    {
-        $container = static::getContainer();
-        $registry = $container->get('doctrine');
-        $manager = $registry->getManager();
-        if (!$manager instanceof EntityManagerInterface) {
-            return;
-        }
-
-        $classes = [];
-        foreach ([Foo::class, Bar::class] as $entityClass) {
-            $classes[] = $manager->getClassMetadata($entityClass);
-        }
-
-        $schemaTool = new SchemaTool($manager);
-        @$schemaTool->dropSchema($classes);
-        parent::tearDown();
+        $res = $response->toArray(false);
+        dd($res);
+        $this->assertEquals($res['@id'], '/post_with_iri_collection/1/slug');
+        $this->assertEquals($res['hydra:member'][0]['id'], '/post_with_iri_collection_item/1');
+        $this->assertEquals($res['hydra:member'][1]['id'], '/post_with_iri_collection_item/2');
     }
 }
