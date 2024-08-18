@@ -78,9 +78,17 @@ final class PropertySchemaChoiceRestriction implements PropertySchemaRestriction
      */
     public function supports(Constraint $constraint, ApiProperty $propertyMetadata): bool
     {
-        $types = array_map(fn (Type $type) => $type->getBuiltinType(), $propertyMetadata->getBuiltinTypes() ?? []);
+        $types = array_map(static fn (Type $type) => $type->getBuiltinType(), $propertyMetadata->getBuiltinTypes() ?? []);
         if ($propertyMetadata->getExtraProperties()['nested_schema'] ?? false) {
             $types = [Type::BUILTIN_TYPE_STRING];
+        }
+
+        if (
+            null !== ($builtinType = $propertyMetadata->getBuiltinTypes()[0] ?? null)
+            && $builtinType->isCollection()
+            && \count($builtinType->getCollectionValueTypes())
+        ) {
+            $types = array_unique(array_merge($types, array_map(static fn (Type $type) => $type->getBuiltinType(), $builtinType->getCollectionValueTypes())));
         }
 
         return $constraint instanceof Choice && \count($types) && array_intersect($types, [Type::BUILTIN_TYPE_STRING, Type::BUILTIN_TYPE_INT, Type::BUILTIN_TYPE_FLOAT]);
