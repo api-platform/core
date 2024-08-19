@@ -49,7 +49,7 @@ final class SecurityParameterProvider implements ProviderInterface
                 continue;
             }
 
-            $securityContext = [$parameter->getKey() => $v, 'object' => $body];
+            $securityContext = [$parameter->getKey() => $v, 'object' => $body, 'operation' => $operation];
             if (!$this->resourceAccessChecker->isGranted($context['resource_class'], $security, $securityContext)) {
                 throw $operation instanceof GraphQlOperation ? new AccessDeniedHttpException($parameter->getSecurityMessage() ?? 'Access Denied.') : new AccessDeniedException($parameter->getSecurityMessage() ?? 'Access Denied.');
             }

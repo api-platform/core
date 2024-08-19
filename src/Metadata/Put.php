@@ -94,7 +94,9 @@ final class Put extends HttpOperation
         $processor = null,
         ?OptionsInterface $stateOptions = null,
         array|Parameters|null $parameters = null,
-        array|string|null $rules = null,
+        mixed $rules = null,
+        ?string $policy = null,
+        array|string|null $middleware = null,
         array $extraProperties = [],
         private ?bool $allowCreate = null,
     ) {
@@ -173,6 +175,8 @@ final class Put extends HttpOperation
             stateOptions: $stateOptions,
             parameters: $parameters,
             rules: $rules,
+            policy: $policy,
+            middleware: $middleware,
             extraProperties: $extraProperties
         );
     }

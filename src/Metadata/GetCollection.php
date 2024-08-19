@@ -95,6 +95,8 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
         ?OptionsInterface $stateOptions = null,
         array|Parameters|null $parameters = null,
         array|string|null $rules = null,
+        ?string $policy = null,
+        array|string|null $middleware = null,
         array $extraProperties = [],
         private ?string $itemUriTemplate = null,
     ) {
@@ -172,6 +174,8 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
             parameters: $parameters,
             extraProperties: $extraProperties,
             rules: $rules,
+            policy: $policy,
+            middleware: $middleware,
             stateOptions: $stateOptions,
         );
     }

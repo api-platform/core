@@ -1,8 +1,10 @@
 providers:
     - ApiPlatform\Laravel\ApiPlatformProvider
+    - Laravel\Sanctum\SanctumServiceProvider
     - Workbench\App\Providers\WorkbenchServiceProvider
 
 migrations:
+    - vendor/laravel/sanctum/database/migrations
     - workbench/database/migrations
 
 seeders:

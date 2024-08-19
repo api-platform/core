@@ -23,6 +23,8 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\ContentNegotiationTrait;
 use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionsHandler;
 use Illuminate\Http\Request;
@@ -30,7 +32,7 @@ use Negotiation\Negotiator;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface as SymfonyHttpExceptionInterface;
 
-class Handler extends ExceptionsHandler
+class ErrorHandler extends ExceptionsHandler
 {
     use ContentNegotiationTrait;
     use OperationRequestInitiatorTrait;
@@ -152,6 +154,18 @@ class Handler extends ExceptionsHandler
             if (is_a($exception::class, $class, true)) {
                 return $status;
             }
+        }
+
+        if ($exception instanceof AuthenticationException) {
+            return 401;
+        }
+
+        if ($exception instanceof AuthorizationException) {
+            return 403;
+        }
+
+        if ($exception instanceof SymfonyHttpExceptionInterface) {
+            return $exception->getStatusCode();
         }
 
         if ($exception instanceof SymfonyHttpExceptionInterface) {

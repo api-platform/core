@@ -199,6 +199,8 @@ class HttpOperation extends Operation
         ?OptionsInterface $stateOptions = null,
         array|Parameters|null $parameters = null,
         array|string|null $rules = null,
+        ?string $policy = null,
+        array|string|null $middleware = null,
         ?bool $queryParameterValidationEnabled = null,
         array $extraProperties = [],
     ) {
@@ -249,6 +251,8 @@ class HttpOperation extends Operation
             stateOptions: $stateOptions,
             parameters: $parameters,
             rules: $rules,
+            policy: $policy,
+            middleware: $middleware,
             queryParameterValidationEnabled: $queryParameterValidationEnabled,
             extraProperties: $extraProperties
         );
