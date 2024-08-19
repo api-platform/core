@@ -28,17 +28,17 @@
     ],
     "require": {
         "php": ">=8.1",
-        "api-platform/json-schema": "@dev || ^3.2 || ^4.0",
-        "api-platform/metadata": "@dev || ^3.2 || ^4.0",
-        "api-platform/state": "@dev || ^3.2 || ^4.0",
+        "api-platform/json-schema": "^3.2 || ^4.0",
+        "api-platform/metadata": "^3.2 || ^4.0",
+        "api-platform/state": "^3.2 || ^4.0",
         "symfony/console": "^6.4 || ^7.0",
         "symfony/property-access": "^6.4 || ^7.1",
         "symfony/serializer": "^6.4 || ^7.1"
     },
     "require-dev": {
-        "api-platform/doctrine-common": "@dev || ^3.2 || ^4.0",
-        "api-platform/doctrine-odm": "@dev || ^3.2 || ^4.0",
-        "api-platform/doctrine-orm": "@dev || ^3.2 || ^4.0",
+        "api-platform/doctrine-common": "^3.2 || ^4.0",
+        "api-platform/doctrine-odm": "^3.2 || ^4.0",
+        "api-platform/doctrine-orm": "^3.2 || ^4.0",
         "phpspec/prophecy-phpunit": "^2.2",
         "phpunit/phpunit": "^11.2",
         "symfony/phpunit-bridge": "^6.4 || ^7.0"

@@ -62,7 +62,10 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
-        run: composer update --no-interaction --no-progress --ansi
+        run: |
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link .
       - run: composer check-dependencies
 
   php-cs-fixer:
@@ -119,7 +122,9 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
-          composer update --no-interaction --no-progress --ansi
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link .
       - name: Run container lint
         run: tests/Fixtures/app/console lint:container
 
@@ -156,7 +161,9 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
-          composer update --no-interaction --no-progress --ansi
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link .
       - name: Cache PHPStan results
         uses: actions/cache@v4
         with:
@@ -175,9 +182,10 @@ jobs:
           ./vendor/bin/phpstan --version
           ./vendor/bin/phpstan analyse --no-interaction --no-progress --ansi
       - name: Install Laravel
+        working-directory: 'src/Laravel'
         run: |
-          composer api-platform/laravel update
-          composer api-platform/laravel run-script build
+          composer global link ../../ --working-directory=$(pwd)
+          composer run-script build
       - name: Run PHPStan analysis (laravel)
         working-directory: 'src/Laravel'
         run: |
@@ -219,7 +227,10 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
-        run: composer update --no-interaction --no-progress --ansi
+        run: |
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link .
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
@@ -294,7 +305,9 @@ jobs:
           ini-values: memory_limit=-1
       - name: Run ${{ matrix.component }} install
         run: |
-          composer update
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link . --permanent
           composer ${{matrix.component}} update
       - name: Run ${{ matrix.component }} tests
         run: |
@@ -364,7 +377,10 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
-        run: composer update --no-interaction --no-progress --ansi
+        run: |
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link .
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests (PHP ${{ matrix.php }})
@@ -465,7 +481,10 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
-        run: composer update --no-interaction --no-progress --ansi
+        run: |
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link .
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
@@ -513,7 +532,10 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
-        run: composer update --no-interaction --no-progress --ansi
+        run: |
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link .
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
@@ -563,8 +585,10 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: |
-          composer update --no-interaction --no-progress --ansi
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer require --dev doctrine/mongodb-odm-bundle
+          composer global link .
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
@@ -654,7 +678,10 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
-        run: composer update --no-interaction --no-progress --ansi
+        run: |
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link .
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
@@ -737,7 +764,10 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
-        run: composer update --no-interaction --no-progress --ansi
+        run: |
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link .
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
@@ -773,7 +803,10 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
-        run: composer update --no-interaction --no-progress --ansi
+        run: |
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link .
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
@@ -813,7 +846,10 @@ jobs:
       - name: Remove cache
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Update project dependencies
-        run: composer update --no-interaction --no-progress --ansi
+        run: |
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link .
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
@@ -855,7 +891,10 @@ jobs:
       - name: Remove cache
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Update project dependencies
-        run: composer update --no-interaction --no-progress --ansi
+        run: |
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link .
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
@@ -901,8 +940,12 @@ jobs:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
+      # TODO: fix pmu windows path directory
       - name: Update project dependencies
-        run: composer update --no-interaction --no-progress --ansi
+        run: |
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link . --working-directory=${{ github.workspace }}
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
@@ -940,7 +983,11 @@ jobs:
       - name: Remove cache
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Update project dependencies
-        run: composer update --prefer-lowest --no-interaction --no-progress --ansi
+        run: |
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link . --permanent
+          composer update --prefer-lowest
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
@@ -982,7 +1029,11 @@ jobs:
       - name: Remove cache
         run: rm -Rf tests/Fixtures/app/var/cache/*
       - name: Update project dependencies
-        run: composer update --prefer-lowest --no-interaction --no-progress --ansi
+        run: |
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link . --permanent
+          composer update --prefer-lowest
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
@@ -1026,7 +1077,10 @@ jobs:
         if: matrix.coverage
         run: echo "COVERAGE=1" >> $GITHUB_ENV
       - name: Update project dependencies
-        run: composer update --no-interaction --no-progress --ansi
+        run: |
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link .
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
@@ -1095,7 +1149,10 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
-        run: composer update --no-interaction --no-progress --ansi
+        run: |
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link .
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests (PHP 8)
@@ -1155,9 +1212,11 @@ jobs:
           tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
           ini-values: memory_limit=-1
-      - name: Run ${{ matrix.component }} install
+      - name: Update project dependencies
         run: |
-          composer update
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link . --permanent
           composer api-platform/laravel update
       - name: PHP version tweaks
         run: |

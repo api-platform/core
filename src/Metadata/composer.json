@@ -36,9 +36,9 @@
         "symfony/type-info": "^7.1"
     },
     "require-dev": {
-        "api-platform/json-schema": "@dev || ^3.2 || ^4.0",
-        "api-platform/openapi": "@dev || ^3.2 || ^4.0",
-        "api-platform/state": "@dev || ^3.2 || ^4.0",
+        "api-platform/json-schema": "^3.2 || ^4.0",
+        "api-platform/openapi": "^3.2 || ^4.0",
+        "api-platform/state": "^3.2 || ^4.0",
         "phpspec/prophecy-phpunit": "^2.2",
         "phpstan/phpdoc-parser": "^1.13",
         "phpunit/phpunit": "^11.2",
