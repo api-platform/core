@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
- * Use Doctrine metadata to populate the identifier property.
+ * Uses Eloquent metadata to populate the identifier property.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
