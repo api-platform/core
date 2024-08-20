@@ -31,7 +31,7 @@ return [
 
     'formats' => [
         'jsonld' => ['application/ld+json'],
-        'jsonapi' => ['application/vnd.api+json'],
+        //'jsonapi' => ['application/vnd.api+json'],
     ],
 
     'patch_formats' => [
@@ -39,10 +39,10 @@ return [
     ],
 
     'docs_formats' => [
-        'jsonopenapi' => ['application/vnd.openapi+json'],
-        'json' => ['application/json'],
         'jsonld' => ['application/ld+json'],
+        'jsonopenapi' => ['application/vnd.openapi+json'],
         'html' => ['text/html'],
+        //'json' => ['application/json'],
     ],
 
     'error_formats' => [
