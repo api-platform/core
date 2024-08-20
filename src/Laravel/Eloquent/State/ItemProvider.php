@@ -31,8 +31,7 @@ final class ItemProvider implements ProviderInterface
     public function __construct(
         private readonly LinksHandlerInterface $linksHandler,
         ?ContainerInterface $handleLinksLocator = null,
-    )
-    {
+    ) {
         $this->handleLinksLocator = $handleLinksLocator;
     }
 
