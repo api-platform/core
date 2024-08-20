@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>API Platform - @yield('title')</title>
+        <title>{{ config('api-platform.title') }} - API Platform</title>
         <link rel="stylesheet" href="/vendor/api-platform/fonts/open-sans/400.css">
         <link rel="stylesheet" href="/vendor/api-platform/fonts/open-sans/700.css">
         <link rel="stylesheet" href="/vendor/api-platform/swagger-ui/swagger-ui.css">
