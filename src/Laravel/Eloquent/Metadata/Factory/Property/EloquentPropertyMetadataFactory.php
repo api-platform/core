@@ -69,7 +69,7 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
             $type = match ($builtinType) {
                 'datetime', 'date' => new Type(Type::BUILTIN_TYPE_OBJECT, $p['nullable'], \DateTime::class),
                 'immutable_datetime', 'immutable_date' => new Type(Type::BUILTIN_TYPE_OBJECT, $p['nullable'], \DateTimeImmutable::class),
-                default => new Type(\in_array($builtinType, Type::$builtinTypes, true)  ? $builtinType : Type::BUILTIN_TYPE_STRING, $p['nullable']),
+                default => new Type(\in_array($builtinType, Type::$builtinTypes, true) ? $builtinType : Type::BUILTIN_TYPE_STRING, $p['nullable']),
             };
 
             return $propertyMetadata
@@ -89,6 +89,7 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
             }
 
             $type = new Type($collection ? Type::BUILTIN_TYPE_ITERABLE : Type::BUILTIN_TYPE_OBJECT, false, $relation['related'], $collection, collectionValueType: new Type(Type::BUILTIN_TYPE_OBJECT, false, $relation['related']));
+
             return $propertyMetadata
                 ->withBuiltinTypes([$type])
                 ->withWritable($propertyMetadata->isWritable() ?? true)
