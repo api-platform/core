@@ -66,22 +66,16 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
             }
 
             $builtinType = $p['cast'] ?? $p['type'];
-            if ('datetime' === $builtinType) {
-                $type = new Type(Type::BUILTIN_TYPE_OBJECT, $p['nullable'], \DateTimeImmutable::class);
-            } else {
-                if (\in_array($builtinType, Type::$builtinTypes, true)) {
-                    $type = new Type($builtinType, $p['nullable']);
-                } else {
-                    $type = new Type(Type::BUILTIN_TYPE_STRING, $p['nullable']);
-                }
-            }
+            $type = match ($builtinType) {
+                'datetime', 'date' => new Type(Type::BUILTIN_TYPE_OBJECT, $p['nullable'], \DateTime::class),
+                'immutable_datetime', 'immutable_date' => new Type(Type::BUILTIN_TYPE_OBJECT, $p['nullable'], \DateTimeImmutable::class),
+                default => new Type(\in_array($builtinType, Type::$builtinTypes, true)  ? $builtinType : Type::BUILTIN_TYPE_STRING, $p['nullable']),
+            };
 
-            $propertyMetadata = $propertyMetadata
+            return $propertyMetadata
                 ->withBuiltinTypes([$type])
                 ->withWritable($propertyMetadata->isWritable() ?? true)
                 ->withReadable($propertyMetadata->isReadable() ?? false === $p['hidden']);
-
-            return $propertyMetadata;
         }
 
         foreach ($this->modelMetadata->getRelations($model) as $relation) {
@@ -95,13 +89,11 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
             }
 
             $type = new Type($collection ? Type::BUILTIN_TYPE_ITERABLE : Type::BUILTIN_TYPE_OBJECT, false, $relation['related'], $collection, collectionValueType: new Type(Type::BUILTIN_TYPE_OBJECT, false, $relation['related']));
-            $propertyMetadata = $propertyMetadata
+            return $propertyMetadata
                 ->withBuiltinTypes([$type])
                 ->withWritable($propertyMetadata->isWritable() ?? true)
                 ->withReadable($propertyMetadata->isReadable() ?? true)
                 ->withExtraProperties(['eloquent_relation' => $relation] + $propertyMetadata->getExtraProperties());
-
-            return $propertyMetadata;
         }
 
         return $propertyMetadata;
