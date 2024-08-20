@@ -21,10 +21,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * @implements ProcessorInterface<\Illuminate\Database\Eloquent\Model, \Illuminate\Database\Eloquent\Model>
  */
-class PersistProcessor implements ProcessorInterface
+final class PersistProcessor implements ProcessorInterface
 {
-    public function __construct(private readonly ModelMetadata $modelMetadata)
-    {
+    public function __construct(
+        private readonly ModelMetadata $modelMetadata,
+    ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])

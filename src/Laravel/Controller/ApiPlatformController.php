@@ -64,11 +64,11 @@ class ApiPlatformController extends Controller
             $operation = $operation->withValidate(!$request->isMethodSafe() && !$request->isMethod('DELETE'));
         }
 
-        if (null === $operation->canRead() && $operation instanceof HttpOperation) {
+        if ($operation instanceof HttpOperation && null === $operation->canRead()) {
             $operation = $operation->withRead($operation->getUriVariables() || $request->isMethodSafe());
         }
 
-        if (null === $operation->canDeserialize() && $operation instanceof HttpOperation) {
+        if ($operation instanceof HttpOperation && null === $operation->canDeserialize()) {
             $operation = $operation->withDeserialize(\in_array($operation->getMethod(), ['POST', 'PUT', 'PATCH'], true));
         }
 

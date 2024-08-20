@@ -17,7 +17,7 @@ Feature: Cache invalidation through HTTP Cache tags (custom TagCollector service
     Then the response status code should be 201
     And the header "Cache-Tags" should not exist
 
-  Scenario: TagCollector can identify $object (IRI is overriden with custom logic)
+  Scenario: TagCollector can identify $object (IRI is overridden with custom logic)
     When I send a "GET" request to "/relation_embedders/1"
     Then the response status code should be 200
     And the header "Cache-Tags" should be equal to "/RE/1#anotherRelated,/RE/1#related,/RE/1"
@@ -126,7 +126,7 @@ Feature: Cache invalidation through HTTP Cache tags (custom TagCollector service
     Then the response status code should be 201
     And the header "Cache-Tags" should not exist
 
-  Scenario: TagCollector can read propertyMetadata (tag is overriden with data from extraProperties)
+  Scenario: TagCollector can read propertyMetadata (tag is overridden with data from extraProperties)
     When I send a "GET" request to "/extra_properties_on_properties/1"
     Then the response status code should be 200
     And the header "Cache-Tags" should be equal to "/extra_properties_on_properties/1#overrideRelationTag,/extra_properties_on_properties/1"

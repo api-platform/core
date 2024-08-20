@@ -48,8 +48,8 @@ final class EloquentResourceCollectionMetadataFactory implements ResourceMetadat
             return $resourceMetadataCollection;
         }
 
-        foreach ($resourceMetadataCollection as $i => $resourceMetatada) {
-            $operations = $resourceMetatada->getOperations();
+        foreach ($resourceMetadataCollection as $i => $resourceMetadata) {
+            $operations = $resourceMetadata->getOperations();
             foreach ($operations as $operationName => $operation) {
                 if (!$operation->getProvider()) {
                     $operation = $operation->withProvider($operation instanceof CollectionOperationInterface ? CollectionProvider::class : ItemProvider::class);
@@ -62,7 +62,7 @@ final class EloquentResourceCollectionMetadataFactory implements ResourceMetadat
                 $operations->add($operationName, $operation);
             }
 
-            $resourceMetadataCollection[$i] = $resourceMetatada->withOperations($operations);
+            $resourceMetadataCollection[$i] = $resourceMetadata->withOperations($operations);
         }
 
         return $resourceMetadataCollection;

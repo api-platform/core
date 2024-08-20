@@ -17,6 +17,7 @@
             "homepage": "https://api-platform.com/community/contributors"
         }
     ],
+    "minimum-stability": "dev",
     "require": {
         "php": ">=8.1",
         "api-platform/documentation": "^4.0",
@@ -54,7 +55,7 @@
         },
         "exclude-from-classmap": [
             "/Tests/",
-            "/Workbench/"
+            "/workbench/"
         ]
     },
     "config": {

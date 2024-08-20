@@ -32,7 +32,7 @@ use SebastianBergmann\Exporter\Exporter;
 trait ArraySubsetTrait
 {
     /**
-     * @param array<mixed, mixed> $subset
+     * @param array $subset
      */
     public function __construct(private iterable $subset, private readonly bool $strict = false)
     {
@@ -82,11 +82,6 @@ trait ArraySubsetTrait
         return 'an array '.$this->toString();
     }
 
-    /**
-     * @param array<mixed, mixed> $other
-     *
-     * @return array<mixed, mixed>
-     */
     private function toArray(iterable $other): array
     {
         if (\is_array($other)) {

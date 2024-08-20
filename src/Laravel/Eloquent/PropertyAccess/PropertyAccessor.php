@@ -22,21 +22,16 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  */
 final class PropertyAccessor implements PropertyAccessorInterface
 {
-    public function __construct(private readonly PropertyAccessorInterface $inner)
-    {
+    public function __construct(
+        private readonly PropertyAccessorInterface $inner,
+    ) {
     }
 
-    /**
-     * @param array<mixed, mixed>|object $objectOrArray
-     */
     public function setValue(object|array &$objectOrArray, string|PropertyPathInterface $propertyPath, mixed $value): void
     {
         $this->inner->setValue($objectOrArray, $propertyPath, $value);
     }
 
-    /**
-     * @param array<mixed, mixed>|object $objectOrArray
-     */
     public function getValue(object|array $objectOrArray, string|PropertyPathInterface $propertyPath): mixed
     {
         $value = $this->inner->getValue($objectOrArray, $propertyPath);
@@ -48,17 +43,11 @@ final class PropertyAccessor implements PropertyAccessorInterface
         return $value;
     }
 
-    /**
-     * @param array<mixed, mixed>|object $objectOrArray
-     */
     public function isWritable(object|array $objectOrArray, string|PropertyPathInterface $propertyPath): bool
     {
         return $this->inner->isWritable($objectOrArray, $propertyPath);
     }
 
-    /**
-     * @param array<mixed, mixed>|object $objectOrArray
-     */
     public function isReadable(object|array $objectOrArray, string|PropertyPathInterface $propertyPath): bool
     {
         return $this->inner->isReadable($objectOrArray, $propertyPath);

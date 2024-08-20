@@ -37,6 +37,7 @@ class ErrorHandler extends ExceptionsHandler
 {
     use ContentNegotiationTrait;
     use OperationRequestInitiatorTrait;
+
     public static mixed $error;
 
     public function __construct(
@@ -95,7 +96,7 @@ class ErrorHandler extends ExceptionsHandler
             } else {
                 // Create a generic, rfc7807 compatible error according to the wanted format
                 $operation = $this->resourceMetadataCollectionFactory->create(Error::class)->getOperation($this->getFormatOperation($format));
-                // status code may be overriden by the exceptionToStatus option
+                // status code may be overridden by the exceptionToStatus option
                 $statusCode = 500;
                 if ($operation instanceof HttpOperation) {
                     $statusCode = $this->getStatusCode($apiOperation, $operation, $exception);

@@ -35,14 +35,21 @@ final class SwaggerUiProcessor implements ProcessorInterface
     /**
      * @param array<string, string[]> $formats
      */
-    public function __construct(private readonly UrlGeneratorInterface $urlGenerator, private readonly NormalizerInterface $normalizer, private readonly Options $openApiOptions, private readonly array $formats = [], private readonly ?string $oauthClientId = null, private readonly ?string $oauthClientSecret = null, private readonly bool $oauthPkce = false)
-    {
+    public function __construct(
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly NormalizerInterface $normalizer,
+        private readonly Options $openApiOptions,
+        private readonly array $formats = [],
+        private readonly ?string $oauthClientId = null,
+        private readonly ?string $oauthClientSecret = null,
+        private readonly bool $oauthPkce = false,
+    ) {
     }
 
     /**
      * @param OpenApi $openApi
      */
-    public function process(mixed $openApi, Operation $operation, array $uriVariables = [], array $context = [])
+    public function process(mixed $openApi, Operation $operation, array $uriVariables = [], array $context = []): Response
     {
         $request = $context['request'] ?? null;
 

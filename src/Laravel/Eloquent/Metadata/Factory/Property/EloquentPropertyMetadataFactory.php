@@ -28,8 +28,10 @@ use Symfony\Component\PropertyInfo\Type;
  */
 final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
-    public function __construct(private ModelMetadata $modelMetadata, private readonly ?PropertyMetadataFactoryInterface $decorated = null)
-    {
+    public function __construct(
+        private readonly ModelMetadata $modelMetadata,
+        private readonly ?PropertyMetadataFactoryInterface $decorated = null
+    ) {
     }
 
     /**

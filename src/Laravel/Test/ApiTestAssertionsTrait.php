@@ -46,9 +46,6 @@ trait ApiTestAssertionsTrait
      * Asserts that the retrieved JSON contains the specified subset.
      *
      * This method delegates to static::assertArraySubset().
-     *
-     * @param array<mixed, mixed> $subset
-     * @param array<mixed, mixed> $json
      */
     public static function assertJsonContains(array|string $subset, array $json, bool $checkForObjectIdentity = true, string $message = ''): void
     {
@@ -63,7 +60,7 @@ trait ApiTestAssertionsTrait
     }
 
     /**
-     * Generate the IRI of a resource item.
+     * Generates the IRI of a resource item.
      */
     protected function getIriFromResource(object $resource): ?string
     {

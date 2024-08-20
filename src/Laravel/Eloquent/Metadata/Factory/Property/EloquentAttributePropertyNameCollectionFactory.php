@@ -19,8 +19,9 @@ use ApiPlatform\Metadata\Property\PropertyNameCollection;
 
 final class EloquentAttributePropertyNameCollectionFactory implements PropertyNameCollectionFactoryInterface
 {
-    public function __construct(private readonly ?PropertyNameCollectionFactoryInterface $decorated = null)
-    {
+    public function __construct(
+        private readonly ?PropertyNameCollectionFactoryInterface $decorated = null,
+    ) {
     }
 
     public function create(string $resourceClass, array $options = []): PropertyNameCollection

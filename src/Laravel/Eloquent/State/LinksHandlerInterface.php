@@ -23,7 +23,7 @@ use Illuminate\Database\Eloquent\Model;
 interface LinksHandlerInterface
 {
     /**
-     * Handle Laravel links.
+     * Handles Laravel links.
      *
      * @param Builder<T>                                                           $builder
      * @param array<string, mixed>                                                 $uriVariables
