@@ -3,7 +3,7 @@
 ## Tests
 
     cd src/Laravel
-    composer install
+    composer update --prefer-stable
     vendor/bin/testbench workbench:build
     vendor/bin/testbench package:test
     # or

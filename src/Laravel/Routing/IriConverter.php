@@ -40,15 +40,17 @@ class IriConverter implements IriConverterInterface
 {
     use ClassInfoTrait;
     use ResourceClassInfoTrait;
-    /**
-     * @var array<string, Operation>
-     */
-    private $localOperationCache = [];
-    /**
-     * @var array<string, Operation>
-     */
-    private $localIdentifiersExtractorOperationCache = [];
     // use UriVariablesResolverTrait;
+
+    /**
+     * @var array<string, Operation>
+     */
+    private array $localOperationCache = [];
+
+    /**
+     * @var array<string, Operation>
+     */
+    private array $localIdentifiersExtractorOperationCache = [];
 
     // , UriVariablesConverterInterface $uriVariablesConverter = null TODO
     /**
@@ -69,7 +71,7 @@ class IriConverter implements IriConverterInterface
             throw new InvalidArgumentException(\sprintf('No resource associated to "%s".', $iri));
         }
 
-        $operation = $parameters['_api_operation'] = $this->resourceMetadataCollectionFactory->create($parameters['_api_resource_class'])->getOperation($parameters['_api_operation_name']);
+        $operation = $this->resourceMetadataCollectionFactory->create($parameters['_api_resource_class'])->getOperation($parameters['_api_operation_name']);
 
         if ($operation instanceof CollectionOperationInterface) {
             throw new InvalidArgumentException(\sprintf('The iri "%s" references a collection not an item.', $iri));
@@ -137,7 +139,7 @@ class IriConverter implements IriConverterInterface
             }
         }
 
-        if (!$operation->getName() || ($operation instanceof HttpOperation && $operation->getUriTemplate() && str_starts_with($operation->getUriTemplate(), SkolemIriConverter::$skolemUriTemplate))) {
+        if (!$operation->getName() || ($operation instanceof HttpOperation && $operation->getUriTemplate() && str_starts_with($operation->getUriTemplate(), SkolemIriConverter::SKOLEM_URI_TEMPLATE))) {
             return $this->generateSkolemIri($resource, $referenceType, $operation, $context, $resourceClass);
         }
 

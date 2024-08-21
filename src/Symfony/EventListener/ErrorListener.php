@@ -241,7 +241,7 @@ final class ErrorListener extends SymfonyErrorListener
 
         // Create a generic, rfc7807 compatible error according to the wanted format
         $operation = $this->resourceMetadataCollectionFactory->create(Error::class)->getOperation($this->getFormatOperation($format));
-        // status code may be overriden by the exceptionToStatus option
+        // status code may be overridden by the exceptionToStatus option
         $statusCode = 500;
         if ($operation instanceof HttpOperation) {
             $statusCode = $this->getStatusCode($apiOperation, $request, $operation, $exception);

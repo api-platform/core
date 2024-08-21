@@ -18,8 +18,9 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 
 final class ResourceClassResolver implements ResourceClassResolverInterface
 {
-    public function __construct(private readonly ResourceClassResolverInterface $inner)
-    {
+    public function __construct(
+        private readonly ResourceClassResolverInterface $inner,
+    ) {
     }
 
     public function getResourceClass(mixed $value, ?string $resourceClass = null, bool $strict = false): string

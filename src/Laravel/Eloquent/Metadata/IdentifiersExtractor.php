@@ -22,8 +22,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 final class IdentifiersExtractor implements IdentifiersExtractorInterface
 {
-    public function __construct(private readonly IdentifiersExtractorInterface $inner)
-    {
+    public function __construct(
+        private readonly IdentifiersExtractorInterface $inner,
+    ) {
     }
 
     public function getIdentifiersFromItem(object $item, ?Operation $operation = null, array $context = []): array

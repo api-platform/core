@@ -34,8 +34,10 @@ final class SwaggerUiProvider implements ProviderInterface
     /**
      * @param ProviderInterface<object> $decorated
      */
-    public function __construct(private readonly ProviderInterface $decorated, private readonly OpenApiFactoryInterface $openApiFactory)
-    {
+    public function __construct(
+        private readonly ProviderInterface $decorated,
+        private readonly OpenApiFactoryInterface $openApiFactory,
+    ) {
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
@@ -58,9 +60,9 @@ final class SwaggerUiProvider implements ProviderInterface
         }
 
         // We need to call our operation provider just in case it fails
-        // when it fails we'll get an Error and we'll fix the status accordingly
+        // when it fails we'll get an Error, and we'll fix the status accordingly
         // @see features/main/content_negotiation.feature:119
-        // DocumentationAction has no content negotation as well we want HTML so render swagger ui
+        // DocumentationAction has no content negotiation as well we want HTML so render swagger ui
         if (!$operation instanceof Error && Documentation::class !== $operation->getClass()) {
             $this->decorated->provide($operation, $uriVariables, $context);
         }

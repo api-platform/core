@@ -54,7 +54,7 @@
         },
         "exclude-from-classmap": [
             "/Tests/",
-            "/Workbench/"
+            "/workbench/"
         ]
     },
     "config": {

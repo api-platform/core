@@ -19,7 +19,7 @@ use ApiPlatform\State\ProcessorInterface;
 /**
  * @implements ProcessorInterface<\Illuminate\Database\Eloquent\Model, null>
  */
-class RemoveProcessor implements ProcessorInterface
+final class RemoveProcessor implements ProcessorInterface
 {
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {

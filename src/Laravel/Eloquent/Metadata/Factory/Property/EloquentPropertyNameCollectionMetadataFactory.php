@@ -21,8 +21,11 @@ use Illuminate\Database\Eloquent\Model;
 
 final class EloquentPropertyNameCollectionMetadataFactory implements PropertyNameCollectionFactoryInterface
 {
-    public function __construct(private ModelMetadata $modelMetadata, private PropertyNameCollectionFactoryInterface $decorated, private ResourceClassResolverInterface $resourceClassResolver)
-    {
+    public function __construct(
+        private readonly ModelMetadata $modelMetadata,
+        private readonly PropertyNameCollectionFactoryInterface $decorated,
+        private readonly ResourceClassResolverInterface $resourceClassResolver,
+    ) {
     }
 
     /**

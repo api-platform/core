@@ -30,8 +30,10 @@ final class ValidateProvider implements ProviderInterface
     /**
      * @param ProviderInterface<object> $inner
      */
-    public function __construct(private readonly ProviderInterface $inner, private readonly Application $app)
-    {
+    public function __construct(
+        private readonly ProviderInterface $inner,
+        private readonly Application $app,
+    ) {
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null

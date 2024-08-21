@@ -23,8 +23,9 @@ use IteratorAggregate;
  */
 final class Paginator implements PaginatorInterface, \IteratorAggregate
 {
-    public function __construct(protected LengthAwarePaginator $paginator) // @phpstan-ignore-line
-    {
+    public function __construct(// @phpstan-ignore-line
+        private readonly LengthAwarePaginator $paginator,
+    ) {
     }
 
     public function count(): int

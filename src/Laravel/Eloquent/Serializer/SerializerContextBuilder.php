@@ -19,10 +19,12 @@ use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
-class SerializerContextBuilder implements SerializerContextBuilderInterface
+final class SerializerContextBuilder implements SerializerContextBuilderInterface
 {
-    public function __construct(private readonly SerializerContextBuilderInterface $decorated, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory)
-    {
+    public function __construct(
+        private readonly SerializerContextBuilderInterface $decorated,
+        private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
+    ) {
     }
 
     /**

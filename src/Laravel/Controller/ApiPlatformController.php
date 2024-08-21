@@ -42,9 +42,12 @@ class ApiPlatformController extends Controller
     public function __invoke(Request $request): Response
     {
         $operation = $request->attributes->get('_api_operation');
-
         if (!$operation) {
             throw new \RuntimeException('Operation not found.');
+        }
+
+        if (!$operation instanceof HttpOperation) {
+            throw new \LogicException('Operation is not an HttpOperation.');
         }
 
         $uriVariables = $this->getUriVariables($request, $operation);
@@ -64,12 +67,12 @@ class ApiPlatformController extends Controller
             $operation = $operation->withValidate(!$request->isMethodSafe() && !$request->isMethod('DELETE'));
         }
 
-        if (null === $operation->canRead() && $operation instanceof HttpOperation) {
-            $operation = $operation->withRead($operation->getUriVariables() || $request->isMethodSafe());
+        if (null === $operation->canRead()) {
+            $operation = $operation->withRead($operation->getUriVariables() || $request->isMethodSafe()); // @phpstan-ignore-line
         }
 
-        if (null === $operation->canDeserialize() && $operation instanceof HttpOperation) {
-            $operation = $operation->withDeserialize(\in_array($operation->getMethod(), ['POST', 'PUT', 'PATCH'], true));
+        if (null === $operation->canDeserialize()) {
+            $operation = $operation->withDeserialize(\in_array($operation->getMethod(), ['POST', 'PUT', 'PATCH'], true)); // @phpstan-ignore-line
         }
 
         $body = $this->provider->provide($operation, $uriVariables, $context);

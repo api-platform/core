@@ -20,10 +20,11 @@ use Illuminate\Foundation\Application;
 /**
  * @implements LinksHandlerInterface<Model>
  */
-class LinksHandler implements LinksHandlerInterface
+final class LinksHandler implements LinksHandlerInterface
 {
-    public function __construct(private readonly Application $application)
-    {
+    public function __construct(
+        private readonly Application $application,
+    ) {
     }
 
     public function handleLinks(Builder $builder, array $uriVariables, array $context): Builder
@@ -35,12 +36,14 @@ class LinksHandler implements LinksHandlerInterface
 
             if ($to = $link->getToProperty()) {
                 $builder = $builder->where($builder->getModel()->getTable().'.'.$builder->getModel()->{$to}()->getForeignKeyName(), $identifier);
+
                 continue;
             }
 
             if ($from = $link->getFromProperty()) {
                 $relation = $this->application->make($link->getFromClass());
                 $builder = $builder->getModel()->where($builder->getModel()->getTable().'.'.$relation->{$from}()->getForeignKeyName(), $identifier);
+
                 continue;
             }
 

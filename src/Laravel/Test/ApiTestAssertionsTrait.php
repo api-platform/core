@@ -63,7 +63,7 @@ trait ApiTestAssertionsTrait
     }
 
     /**
-     * Generate the IRI of a resource item.
+     * Generates the IRI of a resource item.
      */
     protected function getIriFromResource(object $resource): ?string
     {

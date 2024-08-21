@@ -19,17 +19,19 @@ use Illuminate\Database\Eloquent\Model;
 use Psr\Container\ContainerInterface;
 
 /**
- * @implements ProviderInterface<\Illuminate\Database\Eloquent\Model>
+ * @implements ProviderInterface<Model>
  */
-class ItemProvider implements ProviderInterface
+final class ItemProvider implements ProviderInterface
 {
     use LinksHandlerLocatorTrait;
 
     /**
      * @param LinksHandlerInterface<Model> $linksHandler
      */
-    public function __construct(private readonly LinksHandlerInterface $linksHandler, ?ContainerInterface $handleLinksLocator = null)
-    {
+    public function __construct(
+        private readonly LinksHandlerInterface $linksHandler,
+        ?ContainerInterface $handleLinksLocator = null,
+    ) {
         $this->handleLinksLocator = $handleLinksLocator;
     }
 

@@ -22,8 +22,9 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  */
 final class PropertyAccessor implements PropertyAccessorInterface
 {
-    public function __construct(private readonly PropertyAccessorInterface $inner)
-    {
+    public function __construct(
+        private readonly PropertyAccessorInterface $inner,
+    ) {
     }
 
     /**

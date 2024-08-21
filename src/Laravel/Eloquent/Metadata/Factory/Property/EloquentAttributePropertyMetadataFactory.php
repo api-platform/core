@@ -20,8 +20,9 @@ use Illuminate\Database\Eloquent\Model;
 
 final class EloquentAttributePropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
-    public function __construct(private readonly ?PropertyMetadataFactoryInterface $decorated = null)
-    {
+    public function __construct(
+        private readonly ?PropertyMetadataFactoryInterface $decorated = null,
+    ) {
     }
 
     public function create(string $resourceClass, string $property, array $options = []): ApiProperty

@@ -19,21 +19,25 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\ProviderInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Psr\Container\ContainerInterface;
 
 /**
- * @implements ProviderInterface<Paginator|\Illuminate\Database\Eloquent\Collection<int, Model>>
+ * @implements ProviderInterface<Paginator|Collection<int, Model>>
  */
-class CollectionProvider implements ProviderInterface
+final class CollectionProvider implements ProviderInterface
 {
     use LinksHandlerLocatorTrait;
 
     /**
      * @param LinksHandlerInterface<Model> $linksHandler
      */
-    public function __construct(private readonly Pagination $pagination, private readonly LinksHandlerInterface $linksHandler, ?ContainerInterface $handleLinksLocator = null)
-    {
+    public function __construct(
+        private readonly Pagination $pagination,
+        private readonly LinksHandlerInterface $linksHandler,
+        ?ContainerInterface $handleLinksLocator = null,
+    ) {
         $this->handleLinksLocator = $handleLinksLocator;
     }
 

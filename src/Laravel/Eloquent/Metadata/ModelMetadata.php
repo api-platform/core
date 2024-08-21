@@ -46,13 +46,9 @@ final class ModelMetadata
     ];
 
     /**
-     * Get the first policy associated with this model.
-     *
-     * @param Model $model
-     *
-     * @return string
+     * Gets the first policy associated with this model.
      */
-    public function getPolicy($model)
+    public function getPolicy(Model $model): ?string
     {
         $policy = Gate::getPolicyFor($model::class);
 
@@ -60,13 +56,11 @@ final class ModelMetadata
     }
 
     /**
-     * Get the column attributes for the given model.
+     * Gets the column attributes for the given model.
      *
-     * @param Model $model
-     *
-     * @return \Illuminate\Support\Collection<string, mixed>
+     * @return Collection<string, mixed>
      */
-    public function getAttributes($model): Collection
+    public function getAttributes(Model $model): Collection
     {
         $connection = $model->getConnection();
         $schema = $connection->getSchemaBuilder();
@@ -110,9 +104,9 @@ final class ModelMetadata
      *
      * @param array<string, mixed> $columns
      *
-     * @return \Illuminate\Support\Collection<int, mixed>
+     * @return Collection<int, mixed>
      */
-    public function getVirtualAttributes(Model $model, $columns): Collection
+    public function getVirtualAttributes(Model $model, array $columns): Collection
     {
         $class = new \ReflectionClass($model);
 
@@ -149,9 +143,9 @@ final class ModelMetadata
     }
 
     /**
-     * Get the relations from the given model.
+     * Gets the relations from the given model.
      *
-     * @return \Illuminate\Support\Collection<int, mixed>
+     * @return Collection<int, mixed>
      */
     public function getRelations(Model $model): Collection
     {
@@ -206,9 +200,9 @@ final class ModelMetadata
     }
 
     /**
-     * Get the Events that the model dispatches.
+     * Gets the Events that the model dispatches.
      *
-     * @return \Illuminate\Support\Collection<int, mixed>
+     * @return Collection<int, mixed>
      */
     public function getEvents(Model $model): Collection
     {
@@ -220,7 +214,7 @@ final class ModelMetadata
     }
 
     /**
-     * Get the cast type for the given column.
+     * Gets the cast type for the given column.
      */
     private function getCastType(string $column, Model $model): ?string
     {
@@ -236,9 +230,9 @@ final class ModelMetadata
     }
 
     /**
-     * Get the model casts, including any date casts.
+     * Gets the model casts, including any date casts.
      *
-     * @return \Illuminate\Support\Collection<string, mixed>
+     * @return Collection<string, mixed>
      */
     private function getCastsWithDates(Model $model): Collection
     {
@@ -250,11 +244,9 @@ final class ModelMetadata
     }
 
     /**
-     * Get the default value for the given column.
+     * Gets the default value for the given column.
      *
      * @param array<string, mixed>&array{name: string, default: string} $column
-     *
-     * @return mixed|null
      */
     private function getColumnDefault(array $column, Model $model): mixed
     {
@@ -268,7 +260,7 @@ final class ModelMetadata
     }
 
     /**
-     * Determine if the given attribute is hidden.
+     * Determines if the given attribute is hidden.
      */
     private function attributeIsHidden(string $attribute, Model $model): bool
     {
@@ -284,7 +276,7 @@ final class ModelMetadata
     }
 
     /**
-     * Determine if the given attribute is unique.
+     * Determines if the given attribute is unique.
      *
      * @param array<int, array{columns: string[], unique: bool}> $indexes
      */

@@ -22,14 +22,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
- * Use Doctrine metadata to populate the identifier property.
+ * Uses Eloquent metadata to populate the identifier property.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
-    public function __construct(private ModelMetadata $modelMetadata, private readonly ?PropertyMetadataFactoryInterface $decorated = null)
-    {
+    public function __construct(
+        private readonly ModelMetadata $modelMetadata,
+        private readonly ?PropertyMetadataFactoryInterface $decorated = null
+    ) {
     }
 
     /**

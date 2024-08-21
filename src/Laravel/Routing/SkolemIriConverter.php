@@ -25,12 +25,13 @@ use ApiPlatform\Metadata\UrlGeneratorInterface;
  */
 final class SkolemIriConverter implements IriConverterInterface
 {
-    public static string $skolemUriTemplate = '/.well-known/genid/{id}';
+    public const SKOLEM_URI_TEMPLATE = '/.well-known/genid/{id}';
 
     /**
      * @var \SplObjectStorage<object, string>
      */
     private \SplObjectStorage $objectHashMap;
+
     /**
      * @var array<string, string>
      */

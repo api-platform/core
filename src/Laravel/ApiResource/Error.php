@@ -68,7 +68,7 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
         private readonly string $detail,
         #[ApiProperty(identifier: true)] private int $status,
         private readonly array $originalTrace,
-        private ?string $instance = null,
+        private readonly ?string $instance = null,
         private string $type = 'about:blank',
         private array $headers = []
     ) {
