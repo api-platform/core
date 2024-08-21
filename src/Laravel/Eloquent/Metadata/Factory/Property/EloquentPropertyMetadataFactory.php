@@ -59,7 +59,7 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
         }
 
         if ($model->getKeyName() === $property) {
-            $propertyMetadata = $propertyMetadata->withIdentifier(true);
+            $propertyMetadata = $propertyMetadata->withIdentifier(true)->withWritable($propertyMetadata->isWritable() ?? false);
         }
 
         foreach ($this->modelMetadata->getAttributes($model) as $p) {
