@@ -15,7 +15,7 @@ namespace ApiPlatform\Laravel\Eloquent\State;
 
 use ApiPlatform\State\OptionsInterface;
 
-final class Options implements OptionsInterface
+class Options implements OptionsInterface
 {
     /**
      * @param string|callable $handleLinks experimental callable, typed mixed as we may want a service name in the future
