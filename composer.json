@@ -11,7 +11,9 @@
         "JSONAPI",
         "OpenAPI",
         "HAL",
-        "Swagger"
+        "Swagger",
+        "Symfony",
+        "Laravel"
     ],
     "homepage": "https://api-platform.com",
     "license": "MIT",

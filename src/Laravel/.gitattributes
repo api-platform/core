@@ -2,7 +2,7 @@
 /.gitignore export-ignore
 /phpstan.neon.dist export-ignore
 /phpunit.xml.dist export-ignore
-/README.md
+/CONTRIBUTING.md
 /testbench.yaml
 /Tests export-ignore
 /workbench export-ignore
