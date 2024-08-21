@@ -204,6 +204,7 @@ final class ApiProperty
         private ?bool $genId = null,
         private ?string $uriTemplate = null,
         private ?string $property = null,
+        private ?string $policy = null,
         private array $extraProperties = [],
     ) {
         if (\is_string($types)) {
@@ -585,5 +586,18 @@ final class ApiProperty
         $metadata->uriTemplate = $uriTemplate;
 
         return $metadata;
+    }
+
+    public function getPolicy(): ?string
+    {
+        return $this->policy;
+    }
+
+    public function withPolicy(?string $policy): static
+    {
+        $self = clone $this;
+        $self->policy = $policy;
+
+        return $self;
     }
 }

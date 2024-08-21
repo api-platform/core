@@ -94,7 +94,9 @@ final class Delete extends HttpOperation implements DeleteOperationInterface
         $processor = null,
         ?OptionsInterface $stateOptions = null,
         array|Parameters|null $parameters = null,
-        array|string|null $rules = null,
+        mixed $rules = null,
+        ?string $policy = null,
+        array|string|null $middleware = null,
         array $extraProperties = [],
     ) {
         parent::__construct(
@@ -169,6 +171,8 @@ final class Delete extends HttpOperation implements DeleteOperationInterface
             provider: $provider,
             processor: $processor,
             rules: $rules,
+            policy: $policy,
+            middleware: $middleware,
             extraProperties: $extraProperties,
             collectDenormalizationErrors: $collectDenormalizationErrors,
             parameters: $parameters,

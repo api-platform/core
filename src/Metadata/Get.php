@@ -94,7 +94,9 @@ final class Get extends HttpOperation
         $processor = null,
         ?OptionsInterface $stateOptions = null,
         array|Parameters|null $parameters = null,
-        array|string|null $rules = null,
+        mixed $rules = null,
+        ?string $policy = null,
+        array|string|null $middleware = null,
         array $extraProperties = [],
     ) {
         parent::__construct(
@@ -171,6 +173,8 @@ final class Get extends HttpOperation
             stateOptions: $stateOptions,
             parameters: $parameters,
             rules: $rules,
+            policy: $policy,
+            middleware: $middleware,
             extraProperties: $extraProperties,
         );
     }

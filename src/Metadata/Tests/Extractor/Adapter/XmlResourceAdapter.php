@@ -68,6 +68,8 @@ final class XmlResourceAdapter implements ResourceAdapterInterface
         'parameters',
     ];
 
+    private const EXCLUDE = ['policy', 'middleware', 'rule'];
+
     /**
      * {@inheritdoc}
      */
@@ -94,6 +96,10 @@ XML_WRAP
             $fixture['class'] = $resourceClass;
             foreach ($parameters as $parameter) {
                 $parameterName = $parameter->getName();
+                if (\in_array($parameterName, self::EXCLUDE, true)) {
+                    continue;
+                }
+
                 $value = \array_key_exists($parameterName, $fixture) ? $fixture[$parameterName] : null;
 
                 if ('compositeIdentifier' === $parameterName || 'provider' === $parameterName || 'processor' === $parameterName) {

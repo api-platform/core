@@ -78,6 +78,8 @@ abstract class Metadata
          */
         array|Parameters|null $parameters = null,
         protected mixed $rules = null,
+        protected ?string $policy = null,
+        protected array|string|null $middleware = null,
         protected ?bool $queryParameterValidationEnabled = null,
         protected array $extraProperties = []
     ) {
@@ -622,6 +624,32 @@ abstract class Metadata
     {
         $self = clone $this;
         $self->queryParameterValidationEnabled = $queryParameterValidationEnabled;
+
+        return $self;
+    }
+
+    public function getPolicy(): ?string
+    {
+        return $this->policy;
+    }
+
+    public function withPolicy(string $policy): static
+    {
+        $self = clone $this;
+        $self->policy = $policy;
+
+        return $self;
+    }
+
+    public function getMiddleware(): mixed
+    {
+        return $this->middleware;
+    }
+
+    public function withMiddleware(string|array $middleware): static
+    {
+        $self = clone $this;
+        $self->middleware = $middleware;
 
         return $self;
     }

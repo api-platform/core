@@ -37,6 +37,7 @@
         "illuminate/routing": "^11.0",
         "illuminate/support": "^11.0",
         "illuminate/container": "^11.0",
+        "laravel/sanctum": "^4.0",
         "symfony/web-link": "^6.4 || ^7.1",
         "willdurand/negotiation": "^3.1",
         "phpstan/phpdoc-parser": "^1.29"
@@ -82,6 +83,20 @@
     },
     "scripts": {
         "build": "@php vendor/bin/testbench workbench:build --ansi",
-        "test": "@php vendor/bin/testbench package:test"
+        "test": "@php vendor/bin/testbench package:test",
+        "post-autoload-dump": [
+            "@clear",
+            "@prepare"
+        ],
+        "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
+        "prepare": "@php vendor/bin/testbench package:discover --ansi",
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "@build",
+            "@php vendor/bin/testbench serve --ansi"
+        ],
+        "lint": [
+            "@php vendor/bin/phpstan analyse --verbose --ansi"
+        ]
     }
 }

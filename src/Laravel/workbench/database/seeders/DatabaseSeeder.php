@@ -19,6 +19,7 @@ use Workbench\Database\Factories\BookFactory;
 use Workbench\Database\Factories\CommentFactory;
 use Workbench\Database\Factories\PostFactory;
 use Workbench\Database\Factories\SluggableFactory;
+use Workbench\Database\Factories\UserFactory;
 
 class DatabaseSeeder extends Seeder
 {
@@ -30,5 +31,6 @@ class DatabaseSeeder extends Seeder
         BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         PostFactory::new()->has(CommentFactory::new()->count(10))->count(10)->create();
         SluggableFactory::new()->count(10)->create();
+        UserFactory::new()->create();
     }
 }

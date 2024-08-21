@@ -56,10 +56,12 @@ use ApiPlatform\Laravel\Eloquent\State\LinksHandler;
 use ApiPlatform\Laravel\Eloquent\State\LinksHandlerInterface;
 use ApiPlatform\Laravel\Eloquent\State\PersistProcessor;
 use ApiPlatform\Laravel\Eloquent\State\RemoveProcessor;
-use ApiPlatform\Laravel\Exception\Handler;
+use ApiPlatform\Laravel\Exception\ErrorHandler;
 use ApiPlatform\Laravel\Routing\IriConverter;
 use ApiPlatform\Laravel\Routing\Router as UrlGeneratorRouter;
 use ApiPlatform\Laravel\Routing\SkolemIriConverter;
+use ApiPlatform\Laravel\Security\ResourceAccessChecker;
+use ApiPlatform\Laravel\State\AccessCheckerProvider;
 use ApiPlatform\Laravel\State\SwaggerUiProcessor;
 use ApiPlatform\Laravel\State\ValidateProvider;
 use ApiPlatform\Metadata\Exception\NotExposedHttpException;
@@ -91,6 +93,7 @@ use ApiPlatform\Metadata\Resource\Factory\PhpDocResourceMetadataCollectionFactor
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\UriTemplateResourceMetadataCollectionFactory;
+use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\Metadata\ResourceClassResolver;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
@@ -262,7 +265,7 @@ class ApiPlatformProvider extends ServiceProvider
                                                         null,
                                                         $app->make(LoggerInterface::class),
                                                         [
-                                                            'routePrefix' => $config->get('api-platform.prefix') ?? '/',
+                                                            'routePrefix' => $config->get('api-platform.routes.prefix') ?? '/',
                                                         ],
                                                         false
                                                     )
@@ -324,8 +327,12 @@ class ApiPlatformProvider extends ServiceProvider
             return new DeserializeProvider($app->make(JsonApiProvider::class), $app->make(SerializerInterface::class), $app->make(SerializerContextBuilderInterface::class));
         });
 
+        $this->app->singleton(AccessCheckerProvider::class, function (Application $app) {
+            return new AccessCheckerProvider($app->make(DeserializeProvider::class), $app->make(ResourceAccessCheckerInterface::class));
+        });
+
         $this->app->singleton(ContentNegotiationProvider::class, function (Application $app) use ($config) {
-            return new ContentNegotiationProvider($app->make(DeserializeProvider::class), new Negotiator(), $config->get('api-platform.formats'), $config->get('api-platform.error_formats'));
+            return new ContentNegotiationProvider($app->make(AccessCheckerProvider::class), new Negotiator(), $config->get('api-platform.formats'), $config->get('api-platform.error_formats'));
         });
 
         $this->app->bind(ProviderInterface::class, ContentNegotiationProvider::class);
@@ -443,6 +450,10 @@ class ApiPlatformProvider extends ServiceProvider
             return new HydraEntrypointNormalizer($app->make(ResourceMetadataCollectionFactoryInterface::class), $app->make(IriConverterInterface::class), $app->make(UrlGeneratorInterface::class));
         });
 
+        $this->app->singleton(ResourceAccessCheckerInterface::class, function () {
+            return new ResourceAccessChecker();
+        });
+
         $this->app->singleton(ItemNormalizer::class, function (Application $app) use ($defaultContext) {
             return new ItemNormalizer(
                 $app->make(PropertyNameCollectionFactoryInterface::class),
@@ -454,8 +465,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ClassMetadataFactoryInterface::class),
                 $app->make(LoggerInterface::class),
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
-                /* $resourceAccessChecker */
-                null,
+                $app->make(ResourceAccessCheckerInterface::class),
                 $defaultContext
             );
         });
@@ -481,8 +491,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ClassMetadataFactoryInterface::class),
                 $app->make(LoggerInterface::class),
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
-                // $app->make(ResourceAccessCheckerInterface::class),
-                null,
+                $app->make(ResourceAccessCheckerInterface::class),
                 $defaultContext
             );
         });
@@ -628,9 +637,8 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ClassMetadataFactoryInterface::class),
                 $defaultContext,
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
-                null,
+                $app->make(ResourceAccessCheckerInterface::class),
                 null
-                // $app->make(ResourceAccessCheckerInterface::class),
                 // $app->make(TagCollectorInterface::class),
             );
         });
@@ -690,15 +698,14 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(NameConverterInterface::class),
                 $app->make(ClassMetadataFactoryInterface::class),
                 $defaultContext,
-                // $app->make(ResourceAccessCheckerInterface::class),
-                null
+                $app->make(ResourceAccessCheckerInterface::class)
             );
         });
 
         $this->app->singleton(
             ExceptionHandlerInterface::class,
             function (Application $app) {
-                return new Handler(
+                return new ErrorHandler(
                     $app,
                     $app->make(ResourceMetadataCollectionFactoryInterface::class),
                     $app->make(ApiPlatformController::class),
@@ -736,6 +743,7 @@ class ApiPlatformProvider extends ServiceProvider
             return;
         }
 
+        $config = $this->app['config'];
         $routeCollection = new RouteCollection();
         foreach ($resourceNameCollectionFactory->create() as $resourceClass) {
             foreach ($resourceMetadataFactory->create($resourceClass) as $resourceMetadata) {
@@ -743,18 +751,20 @@ class ApiPlatformProvider extends ServiceProvider
                     $uriTemplate = $operation->getUriTemplate();
                     // _format is read by the middleware
                     $uriTemplate = $operation->getRoutePrefix().str_replace('{._format}', '{_format?}', $uriTemplate);
-                    $route = new Route([$operation->getMethod()], $uriTemplate, [ApiPlatformController::class, '__invoke']);
-                    $route->name($operation->getName());
-                    $route->setDefaults(['_api_operation_name' => $operation->getName(), '_api_resource_class' => $operation->getClass()]);
-                    // Another option then to use a middleware, not sure what's best (you then retrieve $request->getRoute() somehow ?)
-                    // $route->??? = ['operation' => $operation];
-                    $routeCollection->add($route)
-                        ->middleware(ApiPlatformMiddleware::class.':'.$operation->getName());
+                    $route = (new Route([$operation->getMethod()], $uriTemplate, [ApiPlatformController::class, '__invoke']))
+                            ->name($operation->getName())
+                            ->setDefaults(['_api_operation_name' => $operation->getName(), '_api_resource_class' => $operation->getClass()]);
+
+                    $route->middleware(ApiPlatformMiddleware::class.':'.$operation->getName());
+                    $route->middleware($config->get('api-platform.routes.middleware'));
+                    $route->middleware($operation->getMiddleware());
+
+                    $routeCollection->add($route);
                 }
             }
         }
 
-        $prefix = $this->app['config']->get('api-platform.prefix') ?? '';
+        $prefix = $config->get('api-platform.routes.prefix') ?? '';
         $route = new Route(['GET'], $prefix.'/contexts/{shortName?}{_format?}', [ContextAction::class, '__invoke']);
         $route->name('api_jsonld_context')->middleware(ApiPlatformMiddleware::class);
         $routeCollection->add($route);
@@ -784,10 +794,6 @@ class ApiPlatformProvider extends ServiceProvider
 
     private function shouldRegisterRoutes(): bool
     {
-        if (!$this->app['config']->get('api-platform.register_routes')) {
-            return false;
-        }
-
         if ($this->app instanceof CachesRoutes && $this->app->routesAreCached()) {
             return false;
         }

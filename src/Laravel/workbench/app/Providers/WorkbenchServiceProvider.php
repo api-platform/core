@@ -30,7 +30,8 @@ class WorkbenchServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app['config']->set('api-platform.resources', [app_path('Models'), app_path('ApiResource')]);
+        $config = $this->app['config'];
+        $config->set('api-platform.resources', [app_path('Models'), app_path('ApiResource')]);
     }
 
     /**

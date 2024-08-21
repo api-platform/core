@@ -16,11 +16,10 @@ return [
     'description' => 'My awesome API',
     'version' => '1.0.0',
 
-    /*
-     *  Automatic registration of routes will only happen if this setting is `true`
-     */
-    'register_routes' => true,
-    'prefix' => '/api',
+    'routes' => [
+        'prefix' => '/api',
+        'middleware' => [],
+    ],
 
     /*
      * Where are ApiResource defined

@@ -56,6 +56,16 @@ return new class extends Migration {
             $table->foreign('post_id')->references('id')->on('posts');
             $table->timestamps();
         });
+
+        Schema::create('users', function (Blueprint $table): void {
+            $table->id();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+            $table->rememberToken();
+            $table->timestamps();
+        });
     }
 
     /**
@@ -67,5 +77,6 @@ return new class extends Migration {
         Schema::dropIfExists('authors');
         Schema::dropIfExists('comments');
         Schema::dropIfExists('posts');
+        Schema::dropIfExists('users');
     }
 };

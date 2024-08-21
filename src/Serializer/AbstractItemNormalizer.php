@@ -443,7 +443,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         $options = $this->getFactoryOptions($context);
         $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $options);
-        $security = $propertyMetadata->getSecurity();
+        $security = $propertyMetadata->getSecurity() ?? $propertyMetadata->getPolicy();
         if (null !== $this->resourceAccessChecker && $security) {
             return $this->resourceAccessChecker->isGranted($context['resource_class'], $security, [
                 'object' => $object,
