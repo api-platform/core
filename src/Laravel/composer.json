@@ -2,7 +2,16 @@
     "name": "api-platform/laravel",
     "description": "API Platform support for Laravel",
     "keywords": [
-        "todo"
+        "Laravel",
+        "REST",
+        "GraphQL",
+        "API",
+        "JSON-LD",
+        "Hydra",
+        "JSONAPI",
+        "OpenAPI",
+        "HAL",
+        "Swagger"
     ],
     "homepage": "https://api-platform.com",
     "license": "MIT",

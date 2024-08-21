@@ -1,9 +1,18 @@
 {
     "name": "api-platform/symfony",
-    "description": "Symfony API Platform integration",
+    "description": "API Platform support for Symfony",
     "type": "library",
     "keywords": [
-        "API"
+        "Symfony",
+        "REST",
+        "GraphQL",
+        "API",
+        "JSON-LD",
+        "Hydra",
+        "JSONAPI",
+        "OpenAPI",
+        "HAL",
+        "Swagger"
     ],
     "homepage": "https://api-platform.com",
     "license": "MIT",
