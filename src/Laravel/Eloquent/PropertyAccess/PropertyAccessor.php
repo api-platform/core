@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Laravel\Eloquent\PropertyAccess;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
@@ -22,9 +23,12 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  */
 final class PropertyAccessor implements PropertyAccessorInterface
 {
+    private readonly PropertyAccessorInterface $inner;
+
     public function __construct(
-        private readonly PropertyAccessorInterface $inner,
+        ?PropertyAccessorInterface $inner = null,
     ) {
+        $this->inner = $inner ?? PropertyAccess::createPropertyAccessor();
     }
 
     /**

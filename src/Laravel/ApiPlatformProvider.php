@@ -131,7 +131,6 @@ use Illuminate\Support\ServiceProvider;
 use Negotiation\Negotiator;
 use phpDocumentor\Reflection\DocBlockFactory;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
@@ -142,7 +141,6 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
-use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter as NameConverterCamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
@@ -284,11 +282,11 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->bind(PropertyAccessorInterface::class, function () {
-            return new EloquentPropertyAccessor(PropertyAccess::createPropertyAccessor());
+            return new EloquentPropertyAccessor();
         });
 
         $this->app->bind(NameConverterInterface::class, function (Application $app) {
-            return new MetadataAwareNameConverter($app->make(ClassMetadataFactoryInterface::class), new NameConverterCamelCaseToSnakeCaseNameConverter());
+            return new MetadataAwareNameConverter($app->make(ClassMetadataFactoryInterface::class));
         });
 
         $this->app->bind(OperationMetadataFactoryInterface::class, OperationMetadataFactory::class);
