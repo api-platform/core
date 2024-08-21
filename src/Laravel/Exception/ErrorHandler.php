@@ -31,6 +31,7 @@ use Illuminate\Http\Request;
 use Negotiation\Negotiator;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface as SymfonyHttpExceptionInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 
 class ErrorHandler extends ExceptionsHandler
 {
@@ -122,6 +123,17 @@ class ErrorHandler extends ExceptionsHandler
                 $identifiers = $this->identifiersExtractor?->getIdentifiersFromItem($errorResource, $operation) ?? [];
             } catch (\Exception $e) {
             }
+
+            $normalizationContext = $operation->getNormalizationContext() ?? [];
+            if (!($normalizationContext['api_error_resource'] ?? false)) {
+                $normalizationContext += ['api_error_resource' => true];
+            }
+
+            if (!isset($normalizationContext[AbstractObjectNormalizer::IGNORED_ATTRIBUTES])) {
+                $normalizationContext[AbstractObjectNormalizer::IGNORED_ATTRIBUTES] = ['trace', 'file', 'line', 'code', 'message', 'originalTrace'];
+            }
+
+            $operation = $operation->withNormalizationContext($normalizationContext);
 
             $dup = $request->duplicate(null, null, []);
             $dup->setMethod('GET');
