@@ -1,0 +1,63 @@
+<?php
+
+declare(strict_types=1);
+
+namespace ApiPlatform\Laravel\Eloquent\Serializer;
+
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+
+/**
+ * Underscore to cameCase name converter.
+ *
+ * @internal
+ *
+ * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Aurélien Pillevesse <aurelienpillevesse@hotmail.fr>
+ */
+final class SnakeCaseToCamelCaseNameConverter implements NameConverterInterface
+{
+    /**
+     * @param array|null $attributes The list of attributes to rename or null for all attributes
+     */
+    public function __construct(
+        private readonly ?array $attributes = null,
+    ) {
+    }
+
+    /**
+     * @param class-string|null $class
+     * @param string|null $format
+     * @param array<string, mixed> $context
+     */
+    public function normalize(
+        string $propertyName, ?string $class = null, ?string $format = null, array $context = []
+    ): string
+    {
+        if (null === $this->attributes || \in_array($propertyName, $this->attributes, true)) {
+            return lcfirst(preg_replace_callback(
+                '/(^|_|\.)+(.)/',
+                fn($match) => ('.' === $match[1] ? '_' : '').strtoupper($match[2]),
+                $propertyName
+            ));
+        }
+
+        return $propertyName;
+    }
+
+    /**
+     * @param class-string|null $class
+     * @param string|null $format
+     * @param array<string, mixed> $context
+     */
+    public function denormalize(
+        string $propertyName, ?string $class = null, ?string $format = null, array $context = []
+    ): string
+    {
+        $snakeCased = strtolower(preg_replace('/[A-Z]/', '_\\0', lcfirst($propertyName)));
+        if (null === $this->attributes || \in_array($snakeCased, $this->attributes, true)) {
+            return $snakeCased;
+        }
+
+        return $propertyName;
+    }
+}
