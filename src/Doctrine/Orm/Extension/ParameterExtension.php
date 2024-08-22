@@ -51,7 +51,7 @@ final class ParameterExtension implements QueryCollectionExtensionInterface, Que
 
             $filter = $this->filterLocator->has($filterId) ? $this->filterLocator->get($filterId) : null;
             if ($filter instanceof FilterInterface) {
-                $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, ['filters' => $values] + $context);
+                $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, ['filters' => $values, 'parameter' => $parameter] + $context);
             }
         }
     }
