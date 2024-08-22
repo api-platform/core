@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Parameters;
+use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
@@ -44,7 +45,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 final class ParameterResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    public function __construct(private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null, private readonly ?ContainerInterface $filterLocator = null)
+    public function __construct(private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null, private readonly ?ContainerInterface $filterLocator = null)
     {
     }
 
@@ -59,6 +60,17 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             foreach ($operations as $operationName => $operation) {
                 $parameters = $operation->getParameters() ?? new Parameters();
                 foreach ($parameters as $key => $parameter) {
+                    if (':property' === $key) {
+                        foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
+                            $parameter = $this->setDefaults($property, $parameter, $resourceClass);
+                            $priority = $parameter->getPriority() ?? $internalPriority--;
+                            $parameters->add($property, $parameter->withPriority($priority)->withProperty($property)->withKey($property));
+                        }
+
+                        $parameters->remove($key, $parameter::class);
+                        continue;
+                    }
+
                     $key = $parameter->getKey() ?? $key;
                     $parameter = $this->setDefaults($key, $parameter, $resourceClass);
                     $priority = $parameter->getPriority() ?? $internalPriority--;

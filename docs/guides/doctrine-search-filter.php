@@ -120,21 +120,24 @@ namespace App\Tests {
             $this->assertJsonContains([
                 'hydra:search' => [
                     '@type' => 'hydra:IriTemplate',
-                    'hydra:template' => '/books.jsonld{?author,title}',
+                    'hydra:template' => '/books.jsonld{?id,title,author}',
                     'hydra:variableRepresentation' => 'BasicRepresentation',
                     'hydra:mapping' => [
                         [
                             '@type' => 'IriTemplateMapping',
-                            'variable' => 'author',
-                            'property' => 'author',
-                            'required' => false,
+                            'variable' => 'id',
+                            'property' => 'id',
                         ],
                         [
                             '@type' => 'IriTemplateMapping',
                             'variable' => 'title',
                             'property' => 'title',
-                            'required' => false,
                         ],
+                        [
+                            '@type' => 'IriTemplateMapping',
+                            'variable' => 'author',
+                            'property' => 'author',
+                        ]
                     ],
                 ],
             ]);

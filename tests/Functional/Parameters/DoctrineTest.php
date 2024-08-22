@@ -45,7 +45,7 @@ final class DoctrineTest extends ApiTestCase
         $this->assertEquals('bar', $a['hydra:member'][1]['foo']);
 
         $this->assertArraySubset(['hydra:search' => [
-            'hydra:template' => \sprintf('/%s{?foo,order[order[id]],order[order[foo]],searchPartial[foo],searchExact[foo],searchOnTextAndDate[foo],searchOnTextAndDate[createdAt][before],searchOnTextAndDate[createdAt][strictly_before],searchOnTextAndDate[createdAt][after],searchOnTextAndDate[createdAt][strictly_after],q}', $route),
+            'hydra:template' => \sprintf('/%s{?foo,order[order[id]],order[order[foo]],searchPartial[foo],searchExact[foo],searchOnTextAndDate[foo],searchOnTextAndDate[createdAt][before],searchOnTextAndDate[createdAt][strictly_before],searchOnTextAndDate[createdAt][after],searchOnTextAndDate[createdAt][strictly_after],q,id,createdAt}', $route),
             'hydra:mapping' => [
                 ['@type' => 'IriTemplateMapping', 'variable' => 'foo', 'property' => 'foo'],
             ],
@@ -91,6 +91,17 @@ final class DoctrineTest extends ApiTestCase
             'query' => \sprintf('{ %s(searchOnTextAndDate: {foo: "bar", createdAt: {before: "2024-01-21"}}) { edges { node { id foo createdAt } } } }', $object),
         ]]);
         $this->assertArraySubset(['foo' => 'bar', 'createdAt' => '2024-01-21T00:00:00+00:00'], $response->toArray()['data'][$object]['edges'][0]['node']);
+    }
+
+    public function testPropertyPlaceholderFilter(): void
+    {
+        $resource = $this->isMongoDB() ? SearchFilterParameterDocument::class : SearchFilterParameter::class;
+        $this->recreateSchema([$resource]);
+        $this->loadFixtures($resource);
+        $route = 'search_filter_parameter';
+        $response = self::createClient()->request('GET', $route.'?foo=baz');
+        $a = $response->toArray();
+        $this->assertEquals($a['hydra:member'][0]['foo'], 'baz');
     }
 
     /**

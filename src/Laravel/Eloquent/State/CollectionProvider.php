@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Eloquent\State;
 
+use ApiPlatform\Laravel\Eloquent\Extension\QueryExtensionInterface;
 use ApiPlatform\Laravel\Eloquent\Paginator;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\HttpOperation;
@@ -31,11 +32,13 @@ final class CollectionProvider implements ProviderInterface
     use LinksHandlerLocatorTrait;
 
     /**
-     * @param LinksHandlerInterface<Model> $linksHandler
+     * @param LinksHandlerInterface<Model>      $linksHandler
+     * @param iterable<QueryExtensionInterface> $queryExtensions
      */
     public function __construct(
         private readonly Pagination $pagination,
         private readonly LinksHandlerInterface $linksHandler,
+        private iterable $queryExtensions = [],
         ?ContainerInterface $handleLinksLocator = null,
     ) {
         $this->handleLinksLocator = $handleLinksLocator;
@@ -54,6 +57,10 @@ final class CollectionProvider implements ProviderInterface
             $query = $handleLinks($model->query(), $uriVariables, ['operation' => $operation, 'modelClass' => $operation->getClass()] + $context);
         } else {
             $query = $this->linksHandler->handleLinks($model->query(), $uriVariables, ['operation' => $operation, 'modelClass' => $operation->getClass()] + $context);
+        }
+
+        foreach ($this->queryExtensions as $extension) {
+            $query = $extension->apply($query, $uriVariables, $operation, $context);
         }
 
         if (false === $this->pagination->isEnabled($operation, $context)) {

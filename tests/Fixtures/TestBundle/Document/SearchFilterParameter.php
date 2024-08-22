@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Filter\ODMSearchFilterValueTransformer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Filter\ODMSearchTextAndDateFilter;
+use ApiPlatform\Tests\Fixtures\TestBundle\Filter\QueryParameterOdmFilter;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 #[GetCollection(
@@ -47,6 +48,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 #[ApiFilter(ODMSearchFilterValueTransformer::class, alias: 'app_odm_search_filter_partial', properties: ['foo' => 'partial'], arguments: ['key' => 'searchPartial'])]
 #[ApiFilter(ODMSearchFilterValueTransformer::class, alias: 'app_odm_search_filter_with_exact', properties: ['foo' => 'exact'], arguments: ['key' => 'searchExact'])]
 #[ApiFilter(ODMSearchTextAndDateFilter::class, alias: 'app_odm_filter_date_and_search', properties: ['foo', 'createdAt'], arguments: ['dateFilterProperties' => ['createdAt' => 'exclude_null'], 'searchFilterProperties' => ['foo' => 'exact']])]
+#[QueryParameter(key: ':property', filter: QueryParameterOdmFilter::class)]
 #[ODM\Document]
 class SearchFilterParameter
 {
