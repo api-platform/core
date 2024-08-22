@@ -11,8 +11,11 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @internal
  *
+ * @see Adapted from https://github.com/symfony/symfony/blob/7.2/src/Symfony/Component/Serializer/NameConverter/CamelCaseToSnakeCaseNameConverter.php.
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Aurélien Pillevesse <aurelienpillevesse@hotmail.fr>
+ * @copyright Fabien Potencier <fabien@symfony.com>
  */
 final class SnakeCaseToCamelCaseNameConverter implements NameConverterInterface
 {

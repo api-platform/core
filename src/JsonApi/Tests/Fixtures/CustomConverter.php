@@ -15,6 +15,7 @@ namespace ApiPlatform\JsonApi\Tests\Fixtures;
 
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Custom converter that will only convert a property named "nameConverted"
@@ -22,7 +23,7 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
  */
 class CustomConverter implements AdvancedNameConverterInterface
 {
-    private CamelCaseToSnakeCaseNameConverter $nameConverter;
+    private NameConverterInterface $nameConverter;
 
     public function __construct()
     {
