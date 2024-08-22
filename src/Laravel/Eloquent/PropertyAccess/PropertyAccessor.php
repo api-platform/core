@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Eloquent\PropertyAccess;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
@@ -36,6 +36,12 @@ final class PropertyAccessor implements PropertyAccessorInterface
      */
     public function setValue(object|array &$objectOrArray, string|PropertyPathInterface $propertyPath, mixed $value): void
     {
+        if ($objectOrArray instanceof Model) {
+            $objectOrArray->{$propertyPath} = $value;
+
+            return;
+        }
+
         $this->inner->setValue($objectOrArray, $propertyPath, $value);
     }
 
@@ -44,13 +50,11 @@ final class PropertyAccessor implements PropertyAccessorInterface
      */
     public function getValue(object|array $objectOrArray, string|PropertyPathInterface $propertyPath): mixed
     {
-        $value = $this->inner->getValue($objectOrArray, $propertyPath);
-
-        if ($value instanceof HasMany) {
+        if ($objectOrArray instanceof Model) {
             return $objectOrArray->{$propertyPath};
         }
 
-        return $value;
+        return $this->inner->getValue($objectOrArray, $propertyPath);
     }
 
     /**
@@ -58,6 +62,10 @@ final class PropertyAccessor implements PropertyAccessorInterface
      */
     public function isWritable(object|array $objectOrArray, string|PropertyPathInterface $propertyPath): bool
     {
+        if ($objectOrArray instanceof Model) {
+            return true;
+        }
+
         return $this->inner->isWritable($objectOrArray, $propertyPath);
     }
 
@@ -66,6 +74,10 @@ final class PropertyAccessor implements PropertyAccessorInterface
      */
     public function isReadable(object|array $objectOrArray, string|PropertyPathInterface $propertyPath): bool
     {
+        if ($objectOrArray instanceof Model) {
+            return true;
+        }
+
         return $this->inner->isReadable($objectOrArray, $propertyPath);
     }
 }

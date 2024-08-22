@@ -63,7 +63,7 @@ class JsonLdTest extends TestCase
                 'name' => 'Don Quichotte',
                 'author' => $this->getIriFromResource($author),
                 'isbn' => fake()->isbn13(),
-                'publicationDate' => fake()->date(),
+                'publicationDate' => fake()->optional()->date(),
             ],
             [
                 'accept' => 'application/ld+json',
