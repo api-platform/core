@@ -46,6 +46,7 @@ final class SerializerFilterParameterProvider implements ParameterProviderInterf
         }
 
         $context = $operation->getNormalizationContext();
+        $request->attributes->set('_api_parameter', $parameter);
         $filter->apply($request, true, RequestAttributesExtractor::extractAttributes($request), $context);
 
         return $operation->withNormalizationContext($context);
