@@ -47,7 +47,7 @@ final class ParameterExtension implements AggregationCollectionExtensionInterfac
 
             $filter = $this->filterLocator->has($filterId) ? $this->filterLocator->get($filterId) : null;
             if ($filter instanceof FilterInterface) {
-                $filterContext = ['filters' => $values];
+                $filterContext = ['filters' => $values, 'parameter' => $parameter];
                 $filter->apply($aggregationBuilder, $resourceClass, $operation, $filterContext);
                 // update by reference
                 if (isset($filterContext['mongodb_odm_sort_fields'])) {
