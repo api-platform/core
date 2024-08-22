@@ -29,7 +29,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 final class SnakeCaseToCamelCaseNameConverter implements NameConverterInterface
 {
     /**
-     * @param array|null $attributes The list of attributes to rename or null for all attributes
+     * @param string[]|null $attributes The list of attributes to rename or null for all attributes
      */
     public function __construct(
         private readonly ?array $attributes = null,
