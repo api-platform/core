@@ -527,22 +527,6 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(ItemNormalizer::class, function (Application $app) use ($defaultContext) {
-            return new ItemNormalizer(
-                $app->make(PropertyNameCollectionFactoryInterface::class),
-                $app->make(PropertyMetadataFactoryInterface::class),
-                $app->make(IriConverterInterface::class),
-                $app->make(ResourceClassResolverInterface::class),
-                $app->make(PropertyAccessorInterface::class),
-                $app->make(NameConverterInterface::class),
-                $app->make(ClassMetadataFactoryInterface::class),
-                $app->make(LoggerInterface::class),
-                $app->make(ResourceMetadataCollectionFactoryInterface::class),
-                $app->make(ResourceAccessCheckerInterface::class),
-                $defaultContext
-            );
-        });
-
         $this->app->singleton(Options::class, function (Application $app) use ($config) {
             return new Options(title: $config->get('api-platform.title') ?? '');
         });
