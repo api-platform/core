@@ -31,17 +31,14 @@ namespace ApiPlatform\Metadata\Util;
  */
 class CamelCaseToSnakeCaseNameConverter
 {
-    private $attributes;
-    private $lowerCamelCase;
-
     /**
      * @param array|null $attributes     The list of attributes to rename or null for all attributes
      * @param bool       $lowerCamelCase Use lowerCamelCase style
      */
-    public function __construct(?array $attributes = null, bool $lowerCamelCase = true)
-    {
-        $this->attributes = $attributes;
-        $this->lowerCamelCase = $lowerCamelCase;
+    public function __construct(
+        private readonly ?array $attributes = null,
+        private readonly bool $lowerCamelCase = true,
+    ) {
     }
 
     public function normalize(string $propertyName): string
@@ -55,9 +52,11 @@ class CamelCaseToSnakeCaseNameConverter
 
     public function denormalize(string $propertyName): string
     {
-        $camelCasedName = preg_replace_callback('/(^|_|\.)+(.)/', function ($match) {
-            return ('.' === $match[1] ? '_' : '').strtoupper($match[2]);
-        }, $propertyName);
+        $camelCasedName = preg_replace_callback(
+            '/(^|_|\.)+(.)/',
+            fn ($match) => ('.' === $match[1] ? '_' : '').strtoupper($match[2]),
+            $propertyName
+        );
 
         if ($this->lowerCamelCase) {
             $camelCasedName = lcfirst($camelCasedName);

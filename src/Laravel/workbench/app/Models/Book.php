@@ -30,7 +30,7 @@ class Book extends Model
     use HasFactory;
     use HasUlids;
 
-    protected $visible = ['name', 'author', 'isbn'];
+    protected $visible = ['name', 'author', 'isbn', 'publication_date'];
     protected $fillable = ['name'];
 
     public function author(): BelongsTo
