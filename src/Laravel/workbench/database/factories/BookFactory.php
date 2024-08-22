@@ -36,6 +36,7 @@ class BookFactory extends Factory
             'id' => (string) new Ulid(),
             'author_id' => AuthorFactory::new(),
             'isbn' => fake()->isbn13(),
+            'publication_date' => fake()->date(),
         ];
     }
 }

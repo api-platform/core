@@ -69,7 +69,7 @@ class JsonApiTest extends TestCase
             '/api/books',
             [
                 'data' => [
-                    'attributes' => ['name' => 'Don Quichotte', 'isbn' => fake()->isbn13()],
+                    'attributes' => ['name' => 'Don Quichotte', 'isbn' => fake()->isbn13(), 'publicationDate' => fake()->date()],
                     'relationships' => ['author' => ['data' => ['id' => $this->getIriFromResource($author), 'type' => 'Author']]],
                 ],
             ],
