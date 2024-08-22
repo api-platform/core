@@ -40,6 +40,7 @@ class CommentFactory extends Factory
         return [
             'post_id' => PostFactory::new(),
             'text' => fake()->text(),
+            'internal_note' => fake()->optional()->text(),
         ];
     }
 }

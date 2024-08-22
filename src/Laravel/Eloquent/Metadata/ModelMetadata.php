@@ -264,12 +264,12 @@ final class ModelMetadata
      */
     private function attributeIsHidden(string $attribute, Model $model): bool
     {
-        if (\count($model->getHidden()) > 0) {
-            return \in_array($attribute, $model->getHidden(), true);
+        if ($visible = $model->getVisible()) {
+            return !\in_array($attribute, $visible, true);
         }
 
-        if (\count($model->getVisible()) > 0) {
-            return !\in_array($attribute, $model->getVisible(), true);
+        if ($hidden = $model->getHidden()) {
+            return \in_array($attribute, $hidden, true);
         }
 
         return false;
