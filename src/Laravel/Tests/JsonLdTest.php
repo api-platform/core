@@ -286,9 +286,10 @@ class JsonLdTest extends TestCase
 
     public function testVisible(): void
     {
-        $response = $this->get('/api/posts/1', ['accept' => 'application/ld+json']);
+        $response = $this->get('/api/posts', ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
         $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
+        dump($response->json());
         $response->assertJsonMissingPath('internalNote');
     }
 }
