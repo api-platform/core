@@ -15,10 +15,11 @@ namespace ApiPlatform\Serializer;
 
 use ApiPlatform\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
-use ApiPlatform\Exception\InvalidArgumentException;
+use ApiPlatform\Exception\InvalidArgumentException as LegacyInvalidArgumentException;
 use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -244,7 +245,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 return $this->iriConverter->getResourceFromIri($data, $context + ['fetch_data' => true]);
             } catch (ItemNotFoundException $e) {
                 throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
-            } catch (InvalidArgumentException $e) {
+            } catch (LegacyInvalidArgumentException|InvalidArgumentException $e) {
                 throw new UnexpectedValueException(\sprintf('Invalid IRI "%s".', $data), $e->getCode(), $e);
             }
         }
@@ -541,9 +542,14 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $childContext = $this->createChildContext($this->createOperationContext($context, $className), $attribute, $format);
         $collectionKeyTypes = $type->getCollectionKeyTypes();
         foreach ($value as $index => $obj) {
+            $currentChildContext = $childContext;
+            if (isset($childContext['deserialization_path'])) {
+                $currentChildContext['deserialization_path'] = "{$childContext['deserialization_path']}[{$index}]";
+            }
+
             // no typehint provided on collection key
             if (!$collectionKeyTypes) {
-                $values[$index] = $this->denormalizeRelation($attribute, $propertyMetadata, $className, $obj, $format, $childContext);
+                $values[$index] = $this->denormalizeRelation($attribute, $propertyMetadata, $className, $obj, $format, $currentChildContext);
                 continue;
             }
 
@@ -554,7 +560,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                     continue;
                 }
 
-                $values[$index] = $this->denormalizeRelation($attribute, $propertyMetadata, $className, $obj, $format, $childContext);
+                $values[$index] = $this->denormalizeRelation($attribute, $propertyMetadata, $className, $obj, $format, $currentChildContext);
                 continue 2;
             }
             throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the key "%s" must be "%s", "%s" given.', $index, $collectionKeyTypes[0]->getBuiltinType(), \gettype($index)), $index, [$collectionKeyTypes[0]->getBuiltinType()], ($context['deserialization_path'] ?? false) ? \sprintf('key(%s)', $context['deserialization_path']) : null, true);
@@ -590,7 +596,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 );
 
                 return null;
-            } catch (InvalidArgumentException $e) {
+            } catch (LegacyInvalidArgumentException|InvalidArgumentException $e) {
                 if (!isset($context['not_normalizable_value_exceptions'])) {
                     throw new UnexpectedValueException(\sprintf('Invalid IRI "%s".', $value), $e->getCode(), $e);
                 }
