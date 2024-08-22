@@ -40,6 +40,10 @@ use ApiPlatform\JsonSchema\SchemaFactory;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Laravel\ApiResource\Error;
 use ApiPlatform\Laravel\Controller\ApiPlatformController;
+use ApiPlatform\Laravel\Eloquent\Extension\FilterQueryExtension;
+use ApiPlatform\Laravel\Eloquent\Extension\QueryExtensionInterface;
+use ApiPlatform\Laravel\Eloquent\Filter\FilterInterface as EloquentFilterInterface;
+use ApiPlatform\Laravel\Eloquent\Filter\SearchFilter;
 use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentAttributePropertyMetadataFactory;
 use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentAttributePropertyNameCollectionFactory;
 use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentPropertyMetadataFactory;
@@ -66,6 +70,7 @@ use ApiPlatform\Laravel\State\AccessCheckerProvider;
 use ApiPlatform\Laravel\State\SwaggerUiProcessor;
 use ApiPlatform\Laravel\State\ValidateProvider;
 use ApiPlatform\Metadata\Exception\NotExposedHttpException;
+use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\IdentifiersExtractor;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
@@ -90,6 +95,7 @@ use ApiPlatform\Metadata\Resource\Factory\LinkFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\LinkResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\NotExposedOperationResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\OperationNameResourceMetadataCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\ParameterResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\PhpDocResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
@@ -102,14 +108,18 @@ use ApiPlatform\OpenApi\Factory\OpenApiFactory;
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\OpenApi\Options;
 use ApiPlatform\OpenApi\Serializer\OpenApiNormalizer;
+use ApiPlatform\Serializer\Filter\FilterInterface as SerializerFilterInterface;
+use ApiPlatform\Serializer\Filter\PropertyFilter;
 use ApiPlatform\Serializer\ItemNormalizer;
 use ApiPlatform\Serializer\JsonEncoder;
 use ApiPlatform\Serializer\Mapping\Factory\ClassMetadataFactory as SerializerClassMetadataFactory;
+use ApiPlatform\Serializer\Parameter\SerializerFilterParameterProvider;
 use ApiPlatform\Serializer\SerializerContextBuilder;
 use ApiPlatform\State\CallableProcessor;
 use ApiPlatform\State\CallableProvider;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginationOptions;
+use ApiPlatform\State\ParameterProviderInterface;
 use ApiPlatform\State\Processor\AddLinkHeaderProcessor;
 use ApiPlatform\State\Processor\RespondProcessor;
 use ApiPlatform\State\Processor\SerializeProcessor;
@@ -117,6 +127,7 @@ use ApiPlatform\State\Processor\WriteProcessor;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\Provider\ContentNegotiationProvider;
 use ApiPlatform\State\Provider\DeserializeProvider;
+use ApiPlatform\State\Provider\ParameterProvider;
 use ApiPlatform\State\Provider\ReadProvider;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\SerializerContextBuilderInterface;
@@ -247,38 +258,42 @@ class ApiPlatformProvider extends ServiceProvider
         // TODO: add cached metadata factories
         $this->app->singleton(ResourceMetadataCollectionFactoryInterface::class, function (Application $app) use ($config) {
             return new EloquentResourceCollectionMetadataFactory(
-                new AlternateUriResourceMetadataCollectionFactory(
-                    new FiltersResourceMetadataCollectionFactory(
-                        new FormatsResourceMetadataCollectionFactory(
-                            new InputOutputResourceMetadataCollectionFactory(
-                                new PhpDocResourceMetadataCollectionFactory(
-                                    new OperationNameResourceMetadataCollectionFactory(
-                                        new LinkResourceMetadataCollectionFactory(
-                                            $app->make(LinkFactoryInterface::class),
-                                            new UriTemplateResourceMetadataCollectionFactory(
+                new ParameterResourceMetadataCollectionFactory(
+                    $this->app->make(PropertyNameCollectionFactoryInterface::class),
+                    new AlternateUriResourceMetadataCollectionFactory(
+                        new FiltersResourceMetadataCollectionFactory(
+                            new FormatsResourceMetadataCollectionFactory(
+                                new InputOutputResourceMetadataCollectionFactory(
+                                    new PhpDocResourceMetadataCollectionFactory(
+                                        new OperationNameResourceMetadataCollectionFactory(
+                                            new LinkResourceMetadataCollectionFactory(
                                                 $app->make(LinkFactoryInterface::class),
-                                                $app->make(PathSegmentNameGeneratorInterface::class),
-                                                new NotExposedOperationResourceMetadataCollectionFactory(
+                                                new UriTemplateResourceMetadataCollectionFactory(
                                                     $app->make(LinkFactoryInterface::class),
-                                                    new AttributesResourceMetadataCollectionFactory(
-                                                        null,
-                                                        $app->make(LoggerInterface::class),
-                                                        [
-                                                            'routePrefix' => $config->get('api-platform.routes.prefix') ?? '/',
-                                                        ],
-                                                        false
+                                                    $app->make(PathSegmentNameGeneratorInterface::class),
+                                                    new NotExposedOperationResourceMetadataCollectionFactory(
+                                                        $app->make(LinkFactoryInterface::class),
+                                                        new AttributesResourceMetadataCollectionFactory(
+                                                            null,
+                                                            $app->make(LoggerInterface::class),
+                                                            [
+                                                                'routePrefix' => $config->get('api-platform.routes.prefix') ?? '/',
+                                                            ],
+                                                            false
+                                                        )
                                                     )
                                                 )
                                             )
                                         )
                                     )
-                                )
-                            ),
-                            $config->get('api-platform.formats'),
-                            $config->get('api-platform.patch_formats'),
+                                ),
+                                $config->get('api-platform.formats'),
+                                $config->get('api-platform.patch_formats'),
+                            )
                         )
-                    )
-                ),
+                    ),
+                    $app->make(FilterInterface::class)
+                )
             );
         });
 
@@ -292,6 +307,22 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->bind(OperationMetadataFactoryInterface::class, OperationMetadataFactory::class);
 
+        $this->app->tag([SearchFilter::class], EloquentFilterInterface::class);
+        $this->app->tag([SearchFilter::class, PropertyFilter::class], FilterInterface::class);
+        $this->app->singleton(FilterInterface::class, function (Application $app) {
+            $tagged = iterator_to_array($app->tagged(FilterInterface::class));
+
+            return new ServiceLocator($tagged);
+        });
+
+        $this->app->bind(FilterQueryExtension::class, function (Application $app) {
+            $tagged = iterator_to_array($app->tagged(EloquentFilterInterface::class));
+
+            return new FilterQueryExtension(new ServiceLocator($tagged));
+        });
+
+        $this->app->tag([FilterQueryExtension::class], QueryExtensionInterface::class);
+
         $this->app->singleton(ItemProvider::class, function (Application $app) {
             $tagged = iterator_to_array($app->tagged(LinksHandlerInterface::class));
 
@@ -300,7 +331,7 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->singleton(CollectionProvider::class, function (Application $app) {
             $tagged = iterator_to_array($app->tagged(LinksHandlerInterface::class));
 
-            return new CollectionProvider($app->make(Pagination::class), new LinksHandler($app), new ServiceLocator($tagged));
+            return new CollectionProvider($app->make(Pagination::class), new LinksHandler($app), $app->tagged(QueryExtensionInterface::class), new ServiceLocator($tagged));
         });
         $this->app->tag([ItemProvider::class, CollectionProvider::class], ProviderInterface::class);
 
@@ -326,8 +357,24 @@ class ApiPlatformProvider extends ServiceProvider
             return new DeserializeProvider($app->make(JsonApiProvider::class), $app->make(SerializerInterface::class), $app->make(SerializerContextBuilderInterface::class));
         });
 
+        $this->app->tag([PropertyFilter::class], SerializerFilterInterface::class);
+
+        $this->app->singleton(SerializerFilterParameterProvider::class, function (Application $app) {
+            $tagged = iterator_to_array($app->tagged(SerializerFilterInterface::class));
+
+            return new SerializerFilterParameterProvider(new ServiceLocator($tagged));
+        });
+
+        $this->app->tag([SerializerFilterParameterProvider::class], ParameterProviderInterface::class);
+
+        $this->app->singleton(ParameterProvider::class, function (Application $app) {
+            $tagged = iterator_to_array($app->tagged(ParameterProviderInterface::class));
+
+            return new ParameterProvider($app->make(DeserializeProvider::class), new ServiceLocator($tagged));
+        });
+
         $this->app->singleton(AccessCheckerProvider::class, function (Application $app) {
-            return new AccessCheckerProvider($app->make(DeserializeProvider::class), $app->make(ResourceAccessCheckerInterface::class));
+            return new AccessCheckerProvider($app->make(ParameterProvider::class), $app->make(ResourceAccessCheckerInterface::class));
         });
 
         $this->app->singleton(ContentNegotiationProvider::class, function (Application $app) use ($config) {
@@ -339,6 +386,7 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->tag([RemoveProcessor::class, PersistProcessor::class], ProcessorInterface::class);
         $this->app->singleton(CallableProcessor::class, function (Application $app) {
             $tagged = iterator_to_array($app->tagged(ProcessorInterface::class));
+            // TODO: tag SwaggerUiProcessor instead?
             $tagged['api_platform.swagger_ui.processor'] = $app->make(SwaggerUiProcessor::class);
 
             return new CallableProcessor(new ServiceLocator($tagged));
@@ -503,8 +551,6 @@ class ApiPlatformProvider extends ServiceProvider
             return new DocumentationAction($app->make(ResourceNameCollectionFactoryInterface::class), $config->get('api-platform.title') ?? '', $config->get('api-platform.description') ?? '', $config->get('api-platform.version') ?? '', $app->make(OpenApiFactoryInterface::class), $app->make(ProviderInterface::class), $app->make(ProcessorInterface::class), $app->make(Negotiator::class), $config->get('api-platform.docs_formats'));
         });
 
-        $this->app->singleton(FilterLocator::class, FilterLocator::class);
-
         $this->app->singleton(EntrypointAction::class, function (Application $app) {
             return new EntrypointAction($app->make(ResourceNameCollectionFactoryInterface::class), $app->make(ProviderInterface::class), $app->make(ProcessorInterface::class), ['jsonld' => ['application/ld+json']]);
         });
@@ -539,7 +585,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(PropertyNameCollectionFactoryInterface::class),
                 $app->make(PropertyMetadataFactoryInterface::class),
                 $app->make(SchemaFactoryInterface::class),
-                $app->make(FilterLocator::class),
+                $app->make(FilterInterface::class),
                 $config->get('api-platform.formats'),
                 null, // ?Options $openApiOptions = null,
                 $app->make(PaginationOptions::class), // ?PaginationOptions $paginationOptions = null,

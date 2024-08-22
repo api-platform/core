@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace Workbench\App\Models;
 
+use ApiPlatform\Laravel\Eloquent\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\QueryParameter;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -25,6 +27,7 @@ use Workbench\App\Http\Requests\BookFormRequest;
     paginationItemsPerPage: 5,
     rules: BookFormRequest::class
 )]
+#[QueryParameter(key: ':property', filter: SearchFilter::class)]
 class Book extends Model
 {
     use HasFactory;
