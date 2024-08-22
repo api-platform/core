@@ -269,4 +269,10 @@ class JsonLdTest extends TestCase
         $response = $this->get($iri, ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
     }
+
+    public function testApiDocsRegex(): void
+    {
+        $response = $this->get('/api/notexists', ['accept' => 'application/ld+json']);
+        $response->assertNotFound();
+    }
 }

@@ -811,6 +811,7 @@ class ApiPlatformProvider extends ServiceProvider
 
             return $entrypointAction->__invoke($request);
         });
+        $route->where('index', 'index');
         $route->name('api_entrypoint')->middleware(ApiPlatformMiddleware::class);
         $routeCollection->add($route);
         $route = new Route(['GET'], $prefix.'/.well-known/genid/{id}', function (): void {
