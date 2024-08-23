@@ -179,7 +179,7 @@ final class ModelMetadata
                     $file->next();
                 }
 
-                return collect(static::RELATION_METHODS)
+                return collect(self::RELATION_METHODS)
                     ->contains(fn ($relationMethod) => str_contains($code, '$this->'.$relationMethod.'('));
             })
             ->map(function (\ReflectionMethod $method) use ($model) {

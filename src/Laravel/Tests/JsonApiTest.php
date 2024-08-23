@@ -38,6 +38,20 @@ class JsonApiTest extends TestCase
         });
     }
 
+    public function testGetEntrypoint(): void
+    {
+        $response = $this->get('/api/', ['accept' => ['application/vnd.api+json']]);
+        $response->assertStatus(200);
+        $response->assertHeader('content-type', 'application/vnd.api+json; charset=utf-8');
+        $this->assertJsonContains([
+            'links' => [
+                'self' => 'http://localhost/api',
+                'book' => 'http://localhost/api/books',
+            ],
+        ],
+            $response->json());
+    }
+
     public function testGetCollection(): void
     {
         $response = $this->get('/api/books', ['accept' => ['application/vnd.api+json']]);

@@ -535,8 +535,8 @@ class ApiPlatformProvider extends ServiceProvider
             return new DocumentationAction($app->make(ResourceNameCollectionFactoryInterface::class), $config->get('api-platform.title') ?? '', $config->get('api-platform.description') ?? '', $config->get('api-platform.version') ?? '', $app->make(OpenApiFactoryInterface::class), $app->make(ProviderInterface::class), $app->make(ProcessorInterface::class), $app->make(Negotiator::class), $config->get('api-platform.docs_formats'));
         });
 
-        $this->app->singleton(EntrypointAction::class, function (Application $app) {
-            return new EntrypointAction($app->make(ResourceNameCollectionFactoryInterface::class), $app->make(ProviderInterface::class), $app->make(ProcessorInterface::class), ['jsonld' => ['application/ld+json']]);
+        $this->app->singleton(EntrypointAction::class, function (Application $app) use ($config) {
+            return new EntrypointAction($app->make(ResourceNameCollectionFactoryInterface::class), $app->make(ProviderInterface::class), $app->make(ProcessorInterface::class), $config->get('api-platform.formats'));
         });
 
         $this->app->singleton(Pagination::class, function () use ($config) {
