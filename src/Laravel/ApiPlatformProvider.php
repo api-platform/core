@@ -62,6 +62,8 @@ use ApiPlatform\Laravel\Eloquent\State\LinksHandlerInterface;
 use ApiPlatform\Laravel\Eloquent\State\PersistProcessor;
 use ApiPlatform\Laravel\Eloquent\State\RemoveProcessor;
 use ApiPlatform\Laravel\Exception\ErrorHandler;
+use ApiPlatform\Laravel\Metadata\ConcernsResourceMetadataCollectionFactory;
+use ApiPlatform\Laravel\Metadata\ConcernsResourceNameCollectionFactory;
 use ApiPlatform\Laravel\Routing\IriConverter;
 use ApiPlatform\Laravel\Routing\Router as UrlGeneratorRouter;
 use ApiPlatform\Laravel\Routing\SkolemIriConverter;
@@ -205,7 +207,7 @@ class ApiPlatformProvider extends ServiceProvider
             $refl = new \ReflectionClass(Error::class);
             $paths[] = \dirname($refl->getFileName());
 
-            return new AttributesResourceNameCollectionFactory($paths);
+            return new ConcernsResourceNameCollectionFactory($paths, new AttributesResourceNameCollectionFactory($paths));
         });
 
         $this->app->bind(ResourceClassResolverInterface::class, ResourceClassResolver::class);
@@ -273,13 +275,20 @@ class ApiPlatformProvider extends ServiceProvider
                                                     $app->make(PathSegmentNameGeneratorInterface::class),
                                                     new NotExposedOperationResourceMetadataCollectionFactory(
                                                         $app->make(LinkFactoryInterface::class),
-                                                        new AttributesResourceMetadataCollectionFactory(
-                                                            null,
+                                                        new ConcernsResourceMetadataCollectionFactory(
+                                                            new AttributesResourceMetadataCollectionFactory(
+                                                                null,
+                                                                $app->make(LoggerInterface::class),
+                                                                [
+                                                                    'routePrefix' => $config->get('api-platform.routes.prefix') ?? '/',
+                                                                ],
+                                                                false,
+                                                            ),
                                                             $app->make(LoggerInterface::class),
                                                             [
                                                                 'routePrefix' => $config->get('api-platform.routes.prefix') ?? '/',
                                                             ],
-                                                            false
+                                                            false,
                                                         )
                                                     )
                                                 )
