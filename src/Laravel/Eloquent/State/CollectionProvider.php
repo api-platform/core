@@ -15,8 +15,6 @@ namespace ApiPlatform\Laravel\Eloquent\State;
 
 use ApiPlatform\Laravel\Eloquent\Extension\QueryExtensionInterface;
 use ApiPlatform\Laravel\Eloquent\Paginator;
-use ApiPlatform\Metadata\Exception\RuntimeException;
-use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\ProviderInterface;
@@ -46,10 +44,6 @@ final class CollectionProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        if (!$operation instanceof HttpOperation) {
-            throw new RuntimeException('Not an HTTP operation.');
-        }
-
         /** @var Model $model */
         $model = new ($operation->getClass())();
 

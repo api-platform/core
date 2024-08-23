@@ -15,7 +15,6 @@ namespace ApiPlatform\GraphQl\Type;
 
 use ApiPlatform\Doctrine\Odm\State\Options as ODMOptions;
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactory;
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface;
 use ApiPlatform\Metadata\GraphQl\Mutation;
@@ -51,7 +50,7 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
 {
     private readonly ContextAwareTypeBuilderInterface $typeBuilder;
 
-    public function __construct(private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ResourceClassResolverInterface $resourceClassResolver, private readonly TypesContainerInterface $typesContainer, ContextAwareTypeBuilderInterface $typeBuilder, private readonly TypeConverterInterface $typeConverter, private readonly ResolverFactoryInterface $itemResolverFactory, private readonly ?ResolverFactoryInterface $collectionResolverFactory, private readonly ?ResolverFactoryInterface $itemMutationResolverFactory, private readonly ?ResolverFactoryInterface $itemSubscriptionResolverFactory, private readonly ContainerInterface $filterLocator, private readonly Pagination $pagination, private readonly ?NameConverterInterface $nameConverter, private readonly string $nestingSeparator, private readonly ?InflectorInterface $inflector = new Inflector())
+    public function __construct(private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ResourceClassResolverInterface $resourceClassResolver, private readonly TypesContainerInterface $typesContainer, ContextAwareTypeBuilderInterface $typeBuilder, private readonly TypeConverterInterface $typeConverter, private readonly ResolverFactoryInterface $resolverFactory, private readonly ContainerInterface $filterLocator, private readonly Pagination $pagination, private readonly ?NameConverterInterface $nameConverter, private readonly string $nestingSeparator, private readonly ?InflectorInterface $inflector = new Inflector())
     {
         $this->typeBuilder = $typeBuilder;
     }
@@ -66,7 +65,7 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
             'args' => [
                 'id' => ['type' => GraphQLType::nonNull(GraphQLType::id())],
             ],
-            'resolve' => ($this->itemResolverFactory)(),
+            'resolve' => ($this->resolverFactory)(),
         ];
     }
 
@@ -450,22 +449,10 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
                 $args = $this->getFilterArgs($args, $resourceClass, $rootResource, $resourceOperation, $rootOperation, $property, $depth);
             }
 
-            if ($this->itemResolverFactory instanceof ResolverFactory) {
-                if ($isStandardGraphqlType || $input) {
-                    $resolve = null;
-                } else {
-                    $resolve = ($this->itemResolverFactory)($resourceClass, $rootResource, $resourceOperation, $this->propertyMetadataFactory);
-                }
+            if ($isStandardGraphqlType || $input) {
+                $resolve = null;
             } else {
-                if ($isStandardGraphqlType || $input) {
-                    $resolve = null;
-                } elseif (($rootOperation instanceof Mutation || $rootOperation instanceof Subscription) && $depth <= 0) {
-                    $resolve = $rootOperation instanceof Mutation ? ($this->itemMutationResolverFactory)($resourceClass, $rootResource, $resourceOperation) : ($this->itemSubscriptionResolverFactory)($resourceClass, $rootResource, $resourceOperation);
-                } elseif ($this->typeBuilder->isCollection($type)) {
-                    $resolve = ($this->collectionResolverFactory)($resourceClass, $rootResource, $resourceOperation);
-                } else {
-                    $resolve = ($this->itemResolverFactory)($resourceClass, $rootResource, $resourceOperation);
-                }
+                $resolve = ($this->resolverFactory)($resourceClass, $rootResource, $resourceOperation, $this->propertyMetadataFactory);
             }
 
             return [

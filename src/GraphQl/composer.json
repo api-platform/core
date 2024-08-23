@@ -24,7 +24,6 @@
         "api-platform/metadata": "^3.2 || ^4.0",
         "api-platform/serializer": "^3.2 || ^4.0",
         "api-platform/state": "^3.2 || ^4.0",
-        "api-platform/validator": "^3.2 || ^4.0",
         "symfony/property-info": "^6.4 || ^7.1",
         "symfony/serializer": "^6.4 || ^7.1",
         "webonyx/graphql-php": "^14.0 || ^15.0",
@@ -41,6 +40,9 @@
         "api-platform/doctrine-common": "^3.2 || ^4.0",
         "api-platform/doctrine-odm": "^3.2 || ^4.0",
         "api-platform/doctrine-orm": "^3.2 || ^4.0"
+    },
+    "suggest": {
+        "api-platform/validator": "To support validation."
     },
     "autoload": {
         "psr-4": {
