@@ -176,7 +176,6 @@ class ApiPlatformProvider extends ServiceProvider
 
         /** @var Repository $config */
         $config = $this->app['config'];
-        $formats = $config->get('api-platform.formats');
 
         $defaultContext = [];
 
@@ -257,7 +256,7 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         // TODO: add cached metadata factories
-        $this->app->singleton(ResourceMetadataCollectionFactoryInterface::class, function (Application $app) use ($config, $formats) {
+        $this->app->singleton(ResourceMetadataCollectionFactoryInterface::class, function (Application $app) use ($config) {
             return new EloquentResourceCollectionMetadataFactory(
                 new ParameterResourceMetadataCollectionFactory(
                     $this->app->make(PropertyNameCollectionFactoryInterface::class),
@@ -288,7 +287,7 @@ class ApiPlatformProvider extends ServiceProvider
                                         )
                                     )
                                 ),
-                                $formats,
+                                $config->get('api-platform.formats'),
                                 $config->get('api-platform.patch_formats'),
                             )
                         )
@@ -378,8 +377,8 @@ class ApiPlatformProvider extends ServiceProvider
             return new AccessCheckerProvider($app->make(ParameterProvider::class), $app->make(ResourceAccessCheckerInterface::class));
         });
 
-        $this->app->singleton(ContentNegotiationProvider::class, function (Application $app) use ($config, $formats) {
-            return new ContentNegotiationProvider($app->make(AccessCheckerProvider::class), new Negotiator(), $formats, $config->get('api-platform.error_formats'));
+        $this->app->singleton(ContentNegotiationProvider::class, function (Application $app) use ($config) {
+            return new ContentNegotiationProvider($app->make(AccessCheckerProvider::class), new Negotiator(), $config->get('api-platform.formats'), $config->get('api-platform.error_formats'));
         });
 
         $this->app->bind(ProviderInterface::class, ContentNegotiationProvider::class);
@@ -536,8 +535,8 @@ class ApiPlatformProvider extends ServiceProvider
             return new DocumentationAction($app->make(ResourceNameCollectionFactoryInterface::class), $config->get('api-platform.title') ?? '', $config->get('api-platform.description') ?? '', $config->get('api-platform.version') ?? '', $app->make(OpenApiFactoryInterface::class), $app->make(ProviderInterface::class), $app->make(ProcessorInterface::class), $app->make(Negotiator::class), $config->get('api-platform.docs_formats'));
         });
 
-        $this->app->singleton(EntrypointAction::class, function (Application $app) use ($formats) {
-            return new EntrypointAction($app->make(ResourceNameCollectionFactoryInterface::class), $app->make(ProviderInterface::class), $app->make(ProcessorInterface::class), $formats);
+        $this->app->singleton(EntrypointAction::class, function (Application $app) use ($config) {
+            return new EntrypointAction($app->make(ResourceNameCollectionFactoryInterface::class), $app->make(ProviderInterface::class), $app->make(ProcessorInterface::class), $config->get('api-platform.formats'));
         });
 
         $this->app->singleton(Pagination::class, function () use ($config) {
@@ -563,7 +562,7 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->bind(OpenApiFactoryInterface::class, OpenApiFactory::class);
-        $this->app->singleton(OpenApiFactory::class, function (Application $app) use ($formats) {
+        $this->app->singleton(OpenApiFactory::class, function (Application $app) use ($config) {
             return new OpenApiFactory(
                 $app->make(ResourceNameCollectionFactoryInterface::class),
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
@@ -571,7 +570,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(PropertyMetadataFactoryInterface::class),
                 $app->make(SchemaFactoryInterface::class),
                 $app->make(FilterInterface::class),
-                $formats,
+                $config->get('api-platform.formats'),
                 null, // ?Options $openApiOptions = null,
                 $app->make(PaginationOptions::class), // ?PaginationOptions $paginationOptions = null,
                 // ?RouterInterface $router = null
@@ -579,18 +578,18 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->bind(DefinitionNameFactoryInterface::class, DefinitionNameFactory::class);
-        $this->app->singleton(DefinitionNameFactory::class, function () use ($formats) {
-            return new DefinitionNameFactory($formats);
+        $this->app->singleton(DefinitionNameFactory::class, function () use ($config) {
+            return new DefinitionNameFactory($config->get('api-platform.formats'));
         });
 
-        $this->app->singleton(SchemaFactory::class, function (Application $app) use ($formats) {
+        $this->app->singleton(SchemaFactory::class, function (Application $app) use ($config) {
             return new SchemaFactory(
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(PropertyNameCollectionFactoryInterface::class),
                 $app->make(PropertyMetadataFactoryInterface::class),
                 $app->make(NameConverterInterface::class),
                 $app->make(ResourceClassResolverInterface::class),
-                $formats,
+                $config->get('api-platform.formats'),
                 $app->make(DefinitionNameFactoryInterface::class),
             );
         });
