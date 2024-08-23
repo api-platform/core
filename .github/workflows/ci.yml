@@ -945,7 +945,7 @@ jobs:
         run: |
           composer global require soyuka/pmu
           composer global config allow-plugins.soyuka/pmu true --no-interaction
-          composer global link . --working-directory=${{ github.workspace }}
+          composer global link . --working-directory="${{ github.workspace }}"
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
