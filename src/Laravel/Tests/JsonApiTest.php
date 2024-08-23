@@ -33,7 +33,7 @@ class JsonApiTest extends TestCase
      */
     protected function defineEnvironment($app): void
     {
-        tap($app['config'], function (Repository $config) {
+        tap($app['config'], function (Repository $config): void {
             $config->set('api-platform.formats', ['jsonapi' => ['application/vnd.api+json']]);
         });
     }
