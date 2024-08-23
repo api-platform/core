@@ -50,7 +50,7 @@ class Comment extends Model
 {
     use HasFactory;
 
-    protected $visible = ['text', 'post'];
+    protected $hidden = ['internal_note'];
 
     public function post(): BelongsTo
     {
