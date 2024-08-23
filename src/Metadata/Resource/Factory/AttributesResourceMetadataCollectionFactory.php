@@ -15,6 +15,7 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
 /**
@@ -41,7 +42,8 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
 
         $metadataCollection = [];
         foreach ($reflectionClass->getAttributes() as $attribute) {
-            if ($this->isResourceMetadata($attribute->getName())) {
+            $name = $attribute->getName();
+            if ($this->isResourceMetadata($name)) {
                 $metadataCollection[] = $attribute->newInstance();
             }
         }

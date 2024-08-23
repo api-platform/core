@@ -28,8 +28,9 @@ use Psr\Log\NullLogger;
 /**
  * @internal
  *
- * This trait shares the common logic between attributes and Laravel concerns factories
+ * This trait shares the common logic between attributes and Laravel concerns factories.
  *
+ * @author Antoine Bluchet <soyuka@gmail.com>
  * @author Kévin Dunglas <kevin@dunglas.dev>
  */
 trait MetadataCollectionFactoryTrait
@@ -45,7 +46,7 @@ trait MetadataCollectionFactoryTrait
 
     private function isResourceMetadata(string $name): bool
     {
-        return is_a($name, ApiResource::class, true) || is_subclass_of($name, HttpOperation::class) || is_subclass_of($name, GraphQlOperation::class);
+        return is_a($name, ApiResource::class, true) || is_subclass_of($name, HttpOperation::class) || is_subclass_of($name, GraphQlOperation::class) || is_a($name, Parameter::class, true);
     }
 
     /**
@@ -58,7 +59,7 @@ trait MetadataCollectionFactoryTrait
      * Get
      * In the future, we will be able to use nested attributes (https://wiki.php.net/rfc/new_in_initializers).
      *
-     * @param Metadata|Parameter[] $metadataCollection
+     * @param array<Metadata|Parameter> $metadataCollection
      *
      * @return ApiResource[]
      */
@@ -73,7 +74,7 @@ trait MetadataCollectionFactoryTrait
 
         foreach ($metadataCollection as $metadata) {
             if ($metadata instanceof Parameter) {
-                if (!$k = $metadataCollection->getKey()) {
+                if (!$k = $metadata->getKey()) {
                     throw new RuntimeException('Parameter "key" is mandatory when used on a class.');
                 }
                 $globalParameters->add($k, $metadata);
