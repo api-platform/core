@@ -289,6 +289,6 @@ class JsonLdTest extends TestCase
         $response = $this->get('/api/books', ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
         $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
-        $this->assertStringNotContainsString('internalNote', $response->getContent());
+        $this->assertStringNotContainsString('internalNote', (string) $response->getContent());
     }
 }
