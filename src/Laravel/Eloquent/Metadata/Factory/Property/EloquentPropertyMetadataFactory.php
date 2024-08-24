@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
@@ -67,10 +68,15 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
                 continue;
             }
 
+            // see https://laravel.com/docs/11.x/eloquent-mutators#attribute-casting
             $builtinType = $p['cast'] ?? $p['type'];
             $type = match ($builtinType) {
-                'datetime', 'date' => new Type(Type::BUILTIN_TYPE_OBJECT, $p['nullable'], \DateTime::class),
+                'double', 'real' => new Type(Type::BUILTIN_TYPE_FLOAT, $p['nullable']),
+                'datetime', 'date', 'timestamp' => new Type(Type::BUILTIN_TYPE_OBJECT, $p['nullable'], \DateTime::class),
                 'immutable_datetime', 'immutable_date' => new Type(Type::BUILTIN_TYPE_OBJECT, $p['nullable'], \DateTimeImmutable::class),
+                'collection', 'encrypted:collection' => new Type(Type::BUILTIN_TYPE_ITERABLE, $p['nullable'], Collection::class, true),
+                'encrypted:array' => new Type(Type::BUILTIN_TYPE_ARRAY, $p['nullable']),
+                'encrypted:object' => new Type(Type::BUILTIN_TYPE_OBJECT, $p['nullable']),
                 default => new Type(\in_array($builtinType, Type::$builtinTypes, true) ? $builtinType : Type::BUILTIN_TYPE_STRING, $p['nullable']),
             };
 
