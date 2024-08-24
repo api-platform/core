@@ -46,7 +46,11 @@ final class EloquentPropertyNameCollectionMetadataFactory implements PropertyNam
             return $this->decorated?->create($resourceClass, $options) ?? new PropertyNameCollection();
         }
 
+        /**
+         * @var array<string, true> $properties
+         */
         $properties = [];
+
         // When it's an Eloquent model we read attributes from database (@see ShowModelCommand)
         foreach ($this->modelMetadata->getAttributes($model) as $property) {
             if (!$property['primary'] && $property['hidden']) {
@@ -64,6 +68,8 @@ final class EloquentPropertyNameCollectionMetadataFactory implements PropertyNam
             $properties[$relation['name']] = true;
         }
 
-        return new PropertyNameCollection(array_keys($properties));
+        return new PropertyNameCollection(
+            array_keys($properties) // @phpstan-ignore-line
+        );
     }
 }
