@@ -28,7 +28,7 @@ use Psr\Log\NullLogger;
 /**
  * @internal
  *
- * This trait shares the common logic between attributes and Laravel concerns factories.
+ * This trait shares the common logic between attributes and Laravel concerns factories
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  * @author Kévin Dunglas <kevin@dunglas.dev>
