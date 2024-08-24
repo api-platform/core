@@ -35,19 +35,18 @@ final class EloquentPropertyNameCollectionMetadataFactory implements PropertyNam
      */
     public function create(string $resourceClass, array $options = []): PropertyNameCollection
     {
-        $propertyNameCollection = $this->decorated?->create($resourceClass, $options);
         if (!class_exists($resourceClass) || !is_a($resourceClass, Model::class, true)) {
-            return $propertyNameCollection ?? new PropertyNameCollection();
+            return $this->decorated?->create($resourceClass, $options) ?? new PropertyNameCollection();
         }
 
         $refl = new \ReflectionClass($resourceClass);
         try {
             $model = $refl->newInstanceWithoutConstructor();
         } catch (\ReflectionException) {
-            return $propertyNameCollection ?? new PropertyNameCollection();
+            return $this->decorated?->create($resourceClass, $options) ?? new PropertyNameCollection();
         }
 
-        $properties = $propertyNameCollection ? array_flip(iterator_to_array($propertyNameCollection)) : [];
+        $properties = [];
         // When it's an Eloquent model we read attributes from database (@see ShowModelCommand)
         foreach ($this->modelMetadata->getAttributes($model) as $property) {
             if (!$property['primary'] && $property['hidden']) {
