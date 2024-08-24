@@ -45,7 +45,6 @@ use ApiPlatform\Laravel\Eloquent\Extension\QueryExtensionInterface;
 use ApiPlatform\Laravel\Eloquent\Filter\FilterInterface as EloquentFilterInterface;
 use ApiPlatform\Laravel\Eloquent\Filter\SearchFilter;
 use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentAttributePropertyMetadataFactory;
-use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentAttributePropertyNameCollectionFactory;
 use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentPropertyMetadataFactory;
 use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentPropertyNameCollectionMetadataFactory;
 use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Resource\EloquentResourceCollectionMetadataFactory;
@@ -62,6 +61,7 @@ use ApiPlatform\Laravel\Eloquent\State\LinksHandlerInterface;
 use ApiPlatform\Laravel\Eloquent\State\PersistProcessor;
 use ApiPlatform\Laravel\Eloquent\State\RemoveProcessor;
 use ApiPlatform\Laravel\Exception\ErrorHandler;
+use ApiPlatform\Laravel\Metadata\ConcernsPropertyNameCollectionMetadataFactory;
 use ApiPlatform\Laravel\Metadata\ConcernsResourceMetadataCollectionFactory;
 use ApiPlatform\Laravel\Metadata\ConcernsResourceNameCollectionFactory;
 use ApiPlatform\Laravel\Routing\IriConverter;
@@ -72,6 +72,7 @@ use ApiPlatform\Laravel\State\AccessCheckerProvider;
 use ApiPlatform\Laravel\State\SwaggerUiProcessor;
 use ApiPlatform\Laravel\State\ValidateProvider;
 use ApiPlatform\Metadata\Exception\NotExposedHttpException;
+use ApiPlatform\Metadata\Factory\Property\ClassLevelAttributePropertyNameCollectionFactory;
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\IdentifiersExtractor;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
@@ -240,11 +241,13 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->singleton(PropertyNameCollectionFactoryInterface::class, function (Application $app) {
-            return new EloquentAttributePropertyNameCollectionFactory(
-                new EloquentPropertyNameCollectionMetadataFactory(
-                    $app->make(ModelMetadata::class),
-                    new PropertyInfoPropertyNameCollectionFactory($app->make(PropertyInfoExtractorInterface::class)),
-                    $app->make(ResourceClassResolverInterface::class)
+            return new ClassLevelAttributePropertyNameCollectionFactory(
+                new ConcernsPropertyNameCollectionMetadataFactory(
+                    new EloquentPropertyNameCollectionMetadataFactory(
+                        $app->make(ModelMetadata::class),
+                        new PropertyInfoPropertyNameCollectionFactory($app->make(PropertyInfoExtractorInterface::class)),
+                        $app->make(ResourceClassResolverInterface::class)
+                    )
                 )
             );
         });

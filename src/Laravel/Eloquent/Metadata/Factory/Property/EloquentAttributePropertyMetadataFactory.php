@@ -15,9 +15,13 @@ namespace ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property;
 
 use ApiPlatform\JsonSchema\Metadata\Property\Factory\SchemaPropertyMetadataFactory;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Handles Eloquent methods for relations.
+ */
 final class EloquentAttributePropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
     public function __construct(
@@ -28,7 +32,8 @@ final class EloquentAttributePropertyMetadataFactory implements PropertyMetadata
     public function create(string $resourceClass, string $property, array $options = []): ApiProperty
     {
         if (!class_exists($resourceClass)) {
-            return $this->decorated?->create($resourceClass, $property, $options) ?? new ApiProperty();
+            return $this->decorated?->create($resourceClass, $property, $options) ??
+                $this->throwNotFound($resourceClass, $property);
         }
 
         $refl = new \ReflectionClass($resourceClass);
@@ -36,27 +41,22 @@ final class EloquentAttributePropertyMetadataFactory implements PropertyMetadata
 
         $propertyMetadata = $this->decorated?->create($resourceClass, $property, $options);
         if (!$model instanceof Model) {
-            return $propertyMetadata ?? new ApiProperty();
+            return $propertyMetadata ?? $this->throwNotFound($resourceClass, $property);
         }
 
-        try {
-            $method = $refl->getMethod($property);
-
-            if ($attributes = $method->getAttributes(ApiProperty::class)) {
-                return $this->createMetadata($attributes[0]->newInstance(), $propertyMetadata);
-            }
-        } catch (\ReflectionException) {
-        }
-
-        $attributes = $refl->getAttributes(ApiProperty::class);
-        foreach ($attributes as $attribute) {
-            $instance = $attribute->newInstance();
-            if ($instance->getProperty() === $property) {
-                return $this->createMetadata($instance, $propertyMetadata);
-            }
+        if ($refl->hasMethod($property) && $attributes = $refl->getMethod($property)->getAttributes(ApiProperty::class)) {
+            return $this->createMetadata($attributes[0]->newInstance(), $propertyMetadata);
         }
 
         return $propertyMetadata;
+    }
+
+    /**
+     * @throws PropertyNotFoundException
+     */
+    private function throwNotFound(string $resourceClass, string $property): never
+    {
+        throw new PropertyNotFoundException(\sprintf('Property "%s" of class "%s" not found.', $property, $resourceClass));
     }
 
     private function createMetadata(ApiProperty $attribute, ?ApiProperty $propertyMetadata = null): ApiProperty
@@ -66,7 +66,7 @@ final class EloquentAttributePropertyMetadataFactory implements PropertyMetadata
         }
 
         foreach (get_class_methods(ApiProperty::class) as $method) {
-            if (preg_match('/^(?:get|is)(.*)/', (string) $method, $matches) && null !== $val = $attribute->{$method}()) {
+            if (preg_match('/^(?:get|is)(.*)/', $method, $matches) && null !== $val = $attribute->{$method}()) {
                 $propertyMetadata = $propertyMetadata->{"with{$matches[1]}"}($val);
             }
         }

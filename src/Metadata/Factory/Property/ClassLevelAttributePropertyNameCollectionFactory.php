@@ -11,13 +11,16 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property;
+namespace ApiPlatform\Metadata\Factory\Property;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 
-final class EloquentAttributePropertyNameCollectionFactory implements PropertyNameCollectionFactoryInterface
+/**
+ * Gathers "virtual" properties created using the ApiProperty attribute at class level.
+ */
+final class ClassLevelAttributePropertyNameCollectionFactory implements PropertyNameCollectionFactoryInterface
 {
     public function __construct(
         private readonly ?PropertyNameCollectionFactoryInterface $decorated = null,
@@ -26,11 +29,12 @@ final class EloquentAttributePropertyNameCollectionFactory implements PropertyNa
 
     public function create(string $resourceClass, array $options = []): PropertyNameCollection
     {
-        $properties = $this->decorated ? iterator_to_array($this->decorated->create($resourceClass, $options)) : [];
-
+        $parentPropertyNameCollection = $this->decorated?->create($resourceClass, $options);
         if (!class_exists($resourceClass)) {
-            return new PropertyNameCollection($properties);
+            return $parentPropertyNameCollection ?? new PropertyNameCollection();
         }
+
+        $properties = $parentPropertyNameCollection ? iterator_to_array($parentPropertyNameCollection) : [];
 
         $refl = new \ReflectionClass($resourceClass);
         $attributes = $refl->getAttributes(ApiProperty::class);
