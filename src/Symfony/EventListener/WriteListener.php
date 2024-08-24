@@ -90,6 +90,16 @@ final class WriteListener
             return;
         }
 
+        $canWrite = $operation->canWrite();
+
+        if (null === $canWrite) {
+            $canWrite = !$request->isMethodSafe();
+        }
+
+        if (!$canWrite) {
+            return;
+        }
+
         if ($operation && (!$this->processor instanceof CallableProcessor && !$this->iriConverter)) {
             if (null === $operation->canWrite()) {
                 $operation = $operation->withWrite(!$request->isMethodSafe());
