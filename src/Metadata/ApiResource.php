@@ -22,7 +22,7 @@ use ApiPlatform\State\OptionsInterface;
  *
  * The API Resource attribute declares the behaviors attached to a Resource inside API Platform.
  * This class is immutable, and if you set a value yourself, API Platform will not override the value.
- * The API Resource helps sharing options with operations.
+ * The API Resource helps to share options with operations.
  *
  * Read more about how metadata works [here](/docs/in-depth/metadata).
  *

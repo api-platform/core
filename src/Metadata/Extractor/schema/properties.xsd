@@ -44,6 +44,7 @@
         <xsd:attribute name="securityPostDenormalize" type="xsd:string"/>
         <xsd:attribute name="initializable" type="xsd:boolean"/>
         <xsd:attribute name="genId" type="xsd:boolean"/>
+        <xsd:attribute name="property" type="xsd:string"/>
         <xsd:attribute name="uriTemplate" type="xsd:string"/>
     </xsd:complexType>
 
