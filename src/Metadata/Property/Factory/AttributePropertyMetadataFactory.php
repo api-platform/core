@@ -89,6 +89,14 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
             }
         }
 
+        $attributes = $reflectionClass->getAttributes(ApiProperty::class);
+        foreach ($attributes as $attribute) {
+            $instance = $attribute->newInstance();
+            if ($instance->getProperty() === $property) {
+                return $this->createMetadata($instance, $parentPropertyMetadata);
+            }
+        }
+
         return $this->handleNotFound($parentPropertyMetadata, $resourceClass, $property);
     }
 

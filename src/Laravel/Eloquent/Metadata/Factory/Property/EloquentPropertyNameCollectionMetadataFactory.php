@@ -23,7 +23,7 @@ final class EloquentPropertyNameCollectionMetadataFactory implements PropertyNam
 {
     public function __construct(
         private readonly ModelMetadata $modelMetadata,
-        private readonly PropertyNameCollectionFactoryInterface $decorated,
+        private readonly ?PropertyNameCollectionFactoryInterface $decorated,
         private readonly ResourceClassResolverInterface $resourceClassResolver,
     ) {
     }
@@ -35,29 +35,29 @@ final class EloquentPropertyNameCollectionMetadataFactory implements PropertyNam
      */
     public function create(string $resourceClass, array $options = []): PropertyNameCollection
     {
-        if (!class_exists($resourceClass)) {
-            return $this->decorated->create($resourceClass, $options);
+        if (!class_exists($resourceClass) || !is_a($resourceClass, Model::class, true)) {
+            return $this->decorated?->create($resourceClass, $options) ?? new PropertyNameCollection();
         }
 
+        $refl = new \ReflectionClass($resourceClass);
         try {
-            $refl = new \ReflectionClass($resourceClass);
             $model = $refl->newInstanceWithoutConstructor();
         } catch (\ReflectionException) {
-            return $this->decorated->create($resourceClass, $options);
+            return $this->decorated?->create($resourceClass, $options) ?? new PropertyNameCollection();
         }
 
-        if (!$model instanceof Model) {
-            return $this->decorated->create($resourceClass, $options);
-        }
-
+        /**
+         * @var array<string, true> $properties
+         */
         $properties = [];
+
         // When it's an Eloquent model we read attributes from database (@see ShowModelCommand)
         foreach ($this->modelMetadata->getAttributes($model) as $property) {
             if (!$property['primary'] && $property['hidden']) {
                 continue;
             }
 
-            $properties[] = $property['name'];
+            $properties[$property['name']] = true;
         }
 
         foreach ($this->modelMetadata->getRelations($model) as $relation) {
@@ -65,9 +65,11 @@ final class EloquentPropertyNameCollectionMetadataFactory implements PropertyNam
                 continue;
             }
 
-            $properties[] = $relation['name'];
+            $properties[$relation['name']] = true;
         }
 
-        return new PropertyNameCollection($properties);
+        return new PropertyNameCollection(
+            array_keys($properties) // @phpstan-ignore-line
+        );
     }
 }

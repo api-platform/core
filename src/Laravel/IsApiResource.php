@@ -11,14 +11,17 @@
 
 declare(strict_types=1);
 
-namespace Workbench\App\Models;
+namespace ApiPlatform\Laravel;
 
-use ApiPlatform\Laravel\IsApiResource;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use ApiPlatform\Metadata\ApiResource;
 
-class Author extends Model
+/**
+ * @author Kévin Dunglas <kevin@dunglas.dev>
+ */
+trait IsApiResource
 {
-    use HasFactory;
-    use IsApiResource;
+    public static function apiResource(): ApiResource
+    {
+        return new ApiResource();
+    }
 }
