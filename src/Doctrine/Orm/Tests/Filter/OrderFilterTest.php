@@ -191,6 +191,19 @@ class OrderFilterTest extends DoctrineOrmFilterTestCase
                     ],
                 ],
             ],
+            'order[dummyBackedEnum]' => [
+                'property' => 'dummyBackedEnum',
+                'type' => 'string',
+                'required' => false,
+                'schema' => [
+                    'default' => 'asc',
+                    'type' => 'string',
+                    'enum' => [
+                        'asc',
+                        'desc',
+                    ],
+                ],
+            ],
         ], $filter->getDescription($this->resourceClass));
 
         $this->assertEquals([

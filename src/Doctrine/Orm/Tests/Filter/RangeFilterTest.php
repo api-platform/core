@@ -331,6 +331,31 @@ class RangeFilterTest extends DoctrineOrmFilterTestCase
                 'type' => 'string',
                 'required' => false,
             ],
+            'dummyBackedEnum[between]' => [
+                'property' => 'dummyBackedEnum',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'dummyBackedEnum[gt]' => [
+                'property' => 'dummyBackedEnum',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'dummyBackedEnum[gte]' => [
+                'property' => 'dummyBackedEnum',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'dummyBackedEnum[lt]' => [
+                'property' => 'dummyBackedEnum',
+                'type' => 'string',
+                'required' => false,
+            ],
+            'dummyBackedEnum[lte]' => [
+                'property' => 'dummyBackedEnum',
+                'type' => 'string',
+                'required' => false,
+            ],
         ], $filter->getDescription($this->resourceClass));
     }
 

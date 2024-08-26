@@ -88,6 +88,11 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
                 'type' => 'bool',
                 'required' => false,
             ],
+            'exists[dummyBackedEnum]' => [
+                'property' => 'dummyBackedEnum',
+                'type' => 'bool',
+                'required' => false,
+            ],
         ], $filter->getDescription($this->resourceClass));
     }
 
