@@ -50,7 +50,7 @@ final class EloquentResourceCollectionMetadataFactory implements ResourceMetadat
 
         foreach ($resourceMetadataCollection as $i => $resourceMetadata) {
             $operations = $resourceMetadata->getOperations();
-            foreach ($operations as $operationName => $operation) {
+            foreach ($operations ?? [] as $operationName => $operation) {
                 if (!$operation->getProvider()) {
                     $operation = $operation->withProvider($operation instanceof CollectionOperationInterface ? CollectionProvider::class : ItemProvider::class);
                 }
@@ -63,6 +63,24 @@ final class EloquentResourceCollectionMetadataFactory implements ResourceMetadat
             }
 
             $resourceMetadataCollection[$i] = $resourceMetadata->withOperations($operations);
+
+            $graphQlOperations = $resourceMetadata->getGraphQlOperations();
+
+            foreach ($graphQlOperations ?? [] as $operationName => $graphQlOperation) {
+                if (!$graphQlOperation->getProvider()) {
+                    $graphQlOperation = $graphQlOperation->withProvider($graphQlOperation instanceof CollectionOperationInterface ? CollectionProvider::class : ItemProvider::class);
+                }
+
+                if (!$graphQlOperation->getProcessor()) {
+                    $graphQlOperation = $graphQlOperation->withProcessor($graphQlOperation instanceof DeleteOperationInterface ? RemoveProcessor::class : PersistProcessor::class);
+                }
+
+                $graphQlOperations[$operationName] = $graphQlOperation;
+            }
+
+            $resourceMetadata = $resourceMetadata->withGraphQlOperations($graphQlOperations);
+
+            $resourceMetadataCollection[$i] = $resourceMetadata;
         }
 
         return $resourceMetadataCollection;

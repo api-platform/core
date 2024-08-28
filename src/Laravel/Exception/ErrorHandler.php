@@ -40,13 +40,17 @@ class ErrorHandler extends ExceptionsHandler
 
     public static mixed $error;
 
+    /**
+     * @param array<class-string, int> $exceptionToStatus
+     */
     public function __construct(
         Container $container,
         ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
         private readonly ApiPlatformController $apiPlatformController,
         private readonly ?IdentifiersExtractorInterface $identifiersExtractor = null,
         private readonly ?ResourceClassResolverInterface $resourceClassResolver = null,
-        ?Negotiator $negotiator = null
+        ?Negotiator $negotiator = null,
+        private readonly ?array $exceptionToStatus = null
     ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->negotiator = $negotiator;
@@ -160,7 +164,8 @@ class ErrorHandler extends ExceptionsHandler
     {
         $exceptionToStatus = array_merge(
             $apiOperation ? $apiOperation->getExceptionToStatus() ?? [] : [],
-            $errorOperation ? $errorOperation->getExceptionToStatus() ?? [] : []
+            $errorOperation ? $errorOperation->getExceptionToStatus() ?? [] : [],
+            $this->exceptionToStatus ?? []
         );
 
         foreach ($exceptionToStatus as $class => $status) {

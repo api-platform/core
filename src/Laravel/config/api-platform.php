@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
+
 return [
     'title' => 'API Platform',
     'description' => 'My awesome API',
@@ -56,4 +59,15 @@ return [
             'parameter_name' => 'order',
         ],
     ],
+
+    'graphql' => [
+        'enabled' => true,
+        'nesting_separator' => '__',
+        'introspection' => ['enabled' => true]
+    ],
+
+    'exception_to_status' => [
+        AuthenticationException::class => 401,
+        AuthorizationException::class => 403
+    ]
 ];

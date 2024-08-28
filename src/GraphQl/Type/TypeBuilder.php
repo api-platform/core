@@ -41,9 +41,15 @@ final class TypeBuilder implements ContextAwareTypeBuilderInterface
 {
     private $defaultFieldResolver;
 
-    public function __construct(private readonly TypesContainerInterface $typesContainer, callable $defaultFieldResolver, private readonly ContainerInterface $fieldsBuilderLocator, private readonly Pagination $pagination)
+    public function __construct(private readonly TypesContainerInterface $typesContainer, callable $defaultFieldResolver, private ?ContainerInterface $fieldsBuilderLocator, private readonly Pagination $pagination)
     {
+        $this->fieldsBuilderLocator = $fieldsBuilderLocator;
         $this->defaultFieldResolver = $defaultFieldResolver;
+    }
+
+    public function setFieldsBuilderLocator(ContainerInterface $fieldsBuilderLocator): void
+    {
+        $this->fieldsBuilderLocator = $fieldsBuilderLocator;
     }
 
     /**

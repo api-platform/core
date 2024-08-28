@@ -15,6 +15,36 @@ namespace ApiPlatform\Laravel;
 
 use ApiPlatform\Documentation\Action\DocumentationAction;
 use ApiPlatform\Documentation\Action\EntrypointAction;
+use ApiPlatform\GraphQl\Error\ErrorHandler as GraphQlErrorHandler;
+use ApiPlatform\GraphQl\Error\ErrorHandlerInterface;
+use ApiPlatform\GraphQl\Executor;
+use ApiPlatform\GraphQl\ExecutorInterface;
+use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactory;
+use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactoryInterface;
+use ApiPlatform\GraphQl\Resolver\ResourceFieldResolver;
+use ApiPlatform\GraphQl\Serializer\Exception\ErrorNormalizer as GraphQlErrorNormalizer;
+use ApiPlatform\GraphQl\Serializer\Exception\HttpExceptionNormalizer as GraphQlHttpExceptionNormalizer;
+use ApiPlatform\GraphQl\Serializer\Exception\RuntimeExceptionNormalizer as GraphQlRuntimeExceptionNormalizer;
+use ApiPlatform\GraphQl\Serializer\Exception\ValidationExceptionNormalizer as GraphQlValidationExceptionNormalizer;
+use ApiPlatform\GraphQl\Serializer\ItemNormalizer as GraphQlItemNormalizer;
+use ApiPlatform\GraphQl\Serializer\ObjectNormalizer as GraphQlObjectNormalizer;
+use ApiPlatform\GraphQl\Serializer\SerializerContextBuilder as GraphQlSerializerContextBuilder;
+use ApiPlatform\GraphQl\State\Processor\NormalizeProcessor;
+use ApiPlatform\GraphQl\State\Provider\DenormalizeProvider as GraphQlDenormalizeProvider;
+use ApiPlatform\GraphQl\State\Provider\ReadProvider as GraphQlReadProvider;
+use ApiPlatform\GraphQl\State\Provider\ResolverProvider;
+use ApiPlatform\GraphQl\Type\ContextAwareTypeBuilderInterface;
+use ApiPlatform\GraphQl\Type\FieldsBuilder;
+use ApiPlatform\GraphQl\Type\FieldsBuilderEnumInterface;
+use ApiPlatform\GraphQl\Type\SchemaBuilder;
+use ApiPlatform\GraphQl\Type\SchemaBuilderInterface;
+use ApiPlatform\GraphQl\Type\TypeBuilder;
+use ApiPlatform\GraphQl\Type\TypeConverter;
+use ApiPlatform\GraphQl\Type\TypeConverterInterface;
+use ApiPlatform\GraphQl\Type\TypesContainer;
+use ApiPlatform\GraphQl\Type\TypesContainerInterface;
+use ApiPlatform\GraphQl\Type\TypesFactory;
+use ApiPlatform\GraphQl\Type\TypesFactoryInterface;
 use ApiPlatform\Hydra\JsonSchema\SchemaFactory as HydraSchemaFactory;
 use ApiPlatform\Hydra\Serializer\CollectionNormalizer as HydraCollectionNormalizer;
 use ApiPlatform\Hydra\Serializer\DocumentationNormalizer as HydraDocumentationNormalizer;
@@ -61,6 +91,8 @@ use ApiPlatform\Laravel\Eloquent\State\LinksHandlerInterface;
 use ApiPlatform\Laravel\Eloquent\State\PersistProcessor;
 use ApiPlatform\Laravel\Eloquent\State\RemoveProcessor;
 use ApiPlatform\Laravel\Exception\ErrorHandler;
+use ApiPlatform\Laravel\GraphQl\Controller\EntrypointController as GraphQlEntrypointController;
+use ApiPlatform\Laravel\GraphQl\Controller\GraphiQlController;
 use ApiPlatform\Laravel\Metadata\ConcernsPropertyNameCollectionMetadataFactory;
 use ApiPlatform\Laravel\Metadata\ConcernsResourceMetadataCollectionFactory;
 use ApiPlatform\Laravel\Metadata\ConcernsResourceNameCollectionFactory;
@@ -76,6 +108,7 @@ use ApiPlatform\Metadata\Factory\Property\ClassLevelAttributePropertyNameCollect
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\IdentifiersExtractor;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
+use ApiPlatform\Metadata\InflectorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactory;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
@@ -107,6 +140,7 @@ use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\Metadata\ResourceClassResolver;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
+use ApiPlatform\Metadata\Util\Inflector;
 use ApiPlatform\OpenApi\Factory\OpenApiFactory;
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\OpenApi\Options;
@@ -201,6 +235,10 @@ class ApiPlatformProvider extends ServiceProvider
             return new ClassMetadataFactory(new AttributeLoader());
         });
 
+        $this->app->singleton(SerializerClassMetadataFactory::class, function (Application $app) {
+            return new SerializerClassMetadataFactory($app->make(ClassMetadataFactoryInterface::class));
+        });
+
         $this->app->bind(PathSegmentNameGeneratorInterface::class, UnderscorePathSegmentNameGenerator::class);
 
         $this->app->singleton(ResourceNameCollectionFactoryInterface::class, function () use ($config) {
@@ -229,7 +267,7 @@ class ApiPlatformProvider extends ServiceProvider
             return new SchemaPropertyMetadataFactory(
                 $app->make(ResourceClassResolverInterface::class),
                 new SerializerPropertyMetadataFactory(
-                    new SerializerClassMetadataFactory($app->make(ClassMetadataFactoryInterface::class)),
+                    $app->make(SerializerClassMetadataFactory::class),
                     new AttributePropertyMetadataFactory(
                         new EloquentAttributePropertyMetadataFactory(
                             $inner,
@@ -285,13 +323,13 @@ class ApiPlatformProvider extends ServiceProvider
                                                                 [
                                                                     'routePrefix' => $config->get('api-platform.routes.prefix') ?? '/',
                                                                 ],
-                                                                false,
+                                                                $config->get('api-platform.graphql.enabled'),
                                                             ),
                                                             $app->make(LoggerInterface::class),
                                                             [
                                                                 'routePrefix' => $config->get('api-platform.routes.prefix') ?? '/',
                                                             ],
-                                                            false,
+                                                            $config->get('api-platform.graphql.enabled'),
                                                         )
                                                     )
                                                 )
@@ -389,8 +427,9 @@ class ApiPlatformProvider extends ServiceProvider
             return new AccessCheckerProvider($app->make(ParameterProvider::class), $app->make(ResourceAccessCheckerInterface::class));
         });
 
+        $this->app->singleton(Negotiator::class, function (Application $app) { return new Negotiator(); });
         $this->app->singleton(ContentNegotiationProvider::class, function (Application $app) use ($config) {
-            return new ContentNegotiationProvider($app->make(AccessCheckerProvider::class), new Negotiator(), $config->get('api-platform.formats'), $config->get('api-platform.error_formats'));
+            return new ContentNegotiationProvider($app->make(AccessCheckerProvider::class), $app->make(Negotiator::class), $config->get('api-platform.formats'), $config->get('api-platform.error_formats'));
         });
 
         $this->app->bind(ProviderInterface::class, ContentNegotiationProvider::class);
@@ -693,9 +732,51 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
+        if ($config->get('api-platform.graphql.enabled')) {
+            $this->app->singleton(GraphQlItemNormalizer::class, function (Application $app) {
+                return new GraphQlItemNormalizer(
+                    $app->make(PropertyNameCollectionFactoryInterface::class),
+                    $app->make(PropertyMetadataFactoryInterface::class),
+                    $app->make(IriConverterInterface::class),
+                    $app->make(IdentifiersExtractorInterface::class),
+                    $app->make(ResourceClassResolverInterface::class),
+                    $app->make(PropertyAccessorInterface::class),
+                    $app->make(NameConverterInterface::class),
+                    $app->make(SerializerClassMetadataFactory::class),
+                    null,
+                    $app->make(ResourceMetadataCollectionFactoryInterface::class),
+                    $app->make(ResourceAccessCheckerInterface::class)
+                );
+            });
+
+            $this->app->singleton(GraphQlObjectNormalizer::class, function (Application $app) {
+                return new GraphQlObjectNormalizer(
+                    $app->make(ObjectNormalizer::class),
+                    $app->make(IriConverterInterface::class),
+                    $app->make(IdentifiersExtractorInterface::class),
+                );
+            });
+        }
+
+        $this->app->singleton(GraphQlErrorNormalizer::class, function () {
+            return new GraphQlErrorNormalizer();
+        });
+
+        $this->app->singleton(GraphQlValidationExceptionNormalizer::class, function () use ($config) {
+            return new GraphQlValidationExceptionNormalizer($config->get('api-platform.exception_to_status'));
+        });
+
+        $this->app->singleton(GraphQlHttpExceptionNormalizer::class, function () {
+            return new GraphQlHttpExceptionNormalizer();
+        });
+
+        $this->app->singleton(GraphQlRuntimeExceptionNormalizer::class, function () {
+            return new GraphQlHttpExceptionNormalizer();
+        });
+
         $this->app->bind(SerializerInterface::class, Serializer::class);
         $this->app->bind(NormalizerInterface::class, Serializer::class);
-        $this->app->singleton(Serializer::class, function (Application $app) {
+        $this->app->singleton(Serializer::class, function (Application $app) use ($config) {
             $list = new \SplPriorityQueue();
             $list->insert($app->make(HydraEntrypointNormalizer::class), -800);
             $list->insert($app->make(HydraCollectionNormalizer::class), -800);
@@ -714,6 +795,16 @@ class ApiPlatformProvider extends ServiceProvider
             $list->insert($app->make(JsonApiCollectionNormalizer::class), -985);
             $list->insert($app->make(JsonApiItemNormalizer::class), -890);
             $list->insert($app->make(JsonApiObjectNormalizer::class), -995);
+
+            if ($config->get('api-platform.graphql.enabled')) {
+                $list->insert($app->make(GraphQlItemNormalizer::class), -890);
+                $list->insert($app->make(GraphQlObjectNormalizer::class), -995);
+                $list->insert($app->make(GraphQlErrorNormalizer::class), -790);
+                $list->insert($app->make(GraphQlValidationExceptionNormalizer::class), -780);
+                $list->insert($app->make(GraphQlHttpExceptionNormalizer::class), -780);
+                $list->insert($app->make(GraphQlRuntimeExceptionNormalizer::class), -780);
+            }
+
             // TODO: unused + implement hal/jsonapi ?
             // $list->insert($dataUriNormalizer, -920);
             // $list->insert($unwrappingDenormalizer, 1000);
@@ -745,22 +836,158 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->singleton(
             ExceptionHandlerInterface::class,
-            function (Application $app) {
+            function (Application $app) use ($config) {
                 return new ErrorHandler(
                     $app,
                     $app->make(ResourceMetadataCollectionFactoryInterface::class),
                     $app->make(ApiPlatformController::class),
                     $app->make(IdentifiersExtractorInterface::class),
                     $app->make(ResourceClassResolverInterface::class),
-                    $app->make(Negotiator::class)
+                    $app->make(Negotiator::class),
+                    $config->get('api-platform.exception_to_status')
                 );
             }
         );
 
-        // $this->app->afterResolving(
-        //     \Illuminate\Foundation\Exceptions\Handler::class,
-        //     fn ($handler) => $using(new Exceptions($handler)),
-        // );
+        $this->app->singleton(InflectorInterface::class, function (Application $app) {
+            return new Inflector();
+        });
+
+        if ($config->get('api-platform.graphql.enabled')) {
+            $this->registerGraphQl($this->app, $config);
+        }
+    }
+
+    private function registerGraphQl(Application $app, Repository $config): void
+    {
+        $app->singleton('api_platform.graphql.type_locator', function (Application $app) {
+            $tagged = iterator_to_array($app->tagged('api_platform.graphql.type'));
+
+            return new ServiceLocator($tagged);
+        });
+
+        $app->singleton(TypesFactoryInterface::class, function (Application $app) {
+            $tagged = iterator_to_array($app->tagged('api_platform.graphql.type'));
+
+            return new TypesFactory($app->make('api_platform.graphql.type_locator'), array_keys($tagged));
+        });
+        $app->singleton(TypesContainerInterface::class, function () {
+            return new TypesContainer();
+        });
+
+        $app->singleton(ResourceFieldResolver::class, function (Application $app) {
+            return new ResourceFieldResolver($app->make(IriConverterInterface::class));
+        });
+
+        $app->singleton(ContextAwareTypeBuilderInterface::class, function (Application $app) {
+            return new TypeBuilder(
+                $app->make(TypesContainerInterface::class),
+                $app->make(ResourceFieldResolver::class),
+                null,
+                $app->make(Pagination::class)
+            );
+        });
+
+        $app->singleton(TypeConverterInterface::class, function (Application $app) {
+            return new TypeConverter(
+                $app->make(ContextAwareTypeBuilderInterface::class),
+                $app->make(TypesContainerInterface::class),
+                $app->make(ResourceMetadataCollectionFactoryInterface::class),
+                $app->make(PropertyMetadataFactoryInterface::class),
+            );
+        });
+
+        $app->singleton(GraphQlSerializerContextBuilder::class, function (Application $app) {
+            return new GraphQlSerializerContextBuilder($app->make(NameConverterInterface::class));
+        });
+
+        $app->singleton('api_platform.graphql.state_provider', function (Application $app) use ($config) {
+            $tagged = iterator_to_array($app->tagged(ParameterProviderInterface::class));
+            $resolvers = iterator_to_array($app->tagged('api_platform.graphql.resolver'));
+
+            return new GraphQlReadProvider(
+                new GraphQlDenormalizeProvider(
+                    new ResolverProvider(
+                        new ParameterProvider(
+                            $app->make(CallableProvider::class),
+                            new ServiceLocator($tagged)
+                        ),
+                        new ServiceLocator($resolvers),
+                    ),
+                    $app->make(SerializerInterface::class),
+                    $app->make(GraphQlSerializerContextBuilder::class)
+                ),
+                $app->make(IriConverterInterface::class),
+                $app->make(GraphQlSerializerContextBuilder::class),
+                $config->get('api-platform.graphql.nesting_separator') ?? '__'
+            );
+        });
+
+        $app->singleton('api_platform.graphql.state_processor', function (Application $app) {
+            return new WriteProcessor(
+                new NormalizeProcessor(
+                    $app->make(SerializerInterface::class),
+                    $app->make(GraphQlSerializerContextBuilder::class),
+                    $app->make(Pagination::class)
+                ),
+                $app->make(CallableProcessor::class),
+            );
+        });
+
+        $app->singleton(ResolverFactoryInterface::class, function (Application $app) {
+            return new ResolverFactory(
+                $app->make('api_platform.graphql.state_provider'),
+                $app->make('api_platform.graphql.state_processor')
+            );
+        });
+
+        $app->singleton(FieldsBuilderEnumInterface::class, function (Application $app) use ($config) {
+            return new FieldsBuilder(
+                $app->make(PropertyNameCollectionFactoryInterface::class),
+                $app->make(PropertyMetadataFactoryInterface::class),
+                $app->make(ResourceMetadataCollectionFactoryInterface::class),
+                $app->make(ResourceClassResolverInterface::class),
+                $app->make(TypesContainerInterface::class),
+                $app->make(ContextAwareTypeBuilderInterface::class),
+                $app->make(TypeConverterInterface::class),
+                $app->make(ResolverFactoryInterface::class),
+                $app->make(FilterInterface::class),
+                $app->make(Pagination::class),
+                $app->make(NameConverterInterface::class),
+                $config->get('api-platform.graphql.nesting_separator') ?? '__',
+                $app->make(InflectorInterface::class)
+            );
+        });
+
+        $app->singleton(SchemaBuilderInterface::class, function (Application $app) {
+            return new SchemaBuilder($app->make(ResourceNameCollectionFactoryInterface::class), $app->make(ResourceMetadataCollectionFactoryInterface::class), $app->make(TypesFactoryInterface::class), $app->make(TypesContainerInterface::class), $app->make(FieldsBuilderEnumInterface::class));
+        });
+
+        $app->singleton(ErrorHandlerInterface::class, function () {
+            return new GraphQlErrorHandler();
+        });
+
+        $app->singleton(ExecutorInterface::class, function () use ($config) {
+            return new Executor($config->get('api-platform.graphql.introspection.enabled') ?? false);
+        });
+
+        $app->singleton(GraphiQlController::class, function () use ($config) {
+            $prefix = $config->get('api-platform.routes.prefix') ?? '';
+
+            return new GraphiQlController($prefix);
+        });
+
+        $app->singleton(GraphQlEntrypointController::class, function (Application $app) {
+            return new GraphQlEntrypointController(
+                $app->make(SchemaBuilderInterface::class),
+                $app->make(ExecutorInterface::class),
+                $app->make(GraphiQlController::class),
+                $app->make(SerializerInterface::class),
+                $app->make(ErrorHandlerInterface::class),
+                debug: true,
+                negotiator: $app->make(Negotiator::class)
+            );
+        });
     }
 
     /**
@@ -779,6 +1006,10 @@ class ApiPlatformProvider extends ServiceProvider
         }
 
         $this->loadViewsFrom(__DIR__.'/resources/views', 'api-platform');
+
+        $fieldsBuilder = $this->app->make(FieldsBuilderEnumInterface::class);
+        $typeBuilder = $this->app->make(ContextAwareTypeBuilderInterface::class);
+        $typeBuilder->setFieldsBuilderLocator(new ServiceLocator(['api_platform.graphql.fields_builder' => $fieldsBuilder]));
 
         if (!$this->shouldRegisterRoutes()) {
             return;
@@ -831,6 +1062,23 @@ class ApiPlatformProvider extends ServiceProvider
         });
         $route->name('api_genid')->middleware(ApiPlatformMiddleware::class);
         $routeCollection->add($route);
+
+        if ($config->get('api-platform.graphql.enabled')) {
+            $route = new Route(['POST', 'GET'], $prefix.'/graphql', function (Application $app, Request $request) {
+                $entrypointAction = $app->make(GraphQlEntrypointController::class);
+
+                return $entrypointAction->__invoke($request);
+            });
+            $routeCollection->add($route);
+
+            $route = new Route(['GET'], $prefix.'/graphiql', function (Application $app) {
+                $controller = $app->make(GraphiQlController::class);
+
+                return $controller->__invoke();
+            });
+            $routeCollection->add($route);
+        }
+
         $router->setRoutes($routeCollection);
     }
 
