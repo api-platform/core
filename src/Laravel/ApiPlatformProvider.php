@@ -73,8 +73,15 @@ use ApiPlatform\Laravel\ApiResource\Error;
 use ApiPlatform\Laravel\Controller\ApiPlatformController;
 use ApiPlatform\Laravel\Eloquent\Extension\FilterQueryExtension;
 use ApiPlatform\Laravel\Eloquent\Extension\QueryExtensionInterface;
+use ApiPlatform\Laravel\Eloquent\Filter\AfterDateFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\BeforeDateFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\DateFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\EndSearchFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\FilterInterface as EloquentFilterInterface;
-use ApiPlatform\Laravel\Eloquent\Filter\SearchFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\ExactSearchFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\OrFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\PartialSearchFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\StartSearchFilter;
 use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentAttributePropertyMetadataFactory;
 use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentPropertyMetadataFactory;
 use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentPropertyNameCollectionMetadataFactory;
@@ -106,7 +113,6 @@ use ApiPlatform\Laravel\State\SwaggerUiProcessor;
 use ApiPlatform\Laravel\State\SwaggerUiProvider;
 use ApiPlatform\Laravel\State\ValidateProvider;
 use ApiPlatform\Metadata\Exception\NotExposedHttpException;
-use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\IdentifiersExtractor;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\InflectorInterface;
@@ -195,6 +201,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
@@ -361,7 +368,8 @@ class ApiPlatformProvider extends ServiceProvider
                                 )
                             )
                         ),
-                        $app->make(FilterInterface::class)
+                        $app->make('filters'),
+                        $app->make(CamelCaseToSnakeCaseNameConverter::class)
                     )
                 ),
                 true === $config->get('app.debug') ? 'array' : 'file'
@@ -378,13 +386,7 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->bind(OperationMetadataFactoryInterface::class, OperationMetadataFactory::class);
 
-        $this->app->tag([SearchFilter::class], EloquentFilterInterface::class);
-        $this->app->tag([SearchFilter::class, PropertyFilter::class], FilterInterface::class);
-        $this->app->singleton(FilterInterface::class, function (Application $app) {
-            $tagged = iterator_to_array($app->tagged(FilterInterface::class));
-
-            return new ServiceLocator($tagged);
-        });
+        $this->app->tag([ExactSearchFilter::class, PartialSearchFilter::class, StartSearchFilter::class, EndSearchFilter::class, DateFilter::class, BeforeDateFilter::class, AfterDateFilter::class], EloquentFilterInterface::class);
 
         $this->app->bind(FilterQueryExtension::class, function (Application $app) {
             $tagged = iterator_to_array($app->tagged(EloquentFilterInterface::class));
@@ -444,6 +446,13 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->tag([SerializerFilterParameterProvider::class], ParameterProviderInterface::class);
+
+        $this->app->singleton('filters', function(Application $app) {
+            return new ServiceLocator(array_merge(
+                iterator_to_array($app->tagged(SerializerFilterInterface::class)),
+                iterator_to_array($app->tagged(EloquentFilterInterface::class))
+            ));
+        });
 
         $this->app->singleton(ParameterProvider::class, function (Application $app) {
             $tagged = iterator_to_array($app->tagged(ParameterProviderInterface::class));
@@ -673,7 +682,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(PropertyNameCollectionFactoryInterface::class),
                 $app->make(PropertyMetadataFactoryInterface::class),
                 $app->make(SchemaFactoryInterface::class),
-                $app->make(FilterInterface::class),
+                null,
                 $config->get('api-platform.formats'),
                 null, // ?Options $openApiOptions = null,
                 $app->make(PaginationOptions::class), // ?PaginationOptions $paginationOptions = null,
