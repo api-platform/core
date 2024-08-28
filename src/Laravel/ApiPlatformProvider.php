@@ -102,6 +102,7 @@ use ApiPlatform\Laravel\Routing\SkolemIriConverter;
 use ApiPlatform\Laravel\Security\ResourceAccessChecker;
 use ApiPlatform\Laravel\State\AccessCheckerProvider;
 use ApiPlatform\Laravel\State\SwaggerUiProcessor;
+use ApiPlatform\Laravel\State\SwaggerUiProvider;
 use ApiPlatform\Laravel\State\ValidateProvider;
 use ApiPlatform\Metadata\Exception\NotExposedHttpException;
 use ApiPlatform\Metadata\Factory\Property\ClassLevelAttributePropertyNameCollectionFactory;
@@ -395,8 +396,12 @@ class ApiPlatformProvider extends ServiceProvider
             return new ReadProvider($app->make(CallableProvider::class));
         });
 
+        $this->app->singleton(SwaggerUiProvider::class, function (Application $app) {
+            return new SwaggerUiProvider($app->make(ReadProvider::class), $app->make(OpenApiFactoryInterface::class));
+        });
+
         $this->app->singleton(ValidateProvider::class, function (Application $app) {
-            return new ValidateProvider($app->make(ReadProvider::class), $app);
+            return new ValidateProvider($app->make(SwaggerUiProvider::class), $app);
         });
 
         $this->app->singleton(JsonApiProvider::class, function (Application $app) use ($config) {
@@ -587,7 +592,7 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->singleton(EntrypointAction::class, function (Application $app) use ($config) {
-            return new EntrypointAction($app->make(ResourceNameCollectionFactoryInterface::class), $app->make(ProviderInterface::class), $app->make(ProcessorInterface::class), $config->get('api-platform.formats'));
+            return new EntrypointAction($app->make(ResourceNameCollectionFactoryInterface::class), $app->make(ProviderInterface::class), $app->make(ProcessorInterface::class), $config->get('api-platform.docs_formats'));
         });
 
         $this->app->singleton(Pagination::class, function () use ($config) {
