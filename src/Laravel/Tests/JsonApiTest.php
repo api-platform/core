@@ -35,6 +35,7 @@ class JsonApiTest extends TestCase
     {
         tap($app['config'], function (Repository $config): void {
             $config->set('api-platform.formats', ['jsonapi' => ['application/vnd.api+json']]);
+            $config->set('api-platform.docs_formats', ['jsonapi' => ['application/vnd.api+json']]);
         });
     }
 
