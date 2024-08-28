@@ -13,7 +13,14 @@ declare(strict_types=1);
 
 namespace Workbench\App\Models;
 
-use ApiPlatform\Laravel\Eloquent\Filter\SearchFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\AfterDateFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\BeforeDateFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\DateFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\EndSearchFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\ExactSearchFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\OrFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\PartialSearchFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\StartSearchFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -22,6 +29,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\OpenApi\Model\Parameter;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -41,7 +49,18 @@ use Workbench\App\Http\Requests\BookFormRequest;
         new GetCollection(),
     ]
 )]
-#[QueryParameter(key: ':property', filter: SearchFilter::class)]
+#[QueryParameter(key: 'isbn', filter: ExactSearchFilter::class)]
+#[QueryParameter(key: 'name', filter: PartialSearchFilter::class)]
+#[QueryParameter(key: 'publicationDate', schema: ['type' => 'date'], filter: DateFilter::class)]
+#[QueryParameter(key: 'publicationDate[before]', schema: ['type' => 'date'], filter: BeforeDateFilter::class, property: 'publication_date')]
+#[QueryParameter(key: 'publicationDate[after]', schema: ['type' => 'date'], filter: AfterDateFilter::class, property: 'publication_date')]
+#[QueryParameter(
+    key: 'name2',
+    schema: ['type' => 'array', 'items' => ['type' => 'string']],
+    openApi: new Parameter(name: 'name2', in: 'query', style: 'deepObject', explode: true),
+    filter: new OrFilter(new PartialSearchFilter),
+    property: 'name'
+)]
 class Book extends Model
 {
     use HasFactory;

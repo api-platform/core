@@ -17,13 +17,14 @@ use ApiPlatform\Metadata\Parameter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
-interface FilterInterface
+final class ExactSearchFilter implements FilterInterface
 {
     /**
      * @param Builder<Model>       $builder
      * @param array<string, mixed> $context
-     *
-     * @return Builder<Model>
      */
-    public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder;
+    public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder
+    {
+        return $builder->where($parameter->getProperty(), $values);
+    }
 }

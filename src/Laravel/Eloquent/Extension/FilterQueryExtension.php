@@ -48,7 +48,7 @@ final readonly class FilterQueryExtension implements QueryExtensionInterface
                 continue;
             }
 
-            $filter = $this->filterLocator->has($filterId) ? $this->filterLocator->get($filterId) : null;
+            $filter = $filterId instanceof FilterInterface ? $filterId : ($this->filterLocator->has($filterId) ? $this->filterLocator->get($filterId) : null);
             if ($filter instanceof FilterInterface) {
                 $builder = $filter->apply($builder, $values, $parameter, $context);
             }

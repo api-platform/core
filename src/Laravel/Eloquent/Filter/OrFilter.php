@@ -17,13 +17,22 @@ use ApiPlatform\Metadata\Parameter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
-interface FilterInterface
+final readonly class OrFilter implements FilterInterface
 {
+    public function __construct(private FilterInterface $filter)
+    {
+    }
+
     /**
      * @param Builder<Model>       $builder
      * @param array<string, mixed> $context
-     *
-     * @return Builder<Model>
      */
-    public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder;
+    public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder
+    {
+        foreach ($values as $value) {
+            $this->filter->apply($builder, $value, $parameter, ['whereClause' => 'orWhere'] + $context);
+        }
+
+        return $builder;
+    }
 }

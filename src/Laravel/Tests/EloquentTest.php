@@ -32,4 +32,35 @@ class EloquentTest extends TestCase
         $response = $this->get('/api/books?isbn='.$book['isbn'], ['accept' => ['application/ld+json']]);
         $this->assertSame($response->json()['hydra:member'][0], $book);
     }
+
+    public function testPartialSearchFilter(): void
+    {
+        $response = $this->get('/api/books', ['accept' => ['application/ld+json']]);
+        $book = $response->json()['hydra:member'][0];
+
+        $name = substr($book['name'],0, strpos($book['name'],' '));
+
+        $response = $this->get('/api/books?name='.$name, ['accept' => ['application/ld+json']]);
+        $this->assertSame($response->json()['hydra:member'][0], $book);
+    }
+
+    public function testDateSearchFilter(): void
+    {
+        // get the 1st book object return
+        $response = $this->get('/api/books', ['accept' => ['application/ld+json']]);
+        $book = $response->json()['hydra:member'][0];
+
+        // patch to add a specific date to test on
+        $this->patch(
+            $book['@id'],
+            [ 'publicationDate' => '2024-18-02 00:00:00'],
+            [
+                'accept' => ['application/ld+json'],
+                'Content-Type' => ['application/merge-patch+json']
+            ]
+        );
+
+        $response = $this->get('/api/books?publicationDate='.$book['publicationDate'], ['accept' => ['application/ld+json']]);
+        $this->assertSame($response->json()['hydra:member'][0], $book);
+    }
 }
