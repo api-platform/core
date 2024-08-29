@@ -60,6 +60,11 @@ use Symfony\Component\WebLink\Link;
 class Error extends \Exception implements ProblemExceptionInterface, HttpExceptionInterface
 {
     /**
+     * @var array<int, mixed>
+     */
+    private array $originalTrace;
+
+    /**
      * @param array<string, string> $headers
      * @param array<int, mixed>     $originalTrace
      */
@@ -67,12 +72,18 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
         private readonly string $title,
         private readonly string $detail,
         #[ApiProperty(identifier: true)] private int $status,
-        private readonly array $originalTrace,
+        array $originalTrace,
         private readonly ?string $instance = null,
         private string $type = 'about:blank',
         private array $headers = []
     ) {
         parent::__construct();
+
+        $this->originalTrace = [];
+        foreach ($originalTrace as $i => $t) {
+            unset($t['args']); // we don't want arguments in our JSON traces, especially with xdebug
+            $this->originalTrace[$i] = $t;
+        }
     }
 
     /**
