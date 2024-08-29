@@ -51,10 +51,8 @@ trait ParameterParserTrait
             $key = $parsedKey[0];
         } elseif (str_contains($key, '[')) {
             preg_match_all('/[^\[\]]+/', $key, $matches);
-            if (isset($matches[0])) {
-                $key = array_shift($matches[0]);
-                $accessors = $matches[0];
-            }
+            $key = array_shift($matches[0]);
+            $accessors = $matches[0];
         }
 
         $value = $values[$key] ?? new ParameterNotFound();
