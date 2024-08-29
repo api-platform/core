@@ -16,3 +16,5 @@
 %Since symfony/validator 7.1: Not passing a value for the "requireTld" option to the Url constraint is deprecated. Its default value will change to "true".%
 
 %$fieldsBuilder argument of SchemaBuilder implementing "ApiPlatform\\GraphQl\\Type\\FieldsBuilderInterface" is deprecated since API Platform 3.1. It has to implement "ApiPlatform\\GraphQl\\Type\\FieldsBuilderEnumInterface" instead.%
+
+%Since symfony/dependency-injection 7.2: Type "tagged" is deprecated for tag <argument>, use "tagged_iterator" instead%

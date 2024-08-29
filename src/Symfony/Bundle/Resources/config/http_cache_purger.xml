@@ -7,15 +7,15 @@
     <services>
         <service id="api_platform.http_cache.purger.varnish" alias="api_platform.http_cache.purger.varnish.ban" public="false" />
         <service id="api_platform.http_cache.purger.varnish.ban" class="ApiPlatform\HttpCache\VarnishPurger" public="false">
-            <argument type="tagged" tag="api_platform.http_cache.http_client" />
+            <argument type="tagged_iterator" tag="api_platform.http_cache.http_client" />
         </service>
         <service id="api_platform.http_cache.purger.varnish.xkey" class="ApiPlatform\HttpCache\VarnishXKeyPurger" public="false">
-            <argument type="tagged" tag="api_platform.http_cache.http_client" />
+            <argument type="tagged_iterator" tag="api_platform.http_cache.http_client" />
             <argument>%api_platform.http_cache.invalidation.max_header_length%</argument>
             <argument>%api_platform.http_cache.invalidation.xkey.glue%</argument>
         </service>
         <service id="api_platform.http_cache.purger.souin" class="ApiPlatform\HttpCache\SouinPurger" public="false">
-            <argument type="tagged" tag="api_platform.http_cache.http_client" />
+            <argument type="tagged_iterator" tag="api_platform.http_cache.http_client" />
             <argument>%api_platform.http_cache.invalidation.max_header_length%</argument>
         </service>
     </services>
