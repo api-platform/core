@@ -83,7 +83,7 @@ final class PathItem
         return $this->servers;
     }
 
-    public function getParameters(): array
+    public function getParameters(): ?array
     {
         return $this->parameters;
     }
