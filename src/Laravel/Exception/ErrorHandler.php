@@ -50,7 +50,8 @@ class ErrorHandler extends ExceptionsHandler
         private readonly ?IdentifiersExtractorInterface $identifiersExtractor = null,
         private readonly ?ResourceClassResolverInterface $resourceClassResolver = null,
         ?Negotiator $negotiator = null,
-        private readonly ?array $exceptionToStatus = null
+        private readonly ?array $exceptionToStatus = null,
+        private readonly ?bool $debug = false
     ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->negotiator = $negotiator;
@@ -135,7 +136,7 @@ class ErrorHandler extends ExceptionsHandler
             }
 
             if (!isset($normalizationContext[AbstractObjectNormalizer::IGNORED_ATTRIBUTES])) {
-                $normalizationContext[AbstractObjectNormalizer::IGNORED_ATTRIBUTES] = ['trace', 'file', 'line', 'code', 'message', 'originalTrace'];
+                $normalizationContext[AbstractObjectNormalizer::IGNORED_ATTRIBUTES] = true === $this->debug ? [] : ['originalTrace'];
             }
 
             $operation = $operation->withNormalizationContext($normalizationContext);

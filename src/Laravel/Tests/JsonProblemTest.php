@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Tests;
 
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Orchestra\Testbench\Attributes\DefineEnvironment;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
 
@@ -36,5 +38,24 @@ class JsonProblemTest extends TestCase
             'status' => 404,
             'detail' => 'Not Found',
         ]);
+    }
+
+    /**
+     * @param Application $app
+     */
+    protected function useProductionMode($app): void
+    {
+        $app['config']->set('app.debug', false);
+    }
+
+    #[DefineEnvironment('useProductionMode')]
+    public function testProductionError(): void
+    {
+        $response = $this->post('/api/books', ['content-type' => 'application/vnd.api+json']);
+        $response->assertStatus(415);
+        $content = $response->json();
+        $this->assertArrayNotHasKey('trace', $content);
+        $this->assertArrayNotHasKey('line', $content);
+        $this->assertArrayNotHasKey('file', $content);
     }
 }

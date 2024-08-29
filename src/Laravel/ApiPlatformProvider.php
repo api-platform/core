@@ -93,6 +93,9 @@ use ApiPlatform\Laravel\Eloquent\State\RemoveProcessor;
 use ApiPlatform\Laravel\Exception\ErrorHandler;
 use ApiPlatform\Laravel\GraphQl\Controller\EntrypointController as GraphQlEntrypointController;
 use ApiPlatform\Laravel\GraphQl\Controller\GraphiQlController;
+use ApiPlatform\Laravel\Metadata\CachePropertyMetadataFactory;
+use ApiPlatform\Laravel\Metadata\CachePropertyNameCollectionMetadataFactory;
+use ApiPlatform\Laravel\Metadata\CacheResourceCollectionMetadataFactory;
 use ApiPlatform\Laravel\Metadata\ConcernsPropertyNameCollectionMetadataFactory;
 use ApiPlatform\Laravel\Metadata\ConcernsResourceMetadataCollectionFactory;
 use ApiPlatform\Laravel\Metadata\ConcernsResourceNameCollectionFactory;
@@ -169,7 +172,7 @@ use ApiPlatform\State\Provider\ParameterProvider;
 use ApiPlatform\State\Provider\ReadProvider;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\SerializerContextBuilderInterface;
-use Illuminate\Config\Repository;
+use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerInterface;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Foundation\CachesRoutes;
@@ -211,10 +214,6 @@ class ApiPlatformProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/config/api-platform.php', 'api-platform');
-
-        /** @var Repository $config */
-        $config = $this->app['config'];
-
         $defaultContext = [];
 
         $this->app->singleton(PropertyInfoExtractorInterface::class, function () {
@@ -242,7 +241,9 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->bind(PathSegmentNameGeneratorInterface::class, UnderscorePathSegmentNameGenerator::class);
 
-        $this->app->singleton(ResourceNameCollectionFactoryInterface::class, function () use ($config) {
+        $this->app->singleton(ResourceNameCollectionFactoryInterface::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
             $paths = $config->get('api-platform.resources') ?? [];
             $refl = new \ReflectionClass(Error::class);
             $paths[] = \dirname($refl->getFileName());
@@ -265,29 +266,41 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->extend(PropertyMetadataFactoryInterface::class, function (PropertyInfoPropertyMetadataFactory $inner, Application $app) {
-            return new SchemaPropertyMetadataFactory(
-                $app->make(ResourceClassResolverInterface::class),
-                new SerializerPropertyMetadataFactory(
-                    $app->make(SerializerClassMetadataFactory::class),
-                    new AttributePropertyMetadataFactory(
-                        new EloquentAttributePropertyMetadataFactory(
-                            $inner,
-                        )
+            /** @var ConfigRepository */
+            $config = $app['config'];
+
+            return new CachePropertyMetadataFactory(
+                new SchemaPropertyMetadataFactory(
+                    $app->make(ResourceClassResolverInterface::class),
+                    new SerializerPropertyMetadataFactory(
+                        $app->make(SerializerClassMetadataFactory::class),
+                        new AttributePropertyMetadataFactory(
+                            new EloquentAttributePropertyMetadataFactory(
+                                $inner,
+                            )
+                        ),
+                        $app->make(ResourceClassResolverInterface::class)
                     ),
-                    $app->make(ResourceClassResolverInterface::class)
                 ),
+                true === $config->get('app.debug') ? 'array' : 'file'
             );
         });
 
         $this->app->singleton(PropertyNameCollectionFactoryInterface::class, function (Application $app) {
-            return new ClassLevelAttributePropertyNameCollectionFactory(
-                new ConcernsPropertyNameCollectionMetadataFactory(
-                    new EloquentPropertyNameCollectionMetadataFactory(
-                        $app->make(ModelMetadata::class),
-                        new PropertyInfoPropertyNameCollectionFactory($app->make(PropertyInfoExtractorInterface::class)),
-                        $app->make(ResourceClassResolverInterface::class)
+            /** @var ConfigRepository */
+            $config = $app['config'];
+
+            return new CachePropertyNameCollectionMetadataFactory(
+                new ClassLevelAttributePropertyNameCollectionFactory(
+                    new ConcernsPropertyNameCollectionMetadataFactory(
+                        new EloquentPropertyNameCollectionMetadataFactory(
+                            $app->make(ModelMetadata::class),
+                            new PropertyInfoPropertyNameCollectionFactory($app->make(PropertyInfoExtractorInterface::class)),
+                            $app->make(ResourceClassResolverInterface::class)
+                        )
                     )
-                )
+                ),
+                true === $config->get('app.debug') ? 'array' : 'file'
             );
         });
 
@@ -300,51 +313,57 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         // TODO: add cached metadata factories
-        $this->app->singleton(ResourceMetadataCollectionFactoryInterface::class, function (Application $app) use ($config) {
-            return new EloquentResourceCollectionMetadataFactory(
-                new ParameterResourceMetadataCollectionFactory(
-                    $this->app->make(PropertyNameCollectionFactoryInterface::class),
-                    new AlternateUriResourceMetadataCollectionFactory(
-                        new FiltersResourceMetadataCollectionFactory(
-                            new FormatsResourceMetadataCollectionFactory(
-                                new InputOutputResourceMetadataCollectionFactory(
-                                    new PhpDocResourceMetadataCollectionFactory(
-                                        new OperationNameResourceMetadataCollectionFactory(
-                                            new LinkResourceMetadataCollectionFactory(
-                                                $app->make(LinkFactoryInterface::class),
-                                                new UriTemplateResourceMetadataCollectionFactory(
+        $this->app->singleton(ResourceMetadataCollectionFactoryInterface::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+
+            return new CacheResourceCollectionMetadataFactory(
+                new EloquentResourceCollectionMetadataFactory(
+                    new ParameterResourceMetadataCollectionFactory(
+                        $this->app->make(PropertyNameCollectionFactoryInterface::class),
+                        new AlternateUriResourceMetadataCollectionFactory(
+                            new FiltersResourceMetadataCollectionFactory(
+                                new FormatsResourceMetadataCollectionFactory(
+                                    new InputOutputResourceMetadataCollectionFactory(
+                                        new PhpDocResourceMetadataCollectionFactory(
+                                            new OperationNameResourceMetadataCollectionFactory(
+                                                new LinkResourceMetadataCollectionFactory(
                                                     $app->make(LinkFactoryInterface::class),
-                                                    $app->make(PathSegmentNameGeneratorInterface::class),
-                                                    new NotExposedOperationResourceMetadataCollectionFactory(
+                                                    new UriTemplateResourceMetadataCollectionFactory(
                                                         $app->make(LinkFactoryInterface::class),
-                                                        new ConcernsResourceMetadataCollectionFactory(
-                                                            new AttributesResourceMetadataCollectionFactory(
-                                                                null,
+                                                        $app->make(PathSegmentNameGeneratorInterface::class),
+                                                        new NotExposedOperationResourceMetadataCollectionFactory(
+                                                            $app->make(LinkFactoryInterface::class),
+                                                            new ConcernsResourceMetadataCollectionFactory(
+                                                                new AttributesResourceMetadataCollectionFactory(
+                                                                    null,
+                                                                    $app->make(LoggerInterface::class),
+                                                                    [
+                                                                        'routePrefix' => $config->get('api-platform.routes.prefix') ?? '/',
+                                                                    ],
+                                                                    $config->get('api-platform.graphql.enabled'),
+                                                                ),
                                                                 $app->make(LoggerInterface::class),
                                                                 [
                                                                     'routePrefix' => $config->get('api-platform.routes.prefix') ?? '/',
                                                                 ],
                                                                 $config->get('api-platform.graphql.enabled'),
-                                                            ),
-                                                            $app->make(LoggerInterface::class),
-                                                            [
-                                                                'routePrefix' => $config->get('api-platform.routes.prefix') ?? '/',
-                                                            ],
-                                                            $config->get('api-platform.graphql.enabled'),
+                                                            )
                                                         )
                                                     )
                                                 )
                                             )
                                         )
-                                    )
-                                ),
-                                $config->get('api-platform.formats'),
-                                $config->get('api-platform.patch_formats'),
+                                    ),
+                                    $config->get('api-platform.formats'),
+                                    $config->get('api-platform.patch_formats'),
+                                )
                             )
-                        )
-                    ),
-                    $app->make(FilterInterface::class)
-                )
+                        ),
+                        $app->make(FilterInterface::class)
+                    )
+                ),
+                true === $config->get('app.debug') ? 'array' : 'file'
             );
         });
 
@@ -404,7 +423,10 @@ class ApiPlatformProvider extends ServiceProvider
             return new ValidateProvider($app->make(SwaggerUiProvider::class), $app);
         });
 
-        $this->app->singleton(JsonApiProvider::class, function (Application $app) use ($config) {
+        $this->app->singleton(JsonApiProvider::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+
             return new JsonApiProvider($app->make(ValidateProvider::class), $config->get('api-platform.collection.order.parameter_name'));
         });
 
@@ -432,8 +454,13 @@ class ApiPlatformProvider extends ServiceProvider
             return new AccessCheckerProvider($app->make(ParameterProvider::class), $app->make(ResourceAccessCheckerInterface::class));
         });
 
-        $this->app->singleton(Negotiator::class, function (Application $app) { return new Negotiator(); });
-        $this->app->singleton(ContentNegotiationProvider::class, function (Application $app) use ($config) {
+        $this->app->singleton(Negotiator::class, function (Application $app) {
+            return new Negotiator();
+        });
+        $this->app->singleton(ContentNegotiationProvider::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+
             return new ContentNegotiationProvider($app->make(AccessCheckerProvider::class), $app->make(Negotiator::class), $config->get('api-platform.formats'), $config->get('api-platform.error_formats'));
         });
 
@@ -452,8 +479,11 @@ class ApiPlatformProvider extends ServiceProvider
             return new WriteProcessor($app->make(SerializeProcessor::class), $app->make(CallableProcessor::class));
         });
 
-        $this->app->singleton(SerializerContextBuilder::class, function (Application $app) use ($config) {
-            return new SerializerContextBuilder($app->make(ResourceMetadataCollectionFactoryInterface::class), $config->get('app.debug') ?? false);
+        $this->app->singleton(SerializerContextBuilder::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+
+            return new SerializerContextBuilder($app->make(ResourceMetadataCollectionFactoryInterface::class), $config->get('app.debug'));
         });
         $this->app->bind(SerializerContextBuilderInterface::class, EloquentSerializerContextBuilder::class);
         $this->app->singleton(EloquentSerializerContextBuilder::class, function (Application $app) {
@@ -583,23 +613,37 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(Options::class, function (Application $app) use ($config) {
+        $this->app->singleton(Options::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+
             return new Options(title: $config->get('api-platform.title') ?? '');
         });
 
-        $this->app->singleton(DocumentationAction::class, function (Application $app) use ($config) {
+        $this->app->singleton(DocumentationAction::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+
             return new DocumentationAction($app->make(ResourceNameCollectionFactoryInterface::class), $config->get('api-platform.title') ?? '', $config->get('api-platform.description') ?? '', $config->get('api-platform.version') ?? '', $app->make(OpenApiFactoryInterface::class), $app->make(ProviderInterface::class), $app->make(ProcessorInterface::class), $app->make(Negotiator::class), $config->get('api-platform.docs_formats'));
         });
 
-        $this->app->singleton(EntrypointAction::class, function (Application $app) use ($config) {
+        $this->app->singleton(EntrypointAction::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+
             return new EntrypointAction($app->make(ResourceNameCollectionFactoryInterface::class), $app->make(ProviderInterface::class), $app->make(ProcessorInterface::class), $config->get('api-platform.docs_formats'));
         });
 
-        $this->app->singleton(Pagination::class, function () use ($config) {
+        $this->app->singleton(Pagination::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+
             return new Pagination($config->get('api-platform.collection.pagination'), []);
         });
 
-        $this->app->singleton(PaginationOptions::class, function () use ($config) {
+        $this->app->singleton(PaginationOptions::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
             $pagination = $config->get('api-platform.collection.pagination');
 
             return new PaginationOptions(
@@ -618,7 +662,10 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->bind(OpenApiFactoryInterface::class, OpenApiFactory::class);
-        $this->app->singleton(OpenApiFactory::class, function (Application $app) use ($config) {
+        $this->app->singleton(OpenApiFactory::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+
             return new OpenApiFactory(
                 $app->make(ResourceNameCollectionFactoryInterface::class),
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
@@ -634,11 +681,17 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->bind(DefinitionNameFactoryInterface::class, DefinitionNameFactory::class);
-        $this->app->singleton(DefinitionNameFactory::class, function () use ($config) {
+        $this->app->singleton(DefinitionNameFactory::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+
             return new DefinitionNameFactory($config->get('api-platform.formats'));
         });
 
-        $this->app->singleton(SchemaFactory::class, function (Application $app) use ($config) {
+        $this->app->singleton(SchemaFactory::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+
             return new SchemaFactory(
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(PropertyNameCollectionFactoryInterface::class),
@@ -703,7 +756,10 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(JsonApiCollectionNormalizer::class, function (Application $app) use ($config) {
+        $this->app->singleton(JsonApiCollectionNormalizer::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+
             return new JsonApiCollectionNormalizer(
                 $app->make(ResourceClassResolverInterface::class),
                 $config->get('api-platform.collection.pagination.page_parameter_name'),
@@ -737,7 +793,7 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        if ($config->get('api-platform.graphql.enabled')) {
+        if ($this->app['config']->get('api-platform.graphql.enabled')) {
             $this->app->singleton(GraphQlItemNormalizer::class, function (Application $app) {
                 return new GraphQlItemNormalizer(
                     $app->make(PropertyNameCollectionFactoryInterface::class),
@@ -767,7 +823,10 @@ class ApiPlatformProvider extends ServiceProvider
             return new GraphQlErrorNormalizer();
         });
 
-        $this->app->singleton(GraphQlValidationExceptionNormalizer::class, function () use ($config) {
+        $this->app->singleton(GraphQlValidationExceptionNormalizer::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+
             return new GraphQlValidationExceptionNormalizer($config->get('api-platform.exception_to_status'));
         });
 
@@ -781,7 +840,9 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->bind(SerializerInterface::class, Serializer::class);
         $this->app->bind(NormalizerInterface::class, Serializer::class);
-        $this->app->singleton(Serializer::class, function (Application $app) use ($config) {
+        $this->app->singleton(Serializer::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
             $list = new \SplPriorityQueue();
             $list->insert($app->make(HydraEntrypointNormalizer::class), -800);
             $list->insert($app->make(HydraCollectionNormalizer::class), -800);
@@ -841,7 +902,10 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->singleton(
             ExceptionHandlerInterface::class,
-            function (Application $app) use ($config) {
+            function (Application $app) {
+                /** @var ConfigRepository */
+                $config = $app['config'];
+
                 return new ErrorHandler(
                     $app,
                     $app->make(ResourceMetadataCollectionFactoryInterface::class),
@@ -849,7 +913,8 @@ class ApiPlatformProvider extends ServiceProvider
                     $app->make(IdentifiersExtractorInterface::class),
                     $app->make(ResourceClassResolverInterface::class),
                     $app->make(Negotiator::class),
-                    $config->get('api-platform.exception_to_status')
+                    $config->get('api-platform.exception_to_status'),
+                    $config->get('app.debug')
                 );
             }
         );
@@ -858,12 +923,12 @@ class ApiPlatformProvider extends ServiceProvider
             return new Inflector();
         });
 
-        if ($config->get('api-platform.graphql.enabled')) {
-            $this->registerGraphQl($this->app, $config);
+        if ($this->app['config']->get('api-platform.graphql.enabled')) {
+            $this->registerGraphQl($this->app);
         }
     }
 
-    private function registerGraphQl(Application $app, Repository $config): void
+    private function registerGraphQl(Application $app): void
     {
         $app->singleton('api_platform.graphql.type_locator', function (Application $app) {
             $tagged = iterator_to_array($app->tagged('api_platform.graphql.type'));
@@ -906,7 +971,9 @@ class ApiPlatformProvider extends ServiceProvider
             return new GraphQlSerializerContextBuilder($app->make(NameConverterInterface::class));
         });
 
-        $app->singleton('api_platform.graphql.state_provider', function (Application $app) use ($config) {
+        $app->singleton('api_platform.graphql.state_provider', function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
             $tagged = iterator_to_array($app->tagged(ParameterProviderInterface::class));
             $resolvers = iterator_to_array($app->tagged('api_platform.graphql.resolver'));
 
@@ -946,7 +1013,10 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $app->singleton(FieldsBuilderEnumInterface::class, function (Application $app) use ($config) {
+        $app->singleton(FieldsBuilderEnumInterface::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+
             return new FieldsBuilder(
                 $app->make(PropertyNameCollectionFactoryInterface::class),
                 $app->make(PropertyMetadataFactoryInterface::class),
@@ -972,24 +1042,32 @@ class ApiPlatformProvider extends ServiceProvider
             return new GraphQlErrorHandler();
         });
 
-        $app->singleton(ExecutorInterface::class, function () use ($config) {
+        $app->singleton(ExecutorInterface::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+
             return new Executor($config->get('api-platform.graphql.introspection.enabled') ?? false);
         });
 
-        $app->singleton(GraphiQlController::class, function () use ($config) {
+        $app->singleton(GraphiQlController::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
             $prefix = $config->get('api-platform.routes.prefix') ?? '';
 
             return new GraphiQlController($prefix);
         });
 
         $app->singleton(GraphQlEntrypointController::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+
             return new GraphQlEntrypointController(
                 $app->make(SchemaBuilderInterface::class),
                 $app->make(ExecutorInterface::class),
                 $app->make(GraphiQlController::class),
                 $app->make(SerializerInterface::class),
                 $app->make(ErrorHandlerInterface::class),
-                debug: true,
+                debug: $config->get('app.debug'),
                 negotiator: $app->make(Negotiator::class)
             );
         });
@@ -1029,8 +1107,8 @@ class ApiPlatformProvider extends ServiceProvider
                     // _format is read by the middleware
                     $uriTemplate = $operation->getRoutePrefix().str_replace('{._format}', '{_format?}', $uriTemplate);
                     $route = (new Route([$operation->getMethod()], $uriTemplate, [ApiPlatformController::class, '__invoke']))
-                            ->name($operation->getName())
-                            ->setDefaults(['_api_operation_name' => $operation->getName(), '_api_resource_class' => $operation->getClass()]);
+                        ->name($operation->getName())
+                        ->setDefaults(['_api_operation_name' => $operation->getName(), '_api_resource_class' => $operation->getClass()]);
 
                     $route->middleware(ApiPlatformMiddleware::class.':'.$operation->getName());
                     $route->middleware($config->get('api-platform.routes.middleware'));
