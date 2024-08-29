@@ -20,7 +20,7 @@ use ApiPlatform\ParameterValidator\Exception\ValidationExceptionInterface;
  *
  * @author Julien DENIAU <julien.deniau@gmail.com>
  *
- * @deprecated use \ApiPlatform\Metadata\Exception\ValidationException instead
+ * @deprecated use \ApiPlatform\ParameterValidator\Exception\ValidationException instead
  */
 final class FilterValidationException extends \Exception implements ValidationExceptionInterface, ExceptionInterface, \Stringable
 {
