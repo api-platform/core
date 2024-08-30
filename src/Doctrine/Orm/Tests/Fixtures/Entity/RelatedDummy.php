@@ -94,6 +94,9 @@ class RelatedDummy extends ParentDummy implements \Stringable
     #[Groups(['fakemanytomany', 'friends'])]
     public Collection|iterable $relatedToDummyFriend;
 
+    #[ORM\Column(enumType: DummyBackedEnum::class, nullable: true)]
+    public DummyBackedEnum $dummyBackedEnum;
+
     /**
      * @var bool|null A dummy bool
      */
