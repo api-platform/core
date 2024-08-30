@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\JsonApi\Serializer;
+namespace ApiPlatform\JsonApi\Tests\Serializer;
 
 use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\JsonApi\Serializer\CollectionNormalizer;

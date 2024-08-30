@@ -48,7 +48,6 @@ use ApiPlatform\Symfony\EventListener\DenyAccessListener;
 use ApiPlatform\Symfony\GraphQl\Resolver\Factory\DataCollectorResolverFactory;
 use ApiPlatform\Symfony\Validator\Exception\ValidationException as SymfonyValidationException;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRestrictionMetadataInterface;
-use ApiPlatform\Symfony\Validator\State\QueryParameterValidateProvider;
 use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
 use Doctrine\Persistence\ManagerRegistry;
@@ -866,17 +865,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.validator.query_parameter_validation', $config['validator']['query_parameter_validation']);
 
         if (class_exists(QueryParameterValidator::class)) {
-            $container
-                ->setDefinition('api_platform.validator.query_parameter_validator', new Definition(QueryParameterValidator::class))
-                ->setArgument(0, new Definition('api_platform.filter_locator'));
-
-            $container
-                ->setDefinition('api_platform.state_provider.query_parameter_validate', new Definition(QueryParameterValidateProvider::class))
-                ->setDecoratedService('api_platform.state_provider.main', null, 200)
-                ->setArguments([
-                    new Definition('api_platform.state_provider.query_parameter_validate.inner'),
-                    new Definition('api_platform.validator.query_parameter_validator'),
-                ]);
+            $loader->load('legacy/parameter_validator/parameter_validator.xml');
+            $loader->load($config['use_symfony_listeners'] ? 'legacy/parameter_validator/events.xml' : 'legacy/parameter_validator/state.xml');
         }
 
         if (!$config['validator']['query_parameter_validation']) {

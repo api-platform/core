@@ -600,8 +600,8 @@ jobs:
         run: |
           composer global require soyuka/pmu
           composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link . --permanent
           composer require --dev doctrine/mongodb-odm-bundle
-          composer global link .
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -1018,11 +1018,17 @@ jobs:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
+      - name: Keep windows path
+        id: get-cwd
+        run: |
+          cwd=$(php -r 'echo(str_replace("\\", "\\\\", $_SERVER["argv"][1]));' '${{ github.workspace }}')
+          echo cwd=$cwd >> $GITHUB_OUTPUT
+        shell: bash
       - name: Update project dependencies
         run: |
           composer global require soyuka/pmu
           composer global config allow-plugins.soyuka/pmu true --no-interaction
-          composer global link .
+          composer global link . --working-directory='${{ steps.get-cwd.outputs.cwd }}'
       - name: Install phpunit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache
@@ -1073,11 +1079,17 @@ jobs:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
+      - name: Keep windows path
+        id: get-cwd
+        run: |
+          cwd=$(php -r 'echo(str_replace("\\", "\\\\", $_SERVER["argv"][1]));' '${{ github.workspace }}')
+          echo cwd=$cwd >> $GITHUB_OUTPUT
+        shell: bash
       - name: Update project dependencies
         run: |
           composer global require soyuka/pmu
           composer global config allow-plugins.soyuka/pmu true --no-interaction
-          composer global link .
+          composer global link . --working-directory='${{ steps.get-cwd.outputs.cwd }}'
       - name: Install phpunit
         run: vendor/bin/simple-phpunit --version
       - name: Clear test app cache

@@ -86,7 +86,7 @@ parameters:
 		# Expected, due to backward compatibility
 		-
 			message: "#Call to function method_exists\\(\\) with ApiPlatform\\\\JsonApi\\\\Serializer\\\\ItemNormalizer and 'setCircularReferenc…' will always evaluate to false\\.#"
-			path: tests/JsonApi/Serializer/ItemNormalizerTest.php
+			path: src/JsonApi/Tests/Serializer/ItemNormalizerTest.php
 		- '#Method GraphQL\\Type\\Definition\\WrappingType::getWrappedType\(\) invoked with 1 parameter, 0 required\.#'
 		- '#Access to an undefined property GraphQL\\Type\\Definition\\NamedType&GraphQL\\Type\\Definition\\Type::\$name\.#'
 		# See https://github.com/phpstan/phpstan-symfony/issues/27

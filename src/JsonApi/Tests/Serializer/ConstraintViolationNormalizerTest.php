@@ -11,18 +11,17 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\JsonApi\Serializer;
+namespace ApiPlatform\JsonApi\Tests\Serializer;
 
 use ApiPlatform\JsonApi\Serializer\ConstraintViolationListNormalizer;
+use ApiPlatform\JsonApi\Tests\Fixtures\Dummy;
+use ApiPlatform\JsonApi\Tests\Fixtures\RelatedDummy;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
@@ -34,9 +33,6 @@ class ConstraintViolationNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
-    /**
-     * @group legacy
-     */
     public function testSupportNormalization(): void
     {
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
@@ -49,10 +45,6 @@ class ConstraintViolationNormalizerTest extends TestCase
         $this->assertFalse($normalizer->supportsNormalization(new \stdClass(), ConstraintViolationListNormalizer::FORMAT));
         $this->assertEmpty($normalizer->getSupportedTypes('json'));
         $this->assertSame([ConstraintViolationListInterface::class => true], $normalizer->getSupportedTypes($normalizer::FORMAT));
-
-        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
-            $this->assertTrue($normalizer->hasCacheableSupportsMethod());
-        }
     }
 
     public function testNormalize(): void

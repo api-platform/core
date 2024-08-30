@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\JsonApi\Serializer;
+namespace ApiPlatform\JsonApi\Tests\Serializer;
 
 use ApiPlatform\JsonApi\Serializer\ReservedAttributeNameConverter;
-use ApiPlatform\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter;
+use ApiPlatform\JsonApi\Tests\Fixtures\CustomConverter;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -46,17 +46,13 @@ class ReservedAttributeNameConverterTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider propertiesProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('propertiesProvider')]
     public function testNormalize(string $propertyName, string $expectedPropertyName): void
     {
         $this->assertSame($expectedPropertyName, $this->reservedAttributeNameConverter->normalize($propertyName));
     }
 
-    /**
-     * @dataProvider propertiesProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('propertiesProvider')]
     public function testDenormalize(string $expectedPropertyName, string $propertyName): void
     {
         $this->assertSame($expectedPropertyName, $this->reservedAttributeNameConverter->denormalize($propertyName));

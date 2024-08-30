@@ -11,10 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\JsonApi\Serializer;
+namespace ApiPlatform\JsonApi\Tests\Serializer;
 
 use ApiPlatform\JsonApi\Serializer\ItemNormalizer;
 use ApiPlatform\JsonApi\Serializer\ReservedAttributeNameConverter;
+use ApiPlatform\JsonApi\Tests\Fixtures\CircularReference;
+use ApiPlatform\JsonApi\Tests\Fixtures\Dummy;
+use ApiPlatform\JsonApi\Tests\Fixtures\RelatedDummy;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
@@ -26,9 +29,6 @@ use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CircularReference;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
