@@ -11,10 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Laravel\Metadata;
+namespace ApiPlatform\Metadata\Resource\Factory;
 
-use ApiPlatform\Laravel\IsApiResource;
-use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\IsApiResource;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Metadata\Util\ReflectionClassRecursiveIterator;
 

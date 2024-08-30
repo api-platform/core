@@ -304,7 +304,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 }
             }
 
-            if (!$operation instanceof CollectionOperationInterface && 'POST' !== $operation->getMethod()) {
+            if (true === $overrideResponses && !$operation instanceof CollectionOperationInterface && 'POST' !== $operation->getMethod()) {
                 if (!isset($existingResponses[404])) {
                     $openapiOperation = $openapiOperation->withResponse(404, new Response('Resource not found'));
                 }

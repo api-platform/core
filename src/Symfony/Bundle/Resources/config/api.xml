@@ -137,7 +137,7 @@
         <service id="api_platform.uri_variables.converter" class="ApiPlatform\Metadata\UriVariablesConverter" public="false">
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-            <argument type="tagged" tag="api_platform.uri_variables.transformer" />
+            <argument type="tagged_iterator" tag="api_platform.uri_variables.transformer" />
         </service>
 
         <service id="api_platform.iri_converter" alias="api_platform.symfony.iri_converter" />

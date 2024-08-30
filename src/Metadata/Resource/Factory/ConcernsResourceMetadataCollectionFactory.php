@@ -11,11 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Laravel\Metadata;
+namespace ApiPlatform\Metadata\Resource\Factory;
 
-use ApiPlatform\Laravel\IsApiResource;
-use ApiPlatform\Metadata\Resource\Factory\MetadataCollectionFactoryTrait;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\IsApiResource;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
 /**

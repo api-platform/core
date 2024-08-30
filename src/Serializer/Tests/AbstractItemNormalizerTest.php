@@ -15,6 +15,7 @@ namespace ApiPlatform\Serializer\Tests;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\IriConverterInterface;
@@ -860,6 +861,56 @@ class AbstractItemNormalizerTest extends TestCase
         // 'not_normalizable_value_exceptions' is set by Serializer thanks to DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS
         $actual = $normalizer->denormalize($data, Dummy::class, null, ['not_normalizable_value_exceptions' => []]);
         $this->assertNull($actual->relatedDummy);
+    }
+
+    public function testDeserializationPathForNotDenormalizableRelations(): void
+    {
+        $data = [
+            'relatedDummies' => ['wrong'],
+        ];
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn(new PropertyNameCollection(['relatedDummies']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummies', [])->willReturn(
+            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class))])->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(true)
+        );
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getResourceFromIri(Argument::cetera())->willThrow(new InvalidArgumentException('Invalid IRI'));
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass(null, RelatedDummy::class)->willReturn(RelatedDummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(DenormalizerInterface::class);
+
+        $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $propertyAccessorProphecy->reveal(),
+            null,
+            null,
+            [],
+            null,
+            null,
+        ]);
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $errors = [];
+        $actual = $normalizer->denormalize($data, Dummy::class, null, ['not_normalizable_value_exceptions' => &$errors]);
+        $this->assertEmpty($actual->relatedDummies);
+        $this->assertCount(1, $errors); // @phpstan-ignore-line method.impossibleType (false positive)
+        $this->assertInstanceOf(NotNormalizableValueException::class, $errors[0]);
+        $this->assertSame('relatedDummies[0]', $errors[0]->getPath());
     }
 
     public function testInnerDocumentNotAllowed(): void
