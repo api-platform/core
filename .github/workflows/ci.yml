@@ -940,12 +940,17 @@ jobs:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
-      # TODO: fix pmu windows path directory
+      - name: Keep windows path
+        id: get-cwd
+        run: |
+          cwd=$(php -r 'echo(str_replace("\\", "\\\\", $_SERVER["argv"][1]));' '${{ github.workspace }}')
+          echo cwd=$cwd >> $GITHUB_OUTPUT
+        shell: bash
       - name: Update project dependencies
         run: |
           composer global require soyuka/pmu
           composer global config allow-plugins.soyuka/pmu true --no-interaction
-          composer global link . --working-directory=${{ github.workspace }}
+          composer global link . --working-directory='${{ steps.get-cwd.outputs.cwd }}'
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
@@ -1223,3 +1228,4 @@ jobs:
           composer run-script build
           composer run-script test
         working-directory: 'src/Laravel'
+

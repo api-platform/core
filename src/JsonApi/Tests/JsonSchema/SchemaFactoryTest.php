@@ -59,9 +59,6 @@ class SchemaFactoryTest extends TestCase
             definitionNameFactory: $definitionNameFactory,
         );
 
-        // $halSchemaFactory = new HalSchemaFactory($baseSchemaFactory);
-        // $hydraSchemaFactory = new HydraSchemaFactory($halSchemaFactory);
-
         $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
 
         $this->schemaFactory = new SchemaFactory(

@@ -33,7 +33,7 @@
         "api-platform/metadata": "^3.2 || ^4.0",
         "api-platform/serializer": "^3.2 || ^4.0",
         "api-platform/state": "^3.2 || ^4.0",
-        "symfony/error-handler": "^7.1",
+        "symfony/error-handler": "^6.4 || ^7.1",
         "symfony/http-foundation": "^6.4 || ^7.1"
     },
     "require-dev": {
