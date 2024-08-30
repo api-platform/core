@@ -16,6 +16,7 @@ use ApiPlatform\Tests\Behat\DoctrineContext;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\User as UserDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
+use ApiPlatform\Tests\PhpUnitBundle;
 use Doctrine\Bundle\DoctrineBundle\ConnectionFactory;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\Command\TailCursorDoctrineODMCommand;
@@ -34,7 +35,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
 use Symfony\Component\HttpClient\Messenger\PingWebhookMessageHandler;
 use Symfony\Component\HttpFoundation\Session\SessionFactory;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 use Symfony\Component\Security\Core\Authorization\Strategy\AccessDecisionStrategyInterface;
@@ -69,12 +69,7 @@ class AppKernel extends Kernel
             new WebProfilerBundle(),
             new FrameworkBundle(),
             new MakerBundle(),
-            new class extends Bundle {
-                public function shutdown(): void
-                {
-                    restore_exception_handler();
-                }
-            },
+            new PhpUnitBundle(),
         ];
 
         if (null === ($_ENV['APP_PHPUNIT'] ?? null)) {
