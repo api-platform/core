@@ -1,5 +1,17 @@
 # Changelog
 
+## v3.3.12
+
+### Bug fixes
+
+* [0a461d749](https://github.com/api-platform/core/commit/0a461d749b7b4ac706f3b7b6138a13cb6e4a9d2d) fix(symfony): allow schema restriction for collection like property from choice constraint (#6520)
+* [0e91b0451](https://github.com/api-platform/core/commit/0e91b045168fa74603a093b301546d604e7997ad) fix: use correct class in FilterValidationException deprecation message (#6549)
+* [2da8dd326](https://github.com/api-platform/core/commit/2da8dd32681fe9d51b0bdb343f60b98b4e9033d2) fix(symfony): replace tagged by tagged_iterator
+* [3b42c9ff2](https://github.com/api-platform/core/commit/3b42c9ff235de5feac555d0283c513a6e4643953) fix: deserialization path for not denormalizable relations collected errors (#6537)
+* [41deeb4e4](https://github.com/api-platform/core/commit/41deeb4e49c35d27cd902ea41ddaa3c8c492d8e4) fix(symfony): fix debug:api-resource command for class with multiple resources with same uriTemplate (#6505)
+* [52fd9818b](https://github.com/api-platform/core/commit/52fd9818b1d02dd89cac578e0762530079b5b42d) fix(elasticsearch): change normalize return type to compatible with other normalizers (#6493)
+* [b3d7c0768](https://github.com/api-platform/core/commit/b3d7c07682366cc387ceee904cadbdd85bad0c09) fix(openapi): allow null return type parameter
+
 ## v3.3.11
 
 ### Features
