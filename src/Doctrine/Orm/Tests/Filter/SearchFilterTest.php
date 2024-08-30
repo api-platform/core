@@ -211,6 +211,20 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                 'strategy' => 'exact',
                 'is_collection' => true,
             ],
+            'dummyBackedEnum' => [
+                'property' => 'dummyBackedEnum',
+                'type' => 'string',
+                'required' => false,
+                'strategy' => 'exact',
+                'is_collection' => false,
+            ],
+            'dummyBackedEnum[]' => [
+                'property' => 'dummyBackedEnum',
+                'type' => 'string',
+                'required' => false,
+                'strategy' => 'exact',
+                'is_collection' => true,
+            ],
         ], $filter->getDescription($this->resourceClass));
     }
 
