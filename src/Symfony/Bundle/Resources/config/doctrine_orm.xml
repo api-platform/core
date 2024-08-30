@@ -59,6 +59,16 @@
             <argument type="collection"></argument>
         </service>
 
+        <service id="api_platform.doctrine.orm.backed_enum_filter" class="ApiPlatform\Doctrine\Orm\Filter\BackedEnumFilter" public="false" abstract="true">
+            <argument type="service" id="doctrine" />
+            <argument type="service" id="logger" on-invalid="ignore" />
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore" />
+        </service>
+        <service id="ApiPlatform\Doctrine\Orm\Filter\BackedEnumFilter" alias="api_platform.doctrine.orm.backed_enum_filter" />
+        <service id="api_platform.doctrine.orm.backed_enum_filter.instance" parent="api_platform.doctrine.orm.backed_enum_filter">
+            <argument type="collection"></argument>
+        </service>
+
         <service id="api_platform.doctrine.orm.boolean_filter" class="ApiPlatform\Doctrine\Orm\Filter\BooleanFilter" public="false" abstract="true">
             <argument type="service" id="doctrine" />
             <argument type="service" id="logger" on-invalid="ignore" />

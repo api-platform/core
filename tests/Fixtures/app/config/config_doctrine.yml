@@ -36,6 +36,11 @@ services:
         arguments: [ { 'dummyFloat': ~, 'dummyPrice': ~ } ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.range' } ]
 
+    app.my_dummy_resource.backed_enum_filter:
+        parent:    'api_platform.doctrine.orm.backed_enum_filter'
+        arguments: [ { 'dummyBackedEnum': ~, 'embeddedDummy.dummyBackedEnum': ~, 'relatedDummy.embeddedDummy.dummyBackedEnum': ~ } ]
+        tags:      [ { name: 'api_platform.filter', id: 'my_dummy.backed_enum' } ]
+
     app.my_dummy_resource.boolean_filter:
         parent:    'api_platform.doctrine.orm.boolean_filter'
         arguments: [ { 'dummyBoolean': ~, 'embeddedDummy.dummyBoolean': ~, 'relatedDummy.embeddedDummy.dummyBoolean': ~ } ]
