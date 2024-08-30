@@ -90,7 +90,7 @@ final class WriteListener
             return;
         }
 
-        $canWrite = $operation->canWrite();
+        $canWrite = $operation?->canWrite();
 
         if (null === $canWrite) {
             $canWrite = !$request->isMethodSafe();
