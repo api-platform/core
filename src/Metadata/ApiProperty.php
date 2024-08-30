@@ -202,11 +202,25 @@ final class ApiProperty
         private $iris = null,
         private ?bool $genId = null,
         private ?string $uriTemplate = null,
+        private ?string $property = null,
         private array $extraProperties = [],
     ) {
         if (\is_string($types)) {
             $this->types = (array) $types;
         }
+    }
+
+    public function getProperty(): ?string
+    {
+        return $this->property;
+    }
+
+    public function withProperty(string $property): self
+    {
+        $self = clone $this;
+        $self->property = $property;
+
+        return $self;
     }
 
     public function getDescription(): ?string
