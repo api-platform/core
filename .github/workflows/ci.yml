@@ -945,6 +945,7 @@ jobs:
           - '8.3'
       fail-fast: false
     env:
+      SYMFONY_PHPUNIT_VERSION: '9.5'
       APP_ENV: sqlite
       DATABASE_URL: sqlite:///%kernel.project_dir%/var/data.db
     steps:
@@ -996,6 +997,7 @@ jobs:
           - '8.3'
       fail-fast: false
     env:
+      SYMFONY_PHPUNIT_VERSION: '9.5'
       APP_ENV: sqlite
       DATABASE_URL: sqlite:///%kernel.project_dir%/var/data.db
     steps:

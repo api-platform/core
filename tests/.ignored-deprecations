@@ -17,6 +17,9 @@
 
 %$fieldsBuilder argument of SchemaBuilder implementing "ApiPlatform\\GraphQl\\Type\\FieldsBuilderInterface" is deprecated since API Platform 3.1. It has to implement "ApiPlatform\\GraphQl\\Type\\FieldsBuilderEnumInterface" instead.%
 
+# waiting for tag https://github.com/doctrine/DoctrineBundle/commit/d84aadb257bb8dc278106c0e53fffe2babcdcd8e
+%Since symfony/dependency-injection 7.2: Type "tagged" is deprecated for tag <argument>, use "tagged_iterator" instead%
+
 # old test filters will be removed in 4.0
 %Since api-platform/core 3.4: The key "swagger" in a filter description is deprecated, use "schema" or "openapi" instead.%
 %Since api-platform/core 3.4: The key "openapi" in a filter description should be a "ApiPlatform\\OpenApi\\Model\\Parameter" class or use "schema" to specify the JSON Schema.%

@@ -6,7 +6,7 @@
         <service id="api_platform.metadata.property.metadata_factory.validator" class="ApiPlatform\Symfony\Validator\Metadata\Property\ValidatorPropertyMetadataFactory" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="20" public="false">
             <argument type="service" id="validator" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory.validator.inner" />
-            <argument type="tagged" tag="api_platform.metadata.property_schema_restriction" />
+            <argument type="tagged_iterator" tag="api_platform.metadata.property_schema_restriction" />
         </service>
 
         <service id="api_platform.metadata.property_schema.choice_restriction" class="ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaChoiceRestriction" public="false">
@@ -14,7 +14,7 @@
         </service>
 
         <service id="api_platform.metadata.property_schema.collection_restriction" class="ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaCollectionRestriction" public="false">
-            <argument type="tagged" tag="api_platform.metadata.property_schema_restriction" />
+            <argument type="tagged_iterator" tag="api_platform.metadata.property_schema_restriction" />
             <tag name="api_platform.metadata.property_schema_restriction"/>
         </service>
 
@@ -43,7 +43,7 @@
         </service>
 
         <service id="api_platform.metadata.property_schema.one_of_restriction" class="ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaOneOfRestriction" public="false">
-            <argument type="tagged" tag="api_platform.metadata.property_schema_restriction" />
+            <argument type="tagged_iterator" tag="api_platform.metadata.property_schema_restriction" />
             <tag name="api_platform.metadata.property_schema_restriction"/>
         </service>
 
