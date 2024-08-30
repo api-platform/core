@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Workbench\App\Models;
 
-use ApiPlatform\Laravel\IsApiResource;
+use ApiPlatform\Metadata\IsApiResource;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 

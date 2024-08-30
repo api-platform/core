@@ -11,10 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Metadata\Factory\Property;
+namespace ApiPlatform\Metadata\Property\Factory;
 
 use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 
 /**

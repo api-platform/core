@@ -11,9 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Laravel;
-
-use ApiPlatform\Metadata\ApiResource;
+namespace ApiPlatform\Metadata;
 
 /**
  * @author Kévin Dunglas <kevin@dunglas.dev>

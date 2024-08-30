@@ -11,11 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Laravel\Metadata;
+namespace ApiPlatform\Metadata\Property\Factory;
 
-use ApiPlatform\Laravel\IsApiResource;
 use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\IsApiResource;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 
 /**
