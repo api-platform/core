@@ -10,6 +10,32 @@
 
 * [0d5f35683](https://github.com/api-platform/core/commit/0d5f356839eb6aa9f536044abe4affa736553e76) feat(laravel): laravel component (#5882)
 
+## v3.4.0-alpha.2
+
+### Deprecations:
+
+Namespaces like `ApiPlatform/Api` or `ApiPlatform/Util` are deprecated and will be removed in 4.0.
+You should now install `api-platform/symfony` instead of `api-platform/core`.
+
+### Bug fixes
+
+* [3c5aea80f](https://github.com/api-platform/core/commit/3c5aea80fdbed20216764f6d721fe4f37cf2889d) fix(symfony): load isApiResource metadata (#6562)
+* [61af0cc90](https://github.com/api-platform/core/commit/61af0cc90c1e095edb12e32ef433a742ef46637e) fix(doctrine): allow doctrine/dbal:^4
+* [e063b80af](https://github.com/api-platform/core/commit/e063b80afe012ca4a6c8999de55b59193e8ae0ae) fix: parameter context for filters (#6535)
+* [e22392193](https://github.com/api-platform/core/commit/e22392193bb1fc71ece5abf393fa54b0745fc287) fix(state): security parameter with listeners (#6457)
+
+### Features
+
+* [05e75be83](https://github.com/api-platform/core/commit/05e75be834c629e0487caaaedfe9fdf0bd5a7226) feat(doctrine): add new filter for filtering an entity using PHP backed enum, resolves #6506 (#6547) (#6560)
+* [0b985ae76](https://github.com/api-platform/core/commit/0b985ae760bc4689d3f5bbacebb21b35b334d0be) feat(state): add security to parameters (#6435)
+* [26d5cbb9b](https://github.com/api-platform/core/commit/26d5cbb9ba996f793e50eff3eab578ea0753d243) feat: deprecate query parameter validator (#6454)
+* [63ccfd58c](https://github.com/api-platform/core/commit/63ccfd58c95b5aa4aa0353eb122d96ef35187222) feat: BackedEnum resources (#6309)
+* [65296eaf1](https://github.com/api-platform/core/commit/65296eaf1eb18dc725e9316e9ab49b191aae43a3) feat(openapi): allow optional request body content (#6374)
+* [7399fcf7e](https://github.com/api-platform/core/commit/7399fcf7eaf28cd649d137da1fdd54f69093e275) feat(symfony): skip error handler (#6463)
+* [74986cb55](https://github.com/api-platform/core/commit/74986cb552182dc645bd1fc967faa0954dd59e0a) feat: inflector as service (#6447)
+* [b47edb2a4](https://github.com/api-platform/core/commit/b47edb2a499c34e79c167f963e3a626a3e9d040a) feat(serializer): context IRI in HAL or JsonApi format (#6215)
+* [db1241c66](https://github.com/api-platform/core/commit/db1241c66a08d226f57d8d61e0ec519071c6afdb) feat(openapi): make open_api_override_responses act on default 404 response generation (#6551)
+
 ## v3.4.0-alpha.1
 
 ### Bug fixes
@@ -29,6 +55,19 @@
 * [7399fcf7e](https://github.com/api-platform/core/commit/7399fcf7eaf28cd649d137da1fdd54f69093e275) feat(symfony): skip error handler (#6463)
 * [74986cb55](https://github.com/api-platform/core/commit/74986cb552182dc645bd1fc967faa0954dd59e0a) feat: inflector as service (#6447)
 * [b47edb2a4](https://github.com/api-platform/core/commit/b47edb2a499c34e79c167f963e3a626a3e9d040a) feat(serializer): context IRI in HAL or JsonApi format (#6215)
+
+## v3.3.12
+
+### Bug fixes
+
+* [0a461d749](https://github.com/api-platform/core/commit/0a461d749b7b4ac706f3b7b6138a13cb6e4a9d2d) fix(symfony): allow schema restriction for collection like property from choice constraint (#6520)
+* [0e91b0451](https://github.com/api-platform/core/commit/0e91b045168fa74603a093b301546d604e7997ad) fix: use correct class in FilterValidationException deprecation message (#6549)
+* [2da8dd326](https://github.com/api-platform/core/commit/2da8dd32681fe9d51b0bdb343f60b98b4e9033d2) fix(symfony): replace tagged by tagged_iterator
+* [3b42c9ff2](https://github.com/api-platform/core/commit/3b42c9ff235de5feac555d0283c513a6e4643953) fix: deserialization path for not denormalizable relations collected errors (#6537)
+* [41deeb4e4](https://github.com/api-platform/core/commit/41deeb4e49c35d27cd902ea41ddaa3c8c492d8e4) fix(symfony): fix debug:api-resource command for class with multiple resources with same uriTemplate (#6505)
+* [52fd9818b](https://github.com/api-platform/core/commit/52fd9818b1d02dd89cac578e0762530079b5b42d) fix(elasticsearch): change normalize return type to compatible with other normalizers (#6493)
+* [b3d7c0768](https://github.com/api-platform/core/commit/b3d7c07682366cc387ceee904cadbdd85bad0c09) fix(openapi): allow null return type parameter
+>>>>>>> upstream/3.3
 
 ## v3.3.11
 

@@ -1,6 +1,6 @@
 {
     "name": "api-platform/symfony",
-    "description": "API Platform support for Symfony",
+    "description": "Symfony API Platform integration",
     "type": "library",
     "keywords": [
         "Symfony",

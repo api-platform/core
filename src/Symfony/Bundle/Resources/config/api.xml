@@ -140,6 +140,14 @@
             <argument type="tagged_iterator" tag="api_platform.uri_variables.transformer" />
         </service>
 
+        <service id="api_platform.uri_variables.transformer.integer" class="ApiPlatform\Metadata\UriVariableTransformer\IntegerUriVariableTransformer" public="false">
+            <tag name="api_platform.uri_variables.transformer" priority="-100" />
+        </service>
+
+        <service id="api_platform.uri_variables.transformer.date_time" class="ApiPlatform\Metadata\UriVariableTransformer\DateTimeUriVariableTransformer" public="false">
+            <tag name="api_platform.uri_variables.transformer" priority="-100" />
+        </service>
+
         <service id="api_platform.iri_converter" alias="api_platform.symfony.iri_converter" />
 
         <service id="api_platform.symfony.iri_converter" class="ApiPlatform\Symfony\Routing\IriConverter" public="false">
@@ -166,14 +174,5 @@
 
             <tag name="serializer.normalizer" priority="-780" />
         </service>
-
-        <service id="api_platform.uri_variables.transformer.integer" class="ApiPlatform\Metadata\UriVariableTransformer\IntegerUriVariableTransformer" public="false">
-            <tag name="api_platform.uri_variables.transformer" priority="-100" />
-        </service>
-
-        <service id="api_platform.uri_variables.transformer.date_time" class="ApiPlatform\Metadata\UriVariableTransformer\DateTimeUriVariableTransformer" public="false">
-            <tag name="api_platform.uri_variables.transformer" priority="-100" />
-        </service>
-
     </services>
 </container>
