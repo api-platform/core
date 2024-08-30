@@ -15,7 +15,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Action;
 
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\State\ProviderInterface;
-use ApiPlatform\Util\RequestAttributesExtractor;
+use ApiPlatform\State\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

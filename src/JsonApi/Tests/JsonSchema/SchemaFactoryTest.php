@@ -13,9 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\JsonApi\JsonSchema;
 
-use ApiPlatform\Hal\JsonSchema\SchemaFactory as HalSchemaFactory;
-use ApiPlatform\Hydra\JsonSchema\SchemaFactory as HydraSchemaFactory;
 use ApiPlatform\JsonApi\JsonSchema\SchemaFactory;
+use ApiPlatform\JsonApi\Tests\Fixtures\Dummy;
 use ApiPlatform\JsonSchema\DefinitionNameFactory;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactory as BaseSchemaFactory;
@@ -29,7 +28,6 @@ use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 
@@ -62,13 +60,10 @@ class SchemaFactoryTest extends TestCase
             definitionNameFactory: $definitionNameFactory,
         );
 
-        $halSchemaFactory = new HalSchemaFactory($baseSchemaFactory);
-        $hydraSchemaFactory = new HydraSchemaFactory($halSchemaFactory);
-
         $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
 
         $this->schemaFactory = new SchemaFactory(
-            schemaFactory: $hydraSchemaFactory,
+            schemaFactory: $baseSchemaFactory,
             propertyMetadataFactory: $propertyMetadataFactory->reveal(),
             resourceClassResolver: $resourceClassResolver->reveal(),
             resourceMetadataFactory: $resourceMetadataFactory->reveal(),

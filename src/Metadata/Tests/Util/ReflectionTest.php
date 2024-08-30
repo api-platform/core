@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Util;
+namespace ApiPlatform\Metadata\Tests\Util;
 
-use ApiPlatform\Util\Reflection;
+use ApiPlatform\Metadata\Util\Reflection;
 use PHPUnit\Framework\TestCase;
 
 /**

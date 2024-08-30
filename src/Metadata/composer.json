@@ -35,9 +35,9 @@
         "symfony/string": "^6.4 || ^7.0"
     },
     "require-dev": {
-        "api-platform/json-schema": "*@dev || ^3.1",
-        "api-platform/openapi": "*@dev || ^3.1",
-        "api-platform/state": "*@dev || ^3.1",
+        "api-platform/json-schema": "^3.1",
+        "api-platform/openapi": "^3.1",
+        "api-platform/state": "^3.1",
         "phpspec/prophecy-phpunit": "^2.0",
         "phpstan/phpdoc-parser": "^1.16",
         "sebastian/comparator": "<5.0",

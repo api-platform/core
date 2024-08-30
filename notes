@@ -1,0 +1,11 @@
+makeHidden => serializer context builder
+
+supprimer PUT en 4.x
+
+trace => prod/dev
+http cache => ??
+doc => ??
+hugo support github
+
+cast un decimal en objet money avec eloquent
+

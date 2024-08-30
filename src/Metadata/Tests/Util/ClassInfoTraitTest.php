@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Util;
+namespace ApiPlatform\Metadata\Tests\Util;
 
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;

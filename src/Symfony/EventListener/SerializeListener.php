@@ -142,7 +142,7 @@ final class SerializeListener
             return;
         }
 
-        if ($controllerResult instanceof ValidationException) {
+        if ($controllerResult instanceof ValidationException && class_exists(ErrorFormatGuesser::class)) {
             $format = ErrorFormatGuesser::guessErrorFormat($request, $this->errorFormats);
             $previousOperation = $request->attributes->get('_api_previous_operation');
             if (!($previousOperation?->getExtraProperties()['rfc_7807_compliant_errors'] ?? false)) {
