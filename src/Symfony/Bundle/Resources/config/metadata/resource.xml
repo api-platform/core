@@ -24,6 +24,10 @@
             <argument>%api_platform.graphql.enabled%</argument>
         </service>
 
+        <service id="api_platform.metadata.resource.metadata_collection_factory.concerns" class="ApiPlatform\Metadata\Resource\Factory\ConcernsResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="800" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.concerns.inner" />
+        </service>
+
         <service id="api_platform.metadata.resource.metadata_collection_factory.not_exposed_operation" class="ApiPlatform\Metadata\Resource\Factory\NotExposedOperationResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="700" public="false">
             <argument type="service" id="api_platform.metadata.resource.link_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.not_exposed_operation.inner" />
