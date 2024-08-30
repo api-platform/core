@@ -20,7 +20,7 @@
         }
     ],
     "require": {
-        "api-platform/metadata": "*@dev || ^3.1"
+        "api-platform/metadata": "^3.1"
     },
     "extra": {
         "branch-alias": {

@@ -151,17 +151,17 @@
         <service id="ApiPlatform\Api\IdentifiersExtractorInterface" alias="api_platform.api.identifiers_extractor" />
         <service id="ApiPlatform\Metadata\IdentifiersExtractorInterface" alias="api_platform.api.identifiers_extractor" />
 
-        <service id="api_platform.uri_variables.converter" class="ApiPlatform\Api\UriVariablesConverter" public="false">
+        <service id="api_platform.uri_variables.converter" class="ApiPlatform\Metadata\UriVariablesConverter" public="false">
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="tagged_iterator" tag="api_platform.uri_variables.transformer" />
         </service>
 
-        <service id="api_platform.uri_variables.transformer.integer" class="ApiPlatform\Api\UriVariableTransformer\IntegerUriVariableTransformer" public="false">
+        <service id="api_platform.uri_variables.transformer.integer" class="ApiPlatform\Metadata\UriVariableTransformer\IntegerUriVariableTransformer" public="false">
             <tag name="api_platform.uri_variables.transformer" priority="-100" />
         </service>
 
-        <service id="api_platform.uri_variables.transformer.date_time" class="ApiPlatform\Api\UriVariableTransformer\DateTimeUriVariableTransformer" public="false">
+        <service id="api_platform.uri_variables.transformer.date_time" class="ApiPlatform\Metadata\UriVariableTransformer\DateTimeUriVariableTransformer" public="false">
             <tag name="api_platform.uri_variables.transformer" priority="-100" />
         </service>
 

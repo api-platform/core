@@ -12,10 +12,6 @@
         </service>
         <service id="ApiPlatform\Validator\ValidatorInterface" alias="api_platform.validator" />
 
-        <service id="api_platform.validator.query_parameter_validator" class="ApiPlatform\Api\QueryParameterValidator\QueryParameterValidator" public="false">
-            <argument type="service" id="api_platform.filter_locator" />
-        </service>
-
         <service id="api_platform.validator.state.error_provider" class="ApiPlatform\Symfony\Validator\State\ErrorProvider">
             <tag name="api_platform.state_provider" key="api_platform.validator.state.error_provider" />
         </service>

@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Util;
+namespace ApiPlatform\Metadata\Tests\Util;
 
-use ApiPlatform\Util\CloneTrait;
+use ApiPlatform\Metadata\Util\CloneTrait;
 use PHPUnit\Framework\TestCase;
 
 /**

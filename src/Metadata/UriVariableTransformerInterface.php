@@ -13,40 +13,27 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
-use ApiPlatform\Exception\InvalidUriVariableException;
+use ApiPlatform\Metadata\Exception\InvalidUriVariableException;
 
-if (class_exists(\ApiPlatform\Api\UriVariableTransformerInterface::class)) {
-    class_alias(
-        \ApiPlatform\Api\UriVariableTransformerInterface::class,
-        __NAMESPACE__.'\UriVariableTransformerInterface'
-    );
+interface UriVariableTransformerInterface
+{
+    /**
+     * Transforms the value of a URI variable (identifier) to its type.
+     *
+     * @param mixed $value   The URI variable value to transform
+     * @param array $types   The guessed type behind the URI variable
+     * @param array $context Options available to the transformer
+     *
+     * @throws InvalidUriVariableException Occurs when the URI variable could not be transformed
+     */
+    public function transform(mixed $value, array $types, array $context = []);
 
-    if (false) { // @phpstan-ignore-line
-        interface UriVariableTransformerInterface extends \ApiPlatform\Api\UriVariableTransformerInterface
-        {
-        }
-    }
-} else {
-    interface UriVariableTransformerInterface
-    {
-        /**
-         * Transforms the value of a URI variable (identifier) to its type.
-         *
-         * @param mixed $value   The URI variable value to transform
-         * @param array $types   The guessed type behind the URI variable
-         * @param array $context Options available to the transformer
-         *
-         * @throws InvalidUriVariableException Occurs when the URI variable could not be transformed
-         */
-        public function transform(mixed $value, array $types, array $context = []);
-
-        /**
-         * Checks whether the value of a URI variable can be transformed to its type by this transformer.
-         *
-         * @param mixed $value   The URI variable value to transform
-         * @param array $types   The types to which the URI variable value should be transformed
-         * @param array $context Options available to the transformer
-         */
-        public function supportsTransformation(mixed $value, array $types, array $context = []): bool;
-    }
+    /**
+     * Checks whether the value of a URI variable can be transformed to its type by this transformer.
+     *
+     * @param mixed $value   The URI variable value to transform
+     * @param array $types   The types to which the URI variable value should be transformed
+     * @param array $context Options available to the transformer
+     */
+    public function supportsTransformation(mixed $value, array $types, array $context = []): bool;
 }

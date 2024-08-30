@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Api\FilterInterface as LegacyFilterInterface;
+use ApiPlatform\Api\QueryParameterValidator\QueryParameterValidator;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationItemExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Filter\AbstractFilter as DoctrineMongoDbOdmAbstractFilter;
@@ -47,6 +48,7 @@ use ApiPlatform\Symfony\EventListener\DenyAccessListener;
 use ApiPlatform\Symfony\GraphQl\Resolver\Factory\DataCollectorResolverFactory;
 use ApiPlatform\Symfony\Validator\Exception\ValidationException as SymfonyValidationException;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRestrictionMetadataInterface;
+use ApiPlatform\Symfony\Validator\State\QueryParameterValidateProvider;
 use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
 use Doctrine\Persistence\ManagerRegistry;
@@ -862,6 +864,20 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $container->setParameter('api_platform.validator.serialize_payload_fields', $config['validator']['serialize_payload_fields']);
         $container->setParameter('api_platform.validator.query_parameter_validation', $config['validator']['query_parameter_validation']);
+
+        if (class_exists(QueryParameterValidator::class)) {
+            $container
+                ->setDefinition('api_platform.validator.query_parameter_validator', new Definition(QueryParameterValidator::class))
+                ->setArgument(0, new Definition('api_platform.filter_locator'));
+
+            $container
+                ->setDefinition('api_platform.state_provider.query_parameter_validate', new Definition(QueryParameterValidateProvider::class))
+                ->setDecoratedService('api_platform.state_provider.main', null, 200)
+                ->setArguments([
+                    new Definition('api_platform.state_provider.query_parameter_validate.inner'),
+                    new Definition('api_platform.validator.query_parameter_validator'),
+                ]);
+        }
 
         if (!$config['validator']['query_parameter_validation']) {
             $container->removeDefinition('api_platform.listener.view.validate_query_parameters');
