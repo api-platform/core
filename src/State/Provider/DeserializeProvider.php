@@ -37,7 +37,7 @@ final class DeserializeProvider implements ProviderInterface
         private readonly ?ProviderInterface $decorated,
         private readonly SerializerInterface $serializer,
         private readonly LegacySerializerContextBuilderInterface|SerializerContextBuilderInterface $serializerContextBuilder,
-        private ?TranslatorInterface $translator = null
+        private ?TranslatorInterface $translator = null,
     ) {
         if (null === $this->translator) {
             $this->translator = new class implements TranslatorInterface, LocaleAwareInterface {

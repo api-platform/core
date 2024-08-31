@@ -29,7 +29,7 @@ final class LinkAccessCheckerProvider implements ProviderInterface
 {
     public function __construct(
         private readonly ProviderInterface $decorated,
-        private readonly ResourceAccessCheckerInterface $resourceAccessChecker
+        private readonly ResourceAccessCheckerInterface $resourceAccessChecker,
     ) {
     }
 

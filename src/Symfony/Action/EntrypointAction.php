@@ -35,7 +35,7 @@ final class EntrypointAction
         private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory,
         private readonly ProviderInterface $provider,
         private readonly ProcessorInterface $processor,
-        private readonly array $documentationFormats = []
+        private readonly array $documentationFormats = [],
     ) {
     }
 

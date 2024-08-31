@@ -36,7 +36,7 @@ final class CollectionPaginator implements \IteratorAggregate, PaginatorInterfac
     public function __construct(
         readonly ReadableCollection $collection,
         private readonly float $currentPage,
-        private readonly float $itemsPerPage
+        private readonly float $itemsPerPage,
     ) {
         $this->items = $collection->slice((int) (($currentPage - 1) * $itemsPerPage), $itemsPerPage > 0 ? (int) $itemsPerPage : null);
         $this->totalItems = $collection->count();

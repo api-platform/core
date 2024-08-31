@@ -22,7 +22,7 @@ class RelationGroupImpactOnCollectionRelation
     public function __construct(
         public ?int $id = null,
         #[Groups('related')]
-        public ?string $title = null
+        public ?string $title = null,
     ) {
     }
 }

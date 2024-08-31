@@ -39,7 +39,7 @@ final class MainController
         private readonly ProviderInterface $provider,
         private readonly ProcessorInterface $processor,
         ?UriVariablesConverterInterface $uriVariablesConverter = null,
-        private readonly ?LoggerInterface $logger = null
+        private readonly ?LoggerInterface $logger = null,
     ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->uriVariablesConverter = $uriVariablesConverter;

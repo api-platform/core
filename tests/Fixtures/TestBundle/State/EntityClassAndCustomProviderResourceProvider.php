@@ -29,7 +29,7 @@ class EntityClassAndCustomProviderResourceProvider implements ProviderInterface
      */
     public function __construct(
         private readonly ItemProvider $itemProvider,
-        private readonly CollectionProvider $collectionProvider
+        private readonly CollectionProvider $collectionProvider,
     ) {
     }
 
