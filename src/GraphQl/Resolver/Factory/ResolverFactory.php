@@ -28,7 +28,7 @@ class ResolverFactory implements ResolverFactoryInterface
 {
     public function __construct(
         private readonly ProviderInterface $provider,
-        private readonly ProcessorInterface $processor
+        private readonly ProcessorInterface $processor,
     ) {
     }
 

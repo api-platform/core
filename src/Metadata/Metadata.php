@@ -77,7 +77,7 @@ abstract class Metadata
          */
         array|Parameters|null $parameters = null,
         protected ?bool $queryParameterValidationEnabled = null,
-        protected array $extraProperties = []
+        protected array $extraProperties = [],
     ) {
         if (\is_array($parameters) && $parameters) {
             $parameters = new Parameters($parameters);

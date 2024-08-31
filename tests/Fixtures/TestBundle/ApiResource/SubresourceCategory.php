@@ -32,7 +32,7 @@ final class SubresourceCategory
     public function __construct(
         #[ApiProperty(identifier: true)]
         public ?int $id = null,
-        public ?string $name = null
+        public ?string $name = null,
     ) {
     }
 

@@ -24,7 +24,7 @@ class NotAResourceWithUnionIntersectTypes
     public function __construct(
         private $ignoredProperty,
         private string|int|float|null $unionType,
-        private Serializable&DummyResourceInterface $intersectType
+        private Serializable&DummyResourceInterface $intersectType,
     ) {
     }
 

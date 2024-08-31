@@ -38,7 +38,7 @@ final class SelectablePaginator implements \IteratorAggregate, PaginatorInterfac
     public function __construct(
         readonly Selectable $selectable,
         private readonly float $currentPage,
-        private readonly float $itemsPerPage
+        private readonly float $itemsPerPage,
     ) {
         $this->totalItems = $this->selectable instanceof \Countable ? $this->selectable->count() : $this->selectable->matching(Criteria::create())->count();
 

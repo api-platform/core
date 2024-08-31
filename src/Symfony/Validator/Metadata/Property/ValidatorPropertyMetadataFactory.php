@@ -167,7 +167,7 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
      */
     private function getPropertyConstraints(
         ValidatorPropertyMetadataInterface $validatorPropertyMetadata,
-        array $groups
+        array $groups,
     ): array {
         $constraints = [];
 

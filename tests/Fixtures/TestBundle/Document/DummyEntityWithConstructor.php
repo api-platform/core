@@ -48,7 +48,7 @@ class DummyEntityWithConstructor
     public function __construct(
         #[ODM\Field] private string $foo,
         #[ODM\Field] private string $bar,
-        private array $items
+        private array $items,
     ) {
     }
 
