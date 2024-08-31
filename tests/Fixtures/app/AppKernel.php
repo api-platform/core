@@ -16,7 +16,6 @@ use ApiPlatform\Tests\Behat\DoctrineContext;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\User as UserDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
-use ApiPlatform\Tests\PhpUnitBundle;
 use Doctrine\Bundle\DoctrineBundle\ConnectionFactory;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\Command\TailCursorDoctrineODMCommand;
@@ -69,7 +68,6 @@ class AppKernel extends Kernel
             new WebProfilerBundle(),
             new FrameworkBundle(),
             new MakerBundle(),
-            new PhpUnitBundle(),
         ];
 
         if (null === ($_ENV['APP_PHPUNIT'] ?? null)) {
@@ -83,6 +81,12 @@ class AppKernel extends Kernel
         $bundles[] = new TestBundle();
 
         return $bundles;
+    }
+
+    public function shutdown(): void
+    {
+        parent::shutdown();
+        restore_exception_handler();
     }
 
     public function getProjectDir(): string
