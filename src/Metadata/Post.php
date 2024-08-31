@@ -96,7 +96,7 @@ final class Post extends HttpOperation
         ?OptionsInterface $stateOptions = null,
         array|Parameters|null $parameters = null,
         array $extraProperties = [],
-        private ?string $itemUriTemplate = null
+        private ?string $itemUriTemplate = null,
     ) {
         parent::__construct(
             method: 'POST',

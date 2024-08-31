@@ -79,7 +79,7 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
         private ?string $instance = null,
         private string $type = 'about:blank',
         private array $headers = [],
-        ?\Throwable $previous = null
+        ?\Throwable $previous = null,
     ) {
         parent::__construct($title, $status, $previous);
 

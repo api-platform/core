@@ -26,7 +26,7 @@ class DummyWithArrayOfNotResourceObjects
         #[ApiProperty(genId: false)]
         public readonly DummyNonResource $notResourceObject,
         /** @var array<DummyNonResource> */
-        public readonly array $arrayOfNotResourceObjects
+        public readonly array $arrayOfNotResourceObjects,
     ) {
     }
 

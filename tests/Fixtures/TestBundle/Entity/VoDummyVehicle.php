@@ -32,7 +32,7 @@ abstract class VoDummyVehicle
     public function __construct(
         #[ORM\Column] #[Groups(['car_read', 'car_write'])] private string $make,
         #[ORM\ManyToOne(targetEntity: VoDummyInsuranceCompany::class, cascade: ['persist'])] #[Groups(['car_read', 'car_write'])] private ?VoDummyInsuranceCompany $insuranceCompany,
-        array $drivers
+        array $drivers,
     ) {
         $this->drivers = new ArrayCollection($drivers);
     }

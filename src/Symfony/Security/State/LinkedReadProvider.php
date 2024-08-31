@@ -33,7 +33,7 @@ final class LinkedReadProvider implements ProviderInterface
     public function __construct(
         private readonly ProviderInterface $decorated,
         private readonly ProviderInterface $locator,
-        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
     ) {
     }
 

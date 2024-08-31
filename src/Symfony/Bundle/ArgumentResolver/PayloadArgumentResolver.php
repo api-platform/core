@@ -27,7 +27,7 @@ final class PayloadArgumentResolver implements CompatibleValueResolverInterface
 
     public function __construct(
         ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
-        private readonly SerializerContextBuilderInterface $serializationContextBuilder
+        private readonly SerializerContextBuilderInterface $serializationContextBuilder,
     ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }

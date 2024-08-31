@@ -53,7 +53,7 @@ final class DeserializeListener
         ProviderInterface|SerializerInterface $serializer,
         private readonly LegacySerializerContextBuilderInterface|SerializerContextBuilderInterface|ResourceMetadataCollectionFactoryInterface|null $serializerContextBuilder = null,
         ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null,
-        private ?TranslatorInterface $translator = null
+        private ?TranslatorInterface $translator = null,
     ) {
         if ($serializer instanceof ProviderInterface) {
             $this->provider = $serializer;

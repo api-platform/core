@@ -47,7 +47,7 @@ final class DocumentationAction
         private readonly ?ProviderInterface $provider = null,
         private readonly ?ProcessorInterface $processor = null,
         ?Negotiator $negotiator = null,
-        private readonly array $documentationFormats = [OpenApiNormalizer::JSON_FORMAT => ['application/vnd.openapi+json'], OpenApiNormalizer::FORMAT => ['application/json']]
+        private readonly array $documentationFormats = [OpenApiNormalizer::JSON_FORMAT => ['application/vnd.openapi+json'], OpenApiNormalizer::FORMAT => ['application/json']],
     ) {
         $this->negotiator = $negotiator ?? new Negotiator();
     }
