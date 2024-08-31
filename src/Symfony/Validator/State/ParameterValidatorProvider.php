@@ -34,7 +34,7 @@ final class ParameterValidatorProvider implements ProviderInterface
 
     public function __construct(
         private readonly ValidatorInterface $validator,
-        private readonly ProviderInterface $decorated
+        private readonly ProviderInterface $decorated,
     ) {
     }
 

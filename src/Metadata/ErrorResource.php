@@ -85,7 +85,7 @@ class ErrorResource extends ApiResource
         $provider = null,
         $processor = null,
         ?OptionsInterface $stateOptions = null,
-        array $extraProperties = []
+        array $extraProperties = [],
     ) {
         parent::__construct(
             uriTemplate: $uriTemplate,

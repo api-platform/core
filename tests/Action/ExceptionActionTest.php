@@ -71,7 +71,7 @@ class ExceptionActionTest extends TestCase
         array $globalExceptionToStatus,
         ?array $resourceExceptionToStatus,
         ?array $operationExceptionToStatus,
-        int $expectedStatusCode
+        int $expectedStatusCode,
     ): void {
         $exception = new \DomainException();
         $flattenException = FlattenException::create($exception);

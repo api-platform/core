@@ -30,7 +30,7 @@ class NotAResource
         /**
          * @Groups("contain_non_resource")
          */
-        private $bar
+        private $bar,
     ) {
     }
 

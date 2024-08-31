@@ -28,7 +28,7 @@ class Library implements ActivableInterface, TimestampableInterface
     public function __construct(
         #[ApiProperty(identifier: true)]
         public readonly string|int $id,
-        public readonly string $name
+        public readonly string $name,
     ) {
     }
 }

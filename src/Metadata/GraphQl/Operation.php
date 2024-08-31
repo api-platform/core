@@ -90,7 +90,7 @@ class Operation extends AbstractOperation
         ?OptionsInterface $stateOptions = null,
         array|Parameters|null $parameters = null,
         ?bool $queryParameterValidationEnabled = null,
-        array $extraProperties = []
+        array $extraProperties = [],
     ) {
         parent::__construct(
             shortName: $shortName,
