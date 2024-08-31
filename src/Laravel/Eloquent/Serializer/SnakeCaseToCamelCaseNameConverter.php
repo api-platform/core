@@ -41,7 +41,7 @@ final class SnakeCaseToCamelCaseNameConverter implements NameConverterInterface
      * @param array<string, mixed> $context
      */
     public function normalize(
-        string $propertyName, ?string $class = null, ?string $format = null, array $context = []
+        string $propertyName, ?string $class = null, ?string $format = null, array $context = [],
     ): string {
         if (null === $this->attributes || \in_array($propertyName, $this->attributes, true)) {
             return lcfirst(preg_replace_callback(
@@ -59,7 +59,7 @@ final class SnakeCaseToCamelCaseNameConverter implements NameConverterInterface
      * @param array<string, mixed> $context
      */
     public function denormalize(
-        string $propertyName, ?string $class = null, ?string $format = null, array $context = []
+        string $propertyName, ?string $class = null, ?string $format = null, array $context = [],
     ): string {
         $snakeCased = strtolower(preg_replace('/[A-Z]/', '_\\0', lcfirst($propertyName)));
         if (null === $this->attributes || \in_array($snakeCased, $this->attributes, true)) {

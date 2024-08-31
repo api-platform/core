@@ -23,7 +23,7 @@ use Psr\Container\ContainerInterface;
 final readonly class FilterQueryExtension implements QueryExtensionInterface
 {
     public function __construct(
-        private ContainerInterface $filterLocator
+        private ContainerInterface $filterLocator,
     ) {
     }
 

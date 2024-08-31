@@ -39,7 +39,7 @@ final class EntrypointController
         private readonly NormalizerInterface $normalizer,
         private readonly ErrorHandlerInterface $errorHandler,
         bool $debug = false,
-        ?Negotiator $negotiator = null
+        ?Negotiator $negotiator = null,
     ) {
         $this->debug = $debug ? DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::INCLUDE_TRACE : DebugFlag::NONE;
         $this->negotiator = $negotiator ?? new Negotiator();

@@ -31,7 +31,7 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
 {
     public function __construct(
         private readonly ModelMetadata $modelMetadata,
-        private readonly ?PropertyMetadataFactoryInterface $decorated = null
+        private readonly ?PropertyMetadataFactoryInterface $decorated = null,
     ) {
     }
 

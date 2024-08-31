@@ -57,7 +57,7 @@ final class ErrorListener extends SymfonyErrorListener
         /** @phpstan-ignore-next-line we're not using this anymore but keeping for bc layer */
         private readonly ?IdentifiersExtractorInterface $identifiersExtractor = null,
         private readonly ?ResourceClassResolverInterface $resourceClassResolver = null,
-        ?Negotiator $negotiator = null
+        ?Negotiator $negotiator = null,
     ) {
         parent::__construct($controller, $logger, $debug, $exceptionsMapping);
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;

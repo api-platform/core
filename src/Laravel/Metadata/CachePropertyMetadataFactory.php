@@ -21,7 +21,7 @@ final readonly class CachePropertyMetadataFactory implements PropertyMetadataFac
 {
     public function __construct(
         private PropertyMetadataFactoryInterface $decorated,
-        private string $cacheStore
+        private string $cacheStore,
     ) {
     }
 

@@ -37,7 +37,7 @@ final class DeserializeListener
      */
     public function __construct(
         private ProviderInterface $provider,
-        ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null
+        ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null,
     ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
     }
