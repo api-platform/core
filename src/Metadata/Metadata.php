@@ -81,7 +81,7 @@ abstract class Metadata
         protected ?string $policy = null,
         protected array|string|null $middleware = null,
         protected ?bool $queryParameterValidationEnabled = null,
-        protected array $extraProperties = []
+        protected array $extraProperties = [],
     ) {
         if (\is_array($parameters) && $parameters) {
             $parameters = new Parameters($parameters);

@@ -43,7 +43,7 @@ final class ContextAction
         private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
         private readonly ?ProviderInterface $provider = null,
         private readonly ?ProcessorInterface $processor = null,
-        private readonly ?SerializerInterface $serializer = null
+        private readonly ?SerializerInterface $serializer = null,
     ) {
     }
 

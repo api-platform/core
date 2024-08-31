@@ -21,7 +21,7 @@ final readonly class CachePropertyNameCollectionMetadataFactory implements Prope
 {
     public function __construct(
         private PropertyNameCollectionFactoryInterface $decorated,
-        private string $cacheStore
+        private string $cacheStore,
     ) {
     }
 

@@ -22,7 +22,7 @@ class OutputAndEntityClassEntity
         #[ORM\Id]
         #[ORM\Column(type: 'integer')]
         #[ORM\GeneratedValue(strategy: 'AUTO')]
-        public readonly ?int $id = null
+        public readonly ?int $id = null,
     ) {
     }
 }

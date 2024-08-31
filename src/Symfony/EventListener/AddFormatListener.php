@@ -35,7 +35,7 @@ final class AddFormatListener
      */
     public function __construct(
         private ProviderInterface $provider,
-        ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null
+        ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
     ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }

@@ -51,7 +51,7 @@ class ErrorHandler extends ExceptionsHandler
         private readonly ?ResourceClassResolverInterface $resourceClassResolver = null,
         ?Negotiator $negotiator = null,
         private readonly ?array $exceptionToStatus = null,
-        private readonly ?bool $debug = false
+        private readonly ?bool $debug = false,
     ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->negotiator = $negotiator;
@@ -214,7 +214,7 @@ class ErrorHandler extends ExceptionsHandler
             'jsonld' => '_api_errors_hydra',
             'jsonapi' => '_api_errors_jsonapi',
             'html' => '_api_errors_problem', // This will be intercepted by the SwaggerUiProvider
-            default => '_api_errors_problem'
+            default => '_api_errors_problem',
         };
     }
 

@@ -21,7 +21,7 @@ final readonly class CacheResourceCollectionMetadataFactory implements ResourceM
 {
     public function __construct(
         private ResourceMetadataCollectionFactoryInterface $decorated,
-        private string $cacheStore
+        private string $cacheStore,
     ) {
     }
 

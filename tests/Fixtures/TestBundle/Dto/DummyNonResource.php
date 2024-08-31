@@ -17,7 +17,7 @@ final class DummyNonResource
 {
     public function __construct(
         public ?string $foo = null,
-        public ?string $bar = null
+        public ?string $bar = null,
     ) {
     }
 }

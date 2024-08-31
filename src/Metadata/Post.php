@@ -98,7 +98,7 @@ final class Post extends HttpOperation
         ?string $policy = null,
         array|string|null $middleware = null,
         array $extraProperties = [],
-        private ?string $itemUriTemplate = null
+        private ?string $itemUriTemplate = null,
     ) {
         parent::__construct(
             method: 'POST',

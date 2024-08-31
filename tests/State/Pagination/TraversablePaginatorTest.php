@@ -26,7 +26,7 @@ class TraversablePaginatorTest extends TestCase
         float $totalItems,
         float $lastPage,
         int $currentItems,
-        bool $hasNextPage
+        bool $hasNextPage,
     ): void {
         $traversable = new \ArrayIterator($results);
 

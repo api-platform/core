@@ -57,7 +57,7 @@ final class ErrorListener extends SymfonyErrorListener
         /** @phpstan-ignore-next-line we're not using this anymore but keeping for bc layer */
         private readonly ?IdentifiersExtractorInterface $identifiersExtractor = null,
         private readonly ?ResourceClassResolverInterface $resourceClassResolver = null,
-        ?Negotiator $negotiator = null
+        ?Negotiator $negotiator = null,
     ) {
         parent::__construct($controller, $logger, $debug, $exceptionsMapping);
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
@@ -196,7 +196,7 @@ final class ErrorListener extends SymfonyErrorListener
             'jsonld' => '_api_errors_hydra',
             'jsonapi' => '_api_errors_jsonapi',
             'html' => '_api_errors_problem', // This will be intercepted by the SwaggerUiProvider
-            default => '_api_errors_problem'
+            default => '_api_errors_problem',
         };
     }
 
