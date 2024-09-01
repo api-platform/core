@@ -21,6 +21,7 @@
         <service id="api_platform.state_provider.read" class="ApiPlatform\State\Provider\ReadProvider">
             <argument type="service" id="api_platform.state_provider.locator" />
             <argument type="service" id="api_platform.serializer.context_builder" />
+            <argument key="$logger" type="service" id="logger" on-invalid="null" />
         </service>
 
         <!-- kernel.request priority must be < 8 to be executed after the Firewall -->
