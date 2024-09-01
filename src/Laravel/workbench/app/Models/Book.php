@@ -15,6 +15,12 @@ namespace Workbench\App\Models;
 
 use ApiPlatform\Laravel\Eloquent\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\QueryParameter;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -25,7 +31,15 @@ use Workbench\App\Http\Requests\BookFormRequest;
 #[ApiResource(
     paginationEnabled: true,
     paginationItemsPerPage: 5,
-    rules: BookFormRequest::class
+    rules: BookFormRequest::class,
+    operations: [
+        new Put(),
+        new Patch(),
+        new Get(),
+        new Post(),
+        new Delete(),
+        new GetCollection(),
+    ]
 )]
 #[QueryParameter(key: ':property', filter: SearchFilter::class)]
 class Book extends Model

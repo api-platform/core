@@ -11,6 +11,12 @@
 
 declare(strict_types=1);
 
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Symfony\Bundle\ApiPlatformBundle;
 use ApiPlatform\Tests\Behat\DoctrineContext;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\User as UserDocument;
@@ -261,6 +267,14 @@ class AppKernel extends Kernel
                 'normalization_context' => ['skip_null_values' => false],
                 'extra_properties' => [
                     'standard_put' => true,
+                ],
+                'operations' => [
+                    Get::class,
+                    GetCollection::class,
+                    Post::class,
+                    Put::class,
+                    Patch::class,
+                    Delete::class,
                 ],
             ],
         ]);
