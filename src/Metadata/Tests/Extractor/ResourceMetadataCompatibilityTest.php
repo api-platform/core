@@ -28,7 +28,6 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\Resource\Factory\ExtractorResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\OperationDefaultsTrait;
@@ -549,7 +548,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
             if (null === $fixtures) {
                 // Build default operations
                 $operations = [];
-                foreach ([new Get(), new GetCollection(), new Post(), new Put(), new Patch(), new Delete()] as $operation) {
+                foreach ([new Get(), new GetCollection(), new Post(), new Patch(), new Delete()] as $operation) {
                     [$name, $operation] = $this->getOperationWithDefaults($resource, $operation);
                     $operations[$name] = $operation;
                 }

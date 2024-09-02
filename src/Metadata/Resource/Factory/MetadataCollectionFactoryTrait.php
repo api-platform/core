@@ -55,7 +55,6 @@ trait MetadataCollectionFactoryTrait
      * Get
      * Post
      * Resource
-     * Put
      * Get
      * In the future, we will be able to use nested attributes (https://wiki.php.net/rfc/new_in_initializers).
      *
