@@ -32,6 +32,8 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Tobias Schultze <http://tobion.de>
  * @copyright Fabien Potencier
+ *
+ * @deprecated moved to ApiPlatform\Metadata\UrlGeneratorInterface
  */
 interface UrlGeneratorInterface
 {

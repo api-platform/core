@@ -30,6 +30,7 @@ $movedClasses = [
     ApiPlatform\Action\NotFoundAction::class => ApiPlatform\Symfony\Action\NotFoundAction::class,
     ApiPlatform\Action\PlaceholderAction::class => ApiPlatform\Symfony\Action\PlaceholderAction::class,
     ApiPlatform\Api\Entrypoint::class => ApiPlatform\Documentation\Entrypoint::class,
+    ApiPlatform\Api\UrlGeneratorInterface::class => ApiPlatform\Metadata\UrlGeneratorInterface::class,
     ApiPlatform\Exception\ExceptionInterface::class => ApiPlatform\Metadata\Exception\ExceptionInterface::class,
     ApiPlatform\Exception\InvalidArgumentException::class => ApiPlatform\Metadata\Exception\InvalidArgumentException::class,
     ApiPlatform\Exception\InvalidIdentifierException::class => ApiPlatform\Metadata\Exception\InvalidIdentifierException::class,
