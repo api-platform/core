@@ -21,10 +21,10 @@
     ],
     "require": {
         "php": ">=8.1",
-        "api-platform/metadata": "^3.1",
-        "api-platform/serializer": "^3.1",
-        "api-platform/state": "^3.1",
-        "api-platform/validator": "^3.1",
+        "api-platform/metadata": "^3.4",
+        "api-platform/state": "^3.4",
+        "api-platform/serializer": "^3.4",
+        "api-platform/validator": "^3.4",
         "symfony/property-info": "^6.4 || ^7.1",
         "symfony/serializer": "^6.4 || ^7.1",
         "webonyx/graphql-php": "^14.0 || ^15.0",
@@ -38,10 +38,7 @@
         "symfony/phpunit-bridge": "^6.4 || ^7.0",
         "symfony/routing": "^6.4 || ^7.0",
         "symfony/validator": "^6.4 || ^7.0",
-        "sebastian/comparator": "<5.0",
-        "api-platform/doctrine-common": "^3.2",
-        "api-platform/doctrine-odm": "^3.2",
-        "api-platform/doctrine-orm": "^3.2"
+        "sebastian/comparator": "<5.0"
     },
     "autoload": {
         "psr-4": {
@@ -50,6 +47,10 @@
         "exclude-from-classmap": [
             "/Tests/"
         ]
+    },
+    "suggest": {
+        "api-platform/doctrine-odm": "To support doctrine ODM state options.",
+        "api-platform/doctrine-orm": "To support doctrine ORM state options."
     },
     "config": {
         "preferred-install": {

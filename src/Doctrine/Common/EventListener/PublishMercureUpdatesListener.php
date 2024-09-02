@@ -11,10 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Doctrine\EventListener;
+namespace ApiPlatform\Doctrine\Common\EventListener;
 
 use ApiPlatform\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
+use ApiPlatform\Doctrine\Common\Messenger\DispatchTrait;
 use ApiPlatform\Exception\InvalidArgumentException;
 use ApiPlatform\Exception\OperationNotFoundException;
 use ApiPlatform\Exception\RuntimeException;
@@ -27,7 +28,6 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
-use ApiPlatform\Symfony\Messenger\DispatchTrait;
 use Doctrine\Common\EventArgs;
 use Doctrine\ODM\MongoDB\Event\OnFlushEventArgs as MongoDbOdmOnFlushEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs as OrmOnFlushEventArgs;
@@ -43,8 +43,6 @@ use Symfony\Component\Serializer\SerializerInterface;
  * Publishes resources updates to the Mercure hub.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @deprecated moved to \ApiPlatform\Doctrine\Common\EventListener\PublishMercureUpdatesListener
  */
 final class PublishMercureUpdatesListener
 {
