@@ -49,6 +49,8 @@ $movedClasses = [
     ApiPlatform\Util\ClientTrait::class => ApiPlatform\Symfony\Bundle\Test\ClientTrait::class,
     ApiPlatform\Util\RequestAttributesExtractor::class => ApiPlatform\State\Util\RequestAttributesExtractor::class,
     ApiPlatform\Symfony\Util\RequestAttributesExtractor::class => ApiPlatform\State\Util\RequestAttributesExtractor::class,
+    ApiPlatform\Doctrine\EventListener\PublishMercureUpdatesListener::class => ApiPlatform\Doctrine\Common\EventListener\PublishMercureUpdatesListener::class,
+    ApiPlatform\Doctrine\EventListener\PurgeHttpCacheListener::class => ApiPlatform\Doctrine\Common\EventListener\PurgeHttpCacheListener::class,
 ];
 
 $removedClasses = [

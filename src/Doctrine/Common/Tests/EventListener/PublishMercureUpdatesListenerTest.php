@@ -11,9 +11,16 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Doctrine\EventListener;
+namespace ApiPlatform\Doctrine\Common\Tests\EventListener;
 
-use ApiPlatform\Doctrine\EventListener\PublishMercureUpdatesListener;
+use ApiPlatform\Doctrine\Common\EventListener\PublishMercureUpdatesListener;
+use ApiPlatform\Doctrine\Common\Tests\Fixtures\NotAResource;
+use ApiPlatform\Doctrine\Common\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Doctrine\Common\Tests\Fixtures\TestBundle\Entity\DummyCar;
+use ApiPlatform\Doctrine\Common\Tests\Fixtures\TestBundle\Entity\DummyFriend;
+use ApiPlatform\Doctrine\Common\Tests\Fixtures\TestBundle\Entity\DummyMercure;
+use ApiPlatform\Doctrine\Common\Tests\Fixtures\TestBundle\Entity\DummyOffer;
+use ApiPlatform\Doctrine\Common\Tests\Fixtures\TestBundle\Entity\MercureWithTopicsAndGetOperation;
 use ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface as GraphQlMercureSubscriptionIriGeneratorInterface;
 use ApiPlatform\GraphQl\Subscription\SubscriptionManagerInterface as GraphQlSubscriptionManagerInterface;
 use ApiPlatform\Metadata\ApiResource;
@@ -25,13 +32,6 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
-use ApiPlatform\Tests\Fixtures\NotAResource;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyFriend;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyMercure;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyOffer;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MercureWithTopicsAndGetOperation;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;

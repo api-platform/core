@@ -35,10 +35,10 @@
         "symfony/mercure-bundle": "*",
         "symfony/phpunit-bridge": "^6.4 || ^7.0",
         "symfony/var-dumper": "^6.4 || ^7.0",
-        "symfony/yaml": "^6.4 || ^7.0",
-        "api-platform/doctrine-odm": "^3.2",
-        "api-platform/doctrine-orm": "^3.2",
-        "api-platform/doctrine-common": "^3.2"
+        "symfony/yaml": "^6.4 || ^7.0"
+    },
+    "suggest": {
+        "api-platform/doctrine-orm": "To support doctrine ORM state options."
     },
     "autoload": {
         "psr-4": {

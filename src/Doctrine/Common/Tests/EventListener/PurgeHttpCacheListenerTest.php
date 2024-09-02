@@ -11,21 +11,21 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Doctrine\EventListener;
+namespace ApiPlatform\Doctrine\Common\Tests\EventListener;
 
-use ApiPlatform\Doctrine\EventListener\PurgeHttpCacheListener;
-use ApiPlatform\Exception\InvalidArgumentException;
-use ApiPlatform\Exception\ItemNotFoundException;
+use ApiPlatform\Doctrine\Common\EventListener\PurgeHttpCacheListener;
+use ApiPlatform\Doctrine\Common\Tests\Fixtures\NotAResource;
+use ApiPlatform\Doctrine\Common\Tests\Fixtures\TestBundle\Entity\ContainNonResource;
+use ApiPlatform\Doctrine\Common\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Doctrine\Common\Tests\Fixtures\TestBundle\Entity\DummyNoGetOperation;
+use ApiPlatform\Doctrine\Common\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\HttpCache\PurgerInterface;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
-use ApiPlatform\Tests\Fixtures\NotAResource;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ContainNonResource;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyNoGetOperation;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;

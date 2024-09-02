@@ -23,14 +23,23 @@
     ],
     "require": {
         "php": ">=8.1",
-        "api-platform/metadata": "@dev",
-        "api-platform/state": "@dev",
+        "api-platform/metadata": "^3.4",
+        "api-platform/state": "^3.4",
         "doctrine/collections": "^2.1",
         "doctrine/common": "^3.2.2",
-        "doctrine/persistence": "^3.2"
+        "doctrine/persistence": "^3.2",
+        "symfony/property-access": "^6.4 || ^7.0",
+        "symfony/serializer": "^6.4 || ^7.0",
+        "symfony/messenger": "^6.4 || ^7.0"
     },
     "require-dev": {
         "doctrine/mongodb-odm": "^2.6",
+        "symfony/expression-language": "^6.4 || 7.0",
+        "api-platform/http-cache": "^3.4",
+        "api-platform/graphql": "^3.4",
+        "api-platform/validator": "^3.4",
+        "api-platform/serializer": "^3.4",
+        "symfony/mercure-bundle": "*",
         "doctrine/orm": "^2.17 || ^3.0",
         "phpspec/prophecy-phpunit": "^2.0",
         "phpunit/phpunit": "^10.0",
@@ -42,7 +51,10 @@
     "suggest": {
         "phpstan/phpdoc-parser": "For PHP documentation support.",
         "symfony/yaml": "For YAML resource configuration.",
-        "symfony/config": "For XML resource configuration."
+        "symfony/config": "For XML resource configuration.",
+        "api-platform/http-cache": "For HTTP cache invalidation.",
+        "api-platform/graphql": "For GraphQl mercure subscriptions.",
+        "symfony/mercure-bundle": "For mercure updates publisher."
     },
     "autoload": {
         "psr-4": {
