@@ -24,6 +24,7 @@ use ApiPlatform\Metadata\Error;
 use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
 use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\HeaderParameterInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -55,7 +56,6 @@ use ApiPlatform\OpenApi\Options;
 use ApiPlatform\OpenApi\Serializer\NormalizeOperationNameTrait;
 use ApiPlatform\State\Pagination\PaginationOptions;
 use Psr\Container\ContainerInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
@@ -93,7 +93,6 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         ?Options $openApiOptions = null,
         ?PaginationOptions $paginationOptions = null,
         private readonly ?RouterInterface $router = null,
-        private readonly ?LoggerInterface $logger = null
     ) {
         $this->filterLocator = $filterLocator;
         $this->openApiOptions = $openApiOptions ?: new Options('API Platform');
@@ -883,39 +882,33 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         $existingResponses = null;
         foreach ($errors as $error) {
             if (!is_a($error, ProblemExceptionInterface::class, true)) {
-                $this->logger?->warning(\sprintf('The error class "%s" does not implement "%s". Did you forget a use statement?', $error, ProblemExceptionInterface::class));
+                throw new RuntimeException(\sprintf('The error class "%s" does not implement "%s". Did you forget a use statement?', $error, ProblemExceptionInterface::class));
             }
 
             $status = null;
             $description = null;
+
             try {
-                /** @var ProblemExceptionInterface */
-                $exception = (new \ReflectionClass($error))->newInstanceWithoutConstructor();
+                /** @var ProblemExceptionInterface $exception */
+                $exception = new $error();
                 $status = $exception->getStatus();
                 $description = $exception->getTitle();
-            } catch (\ReflectionException) {
+            } catch (\TypeError) {
             }
 
             try {
                 $errorOperation = $this->resourceMetadataFactory->create($error)->getOperation();
                 if (!is_a($errorOperation, Error::class)) {
-                    $this->logger?->warning(\sprintf('The error class %s is not an ErrorResource', $error));
-                    continue;
+                    throw new RuntimeException(\sprintf('The error class %s is not an ErrorResource', $error));
                 }
-                /* @var Error $errorOperation */
-                $status ??= $errorOperation->getStatus();
-                $description ??= $errorOperation->getDescription();
             } catch (ResourceClassNotFoundException|OperationNotFoundException) {
-                $this->logger?->warning(\sprintf('The error class %s is not an ErrorResource', $error));
-                continue;
+                $errorOperation = null;
             }
+            $status ??= $errorOperation?->getStatus();
+            $description ??= $errorOperation?->getDescription();
 
             if (!$status) {
-                $this->logger?->error(\sprintf(
-                    'The error class %s has no status defined, please either implement ProblemExceptionInterface, or make it an ErrorResource with a status',
-                    $error
-                ));
-                continue;
+                throw new RuntimeException(\sprintf('The error class %s has no status defined, please either implement ProblemExceptionInterface, or make it an ErrorResource with a status', $error));
             }
 
             $operationErrorSchemas = [];
