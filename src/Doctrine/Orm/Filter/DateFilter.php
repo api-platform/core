@@ -62,6 +62,10 @@ use Doctrine\ORM\QueryBuilder;
  *     book.date_filter:
  *         parent: 'api_platform.doctrine.orm.date_filter'
  *         arguments: [ { createdAt: ~ } ]
+ *         # you can also alias the properties you are filtering on to expose search under different names
+ *         # arguments:
+ *         #   $properties: { createdAt: ~ }
+ *         #   $propertyAliases: { createdAt: 'created' }
  *         tags:  [ 'api_platform.filter' ]
  *         # The following are mandatory only if a _defaults section is defined with inverted values.
  *         # You may want to isolate filters in a dedicated file to avoid adding the following lines (by adding them in the defaults section)
@@ -161,7 +165,7 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface
         $type = (string) $this->getDoctrineFieldType($property, $resourceClass);
 
         if (self::EXCLUDE_NULL === $nullManagement) {
-            $queryBuilder->andWhere($queryBuilder->expr()->isNotNull(\sprintf('%s.%s', $alias, $field)));
+            $queryBuilder->andWhere($queryBuilder->expr()->isNotNull(sprintf('%s.%s', $alias, $field)));
         }
 
         if (isset($values[self::PARAMETER_BEFORE])) {
@@ -234,7 +238,7 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface
         } catch (\Exception) {
             // Silently ignore this filter if it can not be transformed to a \DateTime
             $this->logger->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(\sprintf('The field "%s" has a wrong date format. Use one accepted by the \DateTime constructor', $field)),
+                'exception' => new InvalidArgumentException(sprintf('The field "%s" has a wrong date format. Use one accepted by the \DateTime constructor', $field)),
             ]);
 
             return;
@@ -247,7 +251,7 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface
             self::PARAMETER_AFTER => '>=',
             self::PARAMETER_STRICTLY_AFTER => '>',
         ];
-        $baseWhere = \sprintf('%s.%s %s :%s', $alias, $field, $operatorValue[$operator], $valueParameter);
+        $baseWhere = sprintf('%s.%s %s :%s', $alias, $field, $operatorValue[$operator], $valueParameter);
 
         if (null === $nullManagement || self::EXCLUDE_NULL === $nullManagement) {
             $queryBuilder->andWhere($baseWhere);
@@ -258,12 +262,12 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface
         ) {
             $queryBuilder->andWhere($queryBuilder->expr()->orX(
                 $baseWhere,
-                $queryBuilder->expr()->isNull(\sprintf('%s.%s', $alias, $field))
+                $queryBuilder->expr()->isNull(sprintf('%s.%s', $alias, $field))
             ));
         } else {
             $queryBuilder->andWhere($queryBuilder->expr()->andX(
                 $baseWhere,
-                $queryBuilder->expr()->isNotNull(\sprintf('%s.%s', $alias, $field))
+                $queryBuilder->expr()->isNotNull(sprintf('%s.%s', $alias, $field))
             ));
         }
 

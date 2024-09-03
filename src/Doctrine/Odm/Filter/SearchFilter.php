@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Filter;
 
+use ApiPlatform\Api\IdentifiersExtractorInterface as LegacyIdentifiersExtractorInterface;
+use ApiPlatform\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Doctrine\Common\Filter\SearchFilterInterface;
 use ApiPlatform\Doctrine\Common\Filter\SearchFilterTrait;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
@@ -77,6 +79,10 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *     book.search_filter:
  *         parent: 'api_platform.doctrine.odm.search_filter'
  *         arguments: [ { isbn: 'exact', description: 'partial' } ]
+ *         # you can also alias the properties you are filtering on to expose search under different names
+ *         # arguments:
+ *         #   $properties: { isbn: 'exact', description: 'partial' }
+ *         #   $propertyAliases: { isbn: 'identifier', description: 'aliasedDescription' }
  *         tags:  [ 'api_platform.filter' ]
  *         # The following are mandatory only if a _defaults section is defined with inverted values.
  *         # You may want to isolate filters in a dedicated file to avoid adding the following lines (by adding them in the defaults section)
@@ -140,16 +146,16 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
     public const DOCTRINE_INTEGER_TYPE = [MongoDbType::INTEGER, MongoDbType::INT];
 
-    public function __construct(ManagerRegistry $managerRegistry, IriConverterInterface $iriConverter, ?IdentifiersExtractorInterface $identifiersExtractor, ?PropertyAccessorInterface $propertyAccessor = null, ?LoggerInterface $logger = null, ?array $properties = null, ?NameConverterInterface $nameConverter = null)
+    public function __construct(ManagerRegistry $managerRegistry, IriConverterInterface|LegacyIriConverterInterface $iriConverter, IdentifiersExtractorInterface|LegacyIdentifiersExtractorInterface|null $identifiersExtractor, ?PropertyAccessorInterface $propertyAccessor = null, ?LoggerInterface $logger = null, ?array $properties = null, ?NameConverterInterface $nameConverter = null, array $propertyAliases = [])
     {
-        parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
+        parent::__construct($managerRegistry, $logger, $properties, $nameConverter, $propertyAliases);
 
         $this->iriConverter = $iriConverter;
         $this->identifiersExtractor = $identifiersExtractor;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
     }
 
-    protected function getIriConverter(): IriConverterInterface
+    protected function getIriConverter(): LegacyIriConverterInterface|IriConverterInterface
     {
         return $this->iriConverter;
     }
@@ -203,7 +209,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
             if (!$this->hasValidValues($values, $this->getDoctrineFieldType($property, $resourceClass))) {
                 $this->logger->notice('Invalid filter ignored', [
-                    'exception' => new InvalidArgumentException(\sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
+                    'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $field)),
                 ]);
 
                 return;
@@ -227,7 +233,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
         if (!$this->hasValidValues($values, $doctrineTypeField)) {
             $this->logger->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(\sprintf('Values for field "%s" are not valid according to the doctrine type.', $property)),
+                'exception' => new InvalidArgumentException(sprintf('Values for field "%s" are not valid according to the doctrine type.', $property)),
             ]);
 
             return;
@@ -276,7 +282,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
             self::STRATEGY_START => new Regex("^$quotedValue", $caseSensitive ? '' : 'i'),
             self::STRATEGY_END => new Regex("$quotedValue$", $caseSensitive ? '' : 'i'),
             self::STRATEGY_WORD_START => new Regex("(^$quotedValue.*|.*\s$quotedValue.*)", $caseSensitive ? '' : 'i'),
-            default => throw new InvalidArgumentException(\sprintf('strategy %s does not exist.', $strategy)),
+            default => throw new InvalidArgumentException(sprintf('strategy %s does not exist.', $strategy)),
         };
     }
 

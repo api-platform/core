@@ -46,6 +46,10 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
  *     book.range_filter:
  *         parent: 'api_platform.doctrine.odm.range_filter'
  *         arguments: [ { price: ~ } ]
+ *         # you can also alias the properties you are filtering on to expose search under different names
+ *         # arguments:
+ *         #   $properties: { price: ~ }
+ *         #   $propertyAliases: { price: 'priceInclVat' }
  *         tags:  [ 'api_platform.filter' ]
  *         # The following are mandatory only if a _defaults section is defined with inverted values.
  *         # You may want to isolate filters in a dedicated file to avoid adding the following lines (by adding them in the defaults section)

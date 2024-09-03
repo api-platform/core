@@ -48,6 +48,10 @@ use Doctrine\ORM\QueryBuilder;
  *     book.boolean_filter:
  *         parent: 'api_platform.doctrine.orm.boolean_filter'
  *         arguments: [ { published: ~ } ]
+ *         # you can also alias the properties you are filtering on to expose search under different names
+ *         # arguments:
+ *         #   $properties: { published: ~ }
+ *         #   $propertyAliases: { published: 'issuedOn' }
  *         tags:  [ 'api_platform.filter' ]
  *         # The following are mandatory only if a _defaults section is defined with inverted values.
  *         # You may want to isolate filters in a dedicated file to avoid adding the following lines (by adding them in the defaults section)
@@ -142,7 +146,7 @@ final class BooleanFilter extends AbstractFilter
         $valueParameter = $queryNameGenerator->generateParameterName($field);
 
         $queryBuilder
-            ->andWhere(\sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
+            ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
             ->setParameter($valueParameter, $value);
     }
 }

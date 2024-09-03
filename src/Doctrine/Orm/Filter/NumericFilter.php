@@ -48,6 +48,10 @@ use Doctrine\ORM\QueryBuilder;
  *     book.numeric_filter:
  *         parent: 'api_platform.doctrine.orm.numeric_filter'
  *         arguments: [ { price: ~ } ]
+ *         # you can also alias the properties you are filtering on to expose search under different names
+ *         # arguments:
+ *         #   $properties: { price: ~ }
+ *         #   $propertyAliases: { price: 'priceInclVat' }
  *         tags:  [ 'api_platform.filter' ]
  *         # The following are mandatory only if a _defaults section is defined with inverted values.
  *         # You may want to isolate filters in a dedicated file to avoid adding the following lines (by adding them in the defaults section)
@@ -152,11 +156,11 @@ final class NumericFilter extends AbstractFilter
 
         if (1 === \count($values)) {
             $queryBuilder
-                ->andWhere(\sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
+                ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
                 ->setParameter($valueParameter, $values[0], (string) $this->getDoctrineFieldType($property, $resourceClass));
         } else {
             $queryBuilder
-                ->andWhere(\sprintf('%s.%s IN (:%s)', $alias, $field, $valueParameter))
+                ->andWhere(sprintf('%s.%s IN (:%s)', $alias, $field, $valueParameter))
                 ->setParameter($valueParameter, $values);
         }
     }
