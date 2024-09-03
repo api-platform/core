@@ -1,6 +1,6 @@
 # Changelog
 
-## v3.4.0-alpha.3
+## v3.4.0-alpha.4
 
 ### Deprecations:
 
@@ -28,7 +28,6 @@ You should now install `api-platform/symfony` instead of `api-platform/core`.
 * [74986cb55](https://github.com/api-platform/core/commit/74986cb552182dc645bd1fc967faa0954dd59e0a) feat: inflector as service (#6447)
 * [b47edb2a4](https://github.com/api-platform/core/commit/b47edb2a499c34e79c167f963e3a626a3e9d040a) feat(serializer): context IRI in HAL or JsonApi format (#6215)
 * [db1241c66](https://github.com/api-platform/core/commit/db1241c66a08d226f57d8d61e0ec519071c6afdb) feat(openapi): make open_api_override_responses act on default 404 response generation (#6551)
-
 
 ## v3.4.0-alpha.2
 
