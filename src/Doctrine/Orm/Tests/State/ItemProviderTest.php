@@ -188,7 +188,7 @@ class ItemProviderTest extends TestCase
     public function testCannotCreateQueryBuilder(): void
     {
         if (class_exists(AssociationMapping::class)) {
-            return;
+            $this->assertEquals(true, class_exists(AssociationMapping::class));
         }
 
         $this->expectException(RuntimeException::class);
