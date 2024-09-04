@@ -18,9 +18,10 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AliasedPropertySearchItem;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AliasedPropertySearchItemDocument;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @author Chrirstophe Zarebski <christophe.zarebski@gmail.com>
+ * @author Christophe Zarebski <christophe.zarebski@gmail.com>
  */
 class AliasedPropertySearchFilterTest extends ApiTestCase
 {
@@ -111,9 +112,7 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
         return 'mongodb' === $container->getParameter('kernel.environment') ? 'aliased-property-search-items' : 'aliased-property-search-documents';
     }
 
-    /**
-     * @group aliasedPropertyFilters
-     */
+    #[Group('aliasedPropertyFilters')]
     public function testQuerySearchFilterAliasedPropertyAndResultIsCorrect(): void
     {
         $this->recreateSchema();
@@ -227,9 +226,7 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
         );
     }
 
-    /**
-     * @group aliasedPropertyFilters
-     */
+    #[Group('aliasedPropertyFilters')]
     public function testQueryBooleanFilterAliasedPropertyAndResultIsCorrect(): void
     {
         $this->recreateSchema();
@@ -242,9 +239,7 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
         $this->assertEquals('is_not_validated', $a['hydra:member'][0]['name']);
     }
 
-    /**
-     * @group aliasedPropertyFilters
-     */
+    #[Group('aliasedPropertyFilters')]
     public function testQueryNumericFilterAliasedPropertyAndResultIsCorrect(): void
     {
         $this->recreateSchema();
@@ -257,9 +252,7 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
         $this->assertEquals(20, $a['hydra:member'][0]['timesExecuted']);
     }
 
-    /**
-     * @group aliasedPropertyFilters
-     */
+    #[Group('aliasedPropertyFilters')]
     public function testQueryOrderFilterAliasedPropertyAndResultIsCorrect(): void
     {
         $this->recreateSchema();
@@ -272,9 +265,7 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
         $this->assertEquals(1000, $a['hydra:member'][0]['timesExecuted']);
     }
 
-    /**
-     * @group aliasedPropertyFilters
-     */
+    #[Group('aliasedPropertyFilters')]
     public function testQueryRangeFilterAliasedPropertyAndResultIsCorrect(): void
     {
         $this->recreateSchema();
@@ -286,9 +277,7 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
         $this->assertCount(3, $a['hydra:member']);
     }
 
-    /**
-     * @group aliasedPropertyFilters
-     */
+    #[Group('aliasedPropertyFilters')]
     public function testQueryDateFilterAliasedPropertyAndResultIsCorrect(): void
     {
         $this->recreateSchema();
@@ -301,9 +290,7 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
         $this->assertEquals('created_after', $a['hydra:member'][0]['name']);
     }
 
-    /**
-     * @group aliasedPropertyFilters
-     */
+    #[Group('aliasedPropertyFilters')]
     public function testQueryExistsFilterAliasedPropertyAndResultIsCorrect(): void
     {
         $this->recreateSchema();
