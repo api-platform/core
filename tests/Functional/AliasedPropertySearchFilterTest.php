@@ -31,9 +31,15 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
     use RecreateSchemaTrait;
     use SetupClassResourcesTrait;
 
+    private bool $hasSetup = false;
+
     #[Before]
     protected function createEntities(): void
     {
+        if ($this->hasSetup) {
+            return;
+        }
+
         self::bootKernel();
 
         $container = static::getContainer();
@@ -114,6 +120,8 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
             $manager->persist($r);
         }
         $manager->flush();
+
+        $this->hasSetup = true;
     }
 
     private function getEntityRoutePart(): string
