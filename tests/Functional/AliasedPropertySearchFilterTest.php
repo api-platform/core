@@ -44,9 +44,7 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
         $isMongo = 'mongodb' === $container->getParameter('kernel.environment');
 
         $class = $isMongo ? AliasedPropertySearchItemDocument::class : AliasedPropertySearchItem::class;
-        $classes = [];
-
-        $classes[] = $manager->getClassMetadata($class);
+        $classes = [$class];
 
         $this->recreateSchema($classes);
 
