@@ -11,26 +11,31 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Doctrine\Filter\Orm;
+namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AliasedPropertySearchItem;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AliasedPropertySearchItemDocument;
+use ApiPlatform\Tests\RecreateSchemaTrait;
+use ApiPlatform\Tests\SetupClassResourcesTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Before;
 
 /**
  * @author Christophe Zarebski <christophe.zarebski@gmail.com>
  */
 class AliasedPropertySearchFilterTest extends ApiTestCase
 {
-    private function recreateSchema(): void
-    {
-        self::bootKernel();
+    use RecreateSchemaTrait;
+    use SetupClassResourcesTrait;
 
-        $container = static::getContainer();
-        $registry = $this->getContainer()->get('mongodb' === $container->getParameter('kernel.environment') ? 'doctrine_mongodb' : 'doctrine');
-        $resource = 'mongodb' === $container->getParameter('kernel.environment') ? AliasedPropertySearchItemDocument::class : AliasedPropertySearchItem::class;
-        $manager = $registry->getManager();
+    #[Before]
+    protected function createEntities(): void
+    {
+        $class = $this->isMongoDB() ? AliasedPropertySearchItemDocument::class : AliasedPropertySearchItem::class;
+        $this->recreateSchema([$class]);
+
+        $manager = $this->getManager();
 
         $datasets = [
             [
@@ -84,9 +89,10 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
             ],
         ];
 
+        $r = $this->isMongoDB() ? new AliasedPropertySearchItemDocument() : new AliasedPropertySearchItem();
+
         foreach ($datasets as $set) {
             foreach ($set as $property => $value) {
-                $r = new $resource();
                 $r->{'set'.ucfirst($property)}($value);
             }
             $manager->persist($r);
@@ -96,9 +102,7 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
 
     private function getEntityRoutePart(): string
     {
-        $container = static::getContainer();
-
-        return 'mongodb' === $container->getParameter('kernel.environment') ? 'aliased-property-search-items' : 'aliased-property-search-documents';
+        return $this->isMongoDB() ? 'aliased-property-search-documents' : 'aliased-property-search-items' ;
     }
 
     #[Group('aliasedPropertyFilters')]
@@ -290,5 +294,10 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
         $a = $response->toArray();
         $this->assertCount(1, $a['hydra:member']);
         $this->assertEquals('nullable_property_exists', $a['hydra:member'][0]['name']);
+    }
+
+    public static function getResources(): array
+    {
+        // TODO: Implement getResources() method.
     }
 }
