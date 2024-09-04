@@ -37,8 +37,8 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
         $datasets = [
             [
                 'name' => 'is_not_validated',
-                'isvalidated' => false,
-                'date_of_creation' => \DateTime::createFromFormat('Y-m-dTH:i:s', '1999-01-01T00:00:00'),
+                'isValidated' => false,
+                'dateOfCreation' => \DateTime::createFromFormat('Y-m-dTH:i:s', '1999-01-01T00:00:00'),
                 'nullableBoolProperty' => null,
                 'timesExecuted' => 0,
             ],
