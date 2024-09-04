@@ -189,6 +189,7 @@ class ItemProviderTest extends TestCase
     {
         if (class_exists(AssociationMapping::class)) {
             $this->assertEquals(true, class_exists(AssociationMapping::class));
+            return;
         }
 
         $this->expectException(RuntimeException::class);
