@@ -27,7 +27,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ApiResource(
     operations: [
-        new GetCollection(uriTemplate: '/aliased-property-search-items')
+        new GetCollection(uriTemplate: '/aliased-property-search-items'),
     ],
 )]
 #[ORM\Entity]

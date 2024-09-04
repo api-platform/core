@@ -27,7 +27,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 #[ApiResource(
     operations: [
-        new GetCollection(uriTemplate: '/aliased-property-search-documents')
+        new GetCollection(uriTemplate: '/aliased-property-search-documents'),
     ],
 )]
 #[ODM\Document]
