@@ -26,9 +26,6 @@ use PHPUnit\Framework\Attributes\Before;
  */
 class AliasedPropertySearchFilterTest extends ApiTestCase
 {
-    #use RecreateSchemaTrait;
-    #use SetupClassResourcesTrait;
-
     public static bool $hasSetup = false;
 
     #[Before]
@@ -47,15 +44,15 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
             return;
         }
 
-        $class = $this->isMongoDB() ? AliasedPropertySearchItemDocument::class : AliasedPropertySearchItem::class;
+        $isMongo = 'mongodb' === $container->getParameter('kernel.environment');
+
+        $class = $isMongo ? AliasedPropertySearchItemDocument::class : AliasedPropertySearchItem::class;
         $classes = [];
 
         $classes[] = $manager->getClassMetadata($class);
 
         $schemaTool = new SchemaTool($manager);
         @$schemaTool->createSchema($classes);
-
-        $manager = $this->getManager();
 
         $datasets = [
             [
@@ -109,7 +106,7 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
             ],
         ];
 
-        $r = $this->isMongoDB() ? new AliasedPropertySearchItemDocument() : new AliasedPropertySearchItem();
+        $r = $isMongo ? new AliasedPropertySearchItemDocument() : new AliasedPropertySearchItem();
 
         foreach ($datasets as $set) {
             foreach ($set as $property => $value) {
@@ -124,7 +121,9 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
 
     private function getEntityRoutePart(): string
     {
-        return $this->isMongoDB() ? 'aliased-property-search-documents' : 'aliased-property-search-items' ;
+        $container = static::getContainer();
+
+        return  'mongodb' === $container->getParameter('kernel.environment')? 'aliased-property-search-documents' : 'aliased-property-search-items' ;
     }
 
     #[Group('aliasedPropertyFilters')]
