@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Common\Filter;
 
-use ApiPlatform\Exception\UnMappedPropertyAliasException;
+use ApiPlatform\Metadata\Exception\UnMappedPropertyAliasException;
 
 /**
  * Interface for filtering the collection by given properties.

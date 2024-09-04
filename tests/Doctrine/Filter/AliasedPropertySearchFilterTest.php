@@ -47,9 +47,6 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class AliasedPropertySearchFilterTest extends ApiTestCase
 {
-    /**
-     * @param array<string, mixed> $options kernel options
-     */
     private function recreateSchema(): void
     {
         self::bootKernel();
