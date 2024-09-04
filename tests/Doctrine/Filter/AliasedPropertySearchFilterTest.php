@@ -13,34 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Doctrine\Filter\Orm;
 
-use ApiPlatform\Doctrine\EventListener\PurgeHttpCacheListener;
-use ApiPlatform\Exception\InvalidArgumentException;
-use ApiPlatform\Exception\ItemNotFoundException;
-use ApiPlatform\HttpCache\PurgerInterface;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\IriConverterInterface;
-use ApiPlatform\Metadata\ResourceClassResolverInterface;
-use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use ApiPlatform\Tests\Fixtures\NotAResource;
-use ApiPlatform\Tests\Fixtures\TestBundle\Document\SearchFilterParameterDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AliasedPropertySearchItem;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AliasedPropertySearchItemDocument;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ContainNonResource;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyNoGetOperation;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SearchFilterParameter;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Event\OnFlushEventArgs;
-use Doctrine\ORM\Event\PreUpdateEventArgs;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\SchemaTool;
-use Doctrine\ORM\UnitOfWork;
-use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
-use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * @author Chrirstophe Zarebski <christophe.zarebski@gmail.com>
@@ -68,53 +45,53 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
 
         $datasets = [
             [
-                "name" => "is_not_validated",
-                "isvalidated" => false,
-                "date_of_creation" => \DateTime::createFromFormat('Y-m-dTH:i:s', "1999-01-01T00:00:00"),
-                "nullableBoolProperty" => null,
-                "timesExecuted" => 0
+                'name' => 'is_not_validated',
+                'isvalidated' => false,
+                'date_of_creation' => \DateTime::createFromFormat('Y-m-dTH:i:s', '1999-01-01T00:00:00'),
+                'nullableBoolProperty' => null,
+                'timesExecuted' => 0
             ],
             [
-                "name" => "is_validated",
-                "isValidated" => true,
-                "dateOfCreation" => \DateTime::createFromFormat('Y-m-dTH:i:s', "1999-01-01T00:00:00"),
-                "nullableBoolProperty" => null,
-                "timesExecuted" => 0
+                'name' => 'is_validated',
+                'isValidated' => true,
+                'dateOfCreation' => \DateTime::createFromFormat('Y-m-dTH:i:s', '1999-01-01T00:00:00'),
+                'nullableBoolProperty' => null,
+                'timesExecuted' => 0
             ],
             [
-                "name" => "executed_10",
-                "isValidated" => true,
-                "dateOfCreation" => \DateTime::createFromFormat('Y-m-dTH:i:s', "1999-01-01T00:00:00"),
-                "nullableBoolProperty" => null,
-                "timesExecuted" => 10
+                'name' => 'executed_10',
+                'isValidated' => true,
+                'dateOfCreation' => \DateTime::createFromFormat('Y-m-dTH:i:s', '1999-01-01T00:00:00'),
+                'nullableBoolProperty' => null,
+                'timesExecuted' => 10
             ],
             [
-                "name" => "executed_20",
-                "isValidated" => true,
-                "dateOfCreation" => \DateTime::createFromFormat('Y-m-dTH:i:s', "1999-01-01T00:00:00"),
-                "nullableBoolProperty" => null,
-                "timesExecuted" => 20
+                'name' => 'executed_20',
+                'isValidated' => true,
+                'dateOfCreation' => \DateTime::createFromFormat('Y-m-dTH:i:s', '1999-01-01T00:00:00'),
+                'nullableBoolProperty' => null,
+                'timesExecuted' => 20
             ],
             [
-                "name" => "executed_30",
-                "isValidated" => true,
-                "dateOfCreation" => \DateTime::createFromFormat('Y-m-dTH:i:s', "1999-01-01T00:00:00"),
-                "nullableBoolProperty" => null,
-                "timesExecuted" => 30
+                'name' => 'executed_30',
+                'isValidated' => true,
+                'dateOfCreation' => \DateTime::createFromFormat('Y-m-dTH:i:s', '1999-01-01T00:00:00'),
+                'nullableBoolProperty' => null,
+                'timesExecuted' => 30
             ],
             [
-                "name" => "created_after",
-                "isValidated" => true,
-                "dateOfCreation" => \DateTime::createFromFormat('Y-m-dTH:i:s', "1999-01-02T00:00:00"),
-                "nullableBoolProperty" => null,
-                "timesExecuted" => 1000
+                'name' => 'created_after',
+                'isValidated' => true,
+                'dateOfCreation' => \DateTime::createFromFormat('Y-m-dTH:i:s', '1999-01-02T00:00:00'),
+                'nullableBoolProperty' => null,
+                'timesExecuted' => 1000
             ],
             [
-                "name" => "nullable_property_exists",
-                "isValidated" => true,
-                "dateOfCreation" => \DateTime::createFromFormat('Y-m-dTH:i:s', "1999-01-01T00:00:00"),
-                "nullableBoolProperty" => true,
-                "timesExecuted" => 0
+                'name' => 'nullable_property_exists',
+                'isValidated' => true,
+                'dateOfCreation' => \DateTime::createFromFormat('Y-m-dTH:i:s', '1999-01-01T00:00:00'),
+                'nullableBoolProperty' => true,
+                'timesExecuted' => 0
             ]
         ];
 
@@ -131,6 +108,7 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
     private function getEntityRoutePart(): string
     {
         $container = static::getContainer();
+
         return 'mongodb' === $container->getParameter('kernel.environment') ? 'aliased-property-search-items' : 'aliased-property-search-documents';
     }
 
@@ -151,100 +129,100 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
         $this->assertEquals(
             [
                 [
-                    "@type" => "IriTemplateMapping",
-                    "variable" => "aliasedName",
-                    "property" => "aliasedName",
-                    "required" => false
+                    '@type' => 'IriTemplateMapping',
+                    'variable' => 'aliasedName',
+                    'property' => 'aliasedName',
+                    'required' => false
                 ],
                 [
-                    "@type" => "IriTemplateMapping",
-                    "variable" => "aliasedName[]",
-                    "property" => "aliasedName",
-                    "required" => false
+                    '@type' => 'IriTemplateMapping',
+                    'variable' => 'aliasedName[]',
+                    'property' => 'aliasedName',
+                    'required' => false
                 ],
                 [
-                    "@type" => "IriTemplateMapping",
-                    "variable" => "aliasedIsValidated",
-                    "property" => "aliasedIsValidated",
-                    "required" => false
+                    '@type' => 'IriTemplateMapping',
+                    'variable' => 'aliasedIsValidated',
+                    'property' => 'aliasedIsValidated',
+                    'required' => false
                 ],
                 [
-                    "@type" => "IriTemplateMapping",
-                    "variable" => "aliasedDateOfCreation[before]",
-                    "property" => "aliasedDateOfCreation",
-                    "required" => false
+                    '@type' => 'IriTemplateMapping',
+                    'variable' => 'aliasedDateOfCreation[before]',
+                    'property' => 'aliasedDateOfCreation',
+                    'required' => false
                 ],
                 [
-                    "@type" => "IriTemplateMapping",
-                    "variable" => "aliasedDateOfCreation[strictly_before]",
-                    "property" => "aliasedDateOfCreation",
-                    "required" => false
+                    '@type' => 'IriTemplateMapping',
+                    'variable' => 'aliasedDateOfCreation[strictly_before]',
+                    'property' => 'aliasedDateOfCreation',
+                    'required' => false
                 ],
                 [
-                    "@type" => "IriTemplateMapping",
-                    "variable" => "aliasedDateOfCreation[after]",
-                    "property" => "aliasedDateOfCreation",
-                    "required" => false
+                    '@type' => 'IriTemplateMapping',
+                    'variable' => 'aliasedDateOfCreation[after]',
+                    'property' => 'aliasedDateOfCreation',
+                    'required' => false
                 ],
                 [
-                    "@type" => "IriTemplateMapping",
-                    "variable" => "aliasedDateOfCreation[strictly_after]",
-                    "property" => "aliasedDateOfCreation",
-                    "required" => false
+                    '@type' => 'IriTemplateMapping',
+                    'variable' => 'aliasedDateOfCreation[strictly_after]',
+                    'property' => 'aliasedDateOfCreation',
+                    'required' => false
                 ],
                 [
-                    "@type" => "IriTemplateMapping",
-                    "variable" => "exists[aliasedNullableBoolProperty]",
-                    "property" => "aliasedNullableBoolProperty",
-                    "required" => false
+                    '@type' => 'IriTemplateMapping',
+                    'variable' => 'exists[aliasedNullableBoolProperty]',
+                    'property' => 'aliasedNullableBoolProperty',
+                    'required' => false
                 ],
                 [
-                    "@type" => "IriTemplateMapping",
-                    "variable" => "aliasedTimesExecuted",
-                    "property" => "aliasedTimesExecuted",
-                    "required" => false
+                    '@type' => 'IriTemplateMapping',
+                    'variable' => 'aliasedTimesExecuted',
+                    'property' => 'aliasedTimesExecuted',
+                    'required' => false
                 ],
                 [
-                    "@type" => "IriTemplateMapping",
-                    "variable" => "aliasedTimesExecuted[]",
-                    "property" => "aliasedTimesExecuted",
-                    "required" => false
+                    '@type' => 'IriTemplateMapping',
+                    'variable' => 'aliasedTimesExecuted[]',
+                    'property' => 'aliasedTimesExecuted',
+                    'required' => false
                 ],
                 [
-                    "@type" => "IriTemplateMapping",
-                    "variable" => "customOrder[aliasedTimesExecuted]",
-                    "property" => "aliasedTimesExecuted",
-                    "required" => false
+                    '@type' => 'IriTemplateMapping',
+                    'variable' => 'customOrder[aliasedTimesExecuted]',
+                    'property' => 'aliasedTimesExecuted',
+                    'required' => false
                 ],
                 [
-                    "@type" => "IriTemplateMapping",
-                    "variable" => "timesExecuted[between]",
-                    "property" => "timesExecuted",
-                    "required" => false
+                    '@type' => 'IriTemplateMapping',
+                    'variable' => 'timesExecuted[between]',
+                    'property' => 'timesExecuted',
+                    'required' => false
                 ],
                 [
-                    "@type" => "IriTemplateMapping",
-                    "variable" => "timesExecuted[gt]",
-                    "property" => "timesExecuted",
-                    "required" => false
+                    '@type' => 'IriTemplateMapping',
+                    'variable' => 'timesExecuted[gt]',
+                    'property' => 'timesExecuted',
+                    'required' => false
                 ],
                 [
-                    "@type" => "IriTemplateMapping",
-                    "variable" => "timesExecuted[gte]",
-                    "property" => "timesExecuted",
-                    "required" => false
+                    '@type' => 'IriTemplateMapping',
+                    'variable' => 'timesExecuted[gte]',
+                    'property' => 'timesExecuted',
+                    'required' => false
                 ],
                 [
-                    "@type" => "IriTemplateMapping",
-                    "variable" => "timesExecuted[lt]",
-                    "property" => "timesExecuted",
-                    "required" => false
+                    '@type' => 'IriTemplateMapping',
+                    'variable' => 'timesExecuted[lt]',
+                    'property' => 'timesExecuted',
+                    'required' => false
                 ],
                 [
-                    "@type" => "IriTemplateMapping",
-                    "variable" => "timesExecuted[lte]",
-                    "property" => "timesExecuted",
-                    "required" => false
+                    '@type' => 'IriTemplateMapping',
+                    'variable' => 'timesExecuted[lte]',
+                    'property' => 'timesExecuted',
+                    'required' => false
                 ]
             ], $a['hydra:search']['hydra:mapping']
         );

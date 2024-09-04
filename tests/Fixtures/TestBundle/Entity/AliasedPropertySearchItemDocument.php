@@ -68,23 +68,23 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 )]
 class AliasedPropertySearchItemDocument
 {
-    #[ODM\Id(type: "int", strategy: "INCREMENT")]
+    #[ODM\Id(type: 'int', strategy: 'INCREMENT')]
     private ?int $id = null;
 
-    #[ODM\Field(type: "string")]
+    #[ODM\Field(type: 'string')]
     #[ODM\Index]
     public string $name = '';
 
-    #[ODM\Field(type: "bool")]
+    #[ODM\Field(type: 'bool')]
     public bool $isValidated = false;
 
-    #[ODM\Field(type: "date")]
+    #[ODM\Field(type: 'date')]
     public ?\DateTimeInterface $dateOfCreation = null;
 
-    #[ODM\Field(type: "bool", nullable: true)]
+    #[ODM\Field(type: 'bool', nullable: true)]
     public ?bool $nullableBoolProperty = null;
 
-    #[ODM\Field(type: "int")]
+    #[ODM\Field(type: 'int')]
     public ?int $timesExecuted = 0;
 
     public function getId(): ?int
