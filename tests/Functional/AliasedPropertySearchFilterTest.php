@@ -108,7 +108,6 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
     #[Group('aliasedPropertyFilters')]
     public function testQuerySearchFilterAliasedPropertyAndResultIsCorrect(): void
     {
-        $this->recreateSchema();
         $route = $this->getEntityRoutePart();
 
         $response = self::createClient()->request('GET', $route.'?aliasedName=is_not_validated');
@@ -222,7 +221,6 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
     #[Group('aliasedPropertyFilters')]
     public function testQueryBooleanFilterAliasedPropertyAndResultIsCorrect(): void
     {
-        $this->recreateSchema();
         $route = $this->getEntityRoutePart();
 
         $response = self::createClient()->request('GET', $route.'?aliasedIsValidated=false');
@@ -235,7 +233,6 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
     #[Group('aliasedPropertyFilters')]
     public function testQueryNumericFilterAliasedPropertyAndResultIsCorrect(): void
     {
-        $this->recreateSchema();
         $route = $this->getEntityRoutePart();
 
         $response = self::createClient()->request('GET', $route.'?aliasedTimesExecuted=20');
@@ -248,7 +245,6 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
     #[Group('aliasedPropertyFilters')]
     public function testQueryOrderFilterAliasedPropertyAndResultIsCorrect(): void
     {
-        $this->recreateSchema();
         $route = $this->getEntityRoutePart();
 
         $response = self::createClient()->request('GET', $route.'?customOrder[aliasedTimesExecuted]=desc');
@@ -261,7 +257,6 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
     #[Group('aliasedPropertyFilters')]
     public function testQueryRangeFilterAliasedPropertyAndResultIsCorrect(): void
     {
-        $this->recreateSchema();
         $route = $this->getEntityRoutePart();
 
         $response = self::createClient()->request('GET', $route.'?aliasedTimesExecuted[between]=10..30');
@@ -273,7 +268,6 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
     #[Group('aliasedPropertyFilters')]
     public function testQueryDateFilterAliasedPropertyAndResultIsCorrect(): void
     {
-        $this->recreateSchema();
         $route = $this->getEntityRoutePart();
 
         $response = self::createClient()->request('GET', $route.'?aliasedDateOfCreation[strictly_after]=1999-01-01T01:01:01');
@@ -286,7 +280,6 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
     #[Group('aliasedPropertyFilters')]
     public function testQueryExistsFilterAliasedPropertyAndResultIsCorrect(): void
     {
-        $this->recreateSchema();
         $route = $this->getEntityRoutePart();
 
         $response = self::createClient()->request('GET', $route.'?exists[aliasedNullableBoolProperty]=true');
@@ -298,6 +291,6 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
 
     public static function getResources(): array
     {
-        // TODO: Implement getResources() method.
+        return [];
     }
 }
