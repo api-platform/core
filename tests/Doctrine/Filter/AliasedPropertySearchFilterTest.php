@@ -92,7 +92,7 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
                 'dateOfCreation' => \DateTime::createFromFormat('Y-m-dTH:i:s', '1999-01-01T00:00:00'),
                 'nullableBoolProperty' => true,
                 'timesExecuted' => 0,
-            ]
+            ],
         ];
 
         foreach ($datasets as $set) {
