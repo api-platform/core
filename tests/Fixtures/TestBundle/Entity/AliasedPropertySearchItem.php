@@ -70,7 +70,7 @@ class AliasedPropertySearchItem
 {
     #[ORM\Id]
     #[ORM\Column(type: 'integer')]
-    #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
+    #[ORM\GeneratedValue]
     private ?int $id = null;
 
     #[ORM\Column(type: 'string', nullable: false, options: ['default' => ''])]
