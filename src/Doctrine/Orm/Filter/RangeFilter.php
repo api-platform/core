@@ -168,16 +168,16 @@ final class RangeFilter extends AbstractFilter implements RangeFilterInterface
 
                 if ($rangeValue[0] === $rangeValue[1]) {
                     $queryBuilder
-                        ->andWhere(sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
+                        ->andWhere(\sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
                         ->setParameter($valueParameter, $rangeValue[0]);
 
                     return;
                 }
 
                 $queryBuilder
-                    ->andWhere(sprintf('%1$s.%2$s BETWEEN :%3$s_1 AND :%3$s_2', $alias, $field, $valueParameter))
-                    ->setParameter(sprintf('%s_1', $valueParameter), $rangeValue[0])
-                    ->setParameter(sprintf('%s_2', $valueParameter), $rangeValue[1]);
+                    ->andWhere(\sprintf('%1$s.%2$s BETWEEN :%3$s_1 AND :%3$s_2', $alias, $field, $valueParameter))
+                    ->setParameter(\sprintf('%s_1', $valueParameter), $rangeValue[0])
+                    ->setParameter(\sprintf('%s_2', $valueParameter), $rangeValue[1]);
 
                 break;
             case self::PARAMETER_GREATER_THAN:
@@ -187,7 +187,7 @@ final class RangeFilter extends AbstractFilter implements RangeFilterInterface
                 }
 
                 $queryBuilder
-                    ->andWhere(sprintf('%s.%s > :%s', $alias, $field, $valueParameter))
+                    ->andWhere(\sprintf('%s.%s > :%s', $alias, $field, $valueParameter))
                     ->setParameter($valueParameter, $value);
 
                 break;
@@ -198,7 +198,7 @@ final class RangeFilter extends AbstractFilter implements RangeFilterInterface
                 }
 
                 $queryBuilder
-                    ->andWhere(sprintf('%s.%s >= :%s', $alias, $field, $valueParameter))
+                    ->andWhere(\sprintf('%s.%s >= :%s', $alias, $field, $valueParameter))
                     ->setParameter($valueParameter, $value);
 
                 break;
@@ -209,7 +209,7 @@ final class RangeFilter extends AbstractFilter implements RangeFilterInterface
                 }
 
                 $queryBuilder
-                    ->andWhere(sprintf('%s.%s < :%s', $alias, $field, $valueParameter))
+                    ->andWhere(\sprintf('%s.%s < :%s', $alias, $field, $valueParameter))
                     ->setParameter($valueParameter, $value);
 
                 break;
@@ -220,7 +220,7 @@ final class RangeFilter extends AbstractFilter implements RangeFilterInterface
                 }
 
                 $queryBuilder
-                    ->andWhere(sprintf('%s.%s <= :%s', $alias, $field, $valueParameter))
+                    ->andWhere(\sprintf('%s.%s <= :%s', $alias, $field, $valueParameter))
                     ->setParameter($valueParameter, $value);
 
                 break;
