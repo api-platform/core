@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Exception;
 
-use ApiPlatform\Exception\ExceptionInterface;
-
 /**
  * Unmapped alias for property exception.
  */
