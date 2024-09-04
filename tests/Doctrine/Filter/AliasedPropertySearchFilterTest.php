@@ -36,7 +36,6 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
         if ($manager instanceof EntityManagerInterface) {
             $classes = $manager->getClassMetadata($resource);
             $schemaTool = new SchemaTool($manager);
-            @$schemaTool->dropSchema([$classes]);
             @$schemaTool->createSchema([$classes]);
         } else {
             $schemaManager = $manager->getSchemaManager();
