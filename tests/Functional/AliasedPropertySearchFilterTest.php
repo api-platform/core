@@ -16,8 +16,6 @@ namespace ApiPlatform\Tests\Functional;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AliasedPropertySearchItem;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AliasedPropertySearchItemDocument;
-use ApiPlatform\Tests\RecreateSchemaTrait;
-use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\Attributes\Group;
@@ -28,8 +26,8 @@ use PHPUnit\Framework\Attributes\Before;
  */
 class AliasedPropertySearchFilterTest extends ApiTestCase
 {
-    use RecreateSchemaTrait;
-    use SetupClassResourcesTrait;
+    #use RecreateSchemaTrait;
+    #use SetupClassResourcesTrait;
 
     private bool $hasSetup = false;
 
