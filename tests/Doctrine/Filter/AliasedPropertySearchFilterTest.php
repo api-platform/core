@@ -34,15 +34,6 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
         $resource = 'mongodb' === $container->getParameter('kernel.environment') ? AliasedPropertySearchItemDocument::class : AliasedPropertySearchItem::class;
         $manager = $registry->getManager();
 
-        if ($manager instanceof EntityManagerInterface) {
-            $classes = $manager->getClassMetadata($resource);
-            $schemaTool = new SchemaTool($manager);
-            @$schemaTool->createSchema([$classes]);
-        } else {
-            $schemaManager = $manager->getSchemaManager();
-            $schemaManager->dropCollections();
-        }
-
         $datasets = [
             [
                 'name' => 'is_not_validated',
