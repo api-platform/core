@@ -18,6 +18,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AliasedPropertySearchItem;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AliasedPropertySearchItemDocument;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\SchemaTool;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\Before;
 
@@ -32,8 +34,22 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
     #[Before]
     protected function createEntities(): void
     {
+        self::bootKernel();
+
+        $container = static::getContainer();
+        $registry = $container->get('doctrine');
+        $manager = $registry->getManager();
+        if (!$manager instanceof EntityManagerInterface) {
+            return;
+        }
+
         $class = $this->isMongoDB() ? AliasedPropertySearchItemDocument::class : AliasedPropertySearchItem::class;
-        $this->recreateSchema([$class]);
+        $classes = [];
+
+        $classes[] = $manager->getClassMetadata($class);
+
+        $schemaTool = new SchemaTool($manager);
+        @$schemaTool->createSchema($classes);
 
         $manager = $this->getManager();
 
@@ -110,7 +126,7 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
     {
         $route = $this->getEntityRoutePart();
 
-        $response = self::createClient()->request('GET', $route.'?aliasedName=is_not_validated');
+        $response = self::createClient()->request('GET', '/' . $route . '?aliasedName=is_not_validated');
 
         $a = $response->toArray();
         $this->assertCount(1, $a['hydra:member']);
@@ -223,7 +239,7 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
     {
         $route = $this->getEntityRoutePart();
 
-        $response = self::createClient()->request('GET', $route.'?aliasedIsValidated=false');
+        $response = self::createClient()->request('GET', '/' . $route . '?aliasedIsValidated=false');
 
         $a = $response->toArray();
         $this->assertCount(1, $a['hydra:member']);
@@ -235,7 +251,7 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
     {
         $route = $this->getEntityRoutePart();
 
-        $response = self::createClient()->request('GET', $route.'?aliasedTimesExecuted=20');
+        $response = self::createClient()->request('GET', '/' . $route . '?aliasedTimesExecuted=20');
 
         $a = $response->toArray();
         $this->assertCount(1, $a['hydra:member']);
@@ -247,7 +263,7 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
     {
         $route = $this->getEntityRoutePart();
 
-        $response = self::createClient()->request('GET', $route.'?customOrder[aliasedTimesExecuted]=desc');
+        $response = self::createClient()->request('GET', '/' . $route . '?customOrder[aliasedTimesExecuted]=desc');
 
         $a = $response->toArray();
         $this->assertCount(7, $a['hydra:member']);
@@ -259,7 +275,7 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
     {
         $route = $this->getEntityRoutePart();
 
-        $response = self::createClient()->request('GET', $route.'?aliasedTimesExecuted[between]=10..30');
+        $response = self::createClient()->request('GET', '/' . $route . '?aliasedTimesExecuted[between]=10..30');
 
         $a = $response->toArray();
         $this->assertCount(3, $a['hydra:member']);
@@ -270,7 +286,7 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
     {
         $route = $this->getEntityRoutePart();
 
-        $response = self::createClient()->request('GET', $route.'?aliasedDateOfCreation[strictly_after]=1999-01-01T01:01:01');
+        $response = self::createClient()->request('GET', '/' . $route . '?aliasedDateOfCreation[strictly_after]=1999-01-01T01:01:01');
 
         $a = $response->toArray();
         $this->assertCount(1, $a['hydra:member']);
@@ -282,7 +298,7 @@ class AliasedPropertySearchFilterTest extends ApiTestCase
     {
         $route = $this->getEntityRoutePart();
 
-        $response = self::createClient()->request('GET', $route.'?exists[aliasedNullableBoolProperty]=true');
+        $response = self::createClient()->request('GET', '/' . $route . '?exists[aliasedNullableBoolProperty]=true');
 
         $a = $response->toArray();
         $this->assertCount(1, $a['hydra:member']);
