@@ -1090,15 +1090,18 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->loadViewsFrom(__DIR__.'/resources/views', 'api-platform');
 
-        $fieldsBuilder = $this->app->make(FieldsBuilderEnumInterface::class);
-        $typeBuilder = $this->app->make(ContextAwareTypeBuilderInterface::class);
-        $typeBuilder->setFieldsBuilderLocator(new ServiceLocator(['api_platform.graphql.fields_builder' => $fieldsBuilder]));
+        $config = $this->app['config'];
+
+        if ($config->get('api-platform.graphql.enabled')) {
+            $fieldsBuilder = $this->app->make(FieldsBuilderEnumInterface::class);
+            $typeBuilder = $this->app->make(ContextAwareTypeBuilderInterface::class);
+            $typeBuilder->setFieldsBuilderLocator(new ServiceLocator(['api_platform.graphql.fields_builder' => $fieldsBuilder]));
+        }
 
         if (!$this->shouldRegisterRoutes()) {
             return;
         }
 
-        $config = $this->app['config'];
         $routeCollection = new RouteCollection();
         foreach ($resourceNameCollectionFactory->create() as $resourceClass) {
             foreach ($resourceMetadataFactory->create($resourceClass) as $resourceMetadata) {
