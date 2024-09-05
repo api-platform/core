@@ -388,6 +388,8 @@ jobs:
           mkdir -p build/logs/behat
           vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --no-interaction ${{ matrix.coverage && '--profile=default-coverage' || '--profile=default' }}
           grep -iF "exception" var/log/*.log 
+          grep -iF "exception" build/logs/behat/*.*
+          grep -iF "exception" build/logs/behat/junit/*.*          
       - name: Merge code coverage reports
         if: matrix.coverage
         run: |
