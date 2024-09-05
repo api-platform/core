@@ -1,4 +1,12 @@
 <?php
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace ApiPlatform\Doctrine\Orm\Tests\Filter;
 
@@ -12,7 +20,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class AliasedFieldFilterTest  extends TestCase
+class AliasedFieldFilterTest extends TestCase
 {
     private function getFakeFilter(): object
     {
@@ -34,15 +42,17 @@ class AliasedFieldFilterTest  extends TestCase
         $fakeFilter = $this->getFakeFilter();
 
         $denormalizePropertyNameClosure = function () {
-            /* @var FilterInterface $this */
-            return $this->denormalizePropertyName('aliasedField');
+            $that = $this;
+            /* @var FilterInterface $that */
+            return $that->denormalizePropertyName('aliasedField');
         };
 
         $this->assertEquals('some.relation.field', $denormalizePropertyNameClosure->call($fakeFilter));
 
         $normalizePropertyNameClosure = function () {
-            /* @var FilterInterface $this */
-            return $this->normalizePropertyName('some.relation.field');
+            $that = $this;
+            /* @var FilterInterface $that */
+            return $that->normalizePropertyName('some.relation.field');
         };
 
         $this->assertEquals('aliasedField', $normalizePropertyNameClosure->call($fakeFilter));
@@ -54,8 +64,9 @@ class AliasedFieldFilterTest  extends TestCase
         $fakeFilter = $this->getFakeFilter();
 
         $normalizePropertyNameClosure = function () {
-            /* @var FilterInterface $this */
-            return $this->normalizePropertyName('some.relation.field');
+            $that = $this;
+            /* @var FilterInterface $that */
+            return $that->normalizePropertyName('some.relation.field');
         };
 
         $this->assertEquals('aliasedField', $normalizePropertyNameClosure->call($fakeFilter));
@@ -67,13 +78,15 @@ class AliasedFieldFilterTest  extends TestCase
         $fakeFilter = $this->getFakeFilter();
 
         $denormalizePropertyNameClosure = function () {
-            /* @var FilterInterface $this */
-            return $this->denormalizePropertyName('name');
+            $that = $this;
+            /* @var FilterInterface $that */
+            return $that->denormalizePropertyName('name');
         };
 
         $normalizePropertyNameClosure = function () {
-            /* @var FilterInterface $this */
-            return $this->normalizePropertyName('name');
+            $that = $this;
+            /* @var FilterInterface $that */
+            return $that->normalizePropertyName('name');
         };
 
         $this->assertEquals('name', $denormalizePropertyNameClosure->call($fakeFilter));

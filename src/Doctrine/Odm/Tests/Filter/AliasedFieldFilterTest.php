@@ -44,15 +44,17 @@ class AliasedFieldFilterTest extends TestCase
         $fakeFilter = $this->getFakeFilter();
 
         $denormalizePropertyNameClosure = function () {
-            /* @var FilterInterface $this */
-            return $this->denormalizePropertyName('aliasedField');
+            $that = $this;
+            /* @var FilterInterface $that */
+            return $that->denormalizePropertyName('aliasedField');
         };
 
         $this->assertEquals('some.relation.field', $denormalizePropertyNameClosure->call($fakeFilter));
 
         $normalizePropertyNameClosure = function () {
-            /* @var FilterInterface $this */
-            return $this->normalizePropertyName('some.relation.field');
+            $that = $this;
+            /* @var FilterInterface $that */
+            return $that->normalizePropertyName('some.relation.field');
         };
 
         $this->assertEquals('aliasedField', $normalizePropertyNameClosure->call($fakeFilter));
@@ -64,8 +66,9 @@ class AliasedFieldFilterTest extends TestCase
         $fakeFilter = $this->getFakeFilter();
 
         $normalizePropertyNameClosure = function () {
-            /* @var FilterInterface $this */
-            return $this->normalizePropertyName('some.relation.field');
+            $that = $this;
+            /* @var FilterInterface $that */
+            return $that->normalizePropertyName('some.relation.field');
         };
 
         $this->assertEquals('aliasedField', $normalizePropertyNameClosure->call($fakeFilter));
@@ -77,13 +80,15 @@ class AliasedFieldFilterTest extends TestCase
         $fakeFilter = $this->getFakeFilter();
 
         $denormalizePropertyNameClosure = function () {
-            /* @var FilterInterface $this */
-            return $this->denormalizePropertyName('name');
+            $that = $this;
+            /* @var FilterInterface $that */
+            return $that->denormalizePropertyName('name');
         };
 
         $normalizePropertyNameClosure = function () {
-            /* @var FilterInterface $this */
-            return $this->normalizePropertyName('name');
+            $that = $this;
+            /* @var FilterInterface $that */
+            return $that->normalizePropertyName('name');
         };
 
         $this->assertEquals('name', $denormalizePropertyNameClosure->call($fakeFilter));
