@@ -33,7 +33,7 @@ abstract class AbstractFilter implements FilterInterface, PropertyAwareFilterInt
 
     protected LoggerInterface $logger;
 
-    public function __construct(protected ManagerRegistry $managerRegistry, ?LoggerInterface $logger = null, protected ?array $properties = null, protected ?NameConverterInterface $nameConverter = null, $propertyAliases = [])
+    public function __construct(protected ManagerRegistry $managerRegistry, ?LoggerInterface $logger = null, protected ?array $properties = null, protected ?NameConverterInterface $nameConverter = null, array $propertyAliases = [])
     {
         $this->logger = $logger ?? new NullLogger();
         $this->propertyAliases = $propertyAliases;
