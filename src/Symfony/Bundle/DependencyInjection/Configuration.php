@@ -149,6 +149,12 @@ final class Configuration implements ConfigurationInterface
                 ->arrayNode('resource_class_directories')
                     ->prototype('scalar')->end()
                 ->end()
+                ->arrayNode('serializer')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->booleanNode('hydra_prefix')->defaultNull()->info('Use the "hydra:" prefix.')->end()
+                    ->end()
+                ->end()
             ->end();
 
         $this->addDoctrineOrmSection($rootNode);

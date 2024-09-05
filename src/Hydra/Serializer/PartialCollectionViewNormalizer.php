@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hydra\Serializer;
 
+use ApiPlatform\JsonLd\Serializer\HydraPrefixTrait;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
@@ -36,9 +37,13 @@ use Symfony\Component\Serializer\Serializer;
  */
 final class PartialCollectionViewNormalizer implements NormalizerInterface, NormalizerAwareInterface, CacheableSupportsMethodInterface
 {
+    use HydraPrefixTrait;
     private readonly PropertyAccessorInterface $propertyAccessor;
 
-    public function __construct(private readonly NormalizerInterface $collectionNormalizer, private readonly string $pageParameterName = 'page', private string $enabledParameterName = 'pagination', private readonly ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, ?PropertyAccessorInterface $propertyAccessor = null, private readonly int $urlGenerationStrategy = UrlGeneratorInterface::ABS_PATH)
+    /**
+     * @param array<string, mixed> $defaultContext
+     */
+    public function __construct(private readonly NormalizerInterface $collectionNormalizer, private readonly string $pageParameterName = 'page', private string $enabledParameterName = 'pagination', private readonly ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, ?PropertyAccessorInterface $propertyAccessor = null, private readonly int $urlGenerationStrategy = UrlGeneratorInterface::ABS_PATH, private readonly array $defaultContext = [])
     {
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
     }
@@ -91,16 +96,17 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         $cursorPaginationAttribute = $operation instanceof HttpOperation ? $operation->getPaginationViaCursor() : null;
         $isPaginatedWithCursor = (bool) $cursorPaginationAttribute;
 
-        $data['hydra:view'] = ['@id' => null, '@type' => 'hydra:PartialCollectionView'];
+        $hydraPrefix = $this->getHydraPrefix($context + $this->defaultContext);
+        $data[$hydraPrefix.'view'] = ['@id' => null, '@type' => $hydraPrefix.'PartialCollectionView'];
 
         if ($isPaginatedWithCursor) {
-            return $this->populateDataWithCursorBasedPagination($data, $parsed, $object, $cursorPaginationAttribute, $operation?->getUrlGenerationStrategy() ?? $this->urlGenerationStrategy);
+            return $this->populateDataWithCursorBasedPagination($data, $parsed, $object, $cursorPaginationAttribute, $operation?->getUrlGenerationStrategy() ?? $this->urlGenerationStrategy, $hydraPrefix);
         }
 
-        $data['hydra:view']['@id'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated ? $currentPage : null, $operation?->getUrlGenerationStrategy() ?? $this->urlGenerationStrategy);
+        $data[$hydraPrefix.'view']['@id'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated ? $currentPage : null, $operation?->getUrlGenerationStrategy() ?? $this->urlGenerationStrategy);
 
         if ($paginated) {
-            return $this->populateDataWithPagination($data, $parsed, $currentPage, $lastPage, $itemsPerPage, $pageTotalItems, $operation?->getUrlGenerationStrategy() ?? $this->urlGenerationStrategy);
+            return $this->populateDataWithPagination($data, $parsed, $currentPage, $lastPage, $itemsPerPage, $pageTotalItems, $operation?->getUrlGenerationStrategy() ?? $this->urlGenerationStrategy, $hydraPrefix);
         }
 
         return $data;
@@ -168,38 +174,38 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         return $paginationFilters;
     }
 
-    private function populateDataWithCursorBasedPagination(array $data, array $parsed, \Traversable $object, ?array $cursorPaginationAttribute, ?int $urlGenerationStrategy): array
+    private function populateDataWithCursorBasedPagination(array $data, array $parsed, \Traversable $object, ?array $cursorPaginationAttribute, ?int $urlGenerationStrategy, string $hydraPrefix): array
     {
         $objects = iterator_to_array($object);
         $firstObject = current($objects);
         $lastObject = end($objects);
 
-        $data['hydra:view']['@id'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], urlGenerationStrategy: $urlGenerationStrategy);
+        $data[$hydraPrefix.'view']['@id'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], urlGenerationStrategy: $urlGenerationStrategy);
 
         if (false !== $lastObject && \is_array($cursorPaginationAttribute)) {
-            $data['hydra:view']['hydra:next'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], $this->cursorPaginationFields($cursorPaginationAttribute, 1, $lastObject)), urlGenerationStrategy: $urlGenerationStrategy);
+            $data[$hydraPrefix.'view'][$hydraPrefix.'next'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], $this->cursorPaginationFields($cursorPaginationAttribute, 1, $lastObject)), urlGenerationStrategy: $urlGenerationStrategy);
         }
 
         if (false !== $firstObject && \is_array($cursorPaginationAttribute)) {
-            $data['hydra:view']['hydra:previous'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], $this->cursorPaginationFields($cursorPaginationAttribute, -1, $firstObject)), urlGenerationStrategy: $urlGenerationStrategy);
+            $data[$hydraPrefix.'view'][$hydraPrefix.'previous'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], $this->cursorPaginationFields($cursorPaginationAttribute, -1, $firstObject)), urlGenerationStrategy: $urlGenerationStrategy);
         }
 
         return $data;
     }
 
-    private function populateDataWithPagination(array $data, array $parsed, ?float $currentPage, ?float $lastPage, ?float $itemsPerPage, ?float $pageTotalItems, ?int $urlGenerationStrategy): array
+    private function populateDataWithPagination(array $data, array $parsed, ?float $currentPage, ?float $lastPage, ?float $itemsPerPage, ?float $pageTotalItems, ?int $urlGenerationStrategy, string $hydraPrefix): array
     {
         if (null !== $lastPage) {
-            $data['hydra:view']['hydra:first'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1., $urlGenerationStrategy);
-            $data['hydra:view']['hydra:last'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $lastPage, $urlGenerationStrategy);
+            $data[$hydraPrefix.'view'][$hydraPrefix.'first'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1., $urlGenerationStrategy);
+            $data[$hydraPrefix.'view'][$hydraPrefix.'last'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $lastPage, $urlGenerationStrategy);
         }
 
         if (1. !== $currentPage) {
-            $data['hydra:view']['hydra:previous'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage - 1., $urlGenerationStrategy);
+            $data[$hydraPrefix.'view'][$hydraPrefix.'previous'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage - 1., $urlGenerationStrategy);
         }
 
         if ((null !== $lastPage && $currentPage < $lastPage) || (null === $lastPage && $pageTotalItems >= $itemsPerPage)) {
-            $data['hydra:view']['hydra:next'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage + 1., $urlGenerationStrategy);
+            $data[$hydraPrefix.'view'][$hydraPrefix.'next'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage + 1., $urlGenerationStrategy);
         }
 
         return $data;

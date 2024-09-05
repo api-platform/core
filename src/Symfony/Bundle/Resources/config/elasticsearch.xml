@@ -20,6 +20,8 @@
             <argument type="service" id="serializer.property_accessor" />
             <argument type="service" id="property_info" on-invalid="ignore" />
             <argument type="service" id="serializer.mapping.class_discriminator_resolver" on-invalid="ignore" />
+            <argument>null</argument>
+            <argument>%api_platform.serializer.default_context%</argument>
 
             <!-- Run after serializer.normalizer.data_uri but before serializer.normalizer.object -->
             <tag name="serializer.normalizer" priority="-922" />
