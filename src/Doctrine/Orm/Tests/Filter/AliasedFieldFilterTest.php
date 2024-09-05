@@ -33,14 +33,14 @@ class FilterTest extends ApiTestCase
     {
         $fakeFilter = $this->getFakeFilter();
 
-        $denormalizePropertyNameClosure = function() {
+        $denormalizePropertyNameClosure = function () {
             /* @var FilterInterface $this */
             return $this->denormalizePropertyName('aliasedField');
         };
 
         $this->assertEquals('some.relation.field', $denormalizePropertyNameClosure->call($fakeFilter));
 
-        $normalizePropertyNameClosure = function() {
+        $normalizePropertyNameClosure = function () {
             /** @var FilterInterface $this */
             return $this->normalizePropertyName('some.relation.field');
         };
@@ -53,7 +53,7 @@ class FilterTest extends ApiTestCase
     {
         $fakeFilter = $this->getFakeFilter();
 
-        $normalizePropertyNameClosure = function() {
+        $normalizePropertyNameClosure = function () {
             /* @var FilterInterface $this */
             return $this->normalizePropertyName('some.relation.field');
         };
@@ -66,12 +66,12 @@ class FilterTest extends ApiTestCase
     {
         $fakeFilter = $this->getFakeFilter();
 
-        $denormalizePropertyNameClosure = function() {
+        $denormalizePropertyNameClosure = function () {
             /* @var FilterInterface $this */
             return $this->denormalizePropertyName('name');
         };
 
-        $normalizePropertyNameClosure = function() {
+        $normalizePropertyNameClosure = function () {
             /* @var FilterInterface $this */
             return $this->normalizePropertyName('name');
         };
