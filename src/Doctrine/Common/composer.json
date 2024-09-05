@@ -29,10 +29,10 @@
         "doctrine/common": "^3.2.2",
         "doctrine/persistence": "^3.2",
         "symfony/property-access": "^6.4 || ^7.0",
-        "symfony/serializer": "^6.4 || ^7.0",
-        "symfony/messenger": "^6.4 || ^7.0"
+        "symfony/serializer": "^6.4 || ^7.0"
     },
     "require-dev": {
+        "symfony/messenger": "^6.4 || ^7.0",
         "doctrine/mongodb-odm": "^2.6",
         "symfony/expression-language": "^6.4 || 7.0",
         "api-platform/http-cache": "^3.4 || ^4.0",
@@ -50,6 +50,7 @@
     },
     "suggest": {
         "phpstan/phpdoc-parser": "For PHP documentation support.",
+        "symfony/messenger": "For async mercure updates.",
         "symfony/yaml": "For YAML resource configuration.",
         "symfony/config": "For XML resource configuration.",
         "api-platform/http-cache": "For HTTP cache invalidation.",
