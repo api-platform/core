@@ -56,6 +56,10 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *     book.exist_filter:
  *         parent: 'api_platform.doctrine.orm.exist_filter'
  *         arguments: [ { comment: ~ } ]
+ *         # you can also alias the properties you are filtering on to expose search under different names
+ *         # arguments:
+ *         #   $properties: { comment: ~ }
+ *         #   $propertyAliases: { comment: 'opinion' }
  *         tags:  [ 'api_platform.filter' ]
  *         # The following are mandatory only if a _defaults section is defined with inverted values.
  *         # You may want to isolate filters in a dedicated file to avoid adding the following lines (by adding them in the defaults section)
@@ -117,9 +121,9 @@ final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
 {
     use ExistsFilterTrait;
 
-    public function __construct(ManagerRegistry $managerRegistry, ?LoggerInterface $logger = null, ?array $properties = null, string $existsParameterName = self::QUERY_PARAMETER_KEY, ?NameConverterInterface $nameConverter = null)
+    public function __construct(ManagerRegistry $managerRegistry, ?LoggerInterface $logger = null, ?array $properties = null, string $existsParameterName = self::QUERY_PARAMETER_KEY, ?NameConverterInterface $nameConverter = null, array $propertyAliases = [])
     {
-        parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
+        parent::__construct($managerRegistry, $logger, $properties, $nameConverter, $propertyAliases);
 
         $this->existsParameterName = $existsParameterName;
     }

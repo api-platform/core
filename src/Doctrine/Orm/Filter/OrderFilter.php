@@ -51,6 +51,11 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *     book.order_filter:
  *         parent: 'api_platform.doctrine.orm.order_filter'
  *         arguments: [ $properties: { id: ~, title: ~ }, $orderParameterName: order ]
+ *         # you can also alias the properties you are filtering on to expose search under different names
+ *         # arguments:
+ *         #   $properties: { id: ASC, title: DESC }
+ *         #   $orderParameterName: order
+ *         #   $propertyAliases: { id: 'identifier', title: 'aliasedFieldName' }
  *         tags:  [ 'api_platform.filter' ]
  *         # The following are mandatory only if a _defaults section is defined with inverted values.
  *         # You may want to isolate filters in a dedicated file to avoid adding the following lines (by adding them in the defaults section)
@@ -132,6 +137,10 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *     book.order_filter:
  *         parent: 'api_platform.doctrine.orm.order_filter'
  *         arguments: [ { id: ASC, title: DESC } ]
+ *         # you can also alias the properties you are filtering on to expose search under different names
+ *         # arguments:
+ *         #   $properties: { id: ASC, title: DESC }
+ *         #   $propertyAliases: { id: 'identifier', title: 'aliasedFieldName' }
  *         tags:  [ 'api_platform.filter' ]
  *         # The following are mandatory only if a _defaults section is defined with inverted values.
  *         # You may want to isolate filters in a dedicated file to avoid adding the following lines (by adding them in the defaults section)
@@ -199,7 +208,7 @@ final class OrderFilter extends AbstractFilter implements OrderFilterInterface
 {
     use OrderFilterTrait;
 
-    public function __construct(ManagerRegistry $managerRegistry, string $orderParameterName = 'order', ?LoggerInterface $logger = null, ?array $properties = null, ?NameConverterInterface $nameConverter = null, private readonly ?string $orderNullsComparison = null)
+    public function __construct(ManagerRegistry $managerRegistry, string $orderParameterName = 'order', ?LoggerInterface $logger = null, ?array $properties = null, ?NameConverterInterface $nameConverter = null, private readonly ?string $orderNullsComparison = null, array $propertyAliases = [])
     {
         if (null !== $properties) {
             $properties = array_map(static function ($propertyOptions) {
@@ -214,7 +223,7 @@ final class OrderFilter extends AbstractFilter implements OrderFilterInterface
             }, $properties);
         }
 
-        parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
+        parent::__construct($managerRegistry, $logger, $properties, $nameConverter, $propertyAliases);
 
         $this->orderParameterName = $orderParameterName;
     }

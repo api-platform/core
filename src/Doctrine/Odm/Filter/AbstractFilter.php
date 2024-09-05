@@ -94,6 +94,10 @@ abstract class AbstractFilter implements FilterInterface, PropertyAwareFilterInt
 
     protected function denormalizePropertyName(string|int $property): string
     {
+        if ($this->isAlias($property)) {
+            $property = $this->getPropertyFromAlias($property);
+        }
+
         if (!$this->nameConverter instanceof NameConverterInterface) {
             return (string) $property;
         }
@@ -103,6 +107,8 @@ abstract class AbstractFilter implements FilterInterface, PropertyAwareFilterInt
 
     protected function normalizePropertyName(string $property): string
     {
+        $property = $this->getAliasForPropertyOrProperty($property);
+
         if (!$this->nameConverter instanceof NameConverterInterface) {
             return $property;
         }

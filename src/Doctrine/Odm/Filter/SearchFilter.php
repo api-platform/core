@@ -77,6 +77,10 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *     book.search_filter:
  *         parent: 'api_platform.doctrine.odm.search_filter'
  *         arguments: [ { isbn: 'exact', description: 'partial' } ]
+ *         # you can also alias the properties you are filtering on to expose search under different names
+ *         # arguments:
+ *         #   $properties: { isbn: 'exact', description: 'partial' }
+ *         #   $propertyAliases: { isbn: 'identifier', description: 'aliasedDescription' }
  *         tags:  [ 'api_platform.filter' ]
  *         # The following are mandatory only if a _defaults section is defined with inverted values.
  *         # You may want to isolate filters in a dedicated file to avoid adding the following lines (by adding them in the defaults section)
@@ -140,9 +144,9 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
     public const DOCTRINE_INTEGER_TYPE = [MongoDbType::INTEGER, MongoDbType::INT];
 
-    public function __construct(ManagerRegistry $managerRegistry, IriConverterInterface $iriConverter, ?IdentifiersExtractorInterface $identifiersExtractor, ?PropertyAccessorInterface $propertyAccessor = null, ?LoggerInterface $logger = null, ?array $properties = null, ?NameConverterInterface $nameConverter = null)
+    public function __construct(ManagerRegistry $managerRegistry, IriConverterInterface $iriConverter, ?IdentifiersExtractorInterface $identifiersExtractor, ?PropertyAccessorInterface $propertyAccessor = null, ?LoggerInterface $logger = null, ?array $properties = null, ?NameConverterInterface $nameConverter = null, array $propertyAliases = [])
     {
-        parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
+        parent::__construct($managerRegistry, $logger, $properties, $nameConverter, $propertyAliases);
 
         $this->iriConverter = $iriConverter;
         $this->identifiersExtractor = $identifiersExtractor;
