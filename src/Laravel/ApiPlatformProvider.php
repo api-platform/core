@@ -49,6 +49,7 @@ use ApiPlatform\Hydra\JsonSchema\SchemaFactory as HydraSchemaFactory;
 use ApiPlatform\Hydra\Serializer\CollectionNormalizer as HydraCollectionNormalizer;
 use ApiPlatform\Hydra\Serializer\DocumentationNormalizer as HydraDocumentationNormalizer;
 use ApiPlatform\Hydra\Serializer\EntrypointNormalizer as HydraEntrypointNormalizer;
+use ApiPlatform\Hydra\Serializer\PartialCollectionViewNormalizer as HydraPartialCollectionViewNormalizer;
 use ApiPlatform\Hydra\State\HydraLinkProcessor;
 use ApiPlatform\JsonApi\JsonSchema\SchemaFactory as JsonApiSchemaFactory;
 use ApiPlatform\JsonApi\Serializer\CollectionNormalizer as JsonApiCollectionNormalizer;
@@ -734,13 +735,19 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(HydraCollectionNormalizer::class, function (Application $app) use ($defaultContext) {
-            return new HydraCollectionNormalizer(
-                $app->make(ContextBuilderInterface::class),
-                $app->make(ResourceClassResolverInterface::class),
-                $app->make(IriConverterInterface::class),
+        $this->app->singleton(HydraPartialCollectionViewNormalizer::class, function (Application $app) use ($defaultContext) {
+            return new HydraPartialCollectionViewNormalizer(
+                new HydraCollectionNormalizer(
+                    $app->make(ContextBuilderInterface::class),
+                    $app->make(ResourceClassResolverInterface::class),
+                    $app->make(IriConverterInterface::class),
+                    $app->make(ResourceMetadataCollectionFactoryInterface::class),
+                    $defaultContext
+                ),
+                'page',
+                'pagination',
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
-                $defaultContext
+                $app->make(PropertyAccessorInterface::class),
             );
         });
 
@@ -845,7 +852,7 @@ class ApiPlatformProvider extends ServiceProvider
             $config = $app['config'];
             $list = new \SplPriorityQueue();
             $list->insert($app->make(HydraEntrypointNormalizer::class), -800);
-            $list->insert($app->make(HydraCollectionNormalizer::class), -800);
+            $list->insert($app->make(HydraPartialCollectionViewNormalizer::class), -800);
             $list->insert($app->make(JsonLdItemNormalizer::class), -890);
             $list->insert($app->make(JsonLdObjectNormalizer::class), -995);
             $list->insert($app->make(ArrayDenormalizer::class), -990);
