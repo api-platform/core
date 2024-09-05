@@ -77,10 +77,11 @@ use ApiPlatform\Laravel\Eloquent\Filter\AfterDateFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\BeforeDateFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\DateFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\EndSearchFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\EqualsFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\FilterInterface as EloquentFilterInterface;
-use ApiPlatform\Laravel\Eloquent\Filter\ExactSearchFilter;
-use ApiPlatform\Laravel\Eloquent\Filter\OrFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\OrderFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\PartialSearchFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\RangeFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\StartSearchFilter;
 use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentAttributePropertyMetadataFactory;
 use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentPropertyMetadataFactory;
@@ -386,7 +387,7 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->bind(OperationMetadataFactoryInterface::class, OperationMetadataFactory::class);
 
-        $this->app->tag([ExactSearchFilter::class, PartialSearchFilter::class, StartSearchFilter::class, EndSearchFilter::class, DateFilter::class, BeforeDateFilter::class, AfterDateFilter::class], EloquentFilterInterface::class);
+        $this->app->tag([EqualsFilter::class, PartialSearchFilter::class, StartSearchFilter::class, EndSearchFilter::class, RangeFilter::class, DateFilter::class, BeforeDateFilter::class, AfterDateFilter::class, OrderFilter::class], EloquentFilterInterface::class);
 
         $this->app->bind(FilterQueryExtension::class, function (Application $app) {
             $tagged = iterator_to_array($app->tagged(EloquentFilterInterface::class));
@@ -447,7 +448,7 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->tag([SerializerFilterParameterProvider::class], ParameterProviderInterface::class);
 
-        $this->app->singleton('filters', function(Application $app) {
+        $this->app->singleton('filters', function (Application $app) {
             return new ServiceLocator(array_merge(
                 iterator_to_array($app->tagged(SerializerFilterInterface::class)),
                 iterator_to_array($app->tagged(EloquentFilterInterface::class))

@@ -16,11 +16,10 @@ namespace Workbench\App\Models;
 use ApiPlatform\Laravel\Eloquent\Filter\AfterDateFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\BeforeDateFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\DateFilter;
-use ApiPlatform\Laravel\Eloquent\Filter\EndSearchFilter;
-use ApiPlatform\Laravel\Eloquent\Filter\ExactSearchFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\OrderFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\OrFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\PartialSearchFilter;
-use ApiPlatform\Laravel\Eloquent\Filter\StartSearchFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\RangeFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -49,16 +48,24 @@ use Workbench\App\Http\Requests\BookFormRequest;
         new GetCollection(),
     ]
 )]
-#[QueryParameter(key: 'isbn', filter: ExactSearchFilter::class)]
+#[QueryParameter(key: 'isbn', filter: PartialSearchFilter::class)]
 #[QueryParameter(key: 'name', filter: PartialSearchFilter::class)]
 #[QueryParameter(key: 'publicationDate', schema: ['type' => 'date'], filter: DateFilter::class)]
 #[QueryParameter(key: 'publicationDate[before]', schema: ['type' => 'date'], filter: BeforeDateFilter::class, property: 'publication_date')]
-#[QueryParameter(key: 'publicationDate[after]', schema: ['type' => 'date'], filter: AfterDateFilter::class, property: 'publication_date')]
+#[QueryParameter(
+    key: 'publicationDate[after]',
+    schema: ['type' => 'date'],
+    filter: AfterDateFilter::class,
+    property: 'publication_date',
+    filterContext: ['nulls_comparison' => 'include_null_before_and_after']
+)]
+#[QueryParameter(key: 'isbn_range', schema: ['type' => 'string'], filter: RangeFilter::class, property: 'isbn', description: 'Syntax: \<lt\>.\<valueToCompareTo\> You can use lt, gt, lte, gte or between (to do it, add: .\<value\> at the end)')]
+#[QueryParameter(key: 'order', schema: ['type' => 'string'], filter: OrderFilter::class, description: 'Syntax: \<propertyToOrderOn\>.\<asc|desc\>', filterContext: ['nulls_comparison' => 'nulls_smallest'])]
 #[QueryParameter(
     key: 'name2',
     schema: ['type' => 'array', 'items' => ['type' => 'string']],
-    openApi: new Parameter(name: 'name2', in: 'query', style: 'deepObject', explode: true),
-    filter: new OrFilter(new PartialSearchFilter),
+    openApi: new Parameter(name: 'name2[]', in: 'query', style: 'deepObject', explode: true),
+    filter: new OrFilter(new PartialSearchFilter()),
     property: 'name'
 )]
 class Book extends Model

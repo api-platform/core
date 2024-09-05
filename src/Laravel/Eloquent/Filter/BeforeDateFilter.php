@@ -20,16 +20,17 @@ use Illuminate\Database\Eloquent\Model;
 final class BeforeDateFilter implements FilterInterface
 {
     /**
-     * @param Builder<Model> $builder
+     * @param Builder<Model>       $builder
      * @param array<string, mixed> $context
      */
     public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder
     {
-        if (!is_string($values)) {
+        if (!\is_string($values)) {
             return $builder;
         }
 
         $datetime = new \DateTimeImmutable($values);
+
         return $builder->whereDate($parameter->getProperty(), '<=', $datetime);
     }
 }
