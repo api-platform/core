@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the API Platform project.
  *
@@ -7,6 +8,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Tests\Filter;
 
@@ -43,7 +46,9 @@ class AliasedFieldFilterTest extends TestCase
 
         $denormalizePropertyNameClosure = function () {
             $that = $this;
+
             /* @var FilterInterface $that */
+            /** @phpstan-ignore method.undefined */
             return $that->denormalizePropertyName('aliasedField');
         };
 
@@ -51,7 +56,9 @@ class AliasedFieldFilterTest extends TestCase
 
         $normalizePropertyNameClosure = function () {
             $that = $this;
+
             /* @var FilterInterface $that */
+            /** @phpstan-ignore method.undefined */
             return $that->normalizePropertyName('some.relation.field');
         };
 
@@ -65,7 +72,9 @@ class AliasedFieldFilterTest extends TestCase
 
         $normalizePropertyNameClosure = function () {
             $that = $this;
+
             /* @var FilterInterface $that */
+            /** @phpstan-ignore method.undefined */
             return $that->normalizePropertyName('some.relation.field');
         };
 
@@ -79,13 +88,17 @@ class AliasedFieldFilterTest extends TestCase
 
         $denormalizePropertyNameClosure = function () {
             $that = $this;
+
             /* @var FilterInterface $that */
+            /** @phpstan-ignore method.undefined */
             return $that->denormalizePropertyName('name');
         };
 
         $normalizePropertyNameClosure = function () {
             $that = $this;
+
             /* @var FilterInterface $that */
+            /** @phpstan-ignore method.undefined */
             return $that->normalizePropertyName('name');
         };
 

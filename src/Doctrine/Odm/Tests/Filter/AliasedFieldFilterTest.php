@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the API Platform project.
  *
@@ -16,7 +17,6 @@ use ApiPlatform\Doctrine\Odm\Filter\AbstractFilter as OdmAbstractFilter;
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -45,7 +45,9 @@ class AliasedFieldFilterTest extends TestCase
 
         $denormalizePropertyNameClosure = function () {
             $that = $this;
+
             /* @var FilterInterface $that */
+            /** @phpstan-ignore method.undefined */
             return $that->denormalizePropertyName('aliasedField');
         };
 
@@ -53,7 +55,9 @@ class AliasedFieldFilterTest extends TestCase
 
         $normalizePropertyNameClosure = function () {
             $that = $this;
+
             /* @var FilterInterface $that */
+            /** @phpstan-ignore method.undefined */
             return $that->normalizePropertyName('some.relation.field');
         };
 
@@ -67,7 +71,9 @@ class AliasedFieldFilterTest extends TestCase
 
         $normalizePropertyNameClosure = function () {
             $that = $this;
+
             /* @var FilterInterface $that */
+            /** @phpstan-ignore method.undefined */
             return $that->normalizePropertyName('some.relation.field');
         };
 
@@ -81,13 +87,17 @@ class AliasedFieldFilterTest extends TestCase
 
         $denormalizePropertyNameClosure = function () {
             $that = $this;
+
             /* @var FilterInterface $that */
+            /** @phpstan-ignore method.undefined */
             return $that->denormalizePropertyName('name');
         };
 
         $normalizePropertyNameClosure = function () {
             $that = $this;
+
             /* @var FilterInterface $that */
+            /** @phpstan-ignore method.undefined */
             return $that->normalizePropertyName('name');
         };
 
