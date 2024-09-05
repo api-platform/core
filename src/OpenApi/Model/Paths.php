@@ -43,7 +43,7 @@ final class Paths
         ];
         sort($tagsB);
 
-        return match(true) {
+        return match (true) {
             current($tagsA) === current($tagsB) => $keyA <=> $keyB,
             default => current($tagsA) <=> current($tagsB),
         };
