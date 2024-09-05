@@ -31,7 +31,7 @@ trait PropertyAliasesFilterTrait
 
     protected function isAlias(string $alias): bool
     {
-        return \in_array($alias, $this->getPropertyAliases(), true);
+        return !empty($this->getPropertyAliases()) && \in_array($alias, $this->getPropertyAliases(), true);
     }
 
     protected function getAliasForPropertyOrProperty(string $property): string

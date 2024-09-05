@@ -47,7 +47,7 @@ class AliasedFieldFilterTest extends TestCase
             $that = $this;
 
             /* @var FilterInterface $that */
-            /** @phpstan-ignore method.notFound */
+            /* @phpstan-ignore method.notFound */
             return $that->denormalizePropertyName('aliasedField');
         };
 
@@ -57,7 +57,7 @@ class AliasedFieldFilterTest extends TestCase
             $that = $this;
 
             /* @var FilterInterface $that */
-            /** @phpstan-ignore method.notFound */
+            /* @phpstan-ignore method.notFound */
             return $that->normalizePropertyName('some.relation.field');
         };
 
@@ -73,7 +73,7 @@ class AliasedFieldFilterTest extends TestCase
             $that = $this;
 
             /* @var FilterInterface $that */
-            /** @phpstan-ignore method.notFound */
+            /* @phpstan-ignore method.notFound */
             return $that->normalizePropertyName('some.relation.field');
         };
 
@@ -89,7 +89,7 @@ class AliasedFieldFilterTest extends TestCase
             $that = $this;
 
             /* @var FilterInterface $that */
-            /** @phpstan-ignore method.notFound */
+            /* @phpstan-ignore method.notFound */
             return $that->denormalizePropertyName('name');
         };
 
@@ -97,7 +97,7 @@ class AliasedFieldFilterTest extends TestCase
             $that = $this;
 
             /* @var FilterInterface $that */
-            /** @phpstan-ignore method.notFound */
+            /* @phpstan-ignore method.notFound */
             return $that->normalizePropertyName('name');
         };
 
