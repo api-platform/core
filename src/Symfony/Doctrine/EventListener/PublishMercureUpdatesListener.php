@@ -11,8 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Doctrine\EventListener;
+namespace ApiPlatform\Symfony\Doctrine\EventListener;
 
+use ApiPlatform\Doctrine\Common\Messenger\DispatchTrait;
 use ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface as GraphQlMercureSubscriptionIriGeneratorInterface;
 use ApiPlatform\GraphQl\Subscription\SubscriptionManagerInterface as GraphQlSubscriptionManagerInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
@@ -25,7 +26,6 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
-use ApiPlatform\Symfony\Messenger\DispatchTrait;
 use Doctrine\Common\EventArgs;
 use Doctrine\ODM\MongoDB\Event\OnFlushEventArgs as MongoDbOdmOnFlushEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs as OrmOnFlushEventArgs;

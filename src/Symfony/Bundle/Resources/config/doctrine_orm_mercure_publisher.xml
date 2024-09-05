@@ -8,7 +8,7 @@
 
         <!-- Event listener -->
 
-        <service id="api_platform.doctrine.orm.listener.mercure.publish" class="ApiPlatform\Doctrine\EventListener\PublishMercureUpdatesListener">
+        <service id="api_platform.doctrine.orm.listener.mercure.publish" class="ApiPlatform\Symfony\Doctrine\EventListener\PublishMercureUpdatesListener">
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />

@@ -11,9 +11,8 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Doctrine\EventListener;
+namespace ApiPlatform\Symfony\Tests\Doctrine\EventListener;
 
-use ApiPlatform\Doctrine\EventListener\PublishMercureUpdatesListener;
 use ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface as GraphQlMercureSubscriptionIriGeneratorInterface;
 use ApiPlatform\GraphQl\Subscription\SubscriptionManagerInterface as GraphQlSubscriptionManagerInterface;
 use ApiPlatform\Metadata\ApiResource;
@@ -25,13 +24,14 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
-use ApiPlatform\Tests\Fixtures\NotAResource;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyFriend;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyMercure;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyOffer;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MercureWithTopicsAndGetOperation;
+use ApiPlatform\Symfony\Doctrine\EventListener\PublishMercureUpdatesListener;
+use ApiPlatform\Symfony\Tests\Fixtures\NotAResource;
+use ApiPlatform\Symfony\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Symfony\Tests\Fixtures\TestBundle\Entity\DummyCar;
+use ApiPlatform\Symfony\Tests\Fixtures\TestBundle\Entity\DummyFriend;
+use ApiPlatform\Symfony\Tests\Fixtures\TestBundle\Entity\DummyMercure;
+use ApiPlatform\Symfony\Tests\Fixtures\TestBundle\Entity\DummyOffer;
+use ApiPlatform\Symfony\Tests\Fixtures\TestBundle\Entity\MercureWithTopicsAndGetOperation;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;

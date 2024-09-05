@@ -21,8 +21,8 @@
     ],
     "require": {
         "php": ">=8.1",
-        "api-platform/metadata": "^3.2 || ^4.0",
-        "api-platform/state": "^3.2 || ^4.0",
+        "api-platform/metadata": "^3.4 || ^4.0",
+        "api-platform/state": "^3.4 || ^4.0",
         "doctrine/collections": "^2.1",
         "symfony/property-access": "^6.4 || ^7.1",
         "symfony/property-info": "^6.4 || ^7.1",
@@ -40,6 +40,9 @@
         "api-platform/doctrine-odm": "^3.2 || ^4.0",
         "api-platform/doctrine-orm": "^3.2 || ^4.0",
         "api-platform/doctrine-common": "^3.2 || ^4.0"
+    },
+    "suggest": {
+        "api-platform/doctrine-orm": "To support doctrine ORM state options."
     },
     "autoload": {
         "psr-4": {

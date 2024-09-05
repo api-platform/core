@@ -587,8 +587,8 @@ jobs:
         run: |
           composer global require soyuka/pmu
           composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link . --permanent
           composer require --dev doctrine/mongodb-odm-bundle
-          composer global link .
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests

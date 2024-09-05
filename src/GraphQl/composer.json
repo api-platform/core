@@ -21,9 +21,9 @@
     ],
     "require": {
         "php": ">=8.1",
-        "api-platform/metadata": "^3.2 || ^4.0",
-        "api-platform/serializer": "^3.2 || ^4.0",
-        "api-platform/state": "^3.2 || ^4.0",
+        "api-platform/metadata": "^3.4 || ^4.0",
+        "api-platform/state": "^3.4 || ^4.0",
+        "api-platform/serializer": "^3.4 || ^4.0",
         "symfony/property-info": "^6.4 || ^7.1",
         "symfony/serializer": "^6.4 || ^7.1",
         "webonyx/graphql-php": "^14.0 || ^15.0",
@@ -31,18 +31,11 @@
     },
     "require-dev": {
         "phpspec/prophecy-phpunit": "^2.2",
-        "api-platform/validator": "^3.2 || ^4.0",
-        "twig/twig": "^1.42.3 || ^2.12 || ^3.0",
+        "api-platform/validator": "^3.4 || ^4.0",
+        "twig/twig": "^3.7",
         "symfony/mercure-bundle": "*",
-        "symfony/phpunit-bridge": "^6.4 || ^7.0",
-        "symfony/routing": "^6.4 || ^7.1",
-        "symfony/validator": "^6.4 || ^7.1",
-        "api-platform/doctrine-common": "^3.2 || ^4.0",
-        "api-platform/doctrine-odm": "^3.2 || ^4.0",
-        "api-platform/doctrine-orm": "^3.2 || ^4.0"
-    },
-    "suggest": {
-        "api-platform/validator": "To support validation."
+        "symfony/phpunit-bridge": "^6.4 || ^7.1",
+        "symfony/routing": "^6.4 || ^7.1"
     },
     "autoload": {
         "psr-4": {
@@ -51,6 +44,11 @@
         "exclude-from-classmap": [
             "/Tests/"
         ]
+    },
+    "suggest": {
+        "api-platform/doctrine-odm": "To support doctrine ODM state options.",
+        "api-platform/doctrine-orm": "To support doctrine ORM state options.",
+        "api-platform/validator": "To support validation."
     },
     "config": {
         "preferred-install": {

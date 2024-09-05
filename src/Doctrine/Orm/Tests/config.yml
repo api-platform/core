@@ -9,7 +9,8 @@ doctrine:
     orm:
         auto_generate_proxy_classes: '%kernel.debug%'
         controller_resolver: 
-            auto_mapping: true
+            enabled: false
+            auto_mapping: false
         enable_lazy_ghost_objects: true
         mappings:
             ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity:

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Doctrine\EventListener;
+namespace ApiPlatform\Symfony\Doctrine\EventListener;
 
 use ApiPlatform\HttpCache\PurgerInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;

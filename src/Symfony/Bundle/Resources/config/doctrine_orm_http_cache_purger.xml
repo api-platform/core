@@ -8,7 +8,7 @@
 
         <!-- Event listener -->
 
-        <service id="api_platform.doctrine.listener.http_cache.purge" class="ApiPlatform\Doctrine\EventListener\PurgeHttpCacheListener">
+        <service id="api_platform.doctrine.listener.http_cache.purge" class="ApiPlatform\Symfony\Doctrine\EventListener\PurgeHttpCacheListener">
             <argument type="service" id="api_platform.http_cache.purger" />
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.resource_class_resolver" />
