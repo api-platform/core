@@ -21,7 +21,6 @@
     "require": {
         "php": ">=8.1",
         "api-platform/documentation": "^3.4 || ^4.0",
-        "api-platform/graphql": "^3.4 || ^4.0",
         "api-platform/http-cache": "^3.4 || ^4.0",
         "api-platform/json-schema": "^3.4 || ^4.0",
         "api-platform/jsonld": "^3.4 || ^4.0",
@@ -38,6 +37,7 @@
     },
     "require-dev": {
         "phpspec/prophecy-phpunit": "^2.0",
+        "api-platform/graphql": "^3.4 || ^4.0",
         "symfony/phpunit-bridge": "^6.4 || ^7.0",
         "symfony/routing": "^6.4 || ^7.0",
         "symfony/validator": "^6.4 || ^7.0",
@@ -55,6 +55,7 @@
         "api-platform/doctrine-orm": "To support Doctrine ORM.",
         "api-platform/doctrine-odm": "To support MongoDB. Only versions 4.0 and later are supported.",
         "api-platform/elasticsearch": "To support Elasticsearch.",
+        "api-platform/graphql": "To support GraphQL.",
         "ocramius/package-versions": "To display the API Platform's version in the debug bar.",
         "phpstan/phpdoc-parser": "To support extracting metadata from PHPDoc.",
         "psr/cache-implementation": "To use metadata caching.",
@@ -68,8 +69,7 @@
         "symfony/uid": "To support Symfony UUID/ULID identifiers.",
         "symfony/messenger": "To support messenger integration and asynchronous Mercure updates.",
         "symfony/mercure-bundle": "To support mercure integration.",
-        "symfony/web-profiler-bundle": "To use the data collector.",
-        "webonyx/graphql-php": "To support GraphQL."
+        "symfony/web-profiler-bundle": "To use the data collector."
     },
     "autoload": {
         "psr-4": {
