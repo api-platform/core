@@ -23,8 +23,8 @@
     ],
     "require": {
         "php": ">=8.1",
-        "api-platform/metadata": "^3.2 || ^4.0",
-        "api-platform/state": "^3.2 || ^4.0",
+        "api-platform/metadata": "^3.4 || ^4.0",
+        "api-platform/state": "^3.4 || ^4.0",
         "doctrine/collections": "^2.1",
         "doctrine/common": "^3.2.2",
         "doctrine/persistence": "^3.2"
@@ -42,7 +42,10 @@
     "suggest": {
         "phpstan/phpdoc-parser": "For PHP documentation support.",
         "symfony/yaml": "For YAML resource configuration.",
-        "symfony/config": "For XML resource configuration."
+        "symfony/config": "For XML resource configuration.",
+        "api-platform/http-cache": "For HTTP cache invalidation.",
+        "api-platform/graphql": "For GraphQl mercure subscriptions.",
+        "symfony/mercure-bundle": "For mercure updates publisher."
     },
     "autoload": {
         "psr-4": {

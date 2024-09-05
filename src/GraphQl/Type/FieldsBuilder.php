@@ -526,11 +526,11 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
 
             $entityClass = $resourceClass;
             if ($options = $resourceOperation->getStateOptions()) {
-                if ($options instanceof Options && $options->getEntityClass()) {
+                if (class_exists(Options::class) && $options instanceof Options && $options->getEntityClass()) {
                     $entityClass = $options->getEntityClass();
                 }
 
-                if ($options instanceof ODMOptions && $options->getDocumentClass()) {
+                if (class_exists(ODMOptions::class) && $options instanceof ODMOptions && $options->getDocumentClass()) {
                     $entityClass = $options->getDocumentClass();
                 }
             }
