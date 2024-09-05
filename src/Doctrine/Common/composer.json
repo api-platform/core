@@ -27,19 +27,10 @@
         "api-platform/state": "^3.4 || ^4.0",
         "doctrine/collections": "^2.1",
         "doctrine/common": "^3.2.2",
-        "doctrine/persistence": "^3.2",
-        "symfony/property-access": "^6.4 || ^7.0",
-        "symfony/serializer": "^6.4 || ^7.0"
+        "doctrine/persistence": "^3.2"
     },
     "require-dev": {
-        "symfony/messenger": "^6.4 || ^7.0",
         "doctrine/mongodb-odm": "^2.6",
-        "symfony/expression-language": "^6.4 || 7.0",
-        "api-platform/http-cache": "^3.4 || ^4.0",
-        "api-platform/graphql": "^3.4 || ^4.0",
-        "api-platform/validator": "^3.4 || ^4.0",
-        "api-platform/serializer": "^3.4 || ^4.0",
-        "symfony/mercure-bundle": "*",
         "doctrine/orm": "^2.17 || ^3.0",
         "phpspec/prophecy-phpunit": "^2.0",
         "phpunit/phpunit": "^10.0",

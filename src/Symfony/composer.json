@@ -48,7 +48,8 @@
         "api-platform/elasticsearch": "^3.4 || ^4.0",
         "api-platform/doctrine-orm": "^3.4 || ^4.0",
         "api-platform/doctrine-odm": "^3.4 || ^4.0",
-        "api-platform/parameter-validator": "^3.1"
+        "api-platform/parameter-validator": "^3.1",
+        "symfony/expression-language": "^6.4 || ^7.1"
     },
     "suggest": {
         "api-platform/doctrine-orm": "To support Doctrine ORM.",
@@ -60,7 +61,7 @@
         "ramsey/uuid": "To support Ramsey's UUID identifiers.",
         "symfony/cache": "To have metadata caching when using Symfony integration.",
         "symfony/config": "To load XML configuration files.",
-        "symfony/expression-language": "To use authorization features.",
+        "symfony/expression-language": "To use authorization and mercure advanced features.",
         "symfony/http-client": "To use the HTTP cache invalidation system.",
         "symfony/security": "To use authorization features.",
         "symfony/twig-bundle": "To use the Swagger UI integration.",
