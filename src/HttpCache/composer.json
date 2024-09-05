@@ -29,8 +29,8 @@
         "guzzlehttp/guzzle": "^6.0 || ^7.0",
         "symfony/dependency-injection": "^6.4 || ^7.1",
         "phpspec/prophecy-phpunit": "^2.2",
-        "symfony/phpunit-bridge": "^6.4 || ^7.0",
-        "symfony/http-client": "^6.4 || ^7.1"
+        "symfony/http-client": "^6.4 || ^7.1",
+        "phpunit/phpunit": "^11.2"
     },
     "autoload": {
         "psr-4": {

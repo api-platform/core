@@ -46,8 +46,8 @@
     },
     "require-dev": {
         "phpspec/prophecy-phpunit": "^2.2",
-        "symfony/phpunit-bridge": "^6.4 || ^7.0",
         "symfony/routing": "^6.4 || ^7.1",
+        "phpunit/phpunit": "^11.2",
         "symfony/validator": "^6.4 || ^7.1",
         "symfony/mercure-bundle": "*",
         "webonyx/graphql-php": "^14.0 || ^15.0",

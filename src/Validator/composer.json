@@ -26,8 +26,8 @@
     },
     "require-dev": {
         "phpspec/prophecy-phpunit": "^2.2",
-        "symfony/phpunit-bridge": "^6.4 || ^7.0",
         "symfony/serializer": "^6.4 || ^7.0",
+        "phpunit/phpunit": "^11.2",
         "symfony/validator": "^6.4 || ^7.1",
         "symfony/http-kernel": "^6.4 || ^7.0"
     },
