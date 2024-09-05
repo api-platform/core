@@ -6,13 +6,13 @@ use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter as OrmAbstractFilter;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class FilterTest extends ApiTestCase
+class AliasedFieldFilterTest  extends TestCase
 {
     private function getFakeFilter(): object
     {
@@ -41,7 +41,7 @@ class FilterTest extends ApiTestCase
         $this->assertEquals('some.relation.field', $denormalizePropertyNameClosure->call($fakeFilter));
 
         $normalizePropertyNameClosure = function () {
-            /** @var FilterInterface $this */
+            /* @var FilterInterface $this */
             return $this->normalizePropertyName('some.relation.field');
         };
 
