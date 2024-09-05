@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Doctrine\Common\Tests\Fixtures;
+namespace ApiPlatform\Symfony\Tests\Fixtures;
 
 use Symfony\Component\Serializer\Annotation\Groups;
 

@@ -11,19 +11,22 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Doctrine\Common\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Symfony\Tests\Fixtures\TestBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @author Sergey Balasov <sbalasov@gmail.com>
- */
-#[ORM\Embeddable]
-class DummyCarInfo
+#[ORM\Entity]
+class RelatedDummy
 {
-    /**
-     * @var string
-     */
-    #[ORM\Column(nullable: true)]
-    public $name;
+    private $id;
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function setId($id): void
+    {
+        $this->id = $id;
+    }
 }
