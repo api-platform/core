@@ -40,7 +40,7 @@ final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsM
     public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
         $pathsCallback = static function ($decoratedObject): array {
-            if($decoratedObject instanceof Paths) {
+            if ($decoratedObject instanceof Paths) {
                 $paths = $decoratedObject->getPaths();
 
                 // sort paths by tags, then by path for each tag
