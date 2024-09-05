@@ -17,7 +17,7 @@ use ApiPlatform\Metadata\Parameter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
-final class ExactSearchFilter implements FilterInterface
+final class RangeFilter implements FilterInterface
 {
     /**
      * @param Builder<Model>       $builder
@@ -25,6 +25,23 @@ final class ExactSearchFilter implements FilterInterface
      */
     public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder
     {
-        return $builder->where($parameter->getProperty(), $values);
+        if (!\is_string($values)) {
+            return $builder;
+        }
+
+        $values = explode('.', $values);
+
+        if ('between' === $values[0]) {
+            return $builder->whereBetween($parameter->getProperty(), [min($values[1], $values[2]), max($values[1], $values[2])]);
+        }
+
+        $operatorValue = [
+            'lt' => '<',
+            'gt' => '>',
+            'lte' => '<=',
+            'gte' => '>=',
+        ];
+
+        return $builder->where($parameter->getProperty(), $operatorValue[$values[0]], $values[1]);
     }
 }

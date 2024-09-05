@@ -17,7 +17,7 @@ use ApiPlatform\Metadata\Parameter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
-final class StartSearchFilter implements FilterInterface
+final class EqualsFilter implements FilterInterface
 {
     /**
      * @param Builder<Model>       $builder
@@ -25,6 +25,6 @@ final class StartSearchFilter implements FilterInterface
      */
     public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder
     {
-        return $builder->where($parameter->getProperty(), 'like', $values.'%');
+        return $builder->where($parameter->getProperty(), $values);
     }
 }
