@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hydra\Serializer;
 
+use ApiPlatform\JsonLd\Serializer\HydraPrefixTrait;
 use ApiPlatform\Serializer\AbstractConstraintViolationListNormalizer;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -23,6 +24,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class ConstraintViolationListNormalizer extends AbstractConstraintViolationListNormalizer
 {
+    use HydraPrefixTrait;
     public const FORMAT = 'jsonld';
 
     public function __construct(?array $serializePayloadFields = null, ?NameConverterInterface $nameConverter = null)

@@ -187,6 +187,12 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('symfony/uid.xml');
         }
 
+        $defaultContext = ['hydra_prefix' => $config['serializer']['hydra_prefix']] + ($container->hasParameter('serializer.default_context') ? $container->getParameter('serializer.default_context') : []);
+
+        $container->setParameter('api_platform.serializer.default_context', $defaultContext);
+        if (!$container->hasParameter('serializer.default_context')) {
+            $container->setParameter('serializer.default_context', $container->getParameter('api_platform.serializer.default_context'));
+        }
         if ($config['use_symfony_listeners']) {
             $loader->load('symfony/events.xml');
         } else {

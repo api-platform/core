@@ -92,7 +92,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $resourceMetadataCollection = $this->resourceMetadataFactory->create($resourceClass);
 
             foreach ($resourceMetadataCollection as $resourceMetadata) {
-                $this->collectPaths($resourceMetadata, $resourceMetadataCollection, $paths, $schemas, $webhooks);
+                $this->collectPaths($resourceMetadata, $resourceMetadataCollection, $paths, $schemas, $webhooks, $context);
             }
         }
 
@@ -124,7 +124,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         );
     }
 
-    private function collectPaths(ApiResource $resource, ResourceMetadataCollection $resourceMetadataCollection, Paths $paths, \ArrayObject $schemas, \ArrayObject $webhooks): void
+    private function collectPaths(ApiResource $resource, ResourceMetadataCollection $resourceMetadataCollection, Paths $paths, \ArrayObject $schemas, \ArrayObject $webhooks, array $context = []): void
     {
         if (0 === $resource->getOperations()->count()) {
             return;

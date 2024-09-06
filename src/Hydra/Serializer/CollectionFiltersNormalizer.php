@@ -15,6 +15,7 @@ namespace ApiPlatform\Hydra\Serializer;
 
 use ApiPlatform\Doctrine\Odm\State\Options as ODMOptions;
 use ApiPlatform\Doctrine\Orm\State\Options;
+use ApiPlatform\JsonLd\Serializer\HydraPrefixTrait;
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Parameters;
@@ -34,13 +35,20 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class CollectionFiltersNormalizer implements NormalizerInterface, NormalizerAwareInterface
 {
+    use HydraPrefixTrait;
     private ?ContainerInterface $filterLocator = null;
 
     /**
-     * @param ContainerInterface $filterLocator The new filter locator or the deprecated filter collection
+     * @param ContainerInterface   $filterLocator  The new filter locator or the deprecated filter collection
+     * @param array<string, mixed> $defaultContext
      */
-    public function __construct(private readonly NormalizerInterface $collectionNormalizer, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ResourceClassResolverInterface $resourceClassResolver, ContainerInterface $filterLocator)
-    {
+    public function __construct(
+        private readonly NormalizerInterface $collectionNormalizer,
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
+        private readonly ResourceClassResolverInterface $resourceClassResolver,
+        ContainerInterface $filterLocator,
+        private readonly array $defaultContext = [],
+    ) {
         $this->filterLocator = $filterLocator;
     }
 
@@ -105,7 +113,8 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         }
 
         if ($currentFilters || ($parameters && \count($parameters))) {
-            $data['hydra:search'] = $this->getSearch($resourceClass, $requestParts, $currentFilters, $parameters);
+            $hydraPrefix = $this->getHydraPrefix($context + $this->defaultContext);
+            $data[$hydraPrefix.'search'] = $this->getSearch($resourceClass, $requestParts, $currentFilters, $parameters, $hydraPrefix);
         }
 
         return $data;
@@ -127,7 +136,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
      * @param FilterInterface[]        $filters
      * @param array<string, Parameter> $parameters
      */
-    private function getSearch(string $resourceClass, array $parts, array $filters, array|Parameters|null $parameters): array
+    private function getSearch(string $resourceClass, array $parts, array $filters, array|Parameters|null $parameters, string $hydraPrefix): array
     {
         $variables = [];
         $mapping = [];
@@ -177,7 +186,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
             $mapping[] = $m;
         }
 
-        return ['@type' => 'hydra:IriTemplate', 'hydra:template' => \sprintf('%s{?%s}', $parts['path'], implode(',', $variables)), 'hydra:variableRepresentation' => 'BasicRepresentation', 'hydra:mapping' => $mapping];
+        return ['@type' => $hydraPrefix.'IriTemplate', $hydraPrefix.'template' => \sprintf('%s{?%s}', $parts['path'], implode(',', $variables)), $hydraPrefix.'variableRepresentation' => 'BasicRepresentation', $hydraPrefix.'mapping' => $mapping];
     }
 
     /**

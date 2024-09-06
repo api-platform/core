@@ -16,6 +16,7 @@ namespace ApiPlatform\Hydra\Tests\Serializer;
 use ApiPlatform\Documentation\Documentation;
 use ApiPlatform\Hydra\Serializer\DocumentationNormalizer;
 use ApiPlatform\Hydra\Tests\Fixtures\CustomConverter;
+use ApiPlatform\JsonLd\ContextBuilder;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
@@ -716,5 +717,317 @@ class DocumentationNormalizerTest extends TestCase
             'domain' => '#dummy',
             'range' => 'xmls:string',
         ], $documentationNormalizer->normalize($documentation)['hydra:supportedClass'][0]['hydra:supportedProperty'][0]['hydra:property']);
+    }
+
+    public function testNormalizeWithoutPrefix(): void
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('dummy')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('dummy', [
+            (new ApiResource())->withShortName('dummy')->withDescription('dummy')->withTypes(['#dummy'])->withOperations(new Operations([
+                'get' => (new Get())->withHydraContext(['foo' => 'bar', 'title' => 'foobar'])->withTypes(['#dummy'])->withShortName('dummy'),
+                'put' => (new Put())->withShortName('dummy'),
+                'get_collection' => (new GetCollection())->withShortName('dummy'),
+                'post' => (new Post())->withShortName('dummy'),
+            ])),
+            (new ApiResource())->withShortName('relatedDummy')->withOperations(new Operations(['get' => (new Get())->withTypes(['#relatedDummy'])->withShortName('relatedDummy')])),
+        ]));
+        $resourceMetadataFactoryProphecy->create('relatedDummy')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('relatedDummy', [
+            (new ApiResource())->withShortName('relatedDummy')->withOperations(new Operations(['get' => (new Get())->withShortName('relatedDummy')])),
+        ]));
+
+        $title = 'Test Api';
+        $desc = 'test ApiGerard';
+        $version = '0.0.0';
+        $documentation = new Documentation(new ResourceNameCollection(['dummy' => 'dummy']), $title, $desc, $version);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create('dummy', [])->shouldBeCalled()->willReturn(new PropertyNameCollection(['name', 'description', 'nameConverted', 'relatedDummy', 'iri']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create('dummy', 'name', Argument::type('array'))->shouldBeCalled()->willReturn(
+            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('name')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)
+        );
+        $propertyMetadataFactoryProphecy->create('dummy', 'description', Argument::type('array'))->shouldBeCalled()->willReturn(
+            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('description')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)->withJsonldContext(['@type' => '@id'])
+        );
+        $propertyMetadataFactoryProphecy->create('dummy', 'nameConverted', Argument::type('array'))->shouldBeCalled()->willReturn(
+            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('name converted')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)
+        );
+        $propertyMetadataFactoryProphecy->create('dummy', 'relatedDummy', Argument::type('array'))->shouldBeCalled()->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, 'dummy', true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, 'relatedDummy'))])->withDescription('This is a name.')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true));
+        $propertyMetadataFactoryProphecy->create('dummy', 'iri', Argument::type('array'))->shouldBeCalled()->willReturn((new ApiProperty())->withIris(['https://schema.org/Dummy']));
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Argument::type('string'))->willReturn(true);
+
+        $urlGenerator = $this->prophesize(UrlGeneratorInterface::class);
+        $urlGenerator->generate('api_entrypoint')->willReturn('/')->shouldBeCalledTimes(1);
+        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'])->willReturn('/doc')->shouldBeCalledTimes(1);
+
+        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'], 0)->willReturn('/doc')->shouldBeCalledTimes(1);
+
+        $documentationNormalizer = new DocumentationNormalizer(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $urlGenerator->reveal(),
+            new CustomConverter()
+        );
+
+        $expected = [
+            '@context' => [
+                '@vocab' => '/doc#',
+                'hydra' => 'http://www.w3.org/ns/hydra/core#',
+                'rdf' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+                'rdfs' => 'http://www.w3.org/2000/01/rdf-schema#',
+                'xmls' => 'http://www.w3.org/2001/XMLSchema#',
+                'owl' => 'http://www.w3.org/2002/07/owl#',
+                'schema' => 'https://schema.org/',
+                'domain' => [
+                    '@id' => 'rdfs:domain',
+                    '@type' => '@id',
+                ],
+                'range' => [
+                    '@id' => 'rdfs:range',
+                    '@type' => '@id',
+                ],
+                'subClassOf' => [
+                    '@id' => 'rdfs:subClassOf',
+                    '@type' => '@id',
+                ],
+                'expects' => [
+                    '@id' => 'expects',
+                    '@type' => '@id',
+                ],
+                'returns' => [
+                    '@id' => 'returns',
+                    '@type' => '@id',
+                ],
+            ],
+            '@id' => '/doc',
+            '@type' => 'ApiDocumentation',
+            'title' => 'Test Api',
+            'description' => 'test ApiGerard',
+            'supportedClass' => [
+                [
+                    '@id' => '#dummy',
+                    '@type' => 'Class',
+                    'rdfs:label' => 'dummy',
+                    'title' => 'dummy',
+                    'description' => 'dummy',
+                    'supportedProperty' => [
+                        [
+                            '@type' => 'SupportedProperty',
+                            'property' => [
+                                '@id' => '#dummy/name',
+                                '@type' => 'rdf:Property',
+                                'rdfs:label' => 'name',
+                                'domain' => '#dummy',
+                                'range' => 'xmls:string',
+                            ],
+                            'title' => 'name',
+                            'required' => false,
+                            'readable' => true,
+                            'writeable' => true,
+                            'description' => 'name',
+                        ],
+                        [
+                            '@type' => 'SupportedProperty',
+                            'property' => [
+                                '@id' => '#dummy/description',
+                                '@type' => 'rdf:Property',
+                                'rdfs:label' => 'description',
+                                'domain' => '#dummy',
+                                'range' => '@id',
+                            ],
+                            'title' => 'description',
+                            'required' => false,
+                            'readable' => true,
+                            'writeable' => true,
+                            'description' => 'description',
+                        ],
+                        [
+                            '@type' => 'SupportedProperty',
+                            'property' => [
+                                '@id' => '#dummy/name_converted',
+                                '@type' => 'rdf:Property',
+                                'rdfs:label' => 'name_converted',
+                                'domain' => '#dummy',
+                                'range' => 'xmls:string',
+                            ],
+                            'title' => 'name_converted',
+                            'required' => false,
+                            'readable' => true,
+                            'writeable' => true,
+                            'description' => 'name converted',
+                        ],
+                        [
+                            '@type' => 'SupportedProperty',
+                            'property' => [
+                                '@id' => '#dummy/relatedDummy',
+                                '@type' => 'rdf:Property',
+                                'rdfs:label' => 'relatedDummy',
+                                'domain' => '#dummy',
+                                'range' => '#relatedDummy',
+                            ],
+                            'title' => 'relatedDummy',
+                            'required' => false,
+                            'readable' => true,
+                            'writeable' => true,
+                            'description' => 'This is a name.',
+                        ],
+                        [
+                            '@type' => 'SupportedProperty',
+                            'property' => [
+                                '@id' => 'https://schema.org/Dummy',
+                                '@type' => 'rdf:Property',
+                                'rdfs:label' => 'iri',
+                                'domain' => '#dummy',
+                            ],
+                            'title' => 'iri',
+                            'required' => null,
+                            'readable' => null,
+                            'writeable' => false,
+                        ],
+                    ],
+                    'supportedOperation' => [
+                        [
+                            '@type' => ['Operation', 'schema:FindAction'],
+                            'method' => 'GET',
+                            'title' => 'foobar',
+                            'rdfs:label' => 'foobar',
+                            'returns' => '#dummy',
+                            'foo' => 'bar',
+                        ],
+                        [
+                            '@type' => ['Operation', 'schema:ReplaceAction'],
+                            'expects' => '#dummy',
+                            'method' => 'PUT',
+                            'title' => 'Replaces the dummy resource.',
+                            'rdfs:label' => 'Replaces the dummy resource.',
+                            'returns' => '#dummy',
+                        ],
+                        [
+                            '@type' => ['Operation', 'schema:FindAction'],
+                            'method' => 'GET',
+                            'title' => 'Retrieves a relatedDummy resource.',
+                            'rdfs:label' => 'Retrieves a relatedDummy resource.',
+                            'returns' => '#relatedDummy',
+                        ],
+                    ],
+                ],
+                [
+                    '@id' => '#Entrypoint',
+                    '@type' => 'Class',
+                    'title' => 'The API entrypoint',
+                    'supportedProperty' => [
+                        [
+                            '@type' => 'SupportedProperty',
+                            'property' => [
+                                '@id' => '#Entrypoint/dummy',
+                                '@type' => 'Link',
+                                'rdfs:label' => 'The collection of dummy resources',
+                                'domain' => '#Entrypoint',
+                                'rdfs:range' => [
+                                    ['@id' => 'Collection'],
+                                    [
+                                        'owl:equivalentClass' => [
+                                            'owl:onProperty' => ['@id' => 'member'],
+                                            'owl:allValuesFrom' => ['@id' => '#dummy'],
+                                        ],
+                                    ],
+                                ],
+                                'supportedOperation' => [
+                                    [
+                                        '@type' => ['Operation', 'schema:FindAction'],
+                                        'method' => 'GET',
+                                        'title' => 'Retrieves the collection of dummy resources.',
+                                        'rdfs:label' => 'Retrieves the collection of dummy resources.',
+                                        'returns' => 'Collection',
+                                    ],
+                                    [
+                                        '@type' => ['Operation', 'schema:CreateAction'],
+                                        'expects' => '#dummy',
+                                        'method' => 'POST',
+                                        'title' => 'Creates a dummy resource.',
+                                        'rdfs:label' => 'Creates a dummy resource.',
+                                        'returns' => '#dummy',
+                                    ],
+                                ],
+                            ],
+                            'title' => 'The collection of dummy resources',
+                            'readable' => true,
+                            'writeable' => false,
+                        ],
+                    ],
+                    'supportedOperation' => [
+                        '@type' => 'Operation',
+                        'method' => 'GET',
+                        'rdfs:label' => 'The API entrypoint.',
+                        'returns' => '#EntryPoint',
+                    ],
+                ],
+                [
+                    '@id' => '#ConstraintViolation',
+                    '@type' => 'Class',
+                    'title' => 'A constraint violation',
+                    'supportedProperty' => [
+                        [
+                            '@type' => 'SupportedProperty',
+                            'property' => [
+                                '@id' => '#ConstraintViolation/propertyPath',
+                                '@type' => 'rdf:Property',
+                                'rdfs:label' => 'propertyPath',
+                                'domain' => '#ConstraintViolation',
+                                'range' => 'xmls:string',
+                            ],
+                            'title' => 'propertyPath',
+                            'description' => 'The property path of the violation',
+                            'readable' => true,
+                            'writeable' => false,
+                        ],
+                        [
+                            '@type' => 'SupportedProperty',
+                            'property' => [
+                                '@id' => '#ConstraintViolation/message',
+                                '@type' => 'rdf:Property',
+                                'rdfs:label' => 'message',
+                                'domain' => '#ConstraintViolation',
+                                'range' => 'xmls:string',
+                            ],
+                            'title' => 'message',
+                            'description' => 'The message associated with the violation',
+                            'readable' => true,
+                            'writeable' => false,
+                        ],
+                    ],
+                ],
+                [
+                    '@id' => '#ConstraintViolationList',
+                    '@type' => 'Class',
+                    'subClassOf' => 'Error',
+                    'title' => 'A constraint violation list',
+                    'supportedProperty' => [
+                        [
+                            '@type' => 'SupportedProperty',
+                            'property' => [
+                                '@id' => '#ConstraintViolationList/violations',
+                                '@type' => 'rdf:Property',
+                                'rdfs:label' => 'violations',
+                                'domain' => '#ConstraintViolationList',
+                                'range' => '#ConstraintViolation',
+                            ],
+                            'title' => 'violations',
+                            'description' => 'The violations',
+                            'readable' => true,
+                            'writeable' => false,
+                        ],
+                    ],
+                ],
+            ],
+            'entrypoint' => '/',
+        ];
+
+        $this->assertEquals($expected, $documentationNormalizer->normalize($documentation, null, [ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX => false]));
     }
 }

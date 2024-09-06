@@ -77,8 +77,7 @@
         "symfony/uid": "To support Symfony UUID/ULID identifiers.",
         "symfony/messenger": "To support messenger integration and asynchronous Mercure updates.",
         "symfony/mercure-bundle": "To support mercure integration.",
-        "symfony/web-profiler-bundle": "To use the data collector.",
-        "webonyx/graphql-php": "To support GraphQL."
+        "symfony/web-profiler-bundle": "To use the data collector."
     },
     "autoload": {
         "psr-4": {

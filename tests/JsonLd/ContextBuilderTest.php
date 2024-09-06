@@ -276,4 +276,29 @@ class ContextBuilderTest extends TestCase
 
         $this->assertEquals($expected, $contextBuilder->getAnonymousResourceContext($output, ['iri' => '/dummies', 'name' => 'Dummy', 'api_resource' => new Dummy(), 'has_context' => true]));
     }
+
+    public function testResourceContextWithoutHydraPrefix(): void
+    {
+        $this->resourceMetadataCollectionFactoryProphecy->create($this->entityClass)->willReturn(new ResourceMetadataCollection('DummyEntity', [
+            (new ApiResource())
+                ->withShortName('DummyEntity')
+                ->withOperations(new Operations(['get' => (new Get())->withShortName('DummyEntity')])),
+        ]));
+        $this->propertyNameCollectionFactoryProphecy->create($this->entityClass)->willReturn(new PropertyNameCollection(['dummyPropertyA']));
+        $this->propertyMetadataFactoryProphecy->create($this->entityClass, 'dummyPropertyA', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('Dummy property A')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true));
+        $this->urlGeneratorProphecy->generate('api_doc', ['_format' => 'jsonld'], UrlGeneratorInterface::ABS_URL)->willReturn('');
+
+        $contextBuilder = new ContextBuilder($this->resourceNameCollectionFactoryProphecy->reveal(), $this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->propertyNameCollectionFactoryProphecy->reveal(), $this->propertyMetadataFactoryProphecy->reveal(), $this->urlGeneratorProphecy->reveal(), null, null, [ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX => false]);
+
+        $expected = [
+            'http://www.w3.org/ns/hydra/context.jsonld',
+            [
+                '@vocab' => '#',
+                'hydra' => 'http://www.w3.org/ns/hydra/core#',
+                'dummyPropertyA' => 'DummyEntity/dummyPropertyA',
+            ],
+        ];
+
+        $this->assertEquals($expected, $contextBuilder->getResourceContext($this->entityClass));
+    }
 }
