@@ -25,6 +25,7 @@ use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter as DoctrineOrmAbstractFilter;
 use ApiPlatform\Doctrine\Orm\State\LinksHandlerInterface as OrmLinksHandlerInterface;
 use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInterface;
 use ApiPlatform\GraphQl\Error\ErrorHandlerInterface;
+use ApiPlatform\GraphQl\Executor;
 use ApiPlatform\GraphQl\Resolver\MutationResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryItemResolverInterface;
@@ -561,7 +562,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     private function registerGraphQlConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
     {
         $enabled = $this->isConfigEnabled($container, $config['graphql']);
-
         $graphqlIntrospectionEnabled = $enabled && $this->isConfigEnabled($container, $config['graphql']['introspection']);
 
         $graphiqlEnabled = $enabled && $this->isConfigEnabled($container, $config['graphql']['graphiql']);
@@ -578,6 +578,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         if (!$enabled) {
             return;
+        }
+
+        if (!class_exists(Executor::class)) {
+            throw new \RuntimeException('Graphql is enabled but not installed, run: composer require "api-platform/graphql".');
         }
 
         $container->setParameter('api_platform.graphql.default_ide', $config['graphql']['default_ide']);
