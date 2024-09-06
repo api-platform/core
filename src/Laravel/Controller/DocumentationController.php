@@ -11,10 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Documentation\Action;
+namespace ApiPlatform\Laravel\Controller;
 
 use ApiPlatform\Documentation\Documentation;
-use ApiPlatform\Documentation\DocumentationInterface;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Util\ContentNegotiationTrait;
@@ -32,14 +31,17 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Generates the API documentation.
  *
- * @deprecated use ApiPlatform\Symfony\DocumentationAction instead
- *
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
-final class DocumentationAction
+final class DocumentationController
 {
     use ContentNegotiationTrait;
 
+    /**
+     * @param array<string, string[]>             $documentationFormats
+     * @param ProviderInterface<object>           $provider
+     * @param ProcessorInterface<mixed, Response> $processor
+     */
     public function __construct(
         private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory,
         private readonly string $title = '',
@@ -50,28 +52,24 @@ final class DocumentationAction
         private readonly ?ProcessorInterface $processor = null,
         ?Negotiator $negotiator = null,
         private readonly array $documentationFormats = [OpenApiNormalizer::JSON_FORMAT => ['application/vnd.openapi+json'], OpenApiNormalizer::FORMAT => ['application/json']],
+        private readonly bool $swaggerUiEnabled = true,
     ) {
         $this->negotiator = $negotiator ?? new Negotiator();
     }
 
-    /**
-     * @return DocumentationInterface|OpenApi|Response
-     */
-    public function __invoke(?Request $request = null)
+    public function __invoke(Request $request): Response
     {
-        if (null === $request) {
-            return new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version);
-        }
-
         $context = [
             'api_gateway' => $request->query->getBoolean(ApiGatewayNormalizer::API_GATEWAY),
             'base_url' => $request->getBaseUrl(),
             'spec_version' => (string) $request->query->get(LegacyOpenApiNormalizer::SPEC_VERSION),
         ];
         $request->attributes->set('_api_normalization_context', $request->attributes->get('_api_normalization_context', []) + $context);
+        // We want to find the format early on, this code is also executed later on by the ContentNegotiationProvider.
+        $this->addRequestFormats($request, $this->documentationFormats);
         $format = $this->getRequestFormat($request, $this->documentationFormats);
 
-        if (null !== $this->openApiFactory && ('html' === $format || OpenApiNormalizer::FORMAT === $format || OpenApiNormalizer::JSON_FORMAT === $format || OpenApiNormalizer::YAML_FORMAT === $format)) {
+        if ('html' === $format || OpenApiNormalizer::FORMAT === $format || OpenApiNormalizer::JSON_FORMAT === $format || OpenApiNormalizer::YAML_FORMAT === $format) {
             return $this->getOpenApiDocumentation($context, $format, $request);
         }
 
@@ -81,30 +79,26 @@ final class DocumentationAction
     /**
      * @param array<string,mixed> $context
      */
-    private function getOpenApiDocumentation(array $context, string $format, Request $request): OpenApi|Response
+    private function getOpenApiDocumentation(array $context, string $format, Request $request): Response
     {
-        if ($this->provider && $this->processor) {
-            $context['request'] = $request;
-            $operation = new Get(
-                class: OpenApi::class,
-                read: true,
-                serialize: true,
-                provider: fn () => $this->openApiFactory->__invoke($context),
-                normalizationContext: [
-                    ApiGatewayNormalizer::API_GATEWAY => $context['api_gateway'] ?? null,
-                    LegacyOpenApiNormalizer::SPEC_VERSION => $context['spec_version'] ?? null,
-                ],
-                outputFormats: $this->documentationFormats
-            );
+        $context['request'] = $request;
+        $operation = new Get(
+            class: OpenApi::class,
+            read: true,
+            serialize: true,
+            provider: fn () => $this->openApiFactory->__invoke($context),
+            normalizationContext: [
+                ApiGatewayNormalizer::API_GATEWAY => $context['api_gateway'] ?? null,
+                LegacyOpenApiNormalizer::SPEC_VERSION => $context['spec_version'] ?? null,
+            ],
+            outputFormats: $this->documentationFormats
+        );
 
-            if ('html' === $format) {
-                $operation = $operation->withProcessor('api_platform.swagger_ui.processor')->withWrite(true);
-            }
-
-            return $this->processor->process($this->provider->provide($operation, [], $context), $operation, [], $context);
+        if ('html' === $format && $this->swaggerUiEnabled) {
+            $operation = $operation->withProcessor('api_platform.swagger_ui.processor')->withWrite(true);
         }
 
-        return $this->openApiFactory->__invoke($context);
+        return $this->processor->process($this->provider->provide($operation, [], $context), $operation, [], $context);
     }
 
     /**
@@ -113,20 +107,16 @@ final class DocumentationAction
      *
      * @param array<string,mixed> $context
      */
-    private function getHydraDocumentation(array $context, Request $request): DocumentationInterface|Response
+    private function getHydraDocumentation(array $context, Request $request): Response
     {
-        if ($this->provider && $this->processor) {
-            $context['request'] = $request;
-            $operation = new Get(
-                class: Documentation::class,
-                read: true,
-                serialize: true,
-                provider: fn () => new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version)
-            );
+        $context['request'] = $request;
+        $operation = new Get(
+            class: Documentation::class,
+            read: true,
+            serialize: true,
+            provider: fn () => new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version)
+        );
 
-            return $this->processor->process($this->provider->provide($operation, [], $context), $operation, [], $context);
-        }
-
-        return new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version);
+        return $this->processor->process($this->provider->provide($operation, [], $context), $operation, [], $context);
     }
 }

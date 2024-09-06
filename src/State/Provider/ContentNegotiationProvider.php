@@ -46,12 +46,7 @@ final class ContentNegotiationProvider implements ProviderInterface
         $formats = $operation->getOutputFormats() ?? ($isErrorOperation ? $this->errorFormats : $this->formats);
         $this->addRequestFormats($request, $formats);
         $request->attributes->set('input_format', $this->getInputFormat($operation, $request));
-
-        if (!$isErrorOperation) {
-            $request->setRequestFormat($this->getRequestFormat($request, $formats));
-        } else {
-            $request->setRequestFormat($this->getRequestFormat($request, $formats, false));
-        }
+        $request->setRequestFormat($this->getRequestFormat($request, $formats, !$isErrorOperation));
 
         return $this->decorated?->provide($operation, $uriVariables, $context);
     }

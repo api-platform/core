@@ -26,7 +26,7 @@ class JsonProblemTest extends TestCase
 
     public function testNotFound(): void
     {
-        $response = $this->get('/api/books/notfound');
+        $response = $this->get('/api/books/notfound', headers: ['accept' => 'application/ld+json']);
         $response->assertStatus(404);
         $response->assertHeader('content-type', 'application/problem+json; charset=utf-8');
         $response->assertJsonFragment([

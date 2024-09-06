@@ -127,7 +127,7 @@ class JsonLdTest extends TestCase
     {
         $book = Book::first();
         $iri = $this->getIriFromResource($book);
-        $response = $this->delete($iri, ['accept' => 'application/ld+json']);
+        $response = $this->delete($iri, headers: ['accept' => 'application/ld+json']);
         $response->assertStatus(204);
         $this->assertNull(Book::find($book->id));
     }

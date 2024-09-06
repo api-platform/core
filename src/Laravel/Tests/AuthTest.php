@@ -44,7 +44,7 @@ class AuthTest extends TestCase
     {
         $response = $this->post('/tokens/create');
         $token = $response->json()['token'];
-        $response = $this->post('/api/vaults', [], ['content-type' => ['application/ld+json'], 'authorization' => 'Bearer '.$token]);
+        $response = $this->post('/api/vaults', [], ['accept' => ['application/ld+json'], 'content-type' => ['application/ld+json'], 'authorization' => 'Bearer '.$token]);
         $response->assertStatus(403);
     }
 }

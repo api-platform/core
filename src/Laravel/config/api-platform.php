@@ -69,5 +69,9 @@ return [
     'exception_to_status' => [
         AuthenticationException::class => 401,
         AuthorizationException::class => 403
+    ],
+
+    'swagger_ui' => [
+        'enabled' => true
     ]
 ];

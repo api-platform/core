@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel;
 
-use ApiPlatform\Documentation\Action\DocumentationAction;
-use ApiPlatform\Documentation\Action\EntrypointAction;
 use ApiPlatform\GraphQl\Error\ErrorHandler as GraphQlErrorHandler;
 use ApiPlatform\GraphQl\Error\ErrorHandlerInterface;
 use ApiPlatform\GraphQl\Executor;
@@ -72,6 +70,8 @@ use ApiPlatform\JsonSchema\SchemaFactory;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Laravel\ApiResource\Error;
 use ApiPlatform\Laravel\Controller\ApiPlatformController;
+use ApiPlatform\Laravel\Controller\DocumentationController;
+use ApiPlatform\Laravel\Controller\EntrypointController;
 use ApiPlatform\Laravel\Eloquent\Extension\FilterQueryExtension;
 use ApiPlatform\Laravel\Eloquent\Extension\QueryExtensionInterface;
 use ApiPlatform\Laravel\Eloquent\Filter\DateFilter;
@@ -321,6 +321,11 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->singleton(ResourceMetadataCollectionFactoryInterface::class, function (Application $app) {
             /** @var ConfigRepository */
             $config = $app['config'];
+            $formats = $config->get('api-platform.formats');
+
+            if ($config->get('api-platform.swagger_ui.enabled', false) && !isset($formats['html'])) {
+                $formats['html'] = ['text/html'];
+            }
 
             return new CacheResourceCollectionMetadataFactory(
                 new EloquentResourceCollectionMetadataFactory(
@@ -361,7 +366,7 @@ class ApiPlatformProvider extends ServiceProvider
                                             )
                                         )
                                     ),
-                                    $config->get('api-platform.formats'),
+                                    $formats,
                                     $config->get('api-platform.patch_formats'),
                                 )
                             )
@@ -417,7 +422,10 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->singleton(SwaggerUiProvider::class, function (Application $app) {
-            return new SwaggerUiProvider($app->make(ReadProvider::class), $app->make(OpenApiFactoryInterface::class));
+            /** @var ConfigRepository */
+            $config = $app['config'];
+
+            return new SwaggerUiProvider($app->make(ReadProvider::class), $app->make(OpenApiFactoryInterface::class), $config->get('api-platform.swagger_ui.enabled', false));
         });
 
         $this->app->singleton(ValidateProvider::class, function (Application $app) {
@@ -476,9 +484,14 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->tag([RemoveProcessor::class, PersistProcessor::class], ProcessorInterface::class);
         $this->app->singleton(CallableProcessor::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
             $tagged = iterator_to_array($app->tagged(ProcessorInterface::class));
-            // TODO: tag SwaggerUiProcessor instead?
-            $tagged['api_platform.swagger_ui.processor'] = $app->make(SwaggerUiProcessor::class);
+
+            if ($config->get('api-platform.swagger_ui.enabled', false)) {
+                // TODO: tag SwaggerUiProcessor instead?
+                $tagged['api_platform.swagger_ui.processor'] = $app->make(SwaggerUiProcessor::class);
+            }
 
             return new CallableProcessor(new ServiceLocator($tagged));
         });
@@ -628,18 +641,18 @@ class ApiPlatformProvider extends ServiceProvider
             return new Options(title: $config->get('api-platform.title') ?? '');
         });
 
-        $this->app->singleton(DocumentationAction::class, function (Application $app) {
+        $this->app->singleton(DocumentationController::class, function (Application $app) {
             /** @var ConfigRepository */
             $config = $app['config'];
 
-            return new DocumentationAction($app->make(ResourceNameCollectionFactoryInterface::class), $config->get('api-platform.title') ?? '', $config->get('api-platform.description') ?? '', $config->get('api-platform.version') ?? '', $app->make(OpenApiFactoryInterface::class), $app->make(ProviderInterface::class), $app->make(ProcessorInterface::class), $app->make(Negotiator::class), $config->get('api-platform.docs_formats'));
+            return new DocumentationController($app->make(ResourceNameCollectionFactoryInterface::class), $config->get('api-platform.title') ?? '', $config->get('api-platform.description') ?? '', $config->get('api-platform.version') ?? '', $app->make(OpenApiFactoryInterface::class), $app->make(ProviderInterface::class), $app->make(ProcessorInterface::class), $app->make(Negotiator::class), $config->get('api-platform.docs_formats'), $config->get('api-platform.swagger_ui.enabled', false));
         });
 
-        $this->app->singleton(EntrypointAction::class, function (Application $app) {
+        $this->app->singleton(EntrypointController::class, function (Application $app) {
             /** @var ConfigRepository */
             $config = $app['config'];
 
-            return new EntrypointAction($app->make(ResourceNameCollectionFactoryInterface::class), $app->make(ProviderInterface::class), $app->make(ProcessorInterface::class), $config->get('api-platform.docs_formats'));
+            return new EntrypointController($app->make(ResourceNameCollectionFactoryInterface::class), $app->make(ProviderInterface::class), $app->make(ProcessorInterface::class), $config->get('api-platform.docs_formats'));
         });
 
         $this->app->singleton(Pagination::class, function (Application $app) {
@@ -1144,9 +1157,8 @@ class ApiPlatformProvider extends ServiceProvider
         $route = new Route(['GET'], $prefix.'/contexts/{shortName?}{_format?}', [ContextAction::class, '__invoke']);
         $route->name('api_jsonld_context')->middleware(ApiPlatformMiddleware::class);
         $routeCollection->add($route);
-        // Maybe that we can alias Symfony Request to Laravel Request within the provider ?
         $route = new Route(['GET'], $prefix.'/docs{_format?}', function (Request $request, Application $app) {
-            $documentationAction = $app->make(DocumentationAction::class);
+            $documentationAction = $app->make(DocumentationController::class);
 
             return $documentationAction->__invoke($request);
         });
@@ -1154,7 +1166,7 @@ class ApiPlatformProvider extends ServiceProvider
         $routeCollection->add($route);
 
         $route = new Route(['GET'], $prefix.'/{index?}{_format?}', function (Request $request, Application $app) {
-            $entrypointAction = $app->make(EntrypointAction::class);
+            $entrypointAction = $app->make(EntrypointController::class);
 
             return $entrypointAction->__invoke($request);
         });
