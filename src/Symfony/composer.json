@@ -33,7 +33,8 @@
         "symfony/property-info": "^6.4 || ^7.1",
         "symfony/property-access": "^6.4 || ^7.1",
         "symfony/serializer": "^6.4 || ^7.1",
-        "symfony/security-core": "^6.4 || ^7.0"
+        "symfony/security-core": "^6.4 || ^7.0",
+        "willdurand/negotiation": "^3.0"
     },
     "require-dev": {
         "phpspec/prophecy-phpunit": "^2.0",
