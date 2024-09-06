@@ -45,6 +45,7 @@ abstract class Parameter
         protected string|\Stringable|null $security = null,
         protected ?string $securityMessage = null,
         protected ?array $extraProperties = [],
+        protected ?array $filterContext = null,
     ) {
     }
 
@@ -135,6 +136,11 @@ abstract class Parameter
     public function getExtraProperties(): array
     {
         return $this->extraProperties;
+    }
+
+    public function getFilterContext(): ?array
+    {
+        return $this->filterContext;
     }
 
     public function withKey(string $key): static
