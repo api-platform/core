@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel;
 
-use ApiPlatform\Laravel\Eloquent\Filter\FilterInterface;
 use Psr\Container\ContainerInterface;
 
 // TODO: template T ServiceLocator<ProviderInterface>

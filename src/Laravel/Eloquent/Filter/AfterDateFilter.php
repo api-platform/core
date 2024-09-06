@@ -29,27 +29,19 @@ final class AfterDateFilter implements FilterInterface
             return $builder;
         }
 
-        // TODO: orderByRaw -> add protection against SQL injection
-
         $datetime = new \DateTimeImmutable($values);
 
         if (null === $parameter->getFilterContext() || 'exclude_null' === $parameter->getFilterContext()['nulls_comparison']) {
             return $builder->whereDate($parameter->getProperty(), '>=', $datetime);
         }
 
-        if ('include_null_after' === $parameter->getFilterContext()['nulls_comparison']) {
-            return $builder->whereDate($parameter->getProperty(), '>=', $datetime)
-                ->orWhereNull($parameter->getProperty())
-                ->orderByRaw("{$parameter->getProperty()} ASC NULLS LAST");
+        if ('include_null' === $parameter->getFilterContext()['nulls_comparison']) {
+            return $builder->where(function(Builder $query) use ($parameter, $datetime) {
+                $query->whereDate($parameter->getProperty(), '>=', $datetime)
+                    ->orWhereNull($parameter->getProperty());
+            });
         }
 
-        if ('include_null_before' === $parameter->getFilterContext()['nulls_comparison']) {
-            return $builder->whereDate($parameter->getProperty(), '>=', $datetime)
-                ->orWhereNull($parameter->getProperty())
-                ->orderByRaw("{$parameter->getProperty()} ASC NULLS FIRST");
-        }
-
-        // TODO: include_null_before_and_after
 
         return $builder;
     }

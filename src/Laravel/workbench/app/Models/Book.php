@@ -57,10 +57,10 @@ use Workbench\App\Http\Requests\BookFormRequest;
     schema: ['type' => 'date'],
     filter: AfterDateFilter::class,
     property: 'publication_date',
-    filterContext: ['nulls_comparison' => 'include_null_before_and_after']
+    filterContext: ['nulls_comparison' => 'exclude_null']
 )]
-#[QueryParameter(key: 'isbn_range', schema: ['type' => 'string'], filter: RangeFilter::class, property: 'isbn', description: 'Syntax: \<lt\>.\<valueToCompareTo\> You can use lt, gt, lte, gte or between (to do it, add: .\<value\> at the end)')]
-#[QueryParameter(key: 'order', schema: ['type' => 'string'], filter: OrderFilter::class, description: 'Syntax: \<propertyToOrderOn\>.\<asc|desc\>', filterContext: ['nulls_comparison' => 'nulls_smallest'])]
+#[QueryParameter(key: 'isbn_range[lt]', schema: ['type' => 'string'], filter: RangeFilter::class, property: 'isbn')]
+#[QueryParameter(key: 'order[name]', schema: ['type' => 'string'], filter: OrderFilter::class, property: 'name')]
 #[QueryParameter(
     key: 'name2',
     schema: ['type' => 'array', 'items' => ['type' => 'string']],
