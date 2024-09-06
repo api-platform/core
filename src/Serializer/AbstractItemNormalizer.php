@@ -15,11 +15,10 @@ namespace ApiPlatform\Serializer;
 
 use ApiPlatform\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
-use ApiPlatform\Exception\InvalidArgumentException as LegacyInvalidArgumentException;
-use ApiPlatform\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -245,7 +244,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 return $this->iriConverter->getResourceFromIri($data, $context + ['fetch_data' => true]);
             } catch (ItemNotFoundException $e) {
                 throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
-            } catch (LegacyInvalidArgumentException|InvalidArgumentException $e) {
+            } catch (InvalidArgumentException $e) {
                 throw new UnexpectedValueException(\sprintf('Invalid IRI "%s".', $data), $e->getCode(), $e);
             }
         }
@@ -596,7 +595,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 );
 
                 return null;
-            } catch (LegacyInvalidArgumentException|InvalidArgumentException $e) {
+            } catch (InvalidArgumentException $e) {
                 if (!isset($context['not_normalizable_value_exceptions'])) {
                     throw new UnexpectedValueException(\sprintf('Invalid IRI "%s".', $value), $e->getCode(), $e);
                 }

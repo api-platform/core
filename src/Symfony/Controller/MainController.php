@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Controller;
 
-use ApiPlatform\Exception\InvalidIdentifierException;
-use ApiPlatform\Exception\InvalidUriVariableException;
 use ApiPlatform\Metadata\Error;
+use ApiPlatform\Metadata\Exception\InvalidIdentifierException;
+use ApiPlatform\Metadata\Exception\InvalidUriVariableException;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;

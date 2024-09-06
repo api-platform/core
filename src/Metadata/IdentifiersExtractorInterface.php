@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
-use ApiPlatform\Exception\RuntimeException;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 
 if (interface_exists(\ApiPlatform\Api\IdentifiersExtractorInterface::class)) {
     class_alias(

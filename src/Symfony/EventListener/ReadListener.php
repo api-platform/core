@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Api\UriVariablesConverterInterface as LegacyUriVariablesConverterInterface;
-use ApiPlatform\Exception\InvalidIdentifierException;
-use ApiPlatform\Exception\InvalidUriVariableException;
 use ApiPlatform\Metadata\Error;
+use ApiPlatform\Metadata\Exception\InvalidIdentifierException;
+use ApiPlatform\Metadata\Exception\InvalidUriVariableException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
