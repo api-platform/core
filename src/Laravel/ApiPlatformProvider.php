@@ -46,8 +46,8 @@ use ApiPlatform\GraphQl\Type\TypesContainerInterface;
 use ApiPlatform\GraphQl\Type\TypesFactory;
 use ApiPlatform\GraphQl\Type\TypesFactoryInterface;
 use ApiPlatform\Hydra\JsonSchema\SchemaFactory as HydraSchemaFactory;
-use ApiPlatform\Hydra\Serializer\CollectionNormalizer as HydraCollectionNormalizer;
 use ApiPlatform\Hydra\Serializer\CollectionFiltersNormalizer as HydraFiltersCollectionNormalizer;
+use ApiPlatform\Hydra\Serializer\CollectionNormalizer as HydraCollectionNormalizer;
 use ApiPlatform\Hydra\Serializer\DocumentationNormalizer as HydraDocumentationNormalizer;
 use ApiPlatform\Hydra\Serializer\EntrypointNormalizer as HydraEntrypointNormalizer;
 use ApiPlatform\Hydra\Serializer\PartialCollectionViewNormalizer as HydraPartialCollectionViewNormalizer;
@@ -326,6 +326,7 @@ class ApiPlatformProvider extends ServiceProvider
                 new EloquentResourceCollectionMetadataFactory(
                     new ParameterResourceMetadataCollectionFactory(
                         $this->app->make(PropertyNameCollectionFactoryInterface::class),
+                        $this->app->make(PropertyMetadataFactoryInterface::class),
                         new AlternateUriResourceMetadataCollectionFactory(
                             new FiltersResourceMetadataCollectionFactory(
                                 new FormatsResourceMetadataCollectionFactory(
@@ -339,8 +340,8 @@ class ApiPlatformProvider extends ServiceProvider
                                                         $app->make(PathSegmentNameGeneratorInterface::class),
                                                         new NotExposedOperationResourceMetadataCollectionFactory(
                                                             $app->make(LinkFactoryInterface::class),
-                                                            new ConcernsResourceMetadataCollectionFactory(
-                                                                new AttributesResourceMetadataCollectionFactory(
+                                                            new AttributesResourceMetadataCollectionFactory(
+                                                                new ConcernsResourceMetadataCollectionFactory(
                                                                     null,
                                                                     $app->make(LoggerInterface::class),
                                                                     [
@@ -353,7 +354,7 @@ class ApiPlatformProvider extends ServiceProvider
                                                                     'routePrefix' => $config->get('api-platform.routes.prefix') ?? '/',
                                                                 ],
                                                                 $config->get('api-platform.graphql.enabled'),
-                                                            )
+                                                            ),
                                                         )
                                                     )
                                                 )

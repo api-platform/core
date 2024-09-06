@@ -77,7 +77,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         private readonly array $formats = [],
         ?Options $openApiOptions = null,
         ?PaginationOptions $paginationOptions = null,
-        private readonly ?RouterInterface $router = null
+        private readonly ?RouterInterface $router = null,
     ) {
         $this->filterLocator = $filterLocator;
         $this->openApiOptions = $openApiOptions ?: new Options('API Platform');

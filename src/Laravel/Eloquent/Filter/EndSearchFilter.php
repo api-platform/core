@@ -19,12 +19,14 @@ use Illuminate\Database\Eloquent\Model;
 
 final class EndSearchFilter implements FilterInterface
 {
+    use QueryPropertyTrait;
+
     /**
      * @param Builder<Model>       $builder
      * @param array<string, mixed> $context
      */
     public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder
     {
-        return $builder->where($parameter->getProperty(), 'like', '%'.$values);
+        return $builder->{$context['whereClause'] ?? 'where'}($this->getQueryProperty($parameter), 'like', '%'.$values);
     }
 }
