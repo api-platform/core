@@ -159,4 +159,15 @@ class SchemaFactoryTest extends TestCase
         $this->assertArrayHasKey('hydra:previous', $resultSchema['properties']['hydra:view']['properties']);
         $this->assertArrayHasKey('hydra:next', $resultSchema['properties']['hydra:view']['properties']);
     }
+
+    public function testSchemaTypeBuildSchemaWithoutPrefix(): void
+    {
+        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_OUTPUT, new GetCollection(), null, [ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX => false]);
+        $this->assertNull($resultSchema->getRootDefinitionKey());
+        $this->assertTrue(isset($resultSchema['properties']));
+        $this->assertTrue(isset($resultSchema['properties']['member']));
+        $this->assertArrayHasKey('totalItems', $resultSchema['properties']);
+        $this->assertArrayHasKey('view', $resultSchema['properties']);
+        $this->assertArrayHasKey('search', $resultSchema['properties']);
+    }
 }

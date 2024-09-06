@@ -220,6 +220,9 @@ class ConfigurationTest extends TestCase
             'use_symfony_listeners' => false,
             'handle_symfony_errors' => false,
             'enable_link_security' => false,
+            'serializer' => [
+                'hydra_prefix' => null,
+            ],
         ], $config);
     }
 

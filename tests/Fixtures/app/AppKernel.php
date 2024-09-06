@@ -277,6 +277,9 @@ class AppKernel extends Kernel
                     Delete::class,
                 ],
             ],
+            'serializer' => [
+                'hydra_prefix' => true,
+            ],
         ]);
 
         // TODO: remove this check and move this config in config_common.yml when dropping support for DoctrineBundle <2.10

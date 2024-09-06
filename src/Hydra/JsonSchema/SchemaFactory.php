@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Hydra\JsonSchema;
 
 use ApiPlatform\JsonLd\ContextBuilder;
+use ApiPlatform\JsonLd\Serializer\HydraPrefixTrait;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryAwareInterface;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
@@ -26,6 +27,7 @@ use ApiPlatform\Metadata\Operation;
  */
 final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareInterface
 {
+    use HydraPrefixTrait;
     private const BASE_PROP = [
         'readOnly' => true,
         'type' => 'string',
@@ -57,7 +59,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         ],
     ] + self::BASE_PROPS;
 
-    public function __construct(private readonly SchemaFactoryInterface $schemaFactory)
+    public function __construct(private readonly SchemaFactoryInterface $schemaFactory, private readonly array $defaultContext = [])
     {
         if ($this->schemaFactory instanceof SchemaFactoryAwareInterface) {
             $this->schemaFactory->setSchemaFactory($this);
@@ -105,17 +107,18 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                     break;
             }
 
+            $hydraPrefix = $this->getHydraPrefix(($serializerContext ?? []) + $this->defaultContext);
             $schema['type'] = 'object';
             $schema['properties'] = [
-                'hydra:member' => [
+                $hydraPrefix.'member' => [
                     'type' => 'array',
                     'items' => $items,
                 ],
-                'hydra:totalItems' => [
+                $hydraPrefix.'totalItems' => [
                     'type' => 'integer',
                     'minimum' => 0,
                 ],
-                'hydra:view' => [
+                $hydraPrefix.'view' => [
                     'type' => 'object',
                     'properties' => [
                         '@id' => [
@@ -125,19 +128,19 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                         '@type' => [
                             'type' => 'string',
                         ],
-                        'hydra:first' => [
+                        $hydraPrefix.'first' => [
                             'type' => 'string',
                             'format' => 'iri-reference',
                         ],
-                        'hydra:last' => [
+                        $hydraPrefix.'last' => [
                             'type' => 'string',
                             'format' => 'iri-reference',
                         ],
-                        'hydra:previous' => [
+                        $hydraPrefix.'previous' => [
                             'type' => 'string',
                             'format' => 'iri-reference',
                         ],
-                        'hydra:next' => [
+                        $hydraPrefix.'next' => [
                             'type' => 'string',
                             'format' => 'iri-reference',
                         ],
@@ -145,19 +148,19 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                     'example' => [
                         '@id' => 'string',
                         'type' => 'string',
-                        'hydra:first' => 'string',
-                        'hydra:last' => 'string',
-                        'hydra:previous' => 'string',
-                        'hydra:next' => 'string',
+                        $hydraPrefix.'first' => 'string',
+                        $hydraPrefix.'last' => 'string',
+                        $hydraPrefix.'previous' => 'string',
+                        $hydraPrefix.'next' => 'string',
                     ],
                 ],
-                'hydra:search' => [
+                $hydraPrefix.'search' => [
                     'type' => 'object',
                     'properties' => [
                         '@type' => ['type' => 'string'],
-                        'hydra:template' => ['type' => 'string'],
-                        'hydra:variableRepresentation' => ['type' => 'string'],
-                        'hydra:mapping' => [
+                        $hydraPrefix.'template' => ['type' => 'string'],
+                        $hydraPrefix.'variableRepresentation' => ['type' => 'string'],
+                        $hydraPrefix.'mapping' => [
                             'type' => 'array',
                             'items' => [
                                 'type' => 'object',
@@ -173,7 +176,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 ],
             ];
             $schema['required'] = [
-                'hydra:member',
+                $hydraPrefix.'member',
             ];
 
             return $schema;

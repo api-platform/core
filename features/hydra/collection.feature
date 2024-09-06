@@ -586,3 +586,11 @@ Feature: Collections support
       }
     }
     """
+
+  Scenario: Hydra collection without prefix
+    When I send a "GET" request to "/no_hydra_prefixes"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON node "totalItems" should exist
+    And the JSON node "member" should exist
