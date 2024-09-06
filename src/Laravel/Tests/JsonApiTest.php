@@ -184,7 +184,7 @@ class JsonApiTest extends TestCase
     {
         $book = Book::first();
         $iri = $this->getIriFromResource($book);
-        $response = $this->delete($iri, ['accept' => 'application/vnd.api+json']);
+        $response = $this->delete($iri, headers: ['accept' => 'application/vnd.api+json']);
         $response->assertStatus(204);
         $this->assertNull(Book::find($book->id));
     }

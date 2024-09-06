@@ -37,6 +37,7 @@ final class SwaggerUiProvider implements ProviderInterface
     public function __construct(
         private readonly ProviderInterface $decorated,
         private readonly OpenApiFactoryInterface $openApiFactory,
+        private readonly bool $swaggerUiEnabled = true,
     ) {
     }
 
@@ -51,6 +52,7 @@ final class SwaggerUiProvider implements ProviderInterface
             !($operation instanceof HttpOperation)
             || !($request = $context['request'] ?? null)
             || 'html' !== $request->getRequestFormat()
+            || !$this->swaggerUiEnabled
         ) {
             return $this->decorated->provide($operation, $uriVariables, $context);
         }

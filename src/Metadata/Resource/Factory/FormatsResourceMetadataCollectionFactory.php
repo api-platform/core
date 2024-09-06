@@ -33,8 +33,12 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
  */
 final class FormatsResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $decorated, private readonly array $formats, private readonly array $patchFormats, private readonly ?array $errorFormats = null)
-    {
+    public function __construct(
+        private readonly ResourceMetadataCollectionFactoryInterface $decorated,
+        private readonly array $formats,
+        private readonly array $patchFormats,
+        private readonly ?array $errorFormats = null,
+    ) {
     }
 
     /**
