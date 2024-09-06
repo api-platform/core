@@ -71,16 +71,16 @@ class EloquentTest extends TestCase
         $response = $this->get('/api/authors', ['accept' => ['application/ld+json']])->json();
         $author = $response['hydra:member'][0];
 
-        $test = $this->get('/api/authors?name='.explode(' ', $author['name'])[0])->json();
+        $test = $this->get('/api/authors?name='.explode(' ', $author['name'])[0], ['accept' => ['application/ld+json']])->json();
         $this->assertSame($test['hydra:member'][0]['id'], $author['id']);
 
-        $test = $this->get('/api/authors?id='.$author['id'])->json();
+        $test = $this->get('/api/authors?id='.$author['id'], ['accept' => ['application/ld+json']])->json();
         $this->assertSame($test['hydra:member'][0]['id'], $author['id']);
     }
 
     public function testOrderFilterWithPropertyPlaceholder(): void
     {
-        $res = $this->get('/api/authors?order[id]=desc');
+        $res = $this->get('/api/authors?order[id]=desc', ['accept' => ['application/ld+json']]);
         $this->assertSame($res['hydra:member'][0]['id'], 10);
     }
 
@@ -90,7 +90,7 @@ class EloquentTest extends TestCase
         $book = $response[0];
         $book2 = $response[1];
 
-        $res = $this->get(\sprintf('/api/books?name2[]=%s&name2[]=%s', $book['name'], $book2['name']))->json();
+        $res = $this->get(\sprintf('/api/books?name2[]=%s&name2[]=%s', $book['name'], $book2['name']), ['accept' => ['application/ld+json']])->json();
         $this->assertSame($res['hydra:totalItems'], 2);
     }
 }
