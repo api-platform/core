@@ -110,6 +110,7 @@ final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsM
                     $tagsA = [
                         ...($a->getGet()?->getTags() ?? []),
                         ...($a->getPost()?->getTags() ?? []),
+                        ...($a->getPatch()?->getTags() ?? []),
                         ...($a->getPut()?->getTags() ?? []),
                         ...($a->getDelete()?->getTags() ?? []),
                     ];
@@ -118,6 +119,7 @@ final class OpenApiNormalizer implements NormalizerInterface, CacheableSupportsM
                     $tagsB = [
                         ...($b->getGet()?->getTags() ?? []),
                         ...($b->getPost()?->getTags() ?? []),
+                        ...($b->getPatch()?->getTags() ?? []),
                         ...($b->getPut()?->getTags() ?? []),
                         ...($b->getDelete()?->getTags() ?? []),
                     ];
