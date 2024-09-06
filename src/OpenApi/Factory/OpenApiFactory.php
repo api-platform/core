@@ -67,8 +67,18 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     private ?RouteCollection $routeCollection = null;
     private ?ContainerInterface $filterLocator = null;
 
-    public function __construct(private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly SchemaFactoryInterface $jsonSchemaFactory, ContainerInterface $filterLocator, private readonly array $formats = [], ?Options $openApiOptions = null, ?PaginationOptions $paginationOptions = null, private readonly ?RouterInterface $router = null)
-    {
+    public function __construct(
+        private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory,
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory,
+        private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
+        private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        private readonly SchemaFactoryInterface $jsonSchemaFactory,
+        ?ContainerInterface $filterLocator = null,
+        private readonly array $formats = [],
+        ?Options $openApiOptions = null,
+        ?PaginationOptions $paginationOptions = null,
+        private readonly ?RouterInterface $router = null,
+    ) {
         $this->filterLocator = $filterLocator;
         $this->openApiOptions = $openApiOptions ?: new Options('API Platform');
         $this->paginationOptions = $paginationOptions ?: new PaginationOptions();

@@ -13,7 +13,10 @@ declare(strict_types=1);
 
 namespace Workbench\App\Models;
 
-use ApiPlatform\Laravel\Eloquent\Filter\SearchFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\DateFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\EqualsFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\OrFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\PartialSearchFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -41,7 +44,14 @@ use Workbench\App\Http\Requests\BookFormRequest;
         new GetCollection(),
     ]
 )]
-#[QueryParameter(key: ':property', filter: SearchFilter::class)]
+#[QueryParameter(key: 'isbn', filter: PartialSearchFilter::class)]
+#[QueryParameter(key: 'name', filter: PartialSearchFilter::class)]
+#[QueryParameter(key: 'publicationDate', filter: DateFilter::class)]
+#[QueryParameter(
+    key: 'name2',
+    filter: new OrFilter(new EqualsFilter()),
+    property: 'name'
+)]
 class Book extends Model
 {
     use HasFactory;

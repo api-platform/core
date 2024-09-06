@@ -46,7 +46,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         private readonly NormalizerInterface $collectionNormalizer,
         private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
         private readonly ResourceClassResolverInterface $resourceClassResolver,
-        ContainerInterface $filterLocator,
+        ?ContainerInterface $filterLocator = null,
         private readonly array $defaultContext = [],
     ) {
         $this->filterLocator = $filterLocator;

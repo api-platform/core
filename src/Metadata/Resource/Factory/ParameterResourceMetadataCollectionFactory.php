@@ -14,15 +14,19 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\FilterInterface;
+use ApiPlatform\Metadata\HasOpenApiParameterFilterInterface;
+use ApiPlatform\Metadata\HasSchemaFilterInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Parameters;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use ApiPlatform\Serializer\Filter\FilterInterface as SerializerFilterInterface;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\DivisibleBy;
@@ -45,14 +49,28 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 final class ParameterResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    public function __construct(private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null, private readonly ?ContainerInterface $filterLocator = null)
-    {
+    public function __construct(
+        private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
+        private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null,
+        private readonly ?ContainerInterface $filterLocator = null,
+        private readonly ?NameConverterInterface $nameConverter = null,
+    ) {
     }
 
     public function create(string $resourceClass): ResourceMetadataCollection
     {
         $resourceMetadataCollection = $this->decorated?->create($resourceClass) ?? new ResourceMetadataCollection($resourceClass);
 
+        $propertyNames = [];
+        foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $i => $property) {
+            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
+            if ($propertyMetadata->isReadable()) {
+                $propertyNames[] = $property;
+            }
+        }
+
+        $properties = array_flip($propertyNames);
         foreach ($resourceMetadataCollection as $i => $resource) {
             $operations = $resource->getOperations();
 
@@ -61,10 +79,11 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                 $parameters = $operation->getParameters() ?? new Parameters();
                 foreach ($parameters as $key => $parameter) {
                     if (':property' === $key) {
-                        foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
-                            $parameter = $this->setDefaults($property, $parameter, $resourceClass);
-                            $priority = $parameter->getPriority() ?? $internalPriority--;
-                            $parameters->add($property, $parameter->withPriority($priority)->withProperty($property)->withKey($property));
+                        foreach ($propertyNames as $property) {
+                            $converted = $this->nameConverter?->denormalize($property) ?? $property;
+                            $propertyParameter = $this->setDefaults($converted, $parameter, $resourceClass, $properties);
+                            $priority = $propertyParameter->getPriority() ?? $internalPriority--;
+                            $parameters->add($converted, $this->addFilterMetadata($propertyParameter->withPriority($priority)->withKey($converted)));
                         }
 
                         $parameters->remove($key, $parameter::class);
@@ -72,9 +91,19 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                     }
 
                     $key = $parameter->getKey() ?? $key;
-                    $parameter = $this->setDefaults($key, $parameter, $resourceClass);
+
+                    if (str_contains($key, ':property')) {
+                        $p = [];
+                        foreach ($propertyNames as $prop) {
+                            $p[$this->nameConverter?->denormalize($prop) ?? $prop] = $prop;
+                        }
+
+                        $parameter = $parameter->withExtraProperties(($parameter->getExtraProperties() ?? []) + ['_properties' => $p]);
+                    }
+
+                    $parameter = $this->setDefaults($key, $parameter, $resourceClass, $properties);
                     $priority = $parameter->getPriority() ?? $internalPriority--;
-                    $parameters->add($key, $parameter->withPriority($priority));
+                    $parameters->add($key, $this->addFilterMetadata($parameter->withPriority($priority)));
                 }
 
                 // As we deprecate the parameter validator, we declare a parameter for each filter transfering validation to the new system
@@ -98,7 +127,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                 $parameters = $operation->getParameters() ?? new Parameters();
                 foreach ($operation->getParameters() ?? [] as $key => $parameter) {
                     $key = $parameter->getKey() ?? $key;
-                    $parameter = $this->setDefaults($key, $parameter, $resourceClass);
+                    $parameter = $this->setDefaults($key, $parameter, $resourceClass, $properties);
                     $priority = $parameter->getPriority() ?? $internalPriority--;
                     $parameters->add($key, $parameter->withPriority($priority));
                 }
@@ -112,7 +141,37 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         return $resourceMetadataCollection;
     }
 
-    private function setDefaults(string $key, Parameter $parameter, string $resourceClass): Parameter
+    private function addFilterMetadata(Parameter $parameter): Parameter
+    {
+        if (!($filterId = $parameter->getFilter())) {
+            return $parameter;
+        }
+
+        $filter = \is_object($filterId) ? $filterId : $this->filterLocator->get($filterId);
+
+        if (!$filter) {
+            return $parameter;
+        }
+
+        if (null === $parameter->getSchema() && $filter instanceof HasSchemaFilterInterface) {
+            if ($schema = $filter->getSchema($parameter)) {
+                $parameter = $parameter->withSchema($schema);
+            }
+        }
+
+        if (null === $parameter->getOpenApi() && $filter instanceof HasOpenApiParameterFilterInterface) {
+            if ($openApiParameter = $filter->getOpenApiParameter($parameter)) {
+                $parameter = $parameter->withOpenApi($openApiParameter);
+            }
+        }
+
+        return $parameter;
+    }
+
+    /**
+     * @param array<string, int> $properties
+     */
+    private function setDefaults(string $key, Parameter $parameter, string $resourceClass, array $properties): Parameter
     {
         if (null === $parameter->getKey()) {
             $parameter = $parameter->withKey($key);
@@ -135,6 +194,14 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
 
         if (null === $parameter->getProperty() && ($property = $description[$key]['property'] ?? null)) {
             $parameter = $parameter->withProperty($property);
+        }
+
+        if (null === $parameter->getProperty() && isset($properties[$key])) {
+            $parameter = $parameter->withProperty($key);
+        }
+
+        if (null === $parameter->getProperty() && $this->nameConverter && ($nameConvertedKey = $this->nameConverter->normalize($key)) && isset($properties[$nameConvertedKey])) {
+            $parameter = $parameter->withProperty($key)->withExtraProperties(['_query_property' => $nameConvertedKey] + $parameter->getExtraProperties());
         }
 
         if (null === $parameter->getRequired() && ($required = $description[$key]['required'] ?? null)) {

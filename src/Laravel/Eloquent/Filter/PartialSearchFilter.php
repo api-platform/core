@@ -17,19 +17,16 @@ use ApiPlatform\Metadata\Parameter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
-final class SearchFilter implements FilterInterface
+final class PartialSearchFilter implements FilterInterface
 {
+    use QueryPropertyTrait;
+
     /**
      * @param Builder<Model>       $builder
      * @param array<string, mixed> $context
      */
     public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder
     {
-        return $builder->where($parameter->getProperty(), $values);
-    }
-
-    public function getDescription(string $resourceClass): array
-    {
-        return [];
+        return $builder->{$context['whereClause'] ?? 'where'}($this->getQueryProperty($parameter), 'like', '%'.$values.'%');
     }
 }

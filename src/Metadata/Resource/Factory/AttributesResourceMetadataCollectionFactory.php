@@ -46,10 +46,11 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
             }
         }
 
-        foreach ($this->buildResourceOperations($metadataCollection, $resourceClass) as $resource) {
-            $resourceMetadataCollection[] = $resource;
+        $resultCollection = new ResourceMetadataCollection($resourceClass);
+        foreach ($this->buildResourceOperations($metadataCollection, $resourceClass, iterator_to_array($resourceMetadataCollection)) as $resource) {
+            $resultCollection[] = $resource;
         }
 
-        return $resourceMetadataCollection;
+        return $resultCollection;
     }
 }

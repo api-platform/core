@@ -80,6 +80,7 @@
 
         <service id="api_platform.metadata.resource.metadata_collection_factory.parameter" class="ApiPlatform\Metadata\Resource\Factory\ParameterResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" public="false" decoration-priority="1000">
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.parameter.inner" />
             <argument type="service" id="api_platform.filter_locator" />
         </service>

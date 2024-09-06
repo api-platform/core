@@ -62,10 +62,9 @@ trait MetadataCollectionFactoryTrait
      *
      * @return ApiResource[]
      */
-    private function buildResourceOperations(array $metadataCollection, string $resourceClass): array
+    private function buildResourceOperations(array $metadataCollection, string $resourceClass, array $resources = []): array
     {
         $shortName = (false !== $pos = strrpos($resourceClass, '\\')) ? substr($resourceClass, $pos + 1) : $resourceClass;
-        $resources = [];
         $index = -1;
         $operationPriority = 0;
         $hasApiResource = false;

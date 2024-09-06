@@ -15,6 +15,7 @@ namespace ApiPlatform\Metadata\Tests\Resource\Factory;
 
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\Parameters;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\Resource\Factory\AttributesResourceMetadataCollectionFactory;
@@ -29,6 +30,7 @@ class ParameterResourceMetadataCollectionFactoryTests extends TestCase
     public function testParameterFactory(): void
     {
         $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
         $filterLocator = $this->createStub(ContainerInterface::class);
         $filterLocator->method('has')->willReturn(true);
         $filterLocator->method('get')->willReturn(new class implements FilterInterface {
@@ -50,7 +52,12 @@ class ParameterResourceMetadataCollectionFactoryTests extends TestCase
                 ];
             }
         });
-        $parameter = new ParameterResourceMetadataCollectionFactory($nameCollection, new AttributesResourceMetadataCollectionFactory(), $filterLocator);
+        $parameter = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
         $operation = $parameter->create(WithParameter::class)->getOperation('collection');
         $this->assertInstanceOf(Parameters::class, $parameters = $operation->getParameters());
         $hydraParameter = $parameters->get('hydra', QueryParameter::class);
