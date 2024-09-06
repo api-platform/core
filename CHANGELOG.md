@@ -1,5 +1,40 @@
 # Changelog
 
+## v4.0.0-alpha.5
+
+### Bug fixes
+
+* [0a461d749](https://github.com/api-platform/core/commit/0a461d749b7b4ac706f3b7b6138a13cb6e4a9d2d) fix(symfony): allow schema restriction for collection like property from choice constraint (#6520)
+* [0c66a494d](https://github.com/api-platform/core/commit/0c66a494d3bda5817e59da2e43f0232e2e8fea15) fix(laravel): cache metadata, add trace on debug mode (#6555)
+* [1b6e7c6cc](https://github.com/api-platform/core/commit/1b6e7c6ccf3d2c61816a7dceb35f1d5980ea0565) fix(laravel): disable GraphQL by default and fix provider
+* [290944103](https://github.com/api-platform/core/commit/290944103039a4a6d64904d1a89264b800c809d5) fix(laravel): SwaggerUI title (#6527)
+* [2df0860b5](https://github.com/api-platform/core/commit/2df0860b577bb1ae0882096436f3eaeb91281901) fix(laravel): Eloquent date and datetime type detection (#6529)
+* [2fc74f2e6](https://github.com/api-platform/core/commit/2fc74f2e651f229e982343c1cb0c6a2c5d5eee64) fix: remove PUT from default operations (#6570)
+* [3b42c9ff2](https://github.com/api-platform/core/commit/3b42c9ff235de5feac555d0283c513a6e4643953) fix: deserialization path for not denormalizable relations collected errors (#6537)
+* [3c554a605](https://github.com/api-platform/core/commit/3c554a605ec9d5f36dfd852c4f93f0ce582064c9) fix(laravel): docs _format and open swagger ui (#6595)
+* [3c5aea80f](https://github.com/api-platform/core/commit/3c5aea80fdbed20216764f6d721fe4f37cf2889d) fix(symfony): load isApiResource metadata (#6562)
+* [4ee209eff](https://github.com/api-platform/core/commit/4ee209effb0fd11789db9f016d6e90aa3cb942a9) fix(laravel): visible and hidden fields support (#6538)
+* [6e15eb95f](https://github.com/api-platform/core/commit/6e15eb95fffb2deec3d381f5d6fd87e189772270) fix(laravel): register HydraPartialCollectionViewNormalizer (#6588)
+* [86365be2a](https://github.com/api-platform/core/commit/86365be2a5b8e8d0050e09d4e401bb758aa8b7a8) fix(laravel): Eloquent PropertyAccessor (#6536)
+* [a1dd0b54d](https://github.com/api-platform/core/commit/a1dd0b54d137d70f2163fa03690c1f4c74a549c0) fix(laravel): entrypoint with doc formats (#6552)
+* [a4a53ab48](https://github.com/api-platform/core/commit/a4a53ab4838f4d17d3677952157b44ec165e3e3a) fix(laravel): identitifer is not writable unless marked as writable (#6531)
+* [a6f355358](https://github.com/api-platform/core/commit/a6f355358a88e7cf7759db0dee41e185157ddc68) fix(laravel): do not normalize exception originalTrace (#6533)
+* [bd6a57c4c](https://github.com/api-platform/core/commit/bd6a57c4c0b38d6f880a5bd79031a87033f707e6) fix(laravel): snake case props (#6532)
+* [c31566602](https://github.com/api-platform/core/commit/c315666022185839742b8c5ef81601d85d8c3f4b) fix(laravel): api_doc route regex
+* [ebc61d59d](https://github.com/api-platform/core/commit/ebc61d59d60eda3a020593cf4cb46c5d30548e46) fix(laravel): entrypoint serialization (#6541)
+
+
+### Features
+
+* [03357fb90](https://github.com/api-platform/core/commit/03357fb90ac0003f0cec2002df01711d0fb99a1e) feat(laravel): supports more Eloquent types (#6544)
+* [05e75be83](https://github.com/api-platform/core/commit/05e75be834c629e0487caaaedfe9fdf0bd5a7226) feat(doctrine): add new filter for filtering an entity using PHP backed enum, resolves #6506 (#6547) (#6560)
+* [538648840](https://github.com/api-platform/core/commit/538648840dc7439b12033ed6f413f3167705da4d) feat(laravel): enable graphQl support (#6550)
+* [5b9767be2](https://github.com/api-platform/core/commit/5b9767be215afdf61fccf8490d0a3a7018078ce5) feat(laravel): policy, auth and gate (#6523)
+* [5e1233c57](https://github.com/api-platform/core/commit/5e1233c57a497d00a7c4bd3e3ad0cac25aeac014) feat(laravel): search filter (#6534)
+* [9c461626f](https://github.com/api-platform/core/commit/9c461626f7d02f8d15487134b636f11966c19a5e) feat(laravel): provide a trait in addition to the annotation (#6543)
+* [c9f18d4fb](https://github.com/api-platform/core/commit/c9f18d4fb833ea0b89ef18021cad491cf0600ef1)  feat(laravel): eloquent filters (search, date, equals, or) (#6593)
+* [e09e73efc](https://github.com/api-platform/core/commit/e09e73efc5b4a39ab33d00c5d5422d8d9f7b5e89) feat: remove hydra prefix (#6418)
+
 ## v4.0.0-alpha.1
 
 ### Bug fixes
