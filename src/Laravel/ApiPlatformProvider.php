@@ -47,6 +47,7 @@ use ApiPlatform\GraphQl\Type\TypesFactory;
 use ApiPlatform\GraphQl\Type\TypesFactoryInterface;
 use ApiPlatform\Hydra\JsonSchema\SchemaFactory as HydraSchemaFactory;
 use ApiPlatform\Hydra\Serializer\CollectionNormalizer as HydraCollectionNormalizer;
+use ApiPlatform\Hydra\Serializer\CollectionFiltersNormalizer as HydraFiltersCollectionNormalizer;
 use ApiPlatform\Hydra\Serializer\DocumentationNormalizer as HydraDocumentationNormalizer;
 use ApiPlatform\Hydra\Serializer\EntrypointNormalizer as HydraEntrypointNormalizer;
 use ApiPlatform\Hydra\Serializer\PartialCollectionViewNormalizer as HydraPartialCollectionViewNormalizer;
@@ -73,16 +74,11 @@ use ApiPlatform\Laravel\ApiResource\Error;
 use ApiPlatform\Laravel\Controller\ApiPlatformController;
 use ApiPlatform\Laravel\Eloquent\Extension\FilterQueryExtension;
 use ApiPlatform\Laravel\Eloquent\Extension\QueryExtensionInterface;
-use ApiPlatform\Laravel\Eloquent\Filter\AfterDateFilter;
-use ApiPlatform\Laravel\Eloquent\Filter\BeforeDateFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\DateFilter;
-use ApiPlatform\Laravel\Eloquent\Filter\EndSearchFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\EqualsFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\FilterInterface as EloquentFilterInterface;
 use ApiPlatform\Laravel\Eloquent\Filter\OrderFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\PartialSearchFilter;
-use ApiPlatform\Laravel\Eloquent\Filter\RangeFilter;
-use ApiPlatform\Laravel\Eloquent\Filter\StartSearchFilter;
 use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentAttributePropertyMetadataFactory;
 use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentPropertyMetadataFactory;
 use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentPropertyNameCollectionMetadataFactory;
@@ -387,7 +383,7 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->bind(OperationMetadataFactoryInterface::class, OperationMetadataFactory::class);
 
-        $this->app->tag([EqualsFilter::class, PartialSearchFilter::class, StartSearchFilter::class, EndSearchFilter::class, RangeFilter::class, DateFilter::class, BeforeDateFilter::class, AfterDateFilter::class, OrderFilter::class], EloquentFilterInterface::class);
+        $this->app->tag([EqualsFilter::class, PartialSearchFilter::class, DateFilter::class, OrderFilter::class], EloquentFilterInterface::class);
 
         $this->app->bind(FilterQueryExtension::class, function (Application $app) {
             $tagged = iterator_to_array($app->tagged(EloquentFilterInterface::class));
@@ -747,12 +743,16 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->singleton(HydraPartialCollectionViewNormalizer::class, function (Application $app) use ($defaultContext) {
             return new HydraPartialCollectionViewNormalizer(
-                new HydraCollectionNormalizer(
-                    $app->make(ContextBuilderInterface::class),
-                    $app->make(ResourceClassResolverInterface::class),
-                    $app->make(IriConverterInterface::class),
+                new HydraFiltersCollectionNormalizer(
+                    new HydraCollectionNormalizer(
+                        $app->make(ContextBuilderInterface::class),
+                        $app->make(ResourceClassResolverInterface::class),
+                        $app->make(IriConverterInterface::class),
+                        $app->make(ResourceMetadataCollectionFactoryInterface::class),
+                        $defaultContext
+                    ),
                     $app->make(ResourceMetadataCollectionFactoryInterface::class),
-                    $defaultContext
+                    $app->make(ResourceClassResolverInterface::class),
                 ),
                 'page',
                 'pagination',

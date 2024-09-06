@@ -17,6 +17,7 @@ use ApiPlatform\Laravel\Test\ApiTestAssertionsTrait;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
+use UnexpectedValueException;
 
 class EloquentTest extends TestCase
 {
@@ -29,7 +30,7 @@ class EloquentTest extends TestCase
         $response = $this->get('/api/books', ['accept' => ['application/ld+json']]);
         $book = $response->json()['hydra:member'][0];
 
-        $response = $this->get('/api/books?isbn='.$book['isbn'], ['accept' => ['application/ld+json']]);
+        $response = $this->get('/api/books?isbn=' . $book['isbn'], ['accept' => ['application/ld+json']]);
         $this->assertSame($response->json()['hydra:member'][0], $book);
     }
 
@@ -38,29 +39,31 @@ class EloquentTest extends TestCase
         $response = $this->get('/api/books', ['accept' => ['application/ld+json']]);
         $book = $response->json()['hydra:member'][0];
 
-        $name = substr($book['name'], 0, strpos($book['name'], ' '));
+        if (!isset($book['name'])) {
+            throw new UnexpectedValueException;
+        }
 
-        $response = $this->get('/api/books?name='.$name, ['accept' => ['application/ld+json']]);
+        $end = strpos($book['name'], ' ') ?: 3;
+        $name = substr($book['name'], 0, $end);
+
+        $response = $this->get('/api/books?name=' . $name, ['accept' => ['application/ld+json']]);
         $this->assertSame($response->json()['hydra:member'][0], $book);
     }
 
     public function testDateSearchFilter(): void
     {
-        // get the 1st book object return
         $response = $this->get('/api/books', ['accept' => ['application/ld+json']]);
         $book = $response->json()['hydra:member'][0];
-
-        // patch to add a specific date to test on
-        $this->patch(
+        $updated = $this->patchJson(
             $book['@id'],
-            ['publicationDate' => '2024-18-02 00:00:00'],
+            ['publicationDate' => '2024-02-18 00:00:00'],
             [
                 'accept' => ['application/ld+json'],
                 'Content-Type' => ['application/merge-patch+json'],
             ]
         );
 
-        $response = $this->get('/api/books?publicationDate='.$book['publicationDate'], ['accept' => ['application/ld+json']]);
-        $this->assertSame($response->json()['hydra:member'][0], $book);
+        $response = $this->get('/api/books?publicationDate=' . $updated['publicationDate'], ['accept' => ['application/ld+json']]);
+        $this->assertSame($response->json()['hydra:member'][0]['@id'], $book['@id']);
     }
 }

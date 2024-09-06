@@ -13,13 +13,10 @@ declare(strict_types=1);
 
 namespace Workbench\App\Models;
 
-use ApiPlatform\Laravel\Eloquent\Filter\AfterDateFilter;
-use ApiPlatform\Laravel\Eloquent\Filter\BeforeDateFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\DateFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\OrderFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\OrFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\PartialSearchFilter;
-use ApiPlatform\Laravel\Eloquent\Filter\RangeFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -60,7 +57,7 @@ use Workbench\App\Http\Requests\BookFormRequest;
     filterContext: ['nulls_comparison' => 'exclude_null']
 )]
 #[QueryParameter(key: 'isbn_range[lt]', schema: ['type' => 'string'], filter: RangeFilter::class, property: 'isbn')]
-#[QueryParameter(key: 'order[name]', schema: ['type' => 'string'], filter: OrderFilter::class, property: 'name')]
+#[QueryParameter(key: 'order[:property]', schema: ['type' => 'string'], filter: OrderFilter::class, property: 'name')]
 #[QueryParameter(
     key: 'name2',
     schema: ['type' => 'array', 'items' => ['type' => 'string']],
