@@ -35,7 +35,6 @@
         "phpunit/phpunit": "^11.2",
         "symfony/cache": "^6.4 || ^7.1",
         "symfony/framework-bundle": "^6.4 || ^7.1",
-        "symfony/phpunit-bridge": "^6.4 || ^7.0",
         "symfony/property-access": "^6.4 || ^7.0",
         "symfony/serializer": "^6.4 || ^7.0",
         "symfony/uid": "^6.4 || ^7.1",

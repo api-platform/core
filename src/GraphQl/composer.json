@@ -34,8 +34,8 @@
         "api-platform/validator": "^3.4 || ^4.0",
         "twig/twig": "^3.7",
         "symfony/mercure-bundle": "*",
-        "symfony/phpunit-bridge": "^6.4 || ^7.1",
-        "symfony/routing": "^6.4 || ^7.1"
+        "symfony/routing": "^6.4 || ^7.1",
+        "phpunit/phpunit": "^11.2"
     },
     "autoload": {
         "psr-4": {

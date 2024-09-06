@@ -26,9 +26,9 @@
     },
     "require-dev": {
         "phpspec/prophecy-phpunit": "^2.2",
-        "symfony/phpunit-bridge": "^6.4",
         "ramsey/uuid": "^4.0",
-        "ramsey/uuid-doctrine": "^2.0"
+        "ramsey/uuid-doctrine": "^2.0",
+        "phpunit/phpunit": "^11.2"
     },
     "autoload": {
         "psr-4": {
