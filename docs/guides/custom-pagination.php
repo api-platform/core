@@ -7,7 +7,7 @@
 // tags: expert
 // ---
 
-// In case you're using a custom collection (through a Provider), make sure you return the `Paginator` object to get the full hydra response with `hydra:view` (which contains information about first, last, next and previous page).
+// In case you're using a custom collection (through a Provider), make sure you return the `Paginator` object to get the full hydra response with `view` (which contains information about first, last, next and previous page).
 //
 // The following example shows how to handle it using a custom Provider. You will need to use the Doctrine Paginator and pass it to the API Platform Paginator.
 
@@ -160,15 +160,15 @@ namespace App\Tests {
 
             $this->assertResponseIsSuccessful();
             $this->assertMatchesResourceCollectionJsonSchema(Book::class, '_api_/books{._format}_get_collection', 'jsonld');
-            $this->assertNotSame(0, $response->toArray(false)['hydra:totalItems'], 'The collection is empty.');
+            $this->assertNotSame(0, $response->toArray(false)['totalItems'], 'The collection is empty.');
             $this->assertJsonContains([
-                'hydra:totalItems' => 35,
-                'hydra:view' => [
+                'totalItems' => 35,
+                'view' => [
                     '@id' => '/books.jsonld?page=1',
-                    '@type' => 'hydra:PartialCollectionView',
-                    'hydra:first' => '/books.jsonld?page=1',
-                    'hydra:last' => '/books.jsonld?page=2',
-                    'hydra:next' => '/books.jsonld?page=2',
+                    '@type' => 'PartialCollectionView',
+                    'first' => '/books.jsonld?page=1',
+                    'last' => '/books.jsonld?page=2',
+                    'next' => '/books.jsonld?page=2',
                 ],
             ]);
         }

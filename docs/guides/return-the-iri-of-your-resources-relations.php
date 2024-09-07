@@ -157,7 +157,7 @@ namespace App\ApiResource {
 //
 // The **OpenAPI** documentation will set the properties as `read-only` of type `string` in the format `iri-reference` for `JSON-LD`, `JSON:API` and `HAL` formats.
 //
-// The **Hydra** documentation will set the properties as `hydra:Link` with the right domain, with `hydra:readable` to `true` but `hydra:writable` to `false`.
+// The **Hydra** documentation will set the properties as `Link` with the right domain, with `readable` to `true` but `writable` to `false`.
 //
 // When using JSON:API or HAL formats, the IRI will be used and set links, embedded and relationship.
 //

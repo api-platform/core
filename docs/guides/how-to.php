@@ -137,9 +137,9 @@ namespace App\Tests {
 
             $this->assertResponseIsSuccessful();
             $this->assertMatchesResourceCollectionJsonSchema(Book::class, '_api_/books{._format}_get_collection', 'jsonld');
-            $this->assertNotSame(0, $response->toArray(false)['hydra:totalItems'], 'The collection is empty.');
+            $this->assertNotSame(0, $response->toArray(false)['totalItems'], 'The collection is empty.');
             $this->assertJsonContains([
-                'hydra:totalItems' => 10,
+                'totalItems' => 10,
             ]);
         }
     }

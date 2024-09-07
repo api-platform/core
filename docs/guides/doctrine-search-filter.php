@@ -118,11 +118,11 @@ namespace App\Tests {
             $this->assertResponseIsSuccessful();
             $this->assertMatchesResourceCollectionJsonSchema(Book::class, '_api_books{._format}_get_collection', 'jsonld');
             $this->assertJsonContains([
-                'hydra:search' => [
-                    '@type' => 'hydra:IriTemplate',
-                    'hydra:template' => '/books.jsonld{?id,title,author}',
-                    'hydra:variableRepresentation' => 'BasicRepresentation',
-                    'hydra:mapping' => [
+                'search' => [
+                    '@type' => 'IriTemplate',
+                    'template' => '/books.jsonld{?id,title,author}',
+                    'variableRepresentation' => 'BasicRepresentation',
+                    'mapping' => [
                         [
                             '@type' => 'IriTemplateMapping',
                             'variable' => 'id',

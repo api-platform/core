@@ -39,7 +39,7 @@ namespace App\Tests {
             // matches an expected format, for example here with a collection.
             $this->assertMatchesResourceCollectionJsonSchema(Book::class);
             // PHPUnit default assertions are also available.
-            $this->assertCount(0, $response->toArray()['hydra:member']);
+            $this->assertCount(0, $response->toArray()['member']);
         }
     }
 }
