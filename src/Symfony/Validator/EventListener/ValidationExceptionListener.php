@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Validator\EventListener;
 
 use ApiPlatform\Exception\FilterValidationException;
+use ApiPlatform\ParameterValidator\Exception\ValidationException as ParameterValidationException;
 use ApiPlatform\Symfony\EventListener\ExceptionListener;
 use ApiPlatform\Symfony\Validator\Exception\ConstraintViolationListAwareExceptionInterface as SymfonyConstraintViolationListAwareExceptionInterface;
 use ApiPlatform\Util\ErrorFormatGuesser;
@@ -51,7 +52,7 @@ final class ValidationExceptionListener
 
         $exception = $event->getThrowable();
         $hasConstraintViolationList = ($exception instanceof ConstraintViolationListAwareExceptionInterface || $exception instanceof SymfonyConstraintViolationListAwareExceptionInterface);
-        if (!$hasConstraintViolationList && !$exception instanceof FilterValidationException) {
+        if (!$hasConstraintViolationList && !$exception instanceof FilterValidationException && !$exception instanceof ParameterValidationException) {
             return;
         }
 
