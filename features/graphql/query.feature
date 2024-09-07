@@ -677,3 +677,50 @@ Feature: GraphQL query support
     Then the response status code should be 200
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.getSecurityAfterResolver.name" should be equal to "test"
+
+  @createSchema
+  @!mongodb
+  Scenario: Retrieve an item with a subResource collection within an DTO using stateOptions entityClass with an GraphQL query
+    Given there is an issue6590 foo object with 2 bar sub objects
+    When I send the following GraphQL request:
+    """
+    {
+      issue6590OrmFoo(id: "/issue6590_orm_foos/1") {
+        id
+        bars {
+          edges {
+            node {
+              name
+            }
+          }
+        }
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON should be equal to:
+    """
+    {
+      "data": {
+        "issue6590OrmFoo": {
+          "id": "/issue6590_orm_foos/1",
+          "bars": {
+            "edges": [
+              {
+                "node": {
+                  "name": "bar1"
+                }
+              },
+              {
+                "node": {
+                  "name": "bar2"
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+    """
