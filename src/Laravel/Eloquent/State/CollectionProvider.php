@@ -15,6 +15,7 @@ namespace ApiPlatform\Laravel\Eloquent\State;
 
 use ApiPlatform\Laravel\Eloquent\Extension\QueryExtensionInterface;
 use ApiPlatform\Laravel\Eloquent\Paginator;
+use ApiPlatform\Laravel\Eloquent\PartialPaginator;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\ProviderInterface;
@@ -23,7 +24,7 @@ use Illuminate\Database\Eloquent\Model;
 use Psr\Container\ContainerInterface;
 
 /**
- * @implements ProviderInterface<Paginator|Collection<int, Model>>
+ * @implements ProviderInterface<Paginator|Collection<int, Model>|PartialPaginator>
  */
 final class CollectionProvider implements ProviderInterface
 {
@@ -61,12 +62,17 @@ final class CollectionProvider implements ProviderInterface
             return $query->get();
         }
 
-        return new Paginator(
-            $query
-                ->paginate(
-                    perPage: $this->pagination->getLimit($operation, $context),
-                    page: $this->pagination->getPage($context),
-                )
-        );
+        $isPartial = $operation->getPaginationPartial();
+        $collection = $query
+            ->{$isPartial ? 'simplePaginate' : 'paginate'}(
+                perPage: $this->pagination->getLimit($operation, $context),
+                page: $this->pagination->getPage($context),
+            );
+
+        if ($isPartial) {
+            return new PartialPaginator($collection);
+        }
+
+        return new Paginator($collection);
     }
 }
