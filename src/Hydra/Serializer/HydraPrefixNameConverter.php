@@ -17,14 +17,18 @@ use ApiPlatform\JsonLd\ContextBuilder;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
-final class HydraPrefixNameConverter implements NameConverterInterface, AdvancedNameConverterInterface
+final readonly class HydraPrefixNameConverter implements NameConverterInterface, AdvancedNameConverterInterface
 {
-    public function __construct(private readonly NameConverterInterface $nameConverter)
+    /**
+     * @param array<string,mixed> $defaultContext
+     */
+    public function __construct(private NameConverterInterface $nameConverter, private array $defaultContext = [])
     {
     }
 
     public function normalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
     {
+        $context += $this->defaultContext;
         $name = $this->nameConverter->normalize($propertyName, $class, $format, $context);
 
         if (true === ($context[ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX] ?? true)) {
