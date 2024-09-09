@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\State;
 
-use ApiPlatform\Laravel\ApiResource\ValidationError;
 use ApiPlatform\Metadata\Error;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
@@ -27,6 +26,8 @@ use Illuminate\Validation\ValidationException;
  */
 final class ValidateProvider implements ProviderInterface
 {
+    use ValidationErrorTrait;
+
     /**
      * @param ProviderInterface<object> $inner
      */
@@ -55,7 +56,7 @@ final class ValidateProvider implements ProviderInterface
                 $this->app->make($rules);
                 // } catch (AuthorizationException $e) { // TODO: we may want to catch this to transform to an error
             } catch (ValidationException $e) { // @phpstan-ignore-line make->($rules) may throw this
-                throw $this->getValidationError($e);
+                throw $this->getValidationError($e->validator, $e);
             }
 
             return $body;
@@ -65,21 +66,11 @@ final class ValidateProvider implements ProviderInterface
             return $body;
         }
 
-        $validator = Validator::make($request->all(), $rules);
+        $validator = Validator::make($request->request->all(), $rules);
         if ($validator->fails()) {
-            throw $this->getValidationError(new ValidationException($validator));
+            throw $this->getValidationError($validator, new ValidationException($validator));
         }
 
         return $body;
-    }
-
-    private function getValidationError(ValidationException $e): ValidationError
-    {
-        $violations = [];
-        foreach ($e->validator->errors()->messages() as $prop => $message) {
-            $violations[] = ['propertyPath' => $prop, 'message' => implode(\PHP_EOL, $message)];
-        }
-
-        return new ValidationError($e->getMessage(), spl_object_hash($e), $e, $violations);
     }
 }

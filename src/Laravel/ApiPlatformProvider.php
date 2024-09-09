@@ -107,6 +107,7 @@ use ApiPlatform\Laravel\Routing\Router as UrlGeneratorRouter;
 use ApiPlatform\Laravel\Routing\SkolemIriConverter;
 use ApiPlatform\Laravel\Security\ResourceAccessChecker;
 use ApiPlatform\Laravel\State\AccessCheckerProvider;
+use ApiPlatform\Laravel\State\ParameterValidatorProvider;
 use ApiPlatform\Laravel\State\SwaggerUiProcessor;
 use ApiPlatform\Laravel\State\SwaggerUiProvider;
 use ApiPlatform\Laravel\State\ValidateProvider;
@@ -175,6 +176,7 @@ use ApiPlatform\State\Provider\ContentNegotiationProvider;
 use ApiPlatform\State\Provider\DeserializeProvider;
 use ApiPlatform\State\Provider\ParameterProvider;
 use ApiPlatform\State\Provider\ReadProvider;
+use ApiPlatform\State\Provider\SecurityParameterProvider;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\SerializerContextBuilderInterface;
 use Illuminate\Config\Repository as ConfigRepository;
@@ -463,7 +465,15 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->singleton(ParameterProvider::class, function (Application $app) {
             $tagged = iterator_to_array($app->tagged(ParameterProviderInterface::class));
 
-            return new ParameterProvider($app->make(DeserializeProvider::class), new ServiceLocator($tagged));
+            return new ParameterProvider(
+                new ParameterValidatorProvider(
+                    new SecurityParameterProvider(
+                        $app->make(DeserializeProvider::class),
+                        $app->make(ResourceAccessCheckerInterface::class)
+                    ),
+                ),
+                new ServiceLocator($tagged)
+            );
         });
 
         $this->app->singleton(AccessCheckerProvider::class, function (Application $app) {
