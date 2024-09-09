@@ -19,6 +19,11 @@ use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Error;
+use ApiPlatform\Metadata\Exception\OperationNotFoundException;
+use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
+use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\HeaderParameterInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -36,6 +41,7 @@ use ApiPlatform\OpenApi\Model\Link;
 use ApiPlatform\OpenApi\Model\MediaType;
 use ApiPlatform\OpenApi\Model\OAuthFlow;
 use ApiPlatform\OpenApi\Model\OAuthFlows;
+use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use ApiPlatform\OpenApi\Model\PathItem;
 use ApiPlatform\OpenApi\Model\Paths;
@@ -178,15 +184,15 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             if ($openapiAttribute instanceof Webhook) {
                 $pathItem = $openapiAttribute->getPathItem() ?: new PathItem();
-                $openapiOperation = $pathItem->{'get'.ucfirst(strtolower($method))}() ?: new Model\Operation();
+                $openapiOperation = $pathItem->{'get'.ucfirst(strtolower($method))}() ?: new Operation();
             } elseif (!\is_object($openapiAttribute)) {
-                $openapiOperation = new Model\Operation();
+                $openapiOperation = new Operation();
             } else {
                 $openapiOperation = $openapiAttribute;
             }
 
             // Complete with defaults
-            $openapiOperation = new Model\Operation(
+            $openapiOperation = new Operation(
                 operationId: null !== $openapiOperation->getOperationId() ? $openapiOperation->getOperationId() : $this->normalizeOperationName($operationName),
                 tags: null !== $openapiOperation->getTags() ? $openapiOperation->getTags() : [$operation->getShortName() ?: $resourceShortName],
                 responses: null !== $openapiOperation->getResponses() ? $openapiOperation->getResponses() : [],
@@ -279,6 +285,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $openapiOperation = $openapiOperation->withParameters($openapiParameters);
             $existingResponses = $openapiOperation->getResponses() ?: [];
             $overrideResponses = $operation->getExtraProperties()[self::OVERRIDE_OPENAPI_RESPONSES] ?? $this->openApiOptions->getOverrideResponses();
+            if ($operation instanceof HttpOperation && null !== ($errors = $operation->getErrors())) {
+                $openapiOperation = $this->addOperationErrors($openapiOperation, $errors, $responseMimeTypes, $resourceMetadataCollection, $schema, $schemas);
+            }
+
             if ($overrideResponses || !$existingResponses) {
                 // Create responses
                 switch ($method) {
@@ -354,7 +364,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         }
     }
 
-    private function buildOpenApiResponse(array $existingResponses, int|string $status, string $description, ?Model\Operation $openapiOperation = null, ?HttpOperation $operation = null, ?array $responseMimeTypes = null, ?array $operationOutputSchemas = null, ?ResourceMetadataCollection $resourceMetadataCollection = null): Model\Operation
+    private function buildOpenApiResponse(array $existingResponses, int|string $status, string $description, ?Operation $openapiOperation = null, ?HttpOperation $operation = null, ?array $responseMimeTypes = null, ?array $operationOutputSchemas = null, ?ResourceMetadataCollection $resourceMetadataCollection = null): Operation
     {
         if (isset($existingResponses[$status])) {
             return $openapiOperation;
@@ -385,6 +395,9 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         return $content;
     }
 
+    /**
+     * @return array[array<string, string>, array<string, string>]
+     */
     private function getMimeTypes(HttpOperation $operation): array
     {
         $requestFormats = $operation->getInputFormats() ?: [];
@@ -396,6 +409,11 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         return [$requestMimeTypes, $responseMimeTypes];
     }
 
+    /**
+     * @param array<string, string[]> $responseFormats
+     *
+     * @return array<string, string>
+     */
     private function flattenMimeTypes(array $responseFormats): array
     {
         $responseMimeTypes = [];
@@ -662,7 +680,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     /**
      * @return array{0: int, 1: Parameter}|null
      */
-    private function hasParameter(Model\Operation $operation, Parameter $parameter): ?array
+    private function hasParameter(Operation $operation, Parameter $parameter): ?array
     {
         foreach ($operation->getParameters() as $key => $existingParameter) {
             if ($existingParameter->getName() === $parameter->getName() && $existingParameter->getIn() === $parameter->getIn()) {
@@ -701,5 +719,56 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         }
 
         return $actual;
+    }
+
+    /**
+     * @param string[]              $errors
+     * @param array<string, string> $responseMimeTypes
+     */
+    private function addOperationErrors(Operation $operation, array $errors, array $responseMimeTypes, ResourceMetadataCollection $resourceMetadataCollection, Schema $schema, \ArrayObject $schemas): Operation
+    {
+        $existingResponses = null;
+        foreach ($errors as $error) {
+            if (!is_a($error, ProblemExceptionInterface::class, true)) {
+                throw new RuntimeException(\sprintf('The error class "%s" does not implement "%s". Did you forget a use statement?', $error, ProblemExceptionInterface::class));
+            }
+
+            $status = null;
+            $description = null;
+
+            try {
+                /** @var ProblemExceptionInterface $exception */
+                $exception = new $error();
+                $status = $exception->getStatus();
+                $description = $exception->getTitle();
+            } catch (\TypeError) {
+            }
+
+            try {
+                $errorOperation = $this->resourceMetadataFactory->create($error)->getOperation();
+                if (!is_a($errorOperation, Error::class)) {
+                    throw new RuntimeException(\sprintf('The error class %s is not an ErrorResource', $error));
+                }
+            } catch (ResourceClassNotFoundException|OperationNotFoundException) {
+                $errorOperation = null;
+            }
+            $status ??= $errorOperation?->getStatus();
+            $description ??= $errorOperation?->getDescription();
+
+            if (!$status) {
+                throw new RuntimeException(\sprintf('The error class %s has no status defined, please either implement ProblemExceptionInterface, or make it an ErrorResource with a status', $error));
+            }
+
+            $operationErrorSchemas = [];
+            foreach ($responseMimeTypes as $operationFormat) {
+                $operationErrorSchema = $this->jsonSchemaFactory->buildSchema($error, $operationFormat, Schema::TYPE_OUTPUT, null, $schema);
+                $operationErrorSchemas[$operationFormat] = $operationErrorSchema;
+                $this->appendSchemaDefinitions($schemas, $operationErrorSchema->getDefinitions());
+            }
+
+            $operation = $this->buildOpenApiResponse($existingResponses ??= $operation->getResponses() ?: [], $status, $description ?? '', $operation, $errorOperation, $responseMimeTypes, $operationErrorSchemas, $resourceMetadataCollection);
+        }
+
+        return $operation;
     }
 }
