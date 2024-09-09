@@ -52,7 +52,7 @@ final class PersistProcessor implements ProcessorInterface
             \assert(method_exists($manager, 'getReference'));
             $newData = $data;
             $identifiers = array_reverse($uriVariables);
-            $links = $this->getLinks($context['resource_class'] ?? $class, $operation, $context);
+            $links = $this->getLinks($class, $operation, $context);
             $reflectionProperties = $this->getReflectionProperties($data);
 
             // TODO: the call to getReference is most likely to fail with complex identifiers

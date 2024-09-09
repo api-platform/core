@@ -37,7 +37,7 @@ trait LinksHandlerTrait
             return;
         }
 
-        $links = $this->getLinks($context['resource_class'] ?? $resourceClass, $operation, $context);
+        $links = $this->getLinks($resourceClass, $operation, $context);
 
         if (!$links) {
             return;
