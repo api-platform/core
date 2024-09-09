@@ -1,5 +1,6 @@
 <?php
 
+use ApiPlatform\Metadata\UrlGeneratorInterface;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 
@@ -73,5 +74,12 @@ return [
 
     'swagger_ui' => [
         'enabled' => true
+    ],
+
+    'url_generation_strategy' => UrlGeneratorInterface::ABS_PATH,
+
+    'serializer' => [
+        'hydra_prefix' => false,
+        // 'datetime_format' => \DateTimeInterface::RFC3339
     ]
 ];

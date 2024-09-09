@@ -34,10 +34,10 @@ class JsonLdTest extends TestCase
         $response->assertJsonFragment([
             '@context' => '/api/contexts/Book',
             '@id' => '/api/books',
-            '@type' => 'hydra:Collection',
-            'hydra:totalItems' => 10,
+            '@type' => 'Collection',
+            'totalItems' => 10,
         ]);
-        $response->assertJsonCount(5, 'hydra:member');
+        $response->assertJsonCount(5, 'member');
     }
 
     public function testGetBook(): void
@@ -177,22 +177,22 @@ class JsonLdTest extends TestCase
         $response->assertJsonFragment([
             '@context' => '/api/contexts/Post',
             '@id' => '/api/posts',
-            '@type' => 'hydra:Collection',
-            'hydra:totalItems' => 10,
+            '@type' => 'Collection',
+            'totalItems' => 10,
         ]);
-        $response->assertJsonCount(10, 'hydra:member');
-        $postIri = $response->json('hydra:member.0.@id');
-        $commentsIri = $response->json('hydra:member.0.comments');
+        $response->assertJsonCount(10, 'member');
+        $postIri = $response->json('member.0.@id');
+        $commentsIri = $response->json('member.0.comments');
         $this->assertMatchesRegularExpression('~^/api/posts/\d+/comments$~', $commentsIri);
         $response = $this->get($commentsIri, ['accept' => 'application/ld+json']);
         $response->assertJsonFragment([
             '@context' => '/api/contexts/Comment',
             '@id' => $commentsIri,
-            '@type' => 'hydra:Collection',
-            'hydra:totalItems' => 10,
+            '@type' => 'Collection',
+            'totalItems' => 10,
         ]);
 
-        $commentIri = $response->json('hydra:member.0.@id');
+        $commentIri = $response->json('member.0.@id');
         $response = $this->get($commentIri, ['accept' => 'application/ld+json']);
         $response->assertJsonFragment([
             '@id' => $commentIri,
@@ -262,10 +262,10 @@ class JsonLdTest extends TestCase
         $response->assertJsonFragment([
             '@context' => '/api/contexts/Sluggable',
             '@id' => '/api/sluggables',
-            '@type' => 'hydra:Collection',
-            'hydra:totalItems' => 10,
+            '@type' => 'Collection',
+            'totalItems' => 10,
         ]);
-        $iri = $response->json('hydra:member.0.@id');
+        $iri = $response->json('member.0.@id');
         $response = $this->get($iri, ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
     }
