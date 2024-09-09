@@ -66,7 +66,7 @@ trait OperationDefaultsTrait
                 $operation = $operation->{'with'.$upperKey}(array_merge($value, $currentValue));
             }
 
-            if (null !== $currentValue) {
+            if (null !== $currentValue || null === $value) {
                 continue;
             }
 

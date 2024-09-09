@@ -13,37 +13,27 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Eloquent;
 
-use ApiPlatform\State\Pagination\PaginatorInterface;
-use Illuminate\Pagination\LengthAwarePaginator;
+use ApiPlatform\State\Pagination\PartialPaginatorInterface;
+use Illuminate\Pagination\AbstractPaginator;
 use IteratorAggregate;
 
 /**
  * @implements IteratorAggregate<mixed,object>
- * @implements PaginatorInterface<object>
+ * @implements PartialPaginatorInterface<object>
  */
-final class Paginator implements PaginatorInterface, \IteratorAggregate
+final class PartialPaginator implements PartialPaginatorInterface, \IteratorAggregate
 {
     /**
-     * @param LengthAwarePaginator<object> $paginator
+     * @param AbstractPaginator<object> $paginator
      */
     public function __construct(
-        private readonly LengthAwarePaginator $paginator,
+        private readonly AbstractPaginator $paginator,
     ) {
     }
 
     public function count(): int
     {
         return $this->paginator->count();
-    }
-
-    public function getLastPage(): float
-    {
-        return $this->paginator->lastPage();
-    }
-
-    public function getTotalItems(): float
-    {
-        return $this->paginator->total();
     }
 
     public function getCurrentPage(): float

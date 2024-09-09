@@ -349,15 +349,11 @@ class ApiPlatformProvider extends ServiceProvider
                                                                 new ConcernsResourceMetadataCollectionFactory(
                                                                     null,
                                                                     $app->make(LoggerInterface::class),
-                                                                    [
-                                                                        'routePrefix' => $config->get('api-platform.routes.prefix') ?? '/',
-                                                                    ],
+                                                                    $config->get('api-platform.defaults', []),
                                                                     $config->get('api-platform.graphql.enabled'),
                                                                 ),
                                                                 $app->make(LoggerInterface::class),
-                                                                [
-                                                                    'routePrefix' => $config->get('api-platform.routes.prefix') ?? '/',
-                                                                ],
+                                                                $config->get('api-platform.defaults', []),
                                                                 $config->get('api-platform.graphql.enabled'),
                                                             ),
                                                         )
@@ -439,7 +435,8 @@ class ApiPlatformProvider extends ServiceProvider
             /** @var ConfigRepository */
             $config = $app['config'];
 
-            return new JsonApiProvider($app->make(ValidateProvider::class), $config->get('api-platform.collection.order.parameter_name'));
+            // TODO: improve the JsonApiProvider and check the operation parameters for an OrderFilter
+            return new JsonApiProvider($app->make(ValidateProvider::class), 'sort');
         });
 
         $this->app->singleton(DeserializeProvider::class, function (Application $app) {
@@ -679,25 +676,26 @@ class ApiPlatformProvider extends ServiceProvider
             /** @var ConfigRepository */
             $config = $app['config'];
 
-            return new Pagination($config->get('api-platform.collection.pagination'), []);
+            return new Pagination($config->get('api-platform.pagination'), []);
         });
 
         $this->app->singleton(PaginationOptions::class, function (Application $app) {
             /** @var ConfigRepository */
             $config = $app['config'];
-            $pagination = $config->get('api-platform.collection.pagination');
+            $defaults = $config->get('api-platform.defaults');
+            $pagination = $config->get('api-platform.pagination');
 
             return new PaginationOptions(
-                $pagination['enabled'],
+                $defaults['pagination_enabled'],
                 $pagination['page_parameter_name'],
-                $pagination['client_items_per_page'],
+                $defaults['pagination_client_items_per_page'],
                 $pagination['items_per_page_parameter_name'],
-                $pagination['client_enabled'],
+                $defaults['pagination_client_enabled'],
                 $pagination['enabled_parameter_name'],
-                $pagination['items_per_page'],
-                $pagination['maximum_items_per_page'],
-                $pagination['partial'],
-                $pagination['client_partial'],
+                $defaults['pagination_items_per_page'],
+                $defaults['pagination_maximum_items_per_page'],
+                $defaults['pagination_partial'],
+                $defaults['pagination_client_partial'],
                 $pagination['partial_parameter_name'],
             );
         });
@@ -828,7 +826,7 @@ class ApiPlatformProvider extends ServiceProvider
 
             return new JsonApiCollectionNormalizer(
                 $app->make(ResourceClassResolverInterface::class),
-                $config->get('api-platform.collection.pagination.page_parameter_name'),
+                $config->get('api-platform.pagination.page_parameter_name'),
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
             );
         });
@@ -1124,7 +1122,7 @@ class ApiPlatformProvider extends ServiceProvider
         $app->singleton(GraphiQlController::class, function (Application $app) {
             /** @var ConfigRepository */
             $config = $app['config'];
-            $prefix = $config->get('api-platform.routes.prefix') ?? '';
+            $prefix = $config->get('api-platform.defaults.route_prefix') ?? '';
 
             return new GraphiQlController($prefix);
         });
@@ -1194,7 +1192,7 @@ class ApiPlatformProvider extends ServiceProvider
             }
         }
 
-        $prefix = $config->get('api-platform.routes.prefix') ?? '';
+        $prefix = $config->get('api-platform.defaults.route_prefix') ?? '';
         $route = new Route(['GET'], $prefix.'/contexts/{shortName?}{_format?}', [ContextAction::class, '__invoke']);
         $route->name('api_jsonld_context')->middleware(ApiPlatformMiddleware::class);
         $routeCollection->add($route);

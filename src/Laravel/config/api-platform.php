@@ -10,8 +10,6 @@ return [
     'version' => '1.0.0',
 
     'routes' => [
-        'prefix' => '/api',
-        'middleware' => [],
     ],
 
     /*
@@ -42,24 +40,24 @@ return [
         'jsonproblem' => ['application/problem+json'],
     ],
 
-    'collection' => [
-        'pagination' => [
-            'enabled' => true,
-            'partial' => false,
-            'client_enabled' => false,
-            'client_items_per_page' => false,
-            'client_partial' => false,
-            'items_per_page' => 30,
-            'maximum_items_per_page' => null,
-            'page_parameter_name' => 'page',
-            'enabled_parameter_name' => 'pagination',
-            'items_per_page_parameter_name' => 'itemsPerPage',
-            'partial_parameter_name' => 'partial',
-        ],
-        'order' => [
-            'parameter_name' => 'order',
-        ],
+    'defaults' => [
+        'pagination_enabled' => true,
+        'pagination_partial' => false,
+        'pagination_client_enabled' => false,
+		'pagination_client_items_per_page' => false,
+		'pagination_client_partial' => false,
+		'pagination_items_per_page' => 30,
+		'pagination_maximum_items_per_page' => 30,
+        'route_prefix' => '/api',
+        'middleware' => [],
     ],
+
+	'pagination' => [
+		'page_parameter_name' => 'page',
+		'enabled_parameter_name' => 'pagination',
+		'items_per_page_parameter_name' => 'itemsPerPage',
+		'partial_parameter_name' => 'partial',
+	],
 
     'graphql' => [
         'enabled' => false,
