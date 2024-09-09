@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
+use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
 use ApiPlatform\OpenApi\Attributes\Webhook;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\State\OptionsInterface;
@@ -73,11 +74,12 @@ class HttpOperation extends Operation
      *     class?: string|null,
      *     name?: string,
      * }|string|false|null $output {@see https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation}
-     * @param string|array|bool|null $mercure   {@see https://api-platform.com/docs/core/mercure}
-     * @param string|bool|null       $messenger {@see https://api-platform.com/docs/core/messenger/#dispatching-a-resource-through-the-message-bus}
-     * @param string|callable|null   $provider  {@see https://api-platform.com/docs/core/state-providers/#state-providers}
-     * @param string|callable|null   $processor {@see https://api-platform.com/docs/core/state-processors/#state-processors}
-     * @param WebLink[]|null         $links
+     * @param string|array|bool|null                              $mercure   {@see https://api-platform.com/docs/core/mercure}
+     * @param string|bool|null                                    $messenger {@see https://api-platform.com/docs/core/messenger/#dispatching-a-resource-through-the-message-bus}
+     * @param string|callable|null                                $provider  {@see https://api-platform.com/docs/core/state-providers/#state-providers}
+     * @param string|callable|null                                $processor {@see https://api-platform.com/docs/core/state-processors/#state-processors}
+     * @param WebLink[]|null                                      $links
+     * @param array<class-string<ProblemExceptionInterface>>|null $errors
      */
     public function __construct(
         protected string $method = 'GET',
@@ -154,6 +156,7 @@ class HttpOperation extends Operation
         protected bool|OpenApiOperation|Webhook|null $openapi = null,
         protected ?array $exceptionToStatus = null,
         protected ?array $links = null,
+        protected ?array $errors = null,
 
         ?string $shortName = null,
         ?string $class = null,
@@ -620,6 +623,22 @@ class HttpOperation extends Operation
     {
         $self = clone $this;
         $self->links = $links;
+
+        return $self;
+    }
+
+    public function getErrors(): ?array
+    {
+        return $this->errors;
+    }
+
+    /**
+     * @param class-string<ProblemExceptionInterface>[] $errors
+     */
+    public function withErrors(array $errors): self
+    {
+        $self = clone $this;
+        $self->errors = $errors;
 
         return $self;
     }

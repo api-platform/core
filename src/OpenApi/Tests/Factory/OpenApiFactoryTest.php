@@ -20,6 +20,7 @@ use ApiPlatform\JsonSchema\TypeFactory;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Error as ErrorOperation;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\HeaderParameter;
@@ -56,6 +57,7 @@ use ApiPlatform\OpenApi\Model\Server;
 use ApiPlatform\OpenApi\OpenApi;
 use ApiPlatform\OpenApi\Options;
 use ApiPlatform\OpenApi\Tests\Fixtures\Dummy;
+use ApiPlatform\OpenApi\Tests\Fixtures\DummyErrorResource;
 use ApiPlatform\OpenApi\Tests\Fixtures\DummyFilter;
 use ApiPlatform\OpenApi\Tests\Fixtures\OutputDto;
 use ApiPlatform\State\Pagination\PaginationOptions;
@@ -91,173 +93,175 @@ class OpenApiFactoryTest extends TestCase
             )))),
         ]));
 
-        $dummyResource = (new ApiResource())->withOperations(new Operations([
-            'ignored' => new NotExposed(),
-            'ignoredWithUriTemplate' => (new NotExposed())->withUriTemplate('/dummies/{id}'),
-            'getDummyItem' => (new Get())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])]),
-            'putDummyItem' => (new Put())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])]),
-            'deleteDummyItem' => (new Delete())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])]),
-            'customDummyItem' => (new HttpOperation())->withMethod('HEAD')->withUriTemplate('/foo/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])])->withOpenapi(new OpenApiOperation(
-                tags: ['Dummy', 'Profile'],
-                responses: [
-                    '202' => new OpenApiResponse(
-                        description: 'Success',
-                        content: new \ArrayObject([
-                            'application/json' => [
-                                'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                            ],
-                        ]),
-                        headers: new \ArrayObject([
-                            'Foo' => ['description' => 'A nice header', 'schema' => ['type' => 'integer']],
-                        ]),
-                        links: new \ArrayObject([
-                            'Foo' => ['$ref' => '#/components/schemas/Dummy'],
-                        ]),
-                    ),
-                    '205' => new OpenApiResponse(),
-                ],
-                description: 'Custom description',
-                externalDocs: new ExternalDocumentation(
-                    description: 'See also',
-                    url: 'http://schema.example.com/Dummy',
-                ),
-                parameters: [
-                    new Parameter(
-                        name: 'param',
-                        in: 'path',
-                        description: 'Test parameter',
-                        required: true,
-                    ),
-                    new Parameter(
-                        name: 'id',
-                        in: 'path',
-                        description: 'Replace parameter',
-                        required: true,
-                        schema: ['type' => 'string', 'format' => 'uuid'],
-                    ),
-                ],
-                requestBody: new RequestBody(
-                    description: 'Custom request body',
-                    content: new \ArrayObject([
-                        'multipart/form-data' => [
-                            'schema' => [
-                                'type' => 'object',
-                                'properties' => [
-                                    'file' => [
-                                        'type' => 'string',
-                                        'format' => 'binary',
-                                    ],
+        $dummyResource = (new ApiResource())->withOperations(
+            new Operations([
+                'ignored' => new NotExposed(),
+                'ignoredWithUriTemplate' => (new NotExposed())->withUriTemplate('/dummies/{id}'),
+                'getDummyItem' => (new Get())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])]),
+                'putDummyItem' => (new Put())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])]),
+                'deleteDummyItem' => (new Delete())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])]),
+                'customDummyItem' => (new HttpOperation())->withMethod('HEAD')->withUriTemplate('/foo/{id}')->withOperation($baseOperation)->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])])->withOpenapi(new OpenApiOperation(
+                    tags: ['Dummy', 'Profile'],
+                    responses: [
+                        '202' => new OpenApiResponse(
+                            description: 'Success',
+                            content: new \ArrayObject([
+                                'application/json' => [
+                                    'schema' => ['$ref' => '#/components/schemas/Dummy'],
                                 ],
-                            ],
-                        ],
-                    ]),
-                    required: true,
-                ),
-                extensionProperties: ['x-visibility' => 'hide'],
-            )),
-            'custom-http-verb' => (new HttpOperation())->withMethod('TEST')->withOperation($baseOperation),
-            'withRoutePrefix' => (new GetCollection())->withUriTemplate('/dummies')->withRoutePrefix('/prefix')->withOperation($baseOperation),
-            'formatsDummyItem' => (new Put())->withOperation($baseOperation)->withUriTemplate('/formatted/{id}')->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])])->withInputFormats(['json' => ['application/json'], 'csv' => ['text/csv']])->withOutputFormats(['json' => ['application/json'], 'csv' => ['text/csv']]),
-            'getDummyCollection' => (new GetCollection())->withUriTemplate('/dummies')->withOpenapi(new OpenApiOperation(
-                parameters: [
-                    new Parameter(
-                        name: 'page',
-                        in: 'query',
-                        description: 'Test modified collection page number',
-                        required: false,
-                        allowEmptyValue: true,
-                        schema: ['type' => 'integer', 'default' => 1],
+                            ]),
+                            headers: new \ArrayObject([
+                                'Foo' => ['description' => 'A nice header', 'schema' => ['type' => 'integer']],
+                            ]),
+                            links: new \ArrayObject([
+                                'Foo' => ['$ref' => '#/components/schemas/Dummy'],
+                            ]),
+                        ),
+                        '205' => new OpenApiResponse(),
+                    ],
+                    description: 'Custom description',
+                    externalDocs: new ExternalDocumentation(
+                        description: 'See also',
+                        url: 'http://schema.example.com/Dummy',
                     ),
-                ],
-            ))->withOperation($baseOperation),
-            'postDummyCollection' => (new Post())->withUriTemplate('/dummies')->withOperation($baseOperation),
-            // Filtered
-            'filteredDummyCollection' => (new GetCollection())->withUriTemplate('/filtered')->withFilters(['f1', 'f2', 'f3', 'f4', 'f5'])->withOperation($baseOperation),
-            // Paginated
-            'paginatedDummyCollection' => (new GetCollection())->withUriTemplate('/paginated')
-                ->withPaginationClientEnabled(true)
-                ->withPaginationClientItemsPerPage(true)
-                ->withPaginationItemsPerPage(20)
-                ->withPaginationMaximumItemsPerPage(80)
-                ->withOperation($baseOperation),
-            'postDummyCollectionWithRequestBody' => (new Post())->withUriTemplate('/dummiesRequestBody')->withOperation($baseOperation)->withOpenapi(new OpenApiOperation(
-                requestBody: new RequestBody(
-                    description: 'List of Ids',
-                    content: new \ArrayObject([
-                        'application/json' => [
-                            'schema' => [
-                                'type' => 'object',
-                                'properties' => [
-                                    'ids' => [
-                                        'type' => 'array',
-                                        'items' => ['type' => 'string'],
-                                        'example' => [
-                                            '1e677e04-d461-4389-bedc-6d1b665cc9d6',
-                                            '01111b43-f53a-4d50-8639-148850e5da19',
+                    parameters: [
+                        new Parameter(
+                            name: 'param',
+                            in: 'path',
+                            description: 'Test parameter',
+                            required: true,
+                        ),
+                        new Parameter(
+                            name: 'id',
+                            in: 'path',
+                            description: 'Replace parameter',
+                            required: true,
+                            schema: ['type' => 'string', 'format' => 'uuid'],
+                        ),
+                    ],
+                    requestBody: new RequestBody(
+                        description: 'Custom request body',
+                        content: new \ArrayObject([
+                            'multipart/form-data' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'file' => [
+                                            'type' => 'string',
+                                            'format' => 'binary',
                                         ],
                                     ],
                                 ],
                             ],
-                        ],
-                    ]),
-                ),
-            )),
-            'postDummyCollectionWithRequestBodyWithoutContent' => (new Post())->withUriTemplate('/dummiesRequestBodyWithoutContent')->withOperation($baseOperation)->withOpenapi(new OpenApiOperation(
-                requestBody: new RequestBody(
-                    description: 'Extended description for the new Dummy resource',
-                ),
-            )),
-            'putDummyItemWithResponse' => (new Put())->withUriTemplate('/dummyitems/{id}')->withOperation($baseOperation)->withOpenapi(new OpenApiOperation(
-                responses: [
-                    '200' => new OpenApiResponse(
-                        description: 'Success',
+                        ]),
+                        required: true,
+                    ),
+                    extensionProperties: ['x-visibility' => 'hide'],
+                )),
+                'custom-http-verb' => (new HttpOperation())->withMethod('TEST')->withOperation($baseOperation),
+                'withRoutePrefix' => (new GetCollection())->withUriTemplate('/dummies')->withRoutePrefix('/prefix')->withOperation($baseOperation),
+                'formatsDummyItem' => (new Put())->withOperation($baseOperation)->withUriTemplate('/formatted/{id}')->withUriVariables(['id' => (new Link())->withFromClass(Dummy::class)->withIdentifiers(['id'])])->withInputFormats(['json' => ['application/json'], 'csv' => ['text/csv']])->withOutputFormats(['json' => ['application/json'], 'csv' => ['text/csv']]),
+                'getDummyCollection' => (new GetCollection())->withUriTemplate('/dummies')->withOpenapi(new OpenApiOperation(
+                    parameters: [
+                        new Parameter(
+                            name: 'page',
+                            in: 'query',
+                            description: 'Test modified collection page number',
+                            required: false,
+                            allowEmptyValue: true,
+                            schema: ['type' => 'integer', 'default' => 1],
+                        ),
+                    ],
+                ))->withOperation($baseOperation),
+                'postDummyCollection' => (new Post())->withUriTemplate('/dummies')->withOperation($baseOperation),
+                // Filtered
+                'filteredDummyCollection' => (new GetCollection())->withUriTemplate('/filtered')->withFilters(['f1', 'f2', 'f3', 'f4', 'f5'])->withOperation($baseOperation),
+                // Paginated
+                'paginatedDummyCollection' => (new GetCollection())->withUriTemplate('/paginated')
+                    ->withPaginationClientEnabled(true)
+                    ->withPaginationClientItemsPerPage(true)
+                    ->withPaginationItemsPerPage(20)
+                    ->withPaginationMaximumItemsPerPage(80)
+                    ->withOperation($baseOperation),
+                'postDummyCollectionWithRequestBody' => (new Post())->withUriTemplate('/dummiesRequestBody')->withOperation($baseOperation)->withOpenapi(new OpenApiOperation(
+                    requestBody: new RequestBody(
+                        description: 'List of Ids',
                         content: new \ArrayObject([
                             'application/json' => [
-                                'schema' => ['$ref' => '#/components/schemas/Dummy'],
+                                'schema' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'ids' => [
+                                            'type' => 'array',
+                                            'items' => ['type' => 'string'],
+                                            'example' => [
+                                                '1e677e04-d461-4389-bedc-6d1b665cc9d6',
+                                                '01111b43-f53a-4d50-8639-148850e5da19',
+                                            ],
+                                        ],
+                                    ],
+                                ],
                             ],
                         ]),
-                        headers: new \ArrayObject([
-                            'API_KEY' => ['description' => 'Api Key', 'schema' => ['type' => 'string']],
-                        ]),
-                        links: new \ArrayObject([
-                            'link' => ['$ref' => '#/components/schemas/Dummy'],
-                        ]),
                     ),
-                    '400' => new OpenApiResponse(
-                        description: 'Error',
+                )),
+                'postDummyCollectionWithRequestBodyWithoutContent' => (new Post())->withUriTemplate('/dummiesRequestBodyWithoutContent')->withOperation($baseOperation)->withOpenapi(new OpenApiOperation(
+                    requestBody: new RequestBody(
+                        description: 'Extended description for the new Dummy resource',
                     ),
-                ],
-            )),
-            'getDummyItemImageCollection' => (new GetCollection())->withUriTemplate('/dummyitems/{id}/images')->withOperation($baseOperation)->withOpenapi(new OpenApiOperation(
-                responses: [
-                    '200' => new OpenApiResponse(
-                        description: 'Success',
-                    ),
-                ],
-            )),
-            'postDummyItemWithResponse' => (new Post())->withUriTemplate('/dummyitems')->withOperation($baseOperation)->withOpenapi(new OpenApiOperation(
-                responses: [
-                    '201' => new OpenApiResponse(
-                        description: 'Created',
-                        content: new \ArrayObject([
-                            'application/json' => [
-                                'schema' => ['$ref' => '#/components/schemas/Dummy'],
-                            ],
-                        ]),
-                        headers: new \ArrayObject([
-                            'API_KEY' => ['description' => 'Api Key', 'schema' => ['type' => 'string']],
-                        ]),
-                        links: new \ArrayObject([
-                            'link' => ['$ref' => '#/components/schemas/Dummy'],
-                        ]),
-                    ),
-                    '400' => new OpenApiResponse(
-                        description: 'Error',
-                    ),
-                ],
-            )),
-            'postDummyItemWithoutInput' => (new Post())->withUriTemplate('/dummyitem/noinput')->withOperation($baseOperation)->withInput(false),
-        ])
+                )),
+                'putDummyItemWithResponse' => (new Put())->withUriTemplate('/dummyitems/{id}')->withOperation($baseOperation)->withOpenapi(new OpenApiOperation(
+                    responses: [
+                        '200' => new OpenApiResponse(
+                            description: 'Success',
+                            content: new \ArrayObject([
+                                'application/json' => [
+                                    'schema' => ['$ref' => '#/components/schemas/Dummy'],
+                                ],
+                            ]),
+                            headers: new \ArrayObject([
+                                'API_KEY' => ['description' => 'Api Key', 'schema' => ['type' => 'string']],
+                            ]),
+                            links: new \ArrayObject([
+                                'link' => ['$ref' => '#/components/schemas/Dummy'],
+                            ]),
+                        ),
+                        '400' => new OpenApiResponse(
+                            description: 'Error',
+                        ),
+                    ],
+                )),
+                'getDummyItemImageCollection' => (new GetCollection())->withUriTemplate('/dummyitems/{id}/images')->withOperation($baseOperation)->withOpenapi(new OpenApiOperation(
+                    responses: [
+                        '200' => new OpenApiResponse(
+                            description: 'Success',
+                        ),
+                    ],
+                )),
+                'postDummyItemWithResponse' => (new Post())->withUriTemplate('/dummyitems')->withOperation($baseOperation)->withOpenapi(new OpenApiOperation(
+                    responses: [
+                        '201' => new OpenApiResponse(
+                            description: 'Created',
+                            content: new \ArrayObject([
+                                'application/json' => [
+                                    'schema' => ['$ref' => '#/components/schemas/Dummy'],
+                                ],
+                            ]),
+                            headers: new \ArrayObject([
+                                'API_KEY' => ['description' => 'Api Key', 'schema' => ['type' => 'string']],
+                            ]),
+                            links: new \ArrayObject([
+                                'link' => ['$ref' => '#/components/schemas/Dummy'],
+                            ]),
+                        ),
+                        '400' => new OpenApiResponse(
+                            description: 'Error',
+                        ),
+                    ],
+                )),
+                'postDummyItemWithoutInput' => (new Post())->withUriTemplate('/dummyitem/noinput')->withOperation($baseOperation)->withInput(false),
+                'getDummyCollectionWithErrors' => (new GetCollection())->withUriTemplate('erroredDummies')->withErrors([DummyErrorResource::class])->withOperation($baseOperation),
+            ])
         );
 
         $baseOperation = (new HttpOperation())->withTypes(['http://schema.example.com/Dummy'])->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats'])->withClass(Dummy::class)->withShortName('Parameter')->withDescription('This is a dummy');
@@ -273,10 +277,12 @@ class OpenApiFactoryTest extends TestCase
 
         $resourceCollectionMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceCollectionMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, [$dummyResource, $dummyResourceWebhook]));
+        $resourceCollectionMetadataFactoryProphecy->create(DummyErrorResource::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(DummyErrorResource::class, [new ApiResource(operations: [new ErrorOperation(name: 'err', description: 'nice one!')])]));
         $resourceCollectionMetadataFactoryProphecy->create(WithParameter::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(WithParameter::class, [$parameterResource]));
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description', 'dummyDate', 'enum']));
+        $propertyNameCollectionFactoryProphecy->create(DummyErrorResource::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['type', 'title', 'status', 'detail', 'instance']));
         $propertyNameCollectionFactoryProphecy->create(OutputDto::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description', 'dummyDate', 'enum']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
@@ -391,6 +397,59 @@ class OpenApiFactoryTest extends TestCase
                 ->withWritableLink(true)
                 ->withSchema(['type' => 'string', 'description' => 'This is an enum.'])
                 ->withOpenapiContext(['type' => 'string', 'enum' => ['one', 'two'], 'example' => 'one'])
+        );
+        $propertyMetadataFactoryProphecy->create(DummyErrorResource::class, 'type', Argument::any())->shouldBeCalled()->willReturn(
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withDescription('This is an error type.')
+                ->withReadable(true)
+                ->withWritable(false)
+                ->withReadableLink(true)
+                ->withWritableLink(true)
+                ->withInitializable(true)
+                ->withSchema(['type' => 'string', 'description' => 'This is an error type.'])
+        );
+        $propertyMetadataFactoryProphecy->create(DummyErrorResource::class, 'title', Argument::any())->shouldBeCalled()->willReturn(
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withDescription('This is an error title.')
+                ->withReadable(true)
+                ->withWritable(false)
+                ->withReadableLink(true)
+                ->withWritableLink(true)
+                ->withInitializable(true)
+                ->withSchema(['type' => 'string', 'description' => 'This is an error title.'])
+        );
+        $propertyMetadataFactoryProphecy->create(DummyErrorResource::class, 'status', Argument::any())->shouldBeCalled()->willReturn(
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])
+                ->withDescription('This is an error status.')
+                ->withReadable(true)
+                ->withWritable(false)
+                ->withIdentifier(true)
+                ->withSchema(['type' => 'integer', 'description' => 'This is an error status.', 'readOnly' => true])
+        );
+        $propertyMetadataFactoryProphecy->create(DummyErrorResource::class, 'detail', Argument::any())->shouldBeCalled()->willReturn(
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withDescription('This is an error detail.')
+                ->withReadable(true)
+                ->withWritable(false)
+                ->withReadableLink(true)
+                ->withWritableLink(true)
+                ->withInitializable(true)
+                ->withSchema(['type' => 'string', 'description' => 'This is an error detail.'])
+        );
+        $propertyMetadataFactoryProphecy->create(DummyErrorResource::class, 'instance', Argument::any())->shouldBeCalled()->willReturn(
+            (new ApiProperty())
+                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withDescription('This is an error instance.')
+                ->withReadable(true)
+                ->withWritable(false)
+                ->withReadableLink(true)
+                ->withWritableLink(true)
+                ->withInitializable(true)
+                ->withSchema(['type' => 'string', 'description' => 'This is an error instance.'])
         );
 
         $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
@@ -510,6 +569,35 @@ class OpenApiFactoryTest extends TestCase
                 ]),
             ],
         ]));
+        $dummyErrorSchema = new Schema('openapi');
+        $dummyErrorSchema->setDefinitions(new \ArrayObject([
+            'type' => 'object',
+            'description' => 'nice one!',
+            'deprecated' => false,
+            'properties' => [
+                'type' => new \ArrayObject([
+                    'type' => 'string',
+                    'description' => 'This is an error type.',
+                ]),
+                'title' => new \ArrayObject([
+                    'type' => 'string',
+                    'description' => 'This is an error title.',
+                ]),
+                'status' => new \ArrayObject([
+                    'type' => 'integer',
+                    'description' => 'This is an error status.',
+                    'readOnly' => true,
+                ]),
+                'detail' => new \ArrayObject([
+                    'type' => 'string',
+                    'description' => 'This is an error detail.',
+                ]),
+                'instance' => new \ArrayObject([
+                    'type' => 'string',
+                    'description' => 'This is an error instance.',
+                ]),
+            ],
+        ]));
 
         $openApi = $factory(['base_url' => '/app_dev.php/']);
 
@@ -534,6 +622,7 @@ class OpenApiFactoryTest extends TestCase
         $this->assertEquals($components->getSchemas(), new \ArrayObject([
             'Dummy' => $dummySchema->getDefinitions(),
             'Dummy.OutputDto' => $dummySchema->getDefinitions(),
+            'DummyErrorResource' => $dummyErrorSchema->getDefinitions(),
             'Parameter' => $parameterSchema,
         ]));
 
@@ -1041,5 +1130,45 @@ class OpenApiFactoryTest extends TestCase
         $this->assertEquals(['type' => 'string', 'format' => 'uuid'], $parameter->getSchema());
         $this->assertEquals('header', $parameter->getIn());
         $this->assertEquals('hi', $parameter->getDescription());
+
+        $this->assertEquals(new Operation(
+            'getDummyCollectionWithErrors',
+            ['Dummy'],
+            [
+                '200' => new Response('Dummy collection', new \ArrayObject([
+                    'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject([
+                        'type' => 'array',
+                        'items' => ['$ref' => '#/components/schemas/Dummy.OutputDto'],
+                    ]))),
+                ])),
+                '418' => new Response(
+                    'A Teapot Exception',
+                    new \ArrayObject([
+                        'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject([
+                            '$ref' => '#/components/schemas/DummyErrorResource',
+                        ]))),
+                    ]),
+                    links: new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(), null, 'This is a dummy')])
+                ),
+            ],
+            'Retrieves the collection of Dummy resources.',
+            'Retrieves the collection of Dummy resources.',
+            null,
+            [
+                new Parameter('page', 'query', 'The collection page number', false, false, true, [
+                    'type' => 'integer',
+                    'default' => 1,
+                ]),
+                new Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, true, [
+                    'type' => 'integer',
+                    'default' => 30,
+                    'minimum' => 0,
+                ]),
+                new Parameter('pagination', 'query', 'Enable or disable pagination', false, false, true, [
+                    'type' => 'boolean',
+                ]),
+            ],
+            deprecated: false
+        ), $paths->getPath('/erroredDummies')->getGet());
     }
 }
