@@ -120,3 +120,21 @@ Feature: Error handling
     And the JSON node "title" should be equal to "An error occurred"
     And the JSON node "detail" should exist
     And the JSON node "violations" should exist
+
+  Scenario: Get an rfc 7807 error
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/exception_problems_without_prefix" with body:
+    """
+    {}
+    """
+    Then the response status code should be 400
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
+    And the header "Link" should contain '<http://www.w3.org/ns/hydra/error>; rel="http://www.w3.org/ns/json-ld#error"'
+    And the JSON node "type" should exist
+    And the JSON node "title" should be equal to "An error occurred"
+    And the JSON node "detail" should exist
+    And the JSON node "description" should exist
+    And the JSON node "trace" should exist
+    And the JSON node "status" should exist
+    And the JSON node "@context" should not exist
