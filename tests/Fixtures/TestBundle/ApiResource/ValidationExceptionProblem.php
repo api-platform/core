@@ -21,6 +21,7 @@ use Symfony\Component\Validator\ConstraintViolationList;
 #[Post(processor: [ValidationExceptionProblem::class, 'provide'])]
 #[Post(uriTemplate: '/exception_problems', processor: [ValidationExceptionProblem::class, 'provideException'])]
 #[Post(uriTemplate: '/exception_problems_with_compatibility', processor: [ValidationExceptionProblem::class, 'provideException'])]
+#[Post(uriTemplate: '/exception_problems_without_prefix', normalizationContext: ['hydra_prefix' => false], processor: [ValidationExceptionProblem::class, 'provideException'])]
 class ValidationExceptionProblem
 {
     public static function provide(): void

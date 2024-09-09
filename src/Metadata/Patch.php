@@ -48,6 +48,7 @@ final class Patch extends HttpOperation
         ?array $exceptionToStatus = null,
         ?bool $queryParameterValidationEnabled = null,
         ?array $links = null,
+        ?array $errors = null,
 
         ?string $shortName = null,
         ?string $class = null,
@@ -128,6 +129,7 @@ final class Patch extends HttpOperation
             exceptionToStatus: $exceptionToStatus,
             queryParameterValidationEnabled: $queryParameterValidationEnabled,
             links: $links,
+            errors: $errors,
             shortName: $shortName,
             class: $class,
             paginationEnabled: $paginationEnabled,
