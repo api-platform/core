@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel;
 
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactory;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,10 +31,19 @@ class ApiPlatformMiddleware
     public function handle(Request $request, \Closure $next, ?string $operationName = null): Response
     {
         if ($operationName) {
-            $request->attributes->set('_api_operation', $this->operationMetadataFactory->create($operationName));
+            $request->attributes->set('_api_operation', $operation = $this->operationMetadataFactory->create($operationName));
         }
 
-        $request->attributes->set('_format', str_replace('.', '', $request->route('_format') ?? ''));
+        if (!($format = $request->route('_format')) && $operation instanceof HttpOperation && str_ends_with($operation->getUriTemplate(), '{._format}')) {
+            $matches = [];
+            if (preg_match('/\.[a-zA-Z]+$/', $request->getPathInfo(), $matches)) {
+                $format = $matches[0];
+            }
+        }
+
+        if ($format) {
+            $request->attributes->set('_format', substr($format, 1, \strlen($format) - 1));
+        }
 
         return $next($request);
     }

@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Serializer\Filter;
 
+use ApiPlatform\Metadata\HasOpenApiParameterFilterInterface;
+use ApiPlatform\Metadata\Parameter as MetadataParameter;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Parameter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -114,7 +117,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-final class PropertyFilter implements FilterInterface
+final class PropertyFilter implements FilterInterface, HasOpenApiParameterFilterInterface
 {
     private ?array $whitelist;
 
@@ -245,5 +248,10 @@ final class PropertyFilter implements FilterInterface
     private function denormalizePropertyName($property): string
     {
         return null !== $this->nameConverter ? $this->nameConverter->denormalize($property) : $property;
+    }
+
+    public function getOpenApiParameter(MetadataParameter $parameter): Parameter
+    {
+        return new Parameter(name: $parameter->getKey().'[]', in: $parameter instanceof QueryParameter ? 'query' : 'header');
     }
 }

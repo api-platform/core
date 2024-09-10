@@ -25,6 +25,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\Serializer\Filter\PropertyFilter;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -52,6 +53,7 @@ use Workbench\App\Http\Requests\BookFormRequest;
     filter: new OrFilter(new EqualsFilter()),
     property: 'name'
 )]
+#[QueryParameter(key: 'properties', filter: PropertyFilter::class)]
 class Book extends Model
 {
     use HasFactory;

@@ -443,6 +443,7 @@ class ApiPlatformProvider extends ServiceProvider
 
             return new SerializerFilterParameterProvider(new ServiceLocator($tagged));
         });
+        $this->app->alias(SerializerFilterParameterProvider::class, 'api_platform.serializer.filter_parameter_provider');
 
         $this->app->tag([SerializerFilterParameterProvider::class], ParameterProviderInterface::class);
 
@@ -455,6 +456,7 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->singleton(ParameterProvider::class, function (Application $app) {
             $tagged = iterator_to_array($app->tagged(ParameterProviderInterface::class));
+            $tagged['api_platform.serializer.filter_parameter_provider'] = $app->make(SerializerFilterParameterProvider::class);
 
             return new ParameterProvider(
                 new ParameterValidatorProvider(
