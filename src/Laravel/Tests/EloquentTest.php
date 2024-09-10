@@ -33,6 +33,18 @@ class EloquentTest extends TestCase
         $this->assertSame($response->json()['member'][0], $book);
     }
 
+    public function testValidateSearchFilter(): void
+    {
+        $response = $this->get('/api/books?isbn=a', ['accept' => ['application/ld+json']]);
+        $this->assertSame($response->json()['detail'], 'The isbn field must be at least 2 characters.');
+    }
+
+    public function testSearchFilterRelation(): void
+    {
+        $response = $this->get('/api/books?author=1', ['accept' => ['application/ld+json']]);
+        $this->assertSame($response->json()['member'][0]['author'], '/api/authors/1');
+    }
+
     public function testPropertyFilter(): void
     {
         $response = $this->get('/api/books', ['accept' => ['application/ld+json']]);

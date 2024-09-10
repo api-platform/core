@@ -45,8 +45,9 @@ use Workbench\App\Http\Requests\BookFormRequest;
         new GetCollection(),
     ]
 )]
-#[QueryParameter(key: 'isbn', filter: PartialSearchFilter::class)]
+#[QueryParameter(key: 'isbn', filter: PartialSearchFilter::class, constraints: 'min:2')]
 #[QueryParameter(key: 'name', filter: PartialSearchFilter::class)]
+#[QueryParameter(key: 'author', filter: EqualsFilter::class)]
 #[QueryParameter(key: 'publicationDate', filter: DateFilter::class)]
 #[QueryParameter(
     key: 'name2',

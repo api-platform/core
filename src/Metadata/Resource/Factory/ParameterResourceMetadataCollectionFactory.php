@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource\Factory;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\HasOpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\HasSchemaFilterInterface;
@@ -63,14 +64,17 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         $resourceMetadataCollection = $this->decorated?->create($resourceClass) ?? new ResourceMetadataCollection($resourceClass);
 
         $propertyNames = [];
+        $properties = [];
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $i => $property) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
+            if ('author' === $property) {
+            }
             if ($propertyMetadata->isReadable()) {
                 $propertyNames[] = $property;
+                $properties[$property] = $propertyMetadata;
             }
         }
 
-        $properties = array_flip($propertyNames);
         foreach ($resourceMetadataCollection as $i => $resource) {
             $operations = $resource->getOperations();
 
@@ -169,7 +173,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
     }
 
     /**
-     * @param array<string, int> $properties
+     * @param array<string, ApiProperty> $properties
      */
     private function setDefaults(string $key, Parameter $parameter, string $resourceClass, array $properties): Parameter
     {
@@ -196,12 +200,18 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             $parameter = $parameter->withProperty($property);
         }
 
+        $currentKey = $key;
         if (null === $parameter->getProperty() && isset($properties[$key])) {
             $parameter = $parameter->withProperty($key);
         }
 
         if (null === $parameter->getProperty() && $this->nameConverter && ($nameConvertedKey = $this->nameConverter->normalize($key)) && isset($properties[$nameConvertedKey])) {
             $parameter = $parameter->withProperty($key)->withExtraProperties(['_query_property' => $nameConvertedKey] + $parameter->getExtraProperties());
+            $currentKey = $nameConvertedKey;
+        }
+
+        if (isset($properties[$currentKey]) && ($eloquentRelation = ($properties[$currentKey]->getExtraProperties()['eloquent_relation'] ?? null)) && isset($eloquentRelation['foreign_key'])) {
+            $parameter = $parameter->withExtraProperties(['_query_property' => $eloquentRelation['foreign_key']] + $parameter->getExtraProperties());
         }
 
         if (null === $parameter->getRequired() && ($required = $description[$key]['required'] ?? null)) {
