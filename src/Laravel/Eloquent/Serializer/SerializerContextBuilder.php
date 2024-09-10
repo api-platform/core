@@ -37,8 +37,10 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             return $context;
         }
 
-        // isWritable/isReadable is checked later on
-        $context[AbstractNormalizer::ATTRIBUTES] = iterator_to_array($this->propertyNameCollectionFactory->create($context['resource_class'], ['serializer_groups' => $context['groups'] ?? null]));
+        if (!isset($context[AbstractNormalizer::ATTRIBUTES])) {
+            // isWritable/isReadable is checked later on
+            $context[AbstractNormalizer::ATTRIBUTES] = iterator_to_array($this->propertyNameCollectionFactory->create($context['resource_class'], ['serializer_groups' => $context['groups'] ?? null]));
+        }
 
         return $context;
     }

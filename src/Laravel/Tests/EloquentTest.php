@@ -33,6 +33,19 @@ class EloquentTest extends TestCase
         $this->assertSame($response->json()['member'][0], $book);
     }
 
+    public function testPropertyFilter(): void
+    {
+        $response = $this->get('/api/books', ['accept' => ['application/ld+json']]);
+        $book = $response->json()['member'][0];
+
+        $response = $this->get(\sprintf('%s.jsonld?properties[]=author', $book['@id']));
+        $book = $response->json();
+
+        $this->assertArrayHasKey('@id', $book);
+        $this->assertArrayHasKey('author', $book);
+        $this->assertArrayNotHasKey('name', $book);
+    }
+
     public function testPartialSearchFilter(): void
     {
         $response = $this->get('/api/books', ['accept' => ['application/ld+json']]);
