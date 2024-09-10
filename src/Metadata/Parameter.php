@@ -28,7 +28,7 @@ abstract class Parameter
      * @param array<string, mixed>                                               $extraProperties
      * @param ParameterProviderInterface|callable|string|null                    $provider
      * @param FilterInterface|string|null                                        $filter
-     * @param Constraint|Constraint[]|null                                       $constraints
+     * @param Constraint|array<string, string>|string|Constraint[]|null          $constraints
      */
     public function __construct(
         protected ?string $key = null,
@@ -41,7 +41,7 @@ abstract class Parameter
         protected ?bool $required = null,
         protected ?int $priority = null,
         protected ?false $hydra = null,
-        protected Constraint|array|null $constraints = null,
+        protected Constraint|array|string|null $constraints = null,
         protected string|\Stringable|null $security = null,
         protected ?string $securityMessage = null,
         protected ?array $extraProperties = [],
@@ -103,9 +103,9 @@ abstract class Parameter
     }
 
     /**
-     * @return Constraint|Constraint[]|null
+     * @return Constraint|string|array<string, string>|Constraint[]|null
      */
-    public function getConstraints(): Constraint|array|null
+    public function getConstraints(): Constraint|string|array|null
     {
         return $this->constraints;
     }
@@ -232,7 +232,10 @@ abstract class Parameter
         return $self;
     }
 
-    public function withConstraints(array|Constraint $constraints): static
+    /**
+     * @param string|array<string, string>|Constraint[]|Constraint $constraints
+     */
+    public function withConstraints(string|array|Constraint $constraints): static
     {
         $self = clone $this;
         $self->constraints = $constraints;

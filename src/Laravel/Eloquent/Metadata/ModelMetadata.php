@@ -193,6 +193,7 @@ final class ModelMetadata
                     'name' => $method->getName(),
                     'type' => $relation::class,
                     'related' => \get_class($relation->getRelated()),
+                    'foreign_key' => method_exists($relation, 'getForeignKeyName') ? $relation->getForeignKeyName() : null,
                 ];
             })
             ->filter()

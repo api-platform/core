@@ -64,8 +64,12 @@ final class ParameterValidatorProvider implements ProviderInterface
                 $value = null;
             }
 
-            foreach ($constraints as $c) {
-                $allConstraints[] = $c;
+            foreach ((array) $constraints as $k => $c) {
+                if (!\is_string($k)) {
+                    $k = $key;
+                }
+
+                $allConstraints[$k] = $c;
             }
         }
 

@@ -30,6 +30,7 @@ class ApiPlatformMiddleware
      */
     public function handle(Request $request, \Closure $next, ?string $operationName = null): Response
     {
+        $operation = null;
         if ($operationName) {
             $request->attributes->set('_api_operation', $operation = $this->operationMetadataFactory->create($operationName));
         }
@@ -41,9 +42,7 @@ class ApiPlatformMiddleware
             }
         }
 
-        if ($format) {
-            $request->attributes->set('_format', substr($format, 1, \strlen($format) - 1));
-        }
+        $request->attributes->set('_format', $format ? substr($format, 1, \strlen($format) - 1) : '');
 
         return $next($request);
     }
