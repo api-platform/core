@@ -74,7 +74,7 @@ class EloquentTest extends TestCase
         $this->assertSame($response->json()['member'][0], $book);
     }
 
-    public function testDateSearchFilter(): void
+    public function testDateFilterEqual(): void
     {
         $response = $this->get('/api/books', ['accept' => ['application/ld+json']]);
         $book = $response->json()['member'][0];
@@ -87,8 +87,138 @@ class EloquentTest extends TestCase
             ]
         );
 
-        $response = $this->get('/api/books?publicationDate='.$updated['publicationDate'], ['accept' => ['application/ld+json']]);
-        $this->assertSame($response->json()['member'][0]['@id'], $book['@id']);
+        $response = $this->get('/api/books?publicationDate[eq]='.$updated['publicationDate'], ['accept' => ['application/ld+json']]);
+        $this->assertSame($response->json()['hydra:member'][0]['@id'], $book['@id']);
+    }
+
+    public function testDateFilterIncludeNull(): void
+    {
+        $response = $this->get('/api/books', ['accept' => ['application/ld+json']]);
+        $book = $response->json()['hydra:member'][0];
+        $updated = $this->patchJson(
+            $book['@id'],
+            ['publicationDate' => null],
+            [
+                'accept' => ['application/ld+json'],
+                'Content-Type' => ['application/merge-patch+json'],
+            ]
+        );
+
+        $response = $this->get('/api/books?publicationDate2[gt]=9999-12-31', ['accept' => ['application/ld+json']]);
+        $this->assertGreaterThan(0, $response->json()['hydra:totalItems']);
+    }
+
+    public function testDateFilterExcludeNull(): void
+    {
+        $response = $this->get('/api/books', ['accept' => ['application/ld+json']]);
+        $book = $response->json()['hydra:member'][0];
+        $updated = $this->patchJson(
+            $book['@id'],
+            ['publicationDate' => null],
+            [
+                'accept' => ['application/ld+json'],
+                'Content-Type' => ['application/merge-patch+json'],
+            ]
+        );
+
+        $response = $this->get('/api/books?publicationDate[gt]=9999-12-31', ['accept' => ['application/ld+json']]);
+        $this->assertSame(0, $response->json()['hydra:totalItems']);
+    }
+
+    public function testDateFilterGreaterThan(): void
+    {
+        $response = $this->get('/api/books', ['accept' => ['application/ld+json']]);
+        $bookBefore = $response->json()['hydra:member'][0];
+        $updated = $this->patchJson(
+            $bookBefore['@id'],
+            ['publicationDate' => '9998-02-18 00:00:00'],
+            [
+                'accept' => ['application/ld+json'],
+                'Content-Type' => ['application/merge-patch+json'],
+            ]
+        );
+
+        $bookAfter = $response->json()['hydra:member'][1];
+        $this->patchJson(
+            $bookAfter['@id'],
+            ['publicationDate' => '9999-02-18 00:00:00'],
+            [
+                'accept' => ['application/ld+json'],
+                'Content-Type' => ['application/merge-patch+json'],
+            ]
+        );
+
+        $response = $this->get('/api/books?publicationDate[gt]='.$updated['publicationDate'], ['accept' => ['application/ld+json']]);
+        $this->assertSame($response->json()['hydra:member'][0]['@id'], $bookAfter['@id']);
+        $this->assertSame($response->json()['hydra:totalItems'], 1);
+    }
+
+    public function testDateFilterLowerThanEqual(): void
+    {
+        $response = $this->get('/api/books', ['accept' => ['application/ld+json']]);
+        $bookBefore = $response->json()['hydra:member'][0];
+        $updated = $this->patchJson(
+            $bookBefore['@id'],
+            ['publicationDate' => '0001-02-18 00:00:00'],
+            [
+                'accept' => ['application/ld+json'],
+                'Content-Type' => ['application/merge-patch+json'],
+            ]
+        );
+
+        $bookAfter = $response->json()['hydra:member'][1];
+        $this->patchJson(
+            $bookAfter['@id'],
+            ['publicationDate' => '0002-02-18 00:00:00'],
+            [
+                'accept' => ['application/ld+json'],
+                'Content-Type' => ['application/merge-patch+json'],
+            ]
+        );
+
+        $response = $this->get('/api/books?publicationDate[lte]=0002-02-18', ['accept' => ['application/ld+json']]);
+        $this->assertSame($response->json()['hydra:member'][0]['@id'], $bookBefore['@id']);
+        $this->assertSame($response->json()['hydra:member'][1]['@id'], $bookAfter['@id']);
+        $this->assertSame($response->json()['hydra:totalItems'], 2);
+    }
+
+    public function testDateFilterBetween(): void
+    {
+        $response = $this->get('/api/books', ['accept' => ['application/ld+json']]);
+        $book = $response->json()['hydra:member'][0];
+        $updated = $this->patchJson(
+            $book['@id'],
+            ['publicationDate' => '0001-02-18 00:00:00'],
+            [
+                'accept' => ['application/ld+json'],
+                'Content-Type' => ['application/merge-patch+json'],
+            ]
+        );
+
+        $book2 = $response->json()['hydra:member'][1];
+        $this->patchJson(
+            $book2['@id'],
+            ['publicationDate' => '0002-02-18 00:00:00'],
+            [
+                'accept' => ['application/ld+json'],
+                'Content-Type' => ['application/merge-patch+json'],
+            ]
+        );
+
+        $book3 = $response->json()['hydra:member'][2];
+        $updated3 = $this->patchJson(
+            $book3['@id'],
+            ['publicationDate' => '0003-02-18 00:00:00'],
+            [
+                'accept' => ['application/ld+json'],
+                'Content-Type' => ['application/merge-patch+json'],
+            ]
+        );
+
+        $response = $this->get('/api/books?publicationDate[gte]='.substr($updated['publicationDate'], 0, 10).'&publicationDate[lt]='.substr($updated3['publicationDate'], 0, 10), ['accept' => ['application/ld+json']]);
+        $this->assertSame($response->json()['hydra:member'][0]['@id'], $book['@id']);
+        $this->assertSame($response->json()['hydra:member'][1]['@id'], $book2['@id']);
+        $this->assertSame($response->json()['hydra:totalItems'], 2);
     }
 
     public function testSearchFilterWithPropertyPlaceholder(): void
@@ -115,7 +245,121 @@ class EloquentTest extends TestCase
         $book = $response[0];
         $book2 = $response[1];
 
-        $res = $this->get(\sprintf('/api/books?name2[]=%s&name2[]=%s', $book['name'], $book2['name']), ['accept' => ['application/ld+json']])->json();
-        $this->assertSame($res['totalItems'], 2);
+        $res = $this->get(sprintf('/api/books?name2[]=%s&name2[]=%s', $book['name'], $book2['name']), ['accept' => ['application/ld+json']])->json();
+        $this->assertSame($res['hydra:totalItems'], 2);
+    }
+
+    public function testRangeLowerThanFilter(): void
+    {
+        $response = $this->get('/api/books', ['accept' => ['application/ld+json']]);
+        $bookBefore = $response->json()['hydra:member'][0];
+        $this->patchJson(
+            $bookBefore['@id'],
+            ['isbn' => '12'],
+            [
+                'accept' => ['application/ld+json'],
+                'Content-Type' => ['application/merge-patch+json'],
+            ]
+        );
+
+        $bookAfter = $response->json()['hydra:member'][1];
+        $updated = $this->patchJson(
+            $bookAfter['@id'],
+            ['isbn' => '15'],
+            [
+                'accept' => ['application/ld+json'],
+                'Content-Type' => ['application/merge-patch+json'],
+            ]
+        );
+
+        $response = $this->get('api/books?isbn_range[lt]='.$updated['isbn'], ['accept' => ['application/ld+json']]);
+        $this->assertSame($response->json()['hydra:member'][0]['@id'], $bookBefore['@id']);
+        $this->assertSame($response->json()['hydra:totalItems'], 1);
+    }
+
+    public function testRangeLowerThanEqualFilter(): void
+    {
+        $response = $this->get('/api/books', ['accept' => ['application/ld+json']]);
+        $bookBefore = $response->json()['hydra:member'][0];
+        $this->patchJson(
+            $bookBefore['@id'],
+            ['isbn' => '12'],
+            [
+                'accept' => ['application/ld+json'],
+                'Content-Type' => ['application/merge-patch+json'],
+            ]
+        );
+
+        $bookAfter = $response->json()['hydra:member'][1];
+        $updated = $this->patchJson(
+            $bookAfter['@id'],
+            ['isbn' => '15'],
+            [
+                'accept' => ['application/ld+json'],
+                'Content-Type' => ['application/merge-patch+json'],
+            ]
+        );
+
+        $response = $this->get('api/books?isbn_range[lte]='.$updated['isbn'], ['accept' => ['application/ld+json']]);
+        $this->assertSame($response->json()['hydra:member'][0]['@id'], $bookBefore['@id']);
+        $this->assertSame($response->json()['hydra:member'][1]['@id'], $bookAfter['@id']);
+        $this->assertSame($response->json()['hydra:totalItems'], 2);
+    }
+
+    public function testRangeGreaterThanFilter(): void
+    {
+        $response = $this->get('/api/books', ['accept' => ['application/ld+json']]);
+        $bookBefore = $response->json()['hydra:member'][0];
+        $updated = $this->patchJson(
+            $bookBefore['@id'],
+            ['isbn' => '999999999999998'],
+            [
+                'accept' => ['application/ld+json'],
+                'Content-Type' => ['application/merge-patch+json'],
+            ]
+        );
+
+        $bookAfter = $response->json()['hydra:member'][1];
+        $this->patchJson(
+            $bookAfter['@id'],
+            ['isbn' => '999999999999999'],
+            [
+                'accept' => ['application/ld+json'],
+                'Content-Type' => ['application/merge-patch+json'],
+            ]
+        );
+
+        $response = $this->get('api/books?isbn_range[gt]='.$updated['isbn'], ['accept' => ['application/ld+json']]);
+        $this->assertSame($response->json()['hydra:member'][0]['@id'], $bookAfter['@id']);
+        $this->assertSame($response->json()['hydra:totalItems'], 1);
+    }
+
+    public function testRangeGreaterThanEqualFilter(): void
+    {
+        $response = $this->get('/api/books', ['accept' => ['application/ld+json']]);
+        $bookBefore = $response->json()['hydra:member'][0];
+        $updated = $this->patchJson(
+            $bookBefore['@id'],
+            ['isbn' => '999999999999998'],
+            [
+                'accept' => ['application/ld+json'],
+                'Content-Type' => ['application/merge-patch+json'],
+            ]
+        );
+
+        $bookAfter = $response->json()['hydra:member'][1];
+        $this->patchJson(
+            $bookAfter['@id'],
+            ['isbn' => '999999999999999'],
+            [
+                'accept' => ['application/ld+json'],
+                'Content-Type' => ['application/merge-patch+json'],
+            ]
+        );
+
+        $response = $this->get('api/books?isbn_range[gte]='.$updated['isbn'], ['accept' => ['application/ld+json']]);
+        $this->assertSame($response->json()['hydra:member'][0]['@id'], $bookBefore['@id']);
+        $this->assertSame($response->json()['hydra:member'][1]['@id'], $bookAfter['@id']);
+        $this->assertSame($response->json()['hydra:totalItems'], 2);
     }
 }

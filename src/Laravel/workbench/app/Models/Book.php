@@ -17,6 +17,7 @@ use ApiPlatform\Laravel\Eloquent\Filter\DateFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\EqualsFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\OrFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\PartialSearchFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\RangeFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -48,7 +49,9 @@ use Workbench\App\Http\Requests\BookFormRequest;
 #[QueryParameter(key: 'isbn', filter: PartialSearchFilter::class, constraints: 'min:2')]
 #[QueryParameter(key: 'name', filter: PartialSearchFilter::class)]
 #[QueryParameter(key: 'author', filter: EqualsFilter::class)]
-#[QueryParameter(key: 'publicationDate', filter: DateFilter::class)]
+#[QueryParameter(key: 'publicationDate', filter: DateFilter::class, property: 'publication_date')]
+#[QueryParameter(key: 'publicationDate2', filter: DateFilter::class, property: 'publication_date', filterContext: ['include_nulls' => true])]
+#[QueryParameter(key: 'isbn_range', filter: RangeFilter::class, property: 'isbn')]
 #[QueryParameter(
     key: 'name2',
     filter: new OrFilter(new EqualsFilter()),

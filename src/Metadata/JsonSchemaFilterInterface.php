@@ -13,9 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
-use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
-
-interface HasOpenApiParameterFilterInterface
+interface JsonSchemaFilterInterface
 {
-    public function getOpenApiParameter(Parameter $parameter): ?OpenApiParameter;
+    /**
+     * @return array<string, mixed>
+     */
+    public function getSchema(Parameter $parameter): array;
 }

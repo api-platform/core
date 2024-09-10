@@ -16,15 +16,14 @@ namespace ApiPlatform\Laravel\Eloquent\Filter;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\JsonSchemaFilterInterface;
 use ApiPlatform\Metadata\Parameter;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
-final readonly class OrFilter implements FilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface
+final class RangeFilter implements FilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface
 {
-    public function __construct(private FilterInterface $filter)
-    {
-    }
+    use QueryPropertyTrait;
 
     /**
      * @param Builder<Model>       $builder
@@ -32,25 +31,34 @@ final readonly class OrFilter implements FilterInterface, JsonSchemaFilterInterf
      */
     public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder
     {
-        return $builder->where(function ($builder) use ($values, $parameter, $context): void {
-            foreach ($values as $value) {
-                $this->filter->apply($builder, $value, $parameter, ['whereClause' => 'orWhere'] + $context);
-            }
-        });
+        $operatorValue = [
+            'lt' => '<',
+            'gt' => '>',
+            'lte' => '<=',
+            'gte' => '>=',
+        ];
+
+        foreach ($values as $key => $value) {
+            $builder = $builder->{$context['whereClause'] ?? 'where'}($this->getQueryProperty($parameter), $operatorValue[$key], $value);
+        }
+
+        return $builder;
     }
 
-    /**
-     * @return array<string, mixed>
-     */
     public function getSchema(Parameter $parameter): array
     {
-        $schema = $this->filter instanceof JsonSchemaFilterInterface ? $this->filter->getSchema($parameter) : ['type' => 'string'];
-
-        return ['type' => 'array', 'items' => $schema];
+        return ['type' => 'number'];
     }
 
     public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array|null
     {
-        return new OpenApiParameter(name: $parameter->getKey().'[]', in: 'query', style: 'deepObject', explode: true);
+        $in = $parameter instanceof QueryParameter ? 'query' : 'header';
+
+        return [
+            new OpenApiParameter(name: $parameter->getKey().'[gt]', in: $in),
+            new OpenApiParameter(name: $parameter->getKey().'[lt]', in: $in),
+            new OpenApiParameter(name: $parameter->getKey().'[gte]', in: $in),
+            new OpenApiParameter(name: $parameter->getKey().'[lte]', in: $in),
+        ];
     }
 }
