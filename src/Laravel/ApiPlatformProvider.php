@@ -57,7 +57,6 @@ use ApiPlatform\JsonApi\Serializer\EntrypointNormalizer as JsonApiEntrypointNorm
 use ApiPlatform\JsonApi\Serializer\ItemNormalizer as JsonApiItemNormalizer;
 use ApiPlatform\JsonApi\Serializer\ObjectNormalizer as JsonApiObjectNormalizer;
 use ApiPlatform\JsonApi\Serializer\ReservedAttributeNameConverter;
-use ApiPlatform\JsonApi\State\JsonApiProvider;
 use ApiPlatform\JsonLd\Action\ContextAction;
 use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
 use ApiPlatform\JsonLd\ContextBuilder as JsonLdContextBuilder;
@@ -433,16 +432,8 @@ class ApiPlatformProvider extends ServiceProvider
             return new ValidateProvider($app->make(SwaggerUiProvider::class), $app);
         });
 
-        $this->app->singleton(JsonApiProvider::class, function (Application $app) {
-            /** @var ConfigRepository */
-            $config = $app['config'];
-
-            // TODO: improve the JsonApiProvider and check the operation parameters for an OrderFilter
-            return new JsonApiProvider($app->make(ValidateProvider::class), 'sort');
-        });
-
         $this->app->singleton(DeserializeProvider::class, function (Application $app) {
-            return new DeserializeProvider($app->make(JsonApiProvider::class), $app->make(SerializerInterface::class), $app->make(SerializerContextBuilderInterface::class));
+            return new DeserializeProvider($app->make(ValidateProvider::class), $app->make(SerializerInterface::class), $app->make(SerializerContextBuilderInterface::class));
         });
 
         $this->app->tag([PropertyFilter::class], SerializerFilterInterface::class);
