@@ -15,9 +15,9 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\FilterInterface;
-use ApiPlatform\Metadata\HasOpenApiParameterFilterInterface;
-use ApiPlatform\Metadata\HasSchemaFilterInterface;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -157,14 +157,14 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             return $parameter;
         }
 
-        if (null === $parameter->getSchema() && $filter instanceof HasSchemaFilterInterface) {
+        if (null === $parameter->getSchema() && $filter instanceof JsonSchemaFilterInterface) {
             if ($schema = $filter->getSchema($parameter)) {
                 $parameter = $parameter->withSchema($schema);
             }
         }
 
-        if (null === $parameter->getOpenApi() && $filter instanceof HasOpenApiParameterFilterInterface) {
-            if ($openApiParameter = $filter->getOpenApiParameter($parameter)) {
+        if (null === $parameter->getOpenApi() && $filter instanceof OpenApiParameterFilterInterface) {
+            if ($openApiParameter = $filter->getOpenApiParameters($parameter)) {
                 $parameter = $parameter->withOpenApi($openApiParameter);
             }
         }

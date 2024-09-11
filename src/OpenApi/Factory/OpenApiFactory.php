@@ -268,17 +268,37 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 }
 
                 $in = $p instanceof HeaderParameterInterface ? 'header' : 'query';
-                $parameter = new Parameter($key, $in, $p->getDescription() ?? "$resourceShortName $key", $p->getRequired() ?? false, false, false, $p->getSchema() ?? ['type' => 'string']);
+                $defaultParameter = new Parameter($key, $in, $p->getDescription() ?? "$resourceShortName $key", $p->getRequired() ?? false, false, false, $p->getSchema() ?? ['type' => 'string']);
 
-                if ($linkParameter = $p->getOpenApi()) {
-                    $parameter = $this->mergeParameter($parameter, $linkParameter);
+                $linkParameter = $p->getOpenApi();
+                if (null === $linkParameter) {
+                    if ([$i, $operationParameter] = $this->hasParameter($openapiOperation, $defaultParameter)) {
+                        $openapiParameters[$i] = $this->mergeParameter($defaultParameter, $operationParameter);
+                    } else {
+                        $openapiParameters[] = $defaultParameter;
+                    }
+
+                    continue;
                 }
 
+                if (\is_array($linkParameter)) {
+                    foreach ($linkParameter as $lp) {
+                        $parameter = $this->mergeParameter($defaultParameter, $lp);
+                        if ([$i, $operationParameter] = $this->hasParameter($openapiOperation, $parameter)) {
+                            $openapiParameters[$i] = $this->mergeParameter($parameter, $operationParameter);
+                            continue;
+                        }
+
+                        $openapiParameters[] = $parameter;
+                    }
+                    continue;
+                }
+
+                $parameter = $this->mergeParameter($defaultParameter, $linkParameter);
                 if ([$i, $operationParameter] = $this->hasParameter($openapiOperation, $parameter)) {
                     $openapiParameters[$i] = $this->mergeParameter($parameter, $operationParameter);
                     continue;
                 }
-
                 $openapiParameters[] = $parameter;
             }
 

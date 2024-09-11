@@ -13,14 +13,25 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Eloquent\Filter;
 
-use ApiPlatform\Metadata\HasSchemaFilterInterface;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Parameter;
+use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
-final class DateFilter implements FilterInterface, HasSchemaFilterInterface
+final class DateFilter implements FilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface
 {
     use QueryPropertyTrait;
+
+    private const OPERATOR_VALUE = [
+        'eq' => '=',
+        'gt' => '>',
+        'lt' => '<',
+        'gte' => '>=',
+        'lte' => '<=',
+    ];
 
     /**
      * @param Builder<Model>       $builder
@@ -28,13 +39,41 @@ final class DateFilter implements FilterInterface, HasSchemaFilterInterface
      */
     public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder
     {
-        if (!\is_string($values)) {
+        if (!\is_array($values)) {
             return $builder;
         }
 
-        $datetime = new \DateTimeImmutable($values);
+        $values = array_intersect_key($values, self::OPERATOR_VALUE);
 
-        return $builder->{($context['whereClause'] ?? 'where').'Date'}($this->getQueryProperty($parameter), $datetime);
+        if (!$values) {
+            return $builder;
+        }
+
+        if (true === ($parameter->getFilterContext()['include_nulls'] ?? false)) {
+            foreach ($values as $key => $value) {
+                $datetime = $this->getDateTime($value);
+                if (null === $datetime) {
+                    continue;
+                }
+                $builder->{$context['whereClause'] ?? 'where'}(function (Builder $query) use ($parameter, $datetime, $key): void {
+                    $queryProperty = $this->getQueryProperty($parameter);
+                    $query->whereDate($queryProperty, self::OPERATOR_VALUE[$key], $datetime)
+                        ->orWhereNull($queryProperty);
+                });
+            }
+
+            return $builder;
+        }
+
+        foreach ($values as $key => $value) {
+            $datetime = $this->getDateTime($value);
+            if (null === $datetime) {
+                continue;
+            }
+            $builder = $builder->{($context['whereClause'] ?? 'where').'Date'}($this->getQueryProperty($parameter), self::OPERATOR_VALUE[$key], $datetime);
+        }
+
+        return $builder;
     }
 
     /**
@@ -43,5 +82,28 @@ final class DateFilter implements FilterInterface, HasSchemaFilterInterface
     public function getSchema(Parameter $parameter): array
     {
         return ['type' => 'date'];
+    }
+
+    public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array|null
+    {
+        $in = $parameter instanceof QueryParameter ? 'query' : 'header';
+        $key = $parameter->getKey();
+
+        return [
+            new OpenApiParameter(name: $key.'[eq]', in: $in),
+            new OpenApiParameter(name: $key.'[gt]', in: $in),
+            new OpenApiParameter(name: $key.'[lt]', in: $in),
+            new OpenApiParameter(name: $key.'[gte]', in: $in),
+            new OpenApiParameter(name: $key.'[lte]', in: $in),
+        ];
+    }
+
+    private function getDateTime(string $value): ?\DateTimeImmutable
+    {
+        try {
+            return new \DateTimeImmutable($value);
+        } catch (\DateMalformedStringException|\Exception) {
+            return null;
+        }
     }
 }

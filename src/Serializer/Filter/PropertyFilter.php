@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Serializer\Filter;
 
-use ApiPlatform\Metadata\HasOpenApiParameterFilterInterface;
-use ApiPlatform\Metadata\HasSchemaFilterInterface;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Parameter as MetadataParameter;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Parameter;
@@ -118,7 +118,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-final class PropertyFilter implements FilterInterface, HasOpenApiParameterFilterInterface, HasSchemaFilterInterface
+final class PropertyFilter implements FilterInterface, OpenApiParameterFilterInterface, JsonSchemaFilterInterface
 {
     private ?array $whitelist;
 
@@ -277,7 +277,7 @@ final class PropertyFilter implements FilterInterface, HasOpenApiParameterFilter
         ];
     }
 
-    public function getOpenApiParameter(MetadataParameter $parameter): Parameter
+    public function getOpenApiParameters(MetadataParameter $parameter): Parameter|array|null
     {
         $example = \sprintf(
             '%1$s[]={propertyName}&%1$s[]={anotherPropertyName}',

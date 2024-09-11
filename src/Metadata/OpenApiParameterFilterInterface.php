@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
-interface HasSchemaFilterInterface
+use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
+
+interface OpenApiParameterFilterInterface
 {
     /**
-     * @return array<string, mixed>
+     * @return OpenApiParameter|OpenApiParameter[]|null
      */
-    public function getSchema(Parameter $parameter): array;
+    public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array|null;
 }

@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Eloquent\Filter;
 
-use ApiPlatform\Metadata\HasOpenApiParameterFilterInterface;
-use ApiPlatform\Metadata\HasSchemaFilterInterface;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
-final class OrderFilter implements FilterInterface, HasSchemaFilterInterface, HasOpenApiParameterFilterInterface
+final class OrderFilter implements FilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface
 {
     use QueryPropertyTrait;
 
@@ -37,7 +37,6 @@ final class OrderFilter implements FilterInterface, HasSchemaFilterInterface, Ha
                 if (!isset($properties[$key])) {
                     continue;
                 }
-
                 $builder = $builder->orderBy($properties[$key], $value);
             }
 
@@ -52,22 +51,19 @@ final class OrderFilter implements FilterInterface, HasSchemaFilterInterface, Ha
      */
     public function getSchema(Parameter $parameter): array
     {
-        if (str_contains($parameter->getKey(), ':property')) {
-            $properties = [];
-            foreach (array_keys($parameter->getExtraProperties()['_properties'] ?? []) as $property) {
-                $properties[$property] = ['type' => 'string', 'enum' => ['asc', 'desc']];
-            }
-
-            return ['type' => 'object', 'properties' => $properties, 'required' => []];
-        }
-
         return ['type' => 'string', 'enum' => ['asc', 'desc']];
     }
 
-    public function getOpenApiParameter(Parameter $parameter): ?OpenApiParameter
+    public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array|null
     {
         if (str_contains($parameter->getKey(), ':property')) {
-            return new OpenApiParameter(name: str_replace('[:property]', '', $parameter->getKey()), in: 'query', style: 'deepObject', explode: true);
+            $parameters = [];
+            $key = str_replace('[:property]', '', $parameter->getKey());
+            foreach (array_keys($parameter->getExtraProperties()['_properties'] ?? []) as $property) {
+                $parameters[] = new OpenApiParameter(name: \sprintf('%s[%s]', $key, $property), in: 'query');
+            }
+
+            return $parameters;
         }
 
         return null;

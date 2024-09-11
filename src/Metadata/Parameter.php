@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata;
 
 use ApiPlatform\OpenApi;
+use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ParameterProviderInterface;
 use Symfony\Component\Validator\Constraint;
@@ -33,7 +34,7 @@ abstract class Parameter
     public function __construct(
         protected ?string $key = null,
         protected ?array $schema = null,
-        protected OpenApi\Model\Parameter|false|null $openApi = null,
+        protected OpenApiParameter|array|false|null $openApi = null,
         protected mixed $provider = null,
         protected mixed $filter = null,
         protected ?string $property = null,
@@ -62,7 +63,10 @@ abstract class Parameter
         return $this->schema;
     }
 
-    public function getOpenApi(): OpenApi\Model\Parameter|bool|null
+    /**
+     * @return OpenApi\Model\Parameter[]|OpenApi\Model\Parameter|bool|null
+     */
+    public function getOpenApi(): OpenApiParameter|array|bool|null
     {
         return $this->openApi;
     }
@@ -170,7 +174,10 @@ abstract class Parameter
         return $self;
     }
 
-    public function withOpenApi(OpenApi\Model\Parameter $openApi): static
+    /**
+     * @param OpenApi\Model\Parameter[]|OpenApi\Model\Parameter|bool $openApi
+     */
+    public function withOpenApi(OpenApiParameter|array|bool $openApi): static
     {
         $self = clone $this;
         $self->openApi = $openApi;
