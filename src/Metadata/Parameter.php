@@ -175,7 +175,7 @@ abstract class Parameter
     }
 
     /**
-     * @param OpenApi\Model\Parameter[]|OpenApi\Model\Parameter|bool|null $openApi
+     * @param OpenApi\Model\Parameter[]|OpenApi\Model\Parameter|bool $openApi
      */
     public function withOpenApi(OpenApiParameter|array|bool $openApi): static
     {
