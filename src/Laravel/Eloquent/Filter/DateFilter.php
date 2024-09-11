@@ -25,7 +25,7 @@ final class DateFilter implements FilterInterface, JsonSchemaFilterInterface, Op
 {
     use QueryPropertyTrait;
 
-    private const array OPERATOR_VALUE = [
+    private const OPERATOR_VALUE = [
         'eq' => '=',
         'gt' => '>',
         'lt' => '<',
