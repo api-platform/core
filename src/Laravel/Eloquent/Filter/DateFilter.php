@@ -25,6 +25,14 @@ final class DateFilter implements FilterInterface, JsonSchemaFilterInterface, Op
 {
     use QueryPropertyTrait;
 
+    private const array OPERATOR_VALUE = [
+        'eq' => '=',
+        'gt' => '>',
+        'lt' => '<',
+        'gte' => '>=',
+        'lte' => '<=',
+    ];
+
     /**
      * @param Builder<Model>       $builder
      * @param array<string, mixed> $context
@@ -35,15 +43,7 @@ final class DateFilter implements FilterInterface, JsonSchemaFilterInterface, Op
             return $builder;
         }
 
-        $operatorValue = [
-            'eq' => '=',
-            'gt' => '>',
-            'lt' => '<',
-            'gte' => '>=',
-            'lte' => '<=',
-        ];
-
-        $values = array_intersect_key($values, $operatorValue);
+        $values = array_intersect_key($values, self::OPERATOR_VALUE);
 
         if (!$values) {
             return $builder;
@@ -55,9 +55,10 @@ final class DateFilter implements FilterInterface, JsonSchemaFilterInterface, Op
                 if (null === $datetime) {
                     continue;
                 }
-                $builder->{$context['whereClause'] ?? 'where'}(function (Builder $query) use ($parameter, $datetime, $operatorValue, $key): void {
-                    $query->whereDate($this->getQueryProperty($parameter), $operatorValue[$key], $datetime)
-                        ->orWhereNull($this->getQueryProperty($parameter));
+                $builder->{$context['whereClause'] ?? 'where'}(function (Builder $query) use ($parameter, $datetime, $key): void {
+                    $queryProperty = $this->getQueryProperty($parameter);
+                    $query->whereDate($queryProperty, self::OPERATOR_VALUE[$key], $datetime)
+                        ->orWhereNull($queryProperty);
                 });
             }
 
@@ -69,7 +70,7 @@ final class DateFilter implements FilterInterface, JsonSchemaFilterInterface, Op
             if (null === $datetime) {
                 continue;
             }
-            $builder = $builder->{($context['whereClause'] ?? 'where').'Date'}($this->getQueryProperty($parameter), $operatorValue[$key], $datetime);
+            $builder = $builder->{($context['whereClause'] ?? 'where').'Date'}($this->getQueryProperty($parameter), self::OPERATOR_VALUE[$key], $datetime);
         }
 
         return $builder;
@@ -86,17 +87,18 @@ final class DateFilter implements FilterInterface, JsonSchemaFilterInterface, Op
     public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array|null
     {
         $in = $parameter instanceof QueryParameter ? 'query' : 'header';
+        $key = $parameter->getKey();
 
         return [
-            new OpenApiParameter(name: $parameter->getKey().'[eq]', in: $in),
-            new OpenApiParameter(name: $parameter->getKey().'[gt]', in: $in),
-            new OpenApiParameter(name: $parameter->getKey().'[lt]', in: $in),
-            new OpenApiParameter(name: $parameter->getKey().'[gte]', in: $in),
-            new OpenApiParameter(name: $parameter->getKey().'[lte]', in: $in),
+            new OpenApiParameter(name: $key.'[eq]', in: $in),
+            new OpenApiParameter(name: $key.'[gt]', in: $in),
+            new OpenApiParameter(name: $key.'[lt]', in: $in),
+            new OpenApiParameter(name: $key.'[gte]', in: $in),
+            new OpenApiParameter(name: $key.'[lte]', in: $in),
         ];
     }
 
-    public function getDateTime($value): ?\DateTimeImmutable
+    private function getDateTime(string $value): ?\DateTimeImmutable
     {
         try {
             return new \DateTimeImmutable($value);

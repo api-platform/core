@@ -25,21 +25,23 @@ final class RangeFilter implements FilterInterface, JsonSchemaFilterInterface, O
 {
     use QueryPropertyTrait;
 
+    private const array OPERATOR_VALUE = [
+        'lt' => '<',
+        'gt' => '>',
+        'lte' => '<=',
+        'gte' => '>=',
+    ];
+
     /**
      * @param Builder<Model>       $builder
      * @param array<string, mixed> $context
      */
     public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder
     {
-        $operatorValue = [
-            'lt' => '<',
-            'gt' => '>',
-            'lte' => '<=',
-            'gte' => '>=',
-        ];
+        $queryProperty = $this->getQueryProperty($parameter);
 
         foreach ($values as $key => $value) {
-            $builder = $builder->{$context['whereClause'] ?? 'where'}($this->getQueryProperty($parameter), $operatorValue[$key], $value);
+            $builder = $builder->{$context['whereClause'] ?? 'where'}($queryProperty, self::OPERATOR_VALUE[$key], $value);
         }
 
         return $builder;
@@ -53,12 +55,13 @@ final class RangeFilter implements FilterInterface, JsonSchemaFilterInterface, O
     public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array|null
     {
         $in = $parameter instanceof QueryParameter ? 'query' : 'header';
+        $key = $parameter->getKey();
 
         return [
-            new OpenApiParameter(name: $parameter->getKey().'[gt]', in: $in),
-            new OpenApiParameter(name: $parameter->getKey().'[lt]', in: $in),
-            new OpenApiParameter(name: $parameter->getKey().'[gte]', in: $in),
-            new OpenApiParameter(name: $parameter->getKey().'[lte]', in: $in),
+            new OpenApiParameter(name: $key.'[gt]', in: $in),
+            new OpenApiParameter(name: $key.'[lt]', in: $in),
+            new OpenApiParameter(name: $key.'[gte]', in: $in),
+            new OpenApiParameter(name: $key.'[lte]', in: $in),
         ];
     }
 }

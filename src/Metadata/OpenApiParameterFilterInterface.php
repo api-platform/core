@@ -18,7 +18,7 @@ use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 interface OpenApiParameterFilterInterface
 {
     /**
-     * @return OpenApiParameter[]
+     * @return OpenApiParameter|OpenApiParameter[]|null
      */
     public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array|null;
 }

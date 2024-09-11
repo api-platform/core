@@ -50,7 +50,7 @@ use Workbench\App\Http\Requests\BookFormRequest;
 #[QueryParameter(key: 'name', filter: PartialSearchFilter::class)]
 #[QueryParameter(key: 'author', filter: EqualsFilter::class)]
 #[QueryParameter(key: 'publicationDate', filter: DateFilter::class, property: 'publication_date')]
-#[QueryParameter(key: 'publicationDate2', filter: DateFilter::class, property: 'publication_date', filterContext: ['include_nulls' => true])]
+#[QueryParameter(key: 'publicationDateWithNulls', filter: DateFilter::class, property: 'publication_date', filterContext: ['include_nulls' => true])]
 #[QueryParameter(key: 'isbn_range', filter: RangeFilter::class, property: 'isbn')]
 #[QueryParameter(
     key: 'name2',
