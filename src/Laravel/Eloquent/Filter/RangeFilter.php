@@ -25,7 +25,7 @@ final class RangeFilter implements FilterInterface, JsonSchemaFilterInterface, O
 {
     use QueryPropertyTrait;
 
-    private const array OPERATOR_VALUE = [
+    private const OPERATOR_VALUE = [
         'lt' => '<',
         'gt' => '>',
         'lte' => '<=',
