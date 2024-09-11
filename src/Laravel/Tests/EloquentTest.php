@@ -104,7 +104,7 @@ class EloquentTest extends TestCase
             ]
         );
 
-        $response = $this->get('/api/books?publicationDate2[gt]=9999-12-31', ['Accept' => ['application/ld+json']]);
+        $response = $this->get('/api/books?publicationWithNulls[gt]=9999-12-31', ['Accept' => ['application/ld+json']]);
         $this->assertGreaterThan(0, $response->json()['totalItems']);
     }
 
