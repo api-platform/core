@@ -274,7 +274,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 if (null === $linkParameter) {
                     if ([$i, $operationParameter] = $this->hasParameter($openapiOperation, $defaultParameter)) {
                         $openapiParameters[$i] = $this->mergeParameter($defaultParameter, $operationParameter);
+                    } else {
+                        $openapiParameters[] = $defaultParameter;
                     }
+
                     continue;
                 }
 
