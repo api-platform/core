@@ -278,10 +278,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     continue;
                 }
 
-                if (is_array($linkParameter)) {
+                if (\is_array($linkParameter)) {
                     foreach ($linkParameter as $lp) {
                         $parameter = $this->mergeParameter($defaultParameter, $lp);
-                        if([$i, $operationParameter] = $this->hasParameter($openapiOperation, $parameter)) {
+                        if ([$i, $operationParameter] = $this->hasParameter($openapiOperation, $parameter)) {
                             $openapiParameters[$i] = $this->mergeParameter($parameter, $operationParameter);
                             continue;
                         }
@@ -292,7 +292,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 }
 
                 $parameter = $this->mergeParameter($defaultParameter, $linkParameter);
-                if([$i, $operationParameter] = $this->hasParameter($openapiOperation, $parameter)) {
+                if ([$i, $operationParameter] = $this->hasParameter($openapiOperation, $parameter)) {
                     $openapiParameters[$i] = $this->mergeParameter($parameter, $operationParameter);
                     continue;
                 }

@@ -245,7 +245,7 @@ class EloquentTest extends TestCase
         $book = $response[0];
         $book2 = $response[1];
 
-        $res = $this->get(sprintf('/api/books?name2[]=%s&name2[]=%s', $book['name'], $book2['name']), ['accept' => ['application/ld+json']])->json();
+        $res = $this->get(\sprintf('/api/books?name2[]=%s&name2[]=%s', $book['name'], $book2['name']), ['accept' => ['application/ld+json']])->json();
         $this->assertSame($res['hydra:totalItems'], 2);
     }
 

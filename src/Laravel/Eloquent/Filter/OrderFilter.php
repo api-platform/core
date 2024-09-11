@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Eloquent\Filter;
 
-use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\JsonSchemaFilterInterface;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use Illuminate\Database\Eloquent\Builder;
@@ -60,7 +60,7 @@ final class OrderFilter implements FilterInterface, JsonSchemaFilterInterface, O
             $parameters = [];
             $key = str_replace('[:property]', '', $parameter->getKey());
             foreach (array_keys($parameter->getExtraProperties()['_properties'] ?? []) as $property) {
-                $parameters[] = new OpenApiParameter(name: sprintf('%s[%s]', $key, $property), in: 'query');
+                $parameters[] = new OpenApiParameter(name: \sprintf('%s[%s]', $key, $property), in: 'query');
             }
 
             return $parameters;

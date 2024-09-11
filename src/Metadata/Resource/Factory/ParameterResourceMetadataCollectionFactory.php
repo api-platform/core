@@ -15,9 +15,9 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\FilterInterface;
-use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
-use ApiPlatform\Metadata\JsonSchemaFilterInterface;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
