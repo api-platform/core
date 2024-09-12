@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Validator\Metadata\Resource\Factory;
+namespace ApiPlatform\Laravel\Metadata;
 
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Parameter;
@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
+use Illuminate\Validation\Rule;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Count;
@@ -56,11 +57,6 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
                     $parameters->add($key, $this->addSchemaValidation($parameter));
                 }
 
-                // As we deprecate the parameter validator, we declare a parameter for each filter transfering validation to the new system
-                if ($operation->getFilters() && 0 === $parameters->count()) {
-                    $parameters = $this->addFilterValidation($operation);
-                }
-
                 if (\count($parameters) > 0) {
                     $operations->add($operationName, $operation->withParameters($parameters));
                 }
@@ -89,70 +85,80 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
         return $resourceMetadataCollection;
     }
 
-    private function addSchemaValidation(Parameter $parameter, ?array $schema = null, ?bool $required = null, ?OpenApiParameter $openApi = null): Parameter
+    private function addSchemaValidation(Parameter $parameter): Parameter
     {
-        $schema ??= $parameter->getSchema();
-        $required ??= $parameter->getRequired() ?? false;
-        $openApi ??= $parameter->getOpenApi();
+        $schema = $parameter->getSchema();
+        $required = $parameter->getRequired() ?? false;
+        $openApi = $parameter->getOpenApi();
 
         // When it's an array of openapi parameters take the first one as it's probably just a variant of the query parameter,
         // only getAllowEmptyValue is used here anyways
         if (\is_array($openApi)) {
             $openApi = $openApi[0];
         }
-
         $assertions = [];
 
         if ($required && false !== ($allowEmptyValue = $openApi?->getAllowEmptyValue())) {
-            $assertions[] = new NotNull(message: \sprintf('The parameter "%s" is required.', $parameter->getKey()));
+            $assertions[] = 'required';
         }
 
         if (false === ($allowEmptyValue ?? $openApi?->getAllowEmptyValue())) {
-            $assertions[] = new NotBlank(allowNull: !$required);
+            $assertions[] = 'required';
+            $assertions[] = 'nullable';
         }
 
         if (isset($schema['exclusiveMinimum'])) {
-            $assertions[] = new GreaterThan(value: $schema['exclusiveMinimum']);
+            $assertions[] = 'gt:'.$schema['exclusiveMinimum'];
         }
 
         if (isset($schema['exclusiveMaximum'])) {
-            $assertions[] = new LessThan(value: $schema['exclusiveMaximum']);
+            $assertions[] = 'lt:'.$schema['exclusiveMaximum'];
         }
 
         if (isset($schema['minimum'])) {
-            $assertions[] = new GreaterThanOrEqual(value: $schema['minimum']);
+            $assertions[] = 'gte:'.$schema['minimum'];
         }
 
         if (isset($schema['maximum'])) {
-            $assertions[] = new LessThanOrEqual(value: $schema['maximum']);
+            $assertions[] = 'lte:'.$schema['maximum'];
         }
 
         if (isset($schema['pattern'])) {
-            $assertions[] = new Regex($schema['pattern']);
+            $assertions[] = 'regex:'.$schema['pattern'];
         }
 
-        if (isset($schema['maxLength']) || isset($schema['minLength'])) {
-            $assertions[] = new Length(min: $schema['minLength'] ?? null, max: $schema['maxLength'] ?? null);
+        $minLength = isset($schema['minLength']);
+        $maxLength = isset($schema['maxLength']);
+
+        if ($minLength && $maxLength) {
+            $assertions[] = sprintf('between:%s,%s', $schema['minLength'], $schema['maxLength']);
+        } else if ($minLength) {
+            $assertions[] = 'min:'.$schema['minLength'];
+        } else if ($maxLength) {
+            $assertions[] = 'max:'.$schema['maxLength'];
         }
 
-        if (isset($schema['minItems']) || isset($schema['maxItems'])) {
-            $assertions[] = new Count(min: $schema['minItems'] ?? null, max: $schema['maxItems'] ?? null);
+        $minItems = isset($schema['minItems']);
+        $maxItems = isset($schema['maxItems']);
+
+        if ($minItems && $maxItems) {
+            $assertions[] = sprintf('between:%s,%s', $schema['minItems'], $schema['maxItems']);
+        } else if ($minItems) {
+            $assertions[] = 'min:'.$schema['minItems'];
+        } else if ($maxItems) {
+            $assertions[] = 'max:'.$schema['maxItems'];
         }
 
         if (isset($schema['multipleOf'])) {
-            $assertions[] = new DivisibleBy(value: $schema['multipleOf']);
-        }
-
-        if ($schema['uniqueItems'] ?? false) {
-            $assertions[] = new Unique();
+            $assertions[] = 'multiple_of:'.$schema['multipleOf'];
         }
 
         if (isset($schema['enum'])) {
-            $assertions[] = new Choice(choices: $schema['enum']);
+            $assertions[] = [Rule::enum($schema['enum'])];
         }
 
         if (isset($schema['type']) && 'array' === $schema['type']) {
-            $assertions[] = new Type(type: 'array');
+            $assertions[] = 'array';
         }
 
         if (!$assertions) {
@@ -162,46 +168,6 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
         if (1 === \count($assertions)) {
             return $parameter->withConstraints($assertions[0]);
         }
-
         return $parameter->withConstraints($assertions);
-    }
-
-    private function addFilterValidation(HttpOperation $operation): Parameters
-    {
-        $parameters = new Parameters();
-        $internalPriority = -1;
-
-        foreach ($operation->getFilters() as $filter) {
-            if (!$this->filterLocator->has($filter)) {
-                continue;
-            }
-
-            $filter = $this->filterLocator->get($filter);
-            foreach ($filter->getDescription($operation->getClass()) as $parameterName => $definition) {
-                $key = $parameterName;
-                $required = $definition['required'] ?? false;
-                $schema = $definition['schema'] ?? null;
-
-                $openApi = null;
-                if (isset($definition['openapi']) && $definition['openapi'] instanceof OpenApiParameter) {
-                    $openApi = $definition['openapi'];
-                }
-
-                // The query parameter validator forced this, lets maintain BC on filters
-                if (true === $required && !$openApi) {
-                    $openApi = new OpenApiParameter(name: $key, in: 'query', allowEmptyValue: false);
-                }
-
-                $parameters->add($key, $this->addSchemaValidation(
-                    // we disable openapi and hydra on purpose as their docs comes from filters see the condition for addFilterValidation above
-                    new QueryParameter(key: $key, property: $definition['property'] ?? null, priority: $internalPriority--, schema: $schema, openApi: false, hydra: false),
-                    $schema,
-                    $required,
-                    $openApi
-                ));
-            }
-        }
-
-        return $parameters;
     }
 }

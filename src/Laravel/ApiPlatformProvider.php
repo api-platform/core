@@ -102,6 +102,7 @@ use ApiPlatform\Laravel\GraphQl\Controller\GraphiQlController;
 use ApiPlatform\Laravel\Metadata\CachePropertyMetadataFactory;
 use ApiPlatform\Laravel\Metadata\CachePropertyNameCollectionMetadataFactory;
 use ApiPlatform\Laravel\Metadata\CacheResourceCollectionMetadataFactory;
+use ApiPlatform\Laravel\Metadata\ParameterValidationResourceMetadataCollectionFactory;
 use ApiPlatform\Laravel\Routing\IriConverter;
 use ApiPlatform\Laravel\Routing\Router as UrlGeneratorRouter;
 use ApiPlatform\Laravel\Routing\SkolemIriConverter;
@@ -331,46 +332,49 @@ class ApiPlatformProvider extends ServiceProvider
 
             return new CacheResourceCollectionMetadataFactory(
                 new EloquentResourceCollectionMetadataFactory(
-                    new ParameterResourceMetadataCollectionFactory(
-                        $this->app->make(PropertyNameCollectionFactoryInterface::class),
-                        $this->app->make(PropertyMetadataFactoryInterface::class),
-                        new AlternateUriResourceMetadataCollectionFactory(
-                            new FiltersResourceMetadataCollectionFactory(
-                                new FormatsResourceMetadataCollectionFactory(
-                                    new InputOutputResourceMetadataCollectionFactory(
-                                        new PhpDocResourceMetadataCollectionFactory(
-                                            new OperationNameResourceMetadataCollectionFactory(
-                                                new LinkResourceMetadataCollectionFactory(
-                                                    $app->make(LinkFactoryInterface::class),
-                                                    new UriTemplateResourceMetadataCollectionFactory(
+                    new ParameterValidationResourceMetadataCollectionFactory(
+                        new ParameterResourceMetadataCollectionFactory(
+                            $this->app->make(PropertyNameCollectionFactoryInterface::class),
+                            $this->app->make(PropertyMetadataFactoryInterface::class),
+                            new AlternateUriResourceMetadataCollectionFactory(
+                                new FiltersResourceMetadataCollectionFactory(
+                                    new FormatsResourceMetadataCollectionFactory(
+                                        new InputOutputResourceMetadataCollectionFactory(
+                                            new PhpDocResourceMetadataCollectionFactory(
+                                                new OperationNameResourceMetadataCollectionFactory(
+                                                    new LinkResourceMetadataCollectionFactory(
                                                         $app->make(LinkFactoryInterface::class),
-                                                        $app->make(PathSegmentNameGeneratorInterface::class),
-                                                        new NotExposedOperationResourceMetadataCollectionFactory(
+                                                        new UriTemplateResourceMetadataCollectionFactory(
                                                             $app->make(LinkFactoryInterface::class),
-                                                            new AttributesResourceMetadataCollectionFactory(
-                                                                new ConcernsResourceMetadataCollectionFactory(
-                                                                    null,
+                                                            $app->make(PathSegmentNameGeneratorInterface::class),
+                                                            new NotExposedOperationResourceMetadataCollectionFactory(
+                                                                $app->make(LinkFactoryInterface::class),
+                                                                new AttributesResourceMetadataCollectionFactory(
+                                                                    new ConcernsResourceMetadataCollectionFactory(
+                                                                        null,
+                                                                        $app->make(LoggerInterface::class),
+                                                                        $config->get('api-platform.defaults', []),
+                                                                        $config->get('api-platform.graphql.enabled'),
+                                                                    ),
                                                                     $app->make(LoggerInterface::class),
                                                                     $config->get('api-platform.defaults', []),
                                                                     $config->get('api-platform.graphql.enabled'),
                                                                 ),
-                                                                $app->make(LoggerInterface::class),
-                                                                $config->get('api-platform.defaults', []),
-                                                                $config->get('api-platform.graphql.enabled'),
-                                                            ),
+                                                            )
                                                         )
                                                     )
                                                 )
                                             )
-                                        )
-                                    ),
-                                    $formats,
-                                    $config->get('api-platform.patch_formats'),
+                                        ),
+                                        $formats,
+                                        $config->get('api-platform.patch_formats'),
+                                    )
                                 )
-                            )
+                            ),
+                            $app->make('filters'),
+                            $app->make(CamelCaseToSnakeCaseNameConverter::class)
                         ),
-                        $app->make('filters'),
-                        $app->make(CamelCaseToSnakeCaseNameConverter::class)
+                        $app->make('filters')
                     )
                 ),
                 true === $config->get('app.debug') ? 'array' : 'file'
