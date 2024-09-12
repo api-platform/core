@@ -73,6 +73,7 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
     {
         $schema = $parameter->getSchema();
         $required = $parameter->getRequired();
+
         $openApi = $parameter->getOpenApi();
 
         // When it's an array of openapi parameters take the first one as it's probably just a variant of the query parameter,
