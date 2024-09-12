@@ -50,6 +50,8 @@ class TraversablePaginatorTest extends TestCase
             'Empty results' => [[], 1, 2, 0, 1, 0],
             '0 items per page' => [[0, 1, 2, 3], 1, 0, 4, 1, 4],
             'Total items less than items per page' => [[0, 1, 2], 1, 4, 3, 1, 3],
+            'Only one result' => [[0], 1, 1, 1, 1, 1],
+            'Same result number than total page' => [[0, 2, 3], 1, 3, 3, 1, 3],
         ];
     }
 }
