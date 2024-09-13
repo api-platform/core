@@ -50,6 +50,7 @@ interface SerializerContextBuilderInterface
      *   exclude_from_cache_key?: string[],
      *   api_included?: bool,
      *   attributes?: string[],
+     *   deserializer_type?: string,
      * }
      */
     public function createFromRequest(Request $request, bool $normalization, ?array $extractedAttributes = null): array;

@@ -90,7 +90,7 @@ final class DeserializeProvider implements ProviderInterface
         }
 
         try {
-            return $this->serializer->deserialize((string) $request->getContent(), $operation->getClass(), $format, $serializerContext);
+            return $this->serializer->deserialize((string) $request->getContent(), $serializerContext['deserializer_type'] ?? $operation->getClass(), $format, $serializerContext);
         } catch (PartialDenormalizationException $e) {
             if (!class_exists(ConstraintViolationList::class)) {
                 throw $e;
