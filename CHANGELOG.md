@@ -119,7 +119,6 @@ You should now install `api-platform/symfony` instead of `api-platform/core`.
 * [41deeb4e4](https://github.com/api-platform/core/commit/41deeb4e49c35d27cd902ea41ddaa3c8c492d8e4) fix(symfony): fix debug:api-resource command for class with multiple resources with same uriTemplate (#6505)
 * [52fd9818b](https://github.com/api-platform/core/commit/52fd9818b1d02dd89cac578e0762530079b5b42d) fix(elasticsearch): change normalize return type to compatible with other normalizers (#6493)
 * [b3d7c0768](https://github.com/api-platform/core/commit/b3d7c07682366cc387ceee904cadbdd85bad0c09) fix(openapi): allow null return type parameter
->>>>>>> upstream/3.3
 
 ## v3.3.11
 
