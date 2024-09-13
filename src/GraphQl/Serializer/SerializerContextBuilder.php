@@ -20,6 +20,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 
 /**
  * Builds the context used by the Symfony Serializer.
@@ -52,6 +53,15 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         if ($normalization) {
             $context['attributes'] = $this->fieldsToAttributes($resourceClass, $operation, $resolverContext, $context);
         }
+
+        // to keep the cache computation smaller, we have "operation_name" and "iri" anyways
+        $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY][] = 'root_operation';
+        $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY][] = 'operation';
+        $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY][] = 'object';
+        $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY][] = 'data';
+        $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY][] = 'property_metadata';
+        $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY][] = 'circular_reference_limit_counters';
+        $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY][] = 'debug_trace_id';
 
         return $context;
     }
