@@ -13,28 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Metadata;
 
-use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Parameters;
-use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use Illuminate\Validation\Rule;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\Validator\Constraints\Choice;
-use Symfony\Component\Validator\Constraints\Count;
-use Symfony\Component\Validator\Constraints\DivisibleBy;
-use Symfony\Component\Validator\Constraints\GreaterThan;
-use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\LessThan;
-use Symfony\Component\Validator\Constraints\LessThanOrEqual;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\NotNull;
-use Symfony\Component\Validator\Constraints\Regex;
-use Symfony\Component\Validator\Constraints\Type;
-use Symfony\Component\Validator\Constraints\Unique;
 
 final class ParameterValidationResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
@@ -131,10 +115,10 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
         $maxLength = isset($schema['maxLength']);
 
         if ($minLength && $maxLength) {
-            $assertions[] = sprintf('between:%s,%s', $schema['minLength'], $schema['maxLength']);
-        } else if ($minLength) {
+            $assertions[] = \sprintf('between:%s,%s', $schema['minLength'], $schema['maxLength']);
+        } elseif ($minLength) {
             $assertions[] = 'min:'.$schema['minLength'];
-        } else if ($maxLength) {
+        } elseif ($maxLength) {
             $assertions[] = 'max:'.$schema['maxLength'];
         }
 
@@ -142,10 +126,10 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
         $maxItems = isset($schema['maxItems']);
 
         if ($minItems && $maxItems) {
-            $assertions[] = sprintf('between:%s,%s', $schema['minItems'], $schema['maxItems']);
-        } else if ($minItems) {
+            $assertions[] = \sprintf('between:%s,%s', $schema['minItems'], $schema['maxItems']);
+        } elseif ($minItems) {
             $assertions[] = 'min:'.$schema['minItems'];
-        } else if ($maxItems) {
+        } elseif ($maxItems) {
             $assertions[] = 'max:'.$schema['maxItems'];
         }
 
@@ -168,6 +152,7 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
         if (1 === \count($assertions)) {
             return $parameter->withConstraints($assertions[0]);
         }
+
         return $parameter->withConstraints($assertions);
     }
 }

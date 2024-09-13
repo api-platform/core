@@ -99,6 +99,8 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
         // only getAllowEmptyValue is used here anyways
         if (\is_array($openApi)) {
             $openApi = $openApi[0];
+        }else if (false === $openApi) {
+            $openApi = null;
         }
 
         $assertions = [];
