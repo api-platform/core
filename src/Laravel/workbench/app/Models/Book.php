@@ -46,7 +46,7 @@ use Workbench\App\Http\Requests\BookFormRequest;
         new GetCollection(),
     ]
 )]
-#[QueryParameter(key: 'isbn', schema: ['minimum' => '9783877138395', 'maximum' =>'9793877138395'], filter: PartialSearchFilter::class)]
+#[QueryParameter(key: 'isbn', schema: ['minimum' => '9783877138395', 'maximum' => '9793877138395'], filter: PartialSearchFilter::class)]
 #[QueryParameter(key: 'name', schema: ['minLength' => '4'], filter: PartialSearchFilter::class)]
 #[QueryParameter(key: 'author', filter: EqualsFilter::class)]
 #[QueryParameter(key: 'publicationDate', filter: DateFilter::class, property: 'publication_date')]
