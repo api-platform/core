@@ -113,6 +113,11 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         // to keep the cache computation smaller, we have "operation_name" and "iri" anyways
         $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY][] = 'root_operation';
         $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY][] = 'operation';
+        $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY][] = 'object';
+        $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY][] = 'data';
+        $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY][] = 'property_metadata';
+        $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY][] = 'circular_reference_limit_counters';
+        $context[AbstractObjectNormalizer::EXCLUDE_FROM_CACHE_KEY][] = 'debug_trace_id';
 
         // JSON API see JsonApiProvider
         if ($included = $request->attributes->get('_api_included')) {
