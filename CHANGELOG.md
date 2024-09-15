@@ -1,5 +1,12 @@
 # Changelog
 
+## v3.3.13
+
+### Bug fixes
+
+* [ef0ee6427](https://github.com/api-platform/core/commit/ef0ee6427f8056bcb2617c228a7cf9ffd9d29ccd) fix(doctrine): use parameter.property for filter value (#6572)
+* [04b5ee9](https://github.com/api-platform/core/commit/04b5ee9cac995c636365c143306e1c069f0ab805) perf: skip context data added in #5758
+
 ## v3.3.12
 
 ### Bug fixes
