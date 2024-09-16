@@ -139,6 +139,15 @@ class SerializerContextBuilderTest extends TestCase
                     'id' => 3,
                     'field' => 'foo',
                 ],
+                'exclude_from_cache_key' => [
+                    'root_operation',
+                    'operation',
+                    'object',
+                    'data',
+                    'property_metadata',
+                    'circular_reference_limit_counters',
+                    'debug_trace_id',
+                ],
             ],
         ];
         yield 'nominal with advanced name converter' => [
@@ -158,6 +167,15 @@ class SerializerContextBuilderTest extends TestCase
                 'attributes' => [
                     'id' => 3,
                     'denormalizedField' => 'foo',
+                ],
+                'exclude_from_cache_key' => [
+                    'root_operation',
+                    'operation',
+                    'object',
+                    'data',
+                    'property_metadata',
+                    'circular_reference_limit_counters',
+                    'debug_trace_id',
                 ],
             ],
             $advancedNameConverterFactory,
@@ -179,6 +197,15 @@ class SerializerContextBuilderTest extends TestCase
                 'attributes' => [
                     'nodeField' => 'baz',
                 ],
+                'exclude_from_cache_key' => [
+                    'root_operation',
+                    'operation',
+                    'object',
+                    'data',
+                    'property_metadata',
+                    'circular_reference_limit_counters',
+                    'debug_trace_id',
+                ],
             ],
         ];
         yield 'no resource class' => [
@@ -194,6 +221,15 @@ class SerializerContextBuilderTest extends TestCase
                 'graphql_operation_name' => $operationName,
                 'attributes' => [
                     'related' => ['id' => 9],
+                ],
+                'exclude_from_cache_key' => [
+                    'root_operation',
+                    'operation',
+                    'object',
+                    'data',
+                    'property_metadata',
+                    'circular_reference_limit_counters',
+                    'debug_trace_id',
                 ],
             ],
         ];
@@ -215,6 +251,15 @@ class SerializerContextBuilderTest extends TestCase
                     'id' => 7,
                     'related' => ['field' => 'bar'],
                 ],
+                'exclude_from_cache_key' => [
+                    'root_operation',
+                    'operation',
+                    'object',
+                    'data',
+                    'property_metadata',
+                    'circular_reference_limit_counters',
+                    'debug_trace_id',
+                ],
             ],
         ];
         yield 'subscription (using fields in context)' => [
@@ -235,6 +280,15 @@ class SerializerContextBuilderTest extends TestCase
                 'attributes' => [
                     'id' => 7,
                     'related' => ['field' => 'bar'],
+                ],
+                'exclude_from_cache_key' => [
+                    'root_operation',
+                    'operation',
+                    'object',
+                    'data',
+                    'property_metadata',
+                    'circular_reference_limit_counters',
+                    'debug_trace_id',
                 ],
             ],
         ];
@@ -264,6 +318,15 @@ class SerializerContextBuilderTest extends TestCase
                     'graphql_operation_name' => $operationName,
                     'input' => ['class' => 'inputClass'],
                     'output' => ['class' => 'outputClass'],
+                    'exclude_from_cache_key' => [
+                        'root_operation',
+                        'operation',
+                        'object',
+                        'data',
+                        'property_metadata',
+                        'circular_reference_limit_counters',
+                        'debug_trace_id',
+                    ],
                 ],
             ],
             'no resource class' => [
@@ -273,6 +336,15 @@ class SerializerContextBuilderTest extends TestCase
                     'resource_class' => $resourceClass,
                     'operation_name' => $operationName,
                     'graphql_operation_name' => $operationName,
+                    'exclude_from_cache_key' => [
+                        'root_operation',
+                        'operation',
+                        'object',
+                        'data',
+                        'property_metadata',
+                        'circular_reference_limit_counters',
+                        'debug_trace_id',
+                    ],
                 ],
             ],
         ];

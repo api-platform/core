@@ -45,11 +45,16 @@ final class DoctrineTest extends ApiTestCase
         $this->assertEquals('bar', $a['hydra:member'][1]['foo']);
 
         $this->assertArraySubset(['hydra:search' => [
-            'hydra:template' => \sprintf('/%s{?foo,order[order[id]],order[order[foo]],searchPartial[foo],searchExact[foo],searchOnTextAndDate[foo],searchOnTextAndDate[createdAt][before],searchOnTextAndDate[createdAt][strictly_before],searchOnTextAndDate[createdAt][after],searchOnTextAndDate[createdAt][strictly_after],q,id,createdAt}', $route),
+            'hydra:template' => \sprintf('/%s{?foo,fooAlias,order[order[id]],order[order[foo]],searchPartial[foo],searchExact[foo],searchOnTextAndDate[foo],searchOnTextAndDate[createdAt][before],searchOnTextAndDate[createdAt][strictly_before],searchOnTextAndDate[createdAt][after],searchOnTextAndDate[createdAt][strictly_after],q,id,createdAt}', $route),
             'hydra:mapping' => [
                 ['@type' => 'IriTemplateMapping', 'variable' => 'foo', 'property' => 'foo'],
             ],
         ]], $a);
+
+        $response = self::createClient()->request('GET', $route.'?fooAlias=baz');
+        $a = $response->toArray();
+        $this->assertCount(1, $a['hydra:member']);
+        $this->assertEquals('baz', $a['hydra:member'][0]['foo']);
 
         $response = self::createClient()->request('GET', $route.'?order[foo]=asc');
         $this->assertEquals($response->toArray()['hydra:member'][0]['foo'], 'bar');
