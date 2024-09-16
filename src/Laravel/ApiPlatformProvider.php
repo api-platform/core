@@ -198,6 +198,7 @@ use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
@@ -956,7 +957,15 @@ class ApiPlatformProvider extends ServiceProvider
             // $list->insert($jsonserializableNormalizer, -900);
             // $list->insert($uuidDenormalizer, -895); //Todo ramsey uuid support ?
 
-            return new Serializer(iterator_to_array($list), [new JsonEncoder('json'), $app->make(JsonEncoder::class), new JsonEncoder('jsonopenapi'), new JsonEncoder('jsonapi')]);
+            return new Serializer(
+                iterator_to_array($list),
+                [
+                    new JsonEncoder('json'),
+                    $app->make(JsonEncoder::class),
+                    new JsonEncoder('jsonopenapi'),
+                    new JsonEncoder('jsonapi'),
+                    new CsvEncoder(),
+                ]);
         });
 
         $this->app->singleton(JsonLdItemNormalizer::class, function (Application $app) {
