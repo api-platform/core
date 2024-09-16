@@ -82,11 +82,11 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
         }
         $assertions = [];
 
-        if ($required && false !== ($allowEmptyValue = $openApi?->getAllowEmptyValue())) {
+        if ($required && true !== ($allowEmptyValue = $openApi?->getAllowEmptyValue())) {
             $assertions[] = 'required';
         }
 
-        if (false === ($allowEmptyValue ?? $openApi?->getAllowEmptyValue())) {
+        if (true === ($allowEmptyValue ?? $openApi?->getAllowEmptyValue())) {
             $assertions[] = 'required';
             $assertions[] = 'nullable';
         }
@@ -107,15 +107,15 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
             $assertions[] = 'lte:'.$schema['maximum'];
         }
 
-        if (isset($schema['pattern'])) {
-            $assertions[] = 'regex:'.$schema['pattern'];
+        if (isset($schema['regexPattern'])) {
+            $assertions[] = 'regex:'.$schema['regexPattern'];
         }
 
         $minLength = isset($schema['minLength']);
         $maxLength = isset($schema['maxLength']);
 
         if ($minLength && $maxLength) {
-            $assertions[] = \sprintf('between:%s,%s', $schema['minLength'], $schema['maxLength']);
+            $assertions[] = sprintf('between:%s,%s', $schema['minLength'], $schema['maxLength']);
         } elseif ($minLength) {
             $assertions[] = 'min:'.$schema['minLength'];
         } elseif ($maxLength) {
@@ -126,7 +126,7 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
         $maxItems = isset($schema['maxItems']);
 
         if ($minItems && $maxItems) {
-            $assertions[] = \sprintf('between:%s,%s', $schema['minItems'], $schema['maxItems']);
+            $assertions[] = sprintf('between:%s,%s', $schema['minItems'], $schema['maxItems']);
         } elseif ($minItems) {
             $assertions[] = 'min:'.$schema['minItems'];
         } elseif ($maxItems) {
@@ -137,9 +137,9 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
             $assertions[] = 'multiple_of:'.$schema['multipleOf'];
         }
 
-        if (isset($schema['enum'])) {
-            $assertions[] = [Rule::enum($schema['enum'])];
-        }
+        //        if (isset($schema['enum'])) {
+        //            $assertions[] = [Rule::enum($schema['enum'])];
+        //        }
 
         if (isset($schema['type']) && 'array' === $schema['type']) {
             $assertions[] = 'array';
