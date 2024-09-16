@@ -1100,7 +1100,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ContextAwareTypeBuilderInterface::class),
                 $app->make(TypeConverterInterface::class),
                 $app->make(ResolverFactoryInterface::class),
-                $app->make(FilterInterface::class),
+                $app->make('filters'),
                 $app->make(Pagination::class),
                 $app->make(NameConverterInterface::class),
                 $config->get('api-platform.graphql.nesting_separator') ?? '__',
