@@ -72,7 +72,7 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
     private function addSchemaValidation(Parameter $parameter): Parameter
     {
         $schema = $parameter->getSchema();
-        $required = $parameter->getRequired() ?? false;
+        $required = $parameter->getRequired();
         $openApi = $parameter->getOpenApi();
 
         // When it's an array of openapi parameters take the first one as it's probably just a variant of the query parameter,
@@ -81,13 +81,12 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
             $openApi = $openApi[0];
         }
         $assertions = [];
-
-        if ($required && true !== ($allowEmptyValue = $openApi?->getAllowEmptyValue())) {
+        $allowEmptyValue = $openApi?->getAllowEmptyValue();
+        if ($required || (false === $required && false === $allowEmptyValue)) {
             $assertions[] = 'required';
         }
 
-        if (true === ($allowEmptyValue ?? $openApi?->getAllowEmptyValue())) {
-            $assertions[] = 'required';
+        if (true === $allowEmptyValue) {
             $assertions[] = 'nullable';
         }
 
@@ -107,8 +106,8 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
             $assertions[] = 'lte:'.$schema['maximum'];
         }
 
-        if (isset($schema['regexPattern'])) {
-            $assertions[] = 'regex:'.$schema['regexPattern'];
+        if (isset($schema['pattern'])) {
+            $assertions[] = 'regex:'.$schema['pattern'];
         }
 
         $minLength = isset($schema['minLength']);
