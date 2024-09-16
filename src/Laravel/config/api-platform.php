@@ -23,7 +23,7 @@ return [
     'formats' => [
         'jsonld' => ['application/ld+json'],
         //'jsonapi' => ['application/vnd.api+json'],
-        //'csv' => ['application/csv'],
+        //'csv' => ['text/csv'],
     ],
 
     'patch_formats' => [
