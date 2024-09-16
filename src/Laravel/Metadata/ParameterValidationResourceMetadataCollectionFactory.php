@@ -107,8 +107,8 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
             $assertions[] = 'lte:'.$schema['maximum'];
         }
 
-        if (isset($schema['regexPattern'])) {
-            $assertions[] = 'regex:'.$schema['regexPattern'];
+        if (isset($schema['pattern'])) {
+            $assertions[] = 'regex:'.$schema['pattern'];
         }
 
         $minLength = isset($schema['minLength']);
