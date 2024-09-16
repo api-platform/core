@@ -68,6 +68,10 @@ final class TraversablePaginator implements \IteratorAggregate, PaginatorInterfa
             return (int) ceil($this->totalItems);
         }
 
+        if ($this->totalItems === $this->itemsPerPage) {
+            return (int) ceil($this->totalItems);
+        }
+
         return $this->totalItems % $this->itemsPerPage;
     }
 
