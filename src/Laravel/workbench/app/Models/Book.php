@@ -26,6 +26,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\OpenApi\Model\Parameter;
 use ApiPlatform\Serializer\Filter\PropertyFilter;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -47,8 +48,8 @@ use Workbench\App\Http\Requests\BookFormRequest;
     ]
 )]
 #[QueryParameter(key: 'isbn', schema: ['minimum' => '9783877138395', 'maximum' => '9793877138395'], filter: PartialSearchFilter::class)]
-#[QueryParameter(key: 'name', schema: ['minLength' => '4'], filter: PartialSearchFilter::class)]
-#[QueryParameter(key: 'author', filter: EqualsFilter::class)]
+#[QueryParameter(key: 'name', schema: ['regexPattern' => '/^a/'], filter: PartialSearchFilter::class)]
+#[QueryParameter(key: 'author', openApi: new Parameter(name: 'author', in: 'query', allowEmptyValue: true), filter: EqualsFilter::class, required: true)]
 #[QueryParameter(key: 'publicationDate', filter: DateFilter::class, property: 'publication_date')]
 #[QueryParameter(key: 'publicationDateWithNulls', filter: DateFilter::class, property: 'publication_date', filterContext: ['include_nulls' => true])]
 #[QueryParameter(key: 'isbn_range', filter: RangeFilter::class, property: 'isbn')]
