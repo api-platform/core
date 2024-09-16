@@ -114,7 +114,7 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
         $maxLength = isset($schema['maxLength']);
 
         if ($minLength && $maxLength) {
-            $assertions[] = sprintf('between:%s,%s', $schema['minLength'], $schema['maxLength']);
+            $assertions[] = \sprintf('between:%s,%s', $schema['minLength'], $schema['maxLength']);
         } elseif ($minLength) {
             $assertions[] = 'min:'.$schema['minLength'];
         } elseif ($maxLength) {
@@ -125,7 +125,7 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
         $maxItems = isset($schema['maxItems']);
 
         if ($minItems && $maxItems) {
-            $assertions[] = sprintf('between:%s,%s', $schema['minItems'], $schema['maxItems']);
+            $assertions[] = \sprintf('between:%s,%s', $schema['minItems'], $schema['maxItems']);
         } elseif ($minItems) {
             $assertions[] = 'min:'.$schema['minItems'];
         } elseif ($maxItems) {

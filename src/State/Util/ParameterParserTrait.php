@@ -46,6 +46,10 @@ trait ParameterParserTrait
     {
         $accessors = null;
         $key = $parameter->getKey();
+        if (null === $key) {
+            throw new \RuntimeException('A Parameter should have a key.');
+        }
+
         $parsedKey = explode('[:property]', $key);
         if (isset($parsedKey[0]) && isset($values[$parsedKey[0]])) {
             $key = $parsedKey[0];
