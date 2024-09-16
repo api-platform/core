@@ -14,5 +14,11 @@
         <service id="api_platform.validator.state.error_provider" class="ApiPlatform\Symfony\Validator\State\ErrorProvider">
             <tag name="api_platform.state_provider" key="api_platform.validator.state.error_provider" />
         </service>
+
+        <service id="api_platform.validator.metadata.resource.metadata_collection_factory.parameter" class="ApiPlatform\Validator\Metadata\Resource\Factory\ParameterValidationResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" public="false" decoration-priority="1000">
+            <argument type="service" id="api_platform.validator.metadata.resource.metadata_collection_factory.parameter.inner" />
+            <argument type="service" id="api_platform.filter_locator" />
+        </service>
+
     </services>
 </container>

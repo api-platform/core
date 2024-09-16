@@ -26,6 +26,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
     uriTemplate: 'search_filter_parameter{._format}',
     parameters: [
         'foo' => new QueryParameter(filter: 'app_odm_search_filter_via_parameter'),
+        'fooAlias' => new QueryParameter(filter: 'app_odm_search_filter_via_parameter', property: 'foo'),
         'order[:property]' => new QueryParameter(filter: 'app_odm_search_filter_via_parameter.order_filter'),
 
         'searchPartial[:property]' => new QueryParameter(filter: 'app_odm_search_filter_partial'),
