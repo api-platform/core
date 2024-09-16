@@ -235,7 +235,7 @@ class EloquentTest extends TestCase
 
     public function testOrderFilterWithPropertyPlaceholder(): void
     {
-        $res = $this->get('/api/authors?order[id]=desc', ['Accept' => ['application/ld+json']]);
+        $res = $this->get('/api/authors?order[id]=desc', ['Accept' => ['application/ld+json']])->json();
         $this->assertSame($res['member'][0]['id'], 10);
     }
 
@@ -361,5 +361,11 @@ class EloquentTest extends TestCase
         $this->assertSame($response->json()['member'][0]['@id'], $bookBefore['@id']);
         $this->assertSame($response->json()['member'][1]['@id'], $bookAfter['@id']);
         $this->assertSame($response->json()['totalItems'], 2);
+    }
+
+    public function testWrongOrderFilter(): void
+    {
+        $res = $this->get('/api/authors?order[name]=something', ['Accept' => ['application/ld+json']]);
+        $this->assertEquals($res->getStatusCode(), 422);
     }
 }

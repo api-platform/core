@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\State;
 
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ProviderInterface;
@@ -59,18 +60,23 @@ final class ParameterValidatorProvider implements ProviderInterface
             }
 
             $key = $parameter->getKey();
+            if (null === $key) {
+                throw new RuntimeException('A parameter must have a defined key.');
+            }
+
             $value = $parameter->getValue();
             if ($value instanceof ParameterNotFound) {
                 $value = null;
             }
 
-            foreach ((array) $constraints as $k => $c) {
-                if (!\is_string($k)) {
-                    $k = $key;
-                }
-
-                $allConstraints[$k] = $c;
+            // Basically renames our key from order[:property] to order.* to assign the rule properly (see https://laravel.com/docs/11.x/validation#rule-in)
+            if (str_contains($key, '[:property]')) {
+                $k = str_replace('[:property]', '', $key);
+                $allConstraints[$k.'.*'] = $constraints;
+                continue;
             }
+
+            $allConstraints[$key] = $constraints;
         }
 
         $validator = Validator::make($request->query->all(), $allConstraints);

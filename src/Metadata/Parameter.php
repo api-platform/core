@@ -17,7 +17,6 @@ use ApiPlatform\OpenApi;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ParameterProviderInterface;
-use Symfony\Component\Validator\Constraint;
 
 /**
  * @experimental
@@ -29,7 +28,7 @@ abstract class Parameter
      * @param array<string, mixed>                                               $extraProperties
      * @param ParameterProviderInterface|callable|string|null                    $provider
      * @param FilterInterface|string|null                                        $filter
-     * @param Constraint|array<string, string>|string|Constraint[]|null          $constraints
+     * @param mixed                                                              $constraints     an array of Symfony constraints, or an array of Laravel rules
      */
     public function __construct(
         protected ?string $key = null,
@@ -42,7 +41,7 @@ abstract class Parameter
         protected ?bool $required = null,
         protected ?int $priority = null,
         protected ?false $hydra = null,
-        protected Constraint|array|string|null $constraints = null,
+        protected mixed $constraints = null,
         protected string|\Stringable|null $security = null,
         protected ?string $securityMessage = null,
         protected ?array $extraProperties = [],
@@ -106,10 +105,7 @@ abstract class Parameter
         return $this->hydra;
     }
 
-    /**
-     * @return Constraint|string|array<string, string>|Constraint[]|null
-     */
-    public function getConstraints(): Constraint|string|array|null
+    public function getConstraints(): mixed
     {
         return $this->constraints;
     }
@@ -239,10 +235,7 @@ abstract class Parameter
         return $self;
     }
 
-    /**
-     * @param string|array<string, string>|Constraint[]|Constraint $constraints
-     */
-    public function withConstraints(string|array|Constraint $constraints): static
+    public function withConstraints(mixed $constraints): static
     {
         $self = clone $this;
         $self->constraints = $constraints;
