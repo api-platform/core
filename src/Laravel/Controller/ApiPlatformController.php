@@ -51,6 +51,7 @@ class ApiPlatformController extends Controller
         }
 
         $uriVariables = $this->getUriVariables($request, $operation);
+        $request->attributes->set('_api_uri_variables', $uriVariables);
         // at some point we could introduce that back
         // if ($this->uriVariablesConverter) {
         //     $context = ['operation' => $operation, 'uri_variables_map' => $uriVariablesMap];

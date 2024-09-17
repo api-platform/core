@@ -150,6 +150,7 @@ class ErrorHandler extends ExceptionsHandler
             $dup->attributes->remove('exception');
             // These are for swagger
             $dup->attributes->set('_api_original_route', $request->attributes->get('_route'));
+            $dup->attributes->set('_api_original_uri_variables', $request->attributes->get('_api_uri_variables'));
             $dup->attributes->set('_api_original_route_params', $request->attributes->get('_route_params'));
             $dup->attributes->set('_api_requested_operation', $request->attributes->get('_api_requested_operation'));
 

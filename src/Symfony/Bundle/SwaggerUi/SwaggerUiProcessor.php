@@ -80,7 +80,8 @@ final class SwaggerUiProcessor implements ProcessorInterface
         $status = 200;
         $requestedOperation = $request?->attributes->get('_api_requested_operation') ?? null;
         if ($request->isMethodSafe() && $requestedOperation && $requestedOperation->getName()) {
-            $swaggerData['id'] = $request->get('id');
+            // TODO: what if the parameter is named something else then `id`?
+            $swaggerData['id'] = ($request->attributes->get('_api_original_uri_variables') ?? [])['id'] ?? null;
             $swaggerData['queryParameters'] = $request->query->all();
 
             $swaggerData['shortName'] = $requestedOperation->getShortName();

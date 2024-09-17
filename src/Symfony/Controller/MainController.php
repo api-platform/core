@@ -56,6 +56,7 @@ final class MainController
         if (!$operation instanceof Error) {
             try {
                 $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $operation->getClass());
+                $request->attributes->set('_api_uri_variables', $uriVariables);
             } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
                 throw new NotFoundHttpException('Invalid uri variables.', $e);
             }
