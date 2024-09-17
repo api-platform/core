@@ -43,6 +43,9 @@ use ApiPlatform\GraphQl\Type\TypesContainer;
 use ApiPlatform\GraphQl\Type\TypesContainerInterface;
 use ApiPlatform\GraphQl\Type\TypesFactory;
 use ApiPlatform\GraphQl\Type\TypesFactoryInterface;
+use ApiPlatform\Hal\Serializer\CollectionNormalizer as HalCollectionNormalizer;
+use ApiPlatform\Hal\Serializer\EntrypointNormalizer as HalEntrypointNormalizer;
+use ApiPlatform\Hal\Serializer\ObjectNormalizer as HalObjectNormalizer;
 use ApiPlatform\Hydra\JsonSchema\SchemaFactory as HydraSchemaFactory;
 use ApiPlatform\Hydra\Serializer\CollectionFiltersNormalizer as HydraCollectionFiltersNormalizer;
 use ApiPlatform\Hydra\Serializer\CollectionNormalizer as HydraCollectionNormalizer;
@@ -660,6 +663,24 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
+        $this->app->singleton(HalCollectionNormalizer::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+
+            return new HalCollectionNormalizer(
+                $app->make(ResourceClassResolverInterface::class),
+                $config->get('api-platform.pagination.page_parameter_name'),
+                $app->make(ResourceMetadataCollectionFactoryInterface::class),
+            );
+        });
+
+        $this->app->singleton(HalObjectNormalizer::class, function (Application $app) {
+            return new HalObjectNormalizer(
+                $app->make(ObjectNormalizer::class),
+                $app->make(IriConverterInterface::class)
+            );
+        });
+
         $this->app->singleton(Options::class, function (Application $app) {
             /** @var ConfigRepository */
             $config = $app['config'];
@@ -724,7 +745,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $config->get('api-platform.formats'),
                 null, // ?Options $openApiOptions = null,
                 $app->make(PaginationOptions::class), // ?PaginationOptions $paginationOptions = null,
-                // ?RouterInterface $router = null
+            // ?RouterInterface $router = null
             );
         });
 
@@ -856,7 +877,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(ResourceAccessCheckerInterface::class),
                 null
-                // $app->make(TagCollectorInterface::class),
+            // $app->make(TagCollectorInterface::class),
             );
         });
 
@@ -922,6 +943,9 @@ class ApiPlatformProvider extends ServiceProvider
             $list = new \SplPriorityQueue();
             $list->insert($app->make(HydraEntrypointNormalizer::class), -800);
             $list->insert($app->make(HydraPartialCollectionViewNormalizer::class), -800);
+            $list->insert($app->make(HalCollectionNormalizer::class), -800);
+            $list->insert($app->make(HalEntrypointNormalizer::class), -985);
+            $list->insert($app->make(HalObjectNormalizer::class), -995);
             $list->insert($app->make(JsonLdItemNormalizer::class), -890);
             $list->insert($app->make(JsonLdObjectNormalizer::class), -995);
             $list->insert($app->make(ArrayDenormalizer::class), -990);
@@ -951,9 +975,6 @@ class ApiPlatformProvider extends ServiceProvider
             // $list->insert($dataUriNormalizer, -920);
             // $list->insert($unwrappingDenormalizer, 1000);
             // $list->insert($halItemNormalizer, -890);
-            // $list->insert($halEntrypointNormalizer, -800);
-            // $list->insert($halCollectionNormalizer, -985);
-            // $list->insert($halObjectNormalizer, -995);
             // $list->insert($jsonserializableNormalizer, -900);
             // $list->insert($uuidDenormalizer, -895); //Todo ramsey uuid support ?
 
@@ -965,6 +986,7 @@ class ApiPlatformProvider extends ServiceProvider
                     new JsonEncoder('jsonopenapi'),
                     new JsonEncoder('jsonapi'),
                     new CsvEncoder(),
+                    new JsonEncoder('jsonhal')
                 ]);
         });
 

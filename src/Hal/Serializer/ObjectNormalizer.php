@@ -17,7 +17,6 @@ use ApiPlatform\Metadata\IriConverterInterface;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Serializer;
 
 /**
  * Decorates the output with JSON HAL metadata when appropriate, but otherwise
