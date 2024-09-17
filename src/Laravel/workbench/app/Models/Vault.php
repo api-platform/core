@@ -14,10 +14,12 @@ declare(strict_types=1);
 namespace Workbench\App\Models;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Workbench\App\Http\Requests\VaultFormRequest;
 
 #[ApiResource(
     operations: [
@@ -30,6 +32,7 @@ use Illuminate\Database\Eloquent\Model;
             read: true,
             write: false
         ),
+        new Delete(middleware: 'auth:sanctum', rules: VaultFormRequest::class, provider: [self::class, 'provide']),
     ]
 )]
 class Vault extends Model
