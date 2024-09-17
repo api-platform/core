@@ -136,9 +136,9 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
             $assertions[] = 'multiple_of:'.$schema['multipleOf'];
         }
 
-        //        if (isset($schema['enum'])) {
-        //            $assertions[] = [Rule::enum($schema['enum'])];
-        //        }
+        if (isset($schema['enum'])) {
+            $assertions[] = Rule::in($schema['enum']);
+        }
 
         if (isset($schema['type']) && 'array' === $schema['type']) {
             $assertions[] = 'array';
