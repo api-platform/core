@@ -47,4 +47,12 @@ class AuthTest extends TestCase
         $response = $this->post('/api/vaults', [], ['accept' => ['application/ld+json'], 'content-type' => ['application/ld+json'], 'authorization' => 'Bearer '.$token]);
         $response->assertStatus(403);
     }
+
+    public function testAuthenticatedDeleteWithPolicy(): void
+    {
+        $response = $this->post('/tokens/create');
+        $token = $response->json()['token'];
+        $response = $this->delete('/api/vaults/1', [], ['accept' => ['application/ld+json'], 'authorization' => 'Bearer '.$token]);
+        $response->assertStatus(403);
+    }
 }

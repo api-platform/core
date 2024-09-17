@@ -22,4 +22,9 @@ class VaultPolicy
     {
         return false;
     }
+
+    public function delete(User $user): bool
+    {
+        return false;
+    }
 }

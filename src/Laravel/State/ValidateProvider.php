@@ -42,7 +42,7 @@ final class ValidateProvider implements ProviderInterface
         $request = $context['request'];
         $body = $this->inner->provide($operation, $uriVariables, $context);
 
-        if (!$operation->canValidate() || $operation instanceof Error) {
+        if ($operation instanceof Error) {
             return $body;
         }
 
@@ -53,12 +53,20 @@ final class ValidateProvider implements ProviderInterface
 
         if (\is_string($rules) && is_a($rules, FormRequest::class, true)) {
             try {
+                // this also throws an AuthorizationException
                 $this->app->make($rules);
-                // } catch (AuthorizationException $e) { // TODO: we may want to catch this to transform to an error
             } catch (ValidationException $e) { // @phpstan-ignore-line make->($rules) may throw this
+                if (!$operation->canValidate()) {
+                    return $body;
+                }
+
                 throw $this->getValidationError($e->validator, $e);
             }
 
+            return $body;
+        }
+
+        if (!$operation->canValidate()) {
             return $body;
         }
 
