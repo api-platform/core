@@ -745,7 +745,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $config->get('api-platform.formats'),
                 null, // ?Options $openApiOptions = null,
                 $app->make(PaginationOptions::class), // ?PaginationOptions $paginationOptions = null,
-            // ?RouterInterface $router = null
+                // ?RouterInterface $router = null
             );
         });
 
@@ -877,7 +877,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(ResourceAccessCheckerInterface::class),
                 null
-            // $app->make(TagCollectorInterface::class),
+                // $app->make(TagCollectorInterface::class),
             );
         });
 
