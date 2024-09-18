@@ -68,7 +68,6 @@ final class EloquentResourceCollectionMetadataFactory implements ResourceMetadat
         foreach ($resourceMetadataCollection as $i => $resourceMetadata) {
             $operations = $resourceMetadata->getOperations();
             foreach ($operations ?? [] as $operationName => $operation) {
-                /** @var Metadata $operation */
                 if (!$operation->getProvider()) {
                     $operation = $operation->withProvider($operation instanceof CollectionOperationInterface ? CollectionProvider::class : ItemProvider::class);
                 }
