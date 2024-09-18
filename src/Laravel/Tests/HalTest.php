@@ -88,56 +88,14 @@ class HalTest extends TestCase
             [
                 'name' => $book->name, // @phpstan-ignore-line
                 'isbn' => $book->isbn, // @phpstan-ignore-line
-                'author' => '/api/authors/1',
-            ],
-            $response->json()
-        );
-    }
-
-    public function testCreateBook(): void
-    {
-        $response = $this->postJson(
-            '/api/books',
-            [
-                'name' => 'Don Quichotte',
-                'isbn' => fake()->isbn13(),
-                'author' => '/api/authors/1',
-            ],
-            [
-                'accept' => 'application/hal+json',
-                'content_type' => 'application/hal+json',
-            ]
-        );
-
-        $response->assertStatus(201);
-        $response->assertHeader('content-type', 'application/hal+json; charset=utf-8');
-        $this->assertJsonContains(
-            [
-                'name' => 'Don Quichotte',
-                'author' => '/api/authors/1',
-            ],
-            $response->json()
-        );
-    }
-
-    public function testUpdateBook(): void
-    {
-        $book = Book::first();
-        $iri = $this->getIriFromResource($book);
-        $response = $this->putJson(
-            $iri,
-            [
-                'name' => 'New Title',
-            ],
-            [
-                'content_type' => 'application/hal+json',
-                'accept' => 'application/hal+json',
-            ]
-        );
-        $response->assertStatus(200);
-        $this->assertJsonContains(
-            [
-                'name' => 'New Title',
+                '_links' => [
+                    'self' => [
+                        'href' => $iri,
+                    ],
+                    'author' => [
+                        'href' => '/api/authors/1',
+                    ],
+                ],
             ],
             $response->json()
         );

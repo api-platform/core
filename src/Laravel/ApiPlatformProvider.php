@@ -45,6 +45,7 @@ use ApiPlatform\GraphQl\Type\TypesFactory;
 use ApiPlatform\GraphQl\Type\TypesFactoryInterface;
 use ApiPlatform\Hal\Serializer\CollectionNormalizer as HalCollectionNormalizer;
 use ApiPlatform\Hal\Serializer\EntrypointNormalizer as HalEntrypointNormalizer;
+use ApiPlatform\Hal\Serializer\ItemNormalizer as HalItemNormalizer;
 use ApiPlatform\Hal\Serializer\ObjectNormalizer as HalObjectNormalizer;
 use ApiPlatform\Hydra\JsonSchema\SchemaFactory as HydraSchemaFactory;
 use ApiPlatform\Hydra\Serializer\CollectionFiltersNormalizer as HydraCollectionFiltersNormalizer;
@@ -681,6 +682,25 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
+        $this->app->singleton(HalItemNormalizer::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+            $defaultContext = $config->get('api-platform.serializer', []);
+
+            return new HalItemNormalizer(
+                $app->make(PropertyNameCollectionFactoryInterface::class),
+                $app->make(PropertyMetadataFactoryInterface::class),
+                $app->make(IriConverterInterface::class),
+                $app->make(ResourceClassResolverInterface::class),
+                $app->make(PropertyAccessorInterface::class),
+                $app->make(NameConverterInterface::class),
+                $app->make(ClassMetadataFactoryInterface::class),
+                $defaultContext,
+                $app->make(ResourceMetadataCollectionFactoryInterface::class),
+                $app->make(ResourceAccessCheckerInterface::class),
+            );
+        });
+
         $this->app->singleton(Options::class, function (Application $app) {
             /** @var ConfigRepository */
             $config = $app['config'];
@@ -946,6 +966,7 @@ class ApiPlatformProvider extends ServiceProvider
             $list->insert($app->make(HalCollectionNormalizer::class), -800);
             $list->insert($app->make(HalEntrypointNormalizer::class), -985);
             $list->insert($app->make(HalObjectNormalizer::class), -995);
+            $list->insert($app->make(HalItemNormalizer::class), -890);
             $list->insert($app->make(JsonLdItemNormalizer::class), -890);
             $list->insert($app->make(JsonLdObjectNormalizer::class), -995);
             $list->insert($app->make(ArrayDenormalizer::class), -990);
@@ -974,7 +995,6 @@ class ApiPlatformProvider extends ServiceProvider
             // TODO: unused + implement hal/jsonapi ?
             // $list->insert($dataUriNormalizer, -920);
             // $list->insert($unwrappingDenormalizer, 1000);
-            // $list->insert($halItemNormalizer, -890);
             // $list->insert($jsonserializableNormalizer, -900);
             // $list->insert($uuidDenormalizer, -895); //Todo ramsey uuid support ?
 
