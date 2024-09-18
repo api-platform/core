@@ -52,6 +52,19 @@ class PolicyAllowTest extends TestCase
         $response->assertStatus(200);
     }
 
+    public function testGetEmptyColelction(): void
+    {
+        $response = $this->get('/api/books?publicationDate[gt]=9999-12-31', ['accept' => ['application/vnd.api+json']]);
+        $response->assertStatus(200);
+        $response->assertJsonFragment([
+            'meta' => [
+                'totalItems' => 0,
+                'itemsPerPage' => 5,
+                'currentPage' => 1,
+            ],
+        ]);
+    }
+
     public function testGetBook(): void
     {
         $book = Book::first();
