@@ -3,15 +3,15 @@
     "description": "API Hal support",
     "type": "library",
     "keywords": [
-        "REST",
         "GraphQL",
-        "API",
         "JSON-LD",
         "Hydra",
         "JSONAPI",
         "OpenAPI",
-        "HAL",
-        "Swagger"
+        "Swagger",
+        "REST",
+        "API",
+        "HAL"
     ],
     "homepage": "https://api-platform.com",
     "license": "MIT",

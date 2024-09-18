@@ -985,8 +985,8 @@ class ApiPlatformProvider extends ServiceProvider
                     $app->make(JsonEncoder::class),
                     new JsonEncoder('jsonopenapi'),
                     new JsonEncoder('jsonapi'),
+                    new JsonEncoder('jsonhal'),
                     new CsvEncoder(),
-                    new JsonEncoder('jsonhal')
                 ]);
         });
 

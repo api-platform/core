@@ -75,8 +75,8 @@ class HalTest extends TestCase
         $response->assertHeader('content-type', 'application/hal+json; charset=utf-8');
         $this->assertJsonContains(
             [
-                'name' => $book->name,
-                'isbn' => $book->isbn,
+                'name' => $book->name, // @phpstan-ignore-line
+                'isbn' => $book->isbn, // @phpstan-ignore-line
                 'author' => '/api/authors/1',
             ],
             $response->json()
@@ -139,6 +139,6 @@ class HalTest extends TestCase
         $iri = $this->getIriFromResource($book);
         $response = $this->delete($iri, headers: ['accept' => 'application/hal+json']);
         $response->assertStatus(204);
-        $this->assertNull(Book::find($book->id));
+        $this->assertNull(Book::find($book->id)); // @phpstan-ignore-line
     }
 }
