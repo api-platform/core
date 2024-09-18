@@ -38,7 +38,7 @@ final class BackedEnumResourceMetadataCollectionFactory implements ResourceMetad
 
         foreach ($resourceMetadataCollection as $i => $resourceMetadata) {
             $newOperations = [];
-            foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
+            foreach ($resourceMetadata->getOperations() ?? [] as $operationName => $operation) {
                 $newOperations[$operationName] = $operation;
 
                 if (null !== $operation->getProvider()) {
@@ -49,7 +49,7 @@ final class BackedEnumResourceMetadataCollectionFactory implements ResourceMetad
             }
 
             $newGraphQlOperations = [];
-            foreach ($resourceMetadata->getGraphQlOperations() as $operationName => $operation) {
+            foreach ($resourceMetadata->getGraphQlOperations() ?? [] as $operationName => $operation) {
                 $newGraphQlOperations[$operationName] = $operation;
 
                 if (null !== $operation->getProvider()) {
