@@ -28,6 +28,7 @@
 
 ### Features
 
+* [00787f32d](https://github.com/api-platform/core/commit/00787f32da54418de7d869cff218e22d8ae2ae1d) feat(laravel): automatically register policies (#6623)
 * [06a647a80](https://github.com/api-platform/core/commit/06a647a80d4c6b7bfb3474d0685bcb445b56a5a8) feat(laravel): add CSV support (#6617)
 * [a49bde1ea](https://github.com/api-platform/core/commit/a49bde1ea79ae4226b70c20f9bf967ac77e9ab89)  feat(laravel): filter validations rules
 * [03357fb90](https://github.com/api-platform/core/commit/03357fb90ac0003f0cec2002df01711d0fb99a1e) feat(laravel): supports more Eloquent types (#6544)
