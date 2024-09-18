@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Security;
 
+use ApiPlatform\Laravel\Eloquent\Paginator;
 use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use Illuminate\Support\Facades\Gate;
 
@@ -20,6 +21,11 @@ class ResourceAccessChecker implements ResourceAccessCheckerInterface
 {
     public function isGranted(string $resourceClass, string $expression, array $extraVariables = []): bool
     {
-        return Gate::allows($expression, $extraVariables['object']);
+        return Gate::allows(
+            $expression,
+            $extraVariables['object'] instanceof Paginator ?
+                $resourceClass :
+                $extraVariables['object']
+        );
     }
 }

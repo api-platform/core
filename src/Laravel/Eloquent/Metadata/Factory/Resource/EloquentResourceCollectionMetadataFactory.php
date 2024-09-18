@@ -18,13 +18,29 @@ use ApiPlatform\Laravel\Eloquent\State\ItemProvider;
 use ApiPlatform\Laravel\Eloquent\State\PersistProcessor;
 use ApiPlatform\Laravel\Eloquent\State\RemoveProcessor;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\DeleteOperationInterface;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Gate;
 
 final class EloquentResourceCollectionMetadataFactory implements ResourceMetadataCollectionFactoryInterface
 {
+    private const POLICY_METHODS = [
+        Put::class => 'update',
+        Post::class => 'create',
+        Get::class => 'view',
+        GetCollection::class => 'viewAny',
+        Delete::class => 'delete',
+        Patch::class => 'update',
+    ];
+
     public function __construct(
         private readonly ResourceMetadataCollectionFactoryInterface $decorated,
     ) {
@@ -53,6 +69,17 @@ final class EloquentResourceCollectionMetadataFactory implements ResourceMetadat
             foreach ($operations ?? [] as $operationName => $operation) {
                 if (!$operation->getProvider()) {
                     $operation = $operation->withProvider($operation instanceof CollectionOperationInterface ? CollectionProvider::class : ItemProvider::class);
+                }
+
+                if (!$operation->getPolicy() && ($policy = Gate::getPolicyFor($model))) {
+                    $policyMethod = self::POLICY_METHODS[$operation::class] ?? null;
+                    if ($operation instanceof Put && $operation->getAllowCreate()) {
+                        $policyMethod = self::POLICY_METHODS[Post::class];
+                    }
+
+                    if ($policyMethod && method_exists($policy, $policyMethod)) {
+                        $operation = $operation->withPolicy($policyMethod);
+                    }
                 }
 
                 if (!$operation->getProcessor()) {
