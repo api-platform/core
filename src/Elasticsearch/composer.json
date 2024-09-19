@@ -3,8 +3,10 @@
     "description": "API Platform Elasticsearch bridge",
     "type": "library",
     "keywords": [
-        "Filter",
-        "Elasticsearch",
+        "REST",
+        "API",
+        "filter",
+        "elasticsearch",
         "search"
     ],
     "homepage": "https://api-platform.com",
@@ -64,6 +66,10 @@
         },
         "symfony": {
             "require": "^6.4 || ^7.1"
+        },
+        "thanks": {
+            "name": "api-platform/api-platform",
+            "url": "https://github.com/api-platform/api-platform"
         }
     },
     "scripts": {

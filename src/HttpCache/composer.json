@@ -3,8 +3,10 @@
     "description": "API Platform HttpCache component",
     "type": "library",
     "keywords": [
-        "Cache",
-        "Http"
+        "REST",
+        "API",
+        "cache",
+        "HTTP"
     ],
     "homepage": "https://api-platform.com",
     "license": "MIT",
@@ -58,6 +60,10 @@
         },
         "symfony": {
             "require": "^6.4 || ^7.1"
+        },
+        "thanks": {
+            "name": "api-platform/api-platform",
+            "url": "https://github.com/api-platform/api-platform"
         }
     },
     "scripts": {
