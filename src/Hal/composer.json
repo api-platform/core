@@ -50,7 +50,7 @@
             "dev-3.4": "3.4.x-dev"
         },
         "symfony": {
-            "require": "^6.4 || ^7.1"
+            "require": "^6.4 || ^7.0"
         }
     },
     "scripts": {
