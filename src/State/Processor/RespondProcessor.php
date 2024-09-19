@@ -105,7 +105,7 @@ final class RespondProcessor implements ProcessorInterface
                 && ($isAlternateResourceMetadata || $canonicalUriTemplate)
             ) {
                 $canonicalOperation = $operation;
-                if ($this->operationMetadataFactory && null !== ($canonicalUriTemplate)) {
+                if ($this->operationMetadataFactory && null !== $canonicalUriTemplate) {
                     $canonicalOperation = $this->operationMetadataFactory->create($canonicalUriTemplate, $context);
                 }
 
@@ -119,6 +119,7 @@ final class RespondProcessor implements ProcessorInterface
 
         $status ??= self::METHOD_TO_CODE[$method] ?? 200;
 
+        $requestParts = parse_url($request->getRequestUri());
         if ($this->iriConverter && !isset($headers['Content-Location'])) {
             try {
                 if ($hasData) {
@@ -127,10 +128,16 @@ final class RespondProcessor implements ProcessorInterface
                     $iri = $this->iriConverter->getIriFromResource($operation->getClass(), UrlGeneratorInterface::ABS_PATH, $operation);
                 }
 
-                $headers['Content-Location'] = sprintf('%s.%s', $iri, $request->getRequestFormat());
+                if ($iri) {
+                    $location = \sprintf('%s.%s', $iri, $request->getRequestFormat());
+                    if (isset($requestParts['query'])) {
+                        $location .= '?'.$requestParts['query'];
+                    }
 
-                if ((201 === $status || (300 <= $status && $status < 400)) && 'POST' === $method && !isset($headers['Location'])) {
-                    $headers['Location'] = $iri;
+                    $headers['Content-Location'] = $location;
+                    if ((201 === $status || (300 <= $status && $status < 400)) && 'POST' === $method && !isset($headers['Location'])) {
+                        $headers['Location'] = $iri;
+                    }
                 }
             } catch (InvalidArgumentException|ItemNotFoundException|RuntimeException) {
             }
