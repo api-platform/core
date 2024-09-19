@@ -122,6 +122,7 @@ final class RespondProcessor implements ProcessorInterface
         $requestParts = parse_url($request->getRequestUri());
         if ($this->iriConverter && !isset($headers['Content-Location'])) {
             try {
+                $iri = null;
                 if ($hasData) {
                     $iri = $this->iriConverter->getIriFromResource($originalData);
                 } elseif ($operation->getClass()) {
