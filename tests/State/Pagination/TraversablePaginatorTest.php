@@ -26,7 +26,7 @@ class TraversablePaginatorTest extends TestCase
         float $totalItems,
         float $lastPage,
         int $currentItems,
-        bool $hasNextPage,
+        bool $hasNextPage = false,
     ): void {
         $traversable = new \ArrayIterator($results);
 
@@ -45,7 +45,7 @@ class TraversablePaginatorTest extends TestCase
     public static function initializeProvider(): array
     {
         return [
-            'First of three pages of 3 items each' => [[0, 1, 2, 3, 4, 5, 6], 1, 3, 7, 3, 3],
+            'First of three pages of 3 items each' => [[0, 1, 2, 3, 4, 5, 6], 1, 3, 7, 3, 3, true],
             'Second of two pages of 3 items for the first page and 2 for the second' => [[0, 1, 2, 3, 4], 2, 3, 5, 2, 2],
             'Empty results' => [[], 1, 2, 0, 1, 0],
             '0 items per page' => [[0, 1, 2, 3], 1, 0, 4, 1, 4],
