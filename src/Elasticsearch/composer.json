@@ -25,12 +25,12 @@
         "api-platform/metadata": "^3.4 || ^4.0",
         "api-platform/serializer": "^3.4 || ^4.0",
         "api-platform/state": "^3.4 || ^4.0",
-        "elasticsearch/elasticsearch": "^8.9",
+        "elasticsearch/elasticsearch": "^8.4",
         "symfony/cache": "^6.4 || ^7.0",
         "symfony/console": "^6.4 || ^7.0",
-        "symfony/property-access": "^6.4 || ^7.1",
-        "symfony/property-info": "^6.4 || ^7.1",
-        "symfony/serializer": "^6.4 || ^7.1",
+        "symfony/property-access": "^6.4 || ^7.0",
+        "symfony/property-info": "^6.4 || ^7.0",
+        "symfony/serializer": "^6.4 || ^7.0",
         "symfony/uid": "^6.4 || ^7.0"
     },
     "require-dev": {

@@ -26,20 +26,20 @@
         "api-platform/state": "^3.4 || ^4.0",
         "doctrine/doctrine-bundle": "^2.11",
         "doctrine/orm": "^2.17 || ^3.0",
-        "symfony/property-info": "^6.4 || ^7.1"
+        "symfony/property-info": "^6.4 || ^7.0"
     },
     "require-dev": {
         "phpspec/prophecy-phpunit": "^2.2",
         "phpunit/phpunit": "^11.2",
         "ramsey/uuid": "^4.0",
         "ramsey/uuid-doctrine": "^2.0",
-        "symfony/cache": "^6.4 || ^7.1",
-        "symfony/framework-bundle": "^6.4 || ^7.1",
+        "symfony/cache": "^6.4 || ^7.0",
+        "symfony/framework-bundle": "^6.4 || ^7.0",
         "symfony/property-access": "^6.4 || ^7.0",
         "symfony/serializer": "^6.4 || ^7.0",
-        "symfony/uid": "^6.4 || ^7.1",
-        "symfony/validator": "^6.4 || ^7.1",
-        "symfony/yaml": "^6.4 || ^7.1"
+        "symfony/uid": "^6.4 || ^7.0",
+        "symfony/validator": "^6.4 || ^7.0",
+        "symfony/yaml": "^6.4 || ^7.0"
     },
     "autoload": {
         "psr-4": {
