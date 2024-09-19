@@ -3,8 +3,10 @@
     "description": "API Platform HttpCache component",
     "type": "library",
     "keywords": [
-        "Cache",
-        "Http"
+        "REST",
+        "API",
+        "cache",
+        "HTTP"
     ],
     "homepage": "https://api-platform.com",
     "license": "MIT",

@@ -4,14 +4,8 @@
     "type": "library",
     "keywords": [
         "REST",
-        "GraphQL",
         "API",
-        "JSON-LD",
-        "Hydra",
-        "JSONAPI",
-        "OpenAPI",
-        "HAL",
-        "Swagger"
+        "JSONAPI"
     ],
     "homepage": "https://api-platform.com",
     "license": "MIT",

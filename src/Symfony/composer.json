@@ -1,7 +1,7 @@
 {
     "name": "api-platform/symfony",
     "description": "Symfony API Platform integration",
-    "type": "library",
+    "type": "symfony-bundle",
     "keywords": [
         "Symfony",
         "REST",

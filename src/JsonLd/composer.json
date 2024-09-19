@@ -7,11 +7,7 @@
         "GraphQL",
         "API",
         "JSON-LD",
-        "Hydra",
-        "JSONAPI",
-        "OpenAPI",
-        "HAL",
-        "Swagger"
+        "Hydra"
     ],
     "homepage": "https://api-platform.com",
     "license": "MIT",

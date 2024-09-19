@@ -3,10 +3,11 @@
     "description": "Common files used by api-platform/doctrine-orm and api-platform/doctrine-odm",
     "type": "library",
     "keywords": [
-        "DOCTRINE",
-        "ORM",
-        "ODM",
-        "COMMON"
+        "doctrine",
+        "orm",
+        "odm",
+        "REST",
+        "GraphQL"
     ],
     "homepage": "https://api-platform.com",
     "license": "MIT",

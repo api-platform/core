@@ -3,8 +3,10 @@
     "description": "API Platform core Serializer",
     "type": "library",
     "keywords": [
-        "Serializer",
-        "API"
+        "serializer",
+        "API",
+        "REST",
+        "GraphQL"
     ],
     "homepage": "https://api-platform.com",
     "license": "MIT",

@@ -5,7 +5,10 @@
     "keywords": [
         "Doctrine",
         "ODM",
-        "MongoDB"
+        "MongoDB",
+        "API",
+        "REST",
+        "GraphQL"
     ],
     "homepage": "https://api-platform.com",
     "license": "MIT",

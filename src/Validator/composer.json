@@ -3,8 +3,10 @@
     "description": "API Platform validator component",
     "type": "library",
     "keywords": [
-        "Validator",
-        "API"
+        "validator",
+        "API",
+        "REST",
+        "GraphQL"
     ],
     "homepage": "https://api-platform.com",
     "license": "MIT",

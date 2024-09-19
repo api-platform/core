@@ -3,8 +3,10 @@
     "description": "API Platform Elasticsearch bridge",
     "type": "library",
     "keywords": [
-        "Filter",
-        "Elasticsearch",
+        "REST",
+        "API",
+        "filter",
+        "elasticsearch",
         "search"
     ],
     "homepage": "https://api-platform.com",

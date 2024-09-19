@@ -4,7 +4,9 @@
     "type": "library",
     "keywords": [
         "UUID",
-        "API"
+        "API",
+        "REST",
+        "GraphQL"
     ],
     "homepage": "https://api-platform.com",
     "license": "MIT",
