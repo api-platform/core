@@ -3,8 +3,10 @@
     "description": "API Platform validator component",
     "type": "library",
     "keywords": [
-        "Validator",
-        "API"
+        "validator",
+        "API",
+        "REST",
+        "GraphQL"
     ],
     "homepage": "https://api-platform.com",
     "license": "MIT",
@@ -54,6 +56,10 @@
         },
         "symfony": {
             "require": "^6.4 || ^7.1"
+        },
+        "thanks": {
+            "name": "api-platform/api-platform",
+            "url": "https://github.com/api-platform/api-platform"
         }
     },
     "scripts": {
