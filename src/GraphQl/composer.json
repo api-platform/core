@@ -68,6 +68,10 @@
         },
         "symfony": {
             "require": "^6.4 || ^7.0"
+        },
+        "thanks": {
+            "name": "api-platform/api-platform",
+            "url": "https://github.com/api-platform/api-platform"
         }
     },
     "scripts": {
