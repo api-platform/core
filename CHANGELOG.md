@@ -1,5 +1,15 @@
 # Changelog
 
+## v4.0.1
+
+### Bug fixes
+
+* [eb80a1a56](https://github.com/api-platform/core/commit/eb80a1a5651b81cab13b018662a0d21e05facbfe) fix(state): precise format on content-location (#6627)
+
+### Features
+
+* [4a2271670](https://github.com/api-platform/core/commit/4a2271670a88c318ab38bd7eb2a1c0b93a5c0ea0) feat: api-platform/json-hal component (#6621)
+
 ## v4.0.0
 
 ### Bug fixes
