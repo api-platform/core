@@ -14,6 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\State\Processor;
 
 use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\ItemNotFoundException;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
@@ -92,18 +95,23 @@ final class RespondProcessor implements ProcessorInterface
         $hasOutput = \is_array($outputMetadata) && \array_key_exists('class', $outputMetadata) && null !== $outputMetadata['class'];
         $hasData = !$hasOutput ? false : ($this->resourceClassResolver && $originalData && \is_object($originalData) && $this->resourceClassResolver->isResourceClass($this->getObjectClass($originalData)));
 
-        if ($hasData && $this->iriConverter) {
+        if ($hasData) {
+            $isAlternateResourceMetadata = $operation->getExtraProperties()['is_alternate_resource_metadata'] ?? false;
+            $canonicalUriTemplate = $operation->getExtraProperties()['canonical_uri_template'] ?? null;
+
             if (
                 !isset($headers['Location'])
                 && 300 <= $status && $status < 400
-                && (($operation->getExtraProperties()['is_alternate_resource_metadata'] ?? false) || ($operation->getExtraProperties()['canonical_uri_template'] ?? null))
+                && ($isAlternateResourceMetadata || $canonicalUriTemplate)
             ) {
                 $canonicalOperation = $operation;
-                if ($this->operationMetadataFactory && null !== ($operation->getExtraProperties()['canonical_uri_template'] ?? null)) {
-                    $canonicalOperation = $this->operationMetadataFactory->create($operation->getExtraProperties()['canonical_uri_template'], $context);
+                if ($this->operationMetadataFactory && null !== ($canonicalUriTemplate)) {
+                    $canonicalOperation = $this->operationMetadataFactory->create($canonicalUriTemplate, $context);
                 }
 
-                $headers['Location'] = $this->iriConverter->getIriFromResource($originalData, UrlGeneratorInterface::ABS_PATH, $canonicalOperation);
+                if ($this->iriConverter) {
+                    $headers['Location'] = $this->iriConverter->getIriFromResource($originalData, UrlGeneratorInterface::ABS_PATH, $canonicalOperation);
+                }
             } elseif ('PUT' === $method && !$request->attributes->get('previous_data') && null === $status && ($operation instanceof Put && ($operation->getAllowCreate() ?? false))) {
                 $status = 201;
             }
@@ -111,12 +119,20 @@ final class RespondProcessor implements ProcessorInterface
 
         $status ??= self::METHOD_TO_CODE[$method] ?? 200;
 
-        if ($hasData && $this->iriConverter && !isset($headers['Content-Location'])) {
-            $iri = $this->iriConverter->getIriFromResource($originalData);
-            $headers['Content-Location'] = $iri;
+        if ($this->iriConverter && !isset($headers['Content-Location'])) {
+            try {
+                if ($hasData) {
+                    $iri = $this->iriConverter->getIriFromResource($originalData);
+                } else {
+                    $iri = $this->iriConverter->getIriFromResource($operation->getClass(), UrlGeneratorInterface::ABS_PATH, $operation);
+                }
 
-            if ((201 === $status || (300 <= $status && $status < 400)) && 'POST' === $method && !isset($headers['Location'])) {
-                $headers['Location'] = $iri;
+                $headers['Content-Location'] = sprintf('%s.%s', $iri, $request->getRequestFormat());
+
+                if ((201 === $status || (300 <= $status && $status < 400)) && 'POST' === $method && !isset($headers['Location'])) {
+                    $headers['Location'] = $iri;
+                }
+            } catch (InvalidArgumentException|ItemNotFoundException|RuntimeException) {
             }
         }
 
