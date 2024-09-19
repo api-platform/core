@@ -85,6 +85,9 @@
         "branch-alias": {
             "dev-main": "4.0.x-dev",
             "dev-3.4": "3.4.x-dev"
+        },
+        "symfony": {
+            "require": "^6.4 || ^7.1"
         }
     },
     "autoload-dev": {
