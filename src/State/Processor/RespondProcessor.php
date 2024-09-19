@@ -124,7 +124,7 @@ final class RespondProcessor implements ProcessorInterface
             try {
                 if ($hasData) {
                     $iri = $this->iriConverter->getIriFromResource($originalData);
-                } else {
+                } elseif ($operation->getClass()) {
                     $iri = $this->iriConverter->getIriFromResource($operation->getClass(), UrlGeneratorInterface::ABS_PATH, $operation);
                 }
 
