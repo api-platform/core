@@ -32,9 +32,9 @@
     },
     "require-dev": {
         "doctrine/doctrine-bundle": "^2.11",
-        "phpspec/prophecy-phpunit": "^2.2",
-        "phpunit/phpunit": "^11.2",
-        "ramsey/uuid": "^4.0",
+        "phpspec/prophecy-phpunit": "^2.0",
+        "phpunit/phpunit": "^10.0",
+        "ramsey/uuid": "^4.7",
         "ramsey/uuid-doctrine": "^2.0",
         "symfony/cache": "^6.4 || ^7.0",
         "symfony/framework-bundle": "^6.4 || ^7.0",
