@@ -1,4 +1,4 @@
-# API Platform - Doctrine MongoDB ODM 
+# API Platform - Documentation
 
 The API documentation component of the [API Platform](https://api-platform.com) framework.
 
