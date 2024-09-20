@@ -164,6 +164,7 @@ final class Configuration implements ConfigurationInterface
         $this->addExceptionToStatusSection($rootNode);
 
         $this->addFormatSection($rootNode, 'formats', [
+            'jsonld' => ['mime_types' => ['application/ld+json']]
         ]);
         $this->addFormatSection($rootNode, 'patch_formats', [
             'json' => ['mime_types' => ['application/merge-patch+json']],

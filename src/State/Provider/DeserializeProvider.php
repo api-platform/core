@@ -83,7 +83,7 @@ final class DeserializeProvider implements ProviderInterface
             && (
                 'POST' === $method
                 || 'PATCH' === $method
-                || ('PUT' === $method && !($operation->getExtraProperties()['standard_put'] ?? false))
+                || ('PUT' === $method && !($operation->getExtraProperties()['standard_put'] ?? true))
             )
         ) {
             $serializerContext[AbstractNormalizer::OBJECT_TO_POPULATE] = $data;
