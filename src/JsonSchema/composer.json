@@ -24,11 +24,11 @@
         }
     ],
     "require": {
-        "php": ">=8.1",
+        "php": ">=8.2",
         "api-platform/metadata": "^3.4 || ^4.0",
         "symfony/console": "^6.4 || ^7.0",
-        "symfony/property-info": "^6.4 || ^7.1",
-        "symfony/serializer": "^6.4 || ^7.1",
+        "symfony/property-info": "^6.4 || ^7.0",
+        "symfony/serializer": "^6.4 || ^7.0",
         "symfony/uid": "^6.4 || ^7.0"
     },
     "require-dev": {
@@ -59,7 +59,11 @@
             "dev-3.4": "3.4.x-dev"
         },
         "symfony": {
-            "require": "^6.4 || ^7.1"
+            "require": "^6.4 || ^7.0"
+        },
+        "thanks": {
+            "name": "api-platform/api-platform",
+            "url": "https://github.com/api-platform/api-platform"
         }
     },
     "scripts": {

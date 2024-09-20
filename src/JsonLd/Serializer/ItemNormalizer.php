@@ -175,7 +175,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             } catch (ItemNotFoundException $e) {
                 $operation = $context['operation'] ?? null;
 
-                if (!('PUT' === $operation?->getMethod() && ($operation->getExtraProperties()['standard_put'] ?? false))) {
+                if (!('PUT' === $operation?->getMethod() && ($operation->getExtraProperties()['standard_put'] ?? true))) {
                     throw $e;
                 }
             }

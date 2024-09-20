@@ -16,7 +16,7 @@ Feature: Using uuid identifier on resource
     Then the response status code should be 201
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the header "Content-Location" should be equal to "/uuid_identifier_dummies/41b29566-144b-11e6-a148-3e1d05defe78"
+    And the header "Content-Location" should be equal to "/uuid_identifier_dummies/41b29566-144b-11e6-a148-3e1d05defe78.jsonld"
     And the header "Location" should be equal to "/uuid_identifier_dummies/41b29566-144b-11e6-a148-3e1d05defe78"
 
   Scenario: Get a resource
@@ -69,7 +69,7 @@ Feature: Using uuid identifier on resource
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the header "Content-Location" should be equal to "/uuid_identifier_dummies/41b29566-144b-11e6-a148-3e1d05defe78"
+    And the header "Content-Location" should be equal to "/uuid_identifier_dummies/41b29566-144b-11e6-a148-3e1d05defe78.jsonld"
     And the JSON should be equal to:
     """
     {
@@ -90,7 +90,7 @@ Feature: Using uuid identifier on resource
     Then the response status code should be 201
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the header "Content-Location" should be equal to "/custom_generated_identifiers/foo"
+    And the header "Content-Location" should be equal to "/custom_generated_identifiers/foo.jsonld"
     And the header "Location" should be equal to "/custom_generated_identifiers/foo"
     And the JSON should be equal to:
     """

@@ -27,7 +27,7 @@
         }
     ],
     "require": {
-        "php": ">=8.1",
+        "php": ">=8.2",
         "api-platform/documentation": "^4.0",
         "api-platform/hydra": "^4.0",
         "api-platform/json-hal": "^4.0",
@@ -85,6 +85,13 @@
         "branch-alias": {
             "dev-main": "4.0.x-dev",
             "dev-3.4": "3.4.x-dev"
+        },
+        "symfony": {
+            "require": "^6.4 || ^7.1"
+        },
+        "thanks": {
+            "name": "api-platform/api-platform",
+            "url": "https://github.com/api-platform/api-platform"
         }
     },
     "autoload-dev": {

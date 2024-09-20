@@ -265,9 +265,6 @@ class AppKernel extends Kernel
                     'public' => true,
                 ],
                 'normalization_context' => ['skip_null_values' => false],
-                'extra_properties' => [
-                    'standard_put' => true,
-                ],
                 'operations' => [
                     Get::class,
                     GetCollection::class,

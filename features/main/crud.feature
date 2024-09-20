@@ -22,7 +22,7 @@ Feature: Create-Retrieve-Update-Delete
     Then the response status code should be 201
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the header "Content-Location" should be equal to "/dummies/1"
+    And the header "Content-Location" should be equal to "/dummies/1.jsonld"
     And the header "Location" should be equal to "/dummies/1"
     And the JSON should be equal to:
     """
@@ -106,6 +106,7 @@ Feature: Create-Retrieve-Update-Delete
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Location" should be equal to "/dummies.jsonld"
     And the JSON should be equal to:
     """
     {
@@ -513,7 +514,7 @@ Feature: Create-Retrieve-Update-Delete
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the header "Content-Location" should be equal to "/dummies/1"
+    And the header "Content-Location" should be equal to "/dummies/1.jsonld"
     And the JSON should be equal to:
     """
     {
@@ -571,7 +572,7 @@ Feature: Create-Retrieve-Update-Delete
     Then the response status code should be 201
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the header "Content-Location" should be equal to "/processor_entities/1"
+    And the header "Content-Location" should be equal to "/processor_entities/1.jsonld"
     And the header "Location" should be equal to "/processor_entities/1"
     And the JSON should be equal to:
     """
@@ -596,7 +597,7 @@ Feature: Create-Retrieve-Update-Delete
     Then the response status code should be 201
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the header "Content-Location" should be equal to "/provider_entities/1"
+    And the header "Content-Location" should be equal to "/provider_entities/1.jsonld"
     And the header "Location" should be equal to "/provider_entities/1"
     And the JSON should be equal to:
     """

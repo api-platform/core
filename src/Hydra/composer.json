@@ -8,10 +8,7 @@
         "API",
         "JSON-LD",
         "Hydra",
-        "JSONAPI",
-        "OpenAPI",
-        "HAL",
-        "Swagger"
+        "JSONAPI"
     ],
     "homepage": "https://api-platform.com",
     "license": "MIT",
@@ -27,14 +24,14 @@
         }
     ],
     "require": {
-        "php": ">=8.1",
+        "php": ">=8.2",
         "api-platform/state": "^3.4 || ^4.0",
         "api-platform/documentation": "^3.4 || ^4.0",
         "api-platform/metadata": "^3.4 || ^4.0",
         "api-platform/jsonld": "^3.4 || ^4.0",
         "api-platform/json-schema": "^3.4 || ^4.0",
         "api-platform/serializer": "^3.4 || ^4.0",
-        "symfony/web-link": "^6.4 || ^7.1"
+        "symfony/web-link": "^6.4 || ^7.0"
     },
     "require-dev": {
         "api-platform/doctrine-odm": "^3.4 || ^4.0",
@@ -68,7 +65,11 @@
             "dev-3.4": "3.4.x-dev"
         },
         "symfony": {
-            "require": "^6.4 || ^7.1"
+            "require": "^6.4 || ^7.0"
+        },
+        "thanks": {
+            "name": "api-platform/api-platform",
+            "url": "https://github.com/api-platform/api-platform"
         }
     },
     "scripts": {
