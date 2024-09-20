@@ -25,13 +25,13 @@
         "php": ">=8.1",
         "api-platform/metadata": "^3.4 || ^4.0",
         "api-platform/state": "^3.4 || ^4.0",
-        "doctrine/collections": "^2.1",
         "symfony/property-access": "^6.4 || ^7.1",
         "symfony/property-info": "^6.4 || ^7.1",
         "symfony/serializer": "^6.4 || ^7.1",
         "symfony/validator": "^6.4 || ^7.0"
     },
     "require-dev": {
+        "doctrine/collections": "^2.1",
         "phpspec/prophecy-phpunit": "^2.0",
         "sebastian/comparator": "<5.0",
         "symfony/mercure-bundle": "*",
@@ -40,7 +40,8 @@
         "symfony/yaml": "^6.4 || ^7.0"
     },
     "suggest": {
-        "api-platform/doctrine-orm": "To support doctrine ORM state options."
+        "api-platform/doctrine-orm": "To support Doctrine ORM state options.",
+        "api-platform/doctrine-odm": "To support Doctrine MongoDB ODM state options."
     },
     "autoload": {
         "psr-4": {
