@@ -1055,6 +1055,10 @@ class ApiPlatformProvider extends ServiceProvider
         if ($this->app['config']->get('api-platform.graphql.enabled')) {
             $this->registerGraphQl($this->app);
         }
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([Console\InstallCommand::class]);
+        }
     }
 
     private function registerGraphQl(Application $app): void
@@ -1210,11 +1214,11 @@ class ApiPlatformProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__.'/config/api-platform.php' => $this->app->configPath('api-platform.php'),
-            ], 'laravel-assets');
+            ], 'api-platform-config');
 
             $this->publishes([
                 __DIR__.'/public' => $this->app->publicPath('vendor/api-platform'),
-            ], 'laravel-assets');
+            ], ['api-platform-assets', 'public']);
         }
 
         $this->loadViewsFrom(__DIR__.'/resources/views', 'api-platform');
