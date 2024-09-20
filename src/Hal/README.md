@@ -1,8 +1,8 @@
-# API Platform - Validator
+# API Platform - HAL 
 
-The Validator component of the [API Platform](https://api-platform.com) framework.
+The [HAL (Hypertext Application Language)](https://stateless.group/hal_specification.html) component of the [API Platform](https://api-platform.com) framework.
 
-[Documentation](https://api-platform.com/docs/admin/validation/)
+[Documentation](https://api-platform.com/docs/core/content-negotiation/)
 
 > [!CAUTION]
 >
