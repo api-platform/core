@@ -131,13 +131,14 @@ final class ModelMetadata
                 'name' => $name,
                 'type' => null,
                 'increments' => false,
-                'nullable' => null,
+                'nullable' => true,
                 'default' => null,
                 'unique' => null,
                 'fillable' => $model->isFillable($name),
                 'hidden' => $this->attributeIsHidden($name, $model),
                 'appended' => $model->hasAppended($name),
                 'cast' => $cast,
+                'primary' => $name === $model->getKeyName(),
             ])
             ->values();
     }

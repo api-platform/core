@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 use Workbench\App\Http\Requests\BookFormRequest;
 
 #[ApiResource(
@@ -69,5 +70,11 @@ class Book extends Model
     public function author(): BelongsTo
     {
         return $this->belongsTo(Author::class);
+    }
+
+    // Virtual field
+    public function getTitleAttribute(): string
+    {
+        return Str::title($this->name);
     }
 }
