@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Laravel\Eloquent\State;
 
 use ApiPlatform\Laravel\Eloquent\Metadata\ModelMetadata;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -39,6 +40,15 @@ final class PersistProcessor implements ProcessorInterface
                 $data->{$relation['name']}()->associate($data->{$relation['name']});
                 unset($data->{$relation['name']});
             }
+        }
+
+        if (($previousData = $context['previous_data'] ?? null) && $operation instanceof HttpOperation && 'PUT' === $operation->getMethod() && ($operation->getExtraProperties()['standard_put'] ?? true)) {
+            foreach ($this->modelMetadata->getAttributes($data) as $attribute) {
+                if ($attribute['primary'] ?? false) {
+                    $data->{$attribute['name']} = $previousData->{$attribute['name']};
+                }
+            }
+            $data->exists = true;
         }
 
         $data->saveOrFail();
