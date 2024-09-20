@@ -1,4 +1,4 @@
-# API Platform - Parameter Validator 
+# API Platform - RamseyUuid
 
 Integration for [Ramsey's UUID](https://uuid.ramsey.dev) with the [API Platform](https://api-platform.com) framework.
 
