@@ -1,14 +1,19 @@
-/.editorconfig export-ignore
-/.gitattributes export-ignore
-/.github export-ignore
-/.gitignore export-ignore
-/.php_cs.dist export-ignore
+*.sh export-ignore
+.editorconfig export-ignore
+.gitattributes export-ignore
+.github export-ignore
+.gitignore export-ignore
+.php-cs-fixer.dist.php export-ignore
+phpstan.neon.dist export-ignore
+phpunit.xml.dist export-ignore
+phpunit10.xml.dist export-ignore
+/.commitlintrc export-ignore
 /appveyor.yml export-ignore
 /behat.yml.dist export-ignore
+/codecov.yml
 /docs export-ignore
 /features export-ignore
-/phpstan.neon.dist export-ignore
-/phpunit.xml.dist export-ignore
+/package-lock.json export-ignore
+/pmu.baseline
 /tests export-ignore
-/update-js.sh export-ignore
 /yarn.lock export-ignore
