@@ -29,10 +29,10 @@
         "api-platform/metadata": "^3.4 || ^4.0",
         "api-platform/state": "^3.4 || ^4.0",
         "doctrine/mongodb-odm": "^2.6",
-        "doctrine/mongodb-odm-bundle": "^4.0 || ^5.0",
         "symfony/property-info": "^6.4 || ^7.0"
     },
     "require-dev": {
+        "doctrine/mongodb-odm-bundle": "^4.0 || ^5.0",
         "doctrine/doctrine-bundle": "^2.11",
         "phpspec/prophecy-phpunit": "^2.2",
         "phpunit/phpunit": "^11.2",
