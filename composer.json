@@ -49,6 +49,7 @@
         "api-platform/openapi": "^3.4 || ^4.0",
         "api-platform/ramsey-uuid": "^3.4 || ^4.0",
         "api-platform/jsonld": "^3.4 || ^4.0",
+        "api-platform/json-hal": "^3.4 || ^4.0",
         "api-platform/serializer": "^3.4 || ^4.0",
         "api-platform/json-api": "^3.3 || ^4.0",
         "api-platform/http-cache": "^3.4 || ^4.0",
