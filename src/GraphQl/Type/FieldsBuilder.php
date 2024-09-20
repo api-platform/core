@@ -15,6 +15,7 @@ namespace ApiPlatform\GraphQl\Type;
 
 use ApiPlatform\Doctrine\Odm\State\Options as ODMOptions;
 use ApiPlatform\Doctrine\Orm\State\Options;
+use ApiPlatform\GraphQl\Exception\InvalidTypeException;
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactory;
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface;
@@ -36,7 +37,6 @@ use GraphQL\Type\Definition\NullableType;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use GraphQL\Type\Definition\WrappingType;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
