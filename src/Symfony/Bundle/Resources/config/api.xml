@@ -91,8 +91,8 @@
         </service>
 
         <!-- Resources Operations path resolver -->
-        <service id="api_platform.path_segment_name_generator.underscore" class="ApiPlatform\Operation\UnderscorePathSegmentNameGenerator" public="false" />
-        <service id="api_platform.path_segment_name_generator.dash" class="ApiPlatform\Operation\DashPathSegmentNameGenerator" public="false" />
+        <service id="api_platform.path_segment_name_generator.underscore" class="ApiPlatform\Metadata\Operation\UnderscorePathSegmentNameGenerator" public="false" />
+        <service id="api_platform.path_segment_name_generator.dash" class="ApiPlatform\Metadata\Operation\DashPathSegmentNameGenerator" public="false" />
 
         <service id="api_platform.metadata.path_segment_name_generator.underscore" class="ApiPlatform\Metadata\Operation\UnderscorePathSegmentNameGenerator" public="false">
             <argument type="service" id="api_platform.inflector" on-invalid="null" />
