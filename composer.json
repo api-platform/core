@@ -1,7 +1,67 @@
 {
-    "name": "api-platform/core",
+    "authors": [
+        {
+            "name": "Kévin Dunglas",
+            "email": "kevin@dunglas.fr",
+            "homepage": "https://dunglas.fr"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "ApiPlatform\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ApiPlatform\\Tests\\": "tests/",
+            "App\\": "tests/Fixtures/app/var/tmp/src/"
+        }
+    },
+    "config": {
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true,
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true,
+            "phpstan/extension-installer": true,
+            "php-http/discovery": true,
+            "soyuka/pmu": true
+        }
+    },
+    "conflict": {
+        "doctrine/common": "<3.2.2",
+        "doctrine/dbal": "<2.10",
+        "doctrine/orm": "<2.14.0",
+        "doctrine/mongodb-odm": "<2.4",
+        "doctrine/persistence": "<1.3",
+        "symfony/framework-bundle": "6.4.6 || 7.1.6",
+        "symfony/var-exporter": "<6.1.1",
+        "phpunit/phpunit": "<9.5",
+        "phpspec/prophecy": "<1.15",
+        "elasticsearch/elasticsearch": ">=8.0,<8.4"
+    },
     "description": "Build a fully-featured hypermedia or GraphQL API in minutes!",
-    "type": "library",
+    "extra": {
+        "branch-alias": {
+            "dev-3.4": "3.4.x-dev",
+            "dev-main": "4.0.x-dev"
+        },
+        "symfony": {
+            "require": "^6.4 || ^7.1"
+        },
+        "pmu": {
+            "projects": [
+                "./src/*/composer.json",
+                "src/Doctrine/*/composer.json"
+            ]
+        },
+        "thanks": {
+            "name": "api-platform/api-platform",
+            "url": "https://github.com/api-platform/api-platform"
+        }
+    },
+    "homepage": "https://api-platform.com",
     "keywords": [
         "REST",
         "GraphQL",
@@ -13,15 +73,31 @@
         "HAL",
         "Swagger"
     ],
-    "homepage": "https://api-platform.com",
     "license": "MIT",
-    "authors": [
-        {
-            "name": "Kévin Dunglas",
-            "email": "kevin@dunglas.fr",
-            "homepage": "https://dunglas.fr"
-        }
-    ],
+    "name": "api-platform/core",
+    "replace": {
+        "api-platform/doctrine-common": "self.version",
+        "api-platform/doctrine-odm": "self.version",
+        "api-platform/doctrine-orm": "self.version",
+        "api-platform/documentation": "self.version",
+        "api-platform/elasticsearch": "self.version",
+        "api-platform/graphql": "self.version",
+        "api-platform/http-cache": "self.version",
+        "api-platform/hydra": "self.version",
+        "api-platform/json-api": "self.version",
+        "api-platform/json-hal": "self.version",
+        "api-platform/json-schema": "self.version",
+        "api-platform/jsonld": "self.version",
+        "api-platform/laravel": "self.version",
+        "api-platform/metadata": "self.version",
+        "api-platform/openapi": "self.version",
+        "api-platform/parameter-validator": "self.version",
+        "api-platform/ramsey-uuid": "self.version",
+        "api-platform/serializer": "self.version",
+        "api-platform/state": "self.version",
+        "api-platform/symfony": "self.version",
+        "api-platform/validator": "self.version"
+    },
     "require": {
         "php": ">=8.1",
         "doctrine/inflector": "^1.0 || ^2.0",
@@ -38,24 +114,25 @@
         "willdurand/negotiation": "^3.0"
     },
     "require-dev": {
-        "api-platform/json-schema": "^3.4 || ^4.0",
-        "api-platform/metadata": "^3.4 || ^4.0",
-        "api-platform/state": "^3.4 || ^4.0",
         "api-platform/doctrine-common": "^3.4 || ^4.0",
         "api-platform/doctrine-odm": "^3.4 || ^4.0",
         "api-platform/doctrine-orm": "^3.4 || ^4.0",
-        "api-platform/openapi": "^3.4 || ^4.0",
-        "api-platform/ramsey-uuid": "^3.4 || ^4.0",
-        "api-platform/jsonld": "^3.4 || ^4.0",
-        "api-platform/serializer": "^3.4 || ^4.0",
-        "api-platform/json-api": "^3.3 || ^4.0",
-        "api-platform/http-cache": "^3.4 || ^4.0",
-        "api-platform/elasticsearch": "^3.4 || ^4.0",
-        "api-platform/hydra": "^3.4 || ^4.0",
         "api-platform/documentation": "^3.4 || ^4.0",
-        "api-platform/validator": "^3.4 || ^4.0",
+        "api-platform/elasticsearch": "^3.4 || ^4.0",
         "api-platform/graphql": "^3.4 || ^4.0",
-       "behat/behat": "^3.11",
+        "api-platform/http-cache": "^3.4 || ^4.0",
+        "api-platform/hydra": "^3.4 || ^4.0",
+        "api-platform/json-api": "^3.3 || ^4.0",
+        "api-platform/json-schema": "^3.4 || ^4.0",
+        "api-platform/jsonld": "^3.4 || ^4.0",
+        "api-platform/metadata": "^3.4 || ^4.0",
+        "api-platform/openapi": "^3.4 || ^4.0",
+        "api-platform/parameter-validator": "^3.4",
+        "api-platform/ramsey-uuid": "^3.4 || ^4.0",
+        "api-platform/serializer": "^3.4 || ^4.0",
+        "api-platform/state": "^3.4 || ^4.0",
+        "api-platform/validator": "^3.4 || ^4.0",
+        "behat/behat": "^3.11",
         "behat/mink": "^1.9",
         "doctrine/cache": "^1.11 || ^2.1",
         "doctrine/common": "^3.2.2",
@@ -120,18 +197,6 @@
         "twig/twig": "^1.42.3 || ^2.12 || ^3.0",
         "webonyx/graphql-php": "^14.0 || ^15.0"
     },
-    "conflict": {
-        "doctrine/common": "<3.2.2",
-        "doctrine/dbal": "<2.10",
-        "doctrine/orm": "<2.14.0",
-        "doctrine/mongodb-odm": "<2.4",
-        "doctrine/persistence": "<1.3",
-        "symfony/framework-bundle": "6.4.6 || 7.1.6",
-        "symfony/var-exporter": "<6.1.1",
-        "phpunit/phpunit": "<9.5",
-        "phpspec/prophecy": "<1.15",
-        "elasticsearch/elasticsearch": ">=8.0,<8.4"
-    },
     "suggest": {
         "doctrine/mongodb-odm-bundle": "To support MongoDB. Only versions 4.0 and later are supported.",
         "elasticsearch/elasticsearch": "To support Elasticsearch.",
@@ -150,43 +215,5 @@
         "symfony/web-profiler-bundle": "To use the data collector.",
         "webonyx/graphql-php": "To support GraphQL."
     },
-    "autoload": {
-        "psr-4": {
-            "ApiPlatform\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "ApiPlatform\\Tests\\": "tests/",
-            "App\\": "tests/Fixtures/app/var/tmp/src/"
-        }
-    },
-    "config": {
-        "preferred-install": {
-            "*": "dist"
-        },
-        "sort-packages": true,
-        "allow-plugins": {
-            "composer/package-versions-deprecated": true,
-            "phpstan/extension-installer": true,
-            "php-http/discovery": true,
-            "soyuka/pmu": true
-        }
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-3.4": "3.4.x-dev",
-            "dev-main": "4.0.x-dev"
-        },
-        "symfony": {
-            "require": "^6.4 || ^7.1"
-        },
-        "pmu": {
-            "projects": ["./src/*/composer.json", "src/Doctrine/*/composer.json"]
-        },
-        "thanks": {
-            "name": "api-platform/api-platform",
-            "url": "https://github.com/api-platform/api-platform"
-        }
-    }
+    "type": "library"
 }
