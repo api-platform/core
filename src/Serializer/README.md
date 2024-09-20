@@ -1,3 +1,3 @@
-# API Platform - GraphQL
+# API Platform - Serializer
 
-Build GraphQL API endpoints
+The API Platform Serializer
