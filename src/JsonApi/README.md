@@ -1,8 +1,10 @@
-# API Platform - Validator
+# API Platform - JSON:API
 
-The Validator component of the [API Platform](https://api-platform.com) framework.
+The [JSON:API](https://jsonapi.org/) component of the [API Platform](https://api-platform.com) framework.
 
-[Documentation](https://api-platform.com/docs/admin/validation/)
+JSON:API is a popular specification for building APIs in JSON.
+
+[Documentation](https://api-platform.com/docs/core/content-negotiation/)
 
 > [!CAUTION]
 >

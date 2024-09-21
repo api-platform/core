@@ -1,8 +1,10 @@
-# API Platform - Validator
+# API Platform - Metadata 
 
-The Validator component of the [API Platform](https://api-platform.com) framework.
+The Metadata component of the [API Platform](https://api-platform.com) framework.
 
-[Documentation](https://api-platform.com/docs/admin/validation/)
+Generates abstract representation of web APIs. It's the core of the API Platform Core library.
+
+[Documentation](https://api-platform.com/docs/core/)
 
 > [!CAUTION]
 >
