@@ -38,7 +38,7 @@ class ParameterValidator
 
     public function __construct(ContainerInterface $filterLocator)
     {
-        trigger_deprecation('api-platform/core', '3.4', 'The class "%s" is deprecated, use "use \ApiPlatform\Metadata\Parameter::$constraints" instead.', __CLASS__);
+        trigger_deprecation('api-platform/core', '3.4', 'The class "%s" is deprecated, use "\ApiPlatform\Metadata\Parameter::$constraints" instead.', __CLASS__);
 
         $this->setFilterLocator($filterLocator);
 

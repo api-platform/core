@@ -31,7 +31,7 @@ final class ValidationException extends \Exception implements ValidationExceptio
     {
         parent::__construct($message ?: $this->__toString(), $code, $previous);
 
-        trigger_deprecation('api-platform/core', '3.4', 'The class "%s" is deprecated, use "use \ApiPlatform\Metadata\Parameter::$constraints" instead.', __CLASS__);
+        trigger_deprecation('api-platform/core', '3.4', 'The class "%s" is deprecated, use "\ApiPlatform\Metadata\Parameter::$constraints" instead.', __CLASS__);
     }
 
     public function getConstraintViolationList(): array
