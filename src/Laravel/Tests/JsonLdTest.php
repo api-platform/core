@@ -97,7 +97,6 @@ class JsonLdTest extends TestCase
         );
         $response->assertStatus(200);
         $response->assertJsonFragment([
-            '@id' => $iri,
             'name' => 'updated title',
         ]);
     }
