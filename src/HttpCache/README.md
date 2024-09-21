@@ -1,6 +1,6 @@
-# API Platform - HTTP cache
+# API Platform - HTTP Cache
 
-The [HTTP cache](https://httpwg.org/specs/rfc7234.html) component of the [API Platform](https://api-platform.com) framework.
+The [HTTP Cache](https://httpwg.org/specs/rfc7234.html) component of the [API Platform](https://api-platform.com) framework.
 
 This component also provides integrations with [Varnish](https://varnish-cache.org/), [Souin](https://souin.io/)
 and other HTTP cache servers and services.
