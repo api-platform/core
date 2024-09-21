@@ -20,11 +20,9 @@ use Psr\Container\ContainerInterface;
 /**
  * Manipulates filters with a backward compatibility between the new filter locator and the deprecated filter collection.
  *
- * @author Baptiste Meyer <baptiste.meyer@gmail.com>
- *
- * @deprecated
- *
  * @internal
+ *
+ * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 trait FilterLocatorTrait
 {

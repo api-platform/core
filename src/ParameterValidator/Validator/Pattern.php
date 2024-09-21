@@ -14,11 +14,16 @@ declare(strict_types=1);
 namespace ApiPlatform\ParameterValidator\Validator;
 
 /**
- * @deprecated use Parameter constraint instead
+ * @deprecated use \ApiPlatform\Metadata\Parameter::$constraints instead
  */
 final class Pattern implements ValidatorInterface
 {
     use CheckFilterDeprecationsTrait;
+
+    public function __construct()
+    {
+        trigger_deprecation('api-platform/core', '3.4', 'The class "%s" is deprecated, use "use \ApiPlatform\Metadata\Parameter::$constraints" instead.', __CLASS__);
+    }
 
     /**
      * {@inheritdoc}
