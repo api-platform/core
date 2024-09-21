@@ -46,13 +46,12 @@ final class EloquentPropertyNameCollectionMetadataFactory implements PropertyNam
             return $this->decorated?->create($resourceClass, $options) ?? new PropertyNameCollection();
         }
 
-
         /**
          * @var array<string, true> $properties
          */
         $properties = [];
 
-        /**
+        /*
          * When it's an Eloquent model we read attributes from database
          * @see \Illuminate\Database\Console\ShowModelCommand
          */

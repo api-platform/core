@@ -64,7 +64,7 @@ class Book extends Model
     use HasFactory;
     use HasUlids;
 
-    protected $visible = ['name', 'author', 'isbn', 'publication_date'];
+    protected $visible = ['name', 'slug', 'author', 'isbn', 'publication_date'];
     protected $fillable = ['name'];
 
     public function author(): BelongsTo
@@ -73,8 +73,8 @@ class Book extends Model
     }
 
     // Virtual field
-    public function getTitleAttribute(): string
+    public function getSlugAttribute(): string
     {
-        return Str::title($this->name);
+        return Str::slug($this->name);
     }
 }
