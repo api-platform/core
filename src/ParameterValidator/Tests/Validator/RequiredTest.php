@@ -19,6 +19,8 @@ use PHPUnit\Framework\TestCase;
 /**
  * Class RequiredTest.
  *
+ * @group legacy
+ *
  * @author Julien Deniau <julien.deniau@mapado.com>
  */
 class RequiredTest extends TestCase
@@ -58,9 +60,6 @@ class RequiredTest extends TestCase
         );
     }
 
-    /**
-     * @group legacy
-     */
     public function testEmptyValueNotAllowed(): void
     {
         $request = ['some_filter' => ''];
@@ -115,9 +114,6 @@ class RequiredTest extends TestCase
         );
     }
 
-    /**
-     * @group legacy
-     */
     public function testEmptyValueAllowed(): void
     {
         $request = ['some_filter' => ''];

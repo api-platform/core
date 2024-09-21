@@ -17,6 +17,8 @@ use ApiPlatform\ParameterValidator\Validator\MultipleOf;
 use PHPUnit\Framework\TestCase;
 
 /**
+ * @group legacy
+ *
  * @author Julien Deniau <julien.deniau@mapado.com>
  */
 class MultipleOfTest extends TestCase
@@ -40,9 +42,6 @@ class MultipleOfTest extends TestCase
         );
     }
 
-    /**
-     * @group legacy
-     */
     public function testNonMatchingParameter(): void
     {
         $request = ['some_filter' => '8'];
@@ -77,9 +76,6 @@ class MultipleOfTest extends TestCase
         );
     }
 
-    /**
-     * @group legacy
-     */
     public function testMatchingParameter(): void
     {
         $request = ['some_filter' => '8'];

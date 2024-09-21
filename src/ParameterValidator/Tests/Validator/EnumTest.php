@@ -17,6 +17,8 @@ use ApiPlatform\ParameterValidator\Validator\Enum;
 use PHPUnit\Framework\TestCase;
 
 /**
+ * @group legacy
+ *
  * @author Julien Deniau <julien.deniau@mapado.com>
  */
 class EnumTest extends TestCase
@@ -39,9 +41,6 @@ class EnumTest extends TestCase
         );
     }
 
-    /**
-     * @group legacy
-     */
     public function testNonMatchingParameter(): void
     {
         $filter = new Enum();
@@ -74,9 +73,6 @@ class EnumTest extends TestCase
         );
     }
 
-    /**
-     * @group legacy
-     */
     public function testMatchingParameter(): void
     {
         $filter = new Enum();

@@ -17,6 +17,8 @@ use ApiPlatform\ParameterValidator\Validator\Bounds;
 use PHPUnit\Framework\TestCase;
 
 /**
+ * @group legacy
+ *
  * @author Julien Deniau <julien.deniau@mapado.com>
  */
 class BoundsTest extends TestCase
@@ -39,9 +41,6 @@ class BoundsTest extends TestCase
         );
     }
 
-    /**
-     * @group legacy
-     */
     public function testNonMatchingMinimum(): void
     {
         $request = ['some_filter' => '9'];
@@ -124,9 +123,6 @@ class BoundsTest extends TestCase
         );
     }
 
-    /**
-     * @group legacy
-     */
     public function testMatchingMinimum(): void
     {
         $request = ['some_filter' => '10'];
@@ -181,9 +177,6 @@ class BoundsTest extends TestCase
         );
     }
 
-    /**
-     * @group legacy
-     */
     public function testNonMatchingMaximum(): void
     {
         $request = ['some_filter' => '11'];
@@ -266,9 +259,6 @@ class BoundsTest extends TestCase
         );
     }
 
-    /**
-     * @group legacy
-     */
     public function testMatchingMaximum(): void
     {
         $request = ['some_filter' => '10'];
