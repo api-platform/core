@@ -22,7 +22,7 @@ final class Bounds implements ValidatorInterface
 
     public function __construct()
     {
-        trigger_deprecation('api-platform/core', '3.4', 'The class "%s" is deprecated, use "use \ApiPlatform\Metadata\Parameter::$constraints" instead.', __CLASS__);
+        trigger_deprecation('api-platform/core', '3.4', 'The class "%s" is deprecated, use "\ApiPlatform\Metadata\Parameter::$constraints" instead.', __CLASS__);
     }
 
     /**
