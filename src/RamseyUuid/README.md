@@ -1,6 +1,6 @@
-# API Platform - RamseyUuid
+# API Platform - `ramsey/uuid 
 
-Integration for [Ramsey's UUID](https://uuid.ramsey.dev) with the [API Platform](https://api-platform.com) framework.
+Integration for [`ramsey/uuid`](https://uuid.ramsey.dev) with the [API Platform](https://api-platform.com) framework.
 
 [Documentation](https://api-platform.com/docs/core/identifiers/)
 

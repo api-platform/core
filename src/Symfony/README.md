@@ -1,4 +1,4 @@
-# API Platform - Symfony 
+# API Platform - Symfony
 
 Integration of [Symfony](https://symfony.com) with the [API Platform](https://api-platform.com) framework.
 

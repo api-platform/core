@@ -1,4 +1,4 @@
-# API Platform - Elasticsearch Support 
+# API Platform - Elasticsearch Support
 
 Integration for [Elasticsearch](https://www.elastic.co/elasticsearch) with the [API Platform](https://api-platform.com) framework.
 

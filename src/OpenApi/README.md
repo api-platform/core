@@ -1,4 +1,4 @@
-# API Platform - OpenAPI 
+# API Platform - OpenAPI
 
 The [OpenAPI](https://www.openapis.org) component of the [API Platform](https://api-platform.com) framework.
 

@@ -1,4 +1,4 @@
-# API Platform - HTTP cache 
+# API Platform - HTTP cache
 
 The [HTTP cache](https://httpwg.org/specs/rfc7234.html) component of the [API Platform](https://api-platform.com) framework.
 
