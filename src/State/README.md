@@ -1,11 +1,13 @@
 # API Platform - Serializer
 
-The Serializer component of the [API Platform](https://api-platform.com) framework.
+The State component of the [API Platform](https://api-platform.com) framework.
 
-Serializes PHP objects in various API formats.
-Built on top of the Symfony Serializer component.
+Provides and processes API states.
 
-[Documentation](https://api-platform.com/docs/core/serialization/)
+Documentation:
+
+* [State providers](https://api-platform.com/docs/core/state-providers/)
+* [State processors](https://api-platform.com/docs/core/state-processors/)
 
 > [!CAUTION]
 >

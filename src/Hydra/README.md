@@ -1,8 +1,10 @@
-# API Platform - Validator
+# API Platform - Hydra
 
-The Validator component of the [API Platform](https://api-platform.com) framework.
+The [Hydra](https://www.hydra-cg.com/) component of the [API Platform](https://api-platform.com) framework.
 
-[Documentation](https://api-platform.com/docs/admin/validation/)
+Hydra simplifies the development of interoperable, hypermedia-driven Web APIs.
+
+[Documentation](https://api-platform.com/docs/core/)
 
 > [!CAUTION]
 >

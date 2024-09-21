@@ -1,8 +1,8 @@
-# API Platform - Validator
+# API Platform - Doctrine ORM Support 
 
-The Validator component of the [API Platform](https://api-platform.com) framework.
+Integration for [Doctrine ORM](https://www.doctrine-project.org/projects/doctrine-orm/en/current/index.html) with the [API Platform](https://api-platform.com) framework.
 
-[Documentation](https://api-platform.com/docs/admin/validation/)
+[Documentation](https://api-platform.com/docs/core/getting-started/)
 
 > [!CAUTION]
 >
