@@ -744,6 +744,11 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $securitySchemes[$key] = new SecurityScheme('apiKey', $description, $apiKey['name'], $apiKey['type']);
         }
 
+        foreach ($this->openApiOptions->getHttpAuth() as $key => $httpAuth) {
+            $description = \sprintf('Value for the http %s parameter.', $httpAuth['scheme']);
+            $securitySchemes[$key] = new SecurityScheme('http', $description, null, null, $httpAuth['scheme'], $httpAuth['bearerFormat'] ?? null);
+        }
+
         return $securitySchemes;
     }
 
