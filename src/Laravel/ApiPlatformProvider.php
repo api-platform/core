@@ -705,7 +705,10 @@ class ApiPlatformProvider extends ServiceProvider
             /** @var ConfigRepository */
             $config = $app['config'];
 
-            return new Options(title: $config->get('api-platform.title') ?? '');
+            return new Options(
+                title: $config->get('api-platform.title', ''),
+                httpAuth: $config->get('api-platform.swagger_ui.http_auth', [])
+            );
         });
 
         $this->app->singleton(DocumentationController::class, function (Application $app) {
@@ -763,7 +766,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(SchemaFactoryInterface::class),
                 null,
                 $config->get('api-platform.formats'),
-                null, // ?Options $openApiOptions = null,
+                $app->make(Options::class), // ?Options $openApiOptions = null,
                 $app->make(PaginationOptions::class), // ?PaginationOptions $paginationOptions = null,
                 // ?RouterInterface $router = null
             );
