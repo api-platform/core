@@ -139,8 +139,8 @@ namespace App\Tests {
             // {
             //   "@context": "/contexts/ConstraintViolationList",
             //   "@type": "ConstraintViolationList",
-            //   "hydra:title": "An error occurred",
-            //   "hydra:description": "properties: The product must have the minimal properties required (\"description\", \"price\")",
+            //   "title": "An error occurred",
+            //   "description": "properties: The product must have the minimal properties required (\"description\", \"price\")",
             //   "violations": [
             //     {
             //       "propertyPath": "properties",
@@ -151,7 +151,7 @@ namespace App\Tests {
             // ```
             $this->assertResponseStatusCodeSame(422);
             $this->assertJsonContains([
-                'hydra:description' => 'properties: The product must have the minimal properties required ("description", "price")',
+                'description' => 'properties: The product must have the minimal properties required ("description", "price")',
                 'title' => 'An error occurred',
                 'violations' => [
                     ['propertyPath' => 'properties', 'message' => 'The product must have the minimal properties required ("description", "price")'],

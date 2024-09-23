@@ -171,12 +171,21 @@ Feature: Expose only a collection of objects
     When I send a "GET" request to "<uri>"
     Then the response status code should be 404
     And the response should be in JSON
-    And the JSON node "hydra:description" should be equal to "<hydra:description>"
+    And the JSON node "hydra:description" should be equal to "<description>"
     Examples:
-      | uri                      | hydra:description                                                                                                          |
-      | /.well-known/genid/12345 | This route is not exposed on purpose. It generates an IRI for a collection resource without identifier nor item operation. |
+      | uri                      | description                                                                                                          |
       | /tables/12345            | This route does not aim to be called.                                                                                      |
       | /forks/12345             | This route does not aim to be called.                                                                                      |
+
+  Scenario Outline: Get a not exposed route returns a 404 with an explanation
+    When I send a "GET" request to "<uri>"
+    Then the response status code should be 404
+    And the response should be in JSON
+    And the JSON node "description" should be equal to "<description>"
+    Examples:
+      | uri                      | description                                                                                                          |
+      | /.well-known/genid/12345 | This route is not exposed on purpose. It generates an IRI for a collection resource without identifier nor item operation. |
+
 
   Scenario: Get a single item still works
     When I send a "GET" request to "/cuillers/12345"

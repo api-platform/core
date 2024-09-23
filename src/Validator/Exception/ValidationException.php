@@ -108,16 +108,8 @@ class ValidationException extends RuntimeException implements ConstraintViolatio
         return $id;
     }
 
-    #[SerializedName('hydra:title')]
     #[Groups(['jsonld'])]
-    public function getHydraTitle(): string
-    {
-        return $this->errorTitle ?? 'An error occurred';
-    }
-
-    #[Groups(['jsonld'])]
-    #[SerializedName('hydra:description')]
-    public function getHydraDescription(): string
+    public function getDescription(): string
     {
         return $this->detail;
     }
