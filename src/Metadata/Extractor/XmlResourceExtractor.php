@@ -61,7 +61,6 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
         foreach ($xml->resource as $resource) {
             $base = $this->buildExtendedBase($resource);
             $this->resources[$this->resolve((string) $resource['class'])][] = array_merge($base, [
-                'class' => $this->phpize($resource, 'class', 'string'),
                 'operations' => $this->buildOperations($resource, $base),
                 'graphQlOperations' => $this->buildGraphQlOperations($resource, $base),
             ]);
