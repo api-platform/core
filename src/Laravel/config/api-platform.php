@@ -87,6 +87,12 @@ return [
         //    'refreshUrl' => '',
         //    'scopes' => ['scope1' => 'Description scope 1'],
         //    'pkce' => true
+        //],
+        //'http_auth' => [
+        //    'Personal Access Token' => [
+        //        'scheme' => 'bearer',
+        //        'bearerFormat' => 'JWT'
+        //    ]
         //]
     ],
 
