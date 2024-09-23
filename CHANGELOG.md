@@ -1,5 +1,22 @@
 # Changelog
 
+## v4.0.2
+
+### Bug fixes
+
+* [219199db3](https://github.com/api-platform/core/commit/219199db386cab05f1c1225b889c0a9609b36699) fix(symfony): missing alias to serializer context builder interface (#6643)
+* [5f943e3bb](https://github.com/api-platform/core/commit/5f943e3bb56934ba5d0b858f6b4c20a2985b6b6b) fix(graphql): wrong exception namespace (#6647)
+* [72a0b669a](https://github.com/api-platform/core/commit/72a0b669a426ca4bbbf14cf80a6ced683b947e8c) fix(serializer): remove serializer context builder interface
+* [88bd8c3e1](https://github.com/api-platform/core/commit/88bd8c3e151c843649bcac3feefc2cb956212410) fix(laravel): installation command, fix config overwrites (#6649)
+* [93314b08d](https://github.com/api-platform/core/commit/93314b08de1e6f0505af9e3a3ba3d9971f1ef09c) fix(serializer): allow state's SerializerFilterContextBuilderInterface (#6632)
+* [9a0afc917](https://github.com/api-platform/core/commit/9a0afc917a4bfa824ffbb640af9bb1114a5d31b4) fix(serializer): remove unnecessary dependency
+* [c47e2996e](https://github.com/api-platform/core/commit/c47e2996e51c587c998fde88903703bd6ac9a43c) fix: default format and standard_put values
+* [e327f5f69](https://github.com/api-platform/core/commit/e327f5f69c823c1ed674eefc0eb2551e30fb36bd) fix(symfony): namespace of path segment name generator services (#6642)
+
+Notes: 
+
+`standard_put=true` is now the default, you can set it to `false` using `extra_properties.defaults`
+
 ## v4.0.1
 
 ### Bug fixes
