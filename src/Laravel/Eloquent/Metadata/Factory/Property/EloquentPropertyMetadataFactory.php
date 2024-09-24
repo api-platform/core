@@ -77,7 +77,7 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
                 'collection', 'encrypted:collection' => new Type(Type::BUILTIN_TYPE_ITERABLE, $p['nullable'], Collection::class, true),
                 'encrypted:array' => new Type(Type::BUILTIN_TYPE_ARRAY, $p['nullable']),
                 'encrypted:object' => new Type(Type::BUILTIN_TYPE_OBJECT, $p['nullable']),
-                default => new Type(\in_array($builtinType, Type::$builtinTypes, true) ? $builtinType : Type::BUILTIN_TYPE_STRING, $p['nullable']),
+                default => new Type(\in_array($builtinType, Type::$builtinTypes, true) ? $builtinType : Type::BUILTIN_TYPE_STRING, $p['nullable'] ?? true),
             };
 
             return $propertyMetadata
