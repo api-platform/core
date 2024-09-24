@@ -1293,14 +1293,6 @@ class ApiPlatformProvider extends ServiceProvider
         $route->name('api_doc')->middleware(ApiPlatformMiddleware::class);
         $routeCollection->add($route);
 
-        $route = new Route(['GET'], $prefix.'/{index?}{_format?}', function (Request $request, Application $app) {
-            $entrypointAction = $app->make(EntrypointController::class);
-
-            return $entrypointAction->__invoke($request);
-        });
-        $route->where('index', 'index');
-        $route->name('api_entrypoint')->middleware(ApiPlatformMiddleware::class);
-        $routeCollection->add($route);
         $route = new Route(['GET'], $prefix.'/.well-known/genid/{id}', function (): void {
             throw new NotExposedHttpException('This route is not exposed on purpose. It generates an IRI for a collection resource without identifier nor item operation.');
         });
@@ -1322,6 +1314,15 @@ class ApiPlatformProvider extends ServiceProvider
             });
             $routeCollection->add($route);
         }
+
+        $route = new Route(['GET'], $prefix.'/{index?}{_format?}', function (Request $request, Application $app) {
+            $entrypointAction = $app->make(EntrypointController::class);
+
+            return $entrypointAction->__invoke($request);
+        });
+        $route->where('index', 'index');
+        $route->name('api_entrypoint')->middleware(ApiPlatformMiddleware::class);
+        $routeCollection->add($route);
 
         $router->setRoutes($routeCollection);
     }
