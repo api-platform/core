@@ -23,7 +23,7 @@
         </service>
 
         <service id="api_platform.listener.view.validate_query_parameters" class="ApiPlatform\Symfony\EventListener\QueryParameterValidateListener" public="false">
-            <argument type="service" id="api_platform.state_provider.query_parameter_validate" />
+            <argument type="service" id="api_platform.state_provider.parameter_validator" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="16" />
