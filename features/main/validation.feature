@@ -87,7 +87,7 @@ Feature: Using validations groups
     And the JSON node "violations[0].message" should be equal to "This value should not be null."
     And the JSON node "violations[0].propertyPath" should be equal to "test"
     And the JSON node "detail" should be equal to "test: This value should not be null."
-    And the JSON node "hydra:description" should be equal to "test: This value should not be null."
+    And the JSON node "description" should be equal to "test: This value should not be null."
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
 
   @!mongodb

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonLd;
 
 use ApiPlatform\JsonLd\Serializer\HydraPrefixTrait;
+use ApiPlatform\Metadata\Error;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
@@ -184,7 +185,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
             }
         }
 
-        if (false === ($this->defaultContext[self::HYDRA_CONTEXT_HAS_PREFIX] ?? true)) {
+        if (false === ($this->defaultContext[self::HYDRA_CONTEXT_HAS_PREFIX] ?? true) || $operation instanceof Error) {
             return ['http://www.w3.org/ns/hydra/context.jsonld', $context];
         }
 

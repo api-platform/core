@@ -472,7 +472,7 @@ Feature: Relations support
     Then the response status code should be 400
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
-    And the JSON node "hydra:description" should contain 'Invalid IRI "certainly not an IRI".'
+    And the JSON node "description" should contain 'Invalid IRI "certainly not an IRI".'
 
   Scenario: Passing an invalid type to a relation
     When I add "Content-Type" header equal to "application/ld+json"
@@ -493,20 +493,20 @@ Feature: Relations support
       "properties": {
         "@type": {
           "type": "string",
-          "pattern": "^hydra:Error$"
+          "pattern": "^Error$"
         },
-        "hydra:title": {
+        "title": {
           "type": "string",
           "pattern": "^An error occurred$"
         },
-        "hydra:description": {
+        "description": {
           "pattern": "^The type of the \"ApiPlatform\\\\Tests\\\\Fixtures\\\\TestBundle\\\\(Document|Entity)\\\\RelatedDummy\" resource must be \"array\" \\(nested document\\) or \"string\" \\(IRI\\), \"integer\" given.$"
         }
       },
       "required": [
         "@type",
-        "hydra:title",
-        "hydra:description"
+        "title",
+        "description"
       ]
     }
     """
