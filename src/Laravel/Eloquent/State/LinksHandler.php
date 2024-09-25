@@ -37,19 +37,19 @@ final class LinksHandler implements LinksHandlerInterface
                 $identifier = $uriVariables[$uriVariable];
 
                 if ($to = $link->getToProperty()) {
-                    $builder = $builder->where($builder->getModel()->getTable().'.'.$builder->getModel()->{$to}()->getForeignKeyName(), $identifier);
+                    $builder = $builder->where($builder->getModel()->{$to}()->getQualifiedForeignKeyName(), $identifier);
 
                     continue;
                 }
 
                 if ($from = $link->getFromProperty()) {
                     $relation = $this->application->make($link->getFromClass());
-                    $builder = $builder->getModel()->where($builder->getModel()->getTable().'.'.$relation->{$from}()->getForeignKeyName(), $identifier);
+                    $builder = $builder->getModel()->where($relation->{$from}()->getQualifiedForeignKeyName(), $identifier);
 
                     continue;
                 }
 
-                $builder->where($builder->getModel()->getTable().'.'.$link->getIdentifiers()[0], $identifier);
+                $builder->where($builder->getModel()->qualifyColumn($link->getIdentifiers()[0]), $identifier);
             }
 
             return $builder;

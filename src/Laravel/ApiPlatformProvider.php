@@ -705,7 +705,33 @@ class ApiPlatformProvider extends ServiceProvider
             /** @var ConfigRepository */
             $config = $app['config'];
 
-            return new Options(title: $config->get('api-platform.title') ?? '');
+            return new Options(
+                title: $config->get('api-platform.title', ''),
+                description: $config->get('api-platform.description', ''),
+                version: $config->get('api-platform.version', ''),
+                oAuthEnabled: $config->get('api-platform.swagger_ui.oauth.enabled', false),
+                oAuthType: $config->get('api-platform.swagger_ui.oauth.type', null),
+                oAuthFlow: $config->get('api-platform.swagger_ui.oauth.flow', null),
+                oAuthTokenUrl: $config->get('api-platform.swagger_ui.oauth.tokenUrl', null),
+                oAuthAuthorizationUrl: $config->get('api-platform.swagger_ui.oauth.authorizationUrl', null),
+                oAuthRefreshUrl: $config->get('api-platform.swagger_ui.oauth.refreshUrl', null),
+                oAuthScopes: $config->get('api-platform.swagger_ui.oauth.scopes', []),
+                apiKeys: $config->get('api-platform.swagger_ui.apiKeys', []),
+            );
+        });
+
+        $this->app->singleton(SwaggerUiProcessor::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+
+            return new SwaggerUiProcessor(
+                urlGenerator: $app->make(UrlGeneratorInterface::class),
+                normalizer: $app->make(NormalizerInterface::class),
+                openApiOptions: $app->make(Options::class),
+                oauthClientId: $config->get('api-platform.swagger_ui.oauth.clientId'),
+                oauthClientSecret: $config->get('api-platform.swagger_ui.oauth.clientSecret'),
+                oauthPkce: $config->get('api-platform.swagger_ui.oauth.pkce', false),
+            );
         });
 
         $this->app->singleton(DocumentationController::class, function (Application $app) {
@@ -1267,14 +1293,6 @@ class ApiPlatformProvider extends ServiceProvider
         $route->name('api_doc')->middleware(ApiPlatformMiddleware::class);
         $routeCollection->add($route);
 
-        $route = new Route(['GET'], $prefix.'/{index?}{_format?}', function (Request $request, Application $app) {
-            $entrypointAction = $app->make(EntrypointController::class);
-
-            return $entrypointAction->__invoke($request);
-        });
-        $route->where('index', 'index');
-        $route->name('api_entrypoint')->middleware(ApiPlatformMiddleware::class);
-        $routeCollection->add($route);
         $route = new Route(['GET'], $prefix.'/.well-known/genid/{id}', function (): void {
             throw new NotExposedHttpException('This route is not exposed on purpose. It generates an IRI for a collection resource without identifier nor item operation.');
         });
@@ -1296,6 +1314,15 @@ class ApiPlatformProvider extends ServiceProvider
             });
             $routeCollection->add($route);
         }
+
+        $route = new Route(['GET'], $prefix.'/{index?}{_format?}', function (Request $request, Application $app) {
+            $entrypointAction = $app->make(EntrypointController::class);
+
+            return $entrypointAction->__invoke($request);
+        });
+        $route->where('index', 'index');
+        $route->name('api_entrypoint')->middleware(ApiPlatformMiddleware::class);
+        $routeCollection->add($route);
 
         $router->setRoutes($routeCollection);
     }
