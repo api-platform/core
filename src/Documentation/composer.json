@@ -20,7 +20,8 @@
         }
     ],
     "require": {
-        "api-platform/metadata": "^3.4 || ^4.0"
+        "api-platform/metadata": "^3.4 || ^4.0",
+        "php": ">=8.2"
     },
     "extra": {
         "branch-alias": {
