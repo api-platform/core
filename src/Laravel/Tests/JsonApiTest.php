@@ -23,6 +23,7 @@ use Workbench\App\Models\Author;
 use Workbench\App\Models\Book;
 use Workbench\Database\Factories\AuthorFactory;
 use Workbench\Database\Factories\BookFactory;
+use Workbench\Database\Factories\WithAccessorFactory;
 
 class JsonApiTest extends TestCase
 {
@@ -196,5 +197,16 @@ class JsonApiTest extends TestCase
         $response = $this->delete($iri, headers: ['accept' => 'application/vnd.api+json']);
         $response->assertStatus(204);
         $this->assertNull(Book::find($book->id));
+    }
+
+    public function testRelationWithGroups(): void
+    {
+        WithAccessorFactory::new()->create();
+        $response = $this->get('/api/with_accessors/1', ['accept' => 'application/vnd.api+json']);
+        $content = $response->json();
+        $this->assertArrayHasKey('data', $content);
+        $this->assertArrayHasKey('relationships', $content['data']);
+        $this->assertArrayHasKey('relation', $content['data']['relationships']);
+        $this->assertArrayHasKey('data', $content['data']['relationships']['relation']);
     }
 }

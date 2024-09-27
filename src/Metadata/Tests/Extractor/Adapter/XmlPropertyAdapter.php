@@ -47,7 +47,8 @@ final class XmlPropertyAdapter implements PropertyAdapterInterface
         'property',
     ];
 
-    private const EXCLUDE = ['policy'];
+    // TODO: add serialize support for XML (policy is Laravel-only)
+    private const EXCLUDE = ['policy', 'serialize'];
 
     /**
      * {@inheritdoc}
