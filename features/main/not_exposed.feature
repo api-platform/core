@@ -171,7 +171,7 @@ Feature: Expose only a collection of objects
     When I send a "GET" request to "<uri>"
     Then the response status code should be 404
     And the response should be in JSON
-    And the JSON node "hydra:description" should be equal to "<description>"
+    And the JSON node "description" should be equal to "<description>"
     Examples:
       | uri                      | description                                                                                                          |
       | /tables/12345            | This route does not aim to be called.                                                                                      |

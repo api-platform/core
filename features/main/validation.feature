@@ -31,8 +31,8 @@ Feature: Using validations groups
     {
       "@context": "/contexts/ConstraintViolationList",
       "@type": "ConstraintViolationList",
-      "hydra:title": "An error occurred",
-      "hydra:description": "name: This value should not be null.",
+      "title": "An error occurred",
+      "description": "name: This value should not be null.",
       "violations": [
          {
              "propertyPath": "name",
@@ -60,8 +60,8 @@ Feature: Using validations groups
     {
       "@context": "/contexts/ConstraintViolationList",
       "@type": "ConstraintViolationList",
-      "hydra:title": "An error occurred",
-      "hydra:description": "title: This value should not be null.",
+      "title": "An error occurred",
+      "description": "title: This value should not be null.",
       "violations": [
          {
              "propertyPath": "title",
@@ -113,8 +113,8 @@ Feature: Using validations groups
     {
       "@context": "/contexts/ConstraintViolationList",
       "@type": "ConstraintViolationList",
-      "hydra:title": "An error occurred",
-      "hydra:description": "This value should be of type unknown.\nqux: This value should be of type string.\nfoo: This value should be of type bool.\nbar: This value should be of type int.\nuuid: This value should be of type uuid.\nrelatedDummy: This value should be of type array|string.\nrelatedDummies: This value should be of type array.",
+      "title": "An error occurred",
+      "description": "This value should be of type unknown.\nqux: This value should be of type string.\nfoo: This value should be of type bool.\nbar: This value should be of type int.\nuuid: This value should be of type uuid.\nrelatedDummy: This value should be of type array|string.\nrelatedDummies: This value should be of type array.",
       "violations": [
         {
           "propertyPath": "",
