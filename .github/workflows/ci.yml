@@ -61,6 +61,7 @@ jobs:
           path: ${{ steps.composercache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
+      - run: composer validate
       - name: Update project dependencies
         run: |
           composer global require soyuka/pmu
