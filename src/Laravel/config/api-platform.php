@@ -10,12 +10,10 @@ return [
     'version' => '1.0.0',
 
     'routes' => [
+        // Global middleware applied to every API Platform routes
+        // 'middleware' => []
     ],
 
-    /*
-     * Where are ApiResource defined
-     * TODO: link the docs on how to plug on eloquent models or create apiResource like controllers :D
-     */
     'resources' => [
         app_path('Models'),
     ],
