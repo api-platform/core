@@ -1261,6 +1261,7 @@ class ApiPlatformProvider extends ServiceProvider
             return;
         }
 
+        $globalMiddlewares = $config->get('api-platform.routes.middleware');
         $routeCollection = new RouteCollection();
         foreach ($resourceNameCollectionFactory->create() as $resourceClass) {
             foreach ($resourceMetadataFactory->create($resourceClass) as $resourceMetadata) {
@@ -1273,7 +1274,7 @@ class ApiPlatformProvider extends ServiceProvider
                         ->setDefaults(['_api_operation_name' => $operation->getName(), '_api_resource_class' => $operation->getClass()]);
 
                     $route->middleware(ApiPlatformMiddleware::class.':'.$operation->getName());
-                    $route->middleware($config->get('api-platform.routes.middleware'));
+                    $route->middleware($globalMiddlewares);
                     $route->middleware($operation->getMiddleware());
 
                     $routeCollection->add($route);
@@ -1283,20 +1284,26 @@ class ApiPlatformProvider extends ServiceProvider
 
         $prefix = $config->get('api-platform.defaults.route_prefix') ?? '';
         $route = new Route(['GET'], $prefix.'/contexts/{shortName?}{_format?}', [ContextAction::class, '__invoke']);
-        $route->name('api_jsonld_context')->middleware(ApiPlatformMiddleware::class);
+        $route->name('api_jsonld_context');
+        $route->middleware(ApiPlatformMiddleware::class);
+        $route->middleware($globalMiddlewares);
         $routeCollection->add($route);
         $route = new Route(['GET'], $prefix.'/docs{_format?}', function (Request $request, Application $app) {
             $documentationAction = $app->make(DocumentationController::class);
 
             return $documentationAction->__invoke($request);
         });
-        $route->name('api_doc')->middleware(ApiPlatformMiddleware::class);
+        $route->name('api_doc');
+        $route->middleware(ApiPlatformMiddleware::class);
+        $route->middleware($globalMiddlewares);
         $routeCollection->add($route);
 
         $route = new Route(['GET'], $prefix.'/.well-known/genid/{id}', function (): void {
             throw new NotExposedHttpException('This route is not exposed on purpose. It generates an IRI for a collection resource without identifier nor item operation.');
         });
-        $route->name('api_genid')->middleware(ApiPlatformMiddleware::class);
+        $route->name('api_genid');
+        $route->middleware(ApiPlatformMiddleware::class);
+        $route->middleware($globalMiddlewares);
         $routeCollection->add($route);
 
         if ($config->get('api-platform.graphql.enabled')) {
@@ -1305,6 +1312,7 @@ class ApiPlatformProvider extends ServiceProvider
 
                 return $entrypointAction->__invoke($request);
             });
+            $route->middleware($globalMiddlewares);
             $routeCollection->add($route);
 
             $route = new Route(['GET'], $prefix.'/graphiql', function (Application $app) {
@@ -1312,6 +1320,7 @@ class ApiPlatformProvider extends ServiceProvider
 
                 return $controller->__invoke();
             });
+            $route->middleware($globalMiddlewares);
             $routeCollection->add($route);
         }
 
@@ -1321,7 +1330,9 @@ class ApiPlatformProvider extends ServiceProvider
             return $entrypointAction->__invoke($request);
         });
         $route->where('index', 'index');
-        $route->name('api_entrypoint')->middleware(ApiPlatformMiddleware::class);
+        $route->name('api_entrypoint');
+        $route->middleware(ApiPlatformMiddleware::class);
+        $route->middleware($globalMiddlewares);
         $routeCollection->add($route);
 
         $router->setRoutes($routeCollection);
