@@ -27,7 +27,7 @@
         "api-platform/metadata": "^3.4 || ^4.0",
         "api-platform/serializer": "^3.4 || ^4.0",
         "api-platform/state": "^3.4 || ^4.0",
-        "elasticsearch/elasticsearch": "^8.9",
+        "elasticsearch/elasticsearch": "^7.11 || ^8.9",
         "symfony/cache": "^6.4 || ^7.0",
         "symfony/console": "^6.4 || ^7.0",
         "symfony/property-access": "^6.4 || ^7.1",
