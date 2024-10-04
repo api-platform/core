@@ -1,5 +1,23 @@
 # Changelog
 
+## v4.0.3
+
+### Bug fixes
+
+* [025f63e69](https://github.com/api-platform/core/commit/025f63e69c2ec655a828559ed78c49a365ca043b) fix(laravel): route registration of EntrypointController should be last (#6667)
+* [2b4937a3e](https://github.com/api-platform/core/commit/2b4937a3e09fb891b99fd8499b597190a4b740e0) fix(laravel): eloquent accessors (#6668)
+* [4312a1f55](https://github.com/api-platform/core/commit/4312a1f55f4f80152be93734cb5cf73c70dee53a) fix(metadata): register parameters on graphql operations
+* [6d4e24883](https://github.com/api-platform/core/commit/6d4e24883767f1c58dff5e52f57b0422110fa38f) fix(laravel): hiding/showing relationships (#6679)
+* [85306f2f5](https://github.com/api-platform/core/commit/85306f2f5a7d480b1570471689d1d3ca4e9846a3) fix(laravel): swagger ui authentication (#6661)
+* [a6e37068e](https://github.com/api-platform/core/commit/a6e37068ea49d1b5a4ee098a62a287d62fba1c35) fix(laravel): use Model::qualifyColumn instead of hardcoding $table.$column (#6658)
+* [b0d5a2ade](https://github.com/api-platform/core/commit/b0d5a2adedb583074aa93d4f641bdda419d31ffa) fix(laravel): register global middleware to secure non-rest routes
+* [f9d96e546](https://github.com/api-platform/core/commit/f9d96e546a37121244ab98d65c2d91f48b1bb112) fix(metadata): graphql can be disabled but with an existing operation
+
+
+### Features
+
+* [df701da05](https://github.com/api-platform/core/commit/df701da05620a847f529ebabaee97f8cf5ecb37f) feat(laravel): graphql policies
+
 ## v4.0.2
 
 ### Bug fixes
