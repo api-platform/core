@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Uid\AbstractUid;
 
 /**
  * Trait for filtering the collection by given properties.
@@ -125,17 +126,30 @@ trait SearchFilterTrait
             $item = $iriConverter->getResourceFromIri($value, ['fetch_data' => false]);
 
             if (null === $this->identifiersExtractor) {
-                return $this->getPropertyAccessor()->getValue($item, 'id');
+                $id = $this->getPropertyAccessor()->getValue($item, 'id');
+
+                return $this->toUuidValue($id);
             }
 
             $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($item);
 
-            return 1 === \count($identifiers) ? array_pop($identifiers) : $identifiers;
+            if (1 === \count($identifiers)) {
+                $id = array_pop($identifiers);
+
+                return $this->toUuidValue($id);
+            }
+
+            return array_map([$this, 'toUuidValue'], $identifiers);
         } catch (InvalidArgumentException) {
             // Do nothing, return the raw value
         }
 
         return $value;
+    }
+
+    private function toUuidValue(mixed $id): mixed
+    {
+        return ($id instanceof AbstractUid) ? $id->toBinary() : $id;
     }
 
     /**
