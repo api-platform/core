@@ -20,6 +20,7 @@ use Workbench\Database\Factories\CommentFactory;
 use Workbench\Database\Factories\PostFactory;
 use Workbench\Database\Factories\SluggableFactory;
 use Workbench\Database\Factories\UserFactory;
+use Workbench\Database\Factories\VaultFactory;
 use Workbench\Database\Factories\WithAccessorFactory;
 
 class DatabaseSeeder extends Seeder
@@ -34,5 +35,6 @@ class DatabaseSeeder extends Seeder
         SluggableFactory::new()->count(10)->create();
         UserFactory::new()->create();
         WithAccessorFactory::new()->create();
+        VaultFactory::new()->count(10)->create();
     }
 }

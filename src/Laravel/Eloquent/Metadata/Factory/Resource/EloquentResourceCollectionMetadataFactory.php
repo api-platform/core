@@ -22,6 +22,11 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\GraphQl\DeleteMutation;
+use ApiPlatform\Metadata\GraphQl\Mutation;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
+use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
@@ -39,6 +44,12 @@ final class EloquentResourceCollectionMetadataFactory implements ResourceMetadat
         GetCollection::class => 'viewAny',
         Delete::class => 'delete',
         Patch::class => 'update',
+
+        Query::class => 'view',
+        QueryCollection::class => 'viewAny',
+        Mutation::class => 'update',
+        DeleteMutation::class => 'delete',
+        Subscription::class => 'viewAny',
     ];
 
     public function __construct(
@@ -94,6 +105,12 @@ final class EloquentResourceCollectionMetadataFactory implements ResourceMetadat
             $graphQlOperations = $resourceMetadata->getGraphQlOperations();
 
             foreach ($graphQlOperations ?? [] as $operationName => $graphQlOperation) {
+                if (!$graphQlOperation->getPolicy() && ($policy = Gate::getPolicyFor($model))) {
+                    if (($policyMethod = self::POLICY_METHODS[$graphQlOperation::class] ?? null) && method_exists($policy, $policyMethod)) {
+                        $graphQlOperation = $graphQlOperation->withPolicy($policyMethod);
+                    }
+                }
+
                 if (!$graphQlOperation->getProvider()) {
                     $graphQlOperation = $graphQlOperation->withProvider($graphQlOperation instanceof CollectionOperationInterface ? CollectionProvider::class : ItemProvider::class);
                 }
