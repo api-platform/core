@@ -74,6 +74,8 @@ final class QueryCollection extends Query implements CollectionOperationInterfac
         protected ?OptionsInterface $stateOptions = null,
         array|Parameters|null $parameters = null,
         ?bool $queryParameterValidationEnabled = null,
+        mixed $rules = null,
+        ?string $policy = null,
         array $extraProperties = [],
 
         ?bool $nested = null,
@@ -130,6 +132,8 @@ final class QueryCollection extends Query implements CollectionOperationInterfac
             processor: $processor,
             parameters: $parameters,
             queryParameterValidationEnabled: $queryParameterValidationEnabled,
+            policy: $policy,
+            rules: $rules,
             extraProperties: $extraProperties,
             nested: $nested,
         );

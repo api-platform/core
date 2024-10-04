@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\State;
 
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\State\ProviderInterface;
 use Illuminate\Auth\Access\AuthorizationException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * Allows access based on the ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface.
@@ -54,7 +56,7 @@ final class AccessCheckerProvider implements ProviderInterface
         ];
 
         if (!$this->resourceAccessChecker->isGranted($operation->getClass(), $policy, $resourceAccessCheckerContext)) {
-            throw new AuthorizationException($message ?? 'Access Denied.');
+            throw $operation instanceof HttpOperation ? new AuthorizationException($message ?? 'Access Denied.') : new AccessDeniedHttpException($message ?? 'Access Denied.');
         }
 
         return $body;

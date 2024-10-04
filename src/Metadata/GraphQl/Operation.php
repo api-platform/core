@@ -90,6 +90,8 @@ class Operation extends AbstractOperation
         ?OptionsInterface $stateOptions = null,
         array|Parameters|null $parameters = null,
         ?bool $queryParameterValidationEnabled = null,
+        mixed $rules = null,
+        ?string $policy = null,
         array $extraProperties = [],
     ) {
         parent::__construct(
@@ -139,6 +141,8 @@ class Operation extends AbstractOperation
             stateOptions: $stateOptions,
             parameters: $parameters,
             queryParameterValidationEnabled: $queryParameterValidationEnabled,
+            rules: $rules,
+            policy: $policy,
             extraProperties: $extraProperties
         );
     }

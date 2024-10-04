@@ -16,6 +16,7 @@ namespace Workbench\App\Models;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\Post;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -33,7 +34,8 @@ use Workbench\App\Http\Requests\VaultFormRequest;
             write: false
         ),
         new Delete(middleware: 'auth:sanctum', rules: VaultFormRequest::class, provider: [self::class, 'provide']),
-    ]
+    ],
+    graphQlOperations: [new Mutation(name: 'update', policy: 'update')]
 )]
 class Vault extends Model
 {
