@@ -21,6 +21,9 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
 {
     use ResourceClassInfoTrait;
 
+    private const GLUE = '.';
+    private array $prefixCache = [];
+
     public function __construct(private ?array $distinctFormats)
     {
     }
@@ -32,18 +35,18 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
         }
 
         if (!isset($prefix)) {
-            $prefix = (new \ReflectionClass($className))->getShortName();
+            $prefix = $this->createPrefixFromClass($className);
         }
 
         if (null !== $inputOrOutputClass && $className !== $inputOrOutputClass) {
             $parts = explode('\\', $inputOrOutputClass);
             $shortName = end($parts);
-            $prefix .= '.'.$shortName;
+            $prefix .= self::GLUE.$shortName;
         }
 
         if ('json' !== $format && ($this->distinctFormats[$format] ?? false)) {
             // JSON is the default, and so isn't included in the definition name
-            $prefix .= '.'.$format;
+            $prefix .= self::GLUE.$format;
         }
 
         $definitionName = $serializerContext[SchemaFactory::OPENAPI_DEFINITION_NAME] ?? null;
@@ -60,5 +63,23 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
     private function encodeDefinitionName(string $name): string
     {
         return preg_replace('/[^a-zA-Z0-9.\-_]/', '.', $name);
+    }
+
+    private function createPrefixFromClass(string $fullyQualifiedClassName, int $namespaceParts = 1): string
+    {
+        $parts = explode('\\', $fullyQualifiedClassName);
+        $name = implode(self::GLUE, \array_slice($parts, -$namespaceParts));
+
+        if (!isset($this->prefixCache[$name])) {
+            $this->prefixCache[$name] = $fullyQualifiedClassName;
+
+            return $name;
+        }
+
+        if ($this->prefixCache[$name] !== $fullyQualifiedClassName) {
+            $name = $this->createPrefixFromClass($fullyQualifiedClassName, ++$namespaceParts);
+        }
+
+        return $name;
     }
 }
