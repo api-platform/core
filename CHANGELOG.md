@@ -1,5 +1,13 @@
 # Changelog
 
+## v3.3.13
+
+### Bug fixes
+
+* [1b9dfccc8](https://github.com/api-platform/core/commit/1b9dfccc8d64be2b04e48490905771a77aefdd96) fix: count TraversablePaginator (#6611)
+* [4c58b33e8](https://github.com/api-platform/core/commit/4c58b33e8c5a90f9377543bd068288dcf84e3236) fix(jsonapi): fixed definition name to allow using the same class names in different namespaces (#6676)
+* [ef0ee6427](https://github.com/api-platform/core/commit/ef0ee6427f8056bcb2617c228a7cf9ffd9d29ccd) fix(doctrine): use parameter.property for filter value (#6572)
+
 ## v3.3.12
 
 ### Bug fixes
