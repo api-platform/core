@@ -112,7 +112,7 @@ final class RespondProcessor implements ProcessorInterface
         $status ??= self::METHOD_TO_CODE[$method] ?? 200;
 
         if ($hasData && $this->iriConverter && !isset($headers['Content-Location'])) {
-            $iri = $this->iriConverter->getIriFromResource($originalData);
+            $iri = $this->iriConverter->getIriFromResource($originalData, UrlGeneratorInterface::ABS_PATH, $operation, $context);
             $headers['Content-Location'] = $iri;
 
             if ((201 === $status || (300 <= $status && $status < 400)) && 'POST' === $method && !isset($headers['Location'])) {
