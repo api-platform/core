@@ -366,7 +366,8 @@ class ApiPlatformProvider extends ServiceProvider
                                                                     $config->get('api-platform.graphql.enabled'),
                                                                 ),
                                                             )
-                                                        )
+                                                        ),
+                                                        $config->get('api-platform.graphql.enabled')
                                                     )
                                                 )
                                             )
@@ -927,6 +928,10 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
+        if (interface_exists(FieldsBuilderEnumInterface::class)) {
+            $this->registerGraphQl($this->app);
+        }
+
         $this->app->singleton(JsonApiObjectNormalizer::class, function (Application $app) {
             return new JsonApiObjectNormalizer(
                 $app->make(ObjectNormalizer::class),
@@ -934,51 +939,6 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ResourceClassResolverInterface::class),
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
             );
-        });
-
-        if ($this->app['config']->get('api-platform.graphql.enabled')) {
-            $this->app->singleton(GraphQlItemNormalizer::class, function (Application $app) {
-                return new GraphQlItemNormalizer(
-                    $app->make(PropertyNameCollectionFactoryInterface::class),
-                    $app->make(PropertyMetadataFactoryInterface::class),
-                    $app->make(IriConverterInterface::class),
-                    $app->make(IdentifiersExtractorInterface::class),
-                    $app->make(ResourceClassResolverInterface::class),
-                    $app->make(PropertyAccessorInterface::class),
-                    $app->make(NameConverterInterface::class),
-                    $app->make(SerializerClassMetadataFactory::class),
-                    null,
-                    $app->make(ResourceMetadataCollectionFactoryInterface::class),
-                    $app->make(ResourceAccessCheckerInterface::class)
-                );
-            });
-
-            $this->app->singleton(GraphQlObjectNormalizer::class, function (Application $app) {
-                return new GraphQlObjectNormalizer(
-                    $app->make(ObjectNormalizer::class),
-                    $app->make(IriConverterInterface::class),
-                    $app->make(IdentifiersExtractorInterface::class),
-                );
-            });
-        }
-
-        $this->app->singleton(GraphQlErrorNormalizer::class, function () {
-            return new GraphQlErrorNormalizer();
-        });
-
-        $this->app->singleton(GraphQlValidationExceptionNormalizer::class, function (Application $app) {
-            /** @var ConfigRepository */
-            $config = $app['config'];
-
-            return new GraphQlValidationExceptionNormalizer($config->get('api-platform.exception_to_status'));
-        });
-
-        $this->app->singleton(GraphQlHttpExceptionNormalizer::class, function () {
-            return new GraphQlHttpExceptionNormalizer();
-        });
-
-        $this->app->singleton(GraphQlRuntimeExceptionNormalizer::class, function () {
-            return new GraphQlHttpExceptionNormalizer();
         });
 
         $this->app->bind(SerializerInterface::class, Serializer::class);
@@ -1009,7 +969,7 @@ class ApiPlatformProvider extends ServiceProvider
             $list->insert($app->make(JsonApiItemNormalizer::class), -890);
             $list->insert($app->make(JsonApiObjectNormalizer::class), -995);
 
-            if ($config->get('api-platform.graphql.enabled')) {
+            if (interface_exists(FieldsBuilderEnumInterface::class)) {
                 $list->insert($app->make(GraphQlItemNormalizer::class), -890);
                 $list->insert($app->make(GraphQlObjectNormalizer::class), -995);
                 $list->insert($app->make(GraphQlErrorNormalizer::class), -790);
@@ -1033,7 +993,8 @@ class ApiPlatformProvider extends ServiceProvider
                     new JsonEncoder('jsonapi'),
                     new JsonEncoder('jsonhal'),
                     new CsvEncoder(),
-                ]);
+                ]
+            );
         });
 
         $this->app->singleton(JsonLdItemNormalizer::class, function (Application $app) {
@@ -1078,10 +1039,6 @@ class ApiPlatformProvider extends ServiceProvider
             return new Inflector();
         });
 
-        if ($this->app['config']->get('api-platform.graphql.enabled')) {
-            $this->registerGraphQl($this->app);
-        }
-
         if ($this->app->runningInConsole()) {
             $this->commands([Console\InstallCommand::class]);
         }
@@ -1089,6 +1046,49 @@ class ApiPlatformProvider extends ServiceProvider
 
     private function registerGraphQl(Application $app): void
     {
+        $this->app->singleton(GraphQlItemNormalizer::class, function (Application $app) {
+            return new GraphQlItemNormalizer(
+                $app->make(PropertyNameCollectionFactoryInterface::class),
+                $app->make(PropertyMetadataFactoryInterface::class),
+                $app->make(IriConverterInterface::class),
+                $app->make(IdentifiersExtractorInterface::class),
+                $app->make(ResourceClassResolverInterface::class),
+                $app->make(PropertyAccessorInterface::class),
+                $app->make(NameConverterInterface::class),
+                $app->make(SerializerClassMetadataFactory::class),
+                null,
+                $app->make(ResourceMetadataCollectionFactoryInterface::class),
+                $app->make(ResourceAccessCheckerInterface::class)
+            );
+        });
+
+        $this->app->singleton(GraphQlObjectNormalizer::class, function (Application $app) {
+            return new GraphQlObjectNormalizer(
+                $app->make(ObjectNormalizer::class),
+                $app->make(IriConverterInterface::class),
+                $app->make(IdentifiersExtractorInterface::class),
+            );
+        });
+
+        $this->app->singleton(GraphQlErrorNormalizer::class, function () {
+            return new GraphQlErrorNormalizer();
+        });
+
+        $this->app->singleton(GraphQlValidationExceptionNormalizer::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+
+            return new GraphQlValidationExceptionNormalizer($config->get('api-platform.exception_to_status'));
+        });
+
+        $this->app->singleton(GraphQlHttpExceptionNormalizer::class, function () {
+            return new GraphQlHttpExceptionNormalizer();
+        });
+
+        $this->app->singleton(GraphQlRuntimeExceptionNormalizer::class, function () {
+            return new GraphQlHttpExceptionNormalizer();
+        });
+
         $app->singleton('api_platform.graphql.type_locator', function (Application $app) {
             $tagged = iterator_to_array($app->tagged('api_platform.graphql.type'));
 
@@ -1130,44 +1130,78 @@ class ApiPlatformProvider extends ServiceProvider
             return new GraphQlSerializerContextBuilder($app->make(NameConverterInterface::class));
         });
 
-        $app->singleton('api_platform.graphql.state_provider', function (Application $app) {
+        $app->singleton(GraphQlReadProvider::class, function (Application $app) {
             /** @var ConfigRepository */
             $config = $app['config'];
-            $tagged = iterator_to_array($app->tagged(ParameterProviderInterface::class));
-            $resolvers = iterator_to_array($app->tagged('api_platform.graphql.resolver'));
 
             return new GraphQlReadProvider(
-                new GraphQlDenormalizeProvider(
-                    new ResolverProvider(
-                        new ParameterProvider(
-                            $app->make(CallableProvider::class),
-                            new ServiceLocator($tagged)
-                        ),
-                        new ServiceLocator($resolvers),
-                    ),
-                    $app->make(SerializerInterface::class),
-                    $app->make(GraphQlSerializerContextBuilder::class)
-                ),
+                $this->app->make(CallableProvider::class),
                 $app->make(IriConverterInterface::class),
                 $app->make(GraphQlSerializerContextBuilder::class),
                 $config->get('api-platform.graphql.nesting_separator') ?? '__'
             );
         });
+        $app->alias(GraphQlReadProvider::class, 'api_platform.graphql.state_provider.read');
+
+        $app->singleton(ResolverProvider::class, function (Application $app) {
+            $resolvers = iterator_to_array($app->tagged('api_platform.graphql.resolver'));
+
+            return new ResolverProvider(
+                $app->make(GraphQlReadProvider::class),
+                new ServiceLocator($resolvers),
+            );
+        });
+
+        $app->alias(ResolverProvider::class, 'api_platform.graphql.state_provider.resolver');
+
+        $app->singleton(GraphQlDenormalizeProvider::class, function (Application $app) {
+            return new GraphQlDenormalizeProvider(
+                $this->app->make(ResolverProvider::class),
+                $app->make(SerializerInterface::class),
+                $app->make(GraphQlSerializerContextBuilder::class)
+            );
+        });
+
+        $app->alias(GraphQlDenormalizeProvider::class, 'api_platform.graphql.state_provider.denormalize');
+
+        $app->singleton('api_platform.graphql.state_provider.parameter', function (Application $app) {
+            $tagged = iterator_to_array($app->tagged(ParameterProviderInterface::class));
+            $tagged['api_platform.serializer.filter_parameter_provider'] = $app->make(SerializerFilterParameterProvider::class);
+
+            return new ParameterProvider(
+                new ParameterValidatorProvider(
+                    new SecurityParameterProvider(
+                        $app->make(GraphQlDenormalizeProvider::class),
+                        $app->make(ResourceAccessCheckerInterface::class)
+                    ),
+                ),
+                new ServiceLocator($tagged)
+            );
+        });
+
+        $app->singleton('api_platform.graphql.state_provider.access_checker', function (Application $app) {
+            return new AccessCheckerProvider($app->make('api_platform.graphql.state_provider.parameter'), $app->make(ResourceAccessCheckerInterface::class));
+        });
+
+        $app->singleton(NormalizeProcessor::class, function (Application $app) {
+            return new NormalizeProcessor(
+                $app->make(SerializerInterface::class),
+                $app->make(GraphQlSerializerContextBuilder::class),
+                $app->make(Pagination::class)
+            );
+        });
+        $app->alias(NormalizeProcessor::class, 'api_platform.graphql.state_processor.normalize');
 
         $app->singleton('api_platform.graphql.state_processor', function (Application $app) {
             return new WriteProcessor(
-                new NormalizeProcessor(
-                    $app->make(SerializerInterface::class),
-                    $app->make(GraphQlSerializerContextBuilder::class),
-                    $app->make(Pagination::class)
-                ),
+                $app->make('api_platform.graphql.state_processor.normalize'),
                 $app->make(CallableProcessor::class),
             );
         });
 
         $app->singleton(ResolverFactoryInterface::class, function (Application $app) {
             return new ResolverFactory(
-                $app->make('api_platform.graphql.state_provider'),
+                $app->make('api_platform.graphql.state_provider.access_checker'),
                 $app->make('api_platform.graphql.state_processor')
             );
         });
@@ -1227,7 +1261,8 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(SerializerInterface::class),
                 $app->make(ErrorHandlerInterface::class),
                 debug: $config->get('app.debug'),
-                negotiator: $app->make(Negotiator::class)
+                negotiator: $app->make(Negotiator::class),
+                formats: $config->get('api-platform.formats')
             );
         });
     }
@@ -1261,6 +1296,7 @@ class ApiPlatformProvider extends ServiceProvider
             return;
         }
 
+        $globalMiddlewares = $config->get('api-platform.routes.middleware');
         $routeCollection = new RouteCollection();
         foreach ($resourceNameCollectionFactory->create() as $resourceClass) {
             foreach ($resourceMetadataFactory->create($resourceClass) as $resourceMetadata) {
@@ -1273,7 +1309,7 @@ class ApiPlatformProvider extends ServiceProvider
                         ->setDefaults(['_api_operation_name' => $operation->getName(), '_api_resource_class' => $operation->getClass()]);
 
                     $route->middleware(ApiPlatformMiddleware::class.':'.$operation->getName());
-                    $route->middleware($config->get('api-platform.routes.middleware'));
+                    $route->middleware($globalMiddlewares);
                     $route->middleware($operation->getMiddleware());
 
                     $routeCollection->add($route);
@@ -1283,20 +1319,26 @@ class ApiPlatformProvider extends ServiceProvider
 
         $prefix = $config->get('api-platform.defaults.route_prefix') ?? '';
         $route = new Route(['GET'], $prefix.'/contexts/{shortName?}{_format?}', [ContextAction::class, '__invoke']);
-        $route->name('api_jsonld_context')->middleware(ApiPlatformMiddleware::class);
+        $route->name('api_jsonld_context');
+        $route->middleware(ApiPlatformMiddleware::class);
+        $route->middleware($globalMiddlewares);
         $routeCollection->add($route);
         $route = new Route(['GET'], $prefix.'/docs{_format?}', function (Request $request, Application $app) {
             $documentationAction = $app->make(DocumentationController::class);
 
             return $documentationAction->__invoke($request);
         });
-        $route->name('api_doc')->middleware(ApiPlatformMiddleware::class);
+        $route->name('api_doc');
+        $route->middleware(ApiPlatformMiddleware::class);
+        $route->middleware($globalMiddlewares);
         $routeCollection->add($route);
 
         $route = new Route(['GET'], $prefix.'/.well-known/genid/{id}', function (): void {
             throw new NotExposedHttpException('This route is not exposed on purpose. It generates an IRI for a collection resource without identifier nor item operation.');
         });
-        $route->name('api_genid')->middleware(ApiPlatformMiddleware::class);
+        $route->name('api_genid');
+        $route->middleware(ApiPlatformMiddleware::class);
+        $route->middleware($globalMiddlewares);
         $routeCollection->add($route);
 
         if ($config->get('api-platform.graphql.enabled')) {
@@ -1305,6 +1347,7 @@ class ApiPlatformProvider extends ServiceProvider
 
                 return $entrypointAction->__invoke($request);
             });
+            $route->middleware($globalMiddlewares);
             $routeCollection->add($route);
 
             $route = new Route(['GET'], $prefix.'/graphiql', function (Application $app) {
@@ -1312,6 +1355,7 @@ class ApiPlatformProvider extends ServiceProvider
 
                 return $controller->__invoke();
             });
+            $route->middleware($globalMiddlewares);
             $routeCollection->add($route);
         }
 
@@ -1321,7 +1365,9 @@ class ApiPlatformProvider extends ServiceProvider
             return $entrypointAction->__invoke($request);
         });
         $route->where('index', 'index');
-        $route->name('api_entrypoint')->middleware(ApiPlatformMiddleware::class);
+        $route->name('api_entrypoint');
+        $route->middleware(ApiPlatformMiddleware::class);
+        $route->middleware($globalMiddlewares);
         $routeCollection->add($route);
 
         $router->setRoutes($routeCollection);

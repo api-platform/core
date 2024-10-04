@@ -52,6 +52,7 @@
         <service id="api_platform.metadata.resource.metadata_collection_factory.link" class="ApiPlatform\Metadata\Resource\Factory\LinkResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="500" public="false">
             <argument type="service" id="api_platform.metadata.resource.link_factory" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.link.inner" />
+            <argument>%api_platform.graphql.enabled%</argument>
         </service>
 
         <!-- must run after uri template, do not change uriTemplate neither the operation names in < 500 priorities -->

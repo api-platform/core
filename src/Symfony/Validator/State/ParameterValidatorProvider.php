@@ -40,7 +40,7 @@ final class ParameterValidatorProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        if (!($request = $context['request']) instanceof Request) {
+        if (!($request = $context['request'] ?? null) instanceof Request) {
             return $this->decorated->provide($operation, $uriVariables, $context);
         }
 

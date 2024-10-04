@@ -1,5 +1,23 @@
 # Changelog
 
+## v4.0.3
+
+### Bug fixes
+
+* [025f63e69](https://github.com/api-platform/core/commit/025f63e69c2ec655a828559ed78c49a365ca043b) fix(laravel): route registration of EntrypointController should be last (#6667)
+* [2b4937a3e](https://github.com/api-platform/core/commit/2b4937a3e09fb891b99fd8499b597190a4b740e0) fix(laravel): eloquent accessors (#6668)
+* [4312a1f55](https://github.com/api-platform/core/commit/4312a1f55f4f80152be93734cb5cf73c70dee53a) fix(metadata): register parameters on graphql operations
+* [6d4e24883](https://github.com/api-platform/core/commit/6d4e24883767f1c58dff5e52f57b0422110fa38f) fix(laravel): hiding/showing relationships (#6679)
+* [85306f2f5](https://github.com/api-platform/core/commit/85306f2f5a7d480b1570471689d1d3ca4e9846a3) fix(laravel): swagger ui authentication (#6661)
+* [a6e37068e](https://github.com/api-platform/core/commit/a6e37068ea49d1b5a4ee098a62a287d62fba1c35) fix(laravel): use Model::qualifyColumn instead of hardcoding $table.$column (#6658)
+* [b0d5a2ade](https://github.com/api-platform/core/commit/b0d5a2adedb583074aa93d4f641bdda419d31ffa) fix(laravel): register global middleware to secure non-rest routes
+* [f9d96e546](https://github.com/api-platform/core/commit/f9d96e546a37121244ab98d65c2d91f48b1bb112) fix(metadata): graphql can be disabled but with an existing operation
+
+
+### Features
+
+* [df701da05](https://github.com/api-platform/core/commit/df701da05620a847f529ebabaee97f8cf5ecb37f) feat(laravel): graphql policies
+
 ## v4.0.2
 
 ### Bug fixes
@@ -111,6 +129,21 @@ Notes:
 ### Features
 
 * [0d5f35683](https://github.com/api-platform/core/commit/0d5f356839eb6aa9f536044abe4affa736553e76) feat(laravel): laravel component (#5882)
+
+## v3.4.2
+
+### Bug fixes
+
+* [0ca76fc89](https://github.com/api-platform/core/commit/0ca76fc898d2d1a679a490a5dea85473bf680901) fix(elasticsearch): allow elasticsearch 7 (#6689)
+* [15d61c4b7](https://github.com/api-platform/core/commit/15d61c4b75fea2b365e0852a923fed8efbae6ab8) fix(metadata): using parameters in fromClass and toClass uriVariables' options (#6663)
+* [2e2044636](https://github.com/api-platform/core/commit/2e204463675939903128037f82916d68f0016719) fix(metadata): parameter provider in a long running http worker (#6683)
+* [4c58b33e8](https://github.com/api-platform/core/commit/4c58b33e8c5a90f9377543bd068288dcf84e3236) fix(jsonapi): fixed definition name to allow using the same class names in different namespaces (#6676)
+* [4f5f56756](https://github.com/api-platform/core/commit/4f5f5675629fe52ea415a6bd91f3625eedea9c87) fix: remove hydra prefix on errors (#6624)
+* [afe7d47d7](https://github.com/api-platform/core/commit/afe7d47d7b7ba6c8591bfb60137a65d1fa1fe38f) fix(metadata): passing class as parameter in XML ApiResource's definition (#6659)
+* [b93ee467c](https://github.com/api-platform/core/commit/b93ee467c69253e0cfe60e75b48a5c7aa683474a) fix(metadata): overwriting XML ApiResource definition by YAML ApiResource definition (#6660)
+
+> [!WARNING]
+> Hydra prefix on errors is breaking, read `title` not `hydra:title`. The `hydra_prefix` flag doesn't apply to errors as it provided redundant information (both `hydra:title` and `title` were available)
 
 ## v3.4.1
 
@@ -270,6 +303,20 @@ You should now install `api-platform/symfony` instead of `api-platform/core`.
 * [7399fcf7e](https://github.com/api-platform/core/commit/7399fcf7eaf28cd649d137da1fdd54f69093e275) feat(symfony): skip error handler (#6463)
 * [74986cb55](https://github.com/api-platform/core/commit/74986cb552182dc645bd1fc967faa0954dd59e0a) feat: inflector as service (#6447)
 * [b47edb2a4](https://github.com/api-platform/core/commit/b47edb2a499c34e79c167f963e3a626a3e9d040a) feat(serializer): context IRI in HAL or JsonApi format (#6215)
+
+## v3.3.14
+
+### Bug fixes
+
+* [4c58b33e8](https://github.com/api-platform/core/commit/4c58b33e8c5a90f9377543bd068288dcf84e3236) fix(jsonapi): fixed definition name to allow using the same class names in different namespaces (#6676)
+
+## v3.3.13
+
+### Bug fixes
+
+* [1b9dfccc8](https://github.com/api-platform/core/commit/1b9dfccc8d64be2b04e48490905771a77aefdd96) fix: count TraversablePaginator (#6611)
+* [4c58b33e8](https://github.com/api-platform/core/commit/4c58b33e8c5a90f9377543bd068288dcf84e3236) fix(jsonapi): fixed definition name to allow using the same class names in different namespaces (#6676)
+* [ef0ee6427](https://github.com/api-platform/core/commit/ef0ee6427f8056bcb2617c228a7cf9ffd9d29ccd) fix(doctrine): use parameter.property for filter value (#6572)
 
 ## v3.3.12
 

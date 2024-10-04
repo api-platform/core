@@ -1,11 +1,14 @@
 # Contributing to the Laravel Integration of API Platform 
 
+Pull requests should be made at https://github.com/api-plaform/core
+
 ## Tests
 
     cd src/Laravel
     composer global require soyuka/pmu
     composer global link ../../
     vendor/bin/testbench workbench:build
+    vendor/bin/testbench api-platform:install 
     vendor/bin/testbench package:test
     # or
     vendor/bin/phpunit
