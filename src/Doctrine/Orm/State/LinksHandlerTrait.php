@@ -40,7 +40,7 @@ trait LinksHandlerTrait
         $doctrineClassMetadata = $manager->getClassMetadata($entityClass);
         $alias = $queryBuilder->getRootAliases()[0];
 
-        $links = $this->getLinks($entityClass, $operation, $context);
+        $links = $this->getLinks($context['resource_class'] ?? $entityClass, $operation, $context);
 
         if (!$links) {
             return;
