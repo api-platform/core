@@ -1,5 +1,20 @@
 # Changelog
 
+## v3.4.2
+
+### Bug fixes
+
+* [0ca76fc89](https://github.com/api-platform/core/commit/0ca76fc898d2d1a679a490a5dea85473bf680901) fix(elasticsearch): allow elasticsearch 7 (#6689)
+* [15d61c4b7](https://github.com/api-platform/core/commit/15d61c4b75fea2b365e0852a923fed8efbae6ab8) fix(metadata): using parameters in fromClass and toClass uriVariables' options (#6663)
+* [2e2044636](https://github.com/api-platform/core/commit/2e204463675939903128037f82916d68f0016719) fix(metadata): parameter provider in a long running http worker (#6683)
+* [4c58b33e8](https://github.com/api-platform/core/commit/4c58b33e8c5a90f9377543bd068288dcf84e3236) fix(jsonapi): fixed definition name to allow using the same class names in different namespaces (#6676)
+* [4f5f56756](https://github.com/api-platform/core/commit/4f5f5675629fe52ea415a6bd91f3625eedea9c87) fix: remove hydra prefix on errors (#6624)
+* [afe7d47d7](https://github.com/api-platform/core/commit/afe7d47d7b7ba6c8591bfb60137a65d1fa1fe38f) fix(metadata): passing class as parameter in XML ApiResource's definition (#6659)
+* [b93ee467c](https://github.com/api-platform/core/commit/b93ee467c69253e0cfe60e75b48a5c7aa683474a) fix(metadata): overwriting XML ApiResource definition by YAML ApiResource definition (#6660)
+
+> [!WARNING]
+> Hydra prefix on errors is breaking, read `title` not `hydra:title`. The `hydra_prefix` flag doesn't apply to errors as it provided redundant information (both `hydra:title` and `title` were available)
+
 ## v3.4.1
 
 ### Bug fixes
