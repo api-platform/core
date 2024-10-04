@@ -368,4 +368,10 @@ class EloquentTest extends TestCase
         $res = $this->get('/api/authors?order[name]=something', ['Accept' => ['application/ld+json']]);
         $this->assertEquals($res->getStatusCode(), 422);
     }
+
+    public function testWithAccessor(): void
+    {
+        $res = $this->get('/api/with_accessors/1', ['Accept' => ['application/ld+json']]);
+        $this->assertArraySubset(['name' => 'test'], $res->json());
+    }
 }
