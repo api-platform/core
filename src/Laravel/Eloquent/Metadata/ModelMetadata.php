@@ -156,6 +156,7 @@ final class ModelMetadata
                     || $method->isAbstract()
                     || Model::class === $method->getDeclaringClass()->getName()
                     || $method->getNumberOfParameters() > 0
+                    || $this->attributeIsHidden($method->getName(), $model)
             )
             ->filter(function (\ReflectionMethod $method) {
                 if ($method->getReturnType() instanceof \ReflectionNamedType
