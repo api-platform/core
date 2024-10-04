@@ -141,11 +141,11 @@ trait MetadataCollectionFactoryTrait
                 $resources[$index] = $resource = $resource->withOperations(new Operations($operations)); // @phpstan-ignore-line
             }
 
-            $graphQlOperations = $resource->getGraphQlOperations();
             if (!$this->graphQlEnabled) {
                 continue;
             }
 
+            $graphQlOperations = $resource->getGraphQlOperations();
             if (null === $graphQlOperations) {
                 if (!$hasApiResource) {
                     $resources[$index] = $resources[$index]->withGraphQlOperations([]);

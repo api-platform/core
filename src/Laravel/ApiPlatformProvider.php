@@ -366,7 +366,8 @@ class ApiPlatformProvider extends ServiceProvider
                                                                     $config->get('api-platform.graphql.enabled'),
                                                                 ),
                                                             )
-                                                        )
+                                                        ),
+                                                        $config->get('api-platform.graphql.enabled')
                                                     )
                                                 )
                                             )

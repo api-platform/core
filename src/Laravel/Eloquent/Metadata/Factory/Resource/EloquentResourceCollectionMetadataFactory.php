@@ -103,7 +103,6 @@ final class EloquentResourceCollectionMetadataFactory implements ResourceMetadat
             $resourceMetadataCollection[$i] = $resourceMetadata->withOperations($operations);
 
             $graphQlOperations = $resourceMetadata->getGraphQlOperations();
-
             foreach ($graphQlOperations ?? [] as $operationName => $graphQlOperation) {
                 if (!$graphQlOperation->getPolicy() && ($policy = Gate::getPolicyFor($model))) {
                     if (($policyMethod = self::POLICY_METHODS[$graphQlOperation::class] ?? null) && method_exists($policy, $policyMethod)) {
@@ -122,7 +121,9 @@ final class EloquentResourceCollectionMetadataFactory implements ResourceMetadat
                 $graphQlOperations[$operationName] = $graphQlOperation;
             }
 
-            $resourceMetadata = $resourceMetadata->withGraphQlOperations($graphQlOperations);
+            if ($graphQlOperations) {
+                $resourceMetadata = $resourceMetadata->withGraphQlOperations($graphQlOperations);
+            }
 
             $resourceMetadataCollection[$i] = $resourceMetadata;
         }
