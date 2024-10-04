@@ -52,6 +52,10 @@ final class ParameterProvider implements ProviderInterface
         $context = ['operation' => $operation] + $context;
         $parameters = $operation->getParameters();
         foreach ($parameters ?? [] as $parameter) {
+            $extraProperties = $parameter->getExtraProperties();
+            unset($extraProperties['_api_values']);
+            $parameters->add($parameter->getKey(), $parameter = $parameter->withExtraProperties($extraProperties));
+
             $values = $this->getParameterValues($parameter, $request, $context);
             $value = $this->extractParameterValues($parameter, $values);
 

@@ -69,4 +69,29 @@ final class DefinitionNameFactoryTest extends TestCase
 
         static::assertSame($expected, $definitionNameFactory->create($className, $format, $inputOrOutputClass, $operation, $serializerContext));
     }
+
+    public function testCreateDifferentPrefixesForClassesWithTheSameShortName(): void
+    {
+        $definitionNameFactory = new DefinitionNameFactory(['jsonapi' => true, 'jsonhal' => true]);
+
+        self::assertEquals(
+            'DummyClass.jsonapi',
+            $definitionNameFactory->create(\ApiPlatform\Tests\JsonSchema\Dummy\NamespaceA\Module\DummyClass::class, 'jsonapi')
+        );
+
+        self::assertEquals(
+            'Module.DummyClass.jsonapi',
+            $definitionNameFactory->create(\ApiPlatform\Tests\JsonSchema\Dummy\NamespaceB\Module\DummyClass::class, 'jsonapi')
+        );
+
+        self::assertEquals(
+            'NamespaceC.Module.DummyClass.jsonapi',
+            $definitionNameFactory->create(\ApiPlatform\Tests\JsonSchema\Dummy\NamespaceC\Module\DummyClass::class, 'jsonapi')
+        );
+
+        self::assertEquals(
+            'DummyClass.jsonhal',
+            $definitionNameFactory->create(\ApiPlatform\Tests\JsonSchema\Dummy\NamespaceA\Module\DummyClass::class, 'jsonhal')
+        );
+    }
 }
