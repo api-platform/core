@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.3.14
+
+### Bug fixes
+
+* [4c58b33e8](https://github.com/api-platform/core/commit/4c58b33e8c5a90f9377543bd068288dcf84e3236) fix(jsonapi): fixed definition name to allow using the same class names in different namespaces (#6676)
+
 ## v3.3.13
 
 ### Bug fixes
