@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\JsonSchemaFilterInterface;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -34,6 +35,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class ParameterResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
+    private array $localPropertyCache;
+
     public function __construct(
         private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
         private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory,
@@ -47,51 +50,12 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
     {
         $resourceMetadataCollection = $this->decorated?->create($resourceClass) ?? new ResourceMetadataCollection($resourceClass);
 
-        $propertyNames = [];
-        $properties = [];
-        foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $i => $property) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
-            if ($propertyMetadata->isReadable()) {
-                $propertyNames[] = $property;
-                $properties[$property] = $propertyMetadata;
-            }
-        }
-
         foreach ($resourceMetadataCollection as $i => $resource) {
             $operations = $resource->getOperations();
 
             $internalPriority = -1;
             foreach ($operations as $operationName => $operation) {
-                $parameters = $operation->getParameters() ?? new Parameters();
-                foreach ($parameters as $key => $parameter) {
-                    if (':property' === $key) {
-                        foreach ($propertyNames as $property) {
-                            $converted = $this->nameConverter?->denormalize($property) ?? $property;
-                            $propertyParameter = $this->setDefaults($converted, $parameter, $resourceClass, $properties);
-                            $priority = $propertyParameter->getPriority() ?? $internalPriority--;
-                            $parameters->add($converted, $propertyParameter->withPriority($priority)->withKey($converted));
-                        }
-
-                        $parameters->remove($key, $parameter::class);
-                        continue;
-                    }
-
-                    $key = $parameter->getKey() ?? $key;
-
-                    if (str_contains($key, ':property')) {
-                        $p = [];
-                        foreach ($propertyNames as $prop) {
-                            $p[$this->nameConverter?->denormalize($prop) ?? $prop] = $prop;
-                        }
-
-                        $parameter = $parameter->withExtraProperties(($parameter->getExtraProperties() ?? []) + ['_properties' => $p]);
-                    }
-
-                    $parameter = $this->setDefaults($key, $parameter, $resourceClass, $properties);
-                    $priority = $parameter->getPriority() ?? $internalPriority--;
-                    $parameters->add($key, $parameter->withPriority($priority));
-                }
-
+                $parameters = $this->getDefaultParameters($operation, $resourceClass, $internalPriority);
                 if (\count($parameters) > 0) {
                     $operations->add($operationName, $operation->withParameters($parameters));
                 }
@@ -105,21 +69,76 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
 
             $internalPriority = -1;
             foreach ($graphQlOperations as $operationName => $operation) {
-                $parameters = $operation->getParameters() ?? new Parameters();
-                foreach ($operation->getParameters() ?? [] as $key => $parameter) {
-                    $key = $parameter->getKey() ?? $key;
-                    $parameter = $this->setDefaults($key, $parameter, $resourceClass, $properties);
-                    $priority = $parameter->getPriority() ?? $internalPriority--;
-                    $parameters->add($key, $parameter->withPriority($priority));
+                $parameters = $this->getDefaultParameters($operation, $resourceClass, $internalPriority);
+                if (\count($parameters) > 0) {
+                    $graphQlOperations[$operationName] = $operation->withParameters($parameters);
                 }
-
-                $graphQlOperations[$operationName] = $operation->withParameters($parameters);
             }
 
             $resourceMetadataCollection[$i] = $resource->withGraphQlOperations($graphQlOperations);
         }
 
         return $resourceMetadataCollection;
+    }
+
+    /**
+     * @return array{propertyNames: string[], properties: array<string, ApiProperty>}
+     */
+    private function getProperties(string $resourceClass): array
+    {
+        if (isset($this->localPropertyCache[$resourceClass])) {
+            return $this->localPropertyCache[$resourceClass];
+        }
+
+        $propertyNames = [];
+        $properties = [];
+        foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
+            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
+            if ($propertyMetadata->isReadable()) {
+                $propertyNames[] = $property;
+                $properties[$property] = $propertyMetadata;
+            }
+        }
+
+        $this->localPropertyCache = [$resourceClass => ['propertyNames' => $propertyNames, 'properties' => $properties]];
+
+        return $this->localPropertyCache[$resourceClass];
+    }
+
+    private function getDefaultParameters(Operation $operation, string $resourceClass, int &$internalPriority): Parameters
+    {
+        ['propertyNames' => $propertyNames, 'properties' => $properties] = $this->getProperties($resourceClass);
+        $parameters = $operation->getParameters() ?? new Parameters();
+        foreach ($parameters as $key => $parameter) {
+            if (':property' === $key) {
+                foreach ($propertyNames as $property) {
+                    $converted = $this->nameConverter?->denormalize($property) ?? $property;
+                    $propertyParameter = $this->setDefaults($converted, $parameter, $resourceClass, $properties);
+                    $priority = $propertyParameter->getPriority() ?? $internalPriority--;
+                    $parameters->add($converted, $propertyParameter->withPriority($priority)->withKey($converted));
+                }
+
+                $parameters->remove($key, $parameter::class);
+                continue;
+            }
+
+            $key = $parameter->getKey() ?? $key;
+
+            if (str_contains($key, ':property')) {
+                $p = [];
+                foreach ($propertyNames as $prop) {
+                    $p[$this->nameConverter?->denormalize($prop) ?? $prop] = $prop;
+                }
+
+                $parameter = $parameter->withExtraProperties($parameter->getExtraProperties() + ['_properties' => $p]);
+            }
+
+            $parameter = $this->setDefaults($key, $parameter, $resourceClass, $properties);
+            $priority = $parameter->getPriority() ?? $internalPriority--;
+            $parameters->add($key, $parameter->withPriority($priority));
+        }
+
+        return $parameters;
     }
 
     private function addFilterMetadata(Parameter $parameter): Parameter
