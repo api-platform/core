@@ -75,7 +75,7 @@ class LinkResourceMetadataCollectionFactoryTest extends TestCase
             ]),
         );
 
-        $linkResourceMetadataCollectionFactory = new LinkResourceMetadataCollectionFactory($linkFactory, $resourceCollectionMetadataFactoryProphecy->reveal());
+        $linkResourceMetadataCollectionFactory = new LinkResourceMetadataCollectionFactory($linkFactory, $resourceCollectionMetadataFactoryProphecy->reveal(), true);
 
         $this->assertEquals(
             new ResourceMetadataCollection(AttributeResource::class, [
@@ -123,7 +123,7 @@ class LinkResourceMetadataCollectionFactoryTest extends TestCase
             ]),
         );
 
-        $linkResourceMetadataCollectionFactory = new LinkResourceMetadataCollectionFactory($linkFactory, $resourceCollectionMetadataFactoryProphecy->reveal());
+        $linkResourceMetadataCollectionFactory = new LinkResourceMetadataCollectionFactory($linkFactory, $resourceCollectionMetadataFactoryProphecy->reveal(), true);
 
         $this->assertEquals(
             new ResourceMetadataCollection(AttributeResource::class, [
