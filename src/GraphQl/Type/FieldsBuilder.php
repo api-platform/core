@@ -18,11 +18,13 @@ use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\GraphQl\Exception\InvalidTypeException;
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface;
+use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\InflectorInterface;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -296,20 +298,40 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
                     continue;
                 }
 
+                $filter = $this->filterLocator->get($filterId);
                 $parsedKey = explode('[:property]', $key);
                 $flattenFields = [];
-                foreach ($this->filterLocator->get($filterId)->getDescription($operation->getClass()) as $key => $value) {
-                    $values = [];
-                    parse_str($key, $values);
-                    if (isset($values[$parsedKey[0]])) {
-                        $values = $values[$parsedKey[0]];
+
+                if ($filter instanceof FilterInterface) {
+                    foreach ($filter->getDescription($operation->getClass()) as $name => $value) {
+                        $values = [];
+                        parse_str($name, $values);
+                        if (isset($values[$parsedKey[0]])) {
+                            $values = $values[$parsedKey[0]];
+                        }
+
+                        $name = key($values);
+                        $flattenFields[] = ['name' => $name, 'required' => $value['required'] ?? null, 'description' => $value['description'] ?? null, 'leafs' => $values[$name], 'type' => $value['type'] ?? 'string'];
                     }
 
-                    $name = key($values);
-                    $flattenFields[] = ['name' => $name, 'required' => $value['required'] ?? null, 'description' => $value['description'] ?? null, 'leafs' => $values[$name], 'type' => $value['type'] ?? 'string'];
+                    $args[$parsedKey[0]] = $this->parameterToObjectType($flattenFields, $parsedKey[0]);
                 }
 
-                $args[$parsedKey[0]] = $this->parameterToObjectType($flattenFields, $parsedKey[0]);
+                if ($filter instanceof OpenApiParameterFilterInterface) {
+                    foreach ($filter->getOpenApiParameters($parameter) as $value) {
+                        $values = [];
+                        parse_str($value->getName(), $values);
+                        if (isset($values[$parsedKey[0]])) {
+                            $values = $values[$parsedKey[0]];
+                        }
+
+                        $name = key($values);
+                        $flattenFields[] = ['name' => $name, 'required' => $value->getRequired(), 'description' => $value->getDescription(), 'leafs' => $values[$name], 'type' => $value->getSchema()['type'] ?? 'string'];
+                    }
+
+                    $args[$parsedKey[0]] = $this->parameterToObjectType($flattenFields, $parsedKey[0].$operation->getShortName().$operation->getName());
+                }
+
                 continue;
             }
 
