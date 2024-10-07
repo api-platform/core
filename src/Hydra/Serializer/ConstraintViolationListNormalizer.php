@@ -29,7 +29,7 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
     use HydraPrefixTrait;
     public const FORMAT = 'jsonld';
 
-    public function __construct(private readonly UrlGeneratorInterface|LegacyUrlGeneratorInterface $urlGenerator, ?array $serializePayloadFields = null, ?NameConverterInterface $nameConverter = null)
+    public function __construct(private readonly UrlGeneratorInterface|LegacyUrlGeneratorInterface $urlGenerator, ?array $serializePayloadFields = null, ?NameConverterInterface $nameConverter = null, private readonly ?array $defaultContext = [])
     {
         parent::__construct($serializePayloadFields, $nameConverter);
     }
@@ -46,7 +46,7 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
             return $violations;
         }
 
-        $hydraPrefix = $this->getHydraPrefix($context);
+        $hydraPrefix = $this->getHydraPrefix($context + $this->defaultContext);
 
         return [
             '@context' => $this->urlGenerator->generate('api_jsonld_context', ['shortName' => 'ConstraintViolationList']),

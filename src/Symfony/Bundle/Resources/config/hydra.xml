@@ -26,6 +26,7 @@
             <argument type="service" id="api_platform.router" />
             <argument>%api_platform.validator.serialize_payload_fields%</argument>
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
+            <argument>%api_platform.serializer.default_context%</argument>
 
             <tag name="serializer.normalizer" priority="-780" />
         </service>
