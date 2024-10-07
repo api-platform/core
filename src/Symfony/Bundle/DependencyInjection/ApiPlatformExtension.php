@@ -38,6 +38,7 @@ use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\UriVariableTransformerInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Problem\Serializer\ConstraintViolationListNormalizer;
+use ApiPlatform\RamseyUuid\Serializer\UuidDenormalizer;
 use ApiPlatform\State\ApiResource\Error;
 use ApiPlatform\State\ParameterProviderInterface;
 use ApiPlatform\State\ProcessorInterface;
@@ -221,7 +222,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('api.xml');
         $loader->load('filter.xml');
 
-        if (class_exists(Uuid::class)) {
+        if (class_exists(UuidDenormalizer::class) && class_exists(Uuid::class)) {
             $loader->load('ramsey_uuid.xml');
         }
 
