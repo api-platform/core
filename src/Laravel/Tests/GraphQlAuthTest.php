@@ -20,12 +20,21 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\Attributes\DefineEnvironment;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
+use Workbench\Database\Factories\AuthorFactory;
+use Workbench\Database\Factories\BookFactory;
+use Workbench\Database\Factories\UserFactory;
+use Workbench\Database\Factories\VaultFactory;
 
 class GraphQlAuthTest extends TestCase
 {
     use ApiTestAssertionsTrait;
     use RefreshDatabase;
     use WithWorkbench;
+
+    protected function afterRefreshingDatabase(): void
+    {
+        UserFactory::new()->create();
+    }
 
     /**
      * @param Application $app
@@ -34,6 +43,7 @@ class GraphQlAuthTest extends TestCase
     {
         tap($app['config'], function (Repository $config): void {
             $config->set('api-platform.routes.middleware', ['auth:sanctum']);
+            $config->set('app.key', 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF');
             $config->set('api-platform.graphql.enabled', true);
         });
     }
@@ -46,6 +56,7 @@ class GraphQlAuthTest extends TestCase
 
     public function testAuthenticated(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $response = $this->post('/tokens/create');
         $token = $response->json()['token'];
         $response = $this->get('/api/graphql', ['accept' => ['text/html'], 'authorization' => 'Bearer '.$token]);
@@ -64,6 +75,7 @@ class GraphQlAuthTest extends TestCase
 
     public function testPolicy(): void
     {
+        VaultFactory::new()->count(10)->create();
         $response = $this->post('/tokens/create');
         $token = $response->json()['token'];
         $response = $this->postJson('/api/graphql', ['query' => 'mutation {
@@ -86,6 +98,7 @@ class GraphQlAuthTest extends TestCase
         tap($app['config'], function (Repository $config): void {
             $config->set('api-platform.routes.middleware', ['auth:sanctum']);
             $config->set('api-platform.graphql.enabled', true);
+            $config->set('app.key', 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF');
             $config->set('app.debug', false);
         });
     }
@@ -93,6 +106,7 @@ class GraphQlAuthTest extends TestCase
     #[DefineEnvironment('useProductionMode')]
     public function testProductionError(): void
     {
+        VaultFactory::new()->count(10)->create();
         $response = $this->post('/tokens/create');
         $token = $response->json()['token'];
         $response = $this->postJson('/api/graphql', ['query' => 'mutation {

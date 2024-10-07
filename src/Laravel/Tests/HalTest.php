@@ -20,6 +20,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
 use Workbench\App\Models\Book;
+use Workbench\Database\Factories\AuthorFactory;
+use Workbench\Database\Factories\BookFactory;
 
 class HalTest extends TestCase
 {
@@ -35,6 +37,7 @@ class HalTest extends TestCase
         tap($app['config'], function (Repository $config): void {
             $config->set('api-platform.formats', ['jsonhal' => ['application/hal+json']]);
             $config->set('api-platform.docs_formats', ['jsonhal' => ['application/hal+json']]);
+            $config->set('app.debug', true);
         });
     }
 
@@ -61,6 +64,7 @@ class HalTest extends TestCase
 
     public function testGetCollection(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $response = $this->get('/api/books', ['accept' => 'application/hal+json']);
         $response->assertStatus(200);
         $response->assertHeader('content-type', 'application/hal+json; charset=utf-8');
@@ -79,6 +83,7 @@ class HalTest extends TestCase
 
     public function testGetBook(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $book = Book::first();
         $iri = $this->getIriFromResource($book);
         $response = $this->get($iri, ['accept' => ['application/hal+json']]);
@@ -103,6 +108,7 @@ class HalTest extends TestCase
 
     public function testDeleteBook(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $book = Book::first();
         $iri = $this->getIriFromResource($book);
         $response = $this->delete($iri, headers: ['accept' => 'application/hal+json']);

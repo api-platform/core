@@ -17,6 +17,9 @@ use ApiPlatform\Laravel\Test\ApiTestAssertionsTrait;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
+use Workbench\Database\Factories\AuthorFactory;
+use Workbench\Database\Factories\BookFactory;
+use Workbench\Database\Factories\WithAccessorFactory;
 
 class EloquentTest extends TestCase
 {
@@ -26,6 +29,8 @@ class EloquentTest extends TestCase
 
     public function testSearchFilter(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
+
         $response = $this->get('/api/books', ['Accept' => ['application/ld+json']]);
         $book = $response->json()['member'][0];
 
@@ -35,18 +40,24 @@ class EloquentTest extends TestCase
 
     public function testValidateSearchFilter(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
+
         $response = $this->get('/api/books?isbn=a', ['Accept' => ['application/ld+json']]);
         $this->assertSame($response->json()['detail'], 'The isbn field must be at least 2 characters.');
     }
 
     public function testSearchFilterRelation(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
+
         $response = $this->get('/api/books?author=1', ['Accept' => ['application/ld+json']]);
         $this->assertSame($response->json()['member'][0]['author'], '/api/authors/1');
     }
 
     public function testPropertyFilter(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
+
         $response = $this->get('/api/books', ['Accept' => ['application/ld+json']]);
         $book = $response->json()['member'][0];
 
@@ -60,6 +71,8 @@ class EloquentTest extends TestCase
 
     public function testPartialSearchFilter(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
+
         $response = $this->get('/api/books', ['Accept' => ['application/ld+json']]);
         $book = $response->json()['member'][0];
 
@@ -76,6 +89,8 @@ class EloquentTest extends TestCase
 
     public function testDateFilterEqual(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
+
         $response = $this->get('/api/books', ['Accept' => ['application/ld+json']]);
         $book = $response->json()['member'][0];
         $updated = $this->patchJson(
@@ -93,6 +108,8 @@ class EloquentTest extends TestCase
 
     public function testDateFilterIncludeNull(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
+
         $response = $this->get('/api/books', ['Accept' => ['application/ld+json']]);
         $book = $response->json()['member'][0];
         $updated = $this->patchJson(
@@ -110,6 +127,8 @@ class EloquentTest extends TestCase
 
     public function testDateFilterExcludeNull(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
+
         $response = $this->get('/api/books', ['Accept' => ['application/ld+json']]);
         $book = $response->json()['member'][0];
         $updated = $this->patchJson(
@@ -127,6 +146,8 @@ class EloquentTest extends TestCase
 
     public function testDateFilterGreaterThan(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
+
         $response = $this->get('/api/books', ['Accept' => ['application/ld+json']]);
         $bookBefore = $response->json()['member'][0];
         $updated = $this->patchJson(
@@ -155,9 +176,10 @@ class EloquentTest extends TestCase
 
     public function testDateFilterLowerThanEqual(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $response = $this->get('/api/books', ['Accept' => ['application/ld+json']]);
         $bookBefore = $response->json()['member'][0];
-        $updated = $this->patchJson(
+        $this->patchJson(
             $bookBefore['@id'],
             ['publicationDate' => '0001-02-18 00:00:00'],
             [
@@ -184,6 +206,7 @@ class EloquentTest extends TestCase
 
     public function testDateFilterBetween(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $response = $this->get('/api/books', ['Accept' => ['application/ld+json']]);
         $book = $response->json()['member'][0];
         $updated = $this->patchJson(
@@ -223,6 +246,7 @@ class EloquentTest extends TestCase
 
     public function testSearchFilterWithPropertyPlaceholder(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $response = $this->get('/api/authors', ['Accept' => ['application/ld+json']])->json();
         $author = $response['member'][0];
 
@@ -235,12 +259,14 @@ class EloquentTest extends TestCase
 
     public function testOrderFilterWithPropertyPlaceholder(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $res = $this->get('/api/authors?order[id]=desc', ['Accept' => ['application/ld+json']])->json();
         $this->assertSame($res['member'][0]['id'], 10);
     }
 
     public function testOrFilter(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $response = $this->get('/api/books', ['Accept' => ['application/ld+json']])->json()['member'];
         $book = $response[0];
         $book2 = $response[1];
@@ -251,6 +277,7 @@ class EloquentTest extends TestCase
 
     public function testRangeLowerThanFilter(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $response = $this->get('/api/books', ['Accept' => ['application/ld+json']]);
         $bookBefore = $response->json()['member'][0];
         $this->patchJson(
@@ -279,6 +306,7 @@ class EloquentTest extends TestCase
 
     public function testRangeLowerThanEqualFilter(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $response = $this->get('/api/books', ['Accept' => ['application/ld+json']]);
         $bookBefore = $response->json()['member'][0];
         $this->patchJson(
@@ -308,6 +336,7 @@ class EloquentTest extends TestCase
 
     public function testRangeGreaterThanFilter(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $response = $this->get('/api/books', ['Accept' => ['application/ld+json']]);
         $bookBefore = $response->json()['member'][0];
         $updated = $this->patchJson(
@@ -336,6 +365,7 @@ class EloquentTest extends TestCase
 
     public function testRangeGreaterThanEqualFilter(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $response = $this->get('/api/books', ['Accept' => ['application/ld+json']]);
         $bookBefore = $response->json()['member'][0];
         $updated = $this->patchJson(
@@ -365,12 +395,14 @@ class EloquentTest extends TestCase
 
     public function testWrongOrderFilter(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $res = $this->get('/api/authors?order[name]=something', ['Accept' => ['application/ld+json']]);
         $this->assertEquals($res->getStatusCode(), 422);
     }
 
     public function testWithAccessor(): void
     {
+        WithAccessorFactory::new()->create();
         $res = $this->get('/api/with_accessors/1', ['Accept' => ['application/ld+json']]);
         $this->assertArraySubset(['name' => 'test'], $res->json());
     }

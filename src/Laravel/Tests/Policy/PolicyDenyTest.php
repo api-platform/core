@@ -22,6 +22,8 @@ use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
 use Workbench\App\Models\Author;
 use Workbench\App\Models\Book;
+use Workbench\Database\Factories\AuthorFactory;
+use Workbench\Database\Factories\BookFactory;
 
 class PolicyDenyTest extends TestCase
 {
@@ -43,6 +45,7 @@ class PolicyDenyTest extends TestCase
         tap($app['config'], function (Repository $config): void {
             $config->set('api-platform.formats', ['jsonapi' => ['application/vnd.api+json']]);
             $config->set('api-platform.docs_formats', ['jsonapi' => ['application/vnd.api+json']]);
+            $config->set('app.debug', true);
         });
     }
 
@@ -54,6 +57,7 @@ class PolicyDenyTest extends TestCase
 
     public function testGetBook(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->create();
         $book = Book::first();
         $iri = $this->getIriFromResource($book);
         $response = $this->get($iri, ['accept' => ['application/vnd.api+json']]);
@@ -62,6 +66,7 @@ class PolicyDenyTest extends TestCase
 
     public function testCreateBook(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->create();
         $author = Author::find(1);
         $response = $this->postJson(
             '/api/books',
@@ -93,6 +98,7 @@ class PolicyDenyTest extends TestCase
 
     public function testUpdateBook(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->create();
         $book = Book::first();
         $iri = $this->getIriFromResource($book);
         $response = $this->putJson(
@@ -110,6 +116,7 @@ class PolicyDenyTest extends TestCase
 
     public function testPatchBook(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->create();
         $book = Book::first();
         $iri = $this->getIriFromResource($book);
         $response = $this->patchJson(
@@ -127,6 +134,7 @@ class PolicyDenyTest extends TestCase
 
     public function testDeleteBook(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->create();
         $book = Book::first();
         $iri = $this->getIriFromResource($book);
         $response = $this->delete($iri, headers: ['accept' => 'application/vnd.api+json']);
