@@ -261,6 +261,15 @@ class ApiPlatformProvider extends ServiceProvider
             $refl = new \ReflectionClass(Error::class);
             $paths[] = \dirname($refl->getFileName());
 
+            $logger = $app->make(LoggerInterface::class);
+
+            foreach ($paths as $i => $path) {
+                if (!file_exists($path)) {
+                    $logger->warning(\sprintf('We skipped reading resources in "%s" as the path does not exist. Please check the configuration at "api-platform.resources".', $path));
+                    unset($paths[$i]);
+                }
+            }
+
             return new ConcernsResourceNameCollectionFactory($paths, new AttributesResourceNameCollectionFactory($paths));
         });
 
