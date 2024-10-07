@@ -573,6 +573,8 @@ final class DocumentationNormalizer implements NormalizerInterface
     private function getContext(string $hydraPrefix = ContextBuilder::HYDRA_PREFIX): array
     {
         return [
+            ContextBuilderInterface::HYDRA_CONTEXT,
+            [
             '@vocab' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT], UrlGeneratorInterface::ABS_URL).'#',
             'hydra' => ContextBuilderInterface::HYDRA_NS,
             'rdf' => ContextBuilderInterface::RDF_NS,
@@ -585,6 +587,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             'subClassOf' => ['@id' => 'rdfs:subClassOf', '@type' => '@id'],
             'expects' => ['@id' => $hydraPrefix.'expects', '@type' => '@id'],
             'returns' => ['@id' => $hydraPrefix.'returns', '@type' => '@id'],
+            ]
         ];
     }
 
