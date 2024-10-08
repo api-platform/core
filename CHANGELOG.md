@@ -12,9 +12,6 @@
 * [afe7d47d7](https://github.com/api-platform/core/commit/afe7d47d7b7ba6c8591bfb60137a65d1fa1fe38f) fix(metadata): passing class as parameter in XML ApiResource's definition (#6659)
 * [b93ee467c](https://github.com/api-platform/core/commit/b93ee467c69253e0cfe60e75b48a5c7aa683474a) fix(metadata): overwriting XML ApiResource definition by YAML ApiResource definition (#6660)
 
-> [!WARNING]
-> Hydra prefix on errors is breaking, read `title` not `hydra:title`. The `hydra_prefix` flag doesn't apply to errors as it provided redundant information (both `hydra:title` and `title` were available)
-
 ## v3.4.1
 
 ### Bug fixes
