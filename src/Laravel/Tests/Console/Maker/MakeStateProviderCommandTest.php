@@ -20,12 +20,9 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
-use Illuminate\Foundation\Testing\Concerns\InteractsWithConsole;
-
 
 class MakeStateProviderCommandTest extends TestCase
 {
-    use InteractsWithConsole;
     use WithWorkbench;
 
     private ?Filesystem $filesystem;
@@ -78,7 +75,7 @@ class MakeStateProviderCommandTest extends TestCase
         $existingFile = $this->pathResolver->generateStateProviderFilename($providerName);
         $this->filesystem->put($existingFile, '<?php // Existing provider');
 
-        $expectedError = sprintf('[ERROR] The file "%s" can\'t be generated because it already exists.', $existingFile);
+        $expectedError = \sprintf('[ERROR] The file "%s" can\'t be generated because it already exists.', $existingFile);
 
         $this->artisan('make:state-provider')
             ->expectsQuestion('Choose a class name for your state provider (e.g. <fg=yellow>AwesomeStateProvider</>)', $providerName)

@@ -1,5 +1,16 @@
 <?php
 
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
 namespace ApiPlatform\Laravel\Console\Maker;
 
 use ApiPlatform\Laravel\Console\Maker\Utils\AppServiceProviderTagger;
@@ -22,9 +33,8 @@ final class MakeStateProviderCommand extends Command
         private readonly Filesystem $filesystem,
         private readonly StateProviderGenerator $stateProviderGenerator,
         private readonly AppServiceProviderTagger $appServiceProviderTagger,
-        private readonly StateDirectoryManager $stateDirectoryManager
-    )
-    {
+        private readonly StateDirectoryManager $stateDirectoryManager,
+    ) {
         parent::__construct();
     }
 
@@ -38,19 +48,22 @@ final class MakeStateProviderCommand extends Command
 
         $filePath = $this->stateProviderGenerator->getFilePath($directoryPath, $providerName);
         if ($this->stateProviderGenerator->isFileExists($filePath)) {
-            $this->error(sprintf('[ERROR] The file "%s" can\'t be generated because it already exists.', $filePath));
+            $this->error(\sprintf('[ERROR] The file "%s" can\'t be generated because it already exists.', $filePath));
+
             return self::FAILURE;
         }
 
         $this->stateProviderGenerator->generate($filePath, $providerName);
         if (!$this->filesystem->exists($filePath)) {
-            $this->error(sprintf('[ERROR] The file "%s" could not be created.', $filePath));
+            $this->error(\sprintf('[ERROR] The file "%s" could not be created.', $filePath));
+
             return self::FAILURE;
         }
 
         $this->appServiceProviderTagger->addTagToServiceProvider($providerName);
 
         $this->writeSuccessMessage($filePath);
+
         return self::SUCCESS;
     }
 

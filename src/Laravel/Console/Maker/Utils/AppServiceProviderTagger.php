@@ -1,5 +1,16 @@
 <?php
 
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
 namespace ApiPlatform\Laravel\Console\Maker\Utils;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
@@ -7,13 +18,15 @@ use Illuminate\Filesystem\Filesystem;
 
 final readonly class AppServiceProviderTagger
 {
-    /** @var string  */
+    /** @var string */
     private const SERVICE_PROVIDER_PATH = 'Providers/AppServiceProvider.php';
 
-    /** @var string  */
+    /** @var string */
     private const ITEM_PROVIDER_USE_STATEMENT = 'use ApiPlatform\Laravel\Eloquent\State\ItemProvider;';
 
-    public function __construct(private Filesystem $filesystem) {}
+    public function __construct(private Filesystem $filesystem)
+    {
+    }
 
     /**
      * @throws FileNotFoundException
@@ -34,7 +47,7 @@ final readonly class AppServiceProviderTagger
     private function ensureServiceProviderExists(string $path): void
     {
         if (!$this->filesystem->exists($path)) {
-            throw new \RuntimeException("The AppServiceProvider is missing!");
+            throw new \RuntimeException('The AppServiceProvider is missing!');
         }
     }
 
@@ -52,7 +65,7 @@ final readonly class AppServiceProviderTagger
 
     private function addTag(string &$content, string $providerName, string $serviceProviderPath): void
     {
-        $tagStatement = sprintf("\n\n\t\t\$this->app->tag(%s::class, ItemProvider::class);", $providerName);
+        $tagStatement = \sprintf("\n\n\t\t\$this->app->tag(%s::class, ItemProvider::class);", $providerName);
         if (!str_contains($content, $tagStatement)) {
             $content = preg_replace(
                 '/(public function register\(\)[^{]*{)(.*?)(\s*}\s*})/s',
@@ -66,6 +79,6 @@ final readonly class AppServiceProviderTagger
 
     public function getProviderNamespace(string $providerName): string
     {
-        return sprintf('use App\\State\\%s;', $providerName);
+        return \sprintf('use App\\State\\%s;', $providerName);
     }
 }

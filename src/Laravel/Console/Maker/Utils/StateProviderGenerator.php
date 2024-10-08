@@ -1,5 +1,16 @@
 <?php
 
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
 namespace ApiPlatform\Laravel\Console\Maker\Utils;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
@@ -7,11 +18,13 @@ use Illuminate\Filesystem\Filesystem;
 
 final readonly class StateProviderGenerator
 {
-    public function __construct(private Filesystem $filesystem) {}
+    public function __construct(private Filesystem $filesystem)
+    {
+    }
 
     public function getFilePath(string $directoryPath, string $providerName): string
     {
-        return $directoryPath . $providerName . '.php';
+        return $directoryPath.$providerName.'.php';
     }
 
     public function isFileExists(string $filePath): bool
@@ -40,7 +53,7 @@ final readonly class StateProviderGenerator
      */
     private function loadTemplate(): string
     {
-        $templatePath = dirname(__DIR__) . '/Resources/skeleton/StateProvider.tpl.php';
+        $templatePath = \dirname(__DIR__).'/Resources/skeleton/StateProvider.tpl.php';
 
         return $this->filesystem->get($templatePath);
     }
