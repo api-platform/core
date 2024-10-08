@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.0.4
+
+### Features
+
+* [4c0c6348b](https://github.com/api-platform/core/pull/6706/commits/4c0c6348bcbef5e3b942d33b2e0ca318b5cb04f5) feat(laravel): adds make:state-provider command
+
 ## v4.0.3
 
 ### Bug fixes
