@@ -575,19 +575,19 @@ final class DocumentationNormalizer implements NormalizerInterface
         return [
             ContextBuilderInterface::HYDRA_CONTEXT,
             [
-            '@vocab' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT], UrlGeneratorInterface::ABS_URL).'#',
-            'hydra' => ContextBuilderInterface::HYDRA_NS,
-            'rdf' => ContextBuilderInterface::RDF_NS,
-            'rdfs' => ContextBuilderInterface::RDFS_NS,
-            'xmls' => ContextBuilderInterface::XML_NS,
-            'owl' => ContextBuilderInterface::OWL_NS,
-            'schema' => ContextBuilderInterface::SCHEMA_ORG_NS,
-            'domain' => ['@id' => 'rdfs:domain', '@type' => '@id'],
-            'range' => ['@id' => 'rdfs:range', '@type' => '@id'],
-            'subClassOf' => ['@id' => 'rdfs:subClassOf', '@type' => '@id'],
-            'expects' => ['@id' => $hydraPrefix.'expects', '@type' => '@id'],
-            'returns' => ['@id' => $hydraPrefix.'returns', '@type' => '@id'],
-            ]
+                '@vocab' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT], UrlGeneratorInterface::ABS_URL).'#',
+                'hydra' => ContextBuilderInterface::HYDRA_NS,
+                'rdf' => ContextBuilderInterface::RDF_NS,
+                'rdfs' => ContextBuilderInterface::RDFS_NS,
+                'xmls' => ContextBuilderInterface::XML_NS,
+                'owl' => ContextBuilderInterface::OWL_NS,
+                'schema' => ContextBuilderInterface::SCHEMA_ORG_NS,
+                'domain' => ['@id' => 'rdfs:domain', '@type' => '@id'],
+                'range' => ['@id' => 'rdfs:range', '@type' => '@id'],
+                'subClassOf' => ['@id' => 'rdfs:subClassOf', '@type' => '@id'],
+                'expects' => ['@id' => $hydraPrefix.'expects', '@type' => '@id'],
+                'returns' => ['@id' => $hydraPrefix.'returns', '@type' => '@id'],
+            ],
         ];
     }
 
