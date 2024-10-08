@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.0.4
+
+### Features
+
+* [5c2cecfa4](https://github.com/api-platform/core/pull/6708/commits/5c2cecfa40fdf7b3db8f77f0f389d2a78d71a917) feat(laravel): add make provider and processor commands
+
 ## v4.0.3
 
 ### Bug fixes
