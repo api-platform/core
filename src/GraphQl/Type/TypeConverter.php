@@ -168,10 +168,14 @@ final class TypeConverter implements TypeConverterInterface
         try {
             $operation = $resourceMetadataCollection->getOperation($operationName);
         } catch (OperationNotFoundException) {
-            $operation = $resourceMetadataCollection->getOperation($isCollection ? 'collection_query' : 'item_query');
+            try {
+                $operation = $resourceMetadataCollection->getOperation($isCollection ? 'collection_query' : 'item_query');
+            } catch (OperationNotFoundException) {
+                throw new OperationNotFoundException(\sprintf('A GraphQl operation named "%s" should exist on the type "%s" as we reference this type in another query.', $isCollection ? 'collection_query' : 'item_query', $resourceClass));
+            }
         }
         if (!$operation instanceof Operation) {
-            throw new OperationNotFoundException();
+            throw new OperationNotFoundException(\sprintf('A GraphQl operation named "%s" should exist on the type "%s" as we reference this type in another query.', $operationName, $resourceClass));
         }
 
         return $this->typeBuilder->getResourceObjectType($resourceMetadataCollection, $operation, $propertyMetadata, [

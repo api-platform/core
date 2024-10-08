@@ -14,11 +14,18 @@ declare(strict_types=1);
 namespace ApiPlatform\Laravel\Tests;
 
 use ApiPlatform\Laravel\Test\ApiTestAssertionsTrait;
+use Illuminate\Contracts\Config\Repository;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
 use Workbench\App\Models\Author;
 use Workbench\App\Models\Book;
+use Workbench\Database\Factories\AuthorFactory;
+use Workbench\Database\Factories\BookFactory;
+use Workbench\Database\Factories\CommentFactory;
+use Workbench\Database\Factories\PostFactory;
+use Workbench\Database\Factories\SluggableFactory;
 
 class JsonLdTest extends TestCase
 {
@@ -26,8 +33,19 @@ class JsonLdTest extends TestCase
     use RefreshDatabase;
     use WithWorkbench;
 
+    /**
+     * @param Application $app
+     */
+    protected function defineEnvironment($app): void
+    {
+        tap($app['config'], function (Repository $config): void {
+            $config->set('app.debug', true);
+        });
+    }
+
     public function testGetCollection(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $response = $this->get('/api/books', ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
         $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
@@ -42,6 +60,7 @@ class JsonLdTest extends TestCase
 
     public function testGetBook(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $book = Book::first();
         $response = $this->get($this->getIriFromResource($book), ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
@@ -56,6 +75,7 @@ class JsonLdTest extends TestCase
 
     public function testCreateBook(): void
     {
+        AuthorFactory::new()->create();
         $author = Author::find(1);
         $response = $this->postJson(
             '/api/books',
@@ -83,6 +103,7 @@ class JsonLdTest extends TestCase
 
     public function testUpdateBook(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $book = Book::first();
         $iri = $this->getIriFromResource($book);
         $response = $this->putJson(
@@ -103,6 +124,7 @@ class JsonLdTest extends TestCase
 
     public function testPatchBook(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $book = Book::first();
         $iri = $this->getIriFromResource($book);
         $response = $this->patchJson(
@@ -124,6 +146,7 @@ class JsonLdTest extends TestCase
 
     public function testDeleteBook(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $book = Book::first();
         $iri = $this->getIriFromResource($book);
         $response = $this->delete($iri, headers: ['accept' => 'application/ld+json']);
@@ -133,6 +156,7 @@ class JsonLdTest extends TestCase
 
     public function testPatchBookAuthor(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $book = Book::first();
         $iri = $this->getIriFromResource($book);
         $author = Author::find(2);
@@ -169,6 +193,7 @@ class JsonLdTest extends TestCase
 
     public function testSubresourceCollection(): void
     {
+        PostFactory::new()->has(CommentFactory::new()->count(10))->count(10)->create();
         $response = $this->get('/api/posts', ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
         $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
@@ -201,6 +226,7 @@ class JsonLdTest extends TestCase
 
     public function testCreateNotValid(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $author = Author::find(1);
         $response = $this->postJson(
             '/api/books',
@@ -255,6 +281,7 @@ class JsonLdTest extends TestCase
 
     public function testSluggable(): void
     {
+        SluggableFactory::new()->count(10)->create();
         $response = $this->get('/api/sluggables', ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
         $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
@@ -277,6 +304,7 @@ class JsonLdTest extends TestCase
 
     public function testHidden(): void
     {
+        PostFactory::new()->has(CommentFactory::new()->count(10))->count(10)->create();
         $response = $this->get('/api/posts/1/comments/1', ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
         $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
@@ -285,6 +313,7 @@ class JsonLdTest extends TestCase
 
     public function testVisible(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $response = $this->get('/api/books', ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
         $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
