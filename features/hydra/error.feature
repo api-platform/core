@@ -17,8 +17,10 @@ Feature: Error handling
     And the header "Link" should contain '<http://www.w3.org/ns/hydra/error>; rel="http://www.w3.org/ns/json-ld#error"'
     And the JSON node "type" should exist
     And the JSON node "title" should be equal to "An error occurred"
+    And the JSON node "hydra:title" should be equal to "An error occurred"
     And the JSON node "detail" should exist
     And the JSON node "description" should exist
+    And the JSON node "hydra:description" should exist
     And the JSON node "trace" should exist
     And the JSON node "status" should exist
     And the JSON node "@context" should not exist
@@ -47,6 +49,8 @@ Feature: Error handling
           ],
           "detail": "name: This value should not be blank.",
           "title": "An error occurred",
+          "hydra:title": "An error occurred",
+          "hydra:description": "name: This value should not be blank.",
           "description": "name: This value should not be blank.",
           "type": "/validation_errors/c1051bb4-d103-4f74-8988-acbcafc7fdc3"
       }
