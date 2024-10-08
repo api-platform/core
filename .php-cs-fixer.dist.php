@@ -15,6 +15,7 @@ $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
     ->exclude([
         'src/Core/Bridge/Symfony/Maker/Resources/skeleton',
+        'src/Laravel/Console/Maker/Resources/skeleton',
         'src/Laravel/config',
         'tests/Fixtures/app/var',
         'docs/guides',
