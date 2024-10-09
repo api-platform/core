@@ -29,7 +29,7 @@ final class ErrorNormalizer implements NormalizerInterface
     public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         $normalized = $this->inner->normalize($object, $format, $context);
-        $hydraPrefix = $this->getHydraPrefix($context);
+        $hydraPrefix = $this->getHydraPrefix($context + $this->defaultContext);
         if (!$hydraPrefix) {
             return $normalized;
         }
