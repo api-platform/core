@@ -23,6 +23,7 @@ use ApiPlatform\Metadata\UrlGeneratorInterface;
  */
 interface ContextBuilderInterface
 {
+    public const HYDRA_CONTEXT = 'http://www.w3.org/ns/hydra/context.jsonld';
     public const HYDRA_NS = 'http://www.w3.org/ns/hydra/core#';
     public const JSONLD_NS = 'http://www.w3.org/ns/json-ld#';
     public const RDF_NS = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
