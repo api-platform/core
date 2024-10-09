@@ -106,32 +106,35 @@ class DocumentationNormalizerTest extends TestCase
 
         $expected = [
             '@context' => [
-                '@vocab' => '/doc#',
-                'hydra' => 'http://www.w3.org/ns/hydra/core#',
-                'rdf' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-                'rdfs' => 'http://www.w3.org/2000/01/rdf-schema#',
-                'xmls' => 'http://www.w3.org/2001/XMLSchema#',
-                'owl' => 'http://www.w3.org/2002/07/owl#',
-                'schema' => 'https://schema.org/',
-                'domain' => [
-                    '@id' => 'rdfs:domain',
-                    '@type' => '@id',
-                ],
-                'range' => [
-                    '@id' => 'rdfs:range',
-                    '@type' => '@id',
-                ],
-                'subClassOf' => [
-                    '@id' => 'rdfs:subClassOf',
-                    '@type' => '@id',
-                ],
-                'expects' => [
-                    '@id' => 'hydra:expects',
-                    '@type' => '@id',
-                ],
-                'returns' => [
-                    '@id' => 'hydra:returns',
-                    '@type' => '@id',
+                'http://www.w3.org/ns/hydra/context.jsonld',
+                [
+                    '@vocab' => '/doc#',
+                    'hydra' => 'http://www.w3.org/ns/hydra/core#',
+                    'rdf' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+                    'rdfs' => 'http://www.w3.org/2000/01/rdf-schema#',
+                    'xmls' => 'http://www.w3.org/2001/XMLSchema#',
+                    'owl' => 'http://www.w3.org/2002/07/owl#',
+                    'schema' => 'https://schema.org/',
+                    'domain' => [
+                        '@id' => 'rdfs:domain',
+                        '@type' => '@id',
+                    ],
+                    'range' => [
+                        '@id' => 'rdfs:range',
+                        '@type' => '@id',
+                    ],
+                    'subClassOf' => [
+                        '@id' => 'rdfs:subClassOf',
+                        '@type' => '@id',
+                    ],
+                    'expects' => [
+                        '@id' => 'hydra:expects',
+                        '@type' => '@id',
+                    ],
+                    'returns' => [
+                        '@id' => 'hydra:returns',
+                        '@type' => '@id',
+                    ],
                 ],
             ],
             '@id' => '/doc',
@@ -411,32 +414,35 @@ class DocumentationNormalizerTest extends TestCase
 
         $expected = [
             '@context' => [
-                '@vocab' => '/doc#',
-                'hydra' => 'http://www.w3.org/ns/hydra/core#',
-                'rdf' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-                'rdfs' => 'http://www.w3.org/2000/01/rdf-schema#',
-                'xmls' => 'http://www.w3.org/2001/XMLSchema#',
-                'owl' => 'http://www.w3.org/2002/07/owl#',
-                'schema' => 'https://schema.org/',
-                'domain' => [
-                    '@id' => 'rdfs:domain',
-                    '@type' => '@id',
-                ],
-                'range' => [
-                    '@id' => 'rdfs:range',
-                    '@type' => '@id',
-                ],
-                'subClassOf' => [
-                    '@id' => 'rdfs:subClassOf',
-                    '@type' => '@id',
-                ],
-                'expects' => [
-                    '@id' => 'hydra:expects',
-                    '@type' => '@id',
-                ],
-                'returns' => [
-                    '@id' => 'hydra:returns',
-                    '@type' => '@id',
+                'http://www.w3.org/ns/hydra/context.jsonld',
+                [
+                    '@vocab' => '/doc#',
+                    'hydra' => 'http://www.w3.org/ns/hydra/core#',
+                    'rdf' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+                    'rdfs' => 'http://www.w3.org/2000/01/rdf-schema#',
+                    'xmls' => 'http://www.w3.org/2001/XMLSchema#',
+                    'owl' => 'http://www.w3.org/2002/07/owl#',
+                    'schema' => 'https://schema.org/',
+                    'domain' => [
+                        '@id' => 'rdfs:domain',
+                        '@type' => '@id',
+                    ],
+                    'range' => [
+                        '@id' => 'rdfs:range',
+                        '@type' => '@id',
+                    ],
+                    'subClassOf' => [
+                        '@id' => 'rdfs:subClassOf',
+                        '@type' => '@id',
+                    ],
+                    'expects' => [
+                        '@id' => 'hydra:expects',
+                        '@type' => '@id',
+                    ],
+                    'returns' => [
+                        '@id' => 'hydra:returns',
+                        '@type' => '@id',
+                    ],
                 ],
             ],
             '@id' => '/doc',
@@ -776,32 +782,35 @@ class DocumentationNormalizerTest extends TestCase
 
         $expected = [
             '@context' => [
-                '@vocab' => '/doc#',
-                'hydra' => 'http://www.w3.org/ns/hydra/core#',
-                'rdf' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-                'rdfs' => 'http://www.w3.org/2000/01/rdf-schema#',
-                'xmls' => 'http://www.w3.org/2001/XMLSchema#',
-                'owl' => 'http://www.w3.org/2002/07/owl#',
-                'schema' => 'https://schema.org/',
-                'domain' => [
-                    '@id' => 'rdfs:domain',
-                    '@type' => '@id',
-                ],
-                'range' => [
-                    '@id' => 'rdfs:range',
-                    '@type' => '@id',
-                ],
-                'subClassOf' => [
-                    '@id' => 'rdfs:subClassOf',
-                    '@type' => '@id',
-                ],
-                'expects' => [
-                    '@id' => 'expects',
-                    '@type' => '@id',
-                ],
-                'returns' => [
-                    '@id' => 'returns',
-                    '@type' => '@id',
+                'http://www.w3.org/ns/hydra/context.jsonld',
+                [
+                    '@vocab' => '/doc#',
+                    'hydra' => 'http://www.w3.org/ns/hydra/core#',
+                    'rdf' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+                    'rdfs' => 'http://www.w3.org/2000/01/rdf-schema#',
+                    'xmls' => 'http://www.w3.org/2001/XMLSchema#',
+                    'owl' => 'http://www.w3.org/2002/07/owl#',
+                    'schema' => 'https://schema.org/',
+                    'domain' => [
+                        '@id' => 'rdfs:domain',
+                        '@type' => '@id',
+                    ],
+                    'range' => [
+                        '@id' => 'rdfs:range',
+                        '@type' => '@id',
+                    ],
+                    'subClassOf' => [
+                        '@id' => 'rdfs:subClassOf',
+                        '@type' => '@id',
+                    ],
+                    'expects' => [
+                        '@id' => 'expects',
+                        '@type' => '@id',
+                    ],
+                    'returns' => [
+                        '@id' => 'returns',
+                        '@type' => '@id',
+                    ],
                 ],
             ],
             '@id' => '/doc',

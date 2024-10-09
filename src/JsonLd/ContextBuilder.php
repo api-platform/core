@@ -185,8 +185,8 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
             }
         }
 
-        if (false === ($this->defaultContext[self::HYDRA_CONTEXT_HAS_PREFIX] ?? true) || $operation instanceof Error) {
-            return ['http://www.w3.org/ns/hydra/context.jsonld', $context];
+        if (false === ($this->defaultContext[self::HYDRA_CONTEXT_HAS_PREFIX] ?? true)) {
+            return [ContextBuilderInterface::HYDRA_CONTEXT, $context];
         }
 
         return $context;
