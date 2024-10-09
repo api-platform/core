@@ -27,11 +27,6 @@ final readonly class StateTemplateGenerator
         return $directoryPath.$stateFileName.'.php';
     }
 
-    public function isFileExists(string $filePath): bool
-    {
-        return $this->filesystem->exists($filePath);
-    }
-
     /**
      * @throws FileNotFoundException
      */
@@ -40,7 +35,7 @@ final readonly class StateTemplateGenerator
         $namespace = 'App\\State';
         $template = $this->loadTemplate($stateTypeEnum);
 
-        $content = $this->replacePlaceholders($template, [
+        $content = strtr($template, [
             '{{ namespace }}' => $namespace,
             '{{ class_name }}' => $stateClassName,
         ]);
@@ -61,10 +56,5 @@ final readonly class StateTemplateGenerator
         $templatePath = \dirname(__DIR__).'/Resources/skeleton/'.$templateFile;
 
         return $this->filesystem->get($templatePath);
-    }
-
-    private function replacePlaceholders(string $template, array $variables): string
-    {
-        return strtr($template, $variables);
     }
 }

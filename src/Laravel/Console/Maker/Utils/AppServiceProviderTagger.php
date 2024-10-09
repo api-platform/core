@@ -37,20 +37,15 @@ final readonly class AppServiceProviderTagger
     public function addTagToServiceProvider(string $providerName, StateTypeEnum $stateTypeEnum): void
     {
         $appServiceProviderPath = app_path(self::APP_SERVICE_PROVIDER_PATH);
-        $this->ensureServiceProviderExists($appServiceProviderPath);
+        if (!$this->filesystem->exists($appServiceProviderPath)) {
+            throw new \RuntimeException('The AppServiceProvider is missing!');
+        }
 
         $serviceProviderContent = $this->filesystem->get($appServiceProviderPath);
 
         $this->addUseStatement($serviceProviderContent, $this->getStateTypeStatement($stateTypeEnum));
-        $this->addUseStatement($serviceProviderContent, $this->geStateNamespace($providerName));
+        $this->addUseStatement($serviceProviderContent, \sprintf('use App\\State\\%s;', $providerName));
         $this->addTag($serviceProviderContent, $providerName, $appServiceProviderPath, $stateTypeEnum);
-    }
-
-    private function ensureServiceProviderExists(string $path): void
-    {
-        if (!$this->filesystem->exists($path)) {
-            throw new \RuntimeException('The AppServiceProvider is missing!');
-        }
     }
 
     private function addUseStatement(string &$content, string $useStatement): void
@@ -67,7 +62,7 @@ final readonly class AppServiceProviderTagger
 
     private function addTag(string &$content, string $stateName, string $serviceProviderPath, StateTypeEnum $stateTypeEnum): void
     {
-        $tagStatement = $this->formatTagStatement($stateName, $stateTypeEnum->name);
+        $tagStatement = \sprintf("\n\n\t\t\$this->app->tag(%s::class, %sInterface::class);", $stateName, $stateTypeEnum->name);
 
         if (!str_contains($content, $tagStatement)) {
             $content = preg_replace(
@@ -80,17 +75,7 @@ final readonly class AppServiceProviderTagger
         }
     }
 
-    private function formatTagStatement(string $stateName, string $interface): string
-    {
-        return \sprintf("\n\n\t\t\$this->app->tag(%s::class, %sInterface::class);", $stateName, $interface);
-    }
-
-    public function geStateNamespace(string $providerName): string
-    {
-        return \sprintf('use App\\State\\%s;', $providerName);
-    }
-
-    public function getStateTypeStatement(StateTypeEnum $stateTypeEnum): string
+    private function getStateTypeStatement(StateTypeEnum $stateTypeEnum): string
     {
         return match ($stateTypeEnum) {
             StateTypeEnum::Provider => self::ITEM_PROVIDER_USE_STATEMENT,

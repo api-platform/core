@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Laravel\Console\Maker;
 
 use ApiPlatform\Laravel\Console\Maker\Utils\AppServiceProviderTagger;
-use ApiPlatform\Laravel\Console\Maker\Utils\StateDirectoryManager;
 use ApiPlatform\Laravel\Console\Maker\Utils\StateTemplateGenerator;
 use ApiPlatform\Laravel\Console\Maker\Utils\StateTypeEnum;
 use ApiPlatform\Laravel\Console\Maker\Utils\SuccessMessageTrait;
@@ -30,7 +29,6 @@ abstract class AbstractMakeStateCommand extends Command
         private readonly Filesystem $filesystem,
         private readonly StateTemplateGenerator $stateTemplateGenerator,
         private readonly AppServiceProviderTagger $appServiceProviderTagger,
-        private readonly StateDirectoryManager $stateDirectoryManager,
     ) {
         parent::__construct();
     }
@@ -41,10 +39,12 @@ abstract class AbstractMakeStateCommand extends Command
     public function handle(): int
     {
         $stateName = $this->askForStateName();
-        $directoryPath = $this->stateDirectoryManager->ensureStateDirectoryExists();
+
+        $directoryPath = base_path('src/State/');
+        $this->filesystem->ensureDirectoryExists($directoryPath);
 
         $filePath = $this->stateTemplateGenerator->getFilePath($directoryPath, $stateName);
-        if ($this->stateTemplateGenerator->isFileExists($filePath)) {
+        if ($this->filesystem->exists($filePath)) {
             $this->error(\sprintf('[ERROR] The file "%s" can\'t be generated because it already exists.', $filePath));
 
             return self::FAILURE;
