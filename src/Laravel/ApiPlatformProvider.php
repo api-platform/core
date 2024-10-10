@@ -790,7 +790,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(SchemaFactoryInterface::class),
                 null,
                 $config->get('api-platform.formats'),
-                null, // ?Options $openApiOptions = null,
+                $app->make(Options::class),
                 $app->make(PaginationOptions::class), // ?PaginationOptions $paginationOptions = null,
                 // ?RouterInterface $router = null
             );
