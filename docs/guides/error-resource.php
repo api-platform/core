@@ -79,7 +79,7 @@ namespace App\Tests {
 
         public function testBookDoesNotExists(): void
         {
-            $r = static::createClient()->request('GET', '/books/1', options: ['headers' => ['accept' => 'application/ld+json']]);
+            static::createClient()->request('GET', '/books/1', options: ['headers' => ['accept' => 'application/ld+json']]);
             // We expect the status code returned by our `getStatus` and the message inside `detail`
             // for security reasons 500 errors will get their "detail" changed by our Error Provider
             // you can override this by looking at the [Error Provider guide](/docs/guides/error-provider).
