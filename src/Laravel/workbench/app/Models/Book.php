@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 use Workbench\App\Http\Requests\BookFormRequest;
 
 #[ApiResource(
@@ -63,11 +64,17 @@ class Book extends Model
     use HasFactory;
     use HasUlids;
 
-    protected $visible = ['name', 'author', 'isbn', 'publication_date'];
+    protected $visible = ['name', 'slug', 'author', 'isbn', 'publication_date'];
     protected $fillable = ['name'];
 
     public function author(): BelongsTo
     {
         return $this->belongsTo(Author::class);
+    }
+
+    // Virtual field
+    public function getSlugAttribute(): string
+    {
+        return Str::slug($this->name);
     }
 }

@@ -109,6 +109,7 @@ final class ModelMetadata
     public function getVirtualAttributes(Model $model, array $columns): Collection
     {
         $class = new \ReflectionClass($model);
+        $columns = collect($columns);
 
         return collect($class->getMethods())
             ->reject(
@@ -126,18 +127,19 @@ final class ModelMetadata
 
                 return [];
             })
-            ->reject(fn ($cast, $name) => collect($columns)->contains('name', $name))
+            ->reject(fn ($cast, $name) => $columns->contains('name', $name))
             ->map(fn ($cast, $name) => [
                 'name' => $name,
                 'type' => null,
                 'increments' => false,
-                'nullable' => null,
+                'nullable' => true,
                 'default' => null,
                 'unique' => null,
                 'fillable' => $model->isFillable($name),
                 'hidden' => $this->attributeIsHidden($name, $model),
                 'appended' => $model->hasAppended($name),
                 'cast' => $cast,
+                'primary' => $name === $model->getKeyName(),
             ])
             ->values();
     }
