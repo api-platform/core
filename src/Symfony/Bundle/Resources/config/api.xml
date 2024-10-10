@@ -175,5 +175,9 @@
 
             <tag name="serializer.normalizer" priority="-780" />
         </service>
+
+        <service id="api_platform.serializer.property_metadata_loader" class="ApiPlatform\Serializer\Mapping\Loader\PropertyMetadataLoader" public="false">
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
+        </service>
     </services>
 </container>

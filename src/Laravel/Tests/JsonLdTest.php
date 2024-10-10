@@ -26,6 +26,7 @@ use Workbench\Database\Factories\BookFactory;
 use Workbench\Database\Factories\CommentFactory;
 use Workbench\Database\Factories\PostFactory;
 use Workbench\Database\Factories\SluggableFactory;
+use Workbench\Database\Factories\WithAccessorFactory;
 
 class JsonLdTest extends TestCase
 {
@@ -326,5 +327,14 @@ class JsonLdTest extends TestCase
         $response->assertStatus(415);
         $content = $response->json();
         $this->assertArrayHasKey('trace', $content);
+    }
+
+    public function testRelationWithGroups(): void
+    {
+        WithAccessorFactory::new()->create();
+        $response = $this->get('/api/with_accessors/1', ['accept' => 'application/ld+json']);
+        $content = $response->json();
+        $this->assertArrayHasKey('relation', $content);
+        $this->assertArrayHasKey('name', $content['relation']);
     }
 }
