@@ -36,7 +36,7 @@
             <tag name="api_platform.state_provider" priority="-100" key="api_platform.openapi.provider" />
         </service>
 
-        <service id="api_platform.openapi.serializer_context_builder" class="ApiPlatform\OpenApi\Serializer\SerializerContextBuilder" decorates="api_platform.serializer.context_builder" public="false">
+        <service id="api_platform.openapi.serializer_context_builder" class="ApiPlatform\OpenApi\Serializer\SerializerContextBuilder" decorates="api_platform.serializer.context_builder" decoration-priority="10" public="false">
             <argument type="service" id="api_platform.openapi.serializer_context_builder.inner" />
         </service>
 

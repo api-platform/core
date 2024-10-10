@@ -122,8 +122,7 @@ final class ReadListener
 
         if ($this->serializerContextBuilder) {
             // Builtin data providers are able to use the serialization context to automatically add join clauses
-            $context += $normalizationContext = $this->serializerContextBuilder->createFromRequest($request, true, $attributes);
-            $request->attributes->set('_api_normalization_context', $normalizationContext);
+            $context += $this->serializerContextBuilder->createFromRequest($request, true, $attributes);
         }
 
         $parameters = $request->attributes->all();
