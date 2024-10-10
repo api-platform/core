@@ -26,6 +26,8 @@ use Psr\Container\ContainerInterface;
 /**
  * Validates parameters depending on filter description.
  *
+ * @deprecated use \ApiPlatform\Metadata\Parameter::$constraints instead
+ *
  * @author Julien Deniau <julien.deniau@gmail.com>
  */
 class ParameterValidator
@@ -36,6 +38,8 @@ class ParameterValidator
 
     public function __construct(ContainerInterface $filterLocator)
     {
+        trigger_deprecation('api-platform/core', '3.4', 'The class "%s" is deprecated, use "\ApiPlatform\Metadata\Parameter::$constraints" instead.', __CLASS__);
+
         $this->setFilterLocator($filterLocator);
 
         $this->validators = [

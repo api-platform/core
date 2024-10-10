@@ -23,6 +23,8 @@ use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Container\ContainerInterface;
 
 /**
+ * @group legacy
+ *
  * @author Julien Deniau <julien.deniau@mapado.com>
  */
 class ParameterValidatorTest extends TestCase

@@ -17,6 +17,8 @@ use ApiPlatform\ParameterValidator\Validator\ArrayItems;
 use PHPUnit\Framework\TestCase;
 
 /**
+ * @group legacy
+ *
  * @author Julien Deniau <julien.deniau@mapado.com>
  */
 class ArrayItemsTest extends TestCase
@@ -41,9 +43,6 @@ class ArrayItemsTest extends TestCase
         );
     }
 
-    /**
-     * @group legacy
-     */
     public function testNonMatchingParameter(): void
     {
         $filter = new ArrayItems();

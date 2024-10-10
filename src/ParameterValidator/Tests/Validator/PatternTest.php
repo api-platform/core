@@ -17,6 +17,8 @@ use ApiPlatform\ParameterValidator\Validator\Pattern;
 use PHPUnit\Framework\TestCase;
 
 /**
+ * @group legacy
+ *
  * @author Julien Deniau <julien.deniau@mapado.com>
  */
 class PatternTest extends TestCase
@@ -30,9 +32,6 @@ class PatternTest extends TestCase
         );
     }
 
-    /**
-     * @group legacy
-     */
     public function testFilterWithEmptyValue(): void
     {
         $filter = new Pattern();
@@ -75,9 +74,6 @@ class PatternTest extends TestCase
         );
     }
 
-    /**
-     * @group legacy
-     */
     public function testFilterWithZeroAsParameter(): void
     {
         $filter = new Pattern();
@@ -110,9 +106,6 @@ class PatternTest extends TestCase
         );
     }
 
-    /**
-     * @group legacy
-     */
     public function testFilterWithNonMatchingValue(): void
     {
         $filter = new Pattern();
@@ -145,9 +138,6 @@ class PatternTest extends TestCase
         );
     }
 
-    /**
-     * @group legacy
-     */
     public function testFilterWithNonchingValue(): void
     {
         $filter = new Pattern();
