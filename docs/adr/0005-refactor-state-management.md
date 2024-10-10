@@ -30,7 +30,7 @@ For API Platform 3, we refactored the whole metadata susbsytem to be more flexib
 This led to the refactoring of the two main interfaces allowing to plug a data source in API Platform: the state provider and the state processor interfaces.
 
 Leveraging these new interfaces, it should be possible to simplify the code base and to remove most code duplication by transforming most of the code currently
-stored in the kernel event listeners and in the GraphQL resolvers in dedicated state processors and state providers.
+stored in the kernel event listeners and in the GraphQL resolvers in dedicated state processors and state providers. This is quite close to what @alanpoulain proposed in 2019 at https://github.com/api-platform/core/pull/2978 although at that time we needed to refactor the subresource system before tackling this issue. 
 
 ## Decision Outcome
 
