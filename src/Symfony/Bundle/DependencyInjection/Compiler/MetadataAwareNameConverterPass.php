@@ -39,14 +39,20 @@ final class MetadataAwareNameConverterPass implements CompilerPassInterface
         }
 
         $definition = $container->getDefinition('serializer.name_converter.metadata_aware');
-        $num = \count($definition->getArguments());
+        $key = '$fallbackNameConverter';
+        $arguments = $definition->getArguments();
+        if (false === \array_key_exists($key, $arguments)) {
+            $key = 1;
+        }
 
         if ($container->hasAlias('api_platform.name_converter')) {
             $nameConverter = new Reference((string) $container->getAlias('api_platform.name_converter'));
-            if (1 === $num) {
+
+            // old symfony versions
+            if (false === \array_key_exists($key, $arguments)) {
                 $definition->addArgument($nameConverter);
-            } elseif (1 < $num && null === $definition->getArgument(1)) {
-                $definition->setArgument(1, $nameConverter);
+            } elseif (null === $definition->getArgument($key)) {
+                $definition->setArgument($key, $nameConverter);
             }
         }
 
