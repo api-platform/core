@@ -89,6 +89,19 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             return $schema;
         }
 
+        $isJsonMergePatch = 'json' === $format && 'PATCH' === $operation->getMethod() && Schema::TYPE_INPUT === $type;
+        $skipRequiredProperties = false;
+
+        if ($isJsonMergePatch) {
+            if (null === ($skipRequiredProperties = $operation->getExtraProperties()['patch_skip_schema_required_properties'] ?? null)) {
+                trigger_deprecation('api-platform/core', '3.4', "Set 'patch_skip_schema_required_properties' on extra properties as API Platform 4 will remove required properties from the JSON Schema on Patch request.");
+            }
+
+            if (true === $skipRequiredProperties) {
+                $definitionName .= self::PATCH_SCHEMA_POSTFIX;
+            }
+        }
+
         if (!isset($schema['$ref']) && !isset($schema['type'])) {
             $ref = Schema::VERSION_OPENAPI === $version ? '#/components/schemas/'.$definitionName : '#/definitions/'.$definitionName;
             if ($forceCollection || ('POST' !== $method && $operation instanceof CollectionOperationInterface)) {
@@ -130,6 +143,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
 
         $options = ['schema_type' => $type] + $this->getFactoryOptions($serializerContext, $validationGroups, $operation instanceof HttpOperation ? $operation : null);
+
         foreach ($this->propertyNameCollectionFactory->create($inputOrOutputClass, $options) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($inputOrOutputClass, $propertyName, $options);
             if (!$propertyMetadata->isReadable() && !$propertyMetadata->isWritable()) {
@@ -137,7 +151,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             }
 
             $normalizedPropertyName = $this->nameConverter ? $this->nameConverter->normalize($propertyName, $inputOrOutputClass, $format, $serializerContext) : $propertyName;
-            if ($propertyMetadata->isRequired()) {
+            if ($propertyMetadata->isRequired() && !$skipRequiredProperties) {
                 $definition['required'][] = $normalizedPropertyName;
             }
 
