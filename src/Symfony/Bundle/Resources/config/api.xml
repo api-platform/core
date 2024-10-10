@@ -47,7 +47,11 @@
         <service id="ApiPlatform\Serializer\SerializerContextBuilderInterface" alias="api_platform.serializer.context_builder" />
         <service id="ApiPlatform\State\SerializerContextBuilderInterface" alias="api_platform.serializer.context_builder" />
 
-        <service id="api_platform.serializer.context_builder.filter" class="ApiPlatform\Serializer\SerializerFilterContextBuilder" decorates="api_platform.serializer.context_builder" public="false">
+        <service id="api_platform.serializer.context_builder.request_cache" class="ApiPlatform\Serializer\RequestCacheSerializerContextBuilder" decorates="api_platform.serializer.context_builder" decoration-priority="-10" public="false">
+            <argument type="service" id="api_platform.serializer.context_builder.request_cache.inner" />
+        </service>
+
+        <service id="api_platform.serializer.context_builder.filter" class="ApiPlatform\Serializer\SerializerFilterContextBuilder" decorates="api_platform.serializer.context_builder" decoration-priority="20" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.filter_locator" />
             <argument type="service" id="api_platform.serializer.context_builder.filter.inner" />
