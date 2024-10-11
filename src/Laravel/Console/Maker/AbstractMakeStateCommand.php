@@ -68,7 +68,7 @@ abstract class AbstractMakeStateCommand extends Command
     {
         do {
             $stateType = $this->getStateType()->name;
-            $stateName = $this->ask(\sprintf('Choose a class name for your state %s (e.g. <fg=yellow>AwesomeState%s</>)', mb_strtolower($stateType), mb_ucfirst($stateType)));
+            $stateName = $this->ask(\sprintf('Choose a class name for your state %s (e.g. <fg=yellow>AwesomeState%s</>)', strtolower($stateType), ucfirst($stateType)));
             if (empty($stateName)) {
                 $this->error('[ERROR] This value cannot be blank.');
             }

@@ -17,7 +17,7 @@ trait SuccessMessageTrait
 {
     private function writeSuccessMessage(string $filePath, StateTypeEnum $stateTypeEnum): void
     {
-        $stateText = mb_strtolower($stateTypeEnum->name);
+        $stateText = strtolower($stateTypeEnum->name);
 
         $this->newLine();
         $this->line(' <bg=green;fg=white>          </>');
