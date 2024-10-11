@@ -130,6 +130,14 @@ Notes:
 
 * [0d5f35683](https://github.com/api-platform/core/commit/0d5f356839eb6aa9f536044abe4affa736553e76) feat(laravel): laravel component (#5882)
 
+## v3.4.3
+
+### Bug fixes
+
+* [3ca599158](https://github.com/api-platform/core/commit/3ca599158139d56fbd6ee66f2de3e586120d735c) fix(hydra): hydra_prefix on errors (#6704)
+* [f7f605dc8](https://github.com/api-platform/core/commit/f7f605dc8b798b975d2286c970c9091436d7f890) fix: check that api-platform/ramsey-uuid is installed before registering related services (#6696)
+* [fbb53e5e3](https://github.com/api-platform/core/commit/fbb53e5e35ca0ec3de26ddc7de7ea4d1dda5c20b) fix(symfony): metadata aware name converter has 0 arguments by default (#6711)
+
 ## v3.4.2
 
 ### Bug fixes

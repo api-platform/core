@@ -18,12 +18,12 @@ namespace App\ApiResource {
     {
         public function getType(): string
         {
-            return 'teapot';
+            return '/errors/418';
         }
 
         public function getTitle(): ?string
         {
-            return null;
+            return 'Teapot error';
         }
 
         public function getStatus(): ?int
@@ -40,6 +40,8 @@ namespace App\ApiResource {
         {
             return null;
         }
+
+        public string $myCustomField = 'I usually prefer coffee.';
     }
 
     use ApiPlatform\Metadata\ApiResource;
@@ -83,7 +85,12 @@ namespace App\Tests {
             // you can override this by looking at the [Error Provider guide](/docs/guides/error-provider).
             $this->assertResponseStatusCodeSame(418);
             $this->assertJsonContains([
+                '@id' => '/my_domain_exceptions',
+                '@type' => 'MyDomainException',
+                'type' => '/errors/418',
+                'title' => 'Teapot error',
                 'detail' => 'I am teapot',
+                'myCustomField' => 'I usually prefer coffee.'
             ]);
         }
     }
