@@ -39,8 +39,12 @@ final class EloquentPropertyNameCollectionMetadataFactory implements PropertyNam
             return $this->decorated?->create($resourceClass, $options) ?? new PropertyNameCollection();
         }
 
-        $refl = new \ReflectionClass($resourceClass);
         try {
+            $refl = new \ReflectionClass($resourceClass);
+            if ($refl->isAbstract()) {
+                return $this->decorated?->create($resourceClass, $options) ?? new PropertyNameCollection();
+            }
+
             $model = $refl->newInstanceWithoutConstructor();
         } catch (\ReflectionException) {
             return $this->decorated?->create($resourceClass, $options) ?? new PropertyNameCollection();

@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonLd;
 
 use ApiPlatform\JsonLd\Serializer\HydraPrefixTrait;
-use ApiPlatform\Metadata\Error;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;

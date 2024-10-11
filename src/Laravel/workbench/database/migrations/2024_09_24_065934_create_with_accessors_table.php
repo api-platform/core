@@ -21,9 +21,17 @@ return new class extends Migration {
      */
     public function up(): void
     {
+        Schema::create('with_accessor_relations', function (Blueprint $table): void {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+
         Schema::create('with_accessors', function (Blueprint $table): void {
             $table->id();
             $table->string('name');
+            $table->integer('relation_id')->unsigned();
+            $table->foreign('relation_id')->references('id')->on('with_accessor_relations');
             $table->timestamps();
         });
     }
@@ -34,5 +42,6 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::dropIfExists('with_accessors');
+        Schema::dropIfExists('with_accessors_relation');
     }
 };

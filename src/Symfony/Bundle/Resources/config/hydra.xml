@@ -25,6 +25,7 @@
         <service id="api_platform.hydra.normalizer.constraint_violation_list" class="ApiPlatform\Hydra\Serializer\ConstraintViolationListNormalizer" public="false">
             <argument>%api_platform.validator.serialize_payload_fields%</argument>
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
+            <argument>%api_platform.serializer.default_context%</argument>
 
             <tag name="serializer.normalizer" priority="-780" />
         </service>

@@ -36,6 +36,12 @@
             <tag name="serializer.normalizer" priority="-890" />
         </service>
 
+        <service id="api_platform.jsonld.normalizer.error" class="ApiPlatform\JsonLd\Serializer\ErrorNormalizer" public="false">
+            <argument type="service" id="api_platform.jsonld.normalizer.item" />
+            <argument>%api_platform.serializer.default_context%</argument>
+            <tag name="serializer.normalizer" priority="-880" />
+        </service>
+
         <service id="api_platform.jsonld.normalizer.object" class="ApiPlatform\JsonLd\Serializer\ObjectNormalizer" public="false">
             <argument type="service" id="serializer.normalizer.object" />
             <argument type="service" id="api_platform.iri_converter" />
@@ -46,7 +52,7 @@
         </service>
 
         <service id="api_platform.jsonld.normalizer.validation_exception" class="ApiPlatform\Symfony\Validator\Serializer\ValidationExceptionNormalizer" public="false">
-            <argument type="service" id="api_platform.jsonld.normalizer.item" />
+            <argument type="service" id="api_platform.jsonld.normalizer.error" />
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
 
             <tag name="serializer.normalizer" priority="-800" />
