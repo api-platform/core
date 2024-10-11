@@ -1058,7 +1058,11 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         if ($this->app->runningInConsole()) {
-            $this->commands([Console\InstallCommand::class]);
+            $this->commands([
+                Console\InstallCommand::class,
+                Console\Maker\MakeStateProcessorCommand::class,
+                Console\Maker\MakeStateProviderCommand::class,
+            ]);
         }
     }
 
