@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonLd\Serializer;
 
 use ApiPlatform\State\ApiResource\Error;
-use ApiPlatform\Symfony\Validator\Exception\ValidationException as SymfonyValidationException;
 use ApiPlatform\Validator\Exception\ValidationException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -48,7 +47,7 @@ final class ErrorNormalizer implements NormalizerInterface
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $this->inner->supportsNormalization($data, $format, $context)
-            && (is_a($data, Error::class) || is_a($data, ValidationException::class) || is_a($data, SymfonyValidationException::class));
+            && (is_a($data, Error::class) || is_a($data, ValidationException::class));
     }
 
     public function getSupportedTypes(?string $format): array
