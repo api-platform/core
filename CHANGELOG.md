@@ -1,5 +1,18 @@
 # Changelog
 
+## v4.0.4
+
+### Bug fixes
+
+* [2e8287dad](https://github.com/api-platform/core/commit/2e8287dad0c0315dd6527279a6359c0a22f40d93) fix(laravel): allow serializer attributes through ApiProperty (#6680)
+* [439c188ea](https://github.com/api-platform/core/commit/439c188ea1685676d5e705a49a4b835f35a84d72) fix(laravel): match integer type (#6715)
+* [4ad7a50aa](https://github.com/api-platform/core/commit/4ad7a50aaabf0d85e2eb5bb3a6d4ef8d5b7b39a7) fix(laravel): openapi Options binding (#6714)
+* [ec6e64512](https://github.com/api-platform/core/commit/ec6e6451299a50fcab397e86fafe6db132ce7519) fix(laravel): skip resource path when not available (#6697)
+
+### Features
+
+* [5aa799321](https://github.com/api-platform/core/commit/5aa7993219a6fb55f11476a031963a542b2d3586) feat(laravel): command to generate state providers/processors (#6708)
+
 ## v4.0.3
 
 ### Bug fixes
