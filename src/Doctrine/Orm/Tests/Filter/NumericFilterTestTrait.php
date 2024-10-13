@@ -100,6 +100,16 @@ trait NumericFilterTestTrait
                     'dummyPrice' => '21',
                 ],
             ],
+            'comma-separated numeric string (positive integer)' => [
+                [
+                    'id' => null,
+                    'name' => null,
+                    'dummyPrice' => null,
+                ],
+                [
+                    'dummyPrice' => ['21,22'],
+                ],
+            ],
             'multiple numeric string (positive integer)' => [
                 [
                     'id' => null,

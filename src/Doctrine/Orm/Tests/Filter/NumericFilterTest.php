@@ -78,6 +78,9 @@ class NumericFilterTest extends DoctrineOrmFilterTestCase
                 'numeric string (positive integer)' => [
                     \sprintf('SELECT o FROM %s o WHERE o.dummyPrice = :dummyPrice_p1', Dummy::class),
                 ],
+                'comma-separated numeric string (positive integer)' => [
+                    \sprintf('SELECT o FROM %s o WHERE o.dummyPrice IN (:dummyPrice_p1)', Dummy::class),
+                ],
                 'multiple numeric string (positive integer)' => [
                     \sprintf('SELECT o FROM %s o WHERE o.dummyPrice IN (:dummyPrice_p1)', Dummy::class),
                 ],
