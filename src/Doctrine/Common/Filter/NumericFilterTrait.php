@@ -82,8 +82,8 @@ trait NumericFilterTrait
     protected function normalizeValues($value, string $property): ?array
     {
         // Allow CSV format for multiple values.
-        if (\is_string($value) && \str_contains($value, ',')) {
-            $value = \explode(',', $value);
+        if (\is_string($value) && str_contains($value, ',')) {
+            $value = explode(',', $value);
         }
 
         if (!is_numeric($value) && (!\is_array($value) || !$this->isNumericArray($value))) {
