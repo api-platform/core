@@ -15,6 +15,7 @@ namespace Workbench\App\Models;
 
 use ApiPlatform\Laravel\Eloquent\Filter\DateFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\EqualsFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\OrderFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\OrFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\PartialSearchFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\RangeFilter;
@@ -22,6 +23,8 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
@@ -44,6 +47,14 @@ use Workbench\App\Http\Requests\BookFormRequest;
         new Post(),
         new Delete(),
         new GetCollection(),
+    ],
+    graphQlOperations: [
+        new Query(),
+        new QueryCollection(
+            parameters: [
+                new QueryParameter(key: 'order[:property]', filter: OrderFilter::class),
+            ],
+        ),
     ]
 )]
 #[QueryParameter(key: 'isbn', filter: PartialSearchFilter::class, constraints: 'min:2')]

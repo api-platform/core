@@ -47,4 +47,23 @@ class GraphQlTest extends TestCase
         $this->assertArrayHasKey('data', $data);
         $this->assertArrayNotHasKey('errors', $data);
     }
+
+    public function testGetBooksWithPaginationAndOrder(): void
+    {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
+        $response = $this->postJson('/api/graphql', ['query' => '{
+  books(first: 3, order: {name: "desc"}) {
+    edges {
+      node {
+        id, name, publicationDate, author { id, name }
+      }
+    }
+  }
+}'], ['accept' => ['application/json']]);
+        $response->assertStatus(200);
+        $data = $response->json();
+        $this->assertArrayHasKey('data', $data);
+        $this->assertCount(3, $data['data']['books']['edges']);
+        $this->assertArrayNotHasKey('errors', $data);
+    }
 }
