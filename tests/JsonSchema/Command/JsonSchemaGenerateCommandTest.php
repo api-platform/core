@@ -365,4 +365,12 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
             $properties['genders']
         );
     }
+
+    public function testGenId(): void
+    {
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\Entity\DisableIdGeneration', '--type' => 'output', '--format' => 'jsonld']);
+        $result = $this->tester->getDisplay();
+        $json = json_decode($result, associative: true);
+        $this->assertArrayNotHasKey('@id', $json['definitions']['DisableIdGenerationItem.jsonld']['properties']);
+    }
 }
