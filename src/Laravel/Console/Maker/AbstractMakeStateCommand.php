@@ -40,7 +40,7 @@ abstract class AbstractMakeStateCommand extends Command
     {
         $stateName = $this->askForStateName();
 
-        $directoryPath = base_path('src/State/');
+        $directoryPath = base_path('app/State/');
         $this->filesystem->ensureDirectoryExists($directoryPath);
 
         $filePath = $this->stateTemplateGenerator->getFilePath($directoryPath, $stateName);

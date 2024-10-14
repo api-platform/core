@@ -27,6 +27,6 @@ final readonly class PathResolver
 
     public function getStateDirectoryPath(): string
     {
-        return base_path('src/State/');
+        return base_path('app/State/');
     }
 }
