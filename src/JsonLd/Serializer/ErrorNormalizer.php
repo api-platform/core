@@ -28,10 +28,15 @@ final class ErrorNormalizer implements NormalizerInterface
 
     public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
+        $context += $this->defaultContext;
         $normalized = $this->inner->normalize($object, $format, $context);
-        $hydraPrefix = $this->getHydraPrefix($context + $this->defaultContext);
+        $hydraPrefix = $this->getHydraPrefix($context);
         if (!$hydraPrefix) {
             return $normalized;
+        }
+
+        if ('Error' === $normalized['@type']) {
+            $normalized['@type'] = 'hydra:Error';
         }
 
         if (isset($normalized['description'])) {
