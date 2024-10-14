@@ -280,28 +280,28 @@ final class DocumentationNormalizer implements NormalizerInterface
             $hydraOperation += [
                 '@type' => [$hydraPrefix.'Operation', 'schema:FindAction'],
                 $hydraPrefix.'title' => "Retrieves a $shortName resource.",
-                'returns' => null === $outputClass ? 'owl:Nothing' : $prefixedShortName,
+                'returns' => null === $outputClass ? 'owl:Nothing' : substr($prefixedShortName, 1),
             ];
         } elseif ('PATCH' === $method) {
             $hydraOperation += [
                 '@type' => $hydraPrefix.'Operation',
                 $hydraPrefix.'title' => "Updates the $shortName resource.",
-                'returns' => null === $outputClass ? 'owl:Nothing' : $prefixedShortName,
-                'expects' => null === $inputClass ? 'owl:Nothing' : $prefixedShortName,
+                'returns' => null === $outputClass ? 'owl:Nothing' : substr($prefixedShortName, 1),
+                'expects' => null === $inputClass ? 'owl:Nothing' : substr($prefixedShortName, 1),
             ];
         } elseif ('POST' === $method) {
             $hydraOperation += [
                 '@type' => [$hydraPrefix.'Operation', 'schema:CreateAction'],
                 $hydraPrefix.'title' => "Creates a $shortName resource.",
-                'returns' => null === $outputClass ? 'owl:Nothing' : $prefixedShortName,
-                'expects' => null === $inputClass ? 'owl:Nothing' : $prefixedShortName,
+                'returns' => null === $outputClass ? 'owl:Nothing' : substr($prefixedShortName, 1),
+                'expects' => null === $inputClass ? 'owl:Nothing' : substr($prefixedShortName, 1),
             ];
         } elseif ('PUT' === $method) {
             $hydraOperation += [
                 '@type' => [$hydraPrefix.'Operation', 'schema:ReplaceAction'],
                 $hydraPrefix.'title' => "Replaces the $shortName resource.",
-                'returns' => null === $outputClass ? 'owl:Nothing' : $prefixedShortName,
-                'expects' => null === $inputClass ? 'owl:Nothing' : $prefixedShortName,
+                'returns' => null === $outputClass ? 'owl:Nothing' : substr($prefixedShortName, 1),
+                'expects' => null === $inputClass ? 'owl:Nothing' : substr($prefixedShortName, 1),
             ];
         } elseif ('DELETE' === $method) {
             $hydraOperation += [
@@ -430,7 +430,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                 '@type' => $hydraPrefix.'Operation',
                 $hydraPrefix.'method' => 'GET',
                 'rdfs:label' => 'The API entrypoint.',
-                'returns' => '#EntryPoint',
+                'returns' => 'EntryPoint',
             ],
         ];
 
