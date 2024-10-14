@@ -232,9 +232,8 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 continue;
             }
 
-            if (false === $propertyMetadata->getGenId() && !$this->isResourceClass($className)) {
-                $subDefinitionName = $this->definitionNameFactory->create($className, $format, $className,
-                    null, $serializerContext);
+            if (false === $propertyMetadata->getGenId()) {
+                $subDefinitionName = $this->definitionNameFactory->create($className, $format, $className, null, $serializerContext);
 
                 if (isset($subSchema->getDefinitions()[$subDefinitionName])) {
                     unset($subSchema->getDefinitions()[$subDefinitionName]['properties']['@id']);
