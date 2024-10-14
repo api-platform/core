@@ -585,8 +585,6 @@ final class DocumentationNormalizer implements NormalizerInterface
                 'domain' => ['@id' => 'rdfs:domain', '@type' => '@id'],
                 'range' => ['@id' => 'rdfs:range', '@type' => '@id'],
                 'subClassOf' => ['@id' => 'rdfs:subClassOf', '@type' => '@id'],
-                'expects' => ['@id' => $hydraPrefix.'expects', '@type' => '@id'],
-                'returns' => ['@id' => $hydraPrefix.'returns', '@type' => '@id'],
             ],
         ];
     }
