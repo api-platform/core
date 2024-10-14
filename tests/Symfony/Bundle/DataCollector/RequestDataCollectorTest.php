@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Symfony\Bundle\DataCollector\RequestDataCollector;
 use ApiPlatform\Tests\Fixtures\DummyEntity;
+use Composer\InstalledVersions;
 use PackageVersions\Versions;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -163,7 +164,11 @@ class RequestDataCollectorTest extends TestCase
             $this->response
         );
 
-        $this->assertSame(null !== $dataCollector->getVersion(), class_exists(Versions::class));
+        if (class_exists(InstalledVersions::class)) {
+            $this->assertTrue(null !== $dataCollector->getVersion());
+        } else {
+            $this->assertSame(null !== $dataCollector->getVersion(), class_exists(Versions::class));
+        }
     }
 
     public function testWithPreviousData(): void
