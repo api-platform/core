@@ -22,7 +22,6 @@ use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use ApiPlatform\Serializer\Filter\FilterInterface as SerializerFilterInterface;
-use ApiPlatform\State\OptionsInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Count;
@@ -55,16 +54,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         $resourceMetadataCollection = $this->decorated?->create($resourceClass) ?? new ResourceMetadataCollection($resourceClass);
 
         foreach ($resourceMetadataCollection as $i => $resource) {
-            $stateOptions = $resource->getStateOptions();
-            if ($stateOptions instanceof OptionsInterface) {
-                if ($stateOptions instanceof \ApiPlatform\Doctrine\Orm\State\Options) {
-                    $resourceClass = $stateOptions->getEntityClass();
-                }
-                if ($stateOptions instanceof \ApiPlatform\Doctrine\Odm\State\Options) {
-                    $resourceClass = $stateOptions->getDocumentClass();
-                }
-            }
-
+            $resourceClass = $resource->getClassFromStateOptions();
             $operations = $resource->getOperations();
 
             $internalPriority = -1;
