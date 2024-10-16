@@ -26,9 +26,6 @@ class Agent
     #[ORM\Column(length: 255)]
     public ?string $name = null;
 
-    #[ORM\Column(length: 255)]
-    public ?string $apiKey = null;
-
     #[ORM\Column]
     public ?\DateTimeImmutable $createdAt = null;
 
@@ -55,18 +52,6 @@ class Agent
     public function setName(string $name): static
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getApiKey(): ?string
-    {
-        return $this->apiKey;
-    }
-
-    public function setApiKey(string $apiKey): static
-    {
-        $this->apiKey = $apiKey;
 
         return $this;
     }

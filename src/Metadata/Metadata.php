@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
-use ApiPlatform\Doctrine\Odm\State\Options as DoctrineOdmOptions;
-use ApiPlatform\Doctrine\Orm\State\Options as DoctrineOrmOptions;
 use ApiPlatform\State\OptionsInterface;
 
 /**
@@ -618,22 +616,5 @@ abstract class Metadata
         $self->extraProperties = $extraProperties;
 
         return $self;
-    }
-
-    public function getClassFromStateOptions(): ?string
-    {
-        $stateOptions = $this->getStateOptions();
-
-        if ($stateOptions instanceof OptionsInterface) {
-            if ($stateOptions instanceof DoctrineOrmOptions) {
-                return $stateOptions->getEntityClass();
-            }
-
-            if ($stateOptions instanceof DoctrineOdmOptions) {
-                return $stateOptions->getDocumentClass();
-            }
-        }
-
-        return $this->getClass();
     }
 }

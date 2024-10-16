@@ -13,42 +13,43 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource;
 
+use ApiPlatform\Doctrine\Odm\Filter\DateFilter as OdmDateFilter;
+use ApiPlatform\Doctrine\Odm\State\Options as OdmOptions;
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\AgentDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Agent;
-use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiFilter(DateFilter::class, properties: ['birthday'], alias: 'app_filter_date')]
 #[ApiResource(
     shortName: 'Agent',
     operations: [
         new GetCollection(parameters: [
-            'bla[:property]' => new QueryParameter(filter: 'app_filter_date'),
+            'birthday' => new QueryParameter(filter: 'app_filter_date'),
         ]),
     ],
     stateOptions: new Options(entityClass: Agent::class)
 )]
-#[ApiFilter(DateFilter::class, properties: ['birthday'])]
+#[ApiFilter(OdmDateFilter::class, properties: ['birthday'], alias: 'app_filter_date_odm')]
 #[ApiResource(
-    shortName: 'AgentSimple',
+    shortName: 'AgentDocument',
     operations: [
-        new GetCollection(),
+        new GetCollection(parameters: [
+            'birthday' => new QueryParameter(filter: 'app_filter_date_odm'),
+        ]),
     ],
-    stateOptions: new Options(entityClass: Agent::class)
+    stateOptions: new OdmOptions(documentClass: AgentDocument::class)
 )]
 class AgentApi
 {
-    #[Groups(['agent:read'])]
     private ?int $id = null;
 
-    #[Groups(['agent:read', 'agent:write'])]
     private ?string $name = null;
 
-    #[Groups(['agent:read', 'agent:write'])]
     private ?\DateTimeInterface $birthday = null;
 
     public function getId(): ?int
