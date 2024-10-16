@@ -19,6 +19,7 @@ use ApiPlatform\GraphQl\Exception\InvalidTypeException;
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactory;
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface;
+use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
@@ -292,41 +293,6 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
             $args[$id]['type'] = $this->typeConverter->resolveType($arg['type']);
         }
 
-        /*
-         * This is @experimental, read the comment on the parameterToObjectType function as additional information.
-         */
-        foreach ($operation->getParameters() ?? [] as $parameter) {
-            $key = $parameter->getKey();
-
-            if (str_contains($key, ':property')) {
-                if (!($filterId = $parameter->getFilter()) || !$this->filterLocator->has($filterId)) {
-                    continue;
-                }
-
-                $parsedKey = explode('[:property]', $key);
-                $flattenFields = [];
-                foreach ($this->filterLocator->get($filterId)->getDescription($operation->getClass()) as $key => $value) {
-                    $values = [];
-                    parse_str($key, $values);
-                    if (isset($values[$parsedKey[0]])) {
-                        $values = $values[$parsedKey[0]];
-                    }
-
-                    $name = key($values);
-                    $flattenFields[] = ['name' => $name, 'required' => $value['required'] ?? null, 'description' => $value['description'] ?? null, 'leafs' => $values[$name], 'type' => $value['type'] ?? 'string'];
-                }
-
-                $args[$parsedKey[0]] = $this->parameterToObjectType($flattenFields, $parsedKey[0]);
-                continue;
-            }
-
-            $args[$key] = ['type' => GraphQLType::string()];
-
-            if ($parameter->getRequired()) {
-                $args[$key]['type'] = GraphQLType::nonNull($args[$key]['type']);
-            }
-        }
-
         return $args;
     }
 
@@ -448,12 +414,15 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
 
             $args = [];
 
-            if (!$input && !$rootOperation instanceof Mutation && !$rootOperation instanceof Subscription && !$isStandardGraphqlType && $isCollectionType) {
-                if (!$this->isEnumClass($resourceClass) && $this->pagination->isGraphQlEnabled($resourceOperation)) {
-                    $args = $this->getGraphQlPaginationArgs($resourceOperation);
-                }
+            if (!$input && !$rootOperation instanceof Mutation && !$rootOperation instanceof Subscription && !$isStandardGraphqlType) {
+                if ($isCollectionType) {
+                    if (!$this->isEnumClass($resourceClass) && $this->pagination->isGraphQlEnabled($resourceOperation)) {
+                        $args = $this->getGraphQlPaginationArgs($resourceOperation);
+                    }
 
-                $args = $this->getFilterArgs($args, $resourceClass, $rootResource, $resourceOperation, $rootOperation, $property, $depth);
+                    $args = $this->getFilterArgs($args, $resourceClass, $rootResource, $resourceOperation, $rootOperation, $property, $depth);
+                    $args = $this->getParameterArgs($rootOperation, $args);
+                }
             }
 
             if ($this->itemResolverFactory instanceof ResolverFactory) {
@@ -486,6 +455,52 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
         }
 
         return null;
+    }
+
+    /*
+     * This function is @experimental, read the comment on the parameterToObjectType function for additional information.
+     * @experimental
+     */
+    private function getParameterArgs(Operation $operation, array $args = []): array
+    {
+        foreach ($operation->getParameters() ?? [] as $parameter) {
+            $key = $parameter->getKey();
+
+            if (!str_contains($key, ':property')) {
+                $args[$key] = ['type' => GraphQLType::string()];
+
+                if ($parameter->getRequired()) {
+                    $args[$key]['type'] = GraphQLType::nonNull($args[$key]['type']);
+                }
+
+                continue;
+            }
+
+            if (!($filterId = $parameter->getFilter()) || !$this->filterLocator->has($filterId)) {
+                continue;
+            }
+
+            $filter = $this->filterLocator->get($filterId);
+            $parsedKey = explode('[:property]', $key);
+            $flattenFields = [];
+
+            if ($filter instanceof FilterInterface) {
+                foreach ($filter->getDescription($operation->getClass()) as $name => $value) {
+                    $values = [];
+                    parse_str($name, $values);
+                    if (isset($values[$parsedKey[0]])) {
+                        $values = $values[$parsedKey[0]];
+                    }
+
+                    $name = key($values);
+                    $flattenFields[] = ['name' => $name, 'required' => $value['required'] ?? null, 'description' => $value['description'] ?? null, 'leafs' => $values[$name], 'type' => $value['type'] ?? 'string'];
+                }
+
+                $args[$parsedKey[0]] = $this->parameterToObjectType($flattenFields, $parsedKey[0]);
+            }
+        }
+
+        return $args;
     }
 
     private function getGraphQlPaginationArgs(Operation $queryOperation): array
