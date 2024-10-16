@@ -74,6 +74,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             }
 
             $shortName = $resourceMetadata->getShortName();
+
             $prefixedShortName = $resourceMetadata->getTypes()[0] ?? "#$shortName";
             $this->populateEntrypointProperties($resourceMetadata, $shortName, $prefixedShortName, $entrypointProperties, $hydraPrefix, $resourceMetadataCollection);
             $classes[] = $this->getClass($resourceClass, $resourceMetadata, $shortName, $prefixedShortName, $context, $hydraPrefix, $resourceMetadataCollection);
@@ -243,8 +244,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                 if (('POST' === $operation->getMethod() || $operation instanceof CollectionOperationInterface) !== $collection) {
                     continue;
                 }
-
-                $hydraOperations[] = $this->getHydraOperation($operation, $operation->getTypes()[0] ?? "#{$operation->getShortName()}", $hydraPrefix);
+                $hydraOperations[] = $this->getHydraOperation($operation, $operation->getShortName(), $hydraPrefix);
             }
         }
 
@@ -280,28 +280,28 @@ final class DocumentationNormalizer implements NormalizerInterface
             $hydraOperation += [
                 '@type' => [$hydraPrefix.'Operation', 'schema:FindAction'],
                 $hydraPrefix.'title' => "Retrieves a $shortName resource.",
-                'returns' => null === $outputClass ? 'owl:Nothing' : substr($prefixedShortName, 1),
+                'returns' => null === $outputClass ? 'owl:Nothing' : $prefixedShortName,
             ];
         } elseif ('PATCH' === $method) {
             $hydraOperation += [
                 '@type' => $hydraPrefix.'Operation',
                 $hydraPrefix.'title' => "Updates the $shortName resource.",
-                'returns' => null === $outputClass ? 'owl:Nothing' : substr($prefixedShortName, 1),
-                'expects' => null === $inputClass ? 'owl:Nothing' : substr($prefixedShortName, 1),
+                'returns' => null === $outputClass ? 'owl:Nothing' : $prefixedShortName,
+                'expects' => null === $inputClass ? 'owl:Nothing' : $prefixedShortName,
             ];
         } elseif ('POST' === $method) {
             $hydraOperation += [
                 '@type' => [$hydraPrefix.'Operation', 'schema:CreateAction'],
                 $hydraPrefix.'title' => "Creates a $shortName resource.",
-                'returns' => null === $outputClass ? 'owl:Nothing' : substr($prefixedShortName, 1),
-                'expects' => null === $inputClass ? 'owl:Nothing' : substr($prefixedShortName, 1),
+                'returns' => null === $outputClass ? 'owl:Nothing' : $prefixedShortName,
+                'expects' => null === $inputClass ? 'owl:Nothing' : $prefixedShortName,
             ];
         } elseif ('PUT' === $method) {
             $hydraOperation += [
                 '@type' => [$hydraPrefix.'Operation', 'schema:ReplaceAction'],
                 $hydraPrefix.'title' => "Replaces the $shortName resource.",
-                'returns' => null === $outputClass ? 'owl:Nothing' : substr($prefixedShortName, 1),
-                'expects' => null === $inputClass ? 'owl:Nothing' : substr($prefixedShortName, 1),
+                'returns' => null === $outputClass ? 'owl:Nothing' : $prefixedShortName,
+                'expects' => null === $inputClass ? 'owl:Nothing' : $prefixedShortName,
             ];
         } elseif ('DELETE' === $method) {
             $hydraOperation += [
