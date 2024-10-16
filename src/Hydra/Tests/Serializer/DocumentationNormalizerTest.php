@@ -106,32 +106,27 @@ class DocumentationNormalizerTest extends TestCase
 
         $expected = [
             '@context' => [
-                '@vocab' => '/doc#',
-                'hydra' => 'http://www.w3.org/ns/hydra/core#',
-                'rdf' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-                'rdfs' => 'http://www.w3.org/2000/01/rdf-schema#',
-                'xmls' => 'http://www.w3.org/2001/XMLSchema#',
-                'owl' => 'http://www.w3.org/2002/07/owl#',
-                'schema' => 'https://schema.org/',
-                'domain' => [
-                    '@id' => 'rdfs:domain',
-                    '@type' => '@id',
-                ],
-                'range' => [
-                    '@id' => 'rdfs:range',
-                    '@type' => '@id',
-                ],
-                'subClassOf' => [
-                    '@id' => 'rdfs:subClassOf',
-                    '@type' => '@id',
-                ],
-                'expects' => [
-                    '@id' => 'hydra:expects',
-                    '@type' => '@id',
-                ],
-                'returns' => [
-                    '@id' => 'hydra:returns',
-                    '@type' => '@id',
+                'http://www.w3.org/ns/hydra/context.jsonld',
+                [
+                    '@vocab' => '/doc#',
+                    'hydra' => 'http://www.w3.org/ns/hydra/core#',
+                    'rdf' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+                    'rdfs' => 'http://www.w3.org/2000/01/rdf-schema#',
+                    'xmls' => 'http://www.w3.org/2001/XMLSchema#',
+                    'owl' => 'http://www.w3.org/2002/07/owl#',
+                    'schema' => 'https://schema.org/',
+                    'domain' => [
+                        '@id' => 'rdfs:domain',
+                        '@type' => '@id',
+                    ],
+                    'range' => [
+                        '@id' => 'rdfs:range',
+                        '@type' => '@id',
+                    ],
+                    'subClassOf' => [
+                        '@id' => 'rdfs:subClassOf',
+                        '@type' => '@id',
+                    ],
                 ],
             ],
             '@id' => '/doc',
@@ -226,23 +221,23 @@ class DocumentationNormalizerTest extends TestCase
                             'hydra:method' => 'GET',
                             'hydra:title' => 'foobar',
                             'rdfs:label' => 'foobar',
-                            'returns' => '#dummy',
+                            'returns' => 'dummy',
                             'hydra:foo' => 'bar',
                         ],
                         [
                             '@type' => ['hydra:Operation', 'schema:ReplaceAction'],
-                            'expects' => '#dummy',
+                            'expects' => 'dummy',
                             'hydra:method' => 'PUT',
                             'hydra:title' => 'Replaces the dummy resource.',
                             'rdfs:label' => 'Replaces the dummy resource.',
-                            'returns' => '#dummy',
+                            'returns' => 'dummy',
                         ],
                         [
                             '@type' => ['hydra:Operation', 'schema:FindAction'],
                             'hydra:method' => 'GET',
                             'hydra:title' => 'Retrieves a relatedDummy resource.',
                             'rdfs:label' => 'Retrieves a relatedDummy resource.',
-                            'returns' => '#relatedDummy',
+                            'returns' => 'relatedDummy',
                         ],
                     ],
                 ],
@@ -277,11 +272,11 @@ class DocumentationNormalizerTest extends TestCase
                                     ],
                                     [
                                         '@type' => ['hydra:Operation', 'schema:CreateAction'],
-                                        'expects' => '#dummy',
+                                        'expects' => 'dummy',
                                         'hydra:method' => 'POST',
                                         'hydra:title' => 'Creates a dummy resource.',
                                         'rdfs:label' => 'Creates a dummy resource.',
-                                        'returns' => '#dummy',
+                                        'returns' => 'dummy',
                                     ],
                                 ],
                             ],
@@ -294,7 +289,7 @@ class DocumentationNormalizerTest extends TestCase
                         '@type' => 'hydra:Operation',
                         'hydra:method' => 'GET',
                         'rdfs:label' => 'The API entrypoint.',
-                        'returns' => '#EntryPoint',
+                        'returns' => 'EntryPoint',
                     ],
                 ],
                 [
@@ -411,32 +406,27 @@ class DocumentationNormalizerTest extends TestCase
 
         $expected = [
             '@context' => [
-                '@vocab' => '/doc#',
-                'hydra' => 'http://www.w3.org/ns/hydra/core#',
-                'rdf' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-                'rdfs' => 'http://www.w3.org/2000/01/rdf-schema#',
-                'xmls' => 'http://www.w3.org/2001/XMLSchema#',
-                'owl' => 'http://www.w3.org/2002/07/owl#',
-                'schema' => 'https://schema.org/',
-                'domain' => [
-                    '@id' => 'rdfs:domain',
-                    '@type' => '@id',
-                ],
-                'range' => [
-                    '@id' => 'rdfs:range',
-                    '@type' => '@id',
-                ],
-                'subClassOf' => [
-                    '@id' => 'rdfs:subClassOf',
-                    '@type' => '@id',
-                ],
-                'expects' => [
-                    '@id' => 'hydra:expects',
-                    '@type' => '@id',
-                ],
-                'returns' => [
-                    '@id' => 'hydra:returns',
-                    '@type' => '@id',
+                'http://www.w3.org/ns/hydra/context.jsonld',
+                [
+                    '@vocab' => '/doc#',
+                    'hydra' => 'http://www.w3.org/ns/hydra/core#',
+                    'rdf' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+                    'rdfs' => 'http://www.w3.org/2000/01/rdf-schema#',
+                    'xmls' => 'http://www.w3.org/2001/XMLSchema#',
+                    'owl' => 'http://www.w3.org/2002/07/owl#',
+                    'schema' => 'https://schema.org/',
+                    'domain' => [
+                        '@id' => 'rdfs:domain',
+                        '@type' => '@id',
+                    ],
+                    'range' => [
+                        '@id' => 'rdfs:range',
+                        '@type' => '@id',
+                    ],
+                    'subClassOf' => [
+                        '@id' => 'rdfs:subClassOf',
+                        '@type' => '@id',
+                    ],
                 ],
             ],
             '@id' => '/doc',
@@ -521,7 +511,7 @@ class DocumentationNormalizerTest extends TestCase
                             'hydra:method' => 'GET',
                             'hydra:title' => 'Retrieves a dummy resource.',
                             'rdfs:label' => 'Retrieves a dummy resource.',
-                            'returns' => '#dummy',
+                            'returns' => 'dummy',
                         ],
                         [
                             '@type' => [
@@ -532,7 +522,7 @@ class DocumentationNormalizerTest extends TestCase
                             'hydra:method' => 'PUT',
                             'hydra:title' => 'Replaces the dummy resource.',
                             'rdfs:label' => 'Replaces the dummy resource.',
-                            'returns' => '#dummy',
+                            'returns' => 'dummy',
                         ],
                     ],
                     'hydra:description' => 'dummy',
@@ -580,7 +570,7 @@ class DocumentationNormalizerTest extends TestCase
                                             'hydra:Operation',
                                             'schema:CreateAction',
                                         ],
-                                        'expects' => '#dummy',
+                                        'expects' => 'dummy',
                                         'hydra:method' => 'POST',
                                         'hydra:title' => 'Creates a dummy resource.',
                                         'rdfs:label' => 'Creates a dummy resource.',
@@ -597,7 +587,7 @@ class DocumentationNormalizerTest extends TestCase
                         '@type' => 'hydra:Operation',
                         'hydra:method' => 'GET',
                         'rdfs:label' => 'The API entrypoint.',
-                        'returns' => '#EntryPoint',
+                        'returns' => 'EntryPoint',
                     ],
                 ],
                 2 => [
@@ -776,32 +766,27 @@ class DocumentationNormalizerTest extends TestCase
 
         $expected = [
             '@context' => [
-                '@vocab' => '/doc#',
-                'hydra' => 'http://www.w3.org/ns/hydra/core#',
-                'rdf' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-                'rdfs' => 'http://www.w3.org/2000/01/rdf-schema#',
-                'xmls' => 'http://www.w3.org/2001/XMLSchema#',
-                'owl' => 'http://www.w3.org/2002/07/owl#',
-                'schema' => 'https://schema.org/',
-                'domain' => [
-                    '@id' => 'rdfs:domain',
-                    '@type' => '@id',
-                ],
-                'range' => [
-                    '@id' => 'rdfs:range',
-                    '@type' => '@id',
-                ],
-                'subClassOf' => [
-                    '@id' => 'rdfs:subClassOf',
-                    '@type' => '@id',
-                ],
-                'expects' => [
-                    '@id' => 'expects',
-                    '@type' => '@id',
-                ],
-                'returns' => [
-                    '@id' => 'returns',
-                    '@type' => '@id',
+                'http://www.w3.org/ns/hydra/context.jsonld',
+                [
+                    '@vocab' => '/doc#',
+                    'hydra' => 'http://www.w3.org/ns/hydra/core#',
+                    'rdf' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+                    'rdfs' => 'http://www.w3.org/2000/01/rdf-schema#',
+                    'xmls' => 'http://www.w3.org/2001/XMLSchema#',
+                    'owl' => 'http://www.w3.org/2002/07/owl#',
+                    'schema' => 'https://schema.org/',
+                    'domain' => [
+                        '@id' => 'rdfs:domain',
+                        '@type' => '@id',
+                    ],
+                    'range' => [
+                        '@id' => 'rdfs:range',
+                        '@type' => '@id',
+                    ],
+                    'subClassOf' => [
+                        '@id' => 'rdfs:subClassOf',
+                        '@type' => '@id',
+                    ],
                 ],
             ],
             '@id' => '/doc',
@@ -896,23 +881,23 @@ class DocumentationNormalizerTest extends TestCase
                             'method' => 'GET',
                             'title' => 'foobar',
                             'rdfs:label' => 'foobar',
-                            'returns' => '#dummy',
+                            'returns' => 'dummy',
                             'foo' => 'bar',
                         ],
                         [
                             '@type' => ['Operation', 'schema:ReplaceAction'],
-                            'expects' => '#dummy',
+                            'expects' => 'dummy',
                             'method' => 'PUT',
                             'title' => 'Replaces the dummy resource.',
                             'rdfs:label' => 'Replaces the dummy resource.',
-                            'returns' => '#dummy',
+                            'returns' => 'dummy',
                         ],
                         [
                             '@type' => ['Operation', 'schema:FindAction'],
                             'method' => 'GET',
                             'title' => 'Retrieves a relatedDummy resource.',
                             'rdfs:label' => 'Retrieves a relatedDummy resource.',
-                            'returns' => '#relatedDummy',
+                            'returns' => 'relatedDummy',
                         ],
                     ],
                 ],
@@ -947,11 +932,11 @@ class DocumentationNormalizerTest extends TestCase
                                     ],
                                     [
                                         '@type' => ['Operation', 'schema:CreateAction'],
-                                        'expects' => '#dummy',
+                                        'expects' => 'dummy',
                                         'method' => 'POST',
                                         'title' => 'Creates a dummy resource.',
                                         'rdfs:label' => 'Creates a dummy resource.',
-                                        'returns' => '#dummy',
+                                        'returns' => 'dummy',
                                     ],
                                 ],
                             ],
@@ -964,7 +949,7 @@ class DocumentationNormalizerTest extends TestCase
                         '@type' => 'Operation',
                         'method' => 'GET',
                         'rdfs:label' => 'The API entrypoint.',
-                        'returns' => '#EntryPoint',
+                        'returns' => 'EntryPoint',
                     ],
                 ],
                 [
