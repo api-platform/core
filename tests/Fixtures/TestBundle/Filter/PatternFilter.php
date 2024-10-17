@@ -36,7 +36,7 @@ class PatternFilter extends AbstractFilter
                 'type' => 'string',
                 'required' => false,
                 'schema' => [
-                    'pattern' => '/^(pattern|nrettap)$/',
+                    'pattern' => '^(pattern|nrettap)$',
                 ],
             ],
         ];
