@@ -113,7 +113,7 @@ final class ValidationTest extends ApiTestCase
 
     public function testBlank(): void
     {
-        $response = self::createClient()->request('GET', 'validate_parameters?blank=f');
+        self::createClient()->request('GET', 'validate_parameters?blank=f');
         $this->assertResponseIsSuccessful();
     }
 
@@ -145,5 +145,11 @@ final class ValidationTest extends ApiTestCase
                 ],
             ],
         ], $response->toArray(false));
+    }
+
+    public function testValidatePattern(): void
+    {
+        self::createClient()->request('GET', 'validate_parameters?pattern=2');
+        $this->assertResponseIsSuccessful();
     }
 }

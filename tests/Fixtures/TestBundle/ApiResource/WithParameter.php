@@ -62,7 +62,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'length' => new QueryParameter(schema: ['maxLength' => 1, 'minLength' => 3]),
         'array' => new QueryParameter(schema: ['minItems' => 2, 'maxItems' => 3]),
         'multipleOf' => new QueryParameter(schema: ['multipleOf' => 2]),
-        'pattern' => new QueryParameter(schema: ['pattern' => '/\d/']),
+        'pattern' => new QueryParameter(schema: ['pattern' => '\d']),
     ],
     provider: [self::class, 'collectionProvider']
 )]

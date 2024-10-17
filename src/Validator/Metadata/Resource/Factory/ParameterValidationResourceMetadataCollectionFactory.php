@@ -130,7 +130,7 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
         }
 
         if (isset($schema['pattern'])) {
-            $assertions[] = new Regex($schema['pattern']);
+            $assertions[] = new Regex('#'.$schema['pattern'].'#');
         }
 
         if (isset($schema['maxLength']) || isset($schema['minLength'])) {
