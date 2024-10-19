@@ -243,6 +243,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.route_loader',
             'api_platform.router',
             'api_platform.serializer.context_builder',
+            'api_platform.serializer.context_builder.request_cache',
             'api_platform.serializer.context_builder.filter',
             'api_platform.serializer.group_filter',
             'api_platform.serializer.mapping.class_metadata_factory',
