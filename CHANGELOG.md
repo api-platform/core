@@ -1,5 +1,16 @@
 # Changelog
 
+## v3.4.4
+
+### Bug fixes
+
+* [550347867](https://github.com/api-platform/core/commit/550347867f30611b673d8df99f65186d013919dd) fix(graphql): register query parameter arguments with filters (#6727)
+* [99262dce7](https://github.com/api-platform/core/commit/99262dce739800bd841c95e026848b587ba25801) fix(jsonschema): handle @id when genId is false (#6716)
+* [ad5efa535](https://github.com/api-platform/core/commit/ad5efa535a4dcbaad64ecff89514eaa6e07f5b7c) fix: multiple parameter provider #6673 (#6732)
+* [d34cd7be8](https://github.com/api-platform/core/commit/d34cd7be8e7a12fd08a8b10270a614c06c10aa89) fix: use stateOptions when retrieving a Parameter filter (#6728)
+* [e7fb04fab](https://github.com/api-platform/core/commit/e7fb04fab05bc077e2dbeb0fa0fc2c1d28c96105) fix(symfony): fetch api-platform/symfony version debug bar (#6722)
+* [e96623ebf](https://github.com/api-platform/core/commit/e96623ebfd8691ba943bdb56a4d91e160497a311) fix(jsonld): prefix error @type with hydra: (#6721)
+
 ## v3.4.3
 
 ### Bug fixes
