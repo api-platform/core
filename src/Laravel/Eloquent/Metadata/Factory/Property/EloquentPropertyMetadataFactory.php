@@ -18,9 +18,9 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Collection;
@@ -97,7 +97,7 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
             }
 
             $collection = false;
-            if (in_array($relation['type'], [HasMany::class, HasManyThrough::class, BelongsToMany::class, MorphMany::class, MorphToMany::class])) {
+            if (\in_array($relation['type'], [HasMany::class, HasManyThrough::class, BelongsToMany::class, MorphMany::class, MorphToMany::class], true)) {
                 $collection = true;
             }
 
