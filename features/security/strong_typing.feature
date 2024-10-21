@@ -54,7 +54,7 @@ Feature: Handle properly invalid data submitted to the API
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
     And the JSON node "@context" should be equal to "/contexts/Error"
-    And the JSON node "@type" should be equal to "Error"
+    And the JSON node "@type" should be equal to "hydra:Error"
     And the JSON node "title" should be equal to "An error occurred"
     And the JSON node "description" should be equal to 'The type of the "name" attribute must be "string", "NULL" given.'
 
@@ -71,7 +71,7 @@ Feature: Handle properly invalid data submitted to the API
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
     And the JSON node "@context" should be equal to "/contexts/Error"
-    And the JSON node "@type" should be equal to "Error"
+    And the JSON node "@type" should be equal to "hydra:Error"
     And the JSON node "title" should be equal to "An error occurred"
     And the JSON node "description" should be equal to 'Invalid IRI "1".'
     And the JSON node "trace" should exist
@@ -102,7 +102,7 @@ Feature: Handle properly invalid data submitted to the API
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
     And the JSON node "@context" should be equal to "/contexts/Error"
-    And the JSON node "@type" should be equal to "Error"
+    And the JSON node "@type" should be equal to "hydra:Error"
     And the JSON node "title" should be equal to "An error occurred"
     And the JSON node "description" should be equal to 'The type of the "relatedDummies" attribute must be "array", "string" given.'
     And the JSON node "trace" should exist
@@ -120,7 +120,7 @@ Feature: Handle properly invalid data submitted to the API
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
     And the JSON node "@context" should be equal to "/contexts/Error"
-    And the JSON node "@type" should be equal to "Error"
+    And the JSON node "@type" should be equal to "hydra:Error"
     And the JSON node "title" should be equal to "An error occurred"
     And the JSON node "description" should be equal to 'The type of the key "a" must be "int", "string" given.'
 
@@ -136,7 +136,7 @@ Feature: Handle properly invalid data submitted to the API
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
     And the JSON node "@context" should be equal to "/contexts/Error"
-    And the JSON node "@type" should be equal to "Error"
+    And the JSON node "@type" should be equal to "hydra:Error"
     And the JSON node "title" should be equal to "An error occurred"
     And the JSON node "description" should be equal to 'The type of the "name" attribute must be "string", "integer" given.'
 
