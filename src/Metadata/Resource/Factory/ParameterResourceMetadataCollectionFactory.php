@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource\Factory;
 
+use ApiPlatform\Doctrine\Odm\State\Options as DoctrineODMOptions;
+use ApiPlatform\Doctrine\Orm\State\Options as DoctrineORMOptions;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\JsonSchemaFilterInterface;
@@ -113,7 +115,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             if (':property' === $key) {
                 foreach ($propertyNames as $property) {
                     $converted = $this->nameConverter?->denormalize($property) ?? $property;
-                    $propertyParameter = $this->setDefaults($converted, $parameter, $resourceClass, $properties);
+                    $propertyParameter = $this->setDefaults($converted, $parameter, $resourceClass, $properties, $operation);
                     $priority = $propertyParameter->getPriority() ?? $internalPriority--;
                     $parameters->add($converted, $propertyParameter->withPriority($priority)->withKey($converted));
                 }
@@ -133,7 +135,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                 $parameter = $parameter->withExtraProperties($parameter->getExtraProperties() + ['_properties' => $p]);
             }
 
-            $parameter = $this->setDefaults($key, $parameter, $resourceClass, $properties);
+            $parameter = $this->setDefaults($key, $parameter, $resourceClass, $properties, $operation);
             $priority = $parameter->getPriority() ?? $internalPriority--;
             $parameters->add($key, $parameter->withPriority($priority));
         }
@@ -171,7 +173,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
     /**
      * @param array<string, ApiProperty> $properties
      */
-    private function setDefaults(string $key, Parameter $parameter, string $resourceClass, array $properties): Parameter
+    private function setDefaults(string $key, Parameter $parameter, string $resourceClass, array $properties, Operation $operation): Parameter
     {
         if (null === $parameter->getKey()) {
             $parameter = $parameter->withKey($key);
@@ -187,7 +189,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         }
 
         // Read filter description to populate the Parameter
-        $description = $filter instanceof FilterInterface ? $filter->getDescription($resourceClass) : [];
+        $description = $filter instanceof FilterInterface ? $filter->getDescription($this->getFilterClass($operation)) : [];
         if (($schema = $description[$key]['schema'] ?? null) && null === $parameter->getSchema()) {
             $parameter = $parameter->withSchema($schema);
         }
@@ -219,5 +221,18 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         }
 
         return $this->addFilterMetadata($parameter);
+    }
+
+    private function getFilterClass(Operation $operation): ?string
+    {
+        $stateOptions = $operation->getStateOptions();
+        if ($stateOptions instanceof DoctrineORMOptions) {
+            return $stateOptions->getEntityClass();
+        }
+        if ($stateOptions instanceof DoctrineODMOptions) {
+            return $stateOptions->getDocumentClass();
+        }
+
+        return $operation->getClass();
     }
 }
