@@ -493,7 +493,7 @@ Feature: Relations support
       "properties": {
         "@type": {
           "type": "string",
-          "pattern": "^Error$"
+          "pattern": "^hydra:Error$"
         },
         "title": {
           "type": "string",
