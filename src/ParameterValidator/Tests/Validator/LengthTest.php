@@ -17,6 +17,8 @@ use ApiPlatform\ParameterValidator\Validator\Length;
 use PHPUnit\Framework\TestCase;
 
 /**
+ * @group legacy
+ *
  * @author Julien Deniau <julien.deniau@mapado.com>
  */
 class LengthTest extends TestCase
@@ -39,9 +41,6 @@ class LengthTest extends TestCase
         );
     }
 
-    /**
-     * @group legacy
-     */
     public function testNonMatchingParameter(): void
     {
         $filter = new Length();
@@ -86,9 +85,6 @@ class LengthTest extends TestCase
         );
     }
 
-    /**
-     * @group legacy
-     */
     public function testNonMatchingParameterWithOnlyOneDefinition(): void
     {
         $filter = new Length();
@@ -143,9 +139,6 @@ class LengthTest extends TestCase
         );
     }
 
-    /**
-     * @group legacy
-     */
     public function testMatchingParameter(): void
     {
         $filter = new Length();
@@ -194,9 +187,6 @@ class LengthTest extends TestCase
         );
     }
 
-    /**
-     * @group legacy
-     */
     public function testMatchingParameterWithOneDefinition(): void
     {
         $filter = new Length();
