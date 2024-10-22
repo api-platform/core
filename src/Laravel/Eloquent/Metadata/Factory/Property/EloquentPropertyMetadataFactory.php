@@ -96,10 +96,14 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
                 continue;
             }
 
-            $collection = false;
-            if (\in_array($relation['type'], [HasMany::class, HasManyThrough::class, BelongsToMany::class, MorphMany::class, MorphToMany::class], true)) {
-                $collection = true;
-            }
+            $collection = match($relation['type']) {
+                HasMany::class,
+                HasManyThrough::class,
+                BelongsToMany::class,
+                MorphMany::class,
+                MorphToMany::class => true,
+                default => false
+            };
 
             $type = new Type($collection ? Type::BUILTIN_TYPE_ITERABLE : Type::BUILTIN_TYPE_OBJECT, false, $relation['related'], $collection, collectionValueType: new Type(Type::BUILTIN_TYPE_OBJECT, false, $relation['related']));
 
