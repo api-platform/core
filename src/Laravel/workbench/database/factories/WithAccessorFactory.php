@@ -39,6 +39,7 @@ class WithAccessorFactory extends Factory
     {
         return [
             'name' => strtolower(fake()->name()),
+            'relation_id' => WithAccessorRelationFactory::new(),
         ];
     }
 }

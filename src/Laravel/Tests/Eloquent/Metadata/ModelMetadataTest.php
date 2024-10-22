@@ -37,9 +37,9 @@ final class ModelMetadataTest extends TestCase
             /**
              * @return HasMany<Book>
              */
-            public function secret(): HasMany
+            public function secret(): HasMany // @phpstan-ignore-line
             {
-                return $this->hasMany(Book::class);
+                return $this->hasMany(Book::class); // @phpstan-ignore-line
             }
         };
 
@@ -55,9 +55,9 @@ final class ModelMetadataTest extends TestCase
             /**
              * @return HasMany<Book>
              */
-            public function secret(): HasMany
+            public function secret(): HasMany // @phpstan-ignore-line
             {
-                return $this->hasMany(Book::class);
+                return $this->hasMany(Book::class); // @phpstan-ignore-line
             }
         };
 
@@ -71,9 +71,9 @@ final class ModelMetadataTest extends TestCase
             /**
              * @return HasMany<Book>
              */
-            public function secret(): HasMany
+            public function secret(): HasMany // @phpstan-ignore-line
             {
-                return $this->hasMany(Book::class);
+                return $this->hasMany(Book::class); // @phpstan-ignore-line
             }
         };
 

@@ -21,6 +21,9 @@ use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
 use Workbench\App\Models\Author;
 use Workbench\App\Models\Book;
+use Workbench\Database\Factories\AuthorFactory;
+use Workbench\Database\Factories\BookFactory;
+use Workbench\Database\Factories\WithAccessorFactory;
 
 class JsonApiTest extends TestCase
 {
@@ -36,6 +39,7 @@ class JsonApiTest extends TestCase
         tap($app['config'], function (Repository $config): void {
             $config->set('api-platform.formats', ['jsonapi' => ['application/vnd.api+json']]);
             $config->set('api-platform.docs_formats', ['jsonapi' => ['application/vnd.api+json']]);
+            $config->set('app.debug', true);
         });
     }
 
@@ -55,6 +59,7 @@ class JsonApiTest extends TestCase
 
     public function testGetCollection(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $response = $this->get('/api/books', ['accept' => ['application/vnd.api+json']]);
         $response->assertStatus(200);
         $response->assertHeader('content-type', 'application/vnd.api+json; charset=utf-8');
@@ -72,6 +77,7 @@ class JsonApiTest extends TestCase
 
     public function testGetBook(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $book = Book::first();
         $iri = $this->getIriFromResource($book);
         $response = $this->get($iri, ['accept' => ['application/vnd.api+json']]);
@@ -91,6 +97,7 @@ class JsonApiTest extends TestCase
 
     public function testCreateBook(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $author = Author::find(1);
         $response = $this->postJson(
             '/api/books',
@@ -132,6 +139,7 @@ class JsonApiTest extends TestCase
 
     public function testUpdateBook(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $book = Book::first();
         $iri = $this->getIriFromResource($book);
         $response = $this->putJson(
@@ -157,6 +165,7 @@ class JsonApiTest extends TestCase
 
     public function testPatchBook(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $book = Book::first();
         $iri = $this->getIriFromResource($book);
         $response = $this->patchJson(
@@ -182,10 +191,22 @@ class JsonApiTest extends TestCase
 
     public function testDeleteBook(): void
     {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $book = Book::first();
         $iri = $this->getIriFromResource($book);
         $response = $this->delete($iri, headers: ['accept' => 'application/vnd.api+json']);
         $response->assertStatus(204);
         $this->assertNull(Book::find($book->id));
+    }
+
+    public function testRelationWithGroups(): void
+    {
+        WithAccessorFactory::new()->create();
+        $response = $this->get('/api/with_accessors/1', ['accept' => 'application/vnd.api+json']);
+        $content = $response->json();
+        $this->assertArrayHasKey('data', $content);
+        $this->assertArrayHasKey('relationships', $content['data']);
+        $this->assertArrayHasKey('relation', $content['data']['relationships']);
+        $this->assertArrayHasKey('data', $content['data']['relationships']['relation']);
     }
 }

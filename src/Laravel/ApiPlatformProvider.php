@@ -165,6 +165,7 @@ use ApiPlatform\Serializer\Filter\PropertyFilter;
 use ApiPlatform\Serializer\ItemNormalizer;
 use ApiPlatform\Serializer\JsonEncoder;
 use ApiPlatform\Serializer\Mapping\Factory\ClassMetadataFactory as SerializerClassMetadataFactory;
+use ApiPlatform\Serializer\Mapping\Loader\PropertyMetadataLoader;
 use ApiPlatform\Serializer\Parameter\SerializerFilterParameterProvider;
 use ApiPlatform\Serializer\SerializerContextBuilder;
 use ApiPlatform\State\CallableProcessor;
@@ -206,6 +207,7 @@ use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
+use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
@@ -244,8 +246,15 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->bind(LoaderInterface::class, AttributeLoader::class);
         $this->app->bind(ClassMetadataFactoryInterface::class, ClassMetadataFactory::class);
-        $this->app->singleton(ClassMetadataFactory::class, function () {
-            return new ClassMetadataFactory(new AttributeLoader());
+        $this->app->singleton(ClassMetadataFactory::class, function (Application $app) {
+            return new ClassMetadataFactory(
+                new LoaderChain([
+                    new PropertyMetadataLoader(
+                        $app->make(PropertyNameCollectionFactoryInterface::class),
+                    ),
+                    new AttributeLoader(),
+                ])
+            );
         });
 
         $this->app->singleton(SerializerClassMetadataFactory::class, function (Application $app) {
@@ -260,6 +269,15 @@ class ApiPlatformProvider extends ServiceProvider
             $paths = $config->get('api-platform.resources') ?? [];
             $refl = new \ReflectionClass(Error::class);
             $paths[] = \dirname($refl->getFileName());
+
+            $logger = $app->make(LoggerInterface::class);
+
+            foreach ($paths as $i => $path) {
+                if (!file_exists($path)) {
+                    $logger->warning(\sprintf('We skipped reading resources in "%s" as the path does not exist. Please check the configuration at "api-platform.resources".', $path));
+                    unset($paths[$i]);
+                }
+            }
 
             return new ConcernsResourceNameCollectionFactory($paths, new AttributesResourceNameCollectionFactory($paths));
         });
@@ -790,7 +808,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(SchemaFactoryInterface::class),
                 null,
                 $config->get('api-platform.formats'),
-                null, // ?Options $openApiOptions = null,
+                $app->make(Options::class),
                 $app->make(PaginationOptions::class), // ?PaginationOptions $paginationOptions = null,
                 // ?RouterInterface $router = null
             );
@@ -1040,7 +1058,11 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         if ($this->app->runningInConsole()) {
-            $this->commands([Console\InstallCommand::class]);
+            $this->commands([
+                Console\InstallCommand::class,
+                Console\Maker\MakeStateProcessorCommand::class,
+                Console\Maker\MakeStateProviderCommand::class,
+            ]);
         }
     }
 

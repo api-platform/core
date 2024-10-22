@@ -71,6 +71,7 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
             // see https://laravel.com/docs/11.x/eloquent-mutators#attribute-casting
             $builtinType = $p['cast'] ?? $p['type'];
             $type = match ($builtinType) {
+                'integer' => new Type(Type::BUILTIN_TYPE_INT, $p['nullable']),
                 'double', 'real' => new Type(Type::BUILTIN_TYPE_FLOAT, $p['nullable']),
                 'datetime', 'date', 'timestamp' => new Type(Type::BUILTIN_TYPE_OBJECT, $p['nullable'], \DateTime::class),
                 'immutable_datetime', 'immutable_date' => new Type(Type::BUILTIN_TYPE_OBJECT, $p['nullable'], \DateTimeImmutable::class),

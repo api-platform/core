@@ -1,5 +1,27 @@
 # Changelog
 
+## v4.0.5
+
+### Bug fixes
+
+* [4171d5f9c](https://github.com/api-platform/core/commit/4171d5f9cd41731b857c53a186270ba0626baedf) fix(graphql): register query parameter arguments with filters (#6726)
+* [48ab53816](https://github.com/api-platform/core/commit/48ab53816c55e6116aa64ac81f522f4b7b9bb9f6) fix(laravel): make command writes to app instead of src (#6723)
+
+### Features
+
+## v4.0.4
+
+### Bug fixes
+
+* [2e8287dad](https://github.com/api-platform/core/commit/2e8287dad0c0315dd6527279a6359c0a22f40d93) fix(laravel): allow serializer attributes through ApiProperty (#6680)
+* [439c188ea](https://github.com/api-platform/core/commit/439c188ea1685676d5e705a49a4b835f35a84d72) fix(laravel): match integer type (#6715)
+* [4ad7a50aa](https://github.com/api-platform/core/commit/4ad7a50aaabf0d85e2eb5bb3a6d4ef8d5b7b39a7) fix(laravel): openapi Options binding (#6714)
+* [ec6e64512](https://github.com/api-platform/core/commit/ec6e6451299a50fcab397e86fafe6db132ce7519) fix(laravel): skip resource path when not available (#6697)
+
+### Features
+
+* [5aa799321](https://github.com/api-platform/core/commit/5aa7993219a6fb55f11476a031963a542b2d3586) feat(laravel): command to generate state providers/processors (#6708)
+
 ## v4.0.3
 
 ### Bug fixes
@@ -130,6 +152,25 @@ Notes:
 
 * [0d5f35683](https://github.com/api-platform/core/commit/0d5f356839eb6aa9f536044abe4affa736553e76) feat(laravel): laravel component (#5882)
 
+## v3.4.4
+
+### Bug fixes
+
+* [550347867](https://github.com/api-platform/core/commit/550347867f30611b673d8df99f65186d013919dd) fix(graphql): register query parameter arguments with filters (#6727)
+* [99262dce7](https://github.com/api-platform/core/commit/99262dce739800bd841c95e026848b587ba25801) fix(jsonschema): handle @id when genId is false (#6716)
+* [ad5efa535](https://github.com/api-platform/core/commit/ad5efa535a4dcbaad64ecff89514eaa6e07f5b7c) fix: multiple parameter provider #6673 (#6732)
+* [d34cd7be8](https://github.com/api-platform/core/commit/d34cd7be8e7a12fd08a8b10270a614c06c10aa89) fix: use stateOptions when retrieving a Parameter filter (#6728)
+* [e7fb04fab](https://github.com/api-platform/core/commit/e7fb04fab05bc077e2dbeb0fa0fc2c1d28c96105) fix(symfony): fetch api-platform/symfony version debug bar (#6722)
+* [e96623ebf](https://github.com/api-platform/core/commit/e96623ebfd8691ba943bdb56a4d91e160497a311) fix(jsonld): prefix error @type with hydra: (#6721)
+
+## v3.4.3
+
+### Bug fixes
+
+* [3ca599158](https://github.com/api-platform/core/commit/3ca599158139d56fbd6ee66f2de3e586120d735c) fix(hydra): hydra_prefix on errors (#6704)
+* [f7f605dc8](https://github.com/api-platform/core/commit/f7f605dc8b798b975d2286c970c9091436d7f890) fix: check that api-platform/ramsey-uuid is installed before registering related services (#6696)
+* [fbb53e5e3](https://github.com/api-platform/core/commit/fbb53e5e35ca0ec3de26ddc7de7ea4d1dda5c20b) fix(symfony): metadata aware name converter has 0 arguments by default (#6711)
+
 ## v3.4.2
 
 ### Bug fixes
@@ -141,9 +182,6 @@ Notes:
 * [4f5f56756](https://github.com/api-platform/core/commit/4f5f5675629fe52ea415a6bd91f3625eedea9c87) fix: remove hydra prefix on errors (#6624)
 * [afe7d47d7](https://github.com/api-platform/core/commit/afe7d47d7b7ba6c8591bfb60137a65d1fa1fe38f) fix(metadata): passing class as parameter in XML ApiResource's definition (#6659)
 * [b93ee467c](https://github.com/api-platform/core/commit/b93ee467c69253e0cfe60e75b48a5c7aa683474a) fix(metadata): overwriting XML ApiResource definition by YAML ApiResource definition (#6660)
-
-> [!WARNING]
-> Hydra prefix on errors is breaking, read `title` not `hydra:title`. The `hydra_prefix` flag doesn't apply to errors as it provided redundant information (both `hydra:title` and `title` were available)
 
 ## v3.4.1
 

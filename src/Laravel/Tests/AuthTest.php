@@ -14,15 +14,34 @@ declare(strict_types=1);
 namespace ApiPlatform\Laravel\Tests;
 
 use ApiPlatform\Laravel\Test\ApiTestAssertionsTrait;
+use Illuminate\Config\Repository;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
+use Workbench\Database\Factories\UserFactory;
 
 class AuthTest extends TestCase
 {
     use ApiTestAssertionsTrait;
     use RefreshDatabase;
     use WithWorkbench;
+
+    /**
+     * @param Application $app
+     */
+    protected function defineEnvironment($app): void
+    {
+        tap($app['config'], function (Repository $config): void {
+            $config->set('api-platform.graphql.enabled', true);
+            $config->set('app.key', 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF');
+        });
+    }
+
+    protected function afterRefreshingDatabase(): void
+    {
+        UserFactory::new()->create();
+    }
 
     public function testGetCollection(): void
     {
@@ -44,7 +63,7 @@ class AuthTest extends TestCase
     {
         $response = $this->post('/tokens/create');
         $token = $response->json()['token'];
-        $response = $this->post('/api/vaults', [], ['accept' => ['application/ld+json'], 'content-type' => ['application/ld+json'], 'authorization' => 'Bearer '.$token]);
+        $response = $this->postJson('/api/vaults', [], ['accept' => ['application/ld+json'], 'content-type' => ['application/ld+json'], 'authorization' => 'Bearer '.$token]);
         $response->assertStatus(403);
     }
 

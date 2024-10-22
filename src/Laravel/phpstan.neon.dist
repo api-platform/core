@@ -13,8 +13,8 @@ parameters:
 		- State
 		- Test
 		- Tests
-#    ignoreErrors:
-#        - '#PHPDoc tag @var#'
+	ignoreErrors:
+	  - '#Cannot call method expectsQuestion#'
 #
 #    excludePaths:
 #        - ./*/*/FileToBeExcluded.php
