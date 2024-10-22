@@ -14,6 +14,7 @@
         <header>
             <a id="logo" href="https://api-platform.com/"><img src="/vendor/api-platform/logo-header.svg" alt="API Platform"></a>
         </header>
+        @if (config('api-platform.show_webby', true))
         <div class="web calm"><img src="/vendor/api-platform/web.png"></div>
         <svg class="webby_car" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1889.21 582.3">
             <g id="Calque_1">
@@ -209,6 +210,7 @@
                 </g>
             </g>
         </svg>
+        @endif
 
         <div id="swagger-ui" class="api-platform"></div>
         <script src="/vendor/api-platform/swagger-ui/swagger-ui-bundle.js"></script>
