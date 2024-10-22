@@ -1,5 +1,14 @@
 # Changelog
 
+## v4.0.5
+
+### Bug fixes
+
+* [4171d5f9c](https://github.com/api-platform/core/commit/4171d5f9cd41731b857c53a186270ba0626baedf) fix(graphql): register query parameter arguments with filters (#6726)
+* [48ab53816](https://github.com/api-platform/core/commit/48ab53816c55e6116aa64ac81f522f4b7b9bb9f6) fix(laravel): make command writes to app instead of src (#6723)
+
+### Features
+
 ## v4.0.4
 
 ### Bug fixes
