@@ -55,7 +55,10 @@ final class EloquentPropertyNameCollectionMetadataFactory implements PropertyNam
          */
         $properties = [];
 
-        // When it's an Eloquent model we read attributes from database (@see ShowModelCommand)
+        /*
+         * When it's an Eloquent model we read attributes from database
+         * @see \Illuminate\Database\Console\ShowModelCommand
+         */
         foreach ($this->modelMetadata->getAttributes($model) as $property) {
             if (!($property['primary'] ?? null) && $property['hidden']) {
                 continue;
