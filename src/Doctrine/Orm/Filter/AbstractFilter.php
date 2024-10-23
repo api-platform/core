@@ -30,7 +30,7 @@ abstract class AbstractFilter implements FilterInterface, PropertyAwareFilterInt
     use PropertyHelperTrait;
     protected LoggerInterface $logger;
 
-    public function __construct(protected ManagerRegistry $managerRegistry, ?LoggerInterface $logger = null, protected ?array $properties = null, protected ?NameConverterInterface $nameConverter = null)
+    public function __construct(protected ?ManagerRegistry $managerRegistry = null, ?LoggerInterface $logger = null, protected ?array $properties = null, protected ?NameConverterInterface $nameConverter = null)
     {
         $this->logger = $logger ?? new NullLogger();
     }
@@ -53,12 +53,17 @@ abstract class AbstractFilter implements FilterInterface, PropertyAwareFilterInt
      */
     abstract protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void;
 
-    protected function getManagerRegistry(): ManagerRegistry
+    protected function getManagerRegistry(): ?ManagerRegistry
     {
         return $this->managerRegistry;
     }
 
-    protected function getProperties(): ?array
+    public function setManagerRegistry(?ManagerRegistry $managerRegistry): ?ManagerRegistry
+    {
+        return $this->managerRegistry = $managerRegistry;
+    }
+
+    public function getProperties(): ?array
     {
         return $this->properties;
     }

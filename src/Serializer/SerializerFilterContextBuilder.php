@@ -54,11 +54,25 @@ final class SerializerFilterContextBuilder implements SerializerContextBuilderIn
         }
 
         foreach ($resourceFilters as $filterId) {
-            if ($this->filterLocator->has($filterId) && ($filter = $this->filterLocator->get($filterId)) instanceof FilterInterface) {
+            $filter = $this->resolveFilter($filterId);
+            if ($filter instanceof FilterInterface) {
                 $filter->apply($request, $normalization, $attributes, $context);
             }
         }
 
         return $context;
+    }
+
+    private function resolveFilter(object|string|null $filterId): ?\ApiPlatform\Doctrine\Orm\Filter\FilterInterface
+    {
+        if (\is_object($filterId)) {
+            return $filterId instanceof \ApiPlatform\Doctrine\Orm\Filter\FilterInterface ? $filterId : null;
+        }
+
+        if (\is_string($filterId) && $this->filterLocator->has($filterId)) {
+            return $this->filterLocator->get($filterId);
+        }
+
+        return null;
     }
 }

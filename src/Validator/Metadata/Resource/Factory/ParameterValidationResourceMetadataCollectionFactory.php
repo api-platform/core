@@ -13,10 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Validator\Metadata\Resource\Factory;
 
-use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Parameters;
-use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
@@ -52,13 +50,8 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
 
             foreach ($operations as $operationName => $operation) {
                 $parameters = $operation->getParameters() ?? new Parameters();
-                foreach ($parameters as $key => $parameter) {
+                foreach ($operation->getParameters() ?? [] as $key => $parameter) {
                     $parameters->add($key, $this->addSchemaValidation($parameter));
-                }
-
-                // As we deprecate the parameter validator, we declare a parameter for each filter transfering validation to the new system
-                if ($operation->getFilters() && 0 === $parameters->count()) {
-                    $parameters = $this->addFilterValidation($operation);
                 }
 
                 if (\count($parameters) > 0) {
@@ -166,44 +159,5 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
         }
 
         return $parameter->withConstraints($assertions);
-    }
-
-    private function addFilterValidation(HttpOperation $operation): Parameters
-    {
-        $parameters = new Parameters();
-        $internalPriority = -1;
-
-        foreach ($operation->getFilters() as $filter) {
-            if (!$this->filterLocator->has($filter)) {
-                continue;
-            }
-
-            $filter = $this->filterLocator->get($filter);
-            foreach ($filter->getDescription($operation->getClass()) as $parameterName => $definition) {
-                $key = $parameterName;
-                $required = $definition['required'] ?? false;
-                $schema = $definition['schema'] ?? null;
-
-                $openApi = null;
-                if (isset($definition['openapi']) && $definition['openapi'] instanceof OpenApiParameter) {
-                    $openApi = $definition['openapi'];
-                }
-
-                // The query parameter validator forced this, lets maintain BC on filters
-                if (true === $required && !$openApi) {
-                    $openApi = new OpenApiParameter(name: $key, in: 'query', allowEmptyValue: false);
-                }
-
-                $parameters->add($key, $this->addSchemaValidation(
-                    // we disable openapi and hydra on purpose as their docs comes from filters see the condition for addFilterValidation above
-                    new QueryParameter(key: $key, property: $definition['property'] ?? null, priority: $internalPriority--, schema: $schema, openApi: false, hydra: false),
-                    $schema,
-                    $required,
-                    $openApi
-                ));
-            }
-        }
-
-        return $parameters;
     }
 }

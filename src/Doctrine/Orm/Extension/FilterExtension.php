@@ -51,7 +51,7 @@ final class FilterExtension implements QueryCollectionExtensionInterface
         $orderFilters = [];
 
         foreach ($resourceFilters as $filterId) {
-            $filter = $this->filterLocator->has($filterId) ? $this->filterLocator->get($filterId) : null;
+            $filter = $this->resolveFilter($filterId);
             if ($filter instanceof FilterInterface) {
                 // Apply the OrderFilter after every other filter to avoid an edge case where OrderFilter would do a LEFT JOIN instead of an INNER JOIN
                 if ($filter instanceof OrderFilter) {
@@ -68,5 +68,18 @@ final class FilterExtension implements QueryCollectionExtensionInterface
             $context['filters'] ??= [];
             $orderFilter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
         }
+    }
+
+    private function resolveFilter(object|string|null $filterId): ?FilterInterface
+    {
+        if (\is_object($filterId)) {
+            return $filterId instanceof FilterInterface ? $filterId : null;
+        }
+
+        if (\is_string($filterId) && $this->filterLocator->has($filterId)) {
+            return $this->filterLocator->get($filterId);
+        }
+
+        return null;
     }
 }
