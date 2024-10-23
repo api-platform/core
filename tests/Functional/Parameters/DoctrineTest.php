@@ -17,6 +17,7 @@ use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\SearchFilterParameterDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilterWithStateOptionsEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SearchFilterParameter;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -135,7 +136,7 @@ final class DoctrineTest extends ApiTestCase
             $schemaTool = new SchemaTool($manager);
             @$schemaTool->dropSchema([$classes]);
             @$schemaTool->createSchema([$classes]);
-        } else {
+        } elseif ($manager instanceof DocumentManager) {
             $schemaManager = $manager->getSchemaManager();
             $schemaManager->dropCollections();
         }

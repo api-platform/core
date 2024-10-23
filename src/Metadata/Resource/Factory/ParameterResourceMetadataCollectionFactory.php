@@ -16,7 +16,6 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 use ApiPlatform\Doctrine\Odm\State\Options as DoctrineOdmOptions;
 use ApiPlatform\Doctrine\Orm\State\Options as DoctrineOrmOptions;
 use ApiPlatform\Metadata\FilterInterface;
-use ApiPlatform\Metadata\HeaderParameterInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
