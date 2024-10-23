@@ -66,11 +66,11 @@ final class ModelMetadata
         $connection = $model->getConnection();
         $schema = $connection->getSchemaBuilder();
         $table = $model->getTable();
-        /** @var array $columns */
+        /** @var array<int, mixed> $columns */
         $columns = Cache::flexible('api-platform.tables.'.$table, [5, 10], function () use ($schema, $table) {
             return $schema->getColumns($table);
         });
-        /** @var array $indexes */
+        /** @var array<int, mixed> $indexes */
         $indexes = Cache::flexible('api-platform.indexes.'.$table, [5, 10], function () use ($schema, $table) {
             return $schema->getIndexes($table);
         });
