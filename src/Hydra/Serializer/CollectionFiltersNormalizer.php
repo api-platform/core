@@ -171,7 +171,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
                 continue;
             }
 
-            if (!($property = $parameter->getProperty()) && ($filterId = $parameter->getFilter()) && ($filter = $this->getFilter($filterId))) {
+            if (($filterId = $parameter->getFilter()) && ($filter = $this->getFilter($filterId))) {
                 foreach ($filter->getDescription($resourceClass) as $variable => $description) {
                     // This is a practice induced by PHP and is not necessary when implementing URI template
                     if (str_ends_with((string) $variable, '[]')) {
@@ -192,7 +192,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
                 continue;
             }
 
-            if (!$property) {
+            if (!($property = $parameter->getProperty())) {
                 continue;
             }
 

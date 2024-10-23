@@ -16,7 +16,6 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 use ApiPlatform\Doctrine\Odm\State\Options as DoctrineOdmOptions;
 use ApiPlatform\Doctrine\Orm\State\Options as DoctrineOrmOptions;
 use ApiPlatform\Metadata\FilterInterface;
-use ApiPlatform\Metadata\HeaderParameterInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
@@ -126,36 +125,8 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             $parameter = $parameter->withSchema($schema);
         }
 
-        if (null === $parameter->getProperty() && ($property = $description[$key]['property'] ?? null)) {
-            $parameter = $parameter->withProperty($property);
-        }
-
         if (null === $parameter->getRequired() && ($required = $description[$key]['required'] ?? null)) {
             $parameter = $parameter->withRequired($required);
-        }
-
-        if (null === $parameter->getOpenApi() && $openApi = $description[$key]['openapi'] ?? null) {
-            if ($openApi instanceof OpenApiParameter) {
-                $parameter = $parameter->withOpenApi($openApi);
-            } elseif (\is_array($openApi)) {
-                $schema = $schema ?? $openApi['schema'] ?? [];
-                $parameter = $parameter->withOpenApi(new OpenApiParameter(
-                    $key,
-                    $parameter instanceof HeaderParameterInterface ? 'header' : 'query',
-                    $description[$key]['description'] ?? '',
-                    $description[$key]['required'] ?? $openApi['required'] ?? false,
-                    $openApi['deprecated'] ?? false,
-                    $openApi['allowEmptyValue'] ?? true,
-                    $schema,
-                    $openApi['style'] ?? null,
-                    $openApi['explode'] ?? ('array' === ($schema['type'] ?? null)),
-                    $openApi['allowReserved'] ?? false,
-                    $openApi['example'] ?? null,
-                    isset(
-                        $openApi['examples']
-                    ) ? new \ArrayObject($openApi['examples']) : null
-                ));
-            }
         }
 
         $schema = $parameter->getSchema() ?? (($openApi = $parameter->getOpenApi()) ? $openApi->getSchema() : null);
