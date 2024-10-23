@@ -70,7 +70,7 @@ final class ModelMetadata
         $columns = Cache::flexible('api-platform.tables.'.$table, [5, 10], function () use ($schema, $table) {
             return $schema->getColumns($table);
         });
-        /** @var array<string, mixed> $indexes */
+        /** @var array<int, mixed> $indexes */
         $indexes = Cache::flexible('api-platform.indexes.'.$table, [5, 10], function () use ($schema, $table) {
             return $schema->getIndexes($table);
         });
