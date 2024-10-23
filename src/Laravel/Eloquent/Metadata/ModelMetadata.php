@@ -16,6 +16,7 @@ namespace ApiPlatform\Laravel\Eloquent\Metadata;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
@@ -65,8 +66,14 @@ final class ModelMetadata
         $connection = $model->getConnection();
         $schema = $connection->getSchemaBuilder();
         $table = $model->getTable();
-        $columns = $schema->getColumns($table);
-        $indexes = $schema->getIndexes($table);
+        /** @var array<string, mixed> $columns */
+        $columns = Cache::flexible('api-platform.tables.'.$table, [5, 10], function () use ($schema, $table) {
+            return $schema->getColumns($table);
+        });
+        /** @var array<int, mixed> $indexes */
+        $indexes = Cache::flexible('api-platform.indexes.'.$table, [5, 10], function () use ($schema, $table) {
+            return $schema->getIndexes($table);
+        });
 
         return collect($columns)
             ->map(fn ($column) => [

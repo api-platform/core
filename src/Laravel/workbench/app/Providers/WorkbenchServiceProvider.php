@@ -32,6 +32,7 @@ class WorkbenchServiceProvider extends ServiceProvider
     {
         $config = $this->app['config'];
         $config->set('api-platform.resources', [app_path('Models'), app_path('ApiResource')]);
+        $config->set('cache.default', 'null');
     }
 
     /**
