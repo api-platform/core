@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Filter;
 
+use ApiPlatform\Doctrine\Common\Filter\PropertyAliasesFilterTrait;
 use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterInterface;
 use ApiPlatform\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Doctrine\Odm\PropertyHelperTrait as MongoDbOdmPropertyHelperTrait;
@@ -33,12 +34,15 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 abstract class AbstractFilter implements FilterInterface, PropertyAwareFilterInterface
 {
     use MongoDbOdmPropertyHelperTrait;
+    use PropertyAliasesFilterTrait;
     use PropertyHelperTrait;
+
     protected LoggerInterface $logger;
 
-    public function __construct(protected ManagerRegistry $managerRegistry, ?LoggerInterface $logger = null, protected ?array $properties = null, protected ?NameConverterInterface $nameConverter = null)
+    public function __construct(protected ManagerRegistry $managerRegistry, ?LoggerInterface $logger = null, protected ?array $properties = null, protected ?NameConverterInterface $nameConverter = null, array $propertyAliases = [])
     {
         $this->logger = $logger ?? new NullLogger();
+        $this->propertyAliases = $propertyAliases;
     }
 
     /**
@@ -94,6 +98,10 @@ abstract class AbstractFilter implements FilterInterface, PropertyAwareFilterInt
 
     protected function denormalizePropertyName(string|int $property): string
     {
+        if ($this->isAlias($property)) {
+            $property = $this->getPropertyFromAlias($property);
+        }
+
         if (!$this->nameConverter instanceof NameConverterInterface) {
             return (string) $property;
         }
@@ -103,6 +111,8 @@ abstract class AbstractFilter implements FilterInterface, PropertyAwareFilterInt
 
     protected function normalizePropertyName(string $property): string
     {
+        $property = $this->getAliasForPropertyOrProperty($property);
+
         if (!$this->nameConverter instanceof NameConverterInterface) {
             return $property;
         }

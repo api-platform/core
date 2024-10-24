@@ -62,6 +62,10 @@ use Doctrine\ORM\QueryBuilder;
  *     book.date_filter:
  *         parent: 'api_platform.doctrine.orm.date_filter'
  *         arguments: [ { createdAt: ~ } ]
+ *         # you can also alias the properties you are filtering on to expose search under different names
+ *         # arguments:
+ *         #   $properties: { createdAt: ~ }
+ *         #   $propertyAliases: { createdAt: 'created' }
  *         tags:  [ 'api_platform.filter' ]
  *         # The following are mandatory only if a _defaults section is defined with inverted values.
  *         # You may want to isolate filters in a dedicated file to avoid adding the following lines (by adding them in the defaults section)

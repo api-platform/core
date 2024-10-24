@@ -51,6 +51,10 @@ use Doctrine\ORM\QueryBuilder;
  *     book.backed_enum_filter:
  *         parent: 'api_platform.doctrine.orm.backed_enum_filter'
  *         arguments: [ { status: ~ } ]
+ *         # you can also alias the properties you are filtering on to expose search under different names
+ *         # arguments:
+ *         #   $properties: { status: ~ }
+ *         #   $propertyAliases: { status: 'statusLabel' }
  *         tags:  [ 'api_platform.filter' ]
  *         # The following are mandatory only if a _defaults section is defined with inverted values.
  *         # You may want to isolate filters in a dedicated file to avoid adding the following lines (by adding them in the defaults section)
