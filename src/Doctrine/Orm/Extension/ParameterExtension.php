@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ParameterNotFound;
 use Doctrine\ORM\QueryBuilder;
 use Psr\Container\ContainerInterface;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 /**
  * Reads operation parameters and execute its filter.
@@ -30,8 +31,10 @@ final class ParameterExtension implements QueryCollectionExtensionInterface, Que
 {
     use ParameterValueExtractorTrait;
 
-    public function __construct(private readonly ContainerInterface $filterLocator)
-    {
+    public function __construct(
+        private readonly ContainerInterface $filterLocator,
+        private readonly ?ManagerRegistry $managerRegistry = null,
+    ) {
     }
 
     /**
@@ -39,8 +42,10 @@ final class ParameterExtension implements QueryCollectionExtensionInterface, Que
      */
     private function applyFilter(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
+        $filter = null;
+
         foreach ($operation?->getParameters() ?? [] as $parameter) {
-            if (!($v = $parameter->getValue()) || $v instanceof ParameterNotFound) {
+            if (($v = $parameter->getValue()) === null || $v instanceof ParameterNotFound) {
                 continue;
             }
 
@@ -49,9 +54,20 @@ final class ParameterExtension implements QueryCollectionExtensionInterface, Que
                 continue;
             }
 
-            $filter = $this->filterLocator->has($filterId) ? $this->filterLocator->get($filterId) : null;
+            if (\is_string($filterId) && $this->filterLocator->has($filterId)) {
+                $filter = $this->filterLocator->has($filterId) ? $this->filterLocator->get($filterId) : null;
+            }
+
+            if (\is_object($filterId)) {
+                $filter = $filterId;
+                $filter->setManagerRegistry($this->managerRegistry);
+                $filter->setProperties($values);
+            }
+
             if ($filter instanceof FilterInterface) {
-                $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, ['filters' => $values, 'parameter' => $parameter] + $context);
+                $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation,
+                    array_merge(['filters' => $values, 'parameter' => $parameter], $context)
+                );
             }
         }
     }

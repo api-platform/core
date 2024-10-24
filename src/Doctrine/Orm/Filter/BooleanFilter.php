@@ -15,7 +15,12 @@ namespace ApiPlatform\Doctrine\Orm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\BooleanFilterTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Parameter;
+use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
@@ -106,7 +111,7 @@ use Doctrine\ORM\QueryBuilder;
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  */
-final class BooleanFilter extends AbstractFilter
+final class BooleanFilter extends AbstractFilter implements OpenApiParameterFilterInterface, JsonSchemaFilterInterface
 {
     use BooleanFilterTrait;
 
@@ -144,5 +149,28 @@ final class BooleanFilter extends AbstractFilter
         $queryBuilder
             ->andWhere(\sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
             ->setParameter($valueParameter, $value);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getSchema(Parameter $parameter): array
+    {
+        return ['type' => 'boolean'];
+    }
+
+    public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array|null
+    {
+        $in = $parameter instanceof QueryParameter ? 'query' : 'header';
+        $key = $parameter->getKey();
+
+        return [
+            new OpenApiParameter(
+                name: $key,
+                in: $in,
+                required: false,
+                schema: ['type' => 'boolean'],
+            ),
+        ];
     }
 }

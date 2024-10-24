@@ -97,7 +97,8 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         }
         $currentFilters = [];
         foreach ($resourceFilters as $filterId) {
-            if ($filter = $this->getFilter($filterId)) {
+            $filter = $this->resolveFilter($filterId);
+            if ($filter) {
                 $currentFilters[] = $filter;
             }
         }
@@ -153,7 +154,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
                 continue;
             }
 
-            if (!($property = $parameter->getProperty()) && ($filterId = $parameter->getFilter()) && ($filter = $this->getFilter($filterId))) {
+            if (!($property = $parameter->getProperty()) && ($filterId = $parameter->getFilter()) && ($filter = $this->resolveFilter($filterId))) {
                 foreach ($filter->getDescription($resourceClass) as $variable => $description) {
                     // This is a practice induced by PHP and is not necessary when implementing URI template
                     if (str_ends_with((string) $variable, '[]')) {
@@ -189,12 +190,13 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         return ['@type' => $hydraPrefix.'IriTemplate', $hydraPrefix.'template' => \sprintf('%s{?%s}', $parts['path'], implode(',', $variables)), $hydraPrefix.'variableRepresentation' => 'BasicRepresentation', $hydraPrefix.'mapping' => $mapping];
     }
 
-    /**
-     * Gets a filter with a backward compatibility.
-     */
-    private function getFilter(string $filterId): ?FilterInterface
+    private function resolveFilter(object|string|null $filterId): ?\ApiPlatform\Doctrine\Orm\Filter\FilterInterface
     {
-        if ($this->filterLocator && $this->filterLocator->has($filterId)) {
+        if (\is_object($filterId)) {
+            return $filterId instanceof \ApiPlatform\Doctrine\Orm\Filter\FilterInterface ? $filterId : null;
+        }
+
+        if (\is_string($filterId) && $this->filterLocator->has($filterId)) {
             return $this->filterLocator->get($filterId);
         }
 
