@@ -33,6 +33,7 @@ use Symfony\Component\WebLink\Link;
             name: '_api_errors_problem',
             routeName: 'api_errors',
             outputFormats: ['json' => ['application/problem+json']],
+            hideHydraOperation: true,
             normalizationContext: [
                 'groups' => ['jsonproblem'],
                 'skip_null_values' => true,
@@ -51,6 +52,7 @@ use Symfony\Component\WebLink\Link;
         new Operation(
             name: '_api_errors_jsonapi',
             routeName: 'api_errors',
+            hideHydraOperation: true,
             outputFormats: ['jsonapi' => ['application/vnd.api+json']],
             normalizationContext: [
                 'groups' => ['jsonapi'],
@@ -59,18 +61,21 @@ use Symfony\Component\WebLink\Link;
         ),
         new Operation(
             name: '_api_errors',
-            routeName: 'api_errors'
+            routeName: 'api_errors',
+            hideHydraOperation: true,
         ),
     ],
     provider: 'api_platform.state.error_provider',
     graphQlOperations: []
 )]
+#[ApiProperty(property: 'traceAsString', hydra: false)]
+#[ApiProperty(property: 'string', hydra: false)]
 class Error extends \Exception implements ProblemExceptionInterface, HttpExceptionInterface
 {
     public function __construct(
         private string $title,
         private string $detail,
-        #[ApiProperty(identifier: true)] private int $status,
+        #[ApiProperty(identifier: true, writable: false, initializable: false)] private int $status,
         ?array $originalTrace = null,
         private ?string $instance = null,
         private string $type = 'about:blank',
@@ -98,9 +103,11 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
 
     #[SerializedName('trace')]
     #[Groups(['trace'])]
+    #[ApiProperty(writable: false, initializable: false)]
     public ?array $originalTrace = null;
 
     #[Groups(['jsonld'])]
+    #[ApiProperty(writable: false, initializable: false)]
     public function getDescription(): ?string
     {
         return $this->detail;
@@ -121,7 +128,6 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
     }
 
     #[Ignore]
-    #[ApiProperty(readable: false)]
     public function getStatusCode(): int
     {
         return $this->status;
@@ -136,6 +142,7 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
     }
 
     #[Groups(['jsonld', 'jsonproblem', 'jsonapi'])]
+    #[ApiProperty(writable: false, initializable: false)]
     public function getType(): string
     {
         return $this->type;
@@ -147,6 +154,7 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
     }
 
     #[Groups(['jsonld', 'jsonproblem', 'jsonapi'])]
+    #[ApiProperty(writable: false, initializable: false)]
     public function getTitle(): ?string
     {
         return $this->title;
@@ -169,6 +177,7 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
     }
 
     #[Groups(['jsonld', 'jsonproblem', 'jsonapi'])]
+    #[ApiProperty(writable: false, initializable: false)]
     public function getDetail(): ?string
     {
         return $this->detail;
@@ -180,6 +189,7 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
     }
 
     #[Groups(['jsonld', 'jsonproblem'])]
+    #[ApiProperty(writable: false, initializable: false)]
     public function getInstance(): ?string
     {
         return $this->instance;

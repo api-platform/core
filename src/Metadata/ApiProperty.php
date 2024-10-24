@@ -26,7 +26,7 @@ use Symfony\Component\Serializer\Attribute\SerializedPath;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER | \Attribute::TARGET_CLASS_CONSTANT | \Attribute::TARGET_CLASS)]
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER | \Attribute::TARGET_CLASS_CONSTANT | \Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class ApiProperty
 {
     private ?array $types;
@@ -216,6 +216,10 @@ final class ApiProperty
         private ?string $property = null,
         private ?string $policy = null,
         array|Context|Groups|Ignore|SerializedName|SerializedPath|MaxDepth|null $serialize = null,
+        /**
+         * Whether to document this property as a hydra:supportedProperty.
+         */
+        private ?bool $hydra = null,
         private array $extraProperties = [],
     ) {
         $this->types = \is_string($types) ? (array) $types : $types;
@@ -517,7 +521,7 @@ final class ApiProperty
         return $self;
     }
 
-    public function withInitializable(?bool $initializable): self
+    public function withInitializable(bool $initializable): self
     {
         $self = clone $this;
         $self->initializable = $initializable;
@@ -623,6 +627,19 @@ final class ApiProperty
     {
         $self = clone $this;
         $self->serialize = (array) $serialize;
+
+        return $self;
+    }
+
+    public function getHydra(): ?bool
+    {
+        return $this->hydra;
+    }
+
+    public function withHydra(bool $hydra): static
+    {
+        $self = clone $this;
+        $self->hydra = $hydra;
 
         return $self;
     }
