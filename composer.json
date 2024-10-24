@@ -102,6 +102,7 @@
     "require": {
         "php": ">=8.2",
         "doctrine/inflector": "^1.0 || ^2.0",
+        "myclabs/deep-copy": "^1.12",
         "psr/cache": "^1.0 || ^2.0 || ^3.0",
         "psr/container": "^1.0 || ^2.0",
         "symfony/deprecation-contracts": "^3.1",
