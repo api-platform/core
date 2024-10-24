@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Util;
 
+use function DeepCopy\deep_copy;
+
 /**
  * Clones given data if cloneable.
  *
