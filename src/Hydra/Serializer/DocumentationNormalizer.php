@@ -74,6 +74,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             }
 
             $shortName = $resourceMetadata->getShortName();
+
             $prefixedShortName = $resourceMetadata->getTypes()[0] ?? "#$shortName";
             $this->populateEntrypointProperties($resourceMetadata, $shortName, $prefixedShortName, $entrypointProperties, $hydraPrefix, $resourceMetadataCollection);
             $classes[] = $this->getClass($resourceClass, $resourceMetadata, $shortName, $prefixedShortName, $context, $hydraPrefix, $resourceMetadataCollection);
@@ -243,8 +244,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                 if (('POST' === $operation->getMethod() || $operation instanceof CollectionOperationInterface) !== $collection) {
                     continue;
                 }
-
-                $hydraOperations[] = $this->getHydraOperation($operation, $operation->getTypes()[0] ?? "#{$operation->getShortName()}", $hydraPrefix);
+                $hydraOperations[] = $this->getHydraOperation($operation, $operation->getShortName(), $hydraPrefix);
             }
         }
 
@@ -430,7 +430,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                 '@type' => $hydraPrefix.'Operation',
                 $hydraPrefix.'method' => 'GET',
                 'rdfs:label' => 'The API entrypoint.',
-                'returns' => '#EntryPoint',
+                'returns' => 'EntryPoint',
             ],
         ];
 
@@ -573,18 +573,19 @@ final class DocumentationNormalizer implements NormalizerInterface
     private function getContext(string $hydraPrefix = ContextBuilder::HYDRA_PREFIX): array
     {
         return [
-            '@vocab' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT], UrlGeneratorInterface::ABS_URL).'#',
-            'hydra' => ContextBuilderInterface::HYDRA_NS,
-            'rdf' => ContextBuilderInterface::RDF_NS,
-            'rdfs' => ContextBuilderInterface::RDFS_NS,
-            'xmls' => ContextBuilderInterface::XML_NS,
-            'owl' => ContextBuilderInterface::OWL_NS,
-            'schema' => ContextBuilderInterface::SCHEMA_ORG_NS,
-            'domain' => ['@id' => 'rdfs:domain', '@type' => '@id'],
-            'range' => ['@id' => 'rdfs:range', '@type' => '@id'],
-            'subClassOf' => ['@id' => 'rdfs:subClassOf', '@type' => '@id'],
-            'expects' => ['@id' => $hydraPrefix.'expects', '@type' => '@id'],
-            'returns' => ['@id' => $hydraPrefix.'returns', '@type' => '@id'],
+            ContextBuilderInterface::HYDRA_CONTEXT,
+            [
+                '@vocab' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT], UrlGeneratorInterface::ABS_URL).'#',
+                'hydra' => ContextBuilderInterface::HYDRA_NS,
+                'rdf' => ContextBuilderInterface::RDF_NS,
+                'rdfs' => ContextBuilderInterface::RDFS_NS,
+                'xmls' => ContextBuilderInterface::XML_NS,
+                'owl' => ContextBuilderInterface::OWL_NS,
+                'schema' => ContextBuilderInterface::SCHEMA_ORG_NS,
+                'domain' => ['@id' => 'rdfs:domain', '@type' => '@id'],
+                'range' => ['@id' => 'rdfs:range', '@type' => '@id'],
+                'subClassOf' => ['@id' => 'rdfs:subClassOf', '@type' => '@id'],
+            ],
         ];
     }
 
