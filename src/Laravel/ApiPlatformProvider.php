@@ -297,7 +297,7 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->extend(PropertyMetadataFactoryInterface::class, function (PropertyInfoPropertyMetadataFactory $inner, Application $app) {
-            /** @var ConfigRepository */
+            /** @var ConfigRepository $config */
             $config = $app['config'];
 
             return new CachePropertyMetadataFactory(
@@ -313,12 +313,12 @@ class ApiPlatformProvider extends ServiceProvider
                         $app->make(ResourceClassResolverInterface::class)
                     ),
                 ),
-                true === $config->get('app.debug') ? 'array' : 'file'
+                true === $config->get('app.debug') ? 'array' : $config->get('cache.default', 'file')
             );
         });
 
         $this->app->singleton(PropertyNameCollectionFactoryInterface::class, function (Application $app) {
-            /** @var ConfigRepository */
+            /** @var ConfigRepository $config */
             $config = $app['config'];
 
             return new CachePropertyNameCollectionMetadataFactory(
@@ -331,7 +331,7 @@ class ApiPlatformProvider extends ServiceProvider
                         )
                     )
                 ),
-                true === $config->get('app.debug') ? 'array' : 'file'
+                true === $config->get('app.debug') ? 'array' : $config->get('cache.default', 'file')
             );
         });
 
@@ -345,7 +345,7 @@ class ApiPlatformProvider extends ServiceProvider
 
         // TODO: add cached metadata factories
         $this->app->singleton(ResourceMetadataCollectionFactoryInterface::class, function (Application $app) {
-            /** @var ConfigRepository */
+            /** @var ConfigRepository $config */
             $config = $app['config'];
             $formats = $config->get('api-platform.formats');
 
@@ -401,7 +401,7 @@ class ApiPlatformProvider extends ServiceProvider
                         $app->make('filters')
                     )
                 ),
-                true === $config->get('app.debug') ? 'array' : 'file'
+                true === $config->get('app.debug') ? 'array' : $config->get('cache.default', 'file')
             );
         });
 
