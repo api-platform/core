@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonApi\Serializer;
 
+use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -42,6 +43,10 @@ final class ReservedAttributeNameConverter implements AdvancedNameConverterInter
     {
         if (null !== $this->nameConverter) {
             $propertyName = $this->nameConverter->normalize($propertyName, $class, $format, $context);
+        }
+
+        if ($class && is_a($class, ProblemExceptionInterface::class, true)) {
+            return $propertyName;
         }
 
         if (isset(self::JSON_API_RESERVED_ATTRIBUTES[$propertyName])) {

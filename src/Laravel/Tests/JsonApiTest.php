@@ -39,6 +39,7 @@ class JsonApiTest extends TestCase
         tap($app['config'], function (Repository $config): void {
             $config->set('api-platform.formats', ['jsonapi' => ['application/vnd.api+json']]);
             $config->set('api-platform.docs_formats', ['jsonapi' => ['application/vnd.api+json']]);
+            $config->set('api-platform.resources', [app_path('Models'), app_path('ApiResource')]);
             $config->set('app.debug', true);
         });
     }
@@ -48,13 +49,15 @@ class JsonApiTest extends TestCase
         $response = $this->get('/api/', ['accept' => ['application/vnd.api+json']]);
         $response->assertStatus(200);
         $response->assertHeader('content-type', 'application/vnd.api+json; charset=utf-8');
-        $this->assertJsonContains([
-            'links' => [
-                'self' => 'http://localhost/api',
-                'book' => 'http://localhost/api/books',
+        $this->assertJsonContains(
+            [
+                'links' => [
+                    'self' => 'http://localhost/api',
+                    'book' => 'http://localhost/api/books',
+                ],
             ],
-        ],
-            $response->json());
+            $response->json()
+        );
     }
 
     public function testGetCollection(): void
@@ -208,5 +211,78 @@ class JsonApiTest extends TestCase
         $this->assertArrayHasKey('relationships', $content['data']);
         $this->assertArrayHasKey('relation', $content['data']['relationships']);
         $this->assertArrayHasKey('data', $content['data']['relationships']['relation']);
+    }
+
+    public function testValidateJsonApi(): void
+    {
+        $response = $this->postJson(
+            '/api/issue6745/rule_validations',
+            [
+                'data' => [
+                    'type' => 'string',
+                    'attributes' => ['max' => 3],
+                ],
+            ],
+            [
+                'accept' => 'application/vnd.api+json',
+                'content_type' => 'application/vnd.api+json',
+            ]
+        );
+
+        $response->assertStatus(422);
+        $response->assertHeader('content-type', 'application/vnd.api+json; charset=utf-8');
+        $json = $response->json();
+        $this->assertJsonContains([
+            'errors' => [
+                [
+                    'detail' => 'The prop field is required.',
+                    'title' => 'Validation Error',
+                    'status' => 422,
+                    'code' => '58350900e0fc6b8e/prop',
+                ],
+                [
+                    'detail' => 'The max field must be less than 2.',
+                    'title' => 'Validation Error',
+                    'status' => 422,
+                    'code' => '58350900e0fc6b8e/max',
+                ],
+            ],
+        ], $json);
+
+        $this->assertArrayHasKey('id', $json['errors'][0]);
+        $this->assertArrayHasKey('links', $json['errors'][0]);
+        $this->assertArrayHasKey('type', $json['errors'][0]['links']);
+
+        $response = $this->postJson(
+            '/api/issue6745/rule_validations',
+            [
+                'data' => [
+                    'type' => 'string',
+                    'attributes' => [
+                        'prop' => 1,
+                        'max' => 1,
+                    ],
+                ],
+            ],
+            [
+                'accept' => 'application/vnd.api+json',
+                'content_type' => 'application/vnd.api+json',
+            ]
+        );
+        $response->assertStatus(201);
+    }
+
+    public function testNotFound(): void
+    {
+        $response = $this->get('/api/books/notfound', headers: ['accept' => 'application/vnd.api+json']);
+        $response->assertStatus(404);
+        $response->assertHeader('content-type', 'application/vnd.api+json; charset=utf-8');
+
+        $this->assertJsonContains([
+            'links' => ['type' => '/errors/404'],
+            'title' => 'An error occurred',
+            'status' => 404,
+            'detail' => 'Not Found',
+        ], $response->json()['errors'][0]);
     }
 }

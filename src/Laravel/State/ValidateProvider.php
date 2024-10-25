@@ -74,7 +74,14 @@ final class ValidateProvider implements ProviderInterface
             return $body;
         }
 
-        $validator = Validator::make($request->request->all(), $rules);
+        // In Symfony, validation is done on the Resource object (here $body) using Deserialization before Validation
+        // Here, we did not deserialize yet, we validate on the raw body before.
+        $validationBody = $request->request->all();
+        if ('jsonapi' === $request->getRequestFormat()) {
+            $validationBody = $validationBody['data']['attributes'];
+        }
+
+        $validator = Validator::make($validationBody, $rules);
         if ($validator->fails()) {
             throw $this->getValidationError($validator, new ValidationException($validator));
         }

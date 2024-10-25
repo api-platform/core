@@ -52,7 +52,7 @@ use Symfony\Component\WebLink\Link;
             name: '_api_errors_jsonapi',
             outputFormats: ['jsonapi' => ['application/vnd.api+json']],
             normalizationContext: ['groups' => ['jsonapi'], 'skip_null_values' => true],
-            uriTemplate: '/errros/{status}.jsonapi'
+            uriTemplate: '/errors/{status}.jsonapi'
         ),
     ],
     graphQlOperations: []
@@ -124,6 +124,12 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
         return $this->status;
     }
 
+    #[Groups(['jsonapi'])]
+    public function getId(): string
+    {
+        return (string) $this->status;
+    }
+
     /**
      * @param array<string, string> $headers
      */
@@ -132,7 +138,7 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
         $this->headers = $headers;
     }
 
-    #[Groups(['jsonld', 'jsonproblem'])]
+    #[Groups(['jsonld', 'jsonproblem', 'jsonapi'])]
     public function getType(): string
     {
         return $this->type;
@@ -149,7 +155,7 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
         $this->type = $type;
     }
 
-    #[Groups(['jsonld', 'jsonproblem'])]
+    #[Groups(['jsonld', 'jsonproblem', 'jsonapi'])]
     public function getStatus(): ?int
     {
         return $this->status;
@@ -160,13 +166,13 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
         $this->status = $status;
     }
 
-    #[Groups(['jsonld', 'jsonproblem'])]
+    #[Groups(['jsonld', 'jsonproblem', 'jsonapi'])]
     public function getDetail(): ?string
     {
         return $this->detail;
     }
 
-    #[Groups(['jsonld', 'jsonproblem'])]
+    #[Groups(['jsonld', 'jsonproblem', 'jsonapi'])]
     public function getInstance(): ?string
     {
         return $this->instance;

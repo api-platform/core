@@ -386,11 +386,11 @@ class EloquentTest extends TestCase
                 'Content-Type' => ['application/merge-patch+json'],
             ]
         );
-
         $response = $this->get('api/books?isbn_range[gte]='.$updated['isbn'], ['Accept' => ['application/ld+json']]);
-        $this->assertSame($response->json()['member'][0]['@id'], $bookBefore['@id']);
-        $this->assertSame($response->json()['member'][1]['@id'], $bookAfter['@id']);
-        $this->assertSame($response->json()['totalItems'], 2);
+        $json = $response->json();
+        $this->assertSame($json['member'][0]['@id'], $bookBefore['@id']);
+        $this->assertSame($json['member'][1]['@id'], $bookAfter['@id']);
+        $this->assertSame($json['totalItems'], 2);
     }
 
     public function testWrongOrderFilter(): void
