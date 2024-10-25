@@ -331,9 +331,23 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 }
             }
 
+            $entityClass = $this->getFilterClass($operation);
             $openapiParameters = $openapiOperation->getParameters();
             foreach ($operation->getParameters() ?? [] as $key => $p) {
                 if (false === $p->getOpenApi()) {
+                    continue;
+                }
+
+                if (($f = $p->getFilter()) && \is_string($f) && $this->filterLocator->has($f)) {
+                    $filter = $this->filterLocator->get($f);
+                    foreach ($filter->getDescription($entityClass) as $name => $description) {
+                        if ($prop = $p->getProperty()) {
+                            $name = str_replace($prop, $key, $name);
+                        }
+
+                        $openapiParameters[] = $this->getFilterParameter($name, $description, $operation->getShortName(), $f);
+                    }
+
                     continue;
                 }
 
@@ -654,92 +668,102 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     private function getFiltersParameters(CollectionOperationInterface|HttpOperation $operation): array
     {
         $parameters = [];
-
         $resourceFilters = $operation->getFilters();
+        $entityClass = $this->getFilterClass($operation);
+
         foreach ($resourceFilters ?? [] as $filterId) {
             if (!$this->filterLocator->has($filterId)) {
                 continue;
             }
 
             $filter = $this->filterLocator->get($filterId);
-            $entityClass = $operation->getClass();
-            if ($options = $operation->getStateOptions()) {
-                if ($options instanceof DoctrineOptions && $options->getEntityClass()) {
-                    $entityClass = $options->getEntityClass();
-                }
-
-                if ($options instanceof DoctrineODMOptions && $options->getDocumentClass()) {
-                    $entityClass = $options->getDocumentClass();
-                }
-            }
-
-            foreach ($filter->getDescription($entityClass) as $name => $data) {
-                if (isset($data['swagger'])) {
-                    trigger_deprecation('api-platform/core', '4.0', \sprintf('Using the "swagger" field of the %s::getDescription() (%s) is deprecated.', $filter::class, $operation->getShortName()));
-                }
-
-                if (!isset($data['openapi']) || $data['openapi'] instanceof Parameter) {
-                    $schema = $data['schema'] ?? [];
-
-                    if (isset($data['type']) && \in_array($data['type'] ?? null, Type::$builtinTypes, true) && !isset($schema['type'])) {
-                        $schema += $this->jsonSchemaTypeFactory ? $this->jsonSchemaTypeFactory->getType(new Type($data['type'], false, null, $data['is_collection'] ?? false)) : $this->getType(new Type($data['type'], false, null, $data['is_collection'] ?? false));
-                    }
-
-                    if (!isset($schema['type'])) {
-                        $schema['type'] = 'string';
-                    }
-
-                    $style = 'array' === ($schema['type'] ?? null) && \in_array(
-                        $data['type'],
-                        [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_OBJECT],
-                        true
-                    ) ? 'deepObject' : 'form';
-
-                    $parameter = isset($data['openapi']) && $data['openapi'] instanceof Parameter ? $data['openapi'] : new Parameter(in: 'query', name: $name, style: $style, explode: $data['is_collection'] ?? false);
-
-                    if ('' === $parameter->getDescription() && ($description = $data['description'] ?? '')) {
-                        $parameter = $parameter->withDescription($description);
-                    }
-
-                    if (false === $parameter->getRequired() && false !== ($required = $data['required'] ?? false)) {
-                        $parameter = $parameter->withRequired($required);
-                    }
-
-                    $parameters[] = $parameter->withSchema($schema);
-                    continue;
-                }
-
-                trigger_deprecation('api-platform/core', '4.0', \sprintf('Not using "%s" on the "openapi" field of the %s::getDescription() (%s) is deprecated.', Parameter::class, $filter::class, $operation->getShortName()));
-                if ($this->jsonSchemaTypeFactory) {
-                    $schema = $data['schema'] ?? (\in_array($data['type'], Type::$builtinTypes, true) ? $this->jsonSchemaTypeFactory->getType(new Type($data['type'], false, null, $data['is_collection'] ?? false), 'openapi') : ['type' => 'string']);
-                } else {
-                    $schema = $data['schema'] ?? (\in_array($data['type'], Type::$builtinTypes, true) ? $this->getType(new Type($data['type'], false, null, $data['is_collection'] ?? false)) : ['type' => 'string']);
-                }
-
-                $parameters[] = new Parameter(
-                    $name,
-                    'query',
-                    $data['description'] ?? '',
-                    $data['required'] ?? false,
-                    $data['openapi']['deprecated'] ?? false,
-                    $data['openapi']['allowEmptyValue'] ?? true,
-                    $schema,
-                    'array' === $schema['type'] && \in_array(
-                        $data['type'],
-                        [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_OBJECT],
-                        true
-                    ) ? 'deepObject' : 'form',
-                    $data['openapi']['explode'] ?? ('array' === $schema['type']),
-                    $data['openapi']['allowReserved'] ?? false,
-                    $data['openapi']['example'] ?? null,
-                    isset(
-                        $data['openapi']['examples']
-                    ) ? new \ArrayObject($data['openapi']['examples']) : null
-                );
+            foreach ($filter->getDescription($entityClass) as $name => $description) {
+                $parameters[] = $this->getFilterParameter($name, $description, $operation->getShortName(), $filterId);
             }
         }
 
         return $parameters;
+    }
+
+    private function getFilterClass(HttpOperation $operation): ?string
+    {
+        $entityClass = $operation->getClass();
+        if ($options = $operation->getStateOptions()) {
+            if ($options instanceof DoctrineOptions && $options->getEntityClass()) {
+                return $options->getEntityClass();
+            }
+
+            if ($options instanceof DoctrineODMOptions && $options->getDocumentClass()) {
+                return $options->getDocumentClass();
+            }
+        }
+
+        return $entityClass;
+    }
+
+    private function getFilterParameter(string $name, array $description, string $shortName, string $filter): Parameter
+    {
+        if (isset($description['swagger'])) {
+            trigger_deprecation('api-platform/core', '4.0', \sprintf('Using the "swagger" field of the %s::getDescription() (%s) is deprecated.', $filter, $shortName));
+        }
+
+        if (!isset($description['openapi']) || $description['openapi'] instanceof Parameter) {
+            $schema = $description['schema'] ?? [];
+
+            if (isset($description['type']) && \in_array($description['type'], Type::$builtinTypes, true) && !isset($schema['type'])) {
+                $schema += $this->jsonSchemaTypeFactory ? $this->jsonSchemaTypeFactory->getType(new Type($description['type'], false, null, $description['is_collection'] ?? false)) : $this->getType(new Type($description['type'], false, null, $description['is_collection'] ?? false));
+            }
+
+            if (!isset($schema['type'])) {
+                $schema['type'] = 'string';
+            }
+
+            $style = 'array' === ($schema['type'] ?? null) && \in_array(
+                $description['type'],
+                [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_OBJECT],
+                true
+            ) ? 'deepObject' : 'form';
+
+            $parameter = isset($description['openapi']) && $description['openapi'] instanceof Parameter ? $description['openapi'] : new Parameter(in: 'query', name: $name, style: $style, explode: $description['is_collection'] ?? false);
+
+            if ('' === $parameter->getDescription() && ($str = $description['description'] ?? '')) {
+                $parameter = $parameter->withDescription($str);
+            }
+
+            if (false === $parameter->getRequired() && false !== ($required = $description['required'] ?? false)) {
+                $parameter = $parameter->withRequired($required);
+            }
+
+            return $parameter->withSchema($schema);
+        }
+
+        trigger_deprecation('api-platform/core', '4.0', \sprintf('Not using "%s" on the "openapi" field of the %s::getDescription() (%s) is deprecated.', Parameter::class, $filter, $shortName));
+        if ($this->jsonSchemaTypeFactory) {
+            $schema = $description['schema'] ?? (\in_array($description['type'], Type::$builtinTypes, true) ? $this->jsonSchemaTypeFactory->getType(new Type($description['type'], false, null, $description['is_collection'] ?? false), 'openapi') : ['type' => 'string']);
+        } else {
+            $schema = $description['schema'] ?? (\in_array($description['type'], Type::$builtinTypes, true) ? $this->getType(new Type($description['type'], false, null, $description['is_collection'] ?? false)) : ['type' => 'string']);
+        }
+
+        return new Parameter(
+            $name,
+            'query',
+            $description['description'] ?? '',
+            $description['required'] ?? false,
+            $description['openapi']['deprecated'] ?? false,
+            $description['openapi']['allowEmptyValue'] ?? true,
+            $schema,
+            'array' === $schema['type'] && \in_array(
+                $description['type'],
+                [Type::BUILTIN_TYPE_ARRAY, Type::BUILTIN_TYPE_OBJECT],
+                true
+            ) ? 'deepObject' : 'form',
+            $description['openapi']['explode'] ?? ('array' === $schema['type']),
+            $description['openapi']['allowReserved'] ?? false,
+            $description['openapi']['example'] ?? null,
+            isset(
+                $description['openapi']['examples']
+            ) ? new \ArrayObject($description['openapi']['examples']) : null
+        );
     }
 
     private function getPaginationParameters(CollectionOperationInterface|HttpOperation $operation): array

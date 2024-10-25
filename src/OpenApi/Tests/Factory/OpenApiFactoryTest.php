@@ -888,7 +888,8 @@ class OpenApiFactoryTest extends TestCase
                     'type' => 'string',
                     'enum' => ['asc', 'desc'],
                 ]),
-            ]
+            ],
+            deprecated: false
         ), $filteredPath->getGet());
 
         $paginatedPath = $paths->getPath('/paginated');
