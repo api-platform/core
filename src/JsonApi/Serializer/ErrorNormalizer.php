@@ -37,9 +37,34 @@ final class ErrorNormalizer implements NormalizerInterface
         $jsonApiObject = $this->itemNormalizer->normalize($object, $format, $context);
         $error = $jsonApiObject['data']['attributes'];
         $error['id'] = $jsonApiObject['data']['id'];
-        $error['type'] = $jsonApiObject['data']['id'];
+        if (isset($error['type'])) {
+            $error['links'] = ['type' => $error['type']];
+        }
 
-        return ['errors' => [$error]];
+        if (!isset($error['code']) && method_exists($object, 'getId')) {
+            $error['code'] = $object->getId();
+        }
+
+        if (!isset($error['violations'])) {
+            return ['errors' => [$error]];
+        }
+
+        $errors = [];
+        foreach ($error['violations'] as $violation) {
+            $e = ['detail' => $violation['message']] + $error;
+            if (isset($error['links']['type'])) {
+                $type = $error['links']['type'];
+                $e['links']['type'] = \sprintf('%s/%s', $type, $violation['propertyPath']);
+                $e['id'] = str_replace($type, $e['links']['type'], $e['id']);
+            }
+            if (isset($e['code'])) {
+                $e['code'] = \sprintf('%s/%s', $error['code'], $violation['propertyPath']);
+            }
+            unset($e['violations']);
+            $errors[] = $e;
+        }
+
+        return ['errors' => $errors];
     }
 
     /**

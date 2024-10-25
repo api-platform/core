@@ -90,6 +90,12 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
         }
     }
 
+    #[Groups(['jsonapi'])]
+    public function getId(): string
+    {
+        return (string) $this->status;
+    }
+
     #[SerializedName('trace')]
     #[Groups(['trace'])]
     public ?array $originalTrace = null;
@@ -129,7 +135,7 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
         $this->headers = $headers;
     }
 
-    #[Groups(['jsonld', 'jsonproblem'])]
+    #[Groups(['jsonld', 'jsonproblem', 'jsonapi'])]
     public function getType(): string
     {
         return $this->type;
