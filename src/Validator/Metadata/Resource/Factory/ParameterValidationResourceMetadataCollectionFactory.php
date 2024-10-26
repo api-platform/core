@@ -91,6 +91,10 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
 
     private function addSchemaValidation(Parameter $parameter, ?array $schema = null, ?bool $required = null, ?OpenApiParameter $openApi = null): Parameter
     {
+        if (null !== $parameter->getConstraints()) {
+            return $parameter;
+        }
+
         $schema ??= $parameter->getSchema();
         $required ??= $parameter->getRequired() ?? false;
         $openApi ??= $parameter->getOpenApi();
