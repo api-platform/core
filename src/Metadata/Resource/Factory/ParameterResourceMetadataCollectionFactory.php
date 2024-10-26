@@ -155,16 +155,12 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             return $parameter;
         }
 
-        if (null === $parameter->getSchema() && $filter instanceof JsonSchemaFilterInterface) {
-            if ($schema = $filter->getSchema($parameter)) {
-                $parameter = $parameter->withSchema($schema);
-            }
+        if (null === $parameter->getSchema() && $filter instanceof JsonSchemaFilterInterface && $schema = $filter->getSchema($parameter)) {
+            $parameter = $parameter->withSchema($schema);
         }
 
-        if (null === $parameter->getOpenApi() && $filter instanceof OpenApiParameterFilterInterface) {
-            if ($openApiParameter = $filter->getOpenApiParameters($parameter)) {
-                $parameter = $parameter->withOpenApi($openApiParameter);
-            }
+        if (null === $parameter->getOpenApi() && $filter instanceof OpenApiParameterFilterInterface && ($openApiParameter = $filter->getOpenApiParameters($parameter)) && $openApiParameter instanceof OpenApiParameter) {
+            $parameter = $parameter->withOpenApi($openApiParameter);
         }
 
         return $parameter;
@@ -194,10 +190,6 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             $parameter = $parameter->withSchema($schema);
         }
 
-        if (null === $parameter->getProperty() && ($property = $description[$key]['property'] ?? null)) {
-            $parameter = $parameter->withProperty($property);
-        }
-
         $currentKey = $key;
         if (null === $parameter->getProperty() && isset($properties[$key])) {
             $parameter = $parameter->withProperty($key);
@@ -214,10 +206,6 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
 
         if (null === $parameter->getRequired() && ($required = $description[$key]['required'] ?? null)) {
             $parameter = $parameter->withRequired($required);
-        }
-
-        if (null === $parameter->getOpenApi() && ($openApi = $description[$key]['openapi'] ?? null) && $openApi instanceof OpenApiParameter) {
-            $parameter = $parameter->withOpenApi($openApi);
         }
 
         return $this->addFilterMetadata($parameter);

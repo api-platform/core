@@ -17,7 +17,6 @@ use ApiPlatform\Doctrine\Odm\State\Options as ODMOptions;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\JsonLd\Serializer\HydraPrefixTrait;
 use ApiPlatform\Metadata\FilterInterface;
-use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\QueryParameterInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -133,10 +132,9 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
     /**
      * Returns the content of the Hydra search property.
      *
-     * @param FilterInterface[]        $filters
-     * @param array<string, Parameter> $parameters
+     * @param FilterInterface[] $filters
      */
-    private function getSearch(string $resourceClass, array $parts, array $filters, array|Parameters|null $parameters, string $hydraPrefix): array
+    private function getSearch(string $resourceClass, array $parts, array $filters, ?Parameters $parameters, string $hydraPrefix): array
     {
         $variables = [];
         $mapping = [];
@@ -153,10 +151,16 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
                 continue;
             }
 
-            if (!($property = $parameter->getProperty()) && ($filterId = $parameter->getFilter()) && ($filter = $this->getFilter($filterId))) {
-                foreach ($filter->getDescription($resourceClass) as $variable => $description) {
-                    // This is a practice induced by PHP and is not necessary when implementing URI template
+            if (($filterId = $parameter->getFilter()) && \is_string($filterId) && ($filter = $this->getFilter($filterId))) {
+                $filterDescription = $filter->getDescription($resourceClass);
+
+                foreach ($filterDescription as $variable => $description) {
+                    // // This is a practice induced by PHP and is not necessary when implementing URI template
                     if (str_ends_with((string) $variable, '[]')) {
+                        continue;
+                    }
+
+                    if (($prop = $parameter->getProperty()) && ($description['property'] ?? null) !== $prop) {
                         continue;
                     }
 
@@ -171,10 +175,12 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
                     $mapping[] = $m;
                 }
 
-                continue;
+                if ($filterDescription) {
+                    continue;
+                }
             }
 
-            if (!$property) {
+            if (!($property = $parameter->getProperty())) {
                 continue;
             }
 
