@@ -351,7 +351,20 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                         $missingConstructorArguments[] = $constructorParameter->name;
                     }
 
-                    $exception = NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Failed to create object because the class misses the "%s" property.', $constructorParameter->name), $data, ['unknown'], $context['deserialization_path'] ?? null, true);
+                    $attributeContext = $this->getAttributeDenormalizationContext($class, $paramName, $context);
+                    $constructorParameterType = 'unknown';
+                    $reflectionType = $constructorParameter->getType();
+                    if ($reflectionType instanceof \ReflectionNamedType) {
+                        $constructorParameterType = $reflectionType->getName();
+                    }
+
+                    $exception = NotNormalizableValueException::createForUnexpectedDataType(
+                        \sprintf('Failed to create object because the class misses the "%s" property.', $constructorParameter->name),
+                        null,
+                        [$constructorParameterType],
+                        $attributeContext['deserialization_path'] ?? null,
+                        true
+                    );
                     $context['not_normalizable_value_exceptions'][] = $exception;
                 }
             }
