@@ -91,6 +91,10 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
 
     private function addSchemaValidation(Parameter $parameter, ?array $schema = null, ?bool $required = null, ?OpenApiParameter $openApi = null): Parameter
     {
+        if (null !== $parameter->getConstraints()) {
+            return $parameter;
+        }
+
         $schema ??= $parameter->getSchema();
         $required ??= $parameter->getRequired() ?? false;
         $openApi ??= $parameter->getOpenApi();
@@ -130,7 +134,7 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
         }
 
         if (isset($schema['pattern'])) {
-            $assertions[] = new Regex($schema['pattern']);
+            $assertions[] = new Regex('#'.$schema['pattern'].'#');
         }
 
         if (isset($schema['maxLength']) || isset($schema['minLength'])) {

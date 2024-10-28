@@ -1,5 +1,19 @@
 # Changelog
 
+## v4.0.6
+
+### Bug fixes
+
+* [195c4e788](https://github.com/api-platform/core/commit/195c4e7883520416e042ac78143b18652a216fbf) fix(hydra): hydra context changed (#6710)
+* [4f65ef2d0](https://github.com/api-platform/core/commit/4f65ef2d061215df348e3505856f0f41c7c909ed) fix(metadata): providing parameter constraints skips automatic ones (#6756)
+* [5a8ef115a](https://github.com/api-platform/core/commit/5a8ef115a90791992a6c1325fb6d1ac458b22153) fix(symfony): ECMA-262 pattern with RegExp validator (#6733)
+* [67c5a2a24](https://github.com/api-platform/core/commit/67c5a2a2463bca94f0997b4fab1248a08994465b) fix(laravel): jsonapi error serialization (#6755)
+* [ac6f667f3](https://github.com/api-platform/core/commit/ac6f667f301f6c4c399a707faf00567239bd98d8) fix(laravel): collection relations other than HasMany (#6737)
+
+### Features
+
+* [cecd77149](https://github.com/api-platform/core/commit/cecd77149795c1a455ac72bc3ed0606413e69900) feat(laravel): use laravel cache setting (#6751)
+
 ## v4.0.5
 
 ### Bug fixes
@@ -151,6 +165,12 @@ Notes:
 ### Features
 
 * [0d5f35683](https://github.com/api-platform/core/commit/0d5f356839eb6aa9f536044abe4affa736553e76) feat(laravel): laravel component (#5882)
+
+## v3.4.5
+
+### Bug fixes
+
+* [fc8fa00a1](https://github.com/api-platform/core/commit/fc8fa00a19320b65547a60537261959c11f8e6a8) fix(hydra): iri template when using query parameter (#6742)
 
 ## v3.4.4
 

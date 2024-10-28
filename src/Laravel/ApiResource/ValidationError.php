@@ -86,25 +86,25 @@ class ValidationError extends RuntimeException implements \Stringable, ProblemEx
     }
 
     #[SerializedName('description')]
-    #[Groups(['jsonapi', 'jsonld', 'json'])]
+    #[Groups(['jsonld', 'json'])]
     public function getDescription(): string
     {
         return $this->detail;
     }
 
-    #[Groups(['jsonld', 'json'])]
+    #[Groups(['jsonld', 'json', 'jsonapi'])]
     public function getType(): string
     {
         return '/validation_errors/'.$this->id;
     }
 
-    #[Groups(['jsonld', 'json'])]
+    #[Groups(['jsonld', 'json', 'jsonapi'])]
     public function getTitle(): ?string
     {
         return 'Validation Error';
     }
 
-    #[Groups(['jsonld', 'json'])]
+    #[Groups(['jsonld', 'json', 'jsonapi'])]
     private string $detail;
 
     public function getDetail(): ?string
@@ -117,7 +117,7 @@ class ValidationError extends RuntimeException implements \Stringable, ProblemEx
         $this->detail = $detail;
     }
 
-    #[Groups(['jsonld', 'json'])]
+    #[Groups(['jsonld', 'json', 'jsonapi'])]
     public function getStatus(): ?int
     {
         return $this->status;
@@ -128,7 +128,7 @@ class ValidationError extends RuntimeException implements \Stringable, ProblemEx
         $this->status = $status;
     }
 
-    #[Groups(['jsonld', 'json'])]
+    #[Groups(['jsonld', 'json', 'jsonapi'])]
     public function getInstance(): ?string
     {
         return null;
@@ -138,7 +138,7 @@ class ValidationError extends RuntimeException implements \Stringable, ProblemEx
      * @return array<int,array{propertyPath:string,message:string,code?:string}>
      */
     #[SerializedName('violations')]
-    #[Groups(['json', 'jsonld'])]
+    #[Groups(['json', 'jsonld', 'jsonapi'])]
     public function getViolations(): array
     {
         return $this->violations;

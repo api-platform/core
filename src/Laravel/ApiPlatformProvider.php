@@ -58,6 +58,7 @@ use ApiPlatform\Hydra\State\HydraLinkProcessor;
 use ApiPlatform\JsonApi\JsonSchema\SchemaFactory as JsonApiSchemaFactory;
 use ApiPlatform\JsonApi\Serializer\CollectionNormalizer as JsonApiCollectionNormalizer;
 use ApiPlatform\JsonApi\Serializer\EntrypointNormalizer as JsonApiEntrypointNormalizer;
+use ApiPlatform\JsonApi\Serializer\ErrorNormalizer as JsonApiErrorNormalizer;
 use ApiPlatform\JsonApi\Serializer\ItemNormalizer as JsonApiItemNormalizer;
 use ApiPlatform\JsonApi\Serializer\ObjectNormalizer as JsonApiObjectNormalizer;
 use ApiPlatform\JsonApi\Serializer\ReservedAttributeNameConverter;
@@ -297,7 +298,7 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->extend(PropertyMetadataFactoryInterface::class, function (PropertyInfoPropertyMetadataFactory $inner, Application $app) {
-            /** @var ConfigRepository */
+            /** @var ConfigRepository $config */
             $config = $app['config'];
 
             return new CachePropertyMetadataFactory(
@@ -313,12 +314,12 @@ class ApiPlatformProvider extends ServiceProvider
                         $app->make(ResourceClassResolverInterface::class)
                     ),
                 ),
-                true === $config->get('app.debug') ? 'array' : 'file'
+                true === $config->get('app.debug') ? 'array' : $config->get('cache.default', 'file')
             );
         });
 
         $this->app->singleton(PropertyNameCollectionFactoryInterface::class, function (Application $app) {
-            /** @var ConfigRepository */
+            /** @var ConfigRepository $config */
             $config = $app['config'];
 
             return new CachePropertyNameCollectionMetadataFactory(
@@ -331,7 +332,7 @@ class ApiPlatformProvider extends ServiceProvider
                         )
                     )
                 ),
-                true === $config->get('app.debug') ? 'array' : 'file'
+                true === $config->get('app.debug') ? 'array' : $config->get('cache.default', 'file')
             );
         });
 
@@ -345,7 +346,7 @@ class ApiPlatformProvider extends ServiceProvider
 
         // TODO: add cached metadata factories
         $this->app->singleton(ResourceMetadataCollectionFactoryInterface::class, function (Application $app) {
-            /** @var ConfigRepository */
+            /** @var ConfigRepository $config */
             $config = $app['config'];
             $formats = $config->get('api-platform.formats');
 
@@ -401,7 +402,7 @@ class ApiPlatformProvider extends ServiceProvider
                         $app->make('filters')
                     )
                 ),
-                true === $config->get('app.debug') ? 'array' : 'file'
+                true === $config->get('app.debug') ? 'array' : $config->get('cache.default', 'file')
             );
         });
 
@@ -907,6 +908,10 @@ class ApiPlatformProvider extends ServiceProvider
             return new ReservedAttributeNameConverter($app->make(NameConverterInterface::class));
         });
 
+        if (interface_exists(FieldsBuilderEnumInterface::class)) {
+            $this->registerGraphQl($this->app);
+        }
+
         $this->app->singleton(JsonApiEntrypointNormalizer::class, function (Application $app) {
             return new JsonApiEntrypointNormalizer(
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
@@ -946,9 +951,11 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        if (interface_exists(FieldsBuilderEnumInterface::class)) {
-            $this->registerGraphQl($this->app);
-        }
+        $this->app->singleton(JsonApiErrorNormalizer::class, function (Application $app) {
+            return new JsonApiErrorNormalizer(
+                $app->make(JsonApiItemNormalizer::class),
+            );
+        });
 
         $this->app->singleton(JsonApiObjectNormalizer::class, function (Application $app) {
             return new JsonApiObjectNormalizer(
@@ -985,6 +992,7 @@ class ApiPlatformProvider extends ServiceProvider
             $list->insert($app->make(JsonApiEntrypointNormalizer::class), -800);
             $list->insert($app->make(JsonApiCollectionNormalizer::class), -985);
             $list->insert($app->make(JsonApiItemNormalizer::class), -890);
+            $list->insert($app->make(JsonApiErrorNormalizer::class), -790);
             $list->insert($app->make(JsonApiObjectNormalizer::class), -995);
 
             if (interface_exists(FieldsBuilderEnumInterface::class)) {
