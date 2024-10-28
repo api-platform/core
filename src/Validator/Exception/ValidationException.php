@@ -75,7 +75,7 @@ class ValidationException extends RuntimeException implements ConstraintViolatio
 
         if ($message instanceof ConstraintViolationListInterface) {
             $this->constraintViolationList = $message;
-            parent::__construct($code ?? $this->__toString(), $previous ?? 0, $errorTitle instanceof \Throwable ? $errorTitle : null);
+            parent::__construct($this->__toString(), $code ?? 0, $previous);
 
             return;
         }
