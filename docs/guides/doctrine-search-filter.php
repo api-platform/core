@@ -120,24 +120,21 @@ namespace App\Tests {
             $this->assertJsonContains([
                 'search' => [
                     '@type' => 'IriTemplate',
-                    'template' => '/books.jsonld{?id,title,author}',
+                    'template' => '/books.jsonld{?title,author}',
                     'variableRepresentation' => 'BasicRepresentation',
                     'mapping' => [
                         [
                             '@type' => 'IriTemplateMapping',
-                            'variable' => 'id',
-                            'property' => 'id',
-                        ],
-                        [
-                            '@type' => 'IriTemplateMapping',
                             'variable' => 'title',
                             'property' => 'title',
+                            'required' => false,
                         ],
                         [
                             '@type' => 'IriTemplateMapping',
                             'variable' => 'author',
                             'property' => 'author',
-                        ]
+                            'required' => false,
+                        ],
                     ],
                 ],
             ]);

@@ -152,6 +152,12 @@ Notes:
 
 * [0d5f35683](https://github.com/api-platform/core/commit/0d5f356839eb6aa9f536044abe4affa736553e76) feat(laravel): laravel component (#5882)
 
+## v3.4.5
+
+### Bug fixes
+
+* [fc8fa00a1](https://github.com/api-platform/core/commit/fc8fa00a19320b65547a60537261959c11f8e6a8) fix(hydra): iri template when using query parameter (#6742)
+
 ## v3.4.4
 
 ### Bug fixes
