@@ -8,6 +8,7 @@ return [
     'title' => 'API Platform',
     'description' => 'My awesome API',
     'version' => '1.0.0',
+    'show_webby' => true,
 
     'routes' => [
         // Global middleware applied to every API Platform routes
