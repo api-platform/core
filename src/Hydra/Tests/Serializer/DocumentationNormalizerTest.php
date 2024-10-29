@@ -106,7 +106,7 @@ class DocumentationNormalizerTest extends TestCase
 
         $expected = [
             '@context' => [
-                'http://www.w3.org/ns/hydra/context.jsonld',
+                'https://www.w3.org/ns/hydra/context.jsonld',
                 [
                     '@vocab' => '/doc#',
                     'hydra' => 'http://www.w3.org/ns/hydra/core#',
@@ -406,7 +406,7 @@ class DocumentationNormalizerTest extends TestCase
 
         $expected = [
             '@context' => [
-                'http://www.w3.org/ns/hydra/context.jsonld',
+                'https://www.w3.org/ns/hydra/context.jsonld',
                 [
                     '@vocab' => '/doc#',
                     'hydra' => 'http://www.w3.org/ns/hydra/core#',
@@ -766,7 +766,7 @@ class DocumentationNormalizerTest extends TestCase
 
         $expected = [
             '@context' => [
-                'http://www.w3.org/ns/hydra/context.jsonld',
+                'https://www.w3.org/ns/hydra/context.jsonld',
                 [
                     '@vocab' => '/doc#',
                     'hydra' => 'http://www.w3.org/ns/hydra/core#',

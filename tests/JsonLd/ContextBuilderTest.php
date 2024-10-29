@@ -291,7 +291,7 @@ class ContextBuilderTest extends TestCase
         $contextBuilder = new ContextBuilder($this->resourceNameCollectionFactoryProphecy->reveal(), $this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->propertyNameCollectionFactoryProphecy->reveal(), $this->propertyMetadataFactoryProphecy->reveal(), $this->urlGeneratorProphecy->reveal(), null, null, [ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX => false]);
 
         $expected = [
-            'http://www.w3.org/ns/hydra/context.jsonld',
+            'https://www.w3.org/ns/hydra/context.jsonld',
             [
                 '@vocab' => '#',
                 'hydra' => 'http://www.w3.org/ns/hydra/core#',
