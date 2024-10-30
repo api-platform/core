@@ -573,7 +573,7 @@ final class DocumentationNormalizer implements NormalizerInterface
     private function getContext(string $hydraPrefix = ContextBuilder::HYDRA_PREFIX): array
     {
         return [
-            ContextBuilderInterface::HYDRA_CONTEXT,
+            '/bundles/apiplatform/hydra/context.jsonld',
             [
                 '@vocab' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT], UrlGeneratorInterface::ABS_URL).'#',
                 'hydra' => ContextBuilderInterface::HYDRA_NS,

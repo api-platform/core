@@ -94,5 +94,12 @@ fi
 mkdir -p "$dest"
 cp node_modules/redoc/bundles/redoc.standalone.js "$dest"
 
+dest=src/Symfony/Bundle/Resources/public/hydra/
+if [[ -d "$dest" ]]; then
+rm -Rf "$dest"
+fi
+mkdir -p "$dest"
+curl -L -A "Mozilla/5.0" -o "${dest}context.jsonld" http://www.w3.org/ns/hydra/context.jsonld
+
 rm -Rf package.json node_modules/
 # TODO Laravel public files
