@@ -114,11 +114,11 @@ Feature: Using validations groups
       "@context": "/contexts/ConstraintViolationList",
       "@type": "ConstraintViolationList",
       "hydra:title": "An error occurred",
-      "hydra:description": "This value should be of type unknown.\nqux: This value should be of type string.\nfoo: This value should be of type bool.\nbar: This value should be of type int.\nuuid: This value should be of type uuid.\nrelatedDummy: This value should be of type array|string.\nrelatedDummies: This value should be of type array.",
+      "hydra:description": "baz: This value should be of type string.\nqux: This value should be of type string.\nfoo: This value should be of type bool.\nbar: This value should be of type int.\nuuid: This value should be of type uuid.\nrelatedDummy: This value should be of type array|string.\nrelatedDummies: This value should be of type array.",
       "violations": [
         {
-          "propertyPath": "",
-          "message": "This value should be of type unknown.",
+          "propertyPath": "baz",
+          "message": "This value should be of type string.",
           "code": "ba785a8c-82cb-4283-967c-3cf342181b40",
           "hint": "Failed to create object because the class misses the \"baz\" property."
         },
