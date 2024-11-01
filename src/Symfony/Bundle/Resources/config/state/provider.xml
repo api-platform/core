@@ -26,7 +26,7 @@
         </service>
 
         <service id="api_platform.state_provider.backed_enum" class="ApiPlatform\State\Provider\BackedEnumProvider">
-            <tag name="api_platform.state_provider" key="ApiPlatform\State\Provider\BackedEnumProvidevr" />
+            <tag name="api_platform.state_provider" key="ApiPlatform\State\Provider\BackedEnumProvider" />
             <tag name="api_platform.state_provider" key="api_platform.state_provider.backed_enum" />
         </service>
 
