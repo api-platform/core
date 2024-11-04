@@ -15,7 +15,11 @@ namespace ApiPlatform\Doctrine\Odm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\ExistsFilterInterface;
 use ApiPlatform\Doctrine\Common\Filter\ExistsFilterTrait;
+use ApiPlatform\Doctrine\Common\Filter\PropertyPlaceholderOpenApiParameterTrait;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Parameter;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
@@ -107,11 +111,12 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
+final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface
 {
     use ExistsFilterTrait;
+    use PropertyPlaceholderOpenApiParameterTrait;
 
-    public function __construct(ManagerRegistry $managerRegistry, ?LoggerInterface $logger = null, ?array $properties = null, string $existsParameterName = self::QUERY_PARAMETER_KEY, ?NameConverterInterface $nameConverter = null)
+    public function __construct(?ManagerRegistry $managerRegistry = null, ?LoggerInterface $logger = null, ?array $properties = null, string $existsParameterName = self::QUERY_PARAMETER_KEY, ?NameConverterInterface $nameConverter = null)
     {
         parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
 
@@ -123,6 +128,13 @@ final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
      */
     public function apply(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
+        $parameter = $context['parameter'] ?? null;
+        if (null !== ($value = $context['filters'][$parameter?->getProperty()] ?? null)) {
+            $this->filterProperty($this->denormalizePropertyName($parameter->getProperty()), $value, $aggregationBuilder, $resourceClass, $operation, $context);
+
+            return;
+        }
+
         foreach ($context['filters'][$this->existsParameterName] ?? [] as $property => $value) {
             $this->filterProperty($this->denormalizePropertyName($property), $value, $aggregationBuilder, $resourceClass, $operation, $context);
         }
@@ -166,5 +178,10 @@ final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
         $field = $propertyParts['field'];
 
         return $metadata instanceof ClassMetadata && $metadata->hasField($field) ? $metadata->isNullable($field) : false;
+    }
+
+    public function getSchema(Parameter $parameter): array
+    {
+        return ['type' => 'boolean'];
     }
 }

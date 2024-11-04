@@ -27,7 +27,7 @@ use Doctrine\Persistence\Mapping\ClassMetadata;
  */
 trait PropertyHelperTrait
 {
-    abstract protected function getManagerRegistry(): ManagerRegistry;
+    abstract protected function getManagerRegistry(): ?ManagerRegistry;
 
     /**
      * Splits the given property into parts.
@@ -39,9 +39,9 @@ trait PropertyHelperTrait
      */
     protected function getClassMetadata(string $resourceClass): ClassMetadata
     {
-        $manager = $this
-            ->getManagerRegistry()
-            ->getManagerForClass($resourceClass);
+        /** @var ?ManagerRegistry $managerRegistry */
+        $managerRegistry = $this->getManagerRegistry();
+        $manager = $managerRegistry?->getManagerForClass($resourceClass);
 
         if ($manager) {
             return $manager->getClassMetadata($resourceClass);

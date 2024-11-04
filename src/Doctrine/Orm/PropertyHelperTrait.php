@@ -29,7 +29,7 @@ use Doctrine\Persistence\Mapping\ClassMetadata;
  */
 trait PropertyHelperTrait
 {
-    abstract protected function getManagerRegistry(): ManagerRegistry;
+    abstract protected function getManagerRegistry(): ?ManagerRegistry;
 
     /**
      * Splits the given property into parts.

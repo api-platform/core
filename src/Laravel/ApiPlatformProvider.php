@@ -397,7 +397,8 @@ class ApiPlatformProvider extends ServiceProvider
                                 )
                             ),
                             $app->make('filters'),
-                            $app->make(CamelCaseToSnakeCaseNameConverter::class)
+                            $app->make(CamelCaseToSnakeCaseNameConverter::class),
+                            $this->app->make(LoggerInterface::class)
                         ),
                         $app->make('filters')
                     )
