@@ -45,7 +45,7 @@ abstract class Parameter
         protected string|\Stringable|null $security = null,
         protected ?string $securityMessage = null,
         protected ?array $extraProperties = [],
-        protected ?array $filterContext = null,
+        protected array|string|null $filterContext = null,
     ) {
     }
 
@@ -138,7 +138,7 @@ abstract class Parameter
         return $this->extraProperties;
     }
 
-    public function getFilterContext(): ?array
+    public function getFilterContext(): array|string|null
     {
         return $this->filterContext;
     }
@@ -199,6 +199,14 @@ abstract class Parameter
     {
         $self = clone $this;
         $self->filter = $filter;
+
+        return $self;
+    }
+
+    public function withFilterContext(array|string $filterContext): static
+    {
+        $self = clone $this;
+        $self->filterContext = $filterContext;
 
         return $self;
     }
