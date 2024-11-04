@@ -39,4 +39,19 @@ foo: message 2
 TXT
         ), $e->__toString());
     }
+
+    public function testWithPrevious(): void
+    {
+        $previous = new \Exception();
+        $e = new ValidationException(new ConstraintViolationList([
+            new ConstraintViolation('message 1', '', [], '', '', 'invalid'),
+        ]), null, $previous);
+        $this->assertInstanceOf(\RuntimeException::class, $e);
+
+        $this->assertSame(str_replace(\PHP_EOL, "\n", <<<TXT
+message 1
+TXT
+        ), $e->__toString());
+        $this->assertSame($previous, $e->getPrevious());
+    }
 }
