@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Tests\Resource\Factory;
 
+use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -22,16 +23,23 @@ use ApiPlatform\Metadata\Resource\Factory\AttributesResourceMetadataCollectionFa
 use ApiPlatform\Metadata\Resource\Factory\ParameterResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\WithParameter;
 use ApiPlatform\OpenApi\Model\Parameter;
+use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 
 class ParameterResourceMetadataCollectionFactoryTests extends TestCase
 {
+    /**
+     * @throws Exception
+     * @throws ResourceClassNotFoundException
+     */
     public function testParameterFactory(): void
     {
         $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
         $filterLocator = $this->createStub(ContainerInterface::class);
+        $logger = $this->createStub(LoggerInterface::class);
         $filterLocator->method('has')->willReturn(true);
         $filterLocator->method('get')->willReturn(new class implements FilterInterface {
             public function getDescription(string $resourceClass): array
@@ -55,6 +63,7 @@ class ParameterResourceMetadataCollectionFactoryTests extends TestCase
         $parameter = new ParameterResourceMetadataCollectionFactory(
             $nameCollection,
             $propertyMetadata,
+            $logger,
             new AttributesResourceMetadataCollectionFactory(),
             $filterLocator
         );

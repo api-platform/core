@@ -360,6 +360,7 @@ class ApiPlatformProvider extends ServiceProvider
                         new ParameterResourceMetadataCollectionFactory(
                             $this->app->make(PropertyNameCollectionFactoryInterface::class),
                             $this->app->make(PropertyMetadataFactoryInterface::class),
+                            $this->app->make(LoggerInterface::class),
                             new AlternateUriResourceMetadataCollectionFactory(
                                 new FiltersResourceMetadataCollectionFactory(
                                     new FormatsResourceMetadataCollectionFactory(

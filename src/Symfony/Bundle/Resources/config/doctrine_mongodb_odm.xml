@@ -137,7 +137,7 @@
 
         <service id="api_platform.doctrine_mongodb.odm.extension.parameter_extension" class="ApiPlatform\Doctrine\Odm\Extension\ParameterExtension" public="false">
             <argument type="service" id="api_platform.filter_locator" />
-
+            <argument type="service" id="doctrine_mongodb" on-invalid="null"/>
             <tag name="api_platform.doctrine_mongodb.odm.aggregation_extension.collection" priority="32" />
             <tag name="api_platform.doctrine_mongodb.odm.aggregation_extension.item"/>
         </service>

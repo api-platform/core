@@ -61,7 +61,7 @@ trait BooleanFilterTrait
         return $description;
     }
 
-    abstract protected function getProperties(): ?array;
+    abstract public function getProperties(): ?array;
 
     abstract protected function getLogger(): LoggerInterface;
 
