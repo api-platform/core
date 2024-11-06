@@ -1,5 +1,13 @@
 # Changelog
 
+## v4.0.8
+
+### Bug fixes
+
+* [dddb97075](https://github.com/api-platform/core/commit/dddb97075af9c6e2517e1881b803c9d31a1913cf) fix(symfony): default formats order (#6780)
+
+### Features
+
 ## v4.0.7
 
 ### Bug fixes
