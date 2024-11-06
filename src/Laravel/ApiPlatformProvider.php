@@ -529,6 +529,14 @@ class ApiPlatformProvider extends ServiceProvider
             return new CallableProcessor(new ServiceLocator($tagged));
         });
 
+        $this->app->singleton(RespondProcessor::class, function () {
+            return new AddLinkHeaderProcessor(new RespondProcessor(), new HttpHeaderSerializer());
+        });
+
+        $this->app->singleton(SerializeProcessor::class, function (Application $app) {
+            return new SerializeProcessor($app->make(RespondProcessor::class), $app->make(Serializer::class), $app->make(SerializerContextBuilderInterface::class));
+        });
+
         $this->app->singleton(WriteProcessor::class, function (Application $app) {
             return new WriteProcessor($app->make(SerializeProcessor::class), $app->make(CallableProcessor::class));
         });
@@ -547,19 +555,18 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(SerializeProcessor::class, function (Application $app) {
-            return new SerializeProcessor($app->make(RespondProcessor::class), $app->make(Serializer::class), $app->make(SerializerContextBuilderInterface::class));
-        });
-
         $this->app->singleton(HydraLinkProcessor::class, function (Application $app) {
             return new HydraLinkProcessor($app->make(WriteProcessor::class), $app->make(UrlGeneratorInterface::class));
         });
 
-        $this->app->singleton(RespondProcessor::class, function () {
-            return new AddLinkHeaderProcessor(new RespondProcessor(), new HttpHeaderSerializer());
-        });
+        $this->app->bind(ProcessorInterface::class, function (Application $app) {
+            $config = $app['config'];
+            if ($config->has('api-platform.formats.jsonld')) {
+                return $app->make(HydraLinkProcessor::class);
+            }
 
-        $this->app->bind(ProcessorInterface::class, HydraLinkProcessor::class);
+            return $app->make(WriteProcessor::class);
+        });
 
         $this->app->singleton(ObjectNormalizer::class, function (Application $app) {
             $config = $app['config'];

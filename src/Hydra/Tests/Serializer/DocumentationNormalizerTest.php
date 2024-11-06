@@ -37,6 +37,8 @@ use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\PropertyInfo\Type;
 
+use const ApiPlatform\JsonLd\HYDRA_CONTEXT;
+
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
@@ -106,7 +108,7 @@ class DocumentationNormalizerTest extends TestCase
 
         $expected = [
             '@context' => [
-                'http://www.w3.org/ns/hydra/context.jsonld',
+                HYDRA_CONTEXT,
                 [
                     '@vocab' => '/doc#',
                     'hydra' => 'http://www.w3.org/ns/hydra/core#',
@@ -406,7 +408,7 @@ class DocumentationNormalizerTest extends TestCase
 
         $expected = [
             '@context' => [
-                'http://www.w3.org/ns/hydra/context.jsonld',
+                HYDRA_CONTEXT,
                 [
                     '@vocab' => '/doc#',
                     'hydra' => 'http://www.w3.org/ns/hydra/core#',
@@ -766,7 +768,7 @@ class DocumentationNormalizerTest extends TestCase
 
         $expected = [
             '@context' => [
-                'http://www.w3.org/ns/hydra/context.jsonld',
+                HYDRA_CONTEXT,
                 [
                     '@vocab' => '/doc#',
                     'hydra' => 'http://www.w3.org/ns/hydra/core#',
