@@ -185,7 +185,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         }
 
         if (false === ($this->defaultContext[self::HYDRA_CONTEXT_HAS_PREFIX] ?? true)) {
-            return [ContextBuilderInterface::HYDRA_CONTEXT, $context];
+            return [HYDRA_CONTEXT, $context];
         }
 
         return $context;

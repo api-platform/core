@@ -35,6 +35,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
+use const ApiPlatform\JsonLd\HYDRA_CONTEXT;
+
 /**
  * Creates a machine readable Hydra API documentation.
  *
@@ -573,7 +575,7 @@ final class DocumentationNormalizer implements NormalizerInterface
     private function getContext(string $hydraPrefix = ContextBuilder::HYDRA_PREFIX): array
     {
         return [
-            ContextBuilderInterface::HYDRA_CONTEXT,
+            HYDRA_CONTEXT,
             [
                 '@vocab' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT], UrlGeneratorInterface::ABS_URL).'#',
                 'hydra' => ContextBuilderInterface::HYDRA_NS,

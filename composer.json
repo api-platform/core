@@ -9,7 +9,10 @@
     "autoload": {
         "psr-4": {
             "ApiPlatform\\": "src/"
-        }
+        },
+        "files": [
+            "src/JsonLd/HydraContext.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

@@ -301,4 +301,26 @@ final class HydraContext implements Context
 
         return $decoded;
     }
+
+    /**
+     * @Then the Hydra context matches the online resource :url
+     */
+    public function assertHydraContextIsCorrect(string $url): void
+    {
+        $opts = [
+            'http' => [
+                'method' => 'GET',
+                'header' => "User-Agent: Mozilla/5.0\r\n",
+            ],
+        ];
+
+        $context = stream_context_create($opts);
+        $upstream = json_decode(file_get_contents($url, false, $context));
+        $actual = $this->getLastJsonResponse();
+        $local = $actual->{'@context'}[0];
+        Assert::assertEquals(
+            $upstream,
+            $local
+        );
+    }
 }
