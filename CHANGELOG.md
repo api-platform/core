@@ -1,5 +1,18 @@
 # Changelog
 
+## v4.0.7
+
+### Bug fixes
+
+* [17c916c3a](https://github.com/api-platform/core/commit/17c916c3a1bcc837c9bc842dc48390dbeb043450) fix(symfony): BackedEnumProvider typo fix (#6769)
+* [216d9ccaa](https://github.com/api-platform/core/commit/216d9ccaacf7845daaaeab30f3a58bb5567430fe) fix(serializer): fetch type on normalization error when possible (#6761)
+* [2f967d934](https://github.com/api-platform/core/commit/2f967d9345004779f409b9ce1b5d0cbba84c7132) fix(doctrine): throw an exception when a filter is not found in a parameter (#6767)
+* [6c9b508b0](https://github.com/api-platform/core/commit/6c9b508b030976741a68f84e226502e6c218e896) fix(laravel): remove link header when jsonld is not enabled (#6768)
+* [736ca045e](https://github.com/api-platform/core/commit/736ca045e6832f04aaa002ddd7b85c55df4696bb) fix(validator): allow to pass both a ConstraintViolationList and a previous exception (#6762)
+* [9ac3661b6](https://github.com/api-platform/core/commit/9ac3661b6a75255832203b87a9ba7994add64061) fix(hydra): store and use hydra context in a local variable (#6765)
+
+### Features
+
 ## v4.0.6
 
 ### Bug fixes
