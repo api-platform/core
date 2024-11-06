@@ -32,6 +32,9 @@
         "psr-4": {
             "ApiPlatform\\JsonLd\\": ""
         },
+        "files": [
+            "./HydraContext.php"
+        ],
         "exclude-from-classmap": [
             "/Tests/"
         ]
