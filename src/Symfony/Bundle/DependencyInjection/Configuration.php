@@ -37,6 +37,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Serializer\Exception\ExceptionInterface as SerializerExceptionInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * The configuration of the bundle.
@@ -169,12 +170,19 @@ final class Configuration implements ConfigurationInterface
         $this->addFormatSection($rootNode, 'patch_formats', [
             'json' => ['mime_types' => ['application/merge-patch+json']],
         ]);
-        $this->addFormatSection($rootNode, 'docs_formats', [
-            'jsonopenapi' => ['mime_types' => ['application/vnd.openapi+json']],
-            'yamlopenapi' => ['mime_types' => ['application/vnd.openapi+yaml']],
+
+        $defaultDocFormats = [
             'jsonld' => ['mime_types' => ['application/ld+json']],
+            'jsonopenapi' => ['mime_types' => ['application/vnd.openapi+json']],
             'html' => ['mime_types' => ['text/html']],
-        ]);
+        ];
+
+        if (class_exists(Yaml::class)) {
+            $defaultDocFormats['yamlopenapi'] = ['mime_types' => ['application/vnd.openapi+yaml']];
+        }
+
+        $this->addFormatSection($rootNode, 'docs_formats', $defaultDocFormats);
+
         $this->addFormatSection($rootNode, 'error_formats', [
             'jsonld' => ['mime_types' => ['application/ld+json']],
             'jsonproblem' => ['mime_types' => ['application/problem+json']],
