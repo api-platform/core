@@ -1342,6 +1342,7 @@ class ApiPlatformProvider extends ServiceProvider
                     // _format is read by the middleware
                     $uriTemplate = $operation->getRoutePrefix().str_replace('{._format}', '{_format?}', $uriTemplate);
                     $route = (new Route([$operation->getMethod()], $uriTemplate, [ApiPlatformController::class, '__invoke']))
+                        ->where('_format', '^\.[a-zA-Z]+')
                         ->name($operation->getName())
                         ->setDefaults(['_api_operation_name' => $operation->getName(), '_api_resource_class' => $operation->getClass()]);
 
