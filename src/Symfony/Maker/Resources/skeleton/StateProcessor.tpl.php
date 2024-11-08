@@ -8,8 +8,8 @@ use ApiPlatform\State\ProcessorInterface;
 
 class <?php echo $class_name; ?> implements ProcessorInterface
 {
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
-        // Handle the state
+        // Handle the state and return the inner processor
     }
 }
