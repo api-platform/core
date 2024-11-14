@@ -64,8 +64,8 @@ final class PhpDocResourceMetadataCollectionFactory implements ResourceMetadataC
             $phpDocParser = new PhpDocParser($config, new TypeParser($config, new ConstExprParser($config)), new ConstExprParser($config));
             $lexer = new Lexer($config);
         } elseif (class_exists(PhpDocParser::class)) {
-            $phpDocParser = new PhpDocParser(new TypeParser(new ConstExprParser()), new ConstExprParser());
-            $lexer = new Lexer();
+            $phpDocParser = new PhpDocParser(new TypeParser(new ConstExprParser()), new ConstExprParser()); // @phpstan-ignore-line
+            $lexer = new Lexer(); // @phpstan-ignore-line
         }
         $this->phpDocParser = $phpDocParser;
         $this->lexer = $lexer;
