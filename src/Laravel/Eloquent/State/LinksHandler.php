@@ -13,7 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Eloquent\State;
 
+use ApiPlatform\Metadata\Exception\OperationNotFoundException;
+use ApiPlatform\Metadata\GraphQl\Operation;
+use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -25,6 +30,7 @@ final class LinksHandler implements LinksHandlerInterface
 {
     public function __construct(
         private readonly Application $application,
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
     ) {
     }
 
@@ -34,27 +40,72 @@ final class LinksHandler implements LinksHandlerInterface
 
         if ($operation instanceof HttpOperation) {
             foreach (array_reverse($operation->getUriVariables() ?? []) as $uriVariable => $link) {
-                $identifier = $uriVariables[$uriVariable];
-
-                if ($to = $link->getToProperty()) {
-                    $builder = $builder->where($builder->getModel()->{$to}()->getQualifiedForeignKeyName(), $identifier);
-
-                    continue;
-                }
-
-                if ($from = $link->getFromProperty()) {
-                    $relation = $this->application->make($link->getFromClass());
-                    $builder = $builder->getModel()->where($relation->{$from}()->getQualifiedForeignKeyName(), $identifier);
-
-                    continue;
-                }
-
-                $builder->where($builder->getModel()->qualifyColumn($link->getIdentifiers()[0]), $identifier);
+                $builder = $this->buildQuery($builder, $link, $uriVariables[$uriVariable]);
             }
 
             return $builder;
         }
 
-        return $builder;
+        if (!($linkClass = $context['linkClass'] ?? false)) {
+            return $builder;
+        }
+
+        $newLink = null;
+        $linkedOperation = null;
+        $linkProperty = $context['linkProperty'] ?? null;
+
+        try {
+            $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($linkClass);
+            $linkedOperation = $resourceMetadataCollection->getOperation($operation->getName());
+        } catch (OperationNotFoundException) {
+            // Instead, we'll look for the first Query available.
+            foreach ($resourceMetadataCollection as $resourceMetadata) {
+                foreach ($resourceMetadata->getGraphQlOperations() as $op) {
+                    if ($op instanceof Query) {
+                        $linkedOperation = $op;
+                    }
+                }
+            }
+        }
+
+        if (!$linkedOperation instanceof Operation) {
+            return $builder;
+        }
+
+        $resourceClass = $builder->getModel()::class;
+        foreach ($linkedOperation->getLinks() ?? [] as $link) {
+            if ($resourceClass === $link->getToClass() && $linkProperty === $link->getFromProperty()) {
+                $newLink = $link;
+                break;
+            }
+        }
+
+        if (!$newLink) {
+            return $builder;
+        }
+
+        return $this->buildQuery($builder, $newLink, $uriVariables[$newLink->getIdentifiers()[0]]);
+    }
+
+    /**
+     * @param Builder<Model> $builder
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     *
+     * @return Builder<Model> $builder
+     */
+    private function buildQuery(Builder $builder, Link $link, mixed $identifier): Builder
+    {
+        if ($to = $link->getToProperty()) {
+            return $builder->where($builder->getModel()->{$to}()->getQualifiedForeignKeyName(), $identifier);
+        }
+
+        if ($from = $link->getFromProperty()) {
+            $relation = $this->application->make($link->getFromClass());
+
+            return $builder->getModel()->where($relation->{$from}()->getQualifiedForeignKeyName(), $identifier);
+        }
+
+        return $builder->where($builder->getModel()->qualifyColumn($link->getIdentifiers()[0]), $identifier);
     }
 }
