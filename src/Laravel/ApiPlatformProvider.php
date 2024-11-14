@@ -973,11 +973,7 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->bind(SerializerInterface::class, Serializer::class);
-        $this->app->bind(NormalizerInterface::class, Serializer::class);
-        $this->app->singleton(Serializer::class, function (Application $app) {
-            /** @var ConfigRepository */
-            $config = $app['config'];
+        $this->app->singleton('api_platform_normalizer_list', function (Application $app) {
             $list = new \SplPriorityQueue();
             $list->insert($app->make(HydraEntrypointNormalizer::class), -800);
             $list->insert($app->make(HydraPartialCollectionViewNormalizer::class), -800);
@@ -1011,6 +1007,12 @@ class ApiPlatformProvider extends ServiceProvider
                 $list->insert($app->make(GraphQlRuntimeExceptionNormalizer::class), -780);
             }
 
+            return $list;
+        });
+
+        $this->app->bind(SerializerInterface::class, Serializer::class);
+        $this->app->bind(NormalizerInterface::class, Serializer::class);
+        $this->app->singleton(Serializer::class, function (Application $app) {
             // TODO: unused + implement hal/jsonapi ?
             // $list->insert($dataUriNormalizer, -920);
             // $list->insert($unwrappingDenormalizer, 1000);
@@ -1018,7 +1020,7 @@ class ApiPlatformProvider extends ServiceProvider
             // $list->insert($uuidDenormalizer, -895); //Todo ramsey uuid support ?
 
             return new Serializer(
-                iterator_to_array($list),
+                iterator_to_array($app->make('api_platform_normalizer_list')),
                 [
                     new JsonEncoder('json'),
                     $app->make(JsonEncoder::class),
