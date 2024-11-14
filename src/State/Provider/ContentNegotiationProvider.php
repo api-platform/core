@@ -108,14 +108,14 @@ final class ContentNegotiationProvider implements ProviderInterface
             return $format;
         }
 
-        $supportedMimeTypes = [];
-        foreach ($formats as $mimeTypes) {
-            foreach ($mimeTypes as $mimeType) {
-                $supportedMimeTypes[] = $mimeType;
+        if ($operation->canDeserialize() === true && !$request->isMethodSafe() && 'DELETE' !== $request->getMethod()) {
+            $supportedMimeTypes = [];
+            foreach ($formats as $mimeTypes) {
+                foreach ($mimeTypes as $mimeType) {
+                    $supportedMimeTypes[] = $mimeType;
+                }
             }
-        }
 
-        if (!$request->isMethodSafe() && 'DELETE' !== $request->getMethod()) {
             throw new UnsupportedMediaTypeHttpException(\sprintf('The content-type "%s" is not supported. Supported MIME types are "%s".', $contentType, implode('", "', $supportedMimeTypes)));
         }
 
