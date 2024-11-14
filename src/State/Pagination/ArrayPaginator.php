@@ -27,14 +27,15 @@ final class ArrayPaginator implements \IteratorAggregate, PaginatorInterface, Ha
 
     public function __construct(array $results, int $firstResult, int $maxResults)
     {
-        if ($maxResults > 0) {
+        $this->firstResult = $firstResult;
+        $this->maxResults = $maxResults;
+        $this->totalItems = \count($results);
+
+        if ($maxResults > 0 && $firstResult < $this->totalItems) {
             $this->iterator = new \LimitIterator(new \ArrayIterator($results), $firstResult, $maxResults);
         } else {
             $this->iterator = new \EmptyIterator();
         }
-        $this->firstResult = $firstResult;
-        $this->maxResults = $maxResults;
-        $this->totalItems = \count($results);
     }
 
     /**
