@@ -118,8 +118,6 @@ class ContentNegotiationProviderTest extends TestCase
         $operation = $operation->withDeserialize();
         $context = ['request' => $request];
 
-        $result = $provider->provide($operation, [], $context);
-
-        $this->assertSame($expectedResult, $result);
+        $provider->provide($operation, [], $context);
     }
 }

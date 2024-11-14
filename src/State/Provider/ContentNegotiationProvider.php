@@ -108,7 +108,7 @@ final class ContentNegotiationProvider implements ProviderInterface
             return $format;
         }
 
-        if ($operation->canDeserialize() === true && !$request->isMethodSafe() && 'DELETE' !== $request->getMethod()) {
+        if (false !== $operation->canDeserialize() && !$request->isMethodSafe() && 'DELETE' !== $request->getMethod()) {
             $supportedMimeTypes = [];
             foreach ($formats as $mimeTypes) {
                 foreach ($mimeTypes as $mimeType) {
