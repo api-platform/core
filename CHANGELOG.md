@@ -1,5 +1,17 @@
 # Changelog
 
+## v4.0.9
+
+### Bug fixes
+
+* [417fef5da](https://github.com/api-platform/core/commit/417fef5da9b1f3f16e323a193dec141f13b1ebc5) fix(laravel): overlaping route format (#6782)
+* [81099065e](https://github.com/api-platform/core/commit/81099065e30eb0356881907bd52095b85b9cae3d) fix(laravel): declare normalizer list as a service (#6786)
+* [dc8c09b1e](https://github.com/api-platform/core/commit/dc8c09b1e1ac15a7bcd4961fc3e80b06bec82e77) fix(laravel) graphQl Relationship loading (#6792)
+
+Also contains [v3.4.6 changes](#v346).
+
+### Features
+
 ## v4.0.8
 
 ### Bug fixes
