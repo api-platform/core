@@ -432,12 +432,12 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->singleton(ItemProvider::class, function (Application $app) {
             $tagged = iterator_to_array($app->tagged(LinksHandlerInterface::class));
 
-            return new ItemProvider(new LinksHandler($app), new ServiceLocator($tagged));
+            return new ItemProvider(new LinksHandler($app, $app->make(ResourceMetadataCollectionFactoryInterface::class)), new ServiceLocator($tagged));
         });
         $this->app->singleton(CollectionProvider::class, function (Application $app) {
             $tagged = iterator_to_array($app->tagged(LinksHandlerInterface::class));
 
-            return new CollectionProvider($app->make(Pagination::class), new LinksHandler($app), $app->tagged(QueryExtensionInterface::class), new ServiceLocator($tagged));
+            return new CollectionProvider($app->make(Pagination::class), new LinksHandler($app, $app->make(ResourceMetadataCollectionFactoryInterface::class)), $app->tagged(QueryExtensionInterface::class), new ServiceLocator($tagged));
         });
         $this->app->tag([ItemProvider::class, CollectionProvider::class], ProviderInterface::class);
 
@@ -973,11 +973,7 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->bind(SerializerInterface::class, Serializer::class);
-        $this->app->bind(NormalizerInterface::class, Serializer::class);
-        $this->app->singleton(Serializer::class, function (Application $app) {
-            /** @var ConfigRepository */
-            $config = $app['config'];
+        $this->app->singleton('api_platform_normalizer_list', function (Application $app) {
             $list = new \SplPriorityQueue();
             $list->insert($app->make(HydraEntrypointNormalizer::class), -800);
             $list->insert($app->make(HydraPartialCollectionViewNormalizer::class), -800);
@@ -1011,6 +1007,12 @@ class ApiPlatformProvider extends ServiceProvider
                 $list->insert($app->make(GraphQlRuntimeExceptionNormalizer::class), -780);
             }
 
+            return $list;
+        });
+
+        $this->app->bind(SerializerInterface::class, Serializer::class);
+        $this->app->bind(NormalizerInterface::class, Serializer::class);
+        $this->app->singleton(Serializer::class, function (Application $app) {
             // TODO: unused + implement hal/jsonapi ?
             // $list->insert($dataUriNormalizer, -920);
             // $list->insert($unwrappingDenormalizer, 1000);
@@ -1018,7 +1020,7 @@ class ApiPlatformProvider extends ServiceProvider
             // $list->insert($uuidDenormalizer, -895); //Todo ramsey uuid support ?
 
             return new Serializer(
-                iterator_to_array($list),
+                iterator_to_array($app->make('api_platform_normalizer_list')),
                 [
                     new JsonEncoder('json'),
                     $app->make(JsonEncoder::class),
@@ -1342,6 +1344,7 @@ class ApiPlatformProvider extends ServiceProvider
                     // _format is read by the middleware
                     $uriTemplate = $operation->getRoutePrefix().str_replace('{._format}', '{_format?}', $uriTemplate);
                     $route = (new Route([$operation->getMethod()], $uriTemplate, [ApiPlatformController::class, '__invoke']))
+                        ->where('_format', '^\.[a-zA-Z]+')
                         ->name($operation->getName())
                         ->setDefaults(['_api_operation_name' => $operation->getName(), '_api_resource_class' => $operation->getClass()]);
 

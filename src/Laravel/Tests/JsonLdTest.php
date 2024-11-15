@@ -41,6 +41,7 @@ class JsonLdTest extends TestCase
     {
         tap($app['config'], function (Repository $config): void {
             $config->set('app.debug', true);
+            $config->set('api-platform.resources', [app_path('Models'), app_path('ApiResource')]);
         });
     }
 
@@ -336,5 +337,15 @@ class JsonLdTest extends TestCase
         $content = $response->json();
         $this->assertArrayHasKey('relation', $content);
         $this->assertArrayHasKey('name', $content['relation']);
+    }
+
+    /**
+     * @see https://github.com/api-platform/core/issues/6779
+     */
+    public function testSimilarRoutesWithFormat(): void
+    {
+        $response = $this->get('/api/staff_position_histories?page=1', ['accept' => 'application/ld+json']);
+        $response->assertStatus(200);
+        $this->assertSame('/api/staff_position_histories', $response->json()['@id']);
     }
 }

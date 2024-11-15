@@ -13,14 +13,26 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hal\Serializer;
 
+use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Serializer\CacheKeyTrait;
 use ApiPlatform\Serializer\ContextTrait;
+use ApiPlatform\Serializer\TagCollectorInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 /**
  * Converts between objects and array including HAL metadata.
@@ -35,8 +47,24 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     public const FORMAT = 'jsonhal';
 
+    protected const HAL_CIRCULAR_REFERENCE_LIMIT_COUNTERS = 'hal_circular_reference_limit_counters';
+
     private array $componentsCache = [];
     private array $attributesMetadataCache = [];
+
+    public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ?ResourceAccessCheckerInterface $resourceAccessChecker = null, ?TagCollectorInterface $tagCollector = null)
+    {
+        $defaultContext[AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER] = function ($object): ?array {
+            $iri = $this->iriConverter->getIriFromResource($object);
+            if (null === $iri) {
+                return null;
+            }
+
+            return ['_links' => ['self' => ['href' => $iri]]];
+        };
+
+        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $defaultContext, $resourceMetadataCollectionFactory, $resourceAccessChecker, $tagCollector);
+    }
 
     /**
      * {@inheritdoc}
@@ -216,6 +244,10 @@ final class ItemNormalizer extends AbstractItemNormalizer
     {
         $class = $this->getObjectClass($object);
 
+        if ($this->isHalCircularReference($object, $context)) {
+            return $this->handleHalCircularReference($object, $format, $context);
+        }
+
         $attributesMetadata = \array_key_exists($class, $this->attributesMetadataCache) ?
             $this->attributesMetadataCache[$class] :
             $this->attributesMetadataCache[$class] = $this->classMetadataFactory ? $this->classMetadataFactory->getMetadataFor($class)->getAttributesMetadata() : null;
@@ -318,5 +350,50 @@ final class ItemNormalizer extends AbstractItemNormalizer
         ++$context[$key];
 
         return false;
+    }
+
+    /**
+     * Detects if the configured circular reference limit is reached.
+     *
+     * @throws CircularReferenceException
+     */
+    protected function isHalCircularReference(object $object, array &$context): bool
+    {
+        $objectHash = spl_object_hash($object);
+
+        $circularReferenceLimit = $context[AbstractNormalizer::CIRCULAR_REFERENCE_LIMIT] ?? $this->defaultContext[AbstractNormalizer::CIRCULAR_REFERENCE_LIMIT];
+        if (isset($context[self::HAL_CIRCULAR_REFERENCE_LIMIT_COUNTERS][$objectHash])) {
+            if ($context[self::HAL_CIRCULAR_REFERENCE_LIMIT_COUNTERS][$objectHash] >= $circularReferenceLimit) {
+                unset($context[self::HAL_CIRCULAR_REFERENCE_LIMIT_COUNTERS][$objectHash]);
+
+                return true;
+            }
+
+            ++$context[self::HAL_CIRCULAR_REFERENCE_LIMIT_COUNTERS][$objectHash];
+        } else {
+            $context[self::HAL_CIRCULAR_REFERENCE_LIMIT_COUNTERS][$objectHash] = 1;
+        }
+
+        return false;
+    }
+
+    /**
+     * Handles a circular reference.
+     *
+     * If a circular reference handler is set, it will be called. Otherwise, a
+     * {@class CircularReferenceException} will be thrown.
+     *
+     * @final
+     *
+     * @throws CircularReferenceException
+     */
+    protected function handleHalCircularReference(object $object, ?string $format = null, array $context = []): mixed
+    {
+        $circularReferenceHandler = $context[AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER] ?? $this->defaultContext[AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER];
+        if ($circularReferenceHandler) {
+            return $circularReferenceHandler($object, $format, $context);
+        }
+
+        throw new CircularReferenceException(\sprintf('A circular reference has been detected when serializing the object of class "%s" (configured limit: %d).', get_debug_type($object), $context[AbstractNormalizer::CIRCULAR_REFERENCE_LIMIT] ?? $this->defaultContext[AbstractNormalizer::CIRCULAR_REFERENCE_LIMIT]));
     }
 }

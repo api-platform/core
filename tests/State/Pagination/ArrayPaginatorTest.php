@@ -41,6 +41,7 @@ class ArrayPaginatorTest extends TestCase
             'Second of two pages of 3 items for the first page and 2 for the second' => [[0, 1, 2, 3, 4], 3, 3, 2, 5, 2, 2, false],
             'Empty results' => [[], 0, 2, 0, 0, 1, 1, false],
             '0 for max results' => [[0, 1, 2, 3], 2, 0, 0, 4, 1, 1, false],
+            'First result greater than total items' => [[0, 1], 2, 1, 0, 2, 3, 2, false],
         ];
     }
 }
