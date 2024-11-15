@@ -187,6 +187,20 @@ Notes:
 
 * [0d5f35683](https://github.com/api-platform/core/commit/0d5f356839eb6aa9f536044abe4affa736553e76) feat(laravel): laravel component (#5882)
 
+## v3.4.6
+
+### Bug fixes
+
+* [17c916c3a](https://github.com/api-platform/core/commit/17c916c3a1bcc837c9bc842dc48390dbeb043450) fix(symfony): service typo fix BackedEnumProvider for autowiring (#6769)
+* [216d9ccaa](https://github.com/api-platform/core/commit/216d9ccaacf7845daaaeab30f3a58bb5567430fe) fix(serializer): fetch type on normalization error when possible (#6761)
+* [2f967d934](https://github.com/api-platform/core/commit/2f967d9345004779f409b9ce1b5d0cbba84c7132) fix(doctrine): throw an exception when a filter is not found in a parameter (#6767)
+* [736ca045e](https://github.com/api-platform/core/commit/736ca045e6832f04aaa002ddd7b85c55df4696bb) fix(validator): allow to pass both a ConstraintViolationList and a previous exception (#6762)
+* [a98332d99](https://github.com/api-platform/core/commit/a98332d99a43338fa3bc0fd6b20f82ac58d1c397) fix(metadata): name convert parameter property (#6766)
+* [aa1667de1](https://github.com/api-platform/core/commit/aa1667de116fa9a40842f1480fc90ab49c7c2784) fix(state): empty result when the array paginator is out of bound (#6785)
+* [ab88353a3](https://github.com/api-platform/core/commit/ab88353a32f94146b01c34bae377ec5a735846db) fix(hal): detecting and handling circular reference (#6752)
+* [bba030614](https://github.com/api-platform/core/commit/bba030614b96887fea4f5c177e3137378ccae8a5) fix: properly support phpstan/phpdoc-parser 2 (#6789)
+* [bec147b91](https://github.com/api-platform/core/commit/bec147b916c29e346a698b28ddd4493bf305d9a0) fix(state): do not check content type if no input (#6794)
+
 ## v3.4.5
 
 ### Bug fixes

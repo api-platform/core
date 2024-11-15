@@ -23,7 +23,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 /**
  * Dummy Product.
  *
- * https://github.com/api-platform/core/issues/1107.
+ * @see https://github.com/api-platform/core/issues/1107
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
