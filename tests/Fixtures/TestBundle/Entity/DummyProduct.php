@@ -23,7 +23,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Dummy Product.
  *
- * https://github.com/api-platform/core/issues/1107.
+ * @see https://github.com/api-platform/core/issues/1107
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
