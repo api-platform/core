@@ -16,7 +16,6 @@ namespace ApiPlatform\Metadata\Resource;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\OperationNotFoundException;
-use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\Operation;
 
 /**
@@ -36,7 +35,7 @@ final class ResourceMetadataCollection extends \ArrayObject
         parent::__construct($input);
     }
 
-    public function getOperation(?string $operationName = null, bool $forceCollection = false, bool $httpOperation = false, bool $forceGraphQl = false): Operation|GraphQlOperation
+    public function getOperation(?string $operationName = null, bool $forceCollection = false, bool $httpOperation = false, bool $forceGraphQl = false): Operation
     {
         $operationName ??= '';
         $cachePrefix = ($forceCollection ? self::FORCE_COLLECTION : '').($httpOperation ? self::HTTP_OPERATION : '');
