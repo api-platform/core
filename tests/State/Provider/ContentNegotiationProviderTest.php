@@ -21,6 +21,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 
 class ContentNegotiationProviderTest extends TestCase
 {
@@ -59,5 +60,64 @@ class ContentNegotiationProviderTest extends TestCase
         $result = $provider->provide($operation, [], $context);
 
         $this->assertSame($expectedResult, $result);
+    }
+
+    public function testRequestWhenNoInput(): void
+    {
+        $expectedResult = new \stdClass();
+
+        $decorated = $this->prophesize(ProviderInterface::class);
+        $decorated->provide(Argument::cetera())->willReturn($expectedResult);
+
+        $negotiator = new Negotiator();
+        $formats = ['jsonld' => ['application/ld+json']];
+        $errorFormats = ['jsonld' => ['application/ld+json']];
+
+        $provider = new ContentNegotiationProvider($decorated->reveal(), $negotiator, $formats, $errorFormats);
+
+        $request = new Request(
+            server: [
+                'REQUEST_METHOD' => 'POST',
+                'REQUEST_URI' => '/',
+                'CONTENT_TYPE' => 'some-not-supported/content-type',
+            ],
+            content: ''
+        );
+
+        $operation = new Post();
+        $operation = $operation->withDeserialize(false);
+        $context = ['request' => $request];
+
+        $result = $provider->provide($operation, [], $context);
+
+        $this->assertSame($expectedResult, $result);
+    }
+
+    public function testRequestWithInput(): void
+    {
+        $this->expectException(UnsupportedMediaTypeHttpException::class);
+
+        $decorated = $this->prophesize(ProviderInterface::class);
+
+        $negotiator = new Negotiator();
+        $formats = ['jsonld' => ['application/ld+json']];
+        $errorFormats = ['jsonld' => ['application/ld+json']];
+
+        $provider = new ContentNegotiationProvider($decorated->reveal(), $negotiator, $formats, $errorFormats);
+
+        $request = new Request(
+            server: [
+                'REQUEST_METHOD' => 'POST',
+                'REQUEST_URI' => '/',
+                'CONTENT_TYPE' => 'some-not-supported/content-type',
+            ],
+            content: ''
+        );
+
+        $operation = new Post();
+        $operation = $operation->withDeserialize();
+        $context = ['request' => $request];
+
+        $provider->provide($operation, [], $context);
     }
 }
