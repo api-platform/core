@@ -25,6 +25,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use ApiPlatform\Serializer\Filter\FilterInterface as SerializerFilterInterface;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\DivisibleBy;
@@ -47,7 +48,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 final class ParameterResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    public function __construct(private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null, private readonly ?ContainerInterface $filterLocator = null)
+    public function __construct(private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null, private readonly ?ContainerInterface $filterLocator = null, private readonly ?NameConverterInterface $nameConverter = null)
     {
     }
 
@@ -134,6 +135,10 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         // Only add validation if the Symfony Validator is installed
         if (interface_exists(ValidatorInterface::class) && !$parameter->getConstraints()) {
             $parameter = $this->addSchemaValidation($parameter, $schema, $parameter->getRequired() ?? $description['required'] ?? false, $parameter->getOpenApi() ?: null);
+        }
+
+        if ($this->nameConverter && $property = $parameter->getProperty()) {
+            $parameter = $parameter->withProperty($this->nameConverter->normalize($property));
         }
 
         return $parameter;
