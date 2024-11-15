@@ -744,6 +744,7 @@ class ApiPlatformProvider extends ServiceProvider
                 oAuthRefreshUrl: $config->get('api-platform.swagger_ui.oauth.refreshUrl', null),
                 oAuthScopes: $config->get('api-platform.swagger_ui.oauth.scopes', []),
                 apiKeys: $config->get('api-platform.swagger_ui.apiKeys', []),
+                httpAuth: $config->get('api-platform.swagger_ui.http_auth', []),
             );
         });
 
