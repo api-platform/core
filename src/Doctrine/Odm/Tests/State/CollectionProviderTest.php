@@ -20,6 +20,7 @@ use ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document\ProviderDocument;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use Doctrine\ODM\MongoDB\Aggregation\Aggregation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Iterator\Iterator;
@@ -50,9 +51,12 @@ class CollectionProviderTest extends TestCase
     {
         $iterator = $this->prophesize(Iterator::class)->reveal();
 
+        $aggregationProphecy = $this->prophesize(Aggregation::class);
+        $aggregationProphecy->getIterator()->willReturn($iterator);
+
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
         $aggregationBuilderProphecy->hydrate(ProviderDocument::class)->willReturn($aggregationBuilderProphecy)->shouldBeCalled();
-        $aggregationBuilderProphecy->execute([])->willReturn($iterator)->shouldBeCalled();
+        $aggregationBuilderProphecy->getAggregation([])->willReturn($aggregationProphecy)->shouldBeCalled();
         $aggregationBuilder = $aggregationBuilderProphecy->reveal();
 
         $repositoryProphecy = $this->prophesize(DocumentRepository::class);
@@ -76,9 +80,12 @@ class CollectionProviderTest extends TestCase
     {
         $iterator = $this->prophesize(Iterator::class)->reveal();
 
+        $aggregationProphecy = $this->prophesize(Aggregation::class);
+        $aggregationProphecy->getIterator()->willReturn($iterator);
+
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
         $aggregationBuilderProphecy->hydrate(ProviderDocument::class)->willReturn($aggregationBuilderProphecy)->shouldBeCalled();
-        $aggregationBuilderProphecy->execute(['allowDiskUse' => true])->willReturn($iterator)->shouldBeCalled();
+        $aggregationBuilderProphecy->getAggregation(['allowDiskUse' => true])->willReturn($aggregationProphecy)->shouldBeCalled();
         $aggregationBuilder = $aggregationBuilderProphecy->reveal();
 
         $repositoryProphecy = $this->prophesize(DocumentRepository::class);
@@ -143,9 +150,12 @@ class CollectionProviderTest extends TestCase
     {
         $iterator = $this->prophesize(Iterator::class)->reveal();
 
+        $aggregationProphecy = $this->prophesize(Aggregation::class);
+        $aggregationProphecy->getIterator()->willReturn($iterator);
+
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
         $aggregationBuilderProphecy->hydrate(ProviderDocument::class)->willReturn($aggregationBuilderProphecy)->shouldBeCalled();
-        $aggregationBuilderProphecy->execute([])->willReturn($iterator)->shouldBeCalled();
+        $aggregationBuilderProphecy->getAggregation([])->willReturn($aggregationProphecy)->shouldBeCalled();
         $aggregationBuilder = $aggregationBuilderProphecy->reveal();
 
         $repositoryProphecy = $this->prophesize(DocumentRepository::class);

@@ -111,7 +111,7 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
         $attribute = $operation?->getExtraProperties()['doctrine_mongodb'] ?? [];
         $executeOptions = $attribute['execute_options'] ?? [];
 
-        return new Paginator($aggregationBuilder->execute($executeOptions), $manager->getUnitOfWork(), $resourceClass);
+        return new Paginator($aggregationBuilder->getAggregation($executeOptions)->getIterator(), $manager->getUnitOfWork(), $resourceClass);
     }
 
     private function addCountToContext(Builder $aggregationBuilder, array $context): array

@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use Doctrine\ODM\MongoDB\Aggregation\Aggregation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\MatchStage as AggregationMatch;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -49,10 +50,13 @@ class ItemProviderTest extends TestCase
         $result = new \stdClass();
         $iterator->current()->willReturn($result)->shouldBeCalled();
 
+        $aggregationProphecy = $this->prophesize(Aggregation::class);
+        $aggregationProphecy->getIterator()->willReturn($iterator);
+
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
         $aggregationBuilderProphecy->match()->willReturn($matchProphecy->reveal())->shouldBeCalled();
         $aggregationBuilderProphecy->hydrate(ProviderDocument::class)->willReturn($aggregationBuilderProphecy)->shouldBeCalled();
-        $aggregationBuilderProphecy->execute([])->willReturn($iterator->reveal())->shouldBeCalled();
+        $aggregationBuilderProphecy->getAggregation([])->willReturn($aggregationProphecy->reveal())->shouldBeCalled();
         $aggregationBuilder = $aggregationBuilderProphecy->reveal();
 
         $managerRegistry = $this->getManagerRegistry(ProviderDocument::class, $aggregationBuilder);
@@ -82,10 +86,13 @@ class ItemProviderTest extends TestCase
         $result = new \stdClass();
         $iterator->current()->willReturn($result)->shouldBeCalled();
 
+        $aggregationProphecy = $this->prophesize(Aggregation::class);
+        $aggregationProphecy->getIterator()->willReturn($iterator);
+
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
         $aggregationBuilderProphecy->match()->willReturn($matchProphecy->reveal())->shouldBeCalled();
         $aggregationBuilderProphecy->hydrate(ProviderDocument::class)->willReturn($aggregationBuilderProphecy)->shouldBeCalled();
-        $aggregationBuilderProphecy->execute(['allowDiskUse' => true])->willReturn($iterator->reveal())->shouldBeCalled();
+        $aggregationBuilderProphecy->getAggregation(['allowDiskUse' => true])->willReturn($aggregationProphecy->reveal())->shouldBeCalled();
         $aggregationBuilder = $aggregationBuilderProphecy->reveal();
 
         $managerRegistry = $this->getManagerRegistry(ProviderDocument::class, $aggregationBuilder);
@@ -116,10 +123,13 @@ class ItemProviderTest extends TestCase
         $result = new \stdClass();
         $iterator->current()->willReturn($result)->shouldBeCalled();
 
+        $aggregationProphecy = $this->prophesize(Aggregation::class);
+        $aggregationProphecy->getIterator()->willReturn($iterator);
+
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
         $aggregationBuilderProphecy->match()->willReturn($matchProphecy->reveal())->shouldBeCalled();
         $aggregationBuilderProphecy->hydrate(ProviderDocument::class)->willReturn($aggregationBuilderProphecy)->shouldBeCalled();
-        $aggregationBuilderProphecy->execute([])->willReturn($iterator->reveal())->shouldBeCalled();
+        $aggregationBuilderProphecy->getAggregation([])->willReturn($aggregationProphecy->reveal())->shouldBeCalled();
         $aggregationBuilder = $aggregationBuilderProphecy->reveal();
 
         $managerRegistry = $this->getManagerRegistry(ProviderDocument::class, $aggregationBuilder);

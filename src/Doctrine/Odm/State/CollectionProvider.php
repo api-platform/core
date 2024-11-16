@@ -77,6 +77,6 @@ final class CollectionProvider implements ProviderInterface
         $attribute = $operation->getExtraProperties()['doctrine_mongodb'] ?? [];
         $executeOptions = $attribute['execute_options'] ?? [];
 
-        return $aggregationBuilder->hydrate($documentClass)->execute($executeOptions);
+        return $aggregationBuilder->hydrate($documentClass)->getAggregation($executeOptions)->getIterator();
     }
 }

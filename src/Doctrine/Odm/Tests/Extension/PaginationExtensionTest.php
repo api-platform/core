@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
+use Doctrine\ODM\MongoDB\Aggregation\Aggregation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\AddFields;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Count;
@@ -333,8 +334,11 @@ class PaginationExtensionTest extends TestCase
             ],
         ]);
 
+        $aggregationProphecy = $this->prophesize(Aggregation::class);
+        $aggregationProphecy->getIterator()->willReturn($iteratorProphecy->reveal());
+
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
-        $aggregationBuilderProphecy->execute([])->willReturn($iteratorProphecy->reveal());
+        $aggregationBuilderProphecy->getAggregation([])->willReturn($aggregationProphecy->reveal());
         $aggregationBuilderProphecy->getPipeline()->willReturn([
             [
                 '$facet' => [
@@ -390,8 +394,11 @@ class PaginationExtensionTest extends TestCase
             ],
         ]);
 
+        $aggregationProphecy = $this->prophesize(Aggregation::class);
+        $aggregationProphecy->getIterator()->willReturn($iteratorProphecy->reveal());
+
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
-        $aggregationBuilderProphecy->execute(['allowDiskUse' => true])->willReturn($iteratorProphecy->reveal());
+        $aggregationBuilderProphecy->getAggregation(['allowDiskUse' => true])->willReturn($aggregationProphecy->reveal());
         $aggregationBuilderProphecy->getPipeline()->willReturn([
             [
                 '$facet' => [
