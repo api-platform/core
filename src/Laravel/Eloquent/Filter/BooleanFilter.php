@@ -21,21 +21,21 @@ final class BooleanFilter implements FilterInterface
 {
     use QueryPropertyTrait;
 
+    private const BOOLEAN_VALUES = [
+        'true' => true,
+        'false' => false,
+        '1' => true,
+        '0' => false,
+    ];
+
     /**
      * @param Builder<Model>       $builder
      * @param array<string, mixed> $context
      */
     public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder
     {
-        $booleanValues = [
-            'true' => true,
-            'false' => false,
-            '1' => true,
-            '0' => false,
-        ];
-
-        if (array_key_exists($values, $booleanValues)) {
-            $values = $booleanValues[$values];
+        if (!is_string($values) || !array_key_exists($values, self::BOOLEAN_VALUES)) {
+            return $builder;
         }
 
         return $builder->{$context['whereClause'] ?? 'where'}($this->getQueryProperty($parameter), $values);
