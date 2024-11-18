@@ -87,7 +87,16 @@ return [
         //    'refreshUrl' => '',
         //    'scopes' => ['scope1' => 'Description scope 1'],
         //    'pkce' => true
-        //]
+        //],
+        //'license' => [
+        //    'name' => 'Apache 2.0',
+        //    'url' => 'https://www.apache.org/licenses/LICENSE-2.0.html',
+        //],
+        //'contact' => [
+        //    'name' => 'API Support',
+        //    'url' => 'https://www.example.com/support',
+        //    'email' => 'support@example.com',
+        //],
     ],
 
     'url_generation_strategy' => UrlGeneratorInterface::ABS_PATH,
