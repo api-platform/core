@@ -77,6 +77,7 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
             $type = match ($builtinType) {
                 'integer' => new Type(Type::BUILTIN_TYPE_INT, $p['nullable']),
                 'double', 'real' => new Type(Type::BUILTIN_TYPE_FLOAT, $p['nullable']),
+                'boolean', 'bool' => new Type(Type::BUILTIN_TYPE_BOOL, $p['nullable']),
                 'datetime', 'date', 'timestamp' => new Type(Type::BUILTIN_TYPE_OBJECT, $p['nullable'], \DateTime::class),
                 'immutable_datetime', 'immutable_date' => new Type(Type::BUILTIN_TYPE_OBJECT, $p['nullable'], \DateTimeImmutable::class),
                 'collection', 'encrypted:collection' => new Type(Type::BUILTIN_TYPE_ITERABLE, $p['nullable'], Collection::class, true),
