@@ -14,9 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Routing;
 
 use ApiPlatform\Metadata\UrlGeneratorInterface;
-use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
@@ -75,12 +73,7 @@ final class Router implements RouterInterface, UrlGeneratorInterface
         }
 
         $request = Request::create($pathInfo, Request::METHOD_GET, [], [], [], ['HTTP_HOST' => $baseContext->getHost()]);
-        try {
-            $context = (new RequestContext())->fromRequest($request);
-        } catch (RequestExceptionInterface) {
-            throw new ResourceNotFoundException('Invalid request context.');
-        }
-
+        $context = (new RequestContext())->fromRequest($request);
         $context->setPathInfo($pathInfo);
         $context->setScheme($baseContext->getScheme());
         $context->setHost($baseContext->getHost());
