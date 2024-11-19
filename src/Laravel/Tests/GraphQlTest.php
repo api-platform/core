@@ -19,7 +19,6 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
-use Symfony\Component\Uid\Ulid;
 use Workbench\Database\Factories\AuthorFactory;
 use Workbench\Database\Factories\BookFactory;
 
@@ -88,8 +87,8 @@ class GraphQlTest extends TestCase
                     'author' => 'api/authors/'.$author->id,
                     'isbn' => fake()->isbn13(),
                     'isAvailable' => rand(0,1) === 1,
-                ]
-            ]
+                ],
+            ],
         ], ['accept' => ['application/json']]);
         $response->assertStatus(200);
         $data = $response->json();
