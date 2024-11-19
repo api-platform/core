@@ -19,6 +19,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
+use Symfony\Component\Uid\Ulid;
 use Workbench\Database\Factories\AuthorFactory;
 use Workbench\Database\Factories\BookFactory;
 
@@ -65,5 +66,38 @@ class GraphQlTest extends TestCase
         $this->assertArrayHasKey('data', $data);
         $this->assertCount(3, $data['data']['books']['edges']);
         $this->assertArrayNotHasKey('errors', $data);
+    }
+    public function testCreateBook(): void
+    {
+        /** @var \Workbench\App\Models\Author $author */
+        $author = AuthorFactory::new()->create();
+        $response = $this->postJson('/api/graphql', [
+            'query' => '
+                mutation createBook($book: createBookInput!){
+                    createBook(input: $book){
+                        book{
+                            name
+                            isAvailable
+                        }
+                    }
+                }
+            ',
+            'variables' => [
+                'book' => [
+                    'name' => fake()->name(),
+                    'author' => 'api/authors/'.$author->id,
+                    'isbn' => fake()->isbn13(),
+                    'isAvailable' => rand(0,1) === 1,
+                ]
+            ]
+        ], ['accept' => ['application/json']]);
+        $response->assertStatus(200);
+        $data = $response->json();
+        $this->assertArrayNotHasKey('errors', $data);
+        $this->assertArrayHasKey('data', $data);
+        $this->assertArrayHasKey('createBook', $data['data']);
+        $this->assertArrayHasKey('book', $data['data']['createBook']);
+        $this->assertArrayHasKey('isAvailable', $data['data']['createBook']['book']);
+        $this->assertIsBool($data['data']['createBook']['book']['isAvailable']);
     }
 }
