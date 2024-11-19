@@ -66,6 +66,7 @@ class GraphQlTest extends TestCase
         $this->assertCount(3, $data['data']['books']['edges']);
         $this->assertArrayNotHasKey('errors', $data);
     }
+
     public function testCreateBook(): void
     {
         /** @var \Workbench\App\Models\Author $author */
@@ -86,7 +87,7 @@ class GraphQlTest extends TestCase
                     'name' => fake()->name(),
                     'author' => 'api/authors/'.$author->id,
                     'isbn' => fake()->isbn13(),
-                    'isAvailable' => rand(0,1) === 1,
+                    'isAvailable' => 1 === random_int(0, 1),
                 ],
             ],
         ], ['accept' => ['application/json']]);
