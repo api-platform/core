@@ -81,8 +81,8 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
                 'datetime', 'date', 'timestamp' => new Type(Type::BUILTIN_TYPE_OBJECT, $p['nullable'], \DateTime::class),
                 'immutable_datetime', 'immutable_date' => new Type(Type::BUILTIN_TYPE_OBJECT, $p['nullable'], \DateTimeImmutable::class),
                 'collection', 'encrypted:collection' => new Type(Type::BUILTIN_TYPE_ITERABLE, $p['nullable'], Collection::class, true),
-                'encrypted:array' => new Type(Type::BUILTIN_TYPE_ARRAY, $p['nullable']),
-                'encrypted:object' => new Type(Type::BUILTIN_TYPE_OBJECT, $p['nullable']),
+                'array', 'encrypted:array' => new Type(Type::BUILTIN_TYPE_ARRAY, $p['nullable']),
+                'object', 'encrypted:object' => new Type(Type::BUILTIN_TYPE_OBJECT, $p['nullable']),
                 default => new Type(\in_array($builtinType, Type::$builtinTypes, true) ? $builtinType : Type::BUILTIN_TYPE_STRING, $p['nullable'] ?? true),
             };
 
