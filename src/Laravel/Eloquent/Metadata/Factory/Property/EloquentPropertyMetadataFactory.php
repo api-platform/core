@@ -74,16 +74,17 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
 
             // see https://laravel.com/docs/11.x/eloquent-mutators#attribute-casting
             $builtinType = $p['cast'] ?? $p['type'];
+            $optional = $p['nullable'] || !is_null($p['default']);
             $type = match ($builtinType) {
-                'integer' => new Type(Type::BUILTIN_TYPE_INT, $p['nullable']),
-                'double', 'real' => new Type(Type::BUILTIN_TYPE_FLOAT, $p['nullable']),
-                'boolean', 'bool' => new Type(Type::BUILTIN_TYPE_BOOL, $p['nullable']),
-                'datetime', 'date', 'timestamp' => new Type(Type::BUILTIN_TYPE_OBJECT, $p['nullable'], \DateTime::class),
-                'immutable_datetime', 'immutable_date' => new Type(Type::BUILTIN_TYPE_OBJECT, $p['nullable'], \DateTimeImmutable::class),
-                'collection', 'encrypted:collection' => new Type(Type::BUILTIN_TYPE_ITERABLE, $p['nullable'], Collection::class, true),
-                'array', 'encrypted:array' => new Type(Type::BUILTIN_TYPE_ARRAY, $p['nullable']),
-                'object', 'encrypted:object' => new Type(Type::BUILTIN_TYPE_OBJECT, $p['nullable']),
-                default => new Type(\in_array($builtinType, Type::$builtinTypes, true) ? $builtinType : Type::BUILTIN_TYPE_STRING, $p['nullable'] ?? true),
+                'integer' => new Type(Type::BUILTIN_TYPE_INT, $optional),
+                'double', 'real' => new Type(Type::BUILTIN_TYPE_FLOAT, $optional),
+                'boolean', 'bool' => new Type(Type::BUILTIN_TYPE_BOOL, $optional),
+                'datetime', 'date', 'timestamp' => new Type(Type::BUILTIN_TYPE_OBJECT, $optional, \DateTime::class),
+                'immutable_datetime', 'immutable_date' => new Type(Type::BUILTIN_TYPE_OBJECT, $optional, \DateTimeImmutable::class),
+                'collection', 'encrypted:collection' => new Type(Type::BUILTIN_TYPE_ITERABLE, $optional, Collection::class, true),
+                'array', 'encrypted:array' => new Type(Type::BUILTIN_TYPE_ARRAY, $optional),
+                'object', 'encrypted:object' => new Type(Type::BUILTIN_TYPE_OBJECT, $optional),
+                default => new Type(\in_array($builtinType, Type::$builtinTypes, true) ? $builtinType : Type::BUILTIN_TYPE_STRING, $optional ?? true),
             };
 
             return $propertyMetadata
