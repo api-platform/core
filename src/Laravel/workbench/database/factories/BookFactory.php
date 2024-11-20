@@ -37,6 +37,7 @@ class BookFactory extends Factory
             'author_id' => AuthorFactory::new(),
             'isbn' => fake()->isbn13(),
             'publication_date' => fake()->optional()->date(),
+            'is_available' => 1 === random_int(0, 1),
             'internal_note' => fake()->text(),
         ];
     }
