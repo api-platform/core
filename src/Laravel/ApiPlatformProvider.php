@@ -1135,14 +1135,18 @@ class ApiPlatformProvider extends ServiceProvider
 
         $app->singleton('api_platform.graphql.type_locator', function (Application $app) {
             $tagged = iterator_to_array($app->tagged('api_platform.graphql.type'));
+            $services = [];
+            foreach ($tagged as $service) {
+                $services[$service->name] = $service;
+            }
 
-            return new ServiceLocator($tagged);
+            return new ServiceLocator($services);
         });
 
         $app->singleton(TypesFactoryInterface::class, function (Application $app) {
             $tagged = iterator_to_array($app->tagged('api_platform.graphql.type'));
 
-            return new TypesFactory($app->make('api_platform.graphql.type_locator'), array_keys($tagged));
+            return new TypesFactory($app->make('api_platform.graphql.type_locator'), array_column($tagged, 'name'));
         });
         $app->singleton(TypesContainerInterface::class, function () {
             return new TypesContainer();
