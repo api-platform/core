@@ -115,6 +115,10 @@ final class ErrorListener extends SymfonyErrorListener
             $normalizationContext += ['api_error_resource' => true];
         }
 
+        if (isset($normalizationContext['item_uri_template'])) {
+            unset($normalizationContext['item_uri_template']);
+        }
+
         if (!isset($normalizationContext[AbstractObjectNormalizer::IGNORED_ATTRIBUTES])) {
             $normalizationContext[AbstractObjectNormalizer::IGNORED_ATTRIBUTES] = ['trace', 'file', 'line', 'code', 'message', 'traceAsString'];
         }
