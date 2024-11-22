@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.4.7
+
+### Bug fixes
+
+* [2d25e79e0](https://github.com/api-platform/core/commit/2d25e79e0e04ce549fb67ecc2017798a8deb7458) fix(symfony): unset item_uri_template when serializing an error (#6816)
+
 ## v3.4.6
 
 ### Bug fixes
