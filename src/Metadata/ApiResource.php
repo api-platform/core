@@ -106,7 +106,7 @@ class ApiResource extends Metadata
          *       'jsonapi' => ['application/vnd.api+json'],
          *       'json' =>    ['application/json'],
          *       'xml' =>     ['application/xml', 'text/xml'],
-         *       'yaml' =>    ['application/x-yaml'],
+         *       'yaml' =>    ['application/yaml'],
          *       'csv' =>     ['text/csv'],
          *       'html' =>    ['text/html'],
          *       'myformat' =>['application/vnd.myformat'],

@@ -23,6 +23,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\Patch;
@@ -55,6 +56,7 @@ use Workbench\App\Http\Requests\BookFormRequest;
                 new QueryParameter(key: 'order[:property]', filter: OrderFilter::class),
             ],
         ),
+        new Mutation(name: 'create'),
     ]
 )]
 #[QueryParameter(key: 'isbn', filter: PartialSearchFilter::class, constraints: 'min:2')]
@@ -74,8 +76,11 @@ class Book extends Model
     use HasFactory;
     use HasUlids;
 
-    protected $visible = ['name', 'author', 'isbn', 'publication_date'];
-    protected $fillable = ['name'];
+    protected $visible = ['name', 'author', 'isbn', 'publication_date', 'is_available'];
+    protected $fillable = ['name', 'is_available'];
+    protected $casts = [
+        'is_available' => 'boolean',
+    ];
 
     public function author(): BelongsTo
     {
