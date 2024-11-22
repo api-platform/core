@@ -1,5 +1,17 @@
 # Changelog
 
+## v4.0.10
+
+### Bug fixes
+
+* [774590069](https://github.com/api-platform/core/commit/77459006912d9162fdae9eadd496a62858ac990e) fix(laravel): add contact & license options to fix swagger UI issues (#6804)
+* [7ff9790c8](https://github.com/api-platform/core/commit/7ff9790c8e326de8152c653974fd523770dc6501) fix(laravel): allow boolean cast (#6808)
+* [f19dd9446](https://github.com/api-platform/core/commit/f19dd9446f5722d243e82b1e7bc34ebdab95719d) fix(laravel): graphQl type locator indexes (#6815)
+
+Also contains [v3.4.7 changes](#v347).
+
+### Features
+
 ## v4.0.9
 
 ### Bug fixes
