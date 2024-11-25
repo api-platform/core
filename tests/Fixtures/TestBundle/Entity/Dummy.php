@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\Link;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Context;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -88,6 +89,14 @@ class Dummy
     public $dummyDate;
 
     /**
+     * @var \DateTime|null A dummy date with format
+     */
+    #[Context(denormalizationContext: ['datetime_format' => 'Y-m-d'])]
+    #[ApiProperty(iris: ['https://schema.org/DateTime'])]
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private $dummyDateWithFormat;
+
+    /**
      * @var float|null A dummy float
      */
     #[ORM\Column(type: 'float', nullable: true)]
@@ -140,9 +149,10 @@ class Dummy
     {
     }
 
-    public function __construct()
+    public function __construct(?\DateTime $dummyDateWithFormat = null)
     {
         $this->relatedDummies = new ArrayCollection();
+        $this->dummyDateWithFormat = $dummyDateWithFormat;
     }
 
     public function getId()
@@ -207,6 +217,11 @@ class Dummy
     public function getDummyDate()
     {
         return $this->dummyDate;
+    }
+
+    public function getDummyDateWithFormat()
+    {
+        return $this->dummyDateWithFormat;
     }
 
     public function setDummyPrice($dummyPrice)
