@@ -58,6 +58,10 @@ final class ErrorNormalizer implements NormalizerInterface
 
     public function getSupportedTypes(?string $format): array
     {
-        return $this->inner->getSupportedTypes($format);
+        if (method_exists($this->inner, 'getSupportedTypes')) {
+            return $this->inner->getSupportedTypes($format);
+        }
+
+        return [];
     }
 }
