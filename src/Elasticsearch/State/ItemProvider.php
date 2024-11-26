@@ -69,7 +69,7 @@ final class ItemProvider implements ProviderInterface
             throw new Error(status: $response->getStatusCode(), detail: (string) $response->getBody(), title: $response->getReasonPhrase(), originalTrace: $e->getTrace());
         }
 
-        if ($this->client instanceof Client && $documents instanceof Elasticsearch) {
+        if (class_exists(Elastic\Elasticsearch\Response\Elasticsearch::class) && $documents instanceof Elasticsearch) {
             $document = $document->asArray();
         }
 
