@@ -20,11 +20,11 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Util\Inflector;
 use ApiPlatform\State\ApiResource\Error;
 use ApiPlatform\State\ProviderInterface;
-use Elasticsearch\Client as V7Client;
-use Elasticsearch\Common\Exceptions\Missing404Exception as V7Missing404Exception;
 use Elastic\Elasticsearch\Client;
 use Elastic\Elasticsearch\Exception\ClientResponseException;
 use Elastic\Elasticsearch\Response\Elasticsearch;
+use Elasticsearch\Client as V7Client;
+use Elasticsearch\Common\Exceptions\Missing404Exception as V7Missing404Exception;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
