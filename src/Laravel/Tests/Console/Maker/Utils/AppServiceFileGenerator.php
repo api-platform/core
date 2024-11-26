@@ -27,7 +27,7 @@ final readonly class AppServiceFileGenerator
      */
     public function regenerateProviderFile(): void
     {
-        $templatePath = \dirname(__DIR__).'/Resources/skeleton/AppServiceProvider.tpl.php';
+        $templatePath = \dirname(__DIR__).'/Resources/skeleton/AppServiceProvider.php.tpl';
         $targetPath = base_path('app/Providers/AppServiceProvider.php');
 
         $this->regenerateFileFromTemplate($templatePath, $targetPath);

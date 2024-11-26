@@ -49,8 +49,8 @@ final readonly class StateTemplateGenerator
     private function loadTemplate(StateTypeEnum $stateTypeEnum): string
     {
         $templateFile = match ($stateTypeEnum) {
-            StateTypeEnum::Provider => 'StateProvider.tpl.php',
-            StateTypeEnum::Processor => 'StateProcessor.tpl.php',
+            StateTypeEnum::Provider => 'StateProvider.php.tpl',
+            StateTypeEnum::Processor => 'StateProcessor.php.tpl',
         };
 
         $templatePath = \dirname(__DIR__).'/Resources/skeleton/'.$templateFile;
