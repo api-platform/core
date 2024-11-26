@@ -20,6 +20,8 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Util\Inflector;
 use ApiPlatform\State\ApiResource\Error;
 use ApiPlatform\State\ProviderInterface;
+use Elasticsearch\Client as V7Client;
+use Elasticsearch\Common\Exceptions\Missing404Exception as V7Missing404Exception;
 use Elastic\Elasticsearch\Client;
 use Elastic\Elasticsearch\Exception\ClientResponseException;
 use Elastic\Elasticsearch\Response\Elasticsearch;
@@ -34,7 +36,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  */
 final class ItemProvider implements ProviderInterface
 {
-    public function __construct(private readonly Client $client, private readonly ?DenormalizerInterface $denormalizer = null, private readonly ?InflectorInterface $inflector = new Inflector())
+    public function __construct(private readonly V7Client|Client $client, private readonly ?DenormalizerInterface $denormalizer = null, private readonly ?InflectorInterface $inflector = new Inflector())
     {
     }
 
@@ -56,6 +58,8 @@ final class ItemProvider implements ProviderInterface
 
         try {
             $document = $this->client->get($params);
+        } catch (V7Missing404Exception) {
+            return null;
         } catch (ClientResponseException $e) {
             $response = $e->getResponse();
             if (404 === $response->getStatusCode()) {
@@ -65,7 +69,7 @@ final class ItemProvider implements ProviderInterface
             throw new Error(status: $response->getStatusCode(), detail: (string) $response->getBody(), title: $response->getReasonPhrase(), originalTrace: $e->getTrace());
         }
 
-        if ($document instanceof Elasticsearch) {
+        if ($this->client instanceof Client && $documents instanceof Elasticsearch) {
             $document = $document->asArray();
         }
 

@@ -21,6 +21,8 @@ use ApiPlatform\Metadata\Util\Inflector;
 use ApiPlatform\State\ApiResource\Error;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\ProviderInterface;
+use Elasticsearch\Client as V7Client;
+use Elasticsearch\Common\Exceptions\Missing404Exception as V7Missing404Exception;
 use Elastic\Elasticsearch\Client;
 use Elastic\Elasticsearch\Exception\ClientResponseException;
 use Elastic\Elasticsearch\Response\Elasticsearch;
@@ -37,7 +39,7 @@ final class CollectionProvider implements ProviderInterface
     /**
      * @param RequestBodySearchCollectionExtensionInterface[] $collectionExtensions
      */
-    public function __construct(private readonly Client $client, private readonly ?DenormalizerInterface $denormalizer = null, private readonly ?Pagination $pagination = null, private readonly iterable $collectionExtensions = [], private readonly ?InflectorInterface $inflector = new Inflector())
+    public function __construct(private readonly V7Client|Client $client, private readonly ?DenormalizerInterface $denormalizer = null, private readonly ?Pagination $pagination = null, private readonly iterable $collectionExtensions = [], private readonly ?InflectorInterface $inflector = new Inflector())
     {
     }
 
@@ -69,12 +71,14 @@ final class CollectionProvider implements ProviderInterface
 
         try {
             $documents = $this->client->search($params);
+        } catch (V7Missing404Exception $e) {
+            throw new Error(status: $e->getCode(), detail: $e->getMessage(), title: $e->getMessage(), originalTrace: $e->getTrace());
         } catch (ClientResponseException $e) {
             $response = $e->getResponse();
             throw new Error(status: $response->getStatusCode(), detail: (string) $response->getBody(), title: $response->getReasonPhrase(), originalTrace: $e->getTrace());
         }
 
-        if ($documents instanceof Elasticsearch) {
+        if ($this->client instanceof Client && $documents instanceof Elasticsearch) {
             $documents = $documents->asArray();
         }
 
