@@ -36,6 +36,7 @@
         <service id="api_platform.json_schema.metadata.property.metadata_factory.schema" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="10" class="ApiPlatform\JsonSchema\Metadata\Property\Factory\SchemaPropertyMetadataFactory" public="false">
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.json_schema.metadata.property.metadata_factory.schema.inner" />
+            <argument type="service" id="api_platform.property_info" on-invalid="null" />
         </service>
 
         <service id="api_platform.json_schema.backward_compatible_schema_factory" decorates="api_platform.json_schema.schema_factory" decoration-priority="-2" class="ApiPlatform\JsonSchema\BackwardCompatibleSchemaFactory">
