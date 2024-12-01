@@ -24,7 +24,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-final class InnerFieldsNameConverter implements AdvancedNameConverterInterface
+final class InnerFieldsNameConverter implements NameConverterInterface, AdvancedNameConverterInterface
 {
     public function __construct(private readonly NameConverterInterface $inner = new CamelCaseToSnakeCaseNameConverter())
     {

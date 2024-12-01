@@ -62,7 +62,9 @@ final class ContentNegotiationProvider implements ProviderInterface
     private function addRequestFormats(Request $request, array $formats): void
     {
         foreach ($formats as $format => $mimeTypes) {
-            $request->setFormat($format, (array) $mimeTypes);
+            $existingMimeTypes = $request->getMimeTypes($format);
+            $newMimeTypes = array_unique(array_merge((array) $mimeTypes, $existingMimeTypes));
+            $request->setFormat($format, $newMimeTypes);
         }
     }
 

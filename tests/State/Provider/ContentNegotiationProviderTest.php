@@ -27,6 +27,23 @@ class ContentNegotiationProviderTest extends TestCase
 {
     use ProphecyTrait;
 
+    public function testAddRequestFormatsAddsMimeTypesToFormat(): void
+    {
+        $provider = new ContentNegotiationProvider();
+        $request = new Request();
+        $formats = ['json' => ['application/problem+json']];
+
+        $operation = new Post(outputFormats: $formats);
+        $context = ['request' => $request];
+
+        $provider->provide($operation, [], $context);
+
+        $mimeTypes = $request->getMimeTypes('json');
+
+        $this->assertContains('application/problem+json', $mimeTypes);
+        $this->assertContains('application/json', $mimeTypes);
+    }
+
     public function testRequestWithEmptyContentType(): void
     {
         $expectedResult = new \stdClass();
