@@ -139,67 +139,62 @@
             </div>
         </div>
         {% if dataCollected.resourceMetadataCollection is not empty %}
-            <div class="sf-tabs">
-                <div class="tab">
-                    <h3 class="tab-title metadata-tab-title">Metadata</h3>
-                    <h3>Resources</h3>
-                    <div class="tab-content metadata-tab-content">
-                        <div class="sf-tabs">
-                            {% for resourceMetadata in dataCollected.resourceMetadataCollection %}
-                                <div class="tab">
-                                    <h3 class="tab-title">
-                                        {{ resourceMetadata.resource.uriTemplate ??  resourceMetadata.resource.shortName }}
-                                    </h3>
-                                    <div class="tab-content">
-                                        <table>
-                                            <thead>
-                                            <tr>
-                                                <th scope="col" class="key">Resource</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <tr>
-                                                <td>{{- profiler_dump(resourceMetadata.resource, 1) -}}</td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
-                                        {{ apiPlatform.operationTable(resourceMetadata.operations, '', dataCollected.requestAttributes.operation_name|default('')) }}
-                                        <table>
-                                            <thead>
-                                            <tr>
-                                                <th scope="col" class="key">Filters</th>
-                                                <th scope="col"></th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            {% if dataCollected.filters and loop.index0 in dataCollected.filters|keys %}
-                                                {% for id, filter in dataCollected.filters[loop.index0] %}
-                                                    {% set ignored_filter = filter is same as(null) %}
-                                                    <tr{% if ignored_filter %} class="status-warning"{% endif %}>
-                                                        <td>
-                                                            {{ id }}
-                                                            {% if ignored_filter %}
-                                                                <span class="newline text-muted">ignored filter</span>
-                                                            {% else %}
-                                                                {{ dump(filter) }}
-                                                            {% endif %}
-                                                        </td>
-                                                    </tr>
-                                                {% endfor %}
-                                            {% else %}
-                                                <tr>
-                                                    <td class="text-muted" colspan="2">
-                                                        No available filter declared for this resource.
+            <h3>Resources</h3>
+            <div class="tab-content metadata-tab-content">
+                <div class="sf-tabs">
+                    {% for resourceMetadata in dataCollected.resourceMetadataCollection %}
+                        <div class="tab">
+                            <h3 class="tab-title">
+                                {{ resourceMetadata.resource.uriTemplate ?: resourceMetadata.resource.shortName }}
+                            </h3>
+                            <div class="tab-content">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" class="key">Resource</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>{{- profiler_dump(resourceMetadata.resource, 1) -}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                {{ apiPlatform.operationTable(resourceMetadata.operations, '', dataCollected.requestAttributes.operation_name|default('')) }}
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" class="key">Filters</th>
+                                            <th scope="col"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if dataCollected.filters and loop.index0 in dataCollected.filters|keys %}
+                                            {% for id, filter in dataCollected.filters[loop.index0] %}
+                                                {% set ignored_filter = filter is same as(null) %}
+                                                <tr{% if ignored_filter %} class="status-warning"{% endif %}>
+                                                    <td>
+                                                        {{ id }}
+                                                        {% if ignored_filter %}
+                                                            <span class="newline text-muted">ignored filter</span>
+                                                        {% else %}
+                                                            {{ dump(filter) }}
+                                                        {% endif %}
                                                     </td>
                                                 </tr>
-                                            {% endif %}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            {% endfor %}
+                                            {% endfor %}
+                                        {% else %}
+                                            <tr>
+                                                <td class="text-muted" colspan="2">
+                                                    No available filter declared for this resource.
+                                                </td>
+                                            </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
         {% endif %}

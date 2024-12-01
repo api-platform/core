@@ -21,7 +21,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-final class ReservedAttributeNameConverter implements AdvancedNameConverterInterface
+final class ReservedAttributeNameConverter implements NameConverterInterface, AdvancedNameConverterInterface
 {
     public const JSON_API_RESERVED_ATTRIBUTES = [
         'id' => '_id',
