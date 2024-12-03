@@ -58,6 +58,30 @@ final class CollectionProvider implements ProviderInterface
             $query = $extension->apply($query, $uriVariables, $operation, $context);
         }
 
+        $order = $operation->getOrder();
+        if (null !== $order) {
+            $isList = array_is_list($order);
+            foreach ($operation->getOrder() ?? [] as $property => $direction) {
+                if ($isList) {
+                    $property = $direction;
+                    $direction = 'ASC';
+                }
+
+                if (str_contains($property, '.')) {
+                    [$table, $property] = explode('.', $property);
+
+                    // Relation Order by, we need to do laravel eager loading
+                    $query->with([
+                        $table => fn ($query) => $query->orderBy($property, $direction),
+                    ]);
+
+                    continue;
+                }
+
+                $query->orderBy($property, $direction);
+            }
+        }
+
         if (false === $this->pagination->isEnabled($operation, $context)) {
             return $query->get();
         }
