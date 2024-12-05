@@ -191,7 +191,7 @@ final class PublishMercureUpdatesListener
 
         foreach ($options as $key => $value) {
             if (!isset(self::ALLOWED_KEYS[$key])) {
-                throw new InvalidArgumentException(\sprintf('The option "%s" set in the "mercure" attribute of the "%s" resource does not exist. Existing options: "%s"', $key, $resourceClass, implode('", "', self::ALLOWED_KEYS)));
+                throw new InvalidArgumentException(\sprintf('The option "%s" set in the "mercure" attribute of the "%s" resource does not exist. Existing options: "%s"', $key, $resourceClass, implode('", "', array_keys(self::ALLOWED_KEYS))));
             }
         }
 
