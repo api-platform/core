@@ -1,5 +1,15 @@
 # Changelog
 
+## v3.4.8
+
+### Bug fixes
+
+* [4d7deeaf7](https://github.com/api-platform/core/commit/4d7deeaf794178b5496ae989520095831a86df8a) fix(jsonld): check if supportedTypes exists (#6825)
+* [5111935d4](https://github.com/api-platform/core/commit/5111935d4f917920c6f3d24b828f9d59fd0e3520) fix(symfony): object typed property schema collection restriction (#6823)
+* [6bf894f6f](https://github.com/api-platform/core/commit/6bf894f6f0ead0751936aeddcfc527f017498bb3) fix(serializer): use attribute denormalization context for constructor arguments (#6821)
+* [86c97cac3](https://github.com/api-platform/core/commit/86c97cac3b8d45b6190e2999b99a02e88dd4e527) fix(symfony): symfony 7.2 deprecations (#6835)
+* [d312eae7e](https://github.com/api-platform/core/commit/d312eae7ef590ec05139c09bfaf2d3c7668a3f22) fix(doctrine): fixed orm datefilter applying inner join when no filtering values have been provided (#6849)
+
 ## v3.4.7
 
 ### Bug fixes
