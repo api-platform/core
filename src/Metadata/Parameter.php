@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
-use ApiPlatform\OpenApi;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ParameterProviderInterface;
@@ -63,7 +62,7 @@ abstract class Parameter
     }
 
     /**
-     * @return OpenApi\Model\Parameter[]|OpenApi\Model\Parameter|bool|null
+     * @return OpenApiParameter[]|OpenApiParameter|bool|null
      */
     public function getOpenApi(): OpenApiParameter|array|bool|null
     {
@@ -171,7 +170,7 @@ abstract class Parameter
     }
 
     /**
-     * @param OpenApi\Model\Parameter[]|OpenApi\Model\Parameter|bool $openApi
+     * @param OpenApiParameter[]|OpenApiParameter|bool $openApi
      */
     public function withOpenApi(OpenApiParameter|array|bool $openApi): static
     {

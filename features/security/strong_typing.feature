@@ -89,6 +89,19 @@ Feature: Handle properly invalid data submitted to the API
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
 
+  Scenario: Ignore date with wrong format
+    When I add "Content-Type" header equal to "application/ld+json"
+    And I send a "POST" request to "/dummies" with body:
+    """
+    {
+      "name": "Invalid date format",
+      "dummyDateWithFormat": "2020-01-01T00:00:00+00:00"
+    }
+    """
+    Then the response status code should be 400
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
+
   Scenario: Send non-array data when an array is expected
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummies" with body:

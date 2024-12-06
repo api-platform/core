@@ -298,6 +298,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             foreach ($constructorParameters as $constructorParameter) {
                 $paramName = $constructorParameter->name;
                 $key = $this->nameConverter ? $this->nameConverter->normalize($paramName, $class, $format, $context) : $paramName;
+                $attributeContext = $this->getAttributeDenormalizationContext($class, $paramName, $context);
+                $attributeContext['deserialization_path'] = $attributeContext['deserialization_path'] ?? $key;
 
                 $allowed = false === $allowedAttributes || (\is_array($allowedAttributes) && \in_array($paramName, $allowedAttributes, true));
                 $ignored = !$this->isAllowedAttribute($class, $paramName, $format, $context);
@@ -310,10 +312,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                         $params[] = $data[$paramName];
                     }
                 } elseif ($allowed && !$ignored && (isset($data[$key]) || \array_key_exists($key, $data))) {
-                    $constructorContext = $context;
-                    $constructorContext['deserialization_path'] = $context['deserialization_path'] ?? $key;
                     try {
-                        $params[] = $this->createConstructorArgument($data[$key], $key, $constructorParameter, $constructorContext, $format);
+                        $params[] = $this->createConstructorArgument($data[$key], $key, $constructorParameter, $attributeContext, $format);
                     } catch (NotNormalizableValueException $exception) {
                         if (!isset($context['not_normalizable_value_exceptions'])) {
                             throw $exception;
@@ -332,7 +332,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                         $missingConstructorArguments[] = $constructorParameter->name;
                     }
 
-                    $attributeContext = $this->getAttributeDenormalizationContext($class, $paramName, $context);
                     $constructorParameterType = 'unknown';
                     $reflectionType = $constructorParameter->getType();
                     if ($reflectionType instanceof \ReflectionNamedType) {
@@ -343,7 +342,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                         \sprintf('Failed to create object because the class misses the "%s" property.', $constructorParameter->name),
                         null,
                         [$constructorParameterType],
-                        $attributeContext['deserialization_path'] ?? null,
+                        $attributeContext['deserialization_path'],
                         true
                     );
                     $context['not_normalizable_value_exceptions'][] = $exception;
@@ -386,7 +385,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         return $mappedClass;
     }
 
-    protected function createConstructorArgument($parameterData, string $key, \ReflectionParameter $constructorParameter, array &$context, ?string $format = null): mixed
+    protected function createConstructorArgument($parameterData, string $key, \ReflectionParameter $constructorParameter, array $context, ?string $format = null): mixed
     {
         return $this->createAndValidateAttributeValue($constructorParameter->name, $parameterData, $format, $context);
     }

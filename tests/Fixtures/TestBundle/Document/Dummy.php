@@ -20,6 +20,8 @@ use ApiPlatform\Metadata\Link;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Symfony\Component\Serializer\Attribute\Context;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -28,9 +30,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alexandre Delplace <alexandre.delplacemille@gmail.com>
  */
-#[ApiResource(extraProperties: ['doctrine_mongodb' => ['execute_options' => ['allowDiskUse' => true]], 'standard_put' => false], filters: ['my_dummy.mongodb.boolean', 'my_dummy.mongodb.date', 'my_dummy.mongodb.exists', 'my_dummy.mongodb.numeric', 'my_dummy.mongodb.order', 'my_dummy.mongodb.range', 'my_dummy.mongodb.search', 'my_dummy.property'])]
-#[ApiResource(uriTemplate: '/related_owned_dummies/{id}/owning_dummy{._format}', uriVariables: ['id' => new Link(fromClass: RelatedOwnedDummy::class, identifiers: ['id'], fromProperty: 'owningDummy')], status: 200, filters: ['my_dummy.mongodb.boolean', 'my_dummy.mongodb.date', 'my_dummy.mongodb.exists', 'my_dummy.mongodb.numeric', 'my_dummy.mongodb.order', 'my_dummy.mongodb.range', 'my_dummy.mongodb.search', 'my_dummy.property'], operations: [new Get()])]
-#[ApiResource(uriTemplate: '/related_owning_dummies/{id}/owned_dummy{._format}', uriVariables: ['id' => new Link(fromClass: RelatedOwningDummy::class, identifiers: ['id'], fromProperty: 'ownedDummy')], status: 200, filters: ['my_dummy.mongodb.boolean', 'my_dummy.mongodb.date', 'my_dummy.mongodb.exists', 'my_dummy.mongodb.numeric', 'my_dummy.mongodb.order', 'my_dummy.mongodb.range', 'my_dummy.mongodb.search', 'my_dummy.property'], operations: [new Get()])]
+#[ApiResource(extraProperties: ['doctrine_mongodb' => ['execute_options' => ['allowDiskUse' => true]], 'standard_put' => false], filters: ['my_dummy.mongodb.boolean', 'my_dummy.mongodb.date', 'my_dummy.mongodb.exists', 'my_dummy.mongodb.numeric', 'my_dummy.mongodb.order', 'my_dummy.mongodb.range', 'my_dummy.mongodb.search', 'my_dummy.property'], normalizationContext: [AbstractNormalizer::IGNORED_ATTRIBUTES => ['dummyDateWithFormat']])]
+#[ApiResource(uriTemplate: '/related_owned_dummies/{id}/owning_dummy{._format}', uriVariables: ['id' => new Link(fromClass: RelatedOwnedDummy::class, identifiers: ['id'], fromProperty: 'owningDummy')], status: 200, filters: ['my_dummy.mongodb.boolean', 'my_dummy.mongodb.date', 'my_dummy.mongodb.exists', 'my_dummy.mongodb.numeric', 'my_dummy.mongodb.order', 'my_dummy.mongodb.range', 'my_dummy.mongodb.search', 'my_dummy.property'], operations: [new Get()], normalizationContext: [AbstractNormalizer::IGNORED_ATTRIBUTES => ['dummyDateWithFormat']])]
+#[ApiResource(uriTemplate: '/related_owning_dummies/{id}/owned_dummy{._format}', uriVariables: ['id' => new Link(fromClass: RelatedOwningDummy::class, identifiers: ['id'], fromProperty: 'ownedDummy')], status: 200, filters: ['my_dummy.mongodb.boolean', 'my_dummy.mongodb.date', 'my_dummy.mongodb.exists', 'my_dummy.mongodb.numeric', 'my_dummy.mongodb.order', 'my_dummy.mongodb.range', 'my_dummy.mongodb.search', 'my_dummy.property'], operations: [new Get()], normalizationContext: [AbstractNormalizer::IGNORED_ATTRIBUTES => ['dummyDateWithFormat']])]
 #[ODM\Document]
 class Dummy
 {
@@ -76,6 +78,13 @@ class Dummy
     #[ODM\Field(type: 'date', nullable: true)]
     public $dummyDate;
     /**
+     * @var \DateTime|null A dummy date
+     */
+    #[Context(denormalizationContext: ['datetime_format' => 'Y-m-d'])]
+    #[ApiProperty(iris: ['https://schema.org/DateTime'])]
+    #[ODM\Field(type: 'date', nullable: true)]
+    private $dummyDateWithFormat;
+    /**
      * @var float|null A dummy float
      */
     #[ODM\Field(type: 'float', nullable: true)]
@@ -113,9 +122,10 @@ class Dummy
     {
     }
 
-    public function __construct()
+    public function __construct(?\DateTime $dummyDateWithFormat = null)
     {
         $this->relatedDummies = new ArrayCollection();
+        $this->dummyDateWithFormat = $dummyDateWithFormat;
     }
 
     public function getId(): ?int
@@ -176,6 +186,11 @@ class Dummy
     public function getDummyDate()
     {
         return $this->dummyDate;
+    }
+
+    public function getDummyDateWithFormat()
+    {
+        return $this->dummyDateWithFormat;
     }
 
     public function setDummyPrice($dummyPrice)
