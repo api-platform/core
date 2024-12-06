@@ -58,10 +58,9 @@ final class CollectionProvider implements ProviderInterface
             $query = $extension->apply($query, $uriVariables, $operation, $context);
         }
 
-        $order = $operation->getOrder();
-        if (null !== $order) {
+        if ($order = $operation->getOrder()) {
             $isList = array_is_list($order);
-            foreach ($operation->getOrder() ?? [] as $property => $direction) {
+            foreach ($order as $property => $direction) {
                 if ($isList) {
                     $property = $direction;
                     $direction = 'ASC';
