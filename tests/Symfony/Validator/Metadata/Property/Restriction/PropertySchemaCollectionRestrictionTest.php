@@ -75,7 +75,7 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
 
     public static function createProvider(): \Generator
     {
-        yield 'empty' => [new Collection([]), new ApiProperty(), ['type' => 'object', 'properties' => [], 'additionalProperties' => false]];
+        yield 'empty' => [new Collection([]), new ApiProperty(), ['type' => 'object', 'properties' => new \ArrayObject(), 'additionalProperties' => false]];
 
         $fields = [
             'name' => new Required([
@@ -100,13 +100,13 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
                 ],
             ]),
         ];
-        $properties = [
+        $properties = new \ArrayObject([
             'name' => new \ArrayObject(),
             'email' => ['minLength' => 2, 'maxLength' => 255, 'format' => 'email'],
             'phone' => ['pattern' => '^([+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*)$'],
             'age' => ['exclusiveMinimum' => 0],
-            'social' => ['type' => 'object', 'properties' => ['githubUsername' => new \ArrayObject()], 'additionalProperties' => false, 'required' => ['githubUsername']],
-        ];
+            'social' => ['type' => 'object', 'properties' => new \ArrayObject(['githubUsername' => new \ArrayObject()]), 'additionalProperties' => false, 'required' => ['githubUsername']],
+        ]);
         $required = ['name', 'email', 'social'];
 
         yield 'with fields' => [
