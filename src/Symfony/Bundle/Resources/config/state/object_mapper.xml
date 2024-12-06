@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="api_platform.state_provider.object_mapper" class="ApiPlatform\State\Provider\ObjectMapperProvider" decorates="api_platform.state_provider.read">
+            <argument type="service" id="object_mapper" />
+            <argument type="service" id="api_platform.state_provider.object_mapper.inner" />
+        </service>
+
+        <service id="api_platform.state_processor.object_mapper" class="ApiPlatform\State\Processor\ObjectMapperProcessor" decorates="api_platform.state_processor.locator">
+            <argument type="service" id="object_mapper" />
+            <argument type="service" id="api_platform.state_processor.object_mapper.inner" />
+        </service>
+    </services>
+</container>
