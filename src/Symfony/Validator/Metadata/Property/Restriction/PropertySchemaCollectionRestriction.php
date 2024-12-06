@@ -40,7 +40,7 @@ final class PropertySchemaCollectionRestriction implements PropertySchemaRestric
     {
         $restriction = [
             'type' => 'object',
-            'properties' => [],
+            'properties' => new \ArrayObject(),
             'additionalProperties' => $constraint->allowExtraFields,
         ];
         $required = [];
