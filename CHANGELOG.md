@@ -1,5 +1,18 @@
 # Changelog
 
+## v4.0.11
+
+### Bug fixes
+
+* [af66075fd](https://github.com/api-platform/core/commit/af66075fdd6b83bdebc1c4ca33cc0ab7e1a7f8af) fix(laravel): fix foregin keys (relations) beeing in attributes (#6843)
+
+
+### Features
+
+* [2d59c6369](https://github.com/api-platform/core/commit/2d59c63699b4602cfe4d62504896c6d4121c1be4) feat(laravel): belongs to many relations (#6818)
+
+Also contains [v3.4.8 changes](#v348).
+
 ## v4.0.10
 
 ### Bug fixes
