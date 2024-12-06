@@ -377,15 +377,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
             [
                 'type' => 'array',
                 'items' => [
-                    'type' => 'object',
-                    'properties' => [
-                        'bar' => [
-                            'type' => 'string',
-                        ],
-                        'baz' => [
-                            'type' => 'integer',
-                        ],
-                    ],
+                    '$ref' => '#/definitions/Foo.jsonld',
                 ],
             ],
         ];
@@ -394,15 +386,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
             [
                 'type' => 'array',
                 'items' => [
-                    'type' => 'object',
-                    'properties' => [
-                        'bar' => [
-                            'type' => 'string',
-                        ],
-                        'baz' => [
-                            'type' => 'integer',
-                        ],
-                    ],
+                    '$ref' => '#/definitions/Foo.jsonld',
                 ],
             ],
         ];
@@ -411,15 +395,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
             [
                 'type' => 'object',
                 'additionalProperties' => [
-                    'type' => 'object',
-                    'properties' => [
-                        'bar' => [
-                            'type' => 'string',
-                        ],
-                        'baz' => [
-                            'type' => 'integer',
-                        ],
-                    ],
+                    '$ref' => '#/definitions/Foo.jsonld',
                 ],
             ],
         ];

@@ -21,7 +21,6 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Ramsey\Uuid\UuidInterface;
-use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
@@ -38,7 +37,6 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
     public function __construct(
         ResourceClassResolverInterface $resourceClassResolver,
         private readonly ?PropertyMetadataFactoryInterface $decorated = null,
-        private readonly ?PropertyInfoExtractorInterface $propertyInfo = null,
     ) {
         $this->resourceClassResolver = $resourceClassResolver;
     }
@@ -270,17 +268,7 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             ];
         }
 
-        if (!$this->propertyInfo) {
-            return ['type' => 'object'];
-        }
-
-        $properties = $this->propertyInfo->getProperties($className, ['serializer_groups' => null]);
-        $propertiesSchema = [];
-        foreach ($properties as $property) {
-            $propertiesSchema[$property] = $this->create($className, $property)->getSchema();
-        }
-
-        return ['type' => 'object', 'properties' => $propertiesSchema];
+        return ['type' => Schema::UNKNOWN_TYPE];
     }
 
     /**
