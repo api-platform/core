@@ -71,11 +71,11 @@ final class ModelMetadata
 
         return collect($columns)
             ->reject(
-                fn($column) => $relations->contains(
-                    fn($relation) => $relation['foreign_key'] === $column['name']
+                fn ($column) => $relations->contains(
+                    fn ($relation) => $relation['foreign_key'] === $column['name']
                 )
             )
-            ->map(fn($column) => [
+            ->map(fn ($column) => [
                 'name' => $column['name'],
                 'type' => $column['type'],
                 'increments' => $column['auto_increment'],
