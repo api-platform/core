@@ -184,7 +184,7 @@ trait SearchFilterTrait
                 return false;
             }
 
-            if ($type === self::DOCTRINE_UUID_TYPE && false === $this->isValidUuid($value)) {
+            if (self::DOCTRINE_UUID_TYPE === $type && false === $this->isValidUuid($value)) {
                 return false;
             }
         }
