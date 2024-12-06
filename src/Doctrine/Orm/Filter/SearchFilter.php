@@ -140,6 +140,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
     use SearchFilterTrait;
 
     public const DOCTRINE_INTEGER_TYPE = Types::INTEGER;
+    public const DOCTRINE_UUID_TYPE = 'uuid';
 
     public function __construct(ManagerRegistry $managerRegistry, IriConverterInterface|LegacyIriConverterInterface $iriConverter, ?PropertyAccessorInterface $propertyAccessor = null, ?LoggerInterface $logger = null, ?array $properties = null, IdentifiersExtractorInterface|LegacyIdentifiersExtractorInterface|null $identifiersExtractor = null, ?NameConverterInterface $nameConverter = null)
     {
@@ -231,6 +232,11 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
             if (is_numeric($value)) {
                 return $value;
             }
+
+            if ($this->isValidUuid($value)) {
+                return $value;
+            }
+
             try {
                 $item = $this->getIriConverter()->getResourceFromIri($value, ['fetch_data' => false]);
 

@@ -122,6 +122,14 @@ trait SearchFilterTrait
      */
     protected function getIdFromValue(string $value): mixed
     {
+        if (is_numeric($value)) {
+            return $value;
+        }
+
+        if ($this->isValidUuid($value)) {
+            return $value;
+        }
+
         try {
             $iriConverter = $this->getIriConverter();
             $item = $iriConverter->getResourceFromIri($value, ['fetch_data' => false]);
@@ -163,16 +171,41 @@ trait SearchFilterTrait
     }
 
     /**
-     * When the field should be an integer, check that the given value is a valid one.
+     * Check if the values are valid for the given Doctrine type.
      */
     protected function hasValidValues(array $values, ?string $type = null): bool
     {
         foreach ($values as $value) {
-            if (null !== $value && \in_array($type, (array) self::DOCTRINE_INTEGER_TYPE, true) && false === filter_var($value, \FILTER_VALIDATE_INT)) {
+            if (null === $value) {
+                continue;
+            }
+
+            if (\in_array($type, (array) self::DOCTRINE_INTEGER_TYPE, true) && false === filter_var($value, \FILTER_VALIDATE_INT)) {
+                return false;
+            }
+
+            if (\in_array($type, (array) self::DOCTRINE_UUID_TYPE, true) && false === $this->isValidUuid($value)) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    protected function isValidUuid(mixed $value): bool
+    {
+        if (!\is_string($value)) {
+            return false;
+        }
+
+        if (class_exists('\Symfony\Component\Uid\Uuid')) {
+            return \Symfony\Component\Uid\Uuid::isValid($value);
+        }
+
+        if (class_exists('\Ramsey\Uuid\Uuid')) {
+            return \Ramsey\Uuid\Uuid::isValid($value);
+        }
+
+        return 1 === preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i', $value);
     }
 }
