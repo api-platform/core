@@ -13,10 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Extension;
 
+use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
 use ApiPlatform\Doctrine\Common\ParameterValueExtractorTrait;
+use ApiPlatform\Doctrine\Odm\Filter\AbstractFilter;
 use ApiPlatform\Doctrine\Odm\Filter\FilterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ParameterNotFound;
+use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Psr\Container\ContainerInterface;
 
@@ -29,14 +32,20 @@ final class ParameterExtension implements AggregationCollectionExtensionInterfac
 {
     use ParameterValueExtractorTrait;
 
-    public function __construct(private readonly ContainerInterface $filterLocator)
-    {
+    public function __construct(
+        private readonly ContainerInterface $filterLocator,
+        private readonly ?ManagerRegistry $managerRegistry = null,
+    ) {
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     private function applyFilter(Builder $aggregationBuilder, ?string $resourceClass = null, ?Operation $operation = null, array &$context = []): void
     {
         foreach ($operation->getParameters() ?? [] as $parameter) {
-            if (!($v = $parameter->getValue()) || $v instanceof ParameterNotFound) {
+            // TODO: remove the null equality as a parameter can have a null value
+            if (null === ($v = $parameter->getValue()) || $v instanceof ParameterNotFound) {
                 continue;
             }
 
@@ -45,14 +54,40 @@ final class ParameterExtension implements AggregationCollectionExtensionInterfac
                 continue;
             }
 
-            $filter = $this->filterLocator->has($filterId) ? $this->filterLocator->get($filterId) : null;
-            if ($filter instanceof FilterInterface) {
-                $filterContext = ['filters' => $values, 'parameter' => $parameter];
-                $filter->apply($aggregationBuilder, $resourceClass, $operation, $filterContext);
-                // update by reference
-                if (isset($filterContext['mongodb_odm_sort_fields'])) {
-                    $context['mongodb_odm_sort_fields'] = $filterContext['mongodb_odm_sort_fields'];
+            $filter = match (true) {
+                $filterId instanceof FilterInterface => $filterId,
+                \is_string($filterId) && $this->filterLocator->has($filterId) => $this->filterLocator->get($filterId),
+                default => null,
+            };
+
+            if (!$filter instanceof FilterInterface) {
+                continue;
+            }
+
+            if ($this->managerRegistry && $filter instanceof ManagerRegistryAwareInterface && !$filter->hasManagerRegistry()) {
+                $filter->setManagerRegistry($this->managerRegistry);
+            }
+
+            if ($filter instanceof AbstractFilter && !$filter->getProperties()) {
+                $propertyKey = $parameter->getProperty() ?? $parameter->getKey();
+
+                if (str_contains($propertyKey, ':property')) {
+                    $extraProperties = $parameter->getExtraProperties()['_properties'] ?? [];
+                    foreach (array_keys($extraProperties) as $property) {
+                        $properties[$property] = $parameter->getFilterContext();
+                    }
+                } else {
+                    $properties = [$propertyKey => $parameter->getFilterContext()];
                 }
+
+                $filter->setProperties($properties ?? []);
+            }
+
+            $filterContext = ['filters' => $values, 'parameter' => $parameter];
+            $filter->apply($aggregationBuilder, $resourceClass, $operation, $filterContext);
+            // update by reference
+            if (isset($filterContext['mongodb_odm_sort_fields'])) {
+                $context['mongodb_odm_sort_fields'] = $filterContext['mongodb_odm_sort_fields'];
             }
         }
     }

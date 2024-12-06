@@ -16,7 +16,12 @@ namespace ApiPlatform\Doctrine\Odm\Filter;
 use ApiPlatform\Doctrine\Common\Filter\DateFilterInterface;
 use ApiPlatform\Doctrine\Common\Filter\DateFilterTrait;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Parameter;
+use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
 
@@ -117,7 +122,7 @@ use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
  * @author Théo FIDRY <theo.fidry@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class DateFilter extends AbstractFilter implements DateFilterInterface
+final class DateFilter extends AbstractFilter implements DateFilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface
 {
     use DateFilterTrait;
 
@@ -129,11 +134,11 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $values, Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
+    protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
-        // Expect $values to be an array having the period as keys and the date value as values
+        // Expect $value to be an array having the period as keys and the date value as values
         if (
-            !\is_array($values)
+            !\is_array($value)
             || !$this->isPropertyEnabled($property, $resourceClass)
             || !$this->isPropertyMapped($property, $resourceClass)
             || !$this->isDateField($property, $resourceClass)
@@ -153,42 +158,42 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface
             $aggregationBuilder->match()->field($matchField)->notEqual(null);
         }
 
-        if (isset($values[self::PARAMETER_BEFORE])) {
+        if (isset($value[self::PARAMETER_BEFORE])) {
             $this->addMatch(
                 $aggregationBuilder,
                 $matchField,
                 self::PARAMETER_BEFORE,
-                $values[self::PARAMETER_BEFORE],
+                $value[self::PARAMETER_BEFORE],
                 $nullManagement
             );
         }
 
-        if (isset($values[self::PARAMETER_STRICTLY_BEFORE])) {
+        if (isset($value[self::PARAMETER_STRICTLY_BEFORE])) {
             $this->addMatch(
                 $aggregationBuilder,
                 $matchField,
                 self::PARAMETER_STRICTLY_BEFORE,
-                $values[self::PARAMETER_STRICTLY_BEFORE],
+                $value[self::PARAMETER_STRICTLY_BEFORE],
                 $nullManagement
             );
         }
 
-        if (isset($values[self::PARAMETER_AFTER])) {
+        if (isset($value[self::PARAMETER_AFTER])) {
             $this->addMatch(
                 $aggregationBuilder,
                 $matchField,
                 self::PARAMETER_AFTER,
-                $values[self::PARAMETER_AFTER],
+                $value[self::PARAMETER_AFTER],
                 $nullManagement
             );
         }
 
-        if (isset($values[self::PARAMETER_STRICTLY_AFTER])) {
+        if (isset($value[self::PARAMETER_STRICTLY_AFTER])) {
             $this->addMatch(
                 $aggregationBuilder,
                 $matchField,
                 self::PARAMETER_STRICTLY_AFTER,
-                $values[self::PARAMETER_STRICTLY_AFTER],
+                $value[self::PARAMETER_STRICTLY_AFTER],
                 $nullManagement
             );
         }
@@ -236,5 +241,26 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface
         }
 
         $aggregationBuilder->match()->addAnd($aggregationBuilder->matchExpr()->field($field)->operator($operatorValue[$operator], $value));
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function getSchema(Parameter $parameter): array
+    {
+        return ['type' => 'date'];
+    }
+
+    public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array|null
+    {
+        $in = $parameter instanceof QueryParameter ? 'query' : 'header';
+        $key = $parameter->getKey();
+
+        return [
+            new OpenApiParameter(name: $key.'[after]', in: $in),
+            new OpenApiParameter(name: $key.'[before]', in: $in),
+            new OpenApiParameter(name: $key.'[strictly_after]', in: $in),
+            new OpenApiParameter(name: $key.'[strictly_before]', in: $in),
+        ];
     }
 }
