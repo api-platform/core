@@ -67,8 +67,14 @@ final class ModelMetadata
         $table = $model->getTable();
         $columns = $schema->getColumns($table);
         $indexes = $schema->getIndexes($table);
+        $relations = $this->getRelations($model);
 
         return collect($columns)
+            ->reject(
+                fn ($column) => $relations->contains(
+                    fn ($relation) => $relation['foreign_key'] === $column['name']
+                )
+            )
             ->map(fn ($column) => [
                 'name' => $column['name'],
                 'type' => $column['type'],

@@ -119,14 +119,12 @@ final class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertCount(1, $metrics->filter('.metric'), 'The should be one metric displayed (resource class).');
         $this->assertSame($this->isMongoDB() ? DocumentDummy::class : Dummy::class, $metrics->filter('span.value')->html());
 
-        $this->assertCount(4, $crawler->filter('.sf-tabs .tab-content'), 'Tabs must be presents on the panel.');
+        $this->assertCount(3, $crawler->filter('.sf-tabs .tab-content'), 'Tabs must be presents on the panel.');
 
-        // Metadata tab
-        $this->assertSame('Metadata', $crawler->filter('.tab:nth-of-type(1) .tab-title')->html());
-        $tabContent = $crawler->filter('.tab:nth-of-type(1) .tab-content');
+        $tabContent = $crawler->filter('.tab:nth-of-type(1)');
         $this->assertStringEndsWith('Dummy', trim($tabContent->filter('h3')->html()), 'the resource shortname should be displayed.');
 
-        $this->assertCount(9, $tabContent->filter('table'));
+        $this->assertCount(3, $tabContent->filter('table'));
         $this->assertSame('Resource', $tabContent->filter('table:first-of-type thead th:first-of-type')->html());
         $this->assertSame('Operations', $tabContent->filter('table:nth-of-type(2) thead th:first-of-type')->html());
         $this->assertSame('Filters', $tabContent->filter('table:nth-of-type(3) thead th:first-of-type')->html());

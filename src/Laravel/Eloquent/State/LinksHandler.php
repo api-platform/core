@@ -103,6 +103,17 @@ final class LinksHandler implements LinksHandlerInterface
         if ($from = $link->getFromProperty()) {
             $relation = $this->application->make($link->getFromClass());
 
+            if (!method_exists($relation->{$from}(), 'getQualifiedForeignKeyName') && method_exists($relation->{$from}(), 'getQualifiedForeignPivotKeyName')) {
+                /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany<Model, Model> $relation */
+                /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany<Model, Model> $relation_query */
+                $relation_query = $relation->{$from}();
+
+                return $builder->getModel()->join(
+                    $relation_query->getTable(), $relation->{$from}()->getQualifiedForeignPivotKeyName(), $builder->getModel()->getQualifiedKeyName())
+                    ->where($relation->{$from}()->getQualifiedForeignPivotKeyName(),
+                        $identifier);
+            }
+
             return $builder->getModel()->where($relation->{$from}()->getQualifiedForeignKeyName(), $identifier);
         }
 

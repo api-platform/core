@@ -1,5 +1,18 @@
 # Changelog
 
+## v4.0.11
+
+### Bug fixes
+
+* [af66075fd](https://github.com/api-platform/core/commit/af66075fdd6b83bdebc1c4ca33cc0ab7e1a7f8af) fix(laravel): fix foregin keys (relations) beeing in attributes (#6843)
+
+
+### Features
+
+* [2d59c6369](https://github.com/api-platform/core/commit/2d59c63699b4602cfe4d62504896c6d4121c1be4) feat(laravel): belongs to many relations (#6818)
+
+Also contains [v3.4.8 changes](#v348).
+
 ## v4.0.10
 
 ### Bug fixes
@@ -210,6 +223,16 @@ Notes:
 ### Features
 
 * [0d5f35683](https://github.com/api-platform/core/commit/0d5f356839eb6aa9f536044abe4affa736553e76) feat(laravel): laravel component (#5882)
+
+## v3.4.8
+
+### Bug fixes
+
+* [4d7deeaf7](https://github.com/api-platform/core/commit/4d7deeaf794178b5496ae989520095831a86df8a) fix(jsonld): check if supportedTypes exists (#6825)
+* [5111935d4](https://github.com/api-platform/core/commit/5111935d4f917920c6f3d24b828f9d59fd0e3520) fix(symfony): object typed property schema collection restriction (#6823)
+* [6bf894f6f](https://github.com/api-platform/core/commit/6bf894f6f0ead0751936aeddcfc527f017498bb3) fix(serializer): use attribute denormalization context for constructor arguments (#6821)
+* [86c97cac3](https://github.com/api-platform/core/commit/86c97cac3b8d45b6190e2999b99a02e88dd4e527) fix(symfony): symfony 7.2 deprecations (#6835)
+* [d312eae7e](https://github.com/api-platform/core/commit/d312eae7ef590ec05139c09bfaf2d3c7668a3f22) fix(doctrine): fixed orm datefilter applying inner join when no filtering values have been provided (#6849)
 
 ## v3.4.7
 

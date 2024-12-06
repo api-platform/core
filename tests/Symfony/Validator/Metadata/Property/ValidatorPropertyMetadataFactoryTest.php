@@ -622,7 +622,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
 
         $this->assertEquals([
             'type' => 'object',
-            'properties' => [
+            'properties' => new \ArrayObject([
                 'name' => new \ArrayObject(),
                 'email' => ['format' => 'email', 'minLength' => 2, 'maxLength' => 255],
                 'phone' => ['pattern' => '^([+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*)$'],
@@ -631,13 +631,13 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
                 ],
                 'social' => [
                     'type' => 'object',
-                    'properties' => [
+                    'properties' => new \ArrayObject([
                         'githubUsername' => new \ArrayObject(),
-                    ],
+                    ]),
                     'additionalProperties' => false,
                     'required' => ['githubUsername'],
                 ],
-            ],
+            ]),
             'additionalProperties' => true,
             'required' => ['name', 'email', 'social'],
         ], $schema);

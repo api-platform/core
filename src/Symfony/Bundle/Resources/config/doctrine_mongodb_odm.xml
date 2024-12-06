@@ -154,7 +154,7 @@
         <service id="api_platform.doctrine_mongodb.odm.state.collection_provider" class="ApiPlatform\Doctrine\Odm\State\CollectionProvider" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="doctrine_mongodb" />
-            <argument type="tagged" tag="api_platform.doctrine_mongodb.odm.aggregation_extension.collection" />
+            <argument type="tagged_iterator" tag="api_platform.doctrine_mongodb.odm.aggregation_extension.collection" />
             <argument type="tagged_locator" tag="api_platform.doctrine.odm.links_handler" index-by="key" />
 
             <tag name="api_platform.state_provider" priority="-100" key="ApiPlatform\Doctrine\Odm\State\CollectionProvider" />
@@ -165,7 +165,7 @@
         <service id="api_platform.doctrine_mongodb.odm.state.item_provider" class="ApiPlatform\Doctrine\Odm\State\ItemProvider" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="doctrine_mongodb" />
-            <argument type="tagged" tag="api_platform.doctrine_mongodb.odm.aggregation_extension.item" />
+            <argument type="tagged_iterator" tag="api_platform.doctrine_mongodb.odm.aggregation_extension.item" />
             <argument type="tagged_locator" tag="api_platform.doctrine.odm.links_handler" index-by="key" />
 
             <tag name="api_platform.state_provider" priority="-100" key="ApiPlatform\Doctrine\Odm\State\ItemProvider" />
