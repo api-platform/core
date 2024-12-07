@@ -13,39 +13,58 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Uid\Uuid;
 
 /**
- * Custom identifier dummy.
+ * UUID identifier dummy.
  */
 #[ApiResource]
+#[ApiFilter(SearchFilter::class, properties: ['id' => 'exact', 'uuidField' => 'exact', 'relatedUuidIdentifierDummy' => 'exact'])]
 #[ORM\Entity]
 class UuidIdentifierDummy
 {
-    #[ORM\Column(type: 'guid')]
+    #[ORM\Column(type: 'uuid')]
     #[ORM\Id]
-    private ?string $uuid = null;
-    #[ORM\Column(length: 30)]
-    private ?string $name = null;
+    private Uuid $id;
 
-    public function getUuid(): ?string
+    #[ORM\Column(type: 'uuid')]
+    private Uuid $uuidField;
+
+    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(targetEntity: RelatedUuidIdentifierDummy::class)]
+    private RelatedUuidIdentifierDummy $relatedUuidIdentifierDummy;
+
+    public function getId(): Uuid
     {
-        return $this->uuid;
+        return $this->id;
     }
 
-    public function setUuid(string $uuid): void
+    public function setId(Uuid $id): void
     {
-        $this->uuid = $uuid;
+        $this->id = $id;
     }
 
-    public function getName(): ?string
+    public function getUuidField(): Uuid
     {
-        return $this->name;
+        return $this->uuidField;
     }
 
-    public function setName(string $name): void
+    public function setUuidField(Uuid $uuidField): void
     {
-        $this->name = $name;
+        $this->uuidField = $uuidField;
+    }
+
+    public function getRelatedUuidIdentifierDummy(): RelatedUuidIdentifierDummy
+    {
+        return $this->relatedUuidIdentifierDummy;
+    }
+
+    public function setRelatedUuidIdentifierDummy(RelatedUuidIdentifierDummy $relatedUuidIdentifierDummy): void
+    {
+        $this->relatedUuidIdentifierDummy = $relatedUuidIdentifierDummy;
     }
 }
