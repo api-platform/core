@@ -16,6 +16,7 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 use ApiPlatform\Doctrine\Odm\State\Options as DoctrineODMOptions;
 use ApiPlatform\Doctrine\Orm\State\Options as DoctrineORMOptions;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\JsonSchemaFilterInterface;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
@@ -28,6 +29,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use ApiPlatform\Serializer\Filter\FilterInterface as SerializerFilterInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
@@ -45,6 +47,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null,
         private readonly ?ContainerInterface $filterLocator = null,
         private readonly ?NameConverterInterface $nameConverter = null,
+        private readonly ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -184,12 +187,6 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             $parameter = $parameter->withProvider('api_platform.serializer.filter_parameter_provider');
         }
 
-        // Read filter description to populate the Parameter
-        $description = $filter instanceof FilterInterface ? $filter->getDescription($this->getFilterClass($operation)) : [];
-        if (($schema = $description[$key]['schema'] ?? null) && null === $parameter->getSchema()) {
-            $parameter = $parameter->withSchema($schema);
-        }
-
         $currentKey = $key;
         if (null === $parameter->getProperty() && isset($properties[$key])) {
             $parameter = $parameter->withProperty($key);
@@ -208,11 +205,42 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             $parameter = $parameter->withExtraProperties(['_query_property' => $eloquentRelation['foreign_key']] + $parameter->getExtraProperties());
         }
 
+        $parameter = $this->addFilterMetadata($parameter);
+
+        if ($filter instanceof FilterInterface) {
+            try {
+                return $this->getLegacyFilterMetadata($parameter, $operation, $filter);
+            } catch (RuntimeException $exception) {
+                $this->logger?->alert($exception->getMessage(), ['exception' => $exception]);
+
+                return $parameter;
+            }
+        }
+
+        return $parameter;
+    }
+
+    private function getLegacyFilterMetadata(Parameter $parameter, Operation $operation, FilterInterface $filter): Parameter
+    {
+        $description = $filter->getDescription($this->getFilterClass($operation));
+        $key = $parameter->getKey();
+        if (($schema = $description[$key]['schema'] ?? null) && null === $parameter->getSchema()) {
+            $parameter = $parameter->withSchema($schema);
+        }
+
+        if (null === $parameter->getProperty() && ($property = $description[$key]['property'] ?? null)) {
+            $parameter = $parameter->withProperty($property);
+        }
+
         if (null === $parameter->getRequired() && ($required = $description[$key]['required'] ?? null)) {
             $parameter = $parameter->withRequired($required);
         }
 
-        return $this->addFilterMetadata($parameter);
+        if (null === $parameter->getOpenApi() && ($openApi = $description[$key]['openapi'] ?? null) && $openApi instanceof OpenApiParameter) {
+            $parameter = $parameter->withOpenApi($openApi);
+        }
+
+        return $parameter;
     }
 
     private function getFilterClass(Operation $operation): ?string

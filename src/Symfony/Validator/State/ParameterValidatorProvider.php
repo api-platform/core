@@ -61,7 +61,15 @@ final class ParameterValidatorProvider implements ProviderInterface
                 $value = null;
             }
 
-            $violations = $this->validator->validate($value, $constraints);
+            $violations = [];
+            if (\is_array($value) && $properties = $parameter->getExtraProperties()['_properties'] ?? []) {
+                foreach ($properties as $property) {
+                    $violations = [...$violations, ...$this->validator->validate($value[$property] ?? null, $constraints)];
+                }
+            } else {
+                $violations = $this->validator->validate($value, $constraints);
+            }
+
             foreach ($violations as $violation) {
                 $constraintViolationList->add(new ConstraintViolation(
                     $violation->getMessage(),

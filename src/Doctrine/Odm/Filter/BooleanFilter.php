@@ -14,7 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Odm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\BooleanFilterTrait;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Parameter;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
 
@@ -104,7 +106,7 @@ use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class BooleanFilter extends AbstractFilter
+final class BooleanFilter extends AbstractFilter implements JsonSchemaFilterInterface
 {
     use BooleanFilterTrait;
 
@@ -138,5 +140,13 @@ final class BooleanFilter extends AbstractFilter
         }
 
         $aggregationBuilder->match()->field($matchField)->equals($value);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function getSchema(Parameter $parameter): array
+    {
+        return ['type' => 'boolean'];
     }
 }
