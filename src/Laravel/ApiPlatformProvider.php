@@ -19,6 +19,8 @@ use ApiPlatform\GraphQl\Executor;
 use ApiPlatform\GraphQl\ExecutorInterface;
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactory;
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactoryInterface;
+use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
+use ApiPlatform\GraphQl\Resolver\QueryItemResolverInterface;
 use ApiPlatform\GraphQl\Resolver\ResourceFieldResolver;
 use ApiPlatform\GraphQl\Serializer\Exception\ErrorNormalizer as GraphQlErrorNormalizer;
 use ApiPlatform\GraphQl\Serializer\Exception\HttpExceptionNormalizer as GraphQlHttpExceptionNormalizer;
@@ -1193,10 +1195,12 @@ class ApiPlatformProvider extends ServiceProvider
 
         $app->singleton(ResolverProvider::class, function (Application $app) {
             $resolvers = iterator_to_array($app->tagged('api_platform.graphql.resolver'));
+            $taggedItemResolvers = iterator_to_array($app->tagged(QueryItemResolverInterface::class));
+            $taggedCollectionResolvers = iterator_to_array($app->tagged(QueryCollectionResolverInterface::class));
 
             return new ResolverProvider(
                 $app->make(GraphQlReadProvider::class),
-                new ServiceLocator($resolvers),
+                new ServiceLocator([...$resolvers, ...$taggedItemResolvers, ...$taggedCollectionResolvers]),
             );
         });
 
