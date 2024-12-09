@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Util;
 
+use function DeepCopy\deep_copy;
+
 /**
  * Clones given data if cloneable.
  *
@@ -29,7 +31,7 @@ trait CloneTrait
         }
 
         try {
-            return (new \ReflectionClass($data))->isCloneable() ? clone $data : null;
+            return (new \ReflectionClass($data))->isCloneable() ? deep_copy($data) : null;
         } catch (\ReflectionException) {
             return null;
         }
