@@ -149,6 +149,10 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             return $parameter;
         }
 
+        if (!\is_object($filterId) && !$this->filterLocator->has($filterId)) {
+            return $parameter;
+        }
+
         $filter = \is_object($filterId) ? $filterId : $this->filterLocator->get($filterId);
 
         if (!$filter) {
