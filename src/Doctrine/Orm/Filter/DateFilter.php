@@ -158,7 +158,7 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface, Js
         $alias = $queryBuilder->getRootAliases()[0];
         $field = $property;
 
-        if ($this->isPropertyNested($property, $resourceClass) && \count($values) > 0) {
+        if ($this->isPropertyNested($property, $resourceClass) && \count($value) > 0) {
             [$alias, $field] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass, Join::INNER_JOIN);
         }
 

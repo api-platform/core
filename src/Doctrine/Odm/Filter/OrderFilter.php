@@ -278,15 +278,6 @@ final class OrderFilter extends AbstractFilter implements OrderFilterInterface, 
      */
     public function getSchema(Parameter $parameter): array
     {
-        if (str_contains($parameter->getKey(), ':property')) {
-            $properties = [];
-            foreach (array_keys($parameter->getExtraProperties()['_properties'] ?? []) as $property) {
-                $properties[] = [$property => ['type' => 'string', 'enum' => ['asc', 'desc']]];
-            }
-
-            return ['type' => 'object', 'properties' => $properties];
-        }
-
         return ['type' => 'string', 'enum' => ['asc', 'desc']];
     }
 }
