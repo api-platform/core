@@ -34,7 +34,7 @@ final class BooleanFilter implements FilterInterface
      */
     public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder
     {
-        if (!is_string($values) || !array_key_exists($values, self::BOOLEAN_VALUES)) {
+        if (!\is_string($values) || !\array_key_exists($values, self::BOOLEAN_VALUES)) {
             return $builder;
         }
 
