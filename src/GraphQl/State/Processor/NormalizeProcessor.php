@@ -213,6 +213,12 @@ final class NormalizeProcessor implements ProcessorInterface
                 }
                 $data['paginationInfo']['totalCount'] = $collection->getTotalItems();
             }
+            if (isset($selection['paginationInfo']['currentPage'])) {
+                if (!($collection instanceof PartialPaginatorInterface)) {
+                    throw new \LogicException(\sprintf('Collection returned by the collection data provider must implement %s to return currentPage field.', PartialPaginatorInterface::class));
+                }
+                $data['paginationInfo']['currentPage'] = $collection->getCurrentPage();
+            }
             if (isset($selection['paginationInfo']['lastPage'])) {
                 if (!($collection instanceof PaginatorInterface)) {
                     throw new \LogicException(\sprintf('Collection returned by the collection data provider must implement %s to return lastPage field.', PaginatorInterface::class));
