@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
-use ApiPlatform\Elasticsearch\State\Options;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Post;
@@ -165,7 +164,7 @@ final class Configuration implements ConfigurationInterface
         $this->addExceptionToStatusSection($rootNode);
 
         $this->addFormatSection($rootNode, 'formats', [
-            'jsonld' => ['mime_types' => ['application/ld+json']]
+            'jsonld' => ['mime_types' => ['application/ld+json']],
         ]);
         $this->addFormatSection($rootNode, 'patch_formats', [
             'json' => ['mime_types' => ['application/merge-patch+json']],
@@ -266,6 +265,10 @@ final class Configuration implements ConfigurationInterface
                         ->end()
                         ->arrayNode('introspection')
                             ->canBeDisabled()
+                        ->end()
+                        ->integerNode('max_query_depth')->defaultValue(20)
+                        ->end()
+                        ->integerNode('max_query_complexity')->defaultValue(500)
                         ->end()
                         ->scalarNode('nesting_separator')->defaultValue('_')->info('The separator to use to filter nested fields.')->end()
                         ->arrayNode('collection')
