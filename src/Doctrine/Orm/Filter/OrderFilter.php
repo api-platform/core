@@ -244,13 +244,6 @@ final class OrderFilter extends AbstractFilter implements OrderFilterInterface, 
             return;
         }
 
-        $parameter = $context['parameter'] ?? null;
-        if (null !== ($value = $context['filters'][$parameter?->getProperty()] ?? null)) {
-            $this->filterProperty($this->denormalizePropertyName($parameter->getProperty()), $value, $queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
-
-            return;
-        }
-
         foreach ($context['filters'][$this->orderParameterName] as $property => $value) {
             $this->filterProperty($this->denormalizePropertyName($property), $value, $queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
         }
