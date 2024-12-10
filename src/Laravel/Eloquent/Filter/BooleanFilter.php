@@ -13,11 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Eloquent\Filter;
 
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
 use ApiPlatform\Metadata\Parameter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
-final class BooleanFilter implements FilterInterface
+final class BooleanFilter implements FilterInterface, JsonSchemaFilterInterface
 {
     use QueryPropertyTrait;
 
@@ -39,5 +40,10 @@ final class BooleanFilter implements FilterInterface
         }
 
         return $builder->{$context['whereClause'] ?? 'where'}($this->getQueryProperty($parameter), $values);
+    }
+
+    public function getSchema(Parameter $parameter): array
+    {
+        return ['type' => 'boolean'];
     }
 }

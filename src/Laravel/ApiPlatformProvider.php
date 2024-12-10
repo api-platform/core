@@ -81,6 +81,7 @@ use ApiPlatform\Laravel\Controller\DocumentationController;
 use ApiPlatform\Laravel\Controller\EntrypointController;
 use ApiPlatform\Laravel\Eloquent\Extension\FilterQueryExtension;
 use ApiPlatform\Laravel\Eloquent\Extension\QueryExtensionInterface;
+use ApiPlatform\Laravel\Eloquent\Filter\BooleanFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\DateFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\EqualsFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\FilterInterface as EloquentFilterInterface;
@@ -422,7 +423,7 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->bind(OperationMetadataFactoryInterface::class, OperationMetadataFactory::class);
 
-        $this->app->tag([EqualsFilter::class, PartialSearchFilter::class, DateFilter::class, OrderFilter::class, RangeFilter::class], EloquentFilterInterface::class);
+        $this->app->tag([BooleanFilter::class, EqualsFilter::class, PartialSearchFilter::class, DateFilter::class, OrderFilter::class, RangeFilter::class], EloquentFilterInterface::class);
 
         $this->app->bind(FilterQueryExtension::class, function (Application $app) {
             $tagged = iterator_to_array($app->tagged(EloquentFilterInterface::class));

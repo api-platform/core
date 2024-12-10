@@ -144,6 +144,10 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
             $assertions[] = 'array';
         }
 
+        if (isset($schema['type']) && 'boolean' === $schema['type']) {
+            $assertions[] = 'boolean';
+        }
+
         if (!$assertions) {
             return $parameter;
         }

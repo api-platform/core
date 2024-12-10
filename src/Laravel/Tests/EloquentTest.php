@@ -406,4 +406,15 @@ class EloquentTest extends TestCase
         $res = $this->get('/api/with_accessors/1', ['Accept' => ['application/ld+json']]);
         $this->assertArraySubset(['name' => 'test'], $res->json());
     }
+
+    public function testBooleanFilter(): void
+    {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
+        $res = $this->get('/api/books?published=notabool', ['Accept' => ['application/ld+json']]);
+        $this->assertEquals($res->getStatusCode(), 422);
+
+        $res = $this->get('/api/books?published=0', ['Accept' => ['application/ld+json']]);
+        $this->assertEquals($res->getStatusCode(), 200);
+        $this->assertEquals($res->json()['totalItems'], 0);
+    }
 }
