@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
-use ApiPlatform\Elasticsearch\State\Options;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Post;
@@ -83,7 +82,7 @@ final class Configuration implements ConfigurationInterface
                     ->defaultValue('0.0.0')
                 ->end()
                 ->booleanNode('show_webby')->defaultTrue()->info('If true, show Webby on the documentation page')->end()
-                ->booleanNode('use_symfony_listeners')->defaultFalse()->info(sprintf('Uses Symfony event listeners instead of the %s.', MainController::class))->end()
+                ->booleanNode('use_symfony_listeners')->defaultFalse()->info(\sprintf('Uses Symfony event listeners instead of the %s.', MainController::class))->end()
                 ->scalarNode('name_converter')->defaultNull()->info('Specify a name converter to use.')->end()
                 ->scalarNode('asset_package')->defaultNull()->info('Specify an asset package name to use.')->end()
                 ->scalarNode('path_segment_name_generator')->defaultValue('api_platform.metadata.path_segment_name_generator.underscore')->info('Specify a path name generator to use.')->end()
@@ -165,7 +164,7 @@ final class Configuration implements ConfigurationInterface
         $this->addExceptionToStatusSection($rootNode);
 
         $this->addFormatSection($rootNode, 'formats', [
-            'jsonld' => ['mime_types' => ['application/ld+json']]
+            'jsonld' => ['mime_types' => ['application/ld+json']],
         ]);
         $this->addFormatSection($rootNode, 'patch_formats', [
             'json' => ['mime_types' => ['application/merge-patch+json']],
@@ -267,6 +266,10 @@ final class Configuration implements ConfigurationInterface
                         ->arrayNode('introspection')
                             ->canBeDisabled()
                         ->end()
+                        ->integerNode('max_query_depth')->defaultValue(100)
+                        ->end()
+                        ->integerNode('max_query_complexity')->defaultValue(100)
+                        ->end()
                         ->scalarNode('nesting_separator')->defaultValue('_')->info('The separator to use to filter nested fields.')->end()
                         ->arrayNode('collection')
                             ->addDefaultsIfNotSet()
@@ -308,7 +311,7 @@ final class Configuration implements ConfigurationInterface
                             ->end()
                             ->validate()
                                 ->ifTrue(static fn ($v): bool => $v !== array_intersect($v, $supportedVersions))
-                                ->thenInvalid(sprintf('Only the versions %s are supported. Got %s.', implode(' and ', $supportedVersions), '%s'))
+                                ->thenInvalid(\sprintf('Only the versions %s are supported. Got %s.', implode(' and ', $supportedVersions), '%s'))
                             ->end()
                             ->prototype('scalar')->end()
                         ->end()
@@ -542,7 +545,7 @@ final class Configuration implements ConfigurationInterface
                         ->then(static function (array $exceptionToStatus): array {
                             foreach ($exceptionToStatus as $httpStatusCode) {
                                 if ($httpStatusCode < 100 || $httpStatusCode >= 600) {
-                                    throw new InvalidConfigurationException(sprintf('The HTTP status code "%s" is not valid.', $httpStatusCode));
+                                    throw new InvalidConfigurationException(\sprintf('The HTTP status code "%s" is not valid.', $httpStatusCode));
                                 }
                             }
 
