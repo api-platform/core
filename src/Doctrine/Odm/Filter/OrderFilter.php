@@ -230,9 +230,11 @@ final class OrderFilter extends AbstractFilter implements OrderFilterInterface, 
      */
     public function apply(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
-        if (!isset($context['filters'][$this->orderParameterName]) || !\is_array($context['filters'][$this->orderParameterName])) {
-            parent::apply($aggregationBuilder, $resourceClass, $operation, $context);
-
+        if (
+            isset($context['filters'])
+            && (!isset($context['filters'][$this->orderParameterName]) || !\is_array($context['filters'][$this->orderParameterName]))
+            && !isset($context['parameter'])
+        ) {
             return;
         }
 

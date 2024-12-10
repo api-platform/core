@@ -229,8 +229,17 @@ final class OrderFilter extends AbstractFilter implements OrderFilterInterface, 
      */
     public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
-        if (!isset($context['filters'][$this->orderParameterName]) || !\is_array($context['filters'][$this->orderParameterName])) {
-            parent::apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
+        if (
+            isset($context['filters'])
+            && (!isset($context['filters'][$this->orderParameterName]) || !\is_array($context['filters'][$this->orderParameterName]))
+            && !isset($context['parameter'])
+        ) {
+            return;
+        }
+
+        $parameter = $context['parameter'] ?? null;
+        if (null !== ($value = $context['filters'][$parameter?->getProperty()] ?? null)) {
+            $this->filterProperty($this->denormalizePropertyName($parameter->getProperty()), $value, $queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
 
             return;
         }
