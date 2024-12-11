@@ -123,8 +123,8 @@ class ConfigurationTest extends TestCase
                 'introspection' => [
                     'enabled' => true,
                 ],
-                'max_query_depth' => 100,
-                'max_query_complexity' => 100,
+                'max_query_depth' => 20,
+                'max_query_complexity' => 500,
                 'nesting_separator' => '_',
                 'collection' => [
                     'pagination' => [
