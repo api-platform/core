@@ -251,6 +251,7 @@ class AppKernel extends Kernel
             ],
             'graphql' => [
                 'graphql_playground' => false,
+                'max_query_depth' => 200,
             ],
             'use_symfony_listeners' => $useSymfonyListeners,
             'defaults' => [

@@ -28,7 +28,7 @@ use GraphQL\Validator\Rules\QueryDepth;
  */
 final class Executor implements ExecutorInterface
 {
-    public function __construct(private readonly bool $graphQlIntrospectionEnabled = true, private readonly int $maxQueryComplexity = 100, private readonly int $maxQueryDepth = 100)
+    public function __construct(private readonly bool $graphQlIntrospectionEnabled = true, private readonly int $maxQueryComplexity = 500, private readonly int $maxQueryDepth = 20)
     {
         DocumentValidator::addRule(
             new DisableIntrospection(
