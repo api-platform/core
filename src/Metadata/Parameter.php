@@ -127,6 +127,13 @@ abstract class Parameter
         return $this->extraProperties['_api_values'] ?? $default;
     }
 
+    public function setValue(mixed $value): static
+    {
+        $this->extraProperties['_api_values'] = $value;
+
+        return $this;
+    }
+
     /**
      * @return array<string, mixed>
      */
