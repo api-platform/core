@@ -109,9 +109,10 @@ final class LinksHandler implements LinksHandlerInterface
                 $relation_query = $relation->{$from}();
 
                 return $builder->getModel()->join(
-                    $relation_query->getTable(), $relation->{$from}()->getQualifiedForeignPivotKeyName(), $builder->getModel()->getQualifiedKeyName())
+                    $relation_query->getTable(), $relation->{$from}()->getQualifiedRelatedPivotKeyName(), $builder->getModel()->getQualifiedKeyName())
                     ->where($relation->{$from}()->getQualifiedForeignPivotKeyName(),
-                        $identifier);
+                        $identifier)
+                    ->select($builder->getModel()->getTable().'.*');
             }
 
             return $builder->getModel()->where($relation->{$from}()->getQualifiedForeignKeyName(), $identifier);
