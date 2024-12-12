@@ -199,6 +199,22 @@
             <argument type="collection"></argument>
         </service>
 
+        <service id="api_platform.doctrine.orm.iri_search_filter" class="ApiPlatform\Doctrine\Orm\Filter\IriSearchFilter" public="false">
+            <argument type="service" id="doctrine"/>
+            <argument type="service" id="logger" on-invalid="ignore"/>
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
+
+            <tag name="api_platform.filter" priority="-100"/>
+        </service>
+
+        <service id="api_platform.doctrine.orm.exact_search_filter" class="ApiPlatform\Doctrine\Orm\Filter\ExactSearchFilter" public="false">
+            <argument type="service" id="doctrine"/>
+            <argument type="service" id="logger" on-invalid="ignore"/>
+            <argument key="$nameConverter" type="service" id="api_platform.name_converter" on-invalid="ignore"/>
+
+            <tag name="api_platform.filter" priority="-100"/>
+        </service>
+
         <service id="api_platform.doctrine.orm.metadata.resource.metadata_collection_factory" class="ApiPlatform\Doctrine\Orm\Metadata\Resource\DoctrineOrmResourceCollectionMetadataFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="40">
             <argument type="service" id="doctrine" />
             <argument type="service" id="api_platform.doctrine.orm.metadata.resource.metadata_collection_factory.inner" />
