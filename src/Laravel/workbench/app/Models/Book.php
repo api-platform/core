@@ -56,6 +56,11 @@ use Workbench\App\Http\Requests\BookFormRequest;
                 new QueryParameter(key: 'order[:property]', filter: OrderFilter::class),
             ],
         ),
+        new QueryCollection(
+            paginationItemsPerPage: 3,
+            name: 'simplePagination',
+            paginationType: 'page',
+        ),
         new Mutation(name: 'create'),
     ]
 )]
