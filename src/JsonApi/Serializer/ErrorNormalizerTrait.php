@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonApi\Serializer;
 
+use ApiPlatform\Exception\ErrorCodeSerializableInterface;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -39,15 +40,15 @@ trait ErrorNormalizerTrait
     private function getErrorCode(object $object): ?string
     {
         if ($object instanceof FlattenException) {
-            return (string)$object->getStatusCode();
+            $exceptionClass = $object->getClass();
+        } else {
+            $exceptionClass = $object::class;
         }
 
-        if ($object instanceof \Exception) {
-            $code = $object->getCode();
-            return $code !== 0 ? (string)$code : null;
+        if (is_a($exceptionClass, ErrorCodeSerializableInterface::class, true)) {
+            return $exceptionClass::getErrorCode();
         }
 
         return null;
     }
 }
-
