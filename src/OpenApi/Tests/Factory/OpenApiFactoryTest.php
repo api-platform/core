@@ -521,6 +521,14 @@ class OpenApiFactoryTest extends TestCase
                     'type' => 'query',
                     'name' => 'key',
                 ],
+            ], null, null, null, null, null, null, true, [
+                'bearer' => [
+                    'scheme' => 'bearer',
+                    'bearerFormat' => 'JWT',
+                ],
+                'basic' => [
+                    'scheme' => 'basic',
+                ],
             ]),
             new PaginationOptions(true, 'page', true, 'itemsPerPage', true, 'pagination')
         );
@@ -622,12 +630,16 @@ class OpenApiFactoryTest extends TestCase
             'oauth' => new SecurityScheme('oauth2', 'OAuth 2.0 authorization code Grant', null, null, null, null, new OAuthFlows(null, null, null, new OAuthFlow('/oauth/v2/auth', '/oauth/v2/token', '/oauth/v2/refresh', new \ArrayObject(['scope param'])))),
             'header' => new SecurityScheme('apiKey', 'Value for the Authorization header parameter.', 'Authorization', 'header'),
             'query' => new SecurityScheme('apiKey', 'Value for the key query parameter.', 'key', 'query'),
+            'bearer' => new SecurityScheme('http', 'Value for the http bearer parameter.', null, null, 'bearer', 'JWT'),
+            'basic' => new SecurityScheme('http', 'Value for the http basic parameter.', null, null, 'basic', null),
         ]));
 
         $this->assertEquals([
             ['oauth' => []],
             ['header' => []],
             ['query' => []],
+            ['bearer' => []],
+            ['basic' => []],
         ], $openApi->getSecurity());
 
         $paths = $openApi->getPaths();

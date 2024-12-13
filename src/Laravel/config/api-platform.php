@@ -98,6 +98,12 @@ return [
         //    'url' => 'https://www.example.com/support',
         //    'email' => 'support@example.com',
         //],
+        //'http_auth' => [
+        //    'Personal Access Token' => [
+        //        'scheme' => 'bearer',
+        //        'bearerFormat' => 'JWT'
+        //    ]
+        //]
     ],
 
     'url_generation_strategy' => UrlGeneratorInterface::ABS_PATH,
