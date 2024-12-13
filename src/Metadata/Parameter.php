@@ -124,9 +124,9 @@ abstract class Parameter
      *
      * @readonly
      */
-    public function getValue(): mixed
+    public function getValue(mixed $default = new ParameterNotFound()): mixed
     {
-        return $this->extraProperties['_api_values'] ?? new ParameterNotFound();
+        return $this->extraProperties['_api_values'] ?? $default;
     }
 
     /**

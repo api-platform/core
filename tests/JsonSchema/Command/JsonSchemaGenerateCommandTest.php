@@ -20,6 +20,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\BackedEnumStringResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5501\BrokenDocs;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6299\Issue6299;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6317\Issue6317;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6800\TestApiDocHashmapArrayObjectIssue;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ResourceWithEnumProperty;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Species;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DocumentDummy;
@@ -375,5 +376,59 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
         $this->assertArrayNotHasKey('@id', $json['definitions']['DisableIdGenerationItem.jsonld']['properties']);
+    }
+
+    /**
+     * @dataProvider arrayPropertyTypeSyntaxProvider
+     */
+    public function testOpenApiSchemaGenerationForArrayProperty(string $propertyName, array $expectedProperties): void
+    {
+        $this->tester->run([
+            'command' => 'api:json-schema:generate',
+            'resource' => TestApiDocHashmapArrayObjectIssue::class,
+            '--operation' => '_api_/test_api_doc_hashmap_array_object_issues{._format}_get',
+            '--type' => 'output',
+            '--format' => 'jsonld',
+        ]);
+
+        $result = $this->tester->getDisplay();
+        $json = json_decode($result, true);
+        $definitions = $json['definitions'];
+        $ressourceDefinitions = $definitions['TestApiDocHashmapArrayObjectIssue.jsonld'];
+
+        $this->assertArrayHasKey('TestApiDocHashmapArrayObjectIssue.jsonld', $definitions);
+        $this->assertEquals('object', $ressourceDefinitions['type']);
+        $this->assertEquals($expectedProperties, $ressourceDefinitions['properties'][$propertyName]);
+    }
+
+    public static function arrayPropertyTypeSyntaxProvider(): \Generator
+    {
+        yield 'Array of Foo objects using array<Foo> syntax' => [
+            'foos',
+            [
+                'type' => 'array',
+                'items' => [
+                    '$ref' => '#/definitions/Foo.jsonld',
+                ],
+            ],
+        ];
+        yield 'Array of Foo objects using Foo[] syntax' => [
+            'fooOtherSyntax',
+            [
+                'type' => 'array',
+                'items' => [
+                    '$ref' => '#/definitions/Foo.jsonld',
+                ],
+            ],
+        ];
+        yield 'Hashmap of Foo objects using array<string, Foo> syntax' => [
+            'fooHashmaps',
+            [
+                'type' => 'object',
+                'additionalProperties' => [
+                    '$ref' => '#/definitions/Foo.jsonld',
+                ],
+            ],
+        ];
     }
 }

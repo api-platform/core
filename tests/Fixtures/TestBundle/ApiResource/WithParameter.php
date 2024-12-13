@@ -27,6 +27,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Parameter\CustomGroupParameterProvider
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[Get(
     uriTemplate: 'with_parameters/{id}{._format}',
@@ -62,6 +63,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'length' => new QueryParameter(schema: ['maxLength' => 1, 'minLength' => 3]),
         'array' => new QueryParameter(schema: ['minItems' => 2, 'maxItems' => 3]),
         'multipleOf' => new QueryParameter(schema: ['multipleOf' => 2]),
+        'int' => new QueryParameter(property: 'a', constraints: [new Assert\Type('integer')], provider: [self::class, 'toInt']),
         'pattern' => new QueryParameter(schema: ['pattern' => '\d']),
     ],
     provider: [self::class, 'collectionProvider']
@@ -131,5 +133,25 @@ class WithParameter
         $values = [$parameters->get('q', HeaderParameter::class)->getValue(), $parameters->get('q', QueryParameter::class)->getValue()];
 
         return new JsonResponse($values);
+    }
+
+    public static function toInt(Parameter $parameter, array $parameters = [], array $context = []): ?Operation
+    {
+        if (null === ($operation = $context['operation'] ?? null)) {
+            return null;
+        }
+
+        $value = $parameter->getValue();
+
+        if (is_numeric($value)) {
+            $value = (int) $value;
+        }
+
+        $parameters = $operation->getParameters();
+        $parameters->add($parameter->getKey(), $parameter = $parameter->withExtraProperties(
+            $parameter->getExtraProperties() + ['_api_values' => $value]
+        ));
+
+        return $operation->withParameters($parameters);
     }
 }

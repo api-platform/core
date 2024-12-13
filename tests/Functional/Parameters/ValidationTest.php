@@ -33,7 +33,7 @@ final class ValidationTest extends ApiTestCase
     public function testWithGroupFilter(): void
     {
         $response = self::createClient()->request('GET', 'with_parameters_collection');
-        $this->assertArraySubset(['violations' => [['propertyPath' => 'a', 'message' => 'The parameter "hydra" is required.']]], $response->toArray(false));
+        $this->assertArraySubset(['violations' => [['message' => 'The parameter "hydra" is required.']]], $response->toArray(false));
         $response = self::createClient()->request('GET', 'with_parameters_collection?hydra');
         $this->assertResponseIsSuccessful();
     }
@@ -144,6 +144,14 @@ final class ValidationTest extends ApiTestCase
                     'message' => 'The value you selected is not a valid choice.',
                 ],
             ],
+        ], $response->toArray(false));
+    }
+
+    public function testValidateMessage(): void
+    {
+        $response = self::createClient()->request('GET', 'validate_parameters?int=test');
+        $this->assertArraySubset([
+            'detail' => 'int: This value should be of type integer.',
         ], $response->toArray(false));
     }
 

@@ -44,7 +44,6 @@ final class ParameterExtension implements AggregationCollectionExtensionInterfac
     private function applyFilter(Builder $aggregationBuilder, ?string $resourceClass = null, ?Operation $operation = null, array &$context = []): void
     {
         foreach ($operation->getParameters() ?? [] as $parameter) {
-            // TODO: remove the null equality as a parameter can have a null value
             if (null === ($v = $parameter->getValue()) || $v instanceof ParameterNotFound) {
                 continue;
             }
