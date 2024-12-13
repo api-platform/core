@@ -1,5 +1,20 @@
 # Changelog
 
+## v3.4.9
+
+### Bug fixes
+
+* [22cbd0147](https://github.com/api-platform/core/commit/22cbd0147ef6f817093533d62dc8279add67a647) fix(metadata): various parameter improvements (#6867)
+* [978975ef0](https://github.com/api-platform/core/commit/978975ef01d7b9d230291676527aa1140a7e552f) fix(jsonschema): hashmaps produces invalid openapi schema (#6830)
+* [a209dd440](https://github.com/api-platform/core/commit/a209dd440957176099247acf35b82611073352b1) fix: add missing error normalizer trait and remove deprecated interface (#6853)
+* [abbc031ee](https://github.com/api-platform/core/commit/abbc031eece83b54781502cd6373b47a09e109f4) fix: test empty parameter against null (#6852)
+
+### Notes
+
+- `Parameter::getValue()` now takes a default value as argument `getValue(mixed $default = new ParameterNotFound()): mixed`
+- `Parametes::get(string $key, string $parameterClass = QueryParameter::class)` (but also `has` and `remove`) now has a default value as second argument to `QueryParameter::class`
+- Constraint violation had the wrong message when using `property`, fixed by using the `key` instead
+
 ## v3.4.8
 
 ### Bug fixes
