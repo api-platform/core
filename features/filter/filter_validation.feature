@@ -49,7 +49,7 @@ Feature: Validate filters based upon filter description
 
     When I am on "/filter_validators?required=foo&required-allow-empty&exclusiveMaximum=10"
     Then the response status code should be 422
-    And the JSON node "detail" should be equal to 'maximum: This value should be less than 10.'
+    And the JSON node "detail" should be equal to 'exclusiveMaximum: This value should be less than 10.'
 
   Scenario: Test filter bounds: minimum
     When I am on "/filter_validators?required=foo&required-allow-empty&minimum=5"
