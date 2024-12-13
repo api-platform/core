@@ -70,7 +70,7 @@ final class Parameters implements \IteratorAggregate, \Countable
     /**
      * @param class-string $parameterClass
      */
-    public function remove(string $key, string $parameterClass): self
+    public function remove(string $key, string $parameterClass = QueryParameter::class): self
     {
         foreach ($this->parameters as $i => [$parameterName, $parameter]) {
             if ($parameterName === $key && $parameterClass === $parameter::class) {
@@ -86,7 +86,7 @@ final class Parameters implements \IteratorAggregate, \Countable
     /**
      * @param class-string $parameterClass
      */
-    public function get(string $key, string $parameterClass): ?Parameter
+    public function get(string $key, string $parameterClass = QueryParameter::class): ?Parameter
     {
         foreach ($this->parameters as [$parameterName, $parameter]) {
             if ($parameterName === $key && $parameterClass === $parameter::class) {
@@ -100,7 +100,7 @@ final class Parameters implements \IteratorAggregate, \Countable
     /**
      * @param class-string $parameterClass
      */
-    public function has(string $key, string $parameterClass): bool
+    public function has(string $key, string $parameterClass = QueryParameter::class): bool
     {
         foreach ($this->parameters as [$parameterName, $parameter]) {
             if ($parameterName === $key && $parameterClass === $parameter::class) {
