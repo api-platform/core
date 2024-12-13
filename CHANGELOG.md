@@ -1,11 +1,23 @@
 # Changelog
 
+## v4.0.12
+
+### Bug fixes
+
+* [4db72f55f](https://github.com/api-platform/core/commit/4db72f55fa9dcd48518dc62b5bf472895b6a966b) fix: filter may not use FilterInterface (#6858)
+* [c899a3da1](https://github.com/api-platform/core/commit/c899a3da14eb2dff49095d28855ef8f2a1c4072a) fix(laravel): use tagged resolvers as graphql resolvers
+ (#6855)
+* [e0f8c38b9](https://github.com/api-platform/core/commit/e0f8c38b98a05f29ad36b37725e54a036209a859) fix(laravel): graphql currentPage (#6857)
+
+Also contains [v3.4.9 changes](#v349).
+
+### Features
+
 ## v4.0.11
 
 ### Bug fixes
 
 * [af66075fd](https://github.com/api-platform/core/commit/af66075fdd6b83bdebc1c4ca33cc0ab7e1a7f8af) fix(laravel): fix foregin keys (relations) beeing in attributes (#6843)
-
 
 ### Features
 
