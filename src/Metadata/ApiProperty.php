@@ -14,32 +14,43 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata;
 
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\Serializer\Attribute\Context;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\Ignore;
+use Symfony\Component\Serializer\Attribute\MaxDepth;
+use Symfony\Component\Serializer\Attribute\SerializedName;
+use Symfony\Component\Serializer\Attribute\SerializedPath;
 
 /**
  * ApiProperty annotation.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER | \Attribute::TARGET_CLASS_CONSTANT)]
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER | \Attribute::TARGET_CLASS_CONSTANT | \Attribute::TARGET_CLASS)]
 final class ApiProperty
 {
+    private ?array $types;
+    private ?array $serialize;
+
     /**
-     * @param bool|null               $readableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
-     * @param bool|null               $writableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
-     * @param bool|null               $required                https://api-platform.com/docs/admin/validation/#client-side-validation
-     * @param bool|null               $identifier              https://api-platform.com/docs/core/identifiers/
-     * @param mixed                   $example                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
-     * @param string|null             $deprecationReason       https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
-     * @param bool|null               $fetchEager              https://api-platform.com/docs/core/performance/#eager-loading
-     * @param array|null              $jsonldContext           https://api-platform.com/docs/core/extending-jsonld-context/#extending-json-ld-and-hydra-contexts
-     * @param array|null              $openapiContext          https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
-     * @param bool|null               $push                    https://api-platform.com/docs/core/push-relations/
-     * @param string|\Stringable|null $security                https://api-platform.com/docs/core/security
-     * @param string|\Stringable|null $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
-     * @param string[]                $types                   the RDF types of this property
-     * @param string[]                $iris
-     * @param Type[]                  $builtinTypes
-     * @param string|null             $uriTemplate             (experimental) whether to return the subRessource collection IRI instead of an iterable of IRI
+     * @param bool|null                                                                                                                                   $readableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
+     * @param bool|null                                                                                                                                   $writableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
+     * @param bool|null                                                                                                                                   $required                https://api-platform.com/docs/admin/validation/#client-side-validation
+     * @param bool|null                                                                                                                                   $identifier              https://api-platform.com/docs/core/identifiers/
+     * @param mixed                                                                                                                                       $example                 https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
+     * @param string|null                                                                                                                                 $deprecationReason       https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
+     * @param bool|null                                                                                                                                   $fetchEager              https://api-platform.com/docs/core/performance/#eager-loading
+     * @param array|null                                                                                                                                  $jsonldContext           https://api-platform.com/docs/core/extending-jsonld-context/#extending-json-ld-and-hydra-contexts
+     * @param array|null                                                                                                                                  $openapiContext          https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts
+     * @param bool|null                                                                                                                                   $push                    https://api-platform.com/docs/core/push-relations/
+     * @param string|\Stringable|null                                                                                                                     $security                https://api-platform.com/docs/core/security
+     * @param string|\Stringable|null                                                                                                                     $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
+     * @param string[]                                                                                                                                    $types                   the RDF types of this property
+     * @param string[]                                                                                                                                    $iris
+     * @param Type[]                                                                                                                                      $builtinTypes
+     * @param string|null                                                                                                                                 $uriTemplate             (experimental) whether to return the subRessource collection IRI instead of an iterable of IRI
+     * @param string|null                                                                                                                                 $property                The property name
+     * @param Context|Groups|Ignore|SerializedName|SerializedPath|MaxDepth|array<array-key, Context|Groups|Ignore|SerializedName|SerializedPath|MaxDepth> $serialize               Serializer attributes
      */
     public function __construct(
         private ?string $description = null,
@@ -192,7 +203,7 @@ final class ApiProperty
          * </div>
          */
         private string|\Stringable|null $securityPostDenormalize = null,
-        private array|string|null $types = null,
+        array|string|null $types = null,
         /*
          * The related php types.
          */
@@ -203,11 +214,12 @@ final class ApiProperty
         private ?bool $genId = null,
         private ?string $uriTemplate = null,
         private ?string $property = null,
+        private ?string $policy = null,
+        array|Context|Groups|Ignore|SerializedName|SerializedPath|MaxDepth|null $serialize = null,
         private array $extraProperties = [],
     ) {
-        if (\is_string($types)) {
-            $this->types = (array) $types;
-        }
+        $this->types = \is_string($types) ? (array) $types : $types;
+        $this->serialize = \is_array($serialize) ? $serialize : (array) $serialize;
     }
 
     public function getProperty(): ?string
@@ -584,5 +596,34 @@ final class ApiProperty
         $metadata->uriTemplate = $uriTemplate;
 
         return $metadata;
+    }
+
+    public function getPolicy(): ?string
+    {
+        return $this->policy;
+    }
+
+    public function withPolicy(?string $policy): static
+    {
+        $self = clone $this;
+        $self->policy = $policy;
+
+        return $self;
+    }
+
+    public function getSerialize(): ?array
+    {
+        return $this->serialize;
+    }
+
+    /**
+     * @param Context|Groups|Ignore|SerializedName|SerializedPath|MaxDepth|array<array-key, Context|Groups|Ignore|SerializedName|SerializedPath|MaxDepth> $serialize
+     */
+    public function withSerialize(array|Context|Groups|Ignore|SerializedName|SerializedPath|MaxDepth $serialize): static
+    {
+        $self = clone $this;
+        $self->serialize = (array) $serialize;
+
+        return $self;
     }
 }

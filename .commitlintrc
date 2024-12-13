@@ -6,6 +6,7 @@
       2,
       "always",
       [
+        "laravel",
         "symfony",
         "doctrine",
         "metadata",

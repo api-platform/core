@@ -13,14 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\OpenApi\Serializer;
 
-use ApiPlatform\Serializer\SerializerContextBuilderInterface as LegacySerializerContextBuilderInterface;
 use ApiPlatform\State\SerializerContextBuilderInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @internal
  */
-final class SerializerContextBuilder implements SerializerContextBuilderInterface, LegacySerializerContextBuilderInterface
+final class SerializerContextBuilder implements SerializerContextBuilderInterface
 {
     public function __construct(private readonly SerializerContextBuilderInterface $decorated)
     {

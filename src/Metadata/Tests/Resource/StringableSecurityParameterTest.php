@@ -37,9 +37,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class StringableSecurityParameterTest extends TestCase
 {
-    /**
-     * @dataProvider metadataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('metadataProvider')]
     public function testOnMetadata(Metadata $metadata): void
     {
         $this->assertSame($metadata->getSecurity(), 'stringable_security');

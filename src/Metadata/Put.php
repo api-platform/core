@@ -44,7 +44,6 @@ final class Put extends HttpOperation
         ?array $cacheHeaders = null,
         ?array $paginationViaCursor = null,
         ?array $hydraContext = null,
-        ?array $openapiContext = null,
         bool|OpenApiOperation|Webhook|null $openapi = null,
         ?array $exceptionToStatus = null,
         ?bool $queryParameterValidationEnabled = null,
@@ -96,6 +95,9 @@ final class Put extends HttpOperation
         $processor = null,
         ?OptionsInterface $stateOptions = null,
         array|Parameters|null $parameters = null,
+        mixed $rules = null,
+        ?string $policy = null,
+        array|string|null $middleware = null,
         array $extraProperties = [],
         private ?bool $allowCreate = null,
     ) {
@@ -124,7 +126,6 @@ final class Put extends HttpOperation
             cacheHeaders: $cacheHeaders,
             paginationViaCursor: $paginationViaCursor,
             hydraContext: $hydraContext,
-            openapiContext: $openapiContext,
             openapi: $openapi,
             exceptionToStatus: $exceptionToStatus,
             queryParameterValidationEnabled: $queryParameterValidationEnabled,
@@ -175,6 +176,9 @@ final class Put extends HttpOperation
             processor: $processor,
             stateOptions: $stateOptions,
             parameters: $parameters,
+            rules: $rules,
+            policy: $policy,
+            middleware: $middleware,
             extraProperties: $extraProperties
         );
     }

@@ -36,7 +36,7 @@ final class CachedResourceMetadataCollectionFactory implements ResourceMetadataC
      */
     public function create(string $resourceClass): ResourceMetadataCollection
     {
-        $cacheKey = self::CACHE_KEY_PREFIX.md5($resourceClass);
+        $cacheKey = self::CACHE_KEY_PREFIX.hash('xxh3', $resourceClass);
         if (\array_key_exists($cacheKey, $this->localCache)) {
             return new ResourceMetadataCollection($resourceClass, $this->localCache[$cacheKey]);
         }

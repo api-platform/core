@@ -93,7 +93,7 @@ class DoctrineMongoDbOdmSetup
             $namespace .= ':';
         }
 
-        $cache->setNamespace($namespace.'dc2_'.md5($proxyDir.$hydratorDir).'_'); // to avoid collisions
+        $cache->setNamespace($namespace.'dc2_'.hash('xxh3', $proxyDir.$hydratorDir).'_'); // to avoid collisions
 
         return $cache;
     }

@@ -63,8 +63,8 @@ use Symfony\Component\Validator\Constraints as Assert;
         'length' => new QueryParameter(schema: ['maxLength' => 1, 'minLength' => 3]),
         'array' => new QueryParameter(schema: ['minItems' => 2, 'maxItems' => 3]),
         'multipleOf' => new QueryParameter(schema: ['multipleOf' => 2]),
-        'pattern' => new QueryParameter(schema: ['pattern' => '/\d/']),
         'int' => new QueryParameter(property: 'a', constraints: [new Assert\Type('integer')], provider: [self::class, 'toInt']),
+        'pattern' => new QueryParameter(schema: ['pattern' => '\d']),
     ],
     provider: [self::class, 'collectionProvider']
 )]

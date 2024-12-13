@@ -65,7 +65,6 @@ class HttpOperation extends Operation
      * @param array|null $normalizationContext   {@see https://api-platform.com/docs/core/serialization/#using-serialization-groups}
      * @param array|null $denormalizationContext {@see https://api-platform.com/docs/core/serialization/#using-serialization-groups}
      * @param array|null $hydraContext           {@see https://api-platform.com/docs/core/extending-jsonld-context/#hydra}
-     * @param array|null $openapiContext         {@see https://api-platform.com/docs/core/openapi/#using-the-openapi-and-swagger-contexts}
      * @param array{
      *     class?: string|null,
      *     name?: string,
@@ -152,7 +151,6 @@ class HttpOperation extends Operation
         protected ?array $cacheHeaders = null,
         protected ?array $paginationViaCursor = null,
         protected ?array $hydraContext = null,
-        protected ?array $openapiContext = null, // TODO Remove in 4.0
         protected bool|OpenApiOperation|Webhook|null $openapi = null,
         protected ?array $exceptionToStatus = null,
         protected ?array $links = null,
@@ -203,6 +201,9 @@ class HttpOperation extends Operation
         $processor = null,
         ?OptionsInterface $stateOptions = null,
         array|Parameters|null $parameters = null,
+        array|string|null $rules = null,
+        ?string $policy = null,
+        array|string|null $middleware = null,
         ?bool $queryParameterValidationEnabled = null,
         array $extraProperties = [],
     ) {
@@ -252,6 +253,9 @@ class HttpOperation extends Operation
             processor: $processor,
             stateOptions: $stateOptions,
             parameters: $parameters,
+            rules: $rules,
+            policy: $policy,
+            middleware: $middleware,
             queryParameterValidationEnabled: $queryParameterValidationEnabled,
             extraProperties: $extraProperties
         );
@@ -568,19 +572,6 @@ class HttpOperation extends Operation
     {
         $self = clone $this;
         $self->hydraContext = $hydraContext;
-
-        return $self;
-    }
-
-    public function getOpenapiContext(): ?array
-    {
-        return $this->openapiContext;
-    }
-
-    public function withOpenapiContext(array $openapiContext): self
-    {
-        $self = clone $this;
-        $self->openapiContext = $openapiContext;
 
         return $self;
     }

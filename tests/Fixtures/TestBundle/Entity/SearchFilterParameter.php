@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\Tests\Fixtures\TestBundle\Filter\QueryParameterFilter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Filter\SearchFilterValueTransformer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Filter\SearchTextAndDateFilter;
 use Doctrine\ORM\Mapping as ORM;
@@ -48,6 +49,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ApiFilter(SearchFilterValueTransformer::class, alias: 'app_search_filter_partial', properties: ['foo' => 'partial'], arguments: ['key' => 'searchPartial'])]
 #[ApiFilter(SearchFilterValueTransformer::class, alias: 'app_search_filter_with_exact', properties: ['foo' => 'exact'], arguments: ['key' => 'searchExact'])]
 #[ApiFilter(SearchTextAndDateFilter::class, alias: 'app_filter_date_and_search', properties: ['foo', 'createdAt'], arguments: ['dateFilterProperties' => ['createdAt' => 'exclude_null'], 'searchFilterProperties' => ['foo' => 'exact']])]
+#[QueryParameter(key: ':property', filter: QueryParameterFilter::class)]
 #[ORM\Entity]
 class SearchFilterParameter
 {

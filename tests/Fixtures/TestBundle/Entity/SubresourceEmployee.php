@@ -17,7 +17,7 @@ use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ApiResource(
-    '/subresource_organizations/{subresourceOrganization}/subresource_employees',
+    uriTemplate: '/subresource_organizations/{subresourceOrganization}/subresource_employees',
     types: ['https://schema.org/Person']
 )]
 #[ORM\Entity]

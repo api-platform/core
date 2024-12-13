@@ -13,26 +13,22 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonLd\Serializer;
 
-use ApiPlatform\Api\IriConverterInterface as LegacyIriConverterInterface;
 use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\IriConverterInterface;
-use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface as BaseCacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Serializer;
 
 /**
  * Decorates the output with JSON-LD metadata when appropriate, but otherwise just
  * passes through to the decorated normalizer.
  */
-final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
+final class ObjectNormalizer implements NormalizerInterface
 {
     use JsonLdContextTrait;
 
     public const FORMAT = 'jsonld';
 
-    public function __construct(private readonly NormalizerInterface $decorated, private readonly IriConverterInterface|LegacyIriConverterInterface $iriConverter, private AnonymousContextBuilderInterface $anonymousContextBuilder)
+    public function __construct(private readonly NormalizerInterface $decorated, private readonly IriConverterInterface $iriConverter, private AnonymousContextBuilderInterface $anonymousContextBuilder)
     {
     }
 
@@ -46,28 +42,7 @@ final class ObjectNormalizer implements NormalizerInterface, CacheableSupportsMe
 
     public function getSupportedTypes($format): array
     {
-        // @deprecated remove condition when support for symfony versions under 6.3 is dropped
-        if (!method_exists($this->decorated, 'getSupportedTypes')) {
-            return [
-                '*' => $this->decorated instanceof BaseCacheableSupportsMethodInterface && $this->decorated->hasCacheableSupportsMethod(),
-            ];
-        }
-
         return self::FORMAT === $format ? $this->decorated->getSupportedTypes($format) : [];
-    }
-
-    public function hasCacheableSupportsMethod(): bool
-    {
-        if (method_exists(Serializer::class, 'getSupportedTypes')) {
-            trigger_deprecation(
-                'api-platform/core',
-                '3.1',
-                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
-                __METHOD__
-            );
-        }
-
-        return $this->decorated instanceof BaseCacheableSupportsMethodInterface && $this->decorated->hasCacheableSupportsMethod();
     }
 
     /**

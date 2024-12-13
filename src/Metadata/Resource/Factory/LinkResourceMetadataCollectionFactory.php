@@ -23,7 +23,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
  */
 final class LinkResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    public function __construct(private readonly LinkFactoryInterface $linkFactory, private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null)
+    public function __construct(private readonly LinkFactoryInterface $linkFactory, private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null, private bool $graphQlEnabled = false)
     {
     }
 
@@ -35,6 +35,10 @@ final class LinkResourceMetadataCollectionFactory implements ResourceMetadataCol
         $resourceMetadataCollection = new ResourceMetadataCollection($resourceClass);
         if ($this->decorated) {
             $resourceMetadataCollection = $this->decorated->create($resourceClass);
+        }
+
+        if (!$this->graphQlEnabled) {
+            return $resourceMetadataCollection;
         }
 
         foreach ($resourceMetadataCollection as $i => $resource) {

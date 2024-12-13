@@ -14,14 +14,26 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional\Parameters;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\AgentApi;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\AgentDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Agent;
+use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 
 final class QueryParameterStateOptionsTest extends ApiTestCase
 {
+    use SetupClassResourcesTrait;
+
+    /**
+     * @return class-string[]
+     */
+    public static function getResources(): array
+    {
+        return [AgentApi::class];
+    }
+
     public function testQueryParameterStateOptions(): void
     {
         $this->recreateSchema();

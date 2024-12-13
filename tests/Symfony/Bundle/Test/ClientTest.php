@@ -15,27 +15,31 @@ namespace ApiPlatform\Tests\Symfony\Bundle\Test;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Symfony\Bundle\Test\Response;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Tools\SchemaTool;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
+use ApiPlatform\Tests\RecreateSchemaTrait;
+use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class ClientTest extends ApiTestCase
 {
-    protected function setUp(): void
-    {
-        self::bootKernel();
-        /**
-         * @var EntityManagerInterface
-         */
-        $manager = static::getContainer()->get('doctrine')->getManager();
-        /** @var ClassMetadata[] $classes */
-        $classes = $manager->getMetadataFactory()->getAllMetadata();
-        $schemaTool = new SchemaTool($manager);
+    use RecreateSchemaTrait;
+    use SetupClassResourcesTrait;
 
-        @$schemaTool->dropSchema($classes);
-        @$schemaTool->createSchema($classes);
+    /**
+     * @return class-string[]
+     */
+    public static function getResources(): array
+    {
+        return [
+            Dummy::class,
+            RelatedDummy::class,
+            RelatedOwnedDummy::class,
+            SecuredDummy::class,
+        ];
     }
 
     public function testRequest(): void
@@ -54,6 +58,7 @@ class ClientTest extends ApiTestCase
 
     public function testCustomHeader(): void
     {
+        $this->recreateSchema([Dummy::class, RelatedOwnedDummy::class, RelatedDummy::class]);
         $client = self::createClient();
         $client->disableReboot();
         $response = $client->request('POST', '/dummies', [
@@ -75,6 +80,7 @@ class ClientTest extends ApiTestCase
 
     public function testDefaultHeaders(): void
     {
+        $this->recreateSchema([Dummy::class, RelatedOwnedDummy::class, RelatedDummy::class]);
         $client = self::createClient([], [
             'headers' => [
                 'content-type' => 'application/json',
@@ -92,11 +98,10 @@ class ClientTest extends ApiTestCase
         $this->assertStringContainsString('<name>Kevin</name>', $response->getContent());
     }
 
-    /**
-     * @dataProvider authBasicProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('authBasicProvider')]
     public function testAuthBasic($basic): void
     {
+        $this->recreateSchema([SecuredDummy::class, RelatedDummy::class]);
         $client = self::createClient();
         $client->enableReboot();
         $response = $client->request('GET', '/secured_dummies', ['auth_basic' => $basic]);
@@ -112,6 +117,7 @@ class ClientTest extends ApiTestCase
 
     public function testComplexScenario(): void
     {
+        $this->recreateSchema([SecuredDummy::class, RelatedDummy::class]);
         self::createClient()->request('GET', '/secured_dummies', ['auth_basic' => ['dunglas', 'kevin']]);
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
@@ -157,6 +163,7 @@ JSON
 
     public function testLoginUser(): void
     {
+        $this->recreateSchema([SecuredDummy::class, RelatedDummy::class]);
         $client = self::createClient();
         $client->loginUser(new InMemoryUser('dunglas', 'kevin', ['ROLE_USER']));
 

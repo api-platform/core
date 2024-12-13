@@ -26,9 +26,7 @@ use PHPUnit\Framework\TestCase;
 
 class ResolverFactoryTest extends TestCase
 {
-    /**
-     * @dataProvider graphQlQueries
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('graphQlQueries')]
     public function testGraphQlResolver(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null, ?Operation $providedOperation = null, ?Operation $processedOperation = null): void
     {
         $returnValue = new \stdClass();

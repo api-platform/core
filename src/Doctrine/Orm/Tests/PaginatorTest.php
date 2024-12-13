@@ -30,9 +30,7 @@ class PaginatorTest extends TestCase
 {
     use ProphecyTrait;
 
-    /**
-     * @dataProvider initializeProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('initializeProvider')]
     public function testInitialize(int $firstResult, int $maxResults, int $totalItems, int $currentPage, int $lastPage, bool $hasNextPage): void
     {
         $paginator = $this->getPaginator($firstResult, $maxResults, $totalItems);

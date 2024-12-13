@@ -68,6 +68,8 @@ final class XmlResourceAdapter implements ResourceAdapterInterface
         'parameters',
     ];
 
+    private const EXCLUDE = ['policy', 'middleware', 'rule'];
+
     /**
      * {@inheritdoc}
      */
@@ -94,6 +96,10 @@ XML_WRAP
             $fixture['class'] = $resourceClass;
             foreach ($parameters as $parameter) {
                 $parameterName = $parameter->getName();
+                if (\in_array($parameterName, self::EXCLUDE, true)) {
+                    continue;
+                }
+
                 $value = \array_key_exists($parameterName, $fixture) ? $fixture[$parameterName] : null;
 
                 if ('compositeIdentifier' === $parameterName || 'provider' === $parameterName || 'processor' === $parameterName) {
@@ -220,16 +226,6 @@ XML_WRAP
     private function buildHydraContext(\SimpleXMLElement $resource, array $values): void
     {
         $this->buildValues($resource->addChild('hydraContext'), $values);
-    }
-
-    /**
-     * TODO Remove in 4.0.
-     *
-     * @deprecated
-     */
-    private function buildOpenapiContext(\SimpleXMLElement $resource, array $values): void
-    {
-        $this->buildValues($resource->addChild('openapiContext'), $values);
     }
 
     private function buildOpenapi(\SimpleXMLElement $resource, array $values): void
@@ -506,6 +502,10 @@ XML_WRAP
         $childNode = $node->addChild('link');
         $childNode->addAttribute('rel', $values[0]['rel']);
         $childNode->addAttribute('href', $values[0]['href']);
+    }
+
+    private function buildRules(\SimpleXMLElement $resource, ?array $values = null): void
+    {
     }
 
     private function buildHeaders(\SimpleXMLElement $resource, ?array $values = null): void

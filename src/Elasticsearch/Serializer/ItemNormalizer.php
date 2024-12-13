@@ -13,12 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\Serializer;
 
-use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Exception\LogicException;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface as BaseCacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -28,33 +25,12 @@ use Symfony\Component\Serializer\SerializerInterface;
  *
  * @experimental
  */
-final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface, CacheableSupportsMethodInterface
+final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
 {
     public const FORMAT = 'elasticsearch';
 
     public function __construct(private readonly NormalizerInterface $decorated)
     {
-    }
-
-    /**
-     * @throws LogicException
-     */
-    public function hasCacheableSupportsMethod(): bool
-    {
-        if (method_exists(Serializer::class, 'getSupportedTypes')) {
-            trigger_deprecation(
-                'api-platform/core',
-                '3.1',
-                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
-                __METHOD__
-            );
-        }
-
-        if (!$this->decorated instanceof BaseCacheableSupportsMethodInterface) {
-            throw new LogicException(\sprintf('The decorated normalizer must be an instance of "%s".', BaseCacheableSupportsMethodInterface::class));
-        }
-
-        return $this->decorated->hasCacheableSupportsMethod();
     }
 
     /**
@@ -107,7 +83,6 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
         if (!method_exists($this->decorated, 'getSupportedTypes')) {
             return [
                 DocumentNormalizer::FORMAT => null,
-                '*' => $this->decorated instanceof BaseCacheableSupportsMethodInterface && $this->decorated->hasCacheableSupportsMethod(),
             ];
         }
 

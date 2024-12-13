@@ -90,7 +90,6 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             'schemes' => $this->buildArrayValue($resource, 'scheme'),
             'cacheHeaders' => $this->buildCacheHeaders($resource),
             'hydraContext' => isset($resource->hydraContext->values) ? $this->buildValues($resource->hydraContext->values) : null,
-            'openapiContext' => isset($resource->openapiContext->values) ? $this->buildValues($resource->openapiContext->values) : null, // TODO Remove in 4.0
             'openapi' => $this->buildOpenapi($resource),
             'paginationViaCursor' => $this->buildPaginationViaCursor($resource),
             'exceptionToStatus' => $this->buildExceptionToStatus($resource),

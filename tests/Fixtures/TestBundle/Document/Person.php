@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\Enum\AcademicGrade;
 use ApiPlatform\Tests\Fixtures\TestBundle\Enum\GenderTypeEnum;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -39,6 +40,11 @@ class Person
     #[Groups(['people.pets'])]
     #[ODM\Field(type: 'string')]
     public string $name;
+
+    /** @var array<AcademicGrade> */
+    #[ODM\Field(nullable: true)]
+    #[Groups(['people.pets'])]
+    public array $academicGrades = [];
 
     #[Groups(['people.pets'])]
     #[ODM\ReferenceMany(targetDocument: PersonToPet::class, mappedBy: 'person')]

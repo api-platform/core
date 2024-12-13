@@ -22,18 +22,17 @@
         }
     ],
     "require": {
-        "php": ">=8.1",
+        "php": ">=8.2",
         "api-platform/metadata": "^3.4 || ^4.0",
         "api-platform/state": "^3.4 || ^4.0",
-        "symfony/http-foundation": "^6.4 || ^7.1"
+        "symfony/http-foundation": "^6.4 || ^7.0"
     },
     "require-dev": {
         "guzzlehttp/guzzle": "^6.0 || ^7.0",
         "symfony/dependency-injection": "^6.4 || ^7.0",
-        "phpspec/prophecy-phpunit": "^2.0",
-        "symfony/phpunit-bridge": "^6.4 || ^7.0",
+        "phpspec/prophecy-phpunit": "^2.2",
         "symfony/http-client": "^6.4 || ^7.0",
-        "sebastian/comparator": "<5.0"
+        "phpunit/phpunit": "^11.2"
     },
     "autoload": {
         "psr-4": {
@@ -59,7 +58,7 @@
             "dev-3.4": "3.4.x-dev"
         },
         "symfony": {
-            "require": "^6.4 || ^7.1"
+            "require": "^6.4 || ^7.0"
         },
         "thanks": {
             "name": "api-platform/api-platform",

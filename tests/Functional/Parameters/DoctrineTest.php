@@ -14,24 +14,32 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional\Parameters;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use ApiPlatform\Tests\Fixtures\TestBundle\Document\SearchFilterParameterDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\FilterWithStateOptions;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\SearchFilterParameter as SearchFilterParameterDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilterWithStateOptionsEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SearchFilterParameter;
-use Doctrine\ODM\MongoDB\DocumentManager;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Tools\SchemaTool;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use ApiPlatform\Tests\RecreateSchemaTrait;
+use ApiPlatform\Tests\SetupClassResourcesTrait;
 
 final class DoctrineTest extends ApiTestCase
 {
+    use RecreateSchemaTrait;
+    use SetupClassResourcesTrait;
+
+    /**
+     * @return class-string[]
+     */
+    public static function getResources(): array
+    {
+        return [SearchFilterParameter::class, FilterWithStateOptions::class];
+    }
+
     public function testDoctrineEntitySearchFilter(): void
     {
-        static::bootKernel();
-        $container = static::$kernel->getContainer();
-        $resource = $this->isMongoDb($container) ? SearchFilterParameterDocument::class : SearchFilterParameter::class;
-        $this->recreateSchema($resource);
-        $this->createFixture($resource);
-        $route = $this->isMongoDb($container) ? 'search_filter_parameter_document' : 'search_filter_parameter';
+        $resource = $this->isMongoDB() ? SearchFilterParameterDocument::class : SearchFilterParameter::class;
+        $this->recreateSchema([$resource]);
+        $this->loadFixtures($resource);
+        $route = 'search_filter_parameter';
         $response = self::createClient()->request('GET', $route.'?foo=bar');
         $a = $response->toArray();
         $this->assertCount(2, $a['hydra:member']);
@@ -39,11 +47,10 @@ final class DoctrineTest extends ApiTestCase
         $this->assertEquals('bar', $a['hydra:member'][1]['foo']);
 
         $this->assertArraySubset(['hydra:search' => [
-            'hydra:template' => \sprintf('/%s{?foo,fooAlias,order[order[id]],order[order[foo]],searchPartial[foo],searchExact[foo],searchOnTextAndDate[foo],searchOnTextAndDate[createdAt][before],searchOnTextAndDate[createdAt][strictly_before],searchOnTextAndDate[createdAt][after],searchOnTextAndDate[createdAt][strictly_after],q}', $route),
-            'hydra:mapping' => [
-                ['@type' => 'IriTemplateMapping', 'variable' => 'foo', 'property' => 'foo'],
-            ],
+            'hydra:template' => \sprintf('/%s{?foo,fooAlias,order[order[id]],order[order[foo]],searchPartial[foo],searchExact[foo],searchOnTextAndDate[foo],searchOnTextAndDate[createdAt][before],searchOnTextAndDate[createdAt][strictly_before],searchOnTextAndDate[createdAt][after],searchOnTextAndDate[createdAt][strictly_after],q,id,createdAt}', $route),
         ]], $a);
+
+        $this->assertArraySubset(['@type' => 'IriTemplateMapping', 'variable' => 'fooAlias', 'property' => 'foo'], $a['hydra:search']['hydra:mapping'][1]);
 
         $response = self::createClient()->request('GET', $route.'?fooAlias=baz');
         $a = $response->toArray();
@@ -66,21 +73,16 @@ final class DoctrineTest extends ApiTestCase
         $this->assertArraySubset(['foo' => 'bar', 'createdAt' => '2024-01-21T00:00:00+00:00'], $members[0]);
     }
 
-    /**
-     * @group legacy
-     */
     public function testGraphQl(): void
     {
         if ($_SERVER['EVENT_LISTENERS_BACKWARD_COMPATIBILITY_LAYER'] ?? false) {
             $this->markTestSkipped('Parameters are not supported in BC mode.');
         }
 
-        static::bootKernel();
-        $container = static::$kernel->getContainer();
-        $resource = $this->isMongoDb($container) ? SearchFilterParameterDocument::class : SearchFilterParameter::class;
-        $this->recreateSchema($resource);
-        $this->createFixture($resource);
-        $object = $this->isMongoDb($container) ? 'searchFilterParameterDocuments' : 'searchFilterParameters';
+        $resource = $this->isMongoDB() ? SearchFilterParameterDocument::class : SearchFilterParameter::class;
+        $this->recreateSchema([$resource]);
+        $this->loadFixtures($resource);
+        $object = 'searchFilterParameters';
         $response = self::createClient()->request('POST', '/graphql', ['json' => [
             'query' => \sprintf('{ %s(foo: "bar") { edges { node { id foo createdAt } } } }', $object),
         ]]);
@@ -102,12 +104,28 @@ final class DoctrineTest extends ApiTestCase
         $this->assertArraySubset(['foo' => 'bar', 'createdAt' => '2024-01-21T00:00:00+00:00'], $response->toArray()['data'][$object]['edges'][0]['node']);
     }
 
-    public function testStateOptions(): void
+    public function testPropertyPlaceholderFilter(): void
     {
         static::bootKernel();
+        $resource = $this->isMongoDB() ? SearchFilterParameterDocument::class : SearchFilterParameter::class;
+        $this->recreateSchema([$resource]);
+        $this->loadFixtures($resource);
+        $route = 'search_filter_parameter';
+        $response = self::createClient()->request('GET', $route.'?foo=baz');
+        $a = $response->toArray();
+        $this->assertEquals($a['hydra:member'][0]['foo'], 'baz');
+    }
+
+    public function testStateOptions(): void
+    {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('Not tested with mongodb.');
+        }
+
+        static::bootKernel();
         $container = static::$kernel->getContainer();
-        $this->recreateSchema(FilterWithStateOptionsEntity::class);
-        $registry = $this->isMongoDb($container) ? $container->get('doctrine_mongodb') : $container->get('doctrine');
+        $this->recreateSchema([FilterWithStateOptionsEntity::class]);
+        $registry = $container->get('doctrine');
         $manager = $registry->getManager();
         $d = new \DateTimeImmutable();
         $manager->persist(new FilterWithStateOptionsEntity(dummyDate: $d, name: 'current'));
@@ -125,27 +143,10 @@ final class DoctrineTest extends ApiTestCase
         $this->assertEquals('after', $a['hydra:member'][0]['name']);
     }
 
-    private function recreateSchema(string $resourceClass): void
+    public function loadFixtures(string $resourceClass): void
     {
         $container = static::$kernel->getContainer();
-        $registry = $this->isMongoDb($container) ? $container->get('doctrine_mongodb') : $container->get('doctrine');
-        $manager = $registry->getManager();
-
-        if ($manager instanceof EntityManagerInterface) {
-            $classes = $manager->getClassMetadata($resourceClass);
-            $schemaTool = new SchemaTool($manager);
-            @$schemaTool->dropSchema([$classes]);
-            @$schemaTool->createSchema([$classes]);
-        } elseif ($manager instanceof DocumentManager) {
-            $schemaManager = $manager->getSchemaManager();
-            $schemaManager->dropCollections();
-        }
-    }
-
-    public function createFixture(string $resourceClass): void
-    {
-        $container = static::$kernel->getContainer();
-        $registry = $this->isMongoDb($container) ? $container->get('doctrine_mongodb') : $container->get('doctrine');
+        $registry = $this->isMongoDB() ? $container->get('doctrine_mongodb') : $container->get('doctrine');
         $manager = $registry->getManager();
         $date = new \DateTimeImmutable('2024-01-21');
         foreach (['foo', 'foo', 'foo', 'bar', 'bar', 'baz'] as $t) {
@@ -158,11 +159,7 @@ final class DoctrineTest extends ApiTestCase
 
             $manager->persist($s);
         }
-        $manager->flush();
-    }
 
-    private function isMongoDb(ContainerInterface $container): bool
-    {
-        return 'mongodb' === $container->getParameter('kernel.environment');
+        $manager->flush();
     }
 }

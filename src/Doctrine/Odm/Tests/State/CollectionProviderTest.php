@@ -29,14 +29,9 @@ use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
-/**
- * @group mongodb
- */
 class CollectionProviderTest extends TestCase
 {
-    use ExpectDeprecationTrait;
     use ProphecyTrait;
 
     private ObjectProphecy $managerRegistryProphecy;

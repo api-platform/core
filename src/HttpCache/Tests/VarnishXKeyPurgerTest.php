@@ -98,9 +98,7 @@ class VarnishXKeyPurgerTest extends TestCase
         $purger->purge(['/foo', '/bar', '/baz']);
     }
 
-    /**
-     * @dataProvider provideChunkHeaderCases
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideChunkHeaderCases')]
     public function testItChunksHeaderToAvoidHittingVarnishLimit(int $maxHeaderLength, array $iris, array $keysToSend): void
     {
         /** @var HttpClientInterface $client */

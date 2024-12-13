@@ -1,0 +1,31 @@
+providers:
+    - ApiPlatform\Laravel\ApiPlatformProvider
+    - Laravel\Sanctum\SanctumServiceProvider
+    - Workbench\App\Providers\WorkbenchServiceProvider
+
+migrations:
+    - vendor/laravel/sanctum/database/migrations
+    - workbench/database/migrations
+
+seeders:
+    - Workbench\Database\Seeders\DatabaseSeeder
+
+workbench:
+    start: /api/docs
+    welcome: false
+    install: false
+    discovers:
+        web: true
+        api: false
+        commands: false
+        views: false
+    build:
+        - asset-publish
+        - create-sqlite-db
+        - migrate:refresh
+    assets: [ ]
+    sync:
+        - from: ./workbench/app/Models/
+          to: app/Models
+        - from: ./workbench/app/ApiResource/
+          to: app/ApiResource

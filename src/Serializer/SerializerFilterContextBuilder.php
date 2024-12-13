@@ -17,7 +17,7 @@ use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Util\AttributesExtractor;
 use ApiPlatform\Serializer\Filter\FilterInterface;
-use ApiPlatform\State\SerializerContextBuilderInterface as StateSerializerContextBuilderInterface;
+use ApiPlatform\State\SerializerContextBuilderInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -28,7 +28,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class SerializerFilterContextBuilder implements SerializerContextBuilderInterface
 {
-    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ContainerInterface $filterLocator, private readonly SerializerContextBuilderInterface|StateSerializerContextBuilderInterface $decorated)
+    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ContainerInterface $filterLocator, private readonly SerializerContextBuilderInterface $decorated)
     {
     }
 

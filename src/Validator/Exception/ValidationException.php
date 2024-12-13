@@ -43,7 +43,6 @@ use Symfony\Component\WebLink\Link;
             outputFormats: ['json' => ['application/problem+json']],
             normalizationContext: ['groups' => ['json'],
                 'skip_null_values' => true,
-                'rfc_7807_compliant_errors' => true,
             ]),
         new ErrorOperation(
             name: '_api_validation_errors_hydra',
@@ -52,13 +51,12 @@ use Symfony\Component\WebLink\Link;
             normalizationContext: [
                 'groups' => ['jsonld'],
                 'skip_null_values' => true,
-                'rfc_7807_compliant_errors' => true,
             ]
         ),
         new ErrorOperation(
             name: '_api_validation_errors_jsonapi',
             outputFormats: ['jsonapi' => ['application/vnd.api+json']],
-            normalizationContext: ['groups' => ['jsonapi'], 'skip_null_values' => true, 'rfc_7807_compliant_errors' => true]
+            normalizationContext: ['groups' => ['jsonapi'], 'skip_null_values' => true]
         ),
     ],
     graphQlOperations: []
@@ -114,19 +112,19 @@ class ValidationException extends RuntimeException implements ConstraintViolatio
         return $this->detail;
     }
 
-    #[Groups(['jsonld', 'json'])]
+    #[Groups(['jsonld', 'json', 'jsonapi'])]
     public function getType(): string
     {
         return '/validation_errors/'.$this->getId();
     }
 
-    #[Groups(['jsonld', 'json'])]
+    #[Groups(['jsonld', 'json', 'jsonapi'])]
     public function getTitle(): ?string
     {
         return $this->errorTitle ?? 'An error occurred';
     }
 
-    #[Groups(['jsonld', 'json'])]
+    #[Groups(['jsonld', 'json', 'jsonapi'])]
     private string $detail;
 
     public function getDetail(): ?string
@@ -139,7 +137,7 @@ class ValidationException extends RuntimeException implements ConstraintViolatio
         $this->detail = $detail;
     }
 
-    #[Groups(['jsonld', 'json'])]
+    #[Groups(['jsonld', 'json', 'jsonapi'])]
     public function getStatus(): ?int
     {
         return $this->status;
@@ -150,7 +148,7 @@ class ValidationException extends RuntimeException implements ConstraintViolatio
         $this->status = $status;
     }
 
-    #[Groups(['jsonld', 'json'])]
+    #[Groups(['jsonld', 'json', 'jsonapi'])]
     public function getInstance(): ?string
     {
         return null;

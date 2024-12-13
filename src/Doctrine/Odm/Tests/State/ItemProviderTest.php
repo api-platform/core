@@ -32,14 +32,9 @@ use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
-/**
- * @group mongodb
- */
 class ItemProviderTest extends TestCase
 {
-    use ExpectDeprecationTrait;
     use ProphecyTrait;
 
     public function testGetItemSingleIdentifier(): void

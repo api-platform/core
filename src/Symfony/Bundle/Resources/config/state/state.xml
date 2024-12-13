@@ -55,5 +55,10 @@
         </service>
         <service id="ApiPlatform\State\ObjectProvider" alias="api_platform.state_provider.object" />
         <service id="ApiPlatform\State\SerializerContextBuilderInterface" alias="api_platform.serializer.context_builder" />
+
+        <service id="api_platform.state_provider.backed_enum" class="ApiPlatform\State\Provider\BackedEnumProvider">
+            <tag name="api_platform.state_provider" key="ApiPlatform\State\Provider\BackedEnumProvider" />
+            <tag name="api_platform.state_provider" key="api_platform.state_provider.backed_enum" />
+        </service>
     </services>
 </container>

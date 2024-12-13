@@ -438,3 +438,9 @@ Feature: Documentation support
     And I send a "GET" request to "/docs.jsonopenapi"
     Then the response status code should be 200
     And the response should be in JSON
+
+  Scenario: OpenAPI UI is enabled for docs endpoint
+    Given there are 1 dummy objects
+    Given I add "Accept" header equal to "text/html"
+    And I send a "GET" request to "/dummies/1.html"
+    Then the response status code should be 200

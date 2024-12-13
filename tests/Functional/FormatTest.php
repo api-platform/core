@@ -14,9 +14,21 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6384\AcceptHtml;
+use ApiPlatform\Tests\SetupClassResourcesTrait;
 
 final class FormatTest extends ApiTestCase
 {
+    use SetupClassResourcesTrait;
+
+    /**
+     * @return class-string[]
+     */
+    public static function getResources(): array
+    {
+        return [AcceptHtml::class];
+    }
+
     public function testShouldReturnHtml(): void
     {
         $r = self::createClient()->request('GET', '/accept_html', ['headers' => ['Accept' => 'text/html']]);

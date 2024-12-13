@@ -45,9 +45,7 @@ abstract class DoctrineMongoDbOdmFilterTestCase extends KernelTestCase
         $this->repository = $this->manager->getRepository($this->resourceClass);
     }
 
-    /**
-     * @dataProvider provideApplyTestData
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideApplyTestData')]
     public function testApply(?array $properties, array $filterParameters, array $expectedPipeline, ?callable $factory = null, ?string $resourceClass = null): void
     {
         $this->doTestApply($properties, $filterParameters, $expectedPipeline, $factory, $resourceClass);

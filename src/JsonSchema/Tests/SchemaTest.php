@@ -18,9 +18,7 @@ use PHPUnit\Framework\TestCase;
 
 class SchemaTest extends TestCase
 {
-    /**
-     * @dataProvider versionProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('versionProvider')]
     public function testJsonSchemaVersion(string $version, string $ref): void
     {
         $schema = new Schema($version);
@@ -31,9 +29,7 @@ class SchemaTest extends TestCase
         $this->assertSame('Foo', $schema->getRootDefinitionKey());
     }
 
-    /**
-     * @dataProvider versionProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('versionProvider')]
     public function testCollectionJsonSchemaVersion(string $version, string $ref): void
     {
         $schema = new Schema($version);
@@ -62,9 +58,7 @@ class SchemaTest extends TestCase
         $this->assertSame('http://json-schema.org/draft-07/schema#', $schema['$schema']);
     }
 
-    /**
-     * @dataProvider definitionsDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('definitionsDataProvider')]
     public function testDefinitions(string $version, array $baseDefinitions): void
     {
         $schema = new Schema($version);

@@ -47,6 +47,9 @@ final class XmlPropertyAdapter implements PropertyAdapterInterface
         'property',
     ];
 
+    // TODO: add serialize support for XML (policy is Laravel-only)
+    private const EXCLUDE = ['policy', 'serialize'];
+
     /**
      * {@inheritdoc}
      */
@@ -68,6 +71,10 @@ XML_WRAP
 
         foreach ($parameters as $parameter) {
             $parameterName = $parameter->getName();
+            if (\in_array($parameterName, self::EXCLUDE, true)) {
+                continue;
+            }
+
             $value = \array_key_exists($parameterName, $fixtures) ? $fixtures[$parameterName] : null;
 
             if (method_exists($this, 'build'.ucfirst($parameterName))) {

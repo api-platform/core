@@ -43,7 +43,7 @@ final class EntrypointAction
 
     public function __invoke(Request $request)
     {
-        static::$resourceNameCollection = $this->resourceNameCollectionFactory->create();
+        self::$resourceNameCollection = $this->resourceNameCollectionFactory->create();
         $context = [
             'request' => $request,
             'spec_version' => (string) $request->query->get(LegacyOpenApiNormalizer::SPEC_VERSION),
@@ -65,6 +65,6 @@ final class EntrypointAction
 
     public static function provide(): Entrypoint
     {
-        return new Entrypoint(static::$resourceNameCollection);
+        return new Entrypoint(self::$resourceNameCollection);
     }
 }

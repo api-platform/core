@@ -1,0 +1,122 @@
+{
+    "name": "api-platform/laravel",
+    "description": "API Platform support for Laravel",
+    "keywords": [
+        "Laravel",
+        "REST",
+        "GraphQL",
+        "API",
+        "JSON-LD",
+        "Hydra",
+        "JSONAPI",
+        "OpenAPI",
+        "HAL",
+        "Swagger"
+    ],
+    "homepage": "https://api-platform.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kévin Dunglas",
+            "email": "kevin@dunglas.fr",
+            "homepage": "https://dunglas.fr"
+        },
+        {
+            "name": "API Platform Community",
+            "homepage": "https://api-platform.com/community/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "api-platform/documentation": "^4.0",
+        "api-platform/hydra": "^4.0",
+        "api-platform/json-hal": "^4.0",
+        "api-platform/json-schema": "^4.0",
+        "api-platform/jsonld": "^4.0",
+        "api-platform/json-api": "^4.0",
+        "api-platform/metadata": "^4.0",
+        "api-platform/openapi": "^4.0",
+        "api-platform/serializer": "^4.0",
+        "api-platform/state": "^4.0",
+        "illuminate/config": "^11.0",
+        "laravel/framework": "^11.0",
+        "illuminate/contracts": "^11.0",
+        "illuminate/database": "^11.0",
+        "illuminate/http": "^11.0",
+        "illuminate/pagination": "^11.0",
+        "illuminate/routing": "^11.0",
+        "illuminate/support": "^11.0",
+        "illuminate/container": "^11.0",
+        "symfony/web-link": "^6.4 || ^7.1",
+        "willdurand/negotiation": "^3.1",
+        "phpstan/phpdoc-parser": "^1.29",
+        "phpdocumentor/reflection-docblock": "^5.1"
+    },
+    "require-dev": {
+        "doctrine/dbal": "^4.0",
+        "larastan/larastan": "^2.0",
+        "orchestra/testbench": "^9.1",
+        "phpunit/phpunit": "^11.2",
+        "api-platform/graphql": "^4.0",
+        "laravel/sanctum": "^4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "ApiPlatform\\Laravel\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/",
+            "/workbench/"
+        ]
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "suggest": {
+        "api-platform/graphql": "Enable GraphQl support.",
+        "phpdocumentor/reflection-docblock": ""
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "ApiPlatform\\Laravel\\ApiPlatformProvider"
+            ]
+        },
+        "branch-alias": {
+            "dev-main": "4.0.x-dev",
+            "dev-3.4": "3.4.x-dev"
+        },
+        "symfony": {
+            "require": "^6.4 || ^7.1"
+        },
+        "thanks": {
+            "name": "api-platform/api-platform",
+            "url": "https://github.com/api-platform/api-platform"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Workbench\\App\\": "workbench/app/",
+            "Workbench\\Database\\Factories\\": "workbench/database/factories/",
+            "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
+        }
+    },
+    "scripts": {
+        "build": "@php vendor/bin/testbench workbench:build --ansi",
+        "test": "@php vendor/bin/testbench package:test",
+        "post-autoload-dump": [
+            "@clear",
+            "@prepare"
+        ],
+        "clear": "@php vendor/bin/testbench package:purge-skeleton --ansi",
+        "prepare": "@php vendor/bin/testbench package:discover --ansi",
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "@build",
+            "@php vendor/bin/testbench serve --ansi"
+        ],
+        "lint": [
+            "@php vendor/bin/phpstan analyse --verbose --ansi"
+        ]
+    }
+}

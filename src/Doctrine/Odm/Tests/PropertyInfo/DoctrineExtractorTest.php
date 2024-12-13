@@ -31,8 +31,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Type;
 
 /**
- * @group mongodb
- *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
@@ -84,9 +82,7 @@ class DoctrineExtractorTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider typesProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('typesProvider')]
     public function testExtract(string $property, ?array $type = null): void
     {
         $this->assertEquals($type, $this->createExtractor()->getTypes(DoctrineDummy::class, $property));

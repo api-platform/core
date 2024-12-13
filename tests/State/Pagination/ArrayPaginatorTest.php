@@ -21,9 +21,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ArrayPaginatorTest extends TestCase
 {
-    /**
-     * @dataProvider initializeProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('initializeProvider')]
     public function testInitialize(array $results, $firstResult, $maxResults, $currentItems, $totalItems, $currentPage, $lastPage, $hasNextPage): void
     {
         $paginator = new ArrayPaginator($results, $firstResult, $maxResults);

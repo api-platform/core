@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Tests\Metadata\Resource;
 
-use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Doctrine\Orm\Metadata\Resource\DoctrineOrmLinkFactory;
 use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity\Dummy;
 use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity\RelatedDummy;
@@ -25,6 +24,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\Resource\Factory\LinkFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\PropertyLinkFactoryInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;

@@ -30,7 +30,6 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Util\CamelCaseToSnakeCaseNameConverter;
 use ApiPlatform\State\CreateProvider;
 use Psr\Log\LoggerInterface;
@@ -67,7 +66,7 @@ trait OperationDefaultsTrait
                 $operation = $operation->{'with'.$upperKey}(array_merge($value, $currentValue));
             }
 
-            if (null !== $currentValue) {
+            if (null !== $currentValue || null === $value) {
                 continue;
             }
 
@@ -96,7 +95,13 @@ trait OperationDefaultsTrait
             $operations = [];
 
             foreach ($defaultOperations as $defaultOperation) {
-                $operations[] = new $defaultOperation();
+                $operation = new $defaultOperation();
+
+                if ($operation instanceof Post && $resource->getUriTemplate() && !$resource->getProvider()) {
+                    $operation = $operation->withProvider(CreateProvider::class);
+                }
+
+                $operations[] = $operation;
             }
 
             return new Operations($operations);
@@ -107,7 +112,7 @@ trait OperationDefaultsTrait
             $post = $post->withProvider(CreateProvider::class);
         }
 
-        return [new Get(), new GetCollection(), $post, new Put(), new Patch(), new Delete()];
+        return [new Get(), new GetCollection(), $post, new Patch(), new Delete()];
     }
 
     private function addDefaultGraphQlOperations(ApiResource $resource): ApiResource

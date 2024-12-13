@@ -63,9 +63,6 @@ class FieldsBuilderTest extends TestCase
     private ObjectProphecy $typeBuilderProphecy;
     private ObjectProphecy $typeConverterProphecy;
     private ObjectProphecy $itemResolverFactoryProphecy;
-    private ObjectProphecy $collectionResolverFactoryProphecy;
-    private ObjectProphecy $itemMutationResolverFactoryProphecy;
-    private ObjectProphecy $itemSubscriptionResolverFactoryProphecy;
     private ObjectProphecy $filterLocatorProphecy;
     private ObjectProphecy $resourceClassResolverProphecy;
     private FieldsBuilder $fieldsBuilder;
@@ -82,9 +79,6 @@ class FieldsBuilderTest extends TestCase
         $this->typeBuilderProphecy = $this->prophesize(ContextAwareTypeBuilderInterface::class);
         $this->typeConverterProphecy = $this->prophesize(TypeConverterInterface::class);
         $this->itemResolverFactoryProphecy = $this->prophesize(ResolverFactoryInterface::class);
-        $this->collectionResolverFactoryProphecy = $this->prophesize(ResolverFactoryInterface::class);
-        $this->itemMutationResolverFactoryProphecy = $this->prophesize(ResolverFactoryInterface::class);
-        $this->itemSubscriptionResolverFactoryProphecy = $this->prophesize(ResolverFactoryInterface::class);
         $this->filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
         $this->resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $this->fieldsBuilder = $this->buildFieldsBuilder();
@@ -92,7 +86,7 @@ class FieldsBuilderTest extends TestCase
 
     private function buildFieldsBuilder(?AdvancedNameConverterInterface $advancedNameConverter = null): FieldsBuilder
     {
-        return new FieldsBuilder($this->propertyNameCollectionFactoryProphecy->reveal(), $this->propertyMetadataFactoryProphecy->reveal(), $this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->resourceClassResolverProphecy->reveal(), $this->typesContainerProphecy->reveal(), $this->typeBuilderProphecy->reveal(), $this->typeConverterProphecy->reveal(), $this->itemResolverFactoryProphecy->reveal(), $this->collectionResolverFactoryProphecy->reveal(), $this->itemMutationResolverFactoryProphecy->reveal(), $this->itemSubscriptionResolverFactoryProphecy->reveal(), $this->filterLocatorProphecy->reveal(), new Pagination(), $advancedNameConverter ?? new CustomConverter(), '__');
+        return new FieldsBuilder($this->propertyNameCollectionFactoryProphecy->reveal(), $this->propertyMetadataFactoryProphecy->reveal(), $this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->resourceClassResolverProphecy->reveal(), $this->typesContainerProphecy->reveal(), $this->typeBuilderProphecy->reveal(), $this->typeConverterProphecy->reveal(), $this->itemResolverFactoryProphecy->reveal(), $this->filterLocatorProphecy->reveal(), new Pagination(), $advancedNameConverter ?? new CustomConverter(), '__');
     }
 
     public function testGetNodeQueryFields(): void
@@ -119,16 +113,14 @@ class FieldsBuilderTest extends TestCase
         $this->assertSame($itemResolver, $nodeQueryFields['resolve']);
     }
 
-    /**
-     * @dataProvider itemQueryFieldsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('itemQueryFieldsProvider')]
     public function testGetItemQueryFields(string $resourceClass, Operation $operation, array $configuration, ?GraphQLType $graphqlType, ?callable $resolver, array $expectedQueryFields): void
     {
         $this->resourceClassResolverProphecy->isResourceClass($resourceClass)->willReturn(true);
         $this->typeConverterProphecy->convertType(Argument::type(Type::class), false, Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), $resourceClass, $resourceClass, null, 0)->willReturn($graphqlType);
         $this->typeConverterProphecy->resolveType(Argument::type('string'))->willReturn(GraphQLType::string());
         $this->typeBuilderProphecy->isCollection(Argument::type(Type::class))->willReturn(false);
-        $this->itemResolverFactoryProphecy->__invoke($resourceClass, $resourceClass, $operation)->willReturn($resolver);
+        $this->itemResolverFactoryProphecy->__invoke($resourceClass, $resourceClass, $operation, Argument::any())->willReturn($resolver);
 
         $queryFields = $this->fieldsBuilder->getItemQueryFields($resourceClass, $operation, $configuration);
 
@@ -200,9 +192,7 @@ class FieldsBuilderTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider collectionQueryFieldsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('collectionQueryFieldsProvider')]
     public function testGetCollectionQueryFields(string $resourceClass, Operation $operation, array $configuration, ?GraphQLType $graphqlType, ?callable $resolver, array $expectedQueryFields): void
     {
         $this->resourceClassResolverProphecy->isResourceClass($resourceClass)->willReturn(true);
@@ -210,7 +200,7 @@ class FieldsBuilderTest extends TestCase
         $this->typeConverterProphecy->resolveType(Argument::type('string'))->willReturn(GraphQLType::string());
         $this->typeBuilderProphecy->isCollection(Argument::type(Type::class))->willReturn(true);
         $this->typeBuilderProphecy->getPaginatedCollectionType($graphqlType, $operation)->willReturn($graphqlType);
-        $this->collectionResolverFactoryProphecy->__invoke($resourceClass, $resourceClass, $operation)->willReturn($resolver);
+        $this->itemResolverFactoryProphecy->__invoke($resourceClass, $resourceClass, $operation, Argument::any())->willReturn($resolver);
         $this->filterLocatorProphecy->has('my_filter')->willReturn(true);
         $filterProphecy = $this->prophesize(FilterInterface::class);
         $filterProphecy->getDescription($resourceClass)->willReturn([
@@ -353,16 +343,14 @@ class FieldsBuilderTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider mutationFieldsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('mutationFieldsProvider')]
     public function testGetMutationFields(string $resourceClass, Operation $operation, GraphQLType $graphqlType, GraphQLType $inputGraphqlType, ?callable $mutationResolver, array $expectedMutationFields): void
     {
         $this->resourceClassResolverProphecy->isResourceClass($resourceClass)->willReturn(true);
         $this->typeConverterProphecy->convertType(Argument::type(Type::class), false, Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), $resourceClass, $resourceClass, null, 0)->willReturn($graphqlType);
         $this->typeConverterProphecy->convertType(Argument::type(Type::class), true, Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), $resourceClass, $resourceClass, null, 0)->willReturn($inputGraphqlType);
         $this->typeBuilderProphecy->isCollection(Argument::type(Type::class))->willReturn(false);
-        $this->itemMutationResolverFactoryProphecy->__invoke($resourceClass, $resourceClass, $operation)->willReturn($mutationResolver);
+        $this->itemResolverFactoryProphecy->__invoke($resourceClass, $resourceClass, $operation, Argument::any())->willReturn($mutationResolver);
 
         $mutationFields = $this->fieldsBuilder->getMutationFields($resourceClass, $operation);
 
@@ -415,9 +403,7 @@ class FieldsBuilderTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider subscriptionFieldsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('subscriptionFieldsProvider')]
     public function testGetSubscriptionFields(string $resourceClass, Operation $operation, GraphQLType $graphqlType, GraphQLType $inputGraphqlType, ?callable $subscriptionResolver, array $expectedSubscriptionFields): void
     {
         $this->resourceClassResolverProphecy->isResourceClass($resourceClass)->willReturn(true);
@@ -425,7 +411,7 @@ class FieldsBuilderTest extends TestCase
         $this->typeConverterProphecy->convertType(Argument::type(Type::class), true, Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), $resourceClass, $resourceClass, null, 0)->willReturn($inputGraphqlType);
         $this->typeBuilderProphecy->isCollection(Argument::type(Type::class))->willReturn(false);
         $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operation->getName() => $operation])]));
-        $this->itemSubscriptionResolverFactoryProphecy->__invoke($resourceClass, $resourceClass, $operation)->willReturn($subscriptionResolver);
+        $this->itemResolverFactoryProphecy->__invoke($resourceClass, $resourceClass, $operation, Argument::any())->willReturn($subscriptionResolver);
 
         $subscriptionFields = $this->fieldsBuilder->getSubscriptionFields($resourceClass, $operation);
 
@@ -480,9 +466,7 @@ class FieldsBuilderTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider resourceObjectTypeFieldsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('resourceObjectTypeFieldsProvider')]
     public function testGetResourceObjectTypeFields(string $resourceClass, Operation $operation, array $properties, bool $input, int $depth, ?array $ioMetadata, array $expectedResourceObjectTypeFields, ?callable $advancedNameConverterFactory = null): void
     {
         $this->resourceClassResolverProphecy->isResourceClass($resourceClass)->willReturn(true);
@@ -499,14 +483,14 @@ class FieldsBuilderTest extends TestCase
 
             if ('propertyObject' === $propertyName) {
                 $this->typeConverterProphecy->convertType(Argument::type(Type::class), Argument::type('bool'), Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), 'objectClass', $resourceClass, $propertyName, $depth + 1)->willReturn(new ObjectType(['name' => 'objectType', 'fields' => []]));
-                $this->itemResolverFactoryProphecy->__invoke('objectClass', $resourceClass, $operation)->willReturn(static function (): void {
+                $this->itemResolverFactoryProphecy->__invoke('objectClass', $resourceClass, $operation, Argument::any())->willReturn(static function (): void {
                 });
             }
             if ('propertyNestedResource' === $propertyName) {
                 $nestedResourceQueryOperation = new Query();
                 $this->resourceMetadataCollectionFactoryProphecy->create('nestedResourceClass')->willReturn(new ResourceMetadataCollection('nestedResourceClass', [(new ApiResource())->withGraphQlOperations(['item_query' => $nestedResourceQueryOperation])]));
                 $this->typeConverterProphecy->convertType(Argument::type(Type::class), Argument::type('bool'), Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), 'nestedResourceClass', $resourceClass, $propertyName, $depth + 1)->willReturn(new ObjectType(['name' => 'objectType', 'fields' => []]));
-                $this->itemResolverFactoryProphecy->__invoke('nestedResourceClass', $resourceClass, $nestedResourceQueryOperation)->willReturn(static function (): void {
+                $this->itemResolverFactoryProphecy->__invoke('nestedResourceClass', $resourceClass, $nestedResourceQueryOperation, Argument::any())->willReturn(static function (): void {
                 });
             }
         }
@@ -869,9 +853,7 @@ class FieldsBuilderTest extends TestCase
         ], $enumFields);
     }
 
-    /**
-     * @dataProvider resolveResourceArgsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('resolveResourceArgsProvider')]
     public function testResolveResourceArgs(array $args, array $expectedResolvedArgs, ?string $expectedExceptionMessage = null): void
     {
         if (null !== $expectedExceptionMessage) {

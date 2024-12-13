@@ -62,7 +62,7 @@
         </service>
         <service id="ApiPlatform\OpenApi\Options" alias="api_platform.openapi.options" />
 
-        <service id="api_platform.openapi.command" class="ApiPlatform\Symfony\Bundle\Command\OpenApiCommand">
+        <service id="api_platform.openapi.command" class="ApiPlatform\OpenApi\Command\OpenApiCommand">
             <argument type="service" id="api_platform.openapi.factory" />
             <argument type="service" id="api_platform.serializer" />
             <tag name="console.command" />
@@ -85,12 +85,15 @@
             <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="service" id="api_platform.json_schema.schema_factory" />
-            <argument>null</argument>
             <argument type="service" id="api_platform.filter_locator" />
             <argument>%api_platform.formats%</argument>
             <argument type="service" id="api_platform.openapi.options" />
             <argument type="service" id="api_platform.pagination_options" />
             <argument type="service" id="api_platform.router" />
+        </service>
+
+        <service id="api_platform.cache.openapi" parent="cache.system" public="false">
+            <tag name="cache.pool" />
         </service>
 
         <service id="api_platform.jsonopenapi.encoder" class="ApiPlatform\Serializer\JsonEncoder" public="false">

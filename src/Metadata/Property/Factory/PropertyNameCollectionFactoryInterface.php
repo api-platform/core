@@ -26,6 +26,8 @@ interface PropertyNameCollectionFactoryInterface
     /**
      * Creates the property name collection for the given class and options.
      *
+     * @param array<string, mixed> $options
+     *
      * @throws ResourceClassNotFoundException
      */
     public function create(string $resourceClass, array $options = []): PropertyNameCollection;

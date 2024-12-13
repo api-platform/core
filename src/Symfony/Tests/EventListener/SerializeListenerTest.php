@@ -98,6 +98,7 @@ class SerializeListenerTest extends TestCase
         $processor = $this->createMock(ProcessorInterface::class);
         $processor->expects($this->never())->method('process')->willReturn(new Response());
         $metadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $metadata->method('create')->willReturn(new ResourceMetadataCollection('class'));
         $request = new Request([], [], $attributes);
         $listener = new SerializeListener($processor, $metadata);
         $listener->onKernelView(
@@ -113,8 +114,6 @@ class SerializeListenerTest extends TestCase
     public static function provideNonApiAttributes(): array
     {
         return [
-            ['_api_resource_class' => 'dummy'],
-            ['_api_resource_class' => 'dummy', '_api_operation_name' => 'dummy'],
             ['_api_respond' => false, '_api_operation_name' => 'dummy'],
             [],
         ];

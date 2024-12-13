@@ -150,3 +150,6 @@ services:
         parent: 'api_platform.doctrine.orm.order_filter'
         arguments: [ { id: 'ASC', foo: 'DESC' } ]
         tags:  [ 'api_platform.filter' ]
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Filter\QueryParameterFilter:
+        tags:  [ 'api_platform.filter' ]

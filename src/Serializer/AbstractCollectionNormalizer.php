@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Serializer;
 
-use ApiPlatform\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
@@ -29,7 +28,7 @@ use Symfony\Component\Serializer\Serializer;
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-abstract class AbstractCollectionNormalizer implements NormalizerInterface, NormalizerAwareInterface, CacheableSupportsMethodInterface
+abstract class AbstractCollectionNormalizer implements NormalizerInterface, NormalizerAwareInterface
 {
     use ContextTrait {
         initContext as protected;
@@ -42,7 +41,7 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
      */
     public const FORMAT = 'to-override';
 
-    public function __construct(protected ResourceClassResolverInterface|LegacyResourceClassResolverInterface $resourceClassResolver, protected string $pageParameterName, protected ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null)
+    public function __construct(protected ResourceClassResolverInterface $resourceClassResolver, protected string $pageParameterName, protected ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null)
     {
     }
 
@@ -52,20 +51,6 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return static::FORMAT === $format && is_iterable($data);
-    }
-
-    public function hasCacheableSupportsMethod(): bool
-    {
-        if (method_exists(Serializer::class, 'getSupportedTypes')) {
-            trigger_deprecation(
-                'api-platform/core',
-                '3.1',
-                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
-                __METHOD__
-            );
-        }
-
-        return true;
     }
 
     public function getSupportedTypes(?string $format): array

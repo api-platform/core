@@ -16,7 +16,6 @@ namespace ApiPlatform\GraphQl\Type;
 use ApiPlatform\Doctrine\Odm\State\Options as ODMOptions;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\GraphQl\Exception\InvalidTypeException;
-use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactory;
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface;
 use ApiPlatform\Metadata\FilterInterface;
@@ -25,6 +24,7 @@ use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\InflectorInterface;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -48,18 +48,12 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumInterface
+final class FieldsBuilder implements FieldsBuilderEnumInterface
 {
-    private readonly ContextAwareTypeBuilderInterface|TypeBuilderEnumInterface|TypeBuilderInterface $typeBuilder;
+    private readonly ContextAwareTypeBuilderInterface $typeBuilder;
 
-    public function __construct(private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ResourceClassResolverInterface $resourceClassResolver, private readonly TypesContainerInterface $typesContainer, ContextAwareTypeBuilderInterface|TypeBuilderEnumInterface|TypeBuilderInterface $typeBuilder, private readonly TypeConverterInterface $typeConverter, private readonly ResolverFactoryInterface $itemResolverFactory, private readonly ?ResolverFactoryInterface $collectionResolverFactory, private readonly ?ResolverFactoryInterface $itemMutationResolverFactory, private readonly ?ResolverFactoryInterface $itemSubscriptionResolverFactory, private readonly ContainerInterface $filterLocator, private readonly Pagination $pagination, private readonly ?NameConverterInterface $nameConverter, private readonly string $nestingSeparator, private readonly ?InflectorInterface $inflector = new Inflector())
+    public function __construct(private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ResourceClassResolverInterface $resourceClassResolver, private readonly TypesContainerInterface $typesContainer, ContextAwareTypeBuilderInterface $typeBuilder, private readonly TypeConverterInterface $typeConverter, private readonly ResolverFactoryInterface $resolverFactory, private readonly ContainerInterface $filterLocator, private readonly Pagination $pagination, private readonly ?NameConverterInterface $nameConverter, private readonly string $nestingSeparator, private readonly ?InflectorInterface $inflector = new Inflector())
     {
-        if ($typeBuilder instanceof TypeBuilderInterface) {
-            @trigger_error(\sprintf('$typeBuilder argument of FieldsBuilder implementing "%s" is deprecated since API Platform 3.1. It has to implement "%s" instead.', TypeBuilderInterface::class, TypeBuilderEnumInterface::class), \E_USER_DEPRECATED);
-        }
-        if ($typeBuilder instanceof TypeBuilderEnumInterface) {
-            @trigger_error(\sprintf('$typeBuilder argument of TypeConverter implementing "%s" is deprecated since API Platform 3.3. It has to implement "%s" instead.', TypeBuilderEnumInterface::class, ContextAwareTypeBuilderInterface::class), \E_USER_DEPRECATED);
-        }
         $this->typeBuilder = $typeBuilder;
     }
 
@@ -73,7 +67,7 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
             'args' => [
                 'id' => ['type' => GraphQLType::nonNull(GraphQLType::id())],
             ],
-            'resolve' => ($this->itemResolverFactory)(),
+            'resolve' => ($this->resolverFactory)(),
         ];
     }
 
@@ -425,22 +419,10 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
                 }
             }
 
-            if ($this->itemResolverFactory instanceof ResolverFactory) {
-                if ($isStandardGraphqlType || $input) {
-                    $resolve = null;
-                } else {
-                    $resolve = ($this->itemResolverFactory)($resourceClass, $rootResource, $resourceOperation, $this->propertyMetadataFactory);
-                }
+            if ($isStandardGraphqlType || $input) {
+                $resolve = null;
             } else {
-                if ($isStandardGraphqlType || $input) {
-                    $resolve = null;
-                } elseif (($rootOperation instanceof Mutation || $rootOperation instanceof Subscription) && $depth <= 0) {
-                    $resolve = $rootOperation instanceof Mutation ? ($this->itemMutationResolverFactory)($resourceClass, $rootResource, $resourceOperation) : ($this->itemSubscriptionResolverFactory)($resourceClass, $rootResource, $resourceOperation);
-                } elseif ($this->typeBuilder->isCollection($type)) {
-                    $resolve = ($this->collectionResolverFactory)($resourceClass, $rootResource, $resourceOperation);
-                } else {
-                    $resolve = ($this->itemResolverFactory)($resourceClass, $rootResource, $resourceOperation);
-                }
+                $resolve = ($this->resolverFactory)($resourceClass, $rootResource, $resourceOperation, $this->propertyMetadataFactory);
             }
 
             return [
@@ -497,6 +479,21 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
                 }
 
                 $args[$parsedKey[0]] = $this->parameterToObjectType($flattenFields, $parsedKey[0]);
+            }
+
+            if ($filter instanceof OpenApiParameterFilterInterface) {
+                foreach ($filter->getOpenApiParameters($parameter) as $value) {
+                    $values = [];
+                    parse_str($value->getName(), $values);
+                    if (isset($values[$parsedKey[0]])) {
+                        $values = $values[$parsedKey[0]];
+                    }
+
+                    $name = key($values);
+                    $flattenFields[] = ['name' => $name, 'required' => $value->getRequired(), 'description' => $value->getDescription(), 'leafs' => $values[$name], 'type' => $value->getSchema()['type'] ?? 'string'];
+                }
+
+                $args[$parsedKey[0]] = $this->parameterToObjectType($flattenFields, $parsedKey[0].$operation->getShortName().$operation->getName());
             }
         }
 
@@ -678,11 +675,6 @@ final class FieldsBuilder implements FieldsBuilderInterface, FieldsBuilderEnumIn
 
         if ($this->typeBuilder->isCollection($type)) {
             if (!$input && !$this->isEnumClass($resourceClass) && $this->pagination->isGraphQlEnabled($resourceOperation)) {
-                // Deprecated path, to remove in API Platform 4.
-                if ($this->typeBuilder instanceof TypeBuilderInterface) {
-                    return $this->typeBuilder->getResourcePaginatedCollectionType($graphqlType, $resourceClass, $resourceOperation);
-                }
-
                 return $this->typeBuilder->getPaginatedCollectionType($graphqlType, $resourceOperation);
             }
 

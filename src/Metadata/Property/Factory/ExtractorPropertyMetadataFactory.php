@@ -93,7 +93,7 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
     private function update(ApiProperty $propertyMetadata, array $metadata): ApiProperty
     {
         foreach (get_class_methods(ApiProperty::class) as $method) {
-            if (preg_match('/^(?:get|is)(.*)/', (string) $method, $matches) && null !== $val = $metadata[lcfirst($matches[1])]) {
+            if (preg_match('/^(?:get|is)(.*)/', (string) $method, $matches) && null !== ($val = $metadata[lcfirst($matches[1])] ?? null) && method_exists($propertyMetadata, "with{$matches[1]}")) {
                 $propertyMetadata = $propertyMetadata->{"with{$matches[1]}"}($val);
             }
         }

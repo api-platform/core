@@ -35,7 +35,7 @@ class MultipleOfFilter extends AbstractFilter
                 'property' => 'multiple-of',
                 'type' => 'float',
                 'required' => false,
-                'swagger' => [
+                'schema' => [
                     'multipleOf' => 2,
                 ],
             ],

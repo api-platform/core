@@ -20,7 +20,7 @@ use ApiPlatform\Metadata\NotExposed;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
 /**
- * Adds a {@see NotExposed} operation with {@see NotFoundAction} on a resource which only has a GetCollection.
+ * Adds a {@see ApiPlatform\Metadata\NotExposed} operation with {@see ApiPlatform\Symfony\Action\NotFoundAction} on a resource which only has a GetCollection.
  * This operation helps to generate resource IRI for items.
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>

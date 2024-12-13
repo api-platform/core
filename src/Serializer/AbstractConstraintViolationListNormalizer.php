@@ -17,7 +17,6 @@ use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
@@ -28,7 +27,7 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  *
  * @internal
  */
-abstract class AbstractConstraintViolationListNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
+abstract class AbstractConstraintViolationListNormalizer implements NormalizerInterface
 {
     public const FORMAT = null; // Must be overridden
 
@@ -44,7 +43,7 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
      */
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
-        if (!isset($context['rfc_7807_compliant_errors']) && !($context['api_error_resource'] ?? false)) {
+        if (!($context['api_error_resource'] ?? false)) {
             return false;
         }
 
@@ -54,20 +53,6 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
     public function getSupportedTypes($format): array
     {
         return $format === static::FORMAT ? [ConstraintViolationListInterface::class => true] : [];
-    }
-
-    public function hasCacheableSupportsMethod(): bool
-    {
-        if (method_exists(Serializer::class, 'getSupportedTypes')) {
-            trigger_deprecation(
-                'api-platform/core',
-                '3.1',
-                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
-                __METHOD__
-            );
-        }
-
-        return true;
     }
 
     protected function getMessagesAndViolations(ConstraintViolationListInterface $constraintViolationList): array

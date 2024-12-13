@@ -252,7 +252,7 @@ class ApiResource extends Metadata
          * ```yaml
          * # api/config/api_platform/resources.yaml
          * App\Entity\Book:
-         *     urlGenerationStrategy: !php/const ApiPlatform\Api\UrlGeneratorInterface::ABS_URL
+         *     urlGenerationStrategy: !php/const ApiPlatform\Metadata\UrlGeneratorInterface::ABS_URL
          * ```
          *
          * ```xml
@@ -321,7 +321,6 @@ class ApiResource extends Metadata
         protected ?array $denormalizationContext = null,
         protected ?bool $collectDenormalizationErrors = null,
         protected ?array $hydraContext = null,
-        protected ?array $openapiContext = null, // TODO Remove in 4.0
         protected bool|OpenApiOperation|null $openapi = null,
         /**
          * The `validationContext` option configures the context of validation for the current ApiResource.
@@ -960,6 +959,9 @@ class ApiResource extends Metadata
         $provider = null,
         $processor = null,
         protected ?OptionsInterface $stateOptions = null,
+        protected mixed $rules = null,
+        ?string $policy = null,
+        array|string|null $middleware = null,
         array|Parameters|null $parameters = null,
         protected array $extraProperties = [],
     ) {
@@ -1002,6 +1004,9 @@ class ApiResource extends Metadata
             processor: $processor,
             stateOptions: $stateOptions,
             parameters: $parameters,
+            rules: $rules,
+            policy: $policy,
+            middleware: $middleware,
             extraProperties: $extraProperties
         );
 
@@ -1323,29 +1328,6 @@ class ApiResource extends Metadata
     {
         $self = clone $this;
         $self->hydraContext = $hydraContext;
-
-        return $self;
-    }
-
-    /**
-     * TODO Remove in 4.0.
-     *
-     * @deprecated
-     */
-    public function getOpenapiContext(): ?array
-    {
-        return $this->openapiContext;
-    }
-
-    /**
-     * TODO Remove in 4.0.
-     *
-     * @deprecated
-     */
-    public function withOpenapiContext(array $openapiContext): self
-    {
-        $self = clone $this;
-        $self->openapiContext = $openapiContext;
 
         return $self;
     }

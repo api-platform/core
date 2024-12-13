@@ -13,9 +13,27 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\JsonSchema\Command;
 
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Animal;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\AnimalObservation;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\BackedEnumIntegerResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\BackedEnumStringResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5501\BrokenDocs;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6299\Issue6299;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6317\Issue6317;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6800\TestApiDocHashmapArrayObjectIssue;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ResourceWithEnumProperty;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Species;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DocumentDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Answer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5793\BagOfTests;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5998\Issue5998Product;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5998\ProductCode;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5998\SaveProduct;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6212\Nest;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Question;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\ApplicationTester;
@@ -25,8 +43,8 @@ use Symfony\Component\Console\Tester\ApplicationTester;
  */
 class JsonSchemaGenerateCommandTest extends KernelTestCase
 {
+    use SetupClassResourcesTrait;
     private ApplicationTester $tester;
-
     private string $entityClass;
 
     protected function setUp(): void
@@ -39,6 +57,32 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
 
         $this->entityClass = 'mongodb' === $kernel->getEnvironment() ? DocumentDummy::class : Dummy::class;
         $this->tester = new ApplicationTester($application);
+    }
+
+    /**
+     * @return class-string[]
+     */
+    public static function getResources(): array
+    {
+        return [
+            Dummy::class,
+            BrokenDocs::class,
+            Nest::class,
+            BagOfTests::class,
+            ResourceWithEnumProperty::class,
+            Issue6299::class,
+            RelatedDummy::class,
+            Question::class,
+            Answer::class,
+            AnimalObservation::class,
+            Animal::class,
+            Species::class,
+            Issue6317::class,
+            ProductCode::class,
+            Issue5998Product::class,
+            BackedEnumIntegerResource::class,
+            BackedEnumStringResource::class,
+        ];
     }
 
     public function testExecuteWithoutOption(): void
@@ -89,7 +133,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
      */
     public function testExecuteWithNotExposedResourceAndReadableLink(): void
     {
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5501\BrokenDocs', '--type' => 'output']);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => BrokenDocs::class, '--type' => 'output']);
         $result = $this->tester->getDisplay();
 
         $this->assertStringContainsString('Related.jsonld-location.read_collection', $result);
@@ -98,9 +142,10 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
     /**
      * When serializer groups are present the Schema should have an embed resource. #5470 breaks array references when serializer groups are present.
      */
+    #[\PHPUnit\Framework\Attributes\Group('orm')]
     public function testArraySchemaWithReference(): void
     {
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5793\BagOfTests', '--type' => 'input']);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => BagOfTests::class, '--type' => 'input']);
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
 
@@ -127,7 +172,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
 
     public function testArraySchemaWithMultipleUnionTypesJsonLd(): void
     {
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6212\Nest', '--type' => 'output', '--format' => 'jsonld']);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => Nest::class, '--type' => 'output', '--format' => 'jsonld']);
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
 
@@ -143,7 +188,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
 
     public function testArraySchemaWithMultipleUnionTypesJsonApi(): void
     {
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6212\Nest', '--type' => 'output', '--format' => 'jsonapi']);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => Nest::class, '--type' => 'output', '--format' => 'jsonapi']);
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
 
@@ -159,7 +204,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
 
     public function testArraySchemaWithMultipleUnionTypesJsonHal(): void
     {
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6212\Nest', '--type' => 'output', '--format' => 'jsonhal']);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => Nest::class, '--type' => 'output', '--format' => 'jsonhal']);
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
 
@@ -174,27 +219,11 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
     }
 
     /**
-     * TODO: add deprecation (TypeFactory will be deprecated in api platform 3.3).
-     *
-     * @group legacy
-     */
-    public function testArraySchemaWithTypeFactory(): void
-    {
-        $container = static::getContainer();
-
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5896\Foo', '--type' => 'output']);
-        $result = $this->tester->getDisplay();
-        $json = json_decode($result, associative: true);
-
-        $this->assertEquals($json['definitions']['Foo.jsonld']['properties']['expiration'], ['type' => 'string', 'format' => 'date']);
-    }
-
-    /**
      * Test issue #5998.
      */
     public function testWritableNonResourceRef(): void
     {
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5998\SaveProduct', '--type' => 'input']);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => SaveProduct::class, '--type' => 'input']);
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
 
@@ -206,7 +235,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
      */
     public function testOpenApiResourceRefIsNotOverwritten(): void
     {
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6299\Issue6299', '--type' => 'output']);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => Issue6299::class, '--type' => 'output']);
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
 
@@ -217,18 +246,20 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
     /**
      * Test related Schema keeps json-ld context.
      */
+    #[\PHPUnit\Framework\Attributes\Group('orm')]
     public function testSubSchemaJsonLd(): void
     {
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy', '--type' => 'output', '--format' => 'jsonld']);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => RelatedDummy::class, '--type' => 'output', '--format' => 'jsonld']);
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
 
         $this->assertArrayHasKey('@id', $json['definitions']['ThirdLevel.jsonld-friends']['properties']);
     }
 
+    #[\PHPUnit\Framework\Attributes\Group('orm')]
     public function testJsonApiIncludesSchema(): void
     {
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\Entity\Question', '--type' => 'output', '--format' => 'jsonapi']);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => Question::class, '--type' => 'output', '--format' => 'jsonapi']);
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
         $properties = $json['definitions']['Question.jsonapi']['properties']['data']['properties'];
@@ -240,7 +271,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $this->assertArrayHasKey('$ref', $included['items']['anyOf'][0]);
         $this->assertSame('#/definitions/Answer.jsonapi', $included['items']['anyOf'][0]['$ref']);
 
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\AnimalObservation', '--type' => 'output', '--format' => 'jsonapi']);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => AnimalObservation::class, '--type' => 'output', '--format' => 'jsonapi']);
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
         $properties = $json['definitions']['AnimalObservation.jsonapi']['properties']['data']['properties'];
@@ -252,7 +283,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $this->assertCount(1, $included['items']['anyOf']);
         $this->assertSame('#/definitions/Animal.jsonapi', $included['items']['anyOf'][0]['$ref']);
 
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Animal', '--type' => 'output', '--format' => 'jsonapi']);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => Animal::class, '--type' => 'output', '--format' => 'jsonapi']);
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
         $properties = $json['definitions']['Animal.jsonapi']['properties']['data']['properties'];
@@ -264,7 +295,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $this->assertCount(1, $included['items']['anyOf']);
         $this->assertSame('#/definitions/Species.jsonapi', $included['items']['anyOf'][0]['$ref']);
 
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Species', '--type' => 'output', '--format' => 'jsonapi']);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => Species::class, '--type' => 'output', '--format' => 'jsonapi']);
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
         $properties = $json['definitions']['Species.jsonapi']['properties']['data']['properties'];
@@ -278,7 +309,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
      */
     public function testBackedEnumExamplesAreNotLost(): void
     {
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6317\Issue6317', '--type' => 'output', '--format' => 'jsonld']);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => Issue6317::class, '--type' => 'output', '--format' => 'jsonld']);
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
         $properties = $json['definitions']['Issue6317.jsonld']['properties'];
@@ -293,7 +324,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
 
     public function testResourceWithEnumPropertiesSchema(): void
     {
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ResourceWithEnumProperty', '--type' => 'output', '--format' => 'jsonld']);
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => ResourceWithEnumProperty::class, '--type' => 'output', '--format' => 'jsonld']);
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
         $properties = $json['definitions']['ResourceWithEnumProperty.jsonld']['properties'];

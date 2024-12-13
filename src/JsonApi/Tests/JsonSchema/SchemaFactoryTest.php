@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\JsonApi\JsonSchema;
+namespace ApiPlatform\JsonApi\Tests\JsonSchema;
 
 use ApiPlatform\JsonApi\JsonSchema\SchemaFactory;
 use ApiPlatform\JsonApi\Tests\Fixtures\Dummy;
@@ -53,7 +53,6 @@ class SchemaFactoryTest extends TestCase
         $definitionNameFactory = new DefinitionNameFactory(['jsonapi' => true]);
 
         $baseSchemaFactory = new BaseSchemaFactory(
-            typeFactory: null,
             resourceMetadataFactory: $resourceMetadataFactory->reveal(),
             propertyNameCollectionFactory: $propertyNameCollectionFactory->reveal(),
             propertyMetadataFactory: $propertyMetadataFactory->reveal(),

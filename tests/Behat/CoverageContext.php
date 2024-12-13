@@ -19,6 +19,7 @@ use SebastianBergmann\CodeCoverage\CodeCoverage;
 use SebastianBergmann\CodeCoverage\Driver\Selector;
 use SebastianBergmann\CodeCoverage\Filter;
 use SebastianBergmann\CodeCoverage\Report\PHP;
+use Symfony\Component\Finder\Finder;
 
 /**
  * Behat coverage.
@@ -40,15 +41,28 @@ final class CoverageContext implements Context
     public static function setup(): void
     {
         $filter = new Filter();
-        if (method_exists($filter, 'includeDirectory')) {
-            $filter->includeDirectory(__DIR__.'/../../src');
-            self::$coverage = new CodeCoverage((new Selector())->forLineCoverage($filter), $filter);
+        $finder =
+            (new Finder())
+            ->in(__DIR__.'/../../src')
+            ->exclude([
+                'src/Core/Bridge/Symfony/Maker/Resources/skeleton',
+                'tests/Fixtures/app/var',
+                'docs/guides',
+                'docs/var',
+                'src/Doctrine/Orm/Tests/var',
+                'src/Doctrine/Odm/Tests/var',
+            ])
+            ->append([
+                'tests/Fixtures/app/console',
+            ])
+            ->files()
+            ->name('*.php');
 
-            return;
+        foreach ($finder as $file) {
+            $filter->includeFile((string) $file);
         }
 
-        $filter->addDirectoryToWhitelist(__DIR__.'/../../src'); // @phpstan-ignore-line
-        self::$coverage = new CodeCoverage(null, $filter); // @phpstan-ignore-line
+        self::$coverage = new CodeCoverage((new Selector())->forLineCoverage($filter), $filter);
     }
 
     /**

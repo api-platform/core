@@ -49,6 +49,7 @@ interface SerializerContextBuilderInterface
      *   collect_denormalization_errors?: bool,
      *   exclude_from_cache_key?: string[],
      *   api_included?: bool,
+     *   attributes?: string[],
      *   deserializer_type?: string,
      * }
      */

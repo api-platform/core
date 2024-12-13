@@ -6,8 +6,8 @@
 
     <services>
         <service id="api_platform.action.not_found" class="ApiPlatform\Symfony\Action\NotFoundAction" public="true" />
-        <service id="api_platform.action.not_exposed" class="ApiPlatform\Symfony\Action\NotExposedAction" public="true" />
         <service id="ApiPlatform\Symfony\Action\NotFoundAction" alias="api_platform.action.not_found" public="true" />
+        <service id="api_platform.action.not_exposed" class="ApiPlatform\Symfony\Action\NotExposedAction" public="true" />
         <service id="ApiPlatform\Symfony\Action\NotExposedAction" alias="api_platform.action.not_exposed" public="true" />
         <service id="api_platform.serializer" alias="serializer" />
         <service id="api_platform.property_accessor" alias="property_accessor" public="false" />
@@ -15,17 +15,11 @@
         <service id="api_platform.negotiator" class="Negotiation\Negotiator" public="false" />
         <service id="api_platform.action.error_page" class="ApiPlatform\Symfony\Action\ErrorPageAction" public="true" />
 
-        <!-- deprecated -->
-        <service id="ApiPlatform\Action\NotFoundAction" alias="api_platform.action.not_found" public="true" />
-        <service id="ApiPlatform\Action\NotExposedAction" alias="api_platform.action.not_exposed" public="true" />
-
         <service id="api_platform.resource_class_resolver" class="ApiPlatform\Metadata\ResourceClassResolver" public="false">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
         </service>
-        <service id="ApiPlatform\Api\ResourceClassResolverInterface" alias="api_platform.resource_class_resolver" />
         <service id="ApiPlatform\Metadata\ResourceClassResolverInterface" alias="api_platform.resource_class_resolver" />
 
-        <service id="ApiPlatform\Api\UrlGeneratorInterface" alias="api_platform.router" />
         <service id="ApiPlatform\Metadata\UrlGeneratorInterface" alias="api_platform.router" />
 
         <service id="api_platform.router" class="ApiPlatform\Symfony\Routing\Router" public="false">
@@ -44,7 +38,6 @@
             <argument type="service" id="api_platform.filter_locator" />
             <tag name="api_platform.parameter_provider" key="api_platform.serializer.filter_parameter_provider" priority="-895" />
         </service>
-        <service id="ApiPlatform\Serializer\SerializerContextBuilderInterface" alias="api_platform.serializer.context_builder" />
         <service id="ApiPlatform\State\SerializerContextBuilderInterface" alias="api_platform.serializer.context_builder" />
 
         <service id="api_platform.serializer.context_builder.filter" class="ApiPlatform\Serializer\SerializerFilterContextBuilder" decorates="api_platform.serializer.context_builder" public="false">
@@ -103,17 +96,7 @@
             <argument type="service" id="api_platform.inflector" on-invalid="null" />
         </service>
 
-        <service id="api_platform.metadata.inflector" class="ApiPlatform\Metadata\Util\Inflector" public="false">
-            <argument>%api_platform.keep_legacy_inflector%</argument>
-        </service>
-
-        <!-- Action -->
-        <service id="api_platform.action.exception" class="ApiPlatform\Action\ExceptionAction" public="true">
-            <argument type="service" id="api_platform.serializer" />
-            <argument>%api_platform.error_formats%</argument>
-            <argument>%api_platform.exception_to_status%</argument>
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-        </service>
+        <service id="api_platform.metadata.inflector" class="ApiPlatform\Metadata\Util\Inflector" public="false" />
 
         <!-- Cache -->
         <service id="api_platform.cache.route_name_resolver" parent="cache.system" public="false">
@@ -150,7 +133,6 @@
             <argument type="service" id="api_platform.property_accessor" />
         </service>
         <service id="api_platform.identifiers_extractor" alias="api_platform.api.identifiers_extractor" />
-        <service id="ApiPlatform\Api\IdentifiersExtractorInterface" alias="api_platform.api.identifiers_extractor" />
         <service id="ApiPlatform\Metadata\IdentifiersExtractorInterface" alias="api_platform.api.identifiers_extractor" />
 
         <service id="api_platform.uri_variables.converter" class="ApiPlatform\Metadata\UriVariablesConverter" public="false">
@@ -179,7 +161,6 @@
             <argument type="service" id="api_platform.symfony.iri_converter.skolem" />
             <argument type="service" id="api_platform.metadata.operation.metadata_factory" />
         </service>
-        <service id="ApiPlatform\Api\IriConverterInterface" alias="api_platform.symfony.iri_converter" />
         <service id="ApiPlatform\Metadata\IriConverterInterface" alias="api_platform.symfony.iri_converter" />
 
         <service id="api_platform.state.error_provider" class="ApiPlatform\State\ErrorProvider">
@@ -193,6 +174,10 @@
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
 
             <tag name="serializer.normalizer" priority="-780" />
+        </service>
+
+        <service id="api_platform.serializer.property_metadata_loader" class="ApiPlatform\Serializer\Mapping\Loader\PropertyMetadataLoader" public="false">
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
         </service>
     </services>
 </container>

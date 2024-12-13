@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource\Factory;
 
-use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
@@ -47,10 +46,11 @@ final class AttributesResourceMetadataCollectionFactory implements ResourceMetad
             }
         }
 
-        foreach ($this->buildResourceOperations($metadataCollection, $resourceClass) as $resource) {
-            $resourceMetadataCollection[] = $resource;
+        $resultCollection = new ResourceMetadataCollection($resourceClass);
+        foreach ($this->buildResourceOperations($metadataCollection, $resourceClass, iterator_to_array($resourceMetadataCollection)) as $resource) {
+            $resultCollection[] = $resource;
         }
 
-        return $resourceMetadataCollection;
+        return $resultCollection;
     }
 }

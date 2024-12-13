@@ -15,7 +15,6 @@ namespace ApiPlatform\State\Provider;
 
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Serializer\SerializerContextBuilderInterface as LegacySerializerContextBuilderInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\SerializerContextBuilderInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
@@ -36,7 +35,7 @@ final class DeserializeProvider implements ProviderInterface
     public function __construct(
         private readonly ?ProviderInterface $decorated,
         private readonly SerializerInterface $serializer,
-        private readonly LegacySerializerContextBuilderInterface|SerializerContextBuilderInterface $serializerContextBuilder,
+        private readonly SerializerContextBuilderInterface $serializerContextBuilder,
         private ?TranslatorInterface $translator = null,
     ) {
         if (null === $this->translator) {
@@ -83,7 +82,7 @@ final class DeserializeProvider implements ProviderInterface
             && (
                 'POST' === $method
                 || 'PATCH' === $method
-                || ('PUT' === $method && !($operation->getExtraProperties()['standard_put'] ?? false))
+                || ('PUT' === $method && !($operation->getExtraProperties()['standard_put'] ?? true))
             )
         ) {
             $serializerContext[AbstractNormalizer::OBJECT_TO_POPULATE] = $data;

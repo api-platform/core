@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hydra\Serializer;
 
-use ApiPlatform\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
-use ApiPlatform\Api\UrlGeneratorInterface as LegacyUrlGeneratorInterface;
 use ApiPlatform\Documentation\Documentation;
 use ApiPlatform\JsonLd\ContextBuilder;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
@@ -31,26 +29,33 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
-use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
-use ApiPlatform\Symfony\Validator\Exception\ValidationException;
+use ApiPlatform\Validator\Exception\ValidationException;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Serializer;
+
+use const ApiPlatform\JsonLd\HYDRA_CONTEXT;
 
 /**
  * Creates a machine readable Hydra API documentation.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class DocumentationNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
+final class DocumentationNormalizer implements NormalizerInterface
 {
     use HydraPrefixTrait;
     public const FORMAT = 'jsonld';
 
-    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceClassResolverInterface|LegacyResourceClassResolverInterface $resourceClassResolver, private readonly UrlGeneratorInterface|LegacyUrlGeneratorInterface $urlGenerator, private readonly ?NameConverterInterface $nameConverter = null, private readonly ?array $defaultContext = [])
-    {
+    public function __construct(
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory,
+        private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
+        private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        private readonly ResourceClassResolverInterface $resourceClassResolver,
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly ?NameConverterInterface $nameConverter = null,
+        private readonly ?array $defaultContext = [],
+    ) {
     }
 
     /**
@@ -71,6 +76,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
             }
 
             $shortName = $resourceMetadata->getShortName();
+
             $prefixedShortName = $resourceMetadata->getTypes()[0] ?? "#$shortName";
             $this->populateEntrypointProperties($resourceMetadata, $shortName, $prefixedShortName, $entrypointProperties, $hydraPrefix, $resourceMetadataCollection);
             $classes[] = $this->getClass($resourceClass, $resourceMetadata, $shortName, $prefixedShortName, $context, $hydraPrefix, $resourceMetadataCollection);
@@ -240,8 +246,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                 if (('POST' === $operation->getMethod() || $operation instanceof CollectionOperationInterface) !== $collection) {
                     continue;
                 }
-
-                $hydraOperations[] = $this->getHydraOperation($operation, $operation->getTypes()[0] ?? "#{$operation->getShortName()}", $hydraPrefix);
+                $hydraOperations[] = $this->getHydraOperation($operation, $operation->getShortName(), $hydraPrefix);
             }
         }
 
@@ -401,7 +406,8 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
 
         foreach ($builtInTypes as $type) {
             $className = $type->getClassName();
-            if (!$type->isCollection()
+            if (
+                !$type->isCollection()
                 && null !== $className
                 && $this->resourceClassResolver->isResourceClass($className)
             ) {
@@ -426,7 +432,7 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
                 '@type' => $hydraPrefix.'Operation',
                 $hydraPrefix.'method' => 'GET',
                 'rdfs:label' => 'The API entrypoint.',
-                'returns' => '#EntryPoint',
+                'returns' => 'EntryPoint',
             ],
         ];
 
@@ -569,18 +575,19 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     private function getContext(string $hydraPrefix = ContextBuilder::HYDRA_PREFIX): array
     {
         return [
-            '@vocab' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT], UrlGeneratorInterface::ABS_URL).'#',
-            'hydra' => ContextBuilderInterface::HYDRA_NS,
-            'rdf' => ContextBuilderInterface::RDF_NS,
-            'rdfs' => ContextBuilderInterface::RDFS_NS,
-            'xmls' => ContextBuilderInterface::XML_NS,
-            'owl' => ContextBuilderInterface::OWL_NS,
-            'schema' => ContextBuilderInterface::SCHEMA_ORG_NS,
-            'domain' => ['@id' => 'rdfs:domain', '@type' => '@id'],
-            'range' => ['@id' => 'rdfs:range', '@type' => '@id'],
-            'subClassOf' => ['@id' => 'rdfs:subClassOf', '@type' => '@id'],
-            'expects' => ['@id' => $hydraPrefix.'expects', '@type' => '@id'],
-            'returns' => ['@id' => $hydraPrefix.'returns', '@type' => '@id'],
+            HYDRA_CONTEXT,
+            [
+                '@vocab' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT], UrlGeneratorInterface::ABS_URL).'#',
+                'hydra' => ContextBuilderInterface::HYDRA_NS,
+                'rdf' => ContextBuilderInterface::RDF_NS,
+                'rdfs' => ContextBuilderInterface::RDFS_NS,
+                'xmls' => ContextBuilderInterface::XML_NS,
+                'owl' => ContextBuilderInterface::OWL_NS,
+                'schema' => ContextBuilderInterface::SCHEMA_ORG_NS,
+                'domain' => ['@id' => 'rdfs:domain', '@type' => '@id'],
+                'range' => ['@id' => 'rdfs:range', '@type' => '@id'],
+                'subClassOf' => ['@id' => 'rdfs:subClassOf', '@type' => '@id'],
+            ],
         ];
     }
 
@@ -595,19 +602,5 @@ final class DocumentationNormalizer implements NormalizerInterface, CacheableSup
     public function getSupportedTypes($format): array
     {
         return self::FORMAT === $format ? [Documentation::class => true] : [];
-    }
-
-    public function hasCacheableSupportsMethod(): bool
-    {
-        if (method_exists(Serializer::class, 'getSupportedTypes')) {
-            trigger_deprecation(
-                'api-platform/core',
-                '3.1',
-                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
-                __METHOD__
-            );
-        }
-
-        return true;
     }
 }

@@ -1,5 +1,229 @@
 # Changelog
 
+## v4.0.11
+
+### Bug fixes
+
+* [af66075fd](https://github.com/api-platform/core/commit/af66075fdd6b83bdebc1c4ca33cc0ab7e1a7f8af) fix(laravel): fix foregin keys (relations) beeing in attributes (#6843)
+
+
+### Features
+
+* [2d59c6369](https://github.com/api-platform/core/commit/2d59c63699b4602cfe4d62504896c6d4121c1be4) feat(laravel): belongs to many relations (#6818)
+
+Also contains [v3.4.8 changes](#v348).
+
+## v4.0.10
+
+### Bug fixes
+
+* [774590069](https://github.com/api-platform/core/commit/77459006912d9162fdae9eadd496a62858ac990e) fix(laravel): add contact & license options to fix swagger UI issues (#6804)
+* [7ff9790c8](https://github.com/api-platform/core/commit/7ff9790c8e326de8152c653974fd523770dc6501) fix(laravel): allow boolean cast (#6808)
+* [f19dd9446](https://github.com/api-platform/core/commit/f19dd9446f5722d243e82b1e7bc34ebdab95719d) fix(laravel): graphQl type locator indexes (#6815)
+
+Also contains [v3.4.7 changes](#v347).
+
+### Features
+
+## v4.0.9
+
+### Bug fixes
+
+* [417fef5da](https://github.com/api-platform/core/commit/417fef5da9b1f3f16e323a193dec141f13b1ebc5) fix(laravel): overlaping route format (#6782)
+* [81099065e](https://github.com/api-platform/core/commit/81099065e30eb0356881907bd52095b85b9cae3d) fix(laravel): declare normalizer list as a service (#6786)
+* [dc8c09b1e](https://github.com/api-platform/core/commit/dc8c09b1e1ac15a7bcd4961fc3e80b06bec82e77) fix(laravel) graphQl Relationship loading (#6792)
+
+Also contains [v3.4.6 changes](#v346).
+
+### Features
+
+## v4.0.8
+
+### Bug fixes
+
+* [dddb97075](https://github.com/api-platform/core/commit/dddb97075af9c6e2517e1881b803c9d31a1913cf) fix(symfony): default formats order (#6780)
+
+### Features
+
+## v4.0.7
+
+### Bug fixes
+
+* [17c916c3a](https://github.com/api-platform/core/commit/17c916c3a1bcc837c9bc842dc48390dbeb043450) fix(symfony): BackedEnumProvider typo fix (#6769)
+* [216d9ccaa](https://github.com/api-platform/core/commit/216d9ccaacf7845daaaeab30f3a58bb5567430fe) fix(serializer): fetch type on normalization error when possible (#6761)
+* [2f967d934](https://github.com/api-platform/core/commit/2f967d9345004779f409b9ce1b5d0cbba84c7132) fix(doctrine): throw an exception when a filter is not found in a parameter (#6767)
+* [6c9b508b0](https://github.com/api-platform/core/commit/6c9b508b030976741a68f84e226502e6c218e896) fix(laravel): remove link header when jsonld is not enabled (#6768)
+* [736ca045e](https://github.com/api-platform/core/commit/736ca045e6832f04aaa002ddd7b85c55df4696bb) fix(validator): allow to pass both a ConstraintViolationList and a previous exception (#6762)
+* [9ac3661b6](https://github.com/api-platform/core/commit/9ac3661b6a75255832203b87a9ba7994add64061) fix(hydra): store and use hydra context in a local variable (#6765)
+
+### Features
+
+## v4.0.6
+
+### Bug fixes
+
+* [195c4e788](https://github.com/api-platform/core/commit/195c4e7883520416e042ac78143b18652a216fbf) fix(hydra): hydra context changed (#6710)
+* [4f65ef2d0](https://github.com/api-platform/core/commit/4f65ef2d061215df348e3505856f0f41c7c909ed) fix(metadata): providing parameter constraints skips automatic ones (#6756)
+* [5a8ef115a](https://github.com/api-platform/core/commit/5a8ef115a90791992a6c1325fb6d1ac458b22153) fix(symfony): ECMA-262 pattern with RegExp validator (#6733)
+* [67c5a2a24](https://github.com/api-platform/core/commit/67c5a2a2463bca94f0997b4fab1248a08994465b) fix(laravel): jsonapi error serialization (#6755)
+* [ac6f667f3](https://github.com/api-platform/core/commit/ac6f667f301f6c4c399a707faf00567239bd98d8) fix(laravel): collection relations other than HasMany (#6737)
+
+### Features
+
+* [cecd77149](https://github.com/api-platform/core/commit/cecd77149795c1a455ac72bc3ed0606413e69900) feat(laravel): use laravel cache setting (#6751)
+
+## v4.0.5
+
+### Bug fixes
+
+* [4171d5f9c](https://github.com/api-platform/core/commit/4171d5f9cd41731b857c53a186270ba0626baedf) fix(graphql): register query parameter arguments with filters (#6726)
+* [48ab53816](https://github.com/api-platform/core/commit/48ab53816c55e6116aa64ac81f522f4b7b9bb9f6) fix(laravel): make command writes to app instead of src (#6723)
+
+### Features
+
+## v4.0.4
+
+### Bug fixes
+
+* [2e8287dad](https://github.com/api-platform/core/commit/2e8287dad0c0315dd6527279a6359c0a22f40d93) fix(laravel): allow serializer attributes through ApiProperty (#6680)
+* [439c188ea](https://github.com/api-platform/core/commit/439c188ea1685676d5e705a49a4b835f35a84d72) fix(laravel): match integer type (#6715)
+* [4ad7a50aa](https://github.com/api-platform/core/commit/4ad7a50aaabf0d85e2eb5bb3a6d4ef8d5b7b39a7) fix(laravel): openapi Options binding (#6714)
+* [ec6e64512](https://github.com/api-platform/core/commit/ec6e6451299a50fcab397e86fafe6db132ce7519) fix(laravel): skip resource path when not available (#6697)
+
+### Features
+
+* [5aa799321](https://github.com/api-platform/core/commit/5aa7993219a6fb55f11476a031963a542b2d3586) feat(laravel): command to generate state providers/processors (#6708)
+
+## v4.0.3
+
+### Bug fixes
+
+* [025f63e69](https://github.com/api-platform/core/commit/025f63e69c2ec655a828559ed78c49a365ca043b) fix(laravel): route registration of EntrypointController should be last (#6667)
+* [2b4937a3e](https://github.com/api-platform/core/commit/2b4937a3e09fb891b99fd8499b597190a4b740e0) fix(laravel): eloquent accessors (#6668)
+* [4312a1f55](https://github.com/api-platform/core/commit/4312a1f55f4f80152be93734cb5cf73c70dee53a) fix(metadata): register parameters on graphql operations
+* [6d4e24883](https://github.com/api-platform/core/commit/6d4e24883767f1c58dff5e52f57b0422110fa38f) fix(laravel): hiding/showing relationships (#6679)
+* [85306f2f5](https://github.com/api-platform/core/commit/85306f2f5a7d480b1570471689d1d3ca4e9846a3) fix(laravel): swagger ui authentication (#6661)
+* [a6e37068e](https://github.com/api-platform/core/commit/a6e37068ea49d1b5a4ee098a62a287d62fba1c35) fix(laravel): use Model::qualifyColumn instead of hardcoding $table.$column (#6658)
+* [b0d5a2ade](https://github.com/api-platform/core/commit/b0d5a2adedb583074aa93d4f641bdda419d31ffa) fix(laravel): register global middleware to secure non-rest routes
+* [f9d96e546](https://github.com/api-platform/core/commit/f9d96e546a37121244ab98d65c2d91f48b1bb112) fix(metadata): graphql can be disabled but with an existing operation
+
+
+### Features
+
+* [df701da05](https://github.com/api-platform/core/commit/df701da05620a847f529ebabaee97f8cf5ecb37f) feat(laravel): graphql policies
+
+## v4.0.2
+
+### Bug fixes
+
+* [219199db3](https://github.com/api-platform/core/commit/219199db386cab05f1c1225b889c0a9609b36699) fix(symfony): missing alias to serializer context builder interface (#6643)
+* [5f943e3bb](https://github.com/api-platform/core/commit/5f943e3bb56934ba5d0b858f6b4c20a2985b6b6b) fix(graphql): wrong exception namespace (#6647)
+* [72a0b669a](https://github.com/api-platform/core/commit/72a0b669a426ca4bbbf14cf80a6ced683b947e8c) fix(serializer): remove serializer context builder interface
+* [88bd8c3e1](https://github.com/api-platform/core/commit/88bd8c3e151c843649bcac3feefc2cb956212410) fix(laravel): installation command, fix config overwrites (#6649)
+* [93314b08d](https://github.com/api-platform/core/commit/93314b08de1e6f0505af9e3a3ba3d9971f1ef09c) fix(serializer): allow state's SerializerFilterContextBuilderInterface (#6632)
+* [9a0afc917](https://github.com/api-platform/core/commit/9a0afc917a4bfa824ffbb640af9bb1114a5d31b4) fix(serializer): remove unnecessary dependency
+* [c47e2996e](https://github.com/api-platform/core/commit/c47e2996e51c587c998fde88903703bd6ac9a43c) fix: default format and standard_put values
+* [e327f5f69](https://github.com/api-platform/core/commit/e327f5f69c823c1ed674eefc0eb2551e30fb36bd) fix(symfony): namespace of path segment name generator services (#6642)
+
+Notes: 
+
+`standard_put=true` is now the default, you can set it to `false` using `extra_properties.defaults`
+
+## v4.0.1
+
+### Bug fixes
+
+* [eb80a1a56](https://github.com/api-platform/core/commit/eb80a1a5651b81cab13b018662a0d21e05facbfe) fix(state): precise format on content-location (#6627)
+
+### Features
+
+* [4a2271670](https://github.com/api-platform/core/commit/4a2271670a88c318ab38bd7eb2a1c0b93a5c0ea0) feat: api-platform/json-hal component (#6621)
+
+## v4.0.0
+
+### Bug fixes
+
+* [7c5689626](https://github.com/api-platform/core/commit/7c568962634691892fe1057b3c982765a1c20ba2) fix(laravel): call authorize on delete but not validation (#6618)
+* [d74b2b5fa](https://github.com/api-platform/core/commit/d74b2b5fa939a9f5ca11d3538e358070047a6c3d) fix: swagger ui with route identifier (#6616)
+* [de6e3f546](https://github.com/api-platform/core/commit/de6e3f546a26c5ad5444d8e2448d81faec36bd73) fix(laravel): validate enum schema within filter (#6615)
+* [0a461d749](https://github.com/api-platform/core/commit/0a461d749b7b4ac706f3b7b6138a13cb6e4a9d2d) fix(symfony): allow schema restriction for collection like property from choice constraint (#6520)
+* [0c66a494d](https://github.com/api-platform/core/commit/0c66a494d3bda5817e59da2e43f0232e2e8fea15) fix(laravel): cache metadata, add trace on debug mode (#6555)
+* [1b6e7c6cc](https://github.com/api-platform/core/commit/1b6e7c6ccf3d2c61816a7dceb35f1d5980ea0565) fix(laravel): disable GraphQL by default and fix provider
+* [290944103](https://github.com/api-platform/core/commit/290944103039a4a6d64904d1a89264b800c809d5) fix(laravel): SwaggerUI title (#6527)
+* [2df0860b5](https://github.com/api-platform/core/commit/2df0860b577bb1ae0882096436f3eaeb91281901) fix(laravel): Eloquent date and datetime type detection (#6529)
+* [2fc74f2e6](https://github.com/api-platform/core/commit/2fc74f2e651f229e982343c1cb0c6a2c5d5eee64) fix: remove PUT from default operations (#6570)
+* [3b42c9ff2](https://github.com/api-platform/core/commit/3b42c9ff235de5feac555d0283c513a6e4643953) fix: deserialization path for not denormalizable relations collected errors (#6537)
+* [3c554a605](https://github.com/api-platform/core/commit/3c554a605ec9d5f36dfd852c4f93f0ce582064c9) fix(laravel): docs _format and open swagger ui (#6595)
+* [3c5aea80f](https://github.com/api-platform/core/commit/3c5aea80fdbed20216764f6d721fe4f37cf2889d) fix(symfony): load isApiResource metadata (#6562)
+* [4ee209eff](https://github.com/api-platform/core/commit/4ee209effb0fd11789db9f016d6e90aa3cb942a9) fix(laravel): visible and hidden fields support (#6538)
+* [6e15eb95f](https://github.com/api-platform/core/commit/6e15eb95fffb2deec3d381f5d6fd87e189772270) fix(laravel): register HydraPartialCollectionViewNormalizer (#6588)
+* [86365be2a](https://github.com/api-platform/core/commit/86365be2a5b8e8d0050e09d4e401bb758aa8b7a8) fix(laravel): Eloquent PropertyAccessor (#6536)
+* [a1dd0b54d](https://github.com/api-platform/core/commit/a1dd0b54d137d70f2163fa03690c1f4c74a549c0) fix(laravel): entrypoint with doc formats (#6552)
+* [a4a53ab48](https://github.com/api-platform/core/commit/a4a53ab4838f4d17d3677952157b44ec165e3e3a) fix(laravel): identitifer is not writable unless marked as writable (#6531)
+* [a6f355358](https://github.com/api-platform/core/commit/a6f355358a88e7cf7759db0dee41e185157ddc68) fix(laravel): do not normalize exception originalTrace (#6533)
+* [bd6a57c4c](https://github.com/api-platform/core/commit/bd6a57c4c0b38d6f880a5bd79031a87033f707e6) fix(laravel): snake case props (#6532)
+* [c31566602](https://github.com/api-platform/core/commit/c315666022185839742b8c5ef81601d85d8c3f4b) fix(laravel): api_doc route regex
+* [ebc61d59d](https://github.com/api-platform/core/commit/ebc61d59d60eda3a020593cf4cb46c5d30548e46) fix(laravel): entrypoint serialization (#6541)
+
+### Features
+
+* [00787f32d](https://github.com/api-platform/core/commit/00787f32da54418de7d869cff218e22d8ae2ae1d) feat(laravel): automatically register policies (#6623)
+* [06a647a80](https://github.com/api-platform/core/commit/06a647a80d4c6b7bfb3474d0685bcb445b56a5a8) feat(laravel): add CSV support (#6617)
+* [a49bde1ea](https://github.com/api-platform/core/commit/a49bde1ea79ae4226b70c20f9bf967ac77e9ab89)  feat(laravel): filter validations rules
+* [03357fb90](https://github.com/api-platform/core/commit/03357fb90ac0003f0cec2002df01711d0fb99a1e) feat(laravel): supports more Eloquent types (#6544)
+* [05e75be83](https://github.com/api-platform/core/commit/05e75be834c629e0487caaaedfe9fdf0bd5a7226) feat(doctrine): add new filter for filtering an entity using PHP backed enum, resolves #6506 (#6547) (#6560)
+* [538648840](https://github.com/api-platform/core/commit/538648840dc7439b12033ed6f413f3167705da4d) feat(laravel): enable graphQl support (#6550)
+* [5b9767be2](https://github.com/api-platform/core/commit/5b9767be215afdf61fccf8490d0a3a7018078ce5) feat(laravel): policy, auth and gate (#6523)
+* [5e1233c57](https://github.com/api-platform/core/commit/5e1233c57a497d00a7c4bd3e3ad0cac25aeac014) feat(laravel): search filter (#6534)
+* [9c461626f](https://github.com/api-platform/core/commit/9c461626f7d02f8d15487134b636f11966c19a5e) feat(laravel): provide a trait in addition to the annotation (#6543)
+* [c9f18d4fb](https://github.com/api-platform/core/commit/c9f18d4fb833ea0b89ef18021cad491cf0600ef1)  feat(laravel): eloquent filters (search, date, equals, or) (#6593)
+* [e09e73efc](https://github.com/api-platform/core/commit/e09e73efc5b4a39ab33d00c5d5422d8d9f7b5e89) feat: remove hydra prefix (#6418)
+
+## v4.0.0-alpha.5
+
+### Bug fixes
+
+* [0a461d749](https://github.com/api-platform/core/commit/0a461d749b7b4ac706f3b7b6138a13cb6e4a9d2d) fix(symfony): allow schema restriction for collection like property from choice constraint (#6520)
+* [0c66a494d](https://github.com/api-platform/core/commit/0c66a494d3bda5817e59da2e43f0232e2e8fea15) fix(laravel): cache metadata, add trace on debug mode (#6555)
+* [1b6e7c6cc](https://github.com/api-platform/core/commit/1b6e7c6ccf3d2c61816a7dceb35f1d5980ea0565) fix(laravel): disable GraphQL by default and fix provider
+* [290944103](https://github.com/api-platform/core/commit/290944103039a4a6d64904d1a89264b800c809d5) fix(laravel): SwaggerUI title (#6527)
+* [2df0860b5](https://github.com/api-platform/core/commit/2df0860b577bb1ae0882096436f3eaeb91281901) fix(laravel): Eloquent date and datetime type detection (#6529)
+* [2fc74f2e6](https://github.com/api-platform/core/commit/2fc74f2e651f229e982343c1cb0c6a2c5d5eee64) fix: remove PUT from default operations (#6570)
+* [3b42c9ff2](https://github.com/api-platform/core/commit/3b42c9ff235de5feac555d0283c513a6e4643953) fix: deserialization path for not denormalizable relations collected errors (#6537)
+* [3c554a605](https://github.com/api-platform/core/commit/3c554a605ec9d5f36dfd852c4f93f0ce582064c9) fix(laravel): docs _format and open swagger ui (#6595)
+* [3c5aea80f](https://github.com/api-platform/core/commit/3c5aea80fdbed20216764f6d721fe4f37cf2889d) fix(symfony): load isApiResource metadata (#6562)
+* [4ee209eff](https://github.com/api-platform/core/commit/4ee209effb0fd11789db9f016d6e90aa3cb942a9) fix(laravel): visible and hidden fields support (#6538)
+* [6e15eb95f](https://github.com/api-platform/core/commit/6e15eb95fffb2deec3d381f5d6fd87e189772270) fix(laravel): register HydraPartialCollectionViewNormalizer (#6588)
+* [86365be2a](https://github.com/api-platform/core/commit/86365be2a5b8e8d0050e09d4e401bb758aa8b7a8) fix(laravel): Eloquent PropertyAccessor (#6536)
+* [a1dd0b54d](https://github.com/api-platform/core/commit/a1dd0b54d137d70f2163fa03690c1f4c74a549c0) fix(laravel): entrypoint with doc formats (#6552)
+* [a4a53ab48](https://github.com/api-platform/core/commit/a4a53ab4838f4d17d3677952157b44ec165e3e3a) fix(laravel): identitifer is not writable unless marked as writable (#6531)
+* [a6f355358](https://github.com/api-platform/core/commit/a6f355358a88e7cf7759db0dee41e185157ddc68) fix(laravel): do not normalize exception originalTrace (#6533)
+* [bd6a57c4c](https://github.com/api-platform/core/commit/bd6a57c4c0b38d6f880a5bd79031a87033f707e6) fix(laravel): snake case props (#6532)
+* [c31566602](https://github.com/api-platform/core/commit/c315666022185839742b8c5ef81601d85d8c3f4b) fix(laravel): api_doc route regex
+* [ebc61d59d](https://github.com/api-platform/core/commit/ebc61d59d60eda3a020593cf4cb46c5d30548e46) fix(laravel): entrypoint serialization (#6541)
+
+
+### Features
+
+* [03357fb90](https://github.com/api-platform/core/commit/03357fb90ac0003f0cec2002df01711d0fb99a1e) feat(laravel): supports more Eloquent types (#6544)
+* [05e75be83](https://github.com/api-platform/core/commit/05e75be834c629e0487caaaedfe9fdf0bd5a7226) feat(doctrine): add new filter for filtering an entity using PHP backed enum, resolves #6506 (#6547) (#6560)
+* [538648840](https://github.com/api-platform/core/commit/538648840dc7439b12033ed6f413f3167705da4d) feat(laravel): enable graphQl support (#6550)
+* [5b9767be2](https://github.com/api-platform/core/commit/5b9767be215afdf61fccf8490d0a3a7018078ce5) feat(laravel): policy, auth and gate (#6523)
+* [5e1233c57](https://github.com/api-platform/core/commit/5e1233c57a497d00a7c4bd3e3ad0cac25aeac014) feat(laravel): search filter (#6534)
+* [9c461626f](https://github.com/api-platform/core/commit/9c461626f7d02f8d15487134b636f11966c19a5e) feat(laravel): provide a trait in addition to the annotation (#6543)
+* [c9f18d4fb](https://github.com/api-platform/core/commit/c9f18d4fb833ea0b89ef18021cad491cf0600ef1)  feat(laravel): eloquent filters (search, date, equals, or) (#6593)
+* [e09e73efc](https://github.com/api-platform/core/commit/e09e73efc5b4a39ab33d00c5d5422d8d9f7b5e89) feat: remove hydra prefix (#6418)
+
+## v4.0.0-alpha.1
+
+### Bug fixes
+
+* [f7f9f5427](https://github.com/api-platform/core/commit/f7f9f542719ad43d6e0fe74024a2fa05c11cb6fa) fix(laravel): phpstan/doc-parser is mandatory
+
+### Features
+
+* [0d5f35683](https://github.com/api-platform/core/commit/0d5f356839eb6aa9f536044abe4affa736553e76) feat(laravel): laravel component (#5882)
+
 ## v3.4.8
 
 ### Bug fixes

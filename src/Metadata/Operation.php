@@ -807,6 +807,9 @@ abstract class Operation extends Metadata
         protected $processor = null,
         protected ?OptionsInterface $stateOptions = null,
         array|Parameters|null $parameters = null,
+        array|string|null $rules = null,
+        ?string $policy = null,
+        array|string|null $middleware = null,
         ?bool $queryParameterValidationEnabled = null,
         protected array $extraProperties = [],
     ) {
@@ -849,6 +852,9 @@ abstract class Operation extends Metadata
             processor: $processor,
             stateOptions: $stateOptions,
             parameters: $parameters,
+            rules: $rules,
+            policy: $policy,
+            middleware: $middleware,
             queryParameterValidationEnabled: $queryParameterValidationEnabled,
             extraProperties: $extraProperties,
         );

@@ -25,9 +25,7 @@ class InputOutputResourceMetadataCollectionFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    /**
-     * @dataProvider getAttributes
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getAttributes')]
     public function testInputOutputMetadata(mixed $input, ?array $expected): void
     {
         $resourceCollection = new ResourceMetadataCollection('Foo', [new ApiResource(input: $input)]);

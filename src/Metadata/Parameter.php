@@ -13,10 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
-use ApiPlatform\OpenApi;
+use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ParameterProviderInterface;
-use Symfony\Component\Validator\Constraint;
 
 /**
  * @experimental
@@ -28,23 +27,24 @@ abstract class Parameter
      * @param array<string, mixed>                                               $extraProperties
      * @param ParameterProviderInterface|callable|string|null                    $provider
      * @param FilterInterface|string|null                                        $filter
-     * @param Constraint|Constraint[]|null                                       $constraints
+     * @param mixed                                                              $constraints     an array of Symfony constraints, or an array of Laravel rules
      */
     public function __construct(
         protected ?string $key = null,
         protected ?array $schema = null,
-        protected OpenApi\Model\Parameter|bool|null $openApi = null, // TODO: use false as type instead of bool
+        protected OpenApiParameter|array|false|null $openApi = null,
         protected mixed $provider = null,
         protected mixed $filter = null,
         protected ?string $property = null,
         protected ?string $description = null,
         protected ?bool $required = null,
         protected ?int $priority = null,
-        protected ?bool $hydra = null,
-        protected Constraint|array|null $constraints = null,
+        protected ?false $hydra = null,
+        protected mixed $constraints = null,
         protected string|\Stringable|null $security = null,
         protected ?string $securityMessage = null,
         protected ?array $extraProperties = [],
+        protected ?array $filterContext = null,
     ) {
     }
 
@@ -61,7 +61,10 @@ abstract class Parameter
         return $this->schema;
     }
 
-    public function getOpenApi(): OpenApi\Model\Parameter|bool|null
+    /**
+     * @return OpenApiParameter[]|OpenApiParameter|bool|null
+     */
+    public function getOpenApi(): OpenApiParameter|array|bool|null
     {
         return $this->openApi;
     }
@@ -101,10 +104,7 @@ abstract class Parameter
         return $this->hydra;
     }
 
-    /**
-     * @return Constraint|Constraint[]|null
-     */
-    public function getConstraints(): Constraint|array|null
+    public function getConstraints(): mixed
     {
         return $this->constraints;
     }
@@ -137,6 +137,11 @@ abstract class Parameter
         return $this->extraProperties;
     }
 
+    public function getFilterContext(): ?array
+    {
+        return $this->filterContext;
+    }
+
     public function withKey(string $key): static
     {
         $self = clone $this;
@@ -164,7 +169,10 @@ abstract class Parameter
         return $self;
     }
 
-    public function withOpenApi(OpenApi\Model\Parameter $openApi): static
+    /**
+     * @param OpenApiParameter[]|OpenApiParameter|bool $openApi
+     */
+    public function withOpenApi(OpenApiParameter|array|bool $openApi): static
     {
         $self = clone $this;
         $self->openApi = $openApi;
@@ -218,7 +226,7 @@ abstract class Parameter
         return $self;
     }
 
-    public function withHydra(bool $hydra): static
+    public function withHydra(false $hydra): static
     {
         $self = clone $this;
         $self->hydra = $hydra;
@@ -226,7 +234,7 @@ abstract class Parameter
         return $self;
     }
 
-    public function withConstraints(array|Constraint $constraints): static
+    public function withConstraints(mixed $constraints): static
     {
         $self = clone $this;
         $self->constraints = $constraints;

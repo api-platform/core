@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State;
 
-use ApiPlatform\Api\UriVariablesConverterInterface as LegacyUriVariablesConverterInterface;
 use ApiPlatform\Metadata\Exception\InvalidIdentifierException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\UriVariablesConverterInterface;
@@ -21,7 +20,7 @@ use ApiPlatform\Metadata\Util\CompositeIdentifierParser;
 
 trait UriVariablesResolverTrait
 {
-    private LegacyUriVariablesConverterInterface|UriVariablesConverterInterface|null $uriVariablesConverter = null;
+    private ?UriVariablesConverterInterface $uriVariablesConverter = null;
 
     /**
      * Resolves an operation's UriVariables to their identifiers values.

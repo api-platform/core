@@ -17,15 +17,12 @@ use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\IriHelper;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class IriHelperTest extends TestCase
 {
-    use ExpectDeprecationTrait;
-
     public function testHelpers(): void
     {
         $parsed = [

@@ -119,11 +119,7 @@
             <argument type="service" id="api_platform.graphql.types_container" />
             <argument type="service" id="api_platform.graphql.type_builder" />
             <argument type="service" id="api_platform.graphql.type_converter" />
-            <!-- Note that this one is replaced by the below "api_platform.graphql.resolver.factory" we'll only use one in API Platform 4 -->
-            <argument type="service" id="api_platform.graphql.resolver.factory.item" />
-            <argument type="service" id="api_platform.graphql.resolver.factory.collection" on-invalid="null" />
-            <argument type="service" id="api_platform.graphql.resolver.factory.item_mutation" on-invalid="null" />
-            <argument type="service" id="api_platform.graphql.resolver.factory.item_subscription" on-invalid="null" />
+            <argument type="service" id="api_platform.graphql.resolver.factory" />
             <argument type="service" id="api_platform.filter_locator" />
             <argument type="service" id="api_platform.pagination" />
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
@@ -188,20 +184,12 @@
             <argument type="service" id="api_platform.pagination" />
         </service>
 
-        <service id="api_platform.graphql.resolver.factory.item" class="ApiPlatform\GraphQl\Resolver\Factory\ResolverFactory" public="false">
+        <service id="api_platform.graphql.resolver.factory" class="ApiPlatform\GraphQl\Resolver\Factory\ResolverFactory" public="false">
             <argument type="service" id="api_platform.graphql.state_provider" />
             <argument type="service" id="api_platform.graphql.state_processor" />
         </service>
 
         <!-- Resolver Stages -->
-
-        <service id="api_platform.graphql.provider.read" class="ApiPlatform\GraphQl\Provider\ReadProvider" public="false">
-            <argument type="service" id="api_platform.symfony.iri_converter" />
-            <argument type="service" id="api_platform.state_provider" />
-            <argument type="service" id="api_platform.graphql.serializer.context_builder" />
-            <argument>%api_platform.graphql.nesting_separator%</argument>
-        </service>
-
         <service id="api_platform.graphql.resolver.resource_field" class="ApiPlatform\GraphQl\Resolver\ResourceFieldResolver" public="false">
             <argument type="service" id="api_platform.symfony.iri_converter" />
         </service>

@@ -19,8 +19,6 @@ use ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document\Dummy;
 use MongoDB\BSON\UTCDateTime;
 
 /**
- * @group mongodb
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 class DateFilterTest extends DoctrineMongoDbOdmFilterTestCase

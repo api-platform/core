@@ -15,6 +15,8 @@ $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
     ->exclude([
         'src/Core/Bridge/Symfony/Maker/Resources/skeleton',
+        'src/Laravel/Console/Maker/Resources/skeleton',
+        'src/Laravel/config',
         'tests/Fixtures/app/var',
         'docs/guides',
         'docs/var',
@@ -22,19 +24,12 @@ $finder = PhpCsFixer\Finder::create()
         'src/Doctrine/Odm/Tests/var'
     ])
     ->notPath('src/Symfony/Bundle/DependencyInjection/Configuration.php')
-    ->notPath('src/Annotation/ApiFilter.php') // temporary
-    ->notPath('src/Annotation/ApiProperty.php') // temporary
-    ->notPath('src/Annotation/ApiResource.php') // temporary
-    ->notPath('src/Annotation/ApiSubresource.php') // temporary
-    ->notPath('tests/Fixtures/TestBundle/Entity/DummyPhp8.php') // temporary
-    ->notPath('tests/Fixtures/TestBundle/Enum/EnumWithDescriptions.php') // PHPDoc on enum cases
-    ->notPath('tests/Fixtures/TestBundle/Enum/GamePlayMode.php') // PHPDoc on enum cases
-    ->notPath('tests/Fixtures/TestBundle/Enum/GenderTypeEnum.php') // PHPDoc on enum cases
     ->append([
         'tests/Fixtures/app/console',
     ]);
 
 return (new PhpCsFixer\Config())
+    ->setParallelConfig(PhpCsFixer\Runner\Parallel\ParallelConfigFactory::detect())
     ->setRiskyAllowed(true)
     ->setRules([
         '@DoctrineAnnotation' => true,

@@ -55,7 +55,6 @@ trait MetadataCollectionFactoryTrait
      * Get
      * Post
      * Resource
-     * Put
      * Get
      * In the future, we will be able to use nested attributes (https://wiki.php.net/rfc/new_in_initializers).
      *
@@ -63,10 +62,9 @@ trait MetadataCollectionFactoryTrait
      *
      * @return ApiResource[]
      */
-    private function buildResourceOperations(array $metadataCollection, string $resourceClass): array
+    private function buildResourceOperations(array $metadataCollection, string $resourceClass, array $resources = []): array
     {
         $shortName = (false !== $pos = strrpos($resourceClass, '\\')) ? substr($resourceClass, $pos + 1) : $resourceClass;
-        $resources = [];
         $index = -1;
         $operationPriority = 0;
         $hasApiResource = false;
@@ -143,11 +141,11 @@ trait MetadataCollectionFactoryTrait
                 $resources[$index] = $resource = $resource->withOperations(new Operations($operations)); // @phpstan-ignore-line
             }
 
-            $graphQlOperations = $resource->getGraphQlOperations();
             if (!$this->graphQlEnabled) {
                 continue;
             }
 
+            $graphQlOperations = $resource->getGraphQlOperations();
             if (null === $graphQlOperations) {
                 if (!$hasApiResource) {
                     $resources[$index] = $resources[$index]->withGraphQlOperations([]);

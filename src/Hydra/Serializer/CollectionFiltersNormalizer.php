@@ -13,31 +13,26 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hydra\Serializer;
 
-use ApiPlatform\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
 use ApiPlatform\Doctrine\Odm\State\Options as ODMOptions;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\JsonLd\Serializer\HydraPrefixTrait;
 use ApiPlatform\Metadata\FilterInterface;
-use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\QueryParameterInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
-use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
-use Symfony\Component\Serializer\Normalizer\CacheableSupportsMethodInterface as BaseCacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Serializer;
 
 /**
  * Enhances the result of collection by adding the filters applied on collection.
  *
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-final class CollectionFiltersNormalizer implements NormalizerInterface, NormalizerAwareInterface, CacheableSupportsMethodInterface
+final class CollectionFiltersNormalizer implements NormalizerInterface, NormalizerAwareInterface
 {
     use HydraPrefixTrait;
     private ?ContainerInterface $filterLocator = null;
@@ -46,8 +41,13 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
      * @param ContainerInterface   $filterLocator  The new filter locator or the deprecated filter collection
      * @param array<string, mixed> $defaultContext
      */
-    public function __construct(private readonly NormalizerInterface $collectionNormalizer, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly LegacyResourceClassResolverInterface|ResourceClassResolverInterface $resourceClassResolver, ContainerInterface $filterLocator, private readonly array $defaultContext = [])
-    {
+    public function __construct(
+        private readonly NormalizerInterface $collectionNormalizer,
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
+        private readonly ResourceClassResolverInterface $resourceClassResolver,
+        ?ContainerInterface $filterLocator = null,
+        private readonly array $defaultContext = [],
+    ) {
         $this->filterLocator = $filterLocator;
     }
 
@@ -61,26 +61,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
 
     public function getSupportedTypes($format): array
     {
-        // @deprecated remove condition when support for symfony versions under 6.3 is dropped
-        if (!method_exists($this->collectionNormalizer, 'getSupportedTypes')) {
-            return ['*' => $this->collectionNormalizer instanceof BaseCacheableSupportsMethodInterface && $this->collectionNormalizer->hasCacheableSupportsMethod()];
-        }
-
         return $this->collectionNormalizer->getSupportedTypes($format);
-    }
-
-    public function hasCacheableSupportsMethod(): bool
-    {
-        if (method_exists(Serializer::class, 'getSupportedTypes')) {
-            trigger_deprecation(
-                'api-platform/core',
-                '3.1',
-                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
-                __METHOD__
-            );
-        }
-
-        return $this->collectionNormalizer instanceof BaseCacheableSupportsMethodInterface && $this->collectionNormalizer->hasCacheableSupportsMethod();
     }
 
     /**
@@ -151,10 +132,9 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
     /**
      * Returns the content of the Hydra search property.
      *
-     * @param FilterInterface[]        $filters
-     * @param array<string, Parameter> $parameters
+     * @param FilterInterface[] $filters
      */
-    private function getSearch(string $resourceClass, array $parts, array $filters, array|Parameters|null $parameters, string $hydraPrefix): array
+    private function getSearch(string $resourceClass, array $parts, array $filters, ?Parameters $parameters, string $hydraPrefix): array
     {
         $variables = [];
         $mapping = [];
@@ -171,10 +151,16 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
                 continue;
             }
 
-            if (($filterId = $parameter->getFilter()) && ($filter = $this->getFilter($filterId))) {
-                foreach ($filter->getDescription($resourceClass) as $variable => $description) {
-                    // This is a practice induced by PHP and is not necessary when implementing URI template
+            if (($filterId = $parameter->getFilter()) && \is_string($filterId) && ($filter = $this->getFilter($filterId))) {
+                $filterDescription = $filter->getDescription($resourceClass);
+
+                foreach ($filterDescription as $variable => $description) {
+                    // // This is a practice induced by PHP and is not necessary when implementing URI template
                     if (str_ends_with((string) $variable, '[]')) {
+                        continue;
+                    }
+
+                    if (($prop = $parameter->getProperty()) && ($description['property'] ?? null) !== $prop) {
                         continue;
                     }
 
@@ -189,7 +175,9 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
                     $mapping[] = $m;
                 }
 
-                continue;
+                if ($filterDescription) {
+                    continue;
+                }
             }
 
             if (!($property = $parameter->getProperty())) {

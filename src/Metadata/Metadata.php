@@ -23,16 +23,17 @@ abstract class Metadata
     protected ?Parameters $parameters = null;
 
     /**
-     * @param string|null                         $deprecationReason       https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
-     * @param string|\Stringable|null             $security                https://api-platform.com/docs/core/security
-     * @param string|\Stringable|null             $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
-     * @param mixed|null                          $mercure
-     * @param mixed|null                          $messenger
-     * @param mixed|null                          $input
-     * @param mixed|null                          $output
-     * @param mixed|null                          $provider
-     * @param mixed|null                          $processor
-     * @param Parameters|array<string, Parameter> $parameters
+     * @param string|null                                                                       $deprecationReason       https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
+     * @param string|\Stringable|null                                                           $security                https://api-platform.com/docs/core/security
+     * @param string|\Stringable|null                                                           $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
+     * @param mixed|null                                                                        $mercure
+     * @param mixed|null                                                                        $messenger
+     * @param mixed|null                                                                        $input
+     * @param mixed|null                                                                        $output
+     * @param mixed|null                                                                        $provider
+     * @param mixed|null                                                                        $processor
+     * @param Parameters|array<string, Parameter>                                               $parameters
+     * @param callable|string|array<string, \Illuminate\Contracts\Validation\Rule|array|string> $rules                   Laravel rules can be a FormRequest class, a callable or an array of rules
      */
     public function __construct(
         protected ?string $shortName = null,
@@ -76,6 +77,9 @@ abstract class Metadata
          * @experimental
          */
         array|Parameters|null $parameters = null,
+        protected mixed $rules = null,
+        protected ?string $policy = null,
+        protected array|string|null $middleware = null,
         protected ?bool $queryParameterValidationEnabled = null,
         protected array $extraProperties = [],
     ) {
@@ -579,6 +583,25 @@ abstract class Metadata
         return $self;
     }
 
+    /**
+     * @return string|callable|array<string, \Illuminate\Contracts\Validation\Rule|array|string>
+     */
+    public function getRules(): mixed
+    {
+        return $this->rules;
+    }
+
+    /**
+     * @param string|callable|array<string, \Illuminate\Contracts\Validation\Rule|array|string> $rules
+     */
+    public function withRules(mixed $rules): static
+    {
+        $self = clone $this;
+        $self->rules = $rules;
+
+        return $self;
+    }
+
     public function getParameters(): ?Parameters
     {
         return $this->parameters;
@@ -601,6 +624,32 @@ abstract class Metadata
     {
         $self = clone $this;
         $self->queryParameterValidationEnabled = $queryParameterValidationEnabled;
+
+        return $self;
+    }
+
+    public function getPolicy(): ?string
+    {
+        return $this->policy;
+    }
+
+    public function withPolicy(string $policy): static
+    {
+        $self = clone $this;
+        $self->policy = $policy;
+
+        return $self;
+    }
+
+    public function getMiddleware(): mixed
+    {
+        return $this->middleware;
+    }
+
+    public function withMiddleware(string|array $middleware): static
+    {
+        $self = clone $this;
+        $self->middleware = $middleware;
 
         return $self;
     }

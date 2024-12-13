@@ -110,7 +110,6 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             'types' => $this->buildArrayValue($resource, 'types'),
             'cacheHeaders' => $this->buildArrayValue($resource, 'cacheHeaders'),
             'hydraContext' => $this->buildArrayValue($resource, 'hydraContext'),
-            'openapiContext' => $this->buildArrayValue($resource, 'openapiContext'), // TODO Remove in 4.0
             'openapi' => $this->buildOpenapi($resource),
             'paginationViaCursor' => $this->buildArrayValue($resource, 'paginationViaCursor'),
             'exceptionToStatus' => $this->buildArrayValue($resource, 'exceptionToStatus'),

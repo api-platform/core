@@ -30,15 +30,14 @@ interface FilterInterface
      *   - description : the description of the filter
      *   - strategy: the used strategy
      *   - is_collection: if this filter is for collection
-     *   - swagger: deprecated, use openapi instead
      *   - openapi: additional parameters for the path operation in the version 3 spec,
-     *     e.g. 'openapi' => [
-     *       'description' => 'My Description',
-     *       'name' => 'My Name',
-     *       'schema' => [
+     *     e.g. 'openapi' => ApiPlatform\OpenApi\Model\Parameter(
+     *       description: 'My Description',
+     *       name: 'My Name',
+     *       schema: [
      *          'type' => 'integer',
      *       ]
-     *     ]
+     *     )
      *   - schema: schema definition,
      *     e.g. 'schema' => [
      *       'type' => 'string',
@@ -50,7 +49,7 @@ interface FilterInterface
      *
      * @param class-string $resourceClass
      *
-     * @return array<string, array{property?: string, type?: string, required?: bool, description?: string, strategy?: string, is_collection?: bool, swagger?: array<string, mixed>, openapi?: array<string, mixed>|\ApiPlatform\OpenApi\Model\Parameter, schema?: array<string, mixed>}>
+     * @return array<string, array{property?: string, type?: string, required?: bool, description?: string, strategy?: string, is_collection?: bool, openapi?: \ApiPlatform\OpenApi\Model\Parameter, schema?: array<string, mixed>}>
      */
     public function getDescription(string $resourceClass): array;
 }

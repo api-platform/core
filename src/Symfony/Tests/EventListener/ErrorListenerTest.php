@@ -30,6 +30,11 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class ErrorListenerTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        restore_exception_handler();
+    }
+
     public function testDuplicateException(): void
     {
         $exception = new \Exception();
@@ -55,9 +60,9 @@ class ErrorListenerTest extends TestCase
         });
 
         $request = Request::create('/');
-        $request->attributes->set('_api_operation', new Get(extraProperties: ['rfc_7807_compliant_errors' => true]));
+        $request->attributes->set('_api_operation', new Get());
         $exceptionEvent = new ExceptionEvent($kernel, $request, HttpKernelInterface::SUB_REQUEST, $exception);
-        $errorListener = new ErrorListener('action', null, true, [], $resourceMetadataCollectionFactory, ['jsonproblem' => ['application/problem+json']], [], null, $resourceClassResolver, problemCompliantErrors: true);
+        $errorListener = new ErrorListener('action', null, true, [], $resourceMetadataCollectionFactory, ['jsonproblem' => ['application/problem+json']], [], null, $resourceClassResolver);
         $errorListener->onKernelException($exceptionEvent);
     }
 
@@ -85,7 +90,7 @@ class ErrorListenerTest extends TestCase
             return new Response();
         });
         $request = Request::create('/');
-        $request->attributes->set('_api_operation', new Get(extraProperties: ['rfc_7807_compliant_errors' => true]));
+        $request->attributes->set('_api_operation', new Get());
         $exceptionEvent = new ExceptionEvent($kernel, $request, HttpKernelInterface::SUB_REQUEST, $exception);
         $errorListener = new ErrorListener('action', null, true, [], $resourceMetadataCollectionFactory, ['jsonld' => ['application/ld+json']], [], null, $resourceClassResolver);
         $errorListener->onKernelException($exceptionEvent);
@@ -130,7 +135,7 @@ class ErrorListenerTest extends TestCase
             return new Response();
         });
         $request = Request::create('/');
-        $request->attributes->set('_api_operation', new Get(extraProperties: ['rfc_7807_compliant_errors' => true]));
+        $request->attributes->set('_api_operation', new Get());
         $exceptionEvent = new ExceptionEvent($kernel, $request, HttpKernelInterface::SUB_REQUEST, $exception);
         $identifiersExtractor = $this->createStub(IdentifiersExtractorInterface::class);
         $identifiersExtractor->method('getIdentifiersFromItem')->willReturn(['id' => 1]);

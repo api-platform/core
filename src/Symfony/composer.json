@@ -3,10 +3,16 @@
     "description": "Symfony API Platform integration",
     "type": "symfony-bundle",
     "keywords": [
-        "API",
-        "symfony",
+        "Symfony",
         "REST",
-        "GraphQL"
+        "GraphQL",
+        "API",
+        "JSON-LD",
+        "Hydra",
+        "JSONAPI",
+        "OpenAPI",
+        "HAL",
+        "Swagger"
     ],
     "homepage": "https://api-platform.com",
     "license": "MIT",
@@ -22,7 +28,7 @@
         }
     ],
     "require": {
-        "php": ">=8.1",
+        "php": ">=8.2",
         "api-platform/documentation": "^3.4 || ^4.0",
         "api-platform/http-cache": "^3.4 || ^4.0",
         "api-platform/json-schema": "^3.4 || ^4.0",
@@ -33,27 +39,26 @@
         "api-platform/state": "^3.4 || ^4.0",
         "api-platform/validator": "^3.4 || ^4.0",
         "api-platform/openapi": "^3.4 || ^4.0",
-        "symfony/property-info": "^6.4 || ^7.1",
-        "symfony/property-access": "^6.4 || ^7.1",
-        "symfony/serializer": "^6.4 || ^7.1",
+        "symfony/property-info": "^6.4 || ^7.0",
+        "symfony/property-access": "^6.4 || ^7.0",
+        "symfony/serializer": "^6.4 || ^7.0",
         "symfony/security-core": "^6.4 || ^7.0",
-        "willdurand/negotiation": "^3.0"
+        "willdurand/negotiation": "^3.1"
     },
     "require-dev": {
-        "phpspec/prophecy-phpunit": "^2.0",
-        "api-platform/graphql": "^3.4 || ^4.0",
-        "symfony/phpunit-bridge": "^6.4 || ^7.0",
+        "phpspec/prophecy-phpunit": "^2.2",
         "symfony/routing": "^6.4 || ^7.0",
+        "phpunit/phpunit": "^11.2",
         "symfony/validator": "^6.4 || ^7.0",
         "symfony/mercure-bundle": "*",
-        "webonyx/graphql-php": "^14.0 || ^15.0",
-        "sebastian/comparator": "<5.0",
+        "webonyx/graphql-php": "^15.0",
         "api-platform/doctrine-common": "^3.4 || ^4.0",
         "api-platform/elasticsearch": "^3.4 || ^4.0",
+        "api-platform/graphql": "^3.4 || ^4.0",
         "api-platform/doctrine-orm": "^3.4 || ^4.0",
         "api-platform/doctrine-odm": "^3.4 || ^4.0",
         "api-platform/parameter-validator": "^3.1",
-        "symfony/expression-language": "^6.4 || ^7.1"
+        "symfony/expression-language": "^6.4 || ^7.0"
     },
     "suggest": {
         "api-platform/doctrine-orm": "To support Doctrine ORM.",
@@ -100,7 +105,7 @@
             "dev-3.4": "3.4.x-dev"
         },
         "symfony": {
-            "require": "^6.4 || ^7.1"
+            "require": "^6.4 || ^7.0"
         },
         "thanks": {
             "name": "api-platform/api-platform",

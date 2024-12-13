@@ -35,7 +35,7 @@ class EnumFilter extends AbstractFilter
                 'property' => 'enum',
                 'type' => 'string',
                 'required' => false,
-                'swagger' => [
+                'schema' => [
                     'enum' => ['in-enum', 'mune-ni'],
                 ],
             ],

@@ -13,30 +13,25 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hydra\Serializer;
 
-use ApiPlatform\Api\Entrypoint;
-use ApiPlatform\Api\IriConverterInterface as LegacyIriConverterInterface;
-use ApiPlatform\Api\UrlGeneratorInterface as LegacyUrlGeneratorInterface;
-use ApiPlatform\Documentation\Entrypoint as DocumentationEntrypoint;
+use ApiPlatform\Documentation\Entrypoint;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
-use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Serializer;
 
 /**
  * Normalizes the API entrypoint.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class EntrypointNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
+final class EntrypointNormalizer implements NormalizerInterface
 {
     public const FORMAT = 'jsonld';
 
-    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly IriConverterInterface|LegacyIriConverterInterface $iriConverter, private readonly UrlGeneratorInterface|LegacyUrlGeneratorInterface $urlGenerator)
+    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly IriConverterInterface $iriConverter, private readonly UrlGeneratorInterface $urlGenerator)
     {
     }
 
@@ -84,25 +79,11 @@ final class EntrypointNormalizer implements NormalizerInterface, CacheableSuppor
      */
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
-        return self::FORMAT === $format && ($data instanceof Entrypoint || $data instanceof DocumentationEntrypoint);
+        return self::FORMAT === $format && $data instanceof Entrypoint;
     }
 
     public function getSupportedTypes($format): array
     {
-        return self::FORMAT === $format ? [Entrypoint::class => true, DocumentationEntrypoint::class => true] : [];
-    }
-
-    public function hasCacheableSupportsMethod(): bool
-    {
-        if (method_exists(Serializer::class, 'getSupportedTypes')) {
-            trigger_deprecation(
-                'api-platform/core',
-                '3.1',
-                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
-                __METHOD__
-            );
-        }
-
-        return true;
+        return self::FORMAT === $format ? [Entrypoint::class => true] : [];
     }
 }

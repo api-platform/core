@@ -26,6 +26,9 @@ interface PropertyMetadataFactoryInterface
     /**
      * Creates a property metadata.
      *
+     * @param array<string, mixed> $options
+     * @param class-string|string  $resourceClass
+     *
      * @throws PropertyNotFoundException
      */
     public function create(string $resourceClass, string $property, array $options = []): ApiProperty;

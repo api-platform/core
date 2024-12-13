@@ -28,7 +28,6 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\Resource\Factory\ExtractorResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\OperationDefaultsTrait;
@@ -140,10 +139,6 @@ final class ResourceMetadataCompatibilityTest extends TestCase
             'collectDenormalizationErrors' => true,
             'hydraContext' => [
                 'foo' => ['bar' => 'baz'],
-            ],
-            // TODO Remove in 4.0
-            'openapiContext' => [
-                'bar' => 'baz',
             ],
             'openapi' => [
                 'extensionProperties' => [
@@ -364,10 +359,6 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     'hydraContext' => [
                         'foo' => ['bar' => 'baz'],
                     ],
-                    // TODO Remove in 4.0
-                    'openapiContext' => [
-                        'bar' => 'baz',
-                    ],
                     'openapi' => [
                         'extensionProperties' => [
                             'bar' => 'baz',
@@ -507,19 +498,16 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         'schemes',
         'cacheHeaders',
         'hydraContext',
-        // TODO Remove in 4.0
-        'openapiContext',
         'openapi',
         'paginationViaCursor',
         'stateOptions',
         'links',
+        'rules',
         'headers',
         'parameters',
     ];
 
-    /**
-     * @dataProvider getExtractors
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getExtractors')]
     public function testValidMetadata(string $extractorClass, ResourceAdapterInterface $adapter): void
     {
         $reflClass = new \ReflectionClass(ApiResource::class);
@@ -560,7 +548,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
             if (null === $fixtures) {
                 // Build default operations
                 $operations = [];
-                foreach ([new Get(), new GetCollection(), new Post(), new Put(), new Patch(), new Delete()] as $operation) {
+                foreach ([new Get(), new GetCollection(), new Post(), new Patch(), new Delete()] as $operation) {
                     [$name, $operation] = $this->getOperationWithDefaults($resource, $operation);
                     $operations[$name] = $operation;
                 }

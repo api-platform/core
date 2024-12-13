@@ -13,8 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Hal\Serializer;
 
-use ApiPlatform\Api\Entrypoint;
-use ApiPlatform\Documentation\Entrypoint as DocumentationEntrypoint;
+use ApiPlatform\Documentation\Entrypoint;
 use ApiPlatform\Hal\Serializer\EntrypointNormalizer;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
@@ -27,7 +26,6 @@ use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\Serializer\Serializer;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -36,9 +34,6 @@ class EntrypointNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
-    /**
-     * @group legacy
-     */
     public function testSupportNormalization(): void
     {
         $collection = new ResourceNameCollection();
@@ -55,11 +50,7 @@ class EntrypointNormalizerTest extends TestCase
         $this->assertFalse($normalizer->supportsNormalization(new \stdClass(), EntrypointNormalizer::FORMAT));
 
         $this->assertEmpty($normalizer->getSupportedTypes('json'));
-        $this->assertSame([Entrypoint::class => true, DocumentationEntrypoint::class => true], $normalizer->getSupportedTypes($normalizer::FORMAT));
-
-        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
-            $this->assertTrue($normalizer->hasCacheableSupportsMethod());
-        }
+        $this->assertSame([Entrypoint::class => true], $normalizer->getSupportedTypes($normalizer::FORMAT));
     }
 
     public function testNormalize(): void

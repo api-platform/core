@@ -11,6 +11,12 @@
 
 declare(strict_types=1);
 
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Symfony\Bundle\ApiPlatformBundle;
 use ApiPlatform\Tests\Behat\DoctrineContext;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\User as UserDocument;
@@ -81,6 +87,12 @@ class AppKernel extends Kernel
         $bundles[] = new TestBundle();
 
         return $bundles;
+    }
+
+    public function shutdown(): void
+    {
+        parent::shutdown();
+        restore_exception_handler();
     }
 
     public function getProjectDir(): string
@@ -231,24 +243,15 @@ class AppKernel extends Kernel
         }
         $c->prependExtensionConfig('twig', $twigConfig);
 
-        $metadataBackwardCompatibilityLayer = (bool) ($_SERVER['EVENT_LISTENERS_BACKWARD_COMPATIBILITY_LAYER'] ?? false);
         $useSymfonyListeners = (bool) ($_SERVER['USE_SYMFONY_LISTENERS'] ?? false);
-        $rfc7807CompliantErrors = (bool) ($_SERVER['RFC_7807_COMPLIANT_ERRORS'] ?? true);
-        $useQueryParameterValidator = (bool) ($_SERVER['QUERY_PARAMETER_VALIDATOR'] ?? false);
 
-        $legacyConfig = [];
-        if ($metadataBackwardCompatibilityLayer) {
-            $legacyConfig = ['event_listeners_backward_compatibility_layer' => $metadataBackwardCompatibilityLayer];
-        }
-
-        $c->prependExtensionConfig('api_platform', $legacyConfig + [
+        $c->prependExtensionConfig('api_platform', [
             'mapping' => [
                 'paths' => ['%kernel.project_dir%/../TestBundle/Resources/config/api_resources'],
             ],
             'graphql' => [
                 'graphql_playground' => false,
             ],
-            'use_deprecated_json_schema_type_factory' => true,
             'use_symfony_listeners' => $useSymfonyListeners,
             'defaults' => [
                 'pagination_client_enabled' => true,
@@ -262,10 +265,13 @@ class AppKernel extends Kernel
                     'public' => true,
                 ],
                 'normalization_context' => ['skip_null_values' => false],
-                'extra_properties' => [
-                    'rfc_7807_compliant_errors' => $rfc7807CompliantErrors,
-                    'standard_put' => true,
-                    'use_legacy_parameter_validator' => $useQueryParameterValidator,
+                'operations' => [
+                    Get::class,
+                    GetCollection::class,
+                    Post::class,
+                    Put::class,
+                    Patch::class,
+                    Delete::class,
                 ],
             ],
             'serializer' => [
@@ -285,6 +291,11 @@ class AppKernel extends Kernel
         }
 
         $loader->load(__DIR__.'/config/config_swagger.php');
+
+        // We reduce the amount of resources to the strict minimum to speed up tests
+        if (null !== ($_ENV['APP_PHPUNIT'] ?? null)) {
+            $loader->load(__DIR__.'/config/phpunit.yml');
+        }
 
         if ('mongodb' === $this->environment) {
             $c->prependExtensionConfig('api_platform', [

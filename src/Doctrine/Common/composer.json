@@ -23,7 +23,7 @@
         }
     ],
     "require": {
-        "php": ">=8.1",
+        "php": ">=8.2",
         "api-platform/metadata": "^3.4 || ^4.0",
         "api-platform/state": "^3.4 || ^4.0",
         "doctrine/collections": "^2.1",
@@ -33,16 +33,14 @@
     "require-dev": {
         "doctrine/mongodb-odm": "^2.6",
         "doctrine/orm": "^2.17 || ^3.0",
-        "phpspec/prophecy-phpunit": "^2.0",
-        "phpunit/phpunit": "^10.0",
-        "symfony/phpunit-bridge": "^6.4 || ^7.0"
+        "phpspec/prophecy-phpunit": "^2.2",
+        "phpunit/phpunit": "^11.2"
     },
     "conflict": {
         "doctrine/persistence": "<1.3"
     },
     "suggest": {
         "phpstan/phpdoc-parser": "For PHP documentation support.",
-        "symfony/messenger": "For async mercure updates.",
         "symfony/yaml": "For YAML resource configuration.",
         "symfony/config": "For XML resource configuration.",
         "api-platform/http-cache": "For HTTP cache invalidation.",
@@ -66,7 +64,7 @@
             "dev-3.4": "3.4.x-dev"
         },
         "symfony": {
-            "require": "^6.4 || ^7.1"
+            "require": "^6.4 || ^7.0"
         },
         "thanks": {
             "name": "api-platform/api-platform",

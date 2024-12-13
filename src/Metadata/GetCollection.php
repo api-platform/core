@@ -44,7 +44,6 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
         ?array $cacheHeaders = null,
         ?array $paginationViaCursor = null,
         ?array $hydraContext = null,
-        ?array $openapiContext = null,
         bool|OpenApiOperation|Webhook|null $openapi = null,
         ?array $exceptionToStatus = null,
         ?bool $queryParameterValidationEnabled = null,
@@ -96,6 +95,9 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
         $processor = null,
         ?OptionsInterface $stateOptions = null,
         array|Parameters|null $parameters = null,
+        array|string|null $rules = null,
+        ?string $policy = null,
+        array|string|null $middleware = null,
         array $extraProperties = [],
         private ?string $itemUriTemplate = null,
     ) {
@@ -123,7 +125,6 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
             cacheHeaders: $cacheHeaders,
             paginationViaCursor: $paginationViaCursor,
             hydraContext: $hydraContext,
-            openapiContext: $openapiContext,
             openapi: $openapi,
             exceptionToStatus: $exceptionToStatus,
             queryParameterValidationEnabled: $queryParameterValidationEnabled,
@@ -174,6 +175,9 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
             processor: $processor,
             parameters: $parameters,
             extraProperties: $extraProperties,
+            rules: $rules,
+            policy: $policy,
+            middleware: $middleware,
             stateOptions: $stateOptions,
         );
     }

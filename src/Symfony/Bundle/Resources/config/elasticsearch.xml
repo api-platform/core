@@ -74,7 +74,6 @@
 
         <service id="api_platform.elasticsearch.state.item_provider" class="ApiPlatform\Elasticsearch\State\ItemProvider" public="false">
             <argument type="service" id="api_platform.elasticsearch.client" />
-            <argument type="service" id="api_platform.elasticsearch.metadata.document.metadata_factory" on-invalid="null" />
             <argument type="service" id="serializer" />
             <argument type="service" id="api_platform.inflector" on-invalid="null" />
 
@@ -85,7 +84,6 @@
 
         <service id="api_platform.elasticsearch.state.collection_provider" class="ApiPlatform\Elasticsearch\State\CollectionProvider" public="false">
             <argument type="service" id="api_platform.elasticsearch.client" />
-            <argument type="service" id="api_platform.elasticsearch.metadata.document.metadata_factory" on-invalid="null" />
             <argument type="service" id="serializer" />
             <argument type="service" id="api_platform.pagination" />
             <argument type="tagged_iterator" tag="api_platform.elasticsearch.request_body_search_extension.collection" />
@@ -97,10 +95,7 @@
         <service id="ApiPlatform\Elasticsearch\State\CollectionProvider" alias="api_platform.elasticsearch.state.collection_provider"/>
 
         <service id="api_platform.elasticsearch.metadata.resource.metadata_collection_factory" class="ApiPlatform\Elasticsearch\Metadata\Resource\Factory\ElasticsearchProviderResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="40">
-            <argument type="service" id="api_platform.elasticsearch.client_for_metadata" on-invalid="null" />
             <argument type="service" id="api_platform.elasticsearch.metadata.resource.metadata_collection_factory.inner" />
-            <argument>false</argument>
-            <argument type="service" id="api_platform.inflector" on-invalid="null" />
         </service>
 
     </services>

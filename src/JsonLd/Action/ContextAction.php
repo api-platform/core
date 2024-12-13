@@ -56,6 +56,10 @@ final class ContextAction
      */
     public function __invoke(string $shortName = 'Entrypoint', ?Request $request = null): array|Response
     {
+        if (!$shortName) {
+            $shortName = 'Entrypoint';
+        }
+
         if (null !== $request && $this->provider && $this->processor && $this->serializer) {
             $operation = new Get(
                 outputFormats: ['jsonld' => ['application/ld+json']],

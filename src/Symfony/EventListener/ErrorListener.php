@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\EventListener;
 
-use ApiPlatform\Api\IdentifiersExtractorInterface as LegacyIdentifiersExtractorInterface;
-use ApiPlatform\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
 use ApiPlatform\Metadata\Error as ErrorOperation;
 use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
 use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
@@ -27,7 +25,6 @@ use ApiPlatform\Metadata\Util\ContentNegotiationTrait;
 use ApiPlatform\State\ApiResource\Error;
 use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\State\Util\RequestAttributesExtractor;
-use ApiPlatform\Symfony\Validator\Exception\ConstraintViolationListAwareExceptionInterface as LegacyConstraintViolationListAwareExceptionInterface;
 use ApiPlatform\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
 use Negotiation\Negotiator;
 use Psr\Log\LoggerInterface;
@@ -58,10 +55,9 @@ final class ErrorListener extends SymfonyErrorListener
         private readonly array $errorFormats = [],
         private readonly array $exceptionToStatus = [],
         /** @phpstan-ignore-next-line we're not using this anymore but keeping for bc layer */
-        private readonly IdentifiersExtractorInterface|LegacyIdentifiersExtractorInterface|null $identifiersExtractor = null,
-        private readonly ResourceClassResolverInterface|LegacyResourceClassResolverInterface|null $resourceClassResolver = null,
+        private readonly ?IdentifiersExtractorInterface $identifiersExtractor = null,
+        private readonly ?ResourceClassResolverInterface $resourceClassResolver = null,
         ?Negotiator $negotiator = null,
-        private readonly ?bool $problemCompliantErrors = true,
     ) {
         parent::__construct($controller, $logger, $debug, $exceptionsMapping);
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
@@ -85,18 +81,6 @@ final class ErrorListener extends SymfonyErrorListener
             $this->controller = 'error_controller';
 
             return parent::duplicateRequest($exception, $request);
-        }
-
-        $legacy = $apiOperation ? ($apiOperation->getExtraProperties()['rfc_7807_compliant_errors'] ?? false) : $this->problemCompliantErrors;
-
-        if (!$this->problemCompliantErrors || !$legacy) {
-            trigger_deprecation('api-platform/core', '3.4', "rfc_7807_compliant_errors flag will be removed in 4.0, to handle errors yourself use extraProperties: ['rfc_7807_compliant_errors' => false]");
-            $this->controller = 'api_platform.action.exception';
-            $dup = parent::duplicateRequest($exception, $request);
-            $dup->attributes->set('_api_operation', $apiOperation);
-            $dup->attributes->set('_api_exception_action', true);
-
-            return $dup;
         }
 
         if ($this->debug) {
@@ -133,6 +117,7 @@ final class ErrorListener extends SymfonyErrorListener
         // These are for swagger
         $dup->attributes->set('_api_original_route', $request->attributes->get('_route'));
         $dup->attributes->set('_api_original_route_params', $request->attributes->get('_route_params'));
+        $dup->attributes->set('_api_original_uri_variables', $request->attributes->get('_api_uri_variables'));
         $dup->attributes->set('_api_requested_operation', $request->attributes->get('_api_requested_operation'));
         $dup->attributes->set('_api_platform_disable_listeners', true);
 
@@ -197,7 +182,7 @@ final class ErrorListener extends SymfonyErrorListener
             return 400;
         }
 
-        if ($exception instanceof ConstraintViolationListAwareExceptionInterface || $exception instanceof LegacyConstraintViolationListAwareExceptionInterface) {
+        if ($exception instanceof ConstraintViolationListAwareExceptionInterface) {
             return 422;
         }
 
@@ -261,7 +246,7 @@ final class ErrorListener extends SymfonyErrorListener
 
         // Create a generic, rfc7807 compatible error according to the wanted format
         $operation = $this->resourceMetadataCollectionFactory->create(Error::class)->getOperation($this->getFormatOperation($format));
-        // status code may be overriden by the exceptionToStatus option
+        // status code may be overridden by the exceptionToStatus option
         $statusCode = 500;
         if ($operation instanceof HttpOperation) {
             $statusCode = $this->getStatusCode($apiOperation, $request, $operation, $exception);

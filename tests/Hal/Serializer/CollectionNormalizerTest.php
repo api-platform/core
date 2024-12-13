@@ -13,19 +13,18 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Hal\Serializer;
 
-use ApiPlatform\Api\ResourceClassResolverInterface;
 use ApiPlatform\Hal\Serializer\CollectionNormalizer;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Serializer;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -34,9 +33,7 @@ class CollectionNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
-    /**
-     * @group legacy
-     */
+    #[\PHPUnit\Framework\Attributes\Group('legacy')]
     public function testSupportsNormalize(): void
     {
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -55,10 +52,6 @@ class CollectionNormalizerTest extends TestCase
             'native-array' => true,
             '\Traversable' => true,
         ], $normalizer->getSupportedTypes($normalizer::FORMAT));
-
-        if (!method_exists(Serializer::class, 'getSupportedTypes')) {
-            $this->assertTrue($normalizer->hasCacheableSupportsMethod());
-        }
     }
 
     public function testNormalizePaginator(): void

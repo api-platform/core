@@ -13,19 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Exception;
 
-use ApiPlatform\Exception\ItemNotFoundException as LegacyItemNotFoundException;
-
-if (class_exists(LegacyItemNotFoundException::class)) {
-    class ItemNotFoundException extends LegacyItemNotFoundException
-    {
-    }
-} else {
-    /**
-     * Item not found exception.
-     *
-     * @author Amrouche Hamza <hamza.simperfit@gmail.com>
-     */
-    class ItemNotFoundException extends InvalidArgumentException
-    {
-    }
+/**
+ * Item not found exception.
+ *
+ * @author Amrouche Hamza <hamza.simperfit@gmail.com>
+ */
+class ItemNotFoundException extends InvalidArgumentException
+{
 }

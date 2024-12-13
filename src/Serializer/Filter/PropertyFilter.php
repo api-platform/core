@@ -13,6 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Serializer\Filter;
 
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
+use ApiPlatform\Metadata\Parameter as MetadataParameter;
+use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\OpenApi\Model\Parameter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -113,7 +118,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-final class PropertyFilter implements FilterInterface
+final class PropertyFilter implements FilterInterface, OpenApiParameterFilterInterface, JsonSchemaFilterInterface
 {
     private ?array $whitelist;
 
@@ -127,25 +132,40 @@ final class PropertyFilter implements FilterInterface
      */
     public function apply(Request $request, bool $normalization, array $attributes, array &$context): void
     {
+        // TODO: ideally we should return the new context, not mutate the context given in our arguments which is the serializer context
+        // this would allow to use `Parameter::filterContext` properly, for now let's retrieve it like this:
+        /** @var MetadataParameter|null */
+        $parameter = $request->attributes->get('_api_parameter', null);
+        $parameterName = $this->parameterName;
+        $whitelist = $this->whitelist;
+        $overrideDefaultProperties = $this->overrideDefaultProperties;
+
+        if ($parameter) {
+            $parameterName = $parameter->getKey();
+            $whitelist = $parameter->getFilterContext()['whitelist'] ?? $this->whitelist;
+            $overrideDefaultProperties = $parameter->getFilterContext()['override_default_properties'] ?? $this->overrideDefaultProperties;
+        }
+
         if (null !== $propertyAttribute = $request->attributes->get('_api_filter_property')) {
             $properties = $propertyAttribute;
-        } elseif (\array_key_exists($this->parameterName, $commonAttribute = $request->attributes->get('_api_filters', []))) {
-            $properties = $commonAttribute[$this->parameterName];
+        } elseif (\array_key_exists($parameterName, $commonAttribute = $request->attributes->get('_api_filters', []))) {
+            $properties = $commonAttribute[$parameterName];
         } else {
-            $properties = $request->query->all()[$this->parameterName] ?? null;
+            $properties = $request->query->all()[$parameterName] ?? null;
         }
 
         if (!\is_array($properties)) {
             return;
         }
 
+        // TODO: when refactoring this eventually, note that the ParameterResourceMetadataCollectionFactory already does that and caches this behavior in our Parameter metadata
         $properties = $this->denormalizeProperties($properties);
 
-        if (null !== $this->whitelist) {
-            $properties = $this->getProperties($properties, $this->whitelist);
+        if (null !== $whitelist) {
+            $properties = $this->getProperties($properties, $whitelist);
         }
 
-        if (!$this->overrideDefaultProperties && isset($context[AbstractNormalizer::ATTRIBUTES])) {
+        if (!$overrideDefaultProperties && isset($context[AbstractNormalizer::ATTRIBUTES])) {
             $properties = array_merge_recursive((array) $context[AbstractNormalizer::ATTRIBUTES], $properties);
         }
 
@@ -157,7 +177,8 @@ final class PropertyFilter implements FilterInterface
      */
     public function getDescription(string $resourceClass): array
     {
-        $example = \sprintf('%1$s[]={propertyName}&%1$s[]={anotherPropertyName}&%1$s[{nestedPropertyParent}][]={nestedProperty}',
+        $example = \sprintf(
+            '%1$s[]={propertyName}&%1$s[]={anotherPropertyName}&%1$s[{nestedPropertyParent}][]={nestedProperty}',
             $this->parameterName
         );
 
@@ -167,24 +188,17 @@ final class PropertyFilter implements FilterInterface
                 'is_collection' => true,
                 'required' => false,
                 'description' => 'Allows you to reduce the response to contain only the properties you need. If your desired property is nested, you can address it using nested arrays. Example: '.$example,
-                'swagger' => [
-                    'description' => 'Allows you to reduce the response to contain only the properties you need. If your desired property is nested, you can address it using nested arrays. Example: '.$example,
-                    'name' => "$this->parameterName[]",
-                    'type' => 'array',
-                    'items' => [
-                        'type' => 'string',
-                    ],
-                ],
-                'openapi' => [
-                    'description' => 'Allows you to reduce the response to contain only the properties you need. If your desired property is nested, you can address it using nested arrays. Example: '.$example,
-                    'name' => "$this->parameterName[]",
-                    'schema' => [
+                'openapi' => new Parameter(
+                    in: 'query',
+                    name: "$this->parameterName[]",
+                    description: 'Allows you to reduce the response to contain only the properties you need. If your desired property is nested, you can address it using nested arrays. Example: '.$example,
+                    schema: [
                         'type' => 'array',
                         'items' => [
                             'type' => 'string',
                         ],
-                    ],
-                ],
+                    ]
+                ),
             ],
         ];
     }
@@ -251,5 +265,29 @@ final class PropertyFilter implements FilterInterface
     private function denormalizePropertyName($property): string
     {
         return null !== $this->nameConverter ? $this->nameConverter->denormalize($property) : $property;
+    }
+
+    public function getSchema(MetadataParameter $parameter): array
+    {
+        return [
+            'type' => 'array',
+            'items' => [
+                'type' => 'string',
+            ],
+        ];
+    }
+
+    public function getOpenApiParameters(MetadataParameter $parameter): Parameter|array|null
+    {
+        $example = \sprintf(
+            '%1$s[]={propertyName}&%1$s[]={anotherPropertyName}',
+            $parameter->getKey()
+        );
+
+        return new Parameter(
+            name: $parameter->getKey().'[]',
+            in: $parameter instanceof QueryParameter ? 'query' : 'header',
+            description: 'Allows you to reduce the response to contain only the properties you need. If your desired property is nested, you can address it using nested arrays. Example: '.$example
+        );
     }
 }

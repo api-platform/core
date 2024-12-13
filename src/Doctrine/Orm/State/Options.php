@@ -42,17 +42,4 @@ class Options extends CommonOptions implements OptionsInterface
 
         return $self;
     }
-
-    public function getHandleLinks(): mixed
-    {
-        return $this->handleLinks;
-    }
-
-    public function withHandleLinks(mixed $handleLinks): self
-    {
-        $self = clone $this;
-        $self->handleLinks = $handleLinks;
-
-        return $self;
-    }
 }

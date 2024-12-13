@@ -27,22 +27,22 @@
         }
     ],
     "require": {
-        "php": ">=8.1",
+        "php": ">=8.2",
         "doctrine/inflector": "^1.0 || ^2.0",
         "psr/cache": "^1.0 || ^2.0 || ^3.0",
         "psr/log": "^1.0 || ^2.0 || ^3.0",
-        "symfony/property-info": "^6.4 || ^7.1",
-        "symfony/string": "^6.4 || ^7.0"
+        "symfony/property-info": "^6.4 || ^7.0",
+        "symfony/string": "^6.4 || ^7.0",
+        "symfony/type-info": "^7.1"
     },
     "require-dev": {
         "api-platform/json-schema": "^3.4 || ^4.0",
         "api-platform/openapi": "^3.4 || ^4.0",
         "api-platform/state": "^3.4 || ^4.0",
-        "phpspec/prophecy-phpunit": "^2.0",
-        "phpstan/phpdoc-parser": "^1.16",
-        "sebastian/comparator": "<5.0",
+        "phpspec/prophecy-phpunit": "^2.2",
+        "phpstan/phpdoc-parser": "^1.13",
+        "phpunit/phpunit": "^11.2",
         "symfony/config": "^6.4 || ^7.0",
-        "symfony/phpunit-bridge": "^6.4 || ^7.0",
         "symfony/routing": "^6.4 || ^7.0",
         "symfony/var-dumper": "^6.4 || ^7.0",
         "symfony/web-link": "^6.4 || ^7.0",
@@ -77,7 +77,7 @@
             "dev-3.4": "3.4.x-dev"
         },
         "symfony": {
-            "require": "^6.4 || ^7.1"
+            "require": "^6.4 || ^7.0"
         },
         "thanks": {
             "name": "api-platform/api-platform",

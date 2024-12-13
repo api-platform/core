@@ -36,7 +36,6 @@ use Symfony\Component\WebLink\Link;
             normalizationContext: [
                 'groups' => ['jsonproblem'],
                 'skip_null_values' => true,
-                'rfc_7807_compliant_errors' => true,
             ],
         ),
         new Operation(
@@ -46,7 +45,6 @@ use Symfony\Component\WebLink\Link;
             normalizationContext: [
                 'groups' => ['jsonld'],
                 'skip_null_values' => true,
-                'rfc_7807_compliant_errors' => true,
             ],
             links: [new Link(rel: 'http://www.w3.org/ns/json-ld#error', href: 'http://www.w3.org/ns/hydra/error')],
         ),
@@ -57,7 +55,6 @@ use Symfony\Component\WebLink\Link;
             normalizationContext: [
                 'groups' => ['jsonapi'],
                 'skip_null_values' => true,
-                'rfc_7807_compliant_errors' => true,
             ],
         ),
         new Operation(
@@ -91,6 +88,12 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
             unset($t['args']); // we don't want arguments in our JSON traces, especially with xdebug
             $this->originalTrace[$i] = $t;
         }
+    }
+
+    #[Groups(['jsonapi'])]
+    public function getId(): string
+    {
+        return (string) $this->status;
     }
 
     #[SerializedName('trace')]
@@ -132,7 +135,7 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
         $this->headers = $headers;
     }
 
-    #[Groups(['jsonld', 'jsonproblem'])]
+    #[Groups(['jsonld', 'jsonproblem', 'jsonapi'])]
     public function getType(): string
     {
         return $this->type;

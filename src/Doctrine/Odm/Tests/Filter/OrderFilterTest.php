@@ -21,8 +21,6 @@ use ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document\EmbeddedDummy;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @group mongodb
- *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
 class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase

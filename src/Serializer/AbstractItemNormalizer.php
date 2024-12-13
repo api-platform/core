@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Serializer;
 
-use ApiPlatform\Api\IriConverterInterface as LegacyIriConverterInterface;
-use ApiPlatform\Api\ResourceClassResolverInterface as LegacyResourceClassResolverInterface;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
@@ -64,7 +62,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected array $localFactoryOptionsCache = [];
     protected ?ResourceAccessCheckerInterface $resourceAccessChecker;
 
-    public function __construct(protected PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, protected PropertyMetadataFactoryInterface $propertyMetadataFactory, protected LegacyIriConverterInterface|IriConverterInterface $iriConverter, protected LegacyResourceClassResolverInterface|ResourceClassResolverInterface $resourceClassResolver, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ?ResourceAccessCheckerInterface $resourceAccessChecker = null, protected ?TagCollectorInterface $tagCollector = null)
+    public function __construct(protected PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, protected PropertyMetadataFactoryInterface $propertyMetadataFactory, protected IriConverterInterface $iriConverter, protected ResourceClassResolverInterface $resourceClassResolver, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ?ResourceAccessCheckerInterface $resourceAccessChecker = null, protected ?TagCollectorInterface $tagCollector = null)
     {
         if (!isset($defaultContext['circular_reference_handler'])) {
             $defaultContext['circular_reference_handler'] = fn ($object): ?string => $this->iriConverter->getIriFromResource($object);
@@ -98,23 +96,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         return [
             'object' => true,
         ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasCacheableSupportsMethod(): bool
-    {
-        if (method_exists(Serializer::class, 'getSupportedTypes')) {
-            trigger_deprecation(
-                'api-platform/core',
-                '3.1',
-                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
-                __METHOD__
-            );
-        }
-
-        return true;
     }
 
     /**
@@ -474,7 +455,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         $options = $this->getFactoryOptions($context);
         $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $options);
-        $security = $propertyMetadata->getSecurity();
+        $security = $propertyMetadata->getSecurity() ?? $propertyMetadata->getPolicy();
         if (null !== $this->resourceAccessChecker && $security) {
             return $this->resourceAccessChecker->isGranted($context['resource_class'], $security, [
                 'object' => $object,
@@ -739,7 +720,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             ) {
                 $childContext = $this->createChildContext($this->createOperationContext($context, $className), $attribute, $format);
                 unset($childContext['iri'], $childContext['uri_variables'], $childContext['item_uri_template']);
-
                 if ('jsonld' === $format && $uriTemplate = $propertyMetadata->getUriTemplate()) {
                     $operation = $this->resourceMetadataCollectionFactory->create($className)->getOperation(
                         operationName: $uriTemplate,

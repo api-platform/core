@@ -13,31 +13,20 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonApi\Serializer;
 
-use ApiPlatform\Serializer\CacheableSupportsMethodInterface;
-use ApiPlatform\Symfony\Validator\Exception\ConstraintViolationListAwareExceptionInterface as LegacyConstraintViolationListAwareExceptionInterface;
-use ApiPlatform\Validator\Exception\ConstraintViolationListAwareExceptionInterface;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Serializer;
 
 /**
  * Converts {@see \Exception} or {@see FlattenException} or to a JSON API error representation.
  *
  * @author Héctor Hurtarte <hectorh30@gmail.com>
  */
-final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMethodInterface
+final class ErrorNormalizer implements NormalizerInterface
 {
-    use ErrorNormalizerTrait;
-
     public const FORMAT = 'jsonapi';
-    public const TITLE = 'title';
-    private array $defaultContext = [
-        self::TITLE => 'An error occurred',
-    ];
 
-    public function __construct(private readonly bool $debug = false, array $defaultContext = [], private ?NormalizerInterface $itemNormalizer = null, private ?NormalizerInterface $constraintViolationListNormalizer = null)
+    public function __construct(private ?NormalizerInterface $itemNormalizer = null)
     {
-        $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
     /**
@@ -45,35 +34,37 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
      */
     public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
-        // TODO: in api platform 4 this will be the default, note that JSON:API is close to Problem so we should use the same normalizer
-        if ($context['rfc_7807_compliant_errors'] ?? false) {
-            if ($object instanceof LegacyConstraintViolationListAwareExceptionInterface || $object instanceof ConstraintViolationListAwareExceptionInterface) {
-                // TODO: return ['errors' => $this->constraintViolationListNormalizer(...)]
-                return $this->constraintViolationListNormalizer->normalize($object->getConstraintViolationList(), $format, $context);
-            }
+        $jsonApiObject = $this->itemNormalizer->normalize($object, $format, $context);
+        $error = $jsonApiObject['data']['attributes'];
+        $error['id'] = $jsonApiObject['data']['id'];
+        if (isset($error['type'])) {
+            $error['links'] = ['type' => $error['type']];
+        }
 
-            $jsonApiObject = $this->itemNormalizer->normalize($object, $format, $context);
-            $error = $jsonApiObject['data']['attributes'];
-            $error['id'] = $jsonApiObject['data']['id'];
-            $error['type'] = $jsonApiObject['data']['id'];
+        if (!isset($error['code']) && method_exists($object, 'getId')) {
+            $error['code'] = $object->getId();
+        }
 
+        if (!isset($error['violations'])) {
             return ['errors' => [$error]];
         }
 
-        $data = [
-            'title' => $context[self::TITLE] ?? $this->defaultContext[self::TITLE],
-            'description' => $this->getErrorMessage($object, $context, $this->debug),
-        ];
-
-        if (null !== $errorCode = $this->getErrorCode($object)) {
-            $data['code'] = $errorCode;
+        $errors = [];
+        foreach ($error['violations'] as $violation) {
+            $e = ['detail' => $violation['message']] + $error;
+            if (isset($error['links']['type'])) {
+                $type = $error['links']['type'];
+                $e['links']['type'] = \sprintf('%s/%s', $type, $violation['propertyPath']);
+                $e['id'] = str_replace($type, $e['links']['type'], $e['id']);
+            }
+            if (isset($e['code'])) {
+                $e['code'] = \sprintf('%s/%s', $error['code'], $violation['propertyPath']);
+            }
+            unset($e['violations']);
+            $errors[] = $e;
         }
 
-        if ($this->debug && null !== $trace = $object->getTrace()) {
-            $data['trace'] = $trace;
-        }
-
-        return $data;
+        return ['errors' => $errors];
     }
 
     /**
@@ -94,19 +85,5 @@ final class ErrorNormalizer implements NormalizerInterface, CacheableSupportsMet
         }
 
         return [];
-    }
-
-    public function hasCacheableSupportsMethod(): bool
-    {
-        if (method_exists(Serializer::class, 'getSupportedTypes')) {
-            trigger_deprecation(
-                'api-platform/core',
-                '3.1',
-                'The "%s()" method is deprecated, use "getSupportedTypes()" instead.',
-                __METHOD__
-            );
-        }
-
-        return true;
     }
 }

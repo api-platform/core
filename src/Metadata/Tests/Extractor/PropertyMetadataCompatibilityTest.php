@@ -78,9 +78,7 @@ final class PropertyMetadataCompatibilityTest extends TestCase
         'property' => 'test',
     ];
 
-    /**
-     * @dataProvider getExtractors
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getExtractors')]
     public function testValidMetadata(string $extractorClass, PropertyAdapterInterface $adapter): void
     {
         $reflClass = new \ReflectionClass(ApiProperty::class);
