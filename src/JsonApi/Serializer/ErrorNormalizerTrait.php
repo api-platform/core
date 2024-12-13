@@ -17,6 +17,9 @@ use ApiPlatform\Exception\ErrorCodeSerializableInterface;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @deprecated
+ */
 trait ErrorNormalizerTrait
 {
     private function getErrorMessage($object, array $context, bool $debug = false): string
