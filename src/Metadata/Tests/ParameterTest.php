@@ -23,6 +23,6 @@ class ParameterTest extends TestCase
     {
         $parameter = new QueryParameter();
         $this->assertSame('test', $parameter->getValue('test'));
-        $this->assertSame(new ParameterNotFound(), $parameter->getValue('test'));
+        $this->assertSame(new ParameterNotFound(), $parameter->getValue());
     }
 }

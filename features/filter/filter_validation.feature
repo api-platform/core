@@ -25,15 +25,15 @@ Feature: Validate filters based upon filter description
   Scenario: Required filter should throw an error if not set
     When I am on "/array_filter_validators"
     Then the response status code should be 422
-    And the JSON node "detail" should be equal to 'arrayRequired: This value should not be blank.\nindexedArrayRequired: This value should not be blank.'
+    And the JSON node "detail" should be equal to 'arrayRequired[]: This value should not be blank.\nindexedArrayRequired[foo]: This value should not be blank.'
 
     When I am on "/array_filter_validators?arrayRequired[foo]=foo"
     Then the response status code should be 422
-    And the JSON node "detail" should be equal to 'indexedArrayRequired: This value should not be blank.'
+    And the JSON node "detail" should be equal to 'indexedArrayRequired[foo]: This value should not be blank.'
 
     When I am on "/array_filter_validators?arrayRequired[]=foo"
     Then the response status code should be 422
-    And the JSON node "detail" should be equal to 'indexedArrayRequired: This value should not be blank.'
+    And the JSON node "detail" should be equal to 'indexedArrayRequired[foo]: This value should not be blank.'
 
   Scenario: Test filter bounds: maximum
     When I am on "/filter_validators?required=foo&required-allow-empty&maximum=10"

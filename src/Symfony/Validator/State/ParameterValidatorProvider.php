@@ -21,6 +21,7 @@ use ApiPlatform\State\Util\ParameterParserTrait;
 use ApiPlatform\Validator\Exception\ValidationException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -56,7 +57,6 @@ final class ParameterValidatorProvider implements ProviderInterface
                 continue;
             }
 
-            $key = $parameter->getKey();
             $value = $parameter->getValue();
             if ($value instanceof ParameterNotFound) {
                 $value = null;
@@ -87,7 +87,7 @@ final class ParameterValidatorProvider implements ProviderInterface
     }
 
     // There's a `property` inside Parameter but it's used for hydra:search only as here we want the parameter name instead
-    private function getProperty(Parameter $parameter, ConstraintViolation $violation)
+    private function getProperty(Parameter $parameter, ConstraintViolationInterface $violation): string
     {
         $key = $parameter->getKey();
 
