@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Workbench\App\Models;
 
+use ApiPlatform\Laravel\Eloquent\Filter\BooleanFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\DateFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\EqualsFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\OrderFilter;
@@ -71,12 +72,13 @@ use Workbench\App\Http\Requests\BookFormRequest;
     property: 'name'
 )]
 #[QueryParameter(key: 'properties', filter: PropertyFilter::class)]
+#[QueryParameter(key: 'published', filter: BooleanFilter::class)]
 class Book extends Model
 {
     use HasFactory;
     use HasUlids;
 
-    protected $visible = ['name', 'author', 'isbn', 'publication_date', 'is_available'];
+    protected $visible = ['name', 'author', 'isbn', 'publication_date', 'published', 'is_available'];
     protected $fillable = ['name', 'is_available'];
     protected $casts = [
         'is_available' => 'boolean',

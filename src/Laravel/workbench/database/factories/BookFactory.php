@@ -39,6 +39,7 @@ class BookFactory extends Factory
             'publication_date' => fake()->optional()->date(),
             'is_available' => 1 === random_int(0, 1),
             'internal_note' => fake()->text(),
+            'published' => fake()->boolean(100),
         ];
     }
 }
