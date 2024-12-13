@@ -59,7 +59,7 @@ trait BackedEnumFilterTrait
                 'required' => false,
                 'schema' => [
                     'type' => 'string',
-                    'enum' => array_map(fn (\BackedEnum $case) => $case->value, $this->enumTypes[$property]::cases()),
+                    'enum' => array_map(fn (\BackedEnum $case) => $case->name, $this->enumTypes[$property]::cases()),
                 ],
             ];
         }
@@ -80,7 +80,7 @@ trait BackedEnumFilterTrait
 
     private function normalizeValue($value, string $property): mixed
     {
-        $values = array_map(fn (\BackedEnum $case) => $case->value, $this->enumTypes[$property]::cases());
+        $values = array_map(fn (\BackedEnum $case) => $case->name, $this->enumTypes[$property]::cases());
 
         if (\in_array($value, $values, true)) {
             return $value;
