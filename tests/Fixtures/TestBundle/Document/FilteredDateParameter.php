@@ -18,6 +18,7 @@ use ApiPlatform\Doctrine\Odm\Filter\DateFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\OpenApi\Model\Parameter;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 #[ApiResource]
@@ -26,19 +27,23 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
     parameters: [
         'createdAt' => new QueryParameter(
             filter: new DateFilter(),
+            openApi: new Parameter('createdAt', 'query', allowEmptyValue: true)
         ),
         'date' => new QueryParameter(
             filter: new DateFilter(),
             property: 'createdAt',
+            openApi: new Parameter('createdAt', 'query', allowEmptyValue: true)
         ),
         'date_include_null_always' => new QueryParameter(
             filter: new DateFilter(),
             property: 'createdAt',
             filterContext: DateFilterInterface::INCLUDE_NULL_BEFORE_AND_AFTER,
+            openApi: new Parameter('createdAt', 'query', allowEmptyValue: true)
         ),
         'date_old_way' => new QueryParameter(
             filter: new DateFilter(properties: ['createdAt' => DateFilterInterface::INCLUDE_NULL_BEFORE_AND_AFTER]),
             property: 'createdAt',
+            openApi: new Parameter('createdAt', 'query', allowEmptyValue: true)
         ),
     ],
 )]

@@ -17,6 +17,7 @@ use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\OpenApi\Model\Parameter;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ApiResource]
@@ -25,10 +26,12 @@ use Doctrine\ORM\Mapping as ORM;
     parameters: [
         'quantity' => new QueryParameter(
             filter: new RangeFilter(),
+            openApi: new Parameter('createdAt', 'query', allowEmptyValue: true)
         ),
         'amount' => new QueryParameter(
             filter: new RangeFilter(),
             property: 'quantity',
+            openApi: new Parameter('createdAt', 'query', allowEmptyValue: true)
         ),
     ],
 )]

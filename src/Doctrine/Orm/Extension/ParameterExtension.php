@@ -46,7 +46,6 @@ final class ParameterExtension implements QueryCollectionExtensionInterface, Que
     private function applyFilter(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         foreach ($operation?->getParameters() ?? [] as $parameter) {
-            // TODO: remove the null equality as a parameter can have a null value
             if (null === ($v = $parameter->getValue()) || $v instanceof ParameterNotFound) {
                 continue;
             }

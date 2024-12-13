@@ -86,7 +86,7 @@
             <argument type="service" id="api_platform.elasticsearch.client" />
             <argument type="service" id="serializer" />
             <argument type="service" id="api_platform.pagination" />
-            <argument type="tagged" tag="api_platform.elasticsearch.request_body_search_extension.collection" />
+            <argument type="tagged_iterator" tag="api_platform.elasticsearch.request_body_search_extension.collection" />
             <argument type="service" id="api_platform.inflector" on-invalid="null" />
 
             <tag name="api_platform.state_provider" priority="-100" key="ApiPlatform\Elasticsearch\State\CollectionProvider"/>
