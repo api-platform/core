@@ -49,10 +49,10 @@ class DummyCar
     #[ORM\OneToMany(targetEntity: DummyCarColor::class, mappedBy: 'car')]
     private Collection|iterable|null $thirdColors = null;
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
-    #[ORM\ManyToMany(targetEntity: UuidIdentifierDummy::class, indexBy: 'uuid')]
+    #[ORM\ManyToMany(targetEntity: GuidIdentifierDummy::class, indexBy: 'guid')]
     #[ORM\JoinColumn(name: 'car_id', referencedColumnName: 'id_id')]
-    #[ORM\InverseJoinColumn(name: 'uuid_uuid', referencedColumnName: 'uuid')]
-    #[ORM\JoinTable(name: 'uuid_cars')]
+    #[ORM\InverseJoinColumn(name: 'guid_guid', referencedColumnName: 'guid')]
+    #[ORM\JoinTable(name: 'guid_cars')]
     private Collection|iterable|null $uuid = null;
 
     #[ApiFilter(SearchFilter::class, strategy: 'partial')]
