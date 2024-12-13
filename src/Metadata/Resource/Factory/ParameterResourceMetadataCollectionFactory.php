@@ -149,6 +149,10 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             return $parameter;
         }
 
+        if (!\is_object($filterId) && !$this->filterLocator->has($filterId)) {
+            return $parameter;
+        }
+
         $filter = \is_object($filterId) ? $filterId : $this->filterLocator->get($filterId);
 
         if (!$filter) {
@@ -159,7 +163,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             $parameter = $parameter->withSchema($schema);
         }
 
-        if (null === $parameter->getOpenApi() && $filter instanceof OpenApiParameterFilterInterface && ($openApiParameter = $filter->getOpenApiParameters($parameter)) && $openApiParameter instanceof OpenApiParameter) {
+        if (null === $parameter->getOpenApi() && $filter instanceof OpenApiParameterFilterInterface && ($openApiParameter = $filter->getOpenApiParameters($parameter))) {
             $parameter = $parameter->withOpenApi($openApiParameter);
         }
 
@@ -188,6 +192,10 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         $description = $filter instanceof FilterInterface ? $filter->getDescription($this->getFilterClass($operation)) : [];
         if (($schema = $description[$key]['schema'] ?? null) && null === $parameter->getSchema()) {
             $parameter = $parameter->withSchema($schema);
+        }
+
+        if (($openapi = $description[$key]['openapi'] ?? null) && null === $parameter->getOpenApi() && $openapi instanceof OpenApiParameter) {
+            $parameter = $parameter->withOpenApi($openapi);
         }
 
         $currentKey = $key;

@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Tests\Resource\Factory;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\Resource\Factory\AttributesResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\ParameterResourceMetadataCollectionFactory;
@@ -25,12 +27,14 @@ use ApiPlatform\OpenApi\Model\Parameter;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
-class ParameterResourceMetadataCollectionFactoryTests extends TestCase
+class ParameterResourceMetadataCollectionFactoryTest extends TestCase
 {
     public function testParameterFactory(): void
     {
         $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'hydra', 'everywhere']));
         $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturnOnConsecutiveCalls(new ApiProperty(identifier: true), new ApiProperty(readable: true), new ApiProperty(readable: true));
         $filterLocator = $this->createStub(ContainerInterface::class);
         $filterLocator->method('has')->willReturn(true);
         $filterLocator->method('get')->willReturn(new class implements FilterInterface {
@@ -64,6 +68,24 @@ class ParameterResourceMetadataCollectionFactoryTests extends TestCase
         $this->assertEquals(['type' => 'foo'], $hydraParameter->getSchema());
         $this->assertEquals(new Parameter('test', 'query'), $hydraParameter->getOpenApi());
         $everywhere = $parameters->get('everywhere', QueryParameter::class);
-        $this->assertEquals(new Parameter('everywhere', 'query', allowEmptyValue: true), $everywhere->getOpenApi());
+        $this->assertNull($everywhere->getOpenApi());
+    }
+
+    public function testParameterFactoryNoFilter(): void
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'hydra', 'everywhere']));
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturnOnConsecutiveCalls(new ApiProperty(identifier: true), new ApiProperty(readable: true), new ApiProperty(readable: true));
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+        $parameter = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+        $operation = $parameter->create(WithParameter::class)->getOperation('collection');
+        $this->assertInstanceOf(Parameters::class, $parameters = $operation->getParameters());
     }
 }
