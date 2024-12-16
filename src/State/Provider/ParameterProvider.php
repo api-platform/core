@@ -55,12 +55,12 @@ final class ParameterProvider implements ProviderInterface
 
         if ($operation instanceof HttpOperation && true === $operation->getStrictQueryParameterValidation()) {
             $keys = [];
-            foreach($parameters as $parameter) {
+            foreach ($parameters as $parameter) {
                 $keys[] = $parameter->getKey();
             }
 
             foreach (array_keys($request->attributes->get('_api_query_parameters')) as $key) {
-                if (!in_array($key, $keys)) {
+                if (!\in_array($key, $keys, true)) {
                     throw new ParameterNotSupportedException($key);
                 }
             }
@@ -119,4 +119,3 @@ final class ParameterProvider implements ProviderInterface
         return $this->decorated?->provide($operation, $uriVariables, $context);
     }
 }
-

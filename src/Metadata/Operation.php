@@ -857,6 +857,7 @@ abstract class Operation extends Metadata
             policy: $policy,
             middleware: $middleware,
             queryParameterValidationEnabled: $queryParameterValidationEnabled,
+            strictQueryParameterValidation: $strictQueryParameterValidation,
             extraProperties: $extraProperties,
         );
     }

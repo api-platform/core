@@ -667,4 +667,17 @@ abstract class Metadata
 
         return $self;
     }
+
+    public function getStrictQueryParameterValidation(): ?bool
+    {
+        return $this->strictQueryParameterValidation;
+    }
+
+    public function withStrictQueryParameterValidation(bool $strictQueryParameterValidation): static
+    {
+        $self = clone $this;
+        $self->strictQueryParameterValidation = $strictQueryParameterValidation;
+
+        return $self;
+    }
 }

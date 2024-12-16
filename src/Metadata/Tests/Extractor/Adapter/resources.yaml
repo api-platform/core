@@ -102,6 +102,7 @@ resources:
                     exceptionToStatus:
                         Symfony\Component\Serializer\Exception\ExceptionInterface: 404
                     queryParameterValidationEnabled: false
+                    strictQueryParameterValidation: false
                     read: true
                     deserialize: false
                     validate: false
@@ -339,6 +340,7 @@ resources:
             policy: null
             middleware: null
             parameters: null
+            strictQueryParameterValidation: false
             extraProperties:
                 custom_property: 'Lorem ipsum dolor sit amet'
                 another_custom_property:

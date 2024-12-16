@@ -258,6 +258,7 @@ class HttpOperation extends Operation
             policy: $policy,
             middleware: $middleware,
             queryParameterValidationEnabled: $queryParameterValidationEnabled,
+            strictQueryParameterValidation: $strictQueryParameterValidation,
             extraProperties: $extraProperties
         );
     }
@@ -631,17 +632,6 @@ class HttpOperation extends Operation
     {
         $self = clone $this;
         $self->errors = $errors;
-    }
-
-    public function getStrictQueryParameterValidation(): ?bool
-    {
-        return $this->strictQueryParameterValidation;
-    }
-
-    public function withStrictQueryParameterValidation(bool $strictQueryParameterValidation): self
-    {
-        $self = clone $this;
-        $self->strictQueryParameterValidation = $strictQueryParameterValidation;
 
         return $self;
     }
