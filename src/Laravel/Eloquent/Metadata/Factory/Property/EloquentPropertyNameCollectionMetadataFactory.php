@@ -73,7 +73,7 @@ final class EloquentPropertyNameCollectionMetadataFactory implements PropertyNam
         }
 
         return new PropertyNameCollection(
-            array_keys($properties) // @phpstan-ignore-line
+            array_keys($properties)
         );
     }
 }

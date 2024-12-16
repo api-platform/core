@@ -121,8 +121,6 @@ abstract class Parameter
 
     /**
      * The computed value of this parameter, located into extraProperties['_api_values'].
-     *
-     * @readonly
      */
     public function getValue(mixed $default = new ParameterNotFound()): mixed
     {
