@@ -26,19 +26,47 @@ trait LinksHandlerLocatorTrait
 
     private function getLinksHandler(Operation $operation): ?callable
     {
-        if (!($options = $operation->getStateOptions()) || !$options instanceof Options) {
+	    if (!($options = $operation->getStateOptions()) || !$options instanceof Options) {
             return null;
         }
 
         $handleLinks = $options->getHandleLinks();
         if (\is_callable($handleLinks)) {
-            return $handleLinks;
+		    return $handleLinks;
+        }
+
+        if (\is_array($handleLinks) && \count($handleLinks) === 2 && \class_exists($handleLinks[0])) {
+            [$className, $methodName] = $handleLinks;
+
+            if (\method_exists($className, $methodName)) {
+                return $handleLinks;
+            }
+
+            $suggestedMethod = $this->findSimilarMethod($className, $methodName);
+
+            throw new RuntimeException(\sprintf(
+                'Method "%s" does not exist in class "%s".%s',
+                $methodName,
+                $className,
+                $suggestedMethod ? \sprintf(' Did you mean "%s"?', $suggestedMethod) : ''
+            ));
         }
 
         if ($this->handleLinksLocator && \is_string($handleLinks) && $this->handleLinksLocator->has($handleLinks)) {
-            return [$this->handleLinksLocator->get($handleLinks), 'handleLinks'];
+    		return [$this->handleLinksLocator->get($handleLinks), 'handleLinks'];
         }
 
         throw new RuntimeException(\sprintf('Could not find handleLinks service "%s"', $handleLinks));
     }
+	
+	private function findSimilarMethod(string $className, string $methodName): ?string
+	{
+		$methods = \get_class_methods($className);
+
+		$similarMethods = \array_filter($methods, function ($method) use ($methodName) {
+			return \levenshtein($methodName, $method) <= 3;
+		});
+
+		return $similarMethods ? reset($similarMethods) : null;
+	}
 }
