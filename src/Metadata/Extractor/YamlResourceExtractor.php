@@ -338,6 +338,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                 'write' => $this->phpize($operation, 'write', 'bool'),
                 'serialize' => $this->phpize($operation, 'serialize', 'bool'),
                 'queryParameterValidate' => $this->phpize($operation, 'queryParameterValidate', 'bool'),
+                'strictQueryParameterValidation' => $this->phpize($operation, 'strictQueryParameterValidation', 'bool'),
                 'priority' => $this->phpize($operation, 'priority', 'integer'),
                 'name' => $this->phpize($operation, 'name', 'string'),
                 'class' => (string) $class,

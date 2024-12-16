@@ -96,6 +96,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
             'securityPostValidation' => 'is_granted(\'ROLE_OWNER\')',
             'securityPostValidationMessage' => 'Sorry, you must the owner of this resource to access it.',
             'queryParameterValidationEnabled' => true,
+            'strictQueryParameterValidation' => false,
             'types' => ['someirischema', 'anotheririschema'],
             'formats' => [
                 'json' => null,
@@ -399,6 +400,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                         'Symfony\Component\Serializer\Exception\ExceptionInterface' => 404,
                     ],
                     'queryParameterValidationEnabled' => false,
+                    'strictQueryParameterValidation' => false,
                     'read' => true,
                     'deserialize' => false,
                     'validate' => false,
@@ -486,6 +488,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         'condition',
         'controller',
         'queryParameterValidationEnabled',
+        'strictQueryParameterValidation',
         'exceptionToStatus',
         'types',
         'formats',

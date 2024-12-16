@@ -515,6 +515,7 @@
 
     <xsd:attributeGroup name="extendedBase">
         <xsd:attributeGroup ref="base"/>
+        <xsd:attribute type="xsd:boolean" name="strictQueryParameterValidation"/>
         <xsd:attribute type="xsd:boolean" name="queryParameterValidationEnabled"/>
         <xsd:attribute type="xsd:string" name="routePrefix"/>
         <xsd:attribute type="xsd:boolean" name="stateless"/>
