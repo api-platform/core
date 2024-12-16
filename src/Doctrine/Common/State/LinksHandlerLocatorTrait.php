@@ -54,14 +54,14 @@ trait LinksHandlerLocatorTrait
         throw new RuntimeException(\sprintf('Could not find handleLinks service "%s"', $handleLinks));
     }
 	
-	private function findSimilarMethod(string $className, string $methodName): ?string
-	{
-		$methods = get_class_methods($className);
+    private function findSimilarMethod(string $className, string $methodName): ?string
+    {
+        $methods = get_class_methods($className);;
 
-		$similarMethods = array_filter($methods, function ($method) use ($methodName) {
-			return levenshtein($methodName, $method) <= 3;
-		});
+        $similarMethods = array_filter($methods, function ($method) use ($methodName) {
+	            return levenshtein($methodName, $method) <= 3;
+        });
 
         return $similarMethods ? reset($similarMethods) : null;
-	}
+    }
 }
