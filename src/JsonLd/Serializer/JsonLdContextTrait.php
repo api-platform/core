@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonLd\Serializer;
 
 use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
+use ApiPlatform\JsonLd\ContextBuilder;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
 
 /**
@@ -49,13 +50,19 @@ trait JsonLdContextTrait
 
     private function createJsonLdContext(AnonymousContextBuilderInterface $contextBuilder, $object, array &$context): array
     {
+        $anonymousContext = ($context['output'] ?? []) + ['api_resource' => $context['api_resource'] ?? null];
+
+        if (isset($context[ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX])) {
+            $anonymousContext[ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX] = $context[ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX];
+        }
+
         // We're in a collection, don't add the @context part
         if (isset($context['jsonld_has_context'])) {
-            return $contextBuilder->getAnonymousResourceContext($object, ($context['output'] ?? []) + ['api_resource' => $context['api_resource'] ?? null, 'has_context' => true]);
+            return $contextBuilder->getAnonymousResourceContext($object, ['has_context' => true] + $anonymousContext);
         }
 
         $context['jsonld_has_context'] = true;
 
-        return $contextBuilder->getAnonymousResourceContext($object, ($context['output'] ?? []) + ['api_resource' => $context['api_resource'] ?? null]);
+        return $contextBuilder->getAnonymousResourceContext($object, $anonymousContext);
     }
 }
