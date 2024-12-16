@@ -53,7 +53,7 @@ trait LinksHandlerLocatorTrait
 
         throw new RuntimeException(\sprintf('Could not find handleLinks service "%s"', $handleLinks));
     }
-	
+
     private function findSimilarMethod(string $className, string $methodName): ?string
     {
         $methods = get_class_methods($className);
