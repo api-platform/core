@@ -44,7 +44,7 @@ trait LinksHandlerLocatorTrait
 
             $suggestedMethod = $this->findSimilarMethod($className, $methodName);
 
-            throw new RuntimeException(\sprintf('Method "%s" does not exist in class "%s".%s', $methodName, $className, $suggestedMethod ? \sprintf(' Did you mean "%s"?', $suggestedMethod) : ''))
+            throw new RuntimeException(\sprintf('Method "%s" does not exist in class "%s".%s', $methodName, $className, $suggestedMethod ? \sprintf(' Did you mean "%s"?', $suggestedMethod) : ''));
         }
 
         if ($this->handleLinksLocator && \is_string($handleLinks) && $this->handleLinksLocator->has($handleLinks)) {
