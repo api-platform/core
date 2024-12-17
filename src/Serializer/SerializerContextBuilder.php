@@ -82,9 +82,9 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             }
         }
 
-        if (null === $context['output'] && ($options = $operation?->getStateOptions()) && class_exists(Options::class) && $options instanceof Options && $options->getEntityClass()) {
-            $context['force_resource_class'] = $operation->getClass();
-        }
+        // if (null === $context['output'] && ($options = $operation?->getStateOptions()) && class_exists(Options::class) && $options instanceof Options && $options->getEntityClass()) {
+        //     $context['force_resource_class'] = $operation->getClass();
+        // }
 
         if ($this->debug && isset($context['groups']) && $operation instanceof ErrorOperation) {
             if (!\is_array($context['groups'])) {
