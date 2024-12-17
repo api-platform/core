@@ -16,6 +16,8 @@ namespace ApiPlatform\GraphQl\Tests;
 use ApiPlatform\GraphQl\Executor;
 use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\DisableIntrospection;
+use GraphQL\Validator\Rules\QueryComplexity;
+use GraphQL\Validator\Rules\QueryDepth;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -37,5 +39,21 @@ class ExecutorTest extends TestCase
 
         $expected = new DisableIntrospection(DisableIntrospection::ENABLED);
         $this->assertEquals($expected, DocumentValidator::getRule(DisableIntrospection::class));
+    }
+
+    public function testChangeValueOfMaxQueryDepth(): void
+    {
+        $executor = new Executor(true, 20);
+
+        $expected = new QueryComplexity(20);
+        $this->assertEquals($expected, DocumentValidator::getRule(QueryComplexity::class));
+    }
+
+    public function testChangeValueOfMaxQueryComplexity(): void
+    {
+        $executor = new Executor(true, maxQueryDepth: 20);
+
+        $expected = new QueryDepth(20);
+        $this->assertEquals($expected, DocumentValidator::getRule(QueryDepth::class));
     }
 }
