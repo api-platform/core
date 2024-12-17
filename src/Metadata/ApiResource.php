@@ -321,6 +321,10 @@ class ApiResource extends Metadata
         protected ?array $denormalizationContext = null,
         protected ?bool $collectDenormalizationErrors = null,
         protected ?array $hydraContext = null,
+        /**
+         * Allows to hide an Operation from the hydra documentation.
+         */
+        protected ?bool $showHydraOperation = null,
         protected bool|OpenApiOperation|null $openapi = null,
         /**
          * The `validationContext` option configures the context of validation for the current ApiResource.
