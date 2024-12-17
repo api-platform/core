@@ -101,7 +101,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                 '@id' => \sprintf('#Entrypoint/%s', lcfirst($shortName)),
                 '@type' => $hydraPrefix.'Link',
                 'domain' => '#Entrypoint',
-                'rdfs:label' => "The collection of $shortName resources",
+                'rdfs:label' => "get{$shortName}Collection",
                 'rdfs:range' => [
                     ['@id' => $hydraPrefix.'Collection'],
                     [
@@ -315,8 +315,9 @@ final class DocumentationNormalizer implements NormalizerInterface
 
         $hydraOperation[$hydraPrefix.'method'] ?? $hydraOperation[$hydraPrefix.'method'] = $method;
 
-        if (!isset($hydraOperation['rdfs:label']) && isset($hydraOperation[$hydraPrefix.'title'])) {
-            $hydraOperation['rdfs:label'] = $hydraOperation[$hydraPrefix.'title'];
+        if (!isset($hydraOperation['rdfs:label'])) {
+            // we know that this name is unique
+            $hydraOperation['rdfs:label'] = $operation->getName();
         }
 
         ksort($hydraOperation);
@@ -431,7 +432,8 @@ final class DocumentationNormalizer implements NormalizerInterface
             $hydraPrefix.'supportedOperation' => [
                 '@type' => $hydraPrefix.'Operation',
                 $hydraPrefix.'method' => 'GET',
-                'rdfs:label' => 'The API entrypoint.',
+                'title' => 'The API entrypoint.',
+                'rdfs:label' => 'getEntrypoint',
                 'returns' => 'EntryPoint',
             ],
         ];
