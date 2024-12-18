@@ -66,9 +66,6 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
         $resultsAggregationBuilder = $repository->createAggregationBuilder()->skip($offset);
         if ($limit > 0) {
             $resultsAggregationBuilder->limit($limit);
-        } else {
-            // Results have to be 0 but MongoDB does not support a limit equal to 0.
-            $resultsAggregationBuilder->match()->field(Paginator::LIMIT_ZERO_MARKER_FIELD)->equals(Paginator::LIMIT_ZERO_MARKER);
         }
 
         $aggregationBuilder
@@ -79,7 +76,13 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
             ->field('count')->pipeline(
                 $repository->createAggregationBuilder()
                     ->count('count')
-            );
+            )
+            // Store pagination metadata, read by the Paginator
+            // Using __ to avoid field names mapping
+            ->addFields()
+                ->field('__firstResult__')->literal($offset)
+                ->field('__maxResults__')->literal($limit)
+        ;
     }
 
     /**
@@ -109,7 +112,7 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
         $attribute = $operation?->getExtraProperties()['doctrine_mongodb'] ?? [];
         $executeOptions = $attribute['execute_options'] ?? [];
 
-        return new Paginator($aggregationBuilder->execute($executeOptions), $manager->getUnitOfWork(), $resourceClass, $aggregationBuilder->getPipeline());
+        return new Paginator($aggregationBuilder->execute($executeOptions), $manager->getUnitOfWork(), $resourceClass);
     }
 
     private function addCountToContext(Builder $aggregationBuilder, array $context): array

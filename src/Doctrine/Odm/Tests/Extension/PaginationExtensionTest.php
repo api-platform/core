@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Odm\Tests\Extension;
 
 use ApiPlatform\Doctrine\Odm\Extension\PaginationExtension;
-use ApiPlatform\Doctrine\Odm\Paginator;
 use ApiPlatform\Doctrine\Odm\Tests\DoctrineMongoDbOdmSetup;
 use ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document\Dummy;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
@@ -23,9 +22,9 @@ use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
+use Doctrine\ODM\MongoDB\Aggregation\Stage\AddFields;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Count;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Facet;
-use Doctrine\ODM\MongoDB\Aggregation\Stage\MatchStage as AggregationMatch;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Skip;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Iterator\Iterator;
@@ -49,6 +48,9 @@ class PaginationExtensionTest extends TestCase
      */
     protected function setUp(): void
     {
+        // This class is final, but we need to mock it
+        require_once __DIR__.'/../stubs/AddFields.php';
+
         $this->managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
     }
 
@@ -322,11 +324,14 @@ class PaginationExtensionTest extends TestCase
         $iteratorProphecy = $this->prophesize(Iterator::class);
         $iteratorProphecy->toArray()->willReturn([
             [
+                'results' => [],
                 'count' => [
                     [
                         'count' => 9,
                     ],
                 ],
+                '__firstResult__' => 3,
+                '__maxResults__' => 6,
             ],
         ]);
 
@@ -342,6 +347,12 @@ class PaginationExtensionTest extends TestCase
                     'count' => [
                         ['$count' => 'count'],
                     ],
+                ],
+            ],
+            [
+                '$addFields' => [
+                    '__firstResult__' => ['$literal' => 3],
+                    '__maxResults__' => ['$literal' => 6],
                 ],
             ],
         ]);
@@ -370,11 +381,14 @@ class PaginationExtensionTest extends TestCase
         $iteratorProphecy = $this->prophesize(Iterator::class);
         $iteratorProphecy->toArray()->willReturn([
             [
+                'results' => [],
                 'count' => [
                     [
                         'count' => 9,
                     ],
                 ],
+                '__firstResult__' => 3,
+                '__maxResults__' => 6,
             ],
         ]);
 
@@ -390,6 +404,13 @@ class PaginationExtensionTest extends TestCase
                     'count' => [
                         ['$count' => 'count'],
                     ],
+                ],
+            ],
+            [
+
+                '$addFields' => [
+                    '__firstResult__' => ['$literal' => 3],
+                    '__maxResults__' => ['$literal' => 6],
                 ],
             ],
         ]);
@@ -410,15 +431,16 @@ class PaginationExtensionTest extends TestCase
         $skipProphecy = $this->prophesize(Skip::class);
         if ($expectedLimit > 0) {
             $skipProphecy->limit($expectedLimit)->shouldBeCalled();
-        } else {
-            $matchProphecy = $this->prophesize(AggregationMatch::class);
-            $matchProphecy->field(Paginator::LIMIT_ZERO_MARKER_FIELD)->shouldBeCalled()->willReturn($matchProphecy->reveal());
-            $matchProphecy->equals(Paginator::LIMIT_ZERO_MARKER)->shouldBeCalled()->willReturn($matchProphecy->reveal());
-            $skipProphecy->match()->shouldBeCalled()->willReturn($matchProphecy->reveal());
         }
 
         $resultsAggregationBuilderProphecy = $this->prophesize(Builder::class);
         $resultsAggregationBuilderProphecy->skip($expectedOffset)->shouldBeCalled()->willReturn($skipProphecy->reveal());
+
+        $addFieldsProphecy = $this->prophesize(AddFields::class);
+        $addFieldsProphecy->field('__firstResult__')->shouldBeCalled()->willReturn($addFieldsProphecy->reveal());
+        $addFieldsProphecy->literal($expectedOffset)->shouldBeCalled()->willReturn($addFieldsProphecy->reveal());
+        $addFieldsProphecy->field('__maxResults__')->shouldBeCalled()->willReturn($addFieldsProphecy->reveal());
+        $addFieldsProphecy->literal($expectedLimit)->shouldBeCalled()->willReturn($addFieldsProphecy->reveal());
 
         $countProphecy = $this->prophesize(Count::class);
 
@@ -441,6 +463,7 @@ class PaginationExtensionTest extends TestCase
         $facetProphecy->pipeline($countProphecy)->shouldBeCalled()->willReturn($facetProphecy);
         $facetProphecy->field('count')->shouldBeCalled()->willReturn($facetProphecy);
         $facetProphecy->field('results')->shouldBeCalled()->willReturn($facetProphecy);
+        $facetProphecy->addFields()->shouldBeCalled()->willReturn($addFieldsProphecy->reveal());
 
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
         $aggregationBuilderProphecy->facet()->shouldBeCalled()->willReturn($facetProphecy->reveal());
