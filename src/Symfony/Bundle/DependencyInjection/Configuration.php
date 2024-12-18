@@ -154,7 +154,6 @@ final class Configuration implements ConfigurationInterface
         $this->addDoctrineOrmSection($rootNode);
         $this->addDoctrineMongoDbOdmSection($rootNode);
         $this->addOAuthSection($rootNode);
-        $this->addOAuthSection($rootNode);
         $this->addGraphQlSection($rootNode);
         $this->addSwaggerSection($rootNode);
         $this->addHttpCacheSection($rootNode);
