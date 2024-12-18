@@ -45,6 +45,7 @@ window.onload = function() {
         spec: data.spec,
         dom_id: '#swagger-ui',
         validatorUrl: null,
+        persistAuthorization: data.persistAuthorization,
         deepLinking: true,
         oauth2RedirectUrl: data.oauth.redirectUrl,
         presets: [
