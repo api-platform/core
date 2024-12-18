@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
-use ApiPlatform\Elasticsearch\State\Options;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Post;
@@ -106,7 +105,9 @@ final class Configuration implements ConfigurationInterface
                 ->end()
                 ->booleanNode('handle_symfony_errors')->defaultFalse()->info('Allows to handle symfony exceptions.')->end()
                 ->booleanNode('enable_swagger')->defaultTrue()->info('Enable the Swagger documentation and export.')->end()
-                ->booleanNode('enable_swagger_ui')->defaultValue(class_exists(TwigBundle::class))->info('Enable Swagger UI')->end()
+                ->booleanNode('enable_swagger_ui')->defaultValue(class_exists(TwigBundle::class))->info('Enable Swagger UI')
+                    ->booleanNode('persistAuthorization')->defaultValue(false)->info('Enable Swagger UI Persist Authorization')->end()
+                ->end()
                 ->booleanNode('enable_re_doc')->defaultValue(class_exists(TwigBundle::class))->info('Enable ReDoc')->end()
                 ->booleanNode('enable_entrypoint')->defaultTrue()->info('Enable the entrypoint')->end()
                 ->booleanNode('enable_docs')->defaultTrue()->info('Enable the docs')->end()
@@ -152,6 +153,7 @@ final class Configuration implements ConfigurationInterface
 
         $this->addDoctrineOrmSection($rootNode);
         $this->addDoctrineMongoDbOdmSection($rootNode);
+        $this->addOAuthSection($rootNode);
         $this->addOAuthSection($rootNode);
         $this->addGraphQlSection($rootNode);
         $this->addSwaggerSection($rootNode);
