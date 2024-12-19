@@ -35,8 +35,6 @@ use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\PropertyInfo\Type;
 
-use const ApiPlatform\JsonLd\HYDRA_CONTEXT;
-
 /**
  * @author Markus Mächler <markus.maechler@bithost.ch>
  */
@@ -293,12 +291,9 @@ class ContextBuilderTest extends TestCase
         $contextBuilder = new ContextBuilder($this->resourceNameCollectionFactoryProphecy->reveal(), $this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->propertyNameCollectionFactoryProphecy->reveal(), $this->propertyMetadataFactoryProphecy->reveal(), $this->urlGeneratorProphecy->reveal(), null, null, [ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX => false]);
 
         $expected = [
-            HYDRA_CONTEXT,
-            [
-                '@vocab' => '#',
-                'hydra' => 'http://www.w3.org/ns/hydra/core#',
-                'dummyPropertyA' => 'DummyEntity/dummyPropertyA',
-            ],
+            '@vocab' => '#',
+            'hydra' => 'http://www.w3.org/ns/hydra/core#',
+            'dummyPropertyA' => 'DummyEntity/dummyPropertyA',
         ];
 
         $this->assertEquals($expected, $contextBuilder->getResourceContext($this->entityClass));

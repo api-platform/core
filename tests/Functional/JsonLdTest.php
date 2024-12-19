@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6810\JsonLdContextOutput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6465\Bar;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6465\Foo;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
@@ -29,7 +30,7 @@ class JsonLdTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [Foo::class, Bar::class];
+        return [Foo::class, Bar::class, JsonLdContextOutput::class];
     }
 
     /**
@@ -50,6 +51,20 @@ class JsonLdTest extends ApiTestCase
         $this->assertEquals('Bar two', $res['title']);
     }
 
+    public function testContextWithOutput(): void
+    {
+        $response = self::createClient()->request(
+            'GET',
+            '/json_ld_context_output',
+        );
+        $res = $response->toArray();
+        $this->assertEquals($res['@context'], [
+            '@vocab' => 'http://localhost/docs.jsonld#',
+            'hydra' => 'http://www.w3.org/ns/hydra/core#',
+            'foo' => 'Output/foo',
+        ]);
+    }
+
     protected function setUp(): void
     {
         self::bootKernel();
@@ -66,8 +81,12 @@ class JsonLdTest extends ApiTestCase
             $classes[] = $manager->getClassMetadata($entityClass);
         }
 
-        $schemaTool = new SchemaTool($manager);
-        @$schemaTool->createSchema($classes);
+        try {
+            $schemaTool = new SchemaTool($manager);
+            @$schemaTool->createSchema($classes);
+        } catch (\Exception $e) {
+            return;
+        }
 
         $foo = new Foo();
         $foo->title = 'Foo';
