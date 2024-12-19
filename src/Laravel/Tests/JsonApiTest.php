@@ -17,6 +17,7 @@ use ApiPlatform\Laravel\Test\ApiTestAssertionsTrait;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
 use Workbench\App\Models\Author;
@@ -40,6 +41,8 @@ class JsonApiTest extends TestCase
             $config->set('api-platform.formats', ['jsonapi' => ['application/vnd.api+json']]);
             $config->set('api-platform.docs_formats', ['jsonapi' => ['application/vnd.api+json']]);
             $config->set('api-platform.resources', [app_path('Models'), app_path('ApiResource')]);
+            $config->set('api-platform.pagination.items_per_page_parameter_name', 'limit');
+
             $config->set('app.debug', true);
         });
     }
@@ -284,5 +287,38 @@ class JsonApiTest extends TestCase
             'status' => 404,
             'detail' => 'Not Found',
         ], $response->json()['errors'][0]);
+    }
+
+    public function testSortParameter(): void
+    {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
+        DB::enableQueryLog();
+        $this->get('/api/books?sort=isbn,-name', headers: ['accept' => 'application/vnd.api+json']);
+        ['query' => $q] = DB::getQueryLog()[1];
+        $this->assertStringContainsString('order by "isbn" asc, "name" desc', $q);
+    }
+
+    public function testPageParameter(): void
+    {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
+        DB::enableQueryLog();
+        $this->get('/api/books?page[limit]=1&page[offset]=2', headers: ['accept' => 'application/vnd.api+json']);
+        ['query' => $q] = DB::getQueryLog()[1];
+        $this->assertStringContainsString('select * from "books" limit 1 offset 1', $q);
+    }
+
+    public function testSparseFieldset(): void
+    {
+        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
+        $r = $this->get('/api/books?fields[book]=name,isbn&fields[author]=name&include=author', headers: ['accept' => 'application/vnd.api+json']);
+        $res = $r->json();
+        $attributes = $res['data'][0]['attributes'];
+        $this->assertArrayHasKey('name', $attributes);
+        $this->assertArrayHasKey('isbn', $attributes);
+        $this->assertArrayNotHasKey('isAvailable', $attributes);
+
+        $included = $res['included'][0]['attributes'];
+        $this->assertArrayNotHasKey('createdAt', $included);
+        $this->assertArrayHasKey('name', $included);
     }
 }
