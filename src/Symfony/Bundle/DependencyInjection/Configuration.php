@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Bundle\DependencyInjection;
 
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
-use ApiPlatform\Elasticsearch\State\Options;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Post;
@@ -290,6 +289,7 @@ final class Configuration implements ConfigurationInterface
                 ->arrayNode('swagger')
                     ->addDefaultsIfNotSet()
                     ->children()
+                        ->booleanNode('persistAuthorization')->defaultValue(false)->info('Enable Swagger UI Persist Authorization')->end()
                         ->arrayNode('versions')
                             ->info('The active versions of OpenAPI to be exported or used in Swagger UI. The first value is the default.')
                             ->defaultValue($supportedVersions)

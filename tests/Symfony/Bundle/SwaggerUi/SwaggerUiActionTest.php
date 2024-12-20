@@ -100,6 +100,7 @@ class SwaggerUiActionTest extends TestCase
                 'swagger_data' => [
                     'url' => '/url',
                     'spec' => self::SPEC,
+                    'persistAuthorization' => false,
                     'oauth' => [
                         'enabled' => false,
                         'clientId' => '',
@@ -142,6 +143,7 @@ class SwaggerUiActionTest extends TestCase
                 'swagger_data' => [
                     'url' => '/url',
                     'spec' => self::SPEC,
+                    'persistAuthorization' => false,
                     'oauth' => [
                         'enabled' => false,
                         'clientId' => null,
@@ -201,6 +203,7 @@ class SwaggerUiActionTest extends TestCase
             'swagger_data' => [
                 'url' => '/url',
                 'spec' => self::SPEC,
+                'persistAuthorization' => true,
                 'oauth' => [
                     'enabled' => false,
                     'clientId' => '',
@@ -228,7 +231,7 @@ class SwaggerUiActionTest extends TestCase
             $urlGeneratorProphecy->reveal(),
             $normalizerProphecy->reveal(),
             $openApiFactoryProphecy->reveal(),
-            new Options('title', '', '1.0.0'),
+            new Options(title: 'title', description: '', version: '1.0.0', persistAuthorization: true),
             new SwaggerUiContext(),
             ['jsonld' => ['application/ld+json']]
         );
