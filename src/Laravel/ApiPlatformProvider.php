@@ -1294,7 +1294,7 @@ class ApiPlatformProvider extends ServiceProvider
             /** @var ConfigRepository */
             $config = $app['config'];
 
-            return new Executor($config->get('api-platform.graphql.introspection.enabled') ?? false);
+            return new Executor($config->get('api-platform.graphql.introspection.enabled') ?? false, $config->get('api-platform.graphql.max_query_complexity'), $config->get('api-platform.graphql.max_query_depth'));
         });
 
         $app->singleton(GraphiQlController::class, function (Application $app) {
