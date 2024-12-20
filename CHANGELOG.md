@@ -1,5 +1,17 @@
 # Changelog
 
+## v4.0.13
+
+### Bug fixes
+
+* [3a694624b](https://github.com/api-platform/core/commit/3a694624bdd6c82df756ff04682b5f90fd625f59) fix(laravel): eloquent BelongsToMany relation (#6862)
+* [c8db7aef0](https://github.com/api-platform/core/commit/c8db7aef05557675940c3e610c94c6a2184d90ba) fix(laravel): jsonapi query parameters (page, sort, fields and include) (#6876)
+* [f2c998158](https://github.com/api-platform/core/commit/f2c998158a70632a26efcdd29a17d7f3a2cb859c) fix(jsonld): anonymous context hydra_prefix value (#6873)
+
+Also contains [v3.4.10 changes](#v3410).
+
+### Features
+
 ## v4.0.12
 
 ### Bug fixes
