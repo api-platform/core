@@ -236,6 +236,12 @@ Notes:
 
 * [0d5f35683](https://github.com/api-platform/core/commit/0d5f356839eb6aa9f536044abe4affa736553e76) feat(laravel): laravel component (#5882)
 
+## v3.4.10
+
+### Bug fixes
+
+* [2ee5eb496](https://github.com/api-platform/core/commit/2ee5eb4967f507d04ae07280914bea3c712d8cad) fix(symfony): mercure exception formatting by calling array_keys() (#6879)
+
 ## v3.4.9
 
 ### Bug fixes
