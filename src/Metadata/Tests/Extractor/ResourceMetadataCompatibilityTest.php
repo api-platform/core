@@ -97,6 +97,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
             'securityPostValidationMessage' => 'Sorry, you must the owner of this resource to access it.',
             'queryParameterValidationEnabled' => true,
             'strictQueryParameterValidation' => false,
+            'hideHydraOperation' => false,
             'types' => ['someirischema', 'anotheririschema'],
             'formats' => [
                 'json' => null,
@@ -401,6 +402,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     ],
                     'queryParameterValidationEnabled' => false,
                     'strictQueryParameterValidation' => false,
+                    'hideHydraOperation' => false,
                     'read' => true,
                     'deserialize' => false,
                     'validate' => false,
@@ -489,6 +491,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         'controller',
         'queryParameterValidationEnabled',
         'strictQueryParameterValidation',
+        'hideHydraOperation',
         'exceptionToStatus',
         'types',
         'formats',

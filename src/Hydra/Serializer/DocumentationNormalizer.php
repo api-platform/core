@@ -75,6 +75,10 @@ final class DocumentationNormalizer implements NormalizerInterface
                 continue;
             }
 
+            if (true === $resourceMetadata->getHideHydraOperation()) {
+                continue;
+            }
+
             $shortName = $resourceMetadata->getShortName();
 
             $prefixedShortName = $resourceMetadata->getTypes()[0] ?? "#$shortName";
@@ -243,6 +247,10 @@ final class DocumentationNormalizer implements NormalizerInterface
         $hydraOperations = [];
         foreach ($resourceMetadataCollection as $resourceMetadata) {
             foreach ($resourceMetadata->getOperations() as $operation) {
+                if (true === $operation->getHideHydraOperation()) {
+                    continue;
+                }
+
                 if (('POST' === $operation->getMethod() || $operation instanceof CollectionOperationInterface) !== $collection) {
                     continue;
                 }
