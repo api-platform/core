@@ -22,7 +22,9 @@ use ApiPlatform\Metadata\JsonSchemaFilterInterface;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
+use ApiPlatform\Metadata\ParameterProviderFilterInterface;
 use ApiPlatform\Metadata\Parameters;
+use ApiPlatform\Metadata\PropertiesAwareInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -129,7 +131,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
 
             $key = $parameter->getKey() ?? $key;
 
-            if (str_contains($key, ':property')) {
+            if (str_contains($key, ':property') || (($f = $parameter->getFilter()) && is_a($f, PropertiesAwareInterface::class, true)) || $parameter instanceof PropertiesAwareInterface) {
                 $p = [];
                 foreach ($propertyNames as $prop) {
                     $p[$this->nameConverter?->denormalize($prop) ?? $prop] = $prop;
@@ -157,6 +159,10 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         }
 
         $filter = \is_object($filterId) ? $filterId : $this->filterLocator->get($filterId);
+
+        if ($filter instanceof ParameterProviderFilterInterface) {
+            $parameter = $parameter->withProvider($filter::getParameterProvider());
+        }
 
         if (!$filter) {
             return $parameter;

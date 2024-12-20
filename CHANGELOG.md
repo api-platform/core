@@ -1,11 +1,35 @@
 # Changelog
 
+## v4.0.13
+
+### Bug fixes
+
+* [3a694624b](https://github.com/api-platform/core/commit/3a694624bdd6c82df756ff04682b5f90fd625f59) fix(laravel): eloquent BelongsToMany relation (#6862)
+* [c8db7aef0](https://github.com/api-platform/core/commit/c8db7aef05557675940c3e610c94c6a2184d90ba) fix(laravel): jsonapi query parameters (page, sort, fields and include) (#6876)
+* [f2c998158](https://github.com/api-platform/core/commit/f2c998158a70632a26efcdd29a17d7f3a2cb859c) fix(jsonld): anonymous context hydra_prefix value (#6873)
+
+Also contains [v3.4.10 changes](#v3410).
+
+### Features
+
+## v4.0.12
+
+### Bug fixes
+
+* [4db72f55f](https://github.com/api-platform/core/commit/4db72f55fa9dcd48518dc62b5bf472895b6a966b) fix: filter may not use FilterInterface (#6858)
+* [c899a3da1](https://github.com/api-platform/core/commit/c899a3da14eb2dff49095d28855ef8f2a1c4072a) fix(laravel): use tagged resolvers as graphql resolvers
+ (#6855)
+* [e0f8c38b9](https://github.com/api-platform/core/commit/e0f8c38b98a05f29ad36b37725e54a036209a859) fix(laravel): graphql currentPage (#6857)
+
+Also contains [v3.4.9 changes](#v349).
+
+### Features
+
 ## v4.0.11
 
 ### Bug fixes
 
 * [af66075fd](https://github.com/api-platform/core/commit/af66075fdd6b83bdebc1c4ca33cc0ab7e1a7f8af) fix(laravel): fix foregin keys (relations) beeing in attributes (#6843)
-
 
 ### Features
 
@@ -223,6 +247,27 @@ Notes:
 ### Features
 
 * [0d5f35683](https://github.com/api-platform/core/commit/0d5f356839eb6aa9f536044abe4affa736553e76) feat(laravel): laravel component (#5882)
+
+## v3.4.10
+
+### Bug fixes
+
+* [2ee5eb496](https://github.com/api-platform/core/commit/2ee5eb4967f507d04ae07280914bea3c712d8cad) fix(symfony): mercure exception formatting by calling array_keys() (#6879)
+
+## v3.4.9
+
+### Bug fixes
+
+* [22cbd0147](https://github.com/api-platform/core/commit/22cbd0147ef6f817093533d62dc8279add67a647) fix(metadata): various parameter improvements (#6867)
+* [978975ef0](https://github.com/api-platform/core/commit/978975ef01d7b9d230291676527aa1140a7e552f) fix(jsonschema): hashmaps produces invalid openapi schema (#6830)
+* [a209dd440](https://github.com/api-platform/core/commit/a209dd440957176099247acf35b82611073352b1) fix: add missing error normalizer trait and remove deprecated interface (#6853)
+* [abbc031ee](https://github.com/api-platform/core/commit/abbc031eece83b54781502cd6373b47a09e109f4) fix: test empty parameter against null (#6852)
+
+### Notes
+
+- `Parameter::getValue()` now takes a default value as argument `getValue(mixed $default = new ParameterNotFound()): mixed`
+- `Parametes::get(string $key, string $parameterClass = QueryParameter::class)` (but also `has` and `remove`) now has a default value as second argument to `QueryParameter::class`
+- Constraint violation had the wrong message when using `property`, fixed by using the `key` instead
 
 ## v3.4.8
 

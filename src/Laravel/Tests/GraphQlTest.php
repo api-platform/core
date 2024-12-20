@@ -48,6 +48,35 @@ class GraphQlTest extends TestCase
         $this->assertArrayNotHasKey('errors', $data);
     }
 
+    public function testGetBooksWithSimplePagination(): void
+    {
+        BookFactory::new()->has(AuthorFactory::new())->count(9)->create();
+        $response = $this->postJson('/api/graphql', ['query' => '{
+  simplePaginationBooks(page: 1) {
+    collection {
+        id
+     },
+    paginationInfo {
+        itemsPerPage,
+        currentPage,
+        lastPage,
+        totalCount,
+        hasNextPage
+     }
+  }
+}'], ['accept' => ['application/json']]);
+        $response->assertStatus(200);
+        $data = $response->json();
+        $this->assertArrayHasKey('data', $data);
+        $this->assertCount(3, $data['data']['simplePaginationBooks']['collection']);
+        $this->assertEquals(3, $data['data']['simplePaginationBooks']['paginationInfo']['itemsPerPage']);
+        $this->assertEquals(1, $data['data']['simplePaginationBooks']['paginationInfo']['currentPage']);
+        $this->assertEquals(3, $data['data']['simplePaginationBooks']['paginationInfo']['lastPage']);
+        $this->assertEquals(9, $data['data']['simplePaginationBooks']['paginationInfo']['totalCount']);
+        $this->assertTrue($data['data']['simplePaginationBooks']['paginationInfo']['hasNextPage']);
+        $this->assertArrayNotHasKey('errors', $data);
+    }
+
     public function testGetBooksWithPaginationAndOrder(): void
     {
         BookFactory::new()->has(AuthorFactory::new())->count(10)->create();

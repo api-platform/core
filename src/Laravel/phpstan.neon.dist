@@ -2,6 +2,8 @@ includes:
     - vendor/larastan/larastan/extension.neon
 
 parameters:
+	parallel:
+		maximumNumberOfProcesses: 1
 	level: 7
 	paths:
 		- ApiResource
