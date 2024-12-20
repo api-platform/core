@@ -42,7 +42,7 @@ abstract class DoctrineOrmFilterTestCase extends KernelTestCase
         self::bootKernel();
 
         $this->managerRegistry = self::$kernel->getContainer()->get('doctrine');
-        $this->repository = $this->managerRegistry->getManagerForClass(Dummy::class)->getRepository(Dummy::class);
+        $this->repository = $this->managerRegistry->getManagerForClass($this->resourceClass)->getRepository($this->resourceClass);
     }
 
     /**
