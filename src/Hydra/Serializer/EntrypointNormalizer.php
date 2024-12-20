@@ -56,7 +56,7 @@ final class EntrypointNormalizer implements NormalizerInterface
 
                 foreach ($resource->getOperations() as $operation) {
                     $key = lcfirst($resource->getShortName());
-                    if (!$operation instanceof CollectionOperationInterface || isset($entrypoint[$key])) {
+                    if (true === $operation->getHideHydraOperation() || !$operation instanceof CollectionOperationInterface || isset($entrypoint[$key])) {
                         continue;
                     }
 

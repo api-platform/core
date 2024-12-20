@@ -99,6 +99,7 @@ final class Patch extends HttpOperation
         ?string $policy = null,
         array|string|null $middleware = null,
         ?bool $strictQueryParameterValidation = null,
+        ?bool $hideHydraOperation = null,
         array $extraProperties = [],
     ) {
         parent::__construct(
@@ -180,6 +181,7 @@ final class Patch extends HttpOperation
             policy: $policy,
             middleware: $middleware,
             strictQueryParameterValidation: $strictQueryParameterValidation,
+            hideHydraOperation: $hideHydraOperation,
             extraProperties: $extraProperties
         );
     }

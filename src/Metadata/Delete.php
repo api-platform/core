@@ -99,6 +99,7 @@ final class Delete extends HttpOperation implements DeleteOperationInterface
         ?string $policy = null,
         array|string|null $middleware = null,
         ?bool $strictQueryParameterValidation = null,
+        protected ?bool $hideHydraOperation = null,
         array $extraProperties = [],
     ) {
         parent::__construct(
@@ -180,6 +181,7 @@ final class Delete extends HttpOperation implements DeleteOperationInterface
             collectDenormalizationErrors: $collectDenormalizationErrors,
             parameters: $parameters,
             strictQueryParameterValidation: $strictQueryParameterValidation,
+            hideHydraOperation: $hideHydraOperation,
             stateOptions: $stateOptions,
         );
     }

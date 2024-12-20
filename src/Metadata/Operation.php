@@ -812,6 +812,7 @@ abstract class Operation extends Metadata
         array|string|null $middleware = null,
         ?bool $queryParameterValidationEnabled = null,
         protected ?bool $strictQueryParameterValidation = null,
+        protected ?bool $hideHydraOperation = null,
         protected array $extraProperties = [],
     ) {
         parent::__construct(
@@ -858,6 +859,7 @@ abstract class Operation extends Metadata
             middleware: $middleware,
             queryParameterValidationEnabled: $queryParameterValidationEnabled,
             strictQueryParameterValidation: $strictQueryParameterValidation,
+            hideHydraOperation: $hideHydraOperation,
             extraProperties: $extraProperties,
         );
     }

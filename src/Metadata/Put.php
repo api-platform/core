@@ -100,6 +100,7 @@ final class Put extends HttpOperation
         array|string|null $middleware = null,
         array $extraProperties = [],
         ?bool $strictQueryParameterValidation = null,
+        ?bool $hideHydraOperation = null,
         private ?bool $allowCreate = null,
     ) {
         parent::__construct(
@@ -181,6 +182,7 @@ final class Put extends HttpOperation
             policy: $policy,
             middleware: $middleware,
             strictQueryParameterValidation: $strictQueryParameterValidation,
+            hideHydraOperation: $hideHydraOperation,
             extraProperties: $extraProperties
         );
     }
