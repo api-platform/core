@@ -13,8 +13,10 @@ declare(strict_types=1);
 
 namespace Workbench\App\Models;
 
+use ApiPlatform\JsonApi\Filter\SparseFieldset;
 use ApiPlatform\Laravel\Eloquent\Filter\DateFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\EqualsFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\JsonApi\SortFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\OrderFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\OrFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\PartialSearchFilter;
@@ -40,6 +42,7 @@ use Workbench\App\Http\Requests\BookFormRequest;
 #[ApiResource(
     paginationEnabled: true,
     paginationItemsPerPage: 5,
+    paginationClientItemsPerPage: true,
     rules: BookFormRequest::class,
     operations: [
         new Put(),
@@ -76,6 +79,8 @@ use Workbench\App\Http\Requests\BookFormRequest;
     property: 'name'
 )]
 #[QueryParameter(key: 'properties', filter: PropertyFilter::class)]
+#[QueryParameter(key: 'fields', filter: SparseFieldset::class)]
+#[QueryParameter(key: 'sort', filter: SortFilter::class)]
 class Book extends Model
 {
     use HasFactory;
