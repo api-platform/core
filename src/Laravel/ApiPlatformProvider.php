@@ -429,6 +429,7 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->bind(OperationMetadataFactoryInterface::class, OperationMetadataFactory::class);
 
         $this->app->tag([
+            BooleanFilter::class,
             EqualsFilter::class,
             PartialSearchFilter::class,
             DateFilter::class,
