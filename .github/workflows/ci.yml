@@ -797,7 +797,7 @@ jobs:
       - name: Runs Elasticsearch
         uses: elastic/elastic-github-actions/elasticsearch@master
         with:
-          stack-version: '8.4.0'
+          stack-version: '7.17.0'
           security-enabled: false
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
