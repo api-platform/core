@@ -28,7 +28,7 @@ use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
 /**
  * The date filter allows to filter a collection by date intervals.
  *
- * Syntax: `?property[<after|before|strictly_after|strictly_before>]=value`.
+ * Syntax: `?property[<strictly_before|before|exactly|after|strictly_after>]=value`.
  *
  * The value can take any date format supported by the [`\DateTime` constructor](https://www.php.net/manual/en/datetime.construct.php).
  *
@@ -158,6 +158,16 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface, Js
             $aggregationBuilder->match()->field($matchField)->notEqual(null);
         }
 
+        if (isset($value[self::PARAMETER_STRICTLY_BEFORE])) {
+            $this->addMatch(
+                $aggregationBuilder,
+                $matchField,
+                self::PARAMETER_STRICTLY_BEFORE,
+                $value[self::PARAMETER_STRICTLY_BEFORE],
+                $nullManagement
+            );
+        }
+
         if (isset($value[self::PARAMETER_BEFORE])) {
             $this->addMatch(
                 $aggregationBuilder,
@@ -168,12 +178,12 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface, Js
             );
         }
 
-        if (isset($value[self::PARAMETER_STRICTLY_BEFORE])) {
+        if (isset($value[self::PARAMETER_EXACTLY])) {
             $this->addMatch(
                 $aggregationBuilder,
                 $matchField,
-                self::PARAMETER_STRICTLY_BEFORE,
-                $value[self::PARAMETER_STRICTLY_BEFORE],
+                self::PARAMETER_EXACTLY,
+                $value[self::PARAMETER_EXACTLY],
                 $nullManagement
             );
         }
@@ -222,8 +232,9 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface, Js
         }
 
         $operatorValue = [
-            self::PARAMETER_BEFORE => '$lte',
             self::PARAMETER_STRICTLY_BEFORE => '$lt',
+            self::PARAMETER_BEFORE => '$lte',
+            self::PARAMETER_EXACTLY => '$eq',
             self::PARAMETER_AFTER => '$gte',
             self::PARAMETER_STRICTLY_AFTER => '$gt',
         ];
@@ -257,10 +268,11 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface, Js
         $key = $parameter->getKey();
 
         return [
-            new OpenApiParameter(name: $key.'[after]', in: $in),
-            new OpenApiParameter(name: $key.'[before]', in: $in),
-            new OpenApiParameter(name: $key.'[strictly_after]', in: $in),
             new OpenApiParameter(name: $key.'[strictly_before]', in: $in),
+            new OpenApiParameter(name: $key.'[before]', in: $in),
+            new OpenApiParameter(name: $key.'[exactly]', in: $in),
+            new OpenApiParameter(name: $key.'[after]', in: $in),
+            new OpenApiParameter(name: $key.'[strictly_after]', in: $in),
         ];
     }
 }

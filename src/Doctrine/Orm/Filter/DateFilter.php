@@ -31,7 +31,7 @@ use Doctrine\ORM\QueryBuilder;
 /**
  * The date filter allows to filter a collection by date intervals.
  *
- * Syntax: `?property[<after|before|strictly_after|strictly_before>]=value`.
+ * Syntax: `?property[<strictly_before|before|exactly|after|strictly_after|>]=value`.
  *
  * The value can take any date format supported by the [`\DateTime` constructor](https://www.php.net/manual/en/datetime.construct.php).
  *
@@ -169,6 +169,19 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface, Js
             $queryBuilder->andWhere($queryBuilder->expr()->isNotNull(\sprintf('%s.%s', $alias, $field)));
         }
 
+        if (isset($value[self::PARAMETER_STRICTLY_BEFORE])) {
+            $this->addWhere(
+                $queryBuilder,
+                $queryNameGenerator,
+                $alias,
+                $field,
+                self::PARAMETER_STRICTLY_BEFORE,
+                $value[self::PARAMETER_STRICTLY_BEFORE],
+                $nullManagement,
+                $type
+            );
+        }
+
         if (isset($value[self::PARAMETER_BEFORE])) {
             $this->addWhere(
                 $queryBuilder,
@@ -182,14 +195,14 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface, Js
             );
         }
 
-        if (isset($value[self::PARAMETER_STRICTLY_BEFORE])) {
+        if (isset($value[self::PARAMETER_EXACTLY])) {
             $this->addWhere(
                 $queryBuilder,
                 $queryNameGenerator,
                 $alias,
                 $field,
-                self::PARAMETER_STRICTLY_BEFORE,
-                $value[self::PARAMETER_STRICTLY_BEFORE],
+                self::PARAMETER_EXACTLY,
+                $value[self::PARAMETER_EXACTLY],
                 $nullManagement,
                 $type
             );
@@ -247,8 +260,9 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface, Js
 
         $valueParameter = $queryNameGenerator->generateParameterName($field);
         $operatorValue = [
-            self::PARAMETER_BEFORE => '<=',
             self::PARAMETER_STRICTLY_BEFORE => '<',
+            self::PARAMETER_BEFORE => '<=',
+            self::PARAMETER_EXACTLY => '=',
             self::PARAMETER_AFTER => '>=',
             self::PARAMETER_STRICTLY_AFTER => '>',
         ];
@@ -289,10 +303,11 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface, Js
         $key = $parameter->getKey();
 
         return [
-            new OpenApiParameter(name: $key.'[after]', in: $in),
-            new OpenApiParameter(name: $key.'[before]', in: $in),
-            new OpenApiParameter(name: $key.'[strictly_after]', in: $in),
             new OpenApiParameter(name: $key.'[strictly_before]', in: $in),
+            new OpenApiParameter(name: $key.'[before]', in: $in),
+            new OpenApiParameter(name: $key.'[exactly]', in: $in),
+            new OpenApiParameter(name: $key.'[after]', in: $in),
+            new OpenApiParameter(name: $key.'[strictly_after]', in: $in),
         ];
     }
 }

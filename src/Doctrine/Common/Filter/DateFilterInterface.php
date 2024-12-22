@@ -24,6 +24,7 @@ interface DateFilterInterface
 {
     public const PARAMETER_BEFORE = 'before';
     public const PARAMETER_STRICTLY_BEFORE = 'strictly_before';
+    public const PARAMETER_EXACTLY = 'exactly';
     public const PARAMETER_AFTER = 'after';
     public const PARAMETER_STRICTLY_AFTER = 'strictly_after';
     public const EXCLUDE_NULL = 'exclude_null';

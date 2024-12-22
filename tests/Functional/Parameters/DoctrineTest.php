@@ -47,7 +47,7 @@ final class DoctrineTest extends ApiTestCase
         $this->assertEquals('bar', $a['hydra:member'][1]['foo']);
 
         $this->assertArraySubset(['hydra:search' => [
-            'hydra:template' => \sprintf('/%s{?foo,fooAlias,order[order[id]],order[order[foo]],searchPartial[foo],searchExact[foo],searchOnTextAndDate[foo],searchOnTextAndDate[createdAt][before],searchOnTextAndDate[createdAt][strictly_before],searchOnTextAndDate[createdAt][after],searchOnTextAndDate[createdAt][strictly_after],q,id,createdAt}', $route),
+            'hydra:template' => \sprintf('/%s{?foo,fooAlias,order[order[id]],order[order[foo]],searchPartial[foo],searchExact[foo],searchOnTextAndDate[foo],searchOnTextAndDate[createdAt][strictly_before],searchOnTextAndDate[createdAt][before],searchOnTextAndDate[createdAt][exactly],searchOnTextAndDate[createdAt][after],searchOnTextAndDate[createdAt][strictly_after],q,id,createdAt}', $route),
         ]], $a);
 
         $this->assertArraySubset(['@type' => 'IriTemplateMapping', 'variable' => 'fooAlias', 'property' => 'foo'], $a['hydra:search']['hydra:mapping'][1]);
@@ -71,6 +71,11 @@ final class DoctrineTest extends ApiTestCase
         $members = $response->toArray()['hydra:member'];
         $this->assertCount(1, $members);
         $this->assertArraySubset(['foo' => 'bar', 'createdAt' => '2024-01-21T00:00:00+00:00'], $members[0]);
+
+        $response = self::createClient()->request('GET', $route.'?searchOnTextAndDate[createdAt][exactly]=2024-01-22');
+        $members = $response->toArray()['hydra:member'];
+        $this->assertCount(1, $members);
+        $this->assertArraySubset(['foo' => 'bar', 'createdAt' => '2024-01-22T00:00:00+00:00'], $members[0]);
     }
 
     public function testGraphQl(): void
@@ -134,7 +139,7 @@ final class DoctrineTest extends ApiTestCase
         $manager->flush();
         $response = self::createClient()->request('GET', 'filter_with_state_options?date[before]='.$d->format('Y-m-d'));
         $a = $response->toArray();
-        $this->assertEquals('/filter_with_state_options{?date[before],date[strictly_before],date[after],date[strictly_after]}', $a['hydra:search']['hydra:template']);
+        $this->assertEquals('/filter_with_state_options{?date[strictly_before],date[before],date[exactly],date[after],date[strictly_after]}', $a['hydra:search']['hydra:template']);
         $this->assertCount(1, $a['hydra:member']);
         $this->assertEquals('current', $a['hydra:member'][0]['name']);
         $response = self::createClient()->request('GET', 'filter_with_state_options?date[strictly_after]='.$d->format('Y-m-d'));

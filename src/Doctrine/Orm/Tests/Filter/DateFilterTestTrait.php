@@ -24,12 +24,17 @@ trait DateFilterTestTrait
         $filter = $this->buildFilter();
 
         $this->assertEquals([
+            'dummyDate[strictly_before]' => [
+                'property' => 'dummyDate',
+                'type' => \DateTimeInterface::class,
+                'required' => false,
+            ],
             'dummyDate[before]' => [
                 'property' => 'dummyDate',
                 'type' => \DateTimeInterface::class,
                 'required' => false,
             ],
-            'dummyDate[strictly_before]' => [
+            'dummyDate[exactly]' => [
                 'property' => 'dummyDate',
                 'type' => \DateTimeInterface::class,
                 'required' => false,

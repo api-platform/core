@@ -44,8 +44,9 @@ trait DateFilterTrait
                 continue;
             }
 
-            $description += $this->getFilterDescription($property, self::PARAMETER_BEFORE);
             $description += $this->getFilterDescription($property, self::PARAMETER_STRICTLY_BEFORE);
+            $description += $this->getFilterDescription($property, self::PARAMETER_BEFORE);
+            $description += $this->getFilterDescription($property, self::PARAMETER_EXACTLY);
             $description += $this->getFilterDescription($property, self::PARAMETER_AFTER);
             $description += $this->getFilterDescription($property, self::PARAMETER_STRICTLY_AFTER);
         }
