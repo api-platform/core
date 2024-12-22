@@ -36,6 +36,7 @@ class ElasticsearchClientPassTest extends TestCase
 
     public function testProcess(): void
     {
+        // ES v7
         if (class_exists(\Elasticsearch\ClientBuilder::class)) {
             $clientBuilder = \Elasticsearch\ClientBuilder::class;
 
@@ -45,6 +46,7 @@ class ElasticsearchClientPassTest extends TestCase
                 Argument::withEntry('tracer', Argument::type(Reference::class)),
                 Argument::size(3),
             ];
+        // ES v8 and up
         } else {
             $clientBuilder = \Elastic\Elasticsearch\ClientBuilder::class;
 
@@ -75,7 +77,11 @@ class ElasticsearchClientPassTest extends TestCase
 
     public function testProcessWithoutConfiguration(): void
     {
-        $clientBuilder = class_exists(\Elasticsearch\ClientBuilder::class) ? \Elasticsearch\ClientBuilder::class : \Elastic\Elasticsearch\ClientBuilder::class;
+        $clientBuilder = class_exists(\Elasticsearch\ClientBuilder::class)
+            // ES v7
+            ? \Elasticsearch\ClientBuilder::class
+            // ES v8 and up
+            : \Elastic\Elasticsearch\ClientBuilder::class;
 
         $clientDefinitionProphecy = $this->prophesize(Definition::class);
         $clientDefinitionProphecy->setFactory([$clientBuilder, 'build'])->willReturn($clientDefinitionProphecy->reveal())->shouldBeCalled();
