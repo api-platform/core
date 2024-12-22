@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Behat;
 
 use Behat\Behat\Context\Context;
 use Elastic\Elasticsearch\Client;
+use Elasticsearch\Client as V7Client;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -24,7 +25,7 @@ use Symfony\Component\Finder\Finder;
  */
 final class ElasticsearchContext implements Context
 {
-    public function __construct(private readonly Client $client, private readonly string $elasticsearchMappingsPath, private readonly string $elasticsearchFixturesPath)
+    public function __construct(private readonly V7Client|Client $client, private readonly string $elasticsearchMappingsPath, private readonly string $elasticsearchFixturesPath)
     {
     }
 
