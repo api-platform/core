@@ -408,6 +408,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 }
             }
 
+            if (true === $overrideResponses && !isset($existingResponses[403]) && $operation->getSecurity()) {
+                $openapiOperation = $openapiOperation->withResponse(403, new Response('Forbidden'));
+            }
+
             if (true === $overrideResponses && !$operation instanceof CollectionOperationInterface && 'POST' !== $operation->getMethod()) {
                 if (!isset($existingResponses[404])) {
                     $openapiOperation = $openapiOperation->withResponse(404, new Response('Resource not found'));
