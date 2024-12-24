@@ -367,6 +367,13 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             $openapiOperation = $openapiOperation->withParameters($openapiParameters);
 
+            if ($security = $operation->getSecurity()) {
+                $openapiOperation = $openapiOperation->withResponse(403, new Response(\sprintf(
+                    'Access forbidden: You must meet the following condition(s) to access this resource: %s.',
+                    $security
+                )));
+            }
+
             $existingResponses = $openapiOperation?->getResponses() ?: [];
             $overrideResponses = $operation->getExtraProperties()[self::OVERRIDE_OPENAPI_RESPONSES] ?? $this->openApiOptions->getOverrideResponses();
             if ($operation instanceof HttpOperation && null !== ($errors = $operation->getErrors())) {
