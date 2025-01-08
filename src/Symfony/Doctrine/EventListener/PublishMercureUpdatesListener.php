@@ -50,6 +50,7 @@ final class PublishMercureUpdatesListener
         'topics' => true,
         'data' => true,
         'private' => true,
+        'private_fields' => true,
         'id' => true,
         'type' => true,
         'retry' => true,
@@ -293,11 +294,11 @@ final class PublishMercureUpdatesListener
      */
     private function getGraphQlSubscriptionUpdates(object $object, array $options, string $type): array
     {
-        if ('update' !== $type || !$this->graphQlSubscriptionManager || !$this->graphQlMercureSubscriptionIriGenerator) {
+        if (!$this->graphQlSubscriptionManager || !$this->graphQlMercureSubscriptionIriGenerator) {
             return [];
         }
 
-        $payloads = $this->graphQlSubscriptionManager->getPushPayloads($object);
+        $payloads = $this->graphQlSubscriptionManager->getPushPayloads($object, $type);
 
         $updates = [];
         foreach ($payloads as [$subscriptionId, $data]) {

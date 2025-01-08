@@ -23,7 +23,21 @@ final class SubscriptionIdentifierGenerator implements SubscriptionIdentifierGen
     public function generateSubscriptionIdentifier(array $fields): string
     {
         unset($fields['mercureUrl'], $fields['clientSubscriptionId']);
+        $fields = $this->removeTypename($fields);
 
         return hash('sha256', print_r($fields, true));
+    }
+
+    private function removeTypename(array $data): array
+    {
+        foreach ($data as $key => $value) {
+            if ($key === '__typename') {
+                unset($data[$key]);
+            } elseif (is_array($value)) {
+                $data[$key] = $this->removeTypename($value);
+            }
+        }
+
+        return $data;
     }
 }
