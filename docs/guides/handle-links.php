@@ -19,6 +19,8 @@ namespace App\Entity {
     use ApiPlatform\Metadata\Link;
     use Doctrine\ORM\Mapping as ORM;
     use Doctrine\ORM\QueryBuilder;
+    // Change the namespace depending on whether you're using Doctrine ORM, Doctrine ODM or Eloquent.
+    use ApiPlatform\Doctrine\Orm\State\LinksHandlerInterface;
 
     // To get around that, you can hook into the link management with an [ORM StateOption](/docs/reference/Doctrine/Orm/State/Options/)
     #[GetCollection(
@@ -29,7 +31,7 @@ namespace App\Entity {
     )]
     #[Get('/company/{companyId}/employees/{id}')]
     #[ORM\Entity]
-    class Employee
+    class Employee implements LinksHandlerInterface
     {
         #[ORM\Id, ORM\Column, ORM\GeneratedValue]
         public ?int $id;
