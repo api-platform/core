@@ -88,8 +88,8 @@ class Book extends Model
     use HasFactory;
     use HasUlids;
 
-    protected $visible = ['name', 'author', 'isbn', 'publication_date', 'published', 'is_available'];
-    protected $fillable = ['name', 'is_available'];
+    protected $visible = ['name', 'author', 'isbn', 'publication_date', 'is_available', 'published'];
+    protected $fillable = ['name', 'publication_date', 'isbn', 'is_available', 'published'];
     protected $casts = [
         'is_available' => 'boolean',
     ];
