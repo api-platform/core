@@ -44,7 +44,6 @@ final class QueryParameterValidateListener
         if ($queryParameterValidator instanceof ProviderInterface) {
             $this->provider = $queryParameterValidator;
         } else {
-            trigger_deprecation('api-platform/core', '3.3', 'Use a "%s" as first argument in "%s" instead of "%s".', ProviderInterface::class, self::class, ParameterValidator::class);
             $this->queryParameterValidator = $queryParameterValidator;
         }
 
