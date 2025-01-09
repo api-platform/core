@@ -145,3 +145,19 @@ services:
         parent: 'api_platform.doctrine.orm.order_filter'
         arguments: [ { id: 'ASC', foo: 'DESC' } ]
         tags:  [ 'api_platform.filter' ]
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\Issue6590\FooResourceProvider:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\Issue6590\FooResourceProvider'
+        tags:
+            - name: 'api_platform.state_provider'
+        arguments:
+            $itemProvider: '@ApiPlatform\Doctrine\Orm\State\ItemProvider'
+            $collectionProvider: '@ApiPlatform\Doctrine\Orm\State\CollectionProvider'
+
+    ApiPlatform\Tests\Fixtures\TestBundle\State\Issue6590\BarResourceProvider:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\Issue6590\BarResourceProvider'
+        tags:
+            - name: 'api_platform.state_provider'
+        arguments:
+            $itemProvider: '@ApiPlatform\Doctrine\Orm\State\ItemProvider'
+            $collectionProvider: '@ApiPlatform\Doctrine\Orm\State\CollectionProvider'

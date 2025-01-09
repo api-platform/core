@@ -160,6 +160,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5722\Event;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5722\ItemLog;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5735\Group;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6039\Issue6039EntityUser;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6590\Bar as Issue6590BarDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6590\Foo as Issue6590FooDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\LinkHandledDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiRelationsDummy;
@@ -2322,6 +2324,27 @@ final class DoctrineContext implements Context
         $entity->name = 'test2';
         $entity->bar = 'test';
         $this->manager->persist($entity);
+        $this->manager->flush();
+    }
+
+    /**
+     * @Given there is an issue6590 foo object with 2 bar sub objects
+     */
+    public function thereIsAIssue6590DtoFooObjectWith2BarSubObjects(): void
+    {
+        $foo = new Issue6590FooDummy();
+        $this->manager->persist($foo);
+
+        $bar1 = new Issue6590BarDummy();
+        $bar1->setName('bar1');
+        $bar1->setFoo($foo);
+        $this->manager->persist($bar1);
+
+        $bar2 = new Issue6590BarDummy();
+        $bar2->setName('bar2');
+        $bar2->setFoo($foo);
+        $this->manager->persist($bar2);
+
         $this->manager->flush();
     }
 
