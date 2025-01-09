@@ -129,7 +129,7 @@ final class RespondProcessor implements ProcessorInterface
                     $iri = $this->iriConverter->getIriFromResource($operation->getClass(), UrlGeneratorInterface::ABS_PATH, $operation);
                 }
 
-                if ($iri) {
+                if ($iri && 'GET' !== $method) {
                     $location = \sprintf('%s.%s', $iri, $request->getRequestFormat());
                     if (isset($requestParts['query'])) {
                         $location .= '?'.$requestParts['query'];
