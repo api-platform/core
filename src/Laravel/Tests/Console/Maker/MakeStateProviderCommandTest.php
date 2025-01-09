@@ -30,7 +30,7 @@ class MakeStateProviderCommandTest extends TestCase
     /** @var string */
     private const STATE_PROVIDER_CLASS_NAME = 'Choose a class name for your state provider (e.g. <fg=yellow>AwesomeStateProvider</>)';
 
-    private ?Filesystem $filesystem;
+    private Filesystem $filesystem;
     private PathResolver $pathResolver;
     private AppServiceFileGenerator $appServiceFileGenerator;
 
