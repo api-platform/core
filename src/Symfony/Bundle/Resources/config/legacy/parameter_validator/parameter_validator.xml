@@ -6,6 +6,7 @@
 
     <services>
         <service id="api_platform.validator.query_parameter_validator" class="ApiPlatform\ParameterValidator\ParameterValidator" public="false">
+            <deprecated package="api-platform/symfony" version="4.1">The "%service_id%" service is deprecated use "\ApiPlatform\Metadata\Parameter::$constraints" instead.</deprecated>
             <argument type="service" id="api_platform.filter_locator" />
         </service>
     </services>

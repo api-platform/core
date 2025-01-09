@@ -18,6 +18,8 @@ use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
 /**
  * Filter validation exception.
  *
+ * @deprecated use \ApiPlatform\Metadata\Parameter::$constraints instead
+ *
  * @author Julien DENIAU <julien.deniau@gmail.com>
  */
 final class ValidationException extends \Exception implements ValidationExceptionInterface, ProblemExceptionInterface
@@ -28,6 +30,8 @@ final class ValidationException extends \Exception implements ValidationExceptio
     public function __construct(private readonly array $constraintViolationList, string $message = '', int $code = 0, ?\Exception $previous = null)
     {
         parent::__construct($message ?: $this->__toString(), $code, $previous);
+
+        trigger_deprecation('api-platform/core', '3.4', 'The class "%s" is deprecated, use "\ApiPlatform\Metadata\Parameter::$constraints" instead.', __CLASS__);
     }
 
     public function getConstraintViolationList(): array
