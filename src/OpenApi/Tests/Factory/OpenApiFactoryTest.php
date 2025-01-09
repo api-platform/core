@@ -59,6 +59,7 @@ use ApiPlatform\OpenApi\Options;
 use ApiPlatform\OpenApi\Tests\Fixtures\Dummy;
 use ApiPlatform\OpenApi\Tests\Fixtures\DummyErrorResource;
 use ApiPlatform\OpenApi\Tests\Fixtures\DummyFilter;
+use ApiPlatform\OpenApi\Tests\Fixtures\Issue6872\Diamond;
 use ApiPlatform\OpenApi\Tests\Fixtures\OutputDto;
 use ApiPlatform\State\Pagination\PaginationOptions;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\WithParameter;
@@ -85,6 +86,7 @@ class OpenApiFactoryTest extends TestCase
         $baseOperation = (new HttpOperation())->withTypes(['http://schema.example.com/Dummy'])->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats'])->withClass(Dummy::class)->withOutput([
             'class' => OutputDto::class,
         ])->withPaginationClientItemsPerPage(true)->withShortName('Dummy')->withDescription('This is a dummy');
+
         $dummyResourceWebhook = (new ApiResource())->withOperations(new Operations([
             'dummy webhook' => (new Get())->withUriTemplate('/dummy/{id}')->withShortName('short')->withOpenapi(new Webhook('first webhook')),
             'an other dummy webhook' => (new Post())->withUriTemplate('/dummies')->withShortName('short something')->withOpenapi(new Webhook('happy webhook', new Model\PathItem(post: new Operation(
@@ -272,13 +274,23 @@ class OpenApiFactoryTest extends TestCase
             ]))->withOperation($baseOperation),
         ]));
 
+        $diamondResource = (new ApiResource())
+            ->withOperations(new Operations([
+                'getDiamondCollection' => (new GetCollection(uriTemplate: '/diamonds'))
+                    ->withSecurity("is_granted('ROLE_USER')")
+                    ->withOperation($baseOperation),
+                'putDiamond' => (new Put(uriTemplate: '/diamond/{id}'))
+                    ->withOperation($baseOperation),
+            ]));
+
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
-        $resourceNameCollectionFactoryProphecy->create()->shouldBeCalled()->willReturn(new ResourceNameCollection([Dummy::class, WithParameter::class]));
+        $resourceNameCollectionFactoryProphecy->create()->shouldBeCalled()->willReturn(new ResourceNameCollection([Dummy::class, WithParameter::class, Diamond::class]));
 
         $resourceCollectionMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceCollectionMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, [$dummyResource, $dummyResourceWebhook]));
         $resourceCollectionMetadataFactoryProphecy->create(DummyErrorResource::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(DummyErrorResource::class, [new ApiResource(operations: [new ErrorOperation(name: 'err', description: 'nice one!')])]));
         $resourceCollectionMetadataFactoryProphecy->create(WithParameter::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(WithParameter::class, [$parameterResource]));
+        $resourceCollectionMetadataFactoryProphecy->create(Diamond::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Diamond::class, [$diamondResource]));
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description', 'dummyDate', 'enum']));
@@ -1171,5 +1183,20 @@ class OpenApiFactoryTest extends TestCase
             ],
             deprecated: false
         ), $paths->getPath('/erroredDummies')->getGet());
+
+        $diamondsGetPath = $paths->getPath('/diamonds');
+        $diamondGetOperation = $diamondsGetPath->getGet();
+        $diamondGetResponses = $diamondGetOperation->getResponses();
+
+        $this->assertNotNull($diamondGetOperation);
+        $this->assertArrayHasKey('403', $diamondGetResponses);
+        $this->assertSame('Forbidden', $diamondGetResponses['403']->getDescription());
+
+        $diamondsPutPath = $paths->getPath('/diamond/{id}');
+        $diamondPutOperation = $diamondsPutPath->getPut();
+        $diamondPutResponses = $diamondPutOperation->getResponses();
+
+        $this->assertNotNull($diamondPutOperation);
+        $this->assertArrayNotHasKey('403', $diamondPutResponses);
     }
 }
