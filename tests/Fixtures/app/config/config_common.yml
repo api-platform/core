@@ -90,6 +90,8 @@ api_platform:
             - '%kernel.project_dir%/../TestBundle/Model'
     mercure:
         include_type: true
+    validator:
+        legacy_query_parameter_validation: false
 
 services:
     test.clienL:

@@ -99,6 +99,7 @@ final class Configuration implements ConfigurationInterface
                         ->variableNode('serialize_payload_fields')->defaultValue([])->info('Set to null to serialize all payload fields when a validation error is thrown, or set the fields you want to include explicitly.')->end()
                         ->booleanNode('query_parameter_validation')->defaultValue(true)->end()
                         ->booleanNode('legacy_validation_exception')->defaultValue(true)->info('Uses the legacy "%s" instead of "%s".', LegacyValidationException::class, ValidationException::class)->end()
+                        ->booleanNode('legacy_query_parameter_validation')->defaultValue(true)->info('Use the legacy query validation system.')->end()
                     ->end()
                 ->end()
                 ->arrayNode('eager_loading')

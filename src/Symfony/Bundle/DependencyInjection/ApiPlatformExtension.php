@@ -881,7 +881,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.validator.serialize_payload_fields', $config['validator']['serialize_payload_fields']);
         $container->setParameter('api_platform.validator.query_parameter_validation', $config['validator']['query_parameter_validation']);
 
-        if (class_exists(QueryParameterValidator::class)) {
+        if ($config['validator']['legacy_query_parameter_validation'] && class_exists(QueryParameterValidator::class)) {
             $loader->load('legacy/parameter_validator/parameter_validator.xml');
             $loader->load($config['use_symfony_listeners'] ? 'legacy/parameter_validator/events.xml' : 'legacy/parameter_validator/state.xml');
         }
