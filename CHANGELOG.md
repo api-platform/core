@@ -1,5 +1,14 @@
 # Changelog
 
+## v4.0.14
+
+### Bug fixes
+
+* [97cdb6b3f](https://github.com/api-platform/core/commit/97cdb6b3f43471789e096c9dc3a0c3c7b6d4e43c) fix(state): remove ProcessorInterface laravel specific type
+* [b12a0d005](https://github.com/api-platform/core/commit/b12a0d005fda58a162b82a3574e6ee877838a55b) fix(graphql): register types for parameter args (#6895)
+
+### Features
+
 ## v4.0.13
 
 ### Bug fixes
