@@ -535,8 +535,14 @@ XML_WRAP
             $childNode = $node->addChild('parameter');
             $childNode->addAttribute('in', 'query');
             $childNode->addAttribute('key', $key);
-            $childNode->addAttribute('required', $this->parse($value['required']));
-            $this->buildValues($childNode->addChild('schema'), $value['schema']);
+
+            if (\array_key_exists('required', $value)) {
+                $childNode->addAttribute('required', $this->parse($value['required']));
+            }
+
+            if (\array_key_exists('schema', $value)) {
+                $this->buildValues($childNode->addChild('schema'), $value['schema']);
+            }
         }
     }
 

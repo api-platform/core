@@ -17,6 +17,15 @@
 * [d0a442786](https://github.com/api-platform/core/commit/d0a44278630d201b91cbba0774a09f4eeaac88f7) feat(doctrine): enhance getLinksHandler with method validation and typo suggestions (#6874)
 * [f67f6f1ac](https://github.com/api-platform/core/commit/f67f6f1acb6476182c18a3503f2a8bc80ae89a0b)  feat(doctrine): doctrine filters like laravel eloquent filters  (#6775)
 
+## v4.0.14
+
+### Bug fixes
+
+* [97cdb6b3f](https://github.com/api-platform/core/commit/97cdb6b3f43471789e096c9dc3a0c3c7b6d4e43c) fix(state): remove ProcessorInterface laravel specific type
+* [b12a0d005](https://github.com/api-platform/core/commit/b12a0d005fda58a162b82a3574e6ee877838a55b) fix(graphql): register types for parameter args (#6895)
+
+### Features
+
 ## v4.0.13
 
 ### Bug fixes
@@ -264,6 +273,18 @@ Notes:
 ### Features
 
 * [0d5f35683](https://github.com/api-platform/core/commit/0d5f356839eb6aa9f536044abe4affa736553e76) feat(laravel): laravel component (#5882)
+
+## v3.4.14
+
+### Bug fixes
+
+* [0cf752bce](https://github.com/api-platform/core/commit/0cf752bcec692718b2503250e655d05aea670316) fix(metadata): make the schema attribute to fallback to null for parameters in YamlResourceExtractor (#6896)
+* [2b3c55db2](https://github.com/api-platform/core/commit/2b3c55db2a9ecc52f62c441fa8a5696233a30b87) fix(symfony): remove unsolvable deprecation (#6899) see also (#6655)
+* [9493b9b6e](https://github.com/api-platform/core/commit/9493b9b6ec0264ab5b700c861ad1b97455b4f88d) fix(symfony): revert json schema bc break (#6903)
+* [b82f9ac76](https://github.com/api-platform/core/commit/b82f9ac76ce89dd3910849c73da42317ee1339ed) fix(openapi): not forbidden response on openAPI doc (#6886)
+
+I mispublished a v3.4.13 on some repositories to fix them all I bumped 3.4.10 to 3.4.14
+More details at #6888.
 
 ## v3.4.10
 

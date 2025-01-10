@@ -34,7 +34,7 @@ final class Paginator implements PaginatorInterface, HasNextPagePaginatorInterfa
 
     public function count(): int
     {
-        return $this->paginator->count();
+        return $this->paginator->count(); // @phpstan-ignore-line
     }
 
     public function getLastPage(): float

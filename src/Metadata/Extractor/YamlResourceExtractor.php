@@ -472,7 +472,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             $parameters[$key] = new $cl(
                 key: $key,
                 required: $this->phpize($parameter, 'required', 'bool'),
-                schema: $parameter['schema'],
+                schema: $parameter['schema'] ?? null,
                 openApi: ($parameter['openapi'] ?? null) ? new Parameter(
                     name: $parameter['openapi']['name'],
                     in: $parameter['in'] ?? 'query',
