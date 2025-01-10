@@ -442,6 +442,9 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     'links' => [
                         ['rel' => 'http://www.w3.org/ns/json-ld#error', 'href' => 'http://www.w3.org/ns/hydra/error'],
                     ],
+                    'parameters' => [
+                        'date' => ['key' => 'date'],
+                    ],
                 ],
             ],
         ],
@@ -761,7 +764,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
 
         $parameters = [];
         foreach ($values as $k => $value) {
-            $parameters[$k] = new QueryParameter(key: $value['key'], required: $value['required'], schema: $value['schema']);
+            $parameters[$k] = new QueryParameter(key: $value['key'] ?? $k, required: $value['required'] ?? null, schema: $value['schema'] ?? null);
         }
 
         return $parameters;
