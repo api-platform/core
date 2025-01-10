@@ -42,6 +42,10 @@ class Vault extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'secret',
+    ];
+
     public static function provide(): self
     {
         $v = new self();

@@ -1,5 +1,31 @@
 # Changelog
 
+## v4.1.0-alpha.1
+
+### Bug fixes
+
+* [67fbe51c5](https://github.com/api-platform/core/commit/67fbe51c570abe1ece6651ae6a037662e9012881) fix: reintroduce the `show_webby` parameter in Laravel config (#6741)
+
+### Features
+
+* [00787f32d](https://github.com/api-platform/core/commit/00787f32da54418de7d869cff218e22d8ae2ae1d) feat(laravel): automatically register policies (#6623)
+* [12c42096b](https://github.com/api-platform/core/commit/12c42096bb0006d6ebae60ae5d90e9b356f9a335) feat(metadata): ability to hide an hydra class/operation (#6871)
+* [57f15cf4f](https://github.com/api-platform/core/commit/57f15cf4f38278315c5f31d3949416c9455ba0d0) feat(state): strict query parameters (#6399)
+* [bd0e92936](https://github.com/api-platform/core/commit/bd0e92936f82d3cd4563cd45ebf1f73fd1db9f01) feat(openapi): HTTP Authentication Support for Swagger UI (#6665)
+* [be98f4e01](https://github.com/api-platform/core/commit/be98f4e01a52d8341ef9b65ed2f4e3b46ab31165) feat(graphql): allow to configure max query depth and max query complexity (#6880)
+* [c78ed0b78](https://github.com/api-platform/core/commit/c78ed0b78baf5d2e1b7444a9882ba039c70a3887) feat(laravel): boolean filter (#6806)
+* [d0a442786](https://github.com/api-platform/core/commit/d0a44278630d201b91cbba0774a09f4eeaac88f7) feat(doctrine): enhance getLinksHandler with method validation and typo suggestions (#6874)
+* [f67f6f1ac](https://github.com/api-platform/core/commit/f67f6f1acb6476182c18a3503f2a8bc80ae89a0b)  feat(doctrine): doctrine filters like laravel eloquent filters  (#6775)
+
+## v4.0.14
+
+### Bug fixes
+
+* [97cdb6b3f](https://github.com/api-platform/core/commit/97cdb6b3f43471789e096c9dc3a0c3c7b6d4e43c) fix(state): remove ProcessorInterface laravel specific type
+* [b12a0d005](https://github.com/api-platform/core/commit/b12a0d005fda58a162b82a3574e6ee877838a55b) fix(graphql): register types for parameter args (#6895)
+
+### Features
+
 ## v4.0.13
 
 ### Bug fixes
@@ -247,6 +273,18 @@ Notes:
 ### Features
 
 * [0d5f35683](https://github.com/api-platform/core/commit/0d5f356839eb6aa9f536044abe4affa736553e76) feat(laravel): laravel component (#5882)
+
+## v3.4.14
+
+### Bug fixes
+
+* [0cf752bce](https://github.com/api-platform/core/commit/0cf752bcec692718b2503250e655d05aea670316) fix(metadata): make the schema attribute to fallback to null for parameters in YamlResourceExtractor (#6896)
+* [2b3c55db2](https://github.com/api-platform/core/commit/2b3c55db2a9ecc52f62c441fa8a5696233a30b87) fix(symfony): remove unsolvable deprecation (#6899) see also (#6655)
+* [9493b9b6e](https://github.com/api-platform/core/commit/9493b9b6ec0264ab5b700c861ad1b97455b4f88d) fix(symfony): revert json schema bc break (#6903)
+* [b82f9ac76](https://github.com/api-platform/core/commit/b82f9ac76ce89dd3910849c73da42317ee1339ed) fix(openapi): not forbidden response on openAPI doc (#6886)
+
+I mispublished a v3.4.13 on some repositories to fix them all I bumped 3.4.10 to 3.4.14
+More details at #6888.
 
 ## v3.4.10
 
