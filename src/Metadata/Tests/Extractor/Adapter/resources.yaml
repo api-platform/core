@@ -137,6 +137,9 @@ resources:
                         -
                             rel: 'http://www.w3.org/ns/json-ld#error'
                             href: 'http://www.w3.org/ns/hydra/error'
+                    parameters:
+                        date:
+                            key: date
             formats:
                 json: null
                 jsonld: null
