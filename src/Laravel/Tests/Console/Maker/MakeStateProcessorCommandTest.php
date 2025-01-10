@@ -30,7 +30,7 @@ class MakeStateProcessorCommandTest extends TestCase
     /** @var string */
     private const CHOSEN_CLASS_NAME = 'Choose a class name for your state processor (e.g. <fg=yellow>AwesomeStateProcessor</>)';
 
-    private ?Filesystem $filesystem;
+    private Filesystem $filesystem;
     private PathResolver $pathResolver;
     private AppServiceFileGenerator $appServiceFileGenerator;
 
