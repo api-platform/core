@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Laravel\Tests;
 
 use ApiPlatform\Laravel\Test\ApiTestAssertionsTrait;
+use ApiPlatform\Laravel\workbench\app\Enums\BookStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
@@ -26,6 +27,19 @@ class EloquentTest extends TestCase
     use ApiTestAssertionsTrait;
     use RefreshDatabase;
     use WithWorkbench;
+
+    public function testBackedEnumsNormalization(): void
+    {
+        BookFactory::new([
+            'status' => BookStatus::DRAFT,
+        ])->has(AuthorFactory::new())->count(10)->create();
+
+        $response = $this->get('/api/books', ['Accept' => ['application/ld+json']]);
+        $book = $response->json()['member'][0];
+
+        $this->assertArrayHasKey('status', $book);
+        $this->assertSame('DRAFT', $book['status']);
+    }
 
     public function testSearchFilter(): void
     {
