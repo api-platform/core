@@ -19,15 +19,17 @@ use ApiPlatform\State\OptionsInterface;
 class Options extends CommonOptions implements OptionsInterface
 {
     /**
-     * @param mixed $handleLinks experimental callable, typed mixed as we may want a service name in the future
+     * @param mixed $handleLinks           experimental callable, typed mixed as we may want a service name in the future
+     * @param mixed $transformFromDocument experimental callable, typed mixed as we may want a service name in the future
      *
      * @see LinksHandlerInterface
      */
     public function __construct(
         protected ?string $documentClass = null,
         mixed $handleLinks = null,
+        mixed $transformFromDocument = null,
     ) {
-        parent::__construct(handleLinks: $handleLinks);
+        parent::__construct(handleLinks: $handleLinks, toResourceTransformer: $transformFromDocument);
     }
 
     public function getDocumentClass(): ?string
@@ -39,6 +41,19 @@ class Options extends CommonOptions implements OptionsInterface
     {
         $self = clone $this;
         $self->documentClass = $documentClass;
+
+        return $self;
+    }
+
+    public function getTransformDocument(): mixed
+    {
+        return $this->getToResourceTransformer();
+    }
+
+    public function withTransformDocument(mixed $transformDocument): self
+    {
+        $self = clone $this;
+        $self->toResourceTransformer = $transformDocument;
 
         return $self;
     }

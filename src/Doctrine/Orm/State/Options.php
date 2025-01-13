@@ -19,15 +19,18 @@ use ApiPlatform\State\OptionsInterface;
 class Options extends CommonOptions implements OptionsInterface
 {
     /**
-     * @param string|callable $handleLinks experimental callable, typed mixed as we may want a service name in the future
+     * @param string|callable $handleLinks         experimental callable, typed mixed as we may want a service name in the future
+     * @param string|callable $transformFromEntity experimental callable, typed mixed as we may want a service name in the future
      *
      * @see LinksHandlerInterface
      */
     public function __construct(
         protected ?string $entityClass = null,
         mixed $handleLinks = null,
+        mixed $transformFromEntity = null,
+        mixed $transformToEntity = null,
     ) {
-        parent::__construct(handleLinks: $handleLinks);
+        parent::__construct(handleLinks: $handleLinks, toResourceTransformer: $transformFromEntity, fromResourceTransformer: $transformToEntity);
     }
 
     public function getEntityClass(): ?string
@@ -39,6 +42,32 @@ class Options extends CommonOptions implements OptionsInterface
     {
         $self = clone $this;
         $self->entityClass = $entityClass;
+
+        return $self;
+    }
+
+    public function getTransformFromEntity(): mixed
+    {
+        return $this->getToResourceTransformer();
+    }
+
+    public function withTransformFromEntity(mixed $transformFromEntity): self
+    {
+        $self = clone $this;
+        $self->toResourceTransformer = $transformFromEntity;
+
+        return $self;
+    }
+
+    public function getTransformToEntity(): mixed
+    {
+        return $this->getFromResourceTransformer();
+    }
+
+    public function withTransformToEntity(mixed $transformToEntity): self
+    {
+        $self = clone $this;
+        $self->fromResourceTransformer = $transformToEntity;
 
         return $self;
     }

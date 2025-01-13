@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Orm\State;
 
 use ApiPlatform\Doctrine\Common\State\LinksHandlerLocatorTrait;
+use ApiPlatform\Doctrine\Common\State\ResourceTransformerLocatorTrait;
 use ApiPlatform\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Extension\QueryResultCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator;
@@ -36,15 +37,21 @@ final class CollectionProvider implements ProviderInterface
 {
     use LinksHandlerLocatorTrait;
     use LinksHandlerTrait;
+    use ResourceTransformerLocatorTrait;
     use StateOptionsTrait;
 
     /**
      * @param QueryCollectionExtensionInterface[] $collectionExtensions
      */
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ManagerRegistry $managerRegistry, private readonly iterable $collectionExtensions = [], ?ContainerInterface $handleLinksLocator = null)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
+        ManagerRegistry $managerRegistry,
+        private readonly iterable $collectionExtensions = [],
+        ?ContainerInterface $handleLinksLocator = null,
+        ?ContainerInterface $resourceTransformerLocator = null)
     {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->handleLinksLocator = $handleLinksLocator;
+        $this->resourceTransformerLocator = $resourceTransformerLocator;
         $this->managerRegistry = $managerRegistry;
     }
 
@@ -73,10 +80,16 @@ final class CollectionProvider implements ProviderInterface
             $extension->applyToCollection($queryBuilder, $queryNameGenerator, $entityClass, $operation, $context);
 
             if ($extension instanceof QueryResultCollectionExtensionInterface && $extension->supportsResult($entityClass, $operation, $context)) {
-                return $extension->getResult($queryBuilder, $entityClass, $operation, $context);
+                $result = $extension->getResult($queryBuilder, $entityClass, $operation, $context);
+                break;
             }
         }
 
-        return $queryBuilder->getQuery()->getResult();
+        $result = $result ?? $queryBuilder->getQuery()->getResult();
+
+        return match ($transformer = $this->getToResourceTransformer($operation)) {
+            null => $result,
+            default => array_map($transformer, iterator_to_array($result)),
+        };
     }
 }

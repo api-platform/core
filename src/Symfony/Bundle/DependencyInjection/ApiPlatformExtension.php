@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle\DependencyInjection;
 
+use ApiPlatform\Doctrine\Common\State\ResourceTransformerInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationItemExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Filter\AbstractFilter as DoctrineMongoDbOdmAbstractFilter;
@@ -674,6 +675,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $container->registerForAutoconfiguration(OrmLinksHandlerInterface::class)
             ->addTag('api_platform.doctrine.orm.links_handler');
+        $container->registerForAutoconfiguration(ResourceTransformerInterface::class)
+            ->addTag('api_platform.doctrine.orm.resource_transformer');
 
         $loader->load('doctrine_orm.xml');
 
@@ -701,6 +704,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->setBindings(['$managerRegistry' => new Reference('doctrine_mongodb')]);
         $container->registerForAutoconfiguration(OdmLinksHandlerInterface::class)
             ->addTag('api_platform.doctrine.odm.links_handler');
+        $container->registerForAutoconfiguration(ResourceTransformerInterface::class)
+            ->addTag('api_platform.doctrine.odm.resource_transformer');
 
         $loader->load('doctrine_mongodb_odm.xml');
     }
