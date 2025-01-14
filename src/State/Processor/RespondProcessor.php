@@ -161,7 +161,7 @@ final class RespondProcessor implements ProcessorInterface
     private function getAllowedMethods(?string $resourceClass): string
     {
         $allowedMethods = self::DEFAULT_ALLOWED_METHOD;
-        if (null !== $resourceClass && $this->resourceClassResolver->isResourceClass($resourceClass)) {
+        if (null !== $resourceClass && null !== $this->resourceClassResolver && null !== $this->resourceCollectionMetadataFactory && $this->resourceClassResolver->isResourceClass($resourceClass)) {
             $resourceMetadataCollection = $this->resourceCollectionMetadataFactory->create($resourceClass);
             foreach ($resourceMetadataCollection as $resource) {
                 foreach ($resource->getOperations() as $operation) {
