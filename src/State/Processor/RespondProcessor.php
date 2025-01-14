@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
@@ -45,10 +46,13 @@ final class RespondProcessor implements ProcessorInterface
         'DELETE' => Response::HTTP_NO_CONTENT,
     ];
 
+    private const DEFAULT_ALLOWED_METHOD = ['OPTIONS', 'HEAD'];
+
     public function __construct(
         private ?IriConverterInterface $iriConverter = null,
         private readonly ?ResourceClassResolverInterface $resourceClassResolver = null,
         private readonly ?OperationMetadataFactoryInterface $operationMetadataFactory = null,
+        private readonly ?ResourceMetadataCollectionFactoryInterface $resourceCollectionMetadataFactory = null,
     ) {
     }
 
@@ -87,6 +91,9 @@ final class RespondProcessor implements ProcessorInterface
         if ($acceptPatch = $operation->getAcceptPatch()) {
             $headers['Accept-Patch'] = $acceptPatch;
         }
+
+        $headers['Accept-Post'] = 'text/turtle, application/ld+json';
+        $headers['Allow'] = $this->getAllowedMethods($context['resource_class'] ?? null);
 
         $method = $request->getMethod();
         $originalData = $context['original_data'] ?? null;
@@ -149,5 +156,20 @@ final class RespondProcessor implements ProcessorInterface
             $status,
             $headers
         );
+    }
+
+    private function getAllowedMethods(?string $resourceClass): string
+    {
+        $allowedMethods = self::DEFAULT_ALLOWED_METHOD;
+        if (null !== $resourceClass && $this->resourceClassResolver->isResourceClass($resourceClass)) {
+            $resourceMetadataCollection = $this->resourceCollectionMetadataFactory->create($resourceClass);
+            foreach ($resourceMetadataCollection as $resource) {
+                foreach ($resource->getOperations() as $operation) {
+                    $allowedMethods[] = $operation->getMethod();
+                }
+            }
+        }
+
+        return implode(', ', array_unique($allowedMethods));
     }
 }
