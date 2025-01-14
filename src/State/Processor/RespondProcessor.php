@@ -23,6 +23,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
@@ -161,8 +162,8 @@ final class RespondProcessor implements ProcessorInterface
     private function getAllowedMethods(?string $resourceClass): string
     {
         $allowedMethods = self::DEFAULT_ALLOWED_METHOD;
-        if (null !== $resourceClass && null !== $this->resourceClassResolver && null !== $this->resourceCollectionMetadataFactory && $this->resourceClassResolver->isResourceClass($resourceClass)) {
-            $resourceMetadataCollection = $this->resourceCollectionMetadataFactory->create($resourceClass);
+        if (null !== $resourceClass && null !== $this->resourceClassResolver && $this->resourceClassResolver->isResourceClass($resourceClass)) {
+            $resourceMetadataCollection = $this->resourceCollectionMetadataFactory ? $this->resourceCollectionMetadataFactory->create($resourceClass) : new ResourceMetadataCollection($resourceClass);
             foreach ($resourceMetadataCollection as $resource) {
                 foreach ($resource->getOperations() as $operation) {
                     $allowedMethods[] = $operation->getMethod();
