@@ -93,12 +93,14 @@ final class RespondProcessor implements ProcessorInterface
             $headers['Accept-Patch'] = $acceptPatch;
         }
 
-        $allowedMethods = $this->getAllowedMethods($context['resource_class'] ?? null, $operation->getUriTemplate());
-        $headers['Allow'] = implode(', ', $allowedMethods);
+        if (!$exception) {
+            $allowedMethods = $this->getAllowedMethods($context['resource_class'] ?? null, $operation->getUriTemplate());
+            $headers['Allow'] = implode(', ', $allowedMethods);
 
-        $outputFormats = $operation->getOutputFormats();
-        if (\is_array($outputFormats) && [] !== $outputFormats && \in_array('POST', $allowedMethods, true)) {
-            $headers['Accept-Post'] = implode(', ', array_merge(...array_values($outputFormats)));
+            $outputFormats = $operation->getOutputFormats();
+            if (\is_array($outputFormats) && [] !== $outputFormats && \in_array('POST', $allowedMethods, true)) {
+                $headers['Accept-Post'] = implode(', ', array_merge(...array_values($outputFormats)));
+            }
         }
 
         $method = $request->getMethod();
