@@ -24,9 +24,6 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 class DummyGetPostDeleteOperation
 {
-    /**
-     * @var int|null The id
-     */
     #[ORM\Column(type: 'integer')]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]

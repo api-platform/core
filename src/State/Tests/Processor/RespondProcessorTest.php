@@ -16,8 +16,8 @@ namespace ApiPlatform\State\Tests\Processor;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\HttpOperation;
-use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -42,6 +42,19 @@ class RespondProcessorTest extends TestCase
             ->willReturn(true);
 
         $this->resourceMetadataCollectionFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $this->resourceMetadataCollectionFactory
+            ->method('create')
+            ->willReturn(
+                new ResourceMetadataCollection('DummyResource', [
+                    new ApiResource(operations: [
+                        new Get(uriTemplate: '/dummy_resources/{dummyResourceId}{._format}', name: 'get'),
+                        new GetCollection(uriTemplate: '/dummy_resources{._format}', name: 'get_collections'),
+                        new Post(uriTemplate: '/dummy_resources{._format}', name: 'post'),
+                        new Delete(uriTemplate: '/dummy_resources/{dummyResourceId}{._format}', name: 'delete'),
+                        new Put(uriTemplate: '/dummy_resources/{dummyResourceId}{._format}', name: 'put'),
+                    ]),
+                ])
+            );
 
         $this->processor = new RespondProcessor(
             null,
@@ -51,57 +64,36 @@ class RespondProcessorTest extends TestCase
         );
     }
 
-    public function testHeadersAcceptPostIsSetCorrectly(): void
+    public function testHeadersAcceptPostIsReturnWhenPostAllowed(): void
     {
-        $this->resourceMetadataCollectionFactory
-            ->method('create')
-            ->willReturn(new ResourceMetadataCollection('DummyResourceClass'));
-
-        $operation = new HttpOperation('GET');
+        $operation = (new HttpOperation('GET', '/dummy_resources{._format}', outputFormats: ['jsonld' => ['application/ld+json'], 'json' => ['application/json']]));
         $context = [
-            'resource_class' => 'SomeResourceClass',
+            'resource_class' => 'DummyResource',
             'request' => $this->createGetRequest(),
         ];
 
         /** @var Response $response */
         $response = $this->processor->process(null, $operation, [], $context);
-
-        $this->assertSame('text/turtle, application/ld+json', $response->headers->get('Accept-Post'));
+        $this->assertSame('application/ld+json, application/json', $response->headers->get('Accept-Post'));
     }
 
-    public function testHeaderAllowHasHeadOptionsByDefault(): void
+    public function testHeadersAcceptPostIsNotSetWhenPostIsNotAllowed(): void
     {
-        $this->resourceMetadataCollectionFactory
-            ->method('create')
-            ->willReturn(new ResourceMetadataCollection('DummyResourceClass'));
-
-        $operation = new HttpOperation('GET');
+        $operation = (new HttpOperation('GET', '/dummy_resources/{dummyResourceId}{._format}'));
         $context = [
-            'resource_class' => 'SomeResourceClass',
+            'resource_class' => 'DummyResource',
             'request' => $this->createGetRequest(),
         ];
 
         /** @var Response $response */
         $response = $this->processor->process(null, $operation, [], $context);
 
-        $this->assertSame('OPTIONS, HEAD', $response->headers->get('Allow'));
+        $this->assertNull($response->headers->get('Accept-Post'));
     }
 
     public function testHeaderAllowReflectsResourceAllowedMethods(): void
     {
-        $this->resourceMetadataCollectionFactory
-            ->method('create')
-            ->willReturn(
-                new ResourceMetadataCollection('DummyResource', [
-                    new ApiResource(operations: [
-                        'get' => new Get(name: 'get'),
-                        'post' => new Post(name: 'post'),
-                        'delete' => new Delete(name: 'delete'),
-                    ]),
-                ])
-            );
-
-        $operation = new HttpOperation('GET');
+        $operation = (new HttpOperation('GET', '/dummy_resources{._format}'));
         $context = [
             'resource_class' => 'SomeResourceClass',
             'request' => $this->createGetRequest(),
@@ -115,30 +107,13 @@ class RespondProcessorTest extends TestCase
         $this->assertStringContainsString('HEAD', $allowHeader);
         $this->assertStringContainsString('GET', $allowHeader);
         $this->assertStringContainsString('POST', $allowHeader);
-        $this->assertStringContainsString('DELETE', $allowHeader);
-        $this->assertStringNotContainsString('PATCH', $allowHeader);
-        $this->assertStringNotContainsString('PUT', $allowHeader);
-    }
+        $this->assertStringNotContainsString('DELETE', $allowHeader);
 
-    public function testHeaderAllowReflectsAllowedResourcesGetPutPatch(): void
-    {
-        $this->resourceMetadataCollectionFactory
-            ->method('create')
-            ->willReturn(
-                new ResourceMetadataCollection('DummyResource', [
-                    new ApiResource(operations: [
-                        'get' => new Get(name: 'get'),
-                        'patch' => new Patch(name: 'patch'),
-                        'put' => new Put(name: 'put'),
-                    ]),
-                ])
-            );
-
-        $operation = new HttpOperation('GET');
         $context = [
             'resource_class' => 'SomeResourceClass',
             'request' => $this->createGetRequest(),
         ];
+        $operation = (new HttpOperation('GET', '/dummy_resources/{dummyResourceId}{._format}'));
 
         /** @var Response $response */
         $response = $this->processor->process(null, $operation, [], $context);
@@ -147,10 +122,9 @@ class RespondProcessorTest extends TestCase
         $this->assertStringContainsString('OPTIONS', $allowHeader);
         $this->assertStringContainsString('HEAD', $allowHeader);
         $this->assertStringContainsString('GET', $allowHeader);
-        $this->assertStringContainsString('PATCH', $allowHeader);
         $this->assertStringContainsString('PUT', $allowHeader);
+        $this->assertStringContainsString('DELETE', $allowHeader);
         $this->assertStringNotContainsString('POST', $allowHeader);
-        $this->assertStringNotContainsString('DELETE', $allowHeader);
     }
 
     private function createGetRequest(): Request
