@@ -168,7 +168,7 @@ final class RespondProcessor implements ProcessorInterface
     {
         $allowedMethods = self::DEFAULT_ALLOWED_METHOD;
         if (null !== $currentUriTemplate && null !== $resourceClass && $this->resourceClassResolver->isResourceClass($resourceClass)) {
-            $resourceMetadataCollection =$this->resourceCollectionMetadataFactory ? $this->resourceCollectionMetadataFactory->create($resourceClass) : new ResourceMetadataCollection($resourceClass);
+            $resourceMetadataCollection = $this->resourceCollectionMetadataFactory ? $this->resourceCollectionMetadataFactory->create($resourceClass) : new ResourceMetadataCollection($resourceClass);
             foreach ($resourceMetadataCollection as $resource) {
                 foreach ($resource->getOperations() as $operation) {
                     if ($operation->getUriTemplate() === $currentUriTemplate) {
