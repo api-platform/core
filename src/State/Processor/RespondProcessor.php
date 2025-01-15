@@ -93,8 +93,13 @@ final class RespondProcessor implements ProcessorInterface
             $headers['Accept-Patch'] = $acceptPatch;
         }
 
-        $headers['Accept-Post'] = 'text/turtle, application/ld+json';
-        $headers['Allow'] = $this->getAllowedMethods($context['resource_class'] ?? null);
+        $allowedMethods = $this->getAllowedMethods($context['resource_class'] ?? null, $operation->getUriTemplate());
+        $headers['Allow'] = implode(', ', $allowedMethods);
+
+        $outputFormats = $operation->getOutputFormats();
+        if (\is_array($outputFormats) && [] !== $outputFormats && \in_array('POST', $allowedMethods, true)) {
+            $headers['Accept-Post'] = implode(', ', array_merge(...array_values($outputFormats)));
+        }
 
         $method = $request->getMethod();
         $originalData = $context['original_data'] ?? null;
@@ -159,18 +164,20 @@ final class RespondProcessor implements ProcessorInterface
         );
     }
 
-    private function getAllowedMethods(?string $resourceClass): string
+    private function getAllowedMethods(?string $resourceClass, ?string $currentUriTemplate): array
     {
         $allowedMethods = self::DEFAULT_ALLOWED_METHOD;
-        if (null !== $resourceClass && null !== $this->resourceClassResolver && $this->resourceClassResolver->isResourceClass($resourceClass)) {
-            $resourceMetadataCollection = $this->resourceCollectionMetadataFactory ? $this->resourceCollectionMetadataFactory->create($resourceClass) : new ResourceMetadataCollection($resourceClass);
+        if (null !== $currentUriTemplate && null !== $resourceClass && $this->resourceClassResolver->isResourceClass($resourceClass)) {
+            $resourceMetadataCollection =$this->resourceCollectionMetadataFactory ? $this->resourceCollectionMetadataFactory->create($resourceClass) : new ResourceMetadataCollection($resourceClass);
             foreach ($resourceMetadataCollection as $resource) {
                 foreach ($resource->getOperations() as $operation) {
-                    $allowedMethods[] = $operation->getMethod();
+                    if ($operation->getUriTemplate() === $currentUriTemplate) {
+                        $allowedMethods[] = $operation->getMethod();
+                    }
                 }
             }
         }
 
-        return implode(', ', array_unique($allowedMethods));
+        return array_unique($allowedMethods);
     }
 }
