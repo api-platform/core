@@ -89,8 +89,8 @@ class Book extends Model
     use HasFactory;
     use HasUlids;
 
-    protected $visible = ['name', 'author', 'isbn', 'publication_date', 'is_available', 'published'];
-    protected $fillable = ['name', 'publication_date', 'isbn', 'is_available', 'published'];
+    protected $visible = ['name', 'author', 'isbn', 'status', 'publication_date', 'is_available', 'published'];
+    protected $fillable = ['name', 'status', 'publication_date', 'isbn', 'is_available', 'published'];
     protected $casts = [
         'is_available' => 'boolean',
         'status' => BookStatus::class,
