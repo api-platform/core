@@ -8,6 +8,7 @@ return [
     'title' => 'API Platform',
     'description' => 'My awesome API',
     'version' => '1.0.0',
+    'show_webby' => true,
 
     'routes' => [
         // Global middleware applied to every API Platform routes
@@ -61,7 +62,9 @@ return [
     'graphql' => [
         'enabled' => false,
         'nesting_separator' => '__',
-        'introspection' => ['enabled' => true]
+        'introspection' => ['enabled' => true],
+        'max_query_complexity' => 500,
+        'max_query_depth' => 200
     ],
 
     'exception_to_status' => [
@@ -97,6 +100,12 @@ return [
         //    'url' => 'https://www.example.com/support',
         //    'email' => 'support@example.com',
         //],
+        //'http_auth' => [
+        //    'Personal Access Token' => [
+        //        'scheme' => 'bearer',
+        //        'bearerFormat' => 'JWT'
+        //    ]
+        //]
     ],
 
     'url_generation_strategy' => UrlGeneratorInterface::ABS_PATH,

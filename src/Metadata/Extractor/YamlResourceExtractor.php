@@ -338,6 +338,8 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                 'write' => $this->phpize($operation, 'write', 'bool'),
                 'serialize' => $this->phpize($operation, 'serialize', 'bool'),
                 'queryParameterValidate' => $this->phpize($operation, 'queryParameterValidate', 'bool'),
+                'strictQueryParameterValidation' => $this->phpize($operation, 'strictQueryParameterValidation', 'bool'),
+                'hideHydraOperation' => $this->phpize($resource, 'hideHydraOperation', 'bool'),
                 'priority' => $this->phpize($operation, 'priority', 'integer'),
                 'name' => $this->phpize($operation, 'name', 'string'),
                 'class' => (string) $class,
@@ -470,7 +472,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             $parameters[$key] = new $cl(
                 key: $key,
                 required: $this->phpize($parameter, 'required', 'bool'),
-                schema: $parameter['schema'],
+                schema: $parameter['schema'] ?? null,
                 openApi: ($parameter['openapi'] ?? null) ? new Parameter(
                     name: $parameter['openapi']['name'],
                     in: $parameter['in'] ?? 'query',

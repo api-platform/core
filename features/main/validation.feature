@@ -29,8 +29,8 @@ Feature: Using validations groups
     And the JSON should be a superset of:
     """
     {
-      "@context": "/contexts/ConstraintViolationList",
-      "@type": "ConstraintViolationList",
+      "@context": "/contexts/ConstraintViolation",
+      "@type": "ConstraintViolation",
       "title": "An error occurred",
       "description": "name: This value should not be null.",
       "violations": [
@@ -58,8 +58,8 @@ Feature: Using validations groups
     And the JSON should be a superset of:
     """
     {
-      "@context": "/contexts/ConstraintViolationList",
-      "@type": "ConstraintViolationList",
+      "@context": "/contexts/ConstraintViolation",
+      "@type": "ConstraintViolation",
       "title": "An error occurred",
       "description": "title: This value should not be null.",
       "violations": [
@@ -111,8 +111,8 @@ Feature: Using validations groups
     And the JSON should be a superset of:
     """
     {
-      "@context": "/contexts/ConstraintViolationList",
-      "@type": "ConstraintViolationList",
+      "@context": "/contexts/ConstraintViolation",
+      "@type": "ConstraintViolation",
       "hydra:title": "An error occurred",
       "hydra:description": "baz: This value should be of type string.\nqux: This value should be of type string.\nfoo: This value should be of type bool.\nbar: This value should be of type int.\nuuid: This value should be of type uuid.\nrelatedDummy: This value should be of type array|string.\nrelatedDummies: This value should be of type array.",
       "violations": [

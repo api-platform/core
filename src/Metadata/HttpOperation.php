@@ -155,6 +155,8 @@ class HttpOperation extends Operation
         protected ?array $exceptionToStatus = null,
         protected ?array $links = null,
         protected ?array $errors = null,
+        protected ?bool $strictQueryParameterValidation = null,
+        protected ?bool $hideHydraOperation = null,
 
         ?string $shortName = null,
         ?string $class = null,
@@ -257,6 +259,8 @@ class HttpOperation extends Operation
             policy: $policy,
             middleware: $middleware,
             queryParameterValidationEnabled: $queryParameterValidationEnabled,
+            strictQueryParameterValidation: $strictQueryParameterValidation,
+            hideHydraOperation: $hideHydraOperation,
             extraProperties: $extraProperties
         );
     }

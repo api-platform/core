@@ -35,8 +35,8 @@ final readonly class Options
         private ?string $licenseUrl = null,
         private bool $overrideResponses = true,
         private bool $persistAuthorization = false,
+        private readonly array $httpAuth = []
     ) {
-    }
 
     public function getTitle(): string
     {
@@ -91,6 +91,11 @@ final readonly class Options
     public function getApiKeys(): array
     {
         return $this->apiKeys;
+    }
+
+    public function getHttpAuth(): array
+    {
+        return $this->httpAuth;
     }
 
     public function getContactName(): ?string

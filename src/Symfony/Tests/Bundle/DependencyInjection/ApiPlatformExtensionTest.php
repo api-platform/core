@@ -284,5 +284,6 @@ class ApiPlatformExtensionTest extends TestCase
         ];
 
         $this->assertContainerHas($services, $aliases);
+        $this->container->hasParameter('api_platform.swagger.http_auth');
     }
 }

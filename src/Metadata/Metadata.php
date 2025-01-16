@@ -81,6 +81,8 @@ abstract class Metadata
         protected ?string $policy = null,
         protected array|string|null $middleware = null,
         protected ?bool $queryParameterValidationEnabled = null,
+        protected ?bool $strictQueryParameterValidation = null,
+        protected ?bool $hideHydraOperation = null,
         protected array $extraProperties = [],
     ) {
         if (\is_array($parameters) && $parameters) {
@@ -663,6 +665,32 @@ abstract class Metadata
     {
         $self = clone $this;
         $self->extraProperties = $extraProperties;
+
+        return $self;
+    }
+
+    public function getStrictQueryParameterValidation(): ?bool
+    {
+        return $this->strictQueryParameterValidation;
+    }
+
+    public function withStrictQueryParameterValidation(bool $strictQueryParameterValidation): static
+    {
+        $self = clone $this;
+        $self->strictQueryParameterValidation = $strictQueryParameterValidation;
+
+        return $self;
+    }
+
+    public function getHideHydraOperation(): ?bool
+    {
+        return $this->hideHydraOperation;
+    }
+
+    public function withHideHydraOperation(bool $hideHydraOperation): static
+    {
+        $self = clone $this;
+        $self->hideHydraOperation = $hideHydraOperation;
 
         return $self;
     }

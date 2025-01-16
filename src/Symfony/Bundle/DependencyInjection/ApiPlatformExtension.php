@@ -501,6 +501,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.enable_re_doc', $config['enable_re_doc']);
         $container->setParameter('api_platform.swagger.api_keys', $config['swagger']['api_keys']);
         $container->setParameter('api_platform.swagger.persistAuthorization', $config['swagger']['persistAuthorization']);
+        $container->setParameter('api_platform.swagger.http_auth', $config['swagger']['http_auth']);
         if ($config['openapi']['swagger_ui_extra_configuration'] && $config['swagger']['swagger_ui_extra_configuration']) {
             throw new RuntimeException('You can not set "swagger_ui_extra_configuration" twice - in "openapi" and "swagger" section.');
         }
@@ -565,14 +566,17 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         $enabled = $this->isConfigEnabled($container, $config['graphql']);
         $graphqlIntrospectionEnabled = $enabled && $this->isConfigEnabled($container, $config['graphql']['introspection']);
-
         $graphiqlEnabled = $enabled && $this->isConfigEnabled($container, $config['graphql']['graphiql']);
         $graphqlPlayGroundEnabled = $enabled && $this->isConfigEnabled($container, $config['graphql']['graphql_playground']);
+        $maxQueryDepth = (int) $config['graphql']['max_query_depth'];
+        $maxQueryComplexity = (int) $config['graphql']['max_query_complexity'];
         if ($graphqlPlayGroundEnabled) {
             trigger_deprecation('api-platform/core', '3.1', 'GraphQL Playground is deprecated and will be removed in API Platform 4.0. Only GraphiQL will be available in the future. Set api_platform.graphql.graphql_playground to false in the configuration to remove this deprecation.');
         }
 
         $container->setParameter('api_platform.graphql.enabled', $enabled);
+        $container->setParameter('api_platform.graphql.max_query_depth', $maxQueryDepth);
+        $container->setParameter('api_platform.graphql.max_query_complexity', $maxQueryComplexity);
         $container->setParameter('api_platform.graphql.introspection.enabled', $graphqlIntrospectionEnabled);
         $container->setParameter('api_platform.graphql.graphiql.enabled', $graphiqlEnabled);
         $container->setParameter('api_platform.graphql.graphql_playground.enabled', $graphqlPlayGroundEnabled);

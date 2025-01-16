@@ -164,7 +164,7 @@ final class Configuration implements ConfigurationInterface
         $this->addExceptionToStatusSection($rootNode);
 
         $this->addFormatSection($rootNode, 'formats', [
-            'jsonld' => ['mime_types' => ['application/ld+json']]
+            'jsonld' => ['mime_types' => ['application/ld+json']],
         ]);
         $this->addFormatSection($rootNode, 'patch_formats', [
             'json' => ['mime_types' => ['application/merge-patch+json']],
@@ -266,6 +266,10 @@ final class Configuration implements ConfigurationInterface
                         ->arrayNode('introspection')
                             ->canBeDisabled()
                         ->end()
+                        ->integerNode('max_query_depth')->defaultValue(20)
+                        ->end()
+                        ->integerNode('max_query_complexity')->defaultValue(500)
+                        ->end()
                         ->scalarNode('nesting_separator')->defaultValue('_')->info('The separator to use to filter nested fields.')->end()
                         ->arrayNode('collection')
                             ->addDefaultsIfNotSet()
@@ -326,6 +330,24 @@ final class Configuration implements ConfigurationInterface
                                     ->enumNode('type')
                                         ->info('Whether the api key should be a query parameter or a header.')
                                         ->values(['query', 'header'])
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('http_auth')
+                            ->info('Creates http security schemes for OpenAPI.')
+                            ->useAttributeAsKey('key')
+                            ->validate()
+                                ->ifTrue(static fn ($v): bool => (bool) array_filter(array_keys($v), fn ($item) => !preg_match('/^[a-zA-Z0-9._-]+$/', $item)))
+                                ->thenInvalid('The api keys "key" is not valid according to the pattern enforced by OpenAPI 3.1 ^[a-zA-Z0-9._-]+$.')
+                            ->end()
+                            ->prototype('array')
+                                ->children()
+                                    ->scalarNode('scheme')
+                                        ->info('The OpenAPI HTTP auth scheme, for example "bearer"')
+                                    ->end()
+                                    ->scalarNode('bearerFormat')
+                                        ->info('The OpenAPI HTTP bearer format')
                                     ->end()
                                 ->end()
                             ->end()

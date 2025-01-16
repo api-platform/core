@@ -98,6 +98,8 @@ final class Patch extends HttpOperation
         mixed $rules = null,
         ?string $policy = null,
         array|string|null $middleware = null,
+        ?bool $strictQueryParameterValidation = null,
+        ?bool $hideHydraOperation = null,
         array $extraProperties = [],
     ) {
         parent::__construct(
@@ -178,6 +180,8 @@ final class Patch extends HttpOperation
             rules: $rules,
             policy: $policy,
             middleware: $middleware,
+            strictQueryParameterValidation: $strictQueryParameterValidation,
+            hideHydraOperation: $hideHydraOperation,
             extraProperties: $extraProperties
         );
     }

@@ -102,6 +102,8 @@ resources:
                     exceptionToStatus:
                         Symfony\Component\Serializer\Exception\ExceptionInterface: 404
                     queryParameterValidationEnabled: false
+                    strictQueryParameterValidation: false
+                    hideHydraOperation: false
                     read: true
                     deserialize: false
                     validate: false
@@ -137,6 +139,9 @@ resources:
                         -
                             rel: 'http://www.w3.org/ns/json-ld#error'
                             href: 'http://www.w3.org/ns/hydra/error'
+                    parameters:
+                        date:
+                            key: date
             formats:
                 json: null
                 jsonld: null
@@ -339,6 +344,8 @@ resources:
             policy: null
             middleware: null
             parameters: null
+            strictQueryParameterValidation: false
+            hideHydraOperation: false
             extraProperties:
                 custom_property: 'Lorem ipsum dolor sit amet'
                 another_custom_property:

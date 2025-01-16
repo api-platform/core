@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Extension;
 
+use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
 use ApiPlatform\Doctrine\Common\ParameterValueExtractorTrait;
+use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
@@ -21,6 +23,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ParameterNotFound;
 use Doctrine\ORM\QueryBuilder;
 use Psr\Container\ContainerInterface;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 /**
  * Reads operation parameters and execute its filter.
@@ -31,8 +34,10 @@ final class ParameterExtension implements QueryCollectionExtensionInterface, Que
 {
     use ParameterValueExtractorTrait;
 
-    public function __construct(private readonly ContainerInterface $filterLocator)
-    {
+    public function __construct(
+        private readonly ContainerInterface $filterLocator,
+        private readonly ?ManagerRegistry $managerRegistry = null,
+    ) {
     }
 
     /**
@@ -50,12 +55,38 @@ final class ParameterExtension implements QueryCollectionExtensionInterface, Que
                 continue;
             }
 
-            $filter = $this->filterLocator->has($filterId) ? $this->filterLocator->get($filterId) : null;
+            $filter = match (true) {
+                $filterId instanceof FilterInterface => $filterId,
+                \is_string($filterId) && $this->filterLocator->has($filterId) => $this->filterLocator->get($filterId),
+                default => null,
+            };
+
             if (!$filter instanceof FilterInterface) {
                 throw new InvalidArgumentException(\sprintf('Could not find filter "%s" for parameter "%s" in operation "%s" for resource "%s".', $filterId, $parameter->getKey(), $operation?->getShortName(), $resourceClass));
             }
 
-            $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, ['filters' => $values, 'parameter' => $parameter] + $context);
+            if ($this->managerRegistry && $filter instanceof ManagerRegistryAwareInterface && !$filter->hasManagerRegistry()) {
+                $filter->setManagerRegistry($this->managerRegistry);
+            }
+
+            if ($filter instanceof AbstractFilter && !$filter->getProperties()) {
+                $propertyKey = $parameter->getProperty() ?? $parameter->getKey();
+
+                if (str_contains($propertyKey, ':property')) {
+                    $extraProperties = $parameter->getExtraProperties()['_properties'] ?? [];
+                    foreach (array_keys($extraProperties) as $property) {
+                        $properties[$property] = $parameter->getFilterContext();
+                    }
+                } else {
+                    $properties = [$propertyKey => $parameter->getFilterContext()];
+                }
+
+                $filter->setProperties($properties ?? []);
+            }
+
+            $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation,
+                ['filters' => $values, 'parameter' => $parameter] + $context
+            );
         }
     }
 

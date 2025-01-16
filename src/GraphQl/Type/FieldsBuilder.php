@@ -415,7 +415,15 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
                     }
 
                     $args = $this->getFilterArgs($args, $resourceClass, $rootResource, $resourceOperation, $rootOperation, $property, $depth);
-                    $args = $this->getParameterArgs($rootOperation, $args);
+
+                    // Also register parameter args in the types container
+                    // Note: This is a workaround, for more information read the comment on the parameterToObjectType function.
+                    foreach ($this->getParameterArgs($rootOperation) as $key => $arg) {
+                        if ($arg instanceof InputObjectType || (\is_array($arg) && isset($arg['name']))) {
+                            $this->typesContainer->set(\is_array($arg) ? $arg['name'] : $arg->name(), $arg);
+                        }
+                        $args[$key] = $arg;
+                    }
                 }
             }
 

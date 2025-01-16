@@ -57,6 +57,8 @@ use ApiPlatform\Hydra\Serializer\EntrypointNormalizer as HydraEntrypointNormaliz
 use ApiPlatform\Hydra\Serializer\HydraPrefixNameConverter;
 use ApiPlatform\Hydra\Serializer\PartialCollectionViewNormalizer as HydraPartialCollectionViewNormalizer;
 use ApiPlatform\Hydra\State\HydraLinkProcessor;
+use ApiPlatform\JsonApi\Filter\SparseFieldset;
+use ApiPlatform\JsonApi\Filter\SparseFieldsetParameterProvider;
 use ApiPlatform\JsonApi\JsonSchema\SchemaFactory as JsonApiSchemaFactory;
 use ApiPlatform\JsonApi\Serializer\CollectionNormalizer as JsonApiCollectionNormalizer;
 use ApiPlatform\JsonApi\Serializer\EntrypointNormalizer as JsonApiEntrypointNormalizer;
@@ -81,9 +83,12 @@ use ApiPlatform\Laravel\Controller\DocumentationController;
 use ApiPlatform\Laravel\Controller\EntrypointController;
 use ApiPlatform\Laravel\Eloquent\Extension\FilterQueryExtension;
 use ApiPlatform\Laravel\Eloquent\Extension\QueryExtensionInterface;
+use ApiPlatform\Laravel\Eloquent\Filter\BooleanFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\DateFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\EqualsFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\FilterInterface as EloquentFilterInterface;
+use ApiPlatform\Laravel\Eloquent\Filter\JsonApi\SortFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\JsonApi\SortFilterParameterProvider;
 use ApiPlatform\Laravel\Eloquent\Filter\OrderFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\PartialSearchFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\RangeFilter;
@@ -106,6 +111,7 @@ use ApiPlatform\Laravel\Eloquent\State\RemoveProcessor;
 use ApiPlatform\Laravel\Exception\ErrorHandler;
 use ApiPlatform\Laravel\GraphQl\Controller\EntrypointController as GraphQlEntrypointController;
 use ApiPlatform\Laravel\GraphQl\Controller\GraphiQlController;
+use ApiPlatform\Laravel\JsonApi\State\JsonApiProvider;
 use ApiPlatform\Laravel\Metadata\CachePropertyMetadataFactory;
 use ApiPlatform\Laravel\Metadata\CachePropertyNameCollectionMetadataFactory;
 use ApiPlatform\Laravel\Metadata\CacheResourceCollectionMetadataFactory;
@@ -399,7 +405,8 @@ class ApiPlatformProvider extends ServiceProvider
                                 )
                             ),
                             $app->make('filters'),
-                            $app->make(CamelCaseToSnakeCaseNameConverter::class)
+                            $app->make(CamelCaseToSnakeCaseNameConverter::class),
+                            $this->app->make(LoggerInterface::class)
                         ),
                         $app->make('filters')
                     )
@@ -421,7 +428,16 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->bind(OperationMetadataFactoryInterface::class, OperationMetadataFactory::class);
 
-        $this->app->tag([EqualsFilter::class, PartialSearchFilter::class, DateFilter::class, OrderFilter::class, RangeFilter::class], EloquentFilterInterface::class);
+        $this->app->tag([
+            BooleanFilter::class,
+            EqualsFilter::class,
+            PartialSearchFilter::class,
+            DateFilter::class,
+            OrderFilter::class,
+            RangeFilter::class,
+            SortFilter::class,
+            SparseFieldset::class,
+        ], EloquentFilterInterface::class);
 
         $this->app->bind(FilterQueryExtension::class, function (Application $app) {
             $tagged = iterator_to_array($app->tagged(EloquentFilterInterface::class));
@@ -468,6 +484,12 @@ class ApiPlatformProvider extends ServiceProvider
             return new DeserializeProvider($app->make(ValidateProvider::class), $app->make(SerializerInterface::class), $app->make(SerializerContextBuilderInterface::class));
         });
 
+        if (class_exists(JsonApiProvider::class)) {
+            $this->app->extend(DeserializeProvider::class, function (ProviderInterface $inner, Application $app) {
+                return new JsonApiProvider($inner);
+            });
+        }
+
         $this->app->tag([PropertyFilter::class], SerializerFilterInterface::class);
 
         $this->app->singleton(SerializerFilterParameterProvider::class, function (Application $app) {
@@ -477,7 +499,10 @@ class ApiPlatformProvider extends ServiceProvider
         });
         $this->app->alias(SerializerFilterParameterProvider::class, 'api_platform.serializer.filter_parameter_provider');
 
-        $this->app->tag([SerializerFilterParameterProvider::class], ParameterProviderInterface::class);
+        $this->app->singleton(SortFilterParameterProvider::class, function (Application $app) {
+            return new SortFilterParameterProvider();
+        });
+        $this->app->tag([SerializerFilterParameterProvider::class, SortFilterParameterProvider::class, SparseFieldsetParameterProvider::class], ParameterProviderInterface::class);
 
         $this->app->singleton('filters', function (Application $app) {
             return new ServiceLocator(array_merge(
@@ -752,6 +777,7 @@ class ApiPlatformProvider extends ServiceProvider
                 licenseName: $config->get('api-platform.swagger_ui.license.name', ''),
                 licenseUrl: $config->get('api-platform.swagger_ui.license.url', ''),
                 persistAuthorization: $config->get('api-platform.swagger_ui.persistAuthorization', false),
+                httpAuth: $config->get('api-platform.swagger_ui.http_auth', []),
             );
         });
 
@@ -1292,7 +1318,7 @@ class ApiPlatformProvider extends ServiceProvider
             /** @var ConfigRepository */
             $config = $app['config'];
 
-            return new Executor($config->get('api-platform.graphql.introspection.enabled') ?? false);
+            return new Executor($config->get('api-platform.graphql.introspection.enabled') ?? false, $config->get('api-platform.graphql.max_query_complexity'), $config->get('api-platform.graphql.max_query_depth'));
         });
 
         $app->singleton(GraphiQlController::class, function (Application $app) {

@@ -963,6 +963,8 @@ class ApiResource extends Metadata
         ?string $policy = null,
         array|string|null $middleware = null,
         array|Parameters|null $parameters = null,
+        protected ?bool $strictQueryParameterValidation = null,
+        protected ?bool $hideHydraOperation = null,
         protected array $extraProperties = [],
     ) {
         parent::__construct(
@@ -1007,6 +1009,8 @@ class ApiResource extends Metadata
             rules: $rules,
             policy: $policy,
             middleware: $middleware,
+            strictQueryParameterValidation: $strictQueryParameterValidation,
+            hideHydraOperation: $hideHydraOperation,
             extraProperties: $extraProperties
         );
 

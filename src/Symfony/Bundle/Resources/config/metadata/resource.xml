@@ -85,6 +85,7 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.parameter.inner" />
             <argument type="service" id="api_platform.filter_locator" on-invalid="ignore" />
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
+            <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
         <service id="api_platform.metadata.resource.metadata_collection_factory.cached" class="ApiPlatform\Metadata\Resource\Factory\CachedResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="-10" public="false">

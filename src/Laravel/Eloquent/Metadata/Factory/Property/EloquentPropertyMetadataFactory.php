@@ -88,7 +88,7 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
 
             return $propertyMetadata
                 ->withBuiltinTypes([$type])
-                ->withWritable($propertyMetadata->isWritable() ?? true)
+                ->withWritable($propertyMetadata->isWritable() ?? true === $p['fillable'])
                 ->withReadable($propertyMetadata->isReadable() ?? false === $p['hidden']);
         }
 

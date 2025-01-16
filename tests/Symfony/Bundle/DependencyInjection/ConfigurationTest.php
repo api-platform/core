@@ -123,6 +123,8 @@ class ConfigurationTest extends TestCase
                 'introspection' => [
                     'enabled' => true,
                 ],
+                'max_query_depth' => 20,
+                'max_query_complexity' => 500,
                 'nesting_separator' => '_',
                 'collection' => [
                     'pagination' => [
@@ -149,6 +151,7 @@ class ConfigurationTest extends TestCase
             'swagger' => [
                 'versions' => [3],
                 'api_keys' => [],
+                'http_auth' => [],
                 'swagger_ui_extra_configuration' => [],
                 'persistAuthorization' => false,
             ],
@@ -391,5 +394,25 @@ class ConfigurationTest extends TestCase
         ]);
 
         $this->assertTrue($config['elasticsearch']['enabled']);
+    }
+
+    /**
+     * Test config for http auth.
+     */
+    public function testHttpAuth(): void
+    {
+        $config = $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'swagger' => [
+                    'http_auth' => ['PAT' => [
+                        'scheme' => 'bearer',
+                        'bearerFormat' => 'JWT',
+                    ]],
+                ],
+            ],
+        ]);
+
+        $this->assertArrayHasKey('http_auth', $config['swagger']);
+        $this->assertSame(['scheme' => 'bearer', 'bearerFormat' => 'JWT'], $config['swagger']['http_auth']['PAT']);
     }
 }

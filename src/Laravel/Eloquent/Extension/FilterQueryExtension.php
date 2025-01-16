@@ -40,7 +40,7 @@ final readonly class FilterQueryExtension implements QueryExtensionInterface
         $context['operation'] = $operation;
 
         foreach ($operation->getParameters() ?? [] as $parameter) {
-            if (!($values = $parameter->getValue()) || $values instanceof ParameterNotFound) {
+            if (null === ($values = $parameter->getValue()) || $values instanceof ParameterNotFound) {
                 continue;
             }
 

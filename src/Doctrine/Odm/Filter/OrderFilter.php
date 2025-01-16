@@ -15,7 +15,11 @@ namespace ApiPlatform\Doctrine\Odm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterTrait;
+use ApiPlatform\Doctrine\Common\Filter\PropertyPlaceholderOpenApiParameterTrait;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Parameter;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
@@ -196,11 +200,12 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * @author Théo FIDRY <theo.fidry@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class OrderFilter extends AbstractFilter implements OrderFilterInterface
+final class OrderFilter extends AbstractFilter implements OrderFilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface
 {
     use OrderFilterTrait;
+    use PropertyPlaceholderOpenApiParameterTrait;
 
-    public function __construct(ManagerRegistry $managerRegistry, string $orderParameterName = 'order', ?LoggerInterface $logger = null, ?array $properties = null, ?NameConverterInterface $nameConverter = null)
+    public function __construct(?ManagerRegistry $managerRegistry = null, string $orderParameterName = 'order', ?LoggerInterface $logger = null, ?array $properties = null, ?NameConverterInterface $nameConverter = null)
     {
         if (null !== $properties) {
             $properties = array_map(static function ($propertyOptions) {
@@ -225,12 +230,17 @@ final class OrderFilter extends AbstractFilter implements OrderFilterInterface
      */
     public function apply(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
-        if (isset($context['filters']) && !isset($context['filters'][$this->orderParameterName])) {
+        if (
+            isset($context['filters'])
+            && (!isset($context['filters'][$this->orderParameterName]) || !\is_array($context['filters'][$this->orderParameterName]))
+            && !isset($context['parameter'])
+        ) {
             return;
         }
 
-        if (!isset($context['filters'][$this->orderParameterName]) || !\is_array($context['filters'][$this->orderParameterName])) {
-            parent::apply($aggregationBuilder, $resourceClass, $operation, $context);
+        $parameter = $context['parameter'] ?? null;
+        if (null !== ($value = $context['filters'][$parameter?->getProperty()] ?? null)) {
+            $this->filterProperty($this->denormalizePropertyName($parameter->getProperty()), $value, $aggregationBuilder, $resourceClass, $operation, $context);
 
             return;
         }
@@ -243,13 +253,13 @@ final class OrderFilter extends AbstractFilter implements OrderFilterInterface
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $direction, Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
+    protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
         if (!$this->isPropertyEnabled($property, $resourceClass) || !$this->isPropertyMapped($property, $resourceClass)) {
             return;
         }
 
-        $direction = $this->normalizeValue($direction, $property);
+        $direction = $this->normalizeValue($value, $property);
         if (null === $direction) {
             return;
         }
@@ -263,5 +273,13 @@ final class OrderFilter extends AbstractFilter implements OrderFilterInterface
         $aggregationBuilder->sort(
             $context['mongodb_odm_sort_fields'] = ($context['mongodb_odm_sort_fields'] ?? []) + [$matchField => $direction]
         );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getSchema(Parameter $parameter): array
+    {
+        return ['type' => 'string', 'enum' => ['asc', 'desc']];
     }
 }

@@ -360,6 +360,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 }
             }
 
+            if (true === $overrideResponses && !isset($existingResponses[403]) && $operation->getSecurity()) {
+                $openapiOperation = $openapiOperation->withResponse(403, new Response('Forbidden'));
+            }
+
             if (true === $overrideResponses && !$operation instanceof CollectionOperationInterface && 'POST' !== $operation->getMethod()) {
                 if (!isset($existingResponses[404])) {
                     $openapiOperation = $openapiOperation->withResponse(404, new Response('Resource not found'));
@@ -742,6 +746,11 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         foreach ($this->openApiOptions->getApiKeys() as $key => $apiKey) {
             $description = \sprintf('Value for the %s %s parameter.', $apiKey['name'], $apiKey['type']);
             $securitySchemes[$key] = new SecurityScheme('apiKey', $description, $apiKey['name'], $apiKey['type']);
+        }
+
+        foreach ($this->openApiOptions->getHttpAuth() as $key => $httpAuth) {
+            $description = \sprintf('Value for the http %s parameter.', $httpAuth['scheme']);
+            $securitySchemes[$key] = new SecurityScheme('http', $description, null, null, $httpAuth['scheme'], $httpAuth['bearerFormat'] ?? null);
         }
 
         return $securitySchemes;
