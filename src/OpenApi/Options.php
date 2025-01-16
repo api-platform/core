@@ -37,6 +37,7 @@ final readonly class Options
         private bool $persistAuthorization = false,
         private readonly array $httpAuth = []
     ) {
+    }
 
     public function getTitle(): string
     {
