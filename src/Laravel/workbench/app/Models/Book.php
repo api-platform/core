@@ -22,6 +22,7 @@ use ApiPlatform\Laravel\Eloquent\Filter\OrderFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\OrFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\PartialSearchFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\RangeFilter;
+use ApiPlatform\Laravel\workbench\app\Enums\BookStatus;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -92,6 +93,7 @@ class Book extends Model
     protected $fillable = ['name', 'publication_date', 'isbn', 'is_available', 'published'];
     protected $casts = [
         'is_available' => 'boolean',
+        'status' => BookStatus::class,
     ];
 
     public function author(): BelongsTo

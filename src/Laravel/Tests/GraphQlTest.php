@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Laravel\Tests;
 
 use ApiPlatform\Laravel\Test\ApiTestAssertionsTrait;
+use ApiPlatform\Laravel\workbench\app\Enums\BookStatus;
 use Illuminate\Config\Repository;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -133,6 +134,7 @@ class GraphQlTest extends TestCase
                     'name' => fake()->name(),
                     'author' => 'api/authors/'.$author->id,
                     'isbn' => fake()->isbn13(),
+                    'status' => BookStatus::PUBLISHED,
                     'isAvailable' => 1 === random_int(0, 1),
                 ],
             ],
