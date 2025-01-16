@@ -49,4 +49,33 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
         $apiProperty = $schemaPropertyMetadataFactory->create(DummyWithCustomOpenApiContext::class, 'acme');
         $this->assertEquals([], $apiProperty->getSchema());
     }
+
+    public function testWithCustomOpenApiContextWithoutTypeDefinition(): void
+    {
+        $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
+        $apiProperty = new ApiProperty(
+            openapiContext: ['description' => 'My description'],
+            builtinTypes: [new Type(builtinType: 'bool')],
+        );
+        $decorated = $this->createMock(PropertyMetadataFactoryInterface::class);
+        $decorated->expects($this->once())->method('create')->with(DummyWithCustomOpenApiContext::class, 'foo')->willReturn($apiProperty);
+        $schemaPropertyMetadataFactory = new SchemaPropertyMetadataFactory($resourceClassResolver, $decorated);
+        $apiProperty = $schemaPropertyMetadataFactory->create(DummyWithCustomOpenApiContext::class, 'foo');
+        $this->assertEquals([
+            'type' => 'boolean',
+        ], $apiProperty->getSchema());
+
+        $apiProperty = new ApiProperty(
+            openapiContext: ['iris' => 'https://schema.org/Date'],
+            builtinTypes: [new Type(builtinType: 'object', class: \DateTimeImmutable::class)],
+        );
+        $decorated = $this->createMock(PropertyMetadataFactoryInterface::class);
+        $decorated->expects($this->once())->method('create')->with(DummyWithCustomOpenApiContext::class, 'bar')->willReturn($apiProperty);
+        $schemaPropertyMetadataFactory = new SchemaPropertyMetadataFactory($resourceClassResolver, $decorated);
+        $apiProperty = $schemaPropertyMetadataFactory->create(DummyWithCustomOpenApiContext::class, 'bar');
+        $this->assertEquals([
+            'type' => 'string',
+            'format' => 'date-time',
+        ], $apiProperty->getSchema());
+    }
 }

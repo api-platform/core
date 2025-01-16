@@ -106,7 +106,7 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
         // never override the following keys if at least one is already set or if there's a custom openapi context
         if ([] === $types
             || ($propertySchema['type'] ?? $propertySchema['$ref'] ?? $propertySchema['anyOf'] ?? $propertySchema['allOf'] ?? $propertySchema['oneOf'] ?? false)
-            || ($propertyMetadata->getOpenapiContext() ?? false)
+            || \array_key_exists('type', $propertyMetadata->getOpenapiContext() ?? [])
         ) {
             return $propertyMetadata->withSchema($propertySchema);
         }
