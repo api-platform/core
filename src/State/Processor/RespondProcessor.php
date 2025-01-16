@@ -23,7 +23,6 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
@@ -94,11 +93,22 @@ final class RespondProcessor implements ProcessorInterface
         }
 
         if (!$exception) {
-            $allowedMethods = $this->getAllowedMethods($context['resource_class'] ?? null, $operation->getUriTemplate());
+            $isPostAllowed = false;
+            $allowedMethods = self::DEFAULT_ALLOWED_METHOD;
+            if (null !== ($context['resource_class'] ?? null) && null !== $this->resourceCollectionMetadataFactory && null !== ($currentUriTemplate = $operation->getUriTemplate()) && $this->resourceClassResolver?->isResourceClass($context['resource_class'])) {
+                $resourceMetadataCollection = $this->resourceCollectionMetadataFactory->create($context['resource_class']);
+                foreach ($resourceMetadataCollection as $resource) {
+                    foreach ($resource->getOperations() as $resourceOperation) {
+                        if ($resourceOperation->getUriTemplate() === $currentUriTemplate) {
+                            $allowedMethods[] = $operationMethod = $resourceOperation->getMethod();
+                            $isPostAllowed = $isPostAllowed || ('POST' === $operationMethod);
+                        }
+                    }
+                }
+            }
             $headers['Allow'] = implode(', ', $allowedMethods);
 
-            $outputFormats = $operation->getOutputFormats();
-            if (\is_array($outputFormats) && [] !== $outputFormats && \in_array('POST', $allowedMethods, true)) {
+            if ($isPostAllowed && \is_array($outputFormats = ($outputFormats = $operation->getOutputFormats())) && [] !== $outputFormats) {
                 $headers['Accept-Post'] = implode(', ', array_merge(...array_values($outputFormats)));
             }
         }
@@ -164,22 +174,5 @@ final class RespondProcessor implements ProcessorInterface
             $status,
             $headers
         );
-    }
-
-    private function getAllowedMethods(?string $resourceClass, ?string $currentUriTemplate): array
-    {
-        $allowedMethods = self::DEFAULT_ALLOWED_METHOD;
-        if (null !== $currentUriTemplate && null !== $resourceClass && $this->resourceClassResolver->isResourceClass($resourceClass)) {
-            $resourceMetadataCollection = $this->resourceCollectionMetadataFactory ? $this->resourceCollectionMetadataFactory->create($resourceClass) : new ResourceMetadataCollection($resourceClass);
-            foreach ($resourceMetadataCollection as $resource) {
-                foreach ($resource->getOperations() as $operation) {
-                    if ($operation->getUriTemplate() === $currentUriTemplate) {
-                        $allowedMethods[] = $operation->getMethod();
-                    }
-                }
-            }
-        }
-
-        return array_unique($allowedMethods);
     }
 }
