@@ -35,7 +35,7 @@ final readonly class Options
         private ?string $licenseUrl = null,
         private bool $overrideResponses = true,
         private bool $persistAuthorization = false,
-        private readonly array $httpAuth = []
+        private readonly array $httpAuth = [],
     ) {
     }
 
