@@ -533,7 +533,7 @@ class OpenApiFactoryTest extends TestCase
                     'type' => 'query',
                     'name' => 'key',
                 ],
-            ], null, null, null, null, null, null, true, [
+            ], null, null, null, null, null, null, true, true, [
                 'bearer' => [
                     'scheme' => 'bearer',
                     'bearerFormat' => 'JWT',
