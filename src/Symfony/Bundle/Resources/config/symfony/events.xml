@@ -61,6 +61,7 @@
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.metadata.operation.metadata_factory" />
+            <argument type="service" id="api_platform.metadata.operation.metadata_collection_factory" />
         </service>
 
         <service id="api_platform.state_processor.add_link_header" class="ApiPlatform\State\Processor\AddLinkHeaderProcessor" decorates="api_platform.state_processor.respond">
