@@ -1,11 +1,26 @@
 # Changelog
 
+## v4.0.15
+
+### Bug fixes
+
+* [36cee399c](https://github.com/api-platform/core/commit/36cee399cfd519355b03d0406921066a22ab474c) fix(state): skip Content-Location header for GET requests (#6901)
+* [dba9de197](https://github.com/api-platform/core/commit/dba9de197001e91094e594f0e4dc638007cce7a6) fix(symfony): fix property restrictions for root resource with dynamic validation groups (#6908)
+
+### Features
+
+* [421d97ecf](https://github.com/api-platform/core/commit/421d97ecfdbc7d699a3d017d1e3ae3827a38b216) feat(laravel): add support for backed enum normalizers (#6911)
+
+Also contains [v3.4.15 changes](#v3415).
+
 ## v4.0.14
 
 ### Bug fixes
 
 * [97cdb6b3f](https://github.com/api-platform/core/commit/97cdb6b3f43471789e096c9dc3a0c3c7b6d4e43c) fix(state): remove ProcessorInterface laravel specific type
 * [b12a0d005](https://github.com/api-platform/core/commit/b12a0d005fda58a162b82a3574e6ee877838a55b) fix(graphql): register types for parameter args (#6895)
+
+Also contains [v3.4.14 changes](#v3414).
 
 ## v4.0.13
 
@@ -138,7 +153,7 @@ Also contains [v3.4.6 changes](#v346).
 * [c47e2996e](https://github.com/api-platform/core/commit/c47e2996e51c587c998fde88903703bd6ac9a43c) fix: default format and standard_put values
 * [e327f5f69](https://github.com/api-platform/core/commit/e327f5f69c823c1ed674eefc0eb2551e30fb36bd) fix(symfony): namespace of path segment name generator services (#6642)
 
-Notes: 
+Notes:
 
 `standard_put=true` is now the default, you can set it to `false` using `extra_properties.defaults`
 
