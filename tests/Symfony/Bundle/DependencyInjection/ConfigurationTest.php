@@ -153,6 +153,7 @@ class ConfigurationTest extends TestCase
                 'api_keys' => [],
                 'http_auth' => [],
                 'swagger_ui_extra_configuration' => [],
+                'persist_authorization' => false,
             ],
             'eager_loading' => [
                 'enabled' => true,

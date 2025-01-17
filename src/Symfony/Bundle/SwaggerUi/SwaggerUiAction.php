@@ -79,6 +79,7 @@ final class SwaggerUiAction
                 'pkce' => $this->oauthPkce,
             ],
             'extraConfiguration' => $this->swaggerUiContext->getExtraConfiguration(),
+            'persistAuthorization' => $this->openApiOptions->hasPersistAuthorization(),
         ];
 
         $originalRouteParams = $request->attributes->get('_api_original_route_params') ?? [];
