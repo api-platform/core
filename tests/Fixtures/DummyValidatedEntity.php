@@ -77,4 +77,12 @@ class DummyValidatedEntity
      */
     #[Assert\Url]
     public $dummyUrl;
+
+    /**
+     * @return string[]
+     */
+    public static function getValidationGroups(): array
+    {
+        return ['dummy'];
+    }
 }
