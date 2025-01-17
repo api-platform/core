@@ -1,5 +1,27 @@
 # Changelog
 
+## v4.1.0-alpha.2
+
+### Bug fixes
+
+* [01fd74268](https://github.com/api-platform/core/commit/01fd74268cf0e4a289b31ea74bea7f4e089b8361) fix(laravel): restore accidentally removed BooleanFilter
+* [db40a63e7](https://github.com/api-platform/core/commit/db40a63e729fe03be84111dac2b0774fea4ab343) fix(hydra): rdfs:label should not duplicate title (#6748)
+* [deb2ed265](https://github.com/api-platform/core/commit/deb2ed265dfee7b8a73fd3b542aef3e29eca3412) fix(laravel): fix use laravel fillable for writable props (#6898)
+
+### Features
+
+* [c97db6bb2](https://github.com/api-platform/core/commit/c97db6bb2f6b2db9a6a17141bdb56bd51e9fc50d) feat: swagger ui persist authorization option (#6877)
+
+### Notes
+
+The [hydra patch](#6748) changes default `hydra:title` and uses the resource `shortname`. Previously the `hydra:title` information was duplicating the `hydra:description`. 
+The `rdfs:label` got removed from the `hydra:Class` as it was used instead of the `hydra:title`.
+On `hydra:property` `rdfs:label` got renamed to `label` as the `rdfs` namespace is available in the context. 
+The `ApiPlatform\Metadata\ErrorResource` and the `ConstraintViolation` (`ValidationException` class) are now generated directly from your PHP classes, only our `ConstraintViolationList` is hard-written and documents the `ConstraintViolation::violation` property. Therefore, your [own error resources](https://api-platform.com/docs/guides/error-resource/) are also documented. On top of that, we now set the `rdfs:subClassOf` to `hydra:Error`.
+`#[ApiProperty(hydra: false)]` allows you to skip a documented `hydra:supportedProperty` on a class.
+On write operations, we added the [expectsHeader](https://www.hydra-cg.com/spec/latest/core/#hydra:expectsHeader) field. 
+
+
 ## v4.1.0-alpha.1
 
 ### Bug fixes
