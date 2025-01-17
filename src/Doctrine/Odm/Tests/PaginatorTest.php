@@ -15,7 +15,6 @@ namespace ApiPlatform\Doctrine\Odm\Tests;
 
 use ApiPlatform\Doctrine\Odm\Paginator;
 use ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document\Dummy;
-use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Iterator\Iterator;

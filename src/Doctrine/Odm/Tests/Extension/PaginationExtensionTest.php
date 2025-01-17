@@ -48,9 +48,6 @@ class PaginationExtensionTest extends TestCase
      */
     protected function setUp(): void
     {
-        // This class is final, but we need to mock it
-        require_once __DIR__.'/../stubs/AddFields.php';
-
         $this->managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
     }
 
