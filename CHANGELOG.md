@@ -1,5 +1,13 @@
 # Changelog
 
+## v4.0.16
+
+### Bug fixes
+
+* [dc4fc84ba](https://github.com/api-platform/core/commit/dc4fc84ba93e22b4f44a37e90a93c6d079c1c620) fix(graphql): securityAfterResolver not called
+
+### Features
+
 ## v4.0.15
 
 ### Bug fixes
