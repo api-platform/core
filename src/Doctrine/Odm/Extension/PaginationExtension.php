@@ -80,9 +80,8 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
             // Store pagination metadata, read by the Paginator
             // Using __ to avoid field names mapping
             ->addFields()
-                ->field('__firstResult__')->literal($offset)
-                ->field('__maxResults__')->literal($limit)
-        ;
+                ->field('__api_first_result__')->literal($offset)
+                ->field('__api_max_results__')->literal($limit);
     }
 
     /**

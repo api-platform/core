@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm;
 
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\State\Pagination\HasNextPagePaginatorInterface;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use Doctrine\ODM\MongoDB\Iterator\Iterator;
@@ -38,23 +39,30 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface, HasNext
 
     public function __construct(Iterator $mongoDbOdmIterator, UnitOfWork $unitOfWork, string $resourceClass)
     {
-        $results = $mongoDbOdmIterator->toArray();
+        $result = $mongoDbOdmIterator->toArray()[0];
+
+        if (array_diff_key(['results' => 1, 'count' => 1, '__api_first_result__' => 1, '__api_max_results__' => 1], $result)) {
+            throw new RuntimeException('The result of the query must contain only "__api_first_result__", "__api_max_results__", "results" and "count" fields.');
+        }
+
+        // The "count" facet contains the total number of documents,
+        // it is not set when the query does not return any document
+        $this->totalItems = $result['count'][0]['count'] ?? 0;
 
         // The "results" facet contains the returned documents
-        if ($results[0]['results'] === []) {
+        if ([] === $result['results']) {
             $this->count = 0;
             $this->iterator = new \ArrayIterator();
         } else {
-            $this->count = \count($results[0]['results']);
+            $this->count = \count($result['results']);
             $this->iterator = new \ArrayIterator(array_map(
-                static fn($result): object => $unitOfWork->getOrCreateDocument($resourceClass, $result),
-                $results[0]['results'],
+                static fn ($result): object => $unitOfWork->getOrCreateDocument($resourceClass, $result),
+                $result['results'],
             ));
         }
 
-        $this->totalItems = $results[0]['count'][0]['count'] ?? 0;
-        $this->firstResult = $results[0]['__firstResult__'];
-        $this->maxResults = $results[0]['__maxResults__'];
+        $this->firstResult = $result['__api_first_result__'];
+        $this->maxResults = $result['__api_max_results__'];
     }
 
     /**

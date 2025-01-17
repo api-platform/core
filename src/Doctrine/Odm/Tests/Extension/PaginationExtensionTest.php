@@ -330,8 +330,8 @@ class PaginationExtensionTest extends TestCase
                         'count' => 9,
                     ],
                 ],
-                '__firstResult__' => 3,
-                '__maxResults__' => 6,
+                '__api_first_result__' => 3,
+                '__api_max_results__' => 6,
             ],
         ]);
 
@@ -351,8 +351,8 @@ class PaginationExtensionTest extends TestCase
             ],
             [
                 '$addFields' => [
-                    '__firstResult__' => ['$literal' => 3],
-                    '__maxResults__' => ['$literal' => 6],
+                    '__api_first_result__' => ['$literal' => 3],
+                    '__api_max_results__' => ['$literal' => 6],
                 ],
             ],
         ]);
@@ -387,8 +387,8 @@ class PaginationExtensionTest extends TestCase
                         'count' => 9,
                     ],
                 ],
-                '__firstResult__' => 3,
-                '__maxResults__' => 6,
+                '__api_first_result__' => 3,
+                '__api_max_results__' => 6,
             ],
         ]);
 
@@ -407,10 +407,9 @@ class PaginationExtensionTest extends TestCase
                 ],
             ],
             [
-
                 '$addFields' => [
-                    '__firstResult__' => ['$literal' => 3],
-                    '__maxResults__' => ['$literal' => 6],
+                    '__api_first_result__' => ['$literal' => 3],
+                    '__api_max_results__' => ['$literal' => 6],
                 ],
             ],
         ]);
@@ -437,9 +436,9 @@ class PaginationExtensionTest extends TestCase
         $resultsAggregationBuilderProphecy->skip($expectedOffset)->shouldBeCalled()->willReturn($skipProphecy->reveal());
 
         $addFieldsProphecy = $this->prophesize(AddFields::class);
-        $addFieldsProphecy->field('__firstResult__')->shouldBeCalled()->willReturn($addFieldsProphecy->reveal());
+        $addFieldsProphecy->field('__api_first_result__')->shouldBeCalled()->willReturn($addFieldsProphecy->reveal());
         $addFieldsProphecy->literal($expectedOffset)->shouldBeCalled()->willReturn($addFieldsProphecy->reveal());
-        $addFieldsProphecy->field('__maxResults__')->shouldBeCalled()->willReturn($addFieldsProphecy->reveal());
+        $addFieldsProphecy->field('__api_max_results__')->shouldBeCalled()->willReturn($addFieldsProphecy->reveal());
         $addFieldsProphecy->literal($expectedLimit)->shouldBeCalled()->willReturn($addFieldsProphecy->reveal());
 
         $countProphecy = $this->prophesize(Count::class);

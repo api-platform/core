@@ -11,7 +11,7 @@ use Doctrine\ODM\MongoDB\Aggregation\Expr;
  *
  * @psalm-import-type OperatorExpression from Expr
  * @psalm-type AddFieldsStageExpression = array{'$addFields': array<string, OperatorExpression|mixed>}
-*/
+ */
 class AddFields extends Operator
 {
     /** @return AddFieldsStageExpression */
