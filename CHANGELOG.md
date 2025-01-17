@@ -1,5 +1,12 @@
 # Changelog
 
+## v3.4.16
+
+### Bug fixes
+
+* [dc4fc84ba](https://github.com/api-platform/core/commit/dc4fc84ba93e22b4f44a37e90a93c6d079c1c620) fix(graphql): securityAfterResolver not called
+* [9eb5c4e94](https://github.com/api-platform/core/commit/9eb5c4e941d0ebf59bc8ef5777b144db9b4a0899) fix(symfony): suggest `DocumentationAction` as replacement for deprecated `SwaggerUiAction` (#6894)
+
 ## v3.4.15
 
 ### Bug fixes
