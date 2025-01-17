@@ -35,7 +35,7 @@ final readonly class Options
         private ?string $licenseUrl = null,
         private bool $overrideResponses = true,
         private bool $persistAuthorization = false,
-        private readonly array $httpAuth = [],
+        private array $httpAuth = [],
     ) {
     }
 
@@ -134,7 +134,7 @@ final readonly class Options
         return $this->overrideResponses;
     }
 
-    public function isPersistAuthorization(): bool
+    public function hasPersistAuthorization(): bool
     {
         return $this->persistAuthorization;
     }

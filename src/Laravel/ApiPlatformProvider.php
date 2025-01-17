@@ -776,7 +776,7 @@ class ApiPlatformProvider extends ServiceProvider
                 contactEmail: $config->get('api-platform.swagger_ui.contact.email', ''),
                 licenseName: $config->get('api-platform.swagger_ui.license.name', ''),
                 licenseUrl: $config->get('api-platform.swagger_ui.license.url', ''),
-                persistAuthorization: $config->get('api-platform.swagger_ui.persistAuthorization', false),
+                persistAuthorization: $config->get('api-platform.swagger_ui.persist_authorization', false),
                 httpAuth: $config->get('api-platform.swagger_ui.http_auth', []),
             );
         });
