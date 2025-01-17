@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.4.15
+
+### Bug fixes
+
+* [ab03b5544](https://github.com/api-platform/core/commit/ab03b5544f742b98a39cc23fc157f1be7a2e0c63) fix(openapi): typing issue with `openapiContext` in `#[ApiProperty]` (#6910)
+
 ## v3.4.14
 
 ### Bug fixes
