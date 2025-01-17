@@ -30,4 +30,10 @@ class DummyWithCustomOpenApiContext
 {
     #[ApiProperty(openapiContext: ['type' => 'object', 'properties' => ['alpha' => ['type' => 'integer']]])]
     public $acme;
+
+    #[ApiProperty(openapiContext: ['description' => 'My description'])]
+    public bool $foo;
+
+    #[ApiProperty(openapiContext: ['iris' => 'https://schema.org/Date'])]
+    public \DateTimeImmutable $bar;
 }

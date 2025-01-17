@@ -7,8 +7,6 @@
 * [97cdb6b3f](https://github.com/api-platform/core/commit/97cdb6b3f43471789e096c9dc3a0c3c7b6d4e43c) fix(state): remove ProcessorInterface laravel specific type
 * [b12a0d005](https://github.com/api-platform/core/commit/b12a0d005fda58a162b82a3574e6ee877838a55b) fix(graphql): register types for parameter args (#6895)
 
-### Features
-
 ## v4.0.13
 
 ### Bug fixes
@@ -18,8 +16,6 @@
 * [f2c998158](https://github.com/api-platform/core/commit/f2c998158a70632a26efcdd29a17d7f3a2cb859c) fix(jsonld): anonymous context hydra_prefix value (#6873)
 
 Also contains [v3.4.10 changes](#v3410).
-
-### Features
 
 ## v4.0.12
 
@@ -32,15 +28,11 @@ Also contains [v3.4.10 changes](#v3410).
 
 Also contains [v3.4.9 changes](#v349).
 
-### Features
-
 ## v4.0.11
 
 ### Bug fixes
 
 * [af66075fd](https://github.com/api-platform/core/commit/af66075fdd6b83bdebc1c4ca33cc0ab7e1a7f8af) fix(laravel): fix foregin keys (relations) beeing in attributes (#6843)
-
-### Features
 
 * [2d59c6369](https://github.com/api-platform/core/commit/2d59c63699b4602cfe4d62504896c6d4121c1be4) feat(laravel): belongs to many relations (#6818)
 
@@ -56,8 +48,6 @@ Also contains [v3.4.8 changes](#v348).
 
 Also contains [v3.4.7 changes](#v347).
 
-### Features
-
 ## v4.0.9
 
 ### Bug fixes
@@ -68,15 +58,11 @@ Also contains [v3.4.7 changes](#v347).
 
 Also contains [v3.4.6 changes](#v346).
 
-### Features
-
 ## v4.0.8
 
 ### Bug fixes
 
 * [dddb97075](https://github.com/api-platform/core/commit/dddb97075af9c6e2517e1881b803c9d31a1913cf) fix(symfony): default formats order (#6780)
-
-### Features
 
 ## v4.0.7
 
@@ -89,8 +75,6 @@ Also contains [v3.4.6 changes](#v346).
 * [736ca045e](https://github.com/api-platform/core/commit/736ca045e6832f04aaa002ddd7b85c55df4696bb) fix(validator): allow to pass both a ConstraintViolationList and a previous exception (#6762)
 * [9ac3661b6](https://github.com/api-platform/core/commit/9ac3661b6a75255832203b87a9ba7994add64061) fix(hydra): store and use hydra context in a local variable (#6765)
 
-### Features
-
 ## v4.0.6
 
 ### Bug fixes
@@ -101,8 +85,6 @@ Also contains [v3.4.6 changes](#v346).
 * [67c5a2a24](https://github.com/api-platform/core/commit/67c5a2a2463bca94f0997b4fab1248a08994465b) fix(laravel): jsonapi error serialization (#6755)
 * [ac6f667f3](https://github.com/api-platform/core/commit/ac6f667f301f6c4c399a707faf00567239bd98d8) fix(laravel): collection relations other than HasMany (#6737)
 
-### Features
-
 * [cecd77149](https://github.com/api-platform/core/commit/cecd77149795c1a455ac72bc3ed0606413e69900) feat(laravel): use laravel cache setting (#6751)
 
 ## v4.0.5
@@ -111,8 +93,6 @@ Also contains [v3.4.6 changes](#v346).
 
 * [4171d5f9c](https://github.com/api-platform/core/commit/4171d5f9cd41731b857c53a186270ba0626baedf) fix(graphql): register query parameter arguments with filters (#6726)
 * [48ab53816](https://github.com/api-platform/core/commit/48ab53816c55e6116aa64ac81f522f4b7b9bb9f6) fix(laravel): make command writes to app instead of src (#6723)
-
-### Features
 
 ## v4.0.4
 
@@ -256,6 +236,12 @@ Notes:
 ### Features
 
 * [0d5f35683](https://github.com/api-platform/core/commit/0d5f356839eb6aa9f536044abe4affa736553e76) feat(laravel): laravel component (#5882)
+
+## v3.4.15
+
+### Bug fixes
+
+* [ab03b5544](https://github.com/api-platform/core/commit/ab03b5544f742b98a39cc23fc157f1be7a2e0c63) fix(openapi): typing issue with `openapiContext` in `#[ApiProperty]` (#6910)
 
 ## v3.4.14
 
