@@ -42,7 +42,6 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
 
     public function retrieveSubscriptionId(array $context, ?array $result, ?Operation $operation = null): ?string
     {
-
         /** @var ResolveInfo $info */
         $info = $context['info'];
         $fields = $info->getFieldSelection(\PHP_INT_MAX);
@@ -122,11 +121,6 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
         if ($this->subscriptionsCache->hasItem($cacheKey)) {
             $this->subscriptionsCache->deleteItem($cacheKey);
         }
-    }
-
-    private function encodeIriToCacheKey(string $iri): string
-    {
-        return str_replace('/', '_', $iri);
     }
 
     private function updateSubscriptionCollectionCacheData(
@@ -225,4 +219,8 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
         return $payloads;
     }
 
+    private function encodeIriToCacheKey(string $iri): string
+    {
+        return str_replace('/', '_', $iri);
+    }
 }
