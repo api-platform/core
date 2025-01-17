@@ -252,6 +252,13 @@ Notes:
 
 * [0d5f35683](https://github.com/api-platform/core/commit/0d5f356839eb6aa9f536044abe4affa736553e76) feat(laravel): laravel component (#5882)
 
+## v3.4.16
+
+### Bug fixes
+
+* [dc4fc84ba](https://github.com/api-platform/core/commit/dc4fc84ba93e22b4f44a37e90a93c6d079c1c620) fix(graphql): securityAfterResolver not called
+* [9eb5c4e94](https://github.com/api-platform/core/commit/9eb5c4e941d0ebf59bc8ef5777b144db9b4a0899) fix(symfony): suggest `DocumentationAction` as replacement for deprecated `SwaggerUiAction` (#6894)
+
 ## v3.4.15
 
 ### Bug fixes
@@ -516,6 +523,13 @@ You should now install `api-platform/symfony` instead of `api-platform/core`.
 * [7399fcf7e](https://github.com/api-platform/core/commit/7399fcf7eaf28cd649d137da1fdd54f69093e275) feat(symfony): skip error handler (#6463)
 * [74986cb55](https://github.com/api-platform/core/commit/74986cb552182dc645bd1fc967faa0954dd59e0a) feat: inflector as service (#6447)
 * [b47edb2a4](https://github.com/api-platform/core/commit/b47edb2a499c34e79c167f963e3a626a3e9d040a) feat(serializer): context IRI in HAL or JsonApi format (#6215)
+
+## v3.3.15
+
+### Bug fixes
+
+* [dc4fc84ba](https://github.com/api-platform/core/commit/dc4fc84ba93e22b4f44a37e90a93c6d079c1c620) fix(graphql): securityAfterResolver not called 
+* [9eb5c4e94](https://github.com/api-platform/core/commit/9eb5c4e941d0ebf59bc8ef5777b144db9b4a0899) fix(symfony): suggest `DocumentationAction` as replacement for deprecated `SwaggerUiAction` (#6894)
 
 ## v3.3.14
 
