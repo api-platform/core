@@ -36,7 +36,7 @@ trait ResourceMetadataTrait
         return $forceSubschema ? ($inputOrOutput['class'] ?? $inputOrOutput->class ?? $operation->getClass()) : ($inputOrOutput['class'] ?? $inputOrOutput->class ?? null);
     }
 
-    private function findOperation(string $className, string $type, ?Operation $operation, ?array $serializerContext): Operation
+    private function findOperation(string $className, string $type, ?Operation $operation, ?array $serializerContext, ?string $format = null): Operation
     {
         if (null === $operation) {
             if (null === $this->resourceMetadataFactory) {
@@ -54,7 +54,7 @@ trait ResourceMetadataTrait
                 $operation = new HttpOperation();
             }
 
-            return $this->findOperationForType($resourceMetadataCollection, $type, $operation);
+            return $this->findOperationForType($resourceMetadataCollection, $type, $operation, $format);
         }
 
         // The best here is to use an Operation when calling `buildSchema`, we try to do a smart guess otherwise
@@ -65,13 +65,13 @@ trait ResourceMetadataTrait
                 return $resourceMetadataCollection->getOperation($operation->getName());
             }
 
-            return $this->findOperationForType($resourceMetadataCollection, $type, $operation);
+            return $this->findOperationForType($resourceMetadataCollection, $type, $operation, $format);
         }
 
         return $operation;
     }
 
-    private function findOperationForType(ResourceMetadataCollection $resourceMetadataCollection, string $type, Operation $operation): Operation
+    private function findOperationForType(ResourceMetadataCollection $resourceMetadataCollection, string $type, Operation $operation, ?string $format = null): Operation
     {
         // Find the operation and use the first one that matches criterias
         foreach ($resourceMetadataCollection as $resourceMetadata) {
@@ -82,6 +82,11 @@ trait ResourceMetadataTrait
                 }
 
                 if (Schema::TYPE_INPUT === $type && \in_array($op->getMethod(), ['POST', 'PATCH', 'PUT'], true)) {
+                    $operation = $op;
+                    break 2;
+                }
+
+                if ($format && Schema::TYPE_OUTPUT === $type && \array_key_exists($format, $op->getOutputFormats() ?? [])) {
                     $operation = $op;
                     break 2;
                 }

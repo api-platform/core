@@ -231,7 +231,7 @@ final class ApiProperty
         return $this->property;
     }
 
-    public function withProperty(string $property): self
+    public function withProperty(string $property): static
     {
         $self = clone $this;
         $self->property = $property;
@@ -244,7 +244,7 @@ final class ApiProperty
         return $this->description;
     }
 
-    public function withDescription(string $description): self
+    public function withDescription(string $description): static
     {
         $self = clone $this;
         $self->description = $description;
@@ -257,7 +257,7 @@ final class ApiProperty
         return $this->readable;
     }
 
-    public function withReadable(bool $readable): self
+    public function withReadable(bool $readable): static
     {
         $self = clone $this;
         $self->readable = $readable;
@@ -270,7 +270,7 @@ final class ApiProperty
         return $this->writable;
     }
 
-    public function withWritable(bool $writable): self
+    public function withWritable(bool $writable): static
     {
         $self = clone $this;
         $self->writable = $writable;
@@ -283,7 +283,7 @@ final class ApiProperty
         return $this->readableLink;
     }
 
-    public function withReadableLink(bool $readableLink): self
+    public function withReadableLink(bool $readableLink): static
     {
         $self = clone $this;
         $self->readableLink = $readableLink;
@@ -296,7 +296,7 @@ final class ApiProperty
         return $this->writableLink;
     }
 
-    public function withWritableLink(bool $writableLink): self
+    public function withWritableLink(bool $writableLink): static
     {
         $self = clone $this;
         $self->writableLink = $writableLink;
@@ -309,7 +309,7 @@ final class ApiProperty
         return $this->required;
     }
 
-    public function withRequired(bool $required): self
+    public function withRequired(bool $required): static
     {
         $self = clone $this;
         $self->required = $required;
@@ -322,7 +322,7 @@ final class ApiProperty
         return $this->identifier;
     }
 
-    public function withIdentifier(bool $identifier): self
+    public function withIdentifier(bool $identifier): static
     {
         $self = clone $this;
         $self->identifier = $identifier;
@@ -335,7 +335,7 @@ final class ApiProperty
         return $this->default;
     }
 
-    public function withDefault($default): self
+    public function withDefault($default): static
     {
         $self = clone $this;
         $self->default = $default;
@@ -348,7 +348,7 @@ final class ApiProperty
         return $this->example;
     }
 
-    public function withExample(mixed $example): self
+    public function withExample(mixed $example): static
     {
         $self = clone $this;
         $self->example = $example;
@@ -361,7 +361,7 @@ final class ApiProperty
         return $this->deprecationReason;
     }
 
-    public function withDeprecationReason($deprecationReason): self
+    public function withDeprecationReason($deprecationReason): static
     {
         $self = clone $this;
         $self->deprecationReason = $deprecationReason;
@@ -374,7 +374,7 @@ final class ApiProperty
         return $this->fetchable;
     }
 
-    public function withFetchable($fetchable): self
+    public function withFetchable($fetchable): static
     {
         $self = clone $this;
         $self->fetchable = $fetchable;
@@ -387,7 +387,7 @@ final class ApiProperty
         return $this->fetchEager;
     }
 
-    public function withFetchEager($fetchEager): self
+    public function withFetchEager($fetchEager): static
     {
         $self = clone $this;
         $self->fetchEager = $fetchEager;
@@ -400,7 +400,7 @@ final class ApiProperty
         return $this->jsonldContext;
     }
 
-    public function withJsonldContext($jsonldContext): self
+    public function withJsonldContext($jsonldContext): static
     {
         $self = clone $this;
         $self->jsonldContext = $jsonldContext;
@@ -413,7 +413,7 @@ final class ApiProperty
         return $this->openapiContext;
     }
 
-    public function withOpenapiContext($openapiContext): self
+    public function withOpenapiContext($openapiContext): static
     {
         $self = clone $this;
         $self->openapiContext = $openapiContext;
@@ -426,7 +426,7 @@ final class ApiProperty
         return $this->jsonSchemaContext;
     }
 
-    public function withJsonSchemaContext($jsonSchemaContext): self
+    public function withJsonSchemaContext($jsonSchemaContext): static
     {
         $self = clone $this;
         $self->jsonSchemaContext = $jsonSchemaContext;
@@ -439,7 +439,7 @@ final class ApiProperty
         return $this->push;
     }
 
-    public function withPush($push): self
+    public function withPush($push): static
     {
         $self = clone $this;
         $self->push = $push;
@@ -452,7 +452,7 @@ final class ApiProperty
         return $this->security instanceof \Stringable ? (string) $this->security : $this->security;
     }
 
-    public function withSecurity($security): self
+    public function withSecurity($security): static
     {
         $self = clone $this;
         $self->security = $security;
@@ -465,7 +465,7 @@ final class ApiProperty
         return $this->securityPostDenormalize instanceof \Stringable ? (string) $this->securityPostDenormalize : $this->securityPostDenormalize;
     }
 
-    public function withSecurityPostDenormalize($securityPostDenormalize): self
+    public function withSecurityPostDenormalize($securityPostDenormalize): static
     {
         $self = clone $this;
         $self->securityPostDenormalize = $securityPostDenormalize;
@@ -481,7 +481,7 @@ final class ApiProperty
     /**
      * @param string[]|string $types
      */
-    public function withTypes(array|string $types = []): self
+    public function withTypes(array|string $types = []): static
     {
         $self = clone $this;
         $self->types = (array) $types;
@@ -500,7 +500,7 @@ final class ApiProperty
     /**
      * @param Type[] $builtinTypes
      */
-    public function withBuiltinTypes(array $builtinTypes = []): self
+    public function withBuiltinTypes(array $builtinTypes = []): static
     {
         $self = clone $this;
         $self->builtinTypes = $builtinTypes;
@@ -513,7 +513,7 @@ final class ApiProperty
         return $this->schema;
     }
 
-    public function withSchema(array $schema = []): self
+    public function withSchema(array $schema = []): static
     {
         $self = clone $this;
         $self->schema = $schema;
@@ -521,7 +521,7 @@ final class ApiProperty
         return $self;
     }
 
-    public function withInitializable(bool $initializable): self
+    public function withInitializable(?bool $initializable): static
     {
         $self = clone $this;
         $self->initializable = $initializable;
@@ -539,7 +539,7 @@ final class ApiProperty
         return $this->extraProperties;
     }
 
-    public function withExtraProperties(array $extraProperties = []): self
+    public function withExtraProperties(array $extraProperties = []): static
     {
         $self = clone $this;
         $self->extraProperties = $extraProperties;
@@ -560,7 +560,7 @@ final class ApiProperty
      *
      * @param string|string[] $iris
      */
-    public function withIris(string|array $iris): self
+    public function withIris(string|array $iris): static
     {
         $metadata = clone $this;
         $metadata->iris = (array) $iris;
@@ -576,7 +576,7 @@ final class ApiProperty
         return $this->genId;
     }
 
-    public function withGenId(bool $genId): self
+    public function withGenId(bool $genId): static
     {
         $metadata = clone $this;
         $metadata->genId = $genId;
@@ -594,7 +594,7 @@ final class ApiProperty
         return $this->uriTemplate;
     }
 
-    public function withUriTemplate(?string $uriTemplate): self
+    public function withUriTemplate(?string $uriTemplate): static
     {
         $metadata = clone $this;
         $metadata->uriTemplate = $uriTemplate;

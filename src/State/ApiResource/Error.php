@@ -25,7 +25,6 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\WebLink\Link;
 
 #[ErrorResource(
-    openapi: false,
     uriVariables: ['status'],
     uriTemplate: '/errors/{status}',
     operations: [
@@ -37,15 +36,17 @@ use Symfony\Component\WebLink\Link;
             normalizationContext: [
                 'groups' => ['jsonproblem'],
                 'skip_null_values' => true,
+                'ignored_attributes' => ['trace', 'file', 'line', 'code', 'message', 'traceAsString', 'previous'],
             ],
         ),
         new Operation(
             name: '_api_errors_hydra',
             routeName: 'api_errors',
-            outputFormats: ['jsonld' => ['application/problem+json']],
+            outputFormats: ['jsonld' => ['application/problem+json', 'application/ld+json']],
             normalizationContext: [
                 'groups' => ['jsonld'],
                 'skip_null_values' => true,
+                'ignored_attributes' => ['trace', 'file', 'line', 'code', 'message', 'traceAsString', 'previous'],
             ],
             links: [new Link(rel: 'http://www.w3.org/ns/json-ld#error', href: 'http://www.w3.org/ns/hydra/error')],
         ),
@@ -55,32 +56,46 @@ use Symfony\Component\WebLink\Link;
             hideHydraOperation: true,
             outputFormats: ['jsonapi' => ['application/vnd.api+json']],
             normalizationContext: [
+                'disable_json_schema_serializer_groups' => false,
                 'groups' => ['jsonapi'],
                 'skip_null_values' => true,
+                'ignored_attributes' => ['trace', 'file', 'line', 'code', 'message', 'traceAsString', 'previous'],
             ],
         ),
         new Operation(
             name: '_api_errors',
             routeName: 'api_errors',
             hideHydraOperation: true,
+            openapi: false
         ),
     ],
     provider: 'api_platform.state.error_provider',
-    graphQlOperations: []
+    graphQlOperations: [],
+    description: 'A representation of common errors.'
 )]
 #[ApiProperty(property: 'traceAsString', hydra: false)]
 #[ApiProperty(property: 'string', hydra: false)]
 class Error extends \Exception implements ProblemExceptionInterface, HttpExceptionInterface
 {
+    private ?string $id = null;
+
     public function __construct(
         private string $title,
         private string $detail,
-        #[ApiProperty(identifier: true, writable: false, initializable: false)] private int $status,
+        #[ApiProperty(
+            description: 'The HTTP status code applicable to this problem.',
+            identifier: true,
+            writable: false,
+            initializable: false,
+            schema: ['type' => 'number', 'example' => 404, 'default' => 400]
+        )] private int $status,
         ?array $originalTrace = null,
         private ?string $instance = null,
         private string $type = 'about:blank',
         private array $headers = [],
         ?\Throwable $previous = null,
+        private ?array $meta = null,
+        private ?array $source = null,
     ) {
         parent::__construct($title, $status, $previous);
 
@@ -98,7 +113,28 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
     #[Groups(['jsonapi'])]
     public function getId(): string
     {
-        return (string) $this->status;
+        return $this->id ?? ((string) $this->status);
+    }
+
+    #[Groups(['jsonapi'])]
+    #[ApiProperty(schema: ['type' => 'object'])]
+    public function getMeta(): ?array
+    {
+        return $this->meta;
+    }
+
+    #[Groups(['jsonapi'])]
+    #[ApiProperty(schema: [
+        'type' => 'object',
+        'properties' => [
+            'pointer' => ['type' => 'string'],
+            'parameter' => ['type' => 'string'],
+            'header' => ['type' => 'string'],
+        ],
+    ])]
+    public function getSource(): ?array
+    {
+        return $this->source;
     }
 
     #[SerializedName('trace')]
@@ -142,7 +178,7 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
     }
 
     #[Groups(['jsonld', 'jsonproblem', 'jsonapi'])]
-    #[ApiProperty(writable: false, initializable: false)]
+    #[ApiProperty(writable: false, initializable: false, description: 'A URI reference that identifies the problem type')]
     public function getType(): string
     {
         return $this->type;
@@ -154,7 +190,7 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
     }
 
     #[Groups(['jsonld', 'jsonproblem', 'jsonapi'])]
-    #[ApiProperty(writable: false, initializable: false)]
+    #[ApiProperty(writable: false, initializable: false, description: 'A short, human-readable summary of the problem.')]
     public function getTitle(): ?string
     {
         return $this->title;
@@ -177,7 +213,7 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
     }
 
     #[Groups(['jsonld', 'jsonproblem', 'jsonapi'])]
-    #[ApiProperty(writable: false, initializable: false)]
+    #[ApiProperty(writable: false, initializable: false, description: 'A human-readable explanation specific to this occurrence of the problem.')]
     public function getDetail(): ?string
     {
         return $this->detail;
@@ -188,8 +224,8 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
         $this->detail = $detail;
     }
 
-    #[Groups(['jsonld', 'jsonproblem'])]
-    #[ApiProperty(writable: false, initializable: false)]
+    #[Groups(['jsonld', 'jsonproblem', 'jsonapi'])]
+    #[ApiProperty(writable: false, initializable: false, description: 'A URI reference that identifies the specific occurrence of the problem. It may or may not yield further information if dereferenced.')]
     public function getInstance(): ?string
     {
         return $this->instance;
@@ -198,5 +234,20 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
     public function setInstance(?string $instance = null): void
     {
         $this->instance = $instance;
+    }
+
+    public function setId(?string $id = null): void
+    {
+        $this->id = $id;
+    }
+
+    public function setMeta(?array $meta = null): void
+    {
+        $this->meta = $meta;
+    }
+
+    public function setSource(?array $source = null): void
+    {
+        $this->source = $source;
     }
 }

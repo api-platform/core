@@ -34,6 +34,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6212\Nest;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Question;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\ApplicationTester;
@@ -378,9 +379,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $this->assertArrayNotHasKey('@id', $json['definitions']['DisableIdGenerationItem.jsonld']['properties']);
     }
 
-    /**
-     * @dataProvider arrayPropertyTypeSyntaxProvider
-     */
+    #[DataProvider('arrayPropertyTypeSyntaxProvider')]
     public function testOpenApiSchemaGenerationForArrayProperty(string $propertyName, array $expectedProperties): void
     {
         $this->tester->run([
