@@ -14,15 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional\State;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyGetPostDeleteOperation;
-use ApiPlatform\Tests\RecreateSchemaTrait;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DummyGetPostDeleteOperation;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Tools\SchemaTool;
 
 class RespondProcessorTest extends ApiTestCase
 {
-    use RecreateSchemaTrait;
     use SetupClassResourcesTrait;
 
     /**
@@ -31,18 +27,6 @@ class RespondProcessorTest extends ApiTestCase
     public static function getResources(): array
     {
         return [DummyGetPostDeleteOperation::class];
-    }
-
-    public function testAllowHeadersForSingleResourceWithGetDelete(): void
-    {
-        $client = static::createClient();
-        $client->request('GET', '/dummy_get_post_delete_operations/1', [
-            'headers' => [
-                'Content-Type' => 'application/ld+json',
-            ],
-        ]);
-
-        $this->assertResponseHeaderSame('Allow', 'OPTIONS, HEAD, GET, DELETE');
     }
 
     public function testAllowHeadersForResourceCollectionReflectsAllowedMethods(): void
@@ -55,6 +39,15 @@ class RespondProcessorTest extends ApiTestCase
         ]);
 
         $this->assertResponseHeaderSame('allow', 'OPTIONS, HEAD, GET, POST');
+
+        $client = static::createClient();
+        $client->request('GET', '/dummy_get_post_delete_operations/1', [
+            'headers' => [
+                'Content-Type' => 'application/ld+json',
+            ],
+        ]);
+
+        $this->assertResponseHeaderSame('allow', 'OPTIONS, HEAD, GET, DELETE');
     }
 
     public function testAcceptPostHeaderForResourceWithPostReflectsAllowedTypes(): void
@@ -72,54 +65,12 @@ class RespondProcessorTest extends ApiTestCase
     public function testAcceptPostHeaderDoesNotExistResourceWithoutPost(): void
     {
         $client = static::createClient();
-        $client->request('OPTIONS', '/dummy_get_post_delete_operations/1', [
+        $client->request('GET', '/dummy_get_post_delete_operations/1', [
             'headers' => [
                 'Content-Type' => 'application/ld+json',
             ],
         ]);
 
         $this->assertResponseNotHasHeader('accept-post');
-    }
-
-    protected function setUp(): void
-    {
-        self::bootKernel();
-
-        $container = static::getContainer();
-        $registry = $container->get('doctrine');
-        $manager = $registry->getManager();
-        if (!$manager instanceof EntityManagerInterface) {
-            return;
-        }
-
-        $classes = [$manager->getClassMetadata(DummyGetPostDeleteOperation::class)];
-
-        try {
-            $schemaTool = new SchemaTool($manager);
-            @$schemaTool->createSchema($classes);
-        } catch (\Exception $e) {
-            return;
-        }
-
-        $dummy = new DummyGetPostDeleteOperation();
-        $dummy->setName('Dummy');
-        $manager->persist($dummy);
-        $manager->flush();
-    }
-
-    protected function tearDown(): void
-    {
-        $container = static::getContainer();
-        $registry = $container->get('doctrine');
-        $manager = $registry->getManager();
-        if (!$manager instanceof EntityManagerInterface) {
-            return;
-        }
-
-        $classes = [$manager->getClassMetadata(DummyGetPostDeleteOperation::class)];
-
-        $schemaTool = new SchemaTool($manager);
-        @$schemaTool->dropSchema($classes);
-        parent::tearDown();
     }
 }

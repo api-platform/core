@@ -21,11 +21,16 @@
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.metadata.operation.metadata_factory" />
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
         </service>
 
         <service id="api_platform.state_processor.add_link_header" class="ApiPlatform\State\Processor\AddLinkHeaderProcessor" decorates="api_platform.state_processor.respond">
             <argument type="service" id="api_platform.state_processor.add_link_header.inner" />
+        </service>
+
+        <service id="api_platform.state_processor.linked_data_platform" class="ApiPlatform\State\Processor\LinkedDataPlatformProcessor" decorates="api_platform.state_processor.respond">
+            <argument type="service" id="api_platform.state_processor.linked_data_platform.inner" />
+            <argument type="service" id="api_platform.resource_class_resolver" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
         </service>
     </services>
 </container>
