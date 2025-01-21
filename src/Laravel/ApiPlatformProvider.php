@@ -183,6 +183,7 @@ use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginationOptions;
 use ApiPlatform\State\ParameterProviderInterface;
 use ApiPlatform\State\Processor\AddLinkHeaderProcessor;
+use ApiPlatform\State\Processor\LinkedDataPlatformProcessor;
 use ApiPlatform\State\Processor\RespondProcessor;
 use ApiPlatform\State\Processor\SerializeProcessor;
 use ApiPlatform\State\Processor\WriteProcessor;
@@ -556,6 +557,10 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->singleton(RespondProcessor::class, function () {
             return new AddLinkHeaderProcessor(new RespondProcessor(), new HttpHeaderSerializer());
+        });
+
+        $this->app->singleton(RespondProcessor::class, function (Application $app) {
+            return new LinkedDataPlatformProcessor(new RespondProcessor(), $app->make(ResourceClassResolverInterface::class), $app->make(ResourceMetadataCollectionFactoryInterface::class));
         });
 
         $this->app->singleton(SerializeProcessor::class, function (Application $app) {

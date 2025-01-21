@@ -22,7 +22,6 @@ use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Metadata\Put;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
@@ -46,13 +45,10 @@ final class RespondProcessor implements ProcessorInterface
         'DELETE' => Response::HTTP_NO_CONTENT,
     ];
 
-    private const DEFAULT_ALLOWED_METHOD = ['OPTIONS', 'HEAD'];
-
     public function __construct(
         private ?IriConverterInterface $iriConverter = null,
         private readonly ?ResourceClassResolverInterface $resourceClassResolver = null,
         private readonly ?OperationMetadataFactoryInterface $operationMetadataFactory = null,
-        private readonly ?ResourceMetadataCollectionFactoryInterface $resourceCollectionMetadataFactory = null,
     ) {
     }
 
@@ -90,27 +86,6 @@ final class RespondProcessor implements ProcessorInterface
 
         if ($acceptPatch = $operation->getAcceptPatch()) {
             $headers['Accept-Patch'] = $acceptPatch;
-        }
-
-        if (!$exception) {
-            $isPostAllowed = false;
-            $allowedMethods = self::DEFAULT_ALLOWED_METHOD;
-            if (null !== ($context['resource_class'] ?? null) && null !== $this->resourceCollectionMetadataFactory && null !== ($currentUriTemplate = $operation->getUriTemplate()) && $this->resourceClassResolver?->isResourceClass($context['resource_class'])) {
-                $resourceMetadataCollection = $this->resourceCollectionMetadataFactory->create($context['resource_class']);
-                foreach ($resourceMetadataCollection as $resource) {
-                    foreach ($resource->getOperations() as $resourceOperation) {
-                        if ($resourceOperation->getUriTemplate() === $currentUriTemplate) {
-                            $allowedMethods[] = $operationMethod = $resourceOperation->getMethod();
-                            $isPostAllowed = $isPostAllowed || ('POST' === $operationMethod);
-                        }
-                    }
-                }
-            }
-            $headers['Allow'] = implode(', ', $allowedMethods);
-
-            if ($isPostAllowed && \is_array($outputFormats = ($outputFormats = $operation->getOutputFormats())) && [] !== $outputFormats) {
-                $headers['Accept-Post'] = implode(', ', array_merge(...array_values($outputFormats)));
-            }
         }
 
         $method = $request->getMethod();
