@@ -21,13 +21,13 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
-use Doctrine\ODM\MongoDB\Aggregation\Aggregation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\AddFields;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Count;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Facet;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Skip;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\Iterator\IterableResult;
 use Doctrine\ODM\MongoDB\Iterator\Iterator;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -334,7 +334,7 @@ class PaginationExtensionTest extends TestCase
             ],
         ]);
 
-        $aggregationProphecy = $this->prophesize(Aggregation::class);
+        $aggregationProphecy = $this->prophesize(IterableResult::class);
         $aggregationProphecy->getIterator()->willReturn($iteratorProphecy->reveal());
 
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
@@ -394,7 +394,7 @@ class PaginationExtensionTest extends TestCase
             ],
         ]);
 
-        $aggregationProphecy = $this->prophesize(Aggregation::class);
+        $aggregationProphecy = $this->prophesize(IterableResult::class);
         $aggregationProphecy->getIterator()->willReturn($iteratorProphecy->reveal());
 
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);

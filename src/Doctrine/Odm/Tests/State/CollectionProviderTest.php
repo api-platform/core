@@ -20,9 +20,9 @@ use ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document\ProviderDocument;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use Doctrine\ODM\MongoDB\Aggregation\Aggregation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\Iterator\IterableResult;
 use Doctrine\ODM\MongoDB\Iterator\Iterator;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -51,7 +51,7 @@ class CollectionProviderTest extends TestCase
     {
         $iterator = $this->prophesize(Iterator::class)->reveal();
 
-        $aggregationProphecy = $this->prophesize(Aggregation::class);
+        $aggregationProphecy = $this->prophesize(IterableResult::class);
         $aggregationProphecy->getIterator()->willReturn($iterator);
 
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
@@ -80,7 +80,7 @@ class CollectionProviderTest extends TestCase
     {
         $iterator = $this->prophesize(Iterator::class)->reveal();
 
-        $aggregationProphecy = $this->prophesize(Aggregation::class);
+        $aggregationProphecy = $this->prophesize(IterableResult::class);
         $aggregationProphecy->getIterator()->willReturn($iterator);
 
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
@@ -150,7 +150,7 @@ class CollectionProviderTest extends TestCase
     {
         $iterator = $this->prophesize(Iterator::class)->reveal();
 
-        $aggregationProphecy = $this->prophesize(Aggregation::class);
+        $aggregationProphecy = $this->prophesize(IterableResult::class);
         $aggregationProphecy->getIterator()->willReturn($iterator);
 
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);

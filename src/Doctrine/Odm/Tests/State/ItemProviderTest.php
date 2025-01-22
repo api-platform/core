@@ -21,10 +21,10 @@ use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use Doctrine\ODM\MongoDB\Aggregation\Aggregation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\MatchStage as AggregationMatch;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\Iterator\IterableResult;
 use Doctrine\ODM\MongoDB\Iterator\Iterator;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
@@ -50,7 +50,7 @@ class ItemProviderTest extends TestCase
         $result = new \stdClass();
         $iterator->current()->willReturn($result)->shouldBeCalled();
 
-        $aggregationProphecy = $this->prophesize(Aggregation::class);
+        $aggregationProphecy = $this->prophesize(IterableResult::class);
         $aggregationProphecy->getIterator()->willReturn($iterator);
 
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
@@ -86,7 +86,7 @@ class ItemProviderTest extends TestCase
         $result = new \stdClass();
         $iterator->current()->willReturn($result)->shouldBeCalled();
 
-        $aggregationProphecy = $this->prophesize(Aggregation::class);
+        $aggregationProphecy = $this->prophesize(IterableResult::class);
         $aggregationProphecy->getIterator()->willReturn($iterator);
 
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
@@ -123,7 +123,7 @@ class ItemProviderTest extends TestCase
         $result = new \stdClass();
         $iterator->current()->willReturn($result)->shouldBeCalled();
 
-        $aggregationProphecy = $this->prophesize(Aggregation::class);
+        $aggregationProphecy = $this->prophesize(IterableResult::class);
         $aggregationProphecy->getIterator()->willReturn($iterator);
 
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
