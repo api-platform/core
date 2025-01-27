@@ -53,7 +53,7 @@ class LinkedDataPlatformProcessorTest extends TestCase
                     new ApiResource(operations: [
                         new Get(uriTemplate: '/dummy_resources/{dummyResourceId}{._format}', name: 'get'),
                         new GetCollection(uriTemplate: '/dummy_resources{._format}', name: 'get_collections'),
-                        new Post(uriTemplate: '/dummy_resources{._format}', name: 'post'),
+                        new Post(uriTemplate: '/dummy_resources{._format}', outputFormats: ['jsonld' => ['application/ld+json'], 'text/turtle' => ['text/turtle']], name: 'post'),
                         new Delete(uriTemplate: '/dummy_resources/{dummyResourceId}{._format}', name: 'delete'),
                         new Put(uriTemplate: '/dummy_resources/{dummyResourceId}{._format}', name: 'put'),
                     ]),
@@ -66,7 +66,7 @@ class LinkedDataPlatformProcessorTest extends TestCase
 
     public function testHeadersAcceptPostIsReturnWhenPostAllowed(): void
     {
-        $operation = (new HttpOperation('GET', '/dummy_resources{._format}', outputFormats: ['jsonld' => ['application/ld+json'], 'text/turtle' => ['text/turtle']]));
+        $operation = (new HttpOperation('GET', '/dummy_resources{._format}'));
 
         $context = $this->getContext();
 
