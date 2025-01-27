@@ -43,7 +43,9 @@ use ApiPlatform\OpenApi\OpenApi;
 use ApiPlatform\OpenApi\Options;
 use ApiPlatform\OpenApi\Serializer\OpenApiNormalizer;
 use ApiPlatform\OpenApi\Tests\Fixtures\Dummy;
+use ApiPlatform\State\ApiResource\Error;
 use ApiPlatform\State\Pagination\PaginationOptions;
+use ApiPlatform\Validator\Exception\ValidationException;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -100,6 +102,7 @@ class OpenApiNormalizerTest extends TestCase
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description', 'dummyDate']));
         $propertyNameCollectionFactoryProphecy->create('Zorro', Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['id']));
+        $propertyNameCollectionFactoryProphecy->create(Error::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection([]));
 
         $baseOperation = (new HttpOperation())->withTypes(['http://schema.example.com/Dummy'])
                                               ->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats'])
@@ -141,6 +144,8 @@ class OpenApiNormalizerTest extends TestCase
         $resourceCollectionMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceCollectionMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
         $resourceCollectionMetadataFactoryProphecy->create('Zorro')->shouldBeCalled()->willReturn($zorroMetadata);
+        $resourceCollectionMetadataFactoryProphecy->create(Error::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Error::class, []));
+        $resourceCollectionMetadataFactoryProphecy->create(ValidationException::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(ValidationException::class, []));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'id', Argument::any())->shouldBeCalled()->willReturn(

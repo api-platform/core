@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\State\ApiResource\Error;
 
 /**
  * Decorator factory which adds JSON:API properties to the JSON Schema document.
@@ -31,6 +32,14 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareInterface
 {
     use ResourceMetadataTrait;
+
+    /**
+     * As JSON:API recommends using [includes](https://jsonapi.org/format/#fetching-includes) instead of groups
+     * this flag allows to force using groups to generate the JSON:API JSONSchema. Defaults to true, use it in
+     * a serializer context.
+     */
+    public const DISABLE_JSON_SCHEMA_SERIALIZER_GROUPS = 'disable_json_schema_serializer_groups';
+
     private const LINKS_PROPS = [
         'type' => 'object',
         'properties' => [
@@ -124,14 +133,27 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
         // We don't use the serializer context here as JSON:API doesn't leverage serializer groups for related resources.
         // That is done by query parameter. @see https://jsonapi.org/format/#fetching-includes
-        $schema = $this->schemaFactory->buildSchema($className, $format, $type, $operation, $schema, [], $forceCollection);
+        $serializerContext ??= $this->getSerializerContext($operation ?? $this->findOperation($className, $type, $operation, $serializerContext, $format), $type);
+        $jsonApiSerializerContext = !($serializerContext[self::DISABLE_JSON_SCHEMA_SERIALIZER_GROUPS] ?? true) ? $serializerContext : [];
+        $schema = $this->schemaFactory->buildSchema($className, $format, $type, $operation, $schema, $jsonApiSerializerContext, $forceCollection);
 
         if (($key = $schema->getRootDefinitionKey()) || ($key = $schema->getItemsDefinitionKey())) {
             $definitions = $schema->getDefinitions();
             $properties = $definitions[$key]['properties'] ?? [];
 
+            if (Error::class === $className && !isset($properties['errors'])) {
+                $definitions[$key]['properties'] = [
+                    'errors' => [
+                        'type' => 'object',
+                        'properties' => $properties,
+                    ],
+                ];
+
+                return $schema;
+            }
+
             // Prevent reapplying
-            if (isset($properties['id'], $properties['type']) || isset($properties['data'])) {
+            if (isset($properties['id'], $properties['type']) || isset($properties['data']) || isset($properties['errors'])) {
                 return $schema;
             }
 

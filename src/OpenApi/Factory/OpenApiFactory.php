@@ -20,6 +20,7 @@ use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Error;
+use ApiPlatform\Metadata\ErrorResource;
 use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
 use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
@@ -51,7 +52,9 @@ use ApiPlatform\OpenApi\Model\Server;
 use ApiPlatform\OpenApi\OpenApi;
 use ApiPlatform\OpenApi\Options;
 use ApiPlatform\OpenApi\Serializer\NormalizeOperationNameTrait;
+use ApiPlatform\State\ApiResource\Error as ApiResourceError;
 use ApiPlatform\State\Pagination\PaginationOptions;
+use ApiPlatform\Validator\Exception\ValidationException;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Routing\RouteCollection;
@@ -71,7 +74,14 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     private readonly PaginationOptions $paginationOptions;
     private ?RouteCollection $routeCollection = null;
     private ?ContainerInterface $filterLocator = null;
+    /**
+     * @var array<string|class-string, ErrorResource>
+     */
+    private array $localErrorResourceCache = [];
 
+    /**
+     * @param array<string, string[]> $formats
+     */
     public function __construct(
         private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory,
         private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory,
@@ -322,7 +332,13 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $existingResponses = $openapiOperation->getResponses() ?: [];
             $overrideResponses = $operation->getExtraProperties()[self::OVERRIDE_OPENAPI_RESPONSES] ?? $this->openApiOptions->getOverrideResponses();
             if ($operation instanceof HttpOperation && null !== ($errors = $operation->getErrors())) {
-                $openapiOperation = $this->addOperationErrors($openapiOperation, $errors, $responseMimeTypes, $resourceMetadataCollection, $schema, $schemas);
+                /** @var array<class-string|string, Error> */
+                $errorOperations = [];
+                foreach ($errors as $error) {
+                    $errorOperations[$error] = $this->getErrorResource($error);
+                }
+
+                $openapiOperation = $this->addOperationErrors($openapiOperation, $errorOperations, $resourceMetadataCollection, $schema, $schemas, $operation);
             }
 
             if ($overrideResponses || !$existingResponses) {
@@ -334,40 +350,39 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                         break;
                     case 'POST':
                         $successStatus = (string) $operation->getStatus() ?: 201;
-
                         $openapiOperation = $this->buildOpenApiResponse($existingResponses, $successStatus, \sprintf('%s resource created', $resourceShortName), $openapiOperation, $operation, $responseMimeTypes, $operationOutputSchemas, $resourceMetadataCollection);
 
-                        $openapiOperation = $this->buildOpenApiResponse($existingResponses, '400', 'Invalid input', $openapiOperation);
-
-                        $openapiOperation = $this->buildOpenApiResponse($existingResponses, '422', 'Unprocessable entity', $openapiOperation);
+                        $openapiOperation = $this->addOperationErrors($openapiOperation, [
+                            ApiResourceError::class => $this->getErrorResource(ApiResourceError::class)->withStatus(400)->withDescription('Invalid input'),
+                            ValidationException::class => $this->getErrorResource(ValidationException::class, 422, 'Unprocessable entity'), // we add defaults as ValidationException can not be installed
+                        ], $resourceMetadataCollection, $schema, $schemas, $operation);
                         break;
                     case 'PATCH':
                     case 'PUT':
                         $successStatus = (string) $operation->getStatus() ?: 200;
                         $openapiOperation = $this->buildOpenApiResponse($existingResponses, $successStatus, \sprintf('%s resource updated', $resourceShortName), $openapiOperation, $operation, $responseMimeTypes, $operationOutputSchemas, $resourceMetadataCollection);
-                        $openapiOperation = $this->buildOpenApiResponse($existingResponses, '400', 'Invalid input', $openapiOperation);
-                        if (!isset($existingResponses[400])) {
-                            $openapiOperation = $openapiOperation->withResponse(400, new Response('Invalid input'));
-                        }
-                        $openapiOperation = $this->buildOpenApiResponse($existingResponses, '422', 'Unprocessable entity', $openapiOperation);
+                        $openapiOperation = $this->addOperationErrors($openapiOperation, [
+                            ApiResourceError::class => $this->getErrorResource(ApiResourceError::class)->withStatus(400)->withDescription('Invalid input'),
+                            ValidationException::class => $this->getErrorResource(ValidationException::class, 422, 'Unprocessable entity'), // we add defaults as ValidationException can not be installed
+                        ], $resourceMetadataCollection, $schema, $schemas, $operation);
                         break;
                     case 'DELETE':
                         $successStatus = (string) $operation->getStatus() ?: 204;
-
                         $openapiOperation = $this->buildOpenApiResponse($existingResponses, $successStatus, \sprintf('%s resource deleted', $resourceShortName), $openapiOperation);
-
                         break;
                 }
             }
 
-            if (true === $overrideResponses && !isset($existingResponses[403]) && $operation->getSecurity()) {
-                $openapiOperation = $openapiOperation->withResponse(403, new Response('Forbidden'));
+            if ($overrideResponses && !isset($existingResponses[403]) && $operation->getSecurity()) {
+                $openapiOperation = $this->addOperationErrors($openapiOperation, [
+                    ApiResourceError::class => $this->getErrorResource(ApiResourceError::class)->withStatus(403)->withDescription('Forbidden'),
+                ], $resourceMetadataCollection, $schema, $schemas, $operation);
             }
 
-            if (true === $overrideResponses && !$operation instanceof CollectionOperationInterface && 'POST' !== $operation->getMethod()) {
-                if (!isset($existingResponses[404])) {
-                    $openapiOperation = $openapiOperation->withResponse(404, new Response('Resource not found'));
-                }
+            if ($overrideResponses && !$operation instanceof CollectionOperationInterface && 'POST' !== $operation->getMethod() && !isset($existingResponses[404])) {
+                $openapiOperation = $this->addOperationErrors($openapiOperation, [
+                    ApiResourceError::class => $this->getErrorResource(ApiResourceError::class)->withStatus(404)->withDescription('Not found'),
+                ], $resourceMetadataCollection, $schema, $schemas, $operation);
             }
 
             if (!$openapiOperation->getResponses()) {
@@ -398,9 +413,22 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             if ($openapiAttribute instanceof Webhook) {
                 $webhooks[$openapiAttribute->getName()] = $pathItem->{'with'.ucfirst($method)}($openapiOperation);
-            } else {
-                $paths->addPath($path, $pathItem->{'with'.ucfirst($method)}($openapiOperation));
+                continue;
             }
+
+            // We merge content types for errors, maybe that this logic could be applied to every resources at some point
+            if ($operation instanceof Error && ($existingPathItem = $paths->getPath($path)) && ($existingOperation = $existingPathItem->getGet()) && ($currentResponse = $openapiOperation->getResponses()[200] ?? null)) {
+                $errorResponse = $existingOperation->getResponses()[200];
+                $currentResponseContent = $currentResponse->getContent();
+
+                foreach ($errorResponse->getContent() as $mime => $content) {
+                    $currentResponseContent[$mime] = $content;
+                }
+
+                $openapiOperation = $existingOperation->withResponse(200, $currentResponse->withContent($currentResponseContent));
+            }
+
+            $paths->addPath($path, $pathItem->{'with'.ucfirst($method)}($openapiOperation));
         }
     }
 
@@ -421,6 +449,9 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     }
 
     /**
+     * @param array<string, string> $responseMimeTypes
+     * @param array<string, Schema> $operationSchemas
+     *
      * @return \ArrayObject<MediaType>
      */
     private function buildContent(array $responseMimeTypes, array $operationSchemas): \ArrayObject
@@ -545,7 +576,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     }
 
                     if ($operationUriVariables[$parameterName]->getIdentifiers() === $uriVariableDefinition->getIdentifiers() && $operationUriVariables[$parameterName]->getFromClass() === $uriVariableDefinition->getFromClass()) {
-                        $parameters[$parameterName] = '$request.path.'.$uriVariableDefinition->getIdentifiers()[0];
+                        $parameters[$parameterName] = '$request.path.'.($uriVariableDefinition->getIdentifiers()[0] ?? 'id');
                     }
                 }
 
@@ -555,7 +586,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     }
 
                     if ($uriVariableDefinition->getFromClass() === $currentOperation->getClass()) {
-                        $parameters[$parameterName] = '$response.body#/'.$uriVariableDefinition->getIdentifiers()[0];
+                        $parameters[$parameterName] = '$response.body#/'.($uriVariableDefinition->getIdentifiers()[0] ?? 'id');
                     }
                 }
 
@@ -610,6 +641,9 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         return $entityClass;
     }
 
+    /**
+     * @param array<string, mixed> $description
+     */
     private function getFilterParameter(string $name, array $description, string $shortName, string $filter): Parameter
     {
         if (isset($description['swagger'])) {
@@ -756,6 +790,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         return $securitySchemes;
     }
 
+    /**
+     * @param \ArrayObject<string, mixed> $schemas
+     * @param \ArrayObject<string, mixed> $definitions
+     */
     private function appendSchemaDefinitions(\ArrayObject $schemas, \ArrayObject $definitions): void
     {
         foreach ($definitions as $key => $value) {
@@ -779,18 +817,20 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
     private function mergeParameter(Parameter $actual, Parameter $defined): Parameter
     {
-        foreach ([
-            'name',
-            'in',
-            'description',
-            'required',
-            'deprecated',
-            'allowEmptyValue',
-            'style',
-            'explode',
-            'allowReserved',
-            'example',
-        ] as $method) {
+        foreach (
+            [
+                'name',
+                'in',
+                'description',
+                'required',
+                'deprecated',
+                'allowEmptyValue',
+                'style',
+                'explode',
+                'allowReserved',
+                'example',
+            ] as $method
+        ) {
             $newValue = $defined->{"get$method"}();
             if (null !== $newValue && $actual->{"get$method"}() !== $newValue) {
                 $actual = $actual->{"with$method"}($newValue);
@@ -808,20 +848,55 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     }
 
     /**
-     * @param string[]              $errors
-     * @param array<string, string> $responseMimeTypes
+     * @param array<class-string, ErrorResource> $errors
+     * @param \ArrayObject<string, Schema>       $schemas
      */
-    private function addOperationErrors(Operation $operation, array $errors, array $responseMimeTypes, ResourceMetadataCollection $resourceMetadataCollection, Schema $schema, \ArrayObject $schemas): Operation
-    {
-        $existingResponses = null;
-        foreach ($errors as $error) {
-            if (!is_a($error, ProblemExceptionInterface::class, true)) {
-                throw new RuntimeException(\sprintf('The error class "%s" does not implement "%s". Did you forget a use statement?', $error, ProblemExceptionInterface::class));
+    private function addOperationErrors(
+        Operation $operation,
+        array $errors,
+        ResourceMetadataCollection $resourceMetadataCollection,
+        Schema $schema,
+        \ArrayObject $schemas,
+        HttpOperation $originalOperation,
+    ): Operation {
+        $defaultFormat = ['json' => ['application/problem+json']];
+        foreach ($errors as $error => $errorResource) {
+            $responseMimeTypes = $this->flattenMimeTypes($errorResource->getOutputFormats() ?: $defaultFormat);
+            foreach ($errorResource->getOperations() as $errorOperation) {
+                if (false === $errorOperation->getOpenApi()) {
+                    continue;
+                }
+
+                $responseMimeTypes += $this->flattenMimeTypes($errorOperation->getOutputFormats() ?: $defaultFormat);
             }
 
-            $status = null;
-            $description = null;
+            $operationErrorSchemas = [];
+            foreach ($responseMimeTypes as $operationFormat) {
+                $operationErrorSchema = $this->jsonSchemaFactory->buildSchema($errorResource->getClass(), $operationFormat, Schema::TYPE_OUTPUT, null, $schema);
+                $operationErrorSchemas[$operationFormat] = $operationErrorSchema;
+                $this->appendSchemaDefinitions($schemas, $operationErrorSchema->getDefinitions());
+            }
 
+            if (!$status = $errorResource->getStatus()) {
+                throw new RuntimeException(\sprintf('The error class %s has no status defined, please either implement ProblemExceptionInterface, or make it an ErrorResource with a status', $error));
+            }
+
+            $operation = $this->buildOpenApiResponse($operation->getResponses() ?: [], $status, $errorResource->getDescription() ?? '', $operation, $originalOperation, $responseMimeTypes, $operationErrorSchemas, $resourceMetadataCollection);
+        }
+
+        return $operation;
+    }
+
+    /**
+     * @param string|class-string $error
+     */
+    private function getErrorResource(string $error, ?int $status = null, ?string $description = null): ErrorResource
+    {
+        if ($this->localErrorResourceCache[$error] ?? null) {
+            return $this->localErrorResourceCache[$error];
+        }
+
+        if (is_a($error, ProblemExceptionInterface::class, true)) {
             try {
                 /** @var ProblemExceptionInterface $exception */
                 $exception = new $error();
@@ -829,32 +904,32 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $description = $exception->getTitle();
             } catch (\TypeError) {
             }
-
-            try {
-                $errorOperation = $this->resourceMetadataFactory->create($error)->getOperation();
-                if (!is_a($errorOperation, Error::class)) {
-                    throw new RuntimeException(\sprintf('The error class %s is not an ErrorResource', $error));
-                }
-            } catch (ResourceClassNotFoundException|OperationNotFoundException) {
-                $errorOperation = null;
-            }
-            $status ??= $errorOperation?->getStatus();
-            $description ??= $errorOperation?->getDescription();
-
-            if (!$status) {
-                throw new RuntimeException(\sprintf('The error class %s has no status defined, please either implement ProblemExceptionInterface, or make it an ErrorResource with a status', $error));
-            }
-
-            $operationErrorSchemas = [];
-            foreach ($responseMimeTypes as $operationFormat) {
-                $operationErrorSchema = $this->jsonSchemaFactory->buildSchema($error, $operationFormat, Schema::TYPE_OUTPUT, null, $schema);
-                $operationErrorSchemas[$operationFormat] = $operationErrorSchema;
-                $this->appendSchemaDefinitions($schemas, $operationErrorSchema->getDefinitions());
-            }
-
-            $operation = $this->buildOpenApiResponse($existingResponses ??= $operation->getResponses() ?: [], $status, $description ?? '', $operation, $errorOperation, $responseMimeTypes, $operationErrorSchemas, $resourceMetadataCollection);
+        } elseif (class_exists($error)) {
+            throw new RuntimeException(\sprintf('The error class "%s" does not implement "%s". Did you forget a use statement?', $error, ProblemExceptionInterface::class));
         }
 
-        return $operation;
+        try {
+            $errorResource = $this->resourceMetadataFactory->create($error)[0] ?? new ErrorResource(status: $status, description: $description, class: ApiResourceError::class);
+            if (!($errorResource instanceof ErrorResource)) {
+                throw new RuntimeException(\sprintf('The error class %s is not an ErrorResource', $error));
+            }
+
+            // Here we want the exception status and expression to override the resource one when available
+            if ($status) {
+                $errorResource = $errorResource->withStatus($status);
+            }
+
+            if ($description) {
+                $errorResource = $errorResource->withDescription($description);
+            }
+        } catch (ResourceClassNotFoundException|OperationNotFoundException) {
+            $errorResource = new ErrorResource(status: $status, description: $description, class: ApiResourceError::class);
+        }
+
+        if (!$errorResource->getClass()) {
+            $errorResource = $errorResource->withClass($error);
+        }
+
+        return $this->localErrorResourceCache[$error] = $errorResource;
     }
 }
