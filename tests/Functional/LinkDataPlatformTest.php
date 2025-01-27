@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Functional\State;
+namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DummyGetPostDeleteOperation;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
-class RespondProcessorTest extends ApiTestCase
+class LinkDataPlatformTest extends ApiTestCase
 {
     use SetupClassResourcesTrait;
 

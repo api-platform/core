@@ -29,15 +29,15 @@ use Symfony\Component\HttpFoundation\Response;
  */
 final class LinkedDataPlatformProcessor implements ProcessorInterface
 {
-    private const DEFAULT_ALLOWED_METHOD = ['OPTIONS', 'HEAD'];
+    private const DEFAULT_ALLOWED_METHODS = ['OPTIONS', 'HEAD'];
 
     /**
      * @param ProcessorInterface<T1, T2> $decorated
      */
     public function __construct(
-        private readonly ProcessorInterface $decorated, // todo is processor interface nullable
+        private readonly ProcessorInterface $decorated,
         private readonly ?ResourceClassResolverInterface $resourceClassResolver = null,
-        private readonly ?ResourceMetadataCollectionFactoryInterface $resourceCollectionMetadataFactory = null,
+        private readonly ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
     ) {
     }
 
@@ -48,22 +48,21 @@ final class LinkedDataPlatformProcessor implements ProcessorInterface
             !$response instanceof Response
             || !$operation instanceof HttpOperation
             || $operation instanceof Error
-            || null === $this->resourceCollectionMetadataFactory
+            || !$this->resourceMetadataCollectionFactory
             || !($context['resource_class'] ?? null)
-            || null === $operation->getUriTemplate()
+            || !$operation->getUriTemplate()
             || !$this->resourceClassResolver?->isResourceClass($context['resource_class'])
         ) {
             return $response;
         }
 
-        $allowedMethods = self::DEFAULT_ALLOWED_METHOD;
-        $resourceMetadataCollection = $this->resourceCollectionMetadataFactory->create($context['resource_class']);
-        foreach ($resourceMetadataCollection as $resource) {
-            foreach ($resource->getOperations() as $resourceOperation) {
-                if ($resourceOperation->getUriTemplate() === $operation->getUriTemplate()) {
-                    $operationMethod = $resourceOperation->getMethod();
-                    $allowedMethods[] = $operationMethod;
-                    if ('POST' === $operationMethod && \is_array($outputFormats = $operation->getOutputFormats())) {
+        $allowedMethods = self::DEFAULT_ALLOWED_METHODS;
+        $resourceCollection = $this->resourceMetadataCollectionFactory->create($context['resource_class']);
+        foreach ($resourceCollection as $resource) {
+            foreach ($resource->getOperations() as $op) {
+                if ($op->getUriTemplate() === $operation->getUriTemplate()) {
+                    $allowedMethods[] = $method = $op->getMethod();
+                    if ('POST' === $method && \is_array($outputFormats = $op->getOutputFormats())) {
                         $response->headers->set('Accept-Post', implode(', ', array_merge(...array_values($outputFormats))));
                     }
                 }

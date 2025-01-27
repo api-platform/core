@@ -69,6 +69,8 @@
 
         <service id="api_platform.state_processor.linked_data_platform" class="ApiPlatform\State\Processor\LinkedDataPlatformProcessor" decorates="api_platform.state_processor.respond">
             <argument type="service"  id="api_platform.state_processor.linked_data_platform.inner" />
+            <argument type="service" id="api_platform.resource_class_resolver" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
         </service>
 
         <service id="api_platform.listener.view.write" class="ApiPlatform\Symfony\EventListener\WriteListener">
