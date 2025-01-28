@@ -41,6 +41,7 @@ class PaginationExtensionTest extends TestCase
 {
     use ProphecyTrait;
 
+    /** @var ObjectProphecy<ManagerRegistry> */
     private ObjectProphecy $managerRegistryProphecy;
 
     /**
@@ -424,30 +425,11 @@ class PaginationExtensionTest extends TestCase
 
     private function mockAggregationBuilder(int $expectedOffset, int $expectedLimit): ObjectProphecy
     {
-        $skipProphecy = $this->prophesize(Skip::class);
-        if ($expectedLimit > 0) {
-            $skipProphecy->limit($expectedLimit)->shouldBeCalled();
-        }
-
-        $resultsAggregationBuilderProphecy = $this->prophesize(Builder::class);
-        $resultsAggregationBuilderProphecy->skip($expectedOffset)->shouldBeCalled()->willReturn($skipProphecy->reveal());
-
-        $addFieldsProphecy = $this->prophesize(AddFields::class);
-        $addFieldsProphecy->field('__api_first_result__')->shouldBeCalled()->willReturn($addFieldsProphecy->reveal());
-        $addFieldsProphecy->literal($expectedOffset)->shouldBeCalled()->willReturn($addFieldsProphecy->reveal());
-        $addFieldsProphecy->field('__api_max_results__')->shouldBeCalled()->willReturn($addFieldsProphecy->reveal());
-        $addFieldsProphecy->literal($expectedLimit)->shouldBeCalled()->willReturn($addFieldsProphecy->reveal());
-
         $countProphecy = $this->prophesize(Count::class);
-
         $countAggregationBuilderProphecy = $this->prophesize(Builder::class);
         $countAggregationBuilderProphecy->count('count')->shouldBeCalled()->willReturn($countProphecy->reveal());
 
         $repositoryProphecy = $this->prophesize(DocumentRepository::class);
-        $repositoryProphecy->createAggregationBuilder()->shouldBeCalled()->willReturn(
-            $resultsAggregationBuilderProphecy->reveal(),
-            $countAggregationBuilderProphecy->reveal()
-        );
 
         $objectManagerProphecy = $this->prophesize(DocumentManager::class);
         $objectManagerProphecy->getRepository('Foo')->shouldBeCalled()->willReturn($repositoryProphecy->reveal());
@@ -455,14 +437,40 @@ class PaginationExtensionTest extends TestCase
         $this->managerRegistryProphecy->getManagerForClass('Foo')->shouldBeCalled()->willReturn($objectManagerProphecy->reveal());
 
         $facetProphecy = $this->prophesize(Facet::class);
-        $facetProphecy->pipeline($skipProphecy)->shouldBeCalled()->willReturn($facetProphecy);
-        $facetProphecy->pipeline($countProphecy)->shouldBeCalled()->willReturn($facetProphecy);
-        $facetProphecy->field('count')->shouldBeCalled()->willReturn($facetProphecy);
-        $facetProphecy->field('results')->shouldBeCalled()->willReturn($facetProphecy);
-        $facetProphecy->addFields()->shouldBeCalled()->willReturn($addFieldsProphecy->reveal());
+        $addFieldsProphecy = $this->prophesize(AddFields::class);
+
+        if ($expectedLimit > 0) {
+            $resultsAggregationBuilderProphecy = $this->prophesize(Builder::class);
+            $repositoryProphecy->createAggregationBuilder()->shouldBeCalled()->willReturn(
+                $resultsAggregationBuilderProphecy->reveal(),
+                $countAggregationBuilderProphecy->reveal()
+            );
+
+            $skipProphecy = $this->prophesize(Skip::class);
+            $skipProphecy->limit($expectedLimit)->shouldBeCalled()->willReturn($skipProphecy->reveal());
+            $resultsAggregationBuilderProphecy->skip($expectedOffset)->shouldBeCalled()->willReturn($skipProphecy->reveal());
+            $facetProphecy->field('results')->shouldBeCalled()->willReturn($facetProphecy);
+            $facetProphecy->pipeline($skipProphecy)->shouldBeCalled()->willReturn($facetProphecy->reveal());
+        } else {
+            $repositoryProphecy->createAggregationBuilder()->shouldBeCalled()->willReturn(
+                $countAggregationBuilderProphecy->reveal()
+            );
+
+            $addFieldsProphecy->field('results')->shouldBeCalled()->willReturn($addFieldsProphecy->reveal());
+            $addFieldsProphecy->literal([])->shouldBeCalled()->willReturn($addFieldsProphecy->reveal());
+        }
+
+        $facetProphecy->field('count')->shouldBeCalled()->willReturn($facetProphecy->reveal());
+        $facetProphecy->pipeline($countProphecy)->shouldBeCalled()->willReturn($facetProphecy->reveal());
+
+        $addFieldsProphecy->field('__api_first_result__')->shouldBeCalled()->willReturn($addFieldsProphecy->reveal());
+        $addFieldsProphecy->literal($expectedOffset)->shouldBeCalled()->willReturn($addFieldsProphecy->reveal());
+        $addFieldsProphecy->field('__api_max_results__')->shouldBeCalled()->willReturn($addFieldsProphecy->reveal());
+        $addFieldsProphecy->literal($expectedLimit)->shouldBeCalled()->willReturn($addFieldsProphecy->reveal());
 
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
         $aggregationBuilderProphecy->facet()->shouldBeCalled()->willReturn($facetProphecy->reveal());
+        $aggregationBuilderProphecy->addFields()->shouldBeCalled()->willReturn($addFieldsProphecy->reveal());
 
         return $aggregationBuilderProphecy;
     }
