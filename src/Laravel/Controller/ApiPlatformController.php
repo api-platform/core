@@ -69,11 +69,11 @@ class ApiPlatformController extends Controller
         }
 
         if (null === $operation->canRead()) {
-            $operation = $operation->withRead($operation->getUriVariables() || $request->isMethodSafe()); // @phpstan-ignore-line
+            $operation = $operation->withRead($operation->getUriVariables() || $request->isMethodSafe());
         }
 
         if (null === $operation->canDeserialize()) {
-            $operation = $operation->withDeserialize(\in_array($operation->getMethod(), ['POST', 'PUT', 'PATCH'], true)); // @phpstan-ignore-line
+            $operation = $operation->withDeserialize(\in_array($operation->getMethod(), ['POST', 'PUT', 'PATCH'], true));
         }
 
         $body = $this->provider->provide($operation, $uriVariables, $context);

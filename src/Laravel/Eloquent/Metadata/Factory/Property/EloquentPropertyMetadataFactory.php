@@ -57,10 +57,6 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
             return $this->decorated?->create($resourceClass, $property, $options) ?? new ApiProperty();
         }
 
-        if (!$model instanceof Model) {
-            return $this->decorated?->create($resourceClass, $property, $options) ?? new ApiProperty();
-        }
-
         try {
             $propertyMetadata = $this->decorated?->create($resourceClass, $property, $options) ?? new ApiProperty();
         } catch (PropertyNotFoundException) {
