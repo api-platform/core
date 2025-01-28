@@ -26,7 +26,7 @@ use Twig\Environment as TwigEnvironment;
 /**
  * Displays the swaggerui interface.
  *
- * @deprecated use ApiPlatform\Symfony\Bundle\SwaggerUi\Processor instead
+ * @deprecated use ApiPlatform\Symfony\Action\DocumentationAction instead
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
