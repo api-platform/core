@@ -164,9 +164,15 @@ class Kernel extends BaseKernel
             $em = $this->getContainer()->get('doctrine.orm.entity_manager');
             $loader = new ExistingEntityManager($em);
             $dependencyFactory = DependencyFactory::fromEntityManager($confLoader, $loader);
+            $metadataStorage = $dependencyFactory->getMetadataStorage();
 
-            $dependencyFactory->getMetadataStorage()->ensureInitialized();
-            $executed = $dependencyFactory->getMetadataStorage()->getExecutedMigrations();
+            try {
+                $metadataStorage->ensureInitialized();
+            } catch (\Exception) {
+                // table exists
+            }
+
+            $executed = $metadataStorage->getExecutedMigrations();
 
             if ($executed->hasMigration(new Version($migrationClass)) && Direction::DOWN !== $direction) {
                 continue;
