@@ -1,5 +1,13 @@
 # Changelog
 
+## v4.1.0-beta.1
+
+### Features
+
+* [2e2debb94](https://github.com/api-platform/core/commit/2e2debb94b06752262b0d18b736edc22b501266b) feat(mongodb): Replace usage of deprecated method `AggregationBuilder::execute()` (#6933)
+* [4bdf042e5](https://github.com/api-platform/core/commit/4bdf042e5cab1ddb931562cf98a97686d8c415ae) feat(mongodb): Add pagination metadata to the aggregation results (#6912)
+* [b968ccd50](https://github.com/api-platform/core/commit/b968ccd5026afb5562c4c4588929885b86ecb3cb) feat(openapi): document error outputs using json-schemas (#6923)
+
 ## v4.1.0-alpha.2
 
 ### Bug fixes
