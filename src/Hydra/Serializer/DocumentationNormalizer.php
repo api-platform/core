@@ -29,7 +29,6 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
-use ApiPlatform\Validator\Exception\ValidationException;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -71,17 +70,13 @@ final class DocumentationNormalizer implements NormalizerInterface
             $resourceMetadataCollection = $this->resourceMetadataFactory->create($resourceClass);
 
             $resourceMetadata = $resourceMetadataCollection[0];
-            if ($resourceMetadata instanceof ErrorResource && ValidationException::class === $resourceMetadata->getClass()) {
-                continue;
-            }
-
             if (true === $resourceMetadata->getHideHydraOperation()) {
                 continue;
             }
 
             $shortName = $resourceMetadata->getShortName();
-
             $prefixedShortName = $resourceMetadata->getTypes()[0] ?? "#$shortName";
+
             $this->populateEntrypointProperties($resourceMetadata, $shortName, $prefixedShortName, $entrypointProperties, $hydraPrefix, $resourceMetadataCollection);
             $classes[] = $this->getClass($resourceClass, $resourceMetadata, $shortName, $prefixedShortName, $context, $hydraPrefix, $resourceMetadataCollection);
         }
@@ -105,8 +100,8 @@ final class DocumentationNormalizer implements NormalizerInterface
                 '@id' => \sprintf('#Entrypoint/%s', lcfirst($shortName)),
                 '@type' => $hydraPrefix.'Link',
                 'domain' => '#Entrypoint',
-                'rdfs:label' => "The collection of $shortName resources",
-                'rdfs:range' => [
+                'owl:maxCardinality' => 1,
+                'range' => [
                     ['@id' => $hydraPrefix.'Collection'],
                     [
                         'owl:equivalentClass' => [
@@ -117,7 +112,8 @@ final class DocumentationNormalizer implements NormalizerInterface
                 ],
                 $hydraPrefix.'supportedOperation' => $hydraCollectionOperations,
             ],
-            $hydraPrefix.'title' => "The collection of $shortName resources",
+            $hydraPrefix.'title' => "get{$shortName}Collection",
+            $hydraPrefix.'description' => "The collection of $shortName resources",
             $hydraPrefix.'readable' => true,
             $hydraPrefix.'writeable' => false,
         ];
@@ -140,7 +136,6 @@ final class DocumentationNormalizer implements NormalizerInterface
         $class = [
             '@id' => $prefixedShortName,
             '@type' => $hydraPrefix.'Class',
-            'rdfs:label' => $shortName,
             $hydraPrefix.'title' => $shortName,
             $hydraPrefix.'supportedProperty' => $this->getHydraProperties($resourceClass, $resourceMetadata, $shortName, $prefixedShortName, $context, $hydraPrefix),
             $hydraPrefix.'supportedOperation' => $this->getHydraOperations(false, $resourceMetadataCollection, $hydraPrefix),
@@ -148,6 +143,10 @@ final class DocumentationNormalizer implements NormalizerInterface
 
         if (null !== $description) {
             $class[$hydraPrefix.'description'] = $description;
+        }
+
+        if ($resourceMetadata instanceof ErrorResource) {
+            $class['subClassOf'] = 'Error';
         }
 
         if ($isDeprecated) {
@@ -232,6 +231,10 @@ final class DocumentationNormalizer implements NormalizerInterface
                     $propertyName = $this->nameConverter->normalize($propertyName, $class, self::FORMAT, $context);
                 }
 
+                if (false === $propertyMetadata->getHydra()) {
+                    continue;
+                }
+
                 $properties[] = $this->getProperty($propertyMetadata, $propertyName, $prefixedShortName, $shortName, $hydraPrefix);
             }
         }
@@ -254,6 +257,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                 if (('POST' === $operation->getMethod() || $operation instanceof CollectionOperationInterface) !== $collection) {
                     continue;
                 }
+
                 $hydraOperations[] = $this->getHydraOperation($operation, $operation->getShortName(), $hydraPrefix);
             }
         }
@@ -283,49 +287,57 @@ final class DocumentationNormalizer implements NormalizerInterface
         if ('GET' === $method && $operation instanceof CollectionOperationInterface) {
             $hydraOperation += [
                 '@type' => [$hydraPrefix.'Operation', 'schema:FindAction'],
-                $hydraPrefix.'title' => "Retrieves the collection of $shortName resources.",
+                $hydraPrefix.'description' => "Retrieves the collection of $shortName resources.",
                 'returns' => null === $outputClass ? 'owl:Nothing' : $hydraPrefix.'Collection',
             ];
         } elseif ('GET' === $method) {
             $hydraOperation += [
                 '@type' => [$hydraPrefix.'Operation', 'schema:FindAction'],
-                $hydraPrefix.'title' => "Retrieves a $shortName resource.",
+                $hydraPrefix.'description' => "Retrieves a $shortName resource.",
                 'returns' => null === $outputClass ? 'owl:Nothing' : $prefixedShortName,
             ];
         } elseif ('PATCH' === $method) {
             $hydraOperation += [
                 '@type' => $hydraPrefix.'Operation',
-                $hydraPrefix.'title' => "Updates the $shortName resource.",
+                $hydraPrefix.'description' => "Updates the $shortName resource.",
                 'returns' => null === $outputClass ? 'owl:Nothing' : $prefixedShortName,
                 'expects' => null === $inputClass ? 'owl:Nothing' : $prefixedShortName,
             ];
+
+            if (null !== $inputClass) {
+                $possibleValue = [];
+                foreach ($operation->getInputFormats() as $mimeTypes) {
+                    foreach ($mimeTypes as $mimeType) {
+                        $possibleValue[] = $mimeType;
+                    }
+                }
+
+                $hydraOperation['expectsHeader'] = [['headerName' => 'Content-Type', 'possibleValue' => $possibleValue]];
+            }
         } elseif ('POST' === $method) {
             $hydraOperation += [
                 '@type' => [$hydraPrefix.'Operation', 'schema:CreateAction'],
-                $hydraPrefix.'title' => "Creates a $shortName resource.",
+                $hydraPrefix.'description' => "Creates a $shortName resource.",
                 'returns' => null === $outputClass ? 'owl:Nothing' : $prefixedShortName,
                 'expects' => null === $inputClass ? 'owl:Nothing' : $prefixedShortName,
             ];
         } elseif ('PUT' === $method) {
             $hydraOperation += [
                 '@type' => [$hydraPrefix.'Operation', 'schema:ReplaceAction'],
-                $hydraPrefix.'title' => "Replaces the $shortName resource.",
+                $hydraPrefix.'description' => "Replaces the $shortName resource.",
                 'returns' => null === $outputClass ? 'owl:Nothing' : $prefixedShortName,
                 'expects' => null === $inputClass ? 'owl:Nothing' : $prefixedShortName,
             ];
         } elseif ('DELETE' === $method) {
             $hydraOperation += [
                 '@type' => [$hydraPrefix.'Operation', 'schema:DeleteAction'],
-                $hydraPrefix.'title' => "Deletes the $shortName resource.",
+                $hydraPrefix.'description' => "Deletes the $shortName resource.",
                 'returns' => 'owl:Nothing',
             ];
         }
 
-        $hydraOperation[$hydraPrefix.'method'] ?? $hydraOperation[$hydraPrefix.'method'] = $method;
-
-        if (!isset($hydraOperation['rdfs:label']) && isset($hydraOperation[$hydraPrefix.'title'])) {
-            $hydraOperation['rdfs:label'] = $hydraOperation[$hydraPrefix.'title'];
-        }
+        $hydraOperation[$hydraPrefix.'method'] ??= $method;
+        $hydraOperation[$hydraPrefix.'title'] ??= strtolower($method).$shortName.($operation instanceof CollectionOperationInterface ? 'Collection' : '');
 
         ksort($hydraOperation);
 
@@ -434,29 +446,30 @@ final class DocumentationNormalizer implements NormalizerInterface
         $classes[] = [
             '@id' => '#Entrypoint',
             '@type' => $hydraPrefix.'Class',
-            $hydraPrefix.'title' => 'The API entrypoint',
+            $hydraPrefix.'title' => 'Entrypoint',
             $hydraPrefix.'supportedProperty' => $entrypointProperties,
             $hydraPrefix.'supportedOperation' => [
                 '@type' => $hydraPrefix.'Operation',
                 $hydraPrefix.'method' => 'GET',
-                'rdfs:label' => 'The API entrypoint.',
-                'returns' => 'EntryPoint',
+                $hydraPrefix.'title' => 'index',
+                $hydraPrefix.'description' => 'The API Entrypoint.',
+                $hydraPrefix.'returns' => 'Entrypoint',
             ],
         ];
 
-        // Constraint violation
         $classes[] = [
-            '@id' => '#ConstraintViolation',
+            '@id' => '#ConstraintViolationList',
             '@type' => $hydraPrefix.'Class',
-            $hydraPrefix.'title' => 'A constraint violation',
+            $hydraPrefix.'title' => 'ConstraintViolationList',
+            $hydraPrefix.'description' => 'A constraint violation List.',
             $hydraPrefix.'supportedProperty' => [
                 [
                     '@type' => $hydraPrefix.'SupportedProperty',
                     $hydraPrefix.'property' => [
-                        '@id' => '#ConstraintViolation/propertyPath',
+                        '@id' => '#ConstraintViolationList/propertyPath',
                         '@type' => 'rdf:Property',
                         'rdfs:label' => 'propertyPath',
-                        'domain' => '#ConstraintViolation',
+                        'domain' => '#ConstraintViolationList',
                         'range' => 'xmls:string',
                     ],
                     $hydraPrefix.'title' => 'propertyPath',
@@ -467,38 +480,14 @@ final class DocumentationNormalizer implements NormalizerInterface
                 [
                     '@type' => $hydraPrefix.'SupportedProperty',
                     $hydraPrefix.'property' => [
-                        '@id' => '#ConstraintViolation/message',
+                        '@id' => '#ConstraintViolationList/message',
                         '@type' => 'rdf:Property',
                         'rdfs:label' => 'message',
-                        'domain' => '#ConstraintViolation',
+                        'domain' => '#ConstraintViolationList',
                         'range' => 'xmls:string',
                     ],
                     $hydraPrefix.'title' => 'message',
                     $hydraPrefix.'description' => 'The message associated with the violation',
-                    $hydraPrefix.'readable' => true,
-                    $hydraPrefix.'writeable' => false,
-                ],
-            ],
-        ];
-
-        // Constraint violation list
-        $classes[] = [
-            '@id' => '#ConstraintViolationList',
-            '@type' => $hydraPrefix.'Class',
-            'subClassOf' => $hydraPrefix.'Error',
-            $hydraPrefix.'title' => 'A constraint violation list',
-            $hydraPrefix.'supportedProperty' => [
-                [
-                    '@type' => $hydraPrefix.'SupportedProperty',
-                    $hydraPrefix.'property' => [
-                        '@id' => '#ConstraintViolationList/violations',
-                        '@type' => 'rdf:Property',
-                        'rdfs:label' => 'violations',
-                        'domain' => '#ConstraintViolationList',
-                        'range' => '#ConstraintViolation',
-                    ],
-                    $hydraPrefix.'title' => 'violations',
-                    $hydraPrefix.'description' => 'The violations',
                     $hydraPrefix.'readable' => true,
                     $hydraPrefix.'writeable' => false,
                 ],
@@ -524,8 +513,8 @@ final class DocumentationNormalizer implements NormalizerInterface
         $propertyData = ($propertyMetadata->getJsonldContext()[$hydraPrefix.'property'] ?? []) + [
             '@id' => $iri,
             '@type' => false === $propertyMetadata->isReadableLink() ? $hydraPrefix.'Link' : 'rdf:Property',
-            'rdfs:label' => $propertyName,
             'domain' => $prefixedShortName,
+            'label' => $propertyName,
         ];
 
         if (!isset($propertyData['owl:deprecated']) && $propertyMetadata->getDeprecationReason()) {
@@ -544,7 +533,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             '@type' => $hydraPrefix.'SupportedProperty',
             $hydraPrefix.'property' => $propertyData,
             $hydraPrefix.'title' => $propertyName,
-            $hydraPrefix.'required' => $propertyMetadata->isRequired(),
+            $hydraPrefix.'required' => $propertyMetadata->isRequired() ?? false,
             $hydraPrefix.'readable' => $propertyMetadata->isReadable(),
             $hydraPrefix.'writeable' => $propertyMetadata->isWritable() || $propertyMetadata->isInitializable(),
         ];

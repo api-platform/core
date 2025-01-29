@@ -151,7 +151,10 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
      */
     private function getValidationGroups(ValidatorClassMetadataInterface $classMetadata, array $options): array
     {
-        if (isset($options['validation_groups'])) {
+        if (
+            isset($options['validation_groups'])
+            && !\is_callable($options['validation_groups'])
+        ) {
             return $options['validation_groups'];
         }
 

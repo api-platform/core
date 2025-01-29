@@ -37,9 +37,9 @@ Feature: Error handling
     And the JSON should be equal to:
     """
     {
-          "@context": "/contexts/ConstraintViolationList",
+          "@context": "/contexts/ConstraintViolation",
           "@id": "/validation_errors/c1051bb4-d103-4f74-8988-acbcafc7fdc3",
-          "@type": "ConstraintViolationList",
+          "@type": "ConstraintViolation",
           "status": 422,
           "violations": [
               {

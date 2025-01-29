@@ -13,10 +13,30 @@ declare(strict_types=1);
 
 namespace ApiPlatform\OpenApi;
 
-final class Options
+final readonly class Options
 {
-    public function __construct(private readonly string $title, private readonly string $description = '', private readonly string $version = '', private readonly bool $oAuthEnabled = false, private readonly ?string $oAuthType = null, private readonly ?string $oAuthFlow = null, private readonly ?string $oAuthTokenUrl = null, private readonly ?string $oAuthAuthorizationUrl = null, private readonly ?string $oAuthRefreshUrl = null, private readonly array $oAuthScopes = [], private readonly array $apiKeys = [], private readonly ?string $contactName = null, private readonly ?string $contactUrl = null, private readonly ?string $contactEmail = null, private readonly ?string $termsOfService = null, private readonly ?string $licenseName = null, private readonly ?string $licenseUrl = null, private bool $overrideResponses = true, private readonly array $httpAuth = [])
-    {
+    public function __construct(
+        private string $title,
+        private string $description = '',
+        private string $version = '',
+        private bool $oAuthEnabled = false,
+        private ?string $oAuthType = null,
+        private ?string $oAuthFlow = null,
+        private ?string $oAuthTokenUrl = null,
+        private ?string $oAuthAuthorizationUrl = null,
+        private ?string $oAuthRefreshUrl = null,
+        private array $oAuthScopes = [],
+        private array $apiKeys = [],
+        private ?string $contactName = null,
+        private ?string $contactUrl = null,
+        private ?string $contactEmail = null,
+        private ?string $termsOfService = null,
+        private ?string $licenseName = null,
+        private ?string $licenseUrl = null,
+        private bool $overrideResponses = true,
+        private bool $persistAuthorization = false,
+        private array $httpAuth = [],
+    ) {
     }
 
     public function getTitle(): string
@@ -112,5 +132,10 @@ final class Options
     public function getOverrideResponses(): bool
     {
         return $this->overrideResponses;
+    }
+
+    public function hasPersistAuthorization(): bool
+    {
+        return $this->persistAuthorization;
     }
 }

@@ -76,6 +76,7 @@ final class PropertyMetadataCompatibilityTest extends TestCase
         'genId' => true,
         'uriTemplate' => '/sub-resource-get-collection',
         'property' => 'test',
+        'hydra' => false,
     ];
 
     #[\PHPUnit\Framework\Attributes\DataProvider('getExtractors')]

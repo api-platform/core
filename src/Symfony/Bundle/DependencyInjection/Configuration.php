@@ -293,6 +293,7 @@ final class Configuration implements ConfigurationInterface
                 ->arrayNode('swagger')
                     ->addDefaultsIfNotSet()
                     ->children()
+                        ->booleanNode('persist_authorization')->defaultValue(false)->info('Persist the SwaggerUI Authorization in the localStorage.')->end()
                         ->arrayNode('versions')
                             ->info('The active versions of OpenAPI to be exported or used in Swagger UI. The first value is the default.')
                             ->defaultValue($supportedVersions)

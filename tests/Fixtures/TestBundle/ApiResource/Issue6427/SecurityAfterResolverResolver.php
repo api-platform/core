@@ -23,6 +23,13 @@ final class SecurityAfterResolverResolver implements QueryItemResolverInterface
      */
     public function __invoke($item, array $context): SecurityAfterResolver
     {
+        $idUrl = $context['args']['id'];
+
+        if (str_contains($idUrl, '2')) {
+            // Unknown to simulate a 403 error
+            return new SecurityAfterResolver('2', 'nonexistent');
+        }
+
         return new SecurityAfterResolver('1', 'test');
     }
 }

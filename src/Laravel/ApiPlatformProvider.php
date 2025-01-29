@@ -222,6 +222,7 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\BackedEnumNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeZoneNormalizer;
@@ -776,6 +777,7 @@ class ApiPlatformProvider extends ServiceProvider
                 contactEmail: $config->get('api-platform.swagger_ui.contact.email', ''),
                 licenseName: $config->get('api-platform.swagger_ui.license.name', ''),
                 licenseUrl: $config->get('api-platform.swagger_ui.license.url', ''),
+                persistAuthorization: $config->get('api-platform.swagger_ui.persist_authorization', false),
                 httpAuth: $config->get('api-platform.swagger_ui.http_auth', []),
             );
         });
@@ -1020,6 +1022,7 @@ class ApiPlatformProvider extends ServiceProvider
             $list->insert($app->make(DateTimeZoneNormalizer::class), -915);
             $list->insert($app->make(DateIntervalNormalizer::class), -915);
             $list->insert($app->make(DateTimeNormalizer::class), -910);
+            $list->insert($app->make(BackedEnumNormalizer::class), -910);
             $list->insert($app->make(ObjectNormalizer::class), -1000);
             $list->insert($app->make(ItemNormalizer::class), -895);
             $list->insert($app->make(OpenApiNormalizer::class), -780);

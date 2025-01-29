@@ -35,6 +35,7 @@ return new class extends Migration {
             $table->boolean('is_available')->default(true);
             $table->text('internal_note')->nullable();
             $table->boolean('published')->nullable();
+            $table->enum('status', ['PUBLISHED', 'DRAFT'])->default('PUBLISHED');
             $table->integer('author_id')->unsigned();
             $table->foreign('author_id')->references('id')->on('authors');
             $table->timestamps();

@@ -248,7 +248,7 @@ abstract class Parameter
         return $self;
     }
 
-    public function withSecurity(string|\Stringable|null $security): self
+    public function withSecurity(string|\Stringable|null $security): static
     {
         $self = clone $this;
         $self->security = $security;
@@ -256,7 +256,7 @@ abstract class Parameter
         return $self;
     }
 
-    public function withSecurityMessage(?string $securityMessage): self
+    public function withSecurityMessage(?string $securityMessage): static
     {
         $self = clone $this;
         $self->securityMessage = $securityMessage;

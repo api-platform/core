@@ -15,9 +15,10 @@ namespace ApiPlatform\Doctrine\Odm\Tests;
 
 use ApiPlatform\Doctrine\Odm\Paginator;
 use ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document\Dummy;
-use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Iterator\Iterator;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 
@@ -36,55 +37,6 @@ class PaginatorTest extends TestCase
         $this->assertSame($hasNextPage, $paginator->hasNextPage());
     }
 
-    public function testInitializeWithFacetStageNotApplied(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('$facet stage was not applied to the aggregation pipeline.');
-
-        $this->getPaginatorWithMissingStage();
-    }
-
-    public function testInitializeWithResultsFacetNotApplied(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('"results" facet was not applied to the aggregation pipeline.');
-
-        $this->getPaginatorWithMissingStage(true);
-    }
-
-    public function testInitializeWithCountFacetNotApplied(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('"count" facet was not applied to the aggregation pipeline.');
-
-        $this->getPaginatorWithMissingStage(true, true);
-    }
-
-    public function testInitializeWithSkipStageNotApplied(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('$skip stage was not applied to the facet stage of the aggregation pipeline.');
-
-        $this->getPaginatorWithMissingStage(true, true, true);
-    }
-
-    public function testInitializeWithLimitStageNotApplied(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('$limit stage was not applied to the facet stage of the aggregation pipeline.');
-
-        $this->getPaginatorWithMissingStage(true, true, true, true);
-    }
-
-    public function testInitializeWithLimitZeroStageApplied(): void
-    {
-        $paginator = $this->getPaginator(0, 5, 0, true);
-
-        $this->assertSame(1., $paginator->getCurrentPage());
-        $this->assertSame(1., $paginator->getLastPage());
-        $this->assertSame(0., $paginator->getItemsPerPage());
-    }
-
     public function testInitializeWithNoCount(): void
     {
         $paginator = $this->getPaginatorWithNoCount();
@@ -94,6 +46,17 @@ class PaginatorTest extends TestCase
         $this->assertSame(15., $paginator->getItemsPerPage());
     }
 
+    #[TestWith(['__api_first_result__'])]
+    #[TestWith(['__api_max_results__'])]
+    #[TestWith(['results'])]
+    #[TestWith(['count'])]
+    public function testInitializeWithMissingResultField(string $missingField): void
+    {
+        $this->expectException(RuntimeException::class);
+
+        $this->getPaginatorMissingResultField($missingField);
+    }
+
     public function testGetIterator(): void
     {
         $paginator = $this->getPaginator();
@@ -101,30 +64,15 @@ class PaginatorTest extends TestCase
         $this->assertSame($paginator->getIterator(), $paginator->getIterator(), 'Iterator should be cached');
     }
 
-    private function getPaginator(int $firstResult = 1, int $maxResults = 15, int $totalItems = 42, bool $limitZero = false): Paginator
+    private function getPaginator(int $firstResult = 1, int $maxResults = 15, int $totalItems = 42): Paginator
     {
         $iterator = $this->prophesize(Iterator::class);
-        $pipeline = [
-            [
-                '$facet' => [
-                    'results' => [
-                        ['$skip' => $firstResult],
-                        $limitZero ? ['$match' => [Paginator::LIMIT_ZERO_MARKER_FIELD => Paginator::LIMIT_ZERO_MARKER]] : ['$limit' => $maxResults],
-                    ],
-                    'count' => [
-                        ['$count' => 'count'],
-                    ],
-                ],
-            ],
-        ];
         $iterator->toArray()->willReturn([
             [
-                'count' => [
-                    [
-                        'count' => $totalItems,
-                    ],
-                ],
+                'count' => [['count' => $totalItems]],
                 'results' => [],
+                '__api_first_result__' => $firstResult,
+                '__api_max_results__' => $maxResults,
             ],
         ]);
 
@@ -132,60 +80,18 @@ class PaginatorTest extends TestCase
         $config = DoctrineMongoDbOdmSetup::createAttributeMetadataConfiguration([$fixturesPath], true);
         $documentManager = DocumentManager::create(null, $config);
 
-        return new Paginator($iterator->reveal(), $documentManager->getUnitOfWork(), Dummy::class, $pipeline);
+        return new Paginator($iterator->reveal(), $documentManager->getUnitOfWork(), Dummy::class);
     }
 
-    private function getPaginatorWithMissingStage(bool $facet = false, bool $results = false, bool $count = false, bool $maxResults = false): Paginator
-    {
-        $pipeline = [];
-
-        if ($facet) {
-            $pipeline[] = [
-                '$facet' => [],
-            ];
-        }
-
-        if ($results) {
-            $pipeline[0]['$facet']['results'] = [];
-        }
-
-        if ($count) {
-            $pipeline[0]['$facet']['count'] = [];
-        }
-
-        if ($maxResults) {
-            $pipeline[0]['$facet']['results'][] = ['$skip' => 42];
-        }
-
-        $iterator = $this->prophesize(Iterator::class);
-
-        $fixturesPath = \dirname((string) (new \ReflectionClass(Dummy::class))->getFileName());
-        $config = DoctrineMongoDbOdmSetup::createAttributeMetadataConfiguration([$fixturesPath], true);
-        $documentManager = DocumentManager::create(null, $config);
-
-        return new Paginator($iterator->reveal(), $documentManager->getUnitOfWork(), Dummy::class, $pipeline);
-    }
-
-    private function getPaginatorWithNoCount($firstResult = 1, $maxResults = 15): Paginator
+    private function getPaginatorWithNoCount(): Paginator
     {
         $iterator = $this->prophesize(Iterator::class);
-        $pipeline = [
-            [
-                '$facet' => [
-                    'results' => [
-                        ['$skip' => $firstResult],
-                        ['$limit' => $maxResults],
-                    ],
-                    'count' => [
-                        ['$count' => 'count'],
-                    ],
-                ],
-            ],
-        ];
         $iterator->toArray()->willReturn([
             [
                 'count' => [],
                 'results' => [],
+                '__api_first_result__' => 1,
+                '__api_max_results__' => 15,
             ],
         ]);
 
@@ -193,7 +99,26 @@ class PaginatorTest extends TestCase
         $config = DoctrineMongoDbOdmSetup::createAttributeMetadataConfiguration([$fixturesPath], true);
         $documentManager = DocumentManager::create(null, $config);
 
-        return new Paginator($iterator->reveal(), $documentManager->getUnitOfWork(), Dummy::class, $pipeline);
+        return new Paginator($iterator->reveal(), $documentManager->getUnitOfWork(), Dummy::class);
+    }
+
+    private function getPaginatorMissingResultField(string $missing): Paginator
+    {
+        $iterator = $this->prophesize(Iterator::class);
+        $iterator->toArray()->willReturn([
+            array_diff_key([
+                'count' => [['count' => 42]],
+                'results' => [],
+                '__api_first_result__' => 1,
+                '__api_max_results__' => 15,
+            ], [$missing => 1]),
+        ]);
+
+        $fixturesPath = \dirname((string) (new \ReflectionClass(Dummy::class))->getFileName());
+        $config = DoctrineMongoDbOdmSetup::createAttributeMetadataConfiguration([$fixturesPath], true);
+        $documentManager = DocumentManager::create(null, $config);
+
+        return new Paginator($iterator->reveal(), $documentManager->getUnitOfWork(), Dummy::class);
     }
 
     public static function initializeProvider(): array
