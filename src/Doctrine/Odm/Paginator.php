@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm;
 
-use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\State\Pagination\HasNextPagePaginatorInterface;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use Doctrine\ODM\MongoDB\Iterator\Iterator;
@@ -27,10 +27,7 @@ use Doctrine\ODM\MongoDB\UnitOfWork;
  */
 final class Paginator implements \IteratorAggregate, PaginatorInterface, HasNextPagePaginatorInterface
 {
-    public const LIMIT_ZERO_MARKER_FIELD = '___';
-    public const LIMIT_ZERO_MARKER = 'limit0';
-
-    private ?\ArrayIterator $iterator = null;
+    private readonly \ArrayIterator $iterator;
 
     private readonly int $firstResult;
 
@@ -38,18 +35,34 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface, HasNext
 
     private readonly int $totalItems;
 
-    public function __construct(private readonly Iterator $mongoDbOdmIterator, private readonly UnitOfWork $unitOfWork, private readonly string $resourceClass, private readonly array $pipeline)
-    {
-        $resultsFacetInfo = $this->getFacetInfo('results');
-        $this->getFacetInfo('count');
+    private readonly int $count;
 
-        /*
-         * Since the {@see \MongoDB\Driver\Cursor} class does not expose information about
-         * skip/limit parameters of the query, the values set in the facet stage are used instead.
-         */
-        $this->firstResult = $this->getStageInfo($resultsFacetInfo, '$skip');
-        $this->maxResults = $this->hasLimitZeroStage($resultsFacetInfo) ? 0 : $this->getStageInfo($resultsFacetInfo, '$limit');
-        $this->totalItems = $mongoDbOdmIterator->toArray()[0]['count'][0]['count'] ?? 0;
+    public function __construct(Iterator $mongoDbOdmIterator, UnitOfWork $unitOfWork, string $resourceClass)
+    {
+        $result = $mongoDbOdmIterator->toArray()[0];
+
+        if (array_diff_key(['results' => 1, 'count' => 1, '__api_first_result__' => 1, '__api_max_results__' => 1], $result)) {
+            throw new RuntimeException('The result of the query must contain only "__api_first_result__", "__api_max_results__", "results" and "count" fields.');
+        }
+
+        // The "count" facet contains the total number of documents,
+        // it is not set when the query does not return any document
+        $this->totalItems = $result['count'][0]['count'] ?? 0;
+
+        // The "results" facet contains the returned documents
+        if ([] === $result['results']) {
+            $this->count = 0;
+            $this->iterator = new \ArrayIterator();
+        } else {
+            $this->count = \count($result['results']);
+            $this->iterator = new \ArrayIterator(array_map(
+                static fn ($result): object => $unitOfWork->getOrCreateDocument($resourceClass, $result),
+                $result['results'],
+            ));
+        }
+
+        $this->firstResult = $result['__api_first_result__'];
+        $this->maxResults = $result['__api_max_results__'];
     }
 
     /**
@@ -97,7 +110,7 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface, HasNext
      */
     public function getIterator(): \Traversable
     {
-        return $this->iterator ?? $this->iterator = new \ArrayIterator(array_map(fn ($result): object => $this->unitOfWork->getOrCreateDocument($this->resourceClass, $result), $this->mongoDbOdmIterator->toArray()[0]['results']));
+        return $this->iterator;
     }
 
     /**
@@ -105,7 +118,7 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface, HasNext
      */
     public function count(): int
     {
-        return is_countable($this->mongoDbOdmIterator->toArray()[0]['results']) ? \count($this->mongoDbOdmIterator->toArray()[0]['results']) : 0;
+        return $this->count;
     }
 
     /**
@@ -114,48 +127,5 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface, HasNext
     public function hasNextPage(): bool
     {
         return $this->getLastPage() > $this->getCurrentPage();
-    }
-
-    /**
-     * @throws InvalidArgumentException
-     */
-    private function getFacetInfo(string $field): array
-    {
-        foreach ($this->pipeline as $indexStage => $infoStage) {
-            if (\array_key_exists('$facet', $infoStage)) {
-                if (!isset($this->pipeline[$indexStage]['$facet'][$field])) {
-                    throw new InvalidArgumentException("\"$field\" facet was not applied to the aggregation pipeline.");
-                }
-
-                return $this->pipeline[$indexStage]['$facet'][$field];
-            }
-        }
-
-        throw new InvalidArgumentException('$facet stage was not applied to the aggregation pipeline.');
-    }
-
-    /**
-     * @throws InvalidArgumentException
-     */
-    private function getStageInfo(array $resultsFacetInfo, string $stage): int
-    {
-        foreach ($resultsFacetInfo as $resultFacetInfo) {
-            if (isset($resultFacetInfo[$stage])) {
-                return $resultFacetInfo[$stage];
-            }
-        }
-
-        throw new InvalidArgumentException("$stage stage was not applied to the facet stage of the aggregation pipeline.");
-    }
-
-    private function hasLimitZeroStage(array $resultsFacetInfo): bool
-    {
-        foreach ($resultsFacetInfo as $resultFacetInfo) {
-            if (self::LIMIT_ZERO_MARKER === ($resultFacetInfo['$match'][self::LIMIT_ZERO_MARKER_FIELD] ?? null)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
