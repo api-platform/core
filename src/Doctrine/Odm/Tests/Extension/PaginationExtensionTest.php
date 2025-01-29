@@ -27,6 +27,7 @@ use Doctrine\ODM\MongoDB\Aggregation\Stage\Count;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Facet;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Skip;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\Iterator\IterableResult;
 use Doctrine\ODM\MongoDB\Iterator\Iterator;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -333,8 +334,11 @@ class PaginationExtensionTest extends TestCase
             ],
         ]);
 
+        $aggregationProphecy = $this->prophesize(IterableResult::class);
+        $aggregationProphecy->getIterator()->willReturn($iteratorProphecy->reveal());
+
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
-        $aggregationBuilderProphecy->execute([])->willReturn($iteratorProphecy->reveal());
+        $aggregationBuilderProphecy->getAggregation([])->willReturn($aggregationProphecy->reveal());
         $aggregationBuilderProphecy->getPipeline()->willReturn([
             [
                 '$facet' => [
@@ -390,8 +394,11 @@ class PaginationExtensionTest extends TestCase
             ],
         ]);
 
+        $aggregationProphecy = $this->prophesize(IterableResult::class);
+        $aggregationProphecy->getIterator()->willReturn($iteratorProphecy->reveal());
+
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
-        $aggregationBuilderProphecy->execute(['allowDiskUse' => true])->willReturn($iteratorProphecy->reveal());
+        $aggregationBuilderProphecy->getAggregation(['allowDiskUse' => true])->willReturn($aggregationProphecy->reveal());
         $aggregationBuilderProphecy->getPipeline()->willReturn([
             [
                 '$facet' => [
