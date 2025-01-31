@@ -141,13 +141,14 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
     public const DOCTRINE_INTEGER_TYPE = Types::INTEGER;
 
-    public function __construct(ManagerRegistry $managerRegistry, IriConverterInterface|LegacyIriConverterInterface $iriConverter, ?PropertyAccessorInterface $propertyAccessor = null, ?LoggerInterface $logger = null, ?array $properties = null, IdentifiersExtractorInterface|LegacyIdentifiersExtractorInterface|null $identifiersExtractor = null, ?NameConverterInterface $nameConverter = null)
+    public function __construct(ManagerRegistry $managerRegistry, IriConverterInterface|LegacyIriConverterInterface $iriConverter, ?PropertyAccessorInterface $propertyAccessor = null, ?LoggerInterface $logger = null, ?array $properties = null, IdentifiersExtractorInterface|LegacyIdentifiersExtractorInterface|null $identifiersExtractor = null, ?NameConverterInterface $nameConverter = null, ?string $defaultStrategy = null)
     {
         parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
 
         $this->iriConverter = $iriConverter;
         $this->identifiersExtractor = $identifiersExtractor;
         $this->propertyAccessor = $propertyAccessor ?: PropertyAccess::createPropertyAccessor();
+        $this->defaultStrategy = $defaultStrategy ?? self::STRATEGY_EXACT;
     }
 
     protected function getIriConverter(): IriConverterInterface|LegacyIriConverterInterface
@@ -187,7 +188,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
         }
 
         $caseSensitive = true;
-        $strategy = $this->properties[$property] ?? self::STRATEGY_EXACT;
+        $strategy = $this->properties[$property] ?? $this->defaultStrategy;
 
         // prefixing the strategy with i makes it case insensitive
         if (str_starts_with($strategy, 'i')) {
