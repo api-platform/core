@@ -23,7 +23,7 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/metadata": "^3.4 || ^4.0",
+        "api-platform/metadata": "^4.1",
         "symfony/web-link": "^6.4 || ^7.0"
     },
     "require-dev": {

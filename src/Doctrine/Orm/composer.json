@@ -24,7 +24,7 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/doctrine-common": "^3.4 || ^4.0",
+        "api-platform/doctrine-common": "^4.1",
         "api-platform/metadata": "^3.4 || ^4.0",
         "api-platform/state": "^3.4 || ^4.0",
         "doctrine/orm": "^2.17 || ^3.0",
