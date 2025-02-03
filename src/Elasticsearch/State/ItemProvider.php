@@ -36,8 +36,11 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  */
 final class ItemProvider implements ProviderInterface
 {
-    public function __construct(private readonly V7Client|Client $client, private readonly ?DenormalizerInterface $denormalizer = null, private readonly ?InflectorInterface $inflector = new Inflector())
-    {
+    public function __construct(
+        private readonly V7Client|Client $client, // @phpstan-ignore-line
+        private readonly ?DenormalizerInterface $denormalizer = null,
+        private readonly ?InflectorInterface $inflector = new Inflector(),
+    ) {
     }
 
     /**
@@ -57,8 +60,8 @@ final class ItemProvider implements ProviderInterface
         ];
 
         try {
-            $document = $this->client->get($params);
-        } catch (V7Missing404Exception) {
+            $document = $this->client->get($params); // @phpstan-ignore-line
+        } catch (V7Missing404Exception) { // @phpstan-ignore-line
             return null;
         } catch (ClientResponseException $e) {
             $response = $e->getResponse();

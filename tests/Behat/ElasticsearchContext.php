@@ -25,8 +25,11 @@ use Symfony\Component\Finder\Finder;
  */
 final class ElasticsearchContext implements Context
 {
-    public function __construct(private readonly V7Client|Client $client, private readonly string $elasticsearchMappingsPath, private readonly string $elasticsearchFixturesPath)
-    {
+    public function __construct(
+        private readonly V7Client|Client $client, // @phpstan-ignore-line
+        private readonly string $elasticsearchMappingsPath,
+        private readonly string $elasticsearchFixturesPath,
+    ) {
     }
 
     /**
@@ -77,7 +80,7 @@ final class ElasticsearchContext implements Context
         $finder->files()->in($this->elasticsearchMappingsPath);
 
         foreach ($finder as $file) {
-            $this->client->indices()->create([
+            $this->client->indices()->create([ // @phpstan-ignore-line
                 'index' => $file->getBasename('.json'),
                 'body' => json_decode($file->getContents(), true, 512, \JSON_THROW_ON_ERROR),
             ]);
@@ -96,7 +99,7 @@ final class ElasticsearchContext implements Context
         }
 
         if ([] !== $indexes) {
-            $this->client->indices()->delete([
+            $this->client->indices()->delete([ // @phpstan-ignore-line
                 'index' => implode(',', $indexes),
                 'ignore_unavailable' => true,
             ]);
@@ -108,7 +111,7 @@ final class ElasticsearchContext implements Context
         $finder = new Finder();
         $finder->files()->in($this->elasticsearchFixturesPath)->name('*.json');
 
-        $indexClient = $this->client->indices();
+        $indexClient = $this->client->indices(); // @phpstan-ignore-line
 
         foreach ($finder as $file) {
             $index = $file->getBasename('.json');
@@ -124,13 +127,13 @@ final class ElasticsearchContext implements Context
                 $bulk[] = $document;
 
                 if (0 === (\count($bulk) % 50)) {
-                    $this->client->bulk(['body' => $bulk]);
+                    $this->client->bulk(['body' => $bulk]); // @phpstan-ignore-line
                     $bulk = [];
                 }
             }
 
             if ($bulk) {
-                $this->client->bulk(['body' => $bulk]);
+                $this->client->bulk(['body' => $bulk]); // @phpstan-ignore-line
             }
 
             $indexClient->refresh(['index' => $index]);

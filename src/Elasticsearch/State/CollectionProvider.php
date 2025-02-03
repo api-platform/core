@@ -39,8 +39,13 @@ final class CollectionProvider implements ProviderInterface
     /**
      * @param RequestBodySearchCollectionExtensionInterface[] $collectionExtensions
      */
-    public function __construct(private readonly V7Client|Client $client, private readonly ?DenormalizerInterface $denormalizer = null, private readonly ?Pagination $pagination = null, private readonly iterable $collectionExtensions = [], private readonly ?InflectorInterface $inflector = new Inflector())
-    {
+    public function __construct(
+        private readonly V7Client|Client $client, // @phpstan-ignore-line
+        private readonly ?DenormalizerInterface $denormalizer = null,
+        private readonly ?Pagination $pagination = null,
+        private readonly iterable $collectionExtensions = [],
+        private readonly ?InflectorInterface $inflector = new Inflector(),
+    ) {
     }
 
     /**
@@ -70,9 +75,9 @@ final class CollectionProvider implements ProviderInterface
         ];
 
         try {
-            $documents = $this->client->search($params);
-        } catch (V7Missing404Exception $e) {
-            throw new Error(status: $e->getCode(), detail: $e->getMessage(), title: $e->getMessage(), originalTrace: $e->getTrace());
+            $documents = $this->client->search($params); // @phpstan-ignore-line
+        } catch (V7Missing404Exception $e) { // @phpstan-ignore-line
+            throw new Error(status: $e->getCode(), detail: $e->getMessage(), title: $e->getMessage(), originalTrace: $e->getTrace()); // @phpstan-ignore-line
         } catch (ClientResponseException $e) {
             $response = $e->getResponse();
             throw new Error(status: $response->getStatusCode(), detail: (string) $response->getBody(), title: $response->getReasonPhrase(), originalTrace: $e->getTrace());
