@@ -78,7 +78,7 @@ final class CollectionProvider implements ProviderInterface
             throw new Error(status: $response->getStatusCode(), detail: (string) $response->getBody(), title: $response->getReasonPhrase(), originalTrace: $e->getTrace());
         }
 
-        if (class_exists(Elastic\Elasticsearch\Response\Elasticsearch::class) && $documents instanceof Elasticsearch) {
+        if (class_exists(\Elastic\Elasticsearch\Response\Elasticsearch::class) && $documents instanceof Elasticsearch) {
             $documents = $documents->asArray();
         }
 
