@@ -194,6 +194,7 @@ use ApiPlatform\State\Provider\SecurityParameterProvider;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\SerializerContextBuilderInterface;
 use Illuminate\Config\Repository as ConfigRepository;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerInterface;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Foundation\CachesRoutes;
@@ -1346,7 +1347,7 @@ class ApiPlatformProvider extends ServiceProvider
     /**
      * Bootstrap services.
      */
-    public function boot(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, Router $router): void
+    public function boot(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, Router $router, Container $container): void
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
@@ -1447,7 +1448,9 @@ class ApiPlatformProvider extends ServiceProvider
         $route->middleware($globalMiddlewares);
         $routeCollection->add($route);
 
-        $router->setRoutes($routeCollection);
+        foreach ($routeCollection->getRoutes() as $route) {
+            $router->getRoutes()->add($route->setRouter($router)->setContainer($container));
+        }
     }
 
     private function shouldRegisterRoutes(): bool
