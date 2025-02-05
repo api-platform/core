@@ -19,6 +19,8 @@ interface OpenApiFactoryInterface
 {
     /**
      * Creates an OpenApi class.
+     *
+     * @param array<string, mixed> $context
      */
     public function __invoke(array $context = []): OpenApi;
 }

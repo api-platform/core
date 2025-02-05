@@ -14,24 +14,17 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource;
 
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Factory\OpenApiFactory;
 use ApiPlatform\OpenApi\Model\Operation;
 
 #[ApiResource(
+    description: 'Something nice',
     operations: [
-        new Get(),
-        new GetCollection(openapi: new Operation(extensionProperties: [OpenApiFactory::API_PLATFORM_TAG => ['internal', 'anotherone']])),
-        new Post(openapi: new Operation(extensionProperties: [OpenApiFactory::API_PLATFORM_TAG => 'internal'])),
-        new Patch(),
-        new Delete(),
+        new Get(openapi: new Operation(extensionProperties: [OpenApiFactory::API_PLATFORM_TAG => ['anotherone']])),
     ]
 )]
-class Crud
+class CrudOpenApiApiPlatformTag
 {
     public string $id;
 }
