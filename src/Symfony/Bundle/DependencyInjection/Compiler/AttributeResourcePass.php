@@ -31,18 +31,15 @@ final class AttributeResourcePass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container): void
     {
-        $resourceClassDirectories = $container->getParameter('api_platform.resource_class_directories');
+        $classes = $container->getParameter('api_platform.class_name_resources');
 
         // findTaggedServiceIds cannot be used, as the services are excluded
-        foreach ($container->getDefinitions() as $id => $definition) {
+        foreach ($container->getDefinitions() as $definition) {
             if ($definition->hasTag('api_platform.resource')) {
-                $r = new \ReflectionClass($definition->getClass());
-                if ($r->getFileName()) {
-                    $resourceClassDirectories[] = \dirname($r->getFileName());
-                }
+                $classes[] = $definition->getClass();
             }
         }
-        $resourceClassDirectories = array_unique($resourceClassDirectories);
-        $container->setParameter('api_platform.resource_class_directories', $resourceClassDirectories);
+
+        $container->setParameter('api_platform.class_name_resources', array_unique($classes));
     }
 }
