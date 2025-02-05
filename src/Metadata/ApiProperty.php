@@ -26,7 +26,7 @@ use Symfony\Component\Serializer\Attribute\SerializedPath;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER | \Attribute::TARGET_CLASS_CONSTANT | \Attribute::TARGET_CLASS)]
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER | \Attribute::TARGET_CLASS_CONSTANT | \Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class ApiProperty
 {
     private ?array $types;
@@ -219,7 +219,7 @@ final class ApiProperty
         private array $extraProperties = [],
     ) {
         $this->types = \is_string($types) ? (array) $types : $types;
-        $this->serialize = \is_array($serialize) ? $serialize : (array) $serialize;
+        $this->serialize = \is_array($serialize) ? $serialize : [$serialize];
     }
 
     public function getProperty(): ?string
