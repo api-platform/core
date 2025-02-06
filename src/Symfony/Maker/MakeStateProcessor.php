@@ -69,7 +69,7 @@ final class MakeStateProcessor extends AbstractMaker
 
         $generator->generateClass(
             $stateProcessorClassNameDetails->getFullName(),
-            __DIR__.'/Resources/skeleton/StateProcessor.tpl.php'
+            __DIR__.'/Resources/skeleton/StateProcessor.php.tpl'
         );
         $generator->writeChanges();
 
