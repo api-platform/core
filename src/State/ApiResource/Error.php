@@ -13,9 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\ApiResource;
 
+use ApiPlatform\JsonSchema\SchemaFactory;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Error as Operation;
 use ApiPlatform\Metadata\ErrorResource;
+use ApiPlatform\Metadata\ErrorResourceInterface;
 use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
 use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface as SymfonyHttpExceptionInterface;
@@ -26,24 +28,30 @@ use Symfony\Component\WebLink\Link;
 
 #[ErrorResource(
     uriVariables: ['status'],
-    uriTemplate: '/errors/{status}',
+    requirements: ['status' => '\d+'],
+    uriTemplate: '/errors/{status}{._format}',
+    openapi: false,
     operations: [
         new Operation(
+            errors: [],
             name: '_api_errors_problem',
-            routeName: 'api_errors',
-            outputFormats: ['json' => ['application/problem+json']],
+            routeName: '_api_errors',
+            outputFormats: ['json' => ['application/problem+json', 'application/json']],
             hideHydraOperation: true,
             normalizationContext: [
+                SchemaFactory::OPENAPI_DEFINITION_NAME => '',
                 'groups' => ['jsonproblem'],
                 'skip_null_values' => true,
                 'ignored_attributes' => ['trace', 'file', 'line', 'code', 'message', 'traceAsString', 'previous'],
             ],
         ),
         new Operation(
+            errors: [],
             name: '_api_errors_hydra',
-            routeName: 'api_errors',
+            routeName: '_api_errors',
             outputFormats: ['jsonld' => ['application/problem+json', 'application/ld+json']],
             normalizationContext: [
+                SchemaFactory::OPENAPI_DEFINITION_NAME => '',
                 'groups' => ['jsonld'],
                 'skip_null_values' => true,
                 'ignored_attributes' => ['trace', 'file', 'line', 'code', 'message', 'traceAsString', 'previous'],
@@ -51,11 +59,13 @@ use Symfony\Component\WebLink\Link;
             links: [new Link(rel: 'http://www.w3.org/ns/json-ld#error', href: 'http://www.w3.org/ns/hydra/error')],
         ),
         new Operation(
+            errors: [],
             name: '_api_errors_jsonapi',
-            routeName: 'api_errors',
+            routeName: '_api_errors',
             hideHydraOperation: true,
             outputFormats: ['jsonapi' => ['application/vnd.api+json']],
             normalizationContext: [
+                SchemaFactory::OPENAPI_DEFINITION_NAME => '',
                 'disable_json_schema_serializer_groups' => false,
                 'groups' => ['jsonapi'],
                 'skip_null_values' => true,
@@ -64,18 +74,25 @@ use Symfony\Component\WebLink\Link;
         ),
         new Operation(
             name: '_api_errors',
-            routeName: 'api_errors',
             hideHydraOperation: true,
-            openapi: false
+            extraProperties: ['_api_disable_swagger_provider' => true],
+            outputFormats: [
+                'html' => ['text/html'],
+                'jsonapi' => ['application/vnd.api+json'],
+                'jsonld' => ['application/ld+json'],
+                'json' => ['application/problem+json', 'application/json'],
+            ],
         ),
     ],
+    outputFormats: ['jsonapi' => ['application/vnd.api+json'], 'jsonld' => ['application/ld+json'], 'json' => ['application/problem+json', 'application/json']],
     provider: 'api_platform.state.error_provider',
     graphQlOperations: [],
-    description: 'A representation of common errors.'
+    description: 'A representation of common errors.',
 )]
-#[ApiProperty(property: 'traceAsString', hydra: false)]
-#[ApiProperty(property: 'string', hydra: false)]
-class Error extends \Exception implements ProblemExceptionInterface, HttpExceptionInterface
+#[ApiProperty(property: 'previous', hydra: false, readable: false)]
+#[ApiProperty(property: 'traceAsString', hydra: false, readable: false)]
+#[ApiProperty(property: 'string', hydra: false, readable: false)]
+class Error extends \Exception implements ProblemExceptionInterface, HttpExceptionInterface, ErrorResourceInterface
 {
     private ?string $id = null;
 

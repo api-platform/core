@@ -93,6 +93,7 @@
             <argument type="service" id="api_platform.openapi.options" />
             <argument type="service" id="api_platform.pagination_options" />
             <argument type="service" id="api_platform.router" />
+            <argument>%api_platform.error_formats%</argument>
         </service>
 
         <service id="api_platform.cache.openapi" parent="cache.system" public="false">

@@ -77,6 +77,7 @@ use ApiPlatform\JsonSchema\Metadata\Property\Factory\SchemaPropertyMetadataFacto
 use ApiPlatform\JsonSchema\SchemaFactory;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Laravel\ApiResource\Error;
+use ApiPlatform\Laravel\ApiResource\ValidationError;
 use ApiPlatform\Laravel\Controller\ApiPlatformController;
 use ApiPlatform\Laravel\Controller\DocumentationController;
 use ApiPlatform\Laravel\Controller\EntrypointController;
@@ -177,6 +178,7 @@ use ApiPlatform\Serializer\Parameter\SerializerFilterParameterProvider;
 use ApiPlatform\Serializer\SerializerContextBuilder;
 use ApiPlatform\State\CallableProcessor;
 use ApiPlatform\State\CallableProvider;
+use ApiPlatform\State\ErrorProvider;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginationOptions;
 use ApiPlatform\State\ParameterProviderInterface;
@@ -773,6 +775,9 @@ class ApiPlatformProvider extends ServiceProvider
                 licenseUrl: $config->get('api-platform.swagger_ui.license.url', ''),
                 persistAuthorization: $config->get('api-platform.swagger_ui.persist_authorization', false),
                 httpAuth: $config->get('api-platform.swagger_ui.http_auth', []),
+                tags: $config->get('api-platform.openapi.tags', []),
+                errorResourceClass: Error::class,
+                validationErrorResourceClass: ValidationError::class
             );
         });
 
@@ -846,7 +851,9 @@ class ApiPlatformProvider extends ServiceProvider
                 null,
                 $config->get('api-platform.formats'),
                 $app->make(Options::class),
-                $app->make(PaginationOptions::class), // ?PaginationOptions $paginationOptions = null,
+                $app->make(PaginationOptions::class),
+                null,
+                $config->get('api-platform.error_formats'),
                 // ?RouterInterface $router = null
             );
         });
@@ -1216,6 +1223,18 @@ class ApiPlatformProvider extends ServiceProvider
         });
         $app->alias(GraphQlReadProvider::class, 'api_platform.graphql.state_provider.read');
 
+        $app->singleton(ErrorProvider::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+
+            return new ErrorProvider(
+                $config->get('app.debug'),
+                $app->make(ResourceClassResolver::class),
+                $app->make(ResourceMetadataCollectionFactoryInterface::class),
+            );
+        });
+        $app->tag([ErrorProvider::class], ProviderInterface::class);
+
         $app->singleton(ResolverProvider::class, function (Application $app) {
             $resolvers = iterator_to_array($app->tagged('api_platform.graphql.resolver'));
             $taggedItemResolvers = iterator_to_array($app->tagged(QueryItemResolverInterface::class));
@@ -1314,7 +1333,7 @@ class ApiPlatformProvider extends ServiceProvider
             /** @var ConfigRepository */
             $config = $app['config'];
 
-            return new Executor($config->get('api-platform.graphql.introspection.enabled') ?? false, $config->get('api-platform.graphql.max_query_complexity'), $config->get('api-platform.graphql.max_query_depth'));
+            return new Executor($config->get('api-platform.graphql.introspection.enabled') ?? false, $config->get('api-platform.graphql.max_query_complexity') ?? 500, $config->get('api-platform.graphql.max_query_depth') ?? 200);
         });
 
         $app->singleton(GraphiQlController::class, function (Application $app) {

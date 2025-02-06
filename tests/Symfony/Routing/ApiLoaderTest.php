@@ -213,7 +213,6 @@ class ApiLoaderTest extends TestCase
 
         $prefixedPath = $prefix.$path;
 
-        $this->assertNotNull($routeCollection->get('api_errors'));
         $this->assertEquals(
             $this->getRoute(
                 $prefixedPath,

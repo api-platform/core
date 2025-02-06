@@ -45,8 +45,3 @@ Feature: Using exception_to_status config
     And I send a "GET" request to "/issue5924"
     Then the response status code should be 429
     Then the header "retry-after" should be equal to 32
-
-  Scenario: Show error page
-    When I add "Accept" header equal to "text/html"
-    And I send a "GET" request to "/errors/404"
-    Then the response status code should be 200

@@ -5,12 +5,6 @@
         xsi:schemaLocation="http://symfony.com/schema/routing
         http://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <route id="api_errors" path="/errors/{status}" methods="GET|HEAD">
-        <default key="_controller">api_platform.action.error_page</default>
-
-        <requirement key="status">\d+</requirement>
-    </route>
-
     <route id="api_validation_errors" path="/validation_errors/{id}" methods="GET|HEAD">
         <default key="_controller">api_platform.action.not_exposed</default>
     </route>
