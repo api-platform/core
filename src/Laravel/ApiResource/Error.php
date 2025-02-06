@@ -28,6 +28,7 @@ use Symfony\Component\WebLink\Link;
 #[ErrorResource(
     types: ['hydra:Error'],
     openapi: false,
+    uriVariables: ['status'],
     operations: [
         new Operation(
             name: '_api_errors_problem',
