@@ -13,10 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\OpenApi\Attributes;
 
+use ApiPlatform\OpenApi\Model\ExtensionTrait;
 use ApiPlatform\OpenApi\Model\PathItem;
 
 class Webhook
 {
+    use ExtensionTrait;
+
     public function __construct(
         protected string $name,
         protected ?PathItem $pathItem = null,

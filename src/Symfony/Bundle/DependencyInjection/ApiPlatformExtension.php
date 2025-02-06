@@ -34,6 +34,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\UriVariableTransformerInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
+use ApiPlatform\OpenApi\Model\Tag;
 use ApiPlatform\RamseyUuid\Serializer\UuidDenormalizer;
 use ApiPlatform\State\ApiResource\Error;
 use ApiPlatform\State\ParameterProviderInterface;
@@ -852,6 +853,13 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.openapi.license.name', $config['openapi']['license']['name']);
         $container->setParameter('api_platform.openapi.license.url', $config['openapi']['license']['url']);
         $container->setParameter('api_platform.openapi.overrideResponses', $config['openapi']['overrideResponses']);
+
+        $tags = [];
+        foreach ($config['openapi']['tags'] as $tag) {
+            $tags[] = new Tag($tag['name'], $tag['description'] ?? null);
+        }
+
+        $container->setParameter('api_platform.openapi.tags', $tags);
 
         $loader->load('json_schema.xml');
     }

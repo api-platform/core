@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Crud;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\CrudOpenApiApiPlatformTag;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
 class OpenApiTest extends ApiTestCase
@@ -26,12 +27,11 @@ class OpenApiTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [Crud::class];
+        return [Crud::class, CrudOpenApiApiPlatformTag::class];
     }
 
     public function testErrorsAreDocumented(): void
     {
-        $container = static::getContainer();
         $response = self::createClient()->request('GET', '/docs', [
             'headers' => ['Accept' => 'application/vnd.openapi+json'],
         ]);
@@ -66,5 +66,34 @@ class OpenApiTest extends ApiTestCase
         foreach (['id', 'title', 'detail', 'instance', 'type', 'status', 'meta', 'source'] as $key) {
             $this->assertArrayHasKey($key, $res['components']['schemas']['Error.jsonapi-jsonapi']['properties']['errors']['properties']);
         }
+    }
+
+    public function testFilterExtensionTags(): void
+    {
+        $response = self::createClient()->request('GET', '/docs?filter_tags[]=internal', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ]);
+
+        $res = $response->toArray();
+        $this->assertArrayNotHasKey('CrudOpenApiApiPlatformTag', $res['components']['schemas']);
+        $this->assertArrayNotHasKey('/cruds/{id}', $res['paths']);
+        $this->assertArrayHasKey('/cruds', $res['paths']);
+        $this->assertArrayHasKey('post', $res['paths']['/cruds']);
+        $this->assertArrayHasKey('get', $res['paths']['/cruds']);
+        $this->assertEquals([['name' => 'Crud']], $res['tags']);
+
+        $response = self::createClient()->request('GET', '/docs?filter_tags[]=anotherone', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ]);
+
+        $res = $response->toArray();
+        $this->assertArrayHasKey('CrudOpenApiApiPlatformTag', $res['components']['schemas']);
+        $this->assertArrayHasKey('Crud', $res['components']['schemas']);
+        $this->assertArrayNotHasKey('/cruds/{id}', $res['paths']);
+        $this->assertArrayHasKey('/cruds', $res['paths']);
+        $this->assertArrayNotHasKey('post', $res['paths']['/cruds']);
+        $this->assertArrayHasKey('get', $res['paths']['/cruds']);
+        $this->assertArrayHasKey('/crud_open_api_api_platform_tags/{id}', $res['paths']);
+        $this->assertEquals([['name' => 'Crud'], ['name' => 'CrudOpenApiApiPlatformTag', 'description' => 'Something nice']], $res['tags']);
     }
 }

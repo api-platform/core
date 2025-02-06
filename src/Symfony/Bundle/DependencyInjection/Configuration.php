@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\OpenApi\Model\Tag;
 use ApiPlatform\Symfony\Controller\MainController;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
@@ -503,6 +504,15 @@ final class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->scalarNode('termsOfService')->defaultNull()->info('A URL to the Terms of Service for the API. MUST be in the format of a URL.')->end()
+                        ->arrayNode('tags')
+                            ->info('Global OpenApi tags overriding the default computed tags if specified.')
+                            ->prototype('array')
+                                ->children()
+                                    ->scalarNode('name')->isRequired()->end()
+                                    ->scalarNode('description')->defaultNull()->end()
+                                ->end()
+                            ->end()
+                        ->end()
                         ->arrayNode('license')
                         ->addDefaultsIfNotSet()
                             ->children()
