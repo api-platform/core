@@ -39,7 +39,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.3'
+          - '8.4'
       fail-fast: false
     steps:
       - name: Checkout
@@ -99,7 +99,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.3'
+          - '8.4'
       fail-fast: false
     steps:
       - name: Checkout
@@ -136,7 +136,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.3'
+          - '8.4'
       fail-fast: false
     env:
       APP_DEBUG: '1' # https://github.com/phpstan/phpstan-symfony/issues/37
@@ -201,10 +201,11 @@ jobs:
         php:
           - '8.2'
           - '8.3'
+          - '8.4'
         include:
           - php: '8.2'
-            coverage: true
           - php: '8.3'
+          - php: '8.4'
             coverage: true
       fail-fast: false
     steps:
@@ -271,6 +272,7 @@ jobs:
         php:
           - '8.2'
           - '8.3'
+          - '8.4'
         component:
           - api-platform/doctrine-common
           - api-platform/doctrine-orm
@@ -290,8 +292,8 @@ jobs:
           - api-platform/validator
         include:
           - php: '8.2'
-            coverage: true
           - php: '8.3'
+          - php: '8.4'
             coverage: true
       fail-fast: false
     steps:
@@ -349,13 +351,12 @@ jobs:
         php:
           - '8.2'
           - '8.3'
+          - '8.4'
         include:
           - php: '8.2'
-            coverage: true
           - php: '8.3'
+          - php: '8.4'
             coverage: true
-          - php: '8.3'
-            coverage: false
       fail-fast: false
     steps:
       - name: Checkout
@@ -449,7 +450,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.3'
+          - '8.4'
       fail-fast: false
     env:
       APP_ENV: postgres
@@ -499,7 +500,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.3'
+          - '8.4'
       fail-fast: false
     services:
       mysql:
@@ -549,8 +550,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.2'
-          - '8.3'
+          - '8.4'
       fail-fast: false
     env:
       APP_ENV: mongodb
@@ -638,8 +638,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.2'
-          - '8.3'
+          - '8.4'
       fail-fast: false
     env:
       APP_ENV: mercure
@@ -729,7 +728,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.3'
+          - '8.4'
       fail-fast: false
     env:
       APP_ENV: elasticsearch
@@ -781,7 +780,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.3'
+          - '8.4'
       fail-fast: false
     steps:
       - name: Checkout
@@ -820,7 +819,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.3'
+          - '8.4'
       fail-fast: false
     steps:
       - name: Checkout
@@ -863,7 +862,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.3'
+          - '8.4'
       fail-fast: false
     steps:
       - name: Checkout
@@ -1008,7 +1007,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.3'
+          - '8.4'
       fail-fast: false
     steps:
       - name: Checkout
@@ -1054,9 +1053,9 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.3'
+          - '8.4'
         include:
-          - php: '8.3'
+          - php: '8.4'
             coverage: true
       fail-fast: false
     steps:
@@ -1132,7 +1131,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.3'
+          - '8.4'
       fail-fast: false
     steps:
       - name: Checkout
@@ -1202,10 +1201,11 @@ jobs:
         php:
           - '8.2'
           - '8.3'
+          - '8.4'
         include:
           - php: '8.2'
-            coverage: true
           - php: '8.3'
+          - php: '8.4'
             coverage: true
       fail-fast: false
     steps:
