@@ -171,8 +171,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->registerForAutoconfiguration(ParameterProviderInterface::class)
             ->addTag('api_platform.parameter_provider');
         $container->registerAttributeForAutoconfiguration(ApiResource::class, static function (ChildDefinition $definition): void {
-            $definition->addTag('api_platform.resource');
-            $definition->addTag('container.excluded', ['source' => __FILE__]);
+            $definition->setAbstract(true)
+                ->addTag('api_platform.resource')
+                ->addTag('container.excluded', ['source' => 'by #[ApiResource] attribute']);
         });
 
         if (!$container->has('api_platform.state.item_provider')) {

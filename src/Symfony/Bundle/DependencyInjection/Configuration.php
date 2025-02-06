@@ -141,6 +141,7 @@ final class Configuration implements ConfigurationInterface
                 ->end()
                 ->arrayNode('resource_class_directories')
                     ->prototype('scalar')->end()
+                    ->setDeprecated('api-platform/symfony', '4.1', 'The "resource_class_directories" configuration is deprecated, classes using #[ApiResource] attribute are autoconfigured by the dependency injection container.')
                 ->end()
                 ->arrayNode('serializer')
                     ->addDefaultsIfNotSet()
