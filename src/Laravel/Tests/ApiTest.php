@@ -1,5 +1,16 @@
 <?php
 
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
 use ApiPlatform\Laravel\Test\ApiTestAssertionsTrait;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Foundation\Application;
@@ -14,7 +25,7 @@ class ApiTest extends TestCase
     use WithWorkbench;
 
     /**
-     * @param  Application  $app
+     * @param Application $app
      */
     protected function defineEnvironment($app): void
     {
@@ -26,8 +37,11 @@ class ApiTest extends TestCase
         });
     }
 
-    public function test_domain_can_be_set()
+    public function testDomainCanBeSet(): void
     {
+        $response = $this->get('http://foobar.com/api/', ['accept' => ['application/ld+json']]);
+        $response->assertNotFound();
+
         $response = $this->get('http://test.com/api/', ['accept' => ['application/ld+json']]);
         $response->assertSuccessful();
     }

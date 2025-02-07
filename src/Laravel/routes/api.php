@@ -1,5 +1,16 @@
 <?php
 
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
 use ApiPlatform\JsonLd\Action\ContextAction;
 use ApiPlatform\Laravel\ApiPlatformMiddleware;
 use ApiPlatform\Laravel\Controller\ApiPlatformController;
@@ -17,14 +28,14 @@ use Illuminate\Support\Str;
 $globalMiddlewares = config()->get('api-platform.routes.middleware', []);
 $domain = config()->get('api-platform.routes.domain');
 
-Route::domain($domain)->middleware($globalMiddlewares)->group(function () {
+Route::domain($domain)->middleware($globalMiddlewares)->group(function (): void {
     $resourceNameCollectionFactory = app()->make(ResourceNameCollectionFactoryInterface::class);
     $resourceMetadataFactory = app()->make(ResourceMetadataCollectionFactoryInterface::class);
 
     foreach ($resourceNameCollectionFactory->create() as $resourceClass) {
         foreach ($resourceMetadataFactory->create($resourceClass) as $resourceMetadata) {
             foreach ($resourceMetadata->getOperations() as $operation) {
-                /** @var HttpOperation $operation */
+                /* @var HttpOperation $operation */
                 Route::addRoute($operation->getMethod(), Str::replace('{._format}', '{_format?}', $operation->getUriTemplate()), ApiPlatformController::class)
                     ->prefix($operation->getRoutePrefix())
                     ->middleware(ApiPlatformMiddleware::class.':'.$operation->getName())
@@ -38,8 +49,8 @@ Route::domain($domain)->middleware($globalMiddlewares)->group(function () {
 
     $prefix = config()->get('api-platform.defaults.route_prefix') ?? '';
 
-    Route::group(['prefix' => $prefix], function () {
-        Route::group(['middleware' => ApiPlatformMiddleware::class], function () {
+    Route::group(['prefix' => $prefix], function (): void {
+        Route::group(['middleware' => ApiPlatformMiddleware::class], function (): void {
             Route::get('/contexts/{shortName?}{_format?}', ContextAction::class)
                 ->middleware(ApiPlatformMiddleware::class)
                 ->name('api_jsonld_context');
@@ -53,6 +64,7 @@ Route::domain($domain)->middleware($globalMiddlewares)->group(function () {
                 ->name('api_genid');
 
             Route::get('/{index?}{_format?}', EntrypointController::class)
+                ->where('index', 'index')
                 ->middleware(ApiPlatformMiddleware::class)
                 ->name('api_entrypoint');
         });
