@@ -61,7 +61,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             $inputOrOutputClass = $className;
             $serializerContext ??= [];
         } else {
-            $operation = $this->findOperation($className, $type, $operation, $serializerContext);
+            $operation = $this->findOperation($className, $type, $operation, $serializerContext, $format);
             $inputOrOutputClass = $this->findOutputClass($className, $type, $operation, $serializerContext);
             $serializerContext ??= $this->getSerializerContext($operation, $type);
         }
@@ -74,7 +74,6 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         $validationGroups = $operation ? $this->getValidationGroups($operation) : [];
         $version = $schema->getVersion();
         $definitionName = $this->definitionNameFactory->create($className, $format, $inputOrOutputClass, $operation, $serializerContext);
-
         $method = $operation instanceof HttpOperation ? $operation->getMethod() : 'GET';
         if (!$operation) {
             $method = Schema::TYPE_INPUT === $type ? 'POST' : 'GET';
@@ -289,6 +288,10 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
         if ($validationGroups) {
             $options['validation_groups'] = $validationGroups;
+        }
+
+        if ($operation && ($ignoredAttributes = $operation->getNormalizationContext()['ignored_attributes'] ?? null)) {
+            $options['ignored_attributes'] = $ignoredAttributes;
         }
 
         return $options;

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\ApiResource;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Error as ErrorOperation;
 use ApiPlatform\Metadata\ErrorResource;
 use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
@@ -32,35 +33,40 @@ use Symfony\Component\WebLink\Link;
     uriTemplate: '/validation_errors/{id}',
     status: 422,
     openapi: false,
+    outputFormats: ['jsonapi' => ['application/vnd.api+json'], 'jsonld' => ['application/ld+json'], 'json' => ['application/problem+json', 'application/json']],
     uriVariables: ['id'],
     shortName: 'ValidationError',
     operations: [
         new ErrorOperation(
+            routeName: 'api_validation_errors',
             name: '_api_validation_errors_problem',
             outputFormats: ['json' => ['application/problem+json']],
-            normalizationContext: ['groups' => ['json'],
+            normalizationContext: [
+                'groups' => ['json'],
                 'skip_null_values' => true,
+                'ignored_attributes' => ['trace', 'file', 'line', 'code', 'message', 'traceAsString', 'previous'],
             ],
-            uriTemplate: '/validation_errors/{id}'
         ),
         new ErrorOperation(
             name: '_api_validation_errors_hydra',
+            routeName: 'api_validation_errors',
             outputFormats: ['jsonld' => ['application/problem+json']],
             links: [new Link(rel: 'http://www.w3.org/ns/json-ld#error', href: 'http://www.w3.org/ns/hydra/error')],
             normalizationContext: [
                 'groups' => ['jsonld'],
                 'skip_null_values' => true,
+                'ignored_attributes' => ['trace', 'file', 'line', 'code', 'message', 'traceAsString', 'previous'],
             ],
-            uriTemplate: '/validation_errors/{id}.jsonld'
         ),
         new ErrorOperation(
             name: '_api_validation_errors_jsonapi',
+            routeName: 'api_validation_errors',
             outputFormats: ['jsonapi' => ['application/vnd.api+json']],
             normalizationContext: [
                 'groups' => ['jsonapi'],
                 'skip_null_values' => true,
+                'ignored_attributes' => ['trace', 'file', 'line', 'code', 'message', 'traceAsString', 'previous'],
             ],
-            uriTemplate: '/validation_errors/{id}.jsonapi'
         ),
     ],
     graphQlOperations: []
@@ -139,6 +145,19 @@ class ValidationError extends RuntimeException implements \Stringable, ProblemEx
      */
     #[SerializedName('violations')]
     #[Groups(['json', 'jsonld', 'jsonapi'])]
+    #[ApiProperty(
+        jsonldContext: ['@type' => 'ConstraintViolationList'],
+        schema: [
+            'type' => 'array',
+            'items' => [
+                'type' => 'object',
+                'properties' => [
+                    'propertyPath' => ['type' => 'string', 'description' => 'The property path of the violation'],
+                    'message' => ['type' => 'string', 'description' => 'The message associated with the violation'],
+                ],
+            ],
+        ]
+    )]
     public function getViolations(): array
     {
         return $this->violations;

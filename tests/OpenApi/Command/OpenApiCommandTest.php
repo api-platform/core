@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\OpenApi\Command;
 
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\DummyCar;
 use ApiPlatform\OpenApi\OpenApi;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Crud;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6317\Issue6317;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5625\Currency;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
@@ -52,6 +53,7 @@ class OpenApiCommandTest extends KernelTestCase
             DummyCar::class,
             Issue6317::class,
             Currency::class,
+            Crud::class,
         ];
     }
 
@@ -160,5 +162,19 @@ YAML;
             $this->fail('Is not valid YAML: '.$exception->getMessage());
         }
         $this->addToAssertionCount(1);
+    }
+
+    public function testFilterXApiPlatformTag(): void
+    {
+        $this->tester->run(['command' => 'api:openapi:export', '--filter-tags' => 'anotherone']);
+        $result = $this->tester->getDisplay();
+        $res = json_decode($result, true, 512, \JSON_THROW_ON_ERROR);
+
+        $this->assertArrayHasKey('Crud', $res['components']['schemas']);
+        $this->assertArrayNotHasKey('/cruds/{id}', $res['paths']);
+        $this->assertArrayHasKey('/cruds', $res['paths']);
+        $this->assertArrayNotHasKey('post', $res['paths']['/cruds']);
+        $this->assertArrayHasKey('get', $res['paths']['/cruds']);
+        $this->assertEquals([['name' => 'Crud']], $res['tags']);
     }
 }

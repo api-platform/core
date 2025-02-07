@@ -1,5 +1,26 @@
 # Changelog
 
+## v4.1.0-beta.2
+
+### Bug fixes
+
+* [da37ca91c](https://github.com/api-platform/core/commit/da37ca91c83e4f715c5acbbe3dc0296e8055bebc) fix(laravel): default to file cache instead of cache.default (#6955)
+* [e041d721e](https://github.com/api-platform/core/commit/e041d721ea6fe24026eb021905740b25102d7966) fix: errors retrieval and documentation (#6952)
+* [e6130cbcc](https://github.com/api-platform/core/commit/e6130cbccc1a8963b731769ef34f39e09f5d2cde) fix: missing filters on swagger ui entrypoint (#6950)
+
+### Features
+
+* [771d9401c](https://github.com/api-platform/core/commit/771d9401cffa0463928bb35ab52a56b269d57e1b) feat(elasticsearch): re-introduce v7 support (#6827)
+* [b5372ddee](https://github.com/api-platform/core/commit/b5372ddeef2067333761104f3c17ed1b86001bf4) feat(openapi): filter x-apiplatform-tags to produce different openapi specifications (#6945)
+
+## v4.1.0-beta.1
+
+### Features
+
+* [2e2debb94](https://github.com/api-platform/core/commit/2e2debb94b06752262b0d18b736edc22b501266b) feat(mongodb): Replace usage of deprecated method `AggregationBuilder::execute()` (#6933)
+* [4bdf042e5](https://github.com/api-platform/core/commit/4bdf042e5cab1ddb931562cf98a97686d8c415ae) feat(mongodb): Add pagination metadata to the aggregation results (#6912)
+* [b968ccd50](https://github.com/api-platform/core/commit/b968ccd5026afb5562c4c4588929885b86ecb3cb) feat(openapi): document error outputs using json-schemas (#6923)
+
 ## v4.1.0-alpha.2
 
 ### Bug fixes
@@ -38,6 +59,22 @@ On write operations, we added the [expectsHeader](https://www.hydra-cg.com/spec/
 * [c78ed0b78](https://github.com/api-platform/core/commit/c78ed0b78baf5d2e1b7444a9882ba039c70a3887) feat(laravel): boolean filter (#6806)
 * [d0a442786](https://github.com/api-platform/core/commit/d0a44278630d201b91cbba0774a09f4eeaac88f7) feat(doctrine): enhance getLinksHandler with method validation and typo suggestions (#6874)
 * [f67f6f1ac](https://github.com/api-platform/core/commit/f67f6f1acb6476182c18a3503f2a8bc80ae89a0b)  feat(doctrine): doctrine filters like laravel eloquent filters  (#6775)
+
+## v4.0.17
+
+### Bug fixes
+
+* [5124d8c57](https://github.com/api-platform/core/commit/5124d8c571bc4324aa060e4ff808d48f0ffa8d73) fix(laravel): Prevent overwriting existing routes on the router (#6941)
+* [5c7e0d2c0](https://github.com/api-platform/core/commit/5c7e0d2c015b5264b2f857abc7e6cb944582de21) fix(symfony): error wrongly inherit normalization context (#6939)
+* [af35d34d0](https://github.com/api-platform/core/commit/af35d34d01e62e96dd81dadde6a056ce67d47703) fix(laravel): mitigate property metadata read for Error (#6951)
+* [d5b48b1cd](https://github.com/api-platform/core/commit/d5b48b1cd6163ee755211476fdd3d4dd0bf6f7ae) fix(laravel): SwaggerUI custom CSS (#6937)
+* [da796b979](https://github.com/api-platform/core/commit/da796b979384663c3eaf4e4fe4d215b447800844) fix(metadata): allow serializer attribute object in ApiProperty::$serialize (#6946)
+* [de2d298e3](https://github.com/api-platform/core/commit/de2d298e306b196bce834af290aec242807ea39b) fix: ensure template files have a tpl file extension (#6826) (#6829)
+* [b6a67a197](https://github.com/api-platform/core/commit/b6a67a197a668ce15f216cffbcddc637f19c69c2) perf: various optimizations for Laravel/Symfony (#6954)
+
+To save some time during cache warmup we recommend to define uri variables such as: `uriVariables: ['id']`. More details at #6954.
+
+### Features
 
 ## v4.0.16
 

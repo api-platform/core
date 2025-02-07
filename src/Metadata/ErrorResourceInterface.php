@@ -11,16 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\OpenApi\Factory;
+namespace ApiPlatform\Metadata;
 
-use ApiPlatform\OpenApi\OpenApi;
-
-interface OpenApiFactoryInterface
+interface ErrorResourceInterface
 {
-    /**
-     * Creates an OpenApi class.
-     *
-     * @param array<string, mixed> $context
-     */
-    public function __invoke(array $context = []): OpenApi;
+    public static function createFromException(\Exception|\Throwable $exception, int $status): self;
 }

@@ -40,8 +40,10 @@ final class ElasticsearchClientPass implements CompilerPassInterface
         }
 
         if (class_exists(\Elasticsearch\ClientBuilder::class)) {
+            // ES v7
             $builderName = \Elasticsearch\ClientBuilder::class;
         } else {
+            // ES v8 and up
             $builderName = \Elastic\Elasticsearch\ClientBuilder::class;
         }
 

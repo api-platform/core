@@ -13,8 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\OpenApi;
 
+use ApiPlatform\OpenApi\Model\Tag;
+
 final readonly class Options
 {
+    /**
+     * @param Tag[]        $tags
+     * @param class-string $errorResourceClass
+     * @param class-string $validationErrorResourceClass
+     */
     public function __construct(
         private string $title,
         private string $description = '',
@@ -36,6 +43,9 @@ final readonly class Options
         private bool $overrideResponses = true,
         private bool $persistAuthorization = false,
         private array $httpAuth = [],
+        private array $tags = [],
+        private ?string $errorResourceClass = null,
+        private ?string $validationErrorResourceClass = null,
     ) {
     }
 
@@ -137,5 +147,29 @@ final readonly class Options
     public function hasPersistAuthorization(): bool
     {
         return $this->persistAuthorization;
+    }
+
+    /**
+     * @return Tag[]
+     */
+    public function getTags(): array
+    {
+        return $this->tags;
+    }
+
+    /**
+     * @return class-string|null
+     */
+    public function getErrorResourceClass(): ?string
+    {
+        return $this->errorResourceClass;
+    }
+
+    /**
+     * @return class-string|null
+     */
+    public function getValidationErrorResourceClass(): ?string
+    {
+        return $this->validationErrorResourceClass;
     }
 }

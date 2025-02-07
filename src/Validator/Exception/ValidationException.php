@@ -36,6 +36,8 @@ use Symfony\Component\WebLink\Link;
     uriTemplate: '/validation_errors/{id}',
     status: 422,
     uriVariables: ['id'],
+    openapi: false,
+    outputFormats: ['jsonapi' => ['application/vnd.api+json'], 'jsonld' => ['application/ld+json'], 'json' => ['application/problem+json', 'application/json']],
     provider: 'api_platform.validator.state.error_provider',
     shortName: 'ConstraintViolation',
     description: 'Unprocessable entity',

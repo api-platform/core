@@ -34,6 +34,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\UriVariableTransformerInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
+use ApiPlatform\OpenApi\Model\Tag;
 use ApiPlatform\RamseyUuid\Serializer\UuidDenormalizer;
 use ApiPlatform\State\ApiResource\Error;
 use ApiPlatform\State\ParameterProviderInterface;
@@ -114,7 +115,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $jsonSchemaFormats = $config['jsonschema_formats'];
 
         if (!$jsonSchemaFormats) {
-            foreach (array_keys($formats) as $f) {
+            foreach (array_merge(array_keys($formats), array_keys($errorFormats)) as $f) {
                 // Distinct JSON-based formats must have names that start with 'json'
                 if (str_starts_with($f, 'json')) {
                     $jsonSchemaFormats[$f] = true;
@@ -811,7 +812,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             return;
         }
 
-        $clientClass = class_exists(\Elasticsearch\Client::class) ? \Elasticsearch\Client::class : \Elastic\Elasticsearch\Client::class;
+        $clientClass = !class_exists(\Elasticsearch\Client::class)
+            // ES v7
+            ? \Elastic\Elasticsearch\Client::class
+            // ES v8 and up
+            : \Elasticsearch\Client::class;
 
         $clientDefinition = new Definition($clientClass);
         $container->setDefinition('api_platform.elasticsearch.client', $clientDefinition);
@@ -852,6 +857,13 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.openapi.license.name', $config['openapi']['license']['name']);
         $container->setParameter('api_platform.openapi.license.url', $config['openapi']['license']['url']);
         $container->setParameter('api_platform.openapi.overrideResponses', $config['openapi']['overrideResponses']);
+
+        $tags = [];
+        foreach ($config['openapi']['tags'] as $tag) {
+            $tags[] = new Tag($tag['name'], $tag['description'] ?? null);
+        }
+
+        $container->setParameter('api_platform.openapi.tags', $tags);
 
         $loader->load('json_schema.xml');
     }

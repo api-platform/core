@@ -91,7 +91,7 @@ api_platform:
         include_type: true
 
 services:
-    test.clienL:
+    test.client:
         class: ApiPlatform\Tests\Fixtures\TestBundle\BrowserKit\Client
         shared: false
         public: true

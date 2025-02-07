@@ -61,6 +61,7 @@
             <argument>%api_platform.openapi.overrideResponses%</argument>
             <argument>%api_platform.swagger.persist_authorization%</argument>
             <argument>%api_platform.swagger.http_auth%</argument>
+            <argument>%api_platform.openapi.tags%</argument>
         </service>
         <service id="ApiPlatform\OpenApi\Options" alias="api_platform.openapi.options" />
 
@@ -92,6 +93,7 @@
             <argument type="service" id="api_platform.openapi.options" />
             <argument type="service" id="api_platform.pagination_options" />
             <argument type="service" id="api_platform.router" />
+            <argument>%api_platform.error_formats%</argument>
         </service>
 
         <service id="api_platform.cache.openapi" parent="cache.system" public="false">

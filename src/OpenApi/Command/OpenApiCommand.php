@@ -43,7 +43,8 @@ final class OpenApiCommand extends Command
             ->addOption('yaml', 'y', InputOption::VALUE_NONE, 'Dump the documentation in YAML')
             ->addOption('output', 'o', InputOption::VALUE_OPTIONAL, 'Write output to file')
             ->addOption('spec-version', null, InputOption::VALUE_OPTIONAL, 'Open API version to use (2 or 3) (2 is deprecated)', '3')
-            ->addOption('api-gateway', null, InputOption::VALUE_NONE, 'Enable the Amazon API Gateway compatibility mode');
+            ->addOption('api-gateway', null, InputOption::VALUE_NONE, 'Enable the Amazon API Gateway compatibility mode')
+            ->addOption('filter-tags', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Filter only matching x-apiplatform-tag operations', null);
     }
 
     /**
@@ -53,9 +54,11 @@ final class OpenApiCommand extends Command
     {
         $filesystem = new Filesystem();
         $io = new SymfonyStyle($input, $output);
-        $data = $this->normalizer->normalize($this->openApiFactory->__invoke(), 'json', [
-            'spec_version' => $input->getOption('spec-version'),
-        ]);
+        $data = $this->normalizer->normalize(
+            $this->openApiFactory->__invoke(['filter_tags' => $input->getOption('filter-tags')]),
+            'json',
+            ['spec_version' => $input->getOption('spec-version')]
+        );
 
         if ($input->getOption('yaml') && !class_exists(Yaml::class)) {
             $output->writeln('The "symfony/yaml" component is not installed.');

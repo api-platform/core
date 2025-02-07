@@ -66,7 +66,6 @@ use ApiPlatform\JsonApi\Serializer\ErrorNormalizer as JsonApiErrorNormalizer;
 use ApiPlatform\JsonApi\Serializer\ItemNormalizer as JsonApiItemNormalizer;
 use ApiPlatform\JsonApi\Serializer\ObjectNormalizer as JsonApiObjectNormalizer;
 use ApiPlatform\JsonApi\Serializer\ReservedAttributeNameConverter;
-use ApiPlatform\JsonLd\Action\ContextAction;
 use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
 use ApiPlatform\JsonLd\ContextBuilder as JsonLdContextBuilder;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
@@ -78,6 +77,7 @@ use ApiPlatform\JsonSchema\Metadata\Property\Factory\SchemaPropertyMetadataFacto
 use ApiPlatform\JsonSchema\SchemaFactory;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Laravel\ApiResource\Error;
+use ApiPlatform\Laravel\ApiResource\ValidationError;
 use ApiPlatform\Laravel\Controller\ApiPlatformController;
 use ApiPlatform\Laravel\Controller\DocumentationController;
 use ApiPlatform\Laravel\Controller\EntrypointController;
@@ -125,7 +125,6 @@ use ApiPlatform\Laravel\State\ParameterValidatorProvider;
 use ApiPlatform\Laravel\State\SwaggerUiProcessor;
 use ApiPlatform\Laravel\State\SwaggerUiProvider;
 use ApiPlatform\Laravel\State\ValidateProvider;
-use ApiPlatform\Metadata\Exception\NotExposedHttpException;
 use ApiPlatform\Metadata\IdentifiersExtractor;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\InflectorInterface;
@@ -179,6 +178,7 @@ use ApiPlatform\Serializer\Parameter\SerializerFilterParameterProvider;
 use ApiPlatform\Serializer\SerializerContextBuilder;
 use ApiPlatform\State\CallableProcessor;
 use ApiPlatform\State\CallableProvider;
+use ApiPlatform\State\ErrorProvider;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginationOptions;
 use ApiPlatform\State\ParameterProviderInterface;
@@ -197,10 +197,6 @@ use ApiPlatform\State\SerializerContextBuilderInterface;
 use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerInterface;
 use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\Foundation\CachesRoutes;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Route;
-use Illuminate\Routing\RouteCollection;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use Negotiation\Negotiator;
@@ -254,6 +250,7 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
+        $this->app->singleton(ModelMetadata::class);
         $this->app->bind(LoaderInterface::class, AttributeLoader::class);
         $this->app->bind(ClassMetadataFactoryInterface::class, ClassMetadataFactory::class);
         $this->app->singleton(ClassMetadataFactory::class, function (Application $app) {
@@ -323,7 +320,7 @@ class ApiPlatformProvider extends ServiceProvider
                         $app->make(ResourceClassResolverInterface::class)
                     ),
                 ),
-                true === $config->get('app.debug') ? 'array' : $config->get('cache.default', 'file')
+                true === $config->get('app.debug') ? 'array' : $config->get('api-platform.cache', 'file')
             );
         });
 
@@ -341,7 +338,7 @@ class ApiPlatformProvider extends ServiceProvider
                         )
                     )
                 ),
-                true === $config->get('app.debug') ? 'array' : $config->get('cache.default', 'file')
+                true === $config->get('app.debug') ? 'array' : $config->get('api-platform.cache', 'file')
             );
         });
 
@@ -412,7 +409,7 @@ class ApiPlatformProvider extends ServiceProvider
                         $app->make('filters')
                     )
                 ),
-                true === $config->get('app.debug') ? 'array' : $config->get('cache.default', 'file')
+                true === $config->get('app.debug') ? 'array' : $config->get('api-platform.cache', 'file')
             );
         });
 
@@ -779,6 +776,9 @@ class ApiPlatformProvider extends ServiceProvider
                 licenseUrl: $config->get('api-platform.swagger_ui.license.url', ''),
                 persistAuthorization: $config->get('api-platform.swagger_ui.persist_authorization', false),
                 httpAuth: $config->get('api-platform.swagger_ui.http_auth', []),
+                tags: $config->get('api-platform.openapi.tags', []),
+                errorResourceClass: Error::class,
+                validationErrorResourceClass: ValidationError::class
             );
         });
 
@@ -852,7 +852,9 @@ class ApiPlatformProvider extends ServiceProvider
                 null,
                 $config->get('api-platform.formats'),
                 $app->make(Options::class),
-                $app->make(PaginationOptions::class), // ?PaginationOptions $paginationOptions = null,
+                $app->make(PaginationOptions::class),
+                null,
+                $config->get('api-platform.error_formats'),
                 // ?RouterInterface $router = null
             );
         });
@@ -1222,6 +1224,18 @@ class ApiPlatformProvider extends ServiceProvider
         });
         $app->alias(GraphQlReadProvider::class, 'api_platform.graphql.state_provider.read');
 
+        $app->singleton(ErrorProvider::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+
+            return new ErrorProvider(
+                $config->get('app.debug'),
+                $app->make(ResourceClassResolver::class),
+                $app->make(ResourceMetadataCollectionFactoryInterface::class),
+            );
+        });
+        $app->tag([ErrorProvider::class], ProviderInterface::class);
+
         $app->singleton(ResolverProvider::class, function (Application $app) {
             $resolvers = iterator_to_array($app->tagged('api_platform.graphql.resolver'));
             $taggedItemResolvers = iterator_to_array($app->tagged(QueryItemResolverInterface::class));
@@ -1320,7 +1334,7 @@ class ApiPlatformProvider extends ServiceProvider
             /** @var ConfigRepository */
             $config = $app['config'];
 
-            return new Executor($config->get('api-platform.graphql.introspection.enabled') ?? false, $config->get('api-platform.graphql.max_query_complexity'), $config->get('api-platform.graphql.max_query_depth'));
+            return new Executor($config->get('api-platform.graphql.introspection.enabled') ?? false, $config->get('api-platform.graphql.max_query_complexity') ?? 500, $config->get('api-platform.graphql.max_query_depth') ?? 200);
         });
 
         $app->singleton(GraphiQlController::class, function (Application $app) {
@@ -1351,7 +1365,7 @@ class ApiPlatformProvider extends ServiceProvider
     /**
      * Bootstrap services.
      */
-    public function boot(ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, Router $router): void
+    public function boot(): void
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
@@ -1373,94 +1387,6 @@ class ApiPlatformProvider extends ServiceProvider
             $typeBuilder->setFieldsBuilderLocator(new ServiceLocator(['api_platform.graphql.fields_builder' => $fieldsBuilder]));
         }
 
-        if (!$this->shouldRegisterRoutes()) {
-            return;
-        }
-
-        $globalMiddlewares = $config->get('api-platform.routes.middleware');
-        $routeCollection = new RouteCollection();
-        foreach ($resourceNameCollectionFactory->create() as $resourceClass) {
-            foreach ($resourceMetadataFactory->create($resourceClass) as $resourceMetadata) {
-                foreach ($resourceMetadata->getOperations() as $operation) {
-                    $uriTemplate = $operation->getUriTemplate();
-                    // _format is read by the middleware
-                    $uriTemplate = $operation->getRoutePrefix().str_replace('{._format}', '{_format?}', $uriTemplate);
-                    $route = (new Route([$operation->getMethod()], $uriTemplate, [ApiPlatformController::class, '__invoke']))
-                        ->where('_format', '^\.[a-zA-Z]+')
-                        ->name($operation->getName())
-                        ->setDefaults(['_api_operation_name' => $operation->getName(), '_api_resource_class' => $operation->getClass()]);
-
-                    $route->middleware(ApiPlatformMiddleware::class.':'.$operation->getName());
-                    $route->middleware($globalMiddlewares);
-                    $route->middleware($operation->getMiddleware());
-
-                    $routeCollection->add($route);
-                }
-            }
-        }
-
-        $prefix = $config->get('api-platform.defaults.route_prefix') ?? '';
-        $route = new Route(['GET'], $prefix.'/contexts/{shortName?}{_format?}', [ContextAction::class, '__invoke']);
-        $route->name('api_jsonld_context');
-        $route->middleware(ApiPlatformMiddleware::class);
-        $route->middleware($globalMiddlewares);
-        $routeCollection->add($route);
-        $route = new Route(['GET'], $prefix.'/docs{_format?}', function (Request $request, Application $app) {
-            $documentationAction = $app->make(DocumentationController::class);
-
-            return $documentationAction->__invoke($request);
-        });
-        $route->name('api_doc');
-        $route->middleware(ApiPlatformMiddleware::class);
-        $route->middleware($globalMiddlewares);
-        $routeCollection->add($route);
-
-        $route = new Route(['GET'], $prefix.'/.well-known/genid/{id}', function (): void {
-            throw new NotExposedHttpException('This route is not exposed on purpose. It generates an IRI for a collection resource without identifier nor item operation.');
-        });
-        $route->name('api_genid');
-        $route->middleware(ApiPlatformMiddleware::class);
-        $route->middleware($globalMiddlewares);
-        $routeCollection->add($route);
-
-        if ($config->get('api-platform.graphql.enabled')) {
-            $route = new Route(['POST', 'GET'], $prefix.'/graphql', function (Application $app, Request $request) {
-                $entrypointAction = $app->make(GraphQlEntrypointController::class);
-
-                return $entrypointAction->__invoke($request);
-            });
-            $route->middleware($globalMiddlewares);
-            $routeCollection->add($route);
-
-            $route = new Route(['GET'], $prefix.'/graphiql', function (Application $app) {
-                $controller = $app->make(GraphiQlController::class);
-
-                return $controller->__invoke();
-            });
-            $route->middleware($globalMiddlewares);
-            $routeCollection->add($route);
-        }
-
-        $route = new Route(['GET'], $prefix.'/{index?}{_format?}', function (Request $request, Application $app) {
-            $entrypointAction = $app->make(EntrypointController::class);
-
-            return $entrypointAction->__invoke($request);
-        });
-        $route->where('index', 'index');
-        $route->name('api_entrypoint');
-        $route->middleware(ApiPlatformMiddleware::class);
-        $route->middleware($globalMiddlewares);
-        $routeCollection->add($route);
-
-        $router->setRoutes($routeCollection);
-    }
-
-    private function shouldRegisterRoutes(): bool
-    {
-        if ($this->app instanceof CachesRoutes && $this->app->routesAreCached()) {
-            return false;
-        }
-
-        return true;
+        $this->loadRoutesFrom(__DIR__.'/routes/api.php');
     }
 }

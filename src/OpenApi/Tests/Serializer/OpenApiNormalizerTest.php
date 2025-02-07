@@ -102,7 +102,6 @@ class OpenApiNormalizerTest extends TestCase
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description', 'dummyDate']));
         $propertyNameCollectionFactoryProphecy->create('Zorro', Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['id']));
-        $propertyNameCollectionFactoryProphecy->create(Error::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection([]));
 
         $baseOperation = (new HttpOperation())->withTypes(['http://schema.example.com/Dummy'])
                                               ->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats'])
