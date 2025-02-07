@@ -812,7 +812,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             return;
         }
 
-        $clientClass = class_exists(\Elasticsearch\Client::class) ? \Elasticsearch\Client::class : \Elastic\Elasticsearch\Client::class;
+        $clientClass = !class_exists(\Elasticsearch\Client::class)
+            // ES v7
+            ? \Elastic\Elasticsearch\Client::class
+            // ES v8 and up
+            : \Elasticsearch\Client::class;
 
         $clientDefinition = new Definition($clientClass);
         $container->setDefinition('api_platform.elasticsearch.client', $clientDefinition);

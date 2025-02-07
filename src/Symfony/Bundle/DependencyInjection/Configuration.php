@@ -470,7 +470,12 @@ final class Configuration implements ConfigurationInterface
                             ->validate()
                                 ->ifTrue()
                                 ->then(static function (bool $v): bool {
-                                    if (!(class_exists(\Elasticsearch\Client::class) || class_exists(\Elastic\Elasticsearch\Client::class))) {
+                                    if (
+                                        // ES v7
+                                        !class_exists(\Elasticsearch\Client::class)
+                                        // ES v8 and up
+                                        && !class_exists(\Elastic\Elasticsearch\Client::class)
+                                    ) {
                                         throw new InvalidConfigurationException('The elasticsearch/elasticsearch package is required for Elasticsearch support.');
                                     }
 
