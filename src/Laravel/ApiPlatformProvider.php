@@ -247,6 +247,7 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
+        $this->app->singleton(ModelMetadata::class);
         $this->app->bind(LoaderInterface::class, AttributeLoader::class);
         $this->app->bind(ClassMetadataFactoryInterface::class, ClassMetadataFactory::class);
         $this->app->singleton(ClassMetadataFactory::class, function (Application $app) {
