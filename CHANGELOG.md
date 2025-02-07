@@ -60,7 +60,6 @@ On write operations, we added the [expectsHeader](https://www.hydra-cg.com/spec/
 * [d0a442786](https://github.com/api-platform/core/commit/d0a44278630d201b91cbba0774a09f4eeaac88f7) feat(doctrine): enhance getLinksHandler with method validation and typo suggestions (#6874)
 * [f67f6f1ac](https://github.com/api-platform/core/commit/f67f6f1acb6476182c18a3503f2a8bc80ae89a0b)  feat(doctrine): doctrine filters like laravel eloquent filters  (#6775)
 
-=======
 ## v4.0.17
 
 ### Bug fixes
