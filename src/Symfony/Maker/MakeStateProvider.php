@@ -69,7 +69,7 @@ final class MakeStateProvider extends AbstractMaker
 
         $generator->generateClass(
             $stateProviderClassNameDetails->getFullName(),
-            __DIR__.'/Resources/skeleton/StateProvider.tpl.php'
+            __DIR__.'/Resources/skeleton/StateProvider.php.tpl'
         );
         $generator->writeChanges();
 
