@@ -118,5 +118,8 @@ return [
     'serializer' => [
         'hydra_prefix' => false,
         // 'datetime_format' => \DateTimeInterface::RFC3339
-    ]
+    ],
+
+    // we recommend using "file" or "acpu"
+    'cache' => 'file'
 ];
