@@ -35,6 +35,10 @@ Route::domain($domain)->middleware($globalMiddlewares)->group(function (): void 
     foreach ($resourceNameCollectionFactory->create() as $resourceClass) {
         foreach ($resourceMetadataFactory->create($resourceClass) as $resourceMetadata) {
             foreach ($resourceMetadata->getOperations() as $operation) {
+                if ($operation->getRouteName()) {
+                    continue;
+                }
+
                 /* @var HttpOperation $operation */
                 Route::addRoute($operation->getMethod(), Str::replace('{._format}', '{_format?}', $operation->getUriTemplate()), ApiPlatformController::class)
                     ->prefix($operation->getRoutePrefix())
@@ -54,6 +58,10 @@ Route::domain($domain)->middleware($globalMiddlewares)->group(function (): void 
             Route::get('/contexts/{shortName?}{_format?}', ContextAction::class)
                 ->middleware(ApiPlatformMiddleware::class)
                 ->name('api_jsonld_context');
+
+            Route::get('/validation_errors/{id}', fn () => throw new NotExposedHttpException('Not exposed.'))
+                ->name('api_validation_errors')
+                ->middleware(ApiPlatformMiddleware::class);
 
             Route::get('/docs{_format?}', DocumentationController::class)
                 ->middleware(ApiPlatformMiddleware::class)

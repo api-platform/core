@@ -113,8 +113,6 @@ class ErrorHandler extends ExceptionsHandler
 
             /** @var HttpOperation $operation */
             if (!$operation->getProvider()) {
-                // TODO: validation
-                // static::$error = 'jsonapi' === $format && $errorResource instanceof ConstraintViolationListAwareExceptionInterface ? $errorResource->getConstraintViolationList() : $errorResource;
                 static::$error = $errorResource;
                 $operation = $operation->withProvider([self::class, 'provide']);
             }
@@ -147,7 +145,7 @@ class ErrorHandler extends ExceptionsHandler
             $dup->attributes->set('_api_previous_operation', $apiOperation);
             $dup->attributes->set('_api_operation', $operation);
             $dup->attributes->set('_api_operation_name', $operation->getName());
-            $dup->attributes->remove('exception');
+            $dup->attributes->set('exception', $exception);
             // These are for swagger
             $dup->attributes->set('_api_original_route', $request->attributes->get('_route'));
             $dup->attributes->set('_api_original_uri_variables', $request->attributes->get('_api_uri_variables'));

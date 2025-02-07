@@ -551,7 +551,9 @@ class OpenApiFactoryTest extends TestCase
                     'scheme' => 'basic',
                 ],
             ]),
-            new PaginationOptions(true, 'page', true, 'itemsPerPage', true, 'pagination')
+            new PaginationOptions(true, 'page', true, 'itemsPerPage', true, 'pagination'),
+            null,
+            ['json' => ['application/problem+json']]
         );
 
         $dummySchema = new Schema('openapi');

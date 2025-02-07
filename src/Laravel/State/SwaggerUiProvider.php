@@ -53,6 +53,7 @@ final class SwaggerUiProvider implements ProviderInterface
             || !($request = $context['request'] ?? null)
             || 'html' !== $request->getRequestFormat()
             || !$this->swaggerUiEnabled
+            || true === ($operation->getExtraProperties()['_api_disable_swagger_provider'] ?? false)
         ) {
             return $this->decorated->provide($operation, $uriVariables, $context);
         }
@@ -64,7 +65,7 @@ final class SwaggerUiProvider implements ProviderInterface
         // We need to call our operation provider just in case it fails
         // when it fails we'll get an Error, and we'll fix the status accordingly
         // @see features/main/content_negotiation.feature:119
-        // DocumentationAction has no content negotiation as well we want HTML so render swagger ui
+        // When requesting DocumentationAction or EntrypointAction with Accept: text/html we render SwaggerUi
         if (!$operation instanceof Error && Documentation::class !== $operation->getClass()) {
             $this->decorated->provide($operation, $uriVariables, $context);
         }

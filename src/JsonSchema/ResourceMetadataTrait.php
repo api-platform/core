@@ -54,7 +54,7 @@ trait ResourceMetadataTrait
                 $operation = new HttpOperation();
             }
 
-            return $this->findOperationForType($resourceMetadataCollection, $type, $operation, $format);
+            return $this->findOperationForType($resourceMetadataCollection, $type, $operation, $forceSubschema ? null : $format);
         }
 
         // The best here is to use an Operation when calling `buildSchema`, we try to do a smart guess otherwise

@@ -115,7 +115,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $jsonSchemaFormats = $config['jsonschema_formats'];
 
         if (!$jsonSchemaFormats) {
-            foreach (array_keys($formats) as $f) {
+            foreach (array_merge(array_keys($formats), array_keys($errorFormats)) as $f) {
                 // Distinct JSON-based formats must have names that start with 'json'
                 if (str_starts_with($f, 'json')) {
                     $jsonSchemaFormats[$f] = true;

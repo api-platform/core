@@ -109,6 +109,10 @@ return [
         //]
     ],
 
+    // 'openapi' => [
+    //     'tags' => []
+    // ],
+
     'url_generation_strategy' => UrlGeneratorInterface::ABS_PATH,
 
     'serializer' => [

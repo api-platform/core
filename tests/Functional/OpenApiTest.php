@@ -57,14 +57,14 @@ class OpenApiTest extends ApiTestCase
 
         // problem detail https://datatracker.ietf.org/doc/html/rfc7807#section-3.1
         foreach (['title', 'detail', 'instance', 'type', 'status'] as $key) {
-            $this->assertArrayHasKey($key, $res['components']['schemas']['Error.jsonld-jsonproblem']['properties']);
+            $this->assertArrayHasKey($key, $res['components']['schemas']['Error']['properties']);
         }
 
         foreach (['title', 'detail', 'instance', 'type', 'status', '@id', '@type', '@context'] as $key) {
-            $this->assertArrayHasKey($key, $res['components']['schemas']['Error.jsonld-jsonld']['properties']);
+            $this->assertArrayHasKey($key, $res['components']['schemas']['Error.jsonld']['properties']);
         }
         foreach (['id', 'title', 'detail', 'instance', 'type', 'status', 'meta', 'source'] as $key) {
-            $this->assertArrayHasKey($key, $res['components']['schemas']['Error.jsonapi-jsonapi']['properties']['errors']['properties']);
+            $this->assertArrayHasKey($key, $res['components']['schemas']['Error.jsonapi']['properties']['errors']['properties']);
         }
     }
 
