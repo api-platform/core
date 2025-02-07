@@ -1,5 +1,18 @@
 # Changelog
 
+## v4.1.0-beta.2
+
+### Bug fixes
+
+* [da37ca91c](https://github.com/api-platform/core/commit/da37ca91c83e4f715c5acbbe3dc0296e8055bebc) fix(laravel): default to file cache instead of cache.default (#6955)
+* [e041d721e](https://github.com/api-platform/core/commit/e041d721ea6fe24026eb021905740b25102d7966) fix: errors retrieval and documentation (#6952)
+* [e6130cbcc](https://github.com/api-platform/core/commit/e6130cbccc1a8963b731769ef34f39e09f5d2cde) fix: missing filters on swagger ui entrypoint (#6950)
+
+### Features
+
+* [771d9401c](https://github.com/api-platform/core/commit/771d9401cffa0463928bb35ab52a56b269d57e1b) feat(elasticsearch): re-introduce v7 support (#6827)
+* [b5372ddee](https://github.com/api-platform/core/commit/b5372ddeef2067333761104f3c17ed1b86001bf4) feat(openapi): filter x-apiplatform-tags to produce different openapi specifications (#6945)
+
 ## v4.1.0-beta.1
 
 ### Features
