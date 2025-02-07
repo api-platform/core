@@ -1,5 +1,21 @@
 # Changelog
 
+## v4.0.17
+
+### Bug fixes
+
+* [5124d8c57](https://github.com/api-platform/core/commit/5124d8c571bc4324aa060e4ff808d48f0ffa8d73) fix(laravel): Prevent overwriting existing routes on the router (#6941)
+* [5c7e0d2c0](https://github.com/api-platform/core/commit/5c7e0d2c015b5264b2f857abc7e6cb944582de21) fix(symfony): error wrongly inherit normalization context (#6939)
+* [af35d34d0](https://github.com/api-platform/core/commit/af35d34d01e62e96dd81dadde6a056ce67d47703) fix(laravel): mitigate property metadata read for Error (#6951)
+* [d5b48b1cd](https://github.com/api-platform/core/commit/d5b48b1cd6163ee755211476fdd3d4dd0bf6f7ae) fix(laravel): SwaggerUI custom CSS (#6937)
+* [da796b979](https://github.com/api-platform/core/commit/da796b979384663c3eaf4e4fe4d215b447800844) fix(metadata): allow serializer attribute object in ApiProperty::$serialize (#6946)
+* [de2d298e3](https://github.com/api-platform/core/commit/de2d298e306b196bce834af290aec242807ea39b) fix: ensure template files have a tpl file extension (#6826) (#6829)
+* [b6a67a197](https://github.com/api-platform/core/commit/b6a67a197a668ce15f216cffbcddc637f19c69c2) perf: various optimizations for Laravel/Symfony (#6954)
+
+To save some time during cache warmup we recommend to define uri variables such as: `uriVariables: ['id']`. More details at #6954.
+
+### Features
+
 ## v4.0.16
 
 ### Bug fixes
