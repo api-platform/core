@@ -317,7 +317,7 @@ class ApiPlatformProvider extends ServiceProvider
                         $app->make(ResourceClassResolverInterface::class)
                     ),
                 ),
-                true === $config->get('app.debug') ? 'array' : $config->get('cache.default', 'file')
+                true === $config->get('app.debug') ? 'array' : $config->get('api-platform.cache', 'file')
             );
         });
 
@@ -335,7 +335,7 @@ class ApiPlatformProvider extends ServiceProvider
                         )
                     )
                 ),
-                true === $config->get('app.debug') ? 'array' : $config->get('cache.default', 'file')
+                true === $config->get('app.debug') ? 'array' : $config->get('api-platform.cache', 'file')
             );
         });
 
@@ -406,7 +406,7 @@ class ApiPlatformProvider extends ServiceProvider
                         $app->make('filters')
                     )
                 ),
-                true === $config->get('app.debug') ? 'array' : $config->get('cache.default', 'file')
+                true === $config->get('app.debug') ? 'array' : $config->get('api-platform.cache', 'file')
             );
         });
 
