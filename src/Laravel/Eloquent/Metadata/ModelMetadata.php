@@ -16,7 +16,6 @@ namespace ApiPlatform\Laravel\Eloquent\Metadata;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
 /**
@@ -26,6 +25,16 @@ use Illuminate\Support\Str;
  */
 final class ModelMetadata
 {
+    /**
+     * @var array<class-string, Collection<string, mixed>>
+     */
+    private $attributesLocalCache = [];
+
+    /**
+     * @var array<class-string, Collection<int, mixed>>
+     */
+    private $relationsLocalCache = [];
+
     /**
      * The methods that can be called in a model to indicate a relation.
      *
@@ -46,22 +55,16 @@ final class ModelMetadata
     ];
 
     /**
-     * Gets the first policy associated with this model.
-     */
-    public function getPolicy(Model $model): ?string
-    {
-        $policy = Gate::getPolicyFor($model::class);
-
-        return $policy ? $policy::class : null;
-    }
-
-    /**
      * Gets the column attributes for the given model.
      *
      * @return Collection<string, mixed>
      */
     public function getAttributes(Model $model): Collection
     {
+        if (isset($this->attributesLocalCache[$model::class])) {
+            return $this->attributesLocalCache[$model::class];
+        }
+
         $connection = $model->getConnection();
         $schema = $connection->getSchemaBuilder();
         $table = $model->getTable();
@@ -69,7 +72,7 @@ final class ModelMetadata
         $indexes = $schema->getIndexes($table);
         $relations = $this->getRelations($model);
 
-        return collect($columns)
+        return $this->attributesLocalCache[$model::class] = collect($columns)
             ->reject(
                 fn ($column) => $relations->contains(
                     fn ($relation) => $relation['foreign_key'] === $column['name']
@@ -112,7 +115,7 @@ final class ModelMetadata
      *
      * @return Collection<int, mixed>
      */
-    public function getVirtualAttributes(Model $model, array $columns): Collection
+    private function getVirtualAttributes(Model $model, array $columns): Collection
     {
         $class = new \ReflectionClass($model);
 
@@ -155,7 +158,11 @@ final class ModelMetadata
      */
     public function getRelations(Model $model): Collection
     {
-        return collect(get_class_methods($model))
+        if (isset($this->relationsLocalCache[$model::class])) {
+            return $this->relationsLocalCache[$model::class];
+        }
+
+        return $this->relationsLocalCache[$model::class] = collect(get_class_methods($model))
             ->map(fn ($method) => new \ReflectionMethod($model, $method))
             ->reject(
                 fn (\ReflectionMethod $method) => $method->isStatic()
@@ -205,20 +212,6 @@ final class ModelMetadata
             })
             ->filter()
             ->values();
-    }
-
-    /**
-     * Gets the Events that the model dispatches.
-     *
-     * @return Collection<int, mixed>
-     */
-    public function getEvents(Model $model): Collection
-    {
-        return collect($model->dispatchesEvents())
-            ->map(fn (string $class, string $event) => [
-                'event' => $event,
-                'class' => $class,
-            ])->values();
     }
 
     /**
