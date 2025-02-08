@@ -52,20 +52,16 @@ Route::domain($domain)->middleware($globalMiddlewares)->group(function (): void 
     Route::group(['prefix' => $prefix], function (): void {
         Route::group(['middleware' => ApiPlatformMiddleware::class], function (): void {
             Route::get('/contexts/{shortName?}{_format?}', ContextAction::class)
-                ->middleware(ApiPlatformMiddleware::class)
                 ->name('api_jsonld_context');
 
             Route::get('/docs{_format?}', DocumentationController::class)
-                ->middleware(ApiPlatformMiddleware::class)
                 ->name('api_doc');
 
             Route::get('/.well-known/genid/{id}', fn () => throw new NotExposedHttpException('This route is not exposed on purpose. It generates an IRI for a collection resource without identifier nor item operation.'))
-                ->middleware(ApiPlatformMiddleware::class)
                 ->name('api_genid');
 
             Route::get('/{index?}{_format?}', EntrypointController::class)
                 ->where('index', 'index')
-                ->middleware(ApiPlatformMiddleware::class)
                 ->name('api_entrypoint');
         });
 
