@@ -49,7 +49,7 @@ api_platform:
         html:                          ['text/html']
         json:                          ['application/json']
         jsonopenapi:                   ['application/vnd.openapi+json']
-        yamlopenapi:                   ['application/vnd.openapi+yaml']
+        yamlopenapi:                   ['text/vnd.openapi+yaml']
         jsonld:                        ['application/ld+json']
         jsonhal:                       ['application/hal+json']
         jsonapi:                       ['application/vnd.api+json']

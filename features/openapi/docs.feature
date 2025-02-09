@@ -373,7 +373,7 @@ Feature: Documentation support
     Given I add "Accept" header equal to "application/vnd.openapi+yaml"
     And I send a "GET" request to "/docs"
     Then the response status code should be 200
-    And the header "Content-Type" should be equal to "application/vnd.openapi+yaml; charset=utf-8"
+    And the header "Content-Type" should be equal to "text/vnd.openapi+yaml; charset=utf-8"
 
     Scenario: Retrieve the OpenAPI documentation
     Given I add "Accept" header equal to "text/html"
