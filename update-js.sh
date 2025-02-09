@@ -1,8 +1,8 @@
 #!/bin/bash
 rm -f package.lock
-# Keep the yarn.lock file in the repo to benefit from GitHub security alerts: https://github.blog/2019-07-02-yarn-support-for-security-alerts/
+rm -f package-lock.lock
 echo "{}" > package.json
-npm i @fontsource/open-sans swagger-ui es6-promise fetch react react-dom graphiql graphql-playground-react@1.7.26 redoc
+npm i @fontsource/open-sans swagger-ui es6-promise fetch react react-dom graphiql graphql-playground-react redoc
 
 dest=src/Symfony/Bundle/Resources/public/fonts/open-sans/
 if [[ -d "$dest" ]]; then
