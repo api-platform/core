@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Tests\Fixtures\Serializer\NameConverter;
 
-use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -21,7 +20,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * Custom converter that will only convert a property named "nameConverted"
  * with the same logic as Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter.
  */
-class CustomConverter implements AdvancedNameConverterInterface
+class CustomConverter implements NameConverterInterface
 {
     private NameConverterInterface $nameConverter;
 
