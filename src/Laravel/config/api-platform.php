@@ -62,7 +62,16 @@ return [
     'graphql' => [
         'enabled' => false,
         'nesting_separator' => '__',
-        'introspection' => ['enabled' => true]
+        'introspection' => ['enabled' => true],
+        'max_query_complexity' => 500,
+        'max_query_depth' => 200,
+        // 'middleware' => null
+    ],
+
+    'graphiql' => [
+        'enabled' => true,
+        // 'domain' => null,
+        // 'middleware' => null
     ],
 
     'exception_to_status' => [
