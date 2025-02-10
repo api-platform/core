@@ -238,6 +238,11 @@ final class PublishMercureUpdatesListener
 
         $updates = array_merge([$this->buildUpdate($iri, $data, $options)], $this->getGraphQlSubscriptionUpdates($object, $options, $type));
 
+        // Detach objects to prevent infinite loops in case a flush occurs before all updates are published and the store is reset
+        $this->updatedObjects->detach($object);
+        $this->createdObjects->detach($object);
+        $this->deletedObjects->detach($object);
+
         foreach ($updates as $update) {
             if ($options['enable_async_update'] && $this->messageBus) {
                 $this->dispatch($update);
