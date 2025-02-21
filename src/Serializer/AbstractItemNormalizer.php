@@ -883,6 +883,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $this->getFactoryOptions($context));
         $types = $propertyMetadata->getBuiltinTypes() ?? [];
         $isMultipleTypes = \count($types) > 1;
+        $denormalizationException = null;
 
         foreach ($types as $type) {
             if (null === $value && ($type->isNullable() || ($context[static::DISABLE_TYPE_ENFORCEMENT] ?? false))) {
@@ -908,7 +909,18 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 $context['resource_class'] = $resourceClass;
                 unset($context['uri_variables']);
 
-                return $this->denormalizeCollection($attribute, $propertyMetadata, $type, $resourceClass, $value, $format, $context);
+                try {
+                    return $this->denormalizeCollection($attribute, $propertyMetadata, $type, $resourceClass, $value, $format, $context);
+                } catch (NotNormalizableValueException $e) {
+                    // union/intersect types: try the next type, if not valid, an exception will be thrown at the end
+                    if ($isMultipleTypes) {
+                        $denormalizationException ??= $e;
+
+                        continue;
+                    }
+
+                    throw $e;
+                }
             }
 
             if (
@@ -918,7 +930,18 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 $resourceClass = $this->resourceClassResolver->getResourceClass(null, $className);
                 $childContext = $this->createChildContext($this->createOperationContext($context, $resourceClass), $attribute, $format);
 
-                return $this->denormalizeRelation($attribute, $propertyMetadata, $resourceClass, $value, $format, $childContext);
+                try {
+                    return $this->denormalizeRelation($attribute, $propertyMetadata, $resourceClass, $value, $format, $childContext);
+                } catch (NotNormalizableValueException $e) {
+                    // union/intersect types: try the next type, if not valid, an exception will be thrown at the end
+                    if ($isMultipleTypes) {
+                        $denormalizationException ??= $e;
+
+                        continue;
+                    }
+
+                    throw $e;
+                }
             }
 
             if (
@@ -933,7 +956,18 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
                 unset($context['resource_class'], $context['uri_variables']);
 
-                return $this->serializer->denormalize($value, $className.'[]', $format, $context);
+                try {
+                    return $this->serializer->denormalize($value, $className.'[]', $format, $context);
+                } catch (NotNormalizableValueException $e) {
+                    // union/intersect types: try the next type, if not valid, an exception will be thrown at the end
+                    if ($isMultipleTypes) {
+                        $denormalizationException ??= $e;
+
+                        continue;
+                    }
+
+                    throw $e;
+                }
             }
 
             if (null !== $className = $type->getClassName()) {
@@ -943,7 +977,18 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
                 unset($context['resource_class'], $context['uri_variables']);
 
-                return $this->serializer->denormalize($value, $className, $format, $context);
+                try {
+                    return $this->serializer->denormalize($value, $className, $format, $context);
+                } catch (NotNormalizableValueException $e) {
+                    // union/intersect types: try the next type, if not valid, an exception will be thrown at the end
+                    if ($isMultipleTypes) {
+                        $denormalizationException ??= $e;
+
+                        continue;
+                    }
+
+                    throw $e;
+                }
             }
 
             /* From @see AbstractObjectNormalizer::validateAndDenormalize() */
@@ -1017,6 +1062,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                     throw $e;
                 }
             }
+        }
+
+        if ($denormalizationException) {
+            throw $denormalizationException;
         }
 
         return $value;

@@ -17,7 +17,11 @@ use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\GenericType;
+use Symfony\Component\TypeInfo\Type\IntersectionType;
 use Symfony\Component\TypeInfo\Type\NullableType;
+use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
@@ -111,6 +115,11 @@ final class PropertyInfoToTypeInfoHelper
         }
 
         if (\count($variableTypes)) {
+            // hack to have generic without classname
+            // this is required because some tests are using invalid data
+            if (null === $class && 'object' === $builtinType) {
+                $type = Type::object(\stdClass::class);
+            }
             $type = Type::generic($type, ...$variableTypes);
         }
 
@@ -151,6 +160,148 @@ final class PropertyInfoToTypeInfoHelper
             $legacyType->isCollection(),
             $legacyType->getCollectionKeyTypes(),
             $legacyType->getCollectionValueTypes(),
+        );
+    }
+
+    /**
+     * Converts a {@see Type} to what is should have been in the "symfony/property-info" component.
+     *
+     * @return list<LegacyType>|null
+     */
+    public static function convertTypeToLegacyTypes(?Type $type): ?array
+    {
+        if (null === $type) {
+            return null;
+        }
+
+        if (\in_array((string) $type, ['mixed', 'never'], true)) {
+            return null;
+        }
+
+        if (\in_array((string) $type, ['null', 'void'], true)) {
+            return [new LegacyType('null')];
+        }
+
+        $legacyType = self::convertTypeToLegacy($type);
+
+        if (!\is_array($legacyType)) {
+            $legacyType = [$legacyType];
+        }
+
+        return $legacyType;
+    }
+
+    /**
+     * Recursive method that converts {@see Type} to its related {@see LegacyType} (or list of {@see @LegacyType}).
+     *
+     * @return LegacyType|list<LegacyType>
+     */
+    private static function convertTypeToLegacy(Type $type): LegacyType|array
+    {
+        $nullable = false;
+
+        if ($type instanceof NullableType) {
+            $nullable = true;
+            $type = $type->getWrappedType();
+        }
+
+        if ($type instanceof UnionType) {
+            $unionTypes = [];
+            foreach ($type->getTypes() as $t) {
+                if ($t instanceof IntersectionType) {
+                    throw new \LogicException(\sprintf('DNF types are not supported by "%s".', LegacyType::class));
+                }
+
+                if ($nullable) {
+                    $t = Type::nullable($t);
+                }
+
+                $unionTypes[] = $t;
+            }
+
+            /** @var list<LegacyType> $legacyTypes */
+            $legacyTypes = array_map(self::convertTypeToLegacy(...), $unionTypes);
+
+            if (1 === \count($legacyTypes)) {
+                return $legacyTypes[0];
+            }
+
+            return $legacyTypes;
+        }
+
+        if ($type instanceof IntersectionType) {
+            /** @var list<LegacyType> $legacyTypes */
+            $legacyTypes = array_map(self::convertTypeToLegacy(...), $type->getTypes());
+
+            if (1 === \count($legacyTypes)) {
+                return $legacyTypes[0];
+            }
+
+            return $legacyTypes;
+        }
+
+        if ($type instanceof CollectionType) {
+            $type = $type->getWrappedType();
+            if ($nullable) {
+                $type = Type::nullable($type);
+            }
+
+            return self::convertTypeToLegacy($type);
+        }
+
+        $typeIdentifier = TypeIdentifier::MIXED;
+        $className = null;
+        $collectionKeyType = $collectionValueType = null;
+
+        if ($type instanceof GenericType) {
+            $wrappedType = $type->getWrappedType();
+
+            if ($wrappedType instanceof BuiltinType) {
+                $typeIdentifier = $wrappedType->getTypeIdentifier();
+            } elseif ($wrappedType instanceof ObjectType) {
+                $typeIdentifier = TypeIdentifier::OBJECT;
+                $className = $wrappedType->getClassName();
+            }
+
+            $variableTypes = $type->getVariableTypes();
+
+            if (2 === \count($variableTypes)) {
+                if ('int|string' !== (string) $variableTypes[0]) {
+                    $collectionKeyType = self::convertTypeToLegacy($variableTypes[0]);
+                }
+                $collectionValueType = self::convertTypeToLegacy($variableTypes[1]);
+            } elseif (1 === \count($variableTypes)) {
+                $collectionValueType = self::convertTypeToLegacy($variableTypes[0]);
+            }
+        } elseif ($type instanceof ObjectType) {
+            $typeIdentifier = TypeIdentifier::OBJECT;
+            $className = $type->getClassName();
+        } elseif ($type instanceof BuiltinType) {
+            $typeIdentifier = $type->getTypeIdentifier();
+        }
+
+        if (TypeIdentifier::MIXED === $typeIdentifier) {
+            return [
+                new LegacyType(LegacyType::BUILTIN_TYPE_INT, true),
+                new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT, true),
+                new LegacyType(LegacyType::BUILTIN_TYPE_STRING, true),
+                new LegacyType(LegacyType::BUILTIN_TYPE_BOOL, true),
+                new LegacyType(LegacyType::BUILTIN_TYPE_RESOURCE, true),
+                new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, true),
+                new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, true),
+                new LegacyType(LegacyType::BUILTIN_TYPE_NULL, true),
+                new LegacyType(LegacyType::BUILTIN_TYPE_CALLABLE, true),
+                new LegacyType(LegacyType::BUILTIN_TYPE_ITERABLE, true),
+            ];
+        }
+
+        return new LegacyType(
+            builtinType: $typeIdentifier->value,
+            nullable: $nullable,
+            class: $className,
+            collection: $type instanceof GenericType,
+            collectionKeyType: $collectionKeyType,
+            collectionValueType: $collectionValueType,
         );
     }
 }
