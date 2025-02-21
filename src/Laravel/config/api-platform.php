@@ -63,8 +63,6 @@ return [
         'enabled' => false,
         'nesting_separator' => '__',
         'introspection' => ['enabled' => true],
-        'max_query_complexity' => 500,
-        'max_query_depth' => 200,
         // 'middleware' => null
     ],
 
