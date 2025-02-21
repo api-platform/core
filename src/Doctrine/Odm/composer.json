@@ -26,10 +26,11 @@
     "require": {
         "php": ">=8.2",
         "api-platform/doctrine-common": "^4.1",
-        "api-platform/metadata": "^3.4 || ^4.0",
+        "api-platform/metadata": "^4.1",
         "api-platform/state": "^3.4 || ^4.0",
         "doctrine/mongodb-odm": "^2.2",
-        "symfony/property-info": "^6.4 || ^7.1"
+        "symfony/property-info": "^7.1",
+        "symfony/type-info": "^7.2"
     },
     "require-dev": {
         "doctrine/doctrine-bundle": "^2.11",

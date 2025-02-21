@@ -23,6 +23,10 @@ use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
+use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 
 /**
  * {@inheritdoc}
@@ -110,21 +114,25 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
 
-            $types = $propertyMetadata->getBuiltinTypes();
-            if (null === ($type = $types[0] ?? null)) {
+            if (null === $type = $propertyMetadata->getPhpType()) {
                 continue;
             }
 
-            try {
-                if ($type->isCollection()) {
-                    $collectionValueType = $type->getCollectionValueTypes()[0] ?? null;
+            $collectionValueIsIdentifiedByClass = function (Type $type) use (&$collectionValueIsIdentifiedByClass, $class): bool {
+                return match (true) {
+                    $type instanceof CollectionType => $type->getCollectionValueType()->isIdentifiedBy($class),
+                    $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($collectionValueIsIdentifiedByClass),
+                    $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($collectionValueIsIdentifiedByClass),
+                    default => false,
+                };
+            };
 
-                    if (null !== $collectionValueType && $collectionValueType->getClassName() === $class) {
-                        return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, \sprintf('%s[0].%s', $propertyName, $property)), $parameterName);
-                    }
+            try {
+                if ($type->isSatisfiedBy($collectionValueIsIdentifiedByClass)) {
+                    return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, \sprintf('%s[0].%s', $propertyName, $property)), $parameterName);
                 }
 
-                if ($type->getClassName() === $class) {
+                if ($type->isIdentifiedBy($class)) {
                     return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, "$propertyName.$property"), $parameterName);
                 }
             } catch (NoSuchPropertyException $e) {

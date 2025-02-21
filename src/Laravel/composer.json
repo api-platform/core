@@ -34,7 +34,7 @@
         "api-platform/json-schema": "^4.0",
         "api-platform/jsonld": "^4.0",
         "api-platform/json-api": "^4.0",
-        "api-platform/metadata": "^4.0",
+        "api-platform/metadata": "^4.1",
         "api-platform/openapi": "^4.0",
         "api-platform/serializer": "^4.0",
         "api-platform/state": "^4.0",

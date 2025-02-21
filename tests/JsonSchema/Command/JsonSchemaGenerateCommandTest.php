@@ -178,8 +178,8 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $json = json_decode($result, associative: true);
 
         $this->assertEquals($json['definitions']['Nest.jsonld']['properties']['owner']['anyOf'], [
-            ['$ref' => '#/definitions/Wren.jsonld'],
             ['$ref' => '#/definitions/Robin.jsonld'],
+            ['$ref' => '#/definitions/Wren.jsonld'],
             ['type' => 'null'],
         ]);
 
@@ -194,8 +194,8 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $json = json_decode($result, associative: true);
 
         $this->assertEquals($json['definitions']['Nest.jsonapi']['properties']['data']['properties']['attributes']['properties']['owner']['anyOf'], [
-            ['$ref' => '#/definitions/Wren.jsonapi'],
             ['$ref' => '#/definitions/Robin.jsonapi'],
+            ['$ref' => '#/definitions/Wren.jsonapi'],
             ['type' => 'null'],
         ]);
 
@@ -210,8 +210,8 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $json = json_decode($result, associative: true);
 
         $this->assertEquals($json['definitions']['Nest.jsonhal']['properties']['owner']['anyOf'], [
-            ['$ref' => '#/definitions/Wren.jsonhal'],
             ['$ref' => '#/definitions/Robin.jsonhal'],
+            ['$ref' => '#/definitions/Wren.jsonhal'],
             ['type' => 'null'],
         ]);
 
