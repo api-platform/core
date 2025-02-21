@@ -69,7 +69,7 @@ Route::domain($domain)->middleware($globalMiddlewares)->group(function (): void 
         if (config()->get('api-platform.graphql.enabled')) {
             Route::group([
                 'middleware' => config()->get('api-platform.graphql.middleware', []),
-            ], function () {
+            ], function (): void {
                 Route::addRoute(['POST', 'GET'], '/graphql', GraphQlEntrypointController::class)
                     ->name('api_graphql');
             });
@@ -78,7 +78,7 @@ Route::domain($domain)->middleware($globalMiddlewares)->group(function (): void 
                 Route::group([
                     'middleware' => config()->get('api-platform.graphiql.middleware', []),
                     'domain' => config()->get('api-platform.graphiql.domain'),
-                ], function () {
+                ], function (): void {
                     Route::get('/graphiql', GraphiQlController::class)
                         ->name('api_graphiql');
                 });
