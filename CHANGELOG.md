@@ -1,5 +1,16 @@
 # Changelog
 
+## v4.0.18
+
+### Bug fixes
+
+* [7007dcca8](https://github.com/api-platform/core/commit/7007dcca8649814d871db7abe0fd65dc9c94a176) fix(laravel): duplicate middleware in routes
+* [a16147ab7](https://github.com/api-platform/core/commit/a16147ab7b36f5238700c6ee9ee9253ce1424808) fix(laravel): handle route prefix (#6978)
+* [d2e1963c5](https://github.com/api-platform/core/commit/d2e1963c56733b3174ae37cbc27a1374eba80bee) fix(symfony): detach objects to prevent loop when using Doctrine middleware and Mercure (#6936) (#6965)
+
+
+### Features
+
 ## v4.0.17
 
 ### Bug fixes
