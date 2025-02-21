@@ -27,7 +27,7 @@
         "php": ">=8.2",
         "api-platform/metadata": "^4.1",
         "symfony/console": "^6.4 || ^7.0",
-        "symfony/property-info": "^6.4 || ^7.1",
+        "symfony/property-info": "^7.1",
         "symfony/serializer": "^6.4 || ^7.0",
         "symfony/uid": "^6.4 || ^7.0"
     },

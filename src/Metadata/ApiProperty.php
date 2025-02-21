@@ -13,13 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
-use Symfony\Component\PropertyInfo\Type;
+use ApiPlatform\Metadata\Util\PropertyInfoToTypeInfoHelper;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\Serializer\Attribute\Context;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Serializer\Attribute\MaxDepth;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Serializer\Attribute\SerializedPath;
+use Symfony\Component\TypeInfo\Type;
 
 /**
  * ApiProperty annotation.
@@ -31,6 +33,15 @@ final class ApiProperty
 {
     private ?array $types;
     private ?array $serialize;
+    private ?Type $phpType;
+
+    /**
+     * Used to know if only legacy types are defined without triggering deprecation.
+     * To be removed in 5.0.
+     *
+     * @internal
+     */
+    public bool $usesLegacyType = false;
 
     /**
      * @param bool|null                                                                                                                                   $readableLink            https://api-platform.com/docs/core/serialization/#force-iri-with-relations-of-the-same-type-parentchilds-relations
@@ -47,10 +58,11 @@ final class ApiProperty
      * @param string|\Stringable|null                                                                                                                     $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
      * @param string[]                                                                                                                                    $types                   the RDF types of this property
      * @param string[]                                                                                                                                    $iris
-     * @param Type[]                                                                                                                                      $builtinTypes
+     * @param LegacyType[]                                                                                                                                $builtinTypes
      * @param string|null                                                                                                                                 $uriTemplate             (experimental) whether to return the subRessource collection IRI instead of an iterable of IRI
      * @param string|null                                                                                                                                 $property                The property name
      * @param Context|Groups|Ignore|SerializedName|SerializedPath|MaxDepth|array<array-key, Context|Groups|Ignore|SerializedName|SerializedPath|MaxDepth> $serialize               Serializer attributes
+     * @param Type                                                                                                                                        $phpType                 The internal PHP type
      */
     public function __construct(
         private ?string $description = null,
@@ -206,6 +218,8 @@ final class ApiProperty
         array|string|null $types = null,
         /*
          * The related php types.
+         *
+         * deprecated since 4.2, use "phpType" instead.
          */
         private ?array $builtinTypes = null,
         private ?array $schema = null,
@@ -221,9 +235,23 @@ final class ApiProperty
          */
         private ?bool $hydra = null,
         private array $extraProperties = [],
+        ?Type $phpType = null,
     ) {
         $this->types = \is_string($types) ? (array) $types : $types;
         $this->serialize = \is_array($serialize) ? $serialize : [$serialize];
+        $this->phpType = $phpType;
+
+        if ($this->builtinTypes) {
+            // trigger_deprecation('api_platform/metadata', '4.2', 'The "builtinTypes" argument of "%s()" is deprecated, use "phpType" instead.');
+
+            $this->usesLegacyType = true;
+
+            if (!$this->phpType) {
+                $this->phpType = PropertyInfoToTypeInfoHelper::convertLegacyTypesToType($this->builtinTypes);
+            }
+        } elseif ($this->phpType) {
+            $this->builtinTypes = PropertyInfoToTypeInfoHelper::convertTypeToLegacyTypes($this->phpType) ?? [];
+        }
     }
 
     public function getProperty(): ?string
@@ -490,20 +518,43 @@ final class ApiProperty
     }
 
     /**
-     * @return Type[]
+     * deprecated since 4.2, use "getPhpType" instead.
+     *
+     * @return LegacyType[]
      */
     public function getBuiltinTypes(): ?array
     {
+        // trigger_deprecation('api-platform/metadata', '4.2', 'The "%s()" method is deprecated, use "%s::getPhpType()" instead.', __METHOD__, self::class);
+
         return $this->builtinTypes;
     }
 
     /**
-     * @param Type[] $builtinTypes
+     * deprecated since 4.2, use "withPhpType" instead.
+     *
+     * @param LegacyType[] $builtinTypes
      */
     public function withBuiltinTypes(array $builtinTypes = []): static
     {
+        // trigger_deprecation('api-platform/metadata', '4.2', 'The "%s()" method is deprecated, use "%s::withPhpType()" instead.', __METHOD__, self::class);
+
         $self = clone $this;
         $self->builtinTypes = $builtinTypes;
+        $self->phpType = PropertyInfoToTypeInfoHelper::convertLegacyTypesToType($builtinTypes);
+
+        return $self;
+    }
+
+    public function getPhpType(): ?Type
+    {
+        return $this->phpType;
+    }
+
+    public function withPhpType(?Type $phpType): self
+    {
+        $self = clone $this;
+        $self->phpType = $phpType;
+        $self->builtinTypes = PropertyInfoToTypeInfoHelper::convertTypeToLegacyTypes($phpType) ?? [];
 
         return $self;
     }
