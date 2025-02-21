@@ -45,4 +45,13 @@ class ApiTest extends TestCase
         $response = $this->get('http://test.com/api/', ['accept' => ['application/ld+json']]);
         $response->assertSuccessful();
     }
+
+    public function testPrefixedOperations(): void
+    {
+        $response = $this->post('http://test.com/billing/calculate', [], ['content-type' => ['application/ld+json']]);
+        $response->assertSuccessful();
+
+        $response = $this->post('http://test.com/shipping/calculate', [], ['content-type' => ['application/ld+json']]);
+        $response->assertSuccessful();
+    }
 }
