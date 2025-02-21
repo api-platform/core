@@ -19,8 +19,14 @@ use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
+use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 
 /**
  * Abstract class with helpers for easing the implementation of a filter.
@@ -31,7 +37,9 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 abstract class AbstractFilter implements FilterInterface
 {
-    use FieldDatatypeTrait { getNestedFieldPath as protected; }
+    use FieldDatatypeTrait {
+        getNestedFieldPath as protected;
+    }
 
     public function __construct(protected PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, protected ?NameConverterInterface $nameConverter = null, protected ?array $properties = null)
     {
@@ -70,8 +78,108 @@ abstract class AbstractFilter implements FilterInterface
      *   - is the decomposed given property an association?
      *   - the resource class of the decomposed given property
      *   - the property name of the decomposed given property
+     *
+     * @return array{0: ?Type, 1: ?bool, 2: ?class-string, 3: ?string}
      */
     protected function getMetadata(string $resourceClass, string $property): array
+    {
+        if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
+            return $this->getLegacyMetadata($resourceClass, $property);
+        }
+
+        $noop = [null, null, null, null];
+
+        if (!$this->hasProperty($resourceClass, $property)) {
+            return $noop;
+        }
+
+        $properties = explode('.', $property);
+        $totalProperties = \count($properties);
+        $currentResourceClass = $resourceClass;
+        $hasAssociation = false;
+        $currentProperty = null;
+        $type = null;
+
+        foreach ($properties as $index => $currentProperty) {
+            try {
+                $propertyMetadata = $this->propertyMetadataFactory->create($currentResourceClass, $currentProperty);
+            } catch (PropertyNotFoundException) {
+                return $noop;
+            }
+
+            // check each type before deciding if it's noop or not
+            // e.g: maybe the first type is noop, but the second is valid
+            $isNoop = false;
+
+            ++$index;
+
+            $type = $propertyMetadata->getNativeType();
+
+            if (null === $type) {
+                return $noop;
+            }
+
+            foreach ($type instanceof CompositeTypeInterface ? $type->getTypes() : [$type] as $t) {
+                $builtinType = $t;
+
+                while ($builtinType instanceof WrappingTypeInterface) {
+                    $builtinType = $builtinType->getWrappedType();
+                }
+
+                if (!$builtinType instanceof ObjectType && !$t instanceof CollectionType) {
+                    if ($totalProperties === $index) {
+                        break 2;
+                    }
+
+                    $isNoop = true;
+
+                    continue;
+                }
+
+                if ($t instanceof CollectionType) {
+                    $t = $t->getCollectionValueType();
+                    $builtinType = $t;
+
+                    while ($builtinType instanceof WrappingTypeInterface) {
+                        $builtinType = $builtinType->getWrappedType();
+                    }
+
+                    if (!$builtinType instanceof ObjectType) {
+                        if ($totalProperties === $index) {
+                            break 2;
+                        }
+
+                        $isNoop = true;
+
+                        continue;
+                    }
+                }
+
+                $className = $builtinType->getClassName();
+
+                if ($isResourceClass = $this->resourceClassResolver->isResourceClass($className)) {
+                    $currentResourceClass = $className;
+                } elseif ($totalProperties !== $index) {
+                    $isNoop = true;
+
+                    continue;
+                }
+
+                $hasAssociation = $totalProperties === $index && $isResourceClass;
+                $isNoop = false;
+
+                break;
+            }
+        }
+
+        if ($isNoop) {
+            return $noop;
+        }
+
+        return [$type, $hasAssociation, $currentResourceClass, $currentProperty];
+    }
+
+    protected function getLegacyMetadata(string $resourceClass, string $property): array
     {
         $noop = [null, null, null, null];
 
@@ -108,7 +216,7 @@ abstract class AbstractFilter implements FilterInterface
             foreach ($types as $type) {
                 $builtinType = $type->getBuiltinType();
 
-                if (Type::BUILTIN_TYPE_OBJECT !== $builtinType && Type::BUILTIN_TYPE_ARRAY !== $builtinType) {
+                if (LegacyType::BUILTIN_TYPE_OBJECT !== $builtinType && LegacyType::BUILTIN_TYPE_ARRAY !== $builtinType) {
                     if ($totalProperties === $index) {
                         break 2;
                     }
@@ -124,7 +232,7 @@ abstract class AbstractFilter implements FilterInterface
                     continue;
                 }
 
-                if (Type::BUILTIN_TYPE_ARRAY === $builtinType && Type::BUILTIN_TYPE_OBJECT !== $type->getBuiltinType()) {
+                if (LegacyType::BUILTIN_TYPE_ARRAY === $builtinType && LegacyType::BUILTIN_TYPE_OBJECT !== $type->getBuiltinType()) {
                     if ($totalProperties === $index) {
                         break 2;
                     }

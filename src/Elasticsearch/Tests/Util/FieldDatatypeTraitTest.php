@@ -21,7 +21,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\TypeInfo\Type;
 
 class FieldDatatypeTraitTest extends TestCase
 {
@@ -71,7 +71,7 @@ class FieldDatatypeTraitTest extends TestCase
     public function testGetNestedFieldPathWithInvalidCollectionType(): void
     {
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Foo::class, 'foo')->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)]))->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Foo::class, 'foo')->willReturn((new ApiProperty())->withNativeType(Type::string()))->shouldBeCalled();
 
         $fieldDatatype = self::createFieldDatatypeInstance($propertyMetadataFactoryProphecy->reveal(),
             $this->prophesize(ResourceClassResolverInterface::class)->reveal());
@@ -90,14 +90,14 @@ class FieldDatatypeTraitTest extends TestCase
 
     private function getValidFieldDatatype()
     {
-        $fooType = new Type(Type::BUILTIN_TYPE_OBJECT, false, Foo::class);
-        $barType = new Type(Type::BUILTIN_TYPE_ARRAY, false, Foo::class, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, Foo::class));
-        $bazType = new Type(Type::BUILTIN_TYPE_STRING, false, Foo::class);
+        $fooType = Type::object(Foo::class);
+        $barType = Type::list(Type::object(Foo::class));
+        $bazType = Type::string();
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Foo::class, 'foo')->willReturn((new ApiProperty())->withBuiltinTypes([$fooType]))->shouldBeCalled();
-        $propertyMetadataFactoryProphecy->create(Foo::class, 'bar')->willReturn((new ApiProperty())->withBuiltinTypes([$barType]))->shouldBeCalled();
-        $propertyMetadataFactoryProphecy->create(Foo::class, 'baz')->willReturn((new ApiProperty())->withBuiltinTypes([$bazType]));
+        $propertyMetadataFactoryProphecy->create(Foo::class, 'foo')->willReturn((new ApiProperty())->withNativeType($fooType))->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Foo::class, 'bar')->willReturn((new ApiProperty())->withNativeType($barType))->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Foo::class, 'baz')->willReturn((new ApiProperty())->withNativeType($bazType));
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Foo::class)->willReturn(true)->shouldBeCalled();
