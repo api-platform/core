@@ -23,7 +23,6 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
 
 $globalMiddlewares = config()->get('api-platform.routes.middleware', []);
 $domain = config()->get('api-platform.routes.domain');
@@ -35,9 +34,11 @@ Route::domain($domain)->middleware($globalMiddlewares)->group(function (): void 
     foreach ($resourceNameCollectionFactory->create() as $resourceClass) {
         foreach ($resourceMetadataFactory->create($resourceClass) as $resourceMetadata) {
             foreach ($resourceMetadata->getOperations() as $operation) {
+                $uriTemplate = str_replace('{._format}', '{_format?}', $operation->getUriTemplate());
+                $uriTemplate = rtrim($operation->getRoutePrefix(), '/').'/'.ltrim($uriTemplate, '/');
+
                 /* @var HttpOperation $operation */
-                Route::addRoute($operation->getMethod(), Str::replace('{._format}', '{_format?}', $operation->getUriTemplate()), ApiPlatformController::class)
-                    ->prefix($operation->getRoutePrefix())
+                Route::addRoute($operation->getMethod(), $uriTemplate, ApiPlatformController::class)
                     ->middleware(ApiPlatformMiddleware::class.':'.$operation->getName())
                     ->middleware($operation->getMiddleware())
                     ->where('_format', '^\.[a-zA-Z]+')
