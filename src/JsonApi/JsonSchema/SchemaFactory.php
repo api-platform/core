@@ -23,6 +23,12 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\State\ApiResource\Error;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
+use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 
 /**
  * Decorator factory which adds JSON:API properties to the JSON Schema document.
@@ -286,21 +292,73 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     private function getRelationship(string $resourceClass, string $property, ?array $serializerContext): ?array
     {
         $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property, $serializerContext ?? []);
-        $types = $propertyMetadata->getBuiltinTypes() ?? [];
+
+        if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
+            $types = $propertyMetadata->getBuiltinTypes() ?? [];
+            $isRelationship = false;
+            $isOne = $isMany = false;
+            $relatedClasses = [];
+
+            foreach ($types as $type) {
+                if ($type->isCollection()) {
+                    $collectionValueType = $type->getCollectionValueTypes()[0] ?? null;
+                    $isMany = $collectionValueType && ($className = $collectionValueType->getClassName()) && $this->resourceClassResolver->isResourceClass($className);
+                } else {
+                    $isOne = ($className = $type->getClassName()) && $this->resourceClassResolver->isResourceClass($className);
+                }
+                if (!isset($className) || (!$isOne && !$isMany)) {
+                    continue;
+                }
+                $isRelationship = true;
+                $resourceMetadata = $this->resourceMetadataFactory->create($className);
+                $operation = $resourceMetadata->getOperation();
+                // @see https://github.com/api-platform/core/issues/5501
+                // @see https://github.com/api-platform/core/pull/5722
+                $relatedClasses[$className] = $operation->canRead();
+            }
+
+            return $isRelationship ? [$isOne, $relatedClasses] : null;
+        }
+
+        if (null === $type = $propertyMetadata->getNativeType()) {
+            return null;
+        }
+
         $isRelationship = false;
         $isOne = $isMany = false;
         $relatedClasses = [];
 
-        foreach ($types as $type) {
-            if ($type->isCollection()) {
-                $collectionValueType = $type->getCollectionValueTypes()[0] ?? null;
-                $isMany = $collectionValueType && ($className = $collectionValueType->getClassName()) && $this->resourceClassResolver->isResourceClass($className);
-            } else {
-                $isOne = ($className = $type->getClassName()) && $this->resourceClassResolver->isResourceClass($className);
+        /** @var class-string|null $className */
+        $className = null;
+
+        $typeIsResourceClass = function (Type $type) use (&$typeIsResourceClass, &$className): bool {
+            return match (true) {
+                $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($typeIsResourceClass),
+                $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($typeIsResourceClass),
+                default => $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($className = $type->getClassName()),
+            };
+        };
+
+        $collectionValueIsResourceClass = function (Type $type) use (&$typeIsResourceClass): bool {
+            return match (true) {
+                $type instanceof CollectionType => $type->getCollectionValueType()->isSatisfiedBy($typeIsResourceClass),
+                $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($typeIsResourceClass),
+                $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($typeIsResourceClass),
+                default => false,
+            };
+        };
+
+        foreach ($type instanceof CompositeTypeInterface ? $type->getTypes() : [$type] as $t) {
+            if ($t->isSatisfiedBy($collectionValueIsResourceClass)) {
+                $isMany = true;
+            } elseif ($t->isSatisfiedBy($typeIsResourceClass)) {
+                $isOne = true;
             }
-            if (!isset($className) || (!$isOne && !$isMany)) {
+
+            if (!$className || (!$isOne && !$isMany)) {
                 continue;
             }
+
             $isRelationship = true;
             $resourceMetadata = $this->resourceMetadataFactory->create($className);
             $operation = $resourceMetadata->getOperation();
