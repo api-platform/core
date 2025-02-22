@@ -24,8 +24,8 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use Illuminate\Support\Facades\Route;
 
-$globalMiddlewares = config()->get('api-platform.routes.middleware', []);
-$domain = config()->get('api-platform.routes.domain');
+$globalMiddlewares = config()->get('api-platform.routes.middleware') ?? [];
+$domain = config()->get('api-platform.routes.domain') ?? '';
 
 Route::domain($domain)->middleware($globalMiddlewares)->group(function (): void {
     $resourceNameCollectionFactory = app()->make(ResourceNameCollectionFactoryInterface::class);
@@ -70,7 +70,7 @@ Route::domain($domain)->middleware($globalMiddlewares)->group(function (): void 
 
         if (config()->get('api-platform.graphql.enabled')) {
             Route::group([
-                'middleware' => config()->get('api-platform.graphql.middleware', []),
+                'middleware' => config()->get('api-platform.graphql.middleware') ?? [],
             ], function (): void {
                 Route::addRoute(['POST', 'GET'], '/graphql', GraphQlEntrypointController::class)
                     ->name('api_graphql');
@@ -78,8 +78,8 @@ Route::domain($domain)->middleware($globalMiddlewares)->group(function (): void 
 
             if (config()->get('api-platform.graphiql.enabled')) {
                 Route::group([
-                    'middleware' => config()->get('api-platform.graphiql.middleware', []),
-                    'domain' => config()->get('api-platform.graphiql.domain'),
+                    'middleware' => config()->get('api-platform.graphiql.middleware') ?? [],
+                    'domain' => config()->get('api-platform.graphiql.domain') ?? '',
                 ], function (): void {
                     Route::get('/graphiql', GraphiQlController::class)
                         ->name('api_graphiql');
