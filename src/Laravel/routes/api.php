@@ -35,11 +35,11 @@ Route::domain($domain)->middleware($globalMiddlewares)->group(function (): void 
         foreach ($resourceMetadataFactory->create($resourceClass) as $resourceMetadata) {
             foreach ($resourceMetadata->getOperations() as $operation) {
                 $uriTemplate = str_replace('{._format}', '{_format?}', $operation->getUriTemplate());
-                $uriTemplate = rtrim($operation->getRoutePrefix(), '/').'/'.ltrim($uriTemplate, '/');
 
                 /* @var HttpOperation $operation */
-                Route::addRoute($operation->getMethod(), $uriTemplate, ApiPlatformController::class)
-                    ->middleware(ApiPlatformMiddleware::class.':'.$operation->getName())
+                $route = Route::addRoute($operation->getMethod(), $uriTemplate, ['uses' => ApiPlatformController::class, 'prefix' => $operation->getRoutePrefix() ?? '']);
+
+                $route->middleware(ApiPlatformMiddleware::class.':'.$operation->getName())
                     ->middleware($operation->getMiddleware())
                     ->where('_format', '^\.[a-zA-Z]+')
                     ->name($operation->getName())
