@@ -37,8 +37,8 @@ Route::domain($domain)->middleware($globalMiddlewares)->group(function (): void 
                 $uriTemplate = str_replace('{._format}', '{_format?}', $operation->getUriTemplate());
 
                 /* @var HttpOperation $operation */
-                $route = Route::addRoute($operation->getMethod(), $uriTemplate, ['uses' => ApiPlatformController::class, 'prefix' => $operation->getRoutePrefix() ?? '']);
-                $route->middleware(ApiPlatformMiddleware::class.':'.$operation->getName())
+                Route::addRoute($operation->getMethod(), $uriTemplate, ['uses' => ApiPlatformController::class, 'prefix' => $operation->getRoutePrefix() ?? ''])
+                    ->middleware(ApiPlatformMiddleware::class.':'.$operation->getName())
                     ->middleware($operation->getMiddleware())
                     ->where('_format', '^\.[a-zA-Z]+')
                     ->name($operation->getName())
