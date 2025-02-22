@@ -113,7 +113,7 @@ trait ApiTestAssertionsTrait
         static::assertThat(self::getHttpResponse()->toArray(false), $constraint, $message);
     }
 
-    public static function assertMatchesResourceCollectionJsonSchema(string $resourceClass, ?string $operationName = null, string $format = 'jsonld', ?array $serializationContext = null): void
+    public static function assertMatchesResourceCollectionJsonSchema(string $resourceClass, ?string $operationName = null, string $format = 'jsonld', ?array $serializationContext = null, ?int $checkMode = null): void
     {
         $schemaFactory = self::getSchemaFactory();
 
@@ -127,10 +127,10 @@ trait ApiTestAssertionsTrait
 
         $schema = $schemaFactory->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, $operation, null, ($serializationContext ?? []) + [BackwardCompatibleSchemaFactory::SCHEMA_DRAFT4_VERSION => true]);
 
-        static::assertMatchesJsonSchema($schema->getArrayCopy());
+        static::assertMatchesJsonSchema($schema->getArrayCopy(), $checkMode);
     }
 
-    public static function assertMatchesResourceItemJsonSchema(string $resourceClass, ?string $operationName = null, string $format = 'jsonld', ?array $serializationContext = null): void
+    public static function assertMatchesResourceItemJsonSchema(string $resourceClass, ?string $operationName = null, string $format = 'jsonld', ?array $serializationContext = null, ?int $checkMode = null): void
     {
         $schemaFactory = self::getSchemaFactory();
 
@@ -144,7 +144,7 @@ trait ApiTestAssertionsTrait
 
         $schema = $schemaFactory->buildSchema($resourceClass, $format, Schema::TYPE_OUTPUT, $operation, null, ($serializationContext ?? []) + [BackwardCompatibleSchemaFactory::SCHEMA_DRAFT4_VERSION => true]);
 
-        static::assertMatchesJsonSchema($schema->getArrayCopy());
+        static::assertMatchesJsonSchema($schema->getArrayCopy(), $checkMode);
     }
 
     /**
