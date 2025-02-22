@@ -26,6 +26,8 @@ use ApiPlatform\Serializer\CacheKeyTrait;
 use ApiPlatform\Serializer\ContextTrait;
 use ApiPlatform\Serializer\TagCollectorInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
@@ -33,6 +35,11 @@ use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
+use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 
 /**
  * Converts between objects and array including HAL metadata.
@@ -175,21 +182,53 @@ final class ItemNormalizer extends AbstractItemNormalizer
         foreach ($attributes as $attribute) {
             $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $options);
 
-            $types = $propertyMetadata->getBuiltinTypes() ?? [];
+            if (method_exists(PropertyInfoExtractor::class, 'getType')) {
+                $type = $propertyMetadata->getNativeType();
+                $types = $type instanceof CompositeTypeInterface ? $type->getTypes() : (null === $type ? [] : [$type]);
+                /** @var class-string|null $className */
+                $className = null;
+            } else {
+                $types = $propertyMetadata->getBuiltinTypes() ?? [];
+            }
 
             // prevent declaring $attribute as attribute if it's already declared as relationship
             $isRelationship = false;
+            $typeIsResourceClass = function (Type $type) use (&$typeIsResourceClass, &$className): bool {
+                return match (true) {
+                    $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($typeIsResourceClass),
+                    $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($typeIsResourceClass),
+                    default => $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($className = $type->getClassName()),
+                };
+            };
 
             foreach ($types as $type) {
                 $isOne = $isMany = false;
 
-                if (null !== $type) {
+                /** @var Type|LegacyType|null $valueType */
+                $valueType = null;
+
+                if ($type instanceof LegacyType) {
                     if ($type->isCollection()) {
                         $valueType = $type->getCollectionValueTypes()[0] ?? null;
                         $isMany = null !== $valueType && ($className = $valueType->getClassName()) && $this->resourceClassResolver->isResourceClass($className);
                     } else {
                         $className = $type->getClassName();
                         $isOne = $className && $this->resourceClassResolver->isResourceClass($className);
+                    }
+                } elseif ($type instanceof Type) {
+                    $typeIsCollection = function (Type $type) use (&$typeIsCollection, &$valueType): bool {
+                        return match (true) {
+                            $type instanceof CollectionType => null !== $valueType = $type->getCollectionValueType(),
+                            $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($typeIsCollection),
+                            $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($typeIsCollection),
+                            default => false,
+                        };
+                    };
+
+                    if ($type->isSatisfiedBy($typeIsCollection)) {
+                        $isMany = $valueType->isSatisfiedBy($typeIsResourceClass);
+                    } else {
+                        $isOne = $type->isSatisfiedBy($typeIsResourceClass);
                     }
                 }
 
