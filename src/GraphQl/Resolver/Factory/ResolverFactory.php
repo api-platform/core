@@ -26,6 +26,11 @@ use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
+use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 
 class ResolverFactory implements ResolverFactoryInterface
 {
@@ -58,10 +63,26 @@ class ResolverFactory implements ResolverFactoryInterface
                 }
 
                 $propertyMetadata = $rootClass ? $propertyMetadataFactory?->create($rootClass, $info->fieldName) : null;
-                $type = $propertyMetadata?->getBuiltinTypes()[0] ?? null;
-                // Data already fetched and normalized (field or nested resource)
-                if ($body || null === $resourceClass || ($type && !$type->isCollection())) {
-                    return $body;
+                if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
+                    $type = $propertyMetadata?->getBuiltinTypes()[0] ?? null;
+                    // Data already fetched and normalized (field or nested resource)
+                    if ($body || null === $resourceClass || ($type && !$type->isCollection())) {
+                        return $body;
+                    }
+                } else {
+                    $type = $propertyMetadata->getNativeType();
+                    $typeIsCollection = static function (Type $type) use (&$typeIsCollection): bool {
+                        return match (true) {
+                            $type instanceof CollectionType => true,
+                            $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($typeIsCollection),
+                            $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($typeIsCollection),
+                            default => false,
+                        };
+                    };
+                    // Data already fetched and normalized (field or nested resource)
+                    if ($body || null === $resourceClass || ($type && !$type->isSatisfiedBy($typeIsCollection))) {
+                        return $body;
+                    }
                 }
             }
 

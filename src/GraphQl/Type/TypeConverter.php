@@ -28,7 +28,13 @@ use GraphQL\Language\AST\TypeNode;
 use GraphQL\Language\Parser;
 use GraphQL\Type\Definition\NullableType;
 use GraphQL\Type\Definition\Type as GraphQLType;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
+use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
  * Converts a type to its GraphQL equivalent.
@@ -44,25 +50,27 @@ final class TypeConverter implements TypeConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function convertType(Type $type, bool $input, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth): GraphQLType|string|null
+    public function convertType(LegacyType $type, bool $input, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth): GraphQLType|string|null
     {
+        trigger_deprecation('api-platform/graphql', '4.1', 'The "%s()" method is deprecated, use "%s::convertPhpType()" instead.', __METHOD__, self::class);
+
         switch ($type->getBuiltinType()) {
-            case Type::BUILTIN_TYPE_BOOL:
+            case LegacyType::BUILTIN_TYPE_BOOL:
                 return GraphQLType::boolean();
-            case Type::BUILTIN_TYPE_INT:
+            case LegacyType::BUILTIN_TYPE_INT:
                 return GraphQLType::int();
-            case Type::BUILTIN_TYPE_FLOAT:
+            case LegacyType::BUILTIN_TYPE_FLOAT:
                 return GraphQLType::float();
-            case Type::BUILTIN_TYPE_STRING:
+            case LegacyType::BUILTIN_TYPE_STRING:
                 return GraphQLType::string();
-            case Type::BUILTIN_TYPE_ARRAY:
-            case Type::BUILTIN_TYPE_ITERABLE:
+            case LegacyType::BUILTIN_TYPE_ARRAY:
+            case LegacyType::BUILTIN_TYPE_ITERABLE:
                 if ($resourceType = $this->getResourceType($type, $input, $rootOperation, $rootResource, $property, $depth)) {
                     return $resourceType;
                 }
 
                 return 'Iterable';
-            case Type::BUILTIN_TYPE_OBJECT:
+            case LegacyType::BUILTIN_TYPE_OBJECT:
                 if (is_a($type->getClassName(), \DateTimeInterface::class, true)) {
                     return GraphQLType::string();
                 }
@@ -71,6 +79,42 @@ final class TypeConverter implements TypeConverterInterface
             default:
                 return null;
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function convertPhpType(Type $type, bool $input, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth): GraphQLType|string|null
+    {
+        if ($type->isIdentifiedBy(TypeIdentifier::BOOL)) {
+            return GraphQLType::boolean();
+        }
+
+        if ($type->isIdentifiedBy(TypeIdentifier::INT)) {
+            return GraphQLType::int();
+        }
+
+        if ($type->isIdentifiedBy(TypeIdentifier::FLOAT)) {
+            return GraphQLType::float();
+        }
+
+        if ($type->isIdentifiedBy(TypeIdentifier::STRING, \DateTimeInterface::class)) {
+            return GraphQLType::string();
+        }
+
+        if ($type->isIdentifiedBy(TypeIdentifier::ARRAY, TypeIdentifier::ITERABLE)) {
+            if ($resourceType = $this->getResourceType($type, $input, $rootOperation, $rootResource, $property, $depth)) {
+                return $resourceType;
+            }
+
+            return 'Iterable';
+        }
+
+        if ($type->isIdentifiedBy(TypeIdentifier::OBJECT)) {
+            return $this->getResourceType($type, $input, $rootOperation, $rootResource, $property, $depth);
+        }
+
+        return null;
     }
 
     /**
@@ -91,19 +135,37 @@ final class TypeConverter implements TypeConverterInterface
         throw new InvalidArgumentException(\sprintf('The type "%s" was not resolved.', $type));
     }
 
-    private function getResourceType(Type $type, bool $input, Operation $rootOperation, string $rootResource, ?string $property, int $depth): ?GraphQLType
+    private function getResourceType(Type|LegacyType $type, bool $input, Operation $rootOperation, string $rootResource, ?string $property, int $depth): ?GraphQLType
     {
-        if (
-            $this->typeBuilder->isCollection($type)
-            && $collectionValueType = $type->getCollectionValueTypes()[0] ?? null
-        ) {
-            $resourceClass = $collectionValueType->getClassName();
-        } else {
-            $resourceClass = $type->getClassName();
-        }
+        if ($type instanceof Type) {
+            $isCollection = $this->typeBuilder->isObjectCollection($type);
 
-        if (null === $resourceClass) {
-            return null;
+            /** @var class-string|null $resourceClass */
+            $resourceClass = null;
+
+            $typeIsResourceClass = function (Type $type) use (&$typeIsResourceClass, &$resourceClass): bool {
+                return match (true) {
+                    $type instanceof CollectionType => $type->getCollectionValueType()->isSatisfiedBy($typeIsResourceClass),
+                    $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($typeIsResourceClass),
+                    $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($typeIsResourceClass),
+                    default => $type instanceof ObjectType && null !== $resourceClass = $type->getClassName(),
+                };
+            };
+
+            if (!$type->isSatisfiedBy($typeIsResourceClass)) {
+                return null;
+            }
+        } else {
+            $isCollection = $this->typeBuilder->isCollection($type);
+            if ($isCollection && $collectionValueType = $type->getCollectionValueTypes()[0] ?? null) {
+                $resourceClass = $collectionValueType->getClassName();
+            } else {
+                $resourceClass = $type->getClassName();
+            }
+
+            if (null === $resourceClass) {
+                return null;
+            }
         }
 
         try {
@@ -158,7 +220,6 @@ final class TypeConverter implements TypeConverterInterface
         }
 
         $operationName = $rootOperation->getName();
-        $isCollection = $this->typeBuilder->isCollection($type);
 
         // We're retrieving the type of a property which is a relation to the root resource.
         if ($resourceClass !== $rootResource && $rootOperation instanceof Query) {

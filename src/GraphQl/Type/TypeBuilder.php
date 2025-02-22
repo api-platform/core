@@ -30,7 +30,12 @@ use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\CollectionType as SymfonyCollectionType;
+use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
+use Symfony\Component\TypeInfo\Type\ObjectType as SymfonyObjectType;
+use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 
 /**
  * Builds the GraphQL types.
@@ -223,9 +228,37 @@ final class TypeBuilder implements ContextAwareTypeBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function isCollection(Type $type): bool
+    public function isCollection(LegacyType $type): bool
     {
+        trigger_deprecation('api-platform/graphql', '4.1', 'The "%s()" method is deprecated, use "%s::isObjectCollection()" instead.', __METHOD__, self::class);
+
         return $type->isCollection() && ($collectionValueType = $type->getCollectionValueTypes()[0] ?? null) && null !== $collectionValueType->getClassName();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isObjectCollection(Type $type): bool
+    {
+        $typeHasClass = static function (Type $type) use (&$typeHasClass): bool {
+            return match (true) {
+                $type instanceof SymfonyObjectType => true,
+                $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($typeHasClass),
+                $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($typeHasClass),
+                default => false,
+            };
+        };
+
+        $collectionValueTypeHasClass = static function (Type $type) use (&$collectionValueTypeHasClass, $typeHasClass): bool {
+            return match (true) {
+                $type instanceof SymfonyCollectionType => $type->getCollectionValueType()->isSatisfiedBy($typeHasClass),
+                $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($collectionValueTypeHasClass),
+                $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($collectionValueTypeHasClass),
+                default => false,
+            };
+        };
+
+        return $type->isSatisfiedBy($collectionValueTypeHasClass);
     }
 
     private function getCursorBasedPaginationFields(GraphQLType $resourceType): array
