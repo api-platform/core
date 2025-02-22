@@ -39,13 +39,10 @@ Route::domain($domain)->middleware($globalMiddlewares)->group(function (): void 
                 /* @var HttpOperation $operation */
                 $route = Route::addRoute($operation->getMethod(), $uriTemplate, ['uses' => ApiPlatformController::class, 'prefix' => $operation->getRoutePrefix() ?? '']);
                 $route->middleware(ApiPlatformMiddleware::class.':'.$operation->getName())
+                    ->middleware($operation->getMiddleware())
                     ->where('_format', '^\.[a-zA-Z]+')
                     ->name($operation->getName())
                     ->setDefaults(['_api_operation_name' => $operation->getName(), '_api_resource_class' => $operation->getClass()]);
-
-                if ($middleware = $operation->getMiddleware()) {
-                    $route->middleware($middleware);
-                }
             }
         }
     }
