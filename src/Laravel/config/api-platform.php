@@ -67,7 +67,7 @@ return [
     ],
 
     'graphiql' => [
-        'enabled' => true,
+        // 'enabled' => true,
         // 'domain' => null,
         // 'middleware' => null
     ],
