@@ -62,7 +62,14 @@ return [
     'graphql' => [
         'enabled' => false,
         'nesting_separator' => '__',
-        'introspection' => ['enabled' => true]
+        'introspection' => ['enabled' => true],
+        // 'middleware' => null
+    ],
+
+    'graphiql' => [
+        // 'enabled' => true,
+        // 'domain' => null,
+        // 'middleware' => null
     ],
 
     'exception_to_status' => [

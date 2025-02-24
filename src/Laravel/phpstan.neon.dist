@@ -8,6 +8,7 @@ parameters:
 	paths:
 		- ApiResource
 		- config
+		- routes
 		- Controller
 		- Eloquent
 		- Exception
@@ -17,8 +18,3 @@ parameters:
 		- Tests
 	ignoreErrors:
 	  - '#Cannot call method expectsQuestion#'
-#
-#    excludePaths:
-#        - ./*/*/FileToBeExcluded.php
-#
-#    checkMissingIterableValueType: false
