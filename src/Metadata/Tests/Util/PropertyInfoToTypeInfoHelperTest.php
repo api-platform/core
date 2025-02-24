@@ -63,4 +63,46 @@ class PropertyInfoToTypeInfoHelperTest extends TestCase
         $type = Type::collection(Type::builtin(TypeIdentifier::ARRAY), Type::int(), Type::string()); // @phpstan-ignore-line
         yield [$type, [new LegacyType('array', false, null, true, [new LegacyType('string')], new LegacyType('int'))]];
     }
+
+    /**
+     * @param list<LegacyType>|null $legacyTypes
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('convertTypeToLegacyTypesDataProvider')]
+    public function testConvertTypeToLegacyTypes(?array $legacyTypes, ?Type $type): void
+    {
+        $this->assertEquals($legacyTypes, PropertyInfoToTypeInfoHelper::convertTypeToLegacyTypes($type));
+    }
+
+    /**
+     * @return iterable<array{0: list<LegacyType>|null, 1: ?Type, 2?: bool}>
+     */
+    public static function convertTypeToLegacyTypesDataProvider(): iterable
+    {
+        yield [null, null];
+        yield [null, Type::mixed()];
+        yield [null, Type::never()];
+        yield [[new LegacyType('null')], Type::null()];
+        yield [[new LegacyType('null')], Type::void()];
+        yield [[new LegacyType('int')], Type::int()];
+        yield [[new LegacyType('object', false, \stdClass::class)], Type::object(\stdClass::class)];
+        yield [
+            [new LegacyType('object', false, \Traversable::class, true, null, new LegacyType('int'))],
+            Type::generic(Type::object(\Traversable::class), Type::int()),
+        ];
+        yield [
+            [new LegacyType('array', false, null, true, new LegacyType('int'), new LegacyType('string'))],
+            Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::int(), Type::string()), // @phpstan-ignore-line
+        ];
+        yield [
+            [new LegacyType('array', false, null, true, new LegacyType('int'), new LegacyType('string'))],
+            Type::collection(Type::builtin(TypeIdentifier::ARRAY), Type::string(), Type::int()), // @phpstan-ignore-line
+        ];
+        yield [[new LegacyType('int', true)], Type::nullable(Type::int())]; // @phpstan-ignore-line
+        yield [[new LegacyType('int'), new LegacyType('string')], Type::union(Type::int(), Type::string())];
+        yield [
+            [new LegacyType('int', true), new LegacyType('string', true)],
+            Type::union(Type::int(), Type::string(), Type::null()),
+        ];
+        yield [[new LegacyType('object', false, \Stringable::class), new LegacyType('object', false, \Traversable::class)], Type::intersection(Type::object(\Traversable::class), Type::object(\Stringable::class))];
+    }
 }

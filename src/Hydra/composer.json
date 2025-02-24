@@ -27,7 +27,7 @@
         "php": ">=8.2",
         "api-platform/state": "^3.4 || ^4.0",
         "api-platform/documentation": "^3.4 || ^4.0",
-        "api-platform/metadata": "^3.4 || ^4.0",
+        "api-platform/metadata": "^4.1",
         "api-platform/jsonld": "^3.4 || ^4.0",
         "api-platform/json-schema": "^3.4 || ^4.0",
         "api-platform/serializer": "^3.4 || ^4.0",
