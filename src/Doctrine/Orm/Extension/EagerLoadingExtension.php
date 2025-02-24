@@ -181,7 +181,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 $associationAlias = $existingJoin->getAlias();
                 $isLeftJoin = Join::LEFT_JOIN === $existingJoin->getJoinType();
             } else {
-                $isNullable = $mapping['joinColumns'][0]['nullable'] ?? true;
+                $isNullable = $mapping['joinColumns'][0]?->nullable ?? true;
                 $isLeftJoin = false !== $wasLeftJoin || true === $isNullable;
                 $method = $isLeftJoin ? 'leftJoin' : 'innerJoin';
 
