@@ -243,9 +243,17 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             try {
                 return $this->iriConverter->getResourceFromIri($data, $context + ['fetch_data' => true]);
             } catch (ItemNotFoundException $e) {
-                throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
+                if (!isset($context['not_normalizable_value_exceptions'])) {
+                    throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
+                }
+
+                throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the "%s" resource "string" (IRI), "%s" given.', $resourceClass, \gettype($data)), $data, [$resourceClass], $context['deserialization_path'] ?? null, true, $e->getCode(), $e);
             } catch (InvalidArgumentException $e) {
-                throw new UnexpectedValueException(\sprintf('Invalid IRI "%s".', $data), $e->getCode(), $e);
+                if (!isset($context['not_normalizable_value_exceptions'])) {
+                    throw new UnexpectedValueException(\sprintf('Invalid IRI "%s".', $data), $e->getCode(), $e);
+                }
+
+                throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the "%s" resource "string" (IRI), "%s" given.', $resourceClass, \gettype($data)), $data, [$resourceClass], $context['deserialization_path'] ?? null, true, $e->getCode(), $e);
             }
         }
 
