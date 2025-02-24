@@ -14,7 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\OpenApi\Factory;
 
 use Ramsey\Uuid\UuidInterface;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type as NativeType;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
 
@@ -23,13 +27,20 @@ use Symfony\Component\Uid\Uuid;
  */
 trait TypeFactoryTrait
 {
-    private function getType(Type $type): array
+    /**
+     * @return array<string, mixed>
+     */
+    private function getType(LegacyType|NativeType $type): array
     {
+        if ($type instanceof NativeType) {
+            return $this->getNativeType($type);
+        }
+
         if ($type->isCollection()) {
             $keyType = $type->getCollectionKeyTypes()[0] ?? null;
-            $subType = ($type->getCollectionValueTypes()[0] ?? null) ?? new Type($type->getBuiltinType(), false, $type->getClassName(), false);
+            $subType = ($type->getCollectionValueTypes()[0] ?? null) ?? new LegacyType($type->getBuiltinType(), false, $type->getClassName(), false);
 
-            if (null !== $keyType && Type::BUILTIN_TYPE_STRING === $keyType->getBuiltinType()) {
+            if (null !== $keyType && LegacyType::BUILTIN_TYPE_STRING === $keyType->getBuiltinType()) {
                 return $this->addNullabilityToTypeDefinition([
                     'type' => 'object',
                     'additionalProperties' => $this->getType($subType),
@@ -42,22 +53,74 @@ trait TypeFactoryTrait
             ], $type);
         }
 
+        return $this->addNullabilityToTypeDefinition($this->makeLegacyBasicType($type), $type);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function getNativeType(NativeType $type): array
+    {
+        if ($type instanceof CollectionType) {
+            $keyType = $type->getCollectionKeyType();
+            $subType = $type->getCollectionValueType();
+
+            if ($keyType->isIdentifiedBy(TypeIdentifier::STRING)) {
+                return $this->addNullabilityToTypeDefinition([
+                    'type' => 'object',
+                    'additionalProperties' => $this->getNativeType($subType),
+                ], $type);
+            }
+
+            return $this->addNullabilityToTypeDefinition([
+                'type' => 'array',
+                'items' => $this->getNativeType($subType),
+            ], $type);
+        }
+
         return $this->addNullabilityToTypeDefinition($this->makeBasicType($type), $type);
     }
 
-    private function makeBasicType(Type $type): array
+    /**
+     * @return array<string, mixed>
+     */
+    private function makeLegacyBasicType(LegacyType $type): array
     {
         return match ($type->getBuiltinType()) {
-            Type::BUILTIN_TYPE_INT => ['type' => 'integer'],
-            Type::BUILTIN_TYPE_FLOAT => ['type' => 'number'],
-            Type::BUILTIN_TYPE_BOOL => ['type' => 'boolean'],
-            Type::BUILTIN_TYPE_OBJECT => $this->getClassType($type->getClassName(), $type->isNullable()),
+            LegacyType::BUILTIN_TYPE_INT => ['type' => 'integer'],
+            LegacyType::BUILTIN_TYPE_FLOAT => ['type' => 'number'],
+            LegacyType::BUILTIN_TYPE_BOOL => ['type' => 'boolean'],
+            LegacyType::BUILTIN_TYPE_OBJECT => $this->getClassType($type->getClassName(), $type->isNullable()),
             default => ['type' => 'string'],
         };
     }
 
     /**
+     * @return array<string, mixed>
+     */
+    private function makeBasicType(NativeType $type): array
+    {
+        if ($type->isIdentifiedBy(TypeIdentifier::INT)) {
+            return ['type' => 'integer'];
+        }
+        if ($type->isIdentifiedBy(TypeIdentifier::FLOAT)) {
+            return ['type' => 'number'];
+        }
+        if ($type->isIdentifiedBy(TypeIdentifier::BOOL)) {
+            return ['type' => 'boolean'];
+        }
+        if ($type instanceof ObjectType) {
+            return $this->getClassType($type->getClassName(), $type->isNullable());
+        }
+
+        // Default for other built-in types like string, resource, mixed, etc.
+        return ['type' => 'string'];
+    }
+
+    /**
      * Gets the JSON Schema document which specifies the data type corresponding to the given PHP class, and recursively adds needed new schema to the current schema if provided.
+     *
+     * @return array<string, mixed>
      */
     private function getClassType(?string $className, bool $nullable): array
     {
@@ -95,6 +158,7 @@ trait TypeFactoryTrait
                 'format' => 'binary',
             ];
         }
+
         if (is_a($className, \BackedEnum::class, true)) {
             $enumCases = array_map(static fn (\BackedEnum $enum): string|int => $enum->value, $className::cases());
 
@@ -118,7 +182,7 @@ trait TypeFactoryTrait
      *
      * @return array<string, mixed>
      */
-    private function addNullabilityToTypeDefinition(array $jsonSchema, Type $type): array
+    private function addNullabilityToTypeDefinition(array $jsonSchema, LegacyType|NativeType $type): array
     {
         if (!$type->isNullable()) {
             return $jsonSchema;
