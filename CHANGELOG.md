@@ -1,5 +1,42 @@
 # Changelog
 
+## v4.1.0
+
+### Bug fixes
+
+* [da37ca91c](https://github.com/api-platform/core/commit/da37ca91c83e4f715c5acbbe3dc0296e8055bebc) fix(laravel): default to file cache instead of cache.default (#6955)
+* [e041d721e](https://github.com/api-platform/core/commit/e041d721ea6fe24026eb021905740b25102d7966) fix: errors retrieval and documentation (#6952)
+* [e6130cbcc](https://github.com/api-platform/core/commit/e6130cbccc1a8963b731769ef34f39e09f5d2cde) fix: missing filters on swagger ui entrypoint (#6950)
+* [01fd74268](https://github.com/api-platform/core/commit/01fd74268cf0e4a289b31ea74bea7f4e089b8361) fix(laravel): restore accidentally removed BooleanFilter
+* [db40a63e7](https://github.com/api-platform/core/commit/db40a63e729fe03be84111dac2b0774fea4ab343) fix(hydra): rdfs:label should not duplicate title (#6748)
+* [deb2ed265](https://github.com/api-platform/core/commit/deb2ed265dfee7b8a73fd3b542aef3e29eca3412) fix(laravel): fix use laravel fillable for writable props (#6898)
+* [67fbe51c5](https://github.com/api-platform/core/commit/67fbe51c570abe1ece6651ae6a037662e9012881) fix: reintroduce the `show_webby` parameter in Laravel config (#6741)
+
+### Features
+
+* [cb5ede1c5](https://github.com/api-platform/core/commit/cb5ede1c5171677a90dd2d96a87e73cd549c0218) feat: add checkMode parameter to control json schema validation (#6974)
+* [771d9401c](https://github.com/api-platform/core/commit/771d9401cffa0463928bb35ab52a56b269d57e1b) feat(elasticsearch): re-introduce v7 support (#6827)
+* [b5372ddee](https://github.com/api-platform/core/commit/b5372ddeef2067333761104f3c17ed1b86001bf4) feat(openapi): filter x-apiplatform-tags to produce different openapi specifications (#6945)
+* [2e2debb94](https://github.com/api-platform/core/commit/2e2debb94b06752262b0d18b736edc22b501266b) feat(mongodb): Replace usage of deprecated method `AggregationBuilder::execute()` (#6933)
+* [4bdf042e5](https://github.com/api-platform/core/commit/4bdf042e5cab1ddb931562cf98a97686d8c415ae) feat(mongodb): Add pagination metadata to the aggregation results (#6912)
+* [b968ccd50](https://github.com/api-platform/core/commit/b968ccd5026afb5562c4c4588929885b86ecb3cb) feat(openapi): document error outputs using json-schemas (#6923)
+* [c97db6bb2](https://github.com/api-platform/core/commit/c97db6bb2f6b2db9a6a17141bdb56bd51e9fc50d) feat: swagger ui persist authorization option (#6877)
+* [00787f32d](https://github.com/api-platform/core/commit/00787f32da54418de7d869cff218e22d8ae2ae1d) feat(laravel): automatically register policies (#6623)
+* [12c42096b](https://github.com/api-platform/core/commit/12c42096bb0006d6ebae60ae5d90e9b356f9a335) feat(metadata): ability to hide an hydra class/operation (#6871)
+* [57f15cf4f](https://github.com/api-platform/core/commit/57f15cf4f38278315c5f31d3949416c9455ba0d0) feat(state): strict query parameters (#6399)
+* [bd0e92936](https://github.com/api-platform/core/commit/bd0e92936f82d3cd4563cd45ebf1f73fd1db9f01) feat(openapi): HTTP Authentication Support for Swagger UI (#6665)
+* [be98f4e01](https://github.com/api-platform/core/commit/be98f4e01a52d8341ef9b65ed2f4e3b46ab31165) feat(graphql): allow to configure max query depth and max query complexity (#6880)
+* [c78ed0b78](https://github.com/api-platform/core/commit/c78ed0b78baf5d2e1b7444a9882ba039c70a3887) feat(laravel): boolean filter (#6806)
+* [d0a442786](https://github.com/api-platform/core/commit/d0a44278630d201b91cbba0774a09f4eeaac88f7) feat(doctrine): enhance getLinksHandler with method validation and typo suggestions (#6874)
+* [f67f6f1ac](https://github.com/api-platform/core/commit/f67f6f1acb6476182c18a3503f2a8bc80ae89a0b)  feat(doctrine): doctrine filters like laravel eloquent filters  (#6775)
+
+The [hydra patch](#6748) changes default `hydra:title` and uses the resource `shortname`. Previously the `hydra:title` information was duplicating the `hydra:description`. 
+The `rdfs:label` got removed from the `hydra:Class` as it was used instead of the `hydra:title`.
+On `hydra:property` `rdfs:label` got renamed to `label` as the `rdfs` namespace is available in the context. 
+The `ApiPlatform\Metadata\ErrorResource` and the `ConstraintViolation` (`ValidationException` class) are now generated directly from your PHP classes, only our `ConstraintViolationList` is hard-written and documents the `ConstraintViolation::violation` property. Therefore, your [own error resources](https://api-platform.com/docs/guides/error-resource/) are also documented. On top of that, we now set the `rdfs:subClassOf` to `hydra:Error`.
+`#[ApiProperty(hydra: false)]` allows you to skip a documented `hydra:supportedProperty` on a class.
+On write operations, we added the [expectsHeader](https://www.hydra-cg.com/spec/latest/core/#hydra:expectsHeader) field. 
+
 ## v4.1.0-beta.2
 
 ### Bug fixes
