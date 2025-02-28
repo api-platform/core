@@ -25,18 +25,18 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/state": "^3.4 || ^4.0",
-        "api-platform/documentation": "^3.4 || ^4.0",
-        "api-platform/metadata": "^3.4 || ^4.0",
-        "api-platform/jsonld": "^3.4 || ^4.0",
-        "api-platform/json-schema": "^3.4 || ^4.0",
-        "api-platform/serializer": "^3.4 || ^4.0",
+        "api-platform/state": "^4.1",
+        "api-platform/documentation": "^4.1",
+        "api-platform/metadata": "^4.1",
+        "api-platform/jsonld": "^4.1",
+        "api-platform/json-schema": "^4.1",
+        "api-platform/serializer": "^4.1",
         "symfony/web-link": "^6.4 || ^7.0"
     },
     "require-dev": {
-        "api-platform/doctrine-odm": "^3.4 || ^4.0",
-        "api-platform/doctrine-orm": "^3.4 || ^4.0",
-        "api-platform/doctrine-common": "^3.4 || ^4.0",
+        "api-platform/doctrine-odm": "^4.1",
+        "api-platform/doctrine-orm": "^4.1",
+        "api-platform/doctrine-common": "^4.1",
         "phpspec/prophecy": "^1.19",
         "phpspec/prophecy-phpunit": "^2.2",
         "phpunit/phpunit": "^11.2"
@@ -61,7 +61,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "4.0.x-dev",
+            "dev-main": "4.2.x-dev",
             "dev-3.4": "3.4.x-dev"
         },
         "symfony": {

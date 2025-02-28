@@ -187,6 +187,10 @@ The last step is to add you feature inside `features/`. You can add your test in
 API Platform is split into several components. There are tests for each of these, to run them `cd src/Doctrine/Common` then `composer update` and `./vendor/bin/phpunit`.
 We do not provide a way to run all these tests at once yet.
 
+## Changing a version constraint
+
+Preferably change the version inside the root `composer.json`, then use `composer blend --all` to re-map the depedency accross each sub-project automatically. 
+
 # License and Copyright Attribution
 
 When you open a Pull Request to the API Platform project, you agree to license your code under the [MIT license](LICENSE)
