@@ -30,6 +30,9 @@
 * [d0a442786](https://github.com/api-platform/core/commit/d0a44278630d201b91cbba0774a09f4eeaac88f7) feat(doctrine): enhance getLinksHandler with method validation and typo suggestions (#6874)
 * [f67f6f1ac](https://github.com/api-platform/core/commit/f67f6f1acb6476182c18a3503f2a8bc80ae89a0b)  feat(doctrine): doctrine filters like laravel eloquent filters  (#6775)
 
+## Notes
+
+This version as the 4.0.19 is compatible with Laravel 12.
 The [hydra patch](#6748) changes default `hydra:title` and uses the resource `shortname`. Previously the `hydra:title` information was duplicating the `hydra:description`. 
 The `rdfs:label` got removed from the `hydra:Class` as it was used instead of the `hydra:title`.
 On `hydra:property` `rdfs:label` got renamed to `label` as the `rdfs` namespace is available in the context. 
