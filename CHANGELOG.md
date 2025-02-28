@@ -1,5 +1,13 @@
 # Changelog
 
+## v4.0.19
+
+### Bug fixes
+
+* [1dfefda5e](https://github.com/api-platform/core/commit/1dfefda5e22b7ec03780e928e943097dd31ef68f) fix(laravel): add middleware granularity (#6962)
+
+Compatibility with Laravel 12.
+
 ## v4.0.18
 
 ### Bug fixes
