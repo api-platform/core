@@ -26,7 +26,6 @@ namespace App\Filter {
     use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
     use ApiPlatform\Metadata\Operation;
     use Doctrine\ORM\QueryBuilder;
-    use Symfony\Component\PropertyInfo\Type;
 
     final class RegexpFilter extends AbstractFilter
     {
@@ -67,7 +66,7 @@ namespace App\Filter {
             foreach ($this->properties as $property => $strategy) {
                 $description["regexp_$property"] = [
                     'property' => $property,
-                    'type' => Type::BUILTIN_TYPE_STRING,
+                    'type' => 'string',
                     'required' => false,
                     'description' => 'Filter using a regex. This will appear in the OpenAPI documentation!',
                     'openapi' => [
