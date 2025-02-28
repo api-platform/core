@@ -28,14 +28,14 @@
         "api-platform/doctrine-common": "^3.4 || ^4.0",
         "api-platform/metadata": "^3.4 || ^4.0",
         "api-platform/state": "^3.4 || ^4.0",
-        "doctrine/mongodb-odm": "^2.2",
+        "doctrine/mongodb-odm": "^2.6",
         "symfony/property-info": "^6.4 || ^7.1"
     },
     "require-dev": {
         "doctrine/doctrine-bundle": "^2.11",
         "doctrine/mongodb-odm-bundle": "^5.0",
-        "phpspec/prophecy-phpunit": "^2.0",
-        "phpunit/phpunit": "^10.0",
+        "phpspec/prophecy-phpunit": "^2.2",
+        "phpunit/phpunit": "^11.2",
         "symfony/cache": "^6.4 || ^7.0",
         "symfony/framework-bundle": "^6.4 || ^7.0",
         "symfony/property-access": "^6.4 || ^7.0",

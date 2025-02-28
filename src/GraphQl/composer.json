@@ -24,7 +24,7 @@
         "api-platform/metadata": "^3.4 || ^4.0",
         "api-platform/state": "^3.4 || ^4.0",
         "api-platform/serializer": "^3.4 || ^4.0",
-        "symfony/property-info": "^6.4 || ^7.0",
+        "symfony/property-info": "^6.4 || ^7.1",
         "symfony/serializer": "^6.4 || ^7.0",
         "webonyx/graphql-php": "^15.0",
         "willdurand/negotiation": "^3.1"
