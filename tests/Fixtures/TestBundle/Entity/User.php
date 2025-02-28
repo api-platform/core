@@ -36,12 +36,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 #[ApiResource(operations: [
-    new Get(),
-    new Put(),
-    new Delete(),
-    new Put(input: RecoverPasswordInput::class, output: RecoverPasswordOutput::class, uriTemplate: 'users/recover/{id}', processor: RecoverPasswordProcessor::class),
-    new Post(),
-    new GetCollection(),
     new Post(
         uriTemplate: '/users/password_reset_request',
         messenger: 'input',
@@ -50,6 +44,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
         normalizationContext: ['groups' => ['user_password_reset_request']],
         denormalizationContext: ['groups' => ['user_password_reset_request']]
     ),
+    new Put(input: RecoverPasswordInput::class, output: RecoverPasswordOutput::class, uriTemplate: 'users/recover/{id}', processor: RecoverPasswordProcessor::class),
+    new Get(),
+    new Put(),
+    new Delete(),
+    new Post(),
+    new GetCollection(),
     new Get('users-with-groups/{id}', normalizationContext: ['groups' => ['api-test-case-group']]),
     new GetCollection('users-with-groups', normalizationContext: ['groups' => ['api-test-case-group']]),
 ], normalizationContext: ['groups' => ['user', 'user-read']], denormalizationContext: ['groups' => ['user', 'user-write']])]

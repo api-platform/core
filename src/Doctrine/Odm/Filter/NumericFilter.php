@@ -168,6 +168,6 @@ final class NumericFilter extends AbstractFilter implements JsonSchemaFilterInte
 
     public function getSchema(Parameter $parameter): array
     {
-        return ['type' => 'numeric'];
+        return ['type' => 'number'];
     }
 }

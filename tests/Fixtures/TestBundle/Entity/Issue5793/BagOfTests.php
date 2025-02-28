@@ -49,7 +49,7 @@ class BagOfTests
     #[Groups(['read', 'write'])]
     private Collection $nonResourceTests;
 
-    #[ORM\ManyToOne(targetEntity: TestEntity::class)]
+    #[ORM\ManyToOne(targetEntity: TestEntity::class, cascade: ['persist'])]
     #[ORM\JoinColumn(name: 'type', referencedColumnName: 'id', nullable: false)]
     #[Groups(['read', 'write'])]
     protected ?TestEntity $type = null;

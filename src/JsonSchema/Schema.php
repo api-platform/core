@@ -30,6 +30,7 @@ final class Schema extends \ArrayObject
     public const VERSION_JSON_SCHEMA = 'json-schema';
     public const VERSION_OPENAPI = 'openapi';
     public const VERSION_SWAGGER = 'swagger';
+    public const VERSION_LOCAL = 'local';
     public const UNKNOWN_TYPE = 'unknown_type';
 
     public function __construct(private readonly string $version = self::VERSION_JSON_SCHEMA)
@@ -123,7 +124,11 @@ final class Schema extends \ArrayObject
     {
         // strlen('#/definitions/') = 14
         // strlen('#/components/schemas/') = 21
-        $prefix = self::VERSION_OPENAPI === $this->version ? 21 : 14;
+        $prefix = match ($this->version) {
+            self::VERSION_LOCAL => 9,
+            self::VERSION_OPENAPI => 21,
+            default => 14,
+        };
 
         return substr($definitionKey, $prefix);
     }

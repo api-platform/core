@@ -80,9 +80,9 @@ class AppKernel extends Kernel
             $bundles[] = new FriendsOfBehatSymfonyExtensionBundle();
         }
 
-        if (class_exists(DoctrineMongoDBBundle::class)) {
-            $bundles[] = new DoctrineMongoDBBundle();
-        }
+        // if (class_exists(DoctrineMongoDBBundle::class)) {
+        //     $bundles[] = new DoctrineMongoDBBundle();
+        // }
 
         $bundles[] = new TestBundle();
 

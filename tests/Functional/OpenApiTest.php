@@ -61,10 +61,24 @@ class OpenApiTest extends ApiTestCase
         }
 
         foreach (['title', 'detail', 'instance', 'type', 'status', '@id', '@type', '@context'] as $key) {
-            $this->assertArrayHasKey($key, $res['components']['schemas']['Error.jsonld']['properties']);
+            $this->assertSame(['allOf' => [
+                ['$ref' => '#/components/schemas/HydraItemBaseSchema'],
+                ['$ref' => '#/components/schemas/Error'],
+            ], 'description' => 'A representation of common errors.'], $res['components']['schemas']['Error.jsonld']);
         }
+
         foreach (['id', 'title', 'detail', 'instance', 'type', 'status', 'meta', 'source'] as $key) {
-            $this->assertArrayHasKey($key, $res['components']['schemas']['Error.jsonapi']['properties']['errors']['properties']);
+            $this->assertSame(['allOf' => [
+                ['$ref' => '#/components/schemas/Error'],
+                ['type' => 'object', 'properties' => [
+                    'source' => [
+                        'type' => 'object',
+                    ],
+                    'status' => [
+                        'type' => 'string',
+                    ],
+                ]],
+            ]], $res['components']['schemas']['Error.jsonapi']['properties']['errors']['items']);
         }
     }
 
@@ -80,7 +94,7 @@ class OpenApiTest extends ApiTestCase
         $this->assertArrayHasKey('/cruds', $res['paths']);
         $this->assertArrayHasKey('post', $res['paths']['/cruds']);
         $this->assertArrayHasKey('get', $res['paths']['/cruds']);
-        $this->assertEquals([['name' => 'Crud']], $res['tags']);
+        $this->assertEquals([['name' => 'Crud', 'description' => 'A resource used for OpenAPI tests.']], $res['tags']);
 
         $response = self::createClient()->request('GET', '/docs?filter_tags[]=anotherone', [
             'headers' => ['Accept' => 'application/vnd.openapi+json'],
@@ -94,6 +108,20 @@ class OpenApiTest extends ApiTestCase
         $this->assertArrayNotHasKey('post', $res['paths']['/cruds']);
         $this->assertArrayHasKey('get', $res['paths']['/cruds']);
         $this->assertArrayHasKey('/crud_open_api_api_platform_tags/{id}', $res['paths']);
-        $this->assertEquals([['name' => 'Crud'], ['name' => 'CrudOpenApiApiPlatformTag', 'description' => 'Something nice']], $res['tags']);
+        $this->assertEquals([['name' => 'Crud', 'description' => 'A resource used for OpenAPI tests.'], ['name' => 'CrudOpenApiApiPlatformTag', 'description' => 'Something nice']], $res['tags']);
+    }
+
+    public function testHasSchemasForMultipleFormats(): void
+    {
+        $response = self::createClient()->request('GET', '/docs?filter_tags[]=internal', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ]);
+
+        $res = $response->toArray();
+        $this->assertArrayHasKey('Crud.jsonld', $res['components']['schemas']);
+        $this->assertSame(['allOf' => [
+            ['$ref' => '#/components/schemas/HydraItemBaseSchema'],
+            ['$ref' => '#/components/schemas/Crud'],
+        ], 'description' => 'A resource used for OpenAPI tests.'], $res['components']['schemas']['Crud.jsonld']);
     }
 }

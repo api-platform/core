@@ -23,6 +23,7 @@ use ApiPlatform\OpenApi\Factory\OpenApiFactory;
 use ApiPlatform\OpenApi\Model\Operation;
 
 #[ApiResource(
+    description: 'A resource used for OpenAPI tests.',
     operations: [
         new Get(),
         new GetCollection(openapi: new Operation(extensionProperties: [OpenApiFactory::API_PLATFORM_TAG => ['internal', 'anotherone']])),
