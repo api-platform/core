@@ -31,7 +31,7 @@
         "api-platform/jsonld": "^4.1",
         "api-platform/json-schema": "^4.1",
         "api-platform/serializer": "^4.1",
-        "symfony/web-link": "^6.4 || ^7.0"
+        "symfony/web-link": "^6.4 || ^7.1"
     },
     "require-dev": {
         "api-platform/doctrine-odm": "^4.1",
