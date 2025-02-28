@@ -183,6 +183,7 @@ use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginationOptions;
 use ApiPlatform\State\ParameterProviderInterface;
 use ApiPlatform\State\Processor\AddLinkHeaderProcessor;
+use ApiPlatform\State\Processor\LinkedDataPlatformProcessor;
 use ApiPlatform\State\Processor\RespondProcessor;
 use ApiPlatform\State\Processor\SerializeProcessor;
 use ApiPlatform\State\Processor\WriteProcessor;
@@ -555,11 +556,23 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->singleton(RespondProcessor::class, function () {
-            return new AddLinkHeaderProcessor(new RespondProcessor(), new HttpHeaderSerializer());
+            return new RespondProcessor();
+        });
+
+        $this->app->singleton(AddLinkHeaderProcessor::class, function (Application $app) {
+            return new AddLinkHeaderProcessor($app->make(RespondProcessor::class), new HttpHeaderSerializer());
+        });
+
+        $this->app->singleton(LinkedDataPlatformProcessor::class, function (Application $app) {
+            return new LinkedDataPlatformProcessor(
+                $app->make(AddLinkHeaderProcessor::class), // Original service
+                $app->make(ResourceClassResolverInterface::class),
+                $app->make(ResourceMetadataCollectionFactoryInterface::class)
+            );
         });
 
         $this->app->singleton(SerializeProcessor::class, function (Application $app) {
-            return new SerializeProcessor($app->make(RespondProcessor::class), $app->make(Serializer::class), $app->make(SerializerContextBuilderInterface::class));
+            return new SerializeProcessor($app->make(LinkedDataPlatformProcessor::class), $app->make(Serializer::class), $app->make(SerializerContextBuilderInterface::class));
         });
 
         $this->app->singleton(WriteProcessor::class, function (Application $app) {
