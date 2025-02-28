@@ -28,16 +28,16 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/documentation": "^4.0",
-        "api-platform/hydra": "^4.0",
-        "api-platform/json-hal": "^4.0",
-        "api-platform/json-schema": "^4.0",
-        "api-platform/jsonld": "^4.0",
-        "api-platform/json-api": "^4.0",
-        "api-platform/metadata": "^4.0",
-        "api-platform/openapi": "^4.0",
-        "api-platform/serializer": "^4.0",
-        "api-platform/state": "^4.0",
+        "api-platform/documentation": "^4.1",
+        "api-platform/hydra": "^4.1",
+        "api-platform/json-hal": "^4.1",
+        "api-platform/json-schema": "^4.1",
+        "api-platform/jsonld": "^4.1",
+        "api-platform/json-api": "^4.1",
+        "api-platform/metadata": "^4.1",
+        "api-platform/openapi": "^4.1",
+        "api-platform/serializer": "^4.1",
+        "api-platform/state": "^4.1",
         "illuminate/config": "^11.0",
         "laravel/framework": "^11.0",
         "illuminate/contracts": "^11.0",
@@ -47,7 +47,7 @@
         "illuminate/routing": "^11.0",
         "illuminate/support": "^11.0",
         "illuminate/container": "^11.0",
-        "symfony/web-link": "^6.4 || ^7.1",
+        "symfony/web-link": "^6.4 || ^7.0",
         "willdurand/negotiation": "^3.1",
         "phpstan/phpdoc-parser": "^1.29 || ^2.0",
         "phpdocumentor/reflection-docblock": "^5.1"
@@ -57,7 +57,7 @@
         "larastan/larastan": "^2.0 || ^3.0",
         "orchestra/testbench": "^9.1",
         "phpunit/phpunit": "^11.2",
-        "api-platform/graphql": "^4.0",
+        "api-platform/graphql": "^4.1",
         "laravel/sanctum": "^4.0"
     },
     "autoload": {
@@ -83,7 +83,7 @@
             ]
         },
         "branch-alias": {
-            "dev-main": "4.0.x-dev",
+            "dev-main": "4.2.x-dev",
             "dev-3.4": "3.4.x-dev"
         },
         "symfony": {
