@@ -44,6 +44,7 @@ use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRe
 use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Ramsey\Uuid\Uuid;
@@ -159,6 +160,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerArgumentResolverConfiguration($loader);
         $this->registerLinkSecurityConfiguration($loader, $config);
 
+        if (class_exists(Map::class)) {
+            $loader->load('state/object_mapper.xml');
+        }
         $container->registerForAutoconfiguration(FilterInterface::class)
             ->addTag('api_platform.filter');
         $container->registerForAutoconfiguration(ProviderInterface::class)

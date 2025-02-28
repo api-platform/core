@@ -80,6 +80,14 @@ final class MainController
             $operation = $operation->withDeserialize(\in_array($operation->getMethod(), ['POST', 'PUT', 'PATCH'], true));
         }
 
+        if (null === $operation->canWrite()) {
+            $operation = $operation->withWrite(!$request->isMethodSafe());
+        }
+
+        if (null === $operation->canSerialize()) {
+            $operation = $operation->withSerialize(true);
+        }
+
         $body = $this->provider->provide($operation, $uriVariables, $context);
 
         // The provider can change the Operation, extract it again from the Request attributes
@@ -100,14 +108,6 @@ final class MainController
 
         $context['previous_data'] = $request->attributes->get('previous_data');
         $context['data'] = $request->attributes->get('data');
-
-        if (null === $operation->canWrite()) {
-            $operation = $operation->withWrite(!$request->isMethodSafe());
-        }
-
-        if (null === $operation->canSerialize()) {
-            $operation = $operation->withSerialize(true);
-        }
 
         return $this->processor->process($body, $operation, $uriVariables, $context);
     }
