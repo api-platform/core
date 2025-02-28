@@ -21,17 +21,17 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/metadata": "^3.4 || ^4.0",
-        "api-platform/state": "^3.4 || ^4.0",
-        "api-platform/serializer": "^3.4 || ^4.0",
-        "symfony/property-info": "^6.4 || ^7.0",
+        "api-platform/metadata": "^4.1",
+        "api-platform/state": "^4.1",
+        "api-platform/serializer": "^4.1",
+        "symfony/property-info": "^6.4 || ^7.1",
         "symfony/serializer": "^6.4 || ^7.0",
         "webonyx/graphql-php": "^15.0",
         "willdurand/negotiation": "^3.1"
     },
     "require-dev": {
         "phpspec/prophecy-phpunit": "^2.2",
-        "api-platform/validator": "^3.4 || ^4.0",
+        "api-platform/validator": "^4.1",
         "twig/twig": "^1.42.3 || ^2.12 || ^3.0",
         "symfony/mercure-bundle": "*",
         "symfony/routing": "^6.4 || ^7.0",
@@ -63,7 +63,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "4.0.x-dev",
+            "dev-main": "4.2.x-dev",
             "dev-3.4": "3.4.x-dev"
         },
         "symfony": {
