@@ -18,6 +18,14 @@
             <argument type="service" id="api_platform.serializer.context_builder" />
         </service>
 
+        <service id="ApiPlatform\State\Provider\IriConverterParameterProvider" class="ApiPlatform\State\Provider\IriConverterParameterProvider" public="false">
+            <argument type="service" id="api_platform.iri_converter"/>
+            <argument type="service" id="property_accessor" />
+            <argument type="service" id="api_platform.api.identifiers_extractor" />
+
+            <tag name="api_platform.parameter_provider" key="ApiPlatform\State\Provider\IriConverterParameterProvider" priority="-895" />
+        </service>
+
         <service id="api_platform.state_provider.deserialize" class="ApiPlatform\State\Provider\DeserializeProvider" decorates="api_platform.state_provider.main" decoration-priority="300">
             <argument type="service" id="api_platform.state_provider.deserialize.inner" />
             <argument type="service" id="api_platform.serializer" />
