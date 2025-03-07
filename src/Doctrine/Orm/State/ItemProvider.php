@@ -53,8 +53,11 @@ final class ItemProvider implements ProviderInterface
             $entityClass = $options->getEntityClass();
         }
 
-        /** @var EntityManagerInterface $manager */
+        /** @var EntityManagerInterface|null $manager */
         $manager = $this->managerRegistry->getManagerForClass($entityClass);
+        if (null === $manager) {
+            throw new RuntimeException(\sprintf('No manager found for class "%s". Are you sure it\'s an entity?', $entityClass));
+        }
 
         $fetchData = $context['fetch_data'] ?? true;
         if (!$fetchData && \array_key_exists('id', $uriVariables)) {
