@@ -56,7 +56,7 @@ final class ItemProvider implements ProviderInterface
         /** @var EntityManagerInterface|null $manager */
         $manager = $this->managerRegistry->getManagerForClass($entityClass);
         if (null === $manager) {
-            throw new \LogicException(\sprintf('No manager found for class "%s". Are you sure it\'s an entity?', $entityClass));
+            throw new RuntimeException(\sprintf('No manager found for class "%s". Are you sure it\'s an entity?', $entityClass));
         }
 
         $fetchData = $context['fetch_data'] ?? true;
