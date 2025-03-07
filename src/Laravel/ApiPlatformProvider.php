@@ -448,7 +448,7 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->singleton(ItemProvider::class, function (Application $app) {
             $tagged = iterator_to_array($app->tagged(LinksHandlerInterface::class));
 
-            return new ItemProvider(new LinksHandler($app, $app->make(ResourceMetadataCollectionFactoryInterface::class)), new ServiceLocator($tagged));
+            return new ItemProvider(new LinksHandler($app, $app->make(ResourceMetadataCollectionFactoryInterface::class)), new ServiceLocator($tagged), $app->tagged(QueryExtensionInterface::class));
         });
         $this->app->singleton(CollectionProvider::class, function (Application $app) {
             $tagged = iterator_to_array($app->tagged(LinksHandlerInterface::class));

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Eloquent\State;
 
+use ApiPlatform\Laravel\Eloquent\Extension\QueryExtensionInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use Illuminate\Database\Eloquent\Model;
@@ -26,11 +27,13 @@ final class ItemProvider implements ProviderInterface
     use LinksHandlerLocatorTrait;
 
     /**
-     * @param LinksHandlerInterface<Model> $linksHandler
+     * @param LinksHandlerInterface<Model>      $linksHandler
+     * @param iterable<QueryExtensionInterface> $queryExtensions
      */
     public function __construct(
         private readonly LinksHandlerInterface $linksHandler,
         ?ContainerInterface $handleLinksLocator = null,
+        private iterable $queryExtensions = [],
     ) {
         $this->handleLinksLocator = $handleLinksLocator;
     }
@@ -43,6 +46,10 @@ final class ItemProvider implements ProviderInterface
             $query = $handleLinks($model->query(), $uriVariables, ['operation' => $operation] + $context);
         } else {
             $query = $this->linksHandler->handleLinks($model->query(), $uriVariables, ['operation' => $operation] + $context);
+        }
+
+        foreach ($this->queryExtensions as $extension) {
+            $query = $extension->apply($query, $uriVariables, $operation, $context);
         }
 
         return $query->first();
