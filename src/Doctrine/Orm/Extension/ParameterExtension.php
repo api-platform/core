@@ -22,8 +22,8 @@ use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ParameterNotFound;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Psr\Container\ContainerInterface;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 /**
  * Reads operation parameters and execute its filter.
