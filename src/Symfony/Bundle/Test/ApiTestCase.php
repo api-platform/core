@@ -36,7 +36,11 @@ abstract class ApiTestCase extends KernelTestCase
      */
     protected static function createClient(array $kernelOptions = [], array $defaultOptions = []): Client
     {
-        if (!static::$booted) {
+        if (null === ($alwaysBootKernel = $kernelOptions['alwaysBootKernel'] ?? static::alwaysBootKernel())) {
+            trigger_deprecation('api-platform/symfony', '5.0', \sprintf('We will not boot the kernel if it is booted already. Define the kernelOptions "alwaysBootKernel" or override "%s::alwaysBootKernel" to return "true" if you want to keep the old behavior.', static::class));
+        }
+
+        if ($alwaysBootKernel ? true : !static::$booted) {
             static::bootKernel($kernelOptions);
         }
 
@@ -98,5 +102,13 @@ abstract class ApiTestCase extends KernelTestCase
         $iriConverter = static::getContainer()->get('api_platform.iri_converter');
 
         return $iriConverter->getIriFromResource($resource);
+    }
+
+    /**
+     * When using Alice we recommend to use "true"
+     */
+    protected static function alwaysBootKernel(): ?bool
+    {
+        return null;
     }
 }

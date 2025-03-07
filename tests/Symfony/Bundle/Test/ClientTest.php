@@ -170,4 +170,9 @@ JSON
         $client->request('GET', '/secured_dummies');
         $this->assertResponseIsSuccessful();
     }
+
+    protected static function checkContainerIsBooted(): ?bool
+    {
+        return true;
+    }
 }
