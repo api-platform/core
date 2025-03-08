@@ -36,7 +36,11 @@ abstract class ApiTestCase extends KernelTestCase
      */
     protected static function createClient(array $kernelOptions = [], array $defaultOptions = []): Client
     {
-        if (!static::$booted) {
+        if (null === ($checkContainerIsBooted = $kernelOptions['checkContainerIsBooted'] ?? static::checkContainerIsBooted())) {
+            trigger_deprecation('api-platform', '5.0', \sprintf('In API Platform 5.0 we will not boot the kernel if it is booted already. Define the kernelOptions "checkContainerIsBooted" or implement "%s::checkContainerIsBooted" to return false if you want to keep the old behavior.', static::class));
+        }
+
+        if (true === $checkContainerIsBooted ? !static::$booted : true) {
             static::bootKernel($kernelOptions);
         }
 
@@ -98,5 +102,10 @@ abstract class ApiTestCase extends KernelTestCase
         $iriConverter = static::getContainer()->get('api_platform.iri_converter');
 
         return $iriConverter->getIriFromResource($resource);
+    }
+
+    protected static function checkContainerIsBooted(): ?bool
+    {
+        return null;
     }
 }

@@ -401,6 +401,11 @@ JSON
 
         self::$kernel = $mock;
 
-        self::createClient();
+        self::createClient(['checkContainerIsBooted' => true]);
+    }
+
+    protected static function checkContainerIsBooted(): ?bool
+    {
+        return false;
     }
 }
