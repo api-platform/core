@@ -58,7 +58,7 @@ abstract class ApiTestCase extends KernelTestCase
             /**
              * @var Client
              */
-            $client = static::getContainer()->get('test.api_platform.client');
+            $client = self::getContainer()->get('test.api_platform.client');
         } catch (ServiceNotFoundException) {
             if (!class_exists(AbstractBrowser::class) || !trait_exists(HttpClientTrait::class)) {
                 throw new \LogicException('You cannot create the client used in functional tests if the BrowserKit and HttpClient components are not available. Try running "composer require --dev symfony/browser-kit symfony/http-client".');
