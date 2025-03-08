@@ -29,6 +29,12 @@ abstract class ApiTestCase extends KernelTestCase
     use ApiTestAssertionsTrait;
 
     /**
+     *  If you're using RecreateDatabaseTrait, RefreshDatabaseTrait, ReloadDatabaseTrait from theofidry/AliceBundle, you
+     *  probably need to set this property to false in your test class to avoid recreating the database on each client creation.
+     */
+    protected static bool $alwaysBootKernel = true;
+
+    /**
      * Creates a Client.
      *
      * @param array $kernelOptions  Options to pass to the createKernel method
@@ -36,7 +42,15 @@ abstract class ApiTestCase extends KernelTestCase
      */
     protected static function createClient(array $kernelOptions = [], array $defaultOptions = []): Client
     {
-        if (!static::$booted) {
+        if (static::$alwaysBootKernel) {
+            \trigger_deprecation(
+                'api-platform/core',
+                '4.1.0',
+                'In API Platform 5.0 we will not always boot the kernel when creating a new client (see https://github.com/api-platform/core/issues/6971).',
+            );
+        }
+
+        if (static::$alwaysBootKernel) {
             static::bootKernel($kernelOptions);
         }
 
@@ -44,7 +58,7 @@ abstract class ApiTestCase extends KernelTestCase
             /**
              * @var Client
              */
-            $client = static::$kernel->getContainer()->get('test.api_platform.client');
+            $client = static::getContainer()->get('test.api_platform.client');
         } catch (ServiceNotFoundException) {
             if (!class_exists(AbstractBrowser::class) || !trait_exists(HttpClientTrait::class)) {
                 throw new \LogicException('You cannot create the client used in functional tests if the BrowserKit and HttpClient components are not available. Try running "composer require --dev symfony/browser-kit symfony/http-client".');
