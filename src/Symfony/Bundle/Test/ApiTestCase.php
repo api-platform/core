@@ -43,7 +43,7 @@ abstract class ApiTestCase extends KernelTestCase
     protected static function createClient(array $kernelOptions = [], array $defaultOptions = []): Client
     {
         if (static::$alwaysBootKernel) {
-            \trigger_deprecation(
+            trigger_deprecation(
                 'api-platform/core',
                 '4.1.0',
                 'In API Platform 5.0 we will not always boot the kernel when creating a new client (see https://github.com/api-platform/core/issues/6971).',
