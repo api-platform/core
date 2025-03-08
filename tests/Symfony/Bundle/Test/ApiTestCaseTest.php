@@ -390,6 +390,8 @@ JSON
 
     public function testDoNotRebootKernelOnCreateClient(): void
     {
+        self::$alwaysBootKernel = false;
+
         self::bootKernel();
 
         $mock = $this->createMock(KernelInterface::class);
