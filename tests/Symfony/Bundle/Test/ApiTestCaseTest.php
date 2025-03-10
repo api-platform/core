@@ -40,6 +40,8 @@ class ApiTestCaseTest extends ApiTestCase
     use RecreateSchemaTrait;
     use SetupClassResourcesTrait;
 
+    protected static ?bool $alwaysBootKernel = false;
+
     /**
      * @return class-string[]
      */
