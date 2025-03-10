@@ -3,7 +3,7 @@ name: Distribution update
 on:
   push:
     tags:
-      - v*
+  workflow_dispatch: ~
 
 env:
   GH_TOKEN: ${{ github.token }}
