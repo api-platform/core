@@ -21,6 +21,8 @@ class ItemUriTemplateTest extends ApiTestCase
 {
     use SetupClassResourcesTrait;
 
+    protected static ?bool $alwaysBootKernel = false;
+
     /**
      * @return class-string[]
      */
