@@ -142,7 +142,7 @@ class ApiResource extends Metadata
          *   #[ApiResource(
          *       uriTemplate: '/companies/{companyId}/employees/{id}',
          *       uriVariables: [
-         *           'companyId' => new Link(fromClass: Company::class, toProperty: 'company']),
+         *           'companyId' => new Link(fromClass: Company::class, toProperty: 'company'),
          *           'id' => new Link(fromClass: Employee::class)
          *       ],
          *       operations: [new Get()]
