@@ -55,7 +55,13 @@ class HttpOperation extends Operation
      *     public?: bool,
      *     shared_max_age?: int,
      *     stale_while_revalidate?: int,
-     *     stale-if-error?: int,
+     *     stale_if_error?: int,
+     *     must_revalidate?: bool,
+     *     proxy_revalidate?: bool,
+     *     no_cache?: bool,
+     *     no_store?: bool,
+     *     no_transform?: bool,
+     *     immutable?: bool,
      * }|null $cacheHeaders {@see https://api-platform.com/docs/core/performance/#setting-custom-http-cache-headers}
      * @param array<string, string>|null $headers
      * @param array{

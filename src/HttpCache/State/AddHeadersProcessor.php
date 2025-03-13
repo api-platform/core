@@ -52,36 +52,29 @@ final class AddHeadersProcessor implements ProcessorInterface
 
         $resourceCacheHeaders = $operation->getCacheHeaders() ?? [];
 
-        if ($this->etag && !$response->getEtag()) {
-            $response->setEtag(hash('xxh3', (string) $content));
-        }
+        $public = ($resourceCacheHeaders['public'] ?? $this->public);
 
-        if (null !== ($maxAge = $resourceCacheHeaders['max_age'] ?? $this->maxAge) && !$response->headers->hasCacheControlDirective('max-age')) {
-            $response->setMaxAge($maxAge);
-        }
+        $options = [
+            'etag' => $this->etag && !$response->getEtag() ? hash('xxh3', (string) $content) : null,
+            'max_age' => null !== ($maxAge = $resourceCacheHeaders['max_age'] ?? $this->maxAge) && !$response->headers->hasCacheControlDirective('max-age') ? $maxAge : null,
+            // Cache-Control "s-maxage" is only relevant is resource is not marked as "private"
+            's_maxage' => false !== $public && null !== ($sharedMaxAge = $resourceCacheHeaders['shared_max_age'] ?? $this->sharedMaxAge) && !$response->headers->hasCacheControlDirective('s-maxage') ? $sharedMaxAge : null,
+            'public' => null !== $public && !$response->headers->hasCacheControlDirective('public') ? $public : null,
+            'stale_while_revalidate' => null !== ($staleWhileRevalidate = $resourceCacheHeaders['stale_while_revalidate'] ?? $this->staleWhileRevalidate) && !$response->headers->hasCacheControlDirective('stale-while-revalidate') ? $staleWhileRevalidate : null,
+            'stale_if_error' => null !== ($staleIfError = $resourceCacheHeaders['stale_if_error'] ?? $this->staleIfError) && !$response->headers->hasCacheControlDirective('stale-if-error') ? $staleIfError : null,
+            'must_revalidate' => null !== ($mustRevalidate = $resourceCacheHeaders['must_revalidate'] ?? null) && !$response->headers->hasCacheControlDirective('must-revalidate') ? $mustRevalidate : null,
+            'proxy_revalidate' => null !== ($proxyRevalidate = $resourceCacheHeaders['proxy_revalidate'] ?? null) && !$response->headers->hasCacheControlDirective('proxy-revalidate') ? $proxyRevalidate : null,
+            'no_cache' => null !== ($noCache = $resourceCacheHeaders['no_cache'] ?? null) && !$response->headers->hasCacheControlDirective('no-cache') ? $noCache : null,
+            'no_store' => null !== ($noStore = $resourceCacheHeaders['no_store'] ?? null) && !$response->headers->hasCacheControlDirective('no-store') ? $noStore : null,
+            'no_transform' => null !== ($noTransform = $resourceCacheHeaders['no_transform'] ?? null) && !$response->headers->hasCacheControlDirective('no-transform') ? $noTransform : null,
+            'immutable' => null !== ($immutable = $resourceCacheHeaders['immutable'] ?? null) && !$response->headers->hasCacheControlDirective('immutable') ? $immutable : null,
+        ];
+
+        $response->setCache($options);
 
         $vary = $resourceCacheHeaders['vary'] ?? $this->vary;
         if (null !== $vary) {
             $response->setVary(array_diff($vary, $response->getVary()), false);
-        }
-
-        // if the public-property is defined and not yet set; apply it to the response
-        $public = ($resourceCacheHeaders['public'] ?? $this->public);
-        if (null !== $public && !$response->headers->hasCacheControlDirective('public')) {
-            $public ? $response->setPublic() : $response->setPrivate();
-        }
-
-        // Cache-Control "s-maxage" is only relevant is resource is not marked as "private"
-        if (false !== $public && null !== ($sharedMaxAge = $resourceCacheHeaders['shared_max_age'] ?? $this->sharedMaxAge) && !$response->headers->hasCacheControlDirective('s-maxage')) {
-            $response->setSharedMaxAge($sharedMaxAge);
-        }
-
-        if (null !== ($staleWhileRevalidate = $resourceCacheHeaders['stale_while_revalidate'] ?? $this->staleWhileRevalidate) && !$response->headers->hasCacheControlDirective('stale-while-revalidate')) {
-            $response->headers->addCacheControlDirective('stale-while-revalidate', (string) $staleWhileRevalidate);
-        }
-
-        if (null !== ($staleIfError = $resourceCacheHeaders['stale_if_error'] ?? $this->staleIfError) && !$response->headers->hasCacheControlDirective('stale-if-error')) {
-            $response->headers->addCacheControlDirective('stale-if-error', (string) $staleIfError);
         }
 
         return $response;
