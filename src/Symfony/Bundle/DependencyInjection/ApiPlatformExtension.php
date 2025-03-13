@@ -320,7 +320,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     private function registerMetadataConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
     {
-        [$xmlResources, $yamlResources] = $this->getResourcesToWatch($container, $config);
+        [$xmlResources, $yamlResources, $phpResources] = $this->getResourcesToWatch($container, $config);
 
         $container->setParameter('api_platform.class_name_resources', $this->getClassNameResources());
 
@@ -335,6 +335,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         // V3 metadata
+        $loader->load('metadata/php.xml');
         $loader->load('metadata/xml.xml');
         $loader->load('metadata/links.xml');
         $loader->load('metadata/property.xml');
@@ -353,6 +354,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $container->getDefinition('api_platform.metadata.resource_extractor.yaml')->replaceArgument(0, $yamlResources);
             $container->getDefinition('api_platform.metadata.property_extractor.yaml')->replaceArgument(0, $yamlResources);
         }
+
+        $container->getDefinition('api_platform.metadata.resource_extractor.php_file')->replaceArgument(0, $phpResources);
     }
 
     private function getClassNameResources(): array
@@ -417,7 +420,32 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             }
         }
 
-        $resources = ['yml' => [], 'xml' => [], 'dir' => []];
+        $resources = ['yml' => [], 'xml' => [], 'php' => [], 'dir' => []];
+
+        foreach ($config['mapping']['imports'] ?? [] as $path) {
+            if (is_dir($path)) {
+                foreach (Finder::create()->followLinks()->files()->in($path)->name('/\.php$/')->sortByName() as $file) {
+                    $resources[$file->getExtension()][] = $file->getRealPath();
+                }
+
+                $resources['dir'][] = $path;
+                $container->addResource(new DirectoryResource($path, '/\.php$/'));
+
+                continue;
+            }
+
+            if ($container->fileExists($path, false)) {
+                if (!str_ends_with($path, '.php')) {
+                    throw new RuntimeException(\sprintf('Unsupported mapping type in "%s", supported type is PHP.', $path));
+                }
+
+                $resources['php'][] = $path;
+
+                continue;
+            }
+
+            throw new RuntimeException(\sprintf('Could not open file or directory "%s".', $path));
+        }
 
         foreach ($paths as $path) {
             if (is_dir($path)) {
@@ -446,7 +474,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $container->setParameter('api_platform.resource_class_directories', $resources['dir']);
 
-        return [$resources['xml'], $resources['yml']];
+        return [$resources['xml'], $resources['yml'], $resources['php']];
     }
 
     private function registerOAuthConfiguration(ContainerBuilder $container, array $config): void

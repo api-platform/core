@@ -149,6 +149,11 @@ class ApiPlatformExtensionTest extends TestCase
         }
     }
 
+    private function assertContainerHasService(string $service): void
+    {
+        $this->assertTrue($this->container->hasDefinition($service), \sprintf('Service "%s" not found.', $service));
+    }
+
     private function assertNotContainerHasService(string $service): void
     {
         $this->assertFalse($this->container->hasDefinition($service), \sprintf('Service "%s" found.', $service));
@@ -285,5 +290,16 @@ class ApiPlatformExtensionTest extends TestCase
 
         $this->assertContainerHas($services, $aliases);
         $this->container->hasParameter('api_platform.swagger.http_auth');
+    }
+
+    public function testItRegistersMetadataConfiguration(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['mapping']['imports'] = [__DIR__.'/php'];
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $emptyPhpFile = realpath(__DIR__.'/php/empty_file.php');
+        $this->assertContainerHasService('api_platform.metadata.resource_extractor.php_file');
+        $this->assertSame([$emptyPhpFile], $this->container->getDefinition('api_platform.metadata.resource_extractor.php_file')->getArgument(0));
     }
 }
