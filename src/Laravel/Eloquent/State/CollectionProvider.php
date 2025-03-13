@@ -29,6 +29,7 @@ use Psr\Container\ContainerInterface;
 final class CollectionProvider implements ProviderInterface
 {
     use LinksHandlerLocatorTrait;
+    use ModelInstantiationTrait;
 
     /**
      * @param LinksHandlerInterface<Model>      $linksHandler
@@ -45,12 +46,7 @@ final class CollectionProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $modelClass = $operation->getClass();
-        if (($options = $operation->getStateOptions()) && $options instanceof Options && $options->getModelClass()) {
-            $modelClass = $options->getModelClass();
-        }
-        /** @var Model $model */
-        $model = new ($modelClass)();
+        $model = $this->instantiateModel($operation);
 
         if ($handleLinks = $this->getLinksHandler($operation)) {
             $query = $handleLinks($model->query(), $uriVariables, ['operation' => $operation, 'modelClass' => $operation->getClass()] + $context);
