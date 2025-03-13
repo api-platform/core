@@ -165,6 +165,7 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\Inflector;
 use ApiPlatform\Metadata\Util\ReflectionClassRecursiveIterator;
+use ApiPlatform\OpenApi\Command\OpenApiCommand;
 use ApiPlatform\OpenApi\Factory\OpenApiFactory;
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\OpenApi\Options;
@@ -842,6 +843,10 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
+        $this->app->singleton(OpenApiCommand::class, function (Application $app) {
+            return new OpenApiCommand($app->make(OpenApiFactory::class), $app->make(Serializer::class));
+        });
+
         $this->app->bind(DefinitionNameFactoryInterface::class, DefinitionNameFactory::class);
         $this->app->singleton(DefinitionNameFactory::class, function (Application $app) {
             /** @var ConfigRepository */
@@ -1100,6 +1105,7 @@ class ApiPlatformProvider extends ServiceProvider
                 Console\InstallCommand::class,
                 Console\Maker\MakeStateProcessorCommand::class,
                 Console\Maker\MakeStateProviderCommand::class,
+                OpenApiCommand::class,
             ]);
         }
 
