@@ -32,6 +32,8 @@ final class ReflectionClassRecursiveIterator
     }
 
     /**
+     * @param string[] $directories
+     *
      * @return array<class-string, \ReflectionClass>
      */
     public static function getReflectionClassesFromDirectories(array $directories): array
@@ -45,7 +47,7 @@ final class ReflectionClassRecursiveIterator
         foreach ($directories as $path) {
             $iterator = new \RegexIterator(
                 new \RecursiveIteratorIterator(
-                    new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS),
+                    new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS),
                     \RecursiveIteratorIterator::LEAVES_ONLY
                 ),
                 '/^.+\.php$/i',
