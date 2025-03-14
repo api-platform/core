@@ -63,10 +63,6 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
         $link = (($options['schema_type'] ?? null) === Schema::TYPE_INPUT) ? $propertyMetadata->isWritableLink() : $propertyMetadata->isReadableLink();
         $propertySchema = $propertyMetadata->getSchema() ?? [];
 
-        if (null !== $propertyMetadata->getUriTemplate() || (!\array_key_exists('readOnly', $propertySchema) && false === $propertyMetadata->isWritable() && !$propertyMetadata->isInitializable())) {
-            $propertySchema['readOnly'] = true;
-        }
-
         if (!\array_key_exists('writeOnly', $propertySchema) && false === $propertyMetadata->isReadable()) {
             $propertySchema['writeOnly'] = true;
         }
@@ -87,8 +83,13 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
         }
 
         $types = $propertyMetadata->getBuiltinTypes() ?? [];
+        $className = ($types[0] ?? null)?->getClassName() ?? null;
 
-        if (!\array_key_exists('default', $propertySchema) && !empty($default = $propertyMetadata->getDefault()) && (!\count($types) || null === ($className = $types[0]->getClassName()) || !$this->isResourceClass($className))) {
+        if (null !== $propertyMetadata->getUriTemplate() || (!\array_key_exists('readOnly', $propertySchema) && false === $propertyMetadata->isWritable() && !$propertyMetadata->isInitializable()) && !$className) {
+            $propertySchema['readOnly'] = true;
+        }
+
+        if (!\array_key_exists('default', $propertySchema) && !empty($default = $propertyMetadata->getDefault()) && (!$className || !$this->isResourceClass($className))) {
             if ($default instanceof \BackedEnum) {
                 $default = $default->value;
             }
@@ -104,11 +105,23 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
         }
 
         // never override the following keys if at least one is already set or if there's a custom openapi context
-        if ([] === $types
+        if (
+            [] === $types
             || ($propertySchema['type'] ?? $propertySchema['$ref'] ?? $propertySchema['anyOf'] ?? $propertySchema['allOf'] ?? $propertySchema['oneOf'] ?? false)
             || \array_key_exists('type', $propertyMetadata->getOpenapiContext() ?? [])
         ) {
             return $propertyMetadata->withSchema($propertySchema);
+        }
+
+        if ($propertyMetadata->getUriTemplate()) {
+            return $propertyMetadata->withSchema(
+                $propertySchema +
+                    [
+                        'type' => 'string',
+                        'format' => 'iri-reference',
+                        'example' => 'https://example.com/',
+                    ]
+            );
         }
 
         $valueSchema = [];
@@ -202,6 +215,8 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
      * Note: if the class is not part of exceptions listed above, any class is considered as a resource.
      *
      * @throws PropertyNotFoundException
+     *
+     * @return array<string, mixed>
      */
     private function getClassType(?string $className, bool $nullable, ?bool $readableLink): array
     {
@@ -268,6 +283,8 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             ];
         }
 
+        // When this is set, we compute the schema at SchemaFactory::buildPropertySchema as it
+        // will end up being a $ref to another class schema, we don't have enough informations here
         return ['type' => Schema::UNKNOWN_TYPE];
     }
 

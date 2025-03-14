@@ -14,8 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\OpenApi\Model\Operation;
 
-#[Get(name: 'my own name')]
+#[Get(name: 'my own name', openapi: new Operation(operationId: 'my_own_name'))]
 final class AttributeOnlyOperation
 {
 }
