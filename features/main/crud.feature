@@ -96,7 +96,7 @@ Feature: Create-Retrieve-Update-Delete
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummies"
     Then the response status code should be 400
-    And the JSON node "description" should be equal to "Syntax error"
+    And the JSON node "detail" should be equal to "Syntax error"
 
   Scenario: Get a not found exception
     When I send a "GET" request to "/dummies/42"
@@ -554,7 +554,7 @@ Feature: Create-Retrieve-Update-Delete
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/dummies/1"
     Then the response status code should be 400
-    And the JSON node "description" should be equal to "Syntax error"
+    And the JSON node "detail" should be equal to "Syntax error"
 
   Scenario: Delete a resource
     When I send a "DELETE" request to "/dummies/1"

@@ -67,7 +67,7 @@ final class ErrorTest extends ApiTestCase
                 '401',
                 [
                     '@type' => 'hydra:Error',
-                    'description' => 'Unauthorized',
+                    'hydra:description' => 'Unauthorized',
                 ],
             ],
             [
