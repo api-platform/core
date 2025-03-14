@@ -100,6 +100,16 @@ On write operations, we added the [expectsHeader](https://www.hydra-cg.com/spec/
 * [d0a442786](https://github.com/api-platform/core/commit/d0a44278630d201b91cbba0774a09f4eeaac88f7) feat(doctrine): enhance getLinksHandler with method validation and typo suggestions (#6874)
 * [f67f6f1ac](https://github.com/api-platform/core/commit/f67f6f1acb6476182c18a3503f2a8bc80ae89a0b)  feat(doctrine): doctrine filters like laravel eloquent filters  (#6775)
 
+## v4.0.20
+
+### Bug fixes
+
+* [284937039](https://github.com/api-platform/core/commit/284937039c61d4516687c648f4a7581ec1686f3d) fix(doctrine): mapping ArrayAccess deprecation (#6982)
+* [a434173b8](https://github.com/api-platform/core/commit/a434173b82f735041a79cb5f469ee0e731ca5956) fix(doctrine): Add a proper exception when a doctrine manager could not be found for a resource class (#6995)
+
+
+### Features
+
 ## v4.0.19
 
 ### Bug fixes
