@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Laravel\Eloquent\State;
 
 use ApiPlatform\Laravel\Eloquent\Extension\QueryExtensionInterface;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use Illuminate\Database\Eloquent\Model;
@@ -25,6 +26,7 @@ use Psr\Container\ContainerInterface;
 final class ItemProvider implements ProviderInterface
 {
     use LinksHandlerLocatorTrait;
+    use ModelClassTrait;
 
     /**
      * @param LinksHandlerInterface<Model>      $linksHandler
@@ -40,7 +42,12 @@ final class ItemProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $model = new ($operation->getClass())();
+        $resourceClass = $this->getModelClass($operation);
+        $model = new $resourceClass();
+
+        if (!$model instanceof Model) {
+            throw new RuntimeException(\sprintf('The class "%s" is not an Eloquent model.', $resourceClass));
+        }
 
         if ($handleLinks = $this->getLinksHandler($operation)) {
             $query = $handleLinks($model->query(), $uriVariables, ['operation' => $operation] + $context);
