@@ -162,6 +162,7 @@
         "symfony/cache": "^6.4 || ^7.0",
         "symfony/config": "^6.4 || ^7.0",
         "symfony/console": "^6.4 || ^7.0",
+        "symfony/object-mapper": "dev-feat/automapper-frameworkbundle",
         "symfony/css-selector": "^6.4 || ^7.0",
         "symfony/dependency-injection": "^6.4 || ^7.0",
         "symfony/doctrine-bridge": "^6.4.2 || ^7.0.2",
@@ -208,5 +209,10 @@
         "symfony/web-profiler-bundle": "To use the data collector.",
         "webonyx/graphql-php": "To support GraphQL."
     },
-    "type": "library"
+    "type": "library",
+    "repositories": [
+        { "type": "path", "url": "../symfony/src/Symfony/Component/ObjectMapper" },
+        { "type": "path", "url": "../symfony/src/Symfony/Bundle/FrameworkBundle" }
+    ],
+    "minimum-stability": "dev"
 }
