@@ -1,5 +1,25 @@
 # Changelog
 
+## v4.1.1
+
+### Bug fixes
+
+* [1e0bc9dc8](https://github.com/api-platform/core/commit/1e0bc9dc8ebe2f947ac0b3bc153047b0b28b0a17) fix(laravel): query extensions with item operations (#7001)
+* [1e7076c65](https://github.com/api-platform/core/commit/1e7076c65aea9a2f09b0dcc6598ef2a705e0bb45) fix(laravel): register ErrorProvider (#7018)
+* [2771363b0](https://github.com/api-platform/core/commit/2771363b03f1b1c27313ecd457f7a4934524151c) fix(validation): deprecate string message for ValidationException constructor (#7005)
+* [500062da2](https://github.com/api-platform/core/commit/500062da2074585979e9a92939bc3b7a3c7554c5) fix(symfony): add a `alwaysBootKernel` property for BC layer (#7007)
+* [8697d6630](https://github.com/api-platform/core/commit/8697d66304d276feeef6f838c8c54291d3563aab) fix(openapi): boolean "true" value in HttpOperation::openapi (#7003)
+* [b1e0c889c](https://github.com/api-platform/core/commit/b1e0c889cc96602afc9c68fccb9da25a6b6fd354) fix(doctrine): correct the use statement for ManagerRegistry (#7004)
+* [fcbd804b2](https://github.com/api-platform/core/commit/fcbd804b29907baba8878ca12ff013732e0326e4) fix(jsonld): duplicate error fields when prefix is enabled (#7021)
+
+### Features
+
+* [129853668](https://github.com/api-platform/core/commit/129853668c3fd66bcfe1a298a0f662c29545f7a4) feat(laravel): stateOptions modelClass for eloquent (#7020)
+* [42991b941](https://github.com/api-platform/core/commit/42991b9418c340e44c9e30360e5dd4d869433859) feat(laravel): openapi export command (#7016)
+* [dd1b89f9b](https://github.com/api-platform/core/commit/dd1b89f9b771544cb8449d7e9f8f4bbd80c615d2) feat(laravel): auto configure our tagged interfaces (#7014)
+
+Also contains [v4.0.20 changes](#v4020).
+
 ## v4.1.0
 
 ### Bug fixes
