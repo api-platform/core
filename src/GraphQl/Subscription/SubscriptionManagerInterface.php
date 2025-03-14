@@ -22,5 +22,5 @@ interface SubscriptionManagerInterface
 {
     public function retrieveSubscriptionId(array $context, ?array $result): ?string;
 
-    public function getPushPayloads(object $object): array;
+    public function getPushPayloads(object $object, string $type): array;
 }
