@@ -196,6 +196,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         if ($filter instanceof SerializerFilterInterface && null === $parameter->getProvider()) {
             $parameter = $parameter->withProvider('api_platform.serializer.filter_parameter_provider');
         }
+
         $currentKey = $key;
         if (null === $parameter->getProperty() && isset($properties[$key])) {
             $parameter = $parameter->withProperty($key);
