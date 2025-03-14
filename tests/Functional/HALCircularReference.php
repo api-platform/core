@@ -19,6 +19,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue4358\ResourceB;
 
 class HALCircularReference extends ApiTestCase
 {
+    protected static ?bool $alwaysBootKernel = false;
+
     public function testIssue4358(): void
     {
         $r1 = self::createClient()->request('GET', '/resource_a', ['headers' => ['Accept' => 'application/hal+json']]);

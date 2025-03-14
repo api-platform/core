@@ -22,6 +22,8 @@ final class ErrorTest extends ApiTestCase
 {
     use SetupClassResourcesTrait;
 
+    protected static ?bool $alwaysBootKernel = false;
+
     /**
      * @return class-string[]
      */
@@ -65,7 +67,7 @@ final class ErrorTest extends ApiTestCase
                 '401',
                 [
                     '@type' => 'hydra:Error',
-                    'description' => 'Unauthorized',
+                    'hydra:description' => 'Unauthorized',
                 ],
             ],
             [

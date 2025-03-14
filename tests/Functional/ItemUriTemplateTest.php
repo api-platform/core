@@ -21,6 +21,8 @@ class ItemUriTemplateTest extends ApiTestCase
 {
     use SetupClassResourcesTrait;
 
+    protected static ?bool $alwaysBootKernel = false;
+
     /**
      * @return class-string[]
      */
@@ -35,6 +37,6 @@ class ItemUriTemplateTest extends ApiTestCase
             'headers' => ['accept' => 'application/ld+json'],
         ]);
         $this->assertResponseStatusCodeSame(404);
-        $this->assertJsonContains(['description' => 'Not Found']);
+        $this->assertJsonContains(['detail' => 'Not Found']);
     }
 }

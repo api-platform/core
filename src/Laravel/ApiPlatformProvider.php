@@ -164,6 +164,8 @@ use ApiPlatform\Metadata\ResourceClassResolver;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\Inflector;
+use ApiPlatform\Metadata\Util\ReflectionClassRecursiveIterator;
+use ApiPlatform\OpenApi\Command\OpenApiCommand;
 use ApiPlatform\OpenApi\Factory\OpenApiFactory;
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\OpenApi\Options;
@@ -426,36 +428,24 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->bind(OperationMetadataFactoryInterface::class, OperationMetadataFactory::class);
 
-        $this->app->tag([
-            BooleanFilter::class,
-            EqualsFilter::class,
-            PartialSearchFilter::class,
-            DateFilter::class,
-            OrderFilter::class,
-            RangeFilter::class,
-            SortFilter::class,
-            SparseFieldset::class,
-        ], EloquentFilterInterface::class);
-
         $this->app->bind(FilterQueryExtension::class, function (Application $app) {
             $tagged = iterator_to_array($app->tagged(EloquentFilterInterface::class));
 
             return new FilterQueryExtension(new ServiceLocator($tagged));
         });
 
-        $this->app->tag([FilterQueryExtension::class], QueryExtensionInterface::class);
-
         $this->app->singleton(ItemProvider::class, function (Application $app) {
             $tagged = iterator_to_array($app->tagged(LinksHandlerInterface::class));
 
-            return new ItemProvider(new LinksHandler($app, $app->make(ResourceMetadataCollectionFactoryInterface::class)), new ServiceLocator($tagged));
+            return new ItemProvider(new LinksHandler($app, $app->make(ResourceMetadataCollectionFactoryInterface::class)), new ServiceLocator($tagged), $app->tagged(QueryExtensionInterface::class));
         });
         $this->app->singleton(CollectionProvider::class, function (Application $app) {
             $tagged = iterator_to_array($app->tagged(LinksHandlerInterface::class));
 
             return new CollectionProvider($app->make(Pagination::class), new LinksHandler($app, $app->make(ResourceMetadataCollectionFactoryInterface::class)), $app->tagged(QueryExtensionInterface::class), new ServiceLocator($tagged));
         });
-        $this->app->tag([ItemProvider::class, CollectionProvider::class], ProviderInterface::class);
+
+        $this->app->tag([ItemProvider::class, CollectionProvider::class, ErrorProvider::class], ProviderInterface::class);
 
         $this->app->singleton(CallableProvider::class, function (Application $app) {
             $tagged = iterator_to_array($app->tagged(ProviderInterface::class));
@@ -488,8 +478,6 @@ class ApiPlatformProvider extends ServiceProvider
             });
         }
 
-        $this->app->tag([PropertyFilter::class], SerializerFilterInterface::class);
-
         $this->app->singleton(SerializerFilterParameterProvider::class, function (Application $app) {
             $tagged = iterator_to_array($app->tagged(SerializerFilterInterface::class));
 
@@ -500,7 +488,6 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->singleton(SortFilterParameterProvider::class, function (Application $app) {
             return new SortFilterParameterProvider();
         });
-        $this->app->tag([SerializerFilterParameterProvider::class, SortFilterParameterProvider::class, SparseFieldsetParameterProvider::class], ParameterProviderInterface::class);
 
         $this->app->singleton('filters', function (Application $app) {
             return new ServiceLocator(array_merge(
@@ -540,7 +527,6 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->bind(ProviderInterface::class, ContentNegotiationProvider::class);
 
-        $this->app->tag([RemoveProcessor::class, PersistProcessor::class], ProcessorInterface::class);
         $this->app->singleton(CallableProcessor::class, function (Application $app) {
             /** @var ConfigRepository */
             $config = $app['config'];
@@ -859,6 +845,10 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
+        $this->app->singleton(OpenApiCommand::class, function (Application $app) {
+            return new OpenApiCommand($app->make(OpenApiFactory::class), $app->make(Serializer::class));
+        });
+
         $this->app->bind(DefinitionNameFactoryInterface::class, DefinitionNameFactory::class);
         $this->app->singleton(DefinitionNameFactory::class, function (Application $app) {
             /** @var ConfigRepository */
@@ -953,7 +943,7 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         if (interface_exists(FieldsBuilderEnumInterface::class)) {
-            $this->registerGraphQl($this->app);
+            $this->registerGraphQl();
         }
 
         $this->app->singleton(JsonApiEntrypointNormalizer::class, function (Application $app) {
@@ -1117,11 +1107,14 @@ class ApiPlatformProvider extends ServiceProvider
                 Console\InstallCommand::class,
                 Console\Maker\MakeStateProcessorCommand::class,
                 Console\Maker\MakeStateProviderCommand::class,
+                OpenApiCommand::class,
             ]);
         }
+
+        $this->tagServices();
     }
 
-    private function registerGraphQl(Application $app): void
+    private function registerGraphQl(): void
     {
         $this->app->singleton(GraphQlItemNormalizer::class, function (Application $app) {
             return new GraphQlItemNormalizer(
@@ -1166,7 +1159,7 @@ class ApiPlatformProvider extends ServiceProvider
             return new GraphQlHttpExceptionNormalizer();
         });
 
-        $app->singleton('api_platform.graphql.type_locator', function (Application $app) {
+        $this->app->singleton('api_platform.graphql.type_locator', function (Application $app) {
             $tagged = iterator_to_array($app->tagged('api_platform.graphql.type'));
             $services = [];
             foreach ($tagged as $service) {
@@ -1176,20 +1169,21 @@ class ApiPlatformProvider extends ServiceProvider
             return new ServiceLocator($services);
         });
 
-        $app->singleton(TypesFactoryInterface::class, function (Application $app) {
+        $this->app->singleton(TypesFactoryInterface::class, function (Application $app) {
             $tagged = iterator_to_array($app->tagged('api_platform.graphql.type'));
 
             return new TypesFactory($app->make('api_platform.graphql.type_locator'), array_column($tagged, 'name'));
         });
-        $app->singleton(TypesContainerInterface::class, function () {
+
+        $this->app->singleton(TypesContainerInterface::class, function () {
             return new TypesContainer();
         });
 
-        $app->singleton(ResourceFieldResolver::class, function (Application $app) {
+        $this->app->singleton(ResourceFieldResolver::class, function (Application $app) {
             return new ResourceFieldResolver($app->make(IriConverterInterface::class));
         });
 
-        $app->singleton(ContextAwareTypeBuilderInterface::class, function (Application $app) {
+        $this->app->singleton(ContextAwareTypeBuilderInterface::class, function (Application $app) {
             return new TypeBuilder(
                 $app->make(TypesContainerInterface::class),
                 $app->make(ResourceFieldResolver::class),
@@ -1198,7 +1192,7 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $app->singleton(TypeConverterInterface::class, function (Application $app) {
+        $this->app->singleton(TypeConverterInterface::class, function (Application $app) {
             return new TypeConverter(
                 $app->make(ContextAwareTypeBuilderInterface::class),
                 $app->make(TypesContainerInterface::class),
@@ -1207,11 +1201,11 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $app->singleton(GraphQlSerializerContextBuilder::class, function (Application $app) {
+        $this->app->singleton(GraphQlSerializerContextBuilder::class, function (Application $app) {
             return new GraphQlSerializerContextBuilder($app->make(NameConverterInterface::class));
         });
 
-        $app->singleton(GraphQlReadProvider::class, function (Application $app) {
+        $this->app->singleton(GraphQlReadProvider::class, function (Application $app) {
             /** @var ConfigRepository */
             $config = $app['config'];
 
@@ -1222,9 +1216,9 @@ class ApiPlatformProvider extends ServiceProvider
                 $config->get('api-platform.graphql.nesting_separator') ?? '__'
             );
         });
-        $app->alias(GraphQlReadProvider::class, 'api_platform.graphql.state_provider.read');
+        $this->app->alias(GraphQlReadProvider::class, 'api_platform.graphql.state_provider.read');
 
-        $app->singleton(ErrorProvider::class, function (Application $app) {
+        $this->app->singleton(ErrorProvider::class, function (Application $app) {
             /** @var ConfigRepository */
             $config = $app['config'];
 
@@ -1234,9 +1228,8 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
             );
         });
-        $app->tag([ErrorProvider::class], ProviderInterface::class);
 
-        $app->singleton(ResolverProvider::class, function (Application $app) {
+        $this->app->singleton(ResolverProvider::class, function (Application $app) {
             $resolvers = iterator_to_array($app->tagged('api_platform.graphql.resolver'));
             $taggedItemResolvers = iterator_to_array($app->tagged(QueryItemResolverInterface::class));
             $taggedCollectionResolvers = iterator_to_array($app->tagged(QueryCollectionResolverInterface::class));
@@ -1247,9 +1240,9 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $app->alias(ResolverProvider::class, 'api_platform.graphql.state_provider.resolver');
+        $this->app->alias(ResolverProvider::class, 'api_platform.graphql.state_provider.resolver');
 
-        $app->singleton(GraphQlDenormalizeProvider::class, function (Application $app) {
+        $this->app->singleton(GraphQlDenormalizeProvider::class, function (Application $app) {
             return new GraphQlDenormalizeProvider(
                 $this->app->make(ResolverProvider::class),
                 $app->make(SerializerInterface::class),
@@ -1257,9 +1250,9 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $app->alias(GraphQlDenormalizeProvider::class, 'api_platform.graphql.state_provider.denormalize');
+        $this->app->alias(GraphQlDenormalizeProvider::class, 'api_platform.graphql.state_provider.denormalize');
 
-        $app->singleton('api_platform.graphql.state_provider.parameter', function (Application $app) {
+        $this->app->singleton('api_platform.graphql.state_provider.parameter', function (Application $app) {
             $tagged = iterator_to_array($app->tagged(ParameterProviderInterface::class));
             $tagged['api_platform.serializer.filter_parameter_provider'] = $app->make(SerializerFilterParameterProvider::class);
 
@@ -1274,34 +1267,34 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $app->singleton('api_platform.graphql.state_provider.access_checker', function (Application $app) {
+        $this->app->singleton('api_platform.graphql.state_provider.access_checker', function (Application $app) {
             return new AccessCheckerProvider($app->make('api_platform.graphql.state_provider.parameter'), $app->make(ResourceAccessCheckerInterface::class));
         });
 
-        $app->singleton(NormalizeProcessor::class, function (Application $app) {
+        $this->app->singleton(NormalizeProcessor::class, function (Application $app) {
             return new NormalizeProcessor(
                 $app->make(SerializerInterface::class),
                 $app->make(GraphQlSerializerContextBuilder::class),
                 $app->make(Pagination::class)
             );
         });
-        $app->alias(NormalizeProcessor::class, 'api_platform.graphql.state_processor.normalize');
+        $this->app->alias(NormalizeProcessor::class, 'api_platform.graphql.state_processor.normalize');
 
-        $app->singleton('api_platform.graphql.state_processor', function (Application $app) {
+        $this->app->singleton('api_platform.graphql.state_processor', function (Application $app) {
             return new WriteProcessor(
                 $app->make('api_platform.graphql.state_processor.normalize'),
                 $app->make(CallableProcessor::class),
             );
         });
 
-        $app->singleton(ResolverFactoryInterface::class, function (Application $app) {
+        $this->app->singleton(ResolverFactoryInterface::class, function (Application $app) {
             return new ResolverFactory(
                 $app->make('api_platform.graphql.state_provider.access_checker'),
                 $app->make('api_platform.graphql.state_processor')
             );
         });
 
-        $app->singleton(FieldsBuilderEnumInterface::class, function (Application $app) {
+        $this->app->singleton(FieldsBuilderEnumInterface::class, function (Application $app) {
             /** @var ConfigRepository */
             $config = $app['config'];
 
@@ -1322,22 +1315,22 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $app->singleton(SchemaBuilderInterface::class, function (Application $app) {
+        $this->app->singleton(SchemaBuilderInterface::class, function (Application $app) {
             return new SchemaBuilder($app->make(ResourceNameCollectionFactoryInterface::class), $app->make(ResourceMetadataCollectionFactoryInterface::class), $app->make(TypesFactoryInterface::class), $app->make(TypesContainerInterface::class), $app->make(FieldsBuilderEnumInterface::class));
         });
 
-        $app->singleton(ErrorHandlerInterface::class, function () {
+        $this->app->singleton(ErrorHandlerInterface::class, function () {
             return new GraphQlErrorHandler();
         });
 
-        $app->singleton(ExecutorInterface::class, function (Application $app) {
+        $this->app->singleton(ExecutorInterface::class, function (Application $app) {
             /** @var ConfigRepository */
             $config = $app['config'];
 
             return new Executor($config->get('api-platform.graphql.introspection.enabled') ?? false, $config->get('api-platform.graphql.max_query_complexity') ?? 500, $config->get('api-platform.graphql.max_query_depth') ?? 200);
         });
 
-        $app->singleton(GraphiQlController::class, function (Application $app) {
+        $this->app->singleton(GraphiQlController::class, function (Application $app) {
             /** @var ConfigRepository */
             $config = $app['config'];
             $prefix = $config->get('api-platform.defaults.route_prefix') ?? '';
@@ -1345,7 +1338,7 @@ class ApiPlatformProvider extends ServiceProvider
             return new GraphiQlController($prefix);
         });
 
-        $app->singleton(GraphQlEntrypointController::class, function (Application $app) {
+        $this->app->singleton(GraphQlEntrypointController::class, function (Application $app) {
             /** @var ConfigRepository */
             $config = $app['config'];
 
@@ -1388,5 +1381,55 @@ class ApiPlatformProvider extends ServiceProvider
         }
 
         $this->loadRoutesFrom(__DIR__.'/routes/api.php');
+    }
+
+    private function tagServices(): void
+    {
+        $directory = app_path();
+        $classes = ReflectionClassRecursiveIterator::getReflectionClassesFromDirectories([$directory]);
+
+        $this->app->tag([FilterQueryExtension::class], QueryExtensionInterface::class);
+        $this->autoconfigure($classes, QueryExtensionInterface::class);
+
+        $this->app->tag([PropertyFilter::class], SerializerFilterInterface::class);
+        $this->autoconfigure($classes, SerializerFilterInterface::class);
+
+        $this->app->tag([SerializerFilterParameterProvider::class, SortFilterParameterProvider::class, SparseFieldsetParameterProvider::class], ParameterProviderInterface::class);
+        $this->autoconfigure($classes, ParameterProviderInterface::class);
+
+        $this->app->tag([
+            BooleanFilter::class,
+            EqualsFilter::class,
+            PartialSearchFilter::class,
+            DateFilter::class,
+            OrderFilter::class,
+            RangeFilter::class,
+            SortFilter::class,
+            SparseFieldset::class,
+        ], EloquentFilterInterface::class);
+        $this->autoconfigure($classes, EloquentFilterInterface::class);
+
+        $this->app->tag([ItemProvider::class, CollectionProvider::class, ErrorProvider::class], ProviderInterface::class);
+        $this->autoconfigure($classes, ProviderInterface::class);
+        $this->app->tag([RemoveProcessor::class, PersistProcessor::class], ProcessorInterface::class);
+        $this->autoconfigure($classes, ProcessorInterface::class);
+    }
+
+    /**
+     * @param array<class-string, \ReflectionClass> $classes
+     * @param class-string                          $interface
+     */
+    private function autoconfigure(array $classes, string $interface): void
+    {
+        $m = [];
+        foreach ($classes as $className => $refl) {
+            if ($refl->implementsInterface($interface)) {
+                $m[] = $className;
+            }
+        }
+
+        if ($m) {
+            $this->app->tag($m, $interface);
+        }
     }
 }

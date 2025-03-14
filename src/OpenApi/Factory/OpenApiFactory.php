@@ -174,7 +174,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         }
 
         foreach ($resource->getOperations() as $operationName => $operation) {
-            $resourceShortName = $operation->getShortName();
+            $resourceShortName = $operation->getShortName() ?? $operation;
             // No path to return
             if (null === $operation->getUriTemplate() && null === $operation->getRouteName()) {
                 continue;
@@ -187,7 +187,8 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 continue;
             }
 
-            $operationTag = ($openapiAttribute?->getExtensionProperties()[self::API_PLATFORM_TAG] ?? []);
+            // See https://github.com/api-platform/core/issues/6993 we would like to allow only `false` but as we typed `bool` we have this check
+            $operationTag = !\is_object($openapiAttribute) ? [] : ($openapiAttribute->getExtensionProperties()[self::API_PLATFORM_TAG] ?? []);
             if (!\is_array($operationTag)) {
                 $operationTag = [$operationTag];
             }
@@ -206,7 +207,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             if ($this->routeCollection && $routeName && $route = $this->routeCollection->get($routeName)) {
                 $path = $route->getPath();
             } else {
-                $path = rtrim($operation->getRoutePrefix() ?? '', '/').'/'.ltrim($operation->getUriTemplate(), '/');
+                $path = rtrim($operation->getRoutePrefix() ?? '', '/').'/'.ltrim($operation->getUriTemplate() ?? '', '/');
             }
 
             $path = $this->getPath($path);

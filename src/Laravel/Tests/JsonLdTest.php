@@ -330,6 +330,15 @@ class JsonLdTest extends TestCase
         $this->assertArrayHasKey('trace', $content);
     }
 
+    public function testErrorNotFound(): void
+    {
+        $response = $this->get('/api/books/asd', ['accept' => 'application/ld+json']);
+        $response->assertStatus(404);
+        $content = $response->json();
+        $this->assertArrayHasKey('status', $content);
+        $this->assertEquals(404, $content['status']);
+    }
+
     public function testRelationWithGroups(): void
     {
         WithAccessorFactory::new()->create();
@@ -347,5 +356,17 @@ class JsonLdTest extends TestCase
         $response = $this->get('/api/staff_position_histories?page=1', ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
         $this->assertSame('/api/staff_position_histories', $response->json()['@id']);
+    }
+
+    public function testResourceWithOptionModel(): void
+    {
+        $response = $this->get('/api/resource_with_models?page=1', ['accept' => 'application/ld+json']);
+        $response->assertStatus(200);
+        $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
+        $response->assertJsonFragment([
+            '@context' => '/api/contexts/ResourceWithModel',
+            '@id' => '/api/resource_with_models',
+            '@type' => 'Collection',
+        ]);
     }
 }

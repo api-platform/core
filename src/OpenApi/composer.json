@@ -32,6 +32,7 @@
         "api-platform/metadata": "^4.1",
         "api-platform/state": "^4.1",
         "symfony/console": "^6.4 || ^7.0",
+        "symfony/filesystem": "^7.2",
         "symfony/property-access": "^6.4 || ^7.0",
         "symfony/serializer": "^6.4 || ^7.0"
     },
