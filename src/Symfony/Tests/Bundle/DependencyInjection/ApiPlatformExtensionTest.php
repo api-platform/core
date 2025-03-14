@@ -29,11 +29,13 @@ use ApiPlatform\Symfony\Bundle\DependencyInjection\ApiPlatformExtension;
 use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\ORM\OptimisticLockException;
+use PHPUnit\Framework\Constraint\IsEqual;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Response;
 
 class ApiPlatformExtensionTest extends TestCase
@@ -147,6 +149,11 @@ class ApiPlatformExtensionTest extends TestCase
         foreach ($aliases as $alias) {
             $this->assertContainerHasAlias($alias);
         }
+    }
+
+    private function assertContainerHasService(string $service): void
+    {
+        $this->assertTrue($this->container->hasDefinition($service), \sprintf('Service "%s" not found.', $service));
     }
 
     private function assertNotContainerHasService(string $service): void
@@ -285,5 +292,21 @@ class ApiPlatformExtensionTest extends TestCase
 
         $this->assertContainerHas($services, $aliases);
         $this->container->hasParameter('api_platform.swagger.http_auth');
+    }
+
+    public function testItRegisterMetadataConfiguration(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['mapping']['imports'] = [__DIR__.'/php'];
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $emptyPhpFile = realpath(__DIR__.'/php/empty_file.php');
+
+        $this->assertContainerHasService('api_platform.metadata.resource_extractor.php_file');
+
+        $service = $this->container->get('api_platform.metadata.resource_extractor.php_file');
+        $reflection = new \ReflectionClass($service);
+
+        $this->assertSame([$emptyPhpFile], $reflection->getProperty('paths')->getValue($service));
     }
 }
