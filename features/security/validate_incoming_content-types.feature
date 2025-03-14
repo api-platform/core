@@ -14,4 +14,4 @@ Feature: Validate incoming content type
     """
     Then the response status code should be 415
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
-    And the JSON node "description" should be equal to 'The content-type "text/plain" is not supported. Supported MIME types are "application/ld+json", "application/hal+json", "application/vnd.api+json", "application/xml", "text/xml", "application/json", "text/html", "application/graphql", "multipart/form-data".'
+    And the JSON node "detail" should be equal to 'The content-type "text/plain" is not supported. Supported MIME types are "application/ld+json", "application/hal+json", "application/vnd.api+json", "application/xml", "text/xml", "application/json", "text/html", "application/graphql", "multipart/form-data".'

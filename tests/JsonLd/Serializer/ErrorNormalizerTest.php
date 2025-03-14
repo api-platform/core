@@ -28,8 +28,10 @@ final class ErrorNormalizerTest extends TestCase
         $res = $errorNormalizer->normalize(new \stdClass());
         $this->assertEquals('hydra:Error', $res['@type']);
         $this->assertArrayHasKey('hydra:description', $res);
-        $this->assertEquals($res['hydra:description'], $res['description']);
+        $this->assertEquals($res['hydra:description'], 'bar');
         $this->assertArrayHasKey('hydra:title', $res);
-        $this->assertEquals($res['hydra:title'], $res['title']);
+        $this->assertEquals($res['hydra:title'], 'foo');
+        $this->assertArrayNotHasKey('title', $res);
+        $this->assertArrayNotHasKey('description', $res);
     }
 }

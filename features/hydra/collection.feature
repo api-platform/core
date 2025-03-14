@@ -479,7 +479,7 @@ Feature: Collections support
 
     When I send a "GET" request to "/dummies?itemsPerPage=0&page=2"
     Then the response status code should be 400
-    And the JSON node "description" should be equal to "Page should not be greater than 1 if limit is equal to 0"
+    And the JSON node "detail" should be equal to "Page should not be greater than 1 if limit is equal to 0"
 
   Scenario: Cursor-based pagination with an empty collection
     When I send a "GET" request to "/so_manies"

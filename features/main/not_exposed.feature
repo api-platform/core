@@ -171,7 +171,7 @@ Feature: Expose only a collection of objects
     When I send a "GET" request to "<uri>"
     Then the response status code should be 404
     And the response should be in JSON
-    And the JSON node "description" should be equal to "<description>"
+    And the JSON node "detail" should be equal to "<description>"
     Examples:
       | uri                      | description                                                                                                          |
       | /tables/12345            | This route does not aim to be called.                                                                                      |
@@ -181,7 +181,7 @@ Feature: Expose only a collection of objects
     When I send a "GET" request to "<uri>"
     Then the response status code should be 404
     And the response should be in JSON
-    And the JSON node "description" should be equal to "<description>"
+    And the JSON node "detail" should be equal to "<description>"
     Examples:
       | uri                      | description                                                                                                          |
       | /.well-known/genid/12345 | This route is not exposed on purpose. It generates an IRI for a collection resource without identifier nor item operation. |
