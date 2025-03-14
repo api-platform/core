@@ -330,6 +330,15 @@ class JsonLdTest extends TestCase
         $this->assertArrayHasKey('trace', $content);
     }
 
+    public function testErrorNotFound(): void
+    {
+        $response = $this->get('/api/books/asd', ['accept' => 'application/ld+json']);
+        $response->assertStatus(404);
+        $content = $response->json();
+        $this->assertArrayHasKey('status', $content);
+        $this->assertEquals(404, $content['status']);
+    }
+
     public function testRelationWithGroups(): void
     {
         WithAccessorFactory::new()->create();
