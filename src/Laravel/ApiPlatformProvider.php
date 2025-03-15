@@ -1386,7 +1386,7 @@ class ApiPlatformProvider extends ServiceProvider
     private function tagServices(): void
     {
         $directory = app_path();
-        $classes = ReflectionClassRecursiveIterator::getReflectionClassesFromDirectories([$directory]);
+        $classes = ReflectionClassRecursiveIterator::getReflectionClassesFromDirectories([$directory], false);
 
         $this->app->tag([FilterQueryExtension::class], QueryExtensionInterface::class);
         $this->autoconfigure($classes, QueryExtensionInterface::class);
