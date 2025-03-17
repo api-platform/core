@@ -1,8 +1,9 @@
 #!/bin/bash
 rm -f package.lock
-rm -f package-lock.lock
+rm -f package-lock.json
 echo "{}" > package.json
-npm i @fontsource/open-sans swagger-ui es6-promise fetch react react-dom graphiql graphql-playground-react redoc
+// /!\ UMD is removed since react@19: https://react.dev/blog/2024/04/25/react-19-upgrade-guide#umd-builds-removed
+npm i @fontsource/open-sans swagger-ui es6-promise fetch react@18 react-dom@18 graphiql graphql-playground-react redoc
 
 dest=src/Symfony/Bundle/Resources/public/fonts/open-sans/
 if [[ -d "$dest" ]]; then
