@@ -13,11 +13,9 @@ declare(strict_types=1);
 
 namespace Workbench\App\Models;
 
-use ApiPlatform\JsonApi\Filter\SparseFieldset;
 use ApiPlatform\Laravel\Eloquent\Filter\BooleanFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\DateFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\EqualsFilter;
-use ApiPlatform\Laravel\Eloquent\Filter\JsonApi\SortFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\OrderFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\OrFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\PartialSearchFilter;
@@ -82,8 +80,6 @@ use Workbench\App\Http\Requests\BookFormRequest;
 )]
 #[QueryParameter(key: 'properties', filter: PropertyFilter::class)]
 #[QueryParameter(key: 'published', filter: BooleanFilter::class)]
-#[QueryParameter(key: 'fields', filter: SparseFieldset::class)]
-#[QueryParameter(key: 'sort', filter: SortFilter::class)]
 class Book extends Model
 {
     use HasFactory;

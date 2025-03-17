@@ -13,7 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Tests;
 
+use ApiPlatform\JsonApi\Filter\SparseFieldset;
+use ApiPlatform\Laravel\Eloquent\Filter\JsonApi\SortFilter;
 use ApiPlatform\Laravel\Test\ApiTestAssertionsTrait;
+use ApiPlatform\Metadata\QueryParameter;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -42,6 +45,13 @@ class JsonApiTest extends TestCase
             $config->set('api-platform.docs_formats', ['jsonapi' => ['application/vnd.api+json']]);
             $config->set('api-platform.resources', [app_path('Models'), app_path('ApiResource')]);
             $config->set('api-platform.pagination.items_per_page_parameter_name', 'limit');
+            $config->set('api-platform.defaults', [
+                'route_prefix' => '/api',
+                'parameters' => [
+                    new QueryParameter(key: 'fields', filter: SparseFieldset::class),
+                    new QueryParameter(key: 'sort', filter: SortFilter::class),
+                ],
+            ]);
 
             $config->set('app.debug', true);
         });
