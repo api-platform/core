@@ -85,4 +85,13 @@ final class ParameterTest extends ApiTestCase
             'blabla',
         ]);
     }
+
+    public function testHeaderParameterRequired(): void
+    {
+        self::createClient()->request('GET', 'header_required', ['headers' => ['req' => 'blabla']]);
+        $this->assertResponseStatusCodeSame(200);
+
+        self::createClient()->request('GET', 'header_required', ['headers' => []]);
+        $this->assertResponseStatusCodeSame(422);
+    }
 }
