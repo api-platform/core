@@ -810,17 +810,17 @@ class ApiPlatformProvider extends ServiceProvider
             $pagination = $config->get('api-platform.pagination');
 
             return new PaginationOptions(
-                $defaults['pagination_enabled'],
-                $pagination['page_parameter_name'],
-                $defaults['pagination_client_items_per_page'],
-                $pagination['items_per_page_parameter_name'],
-                $defaults['pagination_client_enabled'],
-                $pagination['enabled_parameter_name'],
-                $defaults['pagination_items_per_page'],
-                $defaults['pagination_maximum_items_per_page'],
-                $defaults['pagination_partial'],
-                $defaults['pagination_client_partial'],
-                $pagination['partial_parameter_name'],
+                $defaults['pagination_enabled'] ?? true,
+                $pagination['page_parameter_name'] ?? 'page',
+                $defaults['pagination_client_items_per_page'] ?? false,
+                $pagination['items_per_page_parameter_name'] ?? 'itemsPerPage',
+                $defaults['pagination_client_enabled'] ?? false,
+                $pagination['enabled_parameter_name'] ?? 'pagination',
+                $defaults['pagination_items_per_page'] ?? 30,
+                $defaults['pagination_maximum_items_per_page'] ?? 30,
+                $defaults['pagination_partial'] ?? false,
+                $defaults['pagination_client_partial'] ?? false,
+                $pagination['partial_parameter_name'] ?? 'partial',
             );
         });
 
