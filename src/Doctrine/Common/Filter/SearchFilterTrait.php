@@ -32,6 +32,7 @@ trait SearchFilterTrait
 {
     use PropertyHelperTrait;
 
+    protected string $defaultStrategy = self::STRATEGY_EXACT;
     protected IriConverterInterface|LegacyIriConverterInterface $iriConverter;
     protected PropertyAccessorInterface $propertyAccessor;
     protected IdentifiersExtractorInterface|LegacyIdentifiersExtractorInterface|null $identifiersExtractor = null;
@@ -65,7 +66,7 @@ trait SearchFilterTrait
             $propertyName = $this->normalizePropertyName($property);
             if ($metadata->hasField($field)) {
                 $typeOfField = $this->getType($metadata->getTypeOfField($field));
-                $strategy = $this->getProperties()[$property] ?? self::STRATEGY_EXACT;
+                $strategy = $this->getProperties()[$property] ?? $this->defaultStrategy;
                 $filterParameterNames = [$propertyName];
 
                 if (\in_array($strategy, [self::STRATEGY_EXACT, self::STRATEGY_IEXACT], true)) {
