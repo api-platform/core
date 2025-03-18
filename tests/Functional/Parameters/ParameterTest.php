@@ -43,6 +43,12 @@ final class ParameterTest extends ApiTestCase
         $this->assertArrayNotHasKey('a', $response->toArray());
     }
 
+    public function testWithObjectProvider(): void
+    {
+        $response = self::createClient()->request('GET', 'with_parameters/1?service=blabla');
+        $this->assertArrayNotHasKey('a', $response->toArray());
+    }
+
     public function testWithHeader(): void
     {
         self::createClient()->request('GET', 'with_parameters/1?service=blabla', ['headers' => ['auth' => 'foo']]);

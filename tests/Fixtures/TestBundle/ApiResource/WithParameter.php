@@ -39,6 +39,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         'group' => new QueryParameter(provider: [self::class, 'provideGroup']),
         'properties' => new QueryParameter(filter: 'my_dummy.property'),
         'service' => new QueryParameter(provider: CustomGroupParameterProvider::class),
+        'object' => new QueryParameter(provider: new CustomGroupParameterProvider()),
         'auth' => new HeaderParameter(provider: [self::class, 'restrictAccess']),
         'priority' => new QueryParameter(provider: [self::class, 'assertSecond'], priority: 10),
         'priorityb' => new QueryParameter(provider: [self::class, 'assertFirst'], priority: 20),
