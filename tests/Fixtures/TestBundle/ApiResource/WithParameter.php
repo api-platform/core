@@ -39,6 +39,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         'group' => new QueryParameter(provider: [self::class, 'provideGroup']),
         'properties' => new QueryParameter(filter: 'my_dummy.property'),
         'service' => new QueryParameter(provider: CustomGroupParameterProvider::class),
+        'object' => new QueryParameter(provider: new CustomGroupParameterProvider()),
         'auth' => new HeaderParameter(provider: [self::class, 'restrictAccess']),
         'priority' => new QueryParameter(provider: [self::class, 'assertSecond'], priority: 10),
         'priorityb' => new QueryParameter(provider: [self::class, 'assertFirst'], priority: 20),
@@ -78,6 +79,13 @@ use Symfony\Component\Validator\Constraints as Assert;
     uriTemplate: 'with_parameters_header_and_query{._format}',
     parameters: new Parameters([new QueryParameter(key: 'q'), new HeaderParameter(key: 'q')]),
     provider: [self::class, 'headerAndQueryProvider']
+)]
+#[GetCollection(
+    uriTemplate: 'header_required',
+    parameters: [
+        'Req' => new HeaderParameter(required: true, schema: ['type' => 'string']),
+    ],
+    provider: [self::class, 'headerProvider']
 )]
 #[QueryParameter(key: 'everywhere')]
 class WithParameter
@@ -127,7 +135,7 @@ class WithParameter
         throw new AccessDeniedHttpException();
     }
 
-    public static function headerAndQueryProvider(Operation $operation, array $uriVariables = [], array $context = [])
+    public static function headerAndQueryProvider(Operation $operation, array $uriVariables = [], array $context = []): JsonResponse
     {
         $parameters = $operation->getParameters();
         $values = [$parameters->get('q', HeaderParameter::class)->getValue(), $parameters->get('q', QueryParameter::class)->getValue()];
@@ -153,5 +161,13 @@ class WithParameter
         ));
 
         return $operation->withParameters($parameters);
+    }
+
+    public static function headerProvider(Operation $operation, array $uriVariables = [], array $context = []): JsonResponse
+    {
+        $parameters = $operation->getParameters();
+        $values = [$parameters->get('Req', HeaderParameter::class)->getValue()];
+
+        return new JsonResponse($values);
     }
 }

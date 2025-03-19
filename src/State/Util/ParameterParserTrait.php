@@ -50,6 +50,10 @@ trait ParameterParserTrait
             throw new \RuntimeException('A Parameter should have a key.');
         }
 
+        if ($parameter instanceof HeaderParameterInterface) {
+            $key = strtolower($key);
+        }
+
         $parsedKey = explode('[:property]', $key);
         if (isset($parsedKey[0]) && isset($values[$parsedKey[0]])) {
             $key = $parsedKey[0];
