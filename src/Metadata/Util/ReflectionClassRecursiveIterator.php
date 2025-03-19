@@ -50,7 +50,7 @@ final class ReflectionClassRecursiveIterator
                     new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS),
                     \RecursiveIteratorIterator::LEAVES_ONLY
                 ),
-                '/^.+\.php$/i',
+                '/^(?!.*Test\.php$).+\.php$/i',
                 \RecursiveRegexIterator::GET_MATCH
             );
 

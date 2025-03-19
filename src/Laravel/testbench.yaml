@@ -32,3 +32,5 @@ workbench:
           to: app/ApiResource
         - from: ./workbench/app/State/
           to: app/State
+        - from: ./workbench/app/Modules/
+          to: app/Modules
