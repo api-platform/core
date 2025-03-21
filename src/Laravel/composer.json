@@ -79,7 +79,8 @@
     "extra": {
         "laravel": {
             "providers": [
-                "ApiPlatform\\Laravel\\ApiPlatformProvider"
+                "ApiPlatform\\Laravel\\ApiPlatformProvider",
+                "ApiPlatform\\Laravel\\ApiPlatformDeferredProvider"
             ]
         },
         "branch-alias": {
