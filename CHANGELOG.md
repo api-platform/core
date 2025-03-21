@@ -120,6 +120,17 @@ On write operations, we added the [expectsHeader](https://www.hydra-cg.com/spec/
 * [d0a442786](https://github.com/api-platform/core/commit/d0a44278630d201b91cbba0774a09f4eeaac88f7) feat(doctrine): enhance getLinksHandler with method validation and typo suggestions (#6874)
 * [f67f6f1ac](https://github.com/api-platform/core/commit/f67f6f1acb6476182c18a3503f2a8bc80ae89a0b)  feat(doctrine): doctrine filters like laravel eloquent filters  (#6775)
 
+## v4.0.21
+
+### Bug fixes
+
+* [7cb5a6db8](https://github.com/api-platform/core/commit/7cb5a6db87241d95e6c324318fe861bd4f1820cf) fix: allow parameter provider as object (#7032)
+* [bb83e9a03](https://github.com/api-platform/core/commit/bb83e9a034c511156aa20a8555bf367374ef5458) fix(symfony): allow to merge array with string in global defaults (#7037)
+* [da2e86809](https://github.com/api-platform/core/commit/da2e86809d4a8dec294dc2fc148d92406f1f7fd1) fix: header parameter should be case insensitive (#7031)
+
+
+### Features
+
 ## v4.0.20
 
 ### Bug fixes
