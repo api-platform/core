@@ -123,6 +123,12 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 continue;
             }
 
+            if (isset($attributesMetadata[$association])
+                && empty(array_intersect($normalizationContext[AbstractNormalizer::GROUPS] ?? [], $attributesMetadata[$association]->getGroups()))) {
+                // Skip this association if the current normalization groups do not include the association's groups
+                continue;
+            }
+
             try {
                 $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $association, $options);
             } catch (PropertyNotFoundException) {
