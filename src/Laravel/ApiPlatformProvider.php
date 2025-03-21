@@ -57,8 +57,6 @@ use ApiPlatform\Hydra\Serializer\EntrypointNormalizer as HydraEntrypointNormaliz
 use ApiPlatform\Hydra\Serializer\HydraPrefixNameConverter;
 use ApiPlatform\Hydra\Serializer\PartialCollectionViewNormalizer as HydraPartialCollectionViewNormalizer;
 use ApiPlatform\Hydra\State\HydraLinkProcessor;
-use ApiPlatform\JsonApi\Filter\SparseFieldset;
-use ApiPlatform\JsonApi\Filter\SparseFieldsetParameterProvider;
 use ApiPlatform\JsonApi\JsonSchema\SchemaFactory as JsonApiSchemaFactory;
 use ApiPlatform\JsonApi\Serializer\CollectionNormalizer as JsonApiCollectionNormalizer;
 use ApiPlatform\JsonApi\Serializer\EntrypointNormalizer as JsonApiEntrypointNormalizer;
@@ -81,17 +79,7 @@ use ApiPlatform\Laravel\ApiResource\ValidationError;
 use ApiPlatform\Laravel\Controller\ApiPlatformController;
 use ApiPlatform\Laravel\Controller\DocumentationController;
 use ApiPlatform\Laravel\Controller\EntrypointController;
-use ApiPlatform\Laravel\Eloquent\Extension\FilterQueryExtension;
-use ApiPlatform\Laravel\Eloquent\Extension\QueryExtensionInterface;
-use ApiPlatform\Laravel\Eloquent\Filter\BooleanFilter;
-use ApiPlatform\Laravel\Eloquent\Filter\DateFilter;
-use ApiPlatform\Laravel\Eloquent\Filter\EqualsFilter;
-use ApiPlatform\Laravel\Eloquent\Filter\FilterInterface as EloquentFilterInterface;
-use ApiPlatform\Laravel\Eloquent\Filter\JsonApi\SortFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\JsonApi\SortFilterParameterProvider;
-use ApiPlatform\Laravel\Eloquent\Filter\OrderFilter;
-use ApiPlatform\Laravel\Eloquent\Filter\PartialSearchFilter;
-use ApiPlatform\Laravel\Eloquent\Filter\RangeFilter;
 use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentAttributePropertyMetadataFactory;
 use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentPropertyMetadataFactory;
 use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentPropertyNameCollectionMetadataFactory;
@@ -102,12 +90,6 @@ use ApiPlatform\Laravel\Eloquent\Metadata\ResourceClassResolver as EloquentResou
 use ApiPlatform\Laravel\Eloquent\PropertyAccess\PropertyAccessor as EloquentPropertyAccessor;
 use ApiPlatform\Laravel\Eloquent\Serializer\SerializerContextBuilder as EloquentSerializerContextBuilder;
 use ApiPlatform\Laravel\Eloquent\Serializer\SnakeCaseToCamelCaseNameConverter;
-use ApiPlatform\Laravel\Eloquent\State\CollectionProvider;
-use ApiPlatform\Laravel\Eloquent\State\ItemProvider;
-use ApiPlatform\Laravel\Eloquent\State\LinksHandler;
-use ApiPlatform\Laravel\Eloquent\State\LinksHandlerInterface;
-use ApiPlatform\Laravel\Eloquent\State\PersistProcessor;
-use ApiPlatform\Laravel\Eloquent\State\RemoveProcessor;
 use ApiPlatform\Laravel\Exception\ErrorHandler;
 use ApiPlatform\Laravel\GraphQl\Controller\EntrypointController as GraphQlEntrypointController;
 use ApiPlatform\Laravel\GraphQl\Controller\GraphiQlController;
@@ -164,14 +146,11 @@ use ApiPlatform\Metadata\ResourceClassResolver;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\Inflector;
-use ApiPlatform\Metadata\Util\ReflectionClassRecursiveIterator;
 use ApiPlatform\OpenApi\Command\OpenApiCommand;
 use ApiPlatform\OpenApi\Factory\OpenApiFactory;
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\OpenApi\Options;
 use ApiPlatform\OpenApi\Serializer\OpenApiNormalizer;
-use ApiPlatform\Serializer\Filter\FilterInterface as SerializerFilterInterface;
-use ApiPlatform\Serializer\Filter\PropertyFilter;
 use ApiPlatform\Serializer\ItemNormalizer;
 use ApiPlatform\Serializer\JsonEncoder;
 use ApiPlatform\Serializer\Mapping\Factory\ClassMetadataFactory as SerializerClassMetadataFactory;
@@ -428,31 +407,6 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->bind(OperationMetadataFactoryInterface::class, OperationMetadataFactory::class);
 
-        $this->app->bind(FilterQueryExtension::class, function (Application $app) {
-            $tagged = iterator_to_array($app->tagged(EloquentFilterInterface::class));
-
-            return new FilterQueryExtension(new ServiceLocator($tagged));
-        });
-
-        $this->app->singleton(ItemProvider::class, function (Application $app) {
-            $tagged = iterator_to_array($app->tagged(LinksHandlerInterface::class));
-
-            return new ItemProvider(new LinksHandler($app, $app->make(ResourceMetadataCollectionFactoryInterface::class)), new ServiceLocator($tagged), $app->tagged(QueryExtensionInterface::class));
-        });
-        $this->app->singleton(CollectionProvider::class, function (Application $app) {
-            $tagged = iterator_to_array($app->tagged(LinksHandlerInterface::class));
-
-            return new CollectionProvider($app->make(Pagination::class), new LinksHandler($app, $app->make(ResourceMetadataCollectionFactoryInterface::class)), $app->tagged(QueryExtensionInterface::class), new ServiceLocator($tagged));
-        });
-
-        $this->app->tag([ItemProvider::class, CollectionProvider::class, ErrorProvider::class], ProviderInterface::class);
-
-        $this->app->singleton(CallableProvider::class, function (Application $app) {
-            $tagged = iterator_to_array($app->tagged(ProviderInterface::class));
-
-            return new CallableProvider(new ServiceLocator($tagged));
-        });
-
         $this->app->singleton(ReadProvider::class, function (Application $app) {
             return new ReadProvider($app->make(CallableProvider::class));
         });
@@ -478,37 +432,8 @@ class ApiPlatformProvider extends ServiceProvider
             });
         }
 
-        $this->app->singleton(SerializerFilterParameterProvider::class, function (Application $app) {
-            $tagged = iterator_to_array($app->tagged(SerializerFilterInterface::class));
-
-            return new SerializerFilterParameterProvider(new ServiceLocator($tagged));
-        });
-        $this->app->alias(SerializerFilterParameterProvider::class, 'api_platform.serializer.filter_parameter_provider');
-
         $this->app->singleton(SortFilterParameterProvider::class, function (Application $app) {
             return new SortFilterParameterProvider();
-        });
-
-        $this->app->singleton('filters', function (Application $app) {
-            return new ServiceLocator(array_merge(
-                iterator_to_array($app->tagged(SerializerFilterInterface::class)),
-                iterator_to_array($app->tagged(EloquentFilterInterface::class))
-            ));
-        });
-
-        $this->app->singleton(ParameterProvider::class, function (Application $app) {
-            $tagged = iterator_to_array($app->tagged(ParameterProviderInterface::class));
-            $tagged['api_platform.serializer.filter_parameter_provider'] = $app->make(SerializerFilterParameterProvider::class);
-
-            return new ParameterProvider(
-                new ParameterValidatorProvider(
-                    new SecurityParameterProvider(
-                        $app->make(DeserializeProvider::class),
-                        $app->make(ResourceAccessCheckerInterface::class)
-                    ),
-                ),
-                new ServiceLocator($tagged)
-            );
         });
 
         $this->app->singleton(AccessCheckerProvider::class, function (Application $app) {
@@ -526,19 +451,6 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->bind(ProviderInterface::class, ContentNegotiationProvider::class);
-
-        $this->app->singleton(CallableProcessor::class, function (Application $app) {
-            /** @var ConfigRepository */
-            $config = $app['config'];
-            $tagged = iterator_to_array($app->tagged(ProcessorInterface::class));
-
-            if ($config->get('api-platform.swagger_ui.enabled', false)) {
-                // TODO: tag SwaggerUiProcessor instead?
-                $tagged['api_platform.swagger_ui.processor'] = $app->make(SwaggerUiProcessor::class);
-            }
-
-            return new CallableProcessor(new ServiceLocator($tagged));
-        });
 
         $this->app->singleton(RespondProcessor::class, function () {
             return new AddLinkHeaderProcessor(new RespondProcessor(), new HttpHeaderSerializer());
@@ -1110,8 +1022,6 @@ class ApiPlatformProvider extends ServiceProvider
                 OpenApiCommand::class,
             ]);
         }
-
-        $this->tagServices();
     }
 
     private function registerGraphQl(): void
@@ -1252,6 +1162,7 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->alias(GraphQlDenormalizeProvider::class, 'api_platform.graphql.state_provider.denormalize');
 
+        // todo add this to deferred
         $this->app->singleton('api_platform.graphql.state_provider.parameter', function (Application $app) {
             $tagged = iterator_to_array($app->tagged(ParameterProviderInterface::class));
             $tagged['api_platform.serializer.filter_parameter_provider'] = $app->make(SerializerFilterParameterProvider::class);
@@ -1381,55 +1292,5 @@ class ApiPlatformProvider extends ServiceProvider
         }
 
         $this->loadRoutesFrom(__DIR__.'/routes/api.php');
-    }
-
-    private function tagServices(): void
-    {
-        $directory = app_path();
-        $classes = ReflectionClassRecursiveIterator::getReflectionClassesFromDirectories([$directory]);
-
-        $this->app->tag([FilterQueryExtension::class], QueryExtensionInterface::class);
-        $this->autoconfigure($classes, QueryExtensionInterface::class);
-
-        $this->app->tag([PropertyFilter::class], SerializerFilterInterface::class);
-        $this->autoconfigure($classes, SerializerFilterInterface::class);
-
-        $this->app->tag([SerializerFilterParameterProvider::class, SortFilterParameterProvider::class, SparseFieldsetParameterProvider::class], ParameterProviderInterface::class);
-        $this->autoconfigure($classes, ParameterProviderInterface::class);
-
-        $this->app->tag([
-            BooleanFilter::class,
-            EqualsFilter::class,
-            PartialSearchFilter::class,
-            DateFilter::class,
-            OrderFilter::class,
-            RangeFilter::class,
-            SortFilter::class,
-            SparseFieldset::class,
-        ], EloquentFilterInterface::class);
-        $this->autoconfigure($classes, EloquentFilterInterface::class);
-
-        $this->app->tag([ItemProvider::class, CollectionProvider::class, ErrorProvider::class], ProviderInterface::class);
-        $this->autoconfigure($classes, ProviderInterface::class);
-        $this->app->tag([RemoveProcessor::class, PersistProcessor::class], ProcessorInterface::class);
-        $this->autoconfigure($classes, ProcessorInterface::class);
-    }
-
-    /**
-     * @param array<class-string, \ReflectionClass> $classes
-     * @param class-string                          $interface
-     */
-    private function autoconfigure(array $classes, string $interface): void
-    {
-        $m = [];
-        foreach ($classes as $className => $refl) {
-            if ($refl->implementsInterface($interface)) {
-                $m[] = $className;
-            }
-        }
-
-        if ($m) {
-            $this->app->tag($m, $interface);
-        }
     }
 }

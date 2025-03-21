@@ -15,8 +15,10 @@ namespace Workbench\App\ApiResource;
 
 use ApiPlatform\Metadata\Get;
 use Workbench\App\State\CustomProvider;
+use Workbench\App\State\CustomProviderWithDependency;
 
 #[Get(uriTemplate: 'custom_service_provider', provider: CustomProvider::class)]
+#[Get(uriTemplate: 'custom_service_provider_with_dependency', provider: CustomProviderWithDependency::class)]
 class ServiceProvider
 {
 }
