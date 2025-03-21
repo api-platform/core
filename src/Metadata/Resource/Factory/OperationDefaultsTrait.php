@@ -63,7 +63,11 @@ trait OperationDefaultsTrait
             $currentValue = $operation->{$getter}();
 
             if (\is_array($currentValue) && $currentValue) {
-                $operation = $operation->{'with'.$upperKey}(array_merge([$value], $currentValue));
+                if ('Formats' === $upperKey && is_string($value)) {
+                    $value = [$value];
+                }
+
+                $operation = $operation->{'with'.$upperKey}(array_merge($value, $currentValue));
             }
 
             if (null !== $currentValue || null === $value) {
