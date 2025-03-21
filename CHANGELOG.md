@@ -1,5 +1,17 @@
 # Changelog
 
+## v4.1.2
+
+### Bug fixes
+
+* [42f25cf04](https://github.com/api-platform/core/commit/42f25cf0461c382ce10e2378be5e9428c23eb94a) fix: react@18 for UMD + add Laravel support in update-js.sh (#7028)
+* [77ffc380b](https://github.com/api-platform/core/commit/77ffc380bcd3c22a1eb4fb0c4f1cd265cfd1a898) fix(laravel): do not require tests while autoconfiguring (#7024)
+* [935b9b55d](https://github.com/api-platform/core/commit/935b9b55da0eacce3dd2bbed4584b10b154d97c2) fix(laravel): json api default parameters (#7027)
+* [a2824ff4b](https://github.com/api-platform/core/commit/a2824ff4be6276e37e37a3b4e4fb2e9a0096789c) fix(laravel): defer autoconfiguration (#7040)
+
+
+### Features
+
 ## v4.1.1
 
 ### Bug fixes
