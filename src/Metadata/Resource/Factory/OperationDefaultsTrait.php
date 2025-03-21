@@ -63,7 +63,7 @@ trait OperationDefaultsTrait
             $currentValue = $operation->{$getter}();
 
             if (\is_array($currentValue) && $currentValue) {
-                if ('Formats' === $upperKey && \is_string($value)) {
+                if (\is_string($value)) {
                     $value = [$value];
                 }
 
