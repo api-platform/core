@@ -28,7 +28,7 @@
         "api-platform/state": "^4.1",
         "doctrine/collections": "^2.1",
         "doctrine/common": "^3.2.2",
-        "doctrine/persistence": "^3.2"
+        "doctrine/persistence": "^3.2 || ^4.0"
     },
     "require-dev": {
         "doctrine/mongodb-odm": "^2.10",
