@@ -113,8 +113,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         }
 
         $currentDepth = $currentDepth > 0 ? $currentDepth - 1 : $currentDepth;
-        $entityManager = $queryBuilder->getEntityManager();
-        $classMetadata = $entityManager->getClassMetadata($resourceClass);
+        $classMetadata = $queryBuilder->getEntityManager()->getClassMetadata($resourceClass);
         $attributesMetadata = $this->classMetadataFactory?->getMetadataFor($resourceClass)->getAttributesMetadata();
 
         foreach ($classMetadata->associationMappings as $association => $mapping) {
@@ -123,7 +122,18 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 continue;
             }
 
-            if (isset($attributesMetadata[$association])
+            // prepare the child context
+            $childNormalizationContext = $normalizationContext;
+            if (isset($normalizationContext[AbstractNormalizer::ATTRIBUTES])) {
+                if ($inAttributes = isset($normalizationContext[AbstractNormalizer::ATTRIBUTES][$association])) {
+                    $childNormalizationContext[AbstractNormalizer::ATTRIBUTES] = $normalizationContext[AbstractNormalizer::ATTRIBUTES][$association];
+                }
+            } else {
+                $inAttributes = null;
+            }
+
+            if (true !== $inAttributes
+                && isset($attributesMetadata[$association])
                 && empty(array_intersect($normalizationContext[AbstractNormalizer::GROUPS] ?? [], $attributesMetadata[$association]->getGroups()))) {
                 // Skip this association if the current normalization groups do not include the association's groups
                 continue;
@@ -147,16 +157,6 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 || (false === $forceEager && ClassMetadata::FETCH_EAGER !== $mapping['fetch'])
             ) {
                 continue;
-            }
-
-            // prepare the child context
-            $childNormalizationContext = $normalizationContext;
-            if (isset($normalizationContext[AbstractNormalizer::ATTRIBUTES])) {
-                if ($inAttributes = isset($normalizationContext[AbstractNormalizer::ATTRIBUTES][$association])) {
-                    $childNormalizationContext[AbstractNormalizer::ATTRIBUTES] = $normalizationContext[AbstractNormalizer::ATTRIBUTES][$association];
-                }
-            } else {
-                $inAttributes = null;
             }
 
             $fetchEager = $propertyMetadata->getFetchEager();
