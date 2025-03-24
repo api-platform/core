@@ -16,7 +16,6 @@ namespace ApiPlatform\Doctrine\Orm\Extension;
 use ApiPlatform\Doctrine\Common\ParameterValueExtractorTrait;
 use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ParameterNotFound;
 use Doctrine\ORM\QueryBuilder;
@@ -51,11 +50,9 @@ final class ParameterExtension implements QueryCollectionExtensionInterface, Que
             }
 
             $filter = $this->filterLocator->has($filterId) ? $this->filterLocator->get($filterId) : null;
-            if (!$filter instanceof FilterInterface) {
-                throw new InvalidArgumentException(\sprintf('Could not find filter "%s" for parameter "%s" in operation "%s" for resource "%s".', $filterId, $parameter->getKey(), $operation?->getShortName(), $resourceClass));
+            if ($filter instanceof FilterInterface) {
+                $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, ['filters' => $values, 'parameter' => $parameter] + $context);
             }
-
-            $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, ['filters' => $values, 'parameter' => $parameter] + $context);
         }
     }
 
