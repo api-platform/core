@@ -34,7 +34,6 @@ use ApiPlatform\GraphQl\State\Provider\DenormalizeProvider as GraphQlDenormalize
 use ApiPlatform\GraphQl\State\Provider\ReadProvider as GraphQlReadProvider;
 use ApiPlatform\GraphQl\State\Provider\ResolverProvider;
 use ApiPlatform\GraphQl\Type\ContextAwareTypeBuilderInterface;
-use ApiPlatform\GraphQl\Type\FieldsBuilder;
 use ApiPlatform\GraphQl\Type\FieldsBuilderEnumInterface;
 use ApiPlatform\GraphQl\Type\SchemaBuilder;
 use ApiPlatform\GraphQl\Type\SchemaBuilderInterface;
@@ -76,34 +75,28 @@ use ApiPlatform\JsonSchema\SchemaFactory;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Laravel\ApiResource\Error;
 use ApiPlatform\Laravel\ApiResource\ValidationError;
-use ApiPlatform\Laravel\Controller\ApiPlatformController;
 use ApiPlatform\Laravel\Controller\DocumentationController;
 use ApiPlatform\Laravel\Controller\EntrypointController;
 use ApiPlatform\Laravel\Eloquent\Filter\JsonApi\SortFilterParameterProvider;
 use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentAttributePropertyMetadataFactory;
 use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentPropertyMetadataFactory;
 use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentPropertyNameCollectionMetadataFactory;
-use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Resource\EloquentResourceCollectionMetadataFactory;
 use ApiPlatform\Laravel\Eloquent\Metadata\IdentifiersExtractor as EloquentIdentifiersExtractor;
 use ApiPlatform\Laravel\Eloquent\Metadata\ModelMetadata;
 use ApiPlatform\Laravel\Eloquent\Metadata\ResourceClassResolver as EloquentResourceClassResolver;
 use ApiPlatform\Laravel\Eloquent\PropertyAccess\PropertyAccessor as EloquentPropertyAccessor;
 use ApiPlatform\Laravel\Eloquent\Serializer\SerializerContextBuilder as EloquentSerializerContextBuilder;
 use ApiPlatform\Laravel\Eloquent\Serializer\SnakeCaseToCamelCaseNameConverter;
-use ApiPlatform\Laravel\Exception\ErrorHandler;
 use ApiPlatform\Laravel\GraphQl\Controller\EntrypointController as GraphQlEntrypointController;
 use ApiPlatform\Laravel\GraphQl\Controller\GraphiQlController;
 use ApiPlatform\Laravel\JsonApi\State\JsonApiProvider;
 use ApiPlatform\Laravel\Metadata\CachePropertyMetadataFactory;
 use ApiPlatform\Laravel\Metadata\CachePropertyNameCollectionMetadataFactory;
-use ApiPlatform\Laravel\Metadata\CacheResourceCollectionMetadataFactory;
-use ApiPlatform\Laravel\Metadata\ParameterValidationResourceMetadataCollectionFactory;
 use ApiPlatform\Laravel\Routing\IriConverter;
 use ApiPlatform\Laravel\Routing\Router as UrlGeneratorRouter;
 use ApiPlatform\Laravel\Routing\SkolemIriConverter;
 use ApiPlatform\Laravel\Security\ResourceAccessChecker;
 use ApiPlatform\Laravel\State\AccessCheckerProvider;
-use ApiPlatform\Laravel\State\ParameterValidatorProvider;
 use ApiPlatform\Laravel\State\SwaggerUiProcessor;
 use ApiPlatform\Laravel\State\SwaggerUiProvider;
 use ApiPlatform\Laravel\State\ValidateProvider;
@@ -123,24 +116,12 @@ use ApiPlatform\Metadata\Property\Factory\PropertyInfoPropertyNameCollectionFact
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\SerializerPropertyMetadataFactory;
-use ApiPlatform\Metadata\Resource\Factory\AlternateUriResourceMetadataCollectionFactory;
-use ApiPlatform\Metadata\Resource\Factory\AttributesResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\AttributesResourceNameCollectionFactory;
-use ApiPlatform\Metadata\Resource\Factory\ConcernsResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\ConcernsResourceNameCollectionFactory;
-use ApiPlatform\Metadata\Resource\Factory\FiltersResourceMetadataCollectionFactory;
-use ApiPlatform\Metadata\Resource\Factory\FormatsResourceMetadataCollectionFactory;
-use ApiPlatform\Metadata\Resource\Factory\InputOutputResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\LinkFactory;
 use ApiPlatform\Metadata\Resource\Factory\LinkFactoryInterface;
-use ApiPlatform\Metadata\Resource\Factory\LinkResourceMetadataCollectionFactory;
-use ApiPlatform\Metadata\Resource\Factory\NotExposedOperationResourceMetadataCollectionFactory;
-use ApiPlatform\Metadata\Resource\Factory\OperationNameResourceMetadataCollectionFactory;
-use ApiPlatform\Metadata\Resource\Factory\ParameterResourceMetadataCollectionFactory;
-use ApiPlatform\Metadata\Resource\Factory\PhpDocResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
-use ApiPlatform\Metadata\Resource\Factory\UriTemplateResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\Metadata\ResourceClassResolver;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
@@ -155,14 +136,12 @@ use ApiPlatform\Serializer\ItemNormalizer;
 use ApiPlatform\Serializer\JsonEncoder;
 use ApiPlatform\Serializer\Mapping\Factory\ClassMetadataFactory as SerializerClassMetadataFactory;
 use ApiPlatform\Serializer\Mapping\Loader\PropertyMetadataLoader;
-use ApiPlatform\Serializer\Parameter\SerializerFilterParameterProvider;
 use ApiPlatform\Serializer\SerializerContextBuilder;
 use ApiPlatform\State\CallableProcessor;
 use ApiPlatform\State\CallableProvider;
 use ApiPlatform\State\ErrorProvider;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginationOptions;
-use ApiPlatform\State\ParameterProviderInterface;
 use ApiPlatform\State\Processor\AddLinkHeaderProcessor;
 use ApiPlatform\State\Processor\RespondProcessor;
 use ApiPlatform\State\Processor\SerializeProcessor;
@@ -172,11 +151,9 @@ use ApiPlatform\State\Provider\ContentNegotiationProvider;
 use ApiPlatform\State\Provider\DeserializeProvider;
 use ApiPlatform\State\Provider\ParameterProvider;
 use ApiPlatform\State\Provider\ReadProvider;
-use ApiPlatform\State\Provider\SecurityParameterProvider;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\SerializerContextBuilderInterface;
 use Illuminate\Config\Repository as ConfigRepository;
-use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerInterface;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
@@ -195,7 +172,6 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
-use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
@@ -328,69 +304,6 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(PropertyNameCollectionFactoryInterface::class),
                 $app->make(PropertyMetadataFactoryInterface::class),
                 $app->make(ResourceClassResolverInterface::class),
-            );
-        });
-
-        // TODO: add cached metadata factories
-        $this->app->singleton(ResourceMetadataCollectionFactoryInterface::class, function (Application $app) {
-            /** @var ConfigRepository $config */
-            $config = $app['config'];
-            $formats = $config->get('api-platform.formats');
-
-            if ($config->get('api-platform.swagger_ui.enabled', false) && !isset($formats['html'])) {
-                $formats['html'] = ['text/html'];
-            }
-
-            return new CacheResourceCollectionMetadataFactory(
-                new EloquentResourceCollectionMetadataFactory(
-                    new ParameterValidationResourceMetadataCollectionFactory(
-                        new ParameterResourceMetadataCollectionFactory(
-                            $this->app->make(PropertyNameCollectionFactoryInterface::class),
-                            $this->app->make(PropertyMetadataFactoryInterface::class),
-                            new AlternateUriResourceMetadataCollectionFactory(
-                                new FiltersResourceMetadataCollectionFactory(
-                                    new FormatsResourceMetadataCollectionFactory(
-                                        new InputOutputResourceMetadataCollectionFactory(
-                                            new PhpDocResourceMetadataCollectionFactory(
-                                                new OperationNameResourceMetadataCollectionFactory(
-                                                    new LinkResourceMetadataCollectionFactory(
-                                                        $app->make(LinkFactoryInterface::class),
-                                                        new UriTemplateResourceMetadataCollectionFactory(
-                                                            $app->make(LinkFactoryInterface::class),
-                                                            $app->make(PathSegmentNameGeneratorInterface::class),
-                                                            new NotExposedOperationResourceMetadataCollectionFactory(
-                                                                $app->make(LinkFactoryInterface::class),
-                                                                new AttributesResourceMetadataCollectionFactory(
-                                                                    new ConcernsResourceMetadataCollectionFactory(
-                                                                        null,
-                                                                        $app->make(LoggerInterface::class),
-                                                                        $config->get('api-platform.defaults', []),
-                                                                        $config->get('api-platform.graphql.enabled'),
-                                                                    ),
-                                                                    $app->make(LoggerInterface::class),
-                                                                    $config->get('api-platform.defaults', []),
-                                                                    $config->get('api-platform.graphql.enabled'),
-                                                                ),
-                                                            )
-                                                        ),
-                                                        $config->get('api-platform.graphql.enabled')
-                                                    )
-                                                )
-                                            )
-                                        ),
-                                        $formats,
-                                        $config->get('api-platform.patch_formats'),
-                                    )
-                                )
-                            ),
-                            $app->make('filters'),
-                            $app->make(CamelCaseToSnakeCaseNameConverter::class),
-                            $this->app->make(LoggerInterface::class)
-                        ),
-                        $app->make('filters')
-                    )
-                ),
-                true === $config->get('app.debug') ? 'array' : $config->get('api-platform.cache', 'file')
             );
         });
 
@@ -991,25 +904,6 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(
-            ExceptionHandlerInterface::class,
-            function (Application $app) {
-                /** @var ConfigRepository */
-                $config = $app['config'];
-
-                return new ErrorHandler(
-                    $app,
-                    $app->make(ResourceMetadataCollectionFactoryInterface::class),
-                    $app->make(ApiPlatformController::class),
-                    $app->make(IdentifiersExtractorInterface::class),
-                    $app->make(ResourceClassResolverInterface::class),
-                    $app->make(Negotiator::class),
-                    $config->get('api-platform.exception_to_status'),
-                    $config->get('app.debug')
-                );
-            }
-        );
-
         $this->app->singleton(InflectorInterface::class, function (Application $app) {
             return new Inflector();
         });
@@ -1162,22 +1056,6 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->alias(GraphQlDenormalizeProvider::class, 'api_platform.graphql.state_provider.denormalize');
 
-        // todo add this to deferred
-        $this->app->singleton('api_platform.graphql.state_provider.parameter', function (Application $app) {
-            $tagged = iterator_to_array($app->tagged(ParameterProviderInterface::class));
-            $tagged['api_platform.serializer.filter_parameter_provider'] = $app->make(SerializerFilterParameterProvider::class);
-
-            return new ParameterProvider(
-                new ParameterValidatorProvider(
-                    new SecurityParameterProvider(
-                        $app->make(GraphQlDenormalizeProvider::class),
-                        $app->make(ResourceAccessCheckerInterface::class)
-                    ),
-                ),
-                new ServiceLocator($tagged)
-            );
-        });
-
         $this->app->singleton('api_platform.graphql.state_provider.access_checker', function (Application $app) {
             return new AccessCheckerProvider($app->make('api_platform.graphql.state_provider.parameter'), $app->make(ResourceAccessCheckerInterface::class));
         });
@@ -1202,27 +1080,6 @@ class ApiPlatformProvider extends ServiceProvider
             return new ResolverFactory(
                 $app->make('api_platform.graphql.state_provider.access_checker'),
                 $app->make('api_platform.graphql.state_processor')
-            );
-        });
-
-        $this->app->singleton(FieldsBuilderEnumInterface::class, function (Application $app) {
-            /** @var ConfigRepository */
-            $config = $app['config'];
-
-            return new FieldsBuilder(
-                $app->make(PropertyNameCollectionFactoryInterface::class),
-                $app->make(PropertyMetadataFactoryInterface::class),
-                $app->make(ResourceMetadataCollectionFactoryInterface::class),
-                $app->make(ResourceClassResolverInterface::class),
-                $app->make(TypesContainerInterface::class),
-                $app->make(ContextAwareTypeBuilderInterface::class),
-                $app->make(TypeConverterInterface::class),
-                $app->make(ResolverFactoryInterface::class),
-                $app->make('filters'),
-                $app->make(Pagination::class),
-                $app->make(NameConverterInterface::class),
-                $config->get('api-platform.graphql.nesting_separator') ?? '__',
-                $app->make(InflectorInterface::class)
             );
         });
 
