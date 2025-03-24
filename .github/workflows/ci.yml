@@ -1283,3 +1283,32 @@ jobs:
           composer run-script test
         working-directory: 'src/Laravel'
 
+  laravel-e2e:
+    name: Laravel E2E installation (PHP 8.4)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          tools: pecl, composer
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
+          ini-values: memory_limit=-1
+      - name: Update project dependencies
+        run: |
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link . --permanent
+      - name: Setup laravel project
+        run: |
+          composer global require laravel/installer
+          laravel new test-api-platform-install --pest --no-interaction
+      - name: Install api-platform/laravel
+        run: |
+          composer global link ../src/Laravel --permanent
+          composer require api-platform/laravel:"@dev"
+          php ./artisan api-platform:install
+        working-directory: 'test-api-platform-install'
