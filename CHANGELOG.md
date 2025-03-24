@@ -1,5 +1,14 @@
 # Changelog
 
+## v4.1.3
+
+### Bug fixes
+
+* [8a2265041](https://github.com/api-platform/core/commit/8a22650419fd32efdafad43493f2327b38dd3ee6) fix(laravel): defer "filters" dependent services (#7045)
+
+
+### Features
+
 ## v4.1.2
 
 ### Bug fixes
