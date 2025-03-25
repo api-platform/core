@@ -75,6 +75,7 @@ use ApiPlatform\JsonSchema\SchemaFactory;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Laravel\ApiResource\Error;
 use ApiPlatform\Laravel\ApiResource\ValidationError;
+use ApiPlatform\Laravel\Controller\ApiPlatformController;
 use ApiPlatform\Laravel\Controller\DocumentationController;
 use ApiPlatform\Laravel\Controller\EntrypointController;
 use ApiPlatform\Laravel\Eloquent\Filter\JsonApi\SortFilterParameterProvider;
@@ -87,6 +88,7 @@ use ApiPlatform\Laravel\Eloquent\Metadata\ResourceClassResolver as EloquentResou
 use ApiPlatform\Laravel\Eloquent\PropertyAccess\PropertyAccessor as EloquentPropertyAccessor;
 use ApiPlatform\Laravel\Eloquent\Serializer\SerializerContextBuilder as EloquentSerializerContextBuilder;
 use ApiPlatform\Laravel\Eloquent\Serializer\SnakeCaseToCamelCaseNameConverter;
+use ApiPlatform\Laravel\Exception\ErrorHandler;
 use ApiPlatform\Laravel\GraphQl\Controller\EntrypointController as GraphQlEntrypointController;
 use ApiPlatform\Laravel\GraphQl\Controller\GraphiQlController;
 use ApiPlatform\Laravel\JsonApi\State\JsonApiProvider;
@@ -154,6 +156,7 @@ use ApiPlatform\State\Provider\ReadProvider;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\SerializerContextBuilderInterface;
 use Illuminate\Config\Repository as ConfigRepository;
+use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerInterface;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
@@ -316,6 +319,10 @@ class ApiPlatformProvider extends ServiceProvider
             $defaultContext = $config->get('api-platform.serializer', []);
 
             return new HydraPrefixNameConverter(new MetadataAwareNameConverter($app->make(ClassMetadataFactoryInterface::class), $app->make(SnakeCaseToCamelCaseNameConverter::class)), $defaultContext);
+        });
+
+        $this->app->singleton(OperationMetadataFactory::class, function (Application $app) {
+            return new OperationMetadataFactory($app->make(ResourceNameCollectionFactoryInterface::class), $app->make(ResourceMetadataCollectionFactoryInterface::class));
         });
 
         $this->app->bind(OperationMetadataFactoryInterface::class, OperationMetadataFactory::class);
@@ -1121,6 +1128,26 @@ class ApiPlatformProvider extends ServiceProvider
                 formats: $config->get('api-platform.formats')
             );
         });
+
+        $this->app->singleton(
+            ExceptionHandlerInterface::class,
+            function (Application $app) {
+                /** @var ConfigRepository */
+                $config = $app['config'];
+
+                return new ErrorHandler(
+                    $app,
+                    $app->make(ResourceMetadataCollectionFactoryInterface::class),
+                    $app->make(ApiPlatformController::class),
+                    $app->make(IdentifiersExtractorInterface::class),
+                    $app->make(ResourceClassResolverInterface::class),
+                    $app->make(Negotiator::class),
+                    $config->get('api-platform.exception_to_status'),
+                    $config->get('app.debug'),
+                    $config->get('api-platform.error_formats')
+                );
+            }
+        );
     }
 
     /**

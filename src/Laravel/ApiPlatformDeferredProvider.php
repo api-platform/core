@@ -22,7 +22,6 @@ use ApiPlatform\GraphQl\Type\TypeConverterInterface;
 use ApiPlatform\GraphQl\Type\TypesContainerInterface;
 use ApiPlatform\JsonApi\Filter\SparseFieldset;
 use ApiPlatform\JsonApi\Filter\SparseFieldsetParameterProvider;
-use ApiPlatform\Laravel\Controller\ApiPlatformController;
 use ApiPlatform\Laravel\Eloquent\Extension\FilterQueryExtension;
 use ApiPlatform\Laravel\Eloquent\Extension\QueryExtensionInterface;
 use ApiPlatform\Laravel\Eloquent\Filter\BooleanFilter;
@@ -41,12 +40,10 @@ use ApiPlatform\Laravel\Eloquent\State\LinksHandler;
 use ApiPlatform\Laravel\Eloquent\State\LinksHandlerInterface;
 use ApiPlatform\Laravel\Eloquent\State\PersistProcessor;
 use ApiPlatform\Laravel\Eloquent\State\RemoveProcessor;
-use ApiPlatform\Laravel\Exception\ErrorHandler;
 use ApiPlatform\Laravel\Metadata\CacheResourceCollectionMetadataFactory;
 use ApiPlatform\Laravel\Metadata\ParameterValidationResourceMetadataCollectionFactory;
 use ApiPlatform\Laravel\State\ParameterValidatorProvider;
 use ApiPlatform\Laravel\State\SwaggerUiProcessor;
-use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\InflectorInterface;
 use ApiPlatform\Metadata\Operation\PathSegmentNameGeneratorInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -81,11 +78,9 @@ use ApiPlatform\State\Provider\DeserializeProvider;
 use ApiPlatform\State\Provider\ParameterProvider;
 use ApiPlatform\State\Provider\SecurityParameterProvider;
 use ApiPlatform\State\ProviderInterface;
-use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerInterface;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
-use Negotiation\Negotiator;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -247,25 +242,6 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
                 true === $config->get('app.debug') ? 'array' : $config->get('api-platform.cache', 'file')
             );
         });
-
-        $this->app->singleton(
-            ExceptionHandlerInterface::class,
-            function (Application $app) {
-                /** @var ConfigRepository */
-                $config = $app['config'];
-
-                return new ErrorHandler(
-                    $app,
-                    $app->make(ResourceMetadataCollectionFactoryInterface::class),
-                    $app->make(ApiPlatformController::class),
-                    $app->make(IdentifiersExtractorInterface::class),
-                    $app->make(ResourceClassResolverInterface::class),
-                    $app->make(Negotiator::class),
-                    $config->get('api-platform.exception_to_status'),
-                    $config->get('app.debug')
-                );
-            }
-        );
 
         if (interface_exists(FieldsBuilderEnumInterface::class)) {
             $this->registerGraphQl();
