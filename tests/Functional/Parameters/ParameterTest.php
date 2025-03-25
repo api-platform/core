@@ -34,6 +34,7 @@ final class ParameterTest extends ApiTestCase
     public function testWithGroupFilter(): void
     {
         $response = self::createClient()->request('GET', 'with_parameters/1?groups[]=b');
+        $this->assertArrayNotHasKey('a', $response->toArray());
         $this->assertArraySubset(['b' => 'bar'], $response->toArray());
         $response = self::createClient()->request('GET', 'with_parameters/1?groups[]=b&groups[]=a');
         $this->assertArraySubset(['a' => 'foo', 'b' => 'bar'], $response->toArray());
