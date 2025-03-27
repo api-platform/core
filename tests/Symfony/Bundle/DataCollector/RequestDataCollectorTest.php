@@ -20,8 +20,6 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Symfony\Bundle\DataCollector\RequestDataCollector;
 use ApiPlatform\Tests\Fixtures\DummyEntity;
-use Composer\InstalledVersions;
-use PackageVersions\Versions;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -73,7 +71,6 @@ class RequestDataCollectorTest extends TestCase
             $this->response
         );
 
-        $this->assertEquals([], $dataCollector->getRequestAttributes());
         $this->assertEquals(['foo', 'bar'], $dataCollector->getAcceptableContentTypes());
         $this->assertEquals([], $dataCollector->getResources());
     }
@@ -88,14 +85,13 @@ class RequestDataCollectorTest extends TestCase
             $this->filterLocator->reveal()
         );
 
-        $this->assertEquals([], $dataCollector->getRequestAttributes());
         $this->assertEquals([], $dataCollector->getAcceptableContentTypes());
         $this->assertEquals([], $dataCollector->getResources());
     }
 
     public function testWithResource(): void
     {
-        $this->apiResourceClassWillReturn(DummyEntity::class, ['_api_operation_name' => 'get', '_api_receive' => true]);
+        $this->apiResourceClassWillReturn(DummyEntity::class, ['_api_operation_name' => 'get']);
         $this->request->attributes = $this->attributes->reveal();
 
         $this->filterLocator->has('foo')->willReturn(false)->shouldBeCalled();
@@ -112,14 +108,6 @@ class RequestDataCollectorTest extends TestCase
             $this->response
         );
 
-        $this->assertEquals([
-            'resource_class' => DummyEntity::class,
-            'has_composite_identifier' => false,
-            'operation_name' => 'get',
-            'receive' => true,
-            'respond' => true,
-            'persist' => true,
-        ], $dataCollector->getRequestAttributes());
         $this->assertEquals(['foo', 'bar'], $dataCollector->getAcceptableContentTypes());
 
         $resource = $dataCollector->getResources()[0];
@@ -147,59 +135,11 @@ class RequestDataCollectorTest extends TestCase
         );
     }
 
-    public function testVersionCollection(): void
-    {
-        $this->apiResourceClassWillReturn(DummyEntity::class);
-
-        $this->filterLocator->has('a_filter')->willReturn(false);
-        $this->filterLocator->has('foo')->willReturn(false);
-
-        $dataCollector = new RequestDataCollector(
-            $this->metadataFactory->reveal(),
-            $this->filterLocator->reveal(),
-        );
-
-        $dataCollector->collect(
-            $this->request->reveal(),
-            $this->response
-        );
-
-        if (class_exists(InstalledVersions::class)) {
-            $this->assertTrue(null !== $dataCollector->getVersion());
-        } else {
-            $this->assertSame(null !== $dataCollector->getVersion(), class_exists(Versions::class));
-        }
-    }
-
-    public function testWithPreviousData(): void
-    {
-        $data = new \stdClass();
-        $data->a = $data;
-
-        $this->apiResourceClassWillReturn(DummyEntity::class, ['_api_operation_name' => 'get', '_api_receive' => true, 'previous_data' => $data]);
-        $this->request->attributes = $this->attributes->reveal();
-
-        $this->filterLocator->has('foo')->willReturn(false);
-        $this->filterLocator->has('a_filter')->willReturn(true);
-        $this->filterLocator->get('a_filter')->willReturn(new \stdClass());
-
-        $dataCollector = new RequestDataCollector(
-            $this->metadataFactory->reveal(),
-            $this->filterLocator->reveal()
-        );
-
-        $dataCollector->collect(
-            $this->request->reveal(),
-            $this->response
-        );
-
-        $this->assertArrayHasKey('previous_data', $requestAttributes = $dataCollector->getRequestAttributes());
-        $this->assertNotSame($requestAttributes['previous_data']->data, $requestAttributes['previous_data']);
-    }
-
     private function apiResourceClassWillReturn(?string $data, array $context = []): void
     {
         $this->attributes->get('_api_resource_class')->shouldBeCalled()->willReturn($data);
+        $this->attributes->get('_api_operation_name')->shouldBeCalled()->willReturn($context['_api_operation_name'] ?? null);
+        $this->attributes->get('_api_operation')->shouldBeCalled()->willReturn($context['_api_operation'] ?? new Get());
         $this->attributes->get('_graphql', false)->shouldBeCalled()->willReturn(false);
         $this->attributes->all()->willReturn([
             '_api_resource_class' => $data,
