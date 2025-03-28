@@ -1,5 +1,16 @@
 # Changelog
 
+## v4.1.4
+
+### Bug fixes
+
+* [eaf007536](https://github.com/api-platform/core/commit/eaf00753693a493788f5ad60c4c45295048eb1a7) fix(state): support filter interface on serializer filter parameter provider (#7047)
+* [b0fa2291e](https://github.com/api-platform/core/commit/b0fa2291e50a57789eb14777277769627931cfbd) fix(laravel): error handler only on api routes (#7049)
+* [1eb9da13a](https://github.com/api-platform/core/commit/1eb9da13a7e06a8d380dfa27e23a0f8457ceb2bd) fix(laravel): missing filters (#7056)
+* [a46a76889](https://github.com/api-platform/core/commit/a46a7688958428b76eb7b6181ae1636cd3b7a4bf) fix(symfony): serialization of closure inside the profiler (#7054)
+* [c1b50e2cb](https://github.com/api-platform/core/commit/c1b50e2cb082b00a371bf62c7e86c2f3fea5dadf) fix(doctrine): joinColumn might be an array (#7060)
+* [f4c426d71](https://github.com/api-platform/core/commit/f4c426d719b01debaa993b00d03cce8964057ecc) Revert "fix(doctrine): throw an exception when a filter is not found in a par…" (#7046)
+
 ## v4.1.3
 
 ### Bug fixes
