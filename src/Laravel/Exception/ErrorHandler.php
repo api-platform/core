@@ -41,6 +41,7 @@ class ErrorHandler extends ExceptionsHandler
 
     /**
      * @param array<class-string, int> $exceptionToStatus
+     * @param array<string, string[]>  $errorFormats
      */
     public function __construct(
         Container $container,
