@@ -1,5 +1,37 @@
 # Changelog
 
+## v4.1.4
+
+### Bug fixes
+
+* [eaf007536](https://github.com/api-platform/core/commit/eaf00753693a493788f5ad60c4c45295048eb1a7) fix(state): support filter interface on serializer filter parameter provider (#7047)
+* [b0fa2291e](https://github.com/api-platform/core/commit/b0fa2291e50a57789eb14777277769627931cfbd) fix(laravel): error handler only on api routes (#7049)
+* [1eb9da13a](https://github.com/api-platform/core/commit/1eb9da13a7e06a8d380dfa27e23a0f8457ceb2bd) fix(laravel): missing filters (#7056)
+* [a46a76889](https://github.com/api-platform/core/commit/a46a7688958428b76eb7b6181ae1636cd3b7a4bf) fix(symfony): serialization of closure inside the profiler (#7054)
+* [c1b50e2cb](https://github.com/api-platform/core/commit/c1b50e2cb082b00a371bf62c7e86c2f3fea5dadf) fix(doctrine): joinColumn might be an array (#7060)
+* [f4c426d71](https://github.com/api-platform/core/commit/f4c426d719b01debaa993b00d03cce8964057ecc) Revert "fix(doctrine): throw an exception when a filter is not found in a par…" (#7046)
+
+## v4.1.3
+
+### Bug fixes
+
+* [8a2265041](https://github.com/api-platform/core/commit/8a22650419fd32efdafad43493f2327b38dd3ee6) fix(laravel): defer "filters" dependent services (#7045)
+
+
+### Features
+
+## v4.1.2
+
+### Bug fixes
+
+* [42f25cf04](https://github.com/api-platform/core/commit/42f25cf0461c382ce10e2378be5e9428c23eb94a) fix: react@18 for UMD + add Laravel support in update-js.sh (#7028)
+* [77ffc380b](https://github.com/api-platform/core/commit/77ffc380bcd3c22a1eb4fb0c4f1cd265cfd1a898) fix(laravel): do not require tests while autoconfiguring (#7024)
+* [935b9b55d](https://github.com/api-platform/core/commit/935b9b55da0eacce3dd2bbed4584b10b154d97c2) fix(laravel): json api default parameters (#7027)
+* [a2824ff4b](https://github.com/api-platform/core/commit/a2824ff4be6276e37e37a3b4e4fb2e9a0096789c) fix(laravel): defer autoconfiguration (#7040)
+
+
+### Features
+
 ## v4.1.1
 
 ### Bug fixes
@@ -119,6 +151,17 @@ On write operations, we added the [expectsHeader](https://www.hydra-cg.com/spec/
 * [c78ed0b78](https://github.com/api-platform/core/commit/c78ed0b78baf5d2e1b7444a9882ba039c70a3887) feat(laravel): boolean filter (#6806)
 * [d0a442786](https://github.com/api-platform/core/commit/d0a44278630d201b91cbba0774a09f4eeaac88f7) feat(doctrine): enhance getLinksHandler with method validation and typo suggestions (#6874)
 * [f67f6f1ac](https://github.com/api-platform/core/commit/f67f6f1acb6476182c18a3503f2a8bc80ae89a0b)  feat(doctrine): doctrine filters like laravel eloquent filters  (#6775)
+
+## v4.0.21
+
+### Bug fixes
+
+* [7cb5a6db8](https://github.com/api-platform/core/commit/7cb5a6db87241d95e6c324318fe861bd4f1820cf) fix: allow parameter provider as object (#7032)
+* [bb83e9a03](https://github.com/api-platform/core/commit/bb83e9a034c511156aa20a8555bf367374ef5458) fix(symfony): allow to merge array with string in global defaults (#7037)
+* [da2e86809](https://github.com/api-platform/core/commit/da2e86809d4a8dec294dc2fc148d92406f1f7fd1) fix: header parameter should be case insensitive (#7031)
+
+
+### Features
 
 ## v4.0.20
 

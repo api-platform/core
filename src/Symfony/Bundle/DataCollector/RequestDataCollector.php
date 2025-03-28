@@ -15,9 +15,6 @@ namespace ApiPlatform\Symfony\Bundle\DataCollector;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\State\Util\RequestAttributesExtractor;
-use Composer\InstalledVersions;
-use PackageVersions\Versions;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -42,17 +39,22 @@ final class RequestDataCollector extends DataCollector
         if ($request->attributes->get('_graphql', false)) {
             $resourceClasses = array_keys($request->attributes->get('_graphql_args', []));
         } else {
-            $resourceClasses = array_filter([$request->attributes->get('_api_resource_class')]);
+            $cl = $request->attributes->get('_api_resource_class');
+            $resourceClasses = $cl ? [$cl] : [];
         }
 
-        $requestAttributes = RequestAttributesExtractor::extractAttributes($request);
-        if (isset($requestAttributes['previous_data'])) {
-            $requestAttributes['previous_data'] = $this->cloneVar($requestAttributes['previous_data']);
-        }
-
-        $this->data['request_attributes'] = $requestAttributes;
+        $this->data['operation_name'] = $request->attributes->get('_api_operation_name');
         $this->data['acceptable_content_types'] = $request->getAcceptableContentTypes();
-        $this->data['resources'] = array_map(fn (string $resourceClass): DataCollected => $this->collectDataByResource($resourceClass, $request), $resourceClasses);
+        $this->data['resources'] = array_map(fn (string $resourceClass): DataCollected => $this->collectDataByResource($resourceClass), $resourceClasses);
+
+        $parameters = [];
+        if ($operation = $request->attributes->get('_api_operation')) {
+            foreach ($operation->getParameters() ?? [] as $key => $param) {
+                $parameters[$key] = $this->cloneVar($param);
+            }
+        }
+
+        $this->data['parameters'] = $parameters;
     }
 
     private function setFilters(ApiResource $resourceMetadata, int $index, array &$filters, array &$counters): void
@@ -66,40 +68,6 @@ final class RequestDataCollector extends DataCollector
             $filters[$index][$id] = null;
             ++$counters['ignored_filters'];
         }
-    }
-
-    // TODO: 4.1 remove Versions as its deprecated
-    public function getVersion(): ?string
-    {
-        if (class_exists(InstalledVersions::class)) {
-            return InstalledVersions::getPrettyVersion('api-platform/symfony') ?? InstalledVersions::getPrettyVersion('api-platform/core');
-        }
-
-        if (!class_exists(Versions::class)) {
-            return null;
-        }
-
-        try {
-            $version = strtok(Versions::getVersion('api-platform/symfony'), '@');
-        } catch (\OutOfBoundsException) {
-            $version = false;
-        }
-
-        if (false === $version) {
-            try {
-                $version = strtok(Versions::getVersion('api-platform/core'), '@');
-            } catch (\OutOfBoundsException) {
-                $version = false;
-            }
-        }
-
-        if (false === $version) {
-            return null;
-        }
-
-        preg_match('/^v(.*?)$/', $version, $output);
-
-        return $output[1] ?? $version;
     }
 
     /**
@@ -120,9 +88,14 @@ final class RequestDataCollector extends DataCollector
         return $this->data['acceptable_content_types'] ?? [];
     }
 
-    public function getRequestAttributes(): array
+    public function getOperationName(): ?string
     {
-        return $this->data['request_attributes'] ?? [];
+        return $this->data['operation_name'] ?? null;
+    }
+
+    public function getParameters(): array
+    {
+        return $this->data['parameters'] ?? [];
     }
 
     public function getResources(): array
@@ -138,7 +111,7 @@ final class RequestDataCollector extends DataCollector
         $this->data = [];
     }
 
-    private function collectDataByResource(string $resourceClass, Request $request): DataCollected
+    private function collectDataByResource(string $resourceClass): DataCollected
     {
         $resourceMetadataCollection = $resourceClass ? $this->metadataFactory->create($resourceClass) : [];
         $filters = [];

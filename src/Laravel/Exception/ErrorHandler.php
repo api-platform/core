@@ -27,7 +27,6 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionsHandler;
-use Illuminate\Http\Request;
 use Negotiation\Negotiator;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface as SymfonyHttpExceptionInterface;
@@ -42,6 +41,7 @@ class ErrorHandler extends ExceptionsHandler
 
     /**
      * @param array<class-string, int> $exceptionToStatus
+     * @param array<string, string[]>  $errorFormats
      */
     public function __construct(
         Container $container,
@@ -52,112 +52,114 @@ class ErrorHandler extends ExceptionsHandler
         ?Negotiator $negotiator = null,
         private readonly ?array $exceptionToStatus = null,
         private readonly ?bool $debug = false,
+        private readonly ?array $errorFormats = null,
     ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->negotiator = $negotiator;
-        // calls register
         parent::__construct($container);
-        $this->register();
     }
 
-    public function register(): void
+    public function render($request, \Throwable $exception)
     {
-        $this->renderable(function (\Throwable $exception, Request $request) {
-            $apiOperation = $this->initializeOperation($request);
-            if (!$apiOperation) {
-                return null;
-            }
+        $apiOperation = $this->initializeOperation($request);
 
-            $formats = config('api-platform.error_formats') ?? ['jsonproblem' => ['application/problem+json']];
-            $format = $request->getRequestFormat() ?? $this->getRequestFormat($request, $formats, false);
+        if (!$apiOperation) {
+            return parent::render($request, $exception);
+        }
 
-            if ($this->resourceClassResolver->isResourceClass($exception::class)) {
-                $resourceCollection = $this->resourceMetadataCollectionFactory->create($exception::class);
+        $formats = $this->errorFormats ?? ['jsonproblem' => ['application/problem+json']];
+        $format = $request->getRequestFormat() ?? $this->getRequestFormat($request, $formats, false);
 
-                $operation = null;
-                foreach ($resourceCollection as $resource) {
-                    foreach ($resource->getOperations() as $op) {
-                        foreach ($op->getOutputFormats() as $key => $value) {
-                            if ($key === $format) {
-                                $operation = $op;
-                                break 3;
-                            }
+        if ($this->resourceClassResolver->isResourceClass($exception::class)) {
+            $resourceCollection = $this->resourceMetadataCollectionFactory->create($exception::class);
+
+            $operation = null;
+            foreach ($resourceCollection as $resource) {
+                foreach ($resource->getOperations() as $op) {
+                    foreach ($op->getOutputFormats() as $key => $value) {
+                        if ($key === $format) {
+                            $operation = $op;
+                            break 3;
                         }
                     }
                 }
+            }
 
-                // No operation found for the requested format, we take the first available
-                if (!$operation) {
-                    $operation = $resourceCollection->getOperation();
+            // No operation found for the requested format, we take the first available
+            if (!$operation) {
+                $operation = $resourceCollection->getOperation();
+            }
+            $errorResource = $exception;
+            if ($errorResource instanceof ProblemExceptionInterface && $operation instanceof HttpOperation) {
+                $statusCode = $this->getStatusCode($apiOperation, $operation, $exception);
+                $operation = $operation->withStatus($statusCode);
+                if ($errorResource instanceof StatusAwareExceptionInterface) {
+                    $errorResource->setStatus($statusCode);
                 }
-                $errorResource = $exception;
-                if ($errorResource instanceof ProblemExceptionInterface && $operation instanceof HttpOperation) {
-                    $statusCode = $this->getStatusCode($apiOperation, $operation, $exception);
-                    $operation = $operation->withStatus($statusCode);
-                    if ($errorResource instanceof StatusAwareExceptionInterface) {
-                        $errorResource->setStatus($statusCode);
-                    }
-                }
-            } else {
-                // Create a generic, rfc7807 compatible error according to the wanted format
-                $operation = $this->resourceMetadataCollectionFactory->create(Error::class)->getOperation($this->getFormatOperation($format));
-                // status code may be overridden by the exceptionToStatus option
-                $statusCode = 500;
-                if ($operation instanceof HttpOperation) {
-                    $statusCode = $this->getStatusCode($apiOperation, $operation, $exception);
-                    $operation = $operation->withStatus($statusCode);
-                }
-
-                $errorResource = Error::createFromException($exception, $statusCode);
+            }
+        } else {
+            // Create a generic, rfc7807 compatible error according to the wanted format
+            $operation = $this->resourceMetadataCollectionFactory->create(Error::class)->getOperation($this->getFormatOperation($format));
+            // status code may be overridden by the exceptionToStatus option
+            $statusCode = 500;
+            if ($operation instanceof HttpOperation) {
+                $statusCode = $this->getStatusCode($apiOperation, $operation, $exception);
+                $operation = $operation->withStatus($statusCode);
             }
 
-            /** @var HttpOperation $operation */
-            if (!$operation->getProvider()) {
-                static::$error = $errorResource;
-                $operation = $operation->withProvider([self::class, 'provide']);
-            }
+            $errorResource = Error::createFromException($exception, $statusCode);
+        }
 
-            // For our swagger Ui errors
-            if ('html' === $format) {
-                $operation = $operation->withOutputFormats(['html' => ['text/html']]);
-            }
+        /** @var HttpOperation $operation */
+        if (!$operation->getProvider()) {
+            static::$error = $errorResource;
+            $operation = $operation->withProvider([self::class, 'provide']);
+        }
 
-            $identifiers = [];
-            try {
-                $identifiers = $this->identifiersExtractor?->getIdentifiersFromItem($errorResource, $operation) ?? [];
-            } catch (\Exception $e) {
-            }
+        // For our swagger Ui errors
+        if ('html' === $format) {
+            $operation = $operation->withOutputFormats(['html' => ['text/html']]);
+        }
 
-            $normalizationContext = $operation->getNormalizationContext() ?? [];
-            if (!($normalizationContext['api_error_resource'] ?? false)) {
-                $normalizationContext += ['api_error_resource' => true];
-            }
+        $identifiers = [];
+        try {
+            $identifiers = $this->identifiersExtractor?->getIdentifiersFromItem($errorResource, $operation) ?? [];
+        } catch (\Exception $e) {
+        }
 
-            if (!isset($normalizationContext[AbstractObjectNormalizer::IGNORED_ATTRIBUTES])) {
-                $normalizationContext[AbstractObjectNormalizer::IGNORED_ATTRIBUTES] = true === $this->debug ? [] : ['originalTrace'];
-            }
+        $normalizationContext = $operation->getNormalizationContext() ?? [];
+        if (!($normalizationContext['api_error_resource'] ?? false)) {
+            $normalizationContext += ['api_error_resource' => true];
+        }
 
-            $operation = $operation->withNormalizationContext($normalizationContext);
+        if (!isset($normalizationContext[AbstractObjectNormalizer::IGNORED_ATTRIBUTES])) {
+            $normalizationContext[AbstractObjectNormalizer::IGNORED_ATTRIBUTES] = true === $this->debug ? [] : ['originalTrace'];
+        }
 
-            $dup = $request->duplicate(null, null, []);
-            $dup->setMethod('GET');
-            $dup->attributes->set('_api_resource_class', $operation->getClass());
-            $dup->attributes->set('_api_previous_operation', $apiOperation);
-            $dup->attributes->set('_api_operation', $operation);
-            $dup->attributes->set('_api_operation_name', $operation->getName());
-            $dup->attributes->set('exception', $exception);
-            // These are for swagger
-            $dup->attributes->set('_api_original_route', $request->attributes->get('_route'));
-            $dup->attributes->set('_api_original_uri_variables', $request->attributes->get('_api_uri_variables'));
-            $dup->attributes->set('_api_original_route_params', $request->attributes->get('_route_params'));
-            $dup->attributes->set('_api_requested_operation', $request->attributes->get('_api_requested_operation'));
+        $operation = $operation->withNormalizationContext($normalizationContext);
 
-            foreach ($identifiers as $name => $value) {
-                $dup->attributes->set($name, $value);
-            }
+        $dup = $request->duplicate(null, null, []);
+        $dup->setMethod('GET');
+        $dup->attributes->set('_api_resource_class', $operation->getClass());
+        $dup->attributes->set('_api_previous_operation', $apiOperation);
+        $dup->attributes->set('_api_operation', $operation);
+        $dup->attributes->set('_api_operation_name', $operation->getName());
+        $dup->attributes->set('exception', $exception);
+        // These are for swagger
+        $dup->attributes->set('_api_original_route', $request->attributes->get('_route'));
+        $dup->attributes->set('_api_original_uri_variables', $request->attributes->get('_api_uri_variables'));
+        $dup->attributes->set('_api_original_route_params', $request->attributes->get('_route_params'));
+        $dup->attributes->set('_api_requested_operation', $request->attributes->get('_api_requested_operation'));
 
+        foreach ($identifiers as $name => $value) {
+            $dup->attributes->set($name, $value);
+        }
+
+        try {
             return $this->apiPlatformController->__invoke($dup);
-        });
+        } catch (\Throwable $e) {
+            return parent::render($dup, $e);
+        }
     }
 
     private function getStatusCode(?HttpOperation $apiOperation, ?HttpOperation $errorOperation, \Throwable $exception): int

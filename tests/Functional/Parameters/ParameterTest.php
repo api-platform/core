@@ -34,6 +34,7 @@ final class ParameterTest extends ApiTestCase
     public function testWithGroupFilter(): void
     {
         $response = self::createClient()->request('GET', 'with_parameters/1?groups[]=b');
+        $this->assertArrayNotHasKey('a', $response->toArray());
         $this->assertArraySubset(['b' => 'bar'], $response->toArray());
         $response = self::createClient()->request('GET', 'with_parameters/1?groups[]=b&groups[]=a');
         $this->assertArraySubset(['a' => 'foo', 'b' => 'bar'], $response->toArray());
@@ -52,6 +53,12 @@ final class ParameterTest extends ApiTestCase
     }
 
     public function testWithServiceProvider(): void
+    {
+        $response = self::createClient()->request('GET', 'with_parameters/1?service=blabla');
+        $this->assertArrayNotHasKey('a', $response->toArray());
+    }
+
+    public function testWithObjectProvider(): void
     {
         $response = self::createClient()->request('GET', 'with_parameters/1?service=blabla');
         $this->assertArrayNotHasKey('a', $response->toArray());
@@ -92,5 +99,14 @@ final class ParameterTest extends ApiTestCase
             ['(complex stuff)'],
             'blabla',
         ]);
+    }
+
+    public function testHeaderParameterRequired(): void
+    {
+        self::createClient()->request('GET', 'header_required', ['headers' => ['req' => 'blabla']]);
+        $this->assertResponseStatusCodeSame(200);
+
+        self::createClient()->request('GET', 'header_required', ['headers' => []]);
+        $this->assertResponseStatusCodeSame(422);
     }
 }

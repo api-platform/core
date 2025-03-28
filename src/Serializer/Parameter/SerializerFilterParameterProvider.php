@@ -35,12 +35,14 @@ final class SerializerFilterParameterProvider implements ParameterProviderInterf
             return null;
         }
 
-        $filter = $parameter->getFilter();
-        if (!\is_string($filter) || !$this->filterLocator->has($filter)) {
+        if (null === ($filter = $parameter->getFilter())) {
             return null;
         }
 
-        $filter = $this->filterLocator->get($filter);
+        if (\is_string($filter) && $this->filterLocator->has($filter)) {
+            $filter = $this->filterLocator->get($filter);
+        }
+
         if (!$filter instanceof FilterInterface) {
             return null;
         }

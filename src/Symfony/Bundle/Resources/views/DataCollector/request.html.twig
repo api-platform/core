@@ -1,25 +1,33 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
-{% macro operationLine(key, operation, actualOperationName) %}
+{% macro operationLine(key, operation, actualOperationName, n) %}
+    {% set context_id = 'operation-' ~ n %}
     <tr>
-        <th scope="row"{% if key == actualOperationName %} class="status-success"{% endif %}>{{ key }}</th>
-        <td{% if key == actualOperationName %} class="status-success"{% endif %}>{{- profiler_dump(operation, 1) -}}</td>
+        <th style="width: 40%" scope="row"{% if key == actualOperationName %} class="status-success"{% endif %}>{{ key }}</th>
+        <td style="width: 60%" {% if key == actualOperationName %} class="status-success"{% endif %}>
+          <a class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="Hide context">Show context</a>
+          <div id="{{ context_id }}" class="context sf-toggle-content sf-toggle-hidden">
+              {{- profiler_dump(operation, 2) -}}
+          </div>
+        </td>
     </tr>
 {% endmacro %}
 
-{% macro operationTable(object, name, actualOperationName) %}
+{% macro operationTable(object, actualOperationName) %}
     {% import _self as apiPlatform %}
     <table>
         <thead>
             <tr>
-                <th scope="col" class="key">{% if name is defined %}{{ name|capitalize }}{% endif %}Operations</th>
-                <th scope="col">Attributes</th>
+                <th scope="col" class="key">{% if name is defined %}{{ name|capitalize }}{% endif %}Name</th>
+                <th scope="col">Operation</th>
             </tr>
         </thead>
 
         <tbody>
+        {% set n = 0 %}
         {% for key, itemOperation in object %}
-            {{ apiPlatform.operationLine(key, itemOperation, actualOperationName) }}
+          {% set n = n + 1 %}
+          {{ apiPlatform.operationLine(key, itemOperation, actualOperationName, n) }}
         {% else %}
             <tr>
                 <td colspan="2" class="text-muted">
@@ -83,12 +91,6 @@
     {% endset %}
 
     {% set text %}
-        {% if collector.version %}
-            <div class="sf-toolbar-info-piece">
-                <b>Version</b>
-                <span>{{ collector.version }}</span>
-            </div>
-        {% endif %}
         {% if collector.resources|length == 0 %}
             <div class="sf-toolbar-info-piece">
                 <b>Resource Class</b>
@@ -139,10 +141,11 @@
             </div>
         </div>
         {% if dataCollected.resourceMetadataCollection is not empty %}
-            <h3>Resources</h3>
+            <h2>Resources</h2>
             <div class="tab-content metadata-tab-content">
                 <div class="sf-tabs">
-                    {% for resourceMetadata in dataCollected.resourceMetadataCollection %}
+                    {% for index, resourceMetadata in dataCollected.resourceMetadataCollection %}
+                        {% set context_id = 'context-' ~ resourceMetadata.resource.shortName ~ index %}
                         <div class="tab">
                             <h3 class="tab-title">
                                 {{ resourceMetadata.resource.uriTemplate ?: resourceMetadata.resource.shortName }}
@@ -151,16 +154,69 @@
                                 <table>
                                     <thead>
                                         <tr>
-                                            <th scope="col" class="key">Resource</th>
+                                            <th scope="col" class="key">Name</th>
+                                            <th>ApiResource</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td>{{- profiler_dump(resourceMetadata.resource, 1) -}}</td>
+                                          <td>{{ resourceMetadata.resource.shortName }}</td>
+                                            <td>
+                                              <div>
+                                                  <a class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="Hide context">Show context</a>
+                                                  <div id="{{ context_id }}" class="context sf-toggle-content sf-toggle-hidden">
+                                                      {{- profiler_dump(resourceMetadata.resource, 2) -}}
+                                                  </div>
+                                              </div>
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
-                                {{ apiPlatform.operationTable(resourceMetadata.operations, '', dataCollected.requestAttributes.operation_name|default('')) }}
+                                <h2>Operations</h2>
+                                {{ apiPlatform.operationTable(resourceMetadata.operations, collector.operationName) }}
+                                <h2>Parameters</h2>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" class="key">Key</th>
+                                            <th scope="col">Value</th>
+                                            <th scope="col">Parameter</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if collector.parameters %}
+                                            {% for key, parameter in collector.parameters %}
+                                                {% set context_id = 'parameter-' ~ key %}
+                                                <tr>
+                                                    <td>
+                                                        {{ key }}
+                                                    </td>
+                                                    <td>
+                                                        {% if parameter.extraProperties['_api_values'] is defined %}
+                                                            {{ dump(parameter.extraProperties['_api_values']) }}
+                                                        {% else %}
+                                                            ∅
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        <a class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="Hide context">Show context</a>
+                                                        <div id="{{ context_id }}" class="context sf-toggle-content sf-toggle-hidden">
+                                                          {{- profiler_dump(parameter, 3) -}}
+                                                        </div>
+
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        {% else %}
+                                            <tr>
+                                                <td class="text-muted" colspan="2">
+                                                    No available parameters declared for this resource.
+                                                </td>
+                                            </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                                <h2>Filters</h2>
                                 <table>
                                     <thead>
                                         <tr>
@@ -178,7 +234,7 @@
                                                         {% if ignored_filter %}
                                                             <span class="newline text-muted">ignored filter</span>
                                                         {% else %}
-                                                            {{ dump(filter) }}
+                                                            {{ filter }}
                                                         {% endif %}
                                                     </td>
                                                 </tr>
@@ -200,4 +256,3 @@
         {% endif %}
     {% endfor %}
 {% endblock %}
-
