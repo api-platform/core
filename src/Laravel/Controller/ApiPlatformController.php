@@ -14,10 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Laravel\Controller;
 
 use ApiPlatform\Metadata\HttpOperation;
-use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactory;
+use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
-use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,10 +28,9 @@ class ApiPlatformController extends Controller
      * @param ProcessorInterface<iterable<object>|object|null, Response> $processor
      */
     public function __construct(
-        protected OperationMetadataFactory $operationMetadataFactory,
+        protected OperationMetadataFactoryInterface $operationMetadataFactory,
         protected ProviderInterface $provider,
         protected ProcessorInterface $processor,
-        protected Application $app,
     ) {
     }
 
