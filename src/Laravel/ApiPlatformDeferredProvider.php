@@ -26,6 +26,7 @@ use ApiPlatform\Laravel\Eloquent\Extension\FilterQueryExtension;
 use ApiPlatform\Laravel\Eloquent\Extension\QueryExtensionInterface;
 use ApiPlatform\Laravel\Eloquent\Filter\BooleanFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\DateFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\EndSearchFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\EqualsFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\FilterInterface as EloquentFilterInterface;
 use ApiPlatform\Laravel\Eloquent\Filter\JsonApi\SortFilter;
@@ -33,6 +34,7 @@ use ApiPlatform\Laravel\Eloquent\Filter\JsonApi\SortFilterParameterProvider;
 use ApiPlatform\Laravel\Eloquent\Filter\OrderFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\PartialSearchFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\RangeFilter;
+use ApiPlatform\Laravel\Eloquent\Filter\StartSearchFilter;
 use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Resource\EloquentResourceCollectionMetadataFactory;
 use ApiPlatform\Laravel\Eloquent\State\CollectionProvider;
 use ApiPlatform\Laravel\Eloquent\State\ItemProvider;
@@ -149,11 +151,13 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
 
         $this->autoconfigure($classes, EloquentFilterInterface::class, [
             BooleanFilter::class,
-            EqualsFilter::class,
-            PartialSearchFilter::class,
             DateFilter::class,
+            EndSearchFilter::class,
+            EqualsFilter::class,
             OrderFilter::class,
+            PartialSearchFilter::class,
             RangeFilter::class,
+            StartSearchFilter::class,
             SortFilter::class,
             SparseFieldset::class,
         ]);
