@@ -124,9 +124,9 @@ final class ApiPlatformProfilerPanelTest extends WebTestCase
         $tabContent = $crawler->filter('.tab:nth-of-type(1)');
         $this->assertStringEndsWith('Dummy', trim($tabContent->filter('h3')->html()), 'the resource shortname should be displayed.');
 
-        $this->assertCount(3, $tabContent->filter('table'));
-        $this->assertSame('Resource', $tabContent->filter('table:first-of-type thead th:first-of-type')->html());
-        $this->assertSame('Operations', $tabContent->filter('table:nth-of-type(2) thead th:first-of-type')->html());
-        $this->assertSame('Filters', $tabContent->filter('table:nth-of-type(3) thead th:first-of-type')->html());
+        $this->assertCount(4, $tabContent->filter('table'));
+        $this->assertSame('Name', $tabContent->filter('table:first-of-type thead th:first-of-type')->html());
+        $this->assertSame('Name', $tabContent->filter('table:nth-of-type(2) thead th:first-of-type')->html());
+        $this->assertSame('Key', $tabContent->filter('table:nth-of-type(3) thead th:first-of-type')->html());
     }
 }
