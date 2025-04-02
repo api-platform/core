@@ -54,6 +54,7 @@ final class DocumentationNormalizer implements NormalizerInterface
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly ?NameConverterInterface $nameConverter = null,
         private readonly ?array $defaultContext = [],
+        private readonly ?bool $entrypointEnabled = true,
     ) {
     }
 
@@ -443,19 +444,21 @@ final class DocumentationNormalizer implements NormalizerInterface
      */
     private function getClasses(array $entrypointProperties, array $classes, string $hydraPrefix = ContextBuilder::HYDRA_PREFIX): array
     {
-        $classes[] = [
-            '@id' => '#Entrypoint',
-            '@type' => $hydraPrefix.'Class',
-            $hydraPrefix.'title' => 'Entrypoint',
-            $hydraPrefix.'supportedProperty' => $entrypointProperties,
-            $hydraPrefix.'supportedOperation' => [
-                '@type' => $hydraPrefix.'Operation',
-                $hydraPrefix.'method' => 'GET',
-                $hydraPrefix.'title' => 'index',
-                $hydraPrefix.'description' => 'The API Entrypoint.',
-                $hydraPrefix.'returns' => 'Entrypoint',
-            ],
-        ];
+        if ($this->entrypointEnabled) {
+            $classes[] = [
+                '@id' => '#Entrypoint',
+                '@type' => $hydraPrefix.'Class',
+                $hydraPrefix.'title' => 'Entrypoint',
+                $hydraPrefix.'supportedProperty' => $entrypointProperties,
+                $hydraPrefix.'supportedOperation' => [
+                    '@type' => $hydraPrefix.'Operation',
+                    $hydraPrefix.'method' => 'GET',
+                    $hydraPrefix.'title' => 'index',
+                    $hydraPrefix.'description' => 'The API Entrypoint.',
+                    $hydraPrefix.'returns' => 'Entrypoint',
+                ],
+            ];
+        }
 
         $classes[] = [
             '@id' => '#ConstraintViolationList',
@@ -560,7 +563,9 @@ final class DocumentationNormalizer implements NormalizerInterface
             $doc[$hydraPrefix.'description'] = $object->getDescription();
         }
 
-        $doc[$hydraPrefix.'entrypoint'] = $this->urlGenerator->generate('api_entrypoint');
+        if ($this->entrypointEnabled) {
+            $doc[$hydraPrefix.'entrypoint'] = $this->urlGenerator->generate('api_entrypoint');
+        }
         $doc[$hydraPrefix.'supportedClass'] = $classes;
 
         return $doc;
