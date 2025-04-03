@@ -36,7 +36,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 #[ODM\Document]
 class SecuredDummyCollection
 {
-    #[ODM\Id(strategy: 'AUTO', type: 'integer')]
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     public ?int $id = null;
 
     /**
