@@ -15,8 +15,8 @@ namespace ApiPlatform\Tests\Functional\GraphQl;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\SecuredDummy as DocumentSecuredDummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\SecuredDummyCollection as DocumentSecuredDummyCollection;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SecuredDummyCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SecuredDummyCollectionParent;
 use ApiPlatform\Tests\RecreateSchemaTrait;

@@ -35,11 +35,9 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 #[ODM\Document]
 class SecuredDummyCollectionParent
 {
-    #[ODM\Id]
-    #[ODM\Field(type: 'id')]
-    public ?string $id = null;
+    #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
+    public ?int $id = null;
 
-    #[ODM\ReferenceOne(targetDocument: SecuredDummyCollection::class, inversedBy: 'parents')]
-    #[ODM\Field(nullable: false)]
-    public SecuredDummyCollection $child;
+    #[ODM\ReferenceOne(targetDocument: SecuredDummyCollection::class)]
+    public ?SecuredDummyCollection $child = null;
 }
