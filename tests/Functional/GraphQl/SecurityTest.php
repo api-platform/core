@@ -16,6 +16,9 @@ namespace ApiPlatform\Tests\Functional\GraphQl;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\SecuredDummy as DocumentSecuredDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\SecuredDummyCollection as DocumentSecuredDummyCollection;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SecuredDummyCollection;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SecuredDummyCollectionParent;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
@@ -23,13 +26,14 @@ final class SecurityTest extends ApiTestCase
 {
     use RecreateSchemaTrait;
     use SetupClassResourcesTrait;
+    protected static ?bool $alwaysBootKernel = false;
 
     /**
      * @return class-string[]
      */
     public static function getResources(): array
     {
-        return [SecuredDummy::class];
+        return [SecuredDummy::class, SecuredDummyCollection::class, SecuredDummyCollectionParent::class];
     }
 
     public function testQueryItem(): void
@@ -111,6 +115,74 @@ QUERY,
         $s->setOwner('user1');
 
         $manager->persist($s);
+        $manager->flush();
+    }
+
+    public function testQueryCollection(): void
+    {
+        $resource = $this->isMongoDB() ? DocumentSecuredDummyCollection::class : SecuredDummyCollection::class;
+        $this->recreateSchema([$resource, $resource.'Parent']);
+        $this->loadFixturesQueryCollection($resource);
+        $client = self::createClient();
+
+        $response = $client->request('POST', '/graphql', ['headers' => ['Authorization' => 'Basic ZHVuZ2xhczprZXZpbg=='], 'json' => [
+            'query' => <<<QUERY
+    {
+        securedDummyCollectionParents {
+            edges {
+              node {
+               child {
+                  title, ownerOnlyProperty, owner
+                }
+              }
+            }
+        }
+    }
+QUERY,
+        ]]);
+
+        $d = $response->toArray();
+        $this->assertNull($d['data']['securedDummyCollectionParents']['edges'][1]['node']['child']['ownerOnlyProperty']);
+    }
+
+    public function loadFixturesQueryCollection(string $resourceClass): void
+    {
+        $parentResourceClass = $resourceClass.'Parent';
+        $container = static::$kernel->getContainer();
+        $registry = $this->isMongoDB() ? $container->get('doctrine_mongodb') : $container->get('doctrine');
+        $manager = $registry->getManager();
+        $s = new $resourceClass();
+        $s->title = 'Foo';
+        $s->ownerOnlyProperty = 'Foo by dunglas';
+        $s->owner = 'dunglas';
+        $manager->persist($s);
+        $p = new $parentResourceClass();
+        $p->child = $s;
+        $manager->persist($p);
+        $s = new $resourceClass();
+        $s->title = 'Bar';
+        $s->ownerOnlyProperty = 'Bar by admin';
+        $s->owner = 'admin';
+        $manager->persist($s);
+        $p = new $parentResourceClass();
+        $p->child = $s;
+        $manager->persist($p);
+        $s = new $resourceClass();
+        $s->title = 'Baz';
+        $s->ownerOnlyProperty = 'Baz by dunglas';
+        $s->owner = 'dunglas';
+        $manager->persist($s);
+        $p = new $parentResourceClass();
+        $p->child = $s;
+        $manager->persist($p);
+        $s = new $resourceClass();
+        $s->ownerOnlyProperty = 'Bat by admin';
+        $s->owner = 'admin';
+        $s->title = 'Bat';
+        $manager->persist($s);
+        $p = new $parentResourceClass();
+        $p->child = $s;
+        $manager->persist($p);
         $manager->flush();
     }
 }
