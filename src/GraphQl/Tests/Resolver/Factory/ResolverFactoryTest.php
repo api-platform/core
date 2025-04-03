@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
@@ -43,7 +44,7 @@ class ResolverFactoryTest extends TestCase
         $resolveInfo = $this->createMock(ResolveInfo::class);
         $resolveInfo->fieldName = 'test';
 
-        $resolverFactory = new ResolverFactory($provider, $processor);
+        $resolverFactory = new ResolverFactory($provider, $processor, $this->createMock(OperationMetadataFactoryInterface::class));
         $this->assertEquals($resolverFactory->__invoke($resourceClass, $rootClass, $operation, $propertyMetadataFactory)(['test' => null], [], [], $resolveInfo), $returnValue);
     }
 
@@ -53,5 +54,22 @@ class ResolverFactoryTest extends TestCase
             ['Dummy', 'Dummy', new Query()],
             ['Dummy', 'Dummy', new Mutation(), (new Mutation())->withValidate(true), (new Mutation())->withValidate(true)->withWrite(true)],
         ];
+    }
+
+    public function testGraphQlResolverWithNode(): void
+    {
+        $returnValue = new \stdClass();
+        $op = new Query(name: 'hi');
+        $provider = $this->createMock(ProviderInterface::class);
+        $provider->expects($this->once())->method('provide')->with($op)->willReturn($returnValue);
+        $processor = $this->createMock(ProcessorInterface::class);
+        $processor->expects($this->once())->method('process')->with($returnValue, $op)->willReturn($returnValue);
+        $resolveInfo = $this->createMock(ResolveInfo::class);
+        $resolveInfo->fieldName = 'test';
+
+        $operationFactory = $this->createMock(OperationMetadataFactoryInterface::class);
+        $operationFactory->method('create')->with('/foo')->willReturn($op);
+        $resolverFactory = new ResolverFactory($provider, $processor, $operationFactory);
+        $this->assertSame($returnValue, $resolverFactory->__invoke()([], ['id' => '/foo'], [], $resolveInfo));
     }
 }

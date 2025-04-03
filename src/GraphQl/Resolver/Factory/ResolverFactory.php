@@ -15,21 +15,28 @@ namespace ApiPlatform\GraphQl\Resolver\Factory;
 
 use ApiPlatform\GraphQl\State\Provider\NoopProvider;
 use ApiPlatform\Metadata\DeleteOperationInterface;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\State\Pagination\ArrayPaginator;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use GraphQL\Type\Definition\ResolveInfo;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ResolverFactory implements ResolverFactoryInterface
 {
     public function __construct(
         private readonly ProviderInterface $provider,
         private readonly ProcessorInterface $processor,
+        private readonly ?OperationMetadataFactoryInterface $operationMetadataFactory = null,
     ) {
+        if (!$operationMetadataFactory) {
+            throw new InvalidArgumentException(\sprintf('Not injecting the "%s" exposes Relay nodes to a security risk.', OperationMetadataFactoryInterface::class));
+        }
     }
 
     public function __invoke(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null, ?PropertyMetadataFactoryInterface $propertyMetadataFactory = null): callable
@@ -70,7 +77,13 @@ class ResolverFactory implements ResolverFactoryInterface
     private function resolve(?array $source, array $args, ResolveInfo $info, ?string $rootClass = null, ?Operation $operation = null, mixed $body = null)
     {
         // Handles relay nodes
-        $operation ??= new Query();
+        if (!$operation) {
+            if (!isset($args['id'])) {
+                throw new NotFoundHttpException('No node found.');
+            }
+
+            $operation = $this->operationMetadataFactory->create($args['id']);
+        }
 
         $graphQlContext = [];
         $context = ['source' => $source, 'args' => $args, 'info' => $info, 'root_class' => $rootClass, 'graphql_context' => &$graphQlContext];

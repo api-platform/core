@@ -121,7 +121,7 @@ trait OperationDefaultsTrait
 
     private function addDefaultGraphQlOperations(ApiResource $resource): ApiResource
     {
-        $operations = enum_exists($resource->getClass()) ? [new QueryCollection(paginationEnabled: false), new Query()] : [new QueryCollection(), new Query(), (new Mutation())->withName('update'), (new DeleteMutation())->withName('delete'), (new Mutation())->withName('create')];
+        $operations = enum_exists($resource->getClass()) ? [new Query(), new QueryCollection(paginationEnabled: false)] : [new Query(), new QueryCollection(), (new Mutation())->withName('update'), (new DeleteMutation())->withName('delete'), (new Mutation())->withName('create')];
         $graphQlOperations = [];
         foreach ($operations as $operation) {
             [$key, $operation] = $this->getOperationWithDefaults($resource, $operation);
