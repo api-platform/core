@@ -191,6 +191,12 @@
         <service id="api_platform.graphql.resolver.factory.item" class="ApiPlatform\GraphQl\Resolver\Factory\ResolverFactory" public="false">
             <argument type="service" id="api_platform.graphql.state_provider" />
             <argument type="service" id="api_platform.graphql.state_processor" />
+            <argument type="service" id="api_platform.graphql.runtime_operation_metadata_factory" />
+        </service>
+
+        <service id="api_platform.graphql.runtime_operation_metadata_factory" class="ApiPlatform\GraphQl\Metadata\RuntimeOperationMetadataFactory" public="false">
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <argument type="service" id="api_platform.router" />
         </service>
 
         <!-- Resolver Stages -->
