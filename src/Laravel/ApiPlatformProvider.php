@@ -17,6 +17,7 @@ use ApiPlatform\GraphQl\Error\ErrorHandler as GraphQlErrorHandler;
 use ApiPlatform\GraphQl\Error\ErrorHandlerInterface;
 use ApiPlatform\GraphQl\Executor;
 use ApiPlatform\GraphQl\ExecutorInterface;
+use ApiPlatform\GraphQl\Metadata\RuntimeOperationMetadataFactory;
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactory;
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
@@ -1086,7 +1087,15 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->singleton(ResolverFactoryInterface::class, function (Application $app) {
             return new ResolverFactory(
                 $app->make('api_platform.graphql.state_provider.access_checker'),
-                $app->make('api_platform.graphql.state_processor')
+                $app->make('api_platform.graphql.state_processor'),
+                $app->make('api_platform.graphql.runtime_operation_metadata_factory'),
+            );
+        });
+
+        $app->singleton('api_platform.graphql.runtime_operation_metadata_factory', function (Application $app) {
+            return new RuntimeOperationMetadataFactory(
+                $app->make(ResourceMetadataCollectionFactoryInterface::class),
+                $app->make(UrlGeneratorRouter::class)
             );
         });
 

@@ -152,6 +152,14 @@ On write operations, we added the [expectsHeader](https://www.hydra-cg.com/spec/
 * [d0a442786](https://github.com/api-platform/core/commit/d0a44278630d201b91cbba0774a09f4eeaac88f7) feat(doctrine): enhance getLinksHandler with method validation and typo suggestions (#6874)
 * [f67f6f1ac](https://github.com/api-platform/core/commit/f67f6f1acb6476182c18a3503f2a8bc80ae89a0b)  feat(doctrine): doctrine filters like laravel eloquent filters  (#6775)
 
+## v4.0.22
+
+### Bug fixes
+
+* [60747cc8c](https://github.com/api-platform/core/commit/60747cc8c2fb855798c923b5537888f8d0969568) fix(graphql): access to unauthorized resource using node Relay [CVE-2025-31481](https://github.com/api-platform/core/security/advisories/GHSA-cg3c-245w-728m)
+* [7af65aad1](https://github.com/api-platform/core/commit/7af65aad13037d7649348ee3dcd88e084ef771f8) fix(graphql): property security might be cached w/ different objects [CVE-2025-31485](https://github.com/api-platform/core/security/advisories/GHSA-428q-q3vv-3fq3)
+* [f4c426d71](https://github.com/api-platform/core/commit/f4c426d719b01debaa993b00d03cce8964057ecc) Revert "fix(doctrine): throw an exception when a filter is not found in a par…" (#7046)
+
 ## v4.0.21
 
 ### Bug fixes
