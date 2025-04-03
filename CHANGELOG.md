@@ -1,5 +1,12 @@
 # Changelog
 
+## v4.1.5
+
+### Bug fixes
+
+* [60747cc8c](https://github.com/api-platform/core/commit/60747cc8c2fb855798c923b5537888f8d0969568) fix(graphql): access to unauthorized resource using node Relay [CVE-2025-31481](https://github.com/api-platform/core/security/advisories/GHSA-cg3c-245w-728m)
+* [7af65aad1](https://github.com/api-platform/core/commit/7af65aad13037d7649348ee3dcd88e084ef771f8) fix(graphql): property security might be cached w/ different objects [CVE-2025-31485](https://github.com/api-platform/core/security/advisories/GHSA-428q-q3vv-3fq3)
+
 ## v4.1.4
 
 ### Bug fixes
@@ -17,9 +24,6 @@
 
 * [8a2265041](https://github.com/api-platform/core/commit/8a22650419fd32efdafad43493f2327b38dd3ee6) fix(laravel): defer "filters" dependent services (#7045)
 
-
-### Features
-
 ## v4.1.2
 
 ### Bug fixes
@@ -29,8 +33,6 @@
 * [935b9b55d](https://github.com/api-platform/core/commit/935b9b55da0eacce3dd2bbed4584b10b154d97c2) fix(laravel): json api default parameters (#7027)
 * [a2824ff4b](https://github.com/api-platform/core/commit/a2824ff4be6276e37e37a3b4e4fb2e9a0096789c) fix(laravel): defer autoconfiguration (#7040)
 
-
-### Features
 
 ## v4.1.1
 
