@@ -230,7 +230,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
                     }
                     $normalizedUriVariable = (new Link())->withFromProperty($normalizedUriVariable[1])->withFromClass($normalizedUriVariable[0]);
                 } else {
-                    $normalizedUriVariable = new Link($normalizedParameterName, $normalizedUriVariable['from_property'] ?? null, $normalizedUriVariable['to_property'] ?? null, $normalizedUriVariable['from_class'] ?? null, $normalizedUriVariable['to_class'] ?? null, $normalizedUriVariable['identifiers'] ?? null, $normalizedUriVariable['composite_identifier'] ?? null, $normalizedUriVariable['expanded_value'] ?? null);
+                    $normalizedUriVariable = new Link($normalizedParameterName, $normalizedUriVariable['from_property'] ?? null, $normalizedUriVariable['to_property'] ?? null, $normalizedUriVariable['from_class'] ?? null, $normalizedUriVariable['to_class'] ?? null, $normalizedUriVariable['identifiers'] ?? null, $normalizedUriVariable['composite_identifier'] ?? null, $normalizedUriVariable['expanded_value'] ?? null, $normalizedUriVariable['security'] ?? null);
                 }
             }
 

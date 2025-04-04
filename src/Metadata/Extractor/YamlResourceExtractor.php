@@ -209,6 +209,9 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             if (isset($data['compositeIdentifier'])) {
                 $uriVariables[$parameterName]['composite_identifier'] = $data['compositeIdentifier'];
             }
+            if (isset($data['security'])) {
+                $uriVariables[$parameterName]['security'] = $data['security'];
+            }
         }
 
         return $uriVariables;
