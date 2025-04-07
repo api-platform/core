@@ -1,5 +1,15 @@
 # Changelog
 
+## v3.4.17
+
+### Bug fixes
+
+* [55712452b](https://github.com/api-platform/core/commit/55712452b4f630978537bdb2a07dc958202336bb) fix(graphql): access to unauthorized resource using node Relay
+* [7cb5a6db8](https://github.com/api-platform/core/commit/7cb5a6db87241d95e6c324318fe861bd4f1820cf) fix: allow parameter provider as object (#7032)
+* [cba3acfbd](https://github.com/api-platform/core/commit/cba3acfbd517763cf320167250c5bed6d569696a) fix(graphql): property security might be cached w/ different objects
+* [da2e86809](https://github.com/api-platform/core/commit/da2e86809d4a8dec294dc2fc148d92406f1f7fd1) fix: header parameter should be case insensitive (#7031)
+* [f4c426d71](https://github.com/api-platform/core/commit/f4c426d719b01debaa993b00d03cce8964057ecc) Revert "fix(doctrine): throw an exception when a filter is not found in a par…" (#7046)
+
 ## v3.4.16
 
 ### Bug fixes
