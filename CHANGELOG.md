@@ -1,5 +1,20 @@
 # Changelog
 
+## v4.1.6
+
+### Bug fixes
+
+* [44e560839](https://github.com/api-platform/core/commit/44e56083996f2f00a1d87a149fd41aeb0149e4dd) fix(laravel): undefined variable app
+
+### Features
+
+## v4.1.5
+
+### Bug fixes
+
+* [60747cc8c](https://github.com/api-platform/core/commit/60747cc8c2fb855798c923b5537888f8d0969568) fix(graphql): access to unauthorized resource using node Relay [CVE-2025-31481](https://github.com/api-platform/core/security/advisories/GHSA-cg3c-245w-728m)
+* [7af65aad1](https://github.com/api-platform/core/commit/7af65aad13037d7649348ee3dcd88e084ef771f8) fix(graphql): property security might be cached w/ different objects [CVE-2025-31485](https://github.com/api-platform/core/security/advisories/GHSA-428q-q3vv-3fq3)
+
 ## v4.1.4
 
 ### Bug fixes
@@ -17,9 +32,6 @@
 
 * [8a2265041](https://github.com/api-platform/core/commit/8a22650419fd32efdafad43493f2327b38dd3ee6) fix(laravel): defer "filters" dependent services (#7045)
 
-
-### Features
-
 ## v4.1.2
 
 ### Bug fixes
@@ -29,8 +41,6 @@
 * [935b9b55d](https://github.com/api-platform/core/commit/935b9b55da0eacce3dd2bbed4584b10b154d97c2) fix(laravel): json api default parameters (#7027)
 * [a2824ff4b](https://github.com/api-platform/core/commit/a2824ff4be6276e37e37a3b4e4fb2e9a0096789c) fix(laravel): defer autoconfiguration (#7040)
 
-
-### Features
 
 ## v4.1.1
 
@@ -151,6 +161,14 @@ On write operations, we added the [expectsHeader](https://www.hydra-cg.com/spec/
 * [c78ed0b78](https://github.com/api-platform/core/commit/c78ed0b78baf5d2e1b7444a9882ba039c70a3887) feat(laravel): boolean filter (#6806)
 * [d0a442786](https://github.com/api-platform/core/commit/d0a44278630d201b91cbba0774a09f4eeaac88f7) feat(doctrine): enhance getLinksHandler with method validation and typo suggestions (#6874)
 * [f67f6f1ac](https://github.com/api-platform/core/commit/f67f6f1acb6476182c18a3503f2a8bc80ae89a0b)  feat(doctrine): doctrine filters like laravel eloquent filters  (#6775)
+
+## v4.0.22
+
+### Bug fixes
+
+* [60747cc8c](https://github.com/api-platform/core/commit/60747cc8c2fb855798c923b5537888f8d0969568) fix(graphql): access to unauthorized resource using node Relay [CVE-2025-31481](https://github.com/api-platform/core/security/advisories/GHSA-cg3c-245w-728m)
+* [7af65aad1](https://github.com/api-platform/core/commit/7af65aad13037d7649348ee3dcd88e084ef771f8) fix(graphql): property security might be cached w/ different objects [CVE-2025-31485](https://github.com/api-platform/core/security/advisories/GHSA-428q-q3vv-3fq3)
+* [f4c426d71](https://github.com/api-platform/core/commit/f4c426d719b01debaa993b00d03cce8964057ecc) Revert "fix(doctrine): throw an exception when a filter is not found in a par…" (#7046)
 
 ## v4.0.21
 

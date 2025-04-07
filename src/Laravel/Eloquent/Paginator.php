@@ -25,7 +25,7 @@ use IteratorAggregate;
 final class Paginator implements PaginatorInterface, HasNextPagePaginatorInterface, \IteratorAggregate
 {
     /**
-     * @param LengthAwarePaginator<object> $paginator
+     * @param LengthAwarePaginator<int, object> $paginator
      */
     public function __construct(
         private readonly LengthAwarePaginator $paginator,

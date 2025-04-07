@@ -24,7 +24,7 @@ use IteratorAggregate;
 final class PartialPaginator implements PartialPaginatorInterface, \IteratorAggregate
 {
     /**
-     * @param AbstractPaginator<object> $paginator
+     * @param AbstractPaginator<int, object> $paginator
      */
     public function __construct(
         private readonly AbstractPaginator $paginator,
