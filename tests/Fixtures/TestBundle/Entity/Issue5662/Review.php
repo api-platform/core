@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5662;
 
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
@@ -20,6 +21,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\State\CreateProvider;
 
+#[ApiResource(openapi: false)]
 #[GetCollection(
     uriTemplate: '/issue5662/admin/reviews{._format}',
     itemUriTemplate: '/issue5662/reviews/{id}{._format}',

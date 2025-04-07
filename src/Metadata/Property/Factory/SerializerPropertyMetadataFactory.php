@@ -89,8 +89,8 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
         }
 
         $serializerAttributeMetadata = $this->getSerializerAttributeMetadata($resourceClass, $propertyName);
-        $groups = $serializerAttributeMetadata ? $serializerAttributeMetadata->getGroups() : [];
-        $ignored = $serializerAttributeMetadata && $serializerAttributeMetadata->isIgnored();
+        $groups = $serializerAttributeMetadata?->getGroups() ?? [];
+        $ignored = $serializerAttributeMetadata?->isIgnored() ?? false;
 
         if (false !== $propertyMetadata->isReadable()) {
             $propertyMetadata = $propertyMetadata->withReadable(!$ignored && (null === $normalizationGroups || array_intersect($normalizationGroups, $groups)));

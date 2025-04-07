@@ -9,6 +9,8 @@
 
         <service id="api_platform.hal.json_schema.schema_factory" class="ApiPlatform\Hal\JsonSchema\SchemaFactory" decorates="api_platform.json_schema.schema_factory">
             <argument type="service" id="api_platform.hal.json_schema.schema_factory.inner" />
+            <argument type="service" id="api_platform.json_schema.definition_name_factory" on-invalid="ignore"/>
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" on-invalid="ignore" />
         </service>
 
         <service id="api_platform.hal.encoder" class="ApiPlatform\Serializer\JsonEncoder" public="false">

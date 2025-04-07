@@ -32,18 +32,18 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
         'date' => new QueryParameter(
             filter: new DateFilter(),
             property: 'createdAt',
-            openApi: new Parameter('createdAt', 'query', allowEmptyValue: true)
+            openApi: new Parameter('date', 'query', allowEmptyValue: true)
         ),
         'date_include_null_always' => new QueryParameter(
             filter: new DateFilter(),
             property: 'createdAt',
             filterContext: DateFilterInterface::INCLUDE_NULL_BEFORE_AND_AFTER,
-            openApi: new Parameter('createdAt', 'query', allowEmptyValue: true)
+            openApi: new Parameter('date_include_null_always', 'query', allowEmptyValue: true)
         ),
         'date_old_way' => new QueryParameter(
             filter: new DateFilter(properties: ['createdAt' => DateFilterInterface::INCLUDE_NULL_BEFORE_AND_AFTER]),
             property: 'createdAt',
-            openApi: new Parameter('createdAt', 'query', allowEmptyValue: true)
+            openApi: new Parameter('date_old_way', 'query', allowEmptyValue: true)
         ),
     ],
 )]

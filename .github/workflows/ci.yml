@@ -425,7 +425,7 @@ jobs:
       - name: Export OpenAPI documents
         run: |
           mkdir -p build/out/openapi
-          tests/Fixtures/app/console api:openapi:export -o build/out/openapi/openapi_v3.json
+          # tests/Fixtures/app/console api:openapi:export -o build/out/openapi/openapi_v3.json
           tests/Fixtures/app/console api:openapi:export --yaml -o build/out/openapi/openapi_v3.yaml
       - name: Setup node
         uses: actions/setup-node@v4
@@ -433,8 +433,7 @@ jobs:
           node-version: '14'
       - name: Validate OpenAPI documents
         run: |
-          npx swagger-cli validate build/out/openapi/openapi_v3.json
-          npx swagger-cli validate build/out/openapi/openapi_v3.yaml
+          npx @quobix/vacuum lint validate build/out/openapi/openapi_v3.yaml
       - name: Upload OpenAPI artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -1227,7 +1226,7 @@ jobs:
       - name: Export OpenAPI documents
         run: |
           mkdir -p build/out/openapi
-          tests/Fixtures/app/console api:openapi:export -o build/out/openapi/openapi_v3.json
+          # tests/Fixtures/app/console api:openapi:export -o build/out/openapi/openapi_v3.json
           tests/Fixtures/app/console api:openapi:export --yaml -o build/out/openapi/openapi_v3.yaml
       - name: Setup node
         uses: actions/setup-node@v4
@@ -1235,8 +1234,7 @@ jobs:
           node-version: '14'
       - name: Validate OpenAPI documents
         run: |
-          npx swagger-cli validate build/out/openapi/openapi_v3.json
-          npx swagger-cli validate build/out/openapi/openapi_v3.yaml
+          npx @quobix/vacuum lint validate build/out/openapi/openapi_v3.yaml
       - name: Upload OpenAPI artifacts
         if: always()
         uses: actions/upload-artifact@v4

@@ -18,7 +18,6 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use ApiPlatform\OpenApi\Model\Tag;
 use ApiPlatform\Symfony\Controller\MainController;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
@@ -523,6 +522,7 @@ final class Configuration implements ConfigurationInterface
                             ->children()
                                 ->scalarNode('name')->defaultNull()->info('The license name used for the API.')->end()
                                 ->scalarNode('url')->defaultNull()->info('URL to the license used for the API. MUST be in the format of a URL.')->end()
+                                ->scalarNode('identifier')->defaultNull()->info('An SPDX license expression for the API. The identifier field is mutually exclusive of the url field.')->end()
                             ->end()
                         ->end()
                         ->variableNode('swagger_ui_extra_configuration')

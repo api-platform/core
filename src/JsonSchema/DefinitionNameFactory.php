@@ -24,8 +24,11 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
     private const GLUE = '.';
     private array $prefixCache = [];
 
-    public function __construct(private ?array $distinctFormats)
+    public function __construct(private ?array $distinctFormats = null)
     {
+        if ($distinctFormats) {
+            trigger_deprecation('api-platform/json-schema', '4.1', 'The distinctFormats argument is deprecated and will be removed in 5.0.');
+        }
     }
 
     public function create(string $className, string $format = 'json', ?string $inputOrOutputClass = null, ?Operation $operation = null, array $serializerContext = []): string
@@ -44,7 +47,10 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
             $prefix .= self::GLUE.$shortName;
         }
 
-        if ('json' !== $format && ($this->distinctFormats[$format] ?? false)) {
+        // TODO: remove in 5.0
+        $v = $this->distinctFormats ? ($this->distinctFormats[$format] ?? false) : true;
+
+        if ('json' !== $format && $v) {
             // JSON is the default, and so isn't included in the definition name
             $prefix .= self::GLUE.$format;
         }

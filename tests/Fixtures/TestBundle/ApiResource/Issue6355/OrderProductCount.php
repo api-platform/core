@@ -32,6 +32,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Controller\Issue6355\UpdateOrderProduc
             read: false,
             write: false,
             name: 'order_product_update_count',
+            uriVariables: ['id']
         ),
     ],
     order: ['position' => 'ASC'],
