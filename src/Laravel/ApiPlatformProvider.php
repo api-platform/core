@@ -1092,7 +1092,7 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $app->singleton('api_platform.graphql.runtime_operation_metadata_factory', function (Application $app) {
+        $this->app->singleton('api_platform.graphql.runtime_operation_metadata_factory', function (Application $app) {
             return new RuntimeOperationMetadataFactory(
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(UrlGeneratorRouter::class)
