@@ -1,5 +1,13 @@
 # Changelog
 
+## v4.1.6
+
+### Bug fixes
+
+* [44e560839](https://github.com/api-platform/core/commit/44e56083996f2f00a1d87a149fd41aeb0149e4dd) fix(laravel): undefined variable app
+
+### Features
+
 ## v4.1.5
 
 ### Bug fixes
