@@ -45,7 +45,7 @@ trait OperationDefaultsTrait
     private function addGlobalDefaults(ApiResource|Operation $operation): ApiResource|Operation
     {
         // Do not add global defaults for internal resources:
-        if (in_array($operation->getClass(), [Error::class, ValidationException::class], true)) {
+        if (\in_array($operation->getClass(), [Error::class, ValidationException::class], true)) {
             return $operation;
         }
 
