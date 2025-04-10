@@ -22,7 +22,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource]
-#[GetCollection]
+#[GetCollection()]
 #[Get]
 #[Post]
 #[ApiResource(
