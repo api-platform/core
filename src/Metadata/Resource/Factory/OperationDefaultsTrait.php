@@ -16,6 +16,8 @@ namespace ApiPlatform\Metadata\Resource\Factory;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Error;
+use ApiPlatform\Metadata\ErrorResource;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -46,6 +48,14 @@ trait OperationDefaultsTrait
 
         foreach ($this->defaults as $key => $value) {
             if ('operations' === $key) {
+                continue;
+            }
+
+            // Error operations shouldn't inherit security, as they must be
+            // publicly accessible by default. If stricter access control is
+            // needed, configure it at the firewall level.
+            // @see https://github.com/api-platform/core/issues/7072
+            if ('security' === $key && ($operation instanceof ErrorResource || $operation instanceof Error)) {
                 continue;
             }
 
