@@ -732,6 +732,7 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->singleton(HydraDocumentationNormalizer::class, function (Application $app) {
             $config = $app['config'];
             $defaultContext = $config->get('api-platform.serializer', []);
+            $entrypointEnabled = $config->get('api-platform.enable_entrypoint', true);
 
             return new HydraDocumentationNormalizer(
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
@@ -740,7 +741,8 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ResourceClassResolverInterface::class),
                 $app->make(UrlGeneratorInterface::class),
                 $app->make(NameConverterInterface::class),
-                $defaultContext
+                $defaultContext,
+                $entrypointEnabled
             );
         });
 

@@ -112,6 +112,14 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $patchFormats = $this->getFormats($config['patch_formats']);
         $errorFormats = $this->getFormats($config['error_formats']);
         $docsFormats = $this->getFormats($config['docs_formats']);
+        if (!$config['enable_docs']) {
+            // JSON-LD documentation format is mandatory, even if documentation is disabled.
+            $docsFormats = isset($formats['jsonld']) ? ['jsonld' => ['application/ld+json']] : [];
+            // If documentation is disabled, the Hydra documentation for all the resources is hidden by default.
+            if (!isset($config['defaults']['hideHydraOperation']) && !isset($config['defaults']['hide_hydra_operation'])) {
+                $config['defaults']['hideHydraOperation'] = true;
+            }
+        }
         $jsonSchemaFormats = $config['jsonschema_formats'];
 
         if (!$jsonSchemaFormats) {
@@ -537,11 +545,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         if (!$container->has('api_platform.json_schema.schema_factory')) {
             $container->removeDefinition('api_platform.hydra.json_schema.schema_factory');
-        }
-
-        if (!$config['enable_docs']) {
-            $container->removeDefinition('api_platform.hydra.listener.response.add_link_header');
-            $container->removeDefinition('api_platform.hydra.processor.link');
         }
     }
 

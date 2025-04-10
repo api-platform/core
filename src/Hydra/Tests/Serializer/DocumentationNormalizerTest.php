@@ -824,4 +824,106 @@ class DocumentationNormalizerTest extends TestCase
 
         $this->assertEquals($expected, $documentationNormalizer->normalize($documentation, null, [ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX => false]));
     }
+
+    public function testNormalizeNoEntrypointAndHideHydraOperation(): void
+    {
+        $title = 'Test Api';
+        $desc = 'test ApiGerard';
+        $version = '0.0.0';
+        $documentation = new Documentation(new ResourceNameCollection(['dummy' => 'dummy']), $title, $desc, $version);
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('dummy')->willReturn(new ResourceMetadataCollection('dummy', [
+            (new ApiResource())->withHideHydraOperation(true)->withOperations(new Operations([
+                'get' => new Get(),
+            ])),
+        ]));
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $urlGenerator = $this->prophesize(UrlGeneratorInterface::class);
+        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'], Argument::any())->willReturn('/doc');
+
+        $documentationNormalizer = new DocumentationNormalizer(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $urlGenerator->reveal(),
+            new CustomConverter(),
+            [],
+            false,
+        );
+
+        $expected = [
+            '@context' => [
+                HYDRA_CONTEXT,
+                [
+                    '@vocab' => '/doc#',
+                    'hydra' => 'http://www.w3.org/ns/hydra/core#',
+                    'rdf' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+                    'rdfs' => 'http://www.w3.org/2000/01/rdf-schema#',
+                    'xmls' => 'http://www.w3.org/2001/XMLSchema#',
+                    'owl' => 'http://www.w3.org/2002/07/owl#',
+                    'schema' => 'https://schema.org/',
+                    'domain' => [
+                        '@id' => 'rdfs:domain',
+                        '@type' => '@id',
+                    ],
+                    'range' => [
+                        '@id' => 'rdfs:range',
+                        '@type' => '@id',
+                    ],
+                    'subClassOf' => [
+                        '@id' => 'rdfs:subClassOf',
+                        '@type' => '@id',
+                    ],
+                ],
+            ],
+            '@id' => '/doc',
+            '@type' => 'ApiDocumentation',
+            'title' => 'Test Api',
+            'description' => 'test ApiGerard',
+            'supportedClass' => [
+                [
+                    '@id' => '#ConstraintViolationList',
+                    '@type' => 'Class',
+                    'title' => 'ConstraintViolationList',
+                    'description' => 'A constraint violation List.',
+                    'supportedProperty' => [
+                        [
+                            '@type' => 'SupportedProperty',
+                            'property' => [
+                                '@id' => '#ConstraintViolationList/propertyPath',
+                                '@type' => 'rdf:Property',
+                                'rdfs:label' => 'propertyPath',
+                                'domain' => '#ConstraintViolationList',
+                                'range' => 'xmls:string',
+                            ],
+                            'title' => 'propertyPath',
+                            'description' => 'The property path of the violation',
+                            'readable' => true,
+                            'writeable' => false,
+                        ],
+                        [
+                            '@type' => 'SupportedProperty',
+                            'property' => [
+                                '@id' => '#ConstraintViolationList/message',
+                                '@type' => 'rdf:Property',
+                                'rdfs:label' => 'message',
+                                'domain' => '#ConstraintViolationList',
+                                'range' => 'xmls:string',
+                            ],
+                            'title' => 'message',
+                            'description' => 'The message associated with the violation',
+                            'readable' => true,
+                            'writeable' => false,
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expected, $documentationNormalizer->normalize($documentation, null, [ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX => false]));
+    }
 }
