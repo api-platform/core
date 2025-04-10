@@ -66,7 +66,7 @@ trait OperationDefaultsTrait
         if (self::isAnInternalResource($operation->getClass())) {
             return $operation;
         }
-        
+
         $extraProperties = $this->defaults['extra_properties'] ?? [];
 
         foreach ($this->defaults as $key => $value) {
