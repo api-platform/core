@@ -42,5 +42,11 @@
             <argument type="service" id="api_platform.state_provider.parameter.inner" />
             <argument type="tagged_locator" tag="api_platform.parameter_provider" index-by="key" />
         </service>
+
+        <service id="api_platform.state_provider.parameter.iri_converter" class="ApiPlatform\State\Provider\IriConverterParameterProvider" public="false">
+            <argument type="service" id="api_platform.iri_converter"/>
+
+            <tag name="api_platform.parameter_provider" key="ApiPlatform\State\Provider\IriConverterParameterProvider" priority="-895" />
+        </service>
     </services>
 </container>
