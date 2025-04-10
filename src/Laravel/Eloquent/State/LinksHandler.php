@@ -102,20 +102,31 @@ final class LinksHandler implements LinksHandlerInterface
 
         if ($from = $link->getFromProperty()) {
             $relation = $this->application->make($link->getFromClass());
-
-            if (!method_exists($relation->{$from}(), 'getQualifiedForeignKeyName') && method_exists($relation->{$from}(), 'getQualifiedForeignPivotKeyName')) {
-                /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany<Model, Model> $relation */
-                /** @var \Illuminate\Database\Eloquent\Relations\BelongsToMany<Model, Model> $relation_query */
-                $relation_query = $relation->{$from}();
-
-                return $builder->getModel()->join(
-                    $relation_query->getTable(), $relation->{$from}()->getQualifiedRelatedPivotKeyName(), $builder->getModel()->getQualifiedKeyName())
-                    ->where($relation->{$from}()->getQualifiedForeignPivotKeyName(),
-                        $identifier)
+            $relationQuery = $relation->{$from}();
+            if (!method_exists($relationQuery, 'getQualifiedForeignKeyName') && method_exists($relationQuery, 'getQualifiedForeignPivotKeyName')) {
+                return $builder->getModel()
+                    ->join(
+                        $relationQuery->getTable(), // @phpstan-ignore-line
+                        $relationQuery->getQualifiedRelatedPivotKeyName(), // @phpstan-ignore-line
+                        $builder->getModel()->getQualifiedKeyName()
+                    )
+                    ->where(
+                        $relationQuery->getQualifiedForeignPivotKeyName(), // @phpstan-ignore-line
+                        $identifier
+                    )
                     ->select($builder->getModel()->getTable().'.*');
             }
 
-            return $builder->getModel()->where($relation->{$from}()->getQualifiedForeignKeyName(), $identifier);
+            if (method_exists($relationQuery, 'dissociate')) {
+                return $builder->getModel()
+                       ->join(
+                           $relationQuery->getParent()->getTable(), // @phpstan-ignore-line
+                           $relationQuery->getParent()->getQualifiedKeyName(), // @phpstan-ignore-line
+                           $identifier
+                       );
+            }
+
+            return $builder->getModel()->where($relationQuery->getQualifiedForeignKeyName(), $identifier);
         }
 
         return $builder->where($builder->getModel()->qualifyColumn($link->getIdentifiers()[0]), $identifier);
