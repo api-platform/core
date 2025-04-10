@@ -43,12 +43,12 @@ trait OperationDefaultsTrait
     private LoggerInterface $logger;
 
     /**
-     * @param  class-string<object>  $class
+     * @param class-string<object> $class
      */
     private static function isAnInternalResource(string $class): bool
     {
         /**
-         * @var  list<class-string<object>>  $internalResources
+         * @var list<class-string<object>> $internalResources
          */
         $internalResources = [
             Error::class,
