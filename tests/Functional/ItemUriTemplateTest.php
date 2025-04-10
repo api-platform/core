@@ -37,6 +37,6 @@ class ItemUriTemplateTest extends ApiTestCase
             'headers' => ['accept' => 'application/ld+json'],
         ]);
         $this->assertResponseStatusCodeSame(404);
-        $this->assertJsonContains(['detail' => 'Not Found']);
+        $this->assertJsonContains(['description' => 'Not Found']);
     }
 }

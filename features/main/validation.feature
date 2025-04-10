@@ -31,7 +31,8 @@ Feature: Using validations groups
     {
       "@context": "/contexts/ConstraintViolation",
       "@type": "ConstraintViolation",
-      "detail": "name: This value should not be null.",
+      "title": "An error occurred",
+      "description": "name: This value should not be null.",
       "violations": [
          {
              "propertyPath": "name",
@@ -59,7 +60,8 @@ Feature: Using validations groups
     {
       "@context": "/contexts/ConstraintViolation",
       "@type": "ConstraintViolation",
-      "detail": "title: This value should not be null.",
+      "title": "An error occurred",
+      "description": "title: This value should not be null.",
       "violations": [
          {
              "propertyPath": "title",
@@ -85,6 +87,7 @@ Feature: Using validations groups
     And the JSON node "violations[0].message" should be equal to "This value should not be null."
     And the JSON node "violations[0].propertyPath" should be equal to "test"
     And the JSON node "detail" should be equal to "test: This value should not be null."
+    And the JSON node "description" should be equal to "test: This value should not be null."
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
 
   @!mongodb
