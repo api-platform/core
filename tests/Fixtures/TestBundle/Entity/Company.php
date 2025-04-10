@@ -24,7 +24,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource]
-#[GetCollection]
+#[GetCollection()]
 #[Get]
 #[NotExposed(
     uriTemplate: '/company-by-name/{name}',
