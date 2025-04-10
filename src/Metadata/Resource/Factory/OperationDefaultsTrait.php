@@ -42,28 +42,10 @@ trait OperationDefaultsTrait
     private array $defaults = [];
     private LoggerInterface $logger;
 
-    /**
-     * @param class-string<object> $class
-     */
-    private static function isAnInternalResource(string $class): bool
-    {
-        /**
-         * @var list<class-string<object>> $internalResources
-         */
-        $internalResources = [
-            Error::class,
-            ValidationException::class,
-        ];
-
-        return array_any(
-            $internalResources,
-            fn (string $resource): bool => is_a($class, $resource, true),
-        );
-    }
-
     private function addGlobalDefaults(ApiResource|Operation $operation): ApiResource|Operation
     {
-        if (self::isAnInternalResource($operation->getClass())) {
+        // Do not add global defaults for internal resources:
+        if (in_array($operation->getClass(), [Error::class, ValidationException::class], true)) {
             return $operation;
         }
 
