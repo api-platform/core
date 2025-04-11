@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Retrieves data from a persistence layer.
  *
- * @template T of object|iterable
+ * @template T of object|array
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
