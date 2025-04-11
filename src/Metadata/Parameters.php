@@ -22,6 +22,9 @@ use ApiPlatform\Metadata\Exception\RuntimeException;
  */
 final class Parameters implements \IteratorAggregate, \Countable
 {
+    /**
+     * @var array<int, array{0: string, 1: Parameter}>
+     */
     private array $parameters = [];
 
     /**
@@ -68,7 +71,9 @@ final class Parameters implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @param class-string $parameterClass
+     * @template T of Parameter
+     *
+     * @param class-string<T> $parameterClass
      */
     public function remove(string $key, string $parameterClass = QueryParameter::class): self
     {
@@ -84,7 +89,11 @@ final class Parameters implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @param class-string $parameterClass
+     * @template T of Parameter
+     *
+     * @param class-string<T> $parameterClass
+     *
+     * @return T|null
      */
     public function get(string $key, string $parameterClass = QueryParameter::class): ?Parameter
     {
@@ -98,7 +107,9 @@ final class Parameters implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @param class-string $parameterClass
+     * @template T of Parameter
+     *
+     * @param class-string<T> $parameterClass
      */
     public function has(string $key, string $parameterClass = QueryParameter::class): bool
     {
@@ -118,7 +129,7 @@ final class Parameters implements \IteratorAggregate, \Countable
 
     public function sort(): self
     {
-        usort($this->parameters, fn ($a, $b): int|float => $b[1]->getPriority() - $a[1]->getPriority());
+        usort($this->parameters, static fn (array $a, array $b): int => $b[1]->getPriority() - $a[1]->getPriority());
 
         return $this;
     }
