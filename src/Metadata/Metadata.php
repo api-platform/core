@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
+use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
 use ApiPlatform\State\OptionsInterface;
 
 /**
@@ -34,6 +35,7 @@ abstract class Metadata
      * @param mixed|null                                                                        $processor
      * @param Parameters|array<string, Parameter>                                               $parameters
      * @param callable|string|array<string, \Illuminate\Contracts\Validation\Rule|array|string> $rules                   Laravel rules can be a FormRequest class, a callable or an array of rules
+     * @param array<class-string<ProblemExceptionInterface>>|null                               $errors
      */
     public function __construct(
         protected ?string $shortName = null,
@@ -73,6 +75,7 @@ abstract class Metadata
         protected $provider = null,
         protected $processor = null,
         protected ?OptionsInterface $stateOptions = null,
+        protected ?array $errors = null,
         /*
          * @experimental
          */
@@ -691,6 +694,22 @@ abstract class Metadata
     {
         $self = clone $this;
         $self->hideHydraOperation = $hideHydraOperation;
+
+        return $self;
+    }
+
+    public function getErrors(): ?array
+    {
+        return $this->errors;
+    }
+
+    /**
+     * @param class-string<ProblemExceptionInterface>[] $errors
+     */
+    public function withErrors(array $errors): static
+    {
+        $self = clone $this;
+        $self->errors = $errors;
 
         return $self;
     }

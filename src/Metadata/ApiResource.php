@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
+use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\State\OptionsInterface;
@@ -45,6 +46,7 @@ class ApiResource extends Metadata
      * @param mixed|null                                                             $messenger
      * @param mixed|null                                                             $input
      * @param mixed|null                                                             $output
+     * @param array<class-string<ProblemExceptionInterface>>|null                    $errors
      */
     public function __construct(
         /**
@@ -966,6 +968,7 @@ class ApiResource extends Metadata
         protected ?bool $strictQueryParameterValidation = null,
         protected ?bool $hideHydraOperation = null,
         protected array $extraProperties = [],
+        ?array $errors = null,
     ) {
         parent::__construct(
             shortName: $shortName,
@@ -1005,13 +1008,14 @@ class ApiResource extends Metadata
             provider: $provider,
             processor: $processor,
             stateOptions: $stateOptions,
+            errors: $errors,
             parameters: $parameters,
             rules: $rules,
             policy: $policy,
             middleware: $middleware,
             strictQueryParameterValidation: $strictQueryParameterValidation,
             hideHydraOperation: $hideHydraOperation,
-            extraProperties: $extraProperties
+            extraProperties: $extraProperties,
         );
 
         $this->operations = null === $operations ? null : new Operations($operations);

@@ -364,14 +364,12 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $existingResponses = $openapiOperation->getResponses() ?: [];
             $overrideResponses = $operation->getExtraProperties()[self::OVERRIDE_OPENAPI_RESPONSES] ?? $this->openApiOptions->getOverrideResponses();
             $errors = null;
+            /** @var array<class-string|string, Error> */
+            $errorOperations = [];
             if ($operation instanceof HttpOperation && null !== ($errors = $operation->getErrors())) {
-                /** @var array<class-string|string, Error> */
-                $errorOperations = [];
                 foreach ($errors as $error) {
                     $errorOperations[$error] = $this->getErrorResource($error);
                 }
-
-                $openapiOperation = $this->addOperationErrors($openapiOperation, $errorOperations, $resourceMetadataCollection, $schema, $schemas, $operation);
             }
 
             if ($overrideResponses || !$existingResponses) {
@@ -385,24 +383,16 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                         $successStatus = (string) $operation->getStatus() ?: 201;
                         $openapiOperation = $this->buildOpenApiResponse($existingResponses, $successStatus, \sprintf('%s resource created', $resourceShortName), $openapiOperation, $operation, $responseMimeTypes, $operationOutputSchemas, $resourceMetadataCollection);
 
-                        if (null === $errors) {
-                            $openapiOperation = $this->addOperationErrors($openapiOperation, [
-                                $defaultError->withStatus(400)->withDescription('Invalid input'),
-                                $defaultValidationError,
-                            ], $resourceMetadataCollection, $schema, $schemas, $operation);
-                        }
+                        $errorOperations[] = $defaultError->withStatus(400)->withDescription('Invalid input');
+                        $errorOperations[] = $defaultValidationError;
                         break;
                     case 'PATCH':
                     case 'PUT':
                         $successStatus = (string) $operation->getStatus() ?: 200;
                         $openapiOperation = $this->buildOpenApiResponse($existingResponses, $successStatus, \sprintf('%s resource updated', $resourceShortName), $openapiOperation, $operation, $responseMimeTypes, $operationOutputSchemas, $resourceMetadataCollection);
 
-                        if (null === $errors) {
-                            $openapiOperation = $this->addOperationErrors($openapiOperation, [
-                                $defaultError->withStatus(400)->withDescription('Invalid input'),
-                                $defaultValidationError,
-                            ], $resourceMetadataCollection, $schema, $schemas, $operation);
-                        }
+                        $errorOperations[] = $defaultError->withStatus(400)->withDescription('Invalid input');
+                        $errorOperations[] = $defaultValidationError;
                         break;
                     case 'DELETE':
                         $successStatus = (string) $operation->getStatus() ?: 204;
@@ -412,15 +402,15 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             }
 
             if ($overrideResponses && !isset($existingResponses[403]) && $operation->getSecurity()) {
-                $openapiOperation = $this->addOperationErrors($openapiOperation, [
-                    $defaultError->withStatus(403)->withDescription('Forbidden'),
-                ], $resourceMetadataCollection, $schema, $schemas, $operation);
+                $errorOperations[] = $defaultError->withStatus(403)->withDescription('Forbidden');
             }
 
             if ($overrideResponses && !$operation instanceof CollectionOperationInterface && 'POST' !== $operation->getMethod() && !isset($existingResponses[404]) && null === $errors) {
-                $openapiOperation = $this->addOperationErrors($openapiOperation, [
-                    $defaultError->withStatus(404)->withDescription('Not found'),
-                ], $resourceMetadataCollection, $schema, $schemas, $operation);
+                $errorOperations[] = $defaultError->withStatus(404)->withDescription('Not found');
+            }
+
+            if ($errorOperations) {
+                $openapiOperation = $this->addOperationErrors($openapiOperation, $errorOperations, $resourceMetadataCollection, $schema, $schemas, $operation);
             }
 
             if (!$openapiOperation->getResponses()) {

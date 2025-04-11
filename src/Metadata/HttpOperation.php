@@ -154,7 +154,6 @@ class HttpOperation extends Operation
         protected bool|OpenApiOperation|Webhook|null $openapi = null,
         protected ?array $exceptionToStatus = null,
         protected ?array $links = null,
-        protected ?array $errors = null,
         protected ?bool $strictQueryParameterValidation = null,
         protected ?bool $hideHydraOperation = null,
 
@@ -202,6 +201,7 @@ class HttpOperation extends Operation
         $provider = null,
         $processor = null,
         ?OptionsInterface $stateOptions = null,
+        ?array $errors = null,
         array|Parameters|null $parameters = null,
         array|string|null $rules = null,
         ?string $policy = null,
@@ -254,6 +254,7 @@ class HttpOperation extends Operation
             provider: $provider,
             processor: $processor,
             stateOptions: $stateOptions,
+            errors: $errors,
             parameters: $parameters,
             rules: $rules,
             policy: $policy,
@@ -261,7 +262,7 @@ class HttpOperation extends Operation
             queryParameterValidationEnabled: $queryParameterValidationEnabled,
             strictQueryParameterValidation: $strictQueryParameterValidation,
             hideHydraOperation: $hideHydraOperation,
-            extraProperties: $extraProperties
+            extraProperties: $extraProperties,
         );
     }
 
@@ -618,22 +619,6 @@ class HttpOperation extends Operation
     {
         $self = clone $this;
         $self->links = $links;
-
-        return $self;
-    }
-
-    public function getErrors(): ?array
-    {
-        return $this->errors;
-    }
-
-    /**
-     * @param class-string<ProblemExceptionInterface>[] $errors
-     */
-    public function withErrors(array $errors): static
-    {
-        $self = clone $this;
-        $self->errors = $errors;
 
         return $self;
     }
