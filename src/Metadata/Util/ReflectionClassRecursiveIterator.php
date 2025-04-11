@@ -33,10 +33,11 @@ final class ReflectionClassRecursiveIterator
 
     /**
      * @param string[] $directories
+     * @param string   $ignoreRegex Laravel uses (?!.*Test\.php$) to avoid loading pest class tests
      *
      * @return array<class-string, \ReflectionClass>
      */
-    public static function getReflectionClassesFromDirectories(array $directories): array
+    public static function getReflectionClassesFromDirectories(array $directories, string $ignoreRegex = ''): array
     {
         $id = hash('xxh3', implode('', $directories));
         if (isset(self::$localCache[$id])) {
@@ -50,7 +51,7 @@ final class ReflectionClassRecursiveIterator
                     new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS),
                     \RecursiveIteratorIterator::LEAVES_ONLY
                 ),
-                '/^(?!.*Test\.php$).+\.php$/i',
+                '/^'.$ignoreRegex.'.+\.php$/i',
                 \RecursiveRegexIterator::GET_MATCH
             );
 
