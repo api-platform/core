@@ -1,0 +1,77 @@
+diff --git a/src/Runner/ErrorHandler.php b/src/Runner/ErrorHandler.php
+index 54f35aa41..94a2bb600 100644
+--- a/src/Runner/ErrorHandler.php
++++ b/src/Runner/ErrorHandler.php
+@@ -59,6 +59,11 @@ final class ErrorHandler
+     private ?int $originalErrorReportingLevel = null;
+     private readonly Source $source;
+
++    /**
++     * @var list<array{int, string, string, int}>
++     */
++    private array $globalDeprecations = [];
++
+     /**
+      * @var ?array{functions: list<non-empty-string>, methods: list<array{className: class-string, methodName: non-empty-string}>}
+      */
+@@ -197,6 +202,23 @@ public function __invoke(int $errorNumber, string $errorString, string $errorFil
+         return false;
+     }
+
++    public function deprecationHandler(int $errorNumber, string $errorString, string $errorFile, int $errorLine): bool
++    {
++        $this->globalDeprecations[] = [$errorNumber, $errorString, $errorFile, $errorLine];
++
++        return true;
++    }
++
++    public function registerDeprecationHandler(): void
++    {
++        set_error_handler([self::$instance, 'deprecationHandler'], E_USER_DEPRECATED);
++    }
++
++    public function restoreDeprecationHandler(): void
++    {
++        restore_error_handler();
++    }
++
+     public function enable(): void
+     {
+         if ($this->enabled) {
+@@ -213,6 +235,7 @@ public function enable(): void
+
+         $this->enabled                     = true;
+         $this->originalErrorReportingLevel = error_reporting();
++        $this->triggerGlobalDeprecations();
+
+         error_reporting($this->originalErrorReportingLevel & self::UNHANDLEABLE_LEVELS);
+     }
+@@ -422,4 +445,11 @@ private function stackTrace(): string
+
+         return $buffer;
+     }
++
++    private function triggerGlobalDeprecations(): void
++    {
++        foreach ($this->globalDeprecations ?? [] as $d) {
++            $this->__invoke(...$d);
++        }
++    }
+ }
+diff --git a/src/TextUI/Application.php b/src/TextUI/Application.php
+index ca6da7005..d8965d41b 100644
+--- a/src/TextUI/Application.php
++++ b/src/TextUI/Application.php
+@@ -178,8 +178,12 @@ public function run(array $argv): int
+
+             EventFacade::instance()->seal();
+
++            ErrorHandler::instance()->registerDeprecationHandler();
++
+             $testSuite = $this->buildTestSuite($configuration);
+
++            ErrorHandler::instance()->restoreDeprecationHandler();
++
+             $this->executeCommandsThatRequireTheTestSuite($configuration, $cliConfiguration, $testSuite);
+
+             if ($testSuite->isEmpty() && !$configuration->hasCliArguments() && $configuration->testSuite()->isEmpty()) {
