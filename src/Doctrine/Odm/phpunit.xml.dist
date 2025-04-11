@@ -11,6 +11,11 @@
     </testsuite>
   </testsuites>
   <source>
+    <deprecationTrigger>
+        <function>trigger_deprecation</function>
+        <method>Doctrine\Deprecations\Deprecation::trigger</method>
+        <method>Doctrine\Deprecations\Deprecation::delegateTriggerToBackend</method>
+    </deprecationTrigger>
     <include>
       <directory>./</directory>
     </include>
