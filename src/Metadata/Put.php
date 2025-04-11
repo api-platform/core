@@ -48,8 +48,6 @@ final class Put extends HttpOperation
         ?array $exceptionToStatus = null,
         ?bool $queryParameterValidationEnabled = null,
         ?array $links = null,
-        ?array $errors = null,
-
         ?string $shortName = null,
         ?string $class = null,
         ?bool $paginationEnabled = null,
@@ -94,6 +92,7 @@ final class Put extends HttpOperation
         $provider = null,
         $processor = null,
         ?OptionsInterface $stateOptions = null,
+        ?array $errors = null,
         array|Parameters|null $parameters = null,
         mixed $rules = null,
         ?string $policy = null,
@@ -132,7 +131,6 @@ final class Put extends HttpOperation
             exceptionToStatus: $exceptionToStatus,
             queryParameterValidationEnabled: $queryParameterValidationEnabled,
             links: $links,
-            errors: $errors,
             shortName: $shortName,
             class: $class,
             paginationEnabled: $paginationEnabled,
@@ -177,13 +175,14 @@ final class Put extends HttpOperation
             provider: $provider,
             processor: $processor,
             stateOptions: $stateOptions,
+            errors: $errors,
             parameters: $parameters,
             rules: $rules,
             policy: $policy,
             middleware: $middleware,
             strictQueryParameterValidation: $strictQueryParameterValidation,
             hideHydraOperation: $hideHydraOperation,
-            extraProperties: $extraProperties
+            extraProperties: $extraProperties,
         );
     }
 

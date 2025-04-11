@@ -48,8 +48,6 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
         ?array $exceptionToStatus = null,
         ?bool $queryParameterValidationEnabled = null,
         ?array $links = null,
-        ?array $errors = null,
-
         ?string $shortName = null,
         ?string $class = null,
         ?bool $paginationEnabled = null,
@@ -94,6 +92,7 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
         $provider = null,
         $processor = null,
         ?OptionsInterface $stateOptions = null,
+        ?array $errors = null,
         array|Parameters|null $parameters = null,
         array|string|null $rules = null,
         ?string $policy = null,
@@ -131,7 +130,6 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
             exceptionToStatus: $exceptionToStatus,
             queryParameterValidationEnabled: $queryParameterValidationEnabled,
             links: $links,
-            errors: $errors,
             shortName: $shortName,
             class: $class,
             paginationEnabled: $paginationEnabled,
@@ -183,6 +181,7 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
             strictQueryParameterValidation: $strictQueryParameterValidation,
             hideHydraOperation: $hideHydraOperation,
             stateOptions: $stateOptions,
+            errors: $errors,
         );
     }
 
