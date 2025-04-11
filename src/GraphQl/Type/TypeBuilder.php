@@ -79,7 +79,7 @@ final class TypeBuilder implements ContextAwareTypeBuilderInterface
 
         if ('item_query' === $operationName || 'collection_query' === $operationName) {
             // Test if the collection/item has different groups
-            if ($resourceMetadataCollection->getOperation($operation instanceof CollectionOperationInterface ? 'item_query' : 'collection_query')->getNormalizationContext() !== $operation->getNormalizationContext()) {
+            if ($resourceMetadataCollection->getOperation($operation instanceof CollectionOperationInterface ? 'collection_query' : 'item_query')->getNormalizationContext() !== $operation->getNormalizationContext()) {
                 $shortName .= $operation instanceof CollectionOperationInterface ? 'Collection' : 'Item';
             }
         }
