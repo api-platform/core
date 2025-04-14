@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Extractor\PropertyExtractorInterface;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
@@ -64,20 +65,24 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
 
         foreach ($propertyMetadata as $key => $value) {
             if ('builtinTypes' === $key && null !== $value) {
+                if (method_exists(PropertyInfoExtractor::class, 'getType')) {
+                    continue;
+                }
+
                 $apiProperty = $apiProperty->withBuiltinTypes(array_map(static fn (string $builtinType): LegacyType => new LegacyType($builtinType), $value));
 
                 continue;
             }
 
-            if ('phpType' === $key && null !== $value) {
+            if ('nativeType' === $key && null !== $value) {
                 if (class_exists(PhpDocParser::class)) {
-                    $apiProperty = $apiProperty->withPhpType((new StringTypeResolver())->resolve($value));
+                    $apiProperty = $apiProperty->withNativeType((new StringTypeResolver())->resolve($value));
 
                     continue;
                 }
 
                 try {
-                    $apiProperty = $apiProperty->withPhpType(Type::builtin($value));
+                    $apiProperty = $apiProperty->withNativeType(Type::builtin($value));
                 } catch (\ValueError) {
                     throw new RuntimeException(\sprintf('Cannot create a type from "%s". Try running "composer require phpstan/phpdoc-parser" to support all types.', $value));
                 }

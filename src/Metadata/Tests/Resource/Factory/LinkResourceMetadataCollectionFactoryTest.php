@@ -49,13 +49,13 @@ class LinkResourceMetadataCollectionFactoryTest extends TestCase
         ]));
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'id')->willReturn(new ApiProperty());
-        $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'foo')->willReturn((new ApiProperty())->withPhpType(
+        $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'foo')->willReturn((new ApiProperty())->withNativeType(
             Type::collection(Type::object(Collection::class), key: Type::int(), value: Type::object(Dummy::class)),
         ));
-        $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'foo2')->willReturn((new ApiProperty())->withPhpType(
+        $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'foo2')->willReturn((new ApiProperty())->withNativeType(
             Type::collection(Type::object(Collection::class), key: Type::int(), value: Type::object(Dummy::class)),
         ));
-        $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'bar')->willReturn((new ApiProperty())->withPhpType(
+        $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'bar')->willReturn((new ApiProperty())->withNativeType(
             Type::collection(Type::object(Collection::class), key: Type::int(), value: Type::object(RelatedDummy::class)),
         ));
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -104,7 +104,7 @@ class LinkResourceMetadataCollectionFactoryTest extends TestCase
         ]));
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'identifier')->willReturn((new ApiProperty())->withIdentifier(true));
-        $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'dummy')->willReturn((new ApiProperty())->withPhpType(
+        $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'dummy')->willReturn((new ApiProperty())->withNativeType(
             Type::collection(Type::object(Collection::class), key: Type::int(), value: Type::object(Dummy::class)),
         ));
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);

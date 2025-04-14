@@ -17,6 +17,7 @@ use ApiPlatform\JsonSchema\Metadata\Property\Factory\SchemaPropertyMetadataFacto
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\Util\Reflection;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 
 /**
  * Creates a property metadata from {@see ApiProperty} attribute.
@@ -124,7 +125,7 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
             if (preg_match('/^(?:get|is)(.*)/', (string) $method, $matches)) {
                 // BC layer, to remove in 5.0
                 if ('getBuiltinTypes' === $method) {
-                    if (!$attribute->usesLegacyType) {
+                    if (method_exists(PropertyInfoExtractor::class, 'getType')) {
                         continue;
                     }
 

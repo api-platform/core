@@ -115,7 +115,7 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
      */
     public function getTypes($class, $property, array $context = []): ?array
     {
-        // trigger_deprecation('api-platform/core', '4.2', 'The "%s()" method is deprecated, use "%s::getType()" instead.', __METHOD__, self::class);
+        trigger_deprecation('api-platform/core', '4.2', 'The "%s()" method is deprecated, use "%s::getType()" instead.', __METHOD__, self::class);
 
         if (null === $metadata = $this->getMetadata($class)) {
             return null;
@@ -173,7 +173,7 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
                     }
             }
 
-            $builtinType = $this->getPhpTypeLegacy($typeOfField);
+            $builtinType = $this->getNativeTypeLegacy($typeOfField);
 
             return $builtinType ? [new LegacyType($builtinType, $nullable)] : null;
         }
@@ -230,7 +230,7 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
         };
     }
 
-    private function getPhpTypeLegacy(string $doctrineType): ?string
+    private function getNativeTypeLegacy(string $doctrineType): ?string
     {
         return match ($doctrineType) {
             MongoDbType::INTEGER, MongoDbType::INT, MongoDbType::INTID, MongoDbType::KEY => LegacyType::BUILTIN_TYPE_INT,

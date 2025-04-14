@@ -58,7 +58,8 @@
         "orchestra/testbench": "^9.1",
         "phpunit/phpunit": "^11.2",
         "api-platform/graphql": "^4.1",
-        "laravel/sanctum": "^4.0"
+        "laravel/sanctum": "^4.0",
+        "symfony/type-info": "^7.3-dev"
     },
     "autoload": {
         "psr-4": {
@@ -119,5 +120,11 @@
         "lint": [
             "@php vendor/bin/phpstan analyse --verbose --ansi"
         ]
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/symfony/type-info"
+        }
+    ]
 }

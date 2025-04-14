@@ -25,6 +25,7 @@
         "symfony/property-info": "^7.0",
         "symfony/runtime": "^7.0",
         "symfony/security-bundle": "^7.0",
+        "symfony/type-info": "^7.3-dev",
         "symfony/serializer": "^7.0",
         "symfony/validator": "^7.0",
         "symfony/yaml": "^7.0",
@@ -50,5 +51,11 @@
             "name": "api-platform/api-platform",
             "url": "https://github.com/api-platform/api-platform"
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/symfony/type-info"
+        }
+    ]
 }

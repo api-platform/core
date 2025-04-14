@@ -38,7 +38,8 @@
         "symfony/http-foundation": "^6.4 || ^7.0",
         "willdurand/negotiation": "^3.1",
         "api-platform/validator": "^4.1",
-        "api-platform/serializer": "^4.1"
+        "api-platform/serializer": "^4.1",
+        "symfony/type-info": "^7.3-dev"
     },
     "autoload": {
         "psr-4": {
@@ -80,5 +81,11 @@
     },
     "scripts": {
         "test": "./vendor/bin/phpunit"
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/symfony/type-info"
+        }
+    ]
 }

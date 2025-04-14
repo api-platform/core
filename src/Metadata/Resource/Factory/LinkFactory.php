@@ -42,7 +42,7 @@ final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInte
     public function createLinkFromProperty(Metadata $operation, string $property): Link
     {
         $metadata = $this->propertyMetadataFactory->create($resourceClass = $operation->getClass(), $property);
-        $relationClass = $this->getPropertyClassType($metadata->getPhpType());
+        $relationClass = $this->getPropertyClassType($metadata->getNativeType());
         if (!$relationClass) {
             throw new RuntimeException(\sprintf('We could not find a class matching the uriVariable "%s" on "%s".', $property, $resourceClass));
         }
@@ -86,7 +86,7 @@ final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInte
         foreach ($this->propertyNameCollectionFactory->create($resourceClass = $operation->getClass()) as $property) {
             $metadata = $this->propertyMetadataFactory->create($resourceClass, $property);
 
-            if (!($relationClass = $this->getPropertyClassType($metadata->getPhpType())) || !$this->resourceClassResolver->isResourceClass($relationClass)) {
+            if (!($relationClass = $this->getPropertyClassType($metadata->getNativeType())) || !$this->resourceClassResolver->isResourceClass($relationClass)) {
                 continue;
             }
 
@@ -116,7 +116,7 @@ final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInte
                         ->withFromProperty($property);
 
                     if (!$attributeLink->getFromClass()) {
-                        $attributeLink = $attributeLink->withFromClass($resourceClass)->withToClass($this->getPropertyClassType($metadata->getPhpType()) ?? $resourceClass);
+                        $attributeLink = $attributeLink->withFromClass($resourceClass)->withToClass($this->getPropertyClassType($metadata->getNativeType()) ?? $resourceClass);
                     }
 
                     $links[] = $attributeLink;

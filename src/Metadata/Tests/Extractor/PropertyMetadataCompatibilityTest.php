@@ -76,7 +76,7 @@ final class PropertyMetadataCompatibilityTest extends TestCase
         'uriTemplate' => '/sub-resource-get-collection',
         'property' => 'test',
         'hydra' => false,
-        'phpType' => 'string',
+        'nativeType' => 'string',
     ];
 
     #[\PHPUnit\Framework\Attributes\DataProvider('getExtractors')]
@@ -124,7 +124,7 @@ final class PropertyMetadataCompatibilityTest extends TestCase
         return $property;
     }
 
-    private function withPhpType(string $value): Type
+    private function withNativeType(string $value): Type
     {
         return Type::builtin($value);
     }

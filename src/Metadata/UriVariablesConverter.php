@@ -16,7 +16,6 @@ namespace ApiPlatform\Metadata;
 use ApiPlatform\Metadata\Exception\InvalidUriVariableException;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\Util\TypeHelper;
 use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
 use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 
@@ -87,11 +86,11 @@ final class UriVariablesConverter implements UriVariablesConverterInterface
         foreach ($properties as $property) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
 
-            if (!$type = $propertyMetadata->getPhpType()) {
+            if (!$type = $propertyMetadata->getNativeType()) {
                 continue;
             }
 
-            foreach (TypeHelper::traverse($type) as $t) {
+            foreach ($type->traverse() as $t) {
                 if (!$t instanceof CompositeTypeInterface && !$t instanceof WrappingTypeInterface) {
                     $typeStrings[] = (string) $t;
                 }

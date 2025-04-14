@@ -31,13 +31,14 @@
         "symfony/cache": "^6.4 || ^7.0",
         "symfony/console": "^6.4 || ^7.0",
         "symfony/property-access": "^6.4 || ^7.0",
-        "symfony/property-info": "^7.1",
+        "symfony/property-info": "^6.4 || ^7.1",
         "symfony/serializer": "^6.4 || ^7.0",
         "symfony/uid": "^6.4 || ^7.0"
     },
     "require-dev": {
         "phpspec/prophecy-phpunit": "^2.2",
-        "phpunit/phpunit": "^11.2"
+        "phpunit/phpunit": "^11.2",
+        "symfony/type-info": "^7.3-dev"
     },
     "autoload": {
         "psr-4": {
@@ -73,5 +74,11 @@
     },
     "scripts": {
         "test": "./vendor/bin/phpunit"
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/symfony/type-info"
+        }
+    ]
 }

@@ -93,11 +93,11 @@ final class LinkFactoryTest extends TestCase
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCreateLinksFromAttributesCases')]
-    public function testCreateLinksFromAttributes(?Type $phpType, array $expectedLinks): void
+    public function testCreateLinksFromAttributes(?Type $nativeType, array $expectedLinks): void
     {
         $propertyNameCollectionFactory = new PropertyInfoPropertyNameCollectionFactory(new PropertyInfoExtractor([new ReflectionExtractor()]));
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'dummy')->willReturn((new ApiProperty())->withPhpType($phpType));
+        $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'dummy')->willReturn((new ApiProperty())->withNativeType($nativeType));
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $linkFactory = new LinkFactory($propertyNameCollectionFactory, $propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal());
 
@@ -146,7 +146,7 @@ final class LinkFactoryTest extends TestCase
 
         $property = 'test';
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'test')->willReturn(new ApiProperty(phpType: Type::object(RelatedDummy::class)));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'test')->willReturn(new ApiProperty(nativeType: Type::object(RelatedDummy::class)));
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(false);
