@@ -117,6 +117,10 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         ['propertyNames' => $propertyNames, 'properties' => $properties] = $this->getProperties($resourceClass);
         $parameters = $operation->getParameters() ?? new Parameters();
         foreach ($parameters as $key => $parameter) {
+            if (null === $parameter->getProvider() && (($f = $parameter->getFilter()) && $f instanceof ParameterProviderFilterInterface)) {
+                $parameters->add($key, $parameter->withProvider($f->getParameterProvider()));
+            }
+
             if (':property' === $key) {
                 foreach ($propertyNames as $property) {
                     $converted = $this->nameConverter?->denormalize($property) ?? $property;
@@ -131,7 +135,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
 
             $key = $parameter->getKey() ?? $key;
 
-            if (str_contains($key, ':property') || (($f = $parameter->getFilter()) && is_a($f, PropertiesAwareInterface::class, true)) || $parameter instanceof PropertiesAwareInterface) {
+            if (str_contains($key, ':property') || ((($f = $parameter->getFilter()) && is_a($f, PropertiesAwareInterface::class, true)) || $parameter instanceof PropertiesAwareInterface)) {
                 $p = [];
                 foreach ($propertyNames as $prop) {
                     $p[$this->nameConverter?->denormalize($prop) ?? $prop] = $prop;

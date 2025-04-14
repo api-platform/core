@@ -17,6 +17,7 @@
             <argument type="service" id="api_platform.router" />
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
             <argument>%api_platform.serializer.default_context%</argument>
+            <argument>%api_platform.enable_entrypoint%</argument>
 
             <tag name="serializer.normalizer" priority="-800" />
         </service>

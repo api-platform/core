@@ -20,6 +20,7 @@ use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
 use Workbench\Database\Factories\AuthorFactory;
 use Workbench\Database\Factories\BookFactory;
+use Workbench\Database\Factories\GrandSonFactory;
 use Workbench\Database\Factories\WithAccessorFactory;
 
 class EloquentTest extends TestCase
@@ -430,5 +431,15 @@ class EloquentTest extends TestCase
         $res = $this->get('/api/books?published=0', ['Accept' => ['application/ld+json']]);
         $this->assertEquals($res->getStatusCode(), 200);
         $this->assertEquals($res->json()['totalItems'], 0);
+    }
+
+    public function testBelongsTo(): void
+    {
+        GrandSonFactory::new()->count(1)->create();
+
+        $res = $this->get('/api/grand_sons/1/grand_father', ['Accept' => ['application/ld+json']]);
+        $json = $res->json();
+        $this->assertEquals($json['@id'], '/api/grand_sons/1/grand_father');
+        $this->assertEquals($json['sons'][0], '/api/grand_sons/1');
     }
 }

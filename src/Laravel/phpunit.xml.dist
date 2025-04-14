@@ -18,6 +18,9 @@
     </testsuites>
     <coverage/>
     <source>
+    <deprecationTrigger>
+        <function>trigger_deprecation</function>
+    </deprecationTrigger>
         <include>
             <directory>./</directory>
         </include>

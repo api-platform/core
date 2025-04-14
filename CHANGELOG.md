@@ -1,12 +1,23 @@
 # Changelog
 
+## v4.1.7
+
+### Bug fixes
+
+* [40c09d1c0](https://github.com/api-platform/core/commit/40c09d1c0560ec5c2a96391faf9fbe328f6f2f97) fix(metadata): yaml link security (#7066)
+* [545eb69b8](https://github.com/api-platform/core/commit/545eb69b86797f436b8c494912513e1ef9064550) fix(symfony): internal resources should not inherit global defaults (#7073)
+* [615bdd6b1](https://github.com/api-platform/core/commit/615bdd6b1c372f6438c6460dfcce69ef6c746e08) fix(hydra): use correctly enable_docs (#7062)
+* [694681f4b](https://github.com/api-platform/core/commit/694681f4b187688dd41de1912637003a2fb313a2) fix(symfony): do not ignore Test files on symfony (#7077)
+* [6f15be5c7](https://github.com/api-platform/core/commit/6f15be5c7badf197f10bb7d57dd79373f855ef20) fix(laravel): eloquent BelongsTo linking (#7075)
+* [dddd3eee4](https://github.com/api-platform/core/commit/dddd3eee40af2e8126476ce3fe4c69f33ec15ac0) fix(metadata): parameter provider within filter (#7081)
+* [dfca9bf60](https://github.com/api-platform/core/commit/dfca9bf6023c5535ce7ee9b3829a8efd7f1f9398) Revert "fix(jsonld): duplicate error fields when prefix is enabled (#7021)" (#7074)
+* [d696a8e42](https://github.com/api-platform/core/commit/d696a8e4284b0e5b5c56300852bab70283386a99) fix(metadata): use template typehint in parameters (#7078)
+
 ## v4.1.6
 
 ### Bug fixes
 
 * [44e560839](https://github.com/api-platform/core/commit/44e56083996f2f00a1d87a149fd41aeb0149e4dd) fix(laravel): undefined variable app
-
-### Features
 
 ## v4.1.5
 
