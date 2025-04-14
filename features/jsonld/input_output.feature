@@ -309,7 +309,7 @@ Feature: JSON-LD DTO input and output
     """
     Then the response status code should be 400
     And the response should be in JSON
-    And the JSON node "description" should be equal to "The input data is misformatted."
+    And the JSON node "detail" should be equal to "The input data is misformatted."
 
   @!mongodb
   Scenario: Reset password through an input DTO without DataTransformer

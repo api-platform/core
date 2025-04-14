@@ -55,8 +55,7 @@ Feature: Handle properly invalid data submitted to the API
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
     And the JSON node "@context" should be equal to "/contexts/Error"
     And the JSON node "@type" should be equal to "hydra:Error"
-    And the JSON node "title" should be equal to "An error occurred"
-    And the JSON node "description" should be equal to 'The type of the "name" attribute must be "string", "NULL" given.'
+    And the JSON node "detail" should be equal to 'The type of the "name" attribute must be "string", "NULL" given.'
 
   Scenario: Create a resource with wrong value type for relation
     When I add "Content-Type" header equal to "application/ld+json"
@@ -72,8 +71,7 @@ Feature: Handle properly invalid data submitted to the API
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
     And the JSON node "@context" should be equal to "/contexts/Error"
     And the JSON node "@type" should be equal to "hydra:Error"
-    And the JSON node "title" should be equal to "An error occurred"
-    And the JSON node "description" should be equal to 'Invalid IRI "1".'
+    And the JSON node "detail" should be equal to 'Invalid IRI "1".'
     And the JSON node "trace" should exist
 
   Scenario: Ignore invalid dates
@@ -116,8 +114,7 @@ Feature: Handle properly invalid data submitted to the API
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
     And the JSON node "@context" should be equal to "/contexts/Error"
     And the JSON node "@type" should be equal to "hydra:Error"
-    And the JSON node "title" should be equal to "An error occurred"
-    And the JSON node "description" should be equal to 'The type of the "relatedDummies" attribute must be "array", "string" given.'
+    And the JSON node "detail" should be equal to 'The type of the "relatedDummies" attribute must be "array", "string" given.'
     And the JSON node "trace" should exist
 
   Scenario: Send an object where an array is expected
@@ -134,8 +131,7 @@ Feature: Handle properly invalid data submitted to the API
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
     And the JSON node "@context" should be equal to "/contexts/Error"
     And the JSON node "@type" should be equal to "hydra:Error"
-    And the JSON node "title" should be equal to "An error occurred"
-    And the JSON node "description" should be equal to 'The type of the key "a" must be "int", "string" given.'
+    And the JSON node "detail" should be equal to 'The type of the key "a" must be "int", "string" given.'
 
   Scenario: Send a scalar having the bad type
     When I add "Content-Type" header equal to "application/ld+json"
@@ -150,8 +146,7 @@ Feature: Handle properly invalid data submitted to the API
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
     And the JSON node "@context" should be equal to "/contexts/Error"
     And the JSON node "@type" should be equal to "hydra:Error"
-    And the JSON node "title" should be equal to "An error occurred"
-    And the JSON node "description" should be equal to 'The type of the "name" attribute must be "string", "integer" given.'
+    And the JSON node "detail" should be equal to 'The type of the "name" attribute must be "string", "integer" given.'
 
   Scenario: According to the JSON spec, allow numbers without explicit floating point for JSON formats
     When I add "Content-Type" header equal to "application/ld+json"
