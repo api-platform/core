@@ -264,15 +264,19 @@ jobs:
         continue-on-error: true
 
   phpunit-components:
-    name: PHPUnit ${{ matrix.component }} (PHP ${{ matrix.php }})
+    name: PHPUnit ${{ matrix.component }} (PHP ${{ matrix.php.version }} ${{ matrix.php.deprecations && 'no deprecations' || '' }})
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
       matrix:
         php:
-          - '8.2'
-          - '8.3'
-          - '8.4'
+          - version: '8.2'
+          - version: '8.3'
+          - version: '8.4'
+          - version: '8.4'
+            coverage: true
+          - version: '8.4'
+            deprecations: true
         component:
           - api-platform/doctrine-common
           - api-platform/doctrine-orm
@@ -290,11 +294,6 @@ jobs:
           - api-platform/state
           - api-platform/symfony
           - api-platform/validator
-        include:
-          - php: '8.2'
-          - php: '8.3'
-          - php: '8.4'
-            coverage: true
       fail-fast: false
     steps:
       - name: Checkout
@@ -302,10 +301,13 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php }}
+          php-version: ${{ matrix.php.version }}
           tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
           ini-values: memory_limit=-1
+      - name: Allow unstable project dependencies
+        if: matrix.php.deprecations == true
+        run: composer config minimum-stability dev
       - name: Run ${{ matrix.component }} install
         run: |
           composer global require soyuka/pmu
@@ -315,7 +317,7 @@ jobs:
       - name: Run ${{ matrix.component }} tests
         run: |
           mkdir -p /tmp/build/logs/phpunit
-          composer ${{matrix.component}} test --log-junit "/tmp/build/logs/phpunit/junit.xml" ${{ matrix.coverage && '--coverage-clover /tmp/build/logs/phpunit/clover.xml' || '' }}
+          composer ${{matrix.component}} test --log-junit "/tmp/build/logs/phpunit/junit.xml" ${{ matrix.php.coverage && '--coverage-clover /tmp/build/logs/phpunit/clover.xml' || '' }} ${{ matrix.php.deprecations && '--fail-on-deprecation --display-deprecations' || '' }}
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4
