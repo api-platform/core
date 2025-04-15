@@ -46,7 +46,7 @@ final class ItemProvider implements ProviderInterface
         $this->managerRegistry = $managerRegistry;
     }
 
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?object
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         $entityClass = $operation->getClass();
         if (($options = $operation->getStateOptions()) && $options instanceof Options && $options->getEntityClass()) {
