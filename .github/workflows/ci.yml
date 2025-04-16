@@ -314,6 +314,9 @@ jobs:
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link . --permanent
           composer ${{matrix.component}} update
+      - name: Patch phpunit
+        if: matrix.php.deprecations == true
+        run: git apply --directory vendor/phpunit/phpunit .github/patches/phpunit.patch
       - name: Run ${{ matrix.component }} tests
         run: |
           mkdir -p /tmp/build/logs/phpunit
