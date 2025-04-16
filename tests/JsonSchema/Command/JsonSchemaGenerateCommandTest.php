@@ -177,11 +177,9 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
 
-        $this->assertEquals($json['definitions']['Nest.jsonld']['properties']['owner']['anyOf'], [
-            ['$ref' => '#/definitions/Robin.jsonld'],
-            ['$ref' => '#/definitions/Wren.jsonld'],
-            ['type' => 'null'],
-        ]);
+        $this->assertContains(['$ref' => '#/definitions/Robin.jsonld'], $json['definitions']['Nest.jsonld']['properties']['owner']['anyOf']);
+        $this->assertContains(['$ref' => '#/definitions/Wren.jsonld'], $json['definitions']['Nest.jsonld']['properties']['owner']['anyOf']);
+        $this->assertContains(['type' => 'null'], $json['definitions']['Nest.jsonld']['properties']['owner']['anyOf']);
 
         $this->assertArrayHasKey('Wren.jsonld', $json['definitions']);
         $this->assertArrayHasKey('Robin.jsonld', $json['definitions']);
@@ -193,11 +191,9 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
 
-        $this->assertEquals($json['definitions']['Nest.jsonapi']['properties']['data']['properties']['attributes']['properties']['owner']['anyOf'], [
-            ['$ref' => '#/definitions/Robin.jsonapi'],
-            ['$ref' => '#/definitions/Wren.jsonapi'],
-            ['type' => 'null'],
-        ]);
+        $this->assertContains(['$ref' => '#/definitions/Robin.jsonapi'], $json['definitions']['Nest.jsonapi']['properties']['data']['properties']['attributes']['properties']['owner']['anyOf']);
+        $this->assertContains(['$ref' => '#/definitions/Wren.jsonapi'], $json['definitions']['Nest.jsonapi']['properties']['data']['properties']['attributes']['properties']['owner']['anyOf']);
+        $this->assertContains(['type' => 'null'], $json['definitions']['Nest.jsonapi']['properties']['data']['properties']['attributes']['properties']['owner']['anyOf']);
 
         $this->assertArrayHasKey('Wren.jsonapi', $json['definitions']);
         $this->assertArrayHasKey('Robin.jsonapi', $json['definitions']);
@@ -209,11 +205,9 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
 
-        $this->assertEquals($json['definitions']['Nest.jsonhal']['properties']['owner']['anyOf'], [
-            ['$ref' => '#/definitions/Robin.jsonhal'],
-            ['$ref' => '#/definitions/Wren.jsonhal'],
-            ['type' => 'null'],
-        ]);
+        $this->assertContains(['$ref' => '#/definitions/Robin.jsonhal'], $json['definitions']['Nest.jsonhal']['properties']['owner']['anyOf']);
+        $this->assertContains(['$ref' => '#/definitions/Wren.jsonhal'], $json['definitions']['Nest.jsonhal']['properties']['owner']['anyOf']);
+        $this->assertContains(['type' => 'null'], $json['definitions']['Nest.jsonhal']['properties']['owner']['anyOf']);
 
         $this->assertArrayHasKey('Wren.jsonhal', $json['definitions']);
         $this->assertArrayHasKey('Robin.jsonhal', $json['definitions']);

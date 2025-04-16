@@ -184,6 +184,12 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             $currentType = $schema['type'];
             $schema['type'] = \is_array($currentType) ? array_merge($currentType, ['null']) : [$currentType, 'null'];
 
+            if (isset($schema['enum'])) {
+                $schema['enum'][] = null;
+
+                return $schema;
+            }
+
             return $schema;
         }
 
@@ -199,18 +205,23 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
     {
         $isNullable = $type->isNullable();
 
-        while ($type instanceof WrappingTypeInterface) {
-            $type = $type->getWrappedType();
-        }
-
         if ($type instanceof UnionType) {
             $subTypes = array_filter($type->getTypes(), fn ($t) => !($t instanceof BuiltinType && $t->isIdentifiedBy(TypeIdentifier::NULL)));
+
+            foreach ($subTypes as $t) {
+                $s = $this->getJsonSchemaFromType($t, $readableLink);
+                // We can not find what type this is, let it be computed at runtime by the SchemaFactory
+                if (($s['type'] ?? null) === Schema::UNKNOWN_TYPE) {
+                    return $s;
+                }
+            }
+
             $schemas = array_map(fn ($t) => $this->getJsonSchemaFromType($t, $readableLink), $subTypes);
 
             if (0 === \count($schemas)) {
                 $schema = [];
             } elseif (1 === \count($schemas)) {
-                $schema = $schemas[0];
+                $schema = current($schemas);
             } else {
                 $schema = ['anyOf' => $schemas];
             }
@@ -235,20 +246,20 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
         }
 
         if ($type instanceof CollectionType) {
-            $keyType = $type->getCollectionKeyType();
             $valueType = $type->getCollectionValueType();
-            $schema = [];
+            $valueSchema = $this->getJsonSchemaFromType($valueType, $readableLink);
+            $keyType = $type->getCollectionKeyType();
 
             // Associative array (string keys)
-            if ($keyType->isSatisfiedBy(fn (Type $t) => $t instanceof BuiltinType && $t->isIdentifiedBy(TypeIdentifier::STRING))) {
+            if ($keyType->isSatisfiedBy(fn (Type $t) => $t instanceof BuiltinType && $t->isIdentifiedBy(TypeIdentifier::INT))) {
                 $schema = [
-                    'type' => 'object',
-                    'additionalProperties' => $this->getJsonSchemaFromType($valueType, $readableLink),
+                    'type' => 'array',
+                    'items' => $valueSchema,
                 ];
             } else { // List (int keys)
                 $schema = [
-                    'type' => 'array',
-                    'items' => $this->getJsonSchemaFromType($valueType, $readableLink),
+                    'type' => 'object',
+                    'additionalProperties' => $valueSchema,
                 ];
             }
 
@@ -262,10 +273,6 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
         }
 
         if ($type instanceof BuiltinType) {
-            if ($type->isIdentifiedBy(TypeIdentifier::NULL)) {
-                return ['type' => 'null'];
-            }
-
             $schema = match ($type->getTypeIdentifier()) {
                 TypeIdentifier::INT => ['type' => 'integer'],
                 TypeIdentifier::FLOAT => ['type' => 'number'],
@@ -284,7 +291,7 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             return $this->applyNullability($schema, $isNullable);
         }
 
-        return $this->applyNullability(['type' => Schema::UNKNOWN_TYPE], $isNullable);
+        return ['type' => Schema::UNKNOWN_TYPE];
     }
 
     /**
@@ -316,17 +323,16 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             return ['type' => 'string', 'format' => 'binary'];
         }
 
-        if (is_a($className, \BackedEnum::class, true)) {
+        $isResourceClass = $this->isResourceClass($className);
+        if (!$isResourceClass && is_a($className, \BackedEnum::class, true)) {
             $enumCases = array_map(static fn (\BackedEnum $enum): string|int => $enum->value, $className::cases());
             $type = \is_string($enumCases[0] ?? '') ? 'string' : 'integer';
 
             return ['type' => $type, 'enum' => $enumCases];
         }
 
-        $isResource = $this->isResourceClass($className);
-
         // If it's a resource and links are not readable, represent as IRI string.
-        if ($isResource && true !== $readableLink) {
+        if ($isResourceClass && true !== $readableLink) {
             return [
                 'type' => 'string',
                 'format' => 'iri-reference',
@@ -334,16 +340,10 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             ];
         }
 
-        // If it's a known resource represent it as UNKNOWN_TYPE this gets resolved at runtime by the SchemaFactory
-        if ($isResource) {
-            return ['type' => Schema::UNKNOWN_TYPE];
-        }
-
-        // For non-resource objects that aren't handled specifically, default to object.
-        return ['type' => 'object'];
+        return ['type' => Schema::UNKNOWN_TYPE];
     }
 
-    private function getLegacyTypeSchema(ApiProperty $propertyMetadata, array $propertySchema, string $resourceClass, string $property, bool $link): array
+    private function getLegacyTypeSchema(ApiProperty $propertyMetadata, array $propertySchema, string $resourceClass, string $property, ?bool $link): array
     {
         $types = $propertyMetadata->getBuiltinTypes() ?? [];
 

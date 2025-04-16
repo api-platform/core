@@ -46,21 +46,24 @@ final class PropertyInfoPropertyMetadataFactory implements PropertyMetadataFacto
             }
         }
 
-        if (!method_exists(PropertyInfoExtractor::class, 'getType') && !$propertyMetadata->getBuiltinTypes()) {
-            $types = $this->propertyInfo->getTypes($resourceClass, $property, $options) ?? [];
+        // TODO: remove in 5.x
+        if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
+            if (!$propertyMetadata->getBuiltinTypes()) {
+                $types = $this->propertyInfo->getTypes($resourceClass, $property, $options) ?? [];
 
-            foreach ($types as $i => $type) {
-                // Temp fix for https://github.com/symfony/symfony/pull/52699
-                if (ArrayCollection::class === $type->getClassName()) {
-                    $types[$i] = new Type($type->getBuiltinType(), $type->isNullable(), $type->getClassName(), true, $type->getCollectionKeyTypes(), $type->getCollectionValueTypes());
+                foreach ($types as $i => $type) {
+                    // Temp fix for https://github.com/symfony/symfony/pull/52699
+                    if (ArrayCollection::class === $type->getClassName()) {
+                        $types[$i] = new Type($type->getBuiltinType(), $type->isNullable(), $type->getClassName(), true, $type->getCollectionKeyTypes(), $type->getCollectionValueTypes());
+                    }
                 }
+
+                $propertyMetadata = $propertyMetadata->withBuiltinTypes($types);
             }
-
-            $propertyMetadata = $propertyMetadata->withBuiltinTypes($types);
-        }
-
-        if (!$propertyMetadata->getNativeType()) {
-            $propertyMetadata = $propertyMetadata->withNativeType($this->propertyInfo->getType($resourceClass, $property, $options));
+        } else {
+            if (!$propertyMetadata->getNativeType()) {
+                $propertyMetadata = $propertyMetadata->withNativeType($this->propertyInfo->getType($resourceClass, $property, $options));
+            }
         }
 
         if (null === $propertyMetadata->getDescription() && null !== $description = $this->propertyInfo->getShortDescription($resourceClass, $property, $options)) {
