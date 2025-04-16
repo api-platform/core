@@ -41,7 +41,8 @@
         "phpunit/phpunit": "^11.2",
         "api-platform/doctrine-common": "^4.1",
         "api-platform/doctrine-orm": "^4.1",
-        "api-platform/doctrine-odm": "^4.1"
+        "api-platform/doctrine-odm": "^4.1",
+        "symfony/type-info": "^7.3-dev"
     },
     "autoload": {
         "psr-4": {
@@ -76,5 +77,11 @@
     },
     "scripts": {
         "test": "./vendor/bin/phpunit"
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/symfony/type-info"
+        }
+    ]
 }

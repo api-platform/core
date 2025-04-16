@@ -33,7 +33,7 @@
         "psr/log": "^1.0 || ^2.0 || ^3.0",
         "symfony/property-info": "^6.4 || ^7.1",
         "symfony/string": "^6.4 || ^7.0",
-        "symfony/type-info": "^7.1"
+        "symfony/type-info": "^7.3-dev"
     },
     "require-dev": {
         "api-platform/json-schema": "^4.1",
@@ -86,5 +86,11 @@
     },
     "scripts": {
         "test": "./vendor/bin/phpunit"
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/symfony/type-info"
+        }
+    ]
 }

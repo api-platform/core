@@ -58,7 +58,8 @@
         "api-platform/doctrine-orm": "^4.1",
         "api-platform/doctrine-odm": "^4.1",
         "api-platform/parameter-validator": "^3.1",
-        "symfony/expression-language": "^6.4 || ^7.0"
+        "symfony/expression-language": "^6.4 || ^7.0",
+        "symfony/type-info": "^7.3-dev"
     },
     "suggest": {
         "api-platform/doctrine-orm": "To support Doctrine ORM.",
@@ -114,5 +115,11 @@
     },
     "scripts": {
         "test": "./vendor/bin/phpunit"
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/symfony/type-info"
+        }
+    ]
 }

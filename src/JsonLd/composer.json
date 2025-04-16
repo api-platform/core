@@ -66,6 +66,13 @@
         "test": "./vendor/bin/phpunit"
     },
     "require-dev": {
-        "phpunit/phpunit": "^11.2"
-    }
+        "phpunit/phpunit": "^11.2",
+        "symfony/type-info": "^7.3-dev"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/symfony/type-info"
+        }
+    ]
 }

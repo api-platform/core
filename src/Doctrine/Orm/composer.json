@@ -40,6 +40,7 @@
         "symfony/framework-bundle": "^6.4 || ^7.0",
         "symfony/property-access": "^6.4 || ^7.0",
         "symfony/serializer": "^6.4 || ^7.0",
+        "symfony/type-info": "^7.3-dev",
         "symfony/uid": "^6.4 || ^7.0",
         "symfony/validator": "^6.4 || ^7.0",
         "symfony/yaml": "^6.4 || ^7.0"
@@ -73,5 +74,11 @@
     },
     "scripts": {
         "test": "./vendor/bin/phpunit"
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/symfony/type-info"
+        }
+    ]
 }

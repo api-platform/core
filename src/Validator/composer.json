@@ -31,7 +31,8 @@
         "symfony/serializer": "^6.4 || ^7.0",
         "phpunit/phpunit": "^11.2",
         "symfony/validator": "^6.4 || ^7.0",
-        "symfony/http-kernel": "^6.4 || ^7.0"
+        "symfony/http-kernel": "^6.4 || ^7.0",
+        "symfony/type-info": "^7.3-dev"
     },
     "autoload": {
         "psr-4": {
@@ -63,5 +64,11 @@
     },
     "scripts": {
         "test": "./vendor/bin/phpunit"
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/symfony/type-info"
+        }
+    ]
 }

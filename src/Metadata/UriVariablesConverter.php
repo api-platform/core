@@ -16,7 +16,8 @@ namespace ApiPlatform\Metadata;
 use ApiPlatform\Metadata\Exception\InvalidUriVariableException;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
+use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 
 /**
  * UriVariables converter that chains uri variables transformers.
@@ -54,7 +55,7 @@ final class UriVariablesConverter implements UriVariablesConverterInterface
                 $properties = [$parameterName];
             }
 
-            if (!$types = $this->getIdentifierTypes($uriVariableDefinition->getFromClass() ?? $class, $properties)) {
+            if (!$types = $this->getIdentifierTypeStrings($uriVariableDefinition->getFromClass() ?? $class, $properties)) {
                 continue;
             }
 
@@ -75,16 +76,27 @@ final class UriVariablesConverter implements UriVariablesConverterInterface
         return $uriVariables;
     }
 
-    private function getIdentifierTypes(string $resourceClass, array $properties): array
+    /**
+     * @return list<string>
+     */
+    private function getIdentifierTypeStrings(string $resourceClass, array $properties): array
     {
-        $types = [];
+        $typeStrings = [];
+
         foreach ($properties as $property) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
-            foreach ($propertyMetadata->getBuiltinTypes() as $type) {
-                $types[] = Type::BUILTIN_TYPE_OBJECT === ($builtinType = $type->getBuiltinType()) ? $type->getClassName() : $builtinType;
+
+            if (!$type = $propertyMetadata->getNativeType()) {
+                continue;
+            }
+
+            foreach ($type->traverse() as $t) {
+                if (!$t instanceof CompositeTypeInterface && !$t instanceof WrappingTypeInterface) {
+                    $typeStrings[] = (string) $t;
+                }
             }
         }
 
-        return $types;
+        return $typeStrings;
     }
 }

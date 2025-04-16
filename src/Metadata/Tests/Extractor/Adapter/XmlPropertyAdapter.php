@@ -46,6 +46,7 @@ final class XmlPropertyAdapter implements PropertyAdapterInterface
         'uriTemplate',
         'hydra',
         'property',
+        'nativeType',
     ];
 
     // TODO: add serialize support for XML (policy is Laravel-only)
@@ -97,12 +98,9 @@ XML_WRAP
         return [$filename];
     }
 
-    private function buildBuiltinTypes(\SimpleXMLElement $resource, array $values): void
+    private function buildBuiltinTypes(\SimpleXMLElement $resource): void
     {
-        $node = $resource->addChild('builtinTypes');
-        foreach ($values as $value) {
-            $node->addChild('builtinType', $value);
-        }
+        // deprecated, to remove in 5.0
     }
 
     private function buildSchema(\SimpleXMLElement $resource, array $values): void

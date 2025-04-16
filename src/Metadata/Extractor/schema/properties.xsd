@@ -47,6 +47,7 @@
         <xsd:attribute name="property" type="xsd:string"/>
         <xsd:attribute name="uriTemplate" type="xsd:string"/>
         <xsd:attribute name="hydra" type="xsd:boolean"/>
+        <xsd:attribute name="nativeType" type="xsd:string"/>
     </xsd:complexType>
 
     <xsd:complexType name="types">

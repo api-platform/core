@@ -24,7 +24,7 @@ use ApiPlatform\Metadata\Tests\Extractor\Adapter\YamlPropertyAdapter;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Comment;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\TypeInfo\Type;
 
 /**
  * Ensures XML and YAML mappings are fully compatible with ApiPlatform\Metadata\ApiProperty.
@@ -66,7 +66,6 @@ final class PropertyMetadataCompatibilityTest extends TestCase
         'security' => 'is_granted(\'IS_AUTHENTICATED_ANONYMOUSLY\')',
         'securityPostDenormalize' => 'is_granted(\'ROLE_CUSTOM_ADMIN\')',
         'types' => ['someirischema', 'anotheririschema'],
-        'builtinTypes' => ['string'],
         'initializable' => true,
         'extraProperties' => [
             'custom_property' => 'Lorem ipsum dolor sit amet',
@@ -77,6 +76,7 @@ final class PropertyMetadataCompatibilityTest extends TestCase
         'uriTemplate' => '/sub-resource-get-collection',
         'property' => 'test',
         'hydra' => false,
+        'nativeType' => 'string',
     ];
 
     #[\PHPUnit\Framework\Attributes\DataProvider('getExtractors')]
@@ -124,8 +124,8 @@ final class PropertyMetadataCompatibilityTest extends TestCase
         return $property;
     }
 
-    private function withBuiltinTypes(array $values, array $fixtures): array
+    private function withNativeType(string $value): Type
     {
-        return array_map(fn (string $builtinType): Type => new Type($builtinType), $values);
+        return Type::builtin($value);
     }
 }

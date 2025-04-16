@@ -29,6 +29,7 @@
         "symfony/console": "^6.4 || ^7.0",
         "symfony/property-info": "^6.4 || ^7.1",
         "symfony/serializer": "^6.4 || ^7.0",
+        "symfony/type-info": "^7.3-dev",
         "symfony/uid": "^6.4 || ^7.0"
     },
     "require-dev": {
@@ -68,5 +69,11 @@
     },
     "scripts": {
         "test": "./vendor/bin/phpunit"
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/symfony/type-info"
+        }
+    ]
 }

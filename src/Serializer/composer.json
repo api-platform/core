@@ -41,7 +41,8 @@
         "phpunit/phpunit": "^11.2",
         "symfony/mercure-bundle": "*",
         "symfony/var-dumper": "^6.4 || ^7.0",
-        "symfony/yaml": "^6.4 || ^7.0"
+        "symfony/yaml": "^6.4 || ^7.0",
+        "symfony/type-info": "^7.3-dev"
     },
     "suggest": {
         "api-platform/doctrine-orm": "To support Doctrine ORM state options.",
@@ -80,5 +81,11 @@
     },
     "scripts": {
         "test": "./vendor/bin/phpunit"
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/symfony/type-info"
+        }
+    ]
 }

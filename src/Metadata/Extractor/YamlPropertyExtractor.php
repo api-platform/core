@@ -95,6 +95,7 @@ final class YamlPropertyExtractor extends AbstractPropertyExtractor
                     'genId' => $this->phpize($propertyValues, 'genId', 'bool'),
                     'uriTemplate' => $this->phpize($propertyValues, 'uriTemplate', 'string'),
                     'property' => $this->phpize($propertyValues, 'property', 'string'),
+                    'nativeType' => $this->phpize($propertyValues, 'nativeType', 'string'),
                 ];
             }
         }

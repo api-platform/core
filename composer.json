@@ -114,7 +114,8 @@
         "symfony/property-info": "^6.4 || ^7.1",
         "symfony/serializer": "^6.4 || ^7.0",
         "symfony/translation-contracts": "^3.3",
-        "symfony/web-link": "^6.4 || ^7.1",
+        "symfony/type-info": "^7.3-dev",
+        "symfony/web-link": "^6.4 || ^7.0",
         "willdurand/negotiation": "^3.1"
     },
     "require-dev": {
@@ -164,7 +165,7 @@
         "symfony/console": "^6.4 || ^7.0",
         "symfony/css-selector": "^6.4 || ^7.0",
         "symfony/dependency-injection": "^6.4 || ^7.0",
-        "symfony/doctrine-bridge": "^6.4.2 || ^7.0.2",
+        "symfony/doctrine-bridge": "^6.4.2 || ^7.1",
         "symfony/dom-crawler": "^6.4 || ^7.0",
         "symfony/error-handler": "^6.4 || ^7.0",
         "symfony/event-dispatcher": "^6.4 || ^7.0",
@@ -208,5 +209,11 @@
         "symfony/web-profiler-bundle": "To use the data collector.",
         "webonyx/graphql-php": "To support GraphQL."
     },
-    "type": "library"
+    "type": "library",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/symfony/type-info"
+        }
+    ]
 }

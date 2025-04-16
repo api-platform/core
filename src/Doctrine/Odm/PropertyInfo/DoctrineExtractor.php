@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\PropertyInfo;
 
-use ApiPlatform\Metadata\Util\PropertyInfoToTypeInfoHelper;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as MongoDbClassMetadata;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
@@ -25,6 +24,7 @@ use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
  * Extracts data using Doctrine MongoDB ODM metadata.
@@ -52,13 +52,71 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
         return $metadata->getFieldNames();
     }
 
+    public function getType(string $class, string $property, array $context = []): ?Type
+    {
+        if (null === $metadata = $this->getMetadata($class)) {
+            return null;
+        }
+
+        if ($metadata->hasAssociation($property)) {
+            /** @var class-string|null */
+            $class = $metadata->getAssociationTargetClass($property);
+
+            if (null === $class) {
+                return null;
+            }
+
+            if ($metadata->isSingleValuedAssociation($property)) {
+                $nullable = $metadata instanceof MongoDbClassMetadata && $metadata->isNullable($property);
+
+                return $nullable ? Type::nullable(Type::object($class)) : Type::object($class);
+            }
+
+            return Type::collection(Type::object(Collection::class), Type::object($class), Type::int());
+        }
+
+        if (!$metadata->hasField($property)) {
+            return null;
+        }
+
+        $typeOfField = $metadata->getTypeOfField($property);
+
+        if (!$typeIdentifier = $this->getTypeIdentifier($typeOfField)) {
+            return null;
+        }
+
+        $nullable = $metadata instanceof MongoDbClassMetadata && $metadata->isNullable($property);
+        $enumType = null;
+
+        if (null !== $enumClass = $metadata instanceof MongoDbClassMetadata ? $metadata->getFieldMapping($property)['enumType'] ?? null : null) {
+            $enumType = $nullable ? Type::nullable(Type::enum($enumClass)) : Type::enum($enumClass);
+        }
+
+        $builtinType = $nullable ? Type::nullable(Type::builtin($typeIdentifier)) : Type::builtin($typeIdentifier);
+
+        $type = match ($typeOfField) {
+            MongoDbType::DATE => Type::object(\DateTime::class),
+            MongoDbType::DATE_IMMUTABLE => Type::object(\DateTimeImmutable::class),
+            MongoDbType::HASH => Type::array(),
+            MongoDbType::COLLECTION => Type::list(),
+            MongoDbType::INT, MongoDbType::INTEGER, MongoDbType::STRING => $enumType ? $enumType : $builtinType,
+            default => $builtinType,
+        };
+
+        return $nullable ? Type::nullable($type) : $type;
+    }
+
     /**
      * {@inheritdoc}
      *
+     * // deprecated since 4.2 use "getType" instead
+     *
      * @return LegacyType[]|null
      */
-    public function getTypes(string $class, string $property, array $context = []): ?array
+    public function getTypes($class, $property, array $context = []): ?array
     {
+        trigger_deprecation('api-platform/core', '4.2', 'The "%s()" method is deprecated, use "%s::getType()" instead.', __METHOD__, self::class);
+
         if (null === $metadata = $this->getMetadata($class)) {
             return null;
         }
@@ -115,7 +173,7 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
                     }
             }
 
-            $builtinType = $this->getPhpType($typeOfField);
+            $builtinType = $this->getNativeTypeLegacy($typeOfField);
 
             return $builtinType ? [new LegacyType($builtinType, $nullable)] : null;
         }
@@ -156,15 +214,23 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
         }
     }
 
-    public function getType(string $class, string $property, array $context = []): ?Type
+    /**
+     * Gets the corresponding built-in PHP type identifier.
+     */
+    private function getTypeIdentifier(string $doctrineType): ?TypeIdentifier
     {
-        return PropertyInfoToTypeInfoHelper::convertLegacyTypesToType($this->getTypes($class, $property, $context));
+        return match ($doctrineType) {
+            MongoDbType::INTEGER, MongoDbType::INT, MongoDbType::INTID, MongoDbType::KEY => TypeIdentifier::INT,
+            MongoDbType::FLOAT => TypeIdentifier::FLOAT,
+            MongoDbType::STRING, MongoDbType::ID, MongoDbType::OBJECTID, MongoDbType::TIMESTAMP, MongoDbType::BINDATA, MongoDbType::BINDATABYTEARRAY, MongoDbType::BINDATACUSTOM, MongoDbType::BINDATAFUNC, MongoDbType::BINDATAMD5, MongoDbType::BINDATAUUID, MongoDbType::BINDATAUUIDRFC4122 => TypeIdentifier::STRING,
+            MongoDbType::BOOLEAN, MongoDbType::BOOL => TypeIdentifier::BOOL,
+            MongoDbType::DATE, MongoDbType::DATE_IMMUTABLE => TypeIdentifier::OBJECT,
+            MongoDbType::HASH, MongoDbType::COLLECTION => TypeIdentifier::ARRAY,
+            default => null,
+        };
     }
 
-    /**
-     * Gets the corresponding built-in PHP type.
-     */
-    private function getPhpType(string $doctrineType): ?string
+    private function getNativeTypeLegacy(string $doctrineType): ?string
     {
         return match ($doctrineType) {
             MongoDbType::INTEGER, MongoDbType::INT, MongoDbType::INTID, MongoDbType::KEY => LegacyType::BUILTIN_TYPE_INT,

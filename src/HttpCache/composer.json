@@ -32,6 +32,7 @@
         "symfony/dependency-injection": "^6.4 || ^7.0",
         "phpspec/prophecy-phpunit": "^2.2",
         "symfony/http-client": "^6.4 || ^7.0",
+        "symfony/type-info": "^7.3-dev",
         "phpunit/phpunit": "^11.2"
     },
     "autoload": {
@@ -67,5 +68,11 @@
     },
     "scripts": {
         "test": "./vendor/bin/phpunit"
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/symfony/type-info"
+        }
+    ]
 }

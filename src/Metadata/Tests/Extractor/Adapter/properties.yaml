@@ -29,8 +29,6 @@ properties:
             types:
                 - someirischema
                 - anotheririschema
-            builtinTypes:
-                - string
             initializable: true
             extraProperties:
                 custom_property: 'Lorem ipsum dolor sit amet'
@@ -41,3 +39,4 @@ properties:
             uriTemplate: /sub-resource-get-collection
             property: test
             hydra: false
+            nativeType: string
