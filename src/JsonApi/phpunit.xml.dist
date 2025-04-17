@@ -9,7 +9,7 @@
     </testsuite>
   </testsuites>
   <coverage/>
-  <source>
+  <source ignoreSuppressionOfDeprecations="true" ignoreIndirectDeprecations="false" >
     <deprecationTrigger>
         <function>trigger_deprecation</function>
     </deprecationTrigger>

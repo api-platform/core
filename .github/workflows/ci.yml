@@ -305,18 +305,19 @@ jobs:
           tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
           ini-values: memory_limit=-1
-      - name: Allow unstable project dependencies
-        if: matrix.php.deprecations == true
-        run: composer config minimum-stability dev
-      - name: Run ${{ matrix.component }} install
+      - name: Linking
         run: |
           composer global require soyuka/pmu
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link . --permanent
-          composer ${{matrix.component}} update
-      - name: Patch phpunit
+      - name: Allow unstable project dependencies
         if: matrix.php.deprecations == true
-        run: git apply --directory vendor/phpunit/phpunit .github/patches/phpunit.patch
+        run: |
+          cd $(composer ${{matrix.component}} --cwd)
+          composer config minimum-stability dev
+      - name: Run ${{ matrix.component }} install
+        run: |
+          composer ${{matrix.component}} update
       - name: Run ${{ matrix.component }} tests
         run: |
           mkdir -p /tmp/build/logs/phpunit
@@ -867,8 +868,6 @@ jobs:
           composer global link .
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
-      - name: Patch phpunit
-        run: git apply --directory vendor/phpunit/phpunit .github/patches/phpunit.patch
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit --fail-on-deprecation --display-deprecations
 
