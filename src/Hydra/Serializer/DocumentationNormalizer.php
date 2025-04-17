@@ -29,10 +29,17 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
+use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 use const ApiPlatform\JsonLd\HYDRA_CONTEXT;
 
@@ -356,61 +363,134 @@ final class DocumentationNormalizer implements NormalizerInterface
             return $jsonldContext['@type'];
         }
 
-        $builtInTypes = $propertyMetadata->getBuiltinTypes() ?? [];
         $types = [];
 
-        foreach ($builtInTypes as $type) {
-            if ($type->isCollection() && null !== $collectionType = $type->getCollectionValueTypes()[0] ?? null) {
-                $type = $collectionType;
+        if (method_exists(PropertyInfoExtractor::class, 'getType')) {
+            $nativeType = $propertyMetadata->getNativeType();
+            if (null === $nativeType) {
+                return null;
             }
 
-            switch ($type->getBuiltinType()) {
-                case Type::BUILTIN_TYPE_STRING:
-                    if (!\in_array('xmls:string', $types, true)) {
-                        $types[] = 'xmls:string';
-                    }
-                    break;
-                case Type::BUILTIN_TYPE_INT:
-                    if (!\in_array('xmls:integer', $types, true)) {
-                        $types[] = 'xmls:integer';
-                    }
-                    break;
-                case Type::BUILTIN_TYPE_FLOAT:
-                    if (!\in_array('xmls:decimal', $types, true)) {
-                        $types[] = 'xmls:decimal';
-                    }
-                    break;
-                case Type::BUILTIN_TYPE_BOOL:
-                    if (!\in_array('xmls:boolean', $types, true)) {
-                        $types[] = 'xmls:boolean';
-                    }
-                    break;
-                case Type::BUILTIN_TYPE_OBJECT:
-                    if (null === $className = $type->getClassName()) {
-                        continue 2;
-                    }
+            /** @var Type|null $collectionValueType */
+            $collectionValueType = null;
+            $typeIsCollection = static function (Type $type) use (&$typeIsCollection, &$collectionValueType): bool {
+                return match (true) {
+                    $type instanceof CollectionType => null !== $collectionValueType = $type->getCollectionValueType(),
+                    $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($typeIsCollection),
+                    $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($typeIsCollection),
+                    default => false,
+                };
+            };
 
-                    if (is_a($className, \DateTimeInterface::class, true)) {
-                        if (!\in_array('xmls:dateTime', $types, true)) {
-                            $types[] = 'xmls:dateTime';
+            if ($nativeType->isSatisfiedBy($typeIsCollection)) {
+                $nativeType = $collectionValueType;
+            }
+
+            // Check for specific types after potentially unwrapping the collection
+            if (null === $nativeType) {
+                return null; // Should not happen if collection had a value type, but safety check
+            }
+
+            if ($nativeType->isIdentifiedBy(TypeIdentifier::STRING)) {
+                $types[] = 'xmls:string';
+            }
+
+            if ($nativeType->isIdentifiedBy(TypeIdentifier::INT)) {
+                $types[] = 'xmls:integer';
+            }
+
+            if ($nativeType->isIdentifiedBy(TypeIdentifier::FLOAT)) {
+                $types[] = 'xmls:decimal';
+            }
+
+            if ($nativeType->isIdentifiedBy(TypeIdentifier::BOOL)) {
+                $types[] = 'xmls:boolean';
+            }
+
+            if ($nativeType->isIdentifiedBy(\DateTimeInterface::class)) {
+                $types[] = 'xmls:dateTime';
+            }
+
+            /** @var class-string|null $className */
+            $className = null;
+
+            $typeIsResourceClass = function (Type $type) use (&$typeIsResourceClass, &$className): bool {
+                return match (true) {
+                    $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($typeIsResourceClass),
+                    $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($typeIsResourceClass),
+                    default => $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($className = $type->getClassName()),
+                };
+            };
+
+            if ($nativeType->isSatisfiedBy($typeIsResourceClass) && $className) {
+                $resourceMetadata = $this->resourceMetadataFactory->create($className);
+                $operation = $resourceMetadata->getOperation();
+
+                if (!$operation instanceof HttpOperation || !$operation->getTypes()) {
+                    if (!\in_array("#{$operation->getShortName()}", $types, true)) {
+                        $types[] = "#{$operation->getShortName()}";
+                    }
+                } else {
+                    $types = array_unique(array_merge($types, $operation->getTypes()));
+                }
+            }
+        // TODO: remove in 5.x
+        } else {
+            $builtInTypes = $propertyMetadata->getBuiltinTypes() ?? [];
+
+            foreach ($builtInTypes as $type) {
+                if ($type->isCollection() && null !== $collectionType = $type->getCollectionValueTypes()[0] ?? null) {
+                    $type = $collectionType;
+                }
+
+                switch ($type->getBuiltinType()) {
+                    case LegacyType::BUILTIN_TYPE_STRING:
+                        if (!\in_array('xmls:string', $types, true)) {
+                            $types[] = 'xmls:string';
                         }
                         break;
-                    }
+                    case LegacyType::BUILTIN_TYPE_INT:
+                        if (!\in_array('xmls:integer', $types, true)) {
+                            $types[] = 'xmls:integer';
+                        }
+                        break;
+                    case LegacyType::BUILTIN_TYPE_FLOAT:
+                        if (!\in_array('xmls:decimal', $types, true)) {
+                            $types[] = 'xmls:decimal';
+                        }
+                        break;
+                    case LegacyType::BUILTIN_TYPE_BOOL:
+                        if (!\in_array('xmls:boolean', $types, true)) {
+                            $types[] = 'xmls:boolean';
+                        }
+                        break;
+                    case LegacyType::BUILTIN_TYPE_OBJECT:
+                        if (null === $className = $type->getClassName()) {
+                            continue 2;
+                        }
 
-                    if ($this->resourceClassResolver->isResourceClass($className)) {
-                        $resourceMetadata = $this->resourceMetadataFactory->create($className);
-                        $operation = $resourceMetadata->getOperation();
-
-                        if (!$operation instanceof HttpOperation || !$operation->getTypes()) {
-                            if (!\in_array("#{$operation->getShortName()}", $types, true)) {
-                                $types[] = "#{$operation->getShortName()}";
+                        if (is_a($className, \DateTimeInterface::class, true)) {
+                            if (!\in_array('xmls:dateTime', $types, true)) {
+                                $types[] = 'xmls:dateTime';
                             }
                             break;
                         }
 
-                        $types = array_unique(array_merge($types, $operation->getTypes()));
-                        break;
-                    }
+                        if ($this->resourceClassResolver->isResourceClass($className)) {
+                            $resourceMetadata = $this->resourceMetadataFactory->create($className);
+                            $operation = $resourceMetadata->getOperation();
+
+                            if (!$operation instanceof HttpOperation || !$operation->getTypes()) {
+                                if (!\in_array("#{$operation->getShortName()}", $types, true)) {
+                                    $types[] = "#{$operation->getShortName()}";
+                                }
+                                break;
+                            }
+
+                            $types = array_unique(array_merge($types, $operation->getTypes()));
+                            break;
+                        }
+                }
             }
         }
 
@@ -418,11 +498,36 @@ final class DocumentationNormalizer implements NormalizerInterface
             return null;
         }
 
+        $types = array_unique($types);
+
         return 1 === \count($types) ? $types[0] : $types;
     }
 
     private function isSingleRelation(ApiProperty $propertyMetadata): bool
     {
+        if (method_exists(PropertyInfoExtractor::class, 'getType')) {
+            $nativeType = $propertyMetadata->getNativeType();
+            if (null === $nativeType) {
+                return false;
+            }
+
+            if ($nativeType instanceof CollectionType) {
+                return false;
+            }
+
+            $typeIsResourceClass = function (Type $type) use (&$typeIsResourceClass): bool {
+                return match (true) {
+                    $type instanceof CollectionType => false,
+                    $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($typeIsResourceClass),
+                    $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($typeIsResourceClass),
+                    default => $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($type->getClassName()),
+                };
+            };
+
+            return $nativeType->isSatisfiedBy($typeIsResourceClass);
+        }
+
+        // TODO: remove in 5.x
         $builtInTypes = $propertyMetadata->getBuiltinTypes() ?? [];
 
         foreach ($builtInTypes as $type) {
