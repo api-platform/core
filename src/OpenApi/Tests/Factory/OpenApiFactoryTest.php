@@ -69,8 +69,8 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+use Symfony\Component\TypeInfo\Type;
 
 class OpenApiFactoryTest extends TestCase
 {
@@ -303,7 +303,7 @@ class OpenApiFactoryTest extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'id', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])
+                ->withNativeType(Type::int())
                 ->withDescription('This is an id.')
                 ->withReadable(true)
                 ->withWritable(false)
@@ -312,7 +312,7 @@ class OpenApiFactoryTest extends TestCase
         );
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withNativeType(Type::string())
                 ->withDescription('This is a name.')
                 ->withReadable(true)
                 ->withWritable(true)
@@ -324,7 +324,7 @@ class OpenApiFactoryTest extends TestCase
         );
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'description', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withNativeType(Type::string())
                 ->withDescription('This is an initializable but not writable property.')
                 ->withReadable(true)
                 ->withWritable(false)
@@ -337,7 +337,7 @@ class OpenApiFactoryTest extends TestCase
         );
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'dummyDate', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTime::class)])
+                ->withNativeType(Type::nullable(Type::object(\DateTime::class)))
                 ->withDescription('This is a \DateTimeInterface object.')
                 ->withReadable(true)
                 ->withWritable(true)
@@ -349,7 +349,7 @@ class OpenApiFactoryTest extends TestCase
         );
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'enum', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withNativeType(Type::string())
                 ->withDescription('This is an enum.')
                 ->withReadable(true)
                 ->withWritable(true)
@@ -362,7 +362,7 @@ class OpenApiFactoryTest extends TestCase
         );
         $propertyMetadataFactoryProphecy->create(OutputDto::class, 'id', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])
+                ->withNativeType(Type::int())
                 ->withDescription('This is an id.')
                 ->withReadable(true)
                 ->withWritable(false)
@@ -371,7 +371,7 @@ class OpenApiFactoryTest extends TestCase
         );
         $propertyMetadataFactoryProphecy->create(OutputDto::class, 'name', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withNativeType(Type::string())
                 ->withDescription('This is a name.')
                 ->withReadable(true)
                 ->withWritable(true)
@@ -383,7 +383,7 @@ class OpenApiFactoryTest extends TestCase
         );
         $propertyMetadataFactoryProphecy->create(OutputDto::class, 'description', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withNativeType(Type::string())
                 ->withDescription('This is an initializable but not writable property.')
                 ->withReadable(true)
                 ->withWritable(false)
@@ -394,7 +394,7 @@ class OpenApiFactoryTest extends TestCase
         );
         $propertyMetadataFactoryProphecy->create(OutputDto::class, 'dummyDate', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTime::class)])
+                ->withNativeType(Type::nullable(Type::object(\DateTime::class)))
                 ->withDescription('This is a \DateTimeInterface object.')
                 ->withReadable(true)
                 ->withWritable(true)
@@ -404,7 +404,7 @@ class OpenApiFactoryTest extends TestCase
         );
         $propertyMetadataFactoryProphecy->create(OutputDto::class, 'enum', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withNativeType(Type::string())
                 ->withDescription('This is an enum.')
                 ->withReadable(true)
                 ->withWritable(true)
@@ -417,7 +417,7 @@ class OpenApiFactoryTest extends TestCase
         foreach ([DummyErrorResource::class, Error::class] as $cl) {
             $propertyMetadataFactoryProphecy->create($cl, 'type', Argument::any())->shouldBeCalled()->willReturn(
                 (new ApiProperty())
-                    ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                    ->withNativeType(Type::string())
                     ->withDescription('This is an error type.')
                     ->withReadable(true)
                     ->withWritable(false)
@@ -428,7 +428,7 @@ class OpenApiFactoryTest extends TestCase
             );
             $propertyMetadataFactoryProphecy->create($cl, 'title', Argument::any())->shouldBeCalled()->willReturn(
                 (new ApiProperty())
-                    ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                    ->withNativeType(Type::string())
                     ->withDescription('This is an error title.')
                     ->withReadable(true)
                     ->withWritable(false)
@@ -439,7 +439,7 @@ class OpenApiFactoryTest extends TestCase
             );
             $propertyMetadataFactoryProphecy->create($cl, 'status', Argument::any())->shouldBeCalled()->willReturn(
                 (new ApiProperty())
-                    ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])
+                    ->withNativeType(Type::int())
                     ->withDescription('This is an error status.')
                     ->withReadable(true)
                     ->withWritable(false)
@@ -448,7 +448,7 @@ class OpenApiFactoryTest extends TestCase
             );
             $propertyMetadataFactoryProphecy->create($cl, 'detail', Argument::any())->shouldBeCalled()->willReturn(
                 (new ApiProperty())
-                    ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                    ->withNativeType(Type::string())
                     ->withDescription('This is an error detail.')
                     ->withReadable(true)
                     ->withWritable(false)
@@ -459,7 +459,7 @@ class OpenApiFactoryTest extends TestCase
             );
             $propertyMetadataFactoryProphecy->create($cl, 'instance', Argument::any())->shouldBeCalled()->willReturn(
                 (new ApiProperty())
-                    ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                    ->withNativeType(Type::string())
                     ->withDescription('This is an error instance.')
                     ->withReadable(true)
                     ->withWritable(false)

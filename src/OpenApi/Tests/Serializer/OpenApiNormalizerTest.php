@@ -50,10 +50,10 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\TypeInfo\Type;
 
 class OpenApiNormalizerTest extends TestCase
 {
@@ -149,7 +149,7 @@ class OpenApiNormalizerTest extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'id', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])
+                ->withNativeType(Type::int())
                 ->withDescription('This is an id.')
                 ->withReadable(true)
                 ->withWritable(false)
@@ -158,7 +158,7 @@ class OpenApiNormalizerTest extends TestCase
         );
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withNativeType(Type::string())
                 ->withDescription('This is a name.')
                 ->withReadable(true)
                 ->withWritable(true)
@@ -170,7 +170,7 @@ class OpenApiNormalizerTest extends TestCase
         );
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'description', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withNativeType(Type::string())
                 ->withDescription('This is an initializable but not writable property.')
                 ->withReadable(true)
                 ->withWritable(false)
@@ -182,7 +182,7 @@ class OpenApiNormalizerTest extends TestCase
         );
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'dummyDate', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTime::class)])
+                ->withNativeType(Type::nullable(Type::object(\DateTime::class)))
                 ->withDescription('This is a \DateTimeInterface object.')
                 ->withReadable(true)
                 ->withWritable(true)
@@ -195,7 +195,7 @@ class OpenApiNormalizerTest extends TestCase
 
         $propertyMetadataFactoryProphecy->create('Zorro', 'id', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])
+                ->withNativeType(Type::int())
                 ->withDescription('This is an id.')
                 ->withReadable(true)
                 ->withWritable(false)
