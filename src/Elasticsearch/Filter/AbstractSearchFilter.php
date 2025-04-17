@@ -21,8 +21,11 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
  * Abstract class with helpers for easing the implementation of a search filter like a term filter or a match filter.
@@ -109,27 +112,40 @@ abstract class AbstractSearchFilter extends AbstractFilter implements ConstantSc
      */
     abstract protected function getQuery(string $property, array $values, ?string $nestedPath): array;
 
-    /**
-     * Converts the given {@see Type} in PHP type.
-     */
-    protected function getPhpType(Type $type): string
+    protected function getPhpType(LegacyType|Type $type): string
     {
-        switch ($builtinType = $type->getBuiltinType()) {
-            case Type::BUILTIN_TYPE_ARRAY:
-            case Type::BUILTIN_TYPE_INT:
-            case Type::BUILTIN_TYPE_FLOAT:
-            case Type::BUILTIN_TYPE_BOOL:
-            case Type::BUILTIN_TYPE_STRING:
-                return $builtinType;
-            case Type::BUILTIN_TYPE_OBJECT:
-                if (null !== ($className = $type->getClassName()) && is_a($className, \DateTimeInterface::class, true)) {
-                    return \DateTimeInterface::class;
-                }
+        if ($type instanceof LegacyType) {
+            switch ($builtinType = $type->getBuiltinType()) {
+                case LegacyType::BUILTIN_TYPE_ARRAY:
+                case LegacyType::BUILTIN_TYPE_INT:
+                case LegacyType::BUILTIN_TYPE_FLOAT:
+                case LegacyType::BUILTIN_TYPE_BOOL:
+                case LegacyType::BUILTIN_TYPE_STRING:
+                    return $builtinType;
+                case LegacyType::BUILTIN_TYPE_OBJECT:
+                    if (null !== ($className = $type->getClassName()) && is_a($className, \DateTimeInterface::class, true)) {
+                        return \DateTimeInterface::class;
+                    }
 
-                // no break
-            default:
-                return 'string';
+                    // no break
+                default:
+                    return 'string';
+            }
         }
+
+        if ($type->isIdentifiedBy(TypeIdentifier::ARRAY, TypeIdentifier::INT, TypeIdentifier::FLOAT, TypeIdentifier::BOOL, TypeIdentifier::STRING)) {
+            while ($type instanceof WrappingTypeInterface) {
+                $type = $type->getWrappedType();
+            }
+
+            return (string) $type;
+        }
+
+        if ($type->isIdentifiedBy(\DateTimeInterface::class)) {
+            return \DateTimeInterface::class;
+        }
+
+        return 'string';
     }
 
     /**
@@ -164,15 +180,26 @@ abstract class AbstractSearchFilter extends AbstractFilter implements ConstantSc
         return $iri;
     }
 
-    /**
-     * Are the given values valid according to the given {@see Type}?
-     */
-    protected function hasValidValues(array $values, Type $type): bool
+    protected function hasValidValues(array $values, LegacyType|Type $type): bool
     {
+        if ($type instanceof LegacyType) {
+            foreach ($values as $value) {
+                if (
+                    null !== $value
+                    && LegacyType::BUILTIN_TYPE_INT === $type->getBuiltinType()
+                    && false === filter_var($value, \FILTER_VALIDATE_INT)
+                ) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         foreach ($values as $value) {
             if (
                 null !== $value
-                && Type::BUILTIN_TYPE_INT === $type->getBuiltinType()
+                && $type->isIdentifiedBy(TypeIdentifier::INT)
                 && false === filter_var($value, \FILTER_VALIDATE_INT)
             ) {
                 return false;
