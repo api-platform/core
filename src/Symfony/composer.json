@@ -48,7 +48,7 @@
     "require-dev": {
         "phpspec/prophecy-phpunit": "^2.2",
         "symfony/routing": "^6.4 || ^7.0",
-        "phpunit/phpunit": "^11.2",
+        "phpunit/phpunit": "11.5.x-dev",
         "symfony/validator": "^6.4 || ^7.0",
         "symfony/mercure-bundle": "*",
         "webonyx/graphql-php": "^15.0",
@@ -114,5 +114,11 @@
     },
     "scripts": {
         "test": "./vendor/bin/phpunit"
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/soyuka/phpunit"
+        }
+    ]
 }

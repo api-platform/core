@@ -33,7 +33,7 @@
     "require-dev": {
         "doctrine/doctrine-bundle": "^2.11",
         "phpspec/prophecy-phpunit": "^2.2",
-        "phpunit/phpunit": "^11.2",
+        "phpunit/phpunit": "11.5.x-dev",
         "ramsey/uuid": "^4.7",
         "ramsey/uuid-doctrine": "^2.0",
         "symfony/cache": "^6.4 || ^7.0",
@@ -73,5 +73,11 @@
     },
     "scripts": {
         "test": "./vendor/bin/phpunit"
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/soyuka/phpunit"
+        }
+    ]
 }

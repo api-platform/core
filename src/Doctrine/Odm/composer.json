@@ -35,7 +35,7 @@
         "doctrine/doctrine-bundle": "^2.11",
         "doctrine/mongodb-odm-bundle": "^5.0",
         "phpspec/prophecy-phpunit": "^2.2",
-        "phpunit/phpunit": "^11.2",
+        "phpunit/phpunit": "11.5.x-dev",
         "symfony/cache": "^6.4 || ^7.0",
         "symfony/framework-bundle": "^6.4 || ^7.0",
         "symfony/property-access": "^6.4 || ^7.0",
@@ -73,5 +73,11 @@
     },
     "scripts": {
         "test": "./vendor/bin/phpunit"
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/soyuka/phpunit"
+        }
+    ]
 }
