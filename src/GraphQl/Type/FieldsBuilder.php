@@ -88,7 +88,6 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
         }
 
         $fieldName = lcfirst('item_query' === $operation->getName() ? $operation->getShortName() : $operation->getName().$operation->getShortName());
-
         if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $operation->getDescription(), $operation->getDeprecationReason(), Type::nullable(Type::object($resourceClass)), $resourceClass, false, $operation)) {
             $args = $this->resolveResourceArgs($configuration['args'] ?? [], $operation);
             $extraArgs = $this->resolveResourceArgs($operation->getExtraArgs() ?? [], $operation);
@@ -111,7 +110,7 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
 
         $fieldName = lcfirst('collection_query' === $operation->getName() ? $operation->getShortName() : $operation->getName().$operation->getShortName());
 
-        if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $operation->getDescription(), $operation->getDeprecationReason(), Type::collection(Type::object(\stdClass::class), Type::object($resourceClass)), $resourceClass, false, $operation)) {
+        if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $operation->getDescription(), $operation->getDeprecationReason(), Type::list(Type::object($resourceClass)), $resourceClass, false, $operation)) {
             $args = $this->resolveResourceArgs($configuration['args'] ?? [], $operation);
             $extraArgs = $this->resolveResourceArgs($operation->getExtraArgs() ?? [], $operation);
             $configuration['args'] = $args ?: $configuration['args'] ?? $fieldConfiguration['args'] + $extraArgs;
@@ -481,7 +480,7 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
                 'resolve' => $resolve,
                 'deprecationReason' => $deprecationReason,
             ];
-        } catch (InvalidTypeException) {
+        } catch (InvalidTypeException $e) {
             // just ignore invalid types
         }
 

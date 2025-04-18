@@ -519,9 +519,9 @@ class FieldsBuilderTest extends TestCase
         yield 'query' => ['resourceClass', (new Query())->withClass('resourceClass'),
             [
                 'property' => new ApiProperty(),
-                'propertyBool' => (new ApiProperty())->withPhpType(Type::bool())->withReadable(true)->withWritable(false),
-                'propertyNotReadable' => (new ApiProperty())->withPhpType(Type::bool())->withReadable(false)->withWritable(false),
-                'nameConverted' => (new ApiProperty())->withPhpType(Type::string())->withReadable(true)->withWritable(false),
+                'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(true)->withWritable(false),
+                'propertyNotReadable' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(false),
+                'nameConverted' => (new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withWritable(false),
             ],
             false, 0, null,
             [
@@ -546,7 +546,7 @@ class FieldsBuilderTest extends TestCase
         ];
         yield 'query with advanced name converter' => ['resourceClass', (new Query())->withClass('resourceClass'),
             [
-                'field' => (new ApiProperty())->withPhpType(Type::string())->withReadable(true)->withWritable(false),
+                'field' => (new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withWritable(false),
             ],
             false, 0, null,
             [
@@ -566,8 +566,8 @@ class FieldsBuilderTest extends TestCase
         yield 'query input' => ['resourceClass', (new Query())->withClass('resourceClass'),
             [
                 'property' => new ApiProperty(),
-                'propertyBool' => (new ApiProperty())->withPhpType(Type::bool())->withReadable(false)->withWritable(true),
-                'nonWritableProperty' => (new ApiProperty())->withPhpType(Type::string())->withReadable(false)->withWritable(false),
+                'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
+                'nonWritableProperty' => (new ApiProperty())->withNativeType(Type::string())->withReadable(false)->withWritable(false),
             ],
             true, 0, null,
             [
@@ -585,7 +585,7 @@ class FieldsBuilderTest extends TestCase
         ];
         yield 'query with simple non-null string array property' => ['resourceClass', (new Query())->withClass('resourceClass'),
             [
-                'property' => (new ApiProperty())->withPhpType(Type::list(Type::string()))->withReadable(true)->withWritable(false),
+                'property' => (new ApiProperty())->withNativeType(Type::list(Type::string()))->withReadable(true)->withWritable(false),
             ],
             false, 0, null,
             [
@@ -603,7 +603,7 @@ class FieldsBuilderTest extends TestCase
         ];
         yield 'query with nested resources' => ['resourceClass', (new Query())->withClass('resourceClass'),
             [
-                'propertyNestedResource' => (new ApiProperty())->withPhpType(Type::object('nestedResourceClass'))->withReadable(true)->withWritable(true),
+                'propertyNestedResource' => (new ApiProperty())->withNativeType(Type::object('nestedResourceClass'))->withReadable(true)->withWritable(true),
             ],
             false, 0, null,
             [
@@ -623,9 +623,9 @@ class FieldsBuilderTest extends TestCase
         yield 'mutation non input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('mutation'),
             [
                 'property' => new ApiProperty(),
-                'propertyBool' => (new ApiProperty())->withPhpType(Type::bool())->withReadable(false)->withWritable(true),
-                'propertyReadable' => (new ApiProperty())->withPhpType(Type::bool())->withReadable(true)->withWritable(true),
-                'propertyObject' => (new ApiProperty())->withPhpType(Type::object('objectClass'))->withReadable(true)->withWritable(true),
+                'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
+                'propertyReadable' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(true)->withWritable(true),
+                'propertyObject' => (new ApiProperty())->withNativeType(Type::object('objectClass'))->withReadable(true)->withWritable(true),
             ],
             false, 0, null,
             [
@@ -652,10 +652,10 @@ class FieldsBuilderTest extends TestCase
         yield 'mutation input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('mutation'),
             [
                 'property' => new ApiProperty(),
-                'propertyBool' => (new ApiProperty())->withPhpType(Type::bool())->withDescription('propertyBool description')->withReadable(false)->withWritable(true)->withDeprecationReason('not useful'),
-                'propertySubresource' => (new ApiProperty())->withPhpType(Type::bool())->withReadable(false)->withWritable(true),
-                'nonWritableProperty' => (new ApiProperty())->withPhpType(Type::string())->withReadable(false)->withWritable(false),
-                'id' => (new ApiProperty())->withPhpType(Type::int())->withReadable(false)->withWritable(true),
+                'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withDescription('propertyBool description')->withReadable(false)->withWritable(true)->withDeprecationReason('not useful'),
+                'propertySubresource' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
+                'nonWritableProperty' => (new ApiProperty())->withNativeType(Type::string())->withReadable(false)->withWritable(false),
+                'id' => (new ApiProperty())->withNativeType(Type::int())->withReadable(false)->withWritable(true),
             ],
             true, 0, null,
             [
@@ -688,7 +688,7 @@ class FieldsBuilderTest extends TestCase
         ];
         yield 'custom mutation' => ['resourceClass', (new Mutation())->withResolver('resolver')->withName('mutation'),
             [
-                'propertyBool' => (new ApiProperty())->withPhpType(Type::bool())->withDescription('propertyBool description')->withReadable(false)->withWritable(true),
+                'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withDescription('propertyBool description')->withReadable(false)->withWritable(true),
             ],
             true, 0, null,
             [
@@ -704,7 +704,7 @@ class FieldsBuilderTest extends TestCase
         ];
         yield 'mutation nested input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('mutation'),
             [
-                'propertyBool' => (new ApiProperty())->withPhpType(Type::bool())->withReadable(false)->withWritable(true),
+                'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
             ],
             true, 1, null,
             [
@@ -723,7 +723,7 @@ class FieldsBuilderTest extends TestCase
         ];
         yield 'delete mutation input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('delete'),
             [
-                'propertyBool' => (new ApiProperty())->withPhpType(Type::bool())->withReadable(false)->withWritable(true),
+                'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
             ],
             true, 0, null,
             [
@@ -735,7 +735,7 @@ class FieldsBuilderTest extends TestCase
         ];
         yield 'create mutation input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('create'),
             [
-                'propertyBool' => (new ApiProperty())->withPhpType(Type::bool())->withReadable(false)->withWritable(true),
+                'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
             ],
             true, 0, null,
             [
@@ -751,7 +751,7 @@ class FieldsBuilderTest extends TestCase
         ];
         yield 'update mutation input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('update'),
             [
-                'propertyBool' => (new ApiProperty())->withPhpType(Type::bool())->withReadable(false)->withWritable(true),
+                'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
             ],
             true, 0, null,
             [
@@ -771,8 +771,8 @@ class FieldsBuilderTest extends TestCase
         yield 'subscription non input' => ['resourceClass', (new Subscription())->withClass('resourceClass'),
             [
                 'property' => new ApiProperty(),
-                'propertyBool' => (new ApiProperty())->withPhpType(Type::bool())->withReadable(false)->withWritable(true),
-                'propertyReadable' => (new ApiProperty())->withPhpType(Type::bool())->withReadable(true)->withWritable(true),
+                'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
+                'propertyReadable' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(true)->withWritable(true),
             ],
             false, 0, null,
             [
@@ -791,9 +791,9 @@ class FieldsBuilderTest extends TestCase
         yield 'subscription input' => ['resourceClass', (new Subscription())->withClass('resourceClass'),
             [
                 'property' => new ApiProperty(),
-                'propertyBool' => (new ApiProperty())->withPhpType(Type::bool())->withDescription('propertyBool description')->withReadable(false)->withWritable(true)->withDeprecationReason('not useful'),
-                'propertySubresource' => (new ApiProperty())->withPhpType(Type::bool())->withReadable(false)->withWritable(true),
-                'id' => (new ApiProperty())->withPhpType(Type::int())->withReadable(false)->withWritable(true),
+                'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withDescription('propertyBool description')->withReadable(false)->withWritable(true)->withDeprecationReason('not useful'),
+                'propertySubresource' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
+                'id' => (new ApiProperty())->withNativeType(Type::int())->withReadable(false)->withWritable(true),
             ],
             true, 0, null,
             [
@@ -805,13 +805,13 @@ class FieldsBuilderTest extends TestCase
         ];
         yield 'null io metadata non input' => ['resourceClass', (new Query())->withClass('resourceClass'),
             [
-                'propertyBool' => (new ApiProperty())->withPhpType(Type::bool())->withReadable(false)->withWritable(true),
+                'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
             ],
             false, 0, ['class' => null], [],
         ];
         yield 'null io metadata input' => ['resourceClass', (new Query())->withClass('resourceClass'),
             [
-                'propertyBool' => (new ApiProperty())->withPhpType(Type::bool())->withReadable(false)->withWritable(true),
+                'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
             ],
             true, 0, ['class' => null],
             [
@@ -820,8 +820,8 @@ class FieldsBuilderTest extends TestCase
         ];
         yield 'invalid types' => ['resourceClass', (new Query())->withClass('resourceClass'),
             [
-                'propertyInvalidType' => (new ApiProperty())->withPhpType(Type::null())->withReadable(true)->withWritable(false),
-                'propertyNotRegisteredType' => (new ApiProperty())->withPhpType(Type::callable())->withReadable(true)->withWritable(false),
+                'propertyInvalidType' => (new ApiProperty())->withNativeType(Type::null())->withReadable(true)->withWritable(false),
+                'propertyNotRegisteredType' => (new ApiProperty())->withNativeType(Type::callable())->withReadable(true)->withWritable(false),
             ],
             false, 0, null,
             [
