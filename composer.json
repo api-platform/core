@@ -211,5 +211,6 @@
     "type": "library",
     "repositories": [
         {"type": "vcs", "url": "https://github.com/soyuka/phpunit"}
-    ]
+    ],
+    "minimum-stability": "dev"
 }
