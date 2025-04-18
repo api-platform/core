@@ -32,7 +32,7 @@ use GraphQL\Type\Definition\Type as GraphQLType;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
-use Symfony\Component\TypeInfo\Type\CollectionType as SymfonyCollectionType;
+use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
 use Symfony\Component\TypeInfo\Type\ObjectType as SymfonyObjectType;
 use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
@@ -251,7 +251,7 @@ final class TypeBuilder implements ContextAwareTypeBuilderInterface
 
         $collectionValueTypeHasClass = static function (Type $type) use (&$collectionValueTypeHasClass, $typeHasClass): bool {
             return match (true) {
-                $type instanceof SymfonyCollectionType => $type->getCollectionValueType()->isSatisfiedBy($typeHasClass),
+                $type instanceof CollectionType => $type->getCollectionValueType()->isSatisfiedBy($typeHasClass),
                 $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($collectionValueTypeHasClass),
                 $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($collectionValueTypeHasClass),
                 default => false,
