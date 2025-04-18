@@ -34,7 +34,7 @@
     "require-dev": {
         "phpspec/prophecy": "^1.19",
         "phpspec/prophecy-phpunit": "^2.2",
-        "phpunit/phpunit": "^11.2",
+        "phpunit/phpunit": "11.5.x-dev",
         "symfony/type-info": "^7.3-dev"
     },
     "autoload": {
@@ -75,6 +75,10 @@
         {
             "type": "vcs",
             "url": "https://github.com/symfony/type-info"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/soyuka/phpunit"
         }
     ]
 }

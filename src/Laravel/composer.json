@@ -57,7 +57,7 @@
         "doctrine/dbal": "^4.0",
         "larastan/larastan": "^2.0 || ^3.0",
         "orchestra/testbench": "^9.1",
-        "phpunit/phpunit": "^11.2",
+        "phpunit/phpunit": "11.5.x-dev",
         "api-platform/graphql": "^4.1",
         "laravel/sanctum": "^4.0"
     },
@@ -125,6 +125,10 @@
         {
             "type": "vcs",
             "url": "https://github.com/symfony/type-info"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/soyuka/phpunit"
         }
     ]
 }

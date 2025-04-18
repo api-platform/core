@@ -33,7 +33,7 @@
         "phpspec/prophecy-phpunit": "^2.2",
         "symfony/http-client": "^6.4 || ^7.0",
         "symfony/type-info": "^7.3-dev",
-        "phpunit/phpunit": "^11.2"
+        "phpunit/phpunit": "11.5.x-dev"
     },
     "autoload": {
         "psr-4": {
@@ -73,6 +73,10 @@
         {
             "type": "vcs",
             "url": "https://github.com/symfony/type-info"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/soyuka/phpunit"
         }
     ]
 }
