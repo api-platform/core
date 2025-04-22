@@ -26,6 +26,7 @@ abstract class Parameter
      * @param (array<string, mixed>&array{type?: string, default?: string})|null $schema
      * @param array<string, mixed>                                               $extraProperties
      * @param ParameterProviderInterface|callable|string|null                    $provider
+     * @param list<string>                                                       $properties      a list of properties this parameter applies to (works with the :property placeholder)
      * @param FilterInterface|string|null                                        $filter
      * @param mixed                                                              $constraints     an array of Symfony constraints, or an array of Laravel rules
      */
@@ -37,6 +38,7 @@ abstract class Parameter
         protected mixed $filter = null,
         protected ?string $property = null,
         protected ?string $description = null,
+        protected ?array $properties = null,
         protected ?bool $required = null,
         protected ?int $priority = null,
         protected ?false $hydra = null,
@@ -278,6 +280,19 @@ abstract class Parameter
     {
         $self = clone $this;
         $self->extraProperties = $extraProperties;
+
+        return $self;
+    }
+
+    public function getProperties(): ?array
+    {
+        return $this->properties;
+    }
+
+    public function withProperties(?array $properties): self
+    {
+        $self = clone $this;
+        $self->properties = $properties;
 
         return $self;
     }
