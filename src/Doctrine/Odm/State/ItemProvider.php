@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\State\Util\StateOptionsTrait;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -35,6 +36,7 @@ final class ItemProvider implements ProviderInterface
 {
     use LinksHandlerLocatorTrait;
     use LinksHandlerTrait;
+    use StateOptionsTrait;
 
     /**
      * @param AggregationItemExtensionInterface[] $itemExtensions
@@ -48,10 +50,7 @@ final class ItemProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?object
     {
-        $documentClass = $operation->getClass();
-        if (($options = $operation->getStateOptions()) && $options instanceof Options && $options->getDocumentClass()) {
-            $documentClass = $options->getDocumentClass();
-        }
+        $documentClass = $this->getStateOptionsClass($operation, $operation->getClass(), Options::class);
 
         /** @var DocumentManager $manager */
         $manager = $this->managerRegistry->getManagerForClass($documentClass);
