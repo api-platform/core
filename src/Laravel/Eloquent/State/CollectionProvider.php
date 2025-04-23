@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\State\Util\StateOptionsTrait;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Psr\Container\ContainerInterface;
@@ -30,7 +31,7 @@ use Psr\Container\ContainerInterface;
 final class CollectionProvider implements ProviderInterface
 {
     use LinksHandlerLocatorTrait;
-    use ModelClassTrait;
+    use StateOptionsTrait;
 
     /**
      * @param LinksHandlerInterface<Model>      $linksHandler
@@ -47,7 +48,7 @@ final class CollectionProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $resourceClass = $this->getModelClass($operation);
+        $resourceClass = $this->getStateOptionsClass($operation, $operation->getClass(), Options::class);
         $model = new $resourceClass();
 
         if (!$model instanceof Model) {

@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\State\Util\StateOptionsTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Container\ContainerInterface;
@@ -35,6 +36,7 @@ final class ItemProvider implements ProviderInterface
 {
     use LinksHandlerLocatorTrait;
     use LinksHandlerTrait;
+    use StateOptionsTrait;
 
     /**
      * @param QueryItemExtensionInterface[] $itemExtensions
@@ -48,10 +50,7 @@ final class ItemProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?object
     {
-        $entityClass = $operation->getClass();
-        if (($options = $operation->getStateOptions()) && $options instanceof Options && $options->getEntityClass()) {
-            $entityClass = $options->getEntityClass();
-        }
+        $entityClass = $this->getStateOptionsClass($operation, $operation->getClass(), Options::class);
 
         /** @var EntityManagerInterface|null $manager */
         $manager = $this->managerRegistry->getManagerForClass($entityClass);
