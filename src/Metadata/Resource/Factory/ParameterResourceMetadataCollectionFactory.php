@@ -92,15 +92,16 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
     /**
      * @return array{propertyNames: string[], properties: array<string, ApiProperty>}
      */
-    private function getProperties(string $resourceClass): array
+    private function getProperties(string $resourceClass, ?Parameter $parameter = null): array
     {
-        if (isset($this->localPropertyCache[$resourceClass])) {
-            return $this->localPropertyCache[$resourceClass];
+        $k = $resourceClass.($parameter?->getProperties() ? ($parameter->getKey() ?? '') : '');
+        if (isset($this->localPropertyCache[$k])) {
+            return $this->localPropertyCache[$k];
         }
 
         $propertyNames = [];
         $properties = [];
-        foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
+        foreach ($parameter?->getProperties() ?? $this->propertyNameCollectionFactory->create($resourceClass) as $property) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
             if ($propertyMetadata->isReadable()) {
                 $propertyNames[] = $property;
@@ -108,16 +109,17 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             }
         }
 
-        $this->localPropertyCache = [$resourceClass => ['propertyNames' => $propertyNames, 'properties' => $properties]];
+        $this->localPropertyCache[$k] = ['propertyNames' => $propertyNames, 'properties' => $properties];
 
-        return $this->localPropertyCache[$resourceClass];
+        return $this->localPropertyCache[$k];
     }
 
     private function getDefaultParameters(Operation $operation, string $resourceClass, int &$internalPriority): Parameters
     {
-        ['propertyNames' => $propertyNames, 'properties' => $properties] = $this->getProperties($resourceClass);
+        $propertyNames = $properties = [];
         $parameters = $operation->getParameters() ?? new Parameters();
         foreach ($parameters as $key => $parameter) {
+            ['propertyNames' => $propertyNames, 'properties' => $properties] = $this->getProperties($resourceClass, $parameter);
             if (null === $parameter->getProvider() && (($f = $parameter->getFilter()) && $f instanceof ParameterProviderFilterInterface)) {
                 $parameters->add($key, $parameter->withProvider($f->getParameterProvider()));
             }
