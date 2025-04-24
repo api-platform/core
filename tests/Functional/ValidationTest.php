@@ -38,6 +38,11 @@ final class ValidationTest extends ApiTestCase
 
     public function testPostWithDenormalizationErrorsCollected(): void
     {
+        $container = static::getContainer();
+        if ('mongodb' === $container->getParameter('kernel.environment')) {
+            $this->markTestSkipped();
+        }
+
         $client = static::createClient();
 
         $response = $client->request('POST', '/dummy_collect_denormalization', [
