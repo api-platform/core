@@ -108,7 +108,7 @@ final class ItemNormalizer extends BaseItemNormalizer
             $data[self::ITEM_IDENTIFIERS_KEY] = $this->identifiersExtractor->getIdentifiersFromItem($object, $context['operation'] ?? null);
         }
 
-        if ($context['graphql_operation_name'] === 'mercure_subscription' && is_object($object) && isset($data['id']) && !isset($data['_id'])) {
+        if (isset($context['graphql_operation_name']) &&  $context['graphql_operation_name'] === 'mercure_subscription' && is_object($object) && isset($data['id']) && !isset($data['_id'])) {
             $data['_id'] = $data['id'];
             $data['id'] = $this->iriConverter->getIriFromResource($object);
         }

@@ -183,9 +183,11 @@ class SubscriptionManagerTest extends TestCase
 
         $cacheItemProphecy = $this->prophesize(CacheItemInterface::class);
         $cacheItemProphecy->isHit()->willReturn(false);
+        $cacheItemProphecy->isHit()->willReturn(false);
         $this->subscriptionsCacheProphecy->getItem('_dummies_2')->willReturn($cacheItemProphecy->reveal());
+        $this->subscriptionsCacheProphecy->getItem('_dummies')->willReturn($cacheItemProphecy->reveal());
 
-        $this->assertEquals([], $this->subscriptionManager->getPushPayloads($object));
+        $this->assertEquals([], $this->subscriptionManager->getPushPayloads($object, 'update'));
     }
 
     public function testGetPushPayloadsHit(): void
@@ -199,16 +201,17 @@ class SubscriptionManagerTest extends TestCase
         $this->iriConverterProphecy->getIriFromResource($object)->willReturn('/dummies/2');
 
         $cacheItemProphecy = $this->prophesize(CacheItemInterface::class);
-        $cacheItemProphecy->isHit()->willReturn(true);
+        $cacheItemProphecy->isHit()->willReturn(true)->shouldBeCalledTimes(2);
         $cacheItemProphecy->get()->willReturn([
             ['subscriptionIdFoo', ['fieldsFoo'], ['resultFoo']],
             ['subscriptionIdBar', ['fieldsBar'], ['resultBar']],
         ]);
         $this->subscriptionsCacheProphecy->getItem('_dummies_2')->willReturn($cacheItemProphecy->reveal());
+        $this->subscriptionsCacheProphecy->getItem('_dummies')->willReturn($cacheItemProphecy->reveal());
 
         $this->normalizeProcessor->process(
             $object,
-            (new Subscription())->withName('update_subscription')->withShortName('Dummy'),
+            (new Subscription())->withName('mercure_subscription')->withShortName('Dummy'),
             [],
             ['fields' => ['fieldsFoo'], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true]
         )->willReturn(
@@ -217,13 +220,13 @@ class SubscriptionManagerTest extends TestCase
 
         $this->normalizeProcessor->process(
             $object,
-            (new Subscription())->withName('update_subscription')->withShortName('Dummy'),
+            (new Subscription())->withName('mercure_subscription')->withShortName('Dummy'),
             [],
             ['fields' => ['fieldsBar'], 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true]
         )->willReturn(
             ['resultBar', 'clientSubscriptionId' => 'client-subscription-id']
         );
 
-        $this->assertEquals([['subscriptionIdFoo', ['newResultFoo']]], $this->subscriptionManager->getPushPayloads($object));
+        $this->assertEquals([['subscriptionIdFoo', ['newResultFoo']]], $this->subscriptionManager->getPushPayloads($object, 'update'));
     }
 }
