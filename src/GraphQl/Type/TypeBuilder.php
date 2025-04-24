@@ -358,6 +358,7 @@ final class TypeBuilder implements ContextAwareTypeBuilderInterface
 
                     if ($operation instanceof Subscription) {
                         $fields['clientSubscriptionId'] = GraphQLType::string();
+                        $fields['isCollection'] = GraphQLType::boolean();
                         if ($operation->getMercure()) {
                             $fields['mercureUrl'] = GraphQLType::string();
                         }
