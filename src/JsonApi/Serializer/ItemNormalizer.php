@@ -23,6 +23,7 @@ use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
+use ApiPlatform\Metadata\Util\TypeHelper;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Serializer\CacheKeyTrait;
 use ApiPlatform\Serializer\ContextTrait;
@@ -38,10 +39,8 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\TypeInfo\Type;
-use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
 use Symfony\Component\TypeInfo\Type\ObjectType;
-use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 
 /**
  * Converts between objects and array.
@@ -376,28 +375,14 @@ final class ItemNormalizer extends AbstractItemNormalizer
                     /** @var class-string|null $className */
                     $className = null;
 
-                    $typeIsResourceClass = function (Type $type) use (&$typeIsResourceClass, &$className): bool {
-                        return match (true) {
-                            $type instanceof ObjectType => $this->resourceClassResolver->isResourceClass($className = $type->getClassName()),
-                            $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($typeIsResourceClass),
-                            $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($typeIsResourceClass),
-                            default => false,
-                        };
-                    };
-
-                    $collectionValueIsResourceClass = function (Type $type) use ($typeIsResourceClass, &$collectionValueIsResourceClass): bool {
-                        return match (true) {
-                            $type instanceof CollectionType => $type->getCollectionValueType()->isSatisfiedBy($typeIsResourceClass),
-                            $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($collectionValueIsResourceClass),
-                            $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($collectionValueIsResourceClass),
-                            default => false,
-                        };
+                    $typeIsResourceClass = function (Type $type) use (&$className): bool {
+                        return $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($className = $type->getClassName());
                     };
 
                     foreach ($type instanceof CompositeTypeInterface ? $type->getTypes() : [$type] as $t) {
                         $isOne = $isMany = false;
 
-                        if ($t->isSatisfiedBy($collectionValueIsResourceClass)) {
+                        if (TypeHelper::getCollectionValueType($t)?->isSatisfiedBy($typeIsResourceClass)) {
                             $isMany = true;
                         } elseif ($t->isSatisfiedBy($typeIsResourceClass)) {
                             $isOne = true;

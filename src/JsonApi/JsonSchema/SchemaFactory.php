@@ -22,13 +22,12 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\Util\TypeHelper;
 use ApiPlatform\State\ApiResource\Error;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\TypeInfo\Type;
-use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
 use Symfony\Component\TypeInfo\Type\ObjectType;
-use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 
 /**
  * Decorator factory which adds JSON:API properties to the JSON Schema document.
@@ -331,25 +330,12 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         /** @var class-string|null $className */
         $className = null;
 
-        $typeIsResourceClass = function (Type $type) use (&$typeIsResourceClass, &$className): bool {
-            return match (true) {
-                $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($typeIsResourceClass),
-                $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($typeIsResourceClass),
-                default => $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($className = $type->getClassName()),
-            };
-        };
-
-        $collectionValueIsResourceClass = function (Type $type) use (&$typeIsResourceClass): bool {
-            return match (true) {
-                $type instanceof CollectionType => $type->getCollectionValueType()->isSatisfiedBy($typeIsResourceClass),
-                $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($typeIsResourceClass),
-                $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($typeIsResourceClass),
-                default => false,
-            };
+        $typeIsResourceClass = function (Type $type) use (&$className): bool {
+            return $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($className = $type->getClassName());
         };
 
         foreach ($type instanceof CompositeTypeInterface ? $type->getTypes() : [$type] as $t) {
-            if ($t->isSatisfiedBy($collectionValueIsResourceClass)) {
+            if (TypeHelper::getCollectionValueType($t)?->isSatisfiedBy($typeIsResourceClass)) {
                 $isMany = true;
             } elseif ($t->isSatisfiedBy($typeIsResourceClass)) {
                 $isOne = true;

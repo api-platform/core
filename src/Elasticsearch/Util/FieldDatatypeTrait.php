@@ -16,13 +16,11 @@ namespace ApiPlatform\Elasticsearch\Util;
 use ApiPlatform\Metadata\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\Util\TypeHelper;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
-use Symfony\Component\TypeInfo\Type\CollectionType;
-use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
 use Symfony\Component\TypeInfo\Type\ObjectType;
-use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 
 /**
  * Field datatypes helpers.
@@ -108,13 +106,8 @@ trait FieldDatatypeTrait
         /** @var class-string|null $className */
         $className = null;
 
-        $typeIsResourceClass = function (Type $type) use (&$typeIsResourceClass, &$className): bool {
-            return match (true) {
-                $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($typeIsResourceClass),
-                $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($typeIsResourceClass),
-                $type instanceof ObjectType => $this->resourceClassResolver->isResourceClass($className = $type->getClassName()),
-                default => false,
-            };
+        $typeIsResourceClass = function (Type $type) use (&$className): bool {
+            return $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($className = $type->getClassName());
         };
 
         if ($type->isSatisfiedBy($typeIsResourceClass)) {
@@ -123,16 +116,7 @@ trait FieldDatatypeTrait
             return null === $nestedPath ? $nestedPath : "$currentProperty.$nestedPath";
         }
 
-        $collectionValueTypeIsResourceClass = function (Type $type) use (&$collectionValueTypeIsResourceClass, &$className): bool {
-            return match (true) {
-                $type instanceof CollectionType => $type->getCollectionValueType() instanceof ObjectType && $this->resourceClassResolver->isResourceClass($className = $type->getCollectionValueType()->getClassName()),
-                $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($collectionValueTypeIsResourceClass),
-                $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($collectionValueTypeIsResourceClass),
-                default => false,
-            };
-        };
-
-        if ($type->isSatisfiedBy($collectionValueTypeIsResourceClass)) {
+        if (TypeHelper::getCollectionValueType($type)?->isSatisfiedBy($typeIsResourceClass)) {
             $nestedPath = $this->getNestedFieldPath($className, implode('.', $properties));
 
             return null === $nestedPath ? $currentProperty : "$currentProperty.$nestedPath";

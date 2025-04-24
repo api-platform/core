@@ -26,7 +26,6 @@ use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
-use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
 use Symfony\Component\TypeInfo\Type\IntersectionType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\UnionType;
@@ -107,13 +106,8 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
     {
         $type = $propertyMetadata->getNativeType();
 
-        $typeIsResourceClass = function (Type $type) use (&$typeIsResourceClass): bool {
-            return match (true) {
-                $type instanceof CollectionType => $type->getCollectionValueType()->isSatisfiedBy($typeIsResourceClass),
-                $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($typeIsResourceClass),
-                $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($typeIsResourceClass),
-                default => $type instanceof ObjectType && $this->isResourceClass($type->getClassName()),
-            };
+        $typeIsResourceClass = function (Type $type) use (&$className): bool {
+            return $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($className = $type->getClassName());
         };
 
         if (!\array_key_exists('default', $propertySchema) && !empty($default = $propertyMetadata->getDefault()) && !$type?->isSatisfiedBy($typeIsResourceClass)) {

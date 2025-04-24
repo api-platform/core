@@ -881,13 +881,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         // TODO check every foreach composite to see if null is an issue
         $types = $type instanceof CompositeTypeInterface ? $type->getTypes() : (null === $type ? [] : [$type]);
         $className = null;
-        $typeIsResourceClass = function (Type $type) use (&$typeIsResourceClass, &$className): bool {
-            return match (true) {
-                $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($typeIsResourceClass),
-                $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($typeIsResourceClass),
-                $type instanceof ObjectType => $this->resourceClassResolver->isResourceClass($className = $type->getClassName()),
-                default => false,
-            };
+        $typeIsResourceClass = function (Type $type) use (&$className): bool {
+            return $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($className = $type->getClassName());
         };
 
         foreach ($types as $type) {
