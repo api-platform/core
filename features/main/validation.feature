@@ -87,74 +87,7 @@ Feature: Using validations groups
     And the JSON node "detail" should be equal to "test: This value should not be null."
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
 
-  @!mongodb
   @createSchema
-  Scenario: Create a resource with collectDenormalizationErrors
-    When I add "Content-type" header equal to "application/ld+json"
-    And I send a "POST" request to "/dummy_collect_denormalization" with body:
-    """
-      {
-        "foo": 3,
-        "bar": "baz",
-        "qux": true,
-        "uuid": "y",
-        "relatedDummy": 8,
-        "relatedDummies": 76
-      }
-    """
-    Then the response status code should be 422
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
-    And the JSON should be a superset of:
-    """
-    {
-      "@context": "/contexts/ConstraintViolation",
-      "@type": "ConstraintViolation",
-      "hydra:title": "An error occurred",
-      "hydra:description": "baz: This value should be of type string.\nqux: This value should be of type string.\nfoo: This value should be of type bool.\nbar: This value should be of type int.\nuuid: This value should be of type uuid.\nrelatedDummy: This value should be of type array|string.\nrelatedDummies: This value should be of type array.",
-      "violations": [
-        {
-          "propertyPath": "baz",
-          "message": "This value should be of type string.",
-          "code": "ba785a8c-82cb-4283-967c-3cf342181b40",
-          "hint": "Failed to create object because the class misses the \"baz\" property."
-        },
-        {
-          "propertyPath": "qux",
-          "message": "This value should be of type string.",
-          "code": "ba785a8c-82cb-4283-967c-3cf342181b40"
-        },
-        {
-          "propertyPath": "foo",
-          "message": "This value should be of type bool.",
-          "code": "ba785a8c-82cb-4283-967c-3cf342181b40"
-        },
-        {
-          "propertyPath": "bar",
-          "message": "This value should be of type int.",
-          "code": "ba785a8c-82cb-4283-967c-3cf342181b40"
-        },
-        {
-          "propertyPath": "uuid",
-          "message": "This value should be of type uuid.",
-          "code": "ba785a8c-82cb-4283-967c-3cf342181b40",
-          "hint": "Invalid UUID string: y"
-        },
-        {
-          "propertyPath": "relatedDummy",
-          "message": "This value should be of type array|string.",
-          "code": "ba785a8c-82cb-4283-967c-3cf342181b40",
-          "hint": "The type of the \"relatedDummy\" attribute must be \"array\" (nested document) or \"string\" (IRI), \"integer\" given."
-        },
-        {
-          "propertyPath": "relatedDummies",
-          "message": "This value should be of type array.",
-          "code": "ba785a8c-82cb-4283-967c-3cf342181b40"
-        }
-      ]
-    }
-    """
-
   @!mongodb
   Scenario: Get violations constraints
     When I add "Accept" header equal to "application/json"

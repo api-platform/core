@@ -193,12 +193,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
             // prevent declaring $attribute as attribute if it's already declared as relationship
             $isRelationship = false;
-            $typeIsResourceClass = function (Type $type) use (&$typeIsResourceClass, &$className): bool {
-                return match (true) {
-                    $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($typeIsResourceClass),
-                    $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($typeIsResourceClass),
-                    default => $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($className = $type->getClassName()),
-                };
+            $typeIsResourceClass = function (Type $type) use (&$className): bool {
+                return $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($className = $type->getClassName());
             };
 
             foreach ($types as $type) {

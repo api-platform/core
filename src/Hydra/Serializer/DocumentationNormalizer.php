@@ -414,12 +414,8 @@ final class DocumentationNormalizer implements NormalizerInterface
             /** @var class-string|null $className */
             $className = null;
 
-            $typeIsResourceClass = function (Type $type) use (&$typeIsResourceClass, &$className): bool {
-                return match (true) {
-                    $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($typeIsResourceClass),
-                    $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($typeIsResourceClass),
-                    default => $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($className = $type->getClassName()),
-                };
+            $typeIsResourceClass = function (Type $type) use (&$className): bool {
+                return $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($className = $type->getClassName());
             };
 
             if ($nativeType->isSatisfiedBy($typeIsResourceClass) && $className) {
@@ -515,13 +511,8 @@ final class DocumentationNormalizer implements NormalizerInterface
                 return false;
             }
 
-            $typeIsResourceClass = function (Type $type) use (&$typeIsResourceClass): bool {
-                return match (true) {
-                    $type instanceof CollectionType => false,
-                    $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($typeIsResourceClass),
-                    $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($typeIsResourceClass),
-                    default => $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($type->getClassName()),
-                };
+            $typeIsResourceClass = function (Type $type) use (&$className): bool {
+                return $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($className = $type->getClassName());
             };
 
             return $nativeType->isSatisfiedBy($typeIsResourceClass);
