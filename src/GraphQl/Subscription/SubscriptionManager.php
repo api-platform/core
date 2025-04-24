@@ -51,7 +51,7 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
             return null;
         }
 
-        $options = $operation->getMercure() ?? false;
+        $options = $operation ? ($operation->getMercure() ?? false) : false;
         $private = $options['private'] ?? false;
         $privateFields = $options['private_fields'] ?? [];
         $previousObject = $context['graphql_context']['previous_object'] ?? null;
@@ -60,7 +60,7 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
                 $fields['__private_field_'.$privateField] = $this->getResourceId($privateField, $previousObject);
             }
         }
-        if ($operation->isCollection()) {
+        if ($operation instanceof Subscription && $operation->isCollection()) {
             $subscriptionId = $this->updateSubscriptionCollectionCacheData(
                 $iri,
                 $fields,
