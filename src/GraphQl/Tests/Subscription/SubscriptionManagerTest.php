@@ -201,13 +201,19 @@ class SubscriptionManagerTest extends TestCase
         $this->iriConverterProphecy->getIriFromResource($object)->willReturn('/dummies/2');
 
         $cacheItemProphecy = $this->prophesize(CacheItemInterface::class);
-        $cacheItemProphecy->isHit()->willReturn(true)->shouldBeCalledTimes(2);
+        $cacheItemProphecy->isHit()->willReturn(true);
         $cacheItemProphecy->get()->willReturn([
             ['subscriptionIdFoo', ['fieldsFoo'], ['resultFoo']],
             ['subscriptionIdBar', ['fieldsBar'], ['resultBar']],
         ]);
+        $cacheItemProphecyCollection = $this->prophesize(CacheItemInterface::class);
+        $cacheItemProphecyCollection->isHit()->willReturn(true);
+        $cacheItemProphecyCollection->get()->willReturn([
+            ['subscriptionIdFoo', ['fieldsFoo'], []],
+            ['subscriptionIdBar', ['fieldsBar'], []],
+        ]);
         $this->subscriptionsCacheProphecy->getItem('_dummies_2')->willReturn($cacheItemProphecy->reveal());
-        $this->subscriptionsCacheProphecy->getItem('_dummies')->willReturn($cacheItemProphecy->reveal());
+        $this->subscriptionsCacheProphecy->getItem('_dummies')->willReturn($cacheItemProphecyCollection->reveal());
 
         $this->normalizeProcessor->process(
             $object,
@@ -227,6 +233,6 @@ class SubscriptionManagerTest extends TestCase
             ['resultBar', 'clientSubscriptionId' => 'client-subscription-id']
         );
 
-        $this->assertEquals([['subscriptionIdFoo', ['newResultFoo']]], $this->subscriptionManager->getPushPayloads($object, 'update'));
+        $this->assertEquals([['subscriptionIdFoo', ['newResultFoo']], ['subscriptionIdFoo', ['newResultFoo']]], $this->subscriptionManager->getPushPayloads($object, 'update'));
     }
 }

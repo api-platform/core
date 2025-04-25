@@ -108,7 +108,7 @@ final class ItemNormalizer extends BaseItemNormalizer
             $data[self::ITEM_IDENTIFIERS_KEY] = $this->identifiersExtractor->getIdentifiersFromItem($object, $context['operation'] ?? null);
         }
 
-        if (isset($context['graphql_operation_name']) &&  $context['graphql_operation_name'] === 'mercure_subscription' && is_object($object) && isset($data['id']) && !isset($data['_id'])) {
+        if (isset($context['graphql_operation_name']) && 'mercure_subscription' === $context['graphql_operation_name'] && \is_object($object) && isset($data['id']) && !isset($data['_id'])) {
             $data['_id'] = $data['id'];
             $data['id'] = $this->iriConverter->getIriFromResource($object);
         }
@@ -128,18 +128,18 @@ final class ItemNormalizer extends BaseItemNormalizer
         }
 
         // Handle relationships for mercure subscriptions
-        if ($operation instanceof QueryCollection && $context['graphql_operation_name'] === 'mercure_subscription' && $attributeValue instanceof Collection && !$attributeValue->isEmpty()) {
+        if ($operation instanceof QueryCollection && 'mercure_subscription' === $context['graphql_operation_name'] && $attributeValue instanceof Collection && !$attributeValue->isEmpty()) {
             $relationContext = $context;
             // Grab collection attributes
             $relationContext['attributes'] = $context['attributes']['collection'];
             // Iterate over the collection and normalize each item
-            $data['collection'] =  $attributeValue
-                ->map(fn($item) => $this->normalize($item, $format, $relationContext))
+            $data['collection'] = $attributeValue
+                ->map(fn ($item) => $this->normalize($item, $format, $relationContext))
                 // Convert the collection to an array
                 ->toArray();
+
             // Handle pagination if it's enabled in the query
-            $data = $this->addPagination($attributeValue, $data, $context);
-            return $data;
+            return $this->addPagination($attributeValue, $data, $context);
         }
 
         // to-many are handled directly by the GraphQL resolver
@@ -150,19 +150,20 @@ final class ItemNormalizer extends BaseItemNormalizer
     {
         if ($context['attributes']['paginationInfo'] ?? false) {
             $data['paginationInfo'] = [];
-            if (array_key_exists('hasNextPage', $context['attributes']['paginationInfo'])) {
+            if (\array_key_exists('hasNextPage', $context['attributes']['paginationInfo'])) {
                 $data['paginationInfo']['hasNextPage'] = $collection->count() > ($context['pagination']['itemsPerPage'] ?? 10);
             }
-            if (array_key_exists('itemsPerPage', $context['attributes']['paginationInfo'])) {
+            if (\array_key_exists('itemsPerPage', $context['attributes']['paginationInfo'])) {
                 $data['paginationInfo']['itemsPerPage'] = $context['pagination']['itemsPerPage'] ?? 10;
             }
-            if (array_key_exists('lastPage', $context['attributes']['paginationInfo'])) {
+            if (\array_key_exists('lastPage', $context['attributes']['paginationInfo'])) {
                 $data['paginationInfo']['lastPage'] = (int) ceil($collection->count() / ($context['pagination']['itemsPerPage'] ?? 10));
             }
-            if (array_key_exists('totalCount', $context['attributes']['paginationInfo'])) {
+            if (\array_key_exists('totalCount', $context['attributes']['paginationInfo'])) {
                 $data['paginationInfo']['totalCount'] = $collection->count();
             }
         }
+
         return $data;
     }
 

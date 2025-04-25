@@ -82,7 +82,7 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
     public function getPushPayloads(object $object, string $type): array
     {
         if ('delete' === $type) {
-            $payloads =  $this->getDeletePushPayloads($object);
+            $payloads = $this->getDeletePushPayloads($object);
         } else {
             $payloads = $this->getCreatedOrUpdatedPayloads($object);
         }
@@ -119,10 +119,11 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
 
     private function getResourceId(mixed $privateField, object $previousObject): string
     {
-        $id = $previousObject->{'get' . ucfirst($privateField)}()->getId();
+        $id = $previousObject->{'get'.ucfirst($privateField)}()->getId();
         if ($id instanceof \Stringable) {
-            return (string)$id;
+            return (string) $id;
         }
+
         return $id;
     }
 
@@ -172,35 +173,35 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
                 $payloads[] = [$subscriptionId, $data];
             }
         }
+
         return $payloads;
     }
 
     private function getDeletePushPayloads(object $object): array
     {
         $iri = $object->id;
-        $subscriptions = $this->getSubscriptionsFromIri($iri);
-        if ($subscriptions === []) {
-            // Get subscriptions from collection Iri
-            $subscriptions = $this->getSubscriptionsFromIri($this->getCollectionIri($iri));
-        }
+        $subscriptions = array_merge(
+            $this->getSubscriptionsFromIri($iri),
+            $this->getSubscriptionsFromIri($this->getCollectionIri($iri))
+        );
 
         $payloads = [];
         foreach ($subscriptions as [$subscriptionId, $subscriptionFields, $subscriptionResult]) {
             $payloads[] = [$subscriptionId, ['type' => 'delete', 'payload' => $object]];
         }
         $this->removeItemFromSubscriptionCache($iri);
+
         return $payloads;
     }
 
     private function updateSubscriptionItemCacheData(
-        string  $iri,
-        array   $fields,
-        ?array  $result,
-        bool    $private,
-        array   $privateFields,
-        ?object $previousObject
-    ): string
-    {
+        string $iri,
+        array $fields,
+        ?array $result,
+        bool $private,
+        array $privateFields,
+        ?object $previousObject,
+    ): string {
         $subscriptionsCacheItem = $this->subscriptionsCache->getItem($this->encodeIriToCacheKey($iri));
         $subscriptions = [];
         if ($subscriptionsCacheItem->isHit()) {
@@ -219,25 +220,24 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
         unset($result['clientSubscriptionId']);
         if ($private && $privateFields && $previousObject) {
             foreach ($privateFields as $privateField) {
-                unset($result['__private_field_' . $privateField]);
+                unset($result['__private_field_'.$privateField]);
             }
         }
         $subscriptions[] = [$subscriptionId, $fields, $result];
         $subscriptionsCacheItem->set($subscriptions);
         $this->subscriptionsCache->save($subscriptionsCacheItem);
+
         return $subscriptionId;
     }
 
-
-
     private function updateSubscriptionCollectionCacheData(
         string $iri,
-        array  $fields,
-    ): string
-    {
+        array $fields,
+    ): string {
         $subscriptionCollectionCacheItem = $this->subscriptionsCache->getItem(
             $this->encodeIriToCacheKey($this->getCollectionIri($iri)),
         );
+        $collectionSubscriptions = [];
         if ($subscriptionCollectionCacheItem->isHit()) {
             $collectionSubscriptions = $subscriptionCollectionCacheItem->get();
             foreach ($collectionSubscriptions as [$subscriptionId, $subscriptionFields]) {
@@ -247,9 +247,10 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
             }
         }
         $subscriptionId = $this->subscriptionIdentifierGenerator->generateSubscriptionIdentifier($fields + ['__collection' => true]);
-        $subscriptions[] = [$subscriptionId, $fields, []];
-        $subscriptionCollectionCacheItem->set($subscriptions);
+        $collectionSubscriptions[] = [$subscriptionId, $fields];
+        $subscriptionCollectionCacheItem->set($collectionSubscriptions);
         $this->subscriptionsCache->save($subscriptionCollectionCacheItem);
+
         return $subscriptionId;
     }
 }
