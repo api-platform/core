@@ -31,9 +31,9 @@ final class SubscriptionIdentifierGenerator implements SubscriptionIdentifierGen
     private function removeTypename(array $data): array
     {
         foreach ($data as $key => $value) {
-            if ($key === '__typename') {
+            if ('__typename' === $key) {
                 unset($data[$key]);
-            } elseif (is_array($value)) {
+            } elseif (\is_array($value)) {
                 $data[$key] = $this->removeTypename($value);
             }
         }
