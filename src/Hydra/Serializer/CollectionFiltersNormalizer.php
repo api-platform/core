@@ -172,6 +172,21 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
                 }
             }
 
+            if (str_contains($key, ':property') && $parameter->getProperties()) {
+                $required = $parameter->getRequired();
+                foreach ($parameter->getProperties() as $prop) {
+                    $k = str_replace(':property', $prop, $key);
+                    $m = ['@type' => 'IriTemplateMapping', 'variable' => $k, 'property' => $prop];
+                    $variables[] = $k;
+                    if (null !== $required) {
+                        $m['required'] = $required;
+                    }
+                    $mapping[] = $m;
+                }
+
+                continue;
+            }
+
             if (!($property = $parameter->getProperty())) {
                 continue;
             }
