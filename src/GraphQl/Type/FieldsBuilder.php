@@ -29,6 +29,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\Inflector;
 use ApiPlatform\Metadata\Util\PropertyInfoToTypeInfoHelper;
+use ApiPlatform\Metadata\Util\TypeHelper;
 use ApiPlatform\State\Pagination\Pagination;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\ListOfType;
@@ -43,9 +44,7 @@ use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\CollectionType;
-use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
 use Symfony\Component\TypeInfo\Type\ObjectType;
-use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
@@ -405,13 +404,12 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
             /** @var class-string|null $resourceClass */
             $resourceClass = null;
 
-            $typeIsResourceClass = function (Type $type) use (&$typeIsResourceClass, &$resourceClass): bool {
-                return match (true) {
-                    $type instanceof CollectionType => $type->getCollectionValueType()->isSatisfiedBy($typeIsResourceClass),
-                    $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($typeIsResourceClass),
-                    $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($typeIsResourceClass),
-                    default => $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($resourceClass = $type->getClassName()),
-                };
+            if ($isCollectionType) {
+                $type = TypeHelper::getCollectionValueType($type);
+            }
+
+            $typeIsResourceClass = function (Type $type) use (&$resourceClass): bool {
+                return $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($resourceClass = $type->getClassName());
             };
 
             $resourceOperation = $rootOperation;

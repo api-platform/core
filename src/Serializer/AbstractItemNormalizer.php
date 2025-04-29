@@ -1083,8 +1083,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     private function createAndValidateAttributeValue(string $attribute, mixed $value, ?string $format = null, array $context = []): mixed
     {
         $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $this->getFactoryOptions($context));
-        $types = $propertyMetadata->getBuiltinTypes() ?? [];
-        $isMultipleTypes = \count($types) > 1;
         $denormalizationException = null;
 
         $types = [];
@@ -1096,6 +1094,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $types = $type instanceof CompositeTypeInterface ? $type->getTypes() : (null === $type ? [] : [$type]);
         }
 
+        $isMultipleTypes = \count($types) > 1;
         $className = null;
         $typeIsResourceClass = function (Type $type) use (&$className): bool {
             return $type instanceof ObjectType ? $this->resourceClassResolver->isResourceClass($className = $type->getClassName()) : false;

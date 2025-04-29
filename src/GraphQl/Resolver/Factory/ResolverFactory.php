@@ -21,16 +21,13 @@ use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Util\TypeHelper;
 use ApiPlatform\State\Pagination\ArrayPaginator;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
-use Symfony\Component\TypeInfo\Type;
-use Symfony\Component\TypeInfo\Type\CollectionType;
-use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
-use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 
 class ResolverFactory implements ResolverFactoryInterface
 {
@@ -71,16 +68,9 @@ class ResolverFactory implements ResolverFactoryInterface
                     }
                 } else {
                     $type = $propertyMetadata->getNativeType();
-                    $typeIsCollection = static function (Type $type) use (&$typeIsCollection): bool {
-                        return match (true) {
-                            $type instanceof CollectionType => true,
-                            $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($typeIsCollection),
-                            $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($typeIsCollection),
-                            default => false,
-                        };
-                    };
+                    $collectionValueType = TypeHelper::getCollectionValueType($type);
                     // Data already fetched and normalized (field or nested resource)
-                    if ($body || null === $resourceClass || ($type && !$type->isSatisfiedBy($typeIsCollection))) {
+                    if ($body || null === $resourceClass || ($type && !$collectionValueType)) {
                         return $body;
                     }
                 }

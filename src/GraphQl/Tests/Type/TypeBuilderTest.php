@@ -627,6 +627,7 @@ class TypeBuilderTest extends TestCase
     #[\PHPUnit\Framework\Attributes\Group('legacy')]
     public function testIsCollectionLegacy(LegacyType $type, bool $expectedIsCollection): void
     {
+        $this->expectUserDeprecationMessage('Since api-platform/graphql 4.2: The "ApiPlatform\GraphQl\Type\TypeBuilder::isCollection()" method is deprecated, use "ApiPlatform\GraphQl\Type\TypeBuilder::isObjectCollection()" instead.');
         $this->assertSame($expectedIsCollection, $this->typeBuilder->isCollection($type));
     }
 

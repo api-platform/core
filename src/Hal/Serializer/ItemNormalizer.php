@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
+use ApiPlatform\Metadata\Util\TypeHelper;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Serializer\CacheKeyTrait;
 use ApiPlatform\Serializer\ContextTrait;
@@ -36,10 +37,8 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\TypeInfo\Type;
-use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
 use Symfony\Component\TypeInfo\Type\ObjectType;
-use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 
 /**
  * Converts between objects and array including HAL metadata.
@@ -212,17 +211,10 @@ final class ItemNormalizer extends AbstractItemNormalizer
                         $isOne = $className && $this->resourceClassResolver->isResourceClass($className);
                     }
                 } elseif ($type instanceof Type) {
-                    $typeIsCollection = function (Type $type) use (&$typeIsCollection, &$valueType): bool {
-                        return match (true) {
-                            $type instanceof CollectionType => null !== $valueType = $type->getCollectionValueType(),
-                            $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($typeIsCollection),
-                            $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($typeIsCollection),
-                            default => false,
-                        };
-                    };
+                    $collectionValueType = TypeHelper::getCollectionValueType($type);
 
-                    if ($type->isSatisfiedBy($typeIsCollection)) {
-                        $isMany = $valueType->isSatisfiedBy($typeIsResourceClass);
+                    if ($collectionValueType) {
+                        $isMany = $collectionValueType->isSatisfiedBy($typeIsResourceClass);
                     } else {
                         $isOne = $type->isSatisfiedBy($typeIsResourceClass);
                     }

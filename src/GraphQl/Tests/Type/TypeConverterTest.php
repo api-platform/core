@@ -66,6 +66,8 @@ class TypeConverterTest extends TestCase
     #[\PHPUnit\Framework\Attributes\Group('legacy')]
     public function testConvertTypeLegacy(LegacyType $type, bool $input, int $depth, GraphQLType|string|null $expectedGraphqlType): void
     {
+        $this->expectUserDeprecationMessage('Since api-platform/graphql 4.2: The "ApiPlatform\GraphQl\Type\TypeConverter::convertType()" method is deprecated, use "ApiPlatform\GraphQl\Type\TypeConverter::convertPhpType()" instead.');
+
         $this->typeBuilderProphecy->isCollection($type)->willReturn(false);
         $this->resourceMetadataCollectionFactoryProphecy->create(Argument::type('string'))->willReturn(new ResourceMetadataCollection('resourceClass'));
         $this->typeBuilderProphecy->getEnumType(Argument::type(Operation::class))->willReturn($expectedGraphqlType);
@@ -336,7 +338,7 @@ class TypeConverterTest extends TestCase
     public static function convertTypeResourceProvider(): array
     {
         return [
-            [Type::collection(Type::object('foo'), Type::object('dummyValue')), new ObjectType(['name' => 'resourceObjectType', 'fields' => []])], // @phpstan-ignore-line
+            [Type::collection(Type::object('dummyValue'), Type::object('dummyValue')), new ObjectType(['name' => 'resourceObjectType', 'fields' => []])], // @phpstan-ignore-line
             [Type::array(Type::object('dummyValue')), new ObjectType(['name' => 'resourceObjectType', 'fields' => []])],
         ];
     }

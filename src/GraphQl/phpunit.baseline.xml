@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<files version="1">
+ <file path="Type/TypeBuilder.php">
+  <line number="233" hash="e21229baf2768aeff59c417e73f0fe2e87c98247">
+   <issue><![CDATA[Since api-platform/graphql 4.2: The "ApiPlatform\GraphQl\Type\TypeBuilder::isCollection()" method is deprecated, use "ApiPlatform\GraphQl\Type\TypeBuilder::isObjectCollection()" instead.]]></issue>
+  </line>
+ </file>
+ <file path="Type/TypeConverter.php">
+  <line number="53" hash="0ea4919000a2cf7f2068773445d16fec3faf53d4">
+   <issue><![CDATA[Since api-platform/graphql 4.2: The "ApiPlatform\GraphQl\Type\TypeConverter::convertType()" method is deprecated, use "ApiPlatform\GraphQl\Type\TypeConverter::convertPhpType()" instead.]]></issue>
+  </line>
+ </file>
+</files>

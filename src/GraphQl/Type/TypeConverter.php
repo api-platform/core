@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Util\TypeHelper;
 use GraphQL\Error\SyntaxError;
 use GraphQL\Language\AST\ListTypeNode;
 use GraphQL\Language\AST\NamedTypeNode;
@@ -30,10 +31,7 @@ use GraphQL\Type\Definition\NullableType;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
-use Symfony\Component\TypeInfo\Type\CollectionType;
-use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
 use Symfony\Component\TypeInfo\Type\ObjectType;
-use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
@@ -52,7 +50,7 @@ final class TypeConverter implements TypeConverterInterface
      */
     public function convertType(LegacyType $type, bool $input, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth): GraphQLType|string|null
     {
-        trigger_deprecation('api-platform/graphql', '4.1', 'The "%s()" method is deprecated, use "%s::convertPhpType()" instead.', __METHOD__, self::class);
+        trigger_deprecation('api-platform/graphql', '4.2', 'The "%s()" method is deprecated, use "%s::convertPhpType()" instead.', __METHOD__, self::class);
 
         switch ($type->getBuiltinType()) {
             case LegacyType::BUILTIN_TYPE_BOOL:
@@ -140,16 +138,14 @@ final class TypeConverter implements TypeConverterInterface
         if ($type instanceof Type) {
             $isCollection = $this->typeBuilder->isObjectCollection($type);
 
+            if ($isCollection) {
+                $type = TypeHelper::getCollectionValueType($type);
+            }
+
             /** @var class-string|null $resourceClass */
             $resourceClass = null;
-
-            $typeIsResourceClass = function (Type $type) use (&$typeIsResourceClass, &$resourceClass): bool {
-                return match (true) {
-                    $type instanceof CollectionType => $type->getCollectionValueType()->isSatisfiedBy($typeIsResourceClass),
-                    $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($typeIsResourceClass),
-                    $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($typeIsResourceClass),
-                    default => $type instanceof ObjectType && null !== $resourceClass = $type->getClassName(),
-                };
+            $typeIsResourceClass = function (Type $type) use (&$resourceClass): bool {
+                return $type instanceof ObjectType && $resourceClass = $type->getClassName();
             };
 
             if (!$type->isSatisfiedBy($typeIsResourceClass)) {
