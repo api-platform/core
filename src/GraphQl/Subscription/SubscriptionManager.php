@@ -240,14 +240,14 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
         $collectionSubscriptions = [];
         if ($subscriptionCollectionCacheItem->isHit()) {
             $collectionSubscriptions = $subscriptionCollectionCacheItem->get();
-            foreach ($collectionSubscriptions as [$subscriptionId, $subscriptionFields]) {
+            foreach ($collectionSubscriptions as [$subscriptionId, $subscriptionFields, $result]) {
                 if ($subscriptionFields === $fields) {
                     return $subscriptionId;
                 }
             }
         }
         $subscriptionId = $this->subscriptionIdentifierGenerator->generateSubscriptionIdentifier($fields + ['__collection' => true]);
-        $collectionSubscriptions[] = [$subscriptionId, $fields];
+        $collectionSubscriptions[] = [$subscriptionId, $fields, []];
         $subscriptionCollectionCacheItem->set($collectionSubscriptions);
         $this->subscriptionsCache->save($subscriptionCollectionCacheItem);
 
