@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Type;
 
-use ApiPlatform\Doctrine\Odm\State\Options as ODMOptions;
-use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\GraphQl\Exception\InvalidTypeException;
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface;
@@ -563,18 +561,7 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
                 continue;
             }
 
-            $entityClass = $resourceClass;
-            if ($options = $resourceOperation->getStateOptions()) {
-                if (class_exists(Options::class) && $options instanceof Options && $options->getEntityClass()) {
-                    $entityClass = $options->getEntityClass();
-                }
-
-                if (class_exists(ODMOptions::class) && $options instanceof ODMOptions && $options->getDocumentClass()) {
-                    $entityClass = $options->getDocumentClass();
-                }
-            }
-
-            foreach ($this->filterLocator->get($filterId)->getDescription($entityClass) as $key => $description) {
+            foreach ($this->filterLocator->get($filterId)->getDescription($resourceClass) as $key => $description) {
                 $nullable = isset($description['required']) ? !$description['required'] : true;
                 $filterType = \in_array($description['type'], Type::$builtinTypes, true) ? new Type($description['type'], $nullable) : new Type('object', $nullable, $description['type']);
                 $graphqlFilterType = $this->convertType($filterType, false, $resourceOperation, $rootOperation, $resourceClass, $rootResource, $property, $depth);
