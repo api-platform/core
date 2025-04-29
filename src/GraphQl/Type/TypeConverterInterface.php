@@ -15,20 +15,25 @@ namespace ApiPlatform\GraphQl\Type;
 
 use ApiPlatform\Metadata\GraphQl\Operation;
 use GraphQL\Type\Definition\Type as GraphQLType;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
 
 /**
  * Converts a type to its GraphQL equivalent.
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
+ *
+ * @method GraphQLType|string|null convertPhpType(Type $type, bool $input, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth)
  */
 interface TypeConverterInterface
 {
     /**
+     * @deprecated since 4.1, use "convertPhpType" instead
+     *
      * Converts a built-in type to its GraphQL equivalent.
      * A string can be returned for a custom registered type.
      */
-    public function convertType(Type $type, bool $input, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth): GraphQLType|string|null;
+    public function convertType(LegacyType $type, bool $input, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth): GraphQLType|string|null;
 
     /**
      * Resolves a type written with the GraphQL type system to its object representation.

@@ -18,7 +18,8 @@ use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use GraphQL\Type\Definition\Type as GraphQLType;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
 
 /**
  * Converts a built-in type to its GraphQL equivalent.
@@ -34,17 +35,32 @@ final class TypeConverter implements TypeConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function convertType(Type $type, bool $input, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth): GraphQLType|string|null
+    public function convertType(LegacyType $type, bool $input, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth): GraphQLType|string|null
     {
         if ('dummyDate' === $property
             && \in_array($rootResource, [Dummy::class, DummyDocument::class], true)
-            && Type::BUILTIN_TYPE_OBJECT === $type->getBuiltinType()
+            && LegacyType::BUILTIN_TYPE_OBJECT === $type->getBuiltinType()
             && is_a($type->getClassName(), \DateTimeInterface::class, true)
         ) {
             return \DateTime::class;
         }
 
         return $this->defaultTypeConverter->convertType($type, $input, $rootOperation, $resourceClass, $rootResource, $property, $depth);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function convertPhpType(Type $type, bool $input, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth): GraphQLType|string|null
+    {
+        if ('dummyDate' === $property
+            && \in_array($rootResource, [Dummy::class, DummyDocument::class], true)
+            && $type->isIdentifiedBy(\DateTimeInterface::class)
+        ) {
+            return \DateTime::class;
+        }
+
+        return $this->defaultTypeConverter->convertPhpType($type, $input, $rootOperation, $resourceClass, $rootResource, $property, $depth);
     }
 
     /**
