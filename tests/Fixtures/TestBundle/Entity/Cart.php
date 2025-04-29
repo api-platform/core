@@ -14,22 +14,21 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Filter\SortComputedFieldFilter;
+use ApiPlatform\Tests\Fixtures\TestBundle\Repository\CartRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\QueryBuilder;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: CartRepository::class)]
 #[GetCollection(
     normalizationContext: ['hydra_prefix' => false],
     paginationItemsPerPage: 3,
     paginationPartial: false,
-    stateOptions: new Options(handleLinks: [self::class, 'handleLinks']),
+    stateOptions: new Options(repositoryMethod: 'getCartsWithTotalQuantity'),
     processor: [self::class, 'process'],
     write: true,
     parameters: [
@@ -51,15 +50,6 @@ class Cart
         }
 
         return $data;
-    }
-
-    public static function handleLinks(QueryBuilder $queryBuilder, array $uriVariables, QueryNameGeneratorInterface $queryNameGenerator, array $context): void
-    {
-        $rootAlias = $queryBuilder->getRootAliases()[0] ?? 'o';
-        $itemsAlias = $queryNameGenerator->generateParameterName('items');
-        $queryBuilder->leftJoin(\sprintf('%s.items', $rootAlias), $itemsAlias)
-            ->addSelect(\sprintf('COALESCE(SUM(%s.quantity), 0) AS totalQuantity', $itemsAlias))
-            ->addGroupBy(\sprintf('%s.id', $rootAlias));
     }
 
     public ?int $totalQuantity;

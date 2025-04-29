@@ -22,6 +22,7 @@ class Options implements OptionsInterface
      */
     public function __construct(
         protected mixed $handleLinks = null,
+        protected ?string $repositoryMethod = null,
     ) {
     }
 
@@ -34,6 +35,19 @@ class Options implements OptionsInterface
     {
         $self = clone $this;
         $self->handleLinks = $handleLinks;
+
+        return $self;
+    }
+
+    public function getRepositoryMethod(): ?string
+    {
+        return $this->repositoryMethod;
+    }
+
+    public function withRepositoryMethod(?string $repositoryMethod): self
+    {
+        $self = clone $this;
+        $self->repositoryMethod = $repositoryMethod;
 
         return $self;
     }
