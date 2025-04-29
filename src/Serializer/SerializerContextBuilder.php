@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Serializer;
 
-use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Error as ErrorOperation;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Util\AttributesExtractor;
 use ApiPlatform\State\SerializerContextBuilderInterface;
+use ApiPlatform\State\Util\StateOptionsTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
@@ -32,6 +32,8 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  */
 final class SerializerContextBuilder implements SerializerContextBuilderInterface
 {
+    use StateOptionsTrait;
+
     public function __construct(private readonly ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, private readonly bool $debug = false)
     {
     }
@@ -82,7 +84,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             }
         }
 
-        if (null === $context['output'] && ($options = $operation?->getStateOptions()) && class_exists(Options::class) && $options instanceof Options && $options->getEntityClass()) {
+        if (null === $context['output'] && $this->getStateOptionsClass($operation)) {
             $context['force_resource_class'] = $operation->getClass();
         }
 

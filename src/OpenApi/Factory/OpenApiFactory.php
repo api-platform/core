@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\OpenApi\Factory;
 
-use ApiPlatform\Doctrine\Odm\State\Options as DoctrineODMOptions;
-use ApiPlatform\Doctrine\Orm\State\Options as DoctrineOptions;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Metadata\ApiResource;
@@ -55,6 +53,7 @@ use ApiPlatform\OpenApi\Options;
 use ApiPlatform\OpenApi\Serializer\NormalizeOperationNameTrait;
 use ApiPlatform\State\ApiResource\Error as ApiResourceError;
 use ApiPlatform\State\Pagination\PaginationOptions;
+use ApiPlatform\State\Util\StateOptionsTrait;
 use ApiPlatform\Validator\Exception\ValidationException;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
@@ -70,6 +69,7 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
 final class OpenApiFactory implements OpenApiFactoryInterface
 {
     use NormalizeOperationNameTrait;
+    use StateOptionsTrait;
     use TypeFactoryTrait;
 
     public const BASE_URL = 'base_url';
@@ -305,7 +305,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 }
             }
 
-            $entityClass = $this->getFilterClass($operation);
+            $entityClass = $this->getStateOptionsClass($operation, $operation->getClass());
             $openapiParameters = $openapiOperation->getParameters();
             foreach ($operation->getParameters() ?? [] as $key => $p) {
                 if (false === $p->getOpenApi()) {
@@ -650,7 +650,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     {
         $parameters = [];
         $resourceFilters = $operation->getFilters();
-        $entityClass = $this->getFilterClass($operation);
+        $entityClass = $this->getStateOptionsClass($operation, $operation->getClass());
 
         foreach ($resourceFilters ?? [] as $filterId) {
             if (!$this->filterLocator->has($filterId)) {
@@ -664,22 +664,6 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         }
 
         return $parameters;
-    }
-
-    private function getFilterClass(HttpOperation $operation): ?string
-    {
-        $entityClass = $operation->getClass();
-        if ($options = $operation->getStateOptions()) {
-            if ($options instanceof DoctrineOptions && $options->getEntityClass()) {
-                return $options->getEntityClass();
-            }
-
-            if ($options instanceof DoctrineODMOptions && $options->getDocumentClass()) {
-                return $options->getDocumentClass();
-            }
-        }
-
-        return $entityClass;
     }
 
     /**

@@ -22,11 +22,14 @@ use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\State\Util\StateOptionsTrait;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\Persistence\ManagerRegistry;
 
 final class DoctrineMongoDbOdmResourceCollectionMetadataFactory implements ResourceMetadataCollectionFactoryInterface
 {
+    use StateOptionsTrait;
+
     public function __construct(private readonly ManagerRegistry $managerRegistry, private readonly ResourceMetadataCollectionFactoryInterface $decorated)
     {
     }
@@ -45,11 +48,7 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactory implements Resou
             if ($operations) {
                 /** @var Operation $operation */
                 foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
-                    $documentClass = $operation->getClass();
-                    if (($options = $operation->getStateOptions()) && $options instanceof Options && $options->getDocumentClass()) {
-                        $documentClass = $options->getDocumentClass();
-                    }
-
+                    $documentClass = $this->getStateOptionsClass($operation, $operation->getClass(), Options::class);
                     if (!$this->managerRegistry->getManagerForClass($documentClass) instanceof DocumentManager) {
                         continue;
                     }

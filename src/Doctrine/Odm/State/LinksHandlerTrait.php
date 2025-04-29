@@ -17,6 +17,7 @@ use ApiPlatform\Doctrine\Common\State\LinksHandlerTrait as CommonLinksHandlerTra
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\Util\StateOptionsTrait;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
@@ -28,6 +29,7 @@ use Doctrine\Persistence\ManagerRegistry;
 trait LinksHandlerTrait
 {
     use CommonLinksHandlerTrait;
+    use StateOptionsTrait;
 
     private ManagerRegistry $managerRegistry;
 
@@ -142,26 +144,18 @@ trait LinksHandlerTrait
 
     private function getLinkFromClass(Link $link, Operation $operation): string
     {
+        $documentClass = $this->getStateOptionsClass($operation, $operation->getClass(), Options::class);
         $fromClass = $link->getFromClass();
-        if ($fromClass === $operation->getClass() && $documentClass = $this->getStateOptionsDocumentClass($operation)) {
+        if ($fromClass === $operation->getClass() && $documentClass) {
             return $documentClass;
         }
 
         $operation = $this->resourceMetadataCollectionFactory->create($fromClass)->getOperation();
 
-        if ($documentClass = $this->getStateOptionsDocumentClass($operation)) {
+        if ($documentClass = $this->getStateOptionsClass($operation, null, Options::class)) {
             return $documentClass;
         }
 
         throw new \Exception('Can not found a doctrine class for this link.');
-    }
-
-    private function getStateOptionsDocumentClass(Operation $operation): ?string
-    {
-        if (($options = $operation->getStateOptions()) && $options instanceof Options && $documentClass = $options->getDocumentClass()) {
-            return $documentClass;
-        }
-
-        return null;
     }
 }

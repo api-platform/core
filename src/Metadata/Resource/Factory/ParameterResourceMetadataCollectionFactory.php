@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource\Factory;
 
-use ApiPlatform\Doctrine\Odm\State\Options as DoctrineODMOptions;
-use ApiPlatform\Doctrine\Orm\State\Options as DoctrineORMOptions;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\FilterInterface;
@@ -30,6 +28,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use ApiPlatform\Serializer\Filter\FilterInterface as SerializerFilterInterface;
+use ApiPlatform\State\Util\StateOptionsTrait;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -41,6 +40,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class ParameterResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
+    use StateOptionsTrait;
+
     private array $localPropertyCache;
 
     public function __construct(
@@ -91,15 +92,16 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
     /**
      * @return array{propertyNames: string[], properties: array<string, ApiProperty>}
      */
-    private function getProperties(string $resourceClass): array
+    private function getProperties(string $resourceClass, ?Parameter $parameter = null): array
     {
-        if (isset($this->localPropertyCache[$resourceClass])) {
-            return $this->localPropertyCache[$resourceClass];
+        $k = $resourceClass.($parameter?->getProperties() ? ($parameter->getKey() ?? '') : '');
+        if (isset($this->localPropertyCache[$k])) {
+            return $this->localPropertyCache[$k];
         }
 
         $propertyNames = [];
         $properties = [];
-        foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $property) {
+        foreach ($parameter?->getProperties() ?? $this->propertyNameCollectionFactory->create($resourceClass) as $property) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
             if ($propertyMetadata->isReadable()) {
                 $propertyNames[] = $property;
@@ -107,16 +109,17 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             }
         }
 
-        $this->localPropertyCache = [$resourceClass => ['propertyNames' => $propertyNames, 'properties' => $properties]];
+        $this->localPropertyCache[$k] = ['propertyNames' => $propertyNames, 'properties' => $properties];
 
-        return $this->localPropertyCache[$resourceClass];
+        return $this->localPropertyCache[$k];
     }
 
     private function getDefaultParameters(Operation $operation, string $resourceClass, int &$internalPriority): Parameters
     {
-        ['propertyNames' => $propertyNames, 'properties' => $properties] = $this->getProperties($resourceClass);
+        $propertyNames = $properties = [];
         $parameters = $operation->getParameters() ?? new Parameters();
         foreach ($parameters as $key => $parameter) {
+            ['propertyNames' => $propertyNames, 'properties' => $properties] = $this->getProperties($resourceClass, $parameter);
             if (null === $parameter->getProvider() && (($f = $parameter->getFilter()) && $f instanceof ParameterProviderFilterInterface)) {
                 $parameters->add($key, $parameter->withProvider($f->getParameterProvider()));
             }
@@ -235,7 +238,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
 
     private function getLegacyFilterMetadata(Parameter $parameter, Operation $operation, FilterInterface $filter): Parameter
     {
-        $description = $filter->getDescription($this->getFilterClass($operation));
+        $description = $filter->getDescription($this->getStateOptionsClass($operation, $operation->getClass()));
         $key = $parameter->getKey();
         if (($schema = $description[$key]['schema'] ?? null) && null === $parameter->getSchema()) {
             $parameter = $parameter->withSchema($schema);
@@ -254,18 +257,5 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         }
 
         return $parameter;
-    }
-
-    private function getFilterClass(Operation $operation): ?string
-    {
-        $stateOptions = $operation->getStateOptions();
-        if ($stateOptions instanceof DoctrineORMOptions) {
-            return $stateOptions->getEntityClass();
-        }
-        if ($stateOptions instanceof DoctrineODMOptions) {
-            return $stateOptions->getDocumentClass();
-        }
-
-        return $operation->getClass();
     }
 }
