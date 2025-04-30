@@ -46,8 +46,8 @@ use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
+use Symfony\Component\TypeInfo\Type;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -117,9 +117,8 @@ class FieldsBuilderTest extends TestCase
     public function testGetItemQueryFields(string $resourceClass, Operation $operation, array $configuration, ?GraphQLType $graphqlType, ?callable $resolver, array $expectedQueryFields): void
     {
         $this->resourceClassResolverProphecy->isResourceClass($resourceClass)->willReturn(true);
-        $this->typeConverterProphecy->convertType(Argument::type(Type::class), false, Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), $resourceClass, $resourceClass, null, 0)->willReturn($graphqlType);
+        $this->typeConverterProphecy->convertPhpType(Argument::type(Type::class), false, Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), $resourceClass, $resourceClass, null, 0)->willReturn($graphqlType);
         $this->typeConverterProphecy->resolveType(Argument::type('string'))->willReturn(GraphQLType::string());
-        $this->typeBuilderProphecy->isCollection(Argument::type(Type::class))->willReturn(false);
         $this->itemResolverFactoryProphecy->__invoke($resourceClass, $resourceClass, $operation, Argument::any())->willReturn($resolver);
 
         $queryFields = $this->fieldsBuilder->getItemQueryFields($resourceClass, $operation, $configuration);
@@ -196,17 +195,16 @@ class FieldsBuilderTest extends TestCase
     public function testGetCollectionQueryFields(string $resourceClass, Operation $operation, array $configuration, ?GraphQLType $graphqlType, ?callable $resolver, array $expectedQueryFields): void
     {
         $this->resourceClassResolverProphecy->isResourceClass($resourceClass)->willReturn(true);
-        $this->typeConverterProphecy->convertType(Argument::type(Type::class), false, Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), $resourceClass, $resourceClass, null, 0)->willReturn($graphqlType);
+        $this->typeConverterProphecy->convertPhpType(Argument::type(Type::class), false, Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), $resourceClass, $resourceClass, null, 0)->willReturn($graphqlType);
         $this->typeConverterProphecy->resolveType(Argument::type('string'))->willReturn(GraphQLType::string());
-        $this->typeBuilderProphecy->isCollection(Argument::type(Type::class))->willReturn(true);
         $this->typeBuilderProphecy->getPaginatedCollectionType($graphqlType, $operation)->willReturn($graphqlType);
         $this->itemResolverFactoryProphecy->__invoke($resourceClass, $resourceClass, $operation, Argument::any())->willReturn($resolver);
         $this->filterLocatorProphecy->has('my_filter')->willReturn(true);
         $filterProphecy = $this->prophesize(FilterInterface::class);
         $filterProphecy->getDescription($resourceClass)->willReturn([
             'boolField' => ['type' => 'bool', 'required' => true],
-            'boolField[]' => ['type' => 'bool', 'required' => true],
-            'parent.child[related.nested]' => ['type' => 'bool', 'required' => true],
+            'boolField[]' => ['type' => 'bool', 'required' => false],
+            'parent.child[related.nested]' => ['type' => 'bool', 'required' => false],
             'dateField[before]' => ['type' => \DateTimeInterface::class, 'required' => false],
         ]);
         $this->filterLocatorProphecy->get('my_filter')->willReturn($filterProphecy->reveal());
@@ -278,7 +276,7 @@ class FieldsBuilderTest extends TestCase
                                 'type' => GraphQLType::string(),
                                 'description' => 'Returns the elements in the list that come after the specified cursor.',
                             ],
-                            'boolField' => $graphqlType,
+                            'boolField' => GraphQLType::nonNull($graphqlType),
                             'boolField_list' => GraphQLType::listOf($graphqlType),
                             'parent__child' => GraphQLType::listOf(new InputObjectType(['name' => 'ShortNameFilter_parent__child', 'fields' => ['related__nested' => $graphqlType]])),
                             'dateField' => GraphQLType::listOf(new InputObjectType(['name' => 'ShortNameFilter_dateField', 'fields' => ['before' => $graphqlType]])),
@@ -330,7 +328,7 @@ class FieldsBuilderTest extends TestCase
                                 'type' => GraphQLType::int(),
                                 'description' => 'Returns the current page.',
                             ],
-                            'boolField' => $graphqlType,
+                            'boolField' => GraphQLType::nonNull($graphqlType),
                             'boolField_list' => GraphQLType::listOf($graphqlType),
                             'parent__child' => GraphQLType::listOf(new InputObjectType(['name' => 'ShortNameFilter_parent__child', 'fields' => ['related__nested' => $graphqlType]])),
                             'dateField' => GraphQLType::listOf(new InputObjectType(['name' => 'ShortNameFilter_dateField', 'fields' => ['before' => $graphqlType]])),
@@ -347,9 +345,8 @@ class FieldsBuilderTest extends TestCase
     public function testGetMutationFields(string $resourceClass, Operation $operation, GraphQLType $graphqlType, GraphQLType $inputGraphqlType, ?callable $mutationResolver, array $expectedMutationFields): void
     {
         $this->resourceClassResolverProphecy->isResourceClass($resourceClass)->willReturn(true);
-        $this->typeConverterProphecy->convertType(Argument::type(Type::class), false, Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), $resourceClass, $resourceClass, null, 0)->willReturn($graphqlType);
-        $this->typeConverterProphecy->convertType(Argument::type(Type::class), true, Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), $resourceClass, $resourceClass, null, 0)->willReturn($inputGraphqlType);
-        $this->typeBuilderProphecy->isCollection(Argument::type(Type::class))->willReturn(false);
+        $this->typeConverterProphecy->convertPhpType(Argument::type(Type::class), false, Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), $resourceClass, $resourceClass, null, 0)->willReturn($graphqlType);
+        $this->typeConverterProphecy->convertPhpType(Argument::type(Type::class), true, Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), $resourceClass, $resourceClass, null, 0)->willReturn($inputGraphqlType);
         $this->itemResolverFactoryProphecy->__invoke($resourceClass, $resourceClass, $operation, Argument::any())->willReturn($mutationResolver);
 
         $mutationFields = $this->fieldsBuilder->getMutationFields($resourceClass, $operation);
@@ -407,9 +404,8 @@ class FieldsBuilderTest extends TestCase
     public function testGetSubscriptionFields(string $resourceClass, Operation $operation, GraphQLType $graphqlType, GraphQLType $inputGraphqlType, ?callable $subscriptionResolver, array $expectedSubscriptionFields): void
     {
         $this->resourceClassResolverProphecy->isResourceClass($resourceClass)->willReturn(true);
-        $this->typeConverterProphecy->convertType(Argument::type(Type::class), false, Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), $resourceClass, $resourceClass, null, 0)->willReturn($graphqlType);
-        $this->typeConverterProphecy->convertType(Argument::type(Type::class), true, Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), $resourceClass, $resourceClass, null, 0)->willReturn($inputGraphqlType);
-        $this->typeBuilderProphecy->isCollection(Argument::type(Type::class))->willReturn(false);
+        $this->typeConverterProphecy->convertPhpType(Argument::type(Type::class), false, Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), $resourceClass, $resourceClass, null, 0)->willReturn($graphqlType);
+        $this->typeConverterProphecy->convertPhpType(Argument::type(Type::class), true, Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), $resourceClass, $resourceClass, null, 0)->willReturn($inputGraphqlType);
         $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([$operation->getName() => $operation])]));
         $this->itemResolverFactoryProphecy->__invoke($resourceClass, $resourceClass, $operation, Argument::any())->willReturn($subscriptionResolver);
 
@@ -476,27 +472,26 @@ class FieldsBuilderTest extends TestCase
         $this->propertyNameCollectionFactoryProphecy->create($resourceClass)->willReturn(new PropertyNameCollection(array_keys($properties)));
         foreach ($properties as $propertyName => $propertyMetadata) {
             $this->propertyMetadataFactoryProphecy->create($resourceClass, $propertyName, ['normalization_groups' => null, 'denormalization_groups' => null])->willReturn($propertyMetadata);
-            $this->typeConverterProphecy->convertType(new Type(Type::BUILTIN_TYPE_NULL), Argument::type('bool'), Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), '', $resourceClass, $propertyName, $depth + 1)->willReturn(null);
-            $this->typeConverterProphecy->convertType(new Type(Type::BUILTIN_TYPE_CALLABLE), Argument::type('bool'), Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), '', $resourceClass, $propertyName, $depth + 1)->willReturn('NotRegisteredType');
-            $this->typeConverterProphecy->convertType(Argument::type(Type::class), Argument::type('bool'), Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), '', $resourceClass, $propertyName, $depth + 1)->willReturn(GraphQLType::string());
-            $this->typeConverterProphecy->convertType(new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING)), Argument::type('bool'), Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), '', $resourceClass, $propertyName, $depth + 1)->willReturn(GraphQLType::nonNull(GraphQLType::listOf(GraphQLType::nonNull(GraphQLType::string()))));
+            $this->typeConverterProphecy->convertPhpType(Type::null(), Argument::type('bool'), Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), '', $resourceClass, $propertyName, $depth + 1)->willReturn(null);
+            $this->typeConverterProphecy->convertPhpType(Type::callable(), Argument::type('bool'), Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), '', $resourceClass, $propertyName, $depth + 1)->willReturn('NotRegisteredType');
+            $this->typeConverterProphecy->convertPhpType(Argument::type(Type::class), Argument::type('bool'), Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), '', $resourceClass, $propertyName, $depth + 1)->willReturn(GraphQLType::string());
+            $this->typeConverterProphecy->convertPhpType(Type::list(Type::string()), Argument::type('bool'), Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), '', $resourceClass, $propertyName, $depth + 1)->willReturn(GraphQLType::nonNull(GraphQLType::listOf(GraphQLType::nonNull(GraphQLType::string()))));
 
             if ('propertyObject' === $propertyName) {
-                $this->typeConverterProphecy->convertType(Argument::type(Type::class), Argument::type('bool'), Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), 'objectClass', $resourceClass, $propertyName, $depth + 1)->willReturn(new ObjectType(['name' => 'objectType', 'fields' => []]));
+                $this->typeConverterProphecy->convertPhpType(Argument::type(Type::class), Argument::type('bool'), Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), 'objectClass', $resourceClass, $propertyName, $depth + 1)->willReturn(new ObjectType(['name' => 'objectType', 'fields' => []]));
                 $this->itemResolverFactoryProphecy->__invoke('objectClass', $resourceClass, $operation, Argument::any())->willReturn(static function (): void {
                 });
             }
             if ('propertyNestedResource' === $propertyName) {
                 $nestedResourceQueryOperation = new Query();
                 $this->resourceMetadataCollectionFactoryProphecy->create('nestedResourceClass')->willReturn(new ResourceMetadataCollection('nestedResourceClass', [(new ApiResource())->withGraphQlOperations(['item_query' => $nestedResourceQueryOperation])]));
-                $this->typeConverterProphecy->convertType(Argument::type(Type::class), Argument::type('bool'), Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), 'nestedResourceClass', $resourceClass, $propertyName, $depth + 1)->willReturn(new ObjectType(['name' => 'objectType', 'fields' => []]));
+                $this->typeConverterProphecy->convertPhpType(Argument::type(Type::class), Argument::type('bool'), Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), 'nestedResourceClass', $resourceClass, $propertyName, $depth + 1)->willReturn(new ObjectType(['name' => 'objectType', 'fields' => []]));
                 $this->itemResolverFactoryProphecy->__invoke('nestedResourceClass', $resourceClass, $nestedResourceQueryOperation, Argument::any())->willReturn(static function (): void {
                 });
             }
         }
         $this->typesContainerProphecy->has('NotRegisteredType')->willReturn(false);
         $this->typesContainerProphecy->all()->willReturn([]);
-        $this->typeBuilderProphecy->isCollection(Argument::type(Type::class))->willReturn(false);
 
         $fieldsBuilder = $this->fieldsBuilder;
         if ($advancedNameConverterFactory) {
@@ -519,9 +514,9 @@ class FieldsBuilderTest extends TestCase
         yield 'query' => ['resourceClass', (new Query())->withClass('resourceClass'),
             [
                 'property' => new ApiProperty(),
-                'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(true)->withWritable(false),
-                'propertyNotReadable' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(false),
-                'nameConverted' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withReadable(true)->withWritable(false),
+                'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(true)->withWritable(false),
+                'propertyNotReadable' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(false),
+                'nameConverted' => (new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withWritable(false),
             ],
             false, 0, null,
             [
@@ -546,7 +541,7 @@ class FieldsBuilderTest extends TestCase
         ];
         yield 'query with advanced name converter' => ['resourceClass', (new Query())->withClass('resourceClass'),
             [
-                'field' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withReadable(true)->withWritable(false),
+                'field' => (new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withWritable(false),
             ],
             false, 0, null,
             [
@@ -566,8 +561,8 @@ class FieldsBuilderTest extends TestCase
         yield 'query input' => ['resourceClass', (new Query())->withClass('resourceClass'),
             [
                 'property' => new ApiProperty(),
-                'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
-                'nonWritableProperty' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withReadable(false)->withWritable(false),
+                'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
+                'nonWritableProperty' => (new ApiProperty())->withNativeType(Type::string())->withReadable(false)->withWritable(false),
             ],
             true, 0, null,
             [
@@ -585,9 +580,7 @@ class FieldsBuilderTest extends TestCase
         ];
         yield 'query with simple non-null string array property' => ['resourceClass', (new Query())->withClass('resourceClass'),
             [
-                'property' => (new ApiProperty())->withBuiltinTypes([
-                    new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_STRING)),
-                ])->withReadable(true)->withWritable(false),
+                'property' => (new ApiProperty())->withNativeType(Type::list(Type::string()))->withReadable(true)->withWritable(false),
             ],
             false, 0, null,
             [
@@ -605,7 +598,7 @@ class FieldsBuilderTest extends TestCase
         ];
         yield 'query with nested resources' => ['resourceClass', (new Query())->withClass('resourceClass'),
             [
-                'propertyNestedResource' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, 'nestedResourceClass')])->withReadable(true)->withWritable(true),
+                'propertyNestedResource' => (new ApiProperty())->withNativeType(Type::object('nestedResourceClass'))->withReadable(true)->withWritable(true),
             ],
             false, 0, null,
             [
@@ -625,9 +618,9 @@ class FieldsBuilderTest extends TestCase
         yield 'mutation non input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('mutation'),
             [
                 'property' => new ApiProperty(),
-                'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
-                'propertyReadable' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(true)->withWritable(true),
-                'propertyObject' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, 'objectClass')])->withReadable(true)->withWritable(true),
+                'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
+                'propertyReadable' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(true)->withWritable(true),
+                'propertyObject' => (new ApiProperty())->withNativeType(Type::object('objectClass'))->withReadable(true)->withWritable(true),
             ],
             false, 0, null,
             [
@@ -654,10 +647,10 @@ class FieldsBuilderTest extends TestCase
         yield 'mutation input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('mutation'),
             [
                 'property' => new ApiProperty(),
-                'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withDescription('propertyBool description')->withReadable(false)->withWritable(true)->withDeprecationReason('not useful'),
-                'propertySubresource' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
-                'nonWritableProperty' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withReadable(false)->withWritable(false),
-                'id' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])->withReadable(false)->withWritable(true),
+                'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withDescription('propertyBool description')->withReadable(false)->withWritable(true)->withDeprecationReason('not useful'),
+                'propertySubresource' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
+                'nonWritableProperty' => (new ApiProperty())->withNativeType(Type::string())->withReadable(false)->withWritable(false),
+                'id' => (new ApiProperty())->withNativeType(Type::int())->withReadable(false)->withWritable(true),
             ],
             true, 0, null,
             [
@@ -690,7 +683,7 @@ class FieldsBuilderTest extends TestCase
         ];
         yield 'custom mutation' => ['resourceClass', (new Mutation())->withResolver('resolver')->withName('mutation'),
             [
-                'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withDescription('propertyBool description')->withReadable(false)->withWritable(true),
+                'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withDescription('propertyBool description')->withReadable(false)->withWritable(true),
             ],
             true, 0, null,
             [
@@ -706,7 +699,7 @@ class FieldsBuilderTest extends TestCase
         ];
         yield 'mutation nested input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('mutation'),
             [
-                'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
+                'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
             ],
             true, 1, null,
             [
@@ -725,7 +718,7 @@ class FieldsBuilderTest extends TestCase
         ];
         yield 'delete mutation input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('delete'),
             [
-                'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
+                'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
             ],
             true, 0, null,
             [
@@ -737,7 +730,7 @@ class FieldsBuilderTest extends TestCase
         ];
         yield 'create mutation input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('create'),
             [
-                'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
+                'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
             ],
             true, 0, null,
             [
@@ -753,7 +746,7 @@ class FieldsBuilderTest extends TestCase
         ];
         yield 'update mutation input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('update'),
             [
-                'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
+                'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
             ],
             true, 0, null,
             [
@@ -773,8 +766,8 @@ class FieldsBuilderTest extends TestCase
         yield 'subscription non input' => ['resourceClass', (new Subscription())->withClass('resourceClass'),
             [
                 'property' => new ApiProperty(),
-                'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
-                'propertyReadable' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(true)->withWritable(true),
+                'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
+                'propertyReadable' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(true)->withWritable(true),
             ],
             false, 0, null,
             [
@@ -793,9 +786,9 @@ class FieldsBuilderTest extends TestCase
         yield 'subscription input' => ['resourceClass', (new Subscription())->withClass('resourceClass'),
             [
                 'property' => new ApiProperty(),
-                'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withDescription('propertyBool description')->withReadable(false)->withWritable(true)->withDeprecationReason('not useful'),
-                'propertySubresource' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
-                'id' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])->withReadable(false)->withWritable(true),
+                'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withDescription('propertyBool description')->withReadable(false)->withWritable(true)->withDeprecationReason('not useful'),
+                'propertySubresource' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
+                'id' => (new ApiProperty())->withNativeType(Type::int())->withReadable(false)->withWritable(true),
             ],
             true, 0, null,
             [
@@ -807,13 +800,13 @@ class FieldsBuilderTest extends TestCase
         ];
         yield 'null io metadata non input' => ['resourceClass', (new Query())->withClass('resourceClass'),
             [
-                'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
+                'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
             ],
             false, 0, ['class' => null], [],
         ];
         yield 'null io metadata input' => ['resourceClass', (new Query())->withClass('resourceClass'),
             [
-                'propertyBool' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_BOOL)])->withReadable(false)->withWritable(true),
+                'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
             ],
             true, 0, ['class' => null],
             [
@@ -822,8 +815,8 @@ class FieldsBuilderTest extends TestCase
         ];
         yield 'invalid types' => ['resourceClass', (new Query())->withClass('resourceClass'),
             [
-                'propertyInvalidType' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_NULL)])->withReadable(true)->withWritable(false),
-                'propertyNotRegisteredType' => (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_CALLABLE)])->withReadable(true)->withWritable(false),
+                'propertyInvalidType' => (new ApiProperty())->withNativeType(Type::null())->withReadable(true)->withWritable(false),
+                'propertyNotRegisteredType' => (new ApiProperty())->withNativeType(Type::callable())->withReadable(true)->withWritable(false),
             ],
             false, 0, null,
             [

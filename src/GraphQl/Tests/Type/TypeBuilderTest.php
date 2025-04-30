@@ -36,12 +36,15 @@ use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type as GraphQLType;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -125,7 +128,7 @@ class TypeBuilderTest extends TestCase
         $resourceObjectType->config['fields']();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('resourceObjectTypeQuerySerializationGroupsProvider')]
+    #[DataProvider('resourceObjectTypeQuerySerializationGroupsProvider')]
     public function testGetResourceObjectTypeQuerySerializationGroups(string $itemSerializationGroup, string $collectionSerializationGroup, Operation $operation, string $shortName): void
     {
         $resourceMetadata = new ResourceMetadataCollection('resourceClass', [(new ApiResource())->withGraphQlOperations([
@@ -622,24 +625,40 @@ class TypeBuilderTest extends TestCase
         ]), $this->typeBuilder->getEnumType($operation));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('typesProvider')]
-    public function testIsCollection(Type $type, bool $expectedIsCollection): void
+    #[DataProvider('legacyTypesProvider')]
+    #[IgnoreDeprecations]
+    public function testIsCollectionLegacy(LegacyType $type, bool $expectedIsCollection): void
     {
+        $this->expectUserDeprecationMessage('Since api-platform/graphql 4.2: The "ApiPlatform\GraphQl\Type\TypeBuilder::isCollection()" method is deprecated and will be removed.');
         $this->assertSame($expectedIsCollection, $this->typeBuilder->isCollection($type));
+    }
+
+    public static function legacyTypesProvider(): array
+    {
+        return [
+            [new LegacyType(LegacyType::BUILTIN_TYPE_BOOL), false],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT), false],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_RESOURCE, false, null, false), false],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, null, true), false],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true), false],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, null, new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT)), false],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'className', true), false],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, null, true, null, new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'className')), true],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, null, new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'className')), true],
+        ];
     }
 
     public static function typesProvider(): array
     {
         return [
-            [new Type(Type::BUILTIN_TYPE_BOOL), false],
-            [new Type(Type::BUILTIN_TYPE_OBJECT), false],
-            [new Type(Type::BUILTIN_TYPE_RESOURCE, false, null, false), false],
-            [new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true), false],
-            [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true), false],
-            [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT)), false],
-            [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'className', true), false],
-            [new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, 'className')), true],
-            [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, 'className')), true],
+            [Type::bool(), false],
+            [Type::object(), false],
+            [Type::resource(), false],
+            [Type::collection(Type::object(\Stringable::class)), false],
+            [Type::array(), false],
+            [Type::array(Type::object()), false],
+            [Type::collection(Type::object(\Traversable::class), Type::object(\Stringable::class)), true],
+            [Type::array(Type::object(\Stringable::class)), true],
         ];
     }
 }

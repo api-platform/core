@@ -34,7 +34,10 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -61,9 +64,12 @@ class TypeConverterTest extends TestCase
         $this->typeConverter = new TypeConverter($this->typeBuilderProphecy->reveal(), $this->typesContainerProphecy->reveal(), $this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->propertyMetadataFactoryProphecy->reveal());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('convertTypeProvider')]
-    public function testConvertType(Type $type, bool $input, int $depth, GraphQLType|string|null $expectedGraphqlType): void
+    #[DataProvider('legacyConvertTypeProvider')]
+    #[IgnoreDeprecations]
+    public function testConvertTypeLegacy(LegacyType $type, bool $input, int $depth, GraphQLType|string|null $expectedGraphqlType): void
     {
+        $this->expectUserDeprecationMessage('Since api-platform/graphql 4.2: The "ApiPlatform\GraphQl\Type\TypeConverter::convertType()" method is deprecated, use "ApiPlatform\GraphQl\Type\TypeConverter::convertPhpType()" instead.');
+
         $this->typeBuilderProphecy->isCollection($type)->willReturn(false);
         $this->resourceMetadataCollectionFactoryProphecy->create(Argument::type('string'))->willReturn(new ResourceMetadataCollection('resourceClass'));
         $this->typeBuilderProphecy->getEnumType(Argument::type(Operation::class))->willReturn($expectedGraphqlType);
@@ -74,27 +80,58 @@ class TypeConverterTest extends TestCase
         $this->assertSame($expectedGraphqlType, $graphqlType);
     }
 
-    public static function convertTypeProvider(): array
+    public static function legacyConvertTypeProvider(): array
     {
         return [
-            [new Type(Type::BUILTIN_TYPE_BOOL), false, 0, GraphQLType::boolean()],
-            [new Type(Type::BUILTIN_TYPE_INT), false, 0, GraphQLType::int()],
-            [new Type(Type::BUILTIN_TYPE_FLOAT), false, 0, GraphQLType::float()],
-            [new Type(Type::BUILTIN_TYPE_STRING), false, 0, GraphQLType::string()],
-            [new Type(Type::BUILTIN_TYPE_ARRAY), false, 0, 'Iterable'],
-            [new Type(Type::BUILTIN_TYPE_ITERABLE), false, 0, 'Iterable'],
-            [new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTimeInterface::class), false, 0, GraphQLType::string()],
-            [new Type(Type::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class), false, 0, new EnumType(['name' => 'GenderTypeEnum', 'values' => []])],
-            [new Type(Type::BUILTIN_TYPE_OBJECT), false, 0, null],
-            [new Type(Type::BUILTIN_TYPE_CALLABLE), false, 0, null],
-            [new Type(Type::BUILTIN_TYPE_NULL), false, 0, null],
-            [new Type(Type::BUILTIN_TYPE_RESOURCE), false, 0, null],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_BOOL), false, 0, GraphQLType::boolean()],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_INT), false, 0, GraphQLType::int()],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT), false, 0, GraphQLType::float()],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_STRING), false, 0, GraphQLType::string()],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY), false, 0, 'Iterable'],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_ITERABLE), false, 0, 'Iterable'],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, \DateTimeInterface::class), false, 0, GraphQLType::string()],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class), false, 0, new EnumType(['name' => 'GenderTypeEnum', 'values' => []])],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT), false, 0, null],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_CALLABLE), false, 0, null],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_NULL), false, 0, null],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_RESOURCE), false, 0, null],
         ];
     }
 
-    public function testConvertTypeNoGraphQlResourceMetadata(): void
+    #[DataProvider('convertTypeProvider')]
+    public function testConvertType(Type $type, bool $input, int $depth, GraphQLType|string|null $expectedGraphqlType): void
     {
-        $type = new Type(Type::BUILTIN_TYPE_OBJECT, false, 'dummy');
+        $this->resourceMetadataCollectionFactoryProphecy->create(Argument::type('string'))->willReturn(new ResourceMetadataCollection('resourceClass'));
+        $this->typeBuilderProphecy->getEnumType(Argument::type(Operation::class))->willReturn($expectedGraphqlType);
+
+        /** @var Operation $operation */
+        $operation = (new Query())->withName('test');
+        $graphqlType = $this->typeConverter->convertPhpType($type, $input, $operation, 'resourceClass', 'rootClass', null, $depth);
+        $this->assertSame($expectedGraphqlType, $graphqlType);
+    }
+
+    public static function convertTypeProvider(): array
+    {
+        return [
+            [Type::bool(), false, 0, GraphQLType::boolean()],
+            [Type::int(), false, 0, GraphQLType::int()],
+            [Type::float(), false, 0, GraphQLType::float()],
+            [Type::string(), false, 0, GraphQLType::string()],
+            [Type::array(), false, 0, 'Iterable'],
+            [Type::iterable(), false, 0, 'Iterable'],
+            [Type::object(\DateTimeInterface::class), false, 0, GraphQLType::string()],
+            [Type::object(GenderTypeEnum::class), false, 0, new EnumType(['name' => 'GenderTypeEnum', 'values' => []])],
+            [Type::object(), false, 0, null],
+            [Type::callable(), false, 0, null],
+            [Type::null(), false, 0, null],
+            [Type::resource(), false, 0, null],
+        ];
+    }
+
+    #[IgnoreDeprecations]
+    public function testConvertTypeNoGraphQlResourceMetadataLegacy(): void
+    {
+        $type = new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'dummy');
 
         $this->typeBuilderProphecy->isCollection($type)->shouldBeCalled()->willReturn(false);
         $this->resourceMetadataCollectionFactoryProphecy->create('dummy')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('dummy', [new ApiResource()]));
@@ -105,9 +142,22 @@ class TypeConverterTest extends TestCase
         $this->assertNull($graphqlType);
     }
 
-    public function testConvertTypeNodeResource(): void
+    public function testConvertTypeNoGraphQlResourceMetadata(): void
     {
-        $type = new Type(Type::BUILTIN_TYPE_OBJECT, false, 'node');
+        $type = Type::object('dummy');
+
+        $this->resourceMetadataCollectionFactoryProphecy->create('dummy')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('dummy', [new ApiResource()]));
+
+        /** @var Operation $operation */
+        $operation = (new Query())->withName('test');
+        $graphqlType = $this->typeConverter->convertPhpType($type, false, $operation, 'resourceClass', 'rootClass', null, 0);
+        $this->assertNull($graphqlType);
+    }
+
+    #[IgnoreDeprecations]
+    public function testConvertTypeNodeResourceLegacy(): void
+    {
+        $type = new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'node');
 
         $this->typeBuilderProphecy->isCollection($type)->shouldBeCalled()->willReturn(false);
         $this->resourceMetadataCollectionFactoryProphecy->create('node')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('node', [(new ApiResource())->withShortName('Node')->withGraphQlOperations(['test' => new Query()])]));
@@ -120,9 +170,24 @@ class TypeConverterTest extends TestCase
         $this->typeConverter->convertType($type, false, $operation, 'resourceClass', 'rootClass', null, 0);
     }
 
-    public function testConvertTypeResourceClassNotFound(): void
+    public function testConvertTypeNodeResource(): void
     {
-        $type = new Type(Type::BUILTIN_TYPE_OBJECT, false, 'dummy');
+        $type = Type::object('node');
+
+        $this->resourceMetadataCollectionFactoryProphecy->create('node')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('node', [(new ApiResource())->withShortName('Node')->withGraphQlOperations(['test' => new Query()])]));
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('A "Node" resource cannot be used with GraphQL because the type is already used by the Relay specification.');
+
+        /** @var Operation $operation */
+        $operation = (new Query())->withName('test');
+        $this->typeConverter->convertPhpType($type, false, $operation, 'resourceClass', 'rootClass', null, 0);
+    }
+
+    #[IgnoreDeprecations]
+    public function testConvertTypeResourceClassNotFoundLegacy(): void
+    {
+        $type = new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'dummy');
 
         $this->typeBuilderProphecy->isCollection($type)->shouldBeCalled()->willReturn(false);
         $this->resourceMetadataCollectionFactoryProphecy->create('dummy')->shouldBeCalled()->willThrow(new ResourceClassNotFoundException());
@@ -133,9 +198,22 @@ class TypeConverterTest extends TestCase
         $this->assertNull($graphqlType);
     }
 
-    public function testConvertTypeResourceIri(): void
+    public function testConvertTypeResourceClassNotFound(): void
     {
-        $type = new Type(Type::BUILTIN_TYPE_OBJECT, false, 'dummy');
+        $type = Type::object('dummy');
+
+        $this->resourceMetadataCollectionFactoryProphecy->create('dummy')->shouldBeCalled()->willThrow(new ResourceClassNotFoundException());
+
+        /** @var Operation $operation */
+        $operation = (new Query())->withName('test');
+        $graphqlType = $this->typeConverter->convertPhpType($type, false, $operation, 'resourceClass', 'rootClass', null, 0);
+        $this->assertNull($graphqlType);
+    }
+
+    #[IgnoreDeprecations]
+    public function testConvertTypeResourceIriLegacy(): void
+    {
+        $type = new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'dummy');
 
         $graphqlResourceMetadata = new ResourceMetadataCollection('dummy', [(new ApiResource())->withGraphQlOperations(['test' => new Query()])]);
         $this->resourceMetadataCollectionFactoryProphecy->create('dummy')->willReturn($graphqlResourceMetadata);
@@ -148,9 +226,24 @@ class TypeConverterTest extends TestCase
         $this->assertSame(GraphQLType::string(), $graphqlType);
     }
 
-    public function testConvertTypeInputResource(): void
+    public function testConvertTypeResourceIri(): void
     {
-        $type = new Type(Type::BUILTIN_TYPE_OBJECT, false, 'dummy');
+        $type = Type::object('dummy');
+
+        $graphqlResourceMetadata = new ResourceMetadataCollection('dummy', [(new ApiResource())->withGraphQlOperations(['test' => new Query()])]);
+        $this->resourceMetadataCollectionFactoryProphecy->create('dummy')->willReturn($graphqlResourceMetadata);
+        $this->propertyMetadataFactoryProphecy->create('rootClass', 'dummyProperty', Argument::type('array'))->shouldBeCalled()->willReturn((new ApiProperty())->withWritableLink(false));
+
+        /** @var Operation $operation */
+        $operation = (new Query())->withName('test');
+        $graphqlType = $this->typeConverter->convertPhpType($type, true, $operation, 'dummy', 'rootClass', 'dummyProperty', 1);
+        $this->assertSame(GraphQLType::string(), $graphqlType);
+    }
+
+    #[IgnoreDeprecations]
+    public function testConvertTypeInputResourceLegacy(): void
+    {
+        $type = new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'dummy');
         /** @var Operation $operation */
         $operation = new Query();
         /** @var ApiProperty $propertyMetadata */
@@ -167,8 +260,27 @@ class TypeConverterTest extends TestCase
         $this->assertSame($expectedGraphqlType, $graphqlType);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('convertTypeResourceProvider')]
-    public function testConvertTypeCollectionResource(Type $type, ObjectType $expectedGraphqlType): void
+    public function testConvertTypeInputResource(): void
+    {
+        $type = Type::object('dummy');
+        /** @var Operation $operation */
+        $operation = new Query();
+        /** @var ApiProperty $propertyMetadata */
+        $propertyMetadata = (new ApiProperty())->withWritableLink(true);
+        $graphqlResourceMetadata = new ResourceMetadataCollection('dummy', [(new ApiResource())->withGraphQlOperations(['item_query' => $operation])]);
+        $expectedGraphqlType = new ObjectType(['name' => 'resourceObjectType', 'fields' => []]);
+
+        $this->resourceMetadataCollectionFactoryProphecy->create('dummy')->willReturn($graphqlResourceMetadata);
+        $this->propertyMetadataFactoryProphecy->create('rootClass', 'dummyProperty', Argument::type('array'))->shouldBeCalled()->willReturn((new ApiProperty())->withWritableLink(true));
+        $this->typeBuilderProphecy->getResourceObjectType($graphqlResourceMetadata, $operation, $propertyMetadata, ['input' => true, 'wrapped' => false, 'depth' => 1])->shouldBeCalled()->willReturn($expectedGraphqlType);
+
+        $graphqlType = $this->typeConverter->convertPhpType($type, true, $operation, 'dummy', 'rootClass', 'dummyProperty', 1);
+        $this->assertSame($expectedGraphqlType, $graphqlType);
+    }
+
+    #[DataProvider('legacyConvertTypeResourceProvider')]
+    #[IgnoreDeprecations]
+    public function testConvertTypeCollectionResourceLegacy(LegacyType $type, ObjectType $expectedGraphqlType): void
     {
         $collectionOperation = new QueryCollection();
         $graphqlResourceMetadata = new ResourceMetadataCollection('dummyValue', [
@@ -189,17 +301,47 @@ class TypeConverterTest extends TestCase
         $this->assertSame($expectedGraphqlType, $graphqlType);
     }
 
-    public static function convertTypeResourceProvider(): array
+    public static function legacyConvertTypeResourceProvider(): array
     {
         return [
-            [new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, 'dummyValue')), new ObjectType(['name' => 'resourceObjectType', 'fields' => []])],
-            [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, 'dummyValue')), new ObjectType(['name' => 'resourceObjectType', 'fields' => []])],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, null, true, null, new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'dummyValue')), new ObjectType(['name' => 'resourceObjectType', 'fields' => []])],
+            [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, null, new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'dummyValue')), new ObjectType(['name' => 'resourceObjectType', 'fields' => []])],
         ];
     }
 
-    public function testConvertTypeCollectionEnum(): void
+    #[DataProvider('convertTypeResourceProvider')]
+    public function testConvertTypeCollectionResource(Type $type, ObjectType $expectedGraphqlType): void
     {
-        $type = new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class));
+        $collectionOperation = new QueryCollection();
+        $graphqlResourceMetadata = new ResourceMetadataCollection('dummyValue', [
+            (new ApiResource())->withShortName('DummyValue')->withGraphQlOperations(['collection_query' => $collectionOperation]),
+        ]);
+
+        $this->resourceMetadataCollectionFactoryProphecy->create('dummyValue')->shouldBeCalled()->willReturn($graphqlResourceMetadata);
+        $this->typeBuilderProphecy->getResourceObjectType($graphqlResourceMetadata, $collectionOperation, null, [
+            'input' => false,
+            'wrapped' => false,
+            'depth' => 0,
+        ])->shouldBeCalled()->willReturn($expectedGraphqlType);
+
+        /** @var Operation $rootOperation */
+        $rootOperation = (new Query())->withName('test');
+        $graphqlType = $this->typeConverter->convertPhpType($type, false, $rootOperation, 'resourceClass', 'rootClass', null, 0);
+        $this->assertSame($expectedGraphqlType, $graphqlType);
+    }
+
+    public static function convertTypeResourceProvider(): array
+    {
+        return [
+            [Type::collection(Type::object('dummyValue'), Type::object('dummyValue')), new ObjectType(['name' => 'resourceObjectType', 'fields' => []])], // @phpstan-ignore-line
+            [Type::array(Type::object('dummyValue')), new ObjectType(['name' => 'resourceObjectType', 'fields' => []])],
+        ];
+    }
+
+    #[IgnoreDeprecations]
+    public function testConvertTypeCollectionEnumLegacy(): void
+    {
+        $type = new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, null, new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, GenderTypeEnum::class));
         $expectedGraphqlType = new EnumType(['name' => 'GenderTypeEnum', 'values' => []]);
         $this->typeBuilderProphecy->isCollection($type)->shouldBeCalled()->willReturn(true);
         $this->resourceMetadataCollectionFactoryProphecy->create(GenderTypeEnum::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(GenderTypeEnum::class, []));
@@ -211,7 +353,20 @@ class TypeConverterTest extends TestCase
         $this->assertSame($expectedGraphqlType, $graphqlType);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('resolveTypeProvider')]
+    public function testConvertTypeCollectionEnum(): void
+    {
+        $type = Type::array(Type::object(GenderTypeEnum::class));
+        $expectedGraphqlType = new EnumType(['name' => 'GenderTypeEnum', 'values' => []]);
+        $this->resourceMetadataCollectionFactoryProphecy->create(GenderTypeEnum::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(GenderTypeEnum::class, []));
+        $this->typeBuilderProphecy->getEnumType(Argument::type(Operation::class))->willReturn($expectedGraphqlType);
+
+        /** @var Operation $rootOperation */
+        $rootOperation = (new Query())->withName('test');
+        $graphqlType = $this->typeConverter->convertPhpType($type, false, $rootOperation, 'resourceClass', 'rootClass', null, 0);
+        $this->assertSame($expectedGraphqlType, $graphqlType);
+    }
+
+    #[DataProvider('resolveTypeProvider')]
     public function testResolveType(string $type, string|GraphQLType $expectedGraphqlType): void
     {
         $this->typesContainerProphecy->has(\DateTime::class)->willReturn(true);
@@ -236,7 +391,7 @@ class TypeConverterTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('resolveTypeInvalidProvider')]
+    #[DataProvider('resolveTypeInvalidProvider')]
     public function testResolveTypeInvalid(string $type, string $expectedExceptionMessage): void
     {
         $this->typesContainerProphecy->has('UnknownType')->willReturn(false);
