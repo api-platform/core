@@ -218,10 +218,23 @@ final class PublishMercureUpdatesListener
             // We need to evaluate it here, because in publishUpdate() the resource would be already deleted
             $this->evaluateTopics($options, $object);
 
+            $privateData = [];
+            $mercureOptions = $operation ? ($operation->getMercure() ?? false) : false;
+            $private = $mercureOptions['private'] ?? false;
+            $privateFields = $mercureOptions['private_fields'] ?? [];
+            if ($private && $privateFields) {
+                foreach ($privateFields as $privateField) {
+                    if (property_exists($object, $privateField)) {
+                        $privateData[$privateField] = $this->getResourceId($privateField, $object);
+                    }
+                }
+            }
+
             $this->deletedObjects[(object) [
                 'id' => $this->iriConverter->getIriFromResource($object),
                 'iri' => $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_URL),
                 'type' => 1 === \count($types) ? $types[0] : $types,
+                'private' => $privateData,
             ]] = $options;
 
             return;
@@ -318,5 +331,15 @@ final class PublishMercureUpdatesListener
     private function buildUpdate(string|array $iri, string $data, array $options): Update
     {
         return new Update($iri, $data, $options['private'] ?? false, $options['id'] ?? null, $options['type'] ?? null, $options['retry'] ?? null);
+    }
+
+    private function getResourceId(string $privateField, object $object): string
+    {
+        $id = $object->{'get'.ucfirst($privateField)}()->getId();
+        if ($id instanceof \Stringable) {
+            return (string) $id;
+        }
+
+        return $id;
     }
 }
