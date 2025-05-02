@@ -17,7 +17,7 @@ use ApiPlatform\Metadata\Get;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-#[Get()]
+#[Get]
 class Chicken
 {
     #[ORM\Id]
