@@ -13,16 +13,18 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Doctrine\Orm\Filter\IriFilter;
+use ApiPlatform\Doctrine\Odm\Filter\IriFilter;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Chicken;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 #[ODM\Document]
-#[GetCollection(normalizationContext: ['hydra_prefix' => false], parameters: ['chickens' => new QueryParameter(filter: new IriFilter())])]
+#[GetCollection(
+    normalizationContext: ['hydra_prefix' => false],
+    parameters: ['chickens' => new QueryParameter(filter: new IriFilter())])
+]
 class ChickenCoop
 {
     #[ODM\Id]
