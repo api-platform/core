@@ -11,38 +11,38 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Doctrine\Orm\Filter;
+namespace ApiPlatform\Doctrine\Odm\Filter;
 
-use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\ParameterProviderFilterInterface;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use ApiPlatform\State\Provider\IriConverterParameterProvider;
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
 final class IriFilter implements FilterInterface, OpenApiParameterFilterInterface, ParameterProviderFilterInterface
 {
-    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
+    public function apply(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
         if (!$parameter = $context['parameter'] ?? null) {
             return;
         }
+
+        \assert($parameter instanceof Parameter);
 
         $value = $parameter->getValue();
         if (!\is_array($value)) {
             $value = [$value];
         }
 
-        $property = $parameter->getProperty();
-        $alias = $queryBuilder->getRootAliases()[0];
-        $parameterName = $queryNameGenerator->generateParameterName($property);
+        // TODO: do something for nested properties?
+        $matchField = $parameter->getProperty();
 
-        $queryBuilder
-            ->join(\sprintf('%s.%s', $alias, $property), $parameterName)
-            ->andWhere(\sprintf('%s IN(:%s)', $parameterName, $parameterName))
-            ->setParameter($parameterName, $value);
+        $aggregationBuilder
+            ->match()
+            ->field($matchField)
+            ->in($value);
     }
 
     public static function getParameterProvider(): string
