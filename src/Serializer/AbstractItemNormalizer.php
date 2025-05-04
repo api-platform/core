@@ -228,28 +228,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                     throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
                 }
 
-                throw NotNormalizableValueException::createForUnexpectedDataType(
-                    \sprintf('The type of the "%s" resource "string" (IRI), "%s" given.', $resourceClass, \gettype($data)),
-                    $data,
-                    [$resourceClass],
-                        $context['deserialization_path'] ?? null,
-                    true,
-                    $e->getCode(),
-                    $e
-                );
+                throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the "%s" resource "string" (IRI), "%s" given.', $resourceClass, \gettype($data)), $data, [$resourceClass], $context['deserialization_path'] ?? null, true, $e->getCode(), $e);
             } catch (InvalidArgumentException $e) {
                 if (!isset($context['not_normalizable_value_exceptions'])) {
                     throw new UnexpectedValueException(\sprintf('Invalid IRI "%s".', $data), $e->getCode(), $e);
                 }
 
-                throw NotNormalizableValueException::createForUnexpectedDataType(
-                    \sprintf('The type of the "%s" resource "string" (IRI), "%s" given.', $resourceClass, \gettype($data)),
-                    $data, [$resourceClass],
-                        $context['deserialization_path'] ?? null,
-                    true,
-                    $e->getCode(),
-                    $e
-                );
+                throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the "%s" resource "string" (IRI), "%s" given.', $resourceClass, \gettype($data)), $data, [$resourceClass], $context['deserialization_path'] ?? null, true, $e->getCode(), $e);
             }
         }
 
@@ -601,29 +586,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                     throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
                 }
 
-                throw NotNormalizableValueException::createForUnexpectedDataType(
-                    $e->getMessage(),
-                    $value,
-                    [$className],
-                    $context['deserialization_path'] ?? null,
-                    true,
-                    $e->getCode(),
-                    $e
-                );
+                throw NotNormalizableValueException::createForUnexpectedDataType($e->getMessage(), $value, [$className], $context['deserialization_path'] ?? null, true, $e->getCode(), $e);
             } catch (InvalidArgumentException $e) {
                 if (!isset($context['not_normalizable_value_exceptions'])) {
                     throw new UnexpectedValueException(\sprintf('Invalid IRI "%s".', $value), $e->getCode(), $e);
                 }
 
-                throw NotNormalizableValueException::createForUnexpectedDataType(
-                    $e->getMessage(),
-                    $value,
-                    [$className],
-                    $context['deserialization_path'] ?? null,
-                    true,
-                    $e->getCode(),
-                    $e
-                );
+                throw NotNormalizableValueException::createForUnexpectedDataType($e->getMessage(), $value, [$className], $context['deserialization_path'] ?? null, true, $e->getCode(), $e);
             }
         }
 
