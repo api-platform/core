@@ -264,7 +264,7 @@ jobs:
         continue-on-error: true
 
   phpunit-components:
-    name: PHPUnit ${{ matrix.component }} (PHP ${{ matrix.php.version }} ${{ matrix.php.coverage && 'coverage' || '' }}${{ matrix.php.deprecations && 'no deprecations' || '' }})
+    name: PHPUnit ${{ matrix.component }} (PHP ${{ matrix.php.version }} ${{ matrix.php.coverage && 'coverage' || '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -274,8 +274,6 @@ jobs:
           - version: '8.3'
           - version: '8.4'
             coverage: true
-          - version: '8.4'
-            deprecations: true
         component:
           - api-platform/doctrine-common
           - api-platform/doctrine-orm
@@ -309,18 +307,13 @@ jobs:
           composer global require soyuka/pmu
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link . --permanent
-      - name: Allow unstable project dependencies
-        if: matrix.php.deprecations == true
-        run: |
-          cd $(composer ${{matrix.component}} --cwd)
-          composer config minimum-stability dev
       - name: Run ${{ matrix.component }} install
         run: |
           composer ${{matrix.component}} update
       - name: Run ${{ matrix.component }} tests
         run: |
           mkdir -p /tmp/build/logs/phpunit
-          composer ${{matrix.component}} test --log-junit "/tmp/build/logs/phpunit/junit.xml" ${{ matrix.php.coverage && '--coverage-clover /tmp/build/logs/phpunit/clover.xml' || '' }} ${{ matrix.php.deprecations && '--fail-on-deprecation --display-deprecations' || '' }}
+          composer ${{matrix.component}} test --log-junit "/tmp/build/logs/phpunit/junit.xml" ${{ matrix.php.coverage && '--coverage-clover /tmp/build/logs/phpunit/clover.xml' || '' }}
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -346,6 +339,56 @@ jobs:
           export PATH="$PATH:$HOME/.composer/vendor/bin"
           php-coveralls --coverage_clover=/tmp/build/logs/phpunit/clover.xml
         continue-on-error: true
+
+  phpunit-components-fail-deprecation:
+    name: PHPUnit no deprecations ${{ matrix.component }} (PHP ${{ matrix.php.version }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        php:
+          - version: '8.4'
+        component:
+          - api-platform/doctrine-common
+          - api-platform/doctrine-orm
+          - api-platform/doctrine-odm
+          - api-platform/metadata
+          - api-platform/hydra
+          - api-platform/json-api
+          - api-platform/json-schema
+          - api-platform/elasticsearch
+          - api-platform/openapi
+          - api-platform/graphql
+          - api-platform/http-cache
+          - api-platform/ramsey-uuid
+          - api-platform/serializer
+          - api-platform/state
+          - api-platform/symfony
+          - api-platform/validator
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php.version }}
+          tools: pecl, composer
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
+          ini-values: memory_limit=-1
+      - name: Linking
+        run: |
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link . --permanent
+      - name: Run ${{ matrix.component }} install
+        run: |
+          composer ${{matrix.component}} update
+      - name: Run ${{ matrix.component }} tests
+        run: |
+          mkdir -p /tmp/build/logs/phpunit
+          cd $(composer ${{matrix.component}} --cwd)
+          ./vendor/bin/phpunit --fail-on-deprecation --display-deprecations --log-junit "/tmp/build/logs/phpunit/junit.xml" 
 
   behat:
     name: Behat (PHP ${{ matrix.php }})
