@@ -74,7 +74,8 @@ class ApiTestCaseTest extends ApiTestCase
     public function testAssertJsonContainsWithJsonObjectString(): void
     {
         self::createClient()->request('GET', '/');
-        $this->assertJsonContains(<<<JSON
+        $this->assertJsonContains(
+            <<<JSON
 {
     "@context": "/contexts/Entrypoint"
 }
@@ -88,7 +89,8 @@ JSON
         $this->expectExceptionMessage('$subset must be array or string (JSON array or JSON object)');
 
         self::createClient()->request('GET', '/');
-        $this->assertJsonContains(<<<JSON
+        $this->assertJsonContains(
+            <<<JSON
 "/contexts/Entrypoint"
 JSON
         );
@@ -109,7 +111,8 @@ JSON
     public function testAssertJsonEqualsWithJsonObjectString(): void
     {
         self::createClient()->request('GET', '/contexts/Address');
-        $this->assertJsonEquals(<<<JSON
+        $this->assertJsonEquals(
+            <<<JSON
 {
     "@context": {
         "@vocab": "http://localhost/docs.jsonld#",
@@ -403,8 +406,12 @@ JSON
         $mock->method('getContainer')->willReturn(self::getContainer());
         $mock->expects($this->never())->method('boot');
 
+        $oldKernel = self::$kernel;
         self::$kernel = $mock;
 
         self::createClient();
+
+        // restore old kernel for proper shutdown
+        self::$kernel = $oldKernel;
     }
 }
