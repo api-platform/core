@@ -48,7 +48,7 @@ final class PropertySchemaRangeRestrictionTest extends TestCase
         yield 'supported int' => [new Range(['min' => 1, 'max' => 10]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)]), true];
         yield 'supported float' => [new Range(['min' => 1, 'max' => 10]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_FLOAT)]), true];
 
-        yield 'not supported constraint' => [new Length(['min' => 1]), new ApiProperty(), false];
+        yield 'not supported constraint' => [new Length(min: 1), new ApiProperty(), false];
         yield 'not supported type' => [new Range(['min' => 1]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)]), false];
     }
 

@@ -23,8 +23,8 @@ final class DummyCompoundRequirements extends Compound
     public function getConstraints(array $options): array
     {
         return [
-            new Length(['min' => 1, 'max' => 32]),
-            new Regex(['pattern' => '/^[a-z]$/']),
+            new Length(min: 1, max: 32),
+            new Regex(pattern: '/^[a-z]$/'),
         ];
     }
 }
