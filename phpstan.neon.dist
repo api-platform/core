@@ -62,10 +62,6 @@ parameters:
 			paths:
 				- tests/Fixtures/TestBundle/Document/
 				- src/Metadata/Tests/Fixtures/ApiResource/
-		-
-			message: '#Parameter \#1 \$constraint of method#'
-			paths:
-				- tests/Symfony/Validator/Metadata/Property/Restriction/
 		- '#Access to an undefined property Prophecy\\Prophecy\\ObjectProphecy<(\\?[a-zA-Z0-9_]+)+>::\$[a-zA-Z0-9_]+#'
 		# https://github.com/phpstan/phpstan-symfony/issues/76
 		-
