@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -53,6 +54,7 @@ class SortExtensionTest extends TestCase
         self::assertEquals(['sort' => [['name' => ['order' => 'asc']], ['bar' => ['order' => 'desc']]]], $sortExtension->applyToCollection([], Foo::class, (new GetCollection())->withOrder(['name', 'bar' => 'desc'])));
     }
 
+    #[IgnoreDeprecations]
     public function testApplyToCollectionWithNestedProperty(): void
     {
         $fooType = Type::list(Type::object(Foo::class));

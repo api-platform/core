@@ -18,6 +18,7 @@ use ApiPlatform\JsonApi\Tests\Fixtures\Dummy;
 use ApiPlatform\JsonApi\Tests\Fixtures\RelatedDummy;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -47,6 +48,7 @@ class ConstraintViolationNormalizerTest extends TestCase
         $this->assertSame([ConstraintViolationListInterface::class => true], $normalizer->getSupportedTypes($normalizer::FORMAT));
     }
 
+    #[IgnoreDeprecations]
     public function testNormalize(): void
     {
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
