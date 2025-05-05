@@ -68,9 +68,9 @@ final class PropertySchemaOneOfRestrictionTest extends TestCase
     {
         yield 'empty' => [new AtLeastOneOf(['constraints' => []]), new ApiProperty(), []];
 
-        yield 'not supported constraints' => [new AtLeastOneOf(['constraints' => [new Positive(), new Length(['min' => 3])]]), new ApiProperty(), []];
+        yield 'not supported constraints' => [new AtLeastOneOf(['constraints' => [new Positive(), new Length(min: 3)]]), new ApiProperty(), []];
 
-        yield 'one supported constraint' => [new AtLeastOneOf(['constraints' => [new Positive(), new Length(['min' => 3])]]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)]), [
+        yield 'one supported constraint' => [new AtLeastOneOf(['constraints' => [new Positive(), new Length(min: 3)]]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)]), [
             'oneOf' => [['minLength' => 3]],
         ]];
     }

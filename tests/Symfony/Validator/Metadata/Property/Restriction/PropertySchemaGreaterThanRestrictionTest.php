@@ -45,18 +45,18 @@ final class PropertySchemaGreaterThanRestrictionTest extends TestCase
 
     public static function supportsProvider(): \Generator
     {
-        yield 'supported int/float with union types' => [new GreaterThan(['value' => 10]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_FLOAT)]), true];
-        yield 'supported int' => [new GreaterThan(['value' => 10]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)]), true];
-        yield 'supported float' => [new GreaterThan(['value' => 10.99]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_FLOAT)]), true];
+        yield 'supported int/float with union types' => [new GreaterThan(value: 10), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_FLOAT)]), true];
+        yield 'supported int' => [new GreaterThan(value: 10), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)]), true];
+        yield 'supported float' => [new GreaterThan(value: 10.99), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_FLOAT)]), true];
         yield 'supported positive' => [new Positive(), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)]), true];
         yield 'not supported positive or zero' => [new PositiveOrZero(), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)]), false];
-        yield 'not supported property path' => [new GreaterThan(['propertyPath' => 'greaterThanMe']), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)]), false];
+        yield 'not supported property path' => [new GreaterThan(propertyPath: 'greaterThanMe'), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)]), false];
     }
 
     public function testCreate(): void
     {
         self::assertEquals([
             'exclusiveMinimum' => 10,
-        ], $this->propertySchemaGreaterThanRestriction->create(new GreaterThan(['value' => 10]), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])));
+        ], $this->propertySchemaGreaterThanRestriction->create(new GreaterThan(value: 10), (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])));
     }
 }
