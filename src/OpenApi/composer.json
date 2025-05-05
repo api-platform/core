@@ -35,7 +35,7 @@
         "symfony/filesystem": "^6.4 || ^7.0",
         "symfony/property-access": "^6.4 || ^7.0",
         "symfony/serializer": "^6.4 || ^7.0",
-        "symfony/type-info": "^7.2"
+        "symfony/type-info": "v7.3.0-BETA1"
     },
     "require-dev": {
         "phpspec/prophecy-phpunit": "^2.2",
@@ -80,10 +80,6 @@
         "test": "./vendor/bin/phpunit"
     },
     "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/symfony/type-info"
-        },
         {
             "type": "vcs",
             "url": "https://github.com/soyuka/phpunit"

@@ -42,10 +42,6 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/symfony/type-info"
-        },
-        {
-            "type": "vcs",
             "url": "https://github.com/soyuka/phpunit"
         }
     ]

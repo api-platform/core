@@ -26,7 +26,7 @@
         "api-platform/serializer": "^4.1",
         "symfony/property-info": "^6.4 || ^7.1",
         "symfony/serializer": "^6.4 || ^7.0",
-        "symfony/type-info": "^7.2",
+        "symfony/type-info": "v7.3.0-BETA1",
         "webonyx/graphql-php": "^15.0",
         "willdurand/negotiation": "^3.1"
     },
@@ -80,10 +80,6 @@
         "test": "./vendor/bin/phpunit"
     },
     "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/symfony/type-info"
-        },
         {
             "type": "vcs",
             "url": "https://github.com/soyuka/phpunit"

@@ -46,20 +46,21 @@
         "willdurand/negotiation": "^3.1"
     },
     "require-dev": {
-        "phpspec/prophecy-phpunit": "^2.2",
-        "symfony/routing": "^6.4 || ^7.0",
-        "phpunit/phpunit": "11.5.x-dev",
-        "symfony/validator": "^6.4 || ^7.0",
-        "symfony/mercure-bundle": "*",
-        "webonyx/graphql-php": "^15.0",
         "api-platform/doctrine-common": "^4.1",
+        "api-platform/doctrine-odm": "^4.1",
+        "api-platform/doctrine-orm": "^4.1",
         "api-platform/elasticsearch": "^4.1",
         "api-platform/graphql": "^4.1",
-        "api-platform/doctrine-orm": "^4.1",
-        "api-platform/doctrine-odm": "^4.1",
         "api-platform/parameter-validator": "^3.1",
+        "phpspec/prophecy-phpunit": "^2.2",
+        "phpunit/phpunit": "11.5.x-dev",
         "symfony/expression-language": "^6.4 || ^7.0",
-        "symfony/type-info": "^7.3-dev"
+        "symfony/intl": "^7.2",
+        "symfony/mercure-bundle": "*",
+        "symfony/routing": "^6.4 || ^7.0",
+        "symfony/type-info": "v7.3.0-BETA1",
+        "symfony/validator": "^6.4 || ^7.0",
+        "webonyx/graphql-php": "^15.0"
     },
     "suggest": {
         "api-platform/doctrine-orm": "To support Doctrine ORM.",
@@ -117,10 +118,6 @@
         "test": "./vendor/bin/phpunit"
     },
     "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/symfony/type-info"
-        },
         {
             "type": "vcs",
             "url": "https://github.com/soyuka/phpunit"

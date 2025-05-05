@@ -30,7 +30,7 @@
         "api-platform/state": "^4.1",
         "doctrine/mongodb-odm": "^2.10",
         "symfony/property-info": "^6.4 || ^7.1",
-        "symfony/type-info": "^7.3-dev"
+        "symfony/type-info": "v7.3.0-BETA1"
     },
     "require-dev": {
         "doctrine/doctrine-bundle": "^2.11",
@@ -76,10 +76,6 @@
         "test": "./vendor/bin/phpunit"
     },
     "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/symfony/type-info"
-        },
         {
             "type": "vcs",
             "url": "https://github.com/soyuka/phpunit"
