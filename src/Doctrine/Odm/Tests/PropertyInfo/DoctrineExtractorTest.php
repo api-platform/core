@@ -27,6 +27,7 @@ use ApiPlatform\Doctrine\Odm\Tests\PropertyInfo\Fixtures\EnumString;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
@@ -83,7 +84,7 @@ class DoctrineExtractorTest extends TestCase
         );
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('legacy')]
+    #[IgnoreDeprecations]
     #[\PHPUnit\Framework\Attributes\DataProvider('legacyTypesProvider')]
     public function testExtractLegacy(string $property, ?array $type = null): void
     {
@@ -96,7 +97,7 @@ class DoctrineExtractorTest extends TestCase
         $this->assertEquals($type, $this->createExtractor()->getType(DoctrineDummy::class, $property));
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('legacy')]
+    #[IgnoreDeprecations]
     public function testExtractWithEmbedOneLegacy(): void
     {
         $expectedTypes = [
@@ -123,7 +124,7 @@ class DoctrineExtractorTest extends TestCase
         );
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('legacy')]
+    #[IgnoreDeprecations]
     public function testExtractWithEmbedManyLegacy(): void
     {
         $expectedTypes = [
@@ -153,7 +154,7 @@ class DoctrineExtractorTest extends TestCase
         );
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('legacy')]
+    #[IgnoreDeprecations]
     public function testExtractEnumLegacy(): void
     {
         $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, EnumString::class)], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumString'));
@@ -168,6 +169,7 @@ class DoctrineExtractorTest extends TestCase
         $this->assertNull($this->createExtractor()->getType(DoctrineEnum::class, 'enumCustom'));
     }
 
+    #[IgnoreDeprecations]
     public static function legacyTypesProvider(): array
     {
         return [
@@ -258,7 +260,7 @@ class DoctrineExtractorTest extends TestCase
         $this->assertNull($this->createExtractor()->getProperties('Not\Exist'));
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('legacy')]
+    #[IgnoreDeprecations]
     public function testGetTypesCatchExceptionLegacy(): void
     {
         $this->assertNull($this->createExtractor()->getTypes('Not\Exist', 'baz'));
@@ -278,7 +280,7 @@ class DoctrineExtractorTest extends TestCase
         $this->assertNull($extractor->isReadable(DoctrineGeneratedValue::class, 'foo'));
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('legacy')]
+    #[IgnoreDeprecations]
     public function testGetTypesWithEmbedManyOmittingTargetDocumentLegacy(): void
     {
         $actualTypes = $this->createExtractor()->getTypes(
