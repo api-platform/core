@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\Util\TypeHelper;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -29,7 +30,6 @@ use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
 use Symfony\Component\TypeInfo\Type\ObjectType;
-use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
@@ -331,11 +331,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 $isCollection = $t instanceof CollectionType;
 
                 if ($isCollection) {
-                    $valueType = $t->getCollectionValueType();
-                }
-
-                while ($valueType instanceof WrappingTypeInterface) {
-                    $valueType = $valueType->getWrappedType();
+                    $valueType = TypeHelper::getCollectionValueType($t);
                 }
 
                 if (!$valueType instanceof ObjectType) {

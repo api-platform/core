@@ -17,10 +17,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\TypeInfo\Type;
-use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
 use Symfony\Component\TypeInfo\Type\ObjectType;
-use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
@@ -94,15 +91,7 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
                 return "data/relationships/$fieldName";
             }
         } else {
-            $typeIsObject = static function (Type $type) use (&$typeIsObject): bool {
-                return match (true) {
-                    $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($typeIsObject),
-                    $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($typeIsObject),
-                    default => $type instanceof ObjectType,
-                };
-            };
-
-            if ($propertyMetadata->getNativeType()?->isSatisfiedBy($typeIsObject)) {
+            if ($propertyMetadata->getNativeType()?->isSatisfiedBy(fn ($t) => $t instanceof ObjectType)) {
                 return "data/relationships/$fieldName";
             }
         }

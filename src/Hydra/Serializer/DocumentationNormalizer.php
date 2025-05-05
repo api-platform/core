@@ -29,6 +29,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
+use ApiPlatform\Metadata\Util\TypeHelper;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -36,9 +37,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\CollectionType;
-use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
 use Symfony\Component\TypeInfo\Type\ObjectType;
-use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 use const ApiPlatform\JsonLd\HYDRA_CONTEXT;
@@ -371,19 +370,8 @@ final class DocumentationNormalizer implements NormalizerInterface
                 return null;
             }
 
-            /** @var Type|null $collectionValueType */
-            $collectionValueType = null;
-            $typeIsCollection = static function (Type $type) use (&$typeIsCollection, &$collectionValueType): bool {
-                return match (true) {
-                    $type instanceof CollectionType => null !== $collectionValueType = $type->getCollectionValueType(),
-                    $type instanceof WrappingTypeInterface => $type->wrappedTypeIsSatisfiedBy($typeIsCollection),
-                    $type instanceof CompositeTypeInterface => $type->composedTypesAreSatisfiedBy($typeIsCollection),
-                    default => false,
-                };
-            };
-
-            if ($nativeType->isSatisfiedBy($typeIsCollection)) {
-                $nativeType = $collectionValueType;
+            if ($nativeType->isSatisfiedBy(fn ($t) => $t instanceof CollectionType)) {
+                $nativeType = TypeHelper::getCollectionValueType($nativeType);
             }
 
             // Check for specific types after potentially unwrapping the collection
