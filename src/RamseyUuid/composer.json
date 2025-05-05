@@ -31,7 +31,7 @@
         "ramsey/uuid": "^4.7",
         "ramsey/uuid-doctrine": "^2.0",
         "phpunit/phpunit": "11.5.x-dev",
-        "symfony/type-info": "^7.3-dev"
+        "symfony/type-info": "v7.3.0-BETA1"
     },
     "autoload": {
         "psr-4": {
@@ -65,10 +65,6 @@
         "test": "./vendor/bin/phpunit"
     },
     "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/symfony/type-info"
-        },
         {
             "type": "vcs",
             "url": "https://github.com/soyuka/phpunit"
