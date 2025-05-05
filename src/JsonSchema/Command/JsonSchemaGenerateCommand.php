@@ -16,6 +16,7 @@ namespace ApiPlatform\JsonSchema\Command;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Metadata\HttpOperation;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -29,6 +30,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  *
  * @author Jacques Lefebvre <jacques@les-tilleuls.coop>
  */
+#[AsCommand(name: 'api:json-schema:generate')]
 final class JsonSchemaGenerateCommand extends Command
 {
     private array $formats;
@@ -89,10 +91,5 @@ final class JsonSchemaGenerateCommand extends Command
         $io->text((string) json_encode($schema, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 
         return 0;
-    }
-
-    public static function getDefaultName(): string
-    {
-        return 'api:json-schema:generate';
     }
 }
