@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\Provider;
 
+use ApiPlatform\Doctrine\Orm\Filter\IriFilter;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
@@ -32,17 +33,20 @@ final readonly class IriConverterParameterProvider implements ParameterProviderI
     public function provide(Parameter $parameter, array $parameters = [], array $context = []): ?Operation
     {
         $operation = $context['operation'] ?? null;
-        if (!($value = $parameter->getValue()) || $value instanceof ParameterNotFound) {
+        $parameterValue = $parameter->getValue();
+
+        $isParameterValueNotSet = !$parameterValue || $parameterValue instanceof ParameterNotFound;
+        if (!$parameter->getFilter() instanceof IriFilter || $isParameterValueNotSet) {
             return $operation;
         }
 
-        if (!\is_array($value)) {
-            $value = [$value];
+        if (!\is_array($parameterValue)) {
+            $parameterValue = [$parameterValue];
         }
 
         $entities = [];
-        foreach ($value as $v) {
-            $entities[] = $this->iriConverter->getResourceFromIri($v, ['fetch_data' => false]);
+        foreach ($parameterValue as $iri) {
+            $entities[] = $this->iriConverter->getResourceFromIri($iri, ['fetch_data' => false]);
         }
 
         $parameter->setValue($entities);
