@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\OpenApi\Command;
 
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -26,6 +27,7 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * Dumps Open API documentation.
  */
+#[AsCommand(name: 'api:openapi:export')]
 final class OpenApiCommand extends Command
 {
     public function __construct(private readonly OpenApiFactoryInterface $openApiFactory, private readonly NormalizerInterface $normalizer)
@@ -81,10 +83,5 @@ final class OpenApiCommand extends Command
         $output->writeln($content);
 
         return \defined(Command::class.'::SUCCESS') ? Command::SUCCESS : 0;
-    }
-
-    public static function getDefaultName(): string
-    {
-        return 'api:openapi:export';
     }
 }
