@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Bundle\Command;
 
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputArgument;
@@ -22,6 +23,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\VarDumper\Cloner\ClonerInterface;
 
+#[AsCommand(name: 'debug:api-resource')]
 final class DebugResourceCommand extends Command
 {
     public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ClonerInterface $cloner, private $dumper)
@@ -110,10 +112,5 @@ final class DebugResourceCommand extends Command
         $output->writeln('Successfully dumped the selected operation');
 
         return \defined(Command::class.'::SUCCESS') ? Command::SUCCESS : 0;
-    }
-
-    public static function getDefaultName(): string
-    {
-        return 'debug:api-resource';
     }
 }
