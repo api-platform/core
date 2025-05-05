@@ -50,7 +50,6 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -911,6 +910,43 @@ class AbstractItemNormalizerTest extends TestCase
         $this->assertCount(1, $errors); // @phpstan-ignore-line method.impossibleType (false positive)
         $this->assertInstanceOf(NotNormalizableValueException::class, $errors[0]);
         $this->assertSame('relatedDummies[0]', $errors[0]->getPath());
+    }
+
+    public function testDeserializationPathForNotDenormalizableResource(): void
+    {
+        $this->expectException(NotNormalizableValueException::class);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getResourceFromIri(Argument::cetera())->willThrow(new InvalidArgumentException('Invalid IRI'));
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(DenormalizerInterface::class);
+
+        $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $propertyAccessorProphecy->reveal(),
+            null,
+            null,
+            [],
+            null,
+            null,
+        ]);
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $normalizer->denormalize('wrong IRI', Dummy::class, null, ['not_normalizable_value_exceptions' => []]);
     }
 
     public function testInnerDocumentNotAllowed(): void
