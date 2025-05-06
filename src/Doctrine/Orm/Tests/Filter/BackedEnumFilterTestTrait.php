@@ -32,9 +32,23 @@ trait BackedEnumFilterTestTrait
                 'property' => 'dummyBackedEnum',
                 'type' => 'string',
                 'required' => false,
+                'is_collection' => false,
                 'schema' => [
                     'type' => 'string',
                     'enum' => ['one', 'two'],
+                ],
+            ],
+            'dummyBackedEnum[]' => [
+                'property' => 'dummyBackedEnum',
+                'type' => 'string',
+                'required' => false,
+                'is_collection' => true,
+                'schema' => [
+                    'type' => 'array',
+                    'items' => [
+                        'type' => 'string',
+                        'enum' => ['one', 'two'],
+                    ],
                 ],
             ],
         ], $filter->getDescription($this->resourceClass));
@@ -49,9 +63,23 @@ trait BackedEnumFilterTestTrait
                 'property' => 'dummyBackedEnum',
                 'type' => 'string',
                 'required' => false,
+                'is_collection' => false,
                 'schema' => [
                     'type' => 'string',
                     'enum' => ['one', 'two'],
+                ],
+            ],
+            'dummyBackedEnum[]' => [
+                'property' => 'dummyBackedEnum',
+                'type' => 'string',
+                'required' => false,
+                'is_collection' => true,
+                'schema' => [
+                    'type' => 'array',
+                    'items' => [
+                        'type' => 'string',
+                        'enum' => ['one', 'two'],
+                    ],
                 ],
             ],
         ], $filter->getDescription($this->resourceClass));
@@ -98,6 +126,19 @@ trait BackedEnumFilterTestTrait
                 ],
                 [
                     'relatedDummy.dummyBackedEnum' => 'foo',
+                ],
+            ],
+            'valid case (multiple values)' => [
+                [
+                    'id' => null,
+                    'name' => null,
+                    'dummyBackedEnum' => null,
+                ],
+                [
+                    'dummyBackedEnum' => [
+                        'one',
+                        'two',
+                    ],
                 ],
             ],
         ];
