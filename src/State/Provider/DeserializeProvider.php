@@ -82,6 +82,7 @@ final class DeserializeProvider implements ProviderInterface
             && (
                 'POST' === $method
                 || 'PATCH' === $method
+                || 'DELETE' === $method
                 || ('PUT' === $method && !($operation->getExtraProperties()['standard_put'] ?? true))
             )
         ) {
