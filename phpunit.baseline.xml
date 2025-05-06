@@ -2,7 +2,9 @@
 <files version="1">
  <file path="vendor/symfony/deprecation-contracts/function.php">
   <line number="25" hash="c6af5d66288d0667e424978000f29571e4954b81">
+   <issue><![CDATA[Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Type" class is deprecated. Use "Symfony\Component\TypeInfo\Type" class from "symfony/type-info" instead.]]></issue>
    <issue><![CDATA[Since symfony/validator 7.1: Not passing a value for the "requireTld" option to the Url constraint is deprecated. Its default value will change to "true".]]></issue>
+   <issue><![CDATA[Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\PropertyInfoExtractor::getTypes()" method is deprecated, use "Symfony\Component\PropertyInfo\PropertyInfoExtractor::getType()" instead.]]></issue>
   </line>
  </file>
 </files>
