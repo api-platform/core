@@ -16,7 +16,8 @@ Then, if it appears that it's a real bug, you may report it using GitHub by foll
 * A clear title to resume the issue
 * A description of the workflow needed to reproduce the bug
 
-> _NOTE:_ Don't hesitate giving as much information as you can (OS, PHP version extensions...)
+> [!NOTE]
+> Don't hesitate giving as much information as you can (OS, PHP version extensions...)
 
 ## Pull Requests
 
@@ -153,6 +154,9 @@ Coverage will be available in `coverage/index.html`.
 
 #### Behat
 
+> [!WARNING]  
+> Please **do not add new Behat tests**, use a functional test (for example: [ComputedFieldTest](https://github.com/api-platform/core/blob/04d5cff1b28b494ac2e90257a79ce6c045ba82ae/tests/Functional/Doctrine/ComputedFieldTest.php)).
+
 The command to launch Behat tests is:
 
     php -d memory_limit=-1 ./vendor/bin/behat --profile=default --stop-on-failure --format=progress
@@ -165,27 +169,64 @@ To get more details about an error, replace `--format=progress` by `-vvv`. You m
 
 	docker run -p 27017:27017 mongo:latest
 
-Start by adding a fixture, usually using Doctrine entities in `tests/Fixtures/TestBundle/Entity`. Note that we often duplicate the fixture 
-in the `tests/Fixtures/TestBundle/Document` directory for MongoDB ODM, if your test doesn't need to be tested with MongoDB use the `@!mongodb` group on the Behat scenario.
-If you need a `Given` step, add it to the doctrine context in `tests/Core/Behat/DoctrineContext.php`, for example:
-
-```
-    /**
-     * @Given there is a payment
-     */
-    public function thereIsAPayment()
-    {
-        $this->manager->persist(new Payment('123.45'));
-        $this->manager->flush();
-    }
-```
-
-The last step is to add you feature inside `features/`. You can add your test in one of our existing features, or create your own.
-
 ## Components tests
 
-API Platform is split into several components. There are tests for each of these, to run them `cd src/Doctrine/Common` then `composer update` and `./vendor/bin/phpunit`.
-We do not provide a way to run all these tests at once yet.
+> [!NOTE]
+> This requires linking dependencies together, we recommend to use `composer global require --dev soyuka/pmu` (see [soyuka/pmu](github.com/soyuka/pmu)).
+
+API Platform is split into several components, components have their own set of tests. 
+
+To run a component test:
+
+```bash
+COMPONENT_DIR=$(api-platform/doctrine-common cwd)
+ROOT_DIR=$(pwd)
+cd $COMPONENT_DIR
+composer link $ROOT_DIR
+./vendor/bin/phpunit
+```
+
+<details>
+  <summary>Run all the tests</summary>
+
+  
+```bash
+#!/bin/bash
+
+set -e
+
+COMPONENTS=(
+  "api-platform/doctrine-common"
+  "api-platform/doctrine-orm"
+  "api-platform/doctrine-odm"
+  "api-platform/metadata"
+  "api-platform/hydra"
+  "api-platform/json-api"
+  "api-platform/json-schema"
+  "api-platform/elasticsearch"
+  "api-platform/openapi"
+  "api-platform/graphql"
+  "api-platform/http-cache"
+  "api-platform/ramsey-uuid"
+  "api-platform/serializer"
+  "api-platform/state"
+  "api-platform/symfony"
+  "api-platform/validator"
+)
+
+PROJECT_ROOT=$(pwd)
+for component in "${COMPONENTS[@]}"; do
+  cd "$PROJECT_ROOT"
+  find src -name vendor -exec rm -r {} \; || true
+  COMPONENT_DIR=$(composer "$component" --cwd)
+  cd $COMPONENT_DIR
+  composer link $PROJECT_ROOT
+  ./vendor/bin/phpunit --fail-on-deprecation --display-deprecations
+done
+exit 0
+```
+</details>
+
 
 ## Changing a version constraint
 
