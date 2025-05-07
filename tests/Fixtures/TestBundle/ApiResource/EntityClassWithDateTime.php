@@ -25,7 +25,6 @@ use ApiPlatform\Metadata\GetCollection;
         ),
         new GetCollection(
             uriTemplate: '/EntityClassWithDateTime',
-            uriVariables: ['id']
         ),
     ],
     stateOptions: new Options(entityClass: \ApiPlatform\Tests\Fixtures\TestBundle\Entity\EntityClassWithDateTime::class)

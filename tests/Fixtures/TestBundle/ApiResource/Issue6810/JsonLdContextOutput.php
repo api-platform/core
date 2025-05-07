@@ -16,7 +16,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6810;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Operation;
 
-#[Get('/json_ld_context_output', provider: [self::class, 'getData'], output: Output::class, normalizationContext: ['hydra_prefix' => false])]
+#[Get('/json_ld_context_output', provider: [self::class, 'getData'], output: Output::class, normalizationContext: ['hydra_prefix' => false], openapi: false)]
 class JsonLdContextOutput
 {
     public function __construct(public string $id)

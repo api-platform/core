@@ -27,7 +27,7 @@ use ApiPlatform\Metadata\Get;
 )]
 class Headers
 {
-    public $id;
+    public int $id;
 
     public static function provide(): self
     {

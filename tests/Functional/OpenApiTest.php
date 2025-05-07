@@ -82,7 +82,7 @@ class OpenApiTest extends ApiTestCase
         $this->assertArrayHasKey('/cruds', $res['paths']);
         $this->assertArrayHasKey('post', $res['paths']['/cruds']);
         $this->assertArrayHasKey('get', $res['paths']['/cruds']);
-        $this->assertEquals([['name' => 'Crud']], $res['tags']);
+        $this->assertEquals([['name' => 'Crud', 'description' => 'A resource used for OpenAPI tests.']], $res['tags']);
 
         $response = self::createClient()->request('GET', '/docs?filter_tags[]=anotherone', [
             'headers' => ['Accept' => 'application/vnd.openapi+json'],
@@ -96,6 +96,6 @@ class OpenApiTest extends ApiTestCase
         $this->assertArrayNotHasKey('post', $res['paths']['/cruds']);
         $this->assertArrayHasKey('get', $res['paths']['/cruds']);
         $this->assertArrayHasKey('/crud_open_api_api_platform_tags/{id}', $res['paths']);
-        $this->assertEquals([['name' => 'Crud'], ['name' => 'CrudOpenApiApiPlatformTag', 'description' => 'Something nice']], $res['tags']);
+        $this->assertEquals([['name' => 'Crud', 'description' => 'A resource used for OpenAPI tests.'], ['name' => 'CrudOpenApiApiPlatformTag', 'description' => 'Something nice']], $res['tags']);
     }
 }

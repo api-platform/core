@@ -67,12 +67,12 @@ class OpenApiCommandTest extends KernelTestCase
     #[\PHPUnit\Framework\Attributes\Group('orm')]
     public function testExecuteWithYaml(): void
     {
-        // $this->setMetadataClasses([DummyCar::class, Currency::class]);
         $this->tester->run(['command' => 'api:openapi:export', '--yaml' => true]);
 
         $result = $this->tester->getDisplay();
 
         $this->assertYaml($result);
+
         $operationId = 'api_dummy_cars_get_collection';
 
         $expected = <<<YAML
@@ -83,7 +83,7 @@ class OpenApiCommandTest extends KernelTestCase
         - DummyCar
 YAML;
 
-        $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result, 'nested object should be present.');
+        $this->assertStringContainsString($expected, $result, 'nested object should be present.');
 
         $operationId = 'api_dummy_cars_id_get';
         $expected = <<<YAML
@@ -93,14 +93,14 @@ YAML;
       tags: []
 YAML;
 
-        $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result, 'arrays should be correctly formatted.');
+        $this->assertStringContainsString($expected, $result, 'arrays should be correctly formatted.');
         $this->assertStringContainsString('openapi: '.OpenApi::VERSION, $result);
 
         $expected = <<<YAML
 info:
   title: 'My Dummy API'
 YAML;
-        $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result, 'multiline formatting must be preserved (using literal style).');
+        $this->assertStringContainsString($expected, $result, 'multiline formatting must be preserved (using literal style).');
 
         $expected = <<<YAML
     This is a test API.
@@ -108,20 +108,19 @@ YAML;
   version: 0.0.0
 YAML;
 
-        $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result);
+        $this->assertStringContainsString($expected, $result);
 
         $expected = <<<YAML
       security:
         -
-          JWT:
+          oauth:
             - CURRENCY_READ
 YAML;
-        $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result);
+        $this->assertStringContainsString($expected, $result);
     }
 
     public function testWriteToFile(): void
     {
-        // $this->setMetadataClasses([DummyCar::class]);
         /** @var string $tmpFile */
         $tmpFile = tempnam(sys_get_temp_dir(), 'test_write_to_file');
 
@@ -136,7 +135,6 @@ YAML;
      */
     public function testBackedEnumExamplesAreNotLost(): void
     {
-        // $this->setMetadataClasses([Issue6317::class]);
         $this->tester->run(['command' => 'api:openapi:export']);
         $result = $this->tester->getDisplay();
         $json = json_decode($result, true, 512, \JSON_THROW_ON_ERROR);
@@ -175,6 +173,6 @@ YAML;
         $this->assertArrayHasKey('/cruds', $res['paths']);
         $this->assertArrayNotHasKey('post', $res['paths']['/cruds']);
         $this->assertArrayHasKey('get', $res['paths']['/cruds']);
-        $this->assertEquals([['name' => 'Crud']], $res['tags']);
+        $this->assertEquals([['name' => 'Crud', 'description' => 'A resource used for OpenAPI tests.']], $res['tags']);
     }
 }

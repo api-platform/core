@@ -22,7 +22,7 @@ use ApiPlatform\Metadata\ApiResource;
 class JsonSchemaResource
 {
     #[ApiProperty(identifier: true)]
-    public $id;
+    public string $id;
 
     #[ApiProperty(writable: false, readableLink: true)]
     public ?JsonSchemaResourceRelated $resourceRelated = null;

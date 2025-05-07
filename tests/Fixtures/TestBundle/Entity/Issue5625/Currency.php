@@ -21,7 +21,7 @@ use ApiPlatform\OpenApi\Model\Operation;
  * Currency.
  */
 #[ApiResource(operations: [
-    new Get(uriTemplate: '/get_security_1', openapi: new Operation(security: [['JWT' => ['CURRENCY_READ']]])),
+    new Get(uriTemplate: '/get_security_1', openapi: new Operation(security: [['oauth' => ['CURRENCY_READ']]])),
 ])]
 class Currency
 {
