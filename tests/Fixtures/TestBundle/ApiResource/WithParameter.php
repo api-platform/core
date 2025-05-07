@@ -32,7 +32,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[Get(
     uriTemplate: 'with_parameters/{id}{._format}',
     uriVariables: [
-        'id' => new Link(schema: ['type' => 'uuid'], property: 'id'),
+        'id' => new Link(schema: ['type' => 'string', 'format' => 'uuid'], property: 'id'),
     ],
     parameters: [
         'groups' => new QueryParameter(filter: new GroupFilter(parameterName: 'groups', overrideDefaultGroups: false)),

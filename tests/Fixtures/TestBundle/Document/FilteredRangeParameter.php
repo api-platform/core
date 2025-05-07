@@ -26,12 +26,12 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
     parameters: [
         'quantity' => new QueryParameter(
             filter: new RangeFilter(),
-            openApi: new Parameter('createdAt', 'query', allowEmptyValue: true)
+            openApi: new Parameter('quantity', 'query', allowEmptyValue: true)
         ),
         'amount' => new QueryParameter(
             filter: new RangeFilter(),
             property: 'quantity',
-            openApi: new Parameter('createdAt', 'query', allowEmptyValue: true)
+            openApi: new Parameter('amount', 'query', allowEmptyValue: true)
         ),
     ],
 )]
