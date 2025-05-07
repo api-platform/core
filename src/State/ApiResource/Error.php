@@ -104,7 +104,7 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
             identifier: true,
             writable: false,
             initializable: false,
-            schema: ['type' => 'number', 'example' => 404, 'default' => 400]
+            schema: ['type' => 'number', 'examples' => [404], 'default' => 400]
         )] private int $status,
         ?array $originalTrace = null,
         private ?string $instance = null,

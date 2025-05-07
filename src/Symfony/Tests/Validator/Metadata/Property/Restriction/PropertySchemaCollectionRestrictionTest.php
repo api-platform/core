@@ -83,12 +83,12 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
             ]),
             'email' => [
                 new NotNull(),
-                new Length(['min' => 2, 'max' => 255]),
+                new Length(min: 2, max: 255),
                 new Email(['mode' => Email::VALIDATION_MODE_HTML5]),
             ],
             'phone' => new Optional([
                 new Type(['type' => 'string']),
-                new Regex(['pattern' => '/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/']),
+                new Regex(pattern: '/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/'),
             ]),
             'age' => new Optional([
                 new Type(['type' => 'int']),

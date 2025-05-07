@@ -248,7 +248,7 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface, Js
      */
     public function getSchema(Parameter $parameter): array
     {
-        return ['type' => 'date'];
+        return ['type' => 'string', 'format' => 'date'];
     }
 
     public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array|null
