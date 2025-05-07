@@ -470,26 +470,6 @@ jobs:
           export PATH="$PATH:$HOME/.composer/vendor/bin"
           php-coveralls --coverage_clover=build/logs/behat/clover.xml
         continue-on-error: true
-      - name: Export OpenAPI documents
-        run: |
-          mkdir -p build/out/openapi
-          tests/Fixtures/app/console api:openapi:export -o build/out/openapi/openapi_v3.json
-          tests/Fixtures/app/console api:openapi:export --yaml -o build/out/openapi/openapi_v3.yaml
-      - name: Setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '14'
-      - name: Validate OpenAPI documents
-        run: |
-          npx swagger-cli validate build/out/openapi/openapi_v3.json
-          npx swagger-cli validate build/out/openapi/openapi_v3.yaml
-      - name: Upload OpenAPI artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: openapi-docs-php${{ matrix.php }}
-          path: build/out/openapi
-        continue-on-error: true
 
   postgresql:
     name: Behat (PHP ${{ matrix.php }}) (PostgreSQL)
@@ -1272,26 +1252,53 @@ jobs:
           name: behat-logs-php${{ matrix.php }}
           path: build/logs/behat
         continue-on-error: true
-      - name: Export OpenAPI documents
-        run: |
-          mkdir -p build/out/openapi
-          tests/Fixtures/app/console api:openapi:export -o build/out/openapi/openapi_v3.json
-          tests/Fixtures/app/console api:openapi:export --yaml -o build/out/openapi/openapi_v3.yaml
+
+  openapi:
+    name: OpenAPI
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        php:
+          - '8.4'
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: pecl, composer
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
+          ini-values: memory_limit=-1
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: '14'
+          node-version: '22'
+      - name: Get composer cache directory
+        id: composercache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composercache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-
+      - name: Update project dependencies
+        run: |
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link .
+      - name: Clear test app cache
+        run: tests/Fixtures/app/console cache:clear --ansi
+      - name: Export OpenAPI documents
+        run: |
+          mkdir -p build/out/openapi
+          tests/Fixtures/app/console api:openapi:export --yaml -o build/out/openapi/openapi_v3.yaml
       - name: Validate OpenAPI documents
         run: |
-          npx swagger-cli validate build/out/openapi/openapi_v3.json
-          npx swagger-cli validate build/out/openapi/openapi_v3.yaml
-      - name: Upload OpenAPI artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: openapi-docs-php${{ matrix.php }}
-          path: build/out/openapi
-        continue-on-error: true
+          npx @quobix/vacuum lint -r tests/Fixtures/app/ruleset.yaml build/out/openapi/openapi_v3.yaml -d
 
   laravel:
     name: Laravel (PHP ${{ matrix.php }})

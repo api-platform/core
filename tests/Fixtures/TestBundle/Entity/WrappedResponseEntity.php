@@ -19,7 +19,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Dto\CustomOutputEntityWrapperDto;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ApiResource(operations: [new Get(normalizationContext: ['groups' => ['read']], output: CustomOutputEntityWrapperDto::class
+#[ApiResource(operations: [new Get(openapi: false, normalizationContext: ['groups' => ['read']], output: CustomOutputEntityWrapperDto::class
 )])]
 #[ORM\Entity]
 class WrappedResponseEntity

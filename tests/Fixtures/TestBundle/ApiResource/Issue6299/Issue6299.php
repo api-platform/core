@@ -17,7 +17,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 
 #[ApiResource]
-#[Get(output: Issue6299OutputDto::class)]
+#[Get(output: Issue6299OutputDto::class, openapi: false)]
 final class Issue6299
 {
 }
