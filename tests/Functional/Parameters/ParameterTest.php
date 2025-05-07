@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Functional\Parameters;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\WithParameter;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class ParameterTest extends ApiTestCase
 {
@@ -96,7 +97,7 @@ final class ParameterTest extends ApiTestCase
     {
         $response = self::createClient()->request('GET', 'with_parameters_header_and_query?q=blabla', ['headers' => ['q' => '(complex stuff)']]);
         $this->assertEquals($response->toArray(), [
-            ['(complex stuff)'],
+            '(complex stuff)',
             'blabla',
         ]);
     }
@@ -108,5 +109,20 @@ final class ParameterTest extends ApiTestCase
 
         self::createClient()->request('GET', 'header_required', ['headers' => []]);
         $this->assertResponseStatusCodeSame(422);
+    }
+
+    #[DataProvider('provideHeaderValues')]
+    public function testHeaderParameterInteger(string $value, int $expectedStatusCode): void
+    {
+        self::createClient()->request('GET', 'header_integer', ['headers' => ['Foo' => $value]]);
+        $this->assertResponseStatusCodeSame($expectedStatusCode);
+    }
+
+    public static function provideHeaderValues(): iterable
+    {
+        yield 'valid integer' => ['3', 200];
+        yield 'too high' => ['6', 422];
+        yield 'too low' => ['0', 422];
+        yield 'invalid integer' => ['string', 422];
     }
 }

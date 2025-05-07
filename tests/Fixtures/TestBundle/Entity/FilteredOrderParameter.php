@@ -19,6 +19,8 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\TypeInfo\Type\BuiltinType;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 #[ApiResource]
 #[GetCollection(
@@ -26,19 +28,23 @@ use Doctrine\ORM\Mapping as ORM;
     parameters: [
         'createdAt' => new QueryParameter(
             filter: new OrderFilter(),
+            nativeType: new BuiltinType(TypeIdentifier::STRING)
         ),
         'date' => new QueryParameter(
             filter: new OrderFilter(),
             property: 'createdAt',
+            nativeType: new BuiltinType(TypeIdentifier::STRING)
         ),
         'date_null_always_first' => new QueryParameter(
             filter: new OrderFilter(),
             property: 'createdAt',
             filterContext: OrderFilterInterface::NULLS_ALWAYS_FIRST,
+            nativeType: new BuiltinType(TypeIdentifier::STRING)
         ),
         'date_null_always_first_old_way' => new QueryParameter(
             filter: new OrderFilter(properties: ['createdAt' => OrderFilterInterface::NULLS_ALWAYS_FIRST]),
             property: 'createdAt',
+            nativeType: new BuiltinType(TypeIdentifier::STRING)
         ),
         'order[:property]' => new QueryParameter(
             filter: new OrderFilter(),
