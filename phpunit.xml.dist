@@ -38,6 +38,7 @@
       <directory>.</directory>
     </include>
     <exclude>
+      <directory>tests</directory>
       <directory>features</directory>
       <directory>vendor</directory>
       <file>.php-cs-fixer.dist.php</file>
