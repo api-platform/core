@@ -44,7 +44,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
         normalizationContext: ['groups' => ['user_password_reset_request']],
         denormalizationContext: ['groups' => ['user_password_reset_request']]
     ),
-    new Put(input: RecoverPasswordInput::class, output: RecoverPasswordOutput::class, uriTemplate: 'users/recover/{id}', processor: RecoverPasswordProcessor::class),
+    new Put(
+        input: RecoverPasswordInput::class,
+        output: RecoverPasswordOutput::class,
+        uriTemplate: 'users/recover/{id}',
+        processor: RecoverPasswordProcessor::class,
+        openapi: false, // ambigous path
+    ),
     new Get(),
     new Put(),
     new Delete(),

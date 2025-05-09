@@ -17,7 +17,7 @@ final class Parameter
 {
     use ExtensionTrait;
 
-    public function __construct(private string $name, private string $in, private string $description = '', private bool $required = false, private bool $deprecated = false, private bool $allowEmptyValue = false, private array $schema = [], private ?string $style = null, private bool $explode = false, private bool $allowReserved = false, private $example = null, private ?\ArrayObject $examples = null, private ?\ArrayObject $content = null)
+    public function __construct(private string $name, private string $in, private string $description = '', private bool $required = false, private bool $deprecated = false, private ?bool $allowEmptyValue = null, private array $schema = [], private ?string $style = null, private bool $explode = false, private ?bool $allowReserved = null, private $example = null, private ?\ArrayObject $examples = null, private ?\ArrayObject $content = null)
     {
         if (null === $style) {
             if ('query' === $in || 'cookie' === $in) {
@@ -53,12 +53,12 @@ final class Parameter
         return $this->deprecated;
     }
 
-    public function canAllowEmptyValue(): bool
+    public function canAllowEmptyValue(): ?bool
     {
         return $this->allowEmptyValue;
     }
 
-    public function getAllowEmptyValue(): bool
+    public function getAllowEmptyValue(): ?bool
     {
         return $this->allowEmptyValue;
     }
@@ -83,12 +83,12 @@ final class Parameter
         return $this->explode;
     }
 
-    public function canAllowReserved(): bool
+    public function canAllowReserved(): ?bool
     {
         return $this->allowReserved;
     }
 
-    public function getAllowReserved(): bool
+    public function getAllowReserved(): ?bool
     {
         return $this->allowReserved;
     }
