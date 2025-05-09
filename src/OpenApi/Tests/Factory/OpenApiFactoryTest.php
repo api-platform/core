@@ -170,7 +170,6 @@ class OpenApiFactoryTest extends TestCase
                             in: 'query',
                             description: 'Test modified collection page number',
                             required: false,
-                            allowEmptyValue: true,
                             schema: ['type' => 'integer', 'default' => 1],
                         ),
                     ],
@@ -268,7 +267,7 @@ class OpenApiFactoryTest extends TestCase
 
         $baseOperation = (new HttpOperation())->withTypes(['http://schema.example.com/Dummy'])->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats'])->withClass(Dummy::class)->withShortName('Parameter')->withDescription('This is a dummy');
         $parameterResource = (new ApiResource())->withOperations(new Operations([
-            'uriVariableSchema' => (new Get(uriTemplate: '/uri_variable_uuid', uriVariables: ['id' => new Link(schema: ['type' => 'string', 'format' => 'uuid'], description: 'hello', required: true, openApi: new Parameter('id', 'path', allowEmptyValue: true))]))->withOperation($baseOperation),
+            'uriVariableSchema' => (new Get(uriTemplate: '/uri_variable_uuid', uriVariables: ['id' => new Link(schema: ['type' => 'string', 'format' => 'uuid'], description: 'hello', required: true, openApi: new Parameter('id', 'path'))]))->withOperation($baseOperation),
             'parameters' => (new Put(uriTemplate: '/parameters', parameters: [
                 'foo' => new HeaderParameter(description: 'hi', schema: ['type' => 'string', 'format' => 'uuid']),
             ]))->withOperation($baseOperation),
@@ -477,7 +476,7 @@ class OpenApiFactoryTest extends TestCase
                 'type' => 'string',
                 'required' => true,
                 'strategy' => 'exact',
-                'openapi' => new Parameter(in: 'query', name: 'name', example: 'bar', deprecated: true, allowEmptyValue: true, allowReserved: true, explode: true),
+                'openapi' => new Parameter(in: 'query', name: 'name', example: 'bar', deprecated: true, allowReserved: true, explode: true),
             ]]),
             'f2' => new DummyFilter(['ha' => [
                 'property' => 'foo',
@@ -690,16 +689,16 @@ class OpenApiFactoryTest extends TestCase
             'Retrieves the collection of Dummy resources.',
             null,
             [
-                new Parameter('page', 'query', 'Test modified collection page number', false, false, true, [
+                new Parameter('page', 'query', 'Test modified collection page number', false, false, null, [
                     'type' => 'integer',
                     'default' => 1,
                 ]),
-                new Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, true, [
+                new Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, null, [
                     'type' => 'integer',
                     'default' => 30,
                     'minimum' => 0,
                 ]),
-                new Parameter('pagination', 'query', 'Enable or disable pagination', false, false, true, [
+                new Parameter('pagination', 'query', 'Enable or disable pagination', false, false, null, [
                     'type' => 'boolean',
                 ]),
             ]
@@ -935,29 +934,29 @@ class OpenApiFactoryTest extends TestCase
             'Retrieves the collection of Dummy resources.',
             null,
             [
-                new Parameter('page', 'query', 'The collection page number', false, false, true, [
+                new Parameter('page', 'query', 'The collection page number', false, false, null, [
                     'type' => 'integer',
                     'default' => 1,
                 ]),
-                new Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, true, [
+                new Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, null, [
                     'type' => 'integer',
                     'default' => 30,
                     'minimum' => 0,
                 ]),
-                new Parameter('pagination', 'query', 'Enable or disable pagination', false, false, true, [
+                new Parameter('pagination', 'query', 'Enable or disable pagination', false, false, null, [
                     'type' => 'boolean',
                 ]),
-                new Parameter('name', 'query', '', true, true, true, [
+                new Parameter('name', 'query', '', true, true, null, [
                     'type' => 'string',
                 ], 'form', true, true, 'bar'),
-                new Parameter('ha', 'query', '', false, false, false, [
+                new Parameter('ha', 'query', '', false, false, null, [
                     'type' => 'integer',
                 ]),
-                new Parameter('toto', 'query', '', true, false, false, [
+                new Parameter('toto', 'query', '', true, false, null, [
                     'type' => 'array',
                     'items' => ['type' => 'string'],
                 ], 'deepObject', true),
-                new Parameter('order[name]', 'query', '', false, false, false, [
+                new Parameter('order[name]', 'query', '', false, false, null, [
                     'type' => 'string',
                     'enum' => ['asc', 'desc'],
                 ]),
@@ -981,17 +980,17 @@ class OpenApiFactoryTest extends TestCase
             'Retrieves the collection of Dummy resources.',
             null,
             [
-                new Parameter('page', 'query', 'The collection page number', false, false, true, [
+                new Parameter('page', 'query', 'The collection page number', false, false, null, [
                     'type' => 'integer',
                     'default' => 1,
                 ]),
-                new Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, true, [
+                new Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, null, [
                     'type' => 'integer',
                     'default' => 20,
                     'minimum' => 0,
                     'maximum' => 80,
                 ]),
-                new Parameter('pagination', 'query', 'Enable or disable pagination', false, false, true, [
+                new Parameter('pagination', 'query', 'Enable or disable pagination', false, false, null, [
                     'type' => 'boolean',
                 ]),
             ]
@@ -1186,16 +1185,16 @@ class OpenApiFactoryTest extends TestCase
             'Retrieves the collection of Dummy resources.',
             null,
             [
-                new Parameter('page', 'query', 'The collection page number', false, false, true, [
+                new Parameter('page', 'query', 'The collection page number', false, false, null, [
                     'type' => 'integer',
                     'default' => 1,
                 ]),
-                new Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, true, [
+                new Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, null, [
                     'type' => 'integer',
                     'default' => 30,
                     'minimum' => 0,
                 ]),
-                new Parameter('pagination', 'query', 'Enable or disable pagination', false, false, true, [
+                new Parameter('pagination', 'query', 'Enable or disable pagination', false, false, null, [
                     'type' => 'boolean',
                 ]),
             ]
@@ -1233,7 +1232,6 @@ class OpenApiFactoryTest extends TestCase
         ), $emptyRequestBodyPath->getPost());
 
         $parameter = $paths->getPath('/uri_variable_uuid')->getGet()->getParameters()[0];
-        $this->assertTrue($parameter->getAllowEmptyValue());
         $this->assertEquals(['type' => 'string', 'format' => 'uuid'], $parameter->getSchema());
 
         $parameter = $paths->getPath('/parameters')->getPut()->getParameters()[0];
@@ -1265,16 +1263,16 @@ class OpenApiFactoryTest extends TestCase
             'Retrieves the collection of Dummy resources.',
             null,
             [
-                new Parameter('page', 'query', 'The collection page number', false, false, true, [
+                new Parameter('page', 'query', 'The collection page number', false, false, null, [
                     'type' => 'integer',
                     'default' => 1,
                 ]),
-                new Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, true, [
+                new Parameter('itemsPerPage', 'query', 'The number of items per page', false, false, null, [
                     'type' => 'integer',
                     'default' => 30,
                     'minimum' => 0,
                 ]),
-                new Parameter('pagination', 'query', 'Enable or disable pagination', false, false, true, [
+                new Parameter('pagination', 'query', 'Enable or disable pagination', false, false, null, [
                     'type' => 'boolean',
                 ]),
             ],

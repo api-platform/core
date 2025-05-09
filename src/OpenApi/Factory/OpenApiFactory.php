@@ -279,7 +279,15 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     continue;
                 }
 
-                $parameter = new Parameter($parameterName, 'path', $uriVariable->getDescription() ?? "$resourceShortName identifier", $uriVariable->getRequired() ?? true, false, false, $uriVariable->getSchema() ?? ['type' => 'string']);
+                $parameter = new Parameter(
+                    $parameterName,
+                    'path',
+                    $uriVariable->getDescription() ?? "$resourceShortName identifier",
+                    $uriVariable->getRequired() ?? true,
+                    false,
+                    null,
+                    $uriVariable->getSchema() ?? ['type' => 'string'],
+                );
 
                 if ($linkParameter = $uriVariable->getOpenApi()) {
                     $parameter = $this->mergeParameter($parameter, $linkParameter);
@@ -329,7 +337,15 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 }
 
                 $in = $p instanceof HeaderParameterInterface ? 'header' : 'query';
-                $defaultParameter = new Parameter($key, $in, $p->getDescription() ?? "$resourceShortName $key", $p->getRequired() ?? false, false, false, $p->getSchema() ?? ['type' => 'string']);
+                $defaultParameter = new Parameter(
+                    $key,
+                    $in,
+                    $p->getDescription() ?? "$resourceShortName $key",
+                    $p->getRequired() ?? false,
+                    false,
+                    null,
+                    $p->getSchema() ?? ['type' => 'string'],
+                );
 
                 $linkParameter = $p->getOpenApi();
                 if (null === $linkParameter) {
@@ -752,7 +768,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $description['description'] ?? '',
             $description['required'] ?? false,
             $description['openapi']['deprecated'] ?? false,
-            $description['openapi']['allowEmptyValue'] ?? true,
+            $description['openapi']['allowEmptyValue'] ?? null,
             $schema,
             'array' === $schema['type'] && \in_array(
                 $description['type'],
@@ -760,7 +776,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 true
             ) ? 'deepObject' : 'form',
             $description['openapi']['explode'] ?? ('array' === $schema['type']),
-            $description['openapi']['allowReserved'] ?? false,
+            $description['openapi']['allowReserved'] ?? null,
             $description['openapi']['example'] ?? null,
             isset(
                 $description['openapi']['examples']
@@ -777,7 +793,15 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         $parameters = [];
 
         if ($operation->getPaginationEnabled() ?? $this->paginationOptions->isPaginationEnabled()) {
-            $parameters[] = new Parameter($this->paginationOptions->getPaginationPageParameterName(), 'query', 'The collection page number', false, false, true, ['type' => 'integer', 'default' => 1]);
+            $parameters[] = new Parameter(
+                $this->paginationOptions->getPaginationPageParameterName(),
+                'query',
+                'The collection page number',
+                false,
+                false,
+                null,
+                ['type' => 'integer', 'default' => 1],
+            );
 
             if ($operation->getPaginationClientItemsPerPage() ?? $this->paginationOptions->getClientItemsPerPage()) {
                 $schema = [
@@ -790,12 +814,28 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $schema['maximum'] = $maxItemsPerPage;
                 }
 
-                $parameters[] = new Parameter($this->paginationOptions->getItemsPerPageParameterName(), 'query', 'The number of items per page', false, false, true, $schema);
+                $parameters[] = new Parameter(
+                    $this->paginationOptions->getItemsPerPageParameterName(),
+                    'query',
+                    'The number of items per page',
+                    false,
+                    false,
+                    null,
+                    $schema,
+                );
             }
         }
 
         if ($operation->getPaginationClientEnabled() ?? $this->paginationOptions->isPaginationClientEnabled()) {
-            $parameters[] = new Parameter($this->paginationOptions->getPaginationClientEnabledParameterName(), 'query', 'Enable or disable pagination', false, false, true, ['type' => 'boolean']);
+            $parameters[] = new Parameter(
+                $this->paginationOptions->getPaginationClientEnabledParameterName(),
+                'query',
+                'Enable or disable pagination',
+                false,
+                false,
+                null,
+                ['type' => 'boolean'],
+            );
         }
 
         return $parameters;
