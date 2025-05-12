@@ -54,7 +54,9 @@ Feature: JSON API Inclusion of Related Resources
     }
   """
 
+  @createSchema
   Scenario: Request inclusion of a non existing related resource
+    Given there are 3 dummy property objects
     When I send a "GET" request to "/dummy_properties/1?include=foo"
     Then the response status code should be 200
     And the response should be in JSON
@@ -87,7 +89,9 @@ Feature: JSON API Inclusion of Related Resources
     }
   """
 
+  @createSchema
   Scenario: Request inclusion of a related resource keeping main object properties unfiltered
+    Given there are 3 dummy property objects
     When I send a "GET" request to "/dummy_properties/1?include=group&fields[group]=id,foo&fields[DummyProperty]=bar,baz"
     Then the response status code should be 200
     And the response should be in JSON
