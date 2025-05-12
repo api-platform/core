@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\UriVariablesConverterInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\State\SerializerContextBuilderInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
 use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
 use Psr\Log\LoggerInterface;
@@ -48,8 +49,8 @@ final class MainController
     {
         $operation = $this->initializeOperation($request);
 
-        if (!$operation) {
-            throw new RuntimeException('Not an API operation.');
+        if (!$operation || !$operation instanceof HttpOperation) {
+            throw new RuntimeException('Not an HTTP API operation.');
         }
 
         $uriVariables = [];
@@ -72,12 +73,22 @@ final class MainController
             $operation = $operation->withValidate(!$request->isMethodSafe() && !$request->isMethod('DELETE'));
         }
 
-        if (null === $operation->canRead() && $operation instanceof HttpOperation) {
+        if (null === $operation->canRead()) {
             $operation = $operation->withRead($operation->getUriVariables() || $request->isMethodSafe());
         }
 
-        if (null === $operation->canDeserialize() && $operation instanceof HttpOperation) {
+        if (null === $operation->canDeserialize()) {
             $operation = $operation->withDeserialize(\in_array($operation->getMethod(), ['POST', 'PUT', 'PATCH'], true));
+        }
+
+        $denormalizationContext = $operation->getDenormalizationContext() ?? [];
+        if ($operation->canDeserialize() && !isset($denormalizationContext[SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE])) {
+            $method = $operation->getMethod();
+            $assignObjectToPopulate = 'POST' === $method
+                || 'PATCH' === $method
+                || ('PUT' === $method && !($operation->getExtraProperties()['standard_put'] ?? true));
+
+            $operation = $operation->withDenormalizationContext($denormalizationContext + [SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE => $assignObjectToPopulate]);
         }
 
         $body = $this->provider->provide($operation, $uriVariables, $context);

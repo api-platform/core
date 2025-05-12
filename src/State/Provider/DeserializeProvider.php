@@ -75,18 +75,23 @@ final class DeserializeProvider implements ProviderInterface
             throw new UnsupportedMediaTypeHttpException('Format not supported.');
         }
 
-        $method = $operation->getMethod();
-
-        if (
-            null !== $data
-            && (
-                'POST' === $method
+        if ($operation instanceof HttpOperation && null === ($serializerContext[SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE] ?? null)) {
+            $method = $operation->getMethod();
+            $assignObjectToPopulate = 'POST' === $method
                 || 'PATCH' === $method
-                || ('PUT' === $method && !($operation->getExtraProperties()['standard_put'] ?? true))
-            )
-        ) {
+                || ('PUT' === $method && !($operation->getExtraProperties()['standard_put'] ?? true));
+
+            if ($assignObjectToPopulate) {
+                $serializerContext[SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE] = true;
+                trigger_deprecation('api-platform/core', '5.0', 'To assign an object to populate you should set "%s" in your denormalizationContext, not defining it is deprecated.', SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE);
+            }
+        }
+
+        if (null !== $data && ($serializerContext[SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE] ?? false)) {
             $serializerContext[AbstractNormalizer::OBJECT_TO_POPULATE] = $data;
         }
+
+        unset($serializerContext[SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE]);
 
         try {
             return $this->serializer->deserialize((string) $request->getContent(), $serializerContext['deserializer_type'] ?? $operation->getClass(), $format, $serializerContext);

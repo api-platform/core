@@ -16,6 +16,7 @@ namespace ApiPlatform\Symfony\EventListener;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\State\SerializerContextBuilderInterface;
 use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\State\Util\RequestAttributesExtractor;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -63,6 +64,16 @@ final class DeserializeListener
 
         if (null === $operation->canDeserialize() && $operation instanceof HttpOperation) {
             $operation = $operation->withDeserialize(\in_array($method, ['POST', 'PUT', 'PATCH'], true));
+        }
+
+        $denormalizationContext = $operation->getDenormalizationContext() ?? [];
+        if ($operation->canDeserialize() && !isset($denormalizationContext[SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE])) {
+            $method = $operation->getMethod();
+            $assignObjectToPopulate = 'POST' === $method
+                || 'PATCH' === $method
+                || ('PUT' === $method && !($operation->getExtraProperties()['standard_put'] ?? true));
+
+            $operation = $operation->withDenormalizationContext($denormalizationContext + [SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE => $assignObjectToPopulate]);
         }
 
         if (!$operation->canDeserialize()) {
