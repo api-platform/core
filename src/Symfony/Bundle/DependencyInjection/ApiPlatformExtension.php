@@ -759,13 +759,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $container->setParameter('api_platform.validator.serialize_payload_fields', $config['validator']['serialize_payload_fields']);
-        $container->setParameter('api_platform.validator.query_parameter_validation', $config['validator']['query_parameter_validation']);
-
-        if (!$config['validator']['query_parameter_validation']) {
-            $container->removeDefinition('api_platform.listener.view.validate_query_parameters');
-            $container->removeDefinition('api_platform.validator.query_parameter_validator');
-            $container->removeDefinition('api_platform.symfony.parameter_validator');
-        }
     }
 
     private function registerDataCollectorConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
