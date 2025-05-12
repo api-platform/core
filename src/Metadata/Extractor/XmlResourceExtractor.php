@@ -301,7 +301,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
                 continue;
             }
 
-            $data[(string) $cacheHeader['name']] = (string) $cacheHeader;
+            $data[(string) $cacheHeader['name']] = XmlUtils::phpize((string) $cacheHeader);
         }
 
         return $data;
