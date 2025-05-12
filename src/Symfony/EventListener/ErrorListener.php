@@ -15,6 +15,7 @@ namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Metadata\Error as ErrorOperation;
 use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
+use ApiPlatform\Metadata\Exception\InvalidUriVariableException;
 use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
@@ -178,7 +179,7 @@ final class ErrorListener extends SymfonyErrorListener
             return $exception->getStatusCode();
         }
 
-        if ($exception instanceof RequestExceptionInterface) {
+        if ($exception instanceof RequestExceptionInterface || $exception instanceof InvalidUriVariableException) {
             return 400;
         }
 

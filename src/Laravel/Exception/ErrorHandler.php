@@ -15,6 +15,7 @@ namespace ApiPlatform\Laravel\Exception;
 
 use ApiPlatform\Laravel\ApiResource\Error;
 use ApiPlatform\Laravel\Controller\ApiPlatformController;
+use ApiPlatform\Metadata\Exception\InvalidUriVariableException;
 use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
 use ApiPlatform\Metadata\Exception\StatusAwareExceptionInterface;
 use ApiPlatform\Metadata\HttpOperation;
@@ -192,7 +193,7 @@ class ErrorHandler extends ExceptionsHandler
             return $exception->getStatusCode();
         }
 
-        if ($exception instanceof RequestExceptionInterface) {
+        if ($exception instanceof RequestExceptionInterface || $exception instanceof InvalidUriVariableException) {
             return 400;
         }
 
