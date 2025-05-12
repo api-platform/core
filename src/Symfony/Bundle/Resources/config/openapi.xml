@@ -62,6 +62,7 @@
             <argument>%api_platform.swagger.persist_authorization%</argument>
             <argument>%api_platform.swagger.http_auth%</argument>
             <argument>%api_platform.openapi.tags%</argument>
+            <argument>%api_platform.openapi.license.identifier%</argument>
         </service>
         <service id="ApiPlatform\OpenApi\Options" alias="api_platform.openapi.options" />
 

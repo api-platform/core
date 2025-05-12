@@ -216,6 +216,7 @@ class ConfigurationTest extends TestCase
                 'license' => [
                     'name' => null,
                     'url' => null,
+                    'identifier' => null,
                 ],
                 'swagger_ui_extra_configuration' => [],
                 'overrideResponses' => true,

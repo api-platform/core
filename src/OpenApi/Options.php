@@ -46,6 +46,7 @@ final readonly class Options
         private array $tags = [],
         private ?string $errorResourceClass = null,
         private ?string $validationErrorResourceClass = null,
+        private ?string $licenseIdentifier = null,
     ) {
     }
 
@@ -171,5 +172,10 @@ final readonly class Options
     public function getValidationErrorResourceClass(): ?string
     {
         return $this->validationErrorResourceClass;
+    }
+
+    public function getLicenseIdentifier(): ?string
+    {
+        return $this->licenseIdentifier;
     }
 }
