@@ -73,12 +73,12 @@ trait ResourceMetadataTrait
 
     private function findOperationForType(ResourceMetadataCollection $resourceMetadataCollection, string $type, Operation $operation, ?string $format = null): Operation
     {
+        $lookForCollection = $operation instanceof CollectionOperationInterface;
         // Find the operation and use the first one that matches criterias
         foreach ($resourceMetadataCollection as $resourceMetadata) {
             foreach ($resourceMetadata->getOperations() ?? [] as $op) {
-                if ($operation instanceof CollectionOperationInterface && $op instanceof CollectionOperationInterface) {
-                    $operation = $op;
-                    break 2;
+                if (!$lookForCollection && $op instanceof CollectionOperationInterface) {
+                    continue;
                 }
 
                 if (Schema::TYPE_INPUT === $type && \in_array($op->getMethod(), ['POST', 'PATCH', 'PUT'], true)) {

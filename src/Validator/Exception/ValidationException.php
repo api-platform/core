@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Validator\Exception;
 
+use ApiPlatform\JsonSchema\SchemaFactory;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Error as ErrorOperation;
 use ApiPlatform\Metadata\ErrorResource;
@@ -46,6 +47,7 @@ use Symfony\Component\WebLink\Link;
             name: '_api_validation_errors_problem',
             outputFormats: ['json' => ['application/problem+json']],
             normalizationContext: [
+                SchemaFactory::OPENAPI_DEFINITION_NAME => '',
                 'groups' => ['json'],
                 'ignored_attributes' => ['trace', 'file', 'line', 'code', 'message', 'traceAsString', 'previous'],
                 'skip_null_values' => true,
@@ -56,6 +58,7 @@ use Symfony\Component\WebLink\Link;
             outputFormats: ['jsonld' => ['application/problem+json', 'application/ld+json']],
             links: [new Link(rel: 'http://www.w3.org/ns/json-ld#error', href: 'http://www.w3.org/ns/hydra/error')],
             normalizationContext: [
+                SchemaFactory::OPENAPI_DEFINITION_NAME => '',
                 'groups' => ['jsonld'],
                 'ignored_attributes' => ['trace', 'file', 'line', 'code', 'message', 'traceAsString', 'previous'],
                 'skip_null_values' => true,
@@ -65,6 +68,7 @@ use Symfony\Component\WebLink\Link;
             name: '_api_validation_errors_jsonapi',
             outputFormats: ['jsonapi' => ['application/vnd.api+json']],
             normalizationContext: [
+                SchemaFactory::OPENAPI_DEFINITION_NAME => '',
                 'disable_json_schema_serializer_groups' => false,
                 'groups' => ['jsonapi'],
                 'skip_null_values' => true,

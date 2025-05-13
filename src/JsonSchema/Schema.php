@@ -123,7 +123,10 @@ final class Schema extends \ArrayObject
     {
         // strlen('#/definitions/') = 14
         // strlen('#/components/schemas/') = 21
-        $prefix = self::VERSION_OPENAPI === $this->version ? 21 : 14;
+        $prefix = match ($this->version) {
+            self::VERSION_OPENAPI => 21,
+            default => 14,
+        };
 
         return substr($definitionKey, $prefix);
     }

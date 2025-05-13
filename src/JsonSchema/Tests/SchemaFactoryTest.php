@@ -79,7 +79,7 @@ class SchemaFactoryTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(NotAResource::class)->willReturn(false);
 
-        $definitionNameFactory = new DefinitionNameFactory(['jsonapi' => true, 'jsonhal' => true, 'jsonld' => true]);
+        $definitionNameFactory = new DefinitionNameFactory();
 
         $schemaFactory = new SchemaFactory(
             resourceMetadataFactory: $resourceMetadataFactoryProphecy->reveal(),
@@ -154,7 +154,7 @@ class SchemaFactoryTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(NotAResource::class)->willReturn(false);
 
-        $definitionNameFactory = new DefinitionNameFactory(['jsonapi' => true, 'jsonhal' => true, 'jsonld' => true]);
+        $definitionNameFactory = new DefinitionNameFactory();
 
         $schemaFactory = new SchemaFactory(
             resourceMetadataFactory: $resourceMetadataFactoryProphecy->reveal(),
@@ -231,7 +231,7 @@ class SchemaFactoryTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(NotAResourceWithUnionIntersectTypes::class)->willReturn(false);
 
-        $definitionNameFactory = new DefinitionNameFactory(['jsonapi' => true, 'jsonhal' => true, 'jsonld' => true]);
+        $definitionNameFactory = new DefinitionNameFactory();
 
         $schemaFactory = new SchemaFactory(
             resourceMetadataFactory: $resourceMetadataFactoryProphecy->reveal(),
@@ -255,7 +255,6 @@ class SchemaFactoryTest extends TestCase
         $this->assertArrayHasKey('ignoredProperty', $definitions[$rootDefinitionKey]['properties']);
         $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['ignoredProperty']);
         $this->assertSame(['string', 'null'], $definitions[$rootDefinitionKey]['properties']['ignoredProperty']['type']);
-
         $this->assertArrayHasKey('unionType', $definitions[$rootDefinitionKey]['properties']);
         $this->assertArrayHasKey('oneOf', $definitions[$rootDefinitionKey]['properties']['unionType']);
         $this->assertCount(2, $definitions[$rootDefinitionKey]['properties']['unionType']['oneOf']);
@@ -301,7 +300,7 @@ class SchemaFactoryTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(NotAResourceWithUnionIntersectTypes::class)->willReturn(false);
 
-        $definitionNameFactory = new DefinitionNameFactory(['jsonapi' => true, 'jsonhal' => true, 'jsonld' => true]);
+        $definitionNameFactory = new DefinitionNameFactory();
 
         $schemaFactory = new SchemaFactory(
             resourceMetadataFactory: $resourceMetadataFactoryProphecy->reveal(),
@@ -385,7 +384,7 @@ class SchemaFactoryTest extends TestCase
         $resourceClassResolverProphecy->isResourceClass(OverriddenOperationDummy::class)->willReturn(true);
         $resourceClassResolverProphecy->isResourceClass(GenderTypeEnum::class)->willReturn(true);
 
-        $definitionNameFactory = new DefinitionNameFactory(['jsonapi' => true, 'jsonhal' => true, 'jsonld' => true]);
+        $definitionNameFactory = new DefinitionNameFactory();
 
         $schemaFactory = new SchemaFactory(
             resourceMetadataFactory: $resourceMetadataFactoryProphecy->reveal(),
@@ -462,7 +461,7 @@ class SchemaFactoryTest extends TestCase
         $resourceClassResolverProphecy->isResourceClass(OverriddenOperationDummy::class)->willReturn(true);
         $resourceClassResolverProphecy->isResourceClass(GenderTypeEnum::class)->willReturn(true);
 
-        $definitionNameFactory = new DefinitionNameFactory(['jsonapi' => true, 'jsonhal' => true, 'jsonld' => true]);
+        $definitionNameFactory = new DefinitionNameFactory();
 
         $schemaFactory = new SchemaFactory(
             resourceMetadataFactory: $resourceMetadataFactoryProphecy->reveal(),
@@ -521,7 +520,7 @@ class SchemaFactoryTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(NotAResource::class)->willReturn(false);
 
-        $definitionNameFactory = new DefinitionNameFactory(['jsonapi' => true, 'jsonhal' => true, 'jsonld' => true]);
+        $definitionNameFactory = new DefinitionNameFactory();
 
         $schemaFactory = new SchemaFactory(
             resourceMetadataFactory: $resourceMetadataFactoryProphecy->reveal(),
@@ -573,7 +572,7 @@ class SchemaFactoryTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(NotAResource::class)->willReturn(false);
 
-        $definitionNameFactory = new DefinitionNameFactory(['jsonapi' => true, 'jsonhal' => true, 'jsonld' => true]);
+        $definitionNameFactory = new DefinitionNameFactory();
 
         $schemaFactory = new SchemaFactory(
             resourceMetadataFactory: $resourceMetadataFactoryProphecy->reveal(),

@@ -79,6 +79,7 @@ final class PropertySchemaGreaterThanRestrictionTest extends TestCase
     {
         self::assertEquals([
             'exclusiveMinimum' => 10,
+            'minimum' => 10,
         ], $this->propertySchemaGreaterThanRestriction->create(new GreaterThan(['value' => 10]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)])));
     }
 
@@ -86,14 +87,17 @@ final class PropertySchemaGreaterThanRestrictionTest extends TestCase
     {
         self::assertEquals([
             'exclusiveMinimum' => 10,
+            'minimum' => 10,
         ], $this->propertySchemaGreaterThanRestriction->create(new GreaterThan(['value' => 10]), (new ApiProperty())->withNativeType(Type::int())));
 
         self::assertEquals([
             'exclusiveMinimum' => 0,
+            'minimum' => 0,
         ], $this->propertySchemaGreaterThanRestriction->create(new Positive(), (new ApiProperty())->withNativeType(Type::int())));
 
         self::assertEquals([
             'exclusiveMinimum' => 10.99,
+            'minimum' => 10.99,
         ], $this->propertySchemaGreaterThanRestriction->create(new GreaterThan(['value' => 10.99]), (new ApiProperty())->withNativeType(Type::float())));
     }
 }

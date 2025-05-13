@@ -45,12 +45,13 @@ class SchemaFactoryTest extends TestCase
                 (new ApiResource())->withOperations(new Operations([
                     'get' => (new Get())->withName('get'),
                 ])),
-            ]));
+            ])
+        );
         $propertyNameCollectionFactory = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactory->create(Dummy::class, ['enable_getter_setter_extraction' => true, 'schema_type' => Schema::TYPE_OUTPUT])->willReturn(new PropertyNameCollection());
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
 
-        $definitionNameFactory = new DefinitionNameFactory(['jsonapi' => true]);
+        $definitionNameFactory = new DefinitionNameFactory();
 
         $baseSchemaFactory = new BaseSchemaFactory(
             resourceMetadataFactory: $resourceMetadataFactory->reveal(),
@@ -60,6 +61,7 @@ class SchemaFactoryTest extends TestCase
         );
 
         $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolver->isResourceClass(Dummy::class)->willReturn(true);
 
         $this->schemaFactory = new SchemaFactory(
             schemaFactory: $baseSchemaFactory,
@@ -107,9 +109,7 @@ class SchemaFactoryTest extends TestCase
                         'type' => 'string',
                     ],
                     'attributes' => [
-                        'type' => 'object',
-                        'properties' => [
-                        ],
+                        '$ref' => '#/definitions/Dummy',
                     ],
                 ],
                 'required' => [
@@ -124,58 +124,39 @@ class SchemaFactoryTest extends TestCase
     public function testSchemaTypeBuildSchema(): void
     {
         $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonapi', Schema::TYPE_OUTPUT, new GetCollection());
-        $definitionName = 'Dummy.jsonapi';
 
         $this->assertNull($resultSchema->getRootDefinitionKey());
-        $this->assertTrue(isset($resultSchema['properties']));
-        $this->assertArrayHasKey('links', $resultSchema['properties']);
-        $this->assertArrayHasKey('self', $resultSchema['properties']['links']['properties']);
-        $this->assertArrayHasKey('first', $resultSchema['properties']['links']['properties']);
-        $this->assertArrayHasKey('prev', $resultSchema['properties']['links']['properties']);
-        $this->assertArrayHasKey('next', $resultSchema['properties']['links']['properties']);
-        $this->assertArrayHasKey('last', $resultSchema['properties']['links']['properties']);
+        $this->assertTrue(isset($resultSchema['allOf'][0]['$ref']));
+        $this->assertEquals($resultSchema['allOf'][0]['$ref'], '#/definitions/JsonApiCollectionBaseSchema');
 
-        $this->assertArrayHasKey('meta', $resultSchema['properties']);
-        $this->assertArrayHasKey('totalItems', $resultSchema['properties']['meta']['properties']);
-        $this->assertArrayHasKey('itemsPerPage', $resultSchema['properties']['meta']['properties']);
-        $this->assertArrayHasKey('currentPage', $resultSchema['properties']['meta']['properties']);
+        $jsonApiCollectionBaseSchema = $resultSchema['definitions']['JsonApiCollectionBaseSchema'];
+        $this->assertTrue(isset($jsonApiCollectionBaseSchema['properties']));
+        $this->assertArrayHasKey('links', $jsonApiCollectionBaseSchema['properties']);
+        $this->assertArrayHasKey('self', $jsonApiCollectionBaseSchema['properties']['links']['properties']);
+        $this->assertArrayHasKey('first', $jsonApiCollectionBaseSchema['properties']['links']['properties']);
+        $this->assertArrayHasKey('prev', $jsonApiCollectionBaseSchema['properties']['links']['properties']);
+        $this->assertArrayHasKey('next', $jsonApiCollectionBaseSchema['properties']['links']['properties']);
+        $this->assertArrayHasKey('last', $jsonApiCollectionBaseSchema['properties']['links']['properties']);
 
-        $this->assertArrayHasKey('data', $resultSchema['properties']);
-        $this->assertArrayHasKey('items', $resultSchema['properties']['data']);
-        $this->assertArrayHasKey('$ref', $resultSchema['properties']['data']['items']);
+        $this->assertArrayHasKey('meta', $jsonApiCollectionBaseSchema['properties']);
+        $this->assertArrayHasKey('totalItems', $jsonApiCollectionBaseSchema['properties']['meta']['properties']);
+        $this->assertArrayHasKey('itemsPerPage', $jsonApiCollectionBaseSchema['properties']['meta']['properties']);
+        $this->assertArrayHasKey('currentPage', $jsonApiCollectionBaseSchema['properties']['meta']['properties']);
 
-        $properties = $resultSchema['definitions'][$definitionName]['properties'];
+        $objectSchema = $resultSchema['allOf'][1];
+        $this->assertArrayHasKey('data', $objectSchema['properties']);
+
+        $this->assertArrayHasKey('items', $objectSchema['properties']['data']);
+        $this->assertArrayHasKey('$ref', $objectSchema['properties']['data']['items']['properties']['attributes']);
+
+        $properties = $objectSchema['properties'];
         $this->assertArrayHasKey('data', $properties);
-        $this->assertArrayHasKey('properties', $properties['data']);
-        $this->assertArrayHasKey('id', $properties['data']['properties']);
-        $this->assertArrayHasKey('type', $properties['data']['properties']);
-        $this->assertArrayHasKey('attributes', $properties['data']['properties']);
+        $this->assertArrayHasKey('items', $properties['data']);
+        $this->assertArrayHasKey('id', $properties['data']['items']['properties']);
+        $this->assertArrayHasKey('type', $properties['data']['items']['properties']);
+        $this->assertArrayHasKey('attributes', $properties['data']['items']['properties']);
 
-        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonapi', Schema::TYPE_OUTPUT, forceCollection: true);
-
-        $this->assertNull($resultSchema->getRootDefinitionKey());
-        $this->assertTrue(isset($resultSchema['properties']));
-        $this->assertArrayHasKey('links', $resultSchema['properties']);
-        $this->assertArrayHasKey('self', $resultSchema['properties']['links']['properties']);
-        $this->assertArrayHasKey('first', $resultSchema['properties']['links']['properties']);
-        $this->assertArrayHasKey('prev', $resultSchema['properties']['links']['properties']);
-        $this->assertArrayHasKey('next', $resultSchema['properties']['links']['properties']);
-        $this->assertArrayHasKey('last', $resultSchema['properties']['links']['properties']);
-
-        $this->assertArrayHasKey('meta', $resultSchema['properties']);
-        $this->assertArrayHasKey('totalItems', $resultSchema['properties']['meta']['properties']);
-        $this->assertArrayHasKey('itemsPerPage', $resultSchema['properties']['meta']['properties']);
-        $this->assertArrayHasKey('currentPage', $resultSchema['properties']['meta']['properties']);
-
-        $this->assertArrayHasKey('data', $resultSchema['properties']);
-        $this->assertArrayHasKey('items', $resultSchema['properties']['data']);
-        $this->assertArrayHasKey('$ref', $resultSchema['properties']['data']['items']);
-
-        $properties = $resultSchema['definitions'][$definitionName]['properties'];
-        $this->assertArrayHasKey('data', $properties);
-        $this->assertArrayHasKey('properties', $properties['data']);
-        $this->assertArrayHasKey('id', $properties['data']['properties']);
-        $this->assertArrayHasKey('type', $properties['data']['properties']);
-        $this->assertArrayHasKey('attributes', $properties['data']['properties']);
+        $forcedCollection = $this->schemaFactory->buildSchema(Dummy::class, 'jsonapi', Schema::TYPE_OUTPUT, forceCollection: true);
+        $this->assertEquals($resultSchema['allOf'][0]['$ref'], $forcedCollection['allOf'][0]['$ref']);
     }
 }

@@ -147,9 +147,8 @@ YAML;
         };
 
         $assertExample($json['components']['schemas']['Issue6317']['properties'], 'id');
-        $assertExample($json['components']['schemas']['Issue6317.jsonld']['properties'], 'id');
-        $assertExample($json['components']['schemas']['Issue6317.jsonapi']['properties']['data']['properties']['attributes']['properties'], '_id');
-        $assertExample($json['components']['schemas']['Issue6317.jsonhal']['properties'], 'id');
+        $assertExample($json['components']['schemas']['Issue6317.jsonld']['allOf'][1]['properties'], 'id');
+        $this->assertEquals($json['components']['schemas']['Issue6317.jsonhal']['allOf'][1]['$ref'], '#/components/schemas/Issue6317');
     }
 
     private function assertYaml(string $data): void

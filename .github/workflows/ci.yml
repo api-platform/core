@@ -1298,7 +1298,7 @@ jobs:
           tests/Fixtures/app/console api:openapi:export --yaml -o build/out/openapi/openapi_v3.yaml
       - name: Validate OpenAPI documents
         run: |
-          npx @quobix/vacuum lint -r tests/Fixtures/app/ruleset.yaml build/out/openapi/openapi_v3.yaml -d
+          npx @quobix/vacuum lint -r tests/Fixtures/app/ruleset.yaml build/out/openapi/openapi_v3.yaml -d --ignore-array-circle-ref --ignore-polymorph-circle-ref -b --no-clip
 
   laravel:
     name: Laravel (PHP ${{ matrix.php }})

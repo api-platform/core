@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\JsonSchema\Dummy\NamespaceA\Module;
+namespace ApiPlatform\JsonSchema\Tests\Fixtures\DefinitionNameFactory\NamespaceB\Module;
 
 class DummyClass
 {
