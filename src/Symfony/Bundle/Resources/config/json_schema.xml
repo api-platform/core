@@ -13,7 +13,7 @@
             <argument type="service" id="api_platform.metadata.property.metadata_factory" />
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
             <argument type="service" id="api_platform.resource_class_resolver" />
-            <argument on-invalid="ignore">%api_platform.jsonschema_formats%</argument>
+            <argument on-invalid="ignore" type="collection"></argument>
             <argument type="service" id="api_platform.json_schema.definition_name_factory" on-invalid="ignore"/>
         </service>
         <service id="ApiPlatform\JsonSchema\SchemaFactoryInterface" alias="api_platform.json_schema.schema_factory" />
@@ -33,9 +33,7 @@
             <argument type="service" id="api_platform.json_schema.backward_compatible_schema_factory.inner" />
         </service>
 
-        <service id="api_platform.json_schema.definition_name_factory" class="ApiPlatform\JsonSchema\DefinitionNameFactory">
-            <argument on-invalid="ignore">%api_platform.jsonschema_formats%</argument>
-        </service>
+        <service id="api_platform.json_schema.definition_name_factory" class="ApiPlatform\JsonSchema\DefinitionNameFactory"></service>
 
     </services>
 
