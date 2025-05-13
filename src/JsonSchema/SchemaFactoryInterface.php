@@ -22,6 +22,8 @@ use ApiPlatform\Metadata\Operation;
  */
 interface SchemaFactoryInterface
 {
+    public const FORCE_SUBSCHEMA = '_api_subschema_force_readable_link';
+
     /**
      * Builds the JSON Schema document corresponding to the given PHP class.
      */

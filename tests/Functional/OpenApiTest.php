@@ -63,10 +63,71 @@ class OpenApiTest extends ApiTestCase
         }
 
         foreach (['title', 'detail', 'instance', 'type', 'status', '@id', '@type', '@context'] as $key) {
-            $this->assertArrayHasKey($key, $res['components']['schemas']['Error.jsonld']['properties']);
+            $this->assertSame(['allOf' => [
+                ['$ref' => '#/components/schemas/HydraItemBaseSchema'],
+                [
+                    'type' => 'object',
+                    'properties' => [
+                        'title' => [
+                            'readOnly' => true,
+                            'description' => 'A short, human-readable summary of the problem.',
+                            'type' => [
+                                0 => 'string',
+                                1 => 'null',
+                            ],
+                        ],
+                        'detail' => [
+                            'readOnly' => true,
+                            'description' => 'A human-readable explanation specific to this occurrence of the problem.',
+                            'type' => [
+                                0 => 'string',
+                                1 => 'null',
+                            ],
+                        ],
+                        'status' => [
+                            'type' => 'number',
+                            'examples' => [
+                                0 => 404,
+                            ],
+                            'default' => 400,
+                        ],
+                        'instance' => [
+                            'readOnly' => true,
+                            'description' => 'A URI reference that identifies the specific occurrence of the problem. It may or may not yield further information if dereferenced.',
+                            'type' => [
+                                0 => 'string',
+                                1 => 'null',
+                            ],
+                        ],
+                        'type' => [
+                            'readOnly' => true,
+                            'description' => 'A URI reference that identifies the problem type',
+                            'type' => 'string',
+                        ],
+                        'description' => [
+                            'readOnly' => true,
+                            'type' => [
+                                0 => 'string',
+                                1 => 'null',
+                            ],
+                        ],
+                    ],
+                ],
+            ], 'description' => 'A representation of common errors.'], $res['components']['schemas']['Error.jsonld']);
         }
+
         foreach (['id', 'title', 'detail', 'instance', 'type', 'status', 'meta', 'source'] as $key) {
-            $this->assertArrayHasKey($key, $res['components']['schemas']['Error.jsonapi']['properties']['errors']['properties']);
+            $this->assertSame(['allOf' => [
+                ['$ref' => '#/components/schemas/Error'],
+                ['type' => 'object', 'properties' => [
+                    'source' => [
+                        'type' => 'object',
+                    ],
+                    'status' => [
+                        'type' => 'string',
+                    ],
+                ]],
+            ]], $res['components']['schemas']['Error.jsonapi']['properties']['errors']['items']);
         }
     }
 
@@ -97,5 +158,26 @@ class OpenApiTest extends ApiTestCase
         $this->assertArrayHasKey('get', $res['paths']['/cruds']);
         $this->assertArrayHasKey('/crud_open_api_api_platform_tags/{id}', $res['paths']);
         $this->assertEquals([['name' => 'Crud', 'description' => 'A resource used for OpenAPI tests.'], ['name' => 'CrudOpenApiApiPlatformTag', 'description' => 'Something nice']], $res['tags']);
+    }
+
+    public function testHasSchemasForMultipleFormats(): void
+    {
+        $response = self::createClient()->request('GET', '/docs?filter_tags[]=internal', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ]);
+
+        $res = $response->toArray();
+        $this->assertArrayHasKey('Crud.jsonld', $res['components']['schemas']);
+        $this->assertSame(['allOf' => [
+            ['$ref' => '#/components/schemas/HydraItemBaseSchema'],
+            [
+                'type' => 'object',
+                'properties' => [
+                    'id' => [
+                        'type' => 'string',
+                    ],
+                ],
+            ],
+        ], 'description' => 'A resource used for OpenAPI tests.'], $res['components']['schemas']['Crud.jsonld']);
     }
 }

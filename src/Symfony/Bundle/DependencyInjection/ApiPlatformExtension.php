@@ -113,6 +113,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $patchFormats = $this->getFormats($config['patch_formats']);
         $errorFormats = $this->getFormats($config['error_formats']);
         $docsFormats = $this->getFormats($config['docs_formats']);
+
         if (!$config['enable_docs']) {
             // JSON-LD documentation format is mandatory, even if documentation is disabled.
             $docsFormats = isset($formats['jsonld']) ? ['jsonld' => ['application/ld+json']] : [];
@@ -144,7 +145,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $patchFormats['jsonapi'] = ['application/vnd.api+json'];
         }
 
-        $this->registerCommonConfiguration($container, $config, $loader, $formats, $patchFormats, $errorFormats, $docsFormats, $jsonSchemaFormats);
+        $this->registerCommonConfiguration($container, $config, $loader, $formats, $patchFormats, $errorFormats, $docsFormats);
         $this->registerMetadataConfiguration($container, $config, $loader);
         $this->registerOAuthConfiguration($container, $config);
         $this->registerOpenApiConfiguration($container, $config, $loader);
@@ -189,7 +190,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
     }
 
-    private function registerCommonConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $formats, array $patchFormats, array $errorFormats, array $docsFormats, array $jsonSchemaFormats): void
+    private function registerCommonConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $formats, array $patchFormats, array $errorFormats, array $docsFormats): void
     {
         $loader->load('state/state.xml');
         $loader->load('symfony/symfony.xml');
@@ -230,7 +231,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.patch_formats', $patchFormats);
         $container->setParameter('api_platform.error_formats', $errorFormats);
         $container->setParameter('api_platform.docs_formats', $docsFormats);
-        $container->setParameter('api_platform.jsonschema_formats', $jsonSchemaFormats);
+        $container->setParameter('api_platform.jsonschema_formats', []);
         $container->setParameter('api_platform.eager_loading.enabled', $this->isConfigEnabled($container, $config['eager_loading']));
         $container->setParameter('api_platform.eager_loading.max_joins', $config['eager_loading']['max_joins']);
         $container->setParameter('api_platform.eager_loading.fetch_partial', $config['eager_loading']['fetch_partial']);

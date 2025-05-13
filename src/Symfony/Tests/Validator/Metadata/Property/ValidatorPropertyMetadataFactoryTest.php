@@ -712,6 +712,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
                 'phone' => ['pattern' => '^([+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*)$'],
                 'age' => [
                     'exclusiveMinimum' => 0,
+                    'minimum' => 0,
                 ],
                 'social' => [
                     'type' => 'object',
@@ -766,7 +767,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         yield [
             'propertyMetadata' => (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]),
             'property' => 'greaterThanMe',
-            'expectedSchema' => ['exclusiveMinimum' => 10],
+            'expectedSchema' => ['exclusiveMinimum' => 10, 'minimum' => 10],
         ];
 
         yield [
@@ -778,7 +779,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         yield [
             'propertyMetadata' => (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]),
             'property' => 'lessThanMe',
-            'expectedSchema' => ['exclusiveMaximum' => 99],
+            'expectedSchema' => ['exclusiveMaximum' => 99, 'maximum' => 99],
         ];
 
         yield [
@@ -790,7 +791,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         yield [
             'propertyMetadata' => (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]),
             'property' => 'positive',
-            'expectedSchema' => ['exclusiveMinimum' => 0],
+            'expectedSchema' => ['exclusiveMinimum' => 0, 'minimum' => 0],
         ];
 
         yield [
@@ -802,7 +803,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         yield [
             'propertyMetadata' => (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]),
             'property' => 'negative',
-            'expectedSchema' => ['exclusiveMaximum' => 0],
+            'expectedSchema' => ['exclusiveMaximum' => 0, 'maximum' => 0],
         ];
 
         yield [
@@ -849,7 +850,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         yield [
             'propertyMetadata' => (new ApiProperty())->withNativeType(Type::int()),
             'property' => 'greaterThanMe',
-            'expectedSchema' => ['exclusiveMinimum' => 10],
+            'expectedSchema' => ['exclusiveMinimum' => 10, 'minimum' => 10],
         ];
 
         yield [
@@ -861,7 +862,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         yield [
             'propertyMetadata' => (new ApiProperty())->withNativeType(Type::int()),
             'property' => 'lessThanMe',
-            'expectedSchema' => ['exclusiveMaximum' => 99],
+            'expectedSchema' => ['exclusiveMaximum' => 99, 'maximum' => 99],
         ];
 
         yield [
@@ -873,7 +874,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         yield [
             'propertyMetadata' => (new ApiProperty())->withNativeType(Type::int()),
             'property' => 'positive',
-            'expectedSchema' => ['exclusiveMinimum' => 0],
+            'expectedSchema' => ['exclusiveMinimum' => 0, 'minimum' => 0],
         ];
 
         yield [
@@ -885,7 +886,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         yield [
             'propertyMetadata' => (new ApiProperty())->withNativeType(Type::int()),
             'property' => 'negative',
-            'expectedSchema' => ['exclusiveMaximum' => 0],
+            'expectedSchema' => ['exclusiveMaximum' => 0, 'maximum' => 0],
         ];
 
         yield [

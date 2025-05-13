@@ -80,13 +80,12 @@ Feature: Documentation support
     And the JSON node "paths./api/custom-call/{id}.put" should exist
     # Properties
     And the "id" property exists for the OpenAPI class "Dummy"
-    And the "name" property is required for the OpenAPI class "Dummy"
+    And the "name" property is required for the OpenAPI class "Dummy.jsonld"
     And the "genderType" property exists for the OpenAPI class "Person"
     And the "genderType" property for the OpenAPI class "Person" should be equal to:
     """
     {
       "default": "male",
-      "example": "male",
       "type": ["string", "null"],
       "enum": [
           "male",
@@ -216,6 +215,7 @@ Feature: Documentation support
     And the "resourceRelated" property for the OpenAPI class "Resource" should be equal to:
     """
     {
+      "readOnly": true,
       "anyOf": [
         {
           "$ref": "#/components/schemas/ResourceRelated"

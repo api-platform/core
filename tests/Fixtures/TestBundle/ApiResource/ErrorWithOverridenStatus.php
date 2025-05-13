@@ -23,7 +23,8 @@ use Symfony\Component\Validator\ConstraintViolationList;
     // To make it work with 3.1, remove in 4
     uriVariables: ['id'],
     provider: [ErrorWithOverridenStatus::class, 'throw'],
-    exceptionToStatus: [ValidationException::class => 403]
+    exceptionToStatus: [ValidationException::class => 403],
+    output: false
 )]
 class ErrorWithOverridenStatus
 {
