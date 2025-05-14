@@ -221,6 +221,8 @@ class ConfigurationTest extends TestCase
                 'swagger_ui_extra_configuration' => [],
                 'overrideResponses' => true,
                 'tags' => [],
+                'error_resource_class' => null,
+                'validation_error_resource_class' => null,
             ],
             'maker' => [
                 'enabled' => true,

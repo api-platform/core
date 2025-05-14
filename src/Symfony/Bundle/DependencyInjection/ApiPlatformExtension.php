@@ -875,6 +875,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $container->setParameter('api_platform.openapi.tags', $tags);
 
+        $container->setParameter('api_platform.openapi.errorResourceClass', $config['openapi']['error_resource_class'] ?? null);
+        $container->setParameter('api_platform.openapi.validationErrorResourceClass', $config['openapi']['validation_error_resource_class'] ?? null);
+
         $loader->load('json_schema.xml');
     }
 
