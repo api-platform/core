@@ -208,7 +208,7 @@ class OpenApiNormalizerTest extends TestCase
         $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
         $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
 
-        $definitionNameFactory = new DefinitionNameFactory(['jsonapi' => true, 'jsonhal' => true, 'jsonld' => true]);
+        $definitionNameFactory = new DefinitionNameFactory();
 
         $schemaFactory = new SchemaFactory(
             resourceMetadataFactory: $resourceMetadataFactory,

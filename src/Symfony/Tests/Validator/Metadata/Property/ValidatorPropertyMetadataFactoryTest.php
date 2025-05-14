@@ -712,7 +712,7 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
                 'phone' => ['pattern' => '^([+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*)$'],
                 'age' => [
                     'exclusiveMinimum' => 0,
-                    'minimum' => 0
+                    'minimum' => 0,
                 ],
                 'social' => [
                     'type' => 'object',

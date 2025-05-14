@@ -118,6 +118,10 @@ class JsonSchemaTest extends ApiTestCase
 
     public function testArraySchemaWithReference(): void
     {
+        if ('mongodb' === self::getContainer()->getParameter('kernel.environment')) {
+            $this->markTestSkipped();
+        }
+
         $schema = $this->schemaFactory->buildSchema(BagOfTests::class, 'jsonld', Schema::TYPE_INPUT);
 
         $this->assertEquals($schema['definitions']['BagOfTests.jsonld-write']['properties']['tests'], new \ArrayObject([

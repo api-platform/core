@@ -234,20 +234,16 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             $properties = $this->buildDefinitionPropertiesSchema($key, $className, $format, $type, $operation, $schema, []);
             $properties['data']['properties']['attributes']['$ref'] = $prefix.$key;
 
-            $definitions[$definitionName] = [
-                'description' => "$definitionName collection.",
-                'allOf' => [
-                    ['$ref' => $prefix.self::COLLECTION_BASE_SCHEMA_NAME],
-                    ['type' => 'object', 'properties' => [
-                        'data' => [
-                            'type' => 'array',
-                            'items' => $properties['data'],
-                        ],
-                    ]],
-                ],
+            $schema['description'] = "$definitionName collection.";
+            $schema['allOf'] = [
+                ['$ref' => $prefix.self::COLLECTION_BASE_SCHEMA_NAME],
+                ['type' => 'object', 'properties' => [
+                    'data' => [
+                        'type' => 'array',
+                        'items' => $properties['data'],
+                    ],
+                ]],
             ];
-
-            $schema['$ref'] = $prefix.$definitionName;
 
             return $schema;
         }

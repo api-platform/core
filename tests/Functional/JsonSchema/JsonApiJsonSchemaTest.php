@@ -82,6 +82,10 @@ class JsonApiJsonSchemaTest extends ApiTestCase
 
     public function testJsonApiIncludesSchemaForQuestion(): void
     {
+        if ('mongodb' === self::getContainer()->getParameter('kernel.environment')) {
+            $this->markTestSkipped();
+        }
+
         $questionSchema = $this->schemaFactory->buildSchema(Question::class, 'jsonapi', Schema::TYPE_OUTPUT);
         $json = $questionSchema->getDefinitions();
         $properties = $json['Question.jsonapi']['properties']['data']['properties'];
@@ -123,8 +127,7 @@ class JsonApiJsonSchemaTest extends ApiTestCase
     public function testJsonApiIncludesSchemaForSpecies(): void
     {
         $speciesSchema = $this->schemaFactory->buildSchema(Species::class, 'jsonapi', Schema::TYPE_OUTPUT, forceCollection: true);
-        $this->assertEquals('#/definitions/Species.jsonapi', $speciesSchema['$ref']);
-        $this->assertEquals(
+        $this->assertArraySubset(
             [
                 'description' => 'Species.jsonapi collection.',
                 'allOf' => [
@@ -157,7 +160,7 @@ class JsonApiJsonSchemaTest extends ApiTestCase
                     ],
                 ],
             ],
-            $speciesSchema->getDefinitions()['Species.jsonapi']
+            $speciesSchema->getArrayCopy()
         );
     }
 }

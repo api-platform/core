@@ -135,7 +135,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         foreach ($this->propertyNameCollectionFactory->create($inputOrOutputClass, $options) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($inputOrOutputClass, $propertyName, $options);
 
-            if (!$propertyMetadata->isReadable() && !$propertyMetadata->isWritable()) {
+            if (false === $propertyMetadata->isReadable() && false === $propertyMetadata->isWritable()) {
                 continue;
             }
 

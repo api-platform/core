@@ -560,7 +560,6 @@ class OpenApiFactoryTest extends TestCase
             'type' => 'object',
             'description' => 'This is a dummy',
             'externalDocs' => ['url' => 'http://schema.example.com/Dummy'],
-            'deprecated' => false,
             'properties' => [
                 'id' => new \ArrayObject([
                     'type' => 'integer',
@@ -595,7 +594,6 @@ class OpenApiFactoryTest extends TestCase
         $dummyErrorSchema->setDefinitions(new \ArrayObject([
             'type' => 'object',
             'description' => 'nice one!',
-            'deprecated' => false,
             'properties' => [
                 'type' => new \ArrayObject([
                     'type' => 'string',
@@ -621,7 +619,7 @@ class OpenApiFactoryTest extends TestCase
             ],
         ]));
         $errorSchema = clone $dummyErrorSchema->getDefinitions();
-        $errorSchema['description'] = '';
+        unset($errorSchema['description']);
 
         $openApi = $factory(['base_url' => '/app_dev.php/']);
 
@@ -646,7 +644,9 @@ class OpenApiFactoryTest extends TestCase
         $this->assertEquals($components->getSchemas(), new \ArrayObject([
             'Dummy' => $dummySchema->getDefinitions(),
             'Dummy.OutputDto' => $dummySchema->getDefinitions(),
-            'Parameter' => $parameterSchema,
+            'Dummy.jsonld' => $dummySchema->getDefinitions(),
+            'Dummy.OutputDto.jsonld' => $dummySchema->getDefinitions(),
+            'Parameter.jsonld' => $parameterSchema,
             'DummyErrorResource' => $dummyErrorSchema->getDefinitions(),
             'Error' => $errorSchema,
         ]));
@@ -681,7 +681,7 @@ class OpenApiFactoryTest extends TestCase
                 '200' => new Response('Dummy collection', new \ArrayObject([
                     'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject([
                         'type' => 'array',
-                        'items' => ['$ref' => '#/components/schemas/Dummy.OutputDto'],
+                        'items' => ['$ref' => '#/components/schemas/Dummy.OutputDto.jsonld'],
                     ]))),
                 ])),
             ],
@@ -711,7 +711,7 @@ class OpenApiFactoryTest extends TestCase
                 '201' => new Response(
                     'Dummy resource created',
                     new \ArrayObject([
-                        'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto']))),
+                        'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto.jsonld']))),
                     ]),
                     null,
                     new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
@@ -734,7 +734,7 @@ class OpenApiFactoryTest extends TestCase
             new RequestBody(
                 'The new Dummy resource',
                 new \ArrayObject([
-                    'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy']))),
+                    'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.jsonld']))),
                 ]),
                 true
             )
@@ -753,7 +753,7 @@ class OpenApiFactoryTest extends TestCase
                 '200' => new Response(
                     'Dummy resource',
                     new \ArrayObject([
-                        'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto']))),
+                        'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto.jsonld']))),
                     ])
                 ),
                 '404' => new Response(
@@ -775,7 +775,7 @@ class OpenApiFactoryTest extends TestCase
                 '200' => new Response(
                     'Dummy resource updated',
                     new \ArrayObject([
-                        'application/ld+json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto'])),
+                        'application/ld+json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto.jsonld'])),
                     ]),
                     null,
                     new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$request.path.id']), null, 'This is a dummy')])
@@ -803,7 +803,7 @@ class OpenApiFactoryTest extends TestCase
             new RequestBody(
                 'The updated Dummy resource',
                 new \ArrayObject([
-                    'application/ld+json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
+                    'application/ld+json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.jsonld'])),
                 ]),
                 true
             )
@@ -883,7 +883,7 @@ class OpenApiFactoryTest extends TestCase
                     'Dummy resource updated',
                     new \ArrayObject([
                         'application/json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto'])),
-                        'text/csv' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto'])),
+                        'text/csv' => new \ArrayObject(),
                     ]),
                     null,
                     new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$request.path.id']), null, 'This is a dummy')])
@@ -912,7 +912,7 @@ class OpenApiFactoryTest extends TestCase
                 'The updated Dummy resource',
                 new \ArrayObject([
                     'application/json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
-                    'text/csv' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
+                    'text/csv' => new \ArrayObject(),
                 ]),
                 true
             )
@@ -926,7 +926,7 @@ class OpenApiFactoryTest extends TestCase
                 '200' => new Response('Dummy collection', new \ArrayObject([
                     'application/ld+json' => new MediaType(new \ArrayObject([
                         'type' => 'array',
-                        'items' => ['$ref' => '#/components/schemas/Dummy.OutputDto'],
+                        'items' => ['$ref' => '#/components/schemas/Dummy.OutputDto.jsonld'],
                     ])),
                 ])),
             ],
@@ -961,7 +961,6 @@ class OpenApiFactoryTest extends TestCase
                     'enum' => ['asc', 'desc'],
                 ]),
             ],
-            deprecated: false
         ), $filteredPath->getGet());
 
         $paginatedPath = $paths->getPath('/paginated');
@@ -972,7 +971,7 @@ class OpenApiFactoryTest extends TestCase
                 '200' => new Response('Dummy collection', new \ArrayObject([
                     'application/ld+json' => new MediaType(new \ArrayObject([
                         'type' => 'array',
-                        'items' => ['$ref' => '#/components/schemas/Dummy.OutputDto'],
+                        'items' => ['$ref' => '#/components/schemas/Dummy.OutputDto.jsonld'],
                     ])),
                 ])),
             ],
@@ -1004,7 +1003,7 @@ class OpenApiFactoryTest extends TestCase
                 '201' => new Response(
                     'Dummy resource created',
                     new \ArrayObject([
-                        'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto']))),
+                        'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto.jsonld']))),
                     ]),
                     null,
                     new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
@@ -1045,7 +1044,6 @@ class OpenApiFactoryTest extends TestCase
                 ]),
                 false
             ),
-            deprecated: false,
         ), $requestBodyPath->getPost());
 
         $requestBodyPath = $paths->getPath('/dummiesRequestBodyWithoutContent');
@@ -1056,7 +1054,7 @@ class OpenApiFactoryTest extends TestCase
                 '201' => new Response(
                     'Dummy resource created',
                     new \ArrayObject([
-                        'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto']))),
+                        'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto.jsonld']))),
                     ]),
                     null,
                     new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
@@ -1079,11 +1077,10 @@ class OpenApiFactoryTest extends TestCase
             new RequestBody(
                 'Extended description for the new Dummy resource',
                 new \ArrayObject([
-                    'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy']))),
+                    'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.jsonld']))),
                 ]),
                 false
             ),
-            deprecated: false,
         ), $requestBodyPath->getPost());
 
         $dummyItemPath = $paths->getPath('/dummyitems/{id}');
@@ -1124,11 +1121,10 @@ class OpenApiFactoryTest extends TestCase
             new RequestBody(
                 'The updated Dummy resource',
                 new \ArrayObject([
-                    'application/ld+json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
+                    'application/ld+json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.jsonld'])),
                 ]),
                 true
             ),
-            deprecated: false
         ), $dummyItemPath->getPut());
 
         $dummyItemPath = $paths->getPath('/dummyitems');
@@ -1164,11 +1160,10 @@ class OpenApiFactoryTest extends TestCase
             new RequestBody(
                 'The new Dummy resource',
                 new \ArrayObject([
-                    'application/ld+json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
+                    'application/ld+json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.jsonld'])),
                 ]),
                 true
             ),
-            deprecated: false
         ), $dummyItemPath->getPost());
 
         $dummyItemPath = $paths->getPath('/dummyitems/{id}/images');
@@ -1208,7 +1203,7 @@ class OpenApiFactoryTest extends TestCase
                 '201' => new Response(
                     'Dummy resource created',
                     new \ArrayObject([
-                        'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto']))),
+                        'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto.jsonld']))),
                     ]),
                     null,
                     new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
@@ -1246,7 +1241,7 @@ class OpenApiFactoryTest extends TestCase
                 '200' => new Response('Dummy collection', new \ArrayObject([
                     'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject([
                         'type' => 'array',
-                        'items' => ['$ref' => '#/components/schemas/Dummy.OutputDto'],
+                        'items' => ['$ref' => '#/components/schemas/Dummy.OutputDto.jsonld'],
                     ]))),
                 ])),
                 '418' => new Response(
@@ -1276,7 +1271,6 @@ class OpenApiFactoryTest extends TestCase
                     'type' => 'boolean',
                 ]),
             ],
-            deprecated: false
         ), $paths->getPath('/erroredDummies')->getGet());
 
         $diamondsGetPath = $paths->getPath('/diamonds');

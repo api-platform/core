@@ -102,11 +102,17 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
     {
         $type = $propertyMetadata->getNativeType();
 
+        $className = null;
         $typeIsResourceClass = function (Type $type) use (&$className): bool {
             return $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($className = $type->getClassName());
         };
+        $isResourceClass = $type?->isSatisfiedBy($typeIsResourceClass);
 
-        if (!\array_key_exists('default', $propertySchema) && !empty($default = $propertyMetadata->getDefault()) && !$type?->isSatisfiedBy($typeIsResourceClass)) {
+        if (null !== $propertyMetadata->getUriTemplate() || (!\array_key_exists('readOnly', $propertySchema) && false === $propertyMetadata->isWritable() && !$propertyMetadata->isInitializable()) && !$className) {
+            $propertySchema['readOnly'] = true;
+        }
+
+        if (!\array_key_exists('default', $propertySchema) && !empty($default = $propertyMetadata->getDefault()) && !$isResourceClass) {
             if ($default instanceof \BackedEnum) {
                 $default = $default->value;
             }

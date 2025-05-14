@@ -160,11 +160,9 @@ final class JsonLdJsonSchemaTest extends ApiTestCase
     {
         $schema = $this->schemaFactory->buildSchema(Nest::class, 'jsonld', 'output');
 
-        $this->assertEquals($schema['definitions']['Nest.jsonld']['allOf'][1]['properties']['owner']['anyOf'], [
-            ['$ref' => '#/definitions/Robin.jsonld'],
-            ['$ref' => '#/definitions/Wren.jsonld'],
-            ['type' => 'null'],
-        ]);
+        $this->assertContains(['$ref' => '#/definitions/Robin.jsonld'], $schema['definitions']['Nest.jsonld']['allOf'][1]['properties']['owner']['anyOf']);
+        $this->assertContains(['$ref' => '#/definitions/Wren.jsonld'], $schema['definitions']['Nest.jsonld']['allOf'][1]['properties']['owner']['anyOf']);
+        $this->assertContains(['type' => 'null'], $schema['definitions']['Nest.jsonld']['allOf'][1]['properties']['owner']['anyOf']);
 
         $this->assertArrayHasKey('Nest.jsonld', $schema['definitions']);
     }

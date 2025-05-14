@@ -67,8 +67,8 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                         'additionalProperties' => true,
                     ],
                 ],
-            ] + self::BASE_PROPS,
-        ],
+            ],
+        ] + self::BASE_PROPS,
     ];
 
     private const ITEM_BASE_SCHEMA_OUTPUT = [
