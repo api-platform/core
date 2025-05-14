@@ -102,6 +102,7 @@ class ConfigurationTest extends TestCase
             'inflector' => 'api_platform.metadata.inflector',
             'validator' => [
                 'serialize_payload_fields' => [],
+                'query_parameter_validation' => true,
             ],
             'name_converter' => null,
             'enable_swagger' => true,
