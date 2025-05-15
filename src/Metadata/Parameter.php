@@ -23,12 +23,12 @@ use ApiPlatform\State\ParameterProviderInterface;
 abstract class Parameter
 {
     /**
-     * @param (array<string, mixed>&array{type?: string, default?: string})|null $schema
-     * @param array<string, mixed>                                               $extraProperties
-     * @param ParameterProviderInterface|callable|string|null                    $provider
-     * @param list<string>                                                       $properties      a list of properties this parameter applies to (works with the :property placeholder)
-     * @param FilterInterface|string|null                                        $filter
-     * @param mixed                                                              $constraints     an array of Symfony constraints, or an array of Laravel rules
+     * @param array{type?: string, default?: string, ...array<string, mixed>}|null $schema
+     * @param array<string, mixed>                                                 $extraProperties
+     * @param ParameterProviderInterface|callable|string|null                      $provider
+     * @param list<string>                                                         $properties      a list of properties this parameter applies to (works with the :property placeholder)
+     * @param FilterInterface|string|null                                          $filter
+     * @param mixed                                                                $constraints     an array of Symfony constraints, or an array of Laravel rules
      */
     public function __construct(
         protected ?string $key = null,
