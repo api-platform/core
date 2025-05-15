@@ -90,11 +90,10 @@ final class ApiLoader extends Loader
                         $path,
                         [
                             '_controller' => $controller ?? 'api_platform.action.placeholder',
-                            '_format' => null,
                             '_stateless' => $operation->getStateless(),
                             '_api_resource_class' => $resourceClass,
                             '_api_operation_name' => $operationName,
-                        ] + ($operation->getDefaults() ?? []),
+                        ] + ($operation->getDefaults() ?? []) + ['_format' => null],
                         $operation->getRequirements() ?? [],
                         $operation->getOptions() ?? [],
                         $operation->getHost() ?? '',
