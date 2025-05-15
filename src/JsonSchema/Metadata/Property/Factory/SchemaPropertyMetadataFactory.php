@@ -72,6 +72,10 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
         $link = (($options['schema_type'] ?? null) === Schema::TYPE_INPUT) ? $propertyMetadata->isWritableLink() : $propertyMetadata->isReadableLink();
         $propertySchema = $propertyMetadata->getSchema() ?? [];
 
+        if (null !== $propertyMetadata->getUriTemplate() || (!\array_key_exists('readOnly', $propertySchema) && false === $propertyMetadata->isWritable() && !$propertyMetadata->isInitializable())) {
+            $propertySchema['readOnly'] = true;
+        }
+
         if (!\array_key_exists('writeOnly', $propertySchema) && false === $propertyMetadata->isReadable()) {
             $propertySchema['writeOnly'] = true;
         }
@@ -121,10 +125,6 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
 
         if (!\array_key_exists('example', $propertySchema) && !empty($example = $propertyMetadata->getExample())) {
             $propertySchema['example'] = $example;
-        }
-
-        if (!\array_key_exists('example', $propertySchema) && \array_key_exists('default', $propertySchema)) {
-            $propertySchema['example'] = $propertySchema['default'];
         }
 
         // never override the following keys if at least one is already set or if there's a custom openapi context
@@ -327,12 +327,11 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             return ['type' => $type, 'enum' => $enumCases];
         }
 
-        // If it's a resource and links are not readable, represent as IRI string.
-        if ($isResourceClass && true !== $readableLink) {
+        if (false === $readableLink && $isResourceClass) {
             return [
                 'type' => 'string',
                 'format' => 'iri-reference',
-                'example' => 'https://example.com/', // Add a generic example
+                'example' => 'https://example.com/',
             ];
         }
 
@@ -357,10 +356,6 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
 
         if (!\array_key_exists('example', $propertySchema) && !empty($example = $propertyMetadata->getExample())) {
             $propertySchema['example'] = $example;
-        }
-
-        if (!\array_key_exists('example', $propertySchema) && \array_key_exists('default', $propertySchema)) {
-            $propertySchema['example'] = $propertySchema['default'];
         }
 
         // never override the following keys if at least one is already set or if there's a custom openapi context
@@ -530,7 +525,7 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             ];
         }
 
-        if (true !== $readableLink && $isResourceClass) {
+        if (false === $readableLink && $isResourceClass) {
             return [
                 'type' => 'string',
                 'format' => 'iri-reference',

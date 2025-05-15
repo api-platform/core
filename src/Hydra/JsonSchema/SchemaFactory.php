@@ -122,7 +122,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             return $this->schemaFactory->buildSchema($className, $format, $type, $operation, $schema, $serializerContext, $forceCollection);
         }
 
-        $definitionName = $this->definitionNameFactory->create($className, $format, $className, $operation, $serializerContext);
+        $definitionName = $this->definitionNameFactory->create($className, $format, $inputOrOutputClass, $operation, $serializerContext);
 
         // JSON-LD is slightly different then JSON:API or HAL
         // All the references that are resources must also be in JSON-LD therefore combining
@@ -134,23 +134,22 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         $prefix = $this->getSchemaUriPrefix($schema->getVersion());
         $collectionKey = $schema->getItemsDefinitionKey();
         $key = $schema->getRootDefinitionKey() ?? $collectionKey;
-        $name = Schema::TYPE_OUTPUT === $type ? self::ITEM_BASE_SCHEMA_NAME : self::ITEM_BASE_SCHEMA_OUTPUT_NAME;
-
-        if (!isset($definitions[$name])) {
-            $definitions[$name] = Schema::TYPE_OUTPUT === $type ? self::ITEM_BASE_SCHEMA_OUTPUT : self::ITEM_BASE_SCHEMA;
-        }
-
-        if (isset($definitions[$key]['description'])) {
-            $definitions[$definitionName]['description'] = $definitions[$key]['description'];
-        }
 
         if (!$collectionKey) {
             if ($this->transformed[$definitionName] ?? false) {
                 return $schema;
             }
 
+            $baseName = Schema::TYPE_OUTPUT === $type ? self::ITEM_BASE_SCHEMA_NAME : self::ITEM_BASE_SCHEMA_OUTPUT_NAME;
+
+            if ($this->isResourceClass($inputOrOutputClass)) {
+                if (!isset($definitions[$baseName])) {
+                    $definitions[$baseName] = Schema::TYPE_OUTPUT === $type ? self::ITEM_BASE_SCHEMA_OUTPUT : self::ITEM_BASE_SCHEMA;
+                }
+            }
+
             $allOf = new \ArrayObject(['allOf' => [
-                ['$ref' => $prefix.$name],
+                ['$ref' => $prefix.$baseName],
                 $definitions[$key],
             ]]);
 
@@ -159,7 +158,6 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             }
 
             $definitions[$definitionName] = $allOf;
-
             unset($definitions[$definitionName]['allOf'][1]['description']);
 
             $schema['$ref'] = $prefix.$definitionName;
@@ -169,7 +167,6 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             return $schema;
         }
 
-        // handle hydra:Collection
         if (($schema['type'] ?? '') !== 'array') {
             return $schema;
         }
@@ -262,8 +259,6 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             ];
         }
 
-        unset($schema['items']);
-
         $schema['type'] = 'object';
         $schema['description'] = "$definitionName collection.";
         $schema['allOf'] = [
@@ -273,11 +268,13 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 'properties' => [
                     $hydraPrefix.'member' => [
                         'type' => 'array',
-                        'items' => ['$ref' => $prefix.$definitionName],
+                        'items' => $schema['items'],
                     ],
                 ],
             ],
         ];
+
+        unset($schema['items']);
 
         return $schema;
     }

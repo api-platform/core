@@ -15,7 +15,9 @@ namespace ApiPlatform\Tests\Functional\JsonSchema;
 
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
+use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\Book;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5501\BrokenDocs;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5501\Related;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ResourceWithEnumProperty;
@@ -31,12 +33,15 @@ class JsonSchemaTest extends ApiTestCase
     use SetupClassResourcesTrait;
 
     protected SchemaFactoryInterface $schemaFactory;
+    protected OperationMetadataFactoryInterface $operationMetadataFactory;
+
     protected static ?bool $alwaysBootKernel = false;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->schemaFactory = self::getContainer()->get('api_platform.json_schema.schema_factory');
+        $this->operationMetadataFactory = self::getContainer()->get('api_platform.metadata.operation.metadata_factory');
     }
 
     /**
@@ -51,6 +56,7 @@ class JsonSchemaTest extends ApiTestCase
             Related::class,
             Nest::class,
             ResourceWithEnumProperty::class,
+            Book::class,
         ];
     }
 
@@ -184,5 +190,12 @@ class JsonSchemaTest extends ApiTestCase
             ]),
             $properties['genders']
         );
+    }
+
+    public function testSchemaWithUnkownType(): void
+    {
+        $schema = $this->schemaFactory->buildSchema(Book::class, 'json', Schema::TYPE_OUTPUT, $this->operationMetadataFactory->create('_api_/issue-5452/books{._format}_get_collection'));
+        $this->assertContains(['$ref' => '#/definitions/ActivableInterface'], $schema['definitions']['Book']['properties']['library']['anyOf']);
+        $this->assertContains(['$ref' => '#/definitions/TimestampableInterface'], $schema['definitions']['Book']['properties']['library']['anyOf']);
     }
 }

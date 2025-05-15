@@ -124,6 +124,11 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         ],
     ];
 
+    /**
+     * @var array<string, bool>
+     */
+    private $builtSchema = [];
+
     public function __construct(private readonly SchemaFactoryInterface $schemaFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, private ?DefinitionNameFactoryInterface $definitionNameFactory = null)
     {
         if (!$definitionNameFactory) {
@@ -163,12 +168,12 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         // We don't use the serializer context here as JSON:API doesn't leverage serializer groups for related resources.
         // That is done by query parameter. @see https://jsonapi.org/format/#fetching-includes
         $jsonApiSerializerContext = $serializerContext;
-        if (false === ($serializerContext[self::DISABLE_JSON_SCHEMA_SERIALIZER_GROUPS] ?? true)) {
+        if (true === ($serializerContext[self::DISABLE_JSON_SCHEMA_SERIALIZER_GROUPS] ?? true) && $inputOrOutputClass === $className) {
             unset($jsonApiSerializerContext['groups']);
         }
 
         $schema = $this->schemaFactory->buildSchema($className, 'json', $type, $operation, $schema, $jsonApiSerializerContext, $forceCollection);
-        $definitionName = $this->definitionNameFactory->create($className, $format, $className, $operation, $serializerContext);
+        $definitionName = $this->definitionNameFactory->create($inputOrOutputClass, $format, $className, $operation, $jsonApiSerializerContext);
         $prefix = $this->getSchemaUriPrefix($schema->getVersion());
         $definitions = $schema->getDefinitions();
         $collectionKey = $schema->getItemsDefinitionKey();
@@ -182,11 +187,6 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
         $key = $schema->getRootDefinitionKey() ?? $collectionKey;
         $properties = $definitions[$definitionName]['properties'] ?? [];
-
-        // Prevent reapplying
-        if (isset($definitions[$key]['description'])) {
-            $definitions[$definitionName]['description'] = $definitions[$key]['description'];
-        }
 
         if (Error::class === $className && !isset($properties['errors'])) {
             $definitions[$definitionName]['properties'] = [
@@ -213,40 +213,40 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             return $schema;
         }
 
-        if (($schema['type'] ?? '') === 'array') {
-            if (!isset($definitions[self::COLLECTION_BASE_SCHEMA_NAME])) {
-                $definitions[self::COLLECTION_BASE_SCHEMA_NAME] = [
-                    'type' => 'object',
-                    'properties' => [
-                        'links' => self::LINKS_PROPS,
-                        'meta' => self::META_PROPS,
-                        'data' => [
-                            'type' => 'array',
-                        ],
-                    ],
-                    'required' => ['data'],
-                ];
-            }
-
-            unset($schema['items']);
-            unset($schema['type']);
-
-            $properties = $this->buildDefinitionPropertiesSchema($key, $className, $format, $type, $operation, $schema, []);
-            $properties['data']['properties']['attributes']['$ref'] = $prefix.$key;
-
-            $schema['description'] = "$definitionName collection.";
-            $schema['allOf'] = [
-                ['$ref' => $prefix.self::COLLECTION_BASE_SCHEMA_NAME],
-                ['type' => 'object', 'properties' => [
-                    'data' => [
-                        'type' => 'array',
-                        'items' => $properties['data'],
-                    ],
-                ]],
-            ];
-
+        if (($schema['type'] ?? '') !== 'array') {
             return $schema;
         }
+
+        if (!isset($definitions[self::COLLECTION_BASE_SCHEMA_NAME])) {
+            $definitions[self::COLLECTION_BASE_SCHEMA_NAME] = [
+                'type' => 'object',
+                'properties' => [
+                    'links' => self::LINKS_PROPS,
+                    'meta' => self::META_PROPS,
+                    'data' => [
+                        'type' => 'array',
+                    ],
+                ],
+                'required' => ['data'],
+            ];
+        }
+
+        unset($schema['items']);
+        unset($schema['type']);
+
+        $properties = $this->buildDefinitionPropertiesSchema($key, $className, $format, $type, $operation, $schema, []);
+        $properties['data']['properties']['attributes']['$ref'] = $prefix.$key;
+
+        $schema['description'] = "$definitionName collection.";
+        $schema['allOf'] = [
+            ['$ref' => $prefix.self::COLLECTION_BASE_SCHEMA_NAME],
+            ['type' => 'object', 'properties' => [
+                'data' => [
+                    'type' => 'array',
+                    'items' => $properties['data'],
+                ],
+            ]],
+        ];
 
         return $schema;
     }
@@ -279,8 +279,23 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                     $inputOrOutputClass = $this->findOutputClass($relatedClassName, $type, $operation, $serializerContext);
                     $serializerContext ??= $this->getSerializerContext($operation, $type);
                     $definitionName = $this->definitionNameFactory->create($relatedClassName, $format, $inputOrOutputClass, $operation, $serializerContext);
-                    $ref = $this->getSchemaUriPrefix($schema->getVersion()).$definitionName;
-                    $refs[$ref] = '$ref';
+
+                    // to avoid recursion
+                    if ($this->builtSchema[$definitionName] ?? false) {
+                        $refs[$this->getSchemaUriPrefix($schema->getVersion()).$definitionName] = '$ref';
+                        continue;
+                    }
+
+                    if (!isset($definitions[$definitionName])) {
+                        $this->builtSchema[$definitionName] = true;
+                        $subSchema = new Schema($schema->getVersion());
+                        $subSchema->setDefinitions($schema->getDefinitions());
+                        $subSchema = $this->buildSchema($relatedClassName, $format, $type, $operation, $subSchema, $serializerContext + [self::FORCE_SUBSCHEMA => true], false);
+                        $schema->setDefinitions($subSchema->getDefinitions());
+                        $definitions = $schema->getDefinitions();
+                    }
+
+                    $refs[$this->getSchemaUriPrefix($schema->getVersion()).$definitionName] = '$ref';
                 }
                 $relatedDefinitions[$propertyName] = array_flip($refs);
                 if ($isOne) {
@@ -325,24 +340,6 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                     ],
                 ],
             ];
-        }
-
-        if ($required = $definitions[$key]['required'] ?? null) {
-            foreach ($required as $i => $require) {
-                if (isset($relationships[$require])) {
-                    $replacement['relationships']['required'][] = $require;
-                    unset($required[$i]);
-                }
-            }
-
-            $replacement['attributes'] = [
-                'allOf' => [
-                    $replacement['attributes'],
-                    ['type' => 'object', 'required' => $required],
-                ],
-            ];
-
-            unset($definitions[$key]['required']);
         }
 
         return [

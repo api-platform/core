@@ -306,7 +306,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
 
         $type = $propertyMetadata->getNativeType();
-        $propertySchemaType = $propertySchema['type'] ?? false;
+        $propertySchemaType = $propertySchema['type'] ?? Schema::UNKNOWN_TYPE;
         $isSchemaDefined = ($propertySchema['$ref'] ?? $propertySchema['anyOf'] ?? $propertySchema['allOf'] ?? $propertySchema['oneOf'] ?? false)
             || ($propertySchemaType && 'string' !== $propertySchemaType && !(\is_array($propertySchemaType) && !\in_array('string', $propertySchemaType, true)))
             || (($propertySchema['format'] ?? $propertySchema['enum'] ?? false) && $propertySchemaType);
@@ -323,11 +323,14 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             return;
         }
 
+        if ($isUnknown) {
+            $propertySchema = [];
+        }
+
         // property schema is created in SchemaPropertyMetadataFactory, but it cannot build resource reference ($ref)
         // complete property schema with resource reference ($ref) if it's related to an object/resource
         $refs = [];
         $isNullable = $type?->isNullable() ?? false;
-        $hasClassName = false;
 
         if ($type) {
             foreach ($type instanceof CompositeTypeInterface ? $type->getTypes() : [$type] as $t) {

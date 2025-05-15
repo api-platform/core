@@ -86,7 +86,6 @@ Feature: Documentation support
     """
     {
       "default": "male",
-      "example": "male",
       "type": ["string", "null"],
       "enum": [
           "male",

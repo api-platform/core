@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Functional\JsonSchema;
 
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
+use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Animal;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\AnimalObservation;
@@ -29,12 +30,14 @@ class JsonApiJsonSchemaTest extends ApiTestCase
     use SetupClassResourcesTrait;
 
     protected SchemaFactoryInterface $schemaFactory;
+    protected OperationMetadataFactoryInterface $operationMetadataFactory;
     protected static ?bool $alwaysBootKernel = false;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->schemaFactory = self::getContainer()->get('api_platform.json_schema.schema_factory');
+        $this->operationMetadataFactory = self::getContainer()->get('api_platform.metadata.operation.metadata_factory');
     }
 
     /**
