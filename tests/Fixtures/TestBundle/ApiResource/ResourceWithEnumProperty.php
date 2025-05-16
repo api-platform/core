@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -30,6 +31,7 @@ class ResourceWithEnumProperty
 {
     public int $id = 1;
 
+    #[ApiProperty(readableLink: true)]
     public ?BackedEnumIntegerResource $intEnum = null;
 
     /** @var BackedEnumStringResource[] */

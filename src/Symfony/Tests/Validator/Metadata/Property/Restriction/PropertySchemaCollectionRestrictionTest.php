@@ -104,7 +104,7 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
             'name' => new \ArrayObject(),
             'email' => ['minLength' => 2, 'maxLength' => 255, 'format' => 'email'],
             'phone' => ['pattern' => '^([+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*)$'],
-            'age' => ['exclusiveMinimum' => 0],
+            'age' => ['exclusiveMinimum' => 0, 'minimum' => 0],
             'social' => ['type' => 'object', 'properties' => new \ArrayObject(['githubUsername' => new \ArrayObject()]), 'additionalProperties' => false, 'required' => ['githubUsername']],
         ]);
         $required = ['name', 'email', 'social'];

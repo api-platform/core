@@ -22,7 +22,7 @@ enum Issue6317: int
     case First = 1;
     case Second = 2;
 
-    #[ApiProperty(identifier: true, example: 'An example of an ID')]
+    #[ApiProperty(identifier: true, example: 1)]
     public function getId(): int
     {
         return $this->value;
@@ -40,7 +40,7 @@ enum Issue6317: int
         return 1 === $this->value ? '1st' : '2nd';
     }
 
-    #[ApiProperty(openapiContext: ['example' => '42'])]
+    #[ApiProperty(openapiContext: ['example' => 42])]
     public function getCardinal(): int
     {
         return $this->value;

@@ -106,11 +106,17 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
     {
         $type = $propertyMetadata->getNativeType();
 
+        $className = null;
         $typeIsResourceClass = function (Type $type) use (&$className): bool {
             return $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($className = $type->getClassName());
         };
+        $isResourceClass = $type?->isSatisfiedBy($typeIsResourceClass);
 
-        if (!\array_key_exists('default', $propertySchema) && !empty($default = $propertyMetadata->getDefault()) && !$type?->isSatisfiedBy($typeIsResourceClass)) {
+        if (null !== $propertyMetadata->getUriTemplate() || (!\array_key_exists('readOnly', $propertySchema) && false === $propertyMetadata->isWritable() && !$propertyMetadata->isInitializable()) && !$className) {
+            $propertySchema['readOnly'] = true;
+        }
+
+        if (!\array_key_exists('default', $propertySchema) && !empty($default = $propertyMetadata->getDefault()) && !$isResourceClass) {
             if ($default instanceof \BackedEnum) {
                 $default = $default->value;
             }
@@ -119,10 +125,6 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
 
         if (!\array_key_exists('example', $propertySchema) && !empty($example = $propertyMetadata->getExample())) {
             $propertySchema['example'] = $example;
-        }
-
-        if (!\array_key_exists('example', $propertySchema) && \array_key_exists('default', $propertySchema)) {
-            $propertySchema['example'] = $propertySchema['default'];
         }
 
         // never override the following keys if at least one is already set or if there's a custom openapi context
@@ -325,12 +327,11 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             return ['type' => $type, 'enum' => $enumCases];
         }
 
-        // If it's a resource and links are not readable, represent as IRI string.
-        if ($isResourceClass && true !== $readableLink) {
+        if (false === $readableLink && $isResourceClass) {
             return [
                 'type' => 'string',
                 'format' => 'iri-reference',
-                'example' => 'https://example.com/', // Add a generic example
+                'example' => 'https://example.com/',
             ];
         }
 
@@ -340,8 +341,13 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
     private function getLegacyTypeSchema(ApiProperty $propertyMetadata, array $propertySchema, string $resourceClass, string $property, ?bool $link): array
     {
         $types = $propertyMetadata->getBuiltinTypes() ?? [];
+        $className = ($types[0] ?? null)?->getClassName() ?? null;
 
-        if (!\array_key_exists('default', $propertySchema) && !empty($default = $propertyMetadata->getDefault()) && (!\count($types) || null === ($className = $types[0]->getClassName()) || !$this->isResourceClass($className))) {
+        if (null !== $propertyMetadata->getUriTemplate() || (!\array_key_exists('readOnly', $propertySchema) && false === $propertyMetadata->isWritable() && !$propertyMetadata->isInitializable()) && !$className) {
+            $propertySchema['readOnly'] = true;
+        }
+
+        if (!\array_key_exists('default', $propertySchema) && !empty($default = $propertyMetadata->getDefault()) && (!$className || !$this->isResourceClass($className))) {
             if ($default instanceof \BackedEnum) {
                 $default = $default->value;
             }
@@ -352,10 +358,6 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             $propertySchema['example'] = $example;
         }
 
-        if (!\array_key_exists('example', $propertySchema) && \array_key_exists('default', $propertySchema)) {
-            $propertySchema['example'] = $propertySchema['default'];
-        }
-
         // never override the following keys if at least one is already set or if there's a custom openapi context
         if (
             [] === $types
@@ -363,6 +365,14 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             || \array_key_exists('type', $propertyMetadata->getOpenapiContext() ?? [])
         ) {
             return $propertySchema;
+        }
+
+        if ($propertyMetadata->getUriTemplate()) {
+            return $propertySchema + [
+                'type' => 'string',
+                'format' => 'iri-reference',
+                'example' => 'https://example.com/',
+            ];
         }
 
         $valueSchema = [];
@@ -455,6 +465,8 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
      * Note: if the class is not part of exceptions listed above, any class is considered as a resource.
      *
      * @throws PropertyNotFoundException
+     *
+     * @return array<string, mixed>
      */
     private function getLegacyClassType(?string $className, bool $nullable, ?bool $readableLink): array
     {
@@ -513,7 +525,7 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             ];
         }
 
-        if (true !== $readableLink && $isResourceClass) {
+        if (false === $readableLink && $isResourceClass) {
             return [
                 'type' => 'string',
                 'format' => 'iri-reference',
@@ -521,6 +533,8 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             ];
         }
 
+        // When this is set, we compute the schema at SchemaFactory::buildPropertySchema as it
+        // will end up being a $ref to another class schema, we don't have enough informations here
         return ['type' => Schema::UNKNOWN_TYPE];
     }
 

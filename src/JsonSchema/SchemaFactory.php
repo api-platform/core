@@ -40,16 +40,16 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
 final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareInterface
 {
     use ResourceMetadataTrait;
+    use SchemaUriPrefixTrait;
 
     private ?SchemaFactoryInterface $schemaFactory = null;
     // Edge case where the related resource is not readable (for example: NotExposed) but we have groups to read the whole related object
-    public const FORCE_SUBSCHEMA = '_api_subschema_force_readable_link';
     public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null, ?ResourceClassResolverInterface $resourceClassResolver = null, private readonly ?array $distinctFormats = null, private ?DefinitionNameFactoryInterface $definitionNameFactory = null)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ?NameConverterInterface $nameConverter = null, ?ResourceClassResolverInterface $resourceClassResolver = null, ?array $distinctFormats = null, private ?DefinitionNameFactoryInterface $definitionNameFactory = null)
     {
         if (!$definitionNameFactory) {
-            $this->definitionNameFactory = new DefinitionNameFactory($this->distinctFormats);
+            $this->definitionNameFactory = new DefinitionNameFactory($distinctFormats);
         }
 
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -92,7 +92,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
 
         if (!isset($schema['$ref']) && !isset($schema['type'])) {
-            $ref = Schema::VERSION_OPENAPI === $version ? '#/components/schemas/'.$definitionName : '#/definitions/'.$definitionName;
+            $ref = $this->getSchemaUriPrefix($version).$definitionName;
             if ($forceCollection || ('POST' !== $method && $operation instanceof CollectionOperationInterface)) {
                 $schema['type'] = 'array';
                 $schema['items'] = ['$ref' => $ref];
@@ -110,7 +110,9 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         /** @var \ArrayObject<string, mixed> $definition */
         $definition = new \ArrayObject(['type' => 'object']);
         $definitions[$definitionName] = $definition;
-        $definition['description'] = $operation ? ($operation->getDescription() ?? '') : '';
+        if ($description = $operation?->getDescription()) {
+            $definition['description'] = $description;
+        }
 
         // additionalProperties are allowed by default, so it does not need to be set explicitly, unless allow_extra_attributes is false
         // See https://json-schema.org/understanding-json-schema/reference/object.html#properties
@@ -121,8 +123,6 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         // see https://github.com/json-schema-org/json-schema-spec/pull/737
         if (Schema::VERSION_SWAGGER !== $version && $operation && $operation->getDeprecationReason()) {
             $definition['deprecated'] = true;
-        } else {
-            $definition['deprecated'] = false;
         }
 
         // externalDocs is an OpenAPI specific extension, but JSON Schema allows additional keys, so we always add it
@@ -134,7 +134,8 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         $options = ['schema_type' => $type] + $this->getFactoryOptions($serializerContext, $validationGroups, $operation instanceof HttpOperation ? $operation : null);
         foreach ($this->propertyNameCollectionFactory->create($inputOrOutputClass, $options) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($inputOrOutputClass, $propertyName, $options);
-            if (!$propertyMetadata->isReadable() && !$propertyMetadata->isWritable()) {
+
+            if (false === $propertyMetadata->isReadable() && false === $propertyMetadata->isWritable()) {
                 continue;
             }
 
@@ -195,6 +196,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             || ('array' === $propertySchemaType && Schema::UNKNOWN_TYPE === ($propertySchema['items']['type'] ?? null))
             || ('object' === $propertySchemaType && Schema::UNKNOWN_TYPE === ($propertySchema['additionalProperties']['type'] ?? null));
 
+        // Scalar properties
         if (
             !$isUnknown && (
                 [] === $types
@@ -203,6 +205,10 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 || ($propertySchema['format'] ?? $propertySchema['enum'] ?? false)
             )
         ) {
+            if (isset($propertySchema['$ref'])) {
+                unset($propertySchema['type']);
+            }
+
             $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = new \ArrayObject($propertySchema);
 
             return;
@@ -259,7 +265,8 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             $refs[] = ['type' => 'null'];
         }
 
-        if (($c = \count($refs)) > 1) {
+        $c = \count($refs);
+        if ($c > 1) {
             $propertySchema['anyOf'] = $refs;
             unset($propertySchema['type']);
         } elseif (1 === $c) {
@@ -299,10 +306,17 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
 
         $type = $propertyMetadata->getNativeType();
-        $propertySchemaType = $propertySchema['type'] ?? false;
+        $propertySchemaType = $propertySchema['type'] ?? Schema::UNKNOWN_TYPE;
         $isSchemaDefined = ($propertySchema['$ref'] ?? $propertySchema['anyOf'] ?? $propertySchema['allOf'] ?? $propertySchema['oneOf'] ?? false)
             || ($propertySchemaType && 'string' !== $propertySchemaType && !(\is_array($propertySchemaType) && !\in_array('string', $propertySchemaType, true)))
             || (($propertySchema['format'] ?? $propertySchema['enum'] ?? false) && $propertySchemaType);
+
+        // Type is defined in an allOf, anyOf, $ref or oneOf
+        if ($isSchemaDefined && !isset($propertySchema['type'])) {
+            $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = new \ArrayObject($propertySchema);
+
+            return;
+        }
 
         // Check if the type is considered "unknown" by SchemaPropertyMetadataFactory
         $isUnknown = Schema::UNKNOWN_TYPE === $propertySchemaType
@@ -316,11 +330,16 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             return;
         }
 
+        if ($isUnknown) {
+            $propertySchema = [];
+        }
+
         // property schema is created in SchemaPropertyMetadataFactory, but it cannot build resource reference ($ref)
         // complete property schema with resource reference ($ref) if it's related to an object/resource
         $refs = [];
         $isNullable = $type?->isNullable() ?? false;
 
+        // TODO: refactor this with TypeInfo we shouldn't have to loop like this, the below code handles object refs
         if ($type) {
             foreach ($type instanceof CompositeTypeInterface ? $type->getTypes() : [$type] as $t) {
                 if ($t instanceof BuiltinType && TypeIdentifier::NULL === $t->getTypeIdentifier()) {
@@ -356,6 +375,10 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
                 if ($isCollection) {
                     $key = ($propertySchema['type'] ?? null) === 'object' ? 'additionalProperties' : 'items';
+                    if (!isset($propertySchema['type'])) {
+                        $propertySchema['type'] = 'array';
+                    }
+
                     if (!isset($propertySchema[$key]) || !\is_array($propertySchema[$key])) {
                         $propertySchema[$key] = [];
                     }

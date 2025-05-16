@@ -97,7 +97,18 @@ final class OpenApiContext implements Context
      */
     public function assertThePropertyIsRequiredForTheOpenAPIClass(string $propertyName, string $className): void
     {
-        if (!\in_array($propertyName, $this->getClassInfo($className)->required, true)) {
+        $ok = false;
+        $schema = $this->getClassInfo($className);
+        if (isset($schema->allOf)) {
+            foreach ($schema->allOf as $schema) {
+                if (isset($schema->required) && \in_array($propertyName, $schema->required, true)) {
+                    $ok = true;
+                    break;
+                }
+            }
+        }
+
+        if (!$ok) {
             throw new ExpectationFailedException(\sprintf('Property "%s" of class "%s" should be required', $propertyName, $className));
         }
     }

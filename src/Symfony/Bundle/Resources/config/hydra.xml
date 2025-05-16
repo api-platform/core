@@ -8,6 +8,8 @@
         <service id="api_platform.hydra.json_schema.schema_factory" class="ApiPlatform\Hydra\JsonSchema\SchemaFactory" decorates="api_platform.json_schema.schema_factory">
             <argument type="service" id="api_platform.hydra.json_schema.schema_factory.inner" />
             <argument>%api_platform.serializer.default_context%</argument>
+            <argument type="service" id="api_platform.json_schema.definition_name_factory" on-invalid="ignore"/>
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" on-invalid="ignore" />
         </service>
         <service id="api_platform.hydra.normalizer.documentation" class="ApiPlatform\Hydra\Serializer\DocumentationNormalizer" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />

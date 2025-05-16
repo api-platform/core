@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\JsonSchema;
+namespace ApiPlatform\JsonSchema\Tests;
 
 use ApiPlatform\JsonSchema\DefinitionNameFactory;
 use ApiPlatform\JsonSchema\SchemaFactory;
@@ -65,33 +65,33 @@ final class DefinitionNameFactoryTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('providerDefinitions')]
     public function testCreate(string $expected, string $className, string $format = 'json', ?string $inputOrOutputClass = null, ?Operation $operation = null, array $serializerContext = []): void
     {
-        $definitionNameFactory = new DefinitionNameFactory(['jsonapi' => true, 'jsonhal' => true, 'jsonld' => true]);
+        $definitionNameFactory = new DefinitionNameFactory();
 
         static::assertSame($expected, $definitionNameFactory->create($className, $format, $inputOrOutputClass, $operation, $serializerContext));
     }
 
     public function testCreateDifferentPrefixesForClassesWithTheSameShortName(): void
     {
-        $definitionNameFactory = new DefinitionNameFactory(['jsonapi' => true, 'jsonhal' => true]);
+        $definitionNameFactory = new DefinitionNameFactory();
 
         self::assertEquals(
             'DummyClass.jsonapi',
-            $definitionNameFactory->create(\ApiPlatform\Tests\JsonSchema\Dummy\NamespaceA\Module\DummyClass::class, 'jsonapi')
+            $definitionNameFactory->create(Fixtures\DefinitionNameFactory\NamespaceA\Module\DummyClass::class, 'jsonapi')
         );
 
         self::assertEquals(
             'Module.DummyClass.jsonapi',
-            $definitionNameFactory->create(\ApiPlatform\Tests\JsonSchema\Dummy\NamespaceB\Module\DummyClass::class, 'jsonapi')
+            $definitionNameFactory->create(Fixtures\DefinitionNameFactory\NamespaceB\Module\DummyClass::class, 'jsonapi')
         );
 
         self::assertEquals(
             'NamespaceC.Module.DummyClass.jsonapi',
-            $definitionNameFactory->create(\ApiPlatform\Tests\JsonSchema\Dummy\NamespaceC\Module\DummyClass::class, 'jsonapi')
+            $definitionNameFactory->create(Fixtures\DefinitionNameFactory\NamespaceC\Module\DummyClass::class, 'jsonapi')
         );
 
         self::assertEquals(
             'DummyClass.jsonhal',
-            $definitionNameFactory->create(\ApiPlatform\Tests\JsonSchema\Dummy\NamespaceA\Module\DummyClass::class, 'jsonhal')
+            $definitionNameFactory->create(Fixtures\DefinitionNameFactory\NamespaceA\Module\DummyClass::class, 'jsonhal')
         );
     }
 }

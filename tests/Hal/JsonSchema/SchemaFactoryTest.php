@@ -50,7 +50,7 @@ class SchemaFactoryTest extends TestCase
         $propertyNameCollectionFactory->create(Dummy::class, ['enable_getter_setter_extraction' => true, 'schema_type' => Schema::TYPE_OUTPUT])->willReturn(new PropertyNameCollection());
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
 
-        $definitionNameFactory = new DefinitionNameFactory(['jsonapi' => true, 'jsonhal' => true, 'jsonld' => true]);
+        $definitionNameFactory = new DefinitionNameFactory();
 
         $baseSchemaFactory = new BaseSchemaFactory(
             resourceMetadataFactory: $resourceMetadataFactory->reveal(),
@@ -87,8 +87,8 @@ class SchemaFactoryTest extends TestCase
         $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
 
         $this->assertTrue(isset($definitions[$rootDefinitionKey]));
-        $this->assertTrue(isset($definitions[$rootDefinitionKey]['properties']));
-        $properties = $resultSchema['definitions'][$rootDefinitionKey]['properties'];
+        $this->assertTrue(isset($definitions[$rootDefinitionKey]['allOf'][0]['properties']));
+        $properties = $resultSchema['definitions'][$rootDefinitionKey]['allOf'][0]['properties'];
         $this->assertArrayHasKey('_links', $properties);
         $this->assertEquals(
             [
@@ -109,29 +109,26 @@ class SchemaFactoryTest extends TestCase
         );
     }
 
-    public function testSchemaTypeBuildSchema(): void
+    public function testCollection(): void
     {
         $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonhal', Schema::TYPE_OUTPUT, new GetCollection());
-        $definitionName = 'Dummy.jsonhal';
-
         $this->assertNull($resultSchema->getRootDefinitionKey());
-        $this->assertTrue(isset($resultSchema['properties']));
-        $this->assertArrayHasKey('_embedded', $resultSchema['properties']);
-        $this->assertArrayHasKey('totalItems', $resultSchema['properties']);
-        $this->assertArrayHasKey('itemsPerPage', $resultSchema['properties']);
-        $this->assertArrayHasKey('_links', $resultSchema['properties']);
-        $properties = $resultSchema['definitions'][$definitionName]['properties'];
-        $this->assertArrayHasKey('_links', $properties);
 
-        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonhal', Schema::TYPE_OUTPUT, null, null, null, true);
+        $this->assertTrue(isset($resultSchema['definitions']['Dummy.jsonhal']));
+        $this->assertTrue(isset($resultSchema['definitions']['HalCollectionBaseSchema']));
+        $this->assertTrue(isset($resultSchema['definitions']['Dummy.jsonhal']));
 
-        $this->assertNull($resultSchema->getRootDefinitionKey());
-        $this->assertTrue(isset($resultSchema['properties']));
-        $this->assertArrayHasKey('_embedded', $resultSchema['properties']);
-        $this->assertArrayHasKey('totalItems', $resultSchema['properties']);
-        $this->assertArrayHasKey('itemsPerPage', $resultSchema['properties']);
-        $this->assertArrayHasKey('_links', $resultSchema['properties']);
-        $properties = $resultSchema['definitions'][$definitionName]['properties'];
-        $this->assertArrayHasKey('_links', $properties);
+        foreach ($resultSchema['allOf'] as $schema) {
+            if (isset($schema['$ref'])) {
+                $this->assertEquals($schema['$ref'], '#/definitions/HalCollectionBaseSchema');
+                continue;
+            }
+
+            $this->assertArrayHasKey('_embedded', $schema['properties']);
+            $this->assertEquals('#/definitions/Dummy.jsonhal', $schema['properties']['_embedded']['additionalProperties']['items']['$ref']);
+        }
+
+        $forceCollectionSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonhal', Schema::TYPE_OUTPUT, null, null, null, true);
+        $this->assertEquals($forceCollectionSchema, $resultSchema);
     }
 }

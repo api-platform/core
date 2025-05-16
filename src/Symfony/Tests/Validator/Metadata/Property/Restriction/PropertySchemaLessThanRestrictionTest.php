@@ -79,6 +79,7 @@ final class PropertySchemaLessThanRestrictionTest extends TestCase
     {
         self::assertEquals([
             'exclusiveMaximum' => 10,
+            'maximum' => 10,
         ], $this->propertySchemaLessThanRestriction->create(new LessThan(['value' => 10]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)])));
     }
 
@@ -86,14 +87,17 @@ final class PropertySchemaLessThanRestrictionTest extends TestCase
     {
         self::assertEquals([
             'exclusiveMaximum' => 10,
+            'maximum' => 10,
         ], $this->propertySchemaLessThanRestriction->create(new LessThan(['value' => 10]), (new ApiProperty())->withNativeType(Type::int())));
 
         self::assertEquals([
             'exclusiveMaximum' => 0,
+            'maximum' => 0,
         ], $this->propertySchemaLessThanRestriction->create(new Negative(), (new ApiProperty())->withNativeType(Type::int())));
 
         self::assertEquals([
             'exclusiveMaximum' => 10.99,
+            'maximum' => 10.99,
         ], $this->propertySchemaLessThanRestriction->create(new LessThan(['value' => 10.99]), (new ApiProperty())->withNativeType(Type::float())));
     }
 }
