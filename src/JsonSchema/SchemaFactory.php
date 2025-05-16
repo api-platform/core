@@ -311,6 +311,13 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             || ($propertySchemaType && 'string' !== $propertySchemaType && !(\is_array($propertySchemaType) && !\in_array('string', $propertySchemaType, true)))
             || (($propertySchema['format'] ?? $propertySchema['enum'] ?? false) && $propertySchemaType);
 
+        // Type is defined in an allOf, anyOf, $ref or oneOf
+        if ($isSchemaDefined && !isset($propertySchema['type'])) {
+            $schema->getDefinitions()[$definitionName]['properties'][$normalizedPropertyName] = new \ArrayObject($propertySchema);
+
+            return;
+        }
+
         // Check if the type is considered "unknown" by SchemaPropertyMetadataFactory
         $isUnknown = Schema::UNKNOWN_TYPE === $propertySchemaType
             || ('array' === $propertySchemaType && Schema::UNKNOWN_TYPE === ($propertySchema['items']['type'] ?? null))
@@ -332,6 +339,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         $refs = [];
         $isNullable = $type?->isNullable() ?? false;
 
+        // TODO: refactor this with TypeInfo we shouldn't have to loop like this, the below code handles object refs
         if ($type) {
             foreach ($type instanceof CompositeTypeInterface ? $type->getTypes() : [$type] as $t) {
                 if ($t instanceof BuiltinType && TypeIdentifier::NULL === $t->getTypeIdentifier()) {
@@ -367,6 +375,10 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
                 if ($isCollection) {
                     $key = ($propertySchema['type'] ?? null) === 'object' ? 'additionalProperties' : 'items';
+                    if (!isset($propertySchema['type'])) {
+                        $propertySchema['type'] = 'array';
+                    }
+
                     if (!isset($propertySchema[$key]) || !\is_array($propertySchema[$key])) {
                         $propertySchema[$key] = [];
                     }

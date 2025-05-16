@@ -255,7 +255,6 @@ class SchemaFactoryTest extends TestCase
         $this->assertArrayHasKey('ignoredProperty', $definitions[$rootDefinitionKey]['properties']);
         $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['ignoredProperty']);
         $this->assertSame(['string', 'null'], $definitions[$rootDefinitionKey]['properties']['ignoredProperty']['type']);
-
         $this->assertArrayHasKey('unionType', $definitions[$rootDefinitionKey]['properties']);
         $this->assertArrayHasKey('oneOf', $definitions[$rootDefinitionKey]['properties']['unionType']);
         $this->assertCount(2, $definitions[$rootDefinitionKey]['properties']['unionType']['oneOf']);

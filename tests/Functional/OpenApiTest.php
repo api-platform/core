@@ -69,6 +69,7 @@ class OpenApiTest extends ApiTestCase
                     'type' => 'object',
                     'properties' => [
                         'title' => [
+                            'readOnly' => true,
                             'description' => 'A short, human-readable summary of the problem.',
                             'type' => [
                                 0 => 'string',
@@ -76,6 +77,7 @@ class OpenApiTest extends ApiTestCase
                             ],
                         ],
                         'detail' => [
+                            'readOnly' => true,
                             'description' => 'A human-readable explanation specific to this occurrence of the problem.',
                             'type' => [
                                 0 => 'string',
@@ -90,6 +92,7 @@ class OpenApiTest extends ApiTestCase
                             'default' => 400,
                         ],
                         'instance' => [
+                            'readOnly' => true,
                             'description' => 'A URI reference that identifies the specific occurrence of the problem. It may or may not yield further information if dereferenced.',
                             'type' => [
                                 0 => 'string',
@@ -97,10 +100,12 @@ class OpenApiTest extends ApiTestCase
                             ],
                         ],
                         'type' => [
+                            'readOnly' => true,
                             'description' => 'A URI reference that identifies the problem type',
                             'type' => 'string',
                         ],
                         'description' => [
+                            'readOnly' => true,
                             'type' => [
                                 0 => 'string',
                                 1 => 'null',

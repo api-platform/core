@@ -58,6 +58,7 @@ final class JsonLdJsonSchemaTest extends ApiTestCase
                     'properties' => [
                         'id' => new \ArrayObject([
                             'type' => 'integer',
+                            'readOnly' => true,
                         ]),
                         'description' => new \ArrayObject([
                             'maxLength' => 255,
@@ -85,6 +86,7 @@ final class JsonLdJsonSchemaTest extends ApiTestCase
             'properties' => [
                 'id' => new \ArrayObject([
                     'type' => 'integer',
+                    'readOnly' => true,
                 ]),
                 'nullableString' => new \ArrayObject([
                     'type' => [
@@ -111,6 +113,7 @@ final class JsonLdJsonSchemaTest extends ApiTestCase
                     'properties' => [
                         'id' => new \ArrayObject([
                             'type' => 'integer',
+                            'readOnly' => true,
                         ]),
                         'nullableString' => new \ArrayObject([
                             'type' => [
