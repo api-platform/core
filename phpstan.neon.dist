@@ -17,7 +17,6 @@ parameters:
 	excludePaths:
 		# uses larastan
 		- src/Laravel
-		- src/Symfony/Bundle/Command/OpenApiCommand.php
 		# Symfony config
 		- tests/Fixtures/app/config/config_swagger.php
 		# Symfony cache
@@ -33,8 +32,6 @@ parameters:
 		- src/Doctrine/*/vendor/*
 		- src/*/vendor/*
 		# Symfony 6 support
-		- src/OpenApi/Serializer/CacheableSupportsMethodInterface.php
-		- src/Serializer/CacheableSupportsMethodInterface.php
 		- tests/Hal/Serializer/ItemNormalizerTest.php
 		- tests/Symfony/Validator/Metadata/Property/ValidatorPropertyMetadataFactoryTest.php
 		- src/Symfony/Bundle/ArgumentResolver/CompatibleValueResolverInterface.php
