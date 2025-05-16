@@ -327,7 +327,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $graphQlSubscriptionManagerProphecy = $this->prophesize(GraphQlSubscriptionManagerInterface::class);
         $graphQlSubscriptionId = 'subscription-id';
         $graphQlSubscriptionData = ['data'];
-        $graphQlSubscriptionManagerProphecy->getPushPayloads($toUpdate)->willReturn([[$graphQlSubscriptionId, $graphQlSubscriptionData]]);
+        $graphQlSubscriptionManagerProphecy->getPushPayloads($toUpdate, 'update')->willReturn([[$graphQlSubscriptionId, $graphQlSubscriptionData]]);
         $graphQlMercureSubscriptionIriGenerator = $this->prophesize(GraphQlMercureSubscriptionIriGeneratorInterface::class);
         $topicIri = 'subscription-topic-iri';
         $graphQlMercureSubscriptionIriGenerator->generateTopicIri($graphQlSubscriptionId)->willReturn($topicIri);
