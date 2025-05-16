@@ -18,16 +18,20 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Symfony\Component\TypeInfo\Type\BuiltinType;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 #[ApiResource]
 #[GetCollection(
     parameters: [
         'active' => new QueryParameter(
             filter: new BooleanFilter(),
+            nativeType: new BuiltinType(TypeIdentifier::BOOL),
         ),
         'enabled' => new QueryParameter(
             filter: new BooleanFilter(),
             property: 'active',
+            nativeType: new BuiltinType(TypeIdentifier::BOOL),
         ),
     ],
 )]
