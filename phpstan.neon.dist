@@ -1,3 +1,5 @@
+includes:
+	- phpstan.baseline.php
 parameters:
 	level: 5
 	paths:
@@ -31,6 +33,9 @@ parameters:
 		- src/Doctrine/Odm/Tests/var/*
 		- src/Doctrine/*/vendor/*
 		- src/*/vendor/*
+		- src/*/Tests/Fixtures/*
+		- tests/Fixtures/*
+		- src/Doctrine/*/Tests/Fixtures/*
 		# Symfony 6 support
 		- tests/Hal/Serializer/ItemNormalizerTest.php
 		- tests/Symfony/Validator/Metadata/Property/ValidatorPropertyMetadataFactoryTest.php
@@ -43,22 +48,7 @@ parameters:
 	ignoreErrors:
 		# False positives
 		-   message: '#Call to an undefined method Negotiation\\AcceptHeader::getType\(\).#'
-		-
-			message: '#but database expects#'
-			paths:
-				- tests/Fixtures/TestBundle/Entity/
 		- '#Cannot call method add\(\) on iterable.#'
-		-
-			message: '#is never read, only written.#'
-			paths:
-				- tests/Fixtures/TestBundle/Document/
-				- tests/Fixtures/TestBundle/Entity/
-				- src/OpenApi/Factory/OpenApiFactory.php
-		-
-			message: '#is never written, only read.#'
-			paths:
-				- tests/Fixtures/TestBundle/Document/
-				- src/Metadata/Tests/Fixtures/ApiResource/
 		-
 			message: '#Parameter \#1 \$constraint of method#'
 			paths:
@@ -90,8 +80,4 @@ parameters:
 				- src/Serializer/AbstractConstraintViolationListNormalizer.php
 				- src/Symfony/Validator/Serializer/ValidationExceptionNormalizer.php
 
-		# See https://github.com/phpstan/phpstan-symfony/issues/27
-		-
-			message: '#^Service "[^"]+" is private.$#'
-			path: src
 		- '#Call to an undefined method Symfony\\Component\\HttpFoundation\\Request::getContentType\(\)\.#'
