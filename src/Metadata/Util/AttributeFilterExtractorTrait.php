@@ -133,7 +133,11 @@ trait AttributeFilterExtractorTrait
     private function generateFilterId(\ReflectionClass $reflectionClass, string $filterClass, ?string $filterId = null): string
     {
         $suffix = null !== $filterId ? '_'.$filterId : $filterId;
+        $filterClassName = (new \ReflectionClass($filterClass))->getName();
+        if (null !== $suffix) {
+            $filterClassName = '';
+        }
 
-        return 'annotated_'.(new UnicodeString(str_replace('\\', '', $reflectionClass->getName().(new \ReflectionClass($filterClass))->getName().$suffix)))->snake()->toString();
+        return 'annotated_'.(new UnicodeString(str_replace('\\', '', $reflectionClass->getName().$filterClassName.$suffix)))->snake()->toString();
     }
 }
