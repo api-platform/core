@@ -1,5 +1,14 @@
 # Changelog
 
+## v4.1.9
+
+### Bug fixes
+
+* [4dd0cdfc4](https://github.com/api-platform/core/commit/4dd0cdfc4a7f4cc73e7e67a49ee790ed1aaf5707) fix(doctrine): support integer-backed enums in BackedEnumFilter (#7127)
+* [70a922573](https://github.com/api-platform/core/commit/70a9225737bece18ad4b66b8ac636c38b2a1008a) fix: error formats (#7148)
+* [723d041c4](https://github.com/api-platform/core/commit/723d041c47467d8be0d8a0f20431da9de0a87c5a) fix(metadata): xml PHPize HTTP cache headers (#7140)
+* [d3d0ca21b](https://github.com/api-platform/core/commit/d3d0ca21bd45a8383e3e51166a65162be93655bf) fix(serializer): invalid uri variable 400 response (#7135)
+
 ## v4.1.8
 
 ### Bug fixes
