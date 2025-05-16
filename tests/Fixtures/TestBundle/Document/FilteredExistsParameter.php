@@ -18,6 +18,8 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Symfony\Component\TypeInfo\Type\BuiltinType;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 #[ApiResource]
 #[GetCollection(
@@ -25,10 +27,12 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
     parameters: [
         'createdAt' => new QueryParameter(
             filter: new ExistsFilter(),
+            nativeType: new BuiltinType(TypeIdentifier::BOOL),
         ),
         'hasCreationDate' => new QueryParameter(
             filter: new ExistsFilter(),
             property: 'createdAt',
+            nativeType: new BuiltinType(TypeIdentifier::BOOL),
         ),
         'exists[:property]' => new QueryParameter(
             filter: new ExistsFilter(),

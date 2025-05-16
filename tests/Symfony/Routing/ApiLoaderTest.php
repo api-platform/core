@@ -321,7 +321,7 @@ class ApiLoaderTest extends TestCase
             $path,
             [
                 '_controller' => $controller,
-                '_format' => null,
+                '_format' => $extraDefaults['_format'] ?? null,
                 '_stateless' => $stateless,
                 '_api_resource_class' => $resourceClass,
                 '_api_operation_name' => $operationName,

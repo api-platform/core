@@ -27,6 +27,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Parameter\CustomGroupParameterProvider
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\TypeInfo\Type\BuiltinType;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[Get(
@@ -58,14 +60,37 @@ use Symfony\Component\Validator\Constraints as Assert;
     uriTemplate: 'validate_parameters{._format}',
     parameters: [
         'enum' => new QueryParameter(schema: ['enum' => ['a', 'b'], 'uniqueItems' => true]),
-        'num' => new QueryParameter(schema: ['minimum' => 1, 'maximum' => 3]),
-        'exclusiveNum' => new QueryParameter(schema: ['exclusiveMinimum' => 1, 'exclusiveMaximum' => 3]),
-        'blank' => new QueryParameter(openApi: new OpenApiParameter(name: 'blank', in: 'query', allowEmptyValue: false)),
-        'length' => new QueryParameter(schema: ['maxLength' => 1, 'minLength' => 3]),
+        'num' => new QueryParameter(
+            schema: ['minimum' => 1, 'maximum' => 3],
+            nativeType: new BuiltinType(TypeIdentifier::STRING),
+        ),
+        'exclusiveNum' => new QueryParameter(
+            schema: ['exclusiveMinimum' => 1, 'exclusiveMaximum' => 3],
+            nativeType: new BuiltinType(TypeIdentifier::STRING),
+        ),
+        'blank' => new QueryParameter(
+            openApi: new OpenApiParameter(name: 'blank', in: 'query', allowEmptyValue: false),
+            nativeType: new BuiltinType(TypeIdentifier::STRING),
+        ),
+        'length' => new QueryParameter(
+            schema: ['maxLength' => 1, 'minLength' => 3],
+            nativeType: new BuiltinType(TypeIdentifier::STRING),
+        ),
         'array' => new QueryParameter(schema: ['minItems' => 2, 'maxItems' => 3]),
-        'multipleOf' => new QueryParameter(schema: ['multipleOf' => 2]),
-        'int' => new QueryParameter(property: 'a', constraints: [new Assert\Type('integer')], provider: [self::class, 'toInt']),
-        'pattern' => new QueryParameter(schema: ['pattern' => '\d']),
+        'multipleOf' => new QueryParameter(
+            schema: ['multipleOf' => 2],
+            nativeType: new BuiltinType(TypeIdentifier::STRING),
+        ),
+        'int' => new QueryParameter(
+            property: 'a',
+            constraints: [new Assert\Type('integer')],
+            provider: [self::class, 'toInt'],
+            nativeType: new BuiltinType(TypeIdentifier::STRING),
+        ),
+        'pattern' => new QueryParameter(
+            schema: ['pattern' => '\d'],
+            nativeType: new BuiltinType(TypeIdentifier::STRING),
+        ),
     ],
     provider: [self::class, 'collectionProvider']
 )]
@@ -77,7 +102,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 #[GetCollection(
     uriTemplate: 'with_parameters_header_and_query{._format}',
-    parameters: new Parameters([new QueryParameter(key: 'q'), new HeaderParameter(key: 'q')]),
+    parameters: new Parameters([
+        new QueryParameter(
+            key: 'q',
+            nativeType: new BuiltinType(TypeIdentifier::STRING),
+        ),
+        new HeaderParameter(
+            key: 'q',
+            nativeType: new BuiltinType(TypeIdentifier::STRING),
+        ),
+    ]),
     provider: [self::class, 'headerAndQueryProvider']
 )]
 #[GetCollection(
@@ -86,6 +120,21 @@ use Symfony\Component\Validator\Constraints as Assert;
         'Req' => new HeaderParameter(required: true, schema: ['type' => 'string']),
     ],
     provider: [self::class, 'headerProvider']
+)]
+#[GetCollection(
+    uriTemplate: 'header_integer',
+    parameters: [
+        'Foo' => new HeaderParameter(
+            schema: [
+                'type' => 'integer',
+                'example' => 3,
+                'minimum' => 1,
+                'maximum' => 5,
+            ],
+            required: true,
+        ),
+    ],
+    provider: [self::class, 'noopProvider']
 )]
 #[QueryParameter(key: 'everywhere')]
 class WithParameter
@@ -169,5 +218,10 @@ class WithParameter
         $values = [$parameters->get('Req', HeaderParameter::class)->getValue()];
 
         return new JsonResponse($values);
+    }
+
+    public static function noopProvider(Operation $operation, array $uriVariables = [], array $context = []): JsonResponse
+    {
+        return new JsonResponse([]);
     }
 }

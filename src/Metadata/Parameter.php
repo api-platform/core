@@ -16,6 +16,7 @@ namespace ApiPlatform\Metadata;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ParameterProviderInterface;
+use Symfony\Component\TypeInfo\Type;
 
 /**
  * @experimental
@@ -29,6 +30,7 @@ abstract class Parameter
      * @param list<string>                                                       $properties      a list of properties this parameter applies to (works with the :property placeholder)
      * @param FilterInterface|string|null                                        $filter
      * @param mixed                                                              $constraints     an array of Symfony constraints, or an array of Laravel rules
+     * @param Type                                                               $nativeType      the PHP native type, we cast values to an array if its a CollectionType, if not and it's an array with a single value we use it (eg: HTTP Header)
      */
     public function __construct(
         protected ?string $key = null,
@@ -47,6 +49,7 @@ abstract class Parameter
         protected ?string $securityMessage = null,
         protected ?array $extraProperties = [],
         protected array|string|null $filterContext = null,
+        protected ?Type $nativeType = null,
     ) {
     }
 
@@ -293,6 +296,19 @@ abstract class Parameter
     {
         $self = clone $this;
         $self->properties = $properties;
+
+        return $self;
+    }
+
+    public function getNativeType(): ?Type
+    {
+        return $this->nativeType;
+    }
+
+    public function withNativeType(Type $nativeType): self
+    {
+        $self = clone $this;
+        $self->nativeType = $nativeType;
 
         return $self;
     }

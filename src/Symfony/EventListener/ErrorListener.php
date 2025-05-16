@@ -15,6 +15,7 @@ namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Metadata\Error as ErrorOperation;
 use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
+use ApiPlatform\Metadata\Exception\InvalidUriVariableException;
 use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
@@ -67,8 +68,9 @@ final class ErrorListener extends SymfonyErrorListener
     protected function duplicateRequest(\Throwable $exception, Request $request): Request
     {
         $format = $this->getRequestFormat($request, $this->errorFormats, false);
-        // Because ErrorFormatGuesser is buggy in some cases
-        $request->setRequestFormat($format);
+        // Reset the request format as it may be that the original request format negotiation won't have the same result
+        // when an error occurs
+        $request->setRequestFormat(null);
         $apiOperation = $this->initializeOperation($request);
 
         // TODO: add configuration flag to:
@@ -178,7 +180,7 @@ final class ErrorListener extends SymfonyErrorListener
             return $exception->getStatusCode();
         }
 
-        if ($exception instanceof RequestExceptionInterface) {
+        if ($exception instanceof RequestExceptionInterface || $exception instanceof InvalidUriVariableException) {
             return 400;
         }
 

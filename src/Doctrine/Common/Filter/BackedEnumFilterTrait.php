@@ -32,7 +32,7 @@ trait BackedEnumFilterTrait
     use PropertyHelperTrait;
 
     /**
-     * @var array<string, string>
+     * @var array<string, class-string>
      */
     private array $enumTypes;
 
@@ -80,6 +80,14 @@ trait BackedEnumFilterTrait
 
     private function normalizeValue($value, string $property): mixed
     {
+        $firstCase = $this->enumTypes[$property]::cases()[0] ?? null;
+        if (
+            \is_int($firstCase?->value)
+            && false !== filter_var($value, \FILTER_VALIDATE_INT)
+        ) {
+            $value = (int) $value;
+        }
+
         $values = array_map(fn (\BackedEnum $case) => $case->value, $this->enumTypes[$property]::cases());
 
         if (\in_array($value, $values, true)) {

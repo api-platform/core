@@ -1,5 +1,28 @@
 # Changelog
 
+## v4.1.9
+
+### Bug fixes
+
+* [4dd0cdfc4](https://github.com/api-platform/core/commit/4dd0cdfc4a7f4cc73e7e67a49ee790ed1aaf5707) fix(doctrine): support integer-backed enums in BackedEnumFilter (#7127)
+* [70a922573](https://github.com/api-platform/core/commit/70a9225737bece18ad4b66b8ac636c38b2a1008a) fix: error formats (#7148)
+* [723d041c4](https://github.com/api-platform/core/commit/723d041c47467d8be0d8a0f20431da9de0a87c5a) fix(metadata): xml PHPize HTTP cache headers (#7140)
+* [d3d0ca21b](https://github.com/api-platform/core/commit/d3d0ca21bd45a8383e3e51166a65162be93655bf) fix(serializer): invalid uri variable 400 response (#7135)
+
+## v4.1.8
+
+### Bug fixes
+
+* [0cd9b9f70](https://github.com/api-platform/core/commit/0cd9b9f7002829a6238ed4a1731c3a123c4a91c4) fix: backport handling of union/intersection type in item normalizer (#7106)
+* [0fc0904b9](https://github.com/api-platform/core/commit/0fc0904b9409e81041d4d5ae48d699f3360208fc) fix(metadata): correct class to exclude defaults (#7088)
+* [5145a8383](https://github.com/api-platform/core/commit/5145a8383c8e234012b957a36701ec824774a817) fix: filtering not using strategy set in attribute when strategy not set per property (#7136)
+* [613bb5b75](https://github.com/api-platform/core/commit/613bb5b75fe6cbc79c99e06bcbd664fc3f25c167) fix(doctrine): filters schema for dates and numbers (#7131)
+* [ed1ef2594](https://github.com/api-platform/core/commit/ed1ef2594e72180e5fe153e762809e3c22b29e7f) fix(state): specify :property parameter properties (#7110)
+* [f55606b01](https://github.com/api-platform/core/commit/f55606b01179703fb4be44f1b66a36136852f154) fix(serializer): throw NotNormalizableValueException when resource not found or invalid IRI on denormalization
+* [3faf5d4b4](https://github.com/api-platform/core/commit/3faf5d4b44f7c39d7a9d6ecbcfdf90f7061f1b6f) fix(doctrine): order filter instance service
+* [0ff950f37](https://github.com/api-platform/core/commit/0ff950f376345ff6a6d39a202b8bef15c3e423d2) fix: type info deprecations to baseline
+* [d93d580a1](https://github.com/api-platform/core/commit/d93d580a1dbaf6a1af5f05f0ebde2f7b68d75d25) fix: command name deprecation
+
 ## v4.1.7
 
 ### Bug fixes
