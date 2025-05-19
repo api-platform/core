@@ -15,6 +15,7 @@ namespace ApiPlatform\State\Provider;
 
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\SerializerContextBuilderInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
@@ -36,6 +37,7 @@ final class DeserializeProvider implements ProviderInterface
         private readonly ?ProviderInterface $decorated,
         private readonly SerializerInterface $serializer,
         private readonly SerializerContextBuilderInterface $serializerContextBuilder,
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
         private ?TranslatorInterface $translator = null,
     ) {
         if (null === $this->translator) {
@@ -100,12 +102,13 @@ final class DeserializeProvider implements ProviderInterface
                 if (!$exception instanceof NotNormalizableValueException) {
                     continue;
                 }
-                $message = (new Type($exception->getExpectedTypes() ?? []))->message;
+                $expectedTypes = $this->normalizeExpectedTypes($exception->getExpectedTypes());
+                $message = (new Type($expectedTypes))->message;
                 $parameters = [];
                 if ($exception->canUseMessageForUser()) {
                     $parameters['hint'] = $exception->getMessage();
                 }
-                $violations->add(new ConstraintViolation($this->translator->trans($message, ['{{ type }}' => implode('|', $exception->getExpectedTypes() ?? [])], 'validators'), $message, $parameters, null, $exception->getPath(), null, null, (string) Type::INVALID_TYPE_ERROR));
+                $violations->add(new ConstraintViolation($this->translator->trans($message, ['{{ type }}' => implode('|', $expectedTypes ?? [])], 'validators'), $message, $parameters, null, $exception->getPath(), null, null, (string) Type::INVALID_TYPE_ERROR));
             }
             if (0 !== \count($violations)) {
                 throw new ValidationException($violations);
@@ -113,5 +116,32 @@ final class DeserializeProvider implements ProviderInterface
         }
 
         return $data;
+    }
+
+    private function normalizeExpectedTypes(?array $expectedTypes = null): array
+    {
+        $normalizedTypes = [];
+
+        foreach ($expectedTypes ?? [] as $expectedType) {
+            $normalizedType = $expectedType;
+
+            if ((\class_exists($expectedType) || \interface_exists($expectedType))) {
+                try {
+                    $normalizedType = $this->resourceMetadataCollectionFactory->create($expectedType)->getOperation()->getShortName();
+                } catch (\Throwable) {
+                    // Do nothing
+                }
+
+                if ($normalizedType === null) {
+                    $classReflection = new \ReflectionClass($expectedType);
+                    $normalizedType = $classReflection->getShortName();
+                }
+            }
+
+            $normalizedTypes[] = $normalizedType;
+        }
+
+
+        return $normalizedTypes;
     }
 }
