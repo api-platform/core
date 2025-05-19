@@ -108,7 +108,7 @@ final class DeserializeProvider implements ProviderInterface
                 if ($exception->canUseMessageForUser()) {
                     $parameters['hint'] = $exception->getMessage();
                 }
-                $violations->add(new ConstraintViolation($this->translator->trans($message, ['{{ type }}' => implode('|', $expectedTypes ?? [])], 'validators'), $message, $parameters, null, $exception->getPath(), null, null, (string) Type::INVALID_TYPE_ERROR));
+                $violations->add(new ConstraintViolation($this->translator->trans($message, ['{{ type }}' => implode('|', $expectedTypes)], 'validators'), $message, $parameters, null, $exception->getPath(), null, null, (string) Type::INVALID_TYPE_ERROR));
             }
             if (0 !== \count($violations)) {
                 throw new ValidationException($violations);
@@ -125,14 +125,14 @@ final class DeserializeProvider implements ProviderInterface
         foreach ($expectedTypes ?? [] as $expectedType) {
             $normalizedType = $expectedType;
 
-            if ((\class_exists($expectedType) || \interface_exists($expectedType))) {
+            if (class_exists($expectedType) || interface_exists($expectedType)) {
                 try {
                     $normalizedType = $this->resourceMetadataCollectionFactory->create($expectedType)->getOperation()->getShortName();
                 } catch (\Throwable) {
                     // Do nothing
                 }
 
-                if ($normalizedType === null) {
+                if (null === $normalizedType) {
                     $classReflection = new \ReflectionClass($expectedType);
                     $normalizedType = $classReflection->getShortName();
                 }
@@ -140,7 +140,6 @@ final class DeserializeProvider implements ProviderInterface
 
             $normalizedTypes[] = $normalizedType;
         }
-
 
         return $normalizedTypes;
     }
