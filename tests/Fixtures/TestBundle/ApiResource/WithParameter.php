@@ -29,7 +29,9 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
+use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\Country;
 
 #[Get(
     uriTemplate: 'with_parameters/{id}{._format}',
@@ -55,6 +57,20 @@ use Symfony\Component\Validator\Constraints as Assert;
         'hydra' => new QueryParameter(property: 'a', required: true),
     ],
     provider: [self::class, 'collectionProvider']
+)]
+#[GetCollection(
+    uriTemplate: 'with_parameters_country{._format}',
+    parameters: [
+        'country' => new QueryParameter(schema: ['type' => 'string'], constraints: [new Country()]),
+    ],
+    provider: [self::class, 'collectionProvider']
+)]
+#[GetCollection(
+    uriTemplate: 'with_parameters_countries{._format}',
+    parameters: [
+        'country' => new QueryParameter(constraints: [new All([new Country()])], castToArray: true),
+    ],
+    provider: [self::class, 'collectionProvider'],
 )]
 #[GetCollection(
     uriTemplate: 'validate_parameters{._format}',
@@ -105,7 +121,6 @@ use Symfony\Component\Validator\Constraints as Assert;
     parameters: new Parameters([
         new QueryParameter(
             key: 'q',
-            nativeType: new BuiltinType(TypeIdentifier::STRING),
         ),
         new HeaderParameter(
             key: 'q',
