@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\Provider;
 
+use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -128,7 +129,7 @@ final class DeserializeProvider implements ProviderInterface
             if (class_exists($expectedType) || interface_exists($expectedType)) {
                 try {
                     $normalizedType = $this->resourceMetadataCollectionFactory->create($expectedType)->getOperation()->getShortName();
-                } catch (\Throwable) {
+                } catch (OperationNotFoundException) {
                     // Do nothing
                 }
 
