@@ -111,8 +111,7 @@ final class PurgeHttpCacheListener
     private function gatherResourceAndItemTags(object $entity, bool $purgeItem): void
     {
         try {
-            $resourceClass = $this->resourceClassResolver->getResourceClass($entity);
-            $iri = $this->iriConverter->getIriFromResource($resourceClass, UrlGeneratorInterface::ABS_PATH, new GetCollection());
+            $iri = $this->iriConverter->getIriFromResource($entity, UrlGeneratorInterface::ABS_PATH, new GetCollection());
             $this->tags[$iri] = $iri;
 
             if ($purgeItem) {
