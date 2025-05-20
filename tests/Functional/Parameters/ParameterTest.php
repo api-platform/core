@@ -102,6 +102,15 @@ final class ParameterTest extends ApiTestCase
         ]);
     }
 
+    public function testHeaderAndQueryWithArray(): void
+    {
+        $response = self::createClient()->request('GET', 'with_parameters_header_and_query?q[]=blabla', ['headers' => ['q' => '(complex stuff)']]);
+        $this->assertEquals($response->toArray(), [
+            '(complex stuff)',
+            ['blabla'],
+        ]);
+    }
+
     public function testHeaderParameterRequired(): void
     {
         self::createClient()->request('GET', 'header_required', ['headers' => ['req' => 'blabla']]);
@@ -124,5 +133,31 @@ final class ParameterTest extends ApiTestCase
         yield 'too high' => ['6', 422];
         yield 'too low' => ['0', 422];
         yield 'invalid integer' => ['string', 422];
+    }
+
+    #[DataProvider('provideCountryValues')]
+    public function testIssue7157(string $queryParameter, int $expectedStatusCode): void
+    {
+        self::createClient()->request('GET', 'with_parameters_country?'.$queryParameter);
+        $this->assertResponseStatusCodeSame($expectedStatusCode);
+    }
+
+    public static function provideCountryValues(): iterable
+    {
+        yield 'valid country' => ['country=FR', 200];
+        yield 'array of countries' => ['country[]=FR', 422];
+    }
+
+    #[DataProvider('provideCountriesValues')]
+    public function testIssue7157WithCountries(string $queryParameter, int $expectedStatusCode): void
+    {
+        self::createClient()->request('GET', 'with_parameters_countries?'.$queryParameter);
+        $this->assertResponseStatusCodeSame($expectedStatusCode);
+    }
+
+    public static function provideCountriesValues(): iterable
+    {
+        yield 'valid country' => ['country=FR', 200];
+        yield 'array of countries' => ['country[]=FR', 200];
     }
 }
