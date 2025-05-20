@@ -11,6 +11,7 @@
 
 declare(strict_types=1);
 
+use ApiPlatform\Laravel\Eloquent\Serializer\SnakeCaseToCamelCaseNameConverter;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
@@ -85,6 +86,8 @@ return [
         // 'domain' => null,
         // 'middleware' => null
     ],
+
+    'name_converter' => SnakeCaseToCamelCaseNameConverter::class,
 
     'exception_to_status' => [
         AuthenticationException::class => 401,

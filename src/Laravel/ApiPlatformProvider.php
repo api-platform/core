@@ -313,9 +313,10 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->bind(NameConverterInterface::class, function (Application $app) {
             $config = $app['config'];
+            $nameConverter = $config->get('api-platform.name_converter', SnakeCaseToCamelCaseNameConverter::class);
             $defaultContext = $config->get('api-platform.serializer', []);
 
-            return new HydraPrefixNameConverter(new MetadataAwareNameConverter($app->make(ClassMetadataFactoryInterface::class), $app->make(SnakeCaseToCamelCaseNameConverter::class)), $defaultContext);
+            return new HydraPrefixNameConverter(new MetadataAwareNameConverter($app->make(ClassMetadataFactoryInterface::class), $app->make($nameConverter)), $defaultContext);
         });
 
         $this->app->singleton(OperationMetadataFactory::class, function (Application $app) {
