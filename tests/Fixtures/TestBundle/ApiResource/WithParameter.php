@@ -28,6 +28,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\GenericType;
+use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -61,7 +64,21 @@ use Symfony\Component\Validator\Constraints\Country;
 #[GetCollection(
     uriTemplate: 'with_parameters_country{._format}',
     parameters: [
-        'country' => new QueryParameter(schema: ['type' => 'string'], constraints: [new Country()]),
+        'country' => new QueryParameter(
+            schema: ['type' => 'string'],
+            constraints: [new Country()],
+            nativeType: new UnionType(
+                new BuiltinType(TypeIdentifier::STRING),
+                new CollectionType(
+                    new GenericType( // @phpstan-ignore-line
+                        new BuiltinType(TypeIdentifier::ARRAY), // @phpstan-ignore-line
+                        new BuiltinType(TypeIdentifier::INT),
+                        new BuiltinType(TypeIdentifier::STRING),
+                    ),
+                    true,
+                ),
+            )
+        ),
     ],
     provider: [self::class, 'collectionProvider']
 )]
@@ -104,8 +121,7 @@ use Symfony\Component\Validator\Constraints\Country;
             nativeType: new BuiltinType(TypeIdentifier::STRING),
         ),
         'pattern' => new QueryParameter(
-            schema: ['pattern' => '\d'],
-            nativeType: new BuiltinType(TypeIdentifier::STRING),
+            schema: ['pattern' => '\d', 'type' => 'string'],
         ),
     ],
     provider: [self::class, 'collectionProvider']
