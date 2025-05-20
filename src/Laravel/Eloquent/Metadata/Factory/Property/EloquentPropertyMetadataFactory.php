@@ -86,10 +86,21 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
                 default => new Type(\in_array($builtinType, Type::$builtinTypes, true) ? $builtinType : Type::BUILTIN_TYPE_STRING, $p['nullable'] ?? true),
             };
 
-            return $propertyMetadata
-                ->withBuiltinTypes([$type])
-                ->withWritable($propertyMetadata->isWritable() ?? true === $p['fillable'])
-                ->withReadable($propertyMetadata->isReadable() ?? false === $p['hidden']);
+            $propertyMetadata = $propertyMetadata
+                ->withBuiltinTypes([$type]);
+
+            // If these are set let the SerializerPropertyMetadataFactory do the work
+            if (!isset($options['denormalization_groups'])) {
+                $propertyMetadata = $propertyMetadata
+                    ->withWritable($propertyMetadata->isWritable() ?? true === $p['fillable']);
+            }
+
+            if (!isset($options['normalization_groups'])) {
+                $propertyMetadata = $propertyMetadata
+                    ->withReadable($propertyMetadata->isReadable() ?? false === $p['hidden']);
+            }
+
+            return $propertyMetadata;
         }
 
         foreach ($this->modelMetadata->getRelations($model) as $relation) {
@@ -110,8 +121,6 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
 
             return $propertyMetadata
                 ->withBuiltinTypes([$type])
-                ->withWritable($propertyMetadata->isWritable() ?? true)
-                ->withReadable($propertyMetadata->isReadable() ?? true)
                 ->withExtraProperties(['eloquent_relation' => $relation] + $propertyMetadata->getExtraProperties());
         }
 

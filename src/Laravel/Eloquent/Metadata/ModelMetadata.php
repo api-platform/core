@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Eloquent\Metadata;
 
+use ApiPlatform\Metadata\Util\CamelCaseToSnakeCaseNameConverter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
@@ -25,6 +26,8 @@ use Illuminate\Support\Str;
  */
 final class ModelMetadata
 {
+    private CamelCaseToSnakeCaseNameConverter $relationNameConverter;
+
     /**
      * @var array<class-string, Collection<string, mixed>>
      */
@@ -53,6 +56,11 @@ final class ModelMetadata
         'morphToMany',
         'morphedByMany',
     ];
+
+    public function __construct()
+    {
+        $this->relationNameConverter = new CamelCaseToSnakeCaseNameConverter();
+    }
 
     /**
      * Gets the column attributes for the given model.
@@ -172,8 +180,10 @@ final class ModelMetadata
                     || $this->attributeIsHidden($method->getName(), $model)
             )
             ->filter(function (\ReflectionMethod $method) {
-                if ($method->getReturnType() instanceof \ReflectionNamedType
-                    && is_subclass_of($method->getReturnType()->getName(), Relation::class)) {
+                if (
+                    $method->getReturnType() instanceof \ReflectionNamedType
+                    && is_subclass_of($method->getReturnType()->getName(), Relation::class)
+                ) {
                     return true;
                 }
 
@@ -204,7 +214,8 @@ final class ModelMetadata
                 }
 
                 return [
-                    'name' => $method->getName(),
+                    'name' => $this->relationNameConverter->normalize($method->getName()),
+                    'method_name' => $method->getName(),
                     'type' => $relation::class,
                     'related' => \get_class($relation->getRelated()),
                     'foreign_key' => method_exists($relation, 'getForeignKeyName') ? $relation->getForeignKeyName() : null,
