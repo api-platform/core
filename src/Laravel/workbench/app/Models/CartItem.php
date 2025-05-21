@@ -20,7 +20,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-// #[ApiResource(denormalizationContext: ['groups' => ['cart_item.write']], normalizationContext: ['groups' => ['cart_item.write']])]
 #[ApiResource(denormalizationContext: ['groups' => ['cart_item.write']], normalizationContext: ['groups' => ['cart_item.write']])]
 #[Groups('cart_item.write')]
 #[ApiProperty(serialize: new Groups(['shopping_cart.write']), property: 'product_sku')]

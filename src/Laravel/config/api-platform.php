@@ -87,6 +87,7 @@ return [
         // 'middleware' => null
     ],
 
+    // set to null if you want to keep snake_case
     'name_converter' => SnakeCaseToCamelCaseNameConverter::class,
 
     'exception_to_status' => [
