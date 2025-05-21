@@ -256,30 +256,26 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->singleton(PropertyMetadataFactoryInterface::class, function (Application $app) {
-            return new PropertyInfoPropertyMetadataFactory(
-                $app->make(PropertyInfoExtractorInterface::class),
-                new EloquentPropertyMetadataFactory(
-                    $app->make(ModelMetadata::class),
-                )
-            );
-        });
-
-        $this->app->extend(PropertyMetadataFactoryInterface::class, function (PropertyInfoPropertyMetadataFactory $inner, Application $app) {
             /** @var ConfigRepository $config */
             $config = $app['config'];
 
             return new CachePropertyMetadataFactory(
                 new SchemaPropertyMetadataFactory(
                     $app->make(ResourceClassResolverInterface::class),
-                    new SerializerPropertyMetadataFactory(
-                        $app->make(SerializerClassMetadataFactory::class),
-                        new AttributePropertyMetadataFactory(
-                            new EloquentAttributePropertyMetadataFactory(
-                                $inner,
-                            )
+                    new PropertyInfoPropertyMetadataFactory(
+                        $app->make(PropertyInfoExtractorInterface::class),
+                        new SerializerPropertyMetadataFactory(
+                            $app->make(SerializerClassMetadataFactory::class),
+                            new AttributePropertyMetadataFactory(
+                                new EloquentAttributePropertyMetadataFactory(
+                                    new EloquentPropertyMetadataFactory(
+                                        $app->make(ModelMetadata::class),
+                                    ),
+                                )
+                            ),
+                            $app->make(ResourceClassResolverInterface::class)
                         ),
-                        $app->make(ResourceClassResolverInterface::class)
-                    ),
+                    )
                 ),
                 true === $config->get('app.debug') ? 'array' : $config->get('api-platform.cache', 'file')
             );
