@@ -13,11 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Eloquent\Metadata;
 
-use ApiPlatform\Metadata\Util\CamelCaseToSnakeCaseNameConverter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Inspired from Illuminate\Database\Console\ShowModelCommand.
@@ -26,8 +27,6 @@ use Illuminate\Support\Str;
  */
 final class ModelMetadata
 {
-    private CamelCaseToSnakeCaseNameConverter $relationNameConverter;
-
     /**
      * @var array<class-string, Collection<string, mixed>>
      */
@@ -57,9 +56,8 @@ final class ModelMetadata
         'morphedByMany',
     ];
 
-    public function __construct()
+    public function __construct(private NameConverterInterface $relationNameConverter = new CamelCaseToSnakeCaseNameConverter())
     {
-        $this->relationNameConverter = new CamelCaseToSnakeCaseNameConverter();
     }
 
     /**

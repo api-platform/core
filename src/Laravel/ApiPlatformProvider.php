@@ -211,7 +211,10 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(ModelMetadata::class);
+        $this->app->singleton(ModelMetadata::class, function () {
+            return new ModelMetadata();
+        });
+
         $this->app->bind(LoaderInterface::class, AttributeLoader::class);
         $this->app->bind(ClassMetadataFactoryInterface::class, ClassMetadataFactory::class);
         $this->app->singleton(ClassMetadataFactory::class, function (Application $app) {
@@ -314,9 +317,13 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->bind(NameConverterInterface::class, function (Application $app) {
             $config = $app['config'];
             $nameConverter = $config->get('api-platform.name_converter', SnakeCaseToCamelCaseNameConverter::class);
+            if ($nameConverter && class_exists($nameConverter)) {
+                $nameConverter = $app->make($nameConverter);
+            }
+
             $defaultContext = $config->get('api-platform.serializer', []);
 
-            return new HydraPrefixNameConverter(new MetadataAwareNameConverter($app->make(ClassMetadataFactoryInterface::class), $app->make($nameConverter)), $defaultContext);
+            return new HydraPrefixNameConverter(new MetadataAwareNameConverter($app->make(ClassMetadataFactoryInterface::class), $nameConverter), $defaultContext);
         });
 
         $this->app->singleton(OperationMetadataFactory::class, function (Application $app) {
