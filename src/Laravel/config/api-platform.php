@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-use ApiPlatform\Laravel\Eloquent\Serializer\SnakeCaseToCamelCaseNameConverter;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
+use Symfony\Component\Serializer\NameConverter\SnakeCaseToCamelCaseNameConverter;
 
 return [
     'title' => 'API Platform',

@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -39,7 +40,9 @@ final class ValidateProvider implements ProviderInterface
         private readonly Application $app,
         // TODO: trigger deprecation in API Platform 4.2 when this is not defined
         private readonly ?NormalizerInterface $normalizer = null,
+        ?NameConverterInterface $nameConverter = null,
     ) {
+        $this->nameConverter = $nameConverter;
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null

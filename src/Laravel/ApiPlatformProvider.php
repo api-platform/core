@@ -88,7 +88,6 @@ use ApiPlatform\Laravel\Eloquent\Metadata\ModelMetadata;
 use ApiPlatform\Laravel\Eloquent\Metadata\ResourceClassResolver as EloquentResourceClassResolver;
 use ApiPlatform\Laravel\Eloquent\PropertyAccess\PropertyAccessor as EloquentPropertyAccessor;
 use ApiPlatform\Laravel\Eloquent\Serializer\SerializerContextBuilder as EloquentSerializerContextBuilder;
-use ApiPlatform\Laravel\Eloquent\Serializer\SnakeCaseToCamelCaseNameConverter;
 use ApiPlatform\Laravel\Exception\ErrorHandler;
 use ApiPlatform\Laravel\GraphQl\Controller\EntrypointController as GraphQlEntrypointController;
 use ApiPlatform\Laravel\GraphQl\Controller\GraphiQlController;
@@ -178,6 +177,7 @@ use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Serializer\NameConverter\SnakeCaseToCamelCaseNameConverter;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\BackedEnumNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
@@ -348,7 +348,13 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->singleton(ValidateProvider::class, function (Application $app) {
-            return new ValidateProvider($app->make(DeserializeProvider::class), $app, $app->make(ObjectNormalizer::class));
+            $config = $app['config'];
+            $nameConverter = $config->get('api-platform.name_converter', SnakeCaseToCamelCaseNameConverter::class);
+            if ($nameConverter && class_exists($nameConverter)) {
+                $nameConverter = $app->make($nameConverter);
+            }
+
+            return new ValidateProvider($app->make(DeserializeProvider::class), $app, $app->make(ObjectNormalizer::class), $nameConverter);
         });
 
         if (class_exists(JsonApiProvider::class)) {
