@@ -50,6 +50,7 @@ abstract class Parameter
         protected ?array $extraProperties = [],
         protected array|string|null $filterContext = null,
         protected ?Type $nativeType = null,
+        protected ?bool $castToArray = null,
     ) {
     }
 
@@ -309,6 +310,19 @@ abstract class Parameter
     {
         $self = clone $this;
         $self->nativeType = $nativeType;
+
+        return $self;
+    }
+
+    public function getCastToArray(): ?bool
+    {
+        return $this->castToArray;
+    }
+
+    public function withCastToArray(bool $castToArray): self
+    {
+        $self = clone $this;
+        $self->castToArray = $castToArray;
 
         return $self;
     }

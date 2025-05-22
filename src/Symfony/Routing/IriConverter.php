@@ -121,7 +121,7 @@ final class IriConverter implements IriConverterInterface
             $operation = $this->operationMetadataFactory->create($context['item_uri_template']);
         }
 
-        $localOperationCacheKey = ($operation?->getName() ?? '').$resourceClass.(\is_string($resource) ? '_c' : '_i');
+        $localOperationCacheKey = ($operation?->getName() ?? '').$resourceClass.((\is_string($resource) || $operation instanceof CollectionOperationInterface) ? '_c' : '_i');
         if ($operation && isset($this->localOperationCache[$localOperationCacheKey])) {
             return $this->generateSymfonyRoute($resource, $referenceType, $this->localOperationCache[$localOperationCacheKey], $context, $this->localIdentifiersExtractorOperationCache[$localOperationCacheKey] ?? null);
         }

@@ -105,12 +105,13 @@ final class DeserializeProvider implements ProviderInterface
                 if (!$exception instanceof NotNormalizableValueException) {
                     continue;
                 }
-                $message = (new Type($exception->getExpectedTypes() ?? []))->message;
+                $expectedTypes = $this->normalizeExpectedTypes($exception->getExpectedTypes());
+                $message = (new Type($expectedTypes))->message;
                 $parameters = [];
                 if ($exception->canUseMessageForUser()) {
                     $parameters['hint'] = $exception->getMessage();
                 }
-                $violations->add(new ConstraintViolation($this->translator->trans($message, ['{{ type }}' => implode('|', $exception->getExpectedTypes() ?? [])], 'validators'), $message, $parameters, null, $exception->getPath(), null, null, (string) Type::INVALID_TYPE_ERROR));
+                $violations->add(new ConstraintViolation($this->translator->trans($message, ['{{ type }}' => implode('|', $expectedTypes)], 'validators'), $message, $parameters, null, $exception->getPath(), null, null, (string) Type::INVALID_TYPE_ERROR));
             }
             if (0 !== \count($violations)) {
                 throw new ValidationException($violations);
@@ -118,5 +119,23 @@ final class DeserializeProvider implements ProviderInterface
         }
 
         return $data;
+    }
+
+    private function normalizeExpectedTypes(?array $expectedTypes = null): array
+    {
+        $normalizedTypes = [];
+
+        foreach ($expectedTypes ?? [] as $expectedType) {
+            $normalizedType = $expectedType;
+
+            if (class_exists($expectedType) || interface_exists($expectedType)) {
+                $classReflection = new \ReflectionClass($expectedType);
+                $normalizedType = $classReflection->getShortName();
+            }
+
+            $normalizedTypes[] = $normalizedType;
+        }
+
+        return $normalizedTypes;
     }
 }
