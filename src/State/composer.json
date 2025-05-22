@@ -38,7 +38,7 @@
         "symfony/http-foundation": "^6.4 || ^7.0",
         "willdurand/negotiation": "^3.1",
         "api-platform/validator": "^4.1",
-        "api-platform/serializer": "^4.1"
+        "api-platform/serializer": "^4.1.11"
     },
     "autoload": {
         "psr-4": {
