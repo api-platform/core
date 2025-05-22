@@ -46,6 +46,7 @@ use ApiPlatform\Laravel\Metadata\CacheResourceCollectionMetadataFactory;
 use ApiPlatform\Laravel\Metadata\ParameterValidationResourceMetadataCollectionFactory;
 use ApiPlatform\Laravel\State\ParameterValidatorProvider;
 use ApiPlatform\Laravel\State\SwaggerUiProcessor;
+use ApiPlatform\Laravel\State\ValidateProvider;
 use ApiPlatform\Metadata\InflectorInterface;
 use ApiPlatform\Metadata\Operation\PathSegmentNameGeneratorInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -76,7 +77,6 @@ use ApiPlatform\State\ErrorProvider;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\ParameterProviderInterface;
 use ApiPlatform\State\ProcessorInterface;
-use ApiPlatform\State\Provider\DeserializeProvider;
 use ApiPlatform\State\Provider\ParameterProvider;
 use ApiPlatform\State\Provider\SecurityParameterProvider;
 use ApiPlatform\State\ProviderInterface;
@@ -133,7 +133,7 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
             return new ParameterProvider(
                 new ParameterValidatorProvider(
                     new SecurityParameterProvider(
-                        $app->make(DeserializeProvider::class),
+                        $app->make(ValidateProvider::class),
                         $app->make(ResourceAccessCheckerInterface::class)
                     ),
                 ),

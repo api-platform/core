@@ -14,12 +14,15 @@ declare(strict_types=1);
 namespace ApiPlatform\Laravel\State;
 
 use ApiPlatform\Metadata\Error;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * @implements ProviderInterface<object>
@@ -34,12 +37,13 @@ final class ValidateProvider implements ProviderInterface
     public function __construct(
         private readonly ProviderInterface $inner,
         private readonly Application $app,
+        // TODO: trigger deprecation in API Platform 4.2 when this is not defined
+        private readonly ?NormalizerInterface $normalizer = null,
     ) {
     }
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $request = $context['request'];
         $body = $this->inner->provide($operation, $uriVariables, $context);
 
         if ($operation instanceof Error) {
@@ -74,12 +78,7 @@ final class ValidateProvider implements ProviderInterface
             return $body;
         }
 
-        // In Symfony, validation is done on the Resource object (here $body) using Deserialization before Validation
-        // Here, we did not deserialize yet, we validate on the raw body before.
-        $validationBody = $request->request->all();
-        if ('jsonapi' === $request->getRequestFormat()) {
-            $validationBody = $validationBody['data']['attributes'];
-        }
+        $validationBody = $this->getBodyForValidation($body);
 
         $validator = Validator::make($validationBody, $rules);
         if ($validator->fails()) {
@@ -87,5 +86,36 @@ final class ValidateProvider implements ProviderInterface
         }
 
         return $body;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function getBodyForValidation(mixed $body): array
+    {
+        if (!$body) {
+            return [];
+        }
+
+        if ($body instanceof Model) {
+            return $body->toArray();
+        }
+
+        if ($this->normalizer) {
+            if (!\is_array($v = $this->normalizer->normalize($body))) {
+                throw new RuntimeException('An array is expected.');
+            }
+
+            return $v;
+        }
+
+        // hopefully this path never gets used, its there for BC-layer only
+        // TODO: deprecation in API Platform 4.2
+        // TODO: remove in 5.0
+        if ($s = json_encode($body)) {
+            return json_decode($s, true);
+        }
+
+        throw new RuntimeException('Could not transform the denormalized body in an array for validation');
     }
 }

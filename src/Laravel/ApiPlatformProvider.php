@@ -343,12 +343,12 @@ class ApiPlatformProvider extends ServiceProvider
             return new SwaggerUiProvider($app->make(ReadProvider::class), $app->make(OpenApiFactoryInterface::class), $config->get('api-platform.swagger_ui.enabled', false));
         });
 
-        $this->app->singleton(ValidateProvider::class, function (Application $app) {
-            return new ValidateProvider($app->make(SwaggerUiProvider::class), $app);
+        $this->app->singleton(DeserializeProvider::class, function (Application $app) {
+            return new DeserializeProvider($app->make(SwaggerUiProvider::class), $app->make(SerializerInterface::class), $app->make(SerializerContextBuilderInterface::class));
         });
 
-        $this->app->singleton(DeserializeProvider::class, function (Application $app) {
-            return new DeserializeProvider($app->make(ValidateProvider::class), $app->make(SerializerInterface::class), $app->make(SerializerContextBuilderInterface::class));
+        $this->app->singleton(ValidateProvider::class, function (Application $app) {
+            return new ValidateProvider($app->make(DeserializeProvider::class), $app, $app->make(ObjectNormalizer::class));
         });
 
         if (class_exists(JsonApiProvider::class)) {
