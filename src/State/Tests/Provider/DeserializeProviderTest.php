@@ -15,7 +15,6 @@ namespace ApiPlatform\State\Tests\Provider;
 
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\Provider\DeserializeProvider;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\SerializerContextBuilderInterface;
@@ -39,9 +38,8 @@ class DeserializeProviderTest extends TestCase
         $serializerContextBuilder->expects($this->once())->method('createFromRequest')->willReturn($serializerContext);
         $serializer = $this->createMock(SerializerInterface::class);
         $serializer->expects($this->once())->method('deserialize')->with('test', 'Test', 'format', ['uri_variables' => ['id' => 1], AbstractNormalizer::OBJECT_TO_POPULATE => $objectToPopulate] + $serializerContext)->willReturn(new \stdClass());
-        $resourceMetadataCollectionFactoryInterface = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
 
-        $provider = new DeserializeProvider($decorated, $serializer, $serializerContextBuilder, $resourceMetadataCollectionFactoryInterface);
+        $provider = new DeserializeProvider($decorated, $serializer, $serializerContextBuilder);
         $request = new Request(content: 'test');
         $request->headers->set('CONTENT_TYPE', 'ok');
         $request->attributes->set('input_format', 'format');
@@ -57,9 +55,8 @@ class DeserializeProviderTest extends TestCase
 
         $serializerContextBuilder = $this->createMock(SerializerContextBuilderInterface::class);
         $serializer = $this->createMock(SerializerInterface::class);
-        $resourceMetadataCollectionFactoryInterface = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
 
-        $provider = new DeserializeProvider($decorated, $serializer, $serializerContextBuilder, $resourceMetadataCollectionFactoryInterface);
+        $provider = new DeserializeProvider($decorated, $serializer, $serializerContextBuilder);
         $request = new Request(content: 'test');
         $request->attributes->set('input_format', 'format');
         $provider->provide($operation, ['id' => 1], ['request' => $request]);
@@ -74,9 +71,8 @@ class DeserializeProviderTest extends TestCase
 
         $serializerContextBuilder = $this->createMock(SerializerContextBuilderInterface::class);
         $serializer = $this->createMock(SerializerInterface::class);
-        $resourceMetadataCollectionFactoryInterface = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
 
-        $provider = new DeserializeProvider($decorated, $serializer, $serializerContextBuilder, $resourceMetadataCollectionFactoryInterface);
+        $provider = new DeserializeProvider($decorated, $serializer, $serializerContextBuilder);
         $request = new Request(content: 'test');
         $request->headers->set('CONTENT_TYPE', 'ok');
         $provider->provide($operation, ['id' => 1], ['request' => $request]);
@@ -93,9 +89,8 @@ class DeserializeProviderTest extends TestCase
         $serializerContextBuilder->expects($this->once())->method('createFromRequest')->willReturn($serializerContext);
         $serializer = $this->createMock(SerializerInterface::class);
         $serializer->expects($this->once())->method('deserialize')->with('test', 'Test', 'format', ['uri_variables' => ['id' => 1]] + $serializerContext)->willReturn(new \stdClass());
-        $resourceMetadataCollectionFactoryInterface = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
 
-        $provider = new DeserializeProvider($decorated, $serializer, $serializerContextBuilder, $resourceMetadataCollectionFactoryInterface);
+        $provider = new DeserializeProvider($decorated, $serializer, $serializerContextBuilder);
         $request = new Request(content: 'test');
         $request->headers->set('CONTENT_TYPE', 'ok');
         $request->attributes->set('input_format', 'format');
@@ -110,9 +105,8 @@ class DeserializeProviderTest extends TestCase
 
         $serializer = $this->createStub(SerializerInterface::class);
         $serializerContextBuilder = $this->createStub(SerializerContextBuilderInterface::class);
-        $resourceMetadataCollectionFactoryInterface = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
 
-        $provider = new DeserializeProvider($decorated, $serializer, $serializerContextBuilder, $resourceMetadataCollectionFactoryInterface);
+        $provider = new DeserializeProvider($decorated, $serializer, $serializerContextBuilder);
 
         // in Symfony (at least up to 7.0.2, 6.4.2, 6.3.11, 5.4.34), a request
         // without a content-type and content-length header will result in the

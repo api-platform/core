@@ -13,10 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\Provider;
 
-use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\SerializerContextBuilderInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
@@ -38,7 +36,6 @@ final class DeserializeProvider implements ProviderInterface
         private readonly ?ProviderInterface $decorated,
         private readonly SerializerInterface $serializer,
         private readonly SerializerContextBuilderInterface $serializerContextBuilder,
-        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
         private ?TranslatorInterface $translator = null,
     ) {
         if (null === $this->translator) {
@@ -127,16 +124,8 @@ final class DeserializeProvider implements ProviderInterface
             $normalizedType = $expectedType;
 
             if (class_exists($expectedType) || interface_exists($expectedType)) {
-                try {
-                    $normalizedType = $this->resourceMetadataCollectionFactory->create($expectedType)->getOperation()->getShortName();
-                } catch (OperationNotFoundException) {
-                    // Do nothing
-                }
-
-                if (null === $normalizedType) {
-                    $classReflection = new \ReflectionClass($expectedType);
-                    $normalizedType = $classReflection->getShortName();
-                }
+                $classReflection = new \ReflectionClass($expectedType);
+                $normalizedType = $classReflection->getShortName();
             }
 
             $normalizedTypes[] = $normalizedType;
