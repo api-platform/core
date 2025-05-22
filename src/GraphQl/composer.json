@@ -21,9 +21,9 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/metadata": "^4.1",
-        "api-platform/state": "^4.1",
-        "api-platform/serializer": "^4.1",
+        "api-platform/metadata": "^4.1.11",
+        "api-platform/state": "^4.1.11",
+        "api-platform/serializer": "^4.1.11",
         "symfony/property-info": "^6.4 || ^7.1",
         "symfony/serializer": "^6.4 || ^7.0",
         "webonyx/graphql-php": "^15.0",
