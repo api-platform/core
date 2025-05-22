@@ -69,4 +69,20 @@ class SnakeCaseApiTest extends TestCase
                 ],
             ]);
     }
+
+    public function testFailWithCamelCase(): void
+    {
+        $cartData = [
+            'productSku' => 'SKU_TEST_001',
+            'quantity' => 2,
+            'priceAtAddition' => '19.99',
+            'shoppingCart' => [
+                'userIdentifier' => 'user-'.Str::uuid()->toString(),
+                'status' => 'active',
+            ],
+        ];
+
+        $response = $this->postJson('/api/cart_items', $cartData, ['accept' => 'application/ld+json', 'content-type' => 'application/ld+json']);
+        $response->assertStatus(422);
+    }
 }

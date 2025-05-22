@@ -23,7 +23,7 @@ use ApiPlatform\Metadata\Post;
 )]
 class RuleValidation
 {
-    public function __construct(public int $prop, public ?int $max = null)
+    public function __construct(public ?int $prop = null, public ?int $max = null)
     {
     }
 }
