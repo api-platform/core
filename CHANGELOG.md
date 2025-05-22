@@ -1,5 +1,25 @@
 # Changelog
 
+## v4.1.10
+
+### Bug fixes
+
+* [329acf21e](https://github.com/api-platform/core/commit/329acf21e3a8618136a21b9121c5891f1fe6b9e8) fix(metadata): infer parameter string type from schema (#7161)
+* [5459ba375](https://github.com/api-platform/core/commit/5459ba375b0e7ffd1c783a6e18a6452769eaff46) fix(metadata): parameter cast to array flag (#7160)
+* [fe73002bf](https://github.com/api-platform/core/commit/fe73002bf5ae64adb1eb9e310dc62ff158de094d) fix(laravel): duplicated property names
+* [b0390080e](https://github.com/api-platform/core/commit/b0390080e90be9ac494c8b4d968e59a4962f32ca) fix(laravel): name convert validation property path
+* [730d17a30](https://github.com/api-platform/core/commit/730d17a306df4b92082484a19e82c5e150537331) fix(laravel): validate the model instead of body
+* [4d66f5ef3](https://github.com/api-platform/core/commit/4d66f5ef313fe3857611e8345702a10019c79ec5) fix(laravel): persist embeded relations with groups
+* [39123942a](https://github.com/api-platform/core/commit/39123942a0e1ff9dfb1e46f4a410160e3cd3fbd7) fix(laravel): register error handler without graphql
+* [fd010ea1b](https://github.com/api-platform/core/commit/fd010ea1be86073f5d8905d5640846390ade7ce6) fix(openapi): nullable externalDocs return type
+* [470c2e8bd](https://github.com/api-platform/core/commit/470c2e8bdf8d7a7502c02d2b681ced2001e2c1cc) fix(httpcache): iri cache tag for collection operation with path parameter
+* [9c0dbb653](https://github.com/api-platform/core/commit/9c0dbb65319beb89193e653e14c99352ac529a55) fix(state): do not expose FQCN in DeserializeProvider on PartialDenormalizationException (#7158)
+* [f78986000](https://github.com/api-platform/core/commit/f789860009888582791611a31d6084c620050615) fix(serializer): exception message to not expose resource FQCN (#7156)
+
+### Features
+
+* [767fa926b](https://github.com/api-platform/core/commit/767fa926b10bef771e896300b8e796287392d8c0) feat(laravel): add name_converter option
+
 ## v4.1.9
 
 ### Bug fixes
