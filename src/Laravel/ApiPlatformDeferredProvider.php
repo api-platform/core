@@ -252,6 +252,26 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
             );
         });
 
+        $this->app->singleton(
+            ExceptionHandlerInterface::class,
+            function (Application $app) {
+                /** @var ConfigRepository */
+                $config = $app['config'];
+
+                return new ErrorHandler(
+                    $app,
+                    $app->make(ResourceMetadataCollectionFactoryInterface::class),
+                    $app->make(ApiPlatformController::class),
+                    $app->make(IdentifiersExtractorInterface::class),
+                    $app->make(ResourceClassResolverInterface::class),
+                    $app->make(Negotiator::class),
+                    $config->get('api-platform.exception_to_status'),
+                    $config->get('app.debug'),
+                    $config->get('api-platform.error_formats')
+                );
+            }
+        );
+
         if (interface_exists(FieldsBuilderEnumInterface::class)) {
             $this->registerGraphQl();
         }
@@ -294,26 +314,6 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
                 $app->make(InflectorInterface::class)
             );
         });
-
-        $this->app->singleton(
-            ExceptionHandlerInterface::class,
-            function (Application $app) {
-                /** @var ConfigRepository */
-                $config = $app['config'];
-
-                return new ErrorHandler(
-                    $app,
-                    $app->make(ResourceMetadataCollectionFactoryInterface::class),
-                    $app->make(ApiPlatformController::class),
-                    $app->make(IdentifiersExtractorInterface::class),
-                    $app->make(ResourceClassResolverInterface::class),
-                    $app->make(Negotiator::class),
-                    $config->get('api-platform.exception_to_status'),
-                    $config->get('app.debug'),
-                    $config->get('api-platform.error_formats')
-                );
-            }
-        );
     }
 
     /**
