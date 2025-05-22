@@ -1,10 +1,10 @@
 # Changelog
 
-## v4.1.11
+## v4.1.11 - v4.1.12
 
 ### Bug fixes
 
-* [e7b3df11e](https://github.com/api-platform/core/commit/e7b3df11e4591f35400c691f6cf016304dce982e) fix(laravel): register error handler without graphql (#7168)
+* [b14a463a9](https://github.com/api-platform/core/commit/b14a463a9da8a285eba1b0adc63ca4121efb0dce) fix(laravel): register error handler without graphql
 
 ## v4.1.10
 
