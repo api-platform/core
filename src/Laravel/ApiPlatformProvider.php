@@ -927,6 +927,26 @@ class ApiPlatformProvider extends ServiceProvider
             return new Inflector();
         });
 
+        $this->app->singleton(
+            ExceptionHandlerInterface::class,
+            function (Application $app) {
+                /** @var ConfigRepository */
+                $config = $app['config'];
+
+                return new ErrorHandler(
+                    $app,
+                    $app->make(ResourceMetadataCollectionFactoryInterface::class),
+                    $app->make(ApiPlatformController::class),
+                    $app->make(IdentifiersExtractorInterface::class),
+                    $app->make(ResourceClassResolverInterface::class),
+                    $app->make(Negotiator::class),
+                    $config->get('api-platform.exception_to_status'),
+                    $config->get('app.debug'),
+                    $config->get('api-platform.error_formats')
+                );
+            }
+        );
+
         if ($this->app->runningInConsole()) {
             $this->commands([
                 Console\InstallCommand::class,
@@ -1148,26 +1168,6 @@ class ApiPlatformProvider extends ServiceProvider
                 formats: $config->get('api-platform.formats')
             );
         });
-
-        $this->app->singleton(
-            ExceptionHandlerInterface::class,
-            function (Application $app) {
-                /** @var ConfigRepository */
-                $config = $app['config'];
-
-                return new ErrorHandler(
-                    $app,
-                    $app->make(ResourceMetadataCollectionFactoryInterface::class),
-                    $app->make(ApiPlatformController::class),
-                    $app->make(IdentifiersExtractorInterface::class),
-                    $app->make(ResourceClassResolverInterface::class),
-                    $app->make(Negotiator::class),
-                    $config->get('api-platform.exception_to_status'),
-                    $config->get('app.debug'),
-                    $config->get('api-platform.error_formats')
-                );
-            }
-        );
     }
 
     /**
