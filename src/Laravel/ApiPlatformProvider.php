@@ -76,7 +76,6 @@ use ApiPlatform\JsonSchema\SchemaFactory;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Laravel\ApiResource\Error;
 use ApiPlatform\Laravel\ApiResource\ValidationError;
-use ApiPlatform\Laravel\Controller\ApiPlatformController;
 use ApiPlatform\Laravel\Controller\DocumentationController;
 use ApiPlatform\Laravel\Controller\EntrypointController;
 use ApiPlatform\Laravel\Eloquent\Filter\JsonApi\SortFilterParameterProvider;
@@ -88,7 +87,6 @@ use ApiPlatform\Laravel\Eloquent\Metadata\ModelMetadata;
 use ApiPlatform\Laravel\Eloquent\Metadata\ResourceClassResolver as EloquentResourceClassResolver;
 use ApiPlatform\Laravel\Eloquent\PropertyAccess\PropertyAccessor as EloquentPropertyAccessor;
 use ApiPlatform\Laravel\Eloquent\Serializer\SerializerContextBuilder as EloquentSerializerContextBuilder;
-use ApiPlatform\Laravel\Exception\ErrorHandler;
 use ApiPlatform\Laravel\GraphQl\Controller\EntrypointController as GraphQlEntrypointController;
 use ApiPlatform\Laravel\GraphQl\Controller\GraphiQlController;
 use ApiPlatform\Laravel\JsonApi\State\JsonApiProvider;
@@ -156,7 +154,6 @@ use ApiPlatform\State\Provider\ReadProvider;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\SerializerContextBuilderInterface;
 use Illuminate\Config\Repository as ConfigRepository;
-use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerInterface;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
@@ -926,26 +923,6 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->singleton(InflectorInterface::class, function (Application $app) {
             return new Inflector();
         });
-
-        $this->app->singleton(
-            ExceptionHandlerInterface::class,
-            function (Application $app) {
-                /** @var ConfigRepository */
-                $config = $app['config'];
-
-                return new ErrorHandler(
-                    $app,
-                    $app->make(ResourceMetadataCollectionFactoryInterface::class),
-                    $app->make(ApiPlatformController::class),
-                    $app->make(IdentifiersExtractorInterface::class),
-                    $app->make(ResourceClassResolverInterface::class),
-                    $app->make(Negotiator::class),
-                    $config->get('api-platform.exception_to_status'),
-                    $config->get('app.debug'),
-                    $config->get('api-platform.error_formats')
-                );
-            }
-        );
 
         if ($this->app->runningInConsole()) {
             $this->commands([
