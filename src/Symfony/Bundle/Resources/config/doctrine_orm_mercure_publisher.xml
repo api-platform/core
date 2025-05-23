@@ -14,6 +14,7 @@
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.serializer" />
             <argument>%api_platform.formats%</argument>
+            <argument type="service" id="service_container" />
             <argument type="service" id="messenger.default_bus" on-invalid="ignore" />
             <argument type="service" id="Symfony\Component\Mercure\HubRegistry" />
             <argument type="service" id="api_platform.graphql.subscription.subscription_manager" on-invalid="ignore" />

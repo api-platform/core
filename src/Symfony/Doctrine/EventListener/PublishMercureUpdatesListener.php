@@ -29,6 +29,7 @@ use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use Doctrine\Common\EventArgs;
 use Doctrine\ODM\MongoDB\Event\OnFlushEventArgs as MongoDbOdmOnFlushEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs as OrmOnFlushEventArgs;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -65,7 +66,7 @@ final class PublishMercureUpdatesListener
     /**
      * @param array<string, string[]|string> $formats
      */
-    public function __construct(ResourceClassResolverInterface $resourceClassResolver, private readonly IriConverterInterface $iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly SerializerInterface $serializer, private readonly array $formats, ?MessageBusInterface $messageBus = null, private readonly ?HubRegistry $hubRegistry = null, private readonly ?GraphQlSubscriptionManagerInterface $graphQlSubscriptionManager = null, private readonly ?GraphQlMercureSubscriptionIriGeneratorInterface $graphQlMercureSubscriptionIriGenerator = null, ?ExpressionLanguage $expressionLanguage = null, private bool $includeType = false)
+    public function __construct(ResourceClassResolverInterface $resourceClassResolver, private readonly IriConverterInterface $iriConverter, ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly SerializerInterface $serializer, private readonly array $formats, private readonly ContainerInterface $container, ?MessageBusInterface $messageBus = null, private readonly ?HubRegistry $hubRegistry = null, private readonly ?GraphQlSubscriptionManagerInterface $graphQlSubscriptionManager = null, private readonly ?GraphQlMercureSubscriptionIriGeneratorInterface $graphQlMercureSubscriptionIriGenerator = null, ?ExpressionLanguage $expressionLanguage = null, private bool $includeType = false)
     {
         if (null === $messageBus && null === $hubRegistry) {
             throw new InvalidArgumentException('A message bus or a hub registry must be provided.');
@@ -240,13 +241,33 @@ final class PublishMercureUpdatesListener
             $data = json_encode(['@id' => $object->id] + ($this->includeType ? ['@type' => $object->type] : []), \JSON_THROW_ON_ERROR);
         } else {
             $resourceClass = $this->getObjectClass($object);
-            $context = $options['normalization_context'] ?? $this->resourceMetadataFactory->create($resourceClass)->getOperation()->getNormalizationContext() ?? [];
+            $operation = $this->resourceMetadataFactory->create($resourceClass)->getOperation();
+            $context = $options['normalization_context'] ?? $operation->getNormalizationContext() ?? [];
 
             // We need to evaluate it here, because in storeObjectToPublish() the resource would not have been persisted yet
             $this->evaluateTopics($options, $object);
 
             $iri = $options['topics'] ?? $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_URL);
-            $data = $options['data'] ?? $this->serializer->serialize($object, key($this->formats), $context);
+
+            $data = null;
+            if(isset($options['data'])) {
+                $data = $options['data'];
+            } else {
+                // check if has a provider
+                $provider = $operation->getProvider() ?? false;
+                if ($provider) {
+                    if(is_string($provider)){
+                        $provider = $this->container->get($provider);
+                    }
+                    $providedData = $provider->provide($operation, [ 'id' => $object->getId() ], $context);
+                    if ($providedData) {
+                        $data = $this->serializer->serialize($providedData, key($this->formats), $context);
+                    }
+                }
+            }
+            if (!$data) {
+                $data = $this->serializer->serialize($object, key($this->formats), $context);
+            }
         }
 
         $updates = array_merge([$this->buildUpdate($iri, $data, $options)], $this->getGraphQlSubscriptionUpdates($object, $options, $type));
