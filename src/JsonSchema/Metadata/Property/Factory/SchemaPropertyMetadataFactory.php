@@ -88,14 +88,14 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
 
         $types = $propertyMetadata->getBuiltinTypes() ?? [];
 
-        if (!\array_key_exists('default', $propertySchema) && !empty($default = $propertyMetadata->getDefault()) && (!\count($types) || null === ($className = $types[0]->getClassName()) || !$this->isResourceClass($className))) {
+        if (!\array_key_exists('default', $propertySchema) && null !== ($default = $propertyMetadata->getDefault()) && (!\count($types) || null === ($className = $types[0]->getClassName()) || !$this->isResourceClass($className))) {
             if ($default instanceof \BackedEnum) {
                 $default = $default->value;
             }
             $propertySchema['default'] = $default;
         }
 
-        if (!\array_key_exists('example', $propertySchema) && !empty($example = $propertyMetadata->getExample())) {
+        if (!\array_key_exists('example', $propertySchema) && null !== ($example = $propertyMetadata->getExample())) {
             $propertySchema['example'] = $example;
         }
 
