@@ -30,13 +30,14 @@
         "php": ">=8.2",
         "api-platform/metadata": "^4.1.11",
         "psr/container": "^1.0 || ^2.0",
-        "symfony/http-kernel": "^6.4 || ^7.0"
+        "symfony/http-kernel": "^6.4 || ^7.0",
+        "symfony/serializer": "^6.4 || ^7.0",
+        "symfony/contracts": "^3.0"
     },
     "require-dev": {
         "api-platform/validator": "^4.1",
         "phpunit/phpunit": "11.5.x-dev",
         "symfony/http-foundation": "^6.4 || ^7.0",
-        "symfony/serializer": "^6.4 || ^7.0",
         "symfony/web-link": "^6.4 || ^7.1",
         "willdurand/negotiation": "^3.1"
     },
