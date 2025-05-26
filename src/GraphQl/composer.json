@@ -77,6 +77,10 @@
     "scripts": {
         "test": "./vendor/bin/phpunit"
     },
+    "conflict": {
+        "symfony/http-client": "<6.4",
+        "doctrine/inflector": "<2.0"
+    },
     "repositories": [
         {
             "type": "vcs",
