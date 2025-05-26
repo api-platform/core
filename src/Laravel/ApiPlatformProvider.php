@@ -76,7 +76,6 @@ use ApiPlatform\JsonSchema\SchemaFactory;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Laravel\ApiResource\Error;
 use ApiPlatform\Laravel\ApiResource\ValidationError;
-use ApiPlatform\Laravel\Controller\ApiPlatformController;
 use ApiPlatform\Laravel\Controller\DocumentationController;
 use ApiPlatform\Laravel\Controller\EntrypointController;
 use ApiPlatform\Laravel\Eloquent\Filter\JsonApi\SortFilterParameterProvider;
@@ -88,8 +87,6 @@ use ApiPlatform\Laravel\Eloquent\Metadata\ModelMetadata;
 use ApiPlatform\Laravel\Eloquent\Metadata\ResourceClassResolver as EloquentResourceClassResolver;
 use ApiPlatform\Laravel\Eloquent\PropertyAccess\PropertyAccessor as EloquentPropertyAccessor;
 use ApiPlatform\Laravel\Eloquent\Serializer\SerializerContextBuilder as EloquentSerializerContextBuilder;
-use ApiPlatform\Laravel\Eloquent\Serializer\SnakeCaseToCamelCaseNameConverter;
-use ApiPlatform\Laravel\Exception\ErrorHandler;
 use ApiPlatform\Laravel\GraphQl\Controller\EntrypointController as GraphQlEntrypointController;
 use ApiPlatform\Laravel\GraphQl\Controller\GraphiQlController;
 use ApiPlatform\Laravel\JsonApi\State\JsonApiProvider;
@@ -157,7 +154,6 @@ use ApiPlatform\State\Provider\ReadProvider;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\SerializerContextBuilderInterface;
 use Illuminate\Config\Repository as ConfigRepository;
-use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerInterface;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
@@ -178,6 +174,7 @@ use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Serializer\NameConverter\SnakeCaseToCamelCaseNameConverter;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\BackedEnumNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateIntervalNormalizer;
@@ -211,7 +208,10 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(ModelMetadata::class);
+        $this->app->singleton(ModelMetadata::class, function () {
+            return new ModelMetadata();
+        });
+
         $this->app->bind(LoaderInterface::class, AttributeLoader::class);
         $this->app->bind(ClassMetadataFactoryInterface::class, ClassMetadataFactory::class);
         $this->app->singleton(ClassMetadataFactory::class, function (Application $app) {
@@ -256,30 +256,26 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->singleton(PropertyMetadataFactoryInterface::class, function (Application $app) {
-            return new PropertyInfoPropertyMetadataFactory(
-                $app->make(PropertyInfoExtractorInterface::class),
-                new EloquentPropertyMetadataFactory(
-                    $app->make(ModelMetadata::class),
-                )
-            );
-        });
-
-        $this->app->extend(PropertyMetadataFactoryInterface::class, function (PropertyInfoPropertyMetadataFactory $inner, Application $app) {
             /** @var ConfigRepository $config */
             $config = $app['config'];
 
             return new CachePropertyMetadataFactory(
                 new SchemaPropertyMetadataFactory(
                     $app->make(ResourceClassResolverInterface::class),
-                    new SerializerPropertyMetadataFactory(
-                        $app->make(SerializerClassMetadataFactory::class),
-                        new AttributePropertyMetadataFactory(
-                            new EloquentAttributePropertyMetadataFactory(
-                                $inner,
-                            )
+                    new PropertyInfoPropertyMetadataFactory(
+                        $app->make(PropertyInfoExtractorInterface::class),
+                        new SerializerPropertyMetadataFactory(
+                            $app->make(SerializerClassMetadataFactory::class),
+                            new AttributePropertyMetadataFactory(
+                                new EloquentAttributePropertyMetadataFactory(
+                                    new EloquentPropertyMetadataFactory(
+                                        $app->make(ModelMetadata::class),
+                                    ),
+                                )
+                            ),
+                            $app->make(ResourceClassResolverInterface::class)
                         ),
-                        $app->make(ResourceClassResolverInterface::class)
-                    ),
+                    )
                 ),
                 true === $config->get('app.debug') ? 'array' : $config->get('api-platform.cache', 'file')
             );
@@ -317,9 +313,14 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->bind(NameConverterInterface::class, function (Application $app) {
             $config = $app['config'];
+            $nameConverter = $config->get('api-platform.name_converter', SnakeCaseToCamelCaseNameConverter::class);
+            if ($nameConverter && class_exists($nameConverter)) {
+                $nameConverter = $app->make($nameConverter);
+            }
+
             $defaultContext = $config->get('api-platform.serializer', []);
 
-            return new HydraPrefixNameConverter(new MetadataAwareNameConverter($app->make(ClassMetadataFactoryInterface::class), $app->make(SnakeCaseToCamelCaseNameConverter::class)), $defaultContext);
+            return new HydraPrefixNameConverter(new MetadataAwareNameConverter($app->make(ClassMetadataFactoryInterface::class), $nameConverter), $defaultContext);
         });
 
         $this->app->singleton(OperationMetadataFactory::class, function (Application $app) {
@@ -339,12 +340,18 @@ class ApiPlatformProvider extends ServiceProvider
             return new SwaggerUiProvider($app->make(ReadProvider::class), $app->make(OpenApiFactoryInterface::class), $config->get('api-platform.swagger_ui.enabled', false));
         });
 
-        $this->app->singleton(ValidateProvider::class, function (Application $app) {
-            return new ValidateProvider($app->make(SwaggerUiProvider::class), $app);
+        $this->app->singleton(DeserializeProvider::class, function (Application $app) {
+            return new DeserializeProvider($app->make(SwaggerUiProvider::class), $app->make(SerializerInterface::class), $app->make(SerializerContextBuilderInterface::class));
         });
 
-        $this->app->singleton(DeserializeProvider::class, function (Application $app) {
-            return new DeserializeProvider($app->make(ValidateProvider::class), $app->make(SerializerInterface::class), $app->make(SerializerContextBuilderInterface::class));
+        $this->app->singleton(ValidateProvider::class, function (Application $app) {
+            $config = $app['config'];
+            $nameConverter = $config->get('api-platform.name_converter', SnakeCaseToCamelCaseNameConverter::class);
+            if ($nameConverter && class_exists($nameConverter)) {
+                $nameConverter = $app->make($nameConverter);
+            }
+
+            return new ValidateProvider($app->make(DeserializeProvider::class), $app, $app->make(ObjectNormalizer::class), $nameConverter);
         });
 
         if (class_exists(JsonApiProvider::class)) {
@@ -756,7 +763,6 @@ class ApiPlatformProvider extends ServiceProvider
                         $app->make(ContextBuilderInterface::class),
                         $app->make(ResourceClassResolverInterface::class),
                         $app->make(IriConverterInterface::class),
-                        $app->make(ResourceMetadataCollectionFactoryInterface::class),
                         $defaultContext
                     ),
                     $app->make(ResourceMetadataCollectionFactoryInterface::class),
@@ -1139,26 +1145,6 @@ class ApiPlatformProvider extends ServiceProvider
                 formats: $config->get('api-platform.formats')
             );
         });
-
-        $this->app->singleton(
-            ExceptionHandlerInterface::class,
-            function (Application $app) {
-                /** @var ConfigRepository */
-                $config = $app['config'];
-
-                return new ErrorHandler(
-                    $app,
-                    $app->make(ResourceMetadataCollectionFactoryInterface::class),
-                    $app->make(ApiPlatformController::class),
-                    $app->make(IdentifiersExtractorInterface::class),
-                    $app->make(ResourceClassResolverInterface::class),
-                    $app->make(Negotiator::class),
-                    $config->get('api-platform.exception_to_status'),
-                    $config->get('app.debug'),
-                    $config->get('api-platform.error_formats')
-                );
-            }
-        );
     }
 
     /**

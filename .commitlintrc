@@ -13,6 +13,7 @@
         "elasticsearch",
         "mongodb",
         "jsonld",
+        "httpcache",
         "hydra",
         "httpcache",
         "jsonapi",

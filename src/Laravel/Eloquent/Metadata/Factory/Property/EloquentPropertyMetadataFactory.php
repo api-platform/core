@@ -91,10 +91,21 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
                 $type = Type::nullable($type);
             }
 
-            return $propertyMetadata
-                ->withNativeType($type)
-                ->withWritable($propertyMetadata->isWritable() ?? true === $p['fillable'])
-                ->withReadable($propertyMetadata->isReadable() ?? false === $p['hidden']);
+            $propertyMetadata = $propertyMetadata
+                ->withNativeType($type);
+
+            // If these are set let the SerializerPropertyMetadataFactory do the work
+            if (!isset($options['denormalization_groups'])) {
+                $propertyMetadata = $propertyMetadata
+                    ->withWritable($propertyMetadata->isWritable() ?? true === $p['fillable']);
+            }
+
+            if (!isset($options['normalization_groups'])) {
+                $propertyMetadata = $propertyMetadata
+                    ->withReadable($propertyMetadata->isReadable() ?? false === $p['hidden']);
+            }
+
+            return $propertyMetadata;
         }
 
         foreach ($this->modelMetadata->getRelations($model) as $relation) {
@@ -118,8 +129,6 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
 
             return $propertyMetadata
                 ->withNativeType($type)
-                ->withWritable($propertyMetadata->isWritable() ?? true)
-                ->withReadable($propertyMetadata->isReadable() ?? true)
                 ->withExtraProperties(['eloquent_relation' => $relation] + $propertyMetadata->getExtraProperties());
         }
 

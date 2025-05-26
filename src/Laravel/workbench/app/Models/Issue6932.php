@@ -11,19 +11,23 @@
 
 declare(strict_types=1);
 
-namespace Workbench\App\ApiResource;
+namespace App\Models;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
+use Illuminate\Database\Eloquent\Model;
 
 #[ApiResource(
-    uriTemplate: '/issue6745/rule_validations',
-    operations: [new Post()],
-    rules: ['prop' => 'required', 'max' => 'lt:2']
+    operations: [
+        new Post(
+            uriTemplate: '/issue_6932',
+            rules: [
+                'sur_name' => 'required',
+            ]
+        ),
+    ],
 )]
-class RuleValidation
+class Issue6932 extends Model
 {
-    public function __construct(public ?int $prop = null, public ?int $max = null)
-    {
-    }
+    protected $table = 'issue6932';
 }
