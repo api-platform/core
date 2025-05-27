@@ -93,5 +93,6 @@
             "type": "vcs",
             "url": "https://github.com/soyuka/phpunit"
         }
-    ]
+    ],
+    "version": "4.1.12"
 }
