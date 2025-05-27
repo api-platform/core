@@ -56,6 +56,20 @@ final class ValidationTest extends ApiTestCase
     {
         return [
             [
+                'enumNotDeepObject[]=c&enumNotDeepObject[]=c',
+                [
+                    [
+                        'propertyPath' => 'enumNotDeepObject', 'message' => 'The value you selected is not a valid choice.',
+                    ],
+                    [
+                        'propertyPath' => 'enumNotDeepObject', 'message' => 'The value you selected is not a valid choice.',
+                    ],
+                    [
+                        'message' => 'This collection should contain only unique elements.',
+                    ],
+                ],
+            ],
+            [
                 'enum[]=c&enum[]=c',
                 [
                     [
