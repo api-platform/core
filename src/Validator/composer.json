@@ -24,7 +24,7 @@
     "require": {
         "php": ">=8.2",
         "api-platform/metadata": "^4.1.11",
-        "symfony/type-info": "^7.2",
+        "symfony/type-info": "v7.3.0-RC1",
         "symfony/web-link": "^6.4 || ^7.1"
     },
     "require-dev": {
@@ -33,7 +33,7 @@
         "phpunit/phpunit": "11.5.x-dev",
         "symfony/validator": "^6.4 || ^7.0",
         "symfony/http-kernel": "^6.4 || ^7.0",
-        "symfony/type-info": "v7.3.0-BETA1"
+        "symfony/type-info": "v7.3.0-RC1"
     },
     "autoload": {
         "psr-4": {

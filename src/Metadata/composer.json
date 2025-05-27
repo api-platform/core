@@ -33,7 +33,7 @@
         "psr/log": "^1.0 || ^2.0 || ^3.0",
         "symfony/property-info": "^6.4 || ^7.1",
         "symfony/string": "^6.4 || ^7.0",
-        "symfony/type-info": "v7.3.0-BETA1"
+        "symfony/type-info": "v7.3.0-RC1"
     },
     "require-dev": {
         "api-platform/json-schema": "^4.1",

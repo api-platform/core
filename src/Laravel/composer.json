@@ -47,7 +47,7 @@
         "illuminate/routing": "^11.0 || ^12.0",
         "illuminate/support": "^11.0 || ^12.0",
         "illuminate/container": "^11.0 || ^12.0",
-        "symfony/type-info": "^7.2 || v7.3.0-BETA1",
+        "symfony/type-info": "^7.2 || v7.3.0-RC1",
         "symfony/web-link": "^6.4 || ^7.1",
         "willdurand/negotiation": "^3.1",
         "phpstan/phpdoc-parser": "^1.29 || ^2.0",

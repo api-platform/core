@@ -55,10 +55,10 @@
         "phpspec/prophecy-phpunit": "^2.2",
         "phpunit/phpunit": "11.5.x-dev",
         "symfony/expression-language": "^6.4 || ^7.0",
-        "symfony/intl": "^7.2",
+        "symfony/intl": "^6.4 || ^7.0",
         "symfony/mercure-bundle": "*",
         "symfony/routing": "^6.4 || ^7.0",
-        "symfony/type-info": "v7.3.0-BETA1",
+        "symfony/type-info": "v7.3.0-RC1",
         "symfony/validator": "^6.4 || ^7.0",
         "webonyx/graphql-php": "^15.0"
     },
