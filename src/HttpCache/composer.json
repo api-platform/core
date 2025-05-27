@@ -32,7 +32,7 @@
         "symfony/dependency-injection": "^6.4 || ^7.0",
         "phpspec/prophecy-phpunit": "^2.2",
         "symfony/http-client": "^6.4 || ^7.0",
-        "symfony/type-info": "v7.3.0-BETA1",
+        "symfony/type-info": "v7.3.0-RC1",
         "phpunit/phpunit": "11.5.x-dev"
     },
     "autoload": {

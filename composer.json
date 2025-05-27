@@ -114,7 +114,7 @@
         "symfony/property-info": "^6.4 || ^7.1",
         "symfony/serializer": "^6.4 || ^7.0",
         "symfony/translation-contracts": "^3.3",
-        "symfony/type-info": "v7.3.0-BETA1",
+        "symfony/type-info": "v7.3.0-RC1",
         "symfony/web-link": "^6.4 || ^7.1",
         "willdurand/negotiation": "^3.1"
     },

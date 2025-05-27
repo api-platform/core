@@ -40,7 +40,7 @@
         "symfony/framework-bundle": "^6.4 || ^7.0",
         "symfony/property-access": "^6.4 || ^7.0",
         "symfony/serializer": "^6.4 || ^7.0",
-        "symfony/type-info": "v7.3.0-BETA1",
+        "symfony/type-info": "v7.3.0-RC1",
         "symfony/uid": "^6.4 || ^7.0",
         "symfony/validator": "^6.4 || ^7.0",
         "symfony/yaml": "^6.4 || ^7.0"
