@@ -317,7 +317,7 @@ jobs:
         if: ${{ matrix.php.lowest }}
         run: |
           cd $(composer ${{matrix.component}} --cwd)
-          composer update${{ matrix.php.lowest && ' --prefer-lowest' || '' }}
+          composer update${{ matrix.php.lowest && ' --prefer-lowest --prefer-source' || '' }}
       - name: Run ${{ matrix.component }} tests
         run: |
           mkdir -p /tmp/build/logs/phpunit
