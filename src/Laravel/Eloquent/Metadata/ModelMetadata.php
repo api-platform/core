@@ -106,7 +106,7 @@ final class ModelMetadata
     private function isColumnPrimaryKey(array $indexes, string $column): bool
     {
         foreach ($indexes as $index) {
-            if (\in_array($column, $index['columns'], true)) {
+            if (\in_array($column, $index['columns'], true) && (true === $index['primary'] ?? false)) {
                 return true;
             }
         }
