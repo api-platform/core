@@ -92,7 +92,8 @@ use Symfony\Component\Validator\Constraints\Country;
 #[GetCollection(
     uriTemplate: 'validate_parameters{._format}',
     parameters: [
-        'enum' => new QueryParameter(schema: ['enum' => ['a', 'b'], 'uniqueItems' => true]),
+        'enum' => new QueryParameter(schema: ['enum' => ['a', 'b'], 'uniqueItems' => true], openApi: new OpenApiParameter(name: 'enum', in: 'query', style: 'deepObject')),
+        'enumNotDeepObject' => new QueryParameter(schema: ['enum' => ['a', 'b'], 'uniqueItems' => true]),
         'num' => new QueryParameter(
             schema: ['minimum' => 1, 'maximum' => 3],
             nativeType: new BuiltinType(TypeIdentifier::STRING),
