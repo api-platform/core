@@ -435,11 +435,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             }
 
             if ($container->fileExists($path, false)) {
-                if (!preg_match('/\.php$/', (string) $path, $matches)) {
+                if (!str_ends_with($path, '.php')) {
                     throw new RuntimeException(\sprintf('Unsupported mapping type in "%s", supported type is PHP.', $path));
                 }
 
-                $resources['php' === $matches[1]][] = $path;
+                $resources['php'][] = $path;
 
                 continue;
             }

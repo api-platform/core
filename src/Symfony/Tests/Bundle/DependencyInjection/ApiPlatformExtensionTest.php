@@ -292,19 +292,14 @@ class ApiPlatformExtensionTest extends TestCase
         $this->container->hasParameter('api_platform.swagger.http_auth');
     }
 
-    public function testItRegisterMetadataConfiguration(): void
+    public function testItRegistersMetadataConfiguration(): void
     {
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['mapping']['imports'] = [__DIR__.'/php'];
         (new ApiPlatformExtension())->load($config, $this->container);
 
         $emptyPhpFile = realpath(__DIR__.'/php/empty_file.php');
-
         $this->assertContainerHasService('api_platform.metadata.resource_extractor.php_file');
-
-        $service = $this->container->get('api_platform.metadata.resource_extractor.php_file');
-        $reflection = new \ReflectionClass($service);
-
-        $this->assertSame([$emptyPhpFile], $reflection->getProperty('paths')->getValue($service));
+        $this->assertSame([$emptyPhpFile], $this->container->getDefinition('api_platform.metadata.resource_extractor.php_file')->getArgument(0));
     }
 }
