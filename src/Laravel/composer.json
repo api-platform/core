@@ -85,7 +85,8 @@
         },
         "branch-alias": {
             "dev-main": "4.2.x-dev",
-            "dev-3.4": "3.4.x-dev"
+            "dev-3.4": "3.4.x-dev",
+            "dev-4.1": "4.1.x-dev"
         },
         "symfony": {
             "require": "^6.4 || ^7.1"
@@ -125,5 +126,6 @@
             "type": "vcs",
             "url": "https://github.com/soyuka/phpunit"
         }
-    ]
+    ],
+    "version": "4.1.12"
 }

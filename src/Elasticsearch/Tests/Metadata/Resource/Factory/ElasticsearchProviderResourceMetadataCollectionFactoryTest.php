@@ -15,10 +15,10 @@ namespace ApiPlatform\Elasticsearch\Tests\Metadata\Resource\Factory;
 
 use ApiPlatform\Elasticsearch\Metadata\Resource\Factory\ElasticsearchProviderResourceMetadataCollectionFactory;
 use ApiPlatform\Elasticsearch\Tests\Fixtures\Foo;
+use ApiPlatform\Elasticsearch\Tests\Fixtures\Metadata\Get;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Metadata\Tests\Fixtures\Metadata\Get;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 

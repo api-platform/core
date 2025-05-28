@@ -64,7 +64,8 @@
     "extra": {
         "branch-alias": {
             "dev-main": "4.2.x-dev",
-            "dev-3.4": "3.4.x-dev"
+            "dev-3.4": "3.4.x-dev",
+            "dev-4.1": "4.1.x-dev"
         },
         "symfony": {
             "require": "^6.4 || ^7.0"
@@ -77,10 +78,15 @@
     "scripts": {
         "test": "./vendor/bin/phpunit"
     },
+    "conflict": {
+        "symfony/http-client": "<6.4",
+        "doctrine/inflector": "<2.0"
+    },
     "repositories": [
         {
             "type": "vcs",
             "url": "https://github.com/soyuka/phpunit"
         }
-    ]
+    ],
+    "version": "4.1.12"
 }

@@ -163,7 +163,7 @@ final class BackedEnumFilter extends AbstractFilter
             $fieldMapping = (array) $fieldMapping;
         }
 
-        if (!$enumType = $fieldMapping['enumType']) {
+        if (!($enumType = $fieldMapping['enumType'] ?? null)) {
             return false;
         }
 

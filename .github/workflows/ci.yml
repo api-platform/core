@@ -264,7 +264,7 @@ jobs:
         continue-on-error: true
 
   phpunit-components:
-    name: PHPUnit ${{ matrix.component }} (PHP ${{ matrix.php.version }} ${{ matrix.php.coverage && 'coverage' || '' }}
+    name: PHPUnit ${{ matrix.component }} (PHP ${{ matrix.php.version }} ${{ matrix.php.coverage && 'coverage' || '' }}${{ matrix.php.lowest && 'lowest' || '' }})
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -274,6 +274,8 @@ jobs:
           - version: '8.3'
           - version: '8.4'
             coverage: true
+          - version: '8.4'
+            lowest: true
         component:
           - api-platform/doctrine-common
           - api-platform/doctrine-orm
@@ -302,14 +304,20 @@ jobs:
           tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
           ini-values: memory_limit=-1
-      - name: Linking
+      - name: PMU
         run: |
           composer global require soyuka/pmu
           composer global config allow-plugins.soyuka/pmu true --no-interaction
-          composer global link . --permanent
-      - name: Run ${{ matrix.component }} install
+      - name: Linking
+        if: ${{ !matrix.php.lowest }}
         run: |
+          composer global link . --permanent
           composer ${{matrix.component}} update
+      - name: Run ${{ matrix.component }} install
+        if: ${{ matrix.php.lowest }}
+        run: |
+          cd $(composer ${{matrix.component}} --cwd)
+          composer update${{ matrix.php.lowest && ' --prefer-lowest --prefer-source' || '' }}
       - name: Run ${{ matrix.component }} tests
         run: |
           mkdir -p /tmp/build/logs/phpunit
