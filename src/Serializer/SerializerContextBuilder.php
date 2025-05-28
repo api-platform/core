@@ -84,10 +84,6 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             }
         }
 
-        // if (null === $context['output'] && $this->getStateOptionsClass($operation)) {
-        //     $context['force_resource_class'] = $operation->getClass();
-        // }
-
         if ($this->debug && isset($context['groups']) && $operation instanceof ErrorOperation) {
             if (!\is_array($context['groups'])) {
                 $context['groups'] = (array) $context['groups'];
