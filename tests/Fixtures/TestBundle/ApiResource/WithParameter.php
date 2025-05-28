@@ -28,8 +28,13 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\GenericType;
+use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
+use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\Country;
 
 #[Get(
     uriTemplate: 'with_parameters/{id}{._format}',
@@ -55,6 +60,34 @@ use Symfony\Component\Validator\Constraints as Assert;
         'hydra' => new QueryParameter(property: 'a', required: true),
     ],
     provider: [self::class, 'collectionProvider']
+)]
+#[GetCollection(
+    uriTemplate: 'with_parameters_country{._format}',
+    parameters: [
+        'country' => new QueryParameter(
+            schema: ['type' => 'string'],
+            constraints: [new Country()],
+            nativeType: new UnionType(
+                new BuiltinType(TypeIdentifier::STRING),
+                new CollectionType(
+                    new GenericType( // @phpstan-ignore-line
+                        new BuiltinType(TypeIdentifier::ARRAY), // @phpstan-ignore-line
+                        new BuiltinType(TypeIdentifier::INT),
+                        new BuiltinType(TypeIdentifier::STRING),
+                    ),
+                    true,
+                ),
+            )
+        ),
+    ],
+    provider: [self::class, 'collectionProvider']
+)]
+#[GetCollection(
+    uriTemplate: 'with_parameters_countries{._format}',
+    parameters: [
+        'country' => new QueryParameter(constraints: [new All([new Country()])], castToArray: true),
+    ],
+    provider: [self::class, 'collectionProvider'],
 )]
 #[GetCollection(
     uriTemplate: 'validate_parameters{._format}',
@@ -88,8 +121,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             nativeType: new BuiltinType(TypeIdentifier::STRING),
         ),
         'pattern' => new QueryParameter(
-            schema: ['pattern' => '\d'],
-            nativeType: new BuiltinType(TypeIdentifier::STRING),
+            schema: ['pattern' => '\d', 'type' => 'string'],
         ),
     ],
     provider: [self::class, 'collectionProvider']
@@ -105,7 +137,6 @@ use Symfony\Component\Validator\Constraints as Assert;
     parameters: new Parameters([
         new QueryParameter(
             key: 'q',
-            nativeType: new BuiltinType(TypeIdentifier::STRING),
         ),
         new HeaderParameter(
             key: 'q',

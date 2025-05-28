@@ -92,9 +92,11 @@ trait ParameterParserTrait
             }
         }
 
-        if ($isCollection) {
-            $value = \is_array($value) ? $value : [$value];
-        } elseif ($parameter instanceof HeaderParameter && \is_array($value) && array_is_list($value) && 1 === \count($value)) {
+        if ($isCollection && true === $parameter->getCastToArray() && !\is_array($value)) {
+            $value = [$value];
+        }
+
+        if (!$isCollection && $parameter instanceof HeaderParameter && \is_array($value) && array_is_list($value) && 1 === \count($value)) {
             $value = $value[0];
         }
 

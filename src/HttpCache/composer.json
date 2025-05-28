@@ -23,8 +23,8 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/metadata": "^4.1",
-        "api-platform/state": "^4.1",
+        "api-platform/metadata": "^4.1.11",
+        "api-platform/state": "^4.1.11",
         "symfony/http-foundation": "^6.4 || ^7.0"
     },
     "require-dev": {
@@ -32,7 +32,7 @@
         "symfony/dependency-injection": "^6.4 || ^7.0",
         "phpspec/prophecy-phpunit": "^2.2",
         "symfony/http-client": "^6.4 || ^7.0",
-        "symfony/type-info": "v7.3.0-BETA1",
+        "symfony/type-info": "v7.3.0-RC1",
         "phpunit/phpunit": "11.5.x-dev"
     },
     "autoload": {

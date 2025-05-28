@@ -119,7 +119,7 @@ final class ValidationTest extends ApiTestCase
         if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
             $this->assertSame('This value should be of type uuid.', $violationUuid['message']);
         } else {
-            $this->assertSame('This value should be of type Ramsey\Uuid\UuidInterface|null.', $violationUuid['message']);
+            $this->assertSame('This value should be of type UuidInterface|null.', $violationUuid['message']);
         }
 
         $violationRelatedDummy = $findViolation('relatedDummy');
