@@ -35,7 +35,7 @@
         "doctrine/orm": "^2.17 || ^3.0",
         "phpspec/prophecy-phpunit": "^2.2",
         "phpunit/phpunit": "11.5.x-dev",
-        "symfony/type-info": "v7.3.0-RC1"
+        "symfony/type-info": "^7.3"
     },
     "conflict": {
         "doctrine/persistence": "<1.3"

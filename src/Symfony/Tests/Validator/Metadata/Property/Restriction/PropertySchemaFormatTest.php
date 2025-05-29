@@ -75,8 +75,8 @@ final class PropertySchemaFormatTest extends TestCase
         if (class_exists(Ulid::class)) {
             yield 'ulid' => [new Ulid(), new ApiProperty(), ['format' => 'ulid']];
         }
-        yield 'ipv4' => [new Ip(['version' => '4']), new ApiProperty(), ['format' => 'ipv4']];
-        yield 'ipv6' => [new Ip(['version' => '6']), new ApiProperty(), ['format' => 'ipv6']];
+        yield 'ipv4' => [new Ip(version: '4'), new ApiProperty(), ['format' => 'ipv4']];
+        yield 'ipv6' => [new Ip(version: '6'), new ApiProperty(), ['format' => 'ipv6']];
         yield 'not supported' => [new Positive(), new ApiProperty(), []];
     }
 }

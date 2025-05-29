@@ -133,14 +133,16 @@ class ItemNormalizerTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(CircularReference::class)->willReturn(true);
         $resourceClassResolverProphecy->getResourceClass($circularReferenceEntity, null)->willReturn(CircularReference::class);
-        $resourceClassResolverProphecy->getResourceClass($circularReferenceEntity, CircularReference::class)->willReturn(CircularReference::class);
-        $resourceClassResolverProphecy->isResourceClass(Argument::type('string'))->willReturn(true);
+        $resourceClassResolverProphecy->getResourceClass(null, CircularReference::class)->willReturn(CircularReference::class);
 
         $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataCollectionFactoryProphecy->create(CircularReference::class)->willReturn(new ResourceMetadataCollection('CircularReference'));
 
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(CircularReference::class, [])->willReturn(new PropertyNameCollection());
+
         $normalizer = new ItemNormalizer(
-            $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
             $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(),
             $iriConverterProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
@@ -158,11 +160,13 @@ class ItemNormalizerTest extends TestCase
             $normalizer->setCircularReferenceLimit($circularReferenceLimit);
 
             $context = [
+                'api_empty_resource_as_iri' => true,
                 'circular_reference_limit' => [spl_object_hash($circularReferenceEntity) => 2],
                 'cache_error' => function (): void {},
             ];
         } else {
             $context = [
+                'api_empty_resource_as_iri' => true,
                 'circular_reference_limit' => $circularReferenceLimit,
                 'circular_reference_limit_counters' => [spl_object_hash($circularReferenceEntity) => 2],
                 'cache_error' => function (): void {},

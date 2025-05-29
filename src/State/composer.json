@@ -39,7 +39,7 @@
         "willdurand/negotiation": "^3.1",
         "api-platform/validator": "^4.1",
         "api-platform/serializer": "^4.1",
-        "symfony/type-info": "v7.3.0-RC1"
+        "symfony/type-info": "^7.3"
     },
     "autoload": {
         "psr-4": {

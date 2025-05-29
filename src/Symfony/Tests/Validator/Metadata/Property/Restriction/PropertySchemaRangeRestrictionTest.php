@@ -55,22 +55,22 @@ final class PropertySchemaRangeRestrictionTest extends TestCase
 
     public static function supportsProvider(): \Generator
     {
-        yield 'supported int/float with union types' => [new Range(['min' => 1, 'max' => 10]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), true];
-        yield 'supported int' => [new Range(['min' => 1, 'max' => 10]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), true];
-        yield 'supported float' => [new Range(['min' => 1, 'max' => 10]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), true];
+        yield 'supported int/float with union types' => [new Range(min: 1, max: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), true];
+        yield 'supported int' => [new Range(min: 1, max: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), true];
+        yield 'supported float' => [new Range(min: 1, max: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), true];
 
-        yield 'not supported constraint' => [new Length(['min' => 1]), new ApiProperty(), false];
-        yield 'not supported type' => [new Range(['min' => 1]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), false];
+        yield 'not supported constraint' => [new Length(min: 1), new ApiProperty(), false];
+        yield 'not supported type' => [new Range(min: 1), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), false];
     }
 
     public static function supportsProviderWithNativeType(): \Generator
     {
-        yield 'native type: supported int/float with union types' => [new Range(['min' => 1, 'max' => 10]), (new ApiProperty())->withNativeType(Type::union(Type::int(), Type::float())), true];
-        yield 'native type: supported int' => [new Range(['min' => 1, 'max' => 10]), (new ApiProperty())->withNativeType(Type::int()), true];
-        yield 'native type: supported float' => [new Range(['min' => 1, 'max' => 10]), (new ApiProperty())->withNativeType(Type::float()), true];
+        yield 'native type: supported int/float with union types' => [new Range(min: 1, max: 10), (new ApiProperty())->withNativeType(Type::union(Type::int(), Type::float())), true];
+        yield 'native type: supported int' => [new Range(min: 1, max: 10), (new ApiProperty())->withNativeType(Type::int()), true];
+        yield 'native type: supported float' => [new Range(min: 1, max: 10), (new ApiProperty())->withNativeType(Type::float()), true];
 
-        yield 'native type: not supported constraint' => [new Length(['min' => 1]), (new ApiProperty())->withNativeType(Type::string()), false];
-        yield 'native type: not supported type' => [new Range(['min' => 1]), (new ApiProperty())->withNativeType(Type::string()), false];
+        yield 'native type: not supported constraint' => [new Length(min: 1), (new ApiProperty())->withNativeType(Type::string()), false];
+        yield 'native type: not supported type' => [new Range(min: 1), (new ApiProperty())->withNativeType(Type::string()), false];
     }
 
     #[IgnoreDeprecations]
@@ -89,23 +89,23 @@ final class PropertySchemaRangeRestrictionTest extends TestCase
 
     public static function createProvider(): \Generator
     {
-        yield 'int min' => [new Range(['min' => 1]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['minimum' => 1]];
-        yield 'int max' => [new Range(['max' => 10]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['maximum' => 10]];
-        yield 'int min max' => [new Range(['min' => 1, 'max' => 10]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['minimum' => 1, 'maximum' => 10]];
+        yield 'int min' => [new Range(min: 1), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['minimum' => 1]];
+        yield 'int max' => [new Range(max: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['maximum' => 10]];
+        yield 'int min max' => [new Range(min: 1, max: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['minimum' => 1, 'maximum' => 10]];
 
-        yield 'float min' => [new Range(['min' => 1.5]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['minimum' => 1.5]];
-        yield 'float max' => [new Range(['max' => 10.5]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['maximum' => 10.5]];
-        yield 'float min max' => [new Range(['min' => 1.5, 'max' => 10.5]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['minimum' => 1.5, 'maximum' => 10.5]];
+        yield 'float min' => [new Range(min: 1.5), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['minimum' => 1.5]];
+        yield 'float max' => [new Range(max: 10.5), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['maximum' => 10.5]];
+        yield 'float min max' => [new Range(min: 1.5, max: 10.5), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['minimum' => 1.5, 'maximum' => 10.5]];
     }
 
     public static function createProviderWithNativeType(): \Generator
     {
-        yield 'native type: int min' => [new Range(['min' => 1]), (new ApiProperty())->withNativeType(Type::int()), ['minimum' => 1]];
-        yield 'native type: int max' => [new Range(['max' => 10]), (new ApiProperty())->withNativeType(Type::int()), ['maximum' => 10]];
-        yield 'native type: int min max' => [new Range(['min' => 1, 'max' => 10]), (new ApiProperty())->withNativeType(Type::int()), ['minimum' => 1, 'maximum' => 10]];
+        yield 'native type: int min' => [new Range(min: 1), (new ApiProperty())->withNativeType(Type::int()), ['minimum' => 1]];
+        yield 'native type: int max' => [new Range(max: 10), (new ApiProperty())->withNativeType(Type::int()), ['maximum' => 10]];
+        yield 'native type: int min max' => [new Range(min: 1, max: 10), (new ApiProperty())->withNativeType(Type::int()), ['minimum' => 1, 'maximum' => 10]];
 
-        yield 'native type: float min' => [new Range(['min' => 1.5]), (new ApiProperty())->withNativeType(Type::float()), ['minimum' => 1.5]];
-        yield 'native type: float max' => [new Range(['max' => 10.5]), (new ApiProperty())->withNativeType(Type::float()), ['maximum' => 10.5]];
-        yield 'native type: float min max' => [new Range(['min' => 1.5, 'max' => 10.5]), (new ApiProperty())->withNativeType(Type::float()), ['minimum' => 1.5, 'maximum' => 10.5]];
+        yield 'native type: float min' => [new Range(min: 1.5), (new ApiProperty())->withNativeType(Type::float()), ['minimum' => 1.5]];
+        yield 'native type: float max' => [new Range(max: 10.5), (new ApiProperty())->withNativeType(Type::float()), ['maximum' => 10.5]];
+        yield 'native type: float min max' => [new Range(min: 1.5, max: 10.5), (new ApiProperty())->withNativeType(Type::float()), ['minimum' => 1.5, 'maximum' => 10.5]];
     }
 }

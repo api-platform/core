@@ -56,34 +56,34 @@ final class PropertySchemaGreaterThanOrEqualRestrictionTest extends TestCase
 
     public static function supportsProvider(): \Generator
     {
-        yield 'supported int/float with union types' => [new GreaterThanOrEqual(['value' => 10]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), true];
-        yield 'supported int' => [new GreaterThanOrEqual(['value' => 10]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), true];
-        yield 'supported float' => [new GreaterThanOrEqual(['value' => 10.99]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), true];
+        yield 'supported int/float with union types' => [new GreaterThanOrEqual(value: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), true];
+        yield 'supported int' => [new GreaterThanOrEqual(value: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), true];
+        yield 'supported float' => [new GreaterThanOrEqual(value: 10.99), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), true];
         yield 'supported positive or zero' => [new PositiveOrZero(), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), true];
         yield 'not supported positive' => [new Positive(), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), false];
-        yield 'not supported property path' => [new GreaterThanOrEqual(['propertyPath' => 'greaterThanMe']), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), false];
+        yield 'not supported property path' => [new GreaterThanOrEqual(propertyPath: 'greaterThanMe'), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), false];
     }
 
     public static function supportsProviderWithNativeType(): \Generator
     {
-        yield 'native type: supported int/float with union types' => [new GreaterThanOrEqual(['value' => 10]), (new ApiProperty())->withNativeType(Type::union(Type::int(), Type::float())), true];
-        yield 'native type: supported int' => [new GreaterThanOrEqual(['value' => 10]), (new ApiProperty())->withNativeType(Type::int()), true];
-        yield 'native type: supported float' => [new GreaterThanOrEqual(['value' => 10.99]), (new ApiProperty())->withNativeType(Type::float()), true];
+        yield 'native type: supported int/float with union types' => [new GreaterThanOrEqual(value: 10), (new ApiProperty())->withNativeType(Type::union(Type::int(), Type::float())), true];
+        yield 'native type: supported int' => [new GreaterThanOrEqual(value: 10), (new ApiProperty())->withNativeType(Type::int()), true];
+        yield 'native type: supported float' => [new GreaterThanOrEqual(value: 10.99), (new ApiProperty())->withNativeType(Type::float()), true];
         yield 'native type: supported positive or zero' => [new PositiveOrZero(), (new ApiProperty())->withNativeType(Type::int()), true];
         yield 'native type: not supported positive' => [new Positive(), (new ApiProperty())->withNativeType(Type::int()), false];
-        yield 'native type: not supported property path' => [new GreaterThanOrEqual(['propertyPath' => 'greaterThanMe']), (new ApiProperty())->withNativeType(Type::int()), false];
+        yield 'native type: not supported property path' => [new GreaterThanOrEqual(propertyPath: 'greaterThanMe'), (new ApiProperty())->withNativeType(Type::int()), false];
     }
 
     #[IgnoreDeprecations]
     public function testCreate(): void
     {
-        self::assertEquals(['minimum' => 10], $this->propertySchemaGreaterThanOrEqualRestriction->create(new GreaterThanOrEqual(['value' => 10]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)])));
+        self::assertEquals(['minimum' => 10], $this->propertySchemaGreaterThanOrEqualRestriction->create(new GreaterThanOrEqual(value: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)])));
     }
 
     public function testCreateWithNativeType(): void
     {
-        self::assertEquals(['minimum' => 10], $this->propertySchemaGreaterThanOrEqualRestriction->create(new GreaterThanOrEqual(['value' => 10]), (new ApiProperty())->withNativeType(Type::int())));
+        self::assertEquals(['minimum' => 10], $this->propertySchemaGreaterThanOrEqualRestriction->create(new GreaterThanOrEqual(value: 10), (new ApiProperty())->withNativeType(Type::int())));
         self::assertEquals(['minimum' => 0], $this->propertySchemaGreaterThanOrEqualRestriction->create(new PositiveOrZero(), (new ApiProperty())->withNativeType(Type::int())));
-        self::assertEquals(['minimum' => 10.99], $this->propertySchemaGreaterThanOrEqualRestriction->create(new GreaterThanOrEqual(['value' => 10.99]), (new ApiProperty())->withNativeType(Type::float())));
+        self::assertEquals(['minimum' => 10.99], $this->propertySchemaGreaterThanOrEqualRestriction->create(new GreaterThanOrEqual(value: 10.99), (new ApiProperty())->withNativeType(Type::float())));
     }
 }
