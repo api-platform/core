@@ -17,6 +17,7 @@ use ApiPlatform\JsonSchema\Metadata\Property\Factory\SchemaPropertyMetadataFacto
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRestrictionMetadataInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Bic;
 use Symfony\Component\Validator\Constraints\CardScheme;
@@ -72,7 +73,7 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
     /**
      * @param PropertySchemaRestrictionMetadataInterface[] $restrictionsMetadata
      */
-    public function __construct(private readonly ValidatorMetadataFactoryInterface $validatorMetadataFactory, private readonly PropertyMetadataFactoryInterface $decorated, private readonly iterable $restrictionsMetadata = [])
+    public function __construct(private readonly ValidatorMetadataFactoryInterface $validatorMetadataFactory, private readonly PropertyMetadataFactoryInterface $decorated, private readonly iterable $restrictionsMetadata = [], private readonly ?ContainerInterface $container = null)
     {
     }
 
@@ -153,7 +154,18 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
     {
         if (
             isset($options['validation_groups'])
-            && !\is_callable($options['validation_groups'])
+            && (
+                !\is_callable($options['validation_groups'])
+                && !(
+                    1 === \count($options['validation_groups'])
+                    && null !== ($validationGroups = $options['validation_groups'][0] ?? null)
+                    && $this->container
+                    && \is_string($validationGroups)
+                    && $this->container->has($validationGroups)
+                    && ($service = $this->container->get($validationGroups))
+                    && \is_callable($service)
+                )
+            )
         ) {
             return $options['validation_groups'];
         }
