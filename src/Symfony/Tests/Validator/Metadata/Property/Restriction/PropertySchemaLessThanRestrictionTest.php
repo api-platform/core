@@ -56,22 +56,22 @@ final class PropertySchemaLessThanRestrictionTest extends TestCase
 
     public static function supportsProvider(): \Generator
     {
-        yield 'supported int/float with union types' => [new LessThan(['value' => 10]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), true];
-        yield 'supported int' => [new LessThan(['value' => 10]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), true];
-        yield 'supported float' => [new LessThan(['value' => 10.99]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), true];
+        yield 'supported int/float with union types' => [new LessThan(value: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), true];
+        yield 'supported int' => [new LessThan(value: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), true];
+        yield 'supported float' => [new LessThan(value: 10.99), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), true];
         yield 'supported negative' => [new Negative(), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), true];
         yield 'not supported negative or zero' => [new NegativeOrZero(), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), false];
-        yield 'not supported property path' => [new LessThan(['propertyPath' => 'greaterThanMe']), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), false];
+        yield 'not supported property path' => [new LessThan(propertyPath: 'greaterThanMe'), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), false];
     }
 
     public static function supportsProviderWithNativeType(): \Generator
     {
-        yield 'native type: supported int/float with union types' => [new LessThan(['value' => 10]), (new ApiProperty())->withNativeType(Type::union(Type::int(), Type::float())), true];
-        yield 'native type: supported int' => [new LessThan(['value' => 10]), (new ApiProperty())->withNativeType(Type::int()), true];
-        yield 'native type: supported float' => [new LessThan(['value' => 10.99]), (new ApiProperty())->withNativeType(Type::float()), true];
+        yield 'native type: supported int/float with union types' => [new LessThan(value: 10), (new ApiProperty())->withNativeType(Type::union(Type::int(), Type::float())), true];
+        yield 'native type: supported int' => [new LessThan(value: 10), (new ApiProperty())->withNativeType(Type::int()), true];
+        yield 'native type: supported float' => [new LessThan(value: 10.99), (new ApiProperty())->withNativeType(Type::float()), true];
         yield 'native type: supported negative' => [new Negative(), (new ApiProperty())->withNativeType(Type::int()), true];
         yield 'native type: not supported negative or zero' => [new NegativeOrZero(), (new ApiProperty())->withNativeType(Type::int()), false];
-        yield 'native type: not supported property path' => [new LessThan(['propertyPath' => 'greaterThanMe']), (new ApiProperty())->withNativeType(Type::int()), false];
+        yield 'native type: not supported property path' => [new LessThan(propertyPath: 'greaterThanMe'), (new ApiProperty())->withNativeType(Type::int()), false];
     }
 
     #[IgnoreDeprecations]
@@ -80,7 +80,7 @@ final class PropertySchemaLessThanRestrictionTest extends TestCase
         self::assertEquals([
             'exclusiveMaximum' => 10,
             'maximum' => 10,
-        ], $this->propertySchemaLessThanRestriction->create(new LessThan(['value' => 10]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)])));
+        ], $this->propertySchemaLessThanRestriction->create(new LessThan(value: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)])));
     }
 
     public function testCreateWithNativeType(): void
@@ -88,7 +88,7 @@ final class PropertySchemaLessThanRestrictionTest extends TestCase
         self::assertEquals([
             'exclusiveMaximum' => 10,
             'maximum' => 10,
-        ], $this->propertySchemaLessThanRestriction->create(new LessThan(['value' => 10]), (new ApiProperty())->withNativeType(Type::int())));
+        ], $this->propertySchemaLessThanRestriction->create(new LessThan(value: 10), (new ApiProperty())->withNativeType(Type::int())));
 
         self::assertEquals([
             'exclusiveMaximum' => 0,
@@ -98,6 +98,6 @@ final class PropertySchemaLessThanRestrictionTest extends TestCase
         self::assertEquals([
             'exclusiveMaximum' => 10.99,
             'maximum' => 10.99,
-        ], $this->propertySchemaLessThanRestriction->create(new LessThan(['value' => 10.99]), (new ApiProperty())->withNativeType(Type::float())));
+        ], $this->propertySchemaLessThanRestriction->create(new LessThan(value: 10.99), (new ApiProperty())->withNativeType(Type::float())));
     }
 }

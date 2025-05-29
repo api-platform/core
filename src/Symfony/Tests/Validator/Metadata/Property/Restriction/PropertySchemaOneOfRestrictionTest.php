@@ -65,7 +65,7 @@ final class PropertySchemaOneOfRestrictionTest extends TestCase
             return;
         }
 
-        yield 'supported' => [new AtLeastOneOf(['constraints' => []]), new ApiProperty(), true];
+        yield 'supported' => [new AtLeastOneOf([]), new ApiProperty(), true];
         yield 'not supported' => [new Positive(), new ApiProperty(), false];
     }
 
@@ -75,7 +75,7 @@ final class PropertySchemaOneOfRestrictionTest extends TestCase
             return;
         }
 
-        yield 'native type: supported' => [new AtLeastOneOf(['constraints' => []]), (new ApiProperty())->withNativeType(Type::mixed()), true];
+        yield 'native type: supported' => [new AtLeastOneOf([]), (new ApiProperty())->withNativeType(Type::mixed()), true];
         yield 'native type: not supported' => [new Positive(), (new ApiProperty())->withNativeType(Type::mixed()), false];
     }
 
@@ -95,18 +95,18 @@ final class PropertySchemaOneOfRestrictionTest extends TestCase
 
     public static function createProvider(): \Generator
     {
-        yield 'empty' => [new AtLeastOneOf(['constraints' => []]), new ApiProperty(), []];
-        yield 'not supported constraints' => [new AtLeastOneOf(['constraints' => [new Positive(), new Length(['min' => 3])]]), new ApiProperty(), []];
-        yield 'one supported constraint' => [new AtLeastOneOf(['constraints' => [new Positive(), new Length(['min' => 3])]]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), [
+        yield 'empty' => [new AtLeastOneOf([]), new ApiProperty(), []];
+        yield 'not supported constraints' => [new AtLeastOneOf([new Positive(), new Length(min: 3)]), new ApiProperty(), []];
+        yield 'one supported constraint' => [new AtLeastOneOf([new Positive(), new Length(min: 3)]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), [
             'oneOf' => [['minLength' => 3]],
         ]];
     }
 
     public static function createProviderWithNativeType(): \Generator
     {
-        yield 'native type: empty' => [new AtLeastOneOf(['constraints' => []]), new ApiProperty(), []];
-        yield 'native type: not supported constraints' => [new AtLeastOneOf(['constraints' => [new Positive(), new Length(['min' => 3])]]), new ApiProperty(), []];
-        yield 'native type: one supported constraint' => [new AtLeastOneOf(['constraints' => [new Positive(), new Length(['min' => 3])]]), (new ApiProperty())->withNativeType(Type::string()), [
+        yield 'native type: empty' => [new AtLeastOneOf([]), new ApiProperty(), []];
+        yield 'native type: not supported constraints' => [new AtLeastOneOf([new Positive(), new Length(min: 3)]), new ApiProperty(), []];
+        yield 'native type: one supported constraint' => [new AtLeastOneOf([new Positive(), new Length(min: 3)]), (new ApiProperty())->withNativeType(Type::string()), [
             'oneOf' => [['minLength' => 3]],
         ]];
     }

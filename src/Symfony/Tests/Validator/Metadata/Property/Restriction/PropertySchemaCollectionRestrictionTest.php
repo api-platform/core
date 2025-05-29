@@ -62,7 +62,7 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
 
     public static function supportsProvider(): \Generator
     {
-        yield 'supported' => [new Collection(['fields' => []]), new ApiProperty(), true];
+        yield 'supported' => [new Collection(fields: []), new ApiProperty(), true];
 
         yield 'not supported' => [new Positive(), new ApiProperty(), false];
     }
@@ -84,21 +84,21 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
             'email' => [
                 new NotNull(),
                 new Length(min: 2, max: 255),
-                new Email(['mode' => Email::VALIDATION_MODE_HTML5]),
+                new Email(mode: Email::VALIDATION_MODE_HTML5),
             ],
             'phone' => new Optional([
-                new Type(['type' => 'string']),
+                new Type(type: 'string'),
                 new Regex(pattern: '/^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\.\/0-9]*$/'),
             ]),
             'age' => new Optional([
-                new Type(['type' => 'int']),
+                new Type(type: 'int'),
                 new GreaterThan(0),
             ]),
-            'social' => new Collection([
-                'fields' => [
+            'social' => new Collection(
+                fields: [
                     'githubUsername' => new NotNull(),
                 ],
-            ]),
+            ),
         ];
         $properties = new \ArrayObject([
             'name' => new \ArrayObject(),
@@ -110,9 +110,9 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
         $required = ['name', 'email', 'social'];
 
         yield 'with fields' => [
-            new Collection([
-                'fields' => $fields,
-            ]),
+            new Collection(
+                fields: $fields,
+            ),
             new ApiProperty(),
             [
                 'type' => 'object',
@@ -123,10 +123,10 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
         ];
 
         yield 'with fields + allowExtraFields' => [
-            new Collection([
-                'fields' => $fields,
-                'allowExtraFields' => true,
-            ]),
+            new Collection(
+                fields: $fields,
+                allowExtraFields: true,
+            ),
             new ApiProperty(),
             [
                 'type' => 'object',
@@ -137,10 +137,10 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
         ];
 
         yield 'with fields + allowMissingFields' => [
-            new Collection([
-                'fields' => $fields,
-                'allowMissingFields' => true,
-            ]),
+            new Collection(
+                fields: $fields,
+                allowMissingFields: true,
+            ),
             new ApiProperty(),
             [
                 'type' => 'object',
@@ -150,11 +150,11 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
         ];
 
         yield 'with fields + allowExtraFields + allowMissingFields' => [
-            new Collection([
-                'fields' => $fields,
-                'allowExtraFields' => true,
-                'allowMissingFields' => true,
-            ]),
+            new Collection(
+                fields: $fields,
+                allowExtraFields: true,
+                allowMissingFields: true,
+            ),
             new ApiProperty(),
             [
                 'type' => 'object',
