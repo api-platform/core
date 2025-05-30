@@ -178,8 +178,23 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
         $openapi = $resource->openapi;
         $data = [];
         $attributes = $openapi->attributes();
-        foreach ($attributes as $attribute) {
-            $data[$attribute->getName()] = $this->phpize($attributes, 'deprecated', 'deprecated' === $attribute->getName() ? 'bool' : 'string');
+
+        /*
+         * \SimpleXMLElement should not be read in an iteration because of a known bug in SimpleXML lib that resets the iterator
+         * and leads to infinite loop
+         * https://bugs.php.net/bug.php?id=55098
+         * https://github.com/php/php-src/issues/12208
+         * https://github.com/php/php-src/issues/12192
+         *
+         * attribute names are stored in an iteration and values are fetched in another one
+         */
+        $attributeNames = [];
+        foreach ($attributes as $name => $attribute) {
+            $attributeNames[] = $name;
+        }
+
+        foreach ($attributeNames as $attributeName) {
+            $data[$attributeName] = $this->phpize($attributes, $attributeName, 'deprecated' === $attributeName ? 'bool' : 'string');
         }
 
         $data['tags'] = $this->buildArrayValue($resource, 'tag');
