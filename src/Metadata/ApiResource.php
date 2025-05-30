@@ -376,7 +376,6 @@ class ApiResource extends Metadata
          * </div>
          */
         protected ?array $filters = null,
-        protected ?bool $elasticsearch = null,
         protected $mercure = null,
         /**
          * The `messenger` option dispatches the current resource through the Message Bus.
@@ -978,7 +977,6 @@ class ApiResource extends Metadata
             collectDenormalizationErrors: $collectDenormalizationErrors,
             validationContext: $validationContext,
             filters: $filters,
-            elasticsearch: $elasticsearch,
             mercure: $mercure,
             messenger: $messenger,
             input: $input,

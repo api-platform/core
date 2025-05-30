@@ -16,9 +16,9 @@ namespace ApiPlatform\Symfony\Security\State;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\Security\Exception\AccessDeniedException;
-use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
 
 /**
  * Checks the individual parts of the linked resource for access rights.

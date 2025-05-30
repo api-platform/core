@@ -15,9 +15,9 @@ namespace ApiPlatform\Tests\Symfony\Security\State;
 
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\Security\Exception\AccessDeniedException;
-use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
 use ApiPlatform\Symfony\Security\State\LinkAccessCheckerProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;

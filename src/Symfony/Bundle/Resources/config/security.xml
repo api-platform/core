@@ -14,7 +14,7 @@
             <argument type="service" id="security.token_storage" on-invalid="null" />
             <argument type="service" id="security.authorization_checker" on-invalid="null" />
         </service>
-        <service id="ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface" alias="api_platform.security.resource_access_checker" />
+        <service id="ApiPlatform\Metadata\ResourceAccessCheckerInterface" alias="api_platform.security.resource_access_checker" />
 
         <service id="api_platform.security.expression_language_provider" class="ApiPlatform\Symfony\Security\Core\Authorization\ExpressionLanguageProvider" public="false">
             <tag name="security.expression_language_provider" />
