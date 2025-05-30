@@ -392,7 +392,6 @@
     <xsd:element name="elasticsearchOptions">
         <xsd:complexType>
             <xsd:attribute name="index" type="xsd:string"/>
-            <xsd:attribute name="type" type="xsd:string"/>
         </xsd:complexType>
     </xsd:element>
 
@@ -486,7 +485,6 @@
         <xsd:attribute type="xsd:token" name="description"/>
         <xsd:attribute type="xsd:integer" name="urlGenerationStrategy"/>
         <xsd:attribute type="xsd:string" name="deprecationReason"/>
-        <xsd:attribute type="xsd:boolean" name="elasticsearch"/>
         <xsd:attribute type="xsd:string" name="messenger"/>
         <xsd:attribute type="xsd:string" name="input"/>
         <xsd:attribute type="xsd:string" name="output"/>

@@ -73,7 +73,6 @@ resources:
                         foo: bar
                     filters:
                         - comment.another_custom_filter
-                    elasticsearch: false
                     mercure:
                         private: true
                     messenger: input
@@ -199,7 +198,6 @@ resources:
                 foo: bar
             filters:
                 - comment.custom_filter
-            elasticsearch: true
             mercure: true
             messenger: true
             input: App\Dto\CommentInput
@@ -258,7 +256,6 @@ resources:
                         foo: bar
                     filters:
                         - comment.another_custom_filter
-                    elasticsearch: false
                     mercure:
                         private: true
                     messenger: input
@@ -297,7 +294,6 @@ resources:
                     stateOptions:
                         elasticsearchOptions:
                             index: foo_index
-                            type: foo_type
                 -
                     class: ApiPlatform\Metadata\GraphQl\Query
                     queryParameterValidationEnabled: true
@@ -309,7 +305,6 @@ resources:
                     stateOptions:
                         elasticsearchOptions:
                             index: foo_index
-                            type: foo_type
                 -
                     class: ApiPlatform\Metadata\GraphQl\QueryCollection
                     queryParameterValidationEnabled: true
@@ -321,7 +316,6 @@ resources:
                     stateOptions:
                         elasticsearchOptions:
                             index: foo_index
-                            type: foo_type
                 -
                     class: ApiPlatform\Metadata\GraphQl\Subscription
                     queryParameterValidationEnabled: true
@@ -333,13 +327,11 @@ resources:
                     stateOptions:
                         elasticsearchOptions:
                             index: foo_index
-                            type: foo_type
             provider: null
             processor: null
             stateOptions:
                 elasticsearchOptions:
                     index: foo_index
-                    type: foo_type
             rules: null
             policy: null
             middleware: null
