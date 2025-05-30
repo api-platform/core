@@ -13,17 +13,10 @@
 
         <!-- Resolvers -->
 
-        <service id="api_platform.graphql.query_resolver_locator" class="Symfony\Component\DependencyInjection\ServiceLocator">
-            <tag name="container.service_locator" />
-        </service>
-
-        <service id="api_platform.graphql.mutation_resolver_locator" class="Symfony\Component\DependencyInjection\ServiceLocator">
-            <tag name="container.service_locator" />
-        </service>
-
         <service id="api_platform.graphql.resolver_locator" class="Symfony\Component\DependencyInjection\ServiceLocator">
             <tag name="container.service_locator" />
         </service>
+
         <!-- Type -->
 
         <service id="api_platform.graphql.iterable_type" class="ApiPlatform\GraphQl\Type\Definition\IterableType">

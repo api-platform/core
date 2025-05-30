@@ -21,7 +21,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
- * Allows access based on the ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface.
+ * Allows access based on the ApiPlatform\Metadata\ResourceAccessCheckerInterface.
  * This implementation covers GraphQl and HTTP.
  *
  * @see ResourceAccessCheckerInterface

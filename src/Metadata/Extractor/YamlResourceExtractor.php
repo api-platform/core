@@ -136,7 +136,6 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             'description' => $this->phpize($resource, 'description', 'string'),
             'urlGenerationStrategy' => $this->phpize($resource, 'urlGenerationStrategy', 'integer'),
             'deprecationReason' => $this->phpize($resource, 'deprecationReason', 'string'),
-            'elasticsearch' => $this->phpize($resource, 'elasticsearch', 'bool'),
             'fetchPartial' => $this->phpize($resource, 'fetchPartial', 'bool'),
             'forceEager' => $this->phpize($resource, 'forceEager', 'bool'),
             'paginationClientEnabled' => $this->phpize($resource, 'paginationClientEnabled', 'bool'),
@@ -419,7 +418,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
         switch (key($stateOptions)) {
             case 'elasticsearchOptions':
                 if (class_exists(Options::class)) {
-                    return new Options($configuration['index'] ?? null, $configuration['type'] ?? null);
+                    return new Options($configuration['index'] ?? null);
                 }
         }
 

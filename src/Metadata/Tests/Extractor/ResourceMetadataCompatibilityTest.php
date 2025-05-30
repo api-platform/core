@@ -73,7 +73,6 @@ final class ResourceMetadataCompatibilityTest extends TestCase
             'controller' => 'App\Controller\CommentController',
             'urlGenerationStrategy' => 1,
             'deprecationReason' => 'This resource is deprecated',
-            'elasticsearch' => true,
             'messenger' => true,
             'input' => 'App\Dto\CommentInput',
             'output' => 'App\Dto\CommentOutut',
@@ -168,7 +167,6 @@ final class ResourceMetadataCompatibilityTest extends TestCase
             'stateOptions' => [
                 'elasticsearchOptions' => [
                     'index' => 'foo_index',
-                    'type' => 'foo_type',
                 ],
             ],
             'graphQlOperations' => [
@@ -202,7 +200,6 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                         'foo' => 'bar',
                     ],
                     'filters' => ['comment.another_custom_filter'],
-                    'elasticsearch' => false,
                     'mercure' => [
                         'private' => true,
                     ],
@@ -243,7 +240,6 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     'stateOptions' => [
                         'elasticsearchOptions' => [
                             'index' => 'foo_index',
-                            'type' => 'foo_type',
                         ],
                     ],
                 ],
@@ -260,7 +256,6 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     'stateOptions' => [
                         'elasticsearchOptions' => [
                             'index' => 'foo_index',
-                            'type' => 'foo_type',
                         ],
                     ],
                 ],
@@ -277,7 +272,6 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     'stateOptions' => [
                         'elasticsearchOptions' => [
                             'index' => 'foo_index',
-                            'type' => 'foo_type',
                         ],
                     ],
                 ],
@@ -294,7 +288,6 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     'stateOptions' => [
                         'elasticsearchOptions' => [
                             'index' => 'foo_index',
-                            'type' => 'foo_type',
                         ],
                     ],
                 ],
@@ -370,7 +363,6 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                         'foo' => 'bar',
                     ],
                     'filters' => ['comment.another_custom_filter'],
-                    'elasticsearch' => false,
                     'mercure' => [
                         'private' => true,
                     ],
@@ -449,7 +441,6 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         'description',
         'urlGenerationStrategy',
         'deprecationReason',
-        'elasticsearch',
         'messenger',
         'mercure',
         'input',

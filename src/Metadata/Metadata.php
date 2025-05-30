@@ -46,7 +46,6 @@ abstract class Metadata
         protected ?bool $collectDenormalizationErrors = null,
         protected ?array $validationContext = null,
         protected ?array $filters = null,
-        protected ?bool $elasticsearch = null,
         protected $mercure = null,
         protected $messenger = null,
         protected $input = null,
@@ -221,25 +220,6 @@ abstract class Metadata
     {
         $self = clone $this;
         $self->filters = $filters;
-
-        return $self;
-    }
-
-    /**
-     * @deprecated this will be removed in v4
-     */
-    public function getElasticsearch(): ?bool
-    {
-        return $this->elasticsearch;
-    }
-
-    /**
-     * @deprecated this will be removed in v4
-     */
-    public function withElasticsearch(bool $elasticsearch): static
-    {
-        $self = clone $this;
-        $self->elasticsearch = $elasticsearch;
 
         return $self;
     }
