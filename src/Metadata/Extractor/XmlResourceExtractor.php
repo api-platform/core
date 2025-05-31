@@ -186,7 +186,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
          * https://bugs.php.net/bug.php?id=55098
          * https://github.com/php/php-src/issues/12208
          * https://github.com/php/php-src/issues/12192
-         * 
+         *
          * attribute names are stored in an iteration and values are fetched in another one
          */
         $attributeNames = [];
