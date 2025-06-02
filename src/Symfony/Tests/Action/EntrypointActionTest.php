@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Tests\Action;
 
-use ApiPlatform\Documentation\Action\EntrypointAction;
 use ApiPlatform\Documentation\Entrypoint;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\Symfony\Action\EntrypointAction;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
