@@ -43,8 +43,8 @@ final class PropertySchemaRegexRestrictionTest extends TestCase
 
     public static function supportsProvider(): \Generator
     {
-        yield 'supported' => [new Regex(['pattern' => '/^[0-9]+$/']), new ApiProperty(), true];
-        yield 'supported too' => [new Regex(['pattern' => '/[0-9]/', 'match' => false]), new ApiProperty(), true];
+        yield 'supported' => [new Regex(pattern: '/^[0-9]+$/'), new ApiProperty(), true];
+        yield 'supported too' => [new Regex(pattern: '/[0-9]/', match: false), new ApiProperty(), true];
         yield 'not supported' => [new Positive(), new ApiProperty(), false];
     }
 
@@ -56,11 +56,11 @@ final class PropertySchemaRegexRestrictionTest extends TestCase
 
     public static function createProvider(): \Generator
     {
-        yield 'anchored' => [new Regex(['pattern' => '/^[0-9]+$/']), new ApiProperty(), ['pattern' => '^([0-9]+)$']];
-        yield 'not anchored' => [new Regex(['pattern' => '/[0-9]/']), new ApiProperty(), ['pattern' => '^(.*[0-9].*)$']];
-        yield 'inverted' => [new Regex(['pattern' => '/[0-9]/', 'match' => false]), new ApiProperty(), ['pattern' => '^(((?![0-9]).)*)$']];
+        yield 'anchored' => [new Regex(pattern: '/^[0-9]+$/'), new ApiProperty(), ['pattern' => '^([0-9]+)$']];
+        yield 'not anchored' => [new Regex(pattern: '/[0-9]/'), new ApiProperty(), ['pattern' => '^(.*[0-9].*)$']];
+        yield 'inverted' => [new Regex(pattern: '/[0-9]/', match: false), new ApiProperty(), ['pattern' => '^(((?![0-9]).)*)$']];
 
-        yield 'with options' => [new Regex(['pattern' => '/^[a-z]+$/i']), new ApiProperty(), []];
-        yield 'with options and manual htmlPattern' => [new Regex(['pattern' => '/^[a-z]+$/i', 'htmlPattern' => '[a-zA-Z]+']), new ApiProperty(), ['pattern' => '^([a-zA-Z]+)$']];
+        yield 'with options' => [new Regex(pattern: '/^[a-z]+$/i'), new ApiProperty(), []];
+        yield 'with options and manual htmlPattern' => [new Regex(pattern: '/^[a-z]+$/i', htmlPattern: '[a-zA-Z]+'), new ApiProperty(), ['pattern' => '^([a-zA-Z]+)$']];
     }
 }

@@ -48,17 +48,17 @@ final class PropertySchemaChoiceRestrictionTest extends TestCase
 
     public static function supportsProvider(): \Generator
     {
-        yield 'supported string' => [new Choice(['choices' => ['a', 'b']]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), true];
-        yield 'supported int' => [new Choice(['choices' => [1, 2]]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), true];
-        yield 'supported float' => [new Choice(['choices' => [1.1, 2.2]]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), true];
-        yield 'supported string/int/float with union types' => [new Choice(['choices' => [1, 2, 1.1, 2.2, 'a', 'b']]), (new ApiProperty())->withBuiltinTypes([
+        yield 'supported string' => [new Choice(choices: ['a', 'b']), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), true];
+        yield 'supported int' => [new Choice(choices: [1, 2]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), true];
+        yield 'supported float' => [new Choice(choices: [1.1, 2.2]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), true];
+        yield 'supported string/int/float with union types' => [new Choice(choices: [1, 2, 1.1, 2.2, 'a', 'b']), (new ApiProperty())->withBuiltinTypes([
             new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT),
             new LegacyType(LegacyType::BUILTIN_TYPE_INT),
             new LegacyType(LegacyType::BUILTIN_TYPE_STRING),
         ]), true];
 
         yield 'not supported constraint' => [new Positive(), new ApiProperty(), false];
-        yield 'not supported type' => [new Choice(['choices' => [new \stdClass(), new \stdClass()]]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT)]), false];
+        yield 'not supported type' => [new Choice(choices: [new \stdClass(), new \stdClass()]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT)]), false];
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('supportsNativeProvider')]
@@ -69,15 +69,15 @@ final class PropertySchemaChoiceRestrictionTest extends TestCase
 
     public static function supportsNativeProvider(): \Generator
     {
-        yield 'supported string' => [new Choice(['choices' => ['a', 'b']]), (new ApiProperty())->withNativeType(Type::string()), true];
-        yield 'supported int' => [new Choice(['choices' => [1, 2]]), (new ApiProperty())->withNativeType(Type::int()), true];
-        yield 'supported float' => [new Choice(['choices' => [1.1, 2.2]]), (new ApiProperty())->withNativeType(Type::float()), true];
-        yield 'supported string/int/float with union types' => [new Choice(['choices' => [1, 2, 1.1, 2.2, 'a', 'b']]), (new ApiProperty())->withNativeType(
+        yield 'supported string' => [new Choice(choices: ['a', 'b']), (new ApiProperty())->withNativeType(Type::string()), true];
+        yield 'supported int' => [new Choice(choices: [1, 2]), (new ApiProperty())->withNativeType(Type::int()), true];
+        yield 'supported float' => [new Choice(choices: [1.1, 2.2]), (new ApiProperty())->withNativeType(Type::float()), true];
+        yield 'supported string/int/float with union types' => [new Choice(choices: [1, 2, 1.1, 2.2, 'a', 'b']), (new ApiProperty())->withNativeType(
             Type::union(Type::float(), Type::int(), Type::string()),
         ), true];
 
         yield 'not supported constraint' => [new Positive(), new ApiProperty(), false];
-        yield 'not supported type' => [new Choice(['choices' => [new \stdClass(), new \stdClass()]]), (new ApiProperty())->withNativeType(Type::object()), false];
+        yield 'not supported type' => [new Choice(choices: [new \stdClass(), new \stdClass()]), (new ApiProperty())->withNativeType(Type::object()), false];
     }
 
     #[IgnoreDeprecations]
@@ -90,52 +90,52 @@ final class PropertySchemaChoiceRestrictionTest extends TestCase
 
     public static function createProvider(): \Generator
     {
-        yield 'single string choice' => [new Choice(['choices' => ['a', 'b']]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), ['enum' => ['a', 'b']]];
-        yield 'multi string choice' => [new Choice(['choices' => ['a', 'b'], 'multiple' => true]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b']]]];
-        yield 'multi string choice min' => [new Choice(['choices' => ['a', 'b'], 'multiple' => true, 'min' => 2]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b']], 'minItems' => 2]];
-        yield 'multi string choice max' => [new Choice(['choices' => ['a', 'b', 'c', 'd'], 'multiple' => true, 'max' => 4]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']], 'maxItems' => 4]];
-        yield 'multi string choice min/max' => [new Choice(['choices' => ['a', 'b', 'c', 'd'], 'multiple' => true, 'min' => 2, 'max' => 4]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']], 'minItems' => 2, 'maxItems' => 4]];
+        yield 'single string choice' => [new Choice(choices: ['a', 'b']), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), ['enum' => ['a', 'b']]];
+        yield 'multi string choice' => [new Choice(choices: ['a', 'b'], multiple: true), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b']]]];
+        yield 'multi string choice min' => [new Choice(choices: ['a', 'b'], multiple: true, min: 2), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b']], 'minItems' => 2]];
+        yield 'multi string choice max' => [new Choice(choices: ['a', 'b', 'c', 'd'], multiple: true, max: 4), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']], 'maxItems' => 4]];
+        yield 'multi string choice min/max' => [new Choice(choices: ['a', 'b', 'c', 'd'], multiple: true, min: 2, max: 4), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']], 'minItems' => 2, 'maxItems' => 4]];
 
-        yield 'single int choice' => [new Choice(['choices' => [1, 2]]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['enum' => [1, 2]]];
-        yield 'multi int choice' => [new Choice(['choices' => [1, 2], 'multiple' => true]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1, 2]]]];
-        yield 'multi int choice min' => [new Choice(['choices' => [1, 2], 'multiple' => true, 'min' => 2]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1, 2]], 'minItems' => 2]];
-        yield 'multi int choice max' => [new Choice(['choices' => [1, 2, 3, 4], 'multiple' => true, 'max' => 4]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1, 2, 3, 4]], 'maxItems' => 4]];
-        yield 'multi int choice min/max' => [new Choice(['choices' => [1, 2, 3, 4], 'multiple' => true, 'min' => 2, 'max' => 4]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1, 2, 3, 4]], 'minItems' => 2, 'maxItems' => 4]];
+        yield 'single int choice' => [new Choice(choices: [1, 2]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['enum' => [1, 2]]];
+        yield 'multi int choice' => [new Choice(choices: [1, 2], multiple: true), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1, 2]]]];
+        yield 'multi int choice min' => [new Choice(choices: [1, 2], multiple: true, min: 2), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1, 2]], 'minItems' => 2]];
+        yield 'multi int choice max' => [new Choice(choices: [1, 2, 3, 4], multiple: true, max: 4), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1, 2, 3, 4]], 'maxItems' => 4]];
+        yield 'multi int choice min/max' => [new Choice(choices: [1, 2, 3, 4], multiple: true, min: 2, max: 4), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1, 2, 3, 4]], 'minItems' => 2, 'maxItems' => 4]];
 
-        yield 'single float choice' => [new Choice(['choices' => [1.1, 2.2]]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['enum' => [1.1, 2.2]]];
-        yield 'multi float choice' => [new Choice(['choices' => [1.1, 2.2], 'multiple' => true]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1.1, 2.2]]]];
-        yield 'multi float choice min' => [new Choice(['choices' => [1.1, 2.2], 'multiple' => true, 'min' => 2]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1.1, 2.2]], 'minItems' => 2]];
-        yield 'multi float choice max' => [new Choice(['choices' => [1.1, 2.2, 3.3, 4.4], 'multiple' => true, 'max' => 4]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1.1, 2.2, 3.3, 4.4]], 'maxItems' => 4]];
-        yield 'multi float choice min/max' => [new Choice(['choices' => [1.1, 2.2, 3.3, 4.4], 'multiple' => true, 'min' => 2, 'max' => 4]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1.1, 2.2, 3.3, 4.4]], 'minItems' => 2, 'maxItems' => 4]];
+        yield 'single float choice' => [new Choice(choices: [1.1, 2.2]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['enum' => [1.1, 2.2]]];
+        yield 'multi float choice' => [new Choice(choices: [1.1, 2.2], multiple: true), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1.1, 2.2]]]];
+        yield 'multi float choice min' => [new Choice(choices: [1.1, 2.2], multiple: true, min: 2), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1.1, 2.2]], 'minItems' => 2]];
+        yield 'multi float choice max' => [new Choice(choices: [1.1, 2.2, 3.3, 4.4], multiple: true, max: 4), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1.1, 2.2, 3.3, 4.4]], 'maxItems' => 4]];
+        yield 'multi float choice min/max' => [new Choice(choices: [1.1, 2.2, 3.3, 4.4], multiple: true, min: 2, max: 4), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1.1, 2.2, 3.3, 4.4]], 'minItems' => 2, 'maxItems' => 4]];
 
-        yield 'single string/int/float choice with union types' => [new Choice(['choices' => [1, 2, 'a', 'b', 1.1, 2.2]]), (new ApiProperty())->withBuiltinTypes([
+        yield 'single string/int/float choice with union types' => [new Choice(choices: [1, 2, 'a', 'b', 1.1, 2.2]), (new ApiProperty())->withBuiltinTypes([
             new LegacyType(LegacyType::BUILTIN_TYPE_STRING),
             new LegacyType(LegacyType::BUILTIN_TYPE_INT),
             new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT),
         ]), ['enum' => [1, 2, 'a', 'b', 1.1, 2.2]]];
-        yield 'multi string/int/float choice with union types' => [new Choice(['choices' => [1, 2, 'a', 'b', 1.1, 2.2], 'multiple' => true]), (new ApiProperty())->withBuiltinTypes([
+        yield 'multi string/int/float choice with union types' => [new Choice(choices: [1, 2, 'a', 'b', 1.1, 2.2], multiple: true), (new ApiProperty())->withBuiltinTypes([
             new LegacyType(LegacyType::BUILTIN_TYPE_STRING),
             new LegacyType(LegacyType::BUILTIN_TYPE_INT),
             new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT),
         ]), ['type' => 'array', 'items' => ['type' => ['number', 'string'], 'enum' => [1, 2, 'a', 'b', 1.1, 2.2]]]];
-        yield 'multi string/int/float choice min with union types' => [new Choice(['choices' => [1, 2, 'a', 'b', 1.1, 2.2], 'multiple' => true, 'min' => 2]), (new ApiProperty())->withBuiltinTypes([
+        yield 'multi string/int/float choice min with union types' => [new Choice(choices: [1, 2, 'a', 'b', 1.1, 2.2], multiple: true, min: 2), (new ApiProperty())->withBuiltinTypes([
             new LegacyType(LegacyType::BUILTIN_TYPE_STRING),
             new LegacyType(LegacyType::BUILTIN_TYPE_INT),
             new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT),
         ]), ['type' => 'array', 'items' => ['type' => ['number', 'string'], 'enum' => [1, 2, 'a', 'b', 1.1, 2.2]], 'minItems' => 2]];
-        yield 'multi string/int/float choice max with union types' => [new Choice(['choices' => [1, 2, 'a', 'b', 1.1, 2.2, 3.3, 4.4], 'multiple' => true, 'max' => 4]), (new ApiProperty())->withBuiltinTypes([
+        yield 'multi string/int/float choice max with union types' => [new Choice(choices: [1, 2, 'a', 'b', 1.1, 2.2, 3.3, 4.4], multiple: true, max: 4), (new ApiProperty())->withBuiltinTypes([
             new LegacyType(LegacyType::BUILTIN_TYPE_STRING),
             new LegacyType(LegacyType::BUILTIN_TYPE_INT),
             new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT),
         ]), ['type' => 'array', 'items' => ['type' => ['number', 'string'], 'enum' => [1, 2, 'a', 'b', 1.1, 2.2, 3.3, 4.4]], 'maxItems' => 4]];
-        yield 'multi string/int/float choice min/max with union types' => [new Choice(['choices' => [1, 2, 'a', 'b', 1.1, 2.2, 3.3, 4.4], 'multiple' => true, 'min' => 2, 'max' => 4]), (new ApiProperty())->withBuiltinTypes([
+        yield 'multi string/int/float choice min/max with union types' => [new Choice(choices: [1, 2, 'a', 'b', 1.1, 2.2, 3.3, 4.4], multiple: true, min: 2, max: 4), (new ApiProperty())->withBuiltinTypes([
             new LegacyType(LegacyType::BUILTIN_TYPE_STRING),
             new LegacyType(LegacyType::BUILTIN_TYPE_INT),
             new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT),
         ]), ['type' => 'array', 'items' => ['type' => ['number', 'string'], 'enum' => [1, 2, 'a', 'b', 1.1, 2.2, 3.3, 4.4]], 'minItems' => 2, 'maxItems' => 4]];
 
-        yield 'single choice callback' => [new Choice(['callback' => ChoiceCallback::getChoices(...)]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), ['enum' => ['a', 'b', 'c', 'd']]];
-        yield 'multi choice callback' => [new Choice(['callback' => ChoiceCallback::getChoices(...), 'multiple' => true]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']]]];
+        yield 'single choice callback' => [new Choice(callback: ChoiceCallback::getChoices(...)), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), ['enum' => ['a', 'b', 'c', 'd']]];
+        yield 'multi choice callback' => [new Choice(callback: ChoiceCallback::getChoices(...), multiple: true), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']]]];
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('createNativeProvider')]
@@ -146,33 +146,33 @@ final class PropertySchemaChoiceRestrictionTest extends TestCase
 
     public static function createNativeProvider(): \Generator
     {
-        yield 'single string choice' => [new Choice(['choices' => ['a', 'b']]), (new ApiProperty())->withNativeType(Type::string()), ['enum' => ['a', 'b']]];
-        yield 'multi string choice' => [new Choice(['choices' => ['a', 'b'], 'multiple' => true]), (new ApiProperty())->withNativeType(Type::string()), ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b']]]];
-        yield 'multi string choice min' => [new Choice(['choices' => ['a', 'b'], 'multiple' => true, 'min' => 2]), (new ApiProperty())->withNativeType(Type::string()), ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b']], 'minItems' => 2]];
-        yield 'multi string choice max' => [new Choice(['choices' => ['a', 'b', 'c', 'd'], 'multiple' => true, 'max' => 4]), (new ApiProperty())->withNativeType(Type::string()), ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']], 'maxItems' => 4]];
-        yield 'multi string choice min/max' => [new Choice(['choices' => ['a', 'b', 'c', 'd'], 'multiple' => true, 'min' => 2, 'max' => 4]), (new ApiProperty())->withNativeType(Type::string()), ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']], 'minItems' => 2, 'maxItems' => 4]];
+        yield 'single string choice' => [new Choice(choices: ['a', 'b']), (new ApiProperty())->withNativeType(Type::string()), ['enum' => ['a', 'b']]];
+        yield 'multi string choice' => [new Choice(choices: ['a', 'b'], multiple: true), (new ApiProperty())->withNativeType(Type::string()), ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b']]]];
+        yield 'multi string choice min' => [new Choice(choices: ['a', 'b'], multiple: true, min: 2), (new ApiProperty())->withNativeType(Type::string()), ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b']], 'minItems' => 2]];
+        yield 'multi string choice max' => [new Choice(choices: ['a', 'b', 'c', 'd'], multiple: true, max: 4), (new ApiProperty())->withNativeType(Type::string()), ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']], 'maxItems' => 4]];
+        yield 'multi string choice min/max' => [new Choice(choices: ['a', 'b', 'c', 'd'], multiple: true, min: 2, max: 4), (new ApiProperty())->withNativeType(Type::string()), ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']], 'minItems' => 2, 'maxItems' => 4]];
 
-        yield 'single int choice' => [new Choice(['choices' => [1, 2]]), (new ApiProperty())->withNativeType(Type::int()), ['enum' => [1, 2]]];
-        yield 'multi int choice' => [new Choice(['choices' => [1, 2], 'multiple' => true]), (new ApiProperty())->withNativeType(Type::int()), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1, 2]]]];
-        yield 'multi int choice min' => [new Choice(['choices' => [1, 2], 'multiple' => true, 'min' => 2]), (new ApiProperty())->withNativeType(Type::int()), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1, 2]], 'minItems' => 2]];
-        yield 'multi int choice max' => [new Choice(['choices' => [1, 2, 3, 4], 'multiple' => true, 'max' => 4]), (new ApiProperty())->withNativeType(Type::int()), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1, 2, 3, 4]], 'maxItems' => 4]];
-        yield 'multi int choice min/max' => [new Choice(['choices' => [1, 2, 3, 4], 'multiple' => true, 'min' => 2, 'max' => 4]), (new ApiProperty())->withNativeType(Type::int()), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1, 2, 3, 4]], 'minItems' => 2, 'maxItems' => 4]];
+        yield 'single int choice' => [new Choice(choices: [1, 2]), (new ApiProperty())->withNativeType(Type::int()), ['enum' => [1, 2]]];
+        yield 'multi int choice' => [new Choice(choices: [1, 2], multiple: true), (new ApiProperty())->withNativeType(Type::int()), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1, 2]]]];
+        yield 'multi int choice min' => [new Choice(choices: [1, 2], multiple: true, min: 2), (new ApiProperty())->withNativeType(Type::int()), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1, 2]], 'minItems' => 2]];
+        yield 'multi int choice max' => [new Choice(choices: [1, 2, 3, 4], multiple: true, max: 4), (new ApiProperty())->withNativeType(Type::int()), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1, 2, 3, 4]], 'maxItems' => 4]];
+        yield 'multi int choice min/max' => [new Choice(choices: [1, 2, 3, 4], multiple: true, min: 2, max: 4), (new ApiProperty())->withNativeType(Type::int()), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1, 2, 3, 4]], 'minItems' => 2, 'maxItems' => 4]];
 
-        yield 'single float choice' => [new Choice(['choices' => [1.1, 2.2]]), (new ApiProperty())->withNativeType(Type::float()), ['enum' => [1.1, 2.2]]];
-        yield 'multi float choice' => [new Choice(['choices' => [1.1, 2.2], 'multiple' => true]), (new ApiProperty())->withNativeType(Type::float()), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1.1, 2.2]]]];
-        yield 'multi float choice min' => [new Choice(['choices' => [1.1, 2.2], 'multiple' => true, 'min' => 2]), (new ApiProperty())->withNativeType(Type::float()), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1.1, 2.2]], 'minItems' => 2]];
-        yield 'multi float choice max' => [new Choice(['choices' => [1.1, 2.2, 3.3, 4.4], 'multiple' => true, 'max' => 4]), (new ApiProperty())->withNativeType(Type::float()), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1.1, 2.2, 3.3, 4.4]], 'maxItems' => 4]];
-        yield 'multi float choice min/max' => [new Choice(['choices' => [1.1, 2.2, 3.3, 4.4], 'multiple' => true, 'min' => 2, 'max' => 4]), (new ApiProperty())->withNativeType(Type::float()), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1.1, 2.2, 3.3, 4.4]], 'minItems' => 2, 'maxItems' => 4]];
+        yield 'single float choice' => [new Choice(choices: [1.1, 2.2]), (new ApiProperty())->withNativeType(Type::float()), ['enum' => [1.1, 2.2]]];
+        yield 'multi float choice' => [new Choice(choices: [1.1, 2.2], multiple: true), (new ApiProperty())->withNativeType(Type::float()), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1.1, 2.2]]]];
+        yield 'multi float choice min' => [new Choice(choices: [1.1, 2.2], multiple: true, min: 2), (new ApiProperty())->withNativeType(Type::float()), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1.1, 2.2]], 'minItems' => 2]];
+        yield 'multi float choice max' => [new Choice(choices: [1.1, 2.2, 3.3, 4.4], multiple: true, max: 4), (new ApiProperty())->withNativeType(Type::float()), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1.1, 2.2, 3.3, 4.4]], 'maxItems' => 4]];
+        yield 'multi float choice min/max' => [new Choice(choices: [1.1, 2.2, 3.3, 4.4], multiple: true, min: 2, max: 4), (new ApiProperty())->withNativeType(Type::float()), ['type' => 'array', 'items' => ['type' => 'number', 'enum' => [1.1, 2.2, 3.3, 4.4]], 'minItems' => 2, 'maxItems' => 4]];
 
         $unionType = Type::union(Type::string(), Type::int(), Type::float());
-        yield 'single string/int/float choice with union types' => [new Choice(['choices' => [1, 2, 'a', 'b', 1.1, 2.2]]), (new ApiProperty())->withNativeType($unionType), ['enum' => [1, 2, 'a', 'b', 1.1, 2.2]]];
-        yield 'multi string/int/float choice with union types' => [new Choice(['choices' => [1, 2, 'a', 'b', 1.1, 2.2], 'multiple' => true]), (new ApiProperty())->withNativeType($unionType), ['type' => 'array', 'items' => ['type' => ['number', 'string'], 'enum' => [1, 2, 'a', 'b', 1.1, 2.2]]]];
-        yield 'multi string/int/float choice min with union types' => [new Choice(['choices' => [1, 2, 'a', 'b', 1.1, 2.2], 'multiple' => true, 'min' => 2]), (new ApiProperty())->withNativeType($unionType), ['type' => 'array', 'items' => ['type' => ['number', 'string'], 'enum' => [1, 2, 'a', 'b', 1.1, 2.2]], 'minItems' => 2]];
-        yield 'multi string/int/float choice max with union types' => [new Choice(['choices' => [1, 2, 'a', 'b', 1.1, 2.2, 3.3, 4.4], 'multiple' => true, 'max' => 4]), (new ApiProperty())->withNativeType($unionType), ['type' => 'array', 'items' => ['type' => ['number', 'string'], 'enum' => [1, 2, 'a', 'b', 1.1, 2.2, 3.3, 4.4]], 'maxItems' => 4]];
-        yield 'multi string/int/float choice min/max with union types' => [new Choice(['choices' => [1, 2, 'a', 'b', 1.1, 2.2, 3.3, 4.4], 'multiple' => true, 'min' => 2, 'max' => 4]), (new ApiProperty())->withNativeType($unionType), ['type' => 'array', 'items' => ['type' => ['number', 'string'], 'enum' => [1, 2, 'a', 'b', 1.1, 2.2, 3.3, 4.4]], 'minItems' => 2, 'maxItems' => 4]];
+        yield 'single string/int/float choice with union types' => [new Choice(choices: [1, 2, 'a', 'b', 1.1, 2.2]), (new ApiProperty())->withNativeType($unionType), ['enum' => [1, 2, 'a', 'b', 1.1, 2.2]]];
+        yield 'multi string/int/float choice with union types' => [new Choice(choices: [1, 2, 'a', 'b', 1.1, 2.2], multiple: true), (new ApiProperty())->withNativeType($unionType), ['type' => 'array', 'items' => ['type' => ['number', 'string'], 'enum' => [1, 2, 'a', 'b', 1.1, 2.2]]]];
+        yield 'multi string/int/float choice min with union types' => [new Choice(choices: [1, 2, 'a', 'b', 1.1, 2.2], multiple: true, min: 2), (new ApiProperty())->withNativeType($unionType), ['type' => 'array', 'items' => ['type' => ['number', 'string'], 'enum' => [1, 2, 'a', 'b', 1.1, 2.2]], 'minItems' => 2]];
+        yield 'multi string/int/float choice max with union types' => [new Choice(choices: [1, 2, 'a', 'b', 1.1, 2.2, 3.3, 4.4], multiple: true, max: 4), (new ApiProperty())->withNativeType($unionType), ['type' => 'array', 'items' => ['type' => ['number', 'string'], 'enum' => [1, 2, 'a', 'b', 1.1, 2.2, 3.3, 4.4]], 'maxItems' => 4]];
+        yield 'multi string/int/float choice min/max with union types' => [new Choice(choices: [1, 2, 'a', 'b', 1.1, 2.2, 3.3, 4.4], multiple: true, min: 2, max: 4), (new ApiProperty())->withNativeType($unionType), ['type' => 'array', 'items' => ['type' => ['number', 'string'], 'enum' => [1, 2, 'a', 'b', 1.1, 2.2, 3.3, 4.4]], 'minItems' => 2, 'maxItems' => 4]];
 
-        yield 'single choice callback' => [new Choice(['callback' => ChoiceCallback::getChoices(...)]), (new ApiProperty())->withNativeType(Type::string()), ['enum' => ['a', 'b', 'c', 'd']]];
-        yield 'multi choice callback' => [new Choice(['callback' => ChoiceCallback::getChoices(...), 'multiple' => true]), (new ApiProperty())->withNativeType(Type::string()), ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']]]];
+        yield 'single choice callback' => [new Choice(callback: ChoiceCallback::getChoices(...)), (new ApiProperty())->withNativeType(Type::string()), ['enum' => ['a', 'b', 'c', 'd']]];
+        yield 'multi choice callback' => [new Choice(callback: ChoiceCallback::getChoices(...), multiple: true), (new ApiProperty())->withNativeType(Type::string()), ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']]]];
     }
 }
 

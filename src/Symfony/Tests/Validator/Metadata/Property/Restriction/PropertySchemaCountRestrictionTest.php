@@ -43,7 +43,7 @@ final class PropertySchemaCountRestrictionTest extends TestCase
 
     public static function supportsProvider(): \Generator
     {
-        yield 'supported' => [new Count(['min' => 1]), new ApiProperty(), true];
+        yield 'supported' => [new Count(min: 1), new ApiProperty(), true];
         yield 'not supported' => [new Positive(), new ApiProperty(), false];
     }
 
@@ -55,8 +55,8 @@ final class PropertySchemaCountRestrictionTest extends TestCase
 
     public static function createProvider(): \Generator
     {
-        yield 'min items' => [new Count(['min' => 1]), new ApiProperty(), ['minItems' => 1]];
-        yield 'max items' => [new Count(['max' => 10]), new ApiProperty(), ['maxItems' => 10]];
-        yield 'min/max items' => [new Count(['min' => 1, 'max' => 10]), new ApiProperty(), ['minItems' => 1, 'maxItems' => 10]];
+        yield 'min items' => [new Count(min: 1), new ApiProperty(), ['minItems' => 1]];
+        yield 'max items' => [new Count(max: 10), new ApiProperty(), ['maxItems' => 10]];
+        yield 'min/max items' => [new Count(min: 1, max: 10), new ApiProperty(), ['minItems' => 1, 'maxItems' => 10]];
     }
 }
