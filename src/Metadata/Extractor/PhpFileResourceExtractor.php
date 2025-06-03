@@ -43,7 +43,7 @@ final class PhpFileResourceExtractor extends AbstractResourceExtractor
             $property->setValue($resource, $resolvedValue);
         }
 
-        $this->resources = [$resource];
+        $this->resources[] = $resource;
     }
 
     /**

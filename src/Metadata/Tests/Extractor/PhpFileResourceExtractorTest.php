@@ -21,11 +21,11 @@ final class PhpFileResourceExtractorTest extends TestCase
 {
     public function testItGetsResourcesFromPhpFileThatReturnsAnApiResource(): void
     {
-        $extractor = new PhpFileResourceExtractor([__DIR__.'/php/valid_php_file.php']);
+        $extractor = new PhpFileResourceExtractor([__DIR__.'/php/valid_php_file.php', __DIR__.'/php/another_valid_php_file.php']);
 
-        $expectedResource = new ApiResource(shortName: 'dummy');
+        $expectedResources = [new ApiResource(shortName: 'dummy'), new ApiResource(shortName: 'another_dummy')];
 
-        $this->assertEquals([$expectedResource], $extractor->getResources());
+        $this->assertEquals($expectedResources, $extractor->getResources());
     }
 
     public function testItExcludesResourcesFromPhpFileThatDoesNotReturnAnApiResource(): void
