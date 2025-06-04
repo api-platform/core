@@ -21,7 +21,10 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-#[GetCollection(normalizationContext: ['hydra_prefix' => false], parameters: ['chickens' => new QueryParameter(filter: new IriFilter())])]
+#[GetCollection(
+    normalizationContext: ['hydra_prefix' => false],
+    parameters: ['chickens' => new QueryParameter(filter: new IriFilter())]
+)]
 class ChickenCoop
 {
     #[ORM\Id]

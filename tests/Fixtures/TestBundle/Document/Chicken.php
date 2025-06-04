@@ -21,7 +21,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 class Chicken
 {
     #[ODM\Id]
-    private string $id;
+    private ?string $id = null;
 
     #[ODM\Field(type: 'string')]
     private string $name;
