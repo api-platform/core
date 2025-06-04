@@ -321,7 +321,7 @@ jobs:
       - name: Run ${{ matrix.component }} tests
         run: |
           mkdir -p /tmp/build/logs/phpunit
-          composer ${{matrix.component}} test --log-junit "/tmp/build/logs/phpunit/junit.xml" ${{ matrix.php.coverage && '--coverage-clover /tmp/build/logs/phpunit/clover.xml' || '' }}
+          composer ${{matrix.component}} test -- --log-junit "/tmp/build/logs/phpunit/junit.xml" ${{ matrix.php.coverage && '--coverage-clover /tmp/build/logs/phpunit/clover.xml' || '' }}${{ matrix.php.lowest && ' --ignore-baseline' || '' }}
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4
