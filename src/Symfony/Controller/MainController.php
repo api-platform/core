@@ -109,9 +109,6 @@ final class MainController
             }
         }
 
-        $context['previous_data'] = $request->attributes->get('previous_data');
-        $context['data'] = $request->attributes->get('data');
-
         if (null === $operation->canWrite()) {
             $operation = $operation->withWrite(!$request->isMethodSafe());
         }
@@ -119,6 +116,9 @@ final class MainController
         if (null === $operation->canSerialize()) {
             $operation = $operation->withSerialize(true);
         }
+
+        $context['previous_data'] = $request->attributes->get('previous_data');
+        $context['data'] = $request->attributes->get('data');
 
         return $this->processor->process($body, $operation, $uriVariables, $context);
     }

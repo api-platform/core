@@ -163,6 +163,7 @@
         "symfony/cache": "^6.4 || ^7.0",
         "symfony/config": "^6.4 || ^7.0",
         "symfony/console": "^6.4 || ^7.0",
+        "symfony/object-mapper": "v7.3.0-RC1",
         "symfony/css-selector": "^6.4 || ^7.0",
         "symfony/dependency-injection": "^6.4 || ^7.0",
         "symfony/doctrine-bridge": "^6.4.2 || ^7.1",
@@ -172,7 +173,7 @@
         "symfony/expression-language": "^6.4 || ^7.0",
         "symfony/finder": "^6.4 || ^7.0",
         "symfony/form": "^6.4 || ^7.0",
-        "symfony/framework-bundle": "^6.4 || ^7.0",
+        "symfony/framework-bundle": "v7.3.0-RC1",
         "symfony/http-client": "^6.4 || ^7.0",
         "symfony/intl": "^6.4 || ^7.0",
         "symfony/maker-bundle": "^1.24",
@@ -212,5 +213,6 @@
     "type": "library",
     "repositories": [
         {"type": "vcs", "url": "https://github.com/soyuka/phpunit"}
-    ]
+    ],
+    "minimum-stability": "RC"
 }

@@ -55,6 +55,7 @@
         "api-platform/parameter-validator": "^3.1",
         "phpspec/prophecy-phpunit": "^2.2",
         "phpunit/phpunit": "11.5.x-dev",
+        "symfony/object-mapper": "v7.3.0-RC1",
         "symfony/expression-language": "^6.4 || ^7.0",
         "symfony/intl": "^6.4 || ^7.0",
         "symfony/mercure-bundle": "*",

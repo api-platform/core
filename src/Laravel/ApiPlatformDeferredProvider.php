@@ -80,7 +80,10 @@ use ApiPlatform\State\ErrorProvider;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\ParameterProviderInterface;
 use ApiPlatform\State\ProcessorInterface;
+use ApiPlatform\State\Processor\ObjectMapperProcessor;
+use ApiPlatform\State\Provider\ObjectMapperProvider;
 use ApiPlatform\State\Provider\ParameterProvider;
+use ApiPlatform\State\Provider\ReadProvider;
 use ApiPlatform\State\Provider\SecurityParameterProvider;
 use ApiPlatform\State\ProviderInterface;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerInterface;
@@ -89,6 +92,12 @@ use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 use Negotiation\Negotiator;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\ObjectMapper\ConditionCallableInterface;
+use Symfony\Component\ObjectMapper\Metadata\ReflectionObjectMapperMetadataFactory;
+use Symfony\Component\ObjectMapper\ObjectMapper;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
+use Symfony\Component\ObjectMapper\TransformCallableInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -186,6 +195,34 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
             $tagged = iterator_to_array($app->tagged(ProviderInterface::class));
 
             return new CallableProvider(new ServiceLocator($tagged));
+        });
+
+        $this->autoconfigure($classes, ProviderInterface::class, [ItemProvider::class, CollectionProvider::class, ErrorProvider::class]);
+
+        $this->app->singleton(ObjectMapperInterface::class, function (Application $app) {
+            return new ObjectMapper(
+                new ReflectionObjectMapperMetadataFactory(),
+                $app->make(PropertyAccessorInterface::class),
+                new ServiceLocator(iterator_to_array($app->tagged(TransformCallableInterface::class))),
+                new ServiceLocator(iterator_to_array($app->tagged(ConditionCallableInterface::class))),
+            );
+        });
+
+        $this->autoconfigure($classes, TransformCallableInterface::class, []);
+        $this->autoconfigure($classes, ConditionCallableInterface::class, []);
+
+        $this->app->extend(ReadProvider::class, function (ReadProvider $service, Application $app) {
+            return new ObjectMapperProvider(
+                $app->make(ObjectMapperInterface::class),
+                $service
+            );
+        });
+
+        $this->app->extend(CallableProcessor::class, function (CallableProcessor $service, Application $app) {
+            return new ObjectMapperProcessor(
+                $app->make(ObjectMapperInterface::class),
+                $service
+            );
         });
 
         $this->autoconfigure($classes, ProviderInterface::class, [ItemProvider::class, CollectionProvider::class, ErrorProvider::class]);
@@ -355,6 +392,7 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
             'api_platform.graphql.state_provider.parameter',
             FieldsBuilderEnumInterface::class,
             ExceptionHandlerInterface::class,
+            ObjectMapperInterface::class
         ];
     }
 }
