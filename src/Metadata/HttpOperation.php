@@ -34,7 +34,7 @@ class HttpOperation extends Operation
      * @param array<int|string, string|string[]>|string|null $formats       {@see https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation}
      * @param array<int|string, string|string[]>|string|null $inputFormats  {@see https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation}
      * @param array<int|string, string|string[]>|string|null $outputFormats {@see https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation}
-     * @param array<string,array{
+     * @param Parameters|array<string,array{
      *     0: string,
      *     1: string
      * }|array{
@@ -344,11 +344,17 @@ class HttpOperation extends Operation
         return $self;
     }
 
-    public function getUriVariables()
+    /**
+     * @return Parameters|array<string, mixed>|null
+     */
+    public function getUriVariables(): mixed
     {
         return $this->uriVariables;
     }
 
+    /**
+     * @param Parameters|array<string, mixed>|array<int, Link>|list<string> $uriVariables
+     */
     public function withUriVariables($uriVariables): static
     {
         $self = clone $this;

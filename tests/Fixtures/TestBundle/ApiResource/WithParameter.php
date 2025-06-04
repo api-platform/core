@@ -23,6 +23,9 @@ use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use ApiPlatform\Serializer\Filter\GroupFilter;
+use ApiPlatform\State\ParameterProvider\IriConverterParameterProvider;
+use ApiPlatform\State\ParameterProvider\ReadLinkParameterProvider;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Parameter\CustomGroupParameterProvider;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -167,6 +170,27 @@ use Symfony\Component\Validator\Constraints\Country;
     ],
     provider: [self::class, 'noopProvider']
 )]
+#[Get(
+    uriTemplate: 'with_parameters_iris',
+    parameters: [
+        'dummy' => new QueryParameter(provider: IriConverterParameterProvider::class),
+    ],
+    provider: [self::class, 'provideDummyFromParameter'],
+)]
+#[Get(
+    uriTemplate: 'with_parameters_links',
+    parameters: [
+        'dummy' => new QueryParameter(provider: ReadLinkParameterProvider::class, extraProperties: ['resource_class' => Dummy::class]),
+    ],
+    provider: [self::class, 'provideDummyFromParameter'],
+)]
+#[Get(
+    uriTemplate: 'with_parameters_links_no_not_found',
+    parameters: [
+        'dummy' => new QueryParameter(provider: ReadLinkParameterProvider::class, extraProperties: ['resource_class' => Dummy::class, 'throw_not_found' => false]),
+    ],
+    provider: [self::class, 'noopProvider'],
+)]
 #[QueryParameter(key: 'everywhere')]
 class WithParameter
 {
@@ -235,12 +259,9 @@ class WithParameter
             $value = (int) $value;
         }
 
-        $parameters = $operation->getParameters();
-        $parameters->add($parameter->getKey(), $parameter = $parameter->withExtraProperties(
-            $parameter->getExtraProperties() + ['_api_values' => $value]
-        ));
+        $parameter->setValue($value);
 
-        return $operation->withParameters($parameters);
+        return $operation;
     }
 
     public static function headerProvider(Operation $operation, array $uriVariables = [], array $context = []): JsonResponse
@@ -254,5 +275,10 @@ class WithParameter
     public static function noopProvider(Operation $operation, array $uriVariables = [], array $context = []): JsonResponse
     {
         return new JsonResponse([]);
+    }
+
+    public static function provideDummyFromParameter(Operation $operation, array $uriVariables = [], array $context = []): object|array
+    {
+        return $operation->getParameters()->get('dummy')->getValue();
     }
 }

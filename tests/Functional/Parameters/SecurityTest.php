@@ -61,7 +61,7 @@ final class SecurityTest extends ApiTestCase
     public static function dataSecurityValues(): iterable
     {
         yield ['secured', Response::HTTP_OK];
-        yield ['not_the_expected_parameter_value', Response::HTTP_UNAUTHORIZED];
+        yield ['not_the_expected_parameter_value', Response::HTTP_FORBIDDEN];
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('dataSecurityValues')]
