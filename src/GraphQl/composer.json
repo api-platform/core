@@ -87,6 +87,5 @@
             "type": "vcs",
             "url": "https://github.com/soyuka/phpunit"
         }
-    ],
-    "version": "v4.1.15"
+    ]
 }
