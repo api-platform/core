@@ -1,5 +1,19 @@
 # Changelog
 
+## v4.1.13
+
+### Bug fixes
+
+* [4bdfd6063](https://github.com/api-platform/core/commit/4bdfd6063a6e80fc9cc33ff16c0ec98fec688291) fix(symfony, laravel) skip webhooks when generates routing (#7175)
+* [582076cb6](https://github.com/api-platform/core/commit/582076cb6c0dbcde205fc49d97a0f50405544d0b) fix(openapi): duplicate get path for webhooks (#7174)
+* [84b967930](https://github.com/api-platform/core/commit/84b96793043c939f333c1aa2e96f69b23d3e9ece) fix(laravel): persist morph relations (#7170)
+* [d51cddba2](https://github.com/api-platform/core/commit/d51cddba2a7618c08e511582ac2f41a6b0eaf657) fix(laravel): index on non-primary key (#7183)
+* [fdb485dd2](https://github.com/api-platform/core/commit/fdb485dd2af56f7664bd90705d81e8f58c8b494a) fix(openapi): `example` and `default` with nullable value not being shown
+
+### Features
+
+* [79d08db6a](https://github.com/api-platform/core/commit/79d08db6a4728303b37440c610c96a490d44780a) feat(elasticsearch): add support for v9 (#7180)
+
 ## v4.1.11 - v4.1.12
 
 ### Bug fixes
