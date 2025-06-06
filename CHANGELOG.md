@@ -1,12 +1,10 @@
 # Changelog
 
-## v4.1.14
+## v4.1.15 - v4.1.14 - v4.1.13
 
-### Bug fixes
+There was an issue with the subtree split as we attempted to test lower dependencies on the subtree split, some components where wrongly tagged.
 
-* [47a5c0eb1](https://github.com/api-platform/core/commit/47a5c0eb1cbeb007a26915c84a1e8c65af0342df) fix: bump composer.json version nodes
-
-## v4.1.13
+The proper fix is at: https://github.com/api-platform/core/pull/7196
 
 ### Bug fixes
 
