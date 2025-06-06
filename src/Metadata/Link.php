@@ -16,7 +16,7 @@ namespace ApiPlatform\Metadata;
 use ApiPlatform\OpenApi;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER)]
-final class Link extends Parameter
+final class Link extends Parameter implements UriVariableParameterInterface
 {
     public function __construct(
         private ?string $parameterName = null,

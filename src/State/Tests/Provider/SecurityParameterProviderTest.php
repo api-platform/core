@@ -11,19 +11,20 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Symfony\Security\State;
+namespace ApiPlatform\State\Tests\Provider;
 
+use ApiPlatform\Metadata\Exception\AccessDeniedException;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
+use ApiPlatform\State\ParameterNotFound;
+use ApiPlatform\State\Provider\SecurityParameterProvider;
 use ApiPlatform\State\ProviderInterface;
-use ApiPlatform\Symfony\Security\Exception\AccessDeniedException;
-use ApiPlatform\Symfony\Security\State\LinkAccessCheckerProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 
-class LinkAccessCheckerProviderTest extends TestCase
+final class SecurityParameterProviderTest extends TestCase
 {
     public function testIsGrantedLink(): void
     {
@@ -39,8 +40,8 @@ class LinkAccessCheckerProviderTest extends TestCase
         $request->attributes = $parameterBag;
         $request->attributes->set('bar', $barObj);
         $resourceAccessChecker = $this->createMock(ResourceAccessCheckerInterface::class);
-        $resourceAccessChecker->expects($this->once())->method('isGranted')->with('Bar', 'is_granted("some_voter", "bar")', ['object' => $obj, 'previous_object' => null, 'request' => $request, 'bar' => $barObj])->willReturn(true);
-        $accessChecker = new LinkAccessCheckerProvider($decorated, $resourceAccessChecker);
+        $resourceAccessChecker->expects($this->once())->method('isGranted')->with('Bar', 'is_granted("some_voter", "bar")', ['object' => $obj, 'previous_object' => null, 'request' => $request, 'bar' => $barObj, 'barId' => new ParameterNotFound(), 'operation' => $operation])->willReturn(true);
+        $accessChecker = new SecurityParameterProvider($decorated, $resourceAccessChecker);
         $accessChecker->provide($operation, [], ['request' => $request]);
     }
 
@@ -60,8 +61,8 @@ class LinkAccessCheckerProviderTest extends TestCase
         $request->attributes = $parameterBag;
         $request->attributes->set('bar', $barObj);
         $resourceAccessChecker = $this->createMock(ResourceAccessCheckerInterface::class);
-        $resourceAccessChecker->expects($this->once())->method('isGranted')->with('Bar', 'is_granted("some_voter", "bar")', ['object' => $obj, 'previous_object' => null, 'request' => $request, 'bar' => $barObj])->willReturn(false);
-        $accessChecker = new LinkAccessCheckerProvider($decorated, $resourceAccessChecker);
+        $resourceAccessChecker->expects($this->once())->method('isGranted')->with('Bar', 'is_granted("some_voter", "bar")', ['object' => $obj, 'previous_object' => null, 'request' => $request, 'bar' => $barObj, 'barId' => new ParameterNotFound(), 'operation' => $operation])->willReturn(false);
+        $accessChecker = new SecurityParameterProvider($decorated, $resourceAccessChecker);
         $accessChecker->provide($operation, [], ['request' => $request]);
     }
 
@@ -82,8 +83,8 @@ class LinkAccessCheckerProviderTest extends TestCase
         $request->attributes = $parameterBag;
         $request->attributes->set('bar', $barObj);
         $resourceAccessChecker = $this->createMock(ResourceAccessCheckerInterface::class);
-        $resourceAccessChecker->expects($this->once())->method('isGranted')->with('Bar', 'is_granted("some_voter", "bar")', ['object' => $obj, 'previous_object' => null, 'request' => $request, 'bar' => $barObj])->willReturn(false);
-        $accessChecker = new LinkAccessCheckerProvider($decorated, $resourceAccessChecker);
+        $resourceAccessChecker->expects($this->once())->method('isGranted')->with('Bar', 'is_granted("some_voter", "bar")', ['object' => $obj, 'previous_object' => null, 'request' => $request, 'bar' => $barObj, 'barId' => new ParameterNotFound(), 'operation' => $operation])->willReturn(false);
+        $accessChecker = new SecurityParameterProvider($decorated, $resourceAccessChecker);
         $accessChecker->provide($operation, [], ['request' => $request]);
     }
 }

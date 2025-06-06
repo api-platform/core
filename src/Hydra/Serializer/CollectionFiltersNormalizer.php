@@ -84,9 +84,9 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class']);
         $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($context['operation_name'] ?? null);
 
-        $parameters = $operation->getParameters();
+        $parameters = $operation->getParameters() ?? new Parameters();
         $resourceFilters = $operation->getFilters();
-        if (!$resourceFilters && !$parameters) {
+        if (!$resourceFilters && 0 === \count($parameters)) {
             return $data;
         }
 
@@ -103,7 +103,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
 
         $resourceClass = $this->getStateOptionsClass($operation, $resourceClass);
 
-        if ($currentFilters || ($parameters && \count($parameters))) {
+        if ($currentFilters || \count($parameters) > 0) {
             $hydraPrefix = $this->getHydraPrefix($context + $this->defaultContext);
             $data[$hydraPrefix.'search'] = $this->getSearch($resourceClass, $requestParts, $currentFilters, $parameters, $hydraPrefix);
         }

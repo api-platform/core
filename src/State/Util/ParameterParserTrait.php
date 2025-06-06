@@ -16,6 +16,8 @@ namespace ApiPlatform\State\Util;
 use ApiPlatform\Metadata\HeaderParameter;
 use ApiPlatform\Metadata\HeaderParameterInterface;
 use ApiPlatform\Metadata\Parameter;
+use ApiPlatform\Metadata\QueryParameterInterface;
+use ApiPlatform\Metadata\UriVariableParameterInterface;
 use ApiPlatform\State\ParameterNotFound;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\TypeInfo\Type\CollectionType;
@@ -34,7 +36,12 @@ trait ParameterParserTrait
     private function getParameterValues(Parameter $parameter, ?Request $request, array $context): array
     {
         if ($request) {
-            return ($parameter instanceof HeaderParameterInterface ? $request->attributes->get('_api_header_parameters') : $request->attributes->get('_api_query_parameters')) ?? [];
+            return match (true) {
+                $parameter instanceof HeaderParameterInterface => $request->attributes->get('_api_header_parameters') ?? [],
+                $parameter instanceof QueryParameterInterface => $request->attributes->get('_api_query_parameters') ?? [],
+                $parameter instanceof UriVariableParameterInterface => $request->attributes->get('_api_path_parameters') ?? [],
+                default => [],
+            };
         }
 
         return $context['args'] ?? [];
