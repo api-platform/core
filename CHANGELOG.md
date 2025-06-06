@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.1.14
+
+### Bug fixes
+
+* [47a5c0eb1](https://github.com/api-platform/core/commit/47a5c0eb1cbeb007a26915c84a1e8c65af0342df) fix: bump composer.json version nodes
+
 ## v4.1.13
 
 ### Bug fixes
