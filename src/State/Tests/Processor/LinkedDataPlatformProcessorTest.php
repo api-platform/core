@@ -34,6 +34,7 @@ use Symfony\Component\HttpFoundation\Response;
 class LinkedDataPlatformProcessorTest extends TestCase
 {
     private ResourceMetadataCollectionFactoryInterface&MockObject $resourceMetadataCollectionFactory;
+
     private ResourceClassResolverInterface&MockObject $resourceClassResolver;
 
     private ProcessorInterface&MockObject $decorated;
