@@ -211,6 +211,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('state/provider.xml');
             $loader->load('state/processor.xml');
         }
+        $loader->load('state/parameter_provider.xml');
 
         $container->setParameter('api_platform.enable_entrypoint', $config['enable_entrypoint']);
         $container->setParameter('api_platform.enable_docs', $config['enable_docs']);

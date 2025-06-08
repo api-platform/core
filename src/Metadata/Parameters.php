@@ -122,6 +122,19 @@ final class Parameters implements \IteratorAggregate, \Countable
         return false;
     }
 
+    /**
+     * @return list<string>
+     */
+    public function keys(): array
+    {
+        $keys = [];
+        foreach ($this->parameters as [$key]) {
+            $keys[] = $key;
+        }
+
+        return $keys;
+    }
+
     public function count(): int
     {
         return \count($this->parameters);
