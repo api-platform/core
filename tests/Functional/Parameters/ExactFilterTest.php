@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional\Parameters;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-// use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyAuthorExact as DummyAuthorExactDocument;
-// use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyBookExact as DummyBookExactDocument;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyAuthorExact;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyBookExact;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Chicken as DocumentChicken;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\ChickenCoop as DocumentChickenCoop;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Chicken;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ChickenCoop;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Doctrine\ODM\MongoDB\MongoDBException;
@@ -38,21 +38,20 @@ final class ExactFilterTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [DummyBookExact::class,  DummyAuthorExact::class];
+        return [Chicken::class, ChickenCoop::class];
     }
 
     /**
-     * @throws MongoDBException
      * @throws \Throwable
      */
     protected function setUp(): void
     {
-        // TODO: implement ODM classes
-        $authorEntityClass = $this->isMongoDB() ? /* DummyAuthorExactDocument::class */ : DummyAuthorExact::class;
-        $bookEntityClass = $this->isMongoDB() ? /* DummyBookExactDocument::class */ : DummyBookExact::class;
+        $entities = $this->isMongoDB()
+            ? [DocumentChicken::class, DocumentChickenCoop::class]
+            : [Chicken::class, ChickenCoop::class];
 
-        $this->recreateSchema([$authorEntityClass, $bookEntityClass]);
-        $this->loadFixtures($authorEntityClass, $bookEntityClass);
+        $this->recreateSchema($entities);
+        $this->loadFixtures();
     }
 
     /**
@@ -63,7 +62,7 @@ final class ExactFilterTest extends ApiTestCase
      * @throws TransportExceptionInterface
      */
     #[DataProvider('exactSearchFilterProvider')]
-    public function testExactSearchFilter(string $url, int $expectedCount, array $expectedTitles): void
+    public function testExactSearchFilter(string $url, int $expectedCount, array $expectedNames): void
     {
         $response = self::createClient()->request('GET', $url);
         $this->assertResponseIsSuccessful();
@@ -73,34 +72,43 @@ final class ExactFilterTest extends ApiTestCase
 
         $this->assertCount($expectedCount, $filteredItems, \sprintf('Expected %d items for URL %s', $expectedCount, $url));
 
-        $titles = array_map(fn ($book) => $book['title'], $filteredItems);
-        sort($titles);
-        sort($expectedTitles);
+        $names = array_map(fn ($chicken) => $chicken['name'], $filteredItems);
+        sort($names);
+        sort($expectedNames);
 
-        $this->assertSame($expectedTitles, $titles, 'The titles do not match the expected values.');
+        $this->assertSame($expectedNames, $names, 'The names do not match the expected values.');
     }
 
     public static function exactSearchFilterProvider(): \Generator
     {
-        yield 'filter_by_author_exact_id_1' => [
-            '/dummy_book_exacts?dummyAuthorExact=1',
-            2,
-            ['Book 1', 'Book 2'],
-        ];
-        yield 'filter_by_author_exact_id_1_and_title_book_1' => [
-            '/dummy_book_exacts?dummyAuthorExact=1&title=Book 1',
+        yield 'filter by exact name "Gertrude"' => [
+            '/chickens?name=Gertrude',
             1,
-            ['Book 1'],
+            ['Gertrude'],
         ];
-        yield 'filter_by_author_exact_id_1_and_title_book_3' => [
-            '/dummy_book_exacts?dummyAuthorExact=1&title=Book 3',
+
+        yield 'filter by a non-existent name' => [
+            '/chickens?name=Kevin',
             0,
             [],
         ];
-        yield 'filter_by_author_exact_id_3_and_title_book_3' => [
-            '/dummy_book_exacts?dummyAuthorExact=2&title=Book 3',
+
+        yield 'filter by exact coop id' => [
+            '/chickens?chickenCoop=1',
             1,
-            ['Book 3'],
+            ['Gertrude'],
+        ];
+
+        yield 'filter by coop id and correct name' => [
+            '/chickens?chickenCoop=1&name=Gertrude',
+            1,
+            ['Gertrude'],
+        ];
+
+        yield 'filter by coop id and incorrect name' => [
+            '/chickens?chickenCoop=1&name=Henriette',
+            0,
+            [],
         ];
     }
 
@@ -108,33 +116,33 @@ final class ExactFilterTest extends ApiTestCase
      * @throws \Throwable
      * @throws MongoDBException
      */
-    private function loadFixtures(string $authorEntityClass, string $bookEntityClass): void
+    private function loadFixtures(): void
     {
         $manager = $this->getManager();
 
-        $authors = [];
-        foreach ([['name' => 'Author 1'], ['name' => 'Author 2']] as $authorData) {
-            $author = new $authorEntityClass(name: $authorData['name']);
-            $manager->persist($author);
-            $authors[] = $author;
+        $chickenClass = $this->isMongoDB() ? DocumentChicken::class : Chicken::class;
+        $coopClass = $this->isMongoDB() ? DocumentChickenCoop::class : ChickenCoop::class;
+
+        $chickenCoop1 = new $coopClass();
+        $chickenCoop2 = new $coopClass();
+
+        $chicken1 = new $chickenClass();
+        $chicken1->setName('Gertrude');
+        $chicken1->setChickenCoop($chickenCoop1);
+
+        $chicken2 = new $chickenClass();
+        $chicken2->setName('Henriette');
+        $chicken2->setChickenCoop($chickenCoop2);
+
+        if (method_exists($chickenCoop1, 'addChicken')) {
+            $chickenCoop1->addChicken($chicken1);
+            $chickenCoop2->addChicken($chicken2);
         }
 
-        $books = [
-            ['title' => 'Book 1', 'isbn' => '1234567890123', 'author' => $authors[0]],
-            ['title' => 'Book 2', 'isbn' => '1234567890124', 'author' => $authors[0]],
-            ['title' => 'Book 3', 'isbn' => '1234567890125', 'author' => $authors[1]],
-        ];
-
-        foreach ($books as $bookData) {
-            $book = new $bookEntityClass(
-                title: $bookData['title'],
-                isbn: $bookData['isbn'],
-                dummyAuthorExact: $bookData['author']
-            );
-
-            $author->dummyBookExacts->add($book);
-            $manager->persist($book);
-        }
+        $manager->persist($chickenCoop1);
+        $manager->persist($chickenCoop2);
+        $manager->persist($chicken1);
+        $manager->persist($chicken2);
 
         $manager->flush();
     }
