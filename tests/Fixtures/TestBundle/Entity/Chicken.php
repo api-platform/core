@@ -13,11 +13,23 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Metadata\Get;
+use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
+use ApiPlatform\Doctrine\Orm\Filter\PartialSearchFilter;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-#[Get]
+#[GetCollection(
+    parameters: [
+        'chickenCoop' => new QueryParameter(filter: new ExactFilter()),
+        'name' => new QueryParameter(filter: new ExactFilter()),
+        'namePartial' => new QueryParameter(
+            filter: new PartialSearchFilter(),
+            property: 'name',
+        ),
+    ],
+)]
 class Chicken
 {
     #[ORM\Id]
