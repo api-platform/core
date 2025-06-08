@@ -17,12 +17,10 @@ use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
-use ApiPlatform\Metadata\ParameterProviderFilterInterface;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
-use ApiPlatform\State\Provider\IriConverterParameterProvider;
 use Doctrine\ORM\QueryBuilder;
 
-final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterface, ParameterProviderFilterInterface
+final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterface
 {
     public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
@@ -42,11 +40,6 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
         $queryBuilder
             ->andWhere(\sprintf('%s.%s = :%s', $alias, $property, $parameterName))
             ->setParameter($parameterName, $value);
-    }
-
-    public static function getParameterProvider(): string
-    {
-        return IriConverterParameterProvider::class;
     }
 
     public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array|null
