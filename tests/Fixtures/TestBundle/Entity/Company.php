@@ -23,14 +23,14 @@ use ApiPlatform\Metadata\Post;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
+#[ApiResource]
+#[GetCollection]
+#[Get]
 #[NotExposed(
     uriTemplate: '/company-by-name/{name}',
     provider: [self::class, 'provideCompanyByName'],
     uriVariables: ['name']
 )]
-#[ApiResource]
-#[GetCollection]
-#[Get]
 #[Post]
 #[ApiResource(
     uriTemplate: '/employees/{employeeId}/company',

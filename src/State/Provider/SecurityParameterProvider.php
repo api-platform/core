@@ -56,6 +56,10 @@ final class SecurityParameterProvider implements ProviderInterface
 
         if ($operation instanceof HttpOperation) {
             foreach ($operation->getUriVariables() ?? [] as $key => $uriVariable) {
+                if ($uriVariable->getValue() instanceof ParameterNotFound) {
+                    $uriVariable->setValue($uriVariables[$key] ?? new ParameterNotFound());
+                }
+
                 $parameters->add($key, $uriVariable->withKey($key));
             }
         }
@@ -69,7 +73,6 @@ final class SecurityParameterProvider implements ProviderInterface
             $value = $parameter->getValue();
             if ($parameter instanceof Link) {
                 $targetResource = $parameter->getFromClass() ?? $parameter->getToClass() ?? null;
-                $value = $uriVariables[$parameter->getKey()] ?? new ParameterNotFound();
             }
 
             if ($value instanceof ParameterNotFound) {

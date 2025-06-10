@@ -130,8 +130,36 @@ final class LinkProviderParameterTest extends ApiTestCase
             $this->markTestSkipped();
         }
 
-        $response = self::createClient()->request('GET', '/companies-by-name/Test/employees');
-        dd($response->toArray(false));
-        self::assertEquals(200, $response->getStatusCode());
+        self::createClient()->request('GET', '/companies-by-name/Test/employees');
+        self::assertJsonContains([
+            'hydra:member' => [
+                ['company' => ['name' => 'Test']],
+            ],
+        ]);
+        self::assertResponseStatusCodeSame(200);
+    }
+
+    /**
+     * See https://github.com/api-platform/core/issues/7061.
+     */
+    public function testLinkSecurityWithConstraint(): void
+    {
+        $manager = $this->getManager();
+        $employee = new Employee();
+        $employee->setName('me');
+        $dummy = new Company();
+        $dummy->setName('Test');
+        $employee->setCompany($dummy);
+        $manager->persist($employee);
+        $manager->persist($dummy);
+        $manager->flush();
+
+        $container = static::getContainer();
+        if ('mongodb' === $container->getParameter('kernel.environment')) {
+            $this->markTestSkipped();
+        }
+
+        $response = self::createClient()->request('GET', '/companies-by-name/NotTest/employees');
+        self::assertEquals(422, $response->getStatusCode());
     }
 }
