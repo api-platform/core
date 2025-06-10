@@ -47,7 +47,9 @@ Route::domain($domain)->middleware($globalMiddlewares)->group(function (): void 
 
                 /* @var HttpOperation $operation */
                 $route = Route::addRoute($operation->getMethod(), $uriTemplate, ['uses' => ApiPlatformController::class, 'prefix' => $operation->getRoutePrefix() ?? ''])
-                    ->where('_format', '^\.[a-zA-Z]+')
+                    ->where([
+                        '_format' => '^\.[a-zA-Z]+',
+                    ] + ($operation->getRequirements() ?? []))
                     ->name($operation->getName())
                     ->setDefaults(['_api_operation_name' => $operation->getName(), '_api_resource_class' => $operation->getClass()]);
 
