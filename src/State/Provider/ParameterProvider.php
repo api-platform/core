@@ -13,11 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\Provider;
 
-use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
-use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\State\Exception\ParameterNotSupportedException;
 use ApiPlatform\State\Exception\ProviderNotFoundException;
 use ApiPlatform\State\ParameterNotFound;
@@ -91,7 +89,7 @@ final class ParameterProvider implements ProviderInterface
             $operation = $operation->withParameters($parameters);
         }
 
-        if ($operation instanceof HttpOperation || $operation instanceof GraphQlOperation) {
+        if ($operation instanceof HttpOperation) {
             $operation = $this->handlePathParameters($operation, $uriVariables, $context);
         }
 
@@ -102,22 +100,22 @@ final class ParameterProvider implements ProviderInterface
     }
 
     /**
-     * TODO: this could be in the Parameters list prepare that change in 4.3 as it can break things.
+     * TODO: uriVariables could be a Parameters instance, it'd make things easier.
      *
      * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      */
-    private function handlePathParameters(GraphQlOperation|HttpOperation $operation, array $uriVariables, array $context): GraphQlOperation|HttpOperation
+    private function handlePathParameters(HttpOperation $operation, array $uriVariables, array $context): HttpOperation
     {
-        $links = $operation instanceof HttpOperation ? $operation->getUriVariables() : $operation->getLinks();
-        foreach ($links ?? [] as $key => $uriVariable) {
+        foreach ($operation->getUriVariables() ?? [] as $key => $uriVariable) {
+            $uriVariable = $uriVariable->withKey($key);
             if ($uriVariable->getSecurity() && !$uriVariable->getProvider()) {
                 $uriVariable = $uriVariable->withProvider(ReadLinkParameterProvider::class);
             }
 
             $values = $uriVariables;
 
-            if (!isset($uriVariables[$key])) {
+            if (!\array_key_exists($key, $uriVariables)) {
                 continue;
             }
 

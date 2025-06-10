@@ -108,7 +108,21 @@ final class ReadLinkParameterProvider implements ParameterProviderInterface
         }
 
         if (!\is_array($value)) {
-            return [1 === \count($links) ? current($links)->getKey() : ($extraProperties['uri_variable'] ?? $parameter->getKey()) => $value];
+            $uriVariables = [];
+
+            foreach ($links as $key => $link) {
+                if (!\is_string($key)) {
+                    $key = $link->getParameterName() ?? $extraProperties['uri_variable'] ?? $link->getFromProperty();
+                }
+
+                if (!$key || !\is_string($key)) {
+                    continue;
+                }
+
+                $uriVariables[$key] = $value;
+            }
+
+            return $uriVariables;
         }
 
         return $value;

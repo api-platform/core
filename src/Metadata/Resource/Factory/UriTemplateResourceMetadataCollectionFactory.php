@@ -235,7 +235,7 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
             }
 
             $normalizedUriVariable = $normalizedUriVariable->withParameterName($normalizedParameterName);
-            $normalizedUriVariables[$normalizedParameterName] = $normalizedUriVariable->withKey($normalizedParameterName);
+            $normalizedUriVariables[$normalizedParameterName] = $normalizedUriVariable;
         }
 
         return $operation->withUriVariables($normalizedUriVariables);

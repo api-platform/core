@@ -38,20 +38,20 @@ final readonly class IriConverterParameterProvider implements ParameterProviderI
             return $operation;
         }
 
+        $iriConverterContext = ['fetch_data' => $parameter->getExtraProperties()['fetch_data'] ?? false];
+
         if (\is_array($value)) {
             $entities = [];
             foreach ($value as $v) {
-                $entities[] = $this->iriConverter->getResourceFromIri($v, [
-                    'fetch_data' => $parameter->getExtraProperties()['fetch_data'] ?? false,
-                ]);
+                $entities[] = $this->iriConverter->getResourceFromIri($v, $iriConverterContext);
             }
 
             $parameter->setValue($entities);
-        } else {
-            $parameter->setValue($this->iriConverter->getResourceFromIri($value, [
-                'fetch_data' => $parameter->getExtraProperties()['fetch_data'] ?? false,
-            ]));
+
+            return $operation;
         }
+
+        $parameter->setValue($this->iriConverter->getResourceFromIri($value, $iriConverterContext));
 
         return $operation;
     }
