@@ -17,10 +17,17 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\NotExposed;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Post;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
+#[NotExposed(
+    uriTemplate: '/company-by-name/{name}',
+    provider: [self::class, 'provideCompanyByName'],
+    uriVariables: ['name']
+)]
 #[ApiResource]
 #[GetCollection]
 #[Get]
@@ -34,6 +41,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity]
 class Company
 {
+    public static function provideCompanyByName(Operation $operation, array $uriVariables): object
+    {
+        $c = new self();
+        $c->setName($uriVariables['name']);
+
+        return $c;
+    }
+
     /**
      * @var int|null The id
      */

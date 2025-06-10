@@ -69,7 +69,7 @@ final class ReadLinkParameterProvider implements ParameterProviderInterface
 
             foreach ($value as $v) {
                 try {
-                    $r = $relation[] = $this->locator->provide($linkOperation, $this->getUriVariables($v, $parameter, $linkOperation), $context);
+                    $relation[] = $this->locator->provide($linkOperation, $this->getUriVariables($v, $parameter, $linkOperation), $context);
                 } catch (ProviderNotFoundException) {
                 }
             }

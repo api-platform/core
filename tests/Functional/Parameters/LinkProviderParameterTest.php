@@ -15,7 +15,9 @@ namespace ApiPlatform\Tests\Functional\Parameters;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\WithParameter;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Company;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Employee;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy;
 use ApiPlatform\Tests\RecreateSchemaTrait;
@@ -33,7 +35,7 @@ final class LinkProviderParameterTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [WithParameter::class, Dummy::class];
+        return [WithParameter::class, Dummy::class, Employee::class, Company::class];
     }
 
     /**
@@ -41,7 +43,7 @@ final class LinkProviderParameterTest extends ApiTestCase
      */
     protected function setUp(): void
     {
-        $this->recreateSchema([Dummy::class, RelatedOwnedDummy::class, RelatedDummy::class]);
+        $this->recreateSchema([Dummy::class, RelatedOwnedDummy::class, RelatedDummy::class, Employee::class, Company::class]);
     }
 
     public function testReadDummyProviderFromQueryParameter(): void
@@ -105,6 +107,31 @@ final class LinkProviderParameterTest extends ApiTestCase
             $this->markTestSkipped();
         }
         $response = self::createClient()->request('GET', '/with_parameters_links_no_not_found?dummy=1');
+        self::assertEquals(200, $response->getStatusCode());
+    }
+
+    /**
+     * See https://github.com/api-platform/core/issues/7061.
+     */
+    public function testLinkSecurityWithSlug(): void
+    {
+        $manager = $this->getManager();
+        $employee = new Employee();
+        $employee->setName('me');
+        $dummy = new Company();
+        $dummy->setName('Test');
+        $employee->setCompany($dummy);
+        $manager->persist($employee);
+        $manager->persist($dummy);
+        $manager->flush();
+
+        $container = static::getContainer();
+        if ('mongodb' === $container->getParameter('kernel.environment')) {
+            $this->markTestSkipped();
+        }
+
+        $response = self::createClient()->request('GET', '/companies-by-name/Test/employees');
+        dd($response->toArray(false));
         self::assertEquals(200, $response->getStatusCode());
     }
 }
