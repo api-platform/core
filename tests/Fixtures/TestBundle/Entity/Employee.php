@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\IdenticalTo;
 
 #[ApiResource]
 #[Post]
@@ -46,8 +47,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
             identifiers: ['name'],
             fromClass: Company::class,
             toProperty: 'company',
-            security: 'company.name == "Test"',
-            extraProperties: ['uri_template' => '/company-by-name/{name}']
+            security: 'company.name == "Test" or company.name == "NotTest"',
+            extraProperties: ['uri_template' => '/company-by-name/{name}'],
+            constraints: [new IdenticalTo('Test')]
         ),
     ],
 )]
