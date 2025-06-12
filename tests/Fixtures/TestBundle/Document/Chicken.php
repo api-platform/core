@@ -32,7 +32,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 )]
 class Chicken
 {
-    #[ODM\Id]
+    #[ODM\Id(type: 'string', strategy: 'INCREMENT')]
     private ?string $id = null;
 
     #[ODM\Field(type: 'string')]
@@ -41,7 +41,7 @@ class Chicken
     #[ODM\ReferenceOne(targetDocument: ChickenCoop::class, inversedBy: 'chickens')]
     private ?ChickenCoop $chickenCoop = null;
 
-    public function getId(): ?string
+    public function getId(): ?int
     {
         return $this->id;
     }

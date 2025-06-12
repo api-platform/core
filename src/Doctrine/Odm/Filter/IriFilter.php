@@ -36,11 +36,12 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
             $value = [$value];
         }
 
-        $matchField = $parameter->getProperty();
+        //TODO: handle nested properties
+        $property = $parameter->getProperty();
 
         $aggregationBuilder
             ->match()
-            ->field($matchField)
+            ->field($property)
             ->in($value);
     }
 

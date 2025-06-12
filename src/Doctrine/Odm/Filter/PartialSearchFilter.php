@@ -35,12 +35,13 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
             return;
         }
 
-        $matchField = $parameter->getProperty();
+        //TODO: handle nested properties
+        $property = $parameter->getProperty();
         $escapedValue = preg_quote($value, '/');
 
         $aggregationBuilder
             ->match()
-            ->field($matchField)
+            ->field($property)
             ->equals(new Regex($escapedValue, 'i'));
     }
 

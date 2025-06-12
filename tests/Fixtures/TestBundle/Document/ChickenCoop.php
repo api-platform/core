@@ -27,8 +27,8 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 ]
 class ChickenCoop
 {
-    #[ODM\Id]
-    private ?string $id = null;
+    #[ODM\Id(type: 'int', strategy: 'INCREMENT')]
+    private ?int $id = null;
 
     #[ODM\ReferenceMany(targetDocument: Chicken::class, mappedBy: 'chickenCoop')]
     private Collection $chickens;
@@ -38,7 +38,7 @@ class ChickenCoop
         $this->chickens = new ArrayCollection();
     }
 
-    public function getId(): ?string
+    public function getId(): ?int
     {
         return $this->id;
     }

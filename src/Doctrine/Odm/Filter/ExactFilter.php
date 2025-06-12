@@ -30,18 +30,14 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
         \assert($parameter instanceof Parameter);
 
         $values = (array) $parameter->getValue();
-        if ([] === $values) {
-            return;
-        }
 
-        $matchField = $parameter->getProperty();
-        $fieldQuery = $aggregationBuilder->match()->field($matchField);
+        //TODO: handle nested properties
+        $property = $parameter->getProperty();
 
-        if (\count($values) > 1) {
-            $fieldQuery->in($values);
-        } else {
-            $fieldQuery->equals(reset($values));
-        }
+        $aggregationBuilder
+            ->match()
+            ->field($property)
+            ->in($values);
     }
 
     public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array|null
