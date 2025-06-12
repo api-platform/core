@@ -46,6 +46,8 @@ final class PartialSearchFilterTest extends ApiTestCase
      */
     protected function setUp(): void
     {
+        self::$alwaysBootKernel = false;
+
         $entities = $this->isMongoDB()
             ? [DocumentChicken::class, DocumentChickenCoop::class]
             : [Chicken::class, ChickenCoop::class];
