@@ -114,9 +114,6 @@ class ConfigurationTest extends TestCase
             'graphql' => [
                 'enabled' => true,
                 'default_ide' => 'graphiql',
-                'graphql_playground' => [
-                    'enabled' => true,
-                ],
                 'graphiql' => [
                     'enabled' => true,
                 ],

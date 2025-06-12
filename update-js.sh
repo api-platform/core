@@ -3,7 +3,7 @@ rm -f package.lock
 rm -f package-lock.json
 echo "{}" > package.json
 # /!\ UMD is removed since react@19: https://react.dev/blog/2024/04/25/react-19-upgrade-guide#umd-builds-removed
-npm i @fontsource/open-sans swagger-ui es6-promise fetch react@18 react-dom@18 graphiql graphql-playground-react redoc
+npm i @fontsource/open-sans swagger-ui es6-promise fetch react@18 react-dom@18 graphiql redoc
 
 for public in src/Symfony/Bundle/Resources/public/ src/Laravel/public/; do
 
@@ -81,14 +81,6 @@ fi
 mkdir -p "$dest"
 cp node_modules/graphiql/graphiql.min.js "$dest"
 cp node_modules/graphiql/graphiql.css "$dest"
-
-dest="${public}graphql-playground/"
-if [[ -d "$dest" ]]; then
-rm -Rf "$dest"
-fi
-mkdir -p "$dest"
-cp node_modules/graphql-playground-react/build/static/js/middleware.js "$dest"
-cp node_modules/graphql-playground-react/build/static/css/index.css "$dest"
 
 dest="${public}redoc/"
 if [[ -d "$dest" ]]; then

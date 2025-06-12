@@ -50,12 +50,10 @@
             <argument type="service" id="api_platform.graphql.schema_builder" />
             <argument type="service" id="api_platform.graphql.executor" />
             <argument type="service" id="api_platform.graphql.action.graphiql" on-invalid="null"/>
-            <argument type="service" id="api_platform.graphql.action.graphql_playground" on-invalid="null"/>
             <argument type="service" id="serializer" />
             <argument type="service" id="api_platform.graphql.error_handler" />
             <argument>%kernel.debug%</argument>
             <argument>%api_platform.graphql.graphiql.enabled%</argument>
-            <argument>%api_platform.graphql.graphql_playground.enabled%</argument>
             <argument>%api_platform.graphql.default_ide%</argument>
         </service>
 
@@ -63,14 +61,6 @@
             <argument type="service" id="twig" />
             <argument type="service" id="api_platform.router" />
             <argument>%api_platform.graphql.graphiql.enabled%</argument>
-            <argument>%api_platform.title%</argument>
-            <argument>%api_platform.asset_package%</argument>
-        </service>
-
-        <service id="api_platform.graphql.action.graphql_playground" class="ApiPlatform\GraphQl\Action\GraphQlPlaygroundAction" public="true">
-            <argument type="service" id="twig" />
-            <argument type="service" id="api_platform.router" />
-            <argument>%api_platform.graphql.graphql_playground.enabled%</argument>
             <argument>%api_platform.title%</argument>
             <argument>%api_platform.asset_package%</argument>
         </service>
