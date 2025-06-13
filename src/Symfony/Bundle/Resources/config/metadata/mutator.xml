@@ -6,5 +6,7 @@
 
     <services>
         <service id="api_platform.metadata.mutator_collection.resource" class="ApiPlatform\Metadata\Mutator\ResourceMutatorCollection" public="false" />
+
+        <service id="api_platform.metadata.mutator_collection.operation" class="ApiPlatform\Metadata\Mutator\OperationMutatorCollection" public="false" />
     </services>
 </container>
