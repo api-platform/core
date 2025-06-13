@@ -31,7 +31,11 @@ use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryItemResolverInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\AsOperationMutator;
+use ApiPlatform\Metadata\AsResourceMutator;
 use ApiPlatform\Metadata\FilterInterface;
+use ApiPlatform\Metadata\OperationMutatorInterface;
+use ApiPlatform\Metadata\ResourceMutatorInterface;
 use ApiPlatform\Metadata\UriVariableTransformerInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\OpenApi\Model\Tag;
@@ -184,6 +188,29 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
                 ->addTag('api_platform.resource')
                 ->addTag('container.excluded', ['source' => 'by #[ApiResource] attribute']);
         });
+        $container->registerAttributeForAutoconfiguration(AsResourceMutator::class,
+            static function (ChildDefinition $definition, AsResourceMutator $attribute, \ReflectionClass $reflector): void {
+                if (!is_a($reflector->name, ResourceMutatorInterface::class, true)) {
+                    throw new RuntimeException(sprintf('Resource mutator "%s" should implement %s', $reflector->name, ResourceMutatorInterface::class));
+                }
+
+                $definition->addTag('api_platform.resource_mutator', [
+                    'resourceClass' => $attribute->resourceClass,
+                ]);
+            },
+        );
+
+        $container->registerAttributeForAutoconfiguration(AsOperationMutator::class,
+            static function (ChildDefinition $definition, AsOperationMutator $attribute, \ReflectionClass $reflector): void {
+                if (!is_a($reflector->name, OperationMutatorInterface::class, true)) {
+                    throw new RuntimeException(sprintf('Operation mutator "%s" should implement %s', $reflector->name, OperationMutatorInterface::class));
+                }
+
+                $definition->addTag('api_platform.operation_mutator', [
+                    'operationName' => $attribute->operationName,
+                ]);
+            },
+        );
 
         if (!$container->has('api_platform.state.item_provider')) {
             $container->setAlias('api_platform.state.item_provider', 'api_platform.state_provider.object');
@@ -341,6 +368,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('metadata/property.xml');
         $loader->load('metadata/resource.xml');
         $loader->load('metadata/operation.xml');
+        $loader->load('metadata/mutator.xml');
 
         $container->getDefinition('api_platform.metadata.resource_extractor.xml')->replaceArgument(0, $xmlResources);
         $container->getDefinition('api_platform.metadata.property_extractor.xml')->replaceArgument(0, $xmlResources);
