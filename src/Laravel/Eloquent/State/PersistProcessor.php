@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -62,7 +63,7 @@ final class PersistProcessor implements ProcessorInterface
             if (HasMany::class === $relation['type'] || MorphMany::class === $relation['type']) {
                 $rel = $data->{$relation['name']};
 
-                if (!\is_array($rel)) {
+                if (!\is_array($rel) && !$rel instanceof Collection) {
                     throw new RuntimeException('To-Many relationship is not a collection.');
                 }
 
