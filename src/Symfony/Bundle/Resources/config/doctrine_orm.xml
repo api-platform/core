@@ -35,7 +35,7 @@
             <argument key="$orderNullsComparison">%api_platform.collection.order_nulls_comparison%</argument>
         </service>
         <service id="ApiPlatform\Doctrine\Orm\Filter\OrderFilter" alias="api_platform.doctrine.orm.order_filter" />
-        <service id="api_platform.doctrine.orm.date_filter.instance" parent="api_platform.doctrine.orm.date_filter">
+        <service id="api_platform.doctrine.orm.order_filter.instance" parent="api_platform.doctrine.orm.order_filter">
             <argument type="collection"></argument>
         </service>
 

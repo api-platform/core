@@ -16,10 +16,13 @@ namespace ApiPlatform\Tests\Functional\Parameters;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\WithParameter;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class ParameterTest extends ApiTestCase
 {
     use SetupClassResourcesTrait;
+
+    protected static ?bool $alwaysBootKernel = false;
 
     /**
      * @return class-string[]
@@ -32,6 +35,7 @@ final class ParameterTest extends ApiTestCase
     public function testWithGroupFilter(): void
     {
         $response = self::createClient()->request('GET', 'with_parameters/1?groups[]=b');
+        $this->assertArrayNotHasKey('a', $response->toArray());
         $this->assertArraySubset(['b' => 'bar'], $response->toArray());
         $response = self::createClient()->request('GET', 'with_parameters/1?groups[]=b&groups[]=a');
         $this->assertArraySubset(['a' => 'foo', 'b' => 'bar'], $response->toArray());
@@ -50,6 +54,12 @@ final class ParameterTest extends ApiTestCase
     }
 
     public function testWithServiceProvider(): void
+    {
+        $response = self::createClient()->request('GET', 'with_parameters/1?service=blabla');
+        $this->assertArrayNotHasKey('a', $response->toArray());
+    }
+
+    public function testWithObjectProvider(): void
     {
         $response = self::createClient()->request('GET', 'with_parameters/1?service=blabla');
         $this->assertArrayNotHasKey('a', $response->toArray());
@@ -87,8 +97,67 @@ final class ParameterTest extends ApiTestCase
     {
         $response = self::createClient()->request('GET', 'with_parameters_header_and_query?q=blabla', ['headers' => ['q' => '(complex stuff)']]);
         $this->assertEquals($response->toArray(), [
-            ['(complex stuff)'],
+            '(complex stuff)',
             'blabla',
         ]);
+    }
+
+    public function testHeaderAndQueryWithArray(): void
+    {
+        $response = self::createClient()->request('GET', 'with_parameters_header_and_query?q[]=blabla', ['headers' => ['q' => '(complex stuff)']]);
+        $this->assertEquals($response->toArray(), [
+            '(complex stuff)',
+            ['blabla'],
+        ]);
+    }
+
+    public function testHeaderParameterRequired(): void
+    {
+        self::createClient()->request('GET', 'header_required', ['headers' => ['req' => 'blabla']]);
+        $this->assertResponseStatusCodeSame(200);
+
+        self::createClient()->request('GET', 'header_required', ['headers' => []]);
+        $this->assertResponseStatusCodeSame(422);
+    }
+
+    #[DataProvider('provideHeaderValues')]
+    public function testHeaderParameterInteger(string $value, int $expectedStatusCode): void
+    {
+        self::createClient()->request('GET', 'header_integer', ['headers' => ['Foo' => $value]]);
+        $this->assertResponseStatusCodeSame($expectedStatusCode);
+    }
+
+    public static function provideHeaderValues(): iterable
+    {
+        yield 'valid integer' => ['3', 200];
+        yield 'too high' => ['6', 422];
+        yield 'too low' => ['0', 422];
+        yield 'invalid integer' => ['string', 422];
+    }
+
+    #[DataProvider('provideCountryValues')]
+    public function testIssue7157(string $queryParameter, int $expectedStatusCode): void
+    {
+        self::createClient()->request('GET', 'with_parameters_country?'.$queryParameter);
+        $this->assertResponseStatusCodeSame($expectedStatusCode);
+    }
+
+    public static function provideCountryValues(): iterable
+    {
+        yield 'valid country' => ['country=FR', 200];
+        yield 'array of countries' => ['country[]=FR', 422];
+    }
+
+    #[DataProvider('provideCountriesValues')]
+    public function testIssue7157WithCountries(string $queryParameter, int $expectedStatusCode): void
+    {
+        self::createClient()->request('GET', 'with_parameters_countries?'.$queryParameter);
+        $this->assertResponseStatusCodeSame($expectedStatusCode);
+    }
+
+    public static function provideCountriesValues(): iterable
+    {
+        yield 'valid country' => ['country=FR', 200];
+        yield 'array of countries' => ['country[]=FR', 200];
     }
 }

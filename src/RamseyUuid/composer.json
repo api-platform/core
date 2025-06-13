@@ -23,14 +23,15 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/metadata": "^3.4 || ^4.0",
+        "api-platform/metadata": "^4.1.11",
         "symfony/serializer": "^6.4 || ^7.0"
     },
     "require-dev": {
         "phpspec/prophecy-phpunit": "^2.2",
-        "ramsey/uuid": "^4.0",
+        "ramsey/uuid": "^4.7",
         "ramsey/uuid-doctrine": "^2.0",
-        "phpunit/phpunit": "^11.2"
+        "phpunit/phpunit": "11.5.x-dev",
+        "symfony/type-info": "^7.3"
     },
     "autoload": {
         "psr-4": {
@@ -49,7 +50,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "4.0.x-dev",
+            "dev-main": "4.2.x-dev",
             "dev-3.4": "3.4.x-dev"
         },
         "symfony": {
@@ -62,5 +63,11 @@
     },
     "scripts": {
         "test": "./vendor/bin/phpunit"
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/soyuka/phpunit"
+        }
+    ]
 }

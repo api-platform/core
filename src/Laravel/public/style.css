@@ -11,7 +11,6 @@ html {
 }
 
 body {
-  margin: 70px 0 0;
   background: #f0f0f0;
 }
 
@@ -58,27 +57,6 @@ header #logo img {
   top: 0;
 }
 
-/* .web:after { */
-/*   content: ""; */
-/*   opacity: 0; */
-/*   width: 2px; */
-/*   height: 70px; */
-/*   position: fixed; */
-/*   right: 35px; */
-/*   background-color: black; */
-/* } */
-
-/* .web.calm:after { */
-/*   opacity: .2; */
-/*   height: calc(100% - 120px); */
-/*   transition: height 2s ease-in-out 2s, opacity 0s linear 2s; */
-/* } */
-/**/
-/* .web.frighten:after { */
-/*   opacity: .2; */
-/*   transition: height 1s ease-in-out; */
-/* } */
-
 .webby_car {
   position: fixed;
   top: 10px;
@@ -117,7 +95,7 @@ header #logo img {
   50% {
     opacity: 1;
     transform: scale(1);
-  } 
+  }
   100% {
     opacity: 0;
     transform: scale(1);
@@ -169,7 +147,7 @@ header #logo img {
   width: 100%;
   max-width: 1460px;
   padding: 0 50px;
-  margin: 0 auto;
+  margin: 80px 0 auto;
 }
 
 /** METHODS BLOCKS **/

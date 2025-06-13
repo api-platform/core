@@ -677,3 +677,20 @@ Feature: GraphQL query support
     Then the response status code should be 200
     And the header "Content-Type" should be equal to "application/json"
     And the JSON node "data.getSecurityAfterResolver.name" should be equal to "test"
+
+
+  Scenario: Call security after resolver with 403 error (ensure /2 does not match securityAfterResolver)
+    When I send the following GraphQL request:
+    """"
+    {
+      getSecurityAfterResolver(id: "/security_after_resolvers/2") {
+        name
+      }
+    }
+    """
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/json"
+    And the JSON node "errors[0].extensions.status" should be equal to 403
+    And the JSON node "errors[0].message" should be equal to "Access Denied."
+    And the JSON node "data.getSecurityAfterResolver.name" should not exist

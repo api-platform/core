@@ -13,15 +13,14 @@ declare(strict_types=1);
 
 namespace Workbench\App\Models;
 
-use ApiPlatform\JsonApi\Filter\SparseFieldset;
 use ApiPlatform\Laravel\Eloquent\Filter\BooleanFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\DateFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\EqualsFilter;
-use ApiPlatform\Laravel\Eloquent\Filter\JsonApi\SortFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\OrderFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\OrFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\PartialSearchFilter;
 use ApiPlatform\Laravel\Eloquent\Filter\RangeFilter;
+use ApiPlatform\Laravel\workbench\app\Enums\BookStatus;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -81,17 +80,16 @@ use Workbench\App\Http\Requests\BookFormRequest;
 )]
 #[QueryParameter(key: 'properties', filter: PropertyFilter::class)]
 #[QueryParameter(key: 'published', filter: BooleanFilter::class)]
-#[QueryParameter(key: 'fields', filter: SparseFieldset::class)]
-#[QueryParameter(key: 'sort', filter: SortFilter::class)]
 class Book extends Model
 {
     use HasFactory;
     use HasUlids;
 
-    protected $visible = ['name', 'author', 'isbn', 'publication_date', 'published', 'is_available'];
-    protected $fillable = ['name', 'is_available'];
+    protected $visible = ['name', 'author', 'isbn', 'status', 'publication_date', 'is_available', 'published'];
+    protected $fillable = ['name', 'status', 'publication_date', 'isbn', 'is_available', 'published'];
     protected $casts = [
         'is_available' => 'boolean',
+        'status' => BookStatus::class,
     ];
 
     public function author(): BelongsTo

@@ -32,7 +32,7 @@ use Doctrine\Common\Collections\Collection;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\TypeInfo\Type;
 
 class LinkResourceMetadataCollectionFactoryTest extends TestCase
 {
@@ -49,15 +49,15 @@ class LinkResourceMetadataCollectionFactoryTest extends TestCase
         ]));
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'id')->willReturn(new ApiProperty());
-        $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'foo')->willReturn((new ApiProperty())->withBuiltinTypes([
-            new Type(Type::BUILTIN_TYPE_OBJECT, false, Collection::class, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)),
-        ]));
-        $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'foo2')->willReturn((new ApiProperty())->withBuiltinTypes([
-            new Type(Type::BUILTIN_TYPE_OBJECT, false, Collection::class, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)),
-        ]));
-        $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'bar')->willReturn((new ApiProperty())->withBuiltinTypes([
-            new Type(Type::BUILTIN_TYPE_OBJECT, false, Collection::class, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)),
-        ]));
+        $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'foo')->willReturn((new ApiProperty())->withNativeType(
+            Type::collection(Type::object(Collection::class), key: Type::int(), value: Type::object(Dummy::class)),
+        ));
+        $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'foo2')->willReturn((new ApiProperty())->withNativeType(
+            Type::collection(Type::object(Collection::class), key: Type::int(), value: Type::object(Dummy::class)),
+        ));
+        $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'bar')->willReturn((new ApiProperty())->withNativeType(
+            Type::collection(Type::object(Collection::class), key: Type::int(), value: Type::object(RelatedDummy::class)),
+        ));
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
         $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
@@ -104,9 +104,9 @@ class LinkResourceMetadataCollectionFactoryTest extends TestCase
         ]));
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'identifier')->willReturn((new ApiProperty())->withIdentifier(true));
-        $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'dummy')->willReturn((new ApiProperty())->withBuiltinTypes([
-            new Type(Type::BUILTIN_TYPE_OBJECT, false, Collection::class, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)),
-        ]));
+        $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'dummy')->willReturn((new ApiProperty())->withNativeType(
+            Type::collection(Type::object(Collection::class), key: Type::int(), value: Type::object(Dummy::class)),
+        ));
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
         $linkFactory = new LinkFactory($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal());

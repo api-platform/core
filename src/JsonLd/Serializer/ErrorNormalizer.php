@@ -40,10 +40,14 @@ final class ErrorNormalizer implements NormalizerInterface
 
         if (isset($normalized['description'])) {
             $normalized['hydra:description'] = $normalized['description'];
+            unset($normalized['description']);
         }
 
         if (isset($normalized['title'])) {
             $normalized['hydra:title'] = $normalized['title'];
+            // this is confusing as the field is also available in the Problem Detail Json representation
+            // but we don't want to repeat the title in the response, tldr: use hydra without prefix
+            unset($normalized['title']);
         }
 
         return $normalized;

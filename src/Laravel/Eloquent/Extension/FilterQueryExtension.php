@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Laravel\Eloquent\Extension;
 
 use ApiPlatform\Laravel\Eloquent\Filter\FilterInterface;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ParameterNotFound;
 use Illuminate\Database\Eloquent\Builder;
@@ -36,6 +37,10 @@ final readonly class FilterQueryExtension implements QueryExtensionInterface
      */
     public function apply(Builder $builder, array $uriVariables, Operation $operation, $context = []): Builder
     {
+        if (!$operation instanceof CollectionOperationInterface) {
+            return $builder;
+        }
+
         $context['uri_variables'] = $uriVariables;
         $context['operation'] = $operation;
 
@@ -46,6 +51,11 @@ final readonly class FilterQueryExtension implements QueryExtensionInterface
 
             if (null === ($filterId = $parameter->getFilter())) {
                 continue;
+            }
+
+            // most eloquent filters work with only a single value
+            if (\is_array($values) && array_is_list($values) && 1 === \count($values)) {
+                $values = current($values);
             }
 
             $filter = $filterId instanceof FilterInterface ? $filterId : ($this->filterLocator->has($filterId) ? $this->filterLocator->get($filterId) : null);

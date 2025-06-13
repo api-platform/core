@@ -33,9 +33,9 @@ Feature: Documentation support
     And the JSON node "hydra:description" should contain "Made with love"
     And the JSON node "hydra:entrypoint" should be equal to "/"
     # Supported classes
-    And the Hydra class "The API entrypoint" exists
-    And the Hydra class "A constraint violation" exists
-    And the Hydra class "A constraint violation list" exists
+    And the Hydra class "Entrypoint" exists
+    And the Hydra class "ConstraintViolation" exists
+    And the Hydra class "ConstraintViolationList" exists
     And the Hydra class "CircularReference" exists
     And the Hydra class "CustomIdentifierDummy" exists
     And the Hydra class "CustomNormalizedDummy" exists
@@ -49,7 +49,6 @@ Feature: Documentation support
     # Doc
     And the value of the node "@id" of the Hydra class "Dummy" is "#Dummy"
     And the value of the node "@type" of the Hydra class "Dummy" is "hydra:Class"
-    And the value of the node "rdfs:label" of the Hydra class "Dummy" is "Dummy"
     And the value of the node "hydra:title" of the Hydra class "Dummy" is "Dummy"
     And the value of the node "hydra:description" of the Hydra class "Dummy" is "Dummy."
     # Properties
@@ -62,7 +61,7 @@ Feature: Documentation support
     And the value of the node "@type" of the property "name" of the Hydra class "Dummy" is "hydra:SupportedProperty"
     And the value of the node "hydra:property.@id" of the property "name" of the Hydra class "Dummy" is "https://schema.org/name"
     And the value of the node "hydra:property.@type" of the property "name" of the Hydra class "Dummy" is "rdf:Property"
-    And the value of the node "hydra:property.rdfs:label" of the property "name" of the Hydra class "Dummy" is "name"
+    And the value of the node "hydra:property.label" of the property "name" of the Hydra class "Dummy" is "name"
     And the value of the node "hydra:property.domain" of the property "name" of the Hydra class "Dummy" is "#Dummy"
     And the value of the node "hydra:property.range" of the property "name" of the Hydra class "Dummy" is "xmls:string"
     And the value of the node "hydra:property.range" of the property "relatedDummy" of the Hydra class "Dummy" is "https://schema.org/Product"
@@ -74,14 +73,16 @@ Feature: Documentation support
     And the value of the node "@type" of the operation "GET" of the Hydra class "Dummy" contains "hydra:Operation"
     And the value of the node "@type" of the operation "GET" of the Hydra class "Dummy" contains "schema:FindAction"
     And the value of the node "hydra:method" of the operation "GET" of the Hydra class "Dummy" is "GET"
-    And the value of the node "hydra:title" of the operation "GET" of the Hydra class "Dummy" is "Retrieves a Dummy resource."
-    And the value of the node "rdfs:label" of the operation "GET" of the Hydra class "Dummy" is "Retrieves a Dummy resource."
+    And the value of the node "hydra:title" of the operation "GET" of the Hydra class "Dummy" is "getDummy"
+    And the value of the node "hydra:description" of the operation "GET" of the Hydra class "Dummy" is "Retrieves a Dummy resource."
     And the value of the node "returns" of the operation "GET" of the Hydra class "Dummy" is "Dummy"
-    And the value of the node "hydra:title" of the operation "PUT" of the Hydra class "Dummy" is "Replaces the Dummy resource."
-    And the value of the node "hydra:title" of the operation "DELETE" of the Hydra class "Dummy" is "Deletes the Dummy resource."
+    And the value of the node "hydra:title" of the operation "PUT" of the Hydra class "Dummy" is "putDummy"
+    And the value of the node "hydra:description" of the operation "PUT" of the Hydra class "Dummy" is "Replaces the Dummy resource."
+    And the value of the node "hydra:description" of the operation "DELETE" of the Hydra class "Dummy" is "Deletes the Dummy resource."
+    And the value of the node "hydra:title" of the operation "DELETE" of the Hydra class "Dummy" is "deleteDummy"
     And the value of the node "returns" of the operation "DELETE" of the Hydra class "Dummy" is "owl:Nothing"
     # Deprecations
     And the boolean value of the node "owl:deprecated" of the Hydra class "DeprecatedResource" is true
     And the boolean value of the node "hydra:property.owl:deprecated" of the property "deprecatedField" of the Hydra class "DeprecatedResource" is true
-    And the boolean value of the node "owl:deprecated" of the property "The collection of DeprecatedResource resources" of the Hydra class "The API entrypoint" is true
+    And the boolean value of the node "owl:deprecated" of the property "getDeprecatedResourceCollection" of the Hydra class "Entrypoint" is true
     And the boolean value of the node "owl:deprecated" of the operation "GET" of the Hydra class "DeprecatedResource" is true

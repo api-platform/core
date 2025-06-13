@@ -8,6 +8,8 @@
         <service id="api_platform.hydra.json_schema.schema_factory" class="ApiPlatform\Hydra\JsonSchema\SchemaFactory" decorates="api_platform.json_schema.schema_factory">
             <argument type="service" id="api_platform.hydra.json_schema.schema_factory.inner" />
             <argument>%api_platform.serializer.default_context%</argument>
+            <argument type="service" id="api_platform.json_schema.definition_name_factory" on-invalid="ignore"/>
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" on-invalid="ignore" />
         </service>
         <service id="api_platform.hydra.normalizer.documentation" class="ApiPlatform\Hydra\Serializer\DocumentationNormalizer" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
@@ -17,6 +19,7 @@
             <argument type="service" id="api_platform.router" />
             <argument type="service" id="api_platform.name_converter" on-invalid="ignore" />
             <argument>%api_platform.serializer.default_context%</argument>
+            <argument>%api_platform.enable_entrypoint%</argument>
 
             <tag name="serializer.normalizer" priority="-800" />
         </service>
@@ -42,7 +45,6 @@
             <argument type="service" id="api_platform.jsonld.context_builder" />
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.iri_converter" />
-            <argument>null</argument>
             <argument>%api_platform.serializer.default_context%</argument>
 
             <!-- Run after api_platform.jsonld.normalizer.object but before serializer.normalizer.object and serializer.denormalizer.array -->

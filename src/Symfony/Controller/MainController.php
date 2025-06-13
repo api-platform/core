@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Controller;
 
-use ApiPlatform\Metadata\Error;
 use ApiPlatform\Metadata\Exception\InvalidIdentifierException;
 use ApiPlatform\Metadata\Exception\InvalidUriVariableException;
 use ApiPlatform\Metadata\Exception\RuntimeException;
@@ -22,6 +21,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\UriVariablesConverterInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\State\SerializerContextBuilderInterface;
 use ApiPlatform\State\UriVariablesResolverTrait;
 use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
 use Psr\Log\LoggerInterface;
@@ -48,12 +48,13 @@ final class MainController
     public function __invoke(Request $request): Response
     {
         $operation = $this->initializeOperation($request);
-        if (!$operation) {
-            throw new RuntimeException('Not an API operation.');
+
+        if (!$operation || !$operation instanceof HttpOperation) {
+            throw new RuntimeException('Not an HTTP API operation.');
         }
 
         $uriVariables = [];
-        if (!$operation instanceof Error) {
+        if (!$request->attributes->has('exception')) {
             try {
                 $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $operation->getClass());
                 $request->attributes->set('_api_uri_variables', $uriVariables);
@@ -72,12 +73,22 @@ final class MainController
             $operation = $operation->withValidate(!$request->isMethodSafe() && !$request->isMethod('DELETE'));
         }
 
-        if (null === $operation->canRead() && $operation instanceof HttpOperation) {
+        if (null === $operation->canRead()) {
             $operation = $operation->withRead($operation->getUriVariables() || $request->isMethodSafe());
         }
 
-        if (null === $operation->canDeserialize() && $operation instanceof HttpOperation) {
+        if (null === $operation->canDeserialize()) {
             $operation = $operation->withDeserialize(\in_array($operation->getMethod(), ['POST', 'PUT', 'PATCH'], true));
+        }
+
+        $denormalizationContext = $operation->getDenormalizationContext() ?? [];
+        if ($operation->canDeserialize() && !isset($denormalizationContext[SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE])) {
+            $method = $operation->getMethod();
+            $assignObjectToPopulate = 'POST' === $method
+                || 'PATCH' === $method
+                || ('PUT' === $method && !($operation->getExtraProperties()['standard_put'] ?? true));
+
+            $operation = $operation->withDenormalizationContext($denormalizationContext + [SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE => $assignObjectToPopulate]);
         }
 
         $body = $this->provider->provide($operation, $uriVariables, $context);
@@ -86,7 +97,7 @@ final class MainController
         if ($request->attributes->get('_api_operation') !== $operation) {
             $operation = $this->initializeOperation($request);
 
-            if (!$operation instanceof Error) {
+            if (!$request->attributes->has('exception')) {
                 try {
                     $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $operation->getClass());
                 } catch (InvalidIdentifierException|InvalidUriVariableException $e) {

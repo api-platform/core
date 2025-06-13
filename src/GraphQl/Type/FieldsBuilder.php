@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\Type;
 
-use ApiPlatform\Doctrine\Odm\State\Options as ODMOptions;
-use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\GraphQl\Exception\InvalidTypeException;
 use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactoryInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface;
@@ -30,6 +28,8 @@ use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\Inflector;
+use ApiPlatform\Metadata\Util\PropertyInfoToTypeInfoHelper;
+use ApiPlatform\Metadata\Util\TypeHelper;
 use ApiPlatform\State\Pagination\Pagination;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\ListOfType;
@@ -38,10 +38,15 @@ use GraphQL\Type\Definition\NullableType;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use GraphQL\Type\Definition\WrappingType;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
  * Builds the GraphQL fields.
@@ -82,7 +87,7 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
 
         $fieldName = lcfirst('item_query' === $operation->getName() ? $operation->getShortName() : $operation->getName().$operation->getShortName());
 
-        if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $operation->getDescription(), $operation->getDeprecationReason(), new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass), $resourceClass, false, $operation)) {
+        if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $operation->getDescription(), $operation->getDeprecationReason(), Type::nullable(Type::object($resourceClass)), $resourceClass, false, $operation)) {
             $args = $this->resolveResourceArgs($configuration['args'] ?? [], $operation);
             $extraArgs = $this->resolveResourceArgs($operation->getExtraArgs() ?? [], $operation);
             $configuration['args'] = $args ?: $configuration['args'] ?? ['id' => ['type' => GraphQLType::nonNull(GraphQLType::id())]] + $extraArgs;
@@ -104,7 +109,7 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
 
         $fieldName = lcfirst('collection_query' === $operation->getName() ? $operation->getShortName() : $operation->getName().$operation->getShortName());
 
-        if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $operation->getDescription(), $operation->getDeprecationReason(), new Type(Type::BUILTIN_TYPE_OBJECT, false, null, true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, $resourceClass)), $resourceClass, false, $operation)) {
+        if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $operation->getDescription(), $operation->getDeprecationReason(), Type::collection(Type::object(\stdClass::class), Type::object($resourceClass)), $resourceClass, false, $operation)) {
             $args = $this->resolveResourceArgs($configuration['args'] ?? [], $operation);
             $extraArgs = $this->resolveResourceArgs($operation->getExtraArgs() ?? [], $operation);
             $configuration['args'] = $args ?: $configuration['args'] ?? $fieldConfiguration['args'] + $extraArgs;
@@ -121,7 +126,7 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
     public function getMutationFields(string $resourceClass, Operation $operation): array
     {
         $mutationFields = [];
-        $resourceType = new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass);
+        $resourceType = Type::nullable(Type::object($resourceClass));
         $description = $operation->getDescription() ?? ucfirst("{$operation->getName()}s a {$operation->getShortName()}.");
 
         if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $description, $operation->getDeprecationReason(), $resourceType, $resourceClass, false, $operation)) {
@@ -139,7 +144,7 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
     public function getSubscriptionFields(string $resourceClass, Operation $operation): array
     {
         $subscriptionFields = [];
-        $resourceType = new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass);
+        $resourceType = Type::nullable(Type::object($resourceClass));
         $description = $operation->getDescription() ?? \sprintf('Subscribes to the action event of a %s.', $operation->getShortName());
 
         if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $description, $operation->getDeprecationReason(), $resourceType, $resourceClass, false, $operation)) {
@@ -215,22 +220,37 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
                     'denormalization_groups' => $operation->getDenormalizationContext()['groups'] ?? null,
                 ];
                 $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property, $context);
-                $propertyTypes = $propertyMetadata->getBuiltinTypes();
 
-                if (
-                    !$propertyTypes
-                    || (!$input && false === $propertyMetadata->isReadable())
-                    || ($input && false === $propertyMetadata->isWritable())
-                ) {
-                    continue;
-                }
+                if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
+                    $propertyTypes = $propertyMetadata->getBuiltinTypes();
 
-                // guess union/intersect types: check each type until finding a valid one
-                foreach ($propertyTypes as $propertyType) {
+                    if (
+                        !$propertyTypes
+                        || (!$input && false === $propertyMetadata->isReadable())
+                        || ($input && false === $propertyMetadata->isWritable())
+                    ) {
+                        continue;
+                    }
+
+                    // guess union/intersect types: check each type until finding a valid one
+                    foreach ($propertyTypes as $propertyType) {
+                        if ($fieldConfiguration = $this->getResourceFieldConfiguration($property, $propertyMetadata->getDescription(), $propertyMetadata->getDeprecationReason(), $propertyType, $resourceClass, $input, $operation, $depth, null !== $propertyMetadata->getSecurity())) {
+                            $fields['id' === $property ? '_id' : $this->normalizePropertyName($property, $resourceClass)] = $fieldConfiguration;
+                            // stop at the first valid type
+                            break;
+                        }
+                    }
+                } else {
+                    if (
+                        !($propertyType = $propertyMetadata->getNativeType())
+                        || (!$input && false === $propertyMetadata->isReadable())
+                        || ($input && false === $propertyMetadata->isWritable())
+                    ) {
+                        continue;
+                    }
+
                     if ($fieldConfiguration = $this->getResourceFieldConfiguration($property, $propertyMetadata->getDescription(), $propertyMetadata->getDeprecationReason(), $propertyType, $resourceClass, $input, $operation, $depth, null !== $propertyMetadata->getSecurity())) {
                         $fields['id' === $property ? '_id' : $this->normalizePropertyName($property, $resourceClass)] = $fieldConfiguration;
-                        // stop at the first valid type
-                        break;
                     }
                 }
             }
@@ -303,8 +323,12 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
         $fields = [];
         foreach ($flattenFields as $field) {
             $key = $field['name'];
-            $type = $this->getParameterType(\in_array($field['type'], Type::$builtinTypes, true) ? new Type($field['type'], !$field['required']) : new Type('object', !$field['required'], $field['type']));
+            $type = \in_array($field['type'], TypeIdentifier::values(), true) ? Type::builtin($field['type']) : Type::object($field['type']);
+            if (!$field['required']) {
+                $type = Type::nullable($type);
+            }
 
+            $type = $this->getParameterType($type);
             if (\is_array($l = $field['leafs'])) {
                 if (0 === key($l)) {
                     $key = $key;
@@ -345,16 +369,27 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
      */
     private function getParameterType(Type $type): GraphQLType
     {
-        return match ($type->getBuiltinType()) {
-            Type::BUILTIN_TYPE_BOOL => GraphQLType::boolean(),
-            Type::BUILTIN_TYPE_INT => GraphQLType::int(),
-            Type::BUILTIN_TYPE_FLOAT => GraphQLType::float(),
-            Type::BUILTIN_TYPE_STRING => GraphQLType::string(),
-            Type::BUILTIN_TYPE_ARRAY => GraphQLType::listOf($this->getParameterType($type->getCollectionValueTypes()[0])),
-            Type::BUILTIN_TYPE_ITERABLE => GraphQLType::listOf($this->getParameterType($type->getCollectionValueTypes()[0])),
-            Type::BUILTIN_TYPE_OBJECT => GraphQLType::string(),
-            default => GraphQLType::string(),
-        };
+        if ($type->isIdentifiedBy(TypeIdentifier::BOOL)) {
+            return GraphQLType::boolean();
+        }
+
+        if ($type->isIdentifiedBy(TypeIdentifier::INT)) {
+            return GraphQLType::int();
+        }
+
+        if ($type->isIdentifiedBy(TypeIdentifier::FLOAT)) {
+            return GraphQLType::float();
+        }
+
+        if ($type->isIdentifiedBy(TypeIdentifier::STRING, TypeIdentifier::OBJECT)) {
+            return GraphQLType::string();
+        }
+
+        if ($type instanceof CollectionType) {
+            return GraphQLType::listOf($this->getParameterType($type->getCollectionValueType()));
+        }
+
+        return GraphQLType::string();
     }
 
     /**
@@ -362,22 +397,30 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
      *
      * @see http://webonyx.github.io/graphql-php/type-system/object-types/
      */
-    private function getResourceFieldConfiguration(?string $property, ?string $fieldDescription, ?string $deprecationReason, Type $type, string $rootResource, bool $input, Operation $rootOperation, int $depth = 0, bool $forceNullable = false): ?array
+    private function getResourceFieldConfiguration(?string $property, ?string $fieldDescription, ?string $deprecationReason, Type|LegacyType $type, string $rootResource, bool $input, Operation $rootOperation, int $depth = 0, bool $forceNullable = false): ?array
     {
-        try {
-            $isCollectionType = $this->typeBuilder->isCollection($type);
+        if ($type instanceof LegacyType) {
+            $type = PropertyInfoToTypeInfoHelper::convertLegacyTypesToType([$type]);
+        }
 
-            if (
-                $isCollectionType
-                && $collectionValueType = $type->getCollectionValueTypes()[0] ?? null
-            ) {
-                $resourceClass = $collectionValueType->getClassName();
-            } else {
-                $resourceClass = $type->getClassName();
+        try {
+            $isCollectionType = $type->isSatisfiedBy(fn ($t) => $t instanceof CollectionType) && ($v = TypeHelper::getCollectionValueType($type)) && TypeHelper::getClassName($v);
+
+            $valueType = $type;
+            if ($isCollectionType) {
+                $valueType = TypeHelper::getCollectionValueType($type);
             }
 
+            /** @var class-string|null $resourceClass */
+            $resourceClass = null;
+            $typeIsResourceClass = function (Type $type) use (&$resourceClass): bool {
+                return $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($resourceClass = $type->getClassName());
+            };
+
+            $isResourceClass = $valueType->isSatisfiedBy($typeIsResourceClass);
+
             $resourceOperation = $rootOperation;
-            if ($resourceClass && $depth >= 1 && $this->resourceClassResolver->isResourceClass($resourceClass)) {
+            if ($resourceClass && $depth >= 1 && $isResourceClass) {
                 $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
                 $resourceOperation = $resourceMetadataCollection->getOperation($isCollectionType ? 'collection_query' : 'item_query');
             }
@@ -415,7 +458,15 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
                     }
 
                     $args = $this->getFilterArgs($args, $resourceClass, $rootResource, $resourceOperation, $rootOperation, $property, $depth);
-                    $args = $this->getParameterArgs($rootOperation, $args);
+
+                    // Also register parameter args in the types container
+                    // Note: This is a workaround, for more information read the comment on the parameterToObjectType function.
+                    foreach ($this->getParameterArgs($rootOperation) as $key => $arg) {
+                        if ($arg instanceof InputObjectType || (\is_array($arg) && isset($arg['name']))) {
+                            $this->typesContainer->set(\is_array($arg) ? $arg['name'] : $arg->name(), $arg);
+                        }
+                        $args[$key] = $arg;
+                    }
                 }
             }
 
@@ -555,20 +606,11 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
                 continue;
             }
 
-            $entityClass = $resourceClass;
-            if ($options = $resourceOperation->getStateOptions()) {
-                if (class_exists(Options::class) && $options instanceof Options && $options->getEntityClass()) {
-                    $entityClass = $options->getEntityClass();
+            foreach ($this->filterLocator->get($filterId)->getDescription($resourceClass) as $key => $description) {
+                $filterType = \in_array($description['type'], TypeIdentifier::values(), true) ? Type::builtin($description['type']) : Type::object($description['type']);
+                if (!($description['required'] ?? false)) {
+                    $filterType = Type::nullable($filterType);
                 }
-
-                if (class_exists(ODMOptions::class) && $options instanceof ODMOptions && $options->getDocumentClass()) {
-                    $entityClass = $options->getDocumentClass();
-                }
-            }
-
-            foreach ($this->filterLocator->get($filterId)->getDescription($entityClass) as $key => $description) {
-                $nullable = isset($description['required']) ? !$description['required'] : true;
-                $filterType = \in_array($description['type'], Type::$builtinTypes, true) ? new Type($description['type'], $nullable) : new Type('object', $nullable, $description['type']);
                 $graphqlFilterType = $this->convertType($filterType, false, $resourceOperation, $rootOperation, $resourceClass, $rootResource, $property, $depth);
 
                 if (str_ends_with($key, '[]')) {
@@ -657,12 +699,16 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
      *
      * @throws InvalidTypeException
      */
-    private function convertType(Type $type, bool $input, Operation $resourceOperation, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth, bool $forceNullable = false): GraphQLType|ListOfType|NonNull
+    private function convertType(Type|LegacyType $type, bool $input, Operation $resourceOperation, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth, bool $forceNullable = false): GraphQLType|ListOfType|NonNull
     {
-        $graphqlType = $this->typeConverter->convertType($type, $input, $rootOperation, $resourceClass, $rootResource, $property, $depth);
+        if ($type instanceof LegacyType) {
+            $type = PropertyInfoToTypeInfoHelper::convertLegacyTypesToType([$type]);
+        }
+
+        $graphqlType = $this->typeConverter->convertPhpType($type, $input, $rootOperation, $resourceClass, $rootResource, $property, $depth);
 
         if (null === $graphqlType) {
-            throw new InvalidTypeException(\sprintf('The type "%s" is not supported.', $type->getBuiltinType()));
+            throw new InvalidTypeException(\sprintf('The type "%s" is not supported.', (string) $type));
         }
 
         if (\is_string($graphqlType)) {
@@ -673,7 +719,7 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
             $graphqlType = $this->typesContainer->get($graphqlType);
         }
 
-        if ($this->typeBuilder->isCollection($type)) {
+        if ($type->isSatisfiedBy(fn ($t) => $t instanceof CollectionType) && ($collectionValueType = TypeHelper::getCollectionValueType($type)) && TypeHelper::getClassName($collectionValueType)) {
             if (!$input && !$this->isEnumClass($resourceClass) && $this->pagination->isGraphQlEnabled($resourceOperation)) {
                 return $this->typeBuilder->getPaginatedCollectionType($graphqlType, $resourceOperation);
             }

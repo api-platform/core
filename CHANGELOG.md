@@ -1,5 +1,321 @@
 # Changelog
 
+## v4.1.11 - v4.1.12
+
+### Bug fixes
+
+* [b14a463a9](https://github.com/api-platform/core/commit/b14a463a9da8a285eba1b0adc63ca4121efb0dce) fix(laravel): register error handler without graphql
+
+## v4.1.10
+
+### Bug fixes
+
+* [329acf21e](https://github.com/api-platform/core/commit/329acf21e3a8618136a21b9121c5891f1fe6b9e8) fix(metadata): infer parameter string type from schema (#7161)
+* [5459ba375](https://github.com/api-platform/core/commit/5459ba375b0e7ffd1c783a6e18a6452769eaff46) fix(metadata): parameter cast to array flag (#7160)
+* [fe73002bf](https://github.com/api-platform/core/commit/fe73002bf5ae64adb1eb9e310dc62ff158de094d) fix(laravel): duplicated property names
+* [b0390080e](https://github.com/api-platform/core/commit/b0390080e90be9ac494c8b4d968e59a4962f32ca) fix(laravel): name convert validation property path
+* [730d17a30](https://github.com/api-platform/core/commit/730d17a306df4b92082484a19e82c5e150537331) fix(laravel): validate the model instead of body
+* [4d66f5ef3](https://github.com/api-platform/core/commit/4d66f5ef313fe3857611e8345702a10019c79ec5) fix(laravel): persist embeded relations with groups
+* [39123942a](https://github.com/api-platform/core/commit/39123942a0e1ff9dfb1e46f4a410160e3cd3fbd7) fix(laravel): register error handler without graphql
+* [fd010ea1b](https://github.com/api-platform/core/commit/fd010ea1be86073f5d8905d5640846390ade7ce6) fix(openapi): nullable externalDocs return type
+* [470c2e8bd](https://github.com/api-platform/core/commit/470c2e8bdf8d7a7502c02d2b681ced2001e2c1cc) fix(httpcache): iri cache tag for collection operation with path parameter
+* [9c0dbb653](https://github.com/api-platform/core/commit/9c0dbb65319beb89193e653e14c99352ac529a55) fix(state): do not expose FQCN in DeserializeProvider on PartialDenormalizationException (#7158)
+* [f78986000](https://github.com/api-platform/core/commit/f789860009888582791611a31d6084c620050615) fix(serializer): exception message to not expose resource FQCN (#7156)
+
+### Features
+
+* [767fa926b](https://github.com/api-platform/core/commit/767fa926b10bef771e896300b8e796287392d8c0) feat(laravel): add name_converter option
+
+## v4.1.9
+
+### Bug fixes
+
+* [4dd0cdfc4](https://github.com/api-platform/core/commit/4dd0cdfc4a7f4cc73e7e67a49ee790ed1aaf5707) fix(doctrine): support integer-backed enums in BackedEnumFilter (#7127)
+* [70a922573](https://github.com/api-platform/core/commit/70a9225737bece18ad4b66b8ac636c38b2a1008a) fix: error formats (#7148)
+* [723d041c4](https://github.com/api-platform/core/commit/723d041c47467d8be0d8a0f20431da9de0a87c5a) fix(metadata): xml PHPize HTTP cache headers (#7140)
+* [d3d0ca21b](https://github.com/api-platform/core/commit/d3d0ca21bd45a8383e3e51166a65162be93655bf) fix(serializer): invalid uri variable 400 response (#7135)
+
+## v4.1.8
+
+### Bug fixes
+
+* [0cd9b9f70](https://github.com/api-platform/core/commit/0cd9b9f7002829a6238ed4a1731c3a123c4a91c4) fix: backport handling of union/intersection type in item normalizer (#7106)
+* [0fc0904b9](https://github.com/api-platform/core/commit/0fc0904b9409e81041d4d5ae48d699f3360208fc) fix(metadata): correct class to exclude defaults (#7088)
+* [5145a8383](https://github.com/api-platform/core/commit/5145a8383c8e234012b957a36701ec824774a817) fix: filtering not using strategy set in attribute when strategy not set per property (#7136)
+* [613bb5b75](https://github.com/api-platform/core/commit/613bb5b75fe6cbc79c99e06bcbd664fc3f25c167) fix(doctrine): filters schema for dates and numbers (#7131)
+* [ed1ef2594](https://github.com/api-platform/core/commit/ed1ef2594e72180e5fe153e762809e3c22b29e7f) fix(state): specify :property parameter properties (#7110)
+* [f55606b01](https://github.com/api-platform/core/commit/f55606b01179703fb4be44f1b66a36136852f154) fix(serializer): throw NotNormalizableValueException when resource not found or invalid IRI on denormalization
+* [3faf5d4b4](https://github.com/api-platform/core/commit/3faf5d4b44f7c39d7a9d6ecbcfdf90f7061f1b6f) fix(doctrine): order filter instance service
+* [0ff950f37](https://github.com/api-platform/core/commit/0ff950f376345ff6a6d39a202b8bef15c3e423d2) fix: type info deprecations to baseline
+* [d93d580a1](https://github.com/api-platform/core/commit/d93d580a1dbaf6a1af5f05f0ebde2f7b68d75d25) fix: command name deprecation
+
+## v4.1.7
+
+### Bug fixes
+
+* [40c09d1c0](https://github.com/api-platform/core/commit/40c09d1c0560ec5c2a96391faf9fbe328f6f2f97) fix(metadata): yaml link security (#7066)
+* [545eb69b8](https://github.com/api-platform/core/commit/545eb69b86797f436b8c494912513e1ef9064550) fix(symfony): internal resources should not inherit global defaults (#7073)
+* [615bdd6b1](https://github.com/api-platform/core/commit/615bdd6b1c372f6438c6460dfcce69ef6c746e08) fix(hydra): use correctly enable_docs (#7062)
+* [694681f4b](https://github.com/api-platform/core/commit/694681f4b187688dd41de1912637003a2fb313a2) fix(symfony): do not ignore Test files on symfony (#7077)
+* [6f15be5c7](https://github.com/api-platform/core/commit/6f15be5c7badf197f10bb7d57dd79373f855ef20) fix(laravel): eloquent BelongsTo linking (#7075)
+* [dddd3eee4](https://github.com/api-platform/core/commit/dddd3eee40af2e8126476ce3fe4c69f33ec15ac0) fix(metadata): parameter provider within filter (#7081)
+* [dfca9bf60](https://github.com/api-platform/core/commit/dfca9bf6023c5535ce7ee9b3829a8efd7f1f9398) Revert "fix(jsonld): duplicate error fields when prefix is enabled (#7021)" (#7074)
+* [d696a8e42](https://github.com/api-platform/core/commit/d696a8e4284b0e5b5c56300852bab70283386a99) fix(metadata): use template typehint in parameters (#7078)
+
+## v4.1.6
+
+### Bug fixes
+
+* [44e560839](https://github.com/api-platform/core/commit/44e56083996f2f00a1d87a149fd41aeb0149e4dd) fix(laravel): undefined variable app
+
+## v4.1.5
+
+### Bug fixes
+
+* [60747cc8c](https://github.com/api-platform/core/commit/60747cc8c2fb855798c923b5537888f8d0969568) fix(graphql): access to unauthorized resource using node Relay [CVE-2025-31481](https://github.com/api-platform/core/security/advisories/GHSA-cg3c-245w-728m)
+* [7af65aad1](https://github.com/api-platform/core/commit/7af65aad13037d7649348ee3dcd88e084ef771f8) fix(graphql): property security might be cached w/ different objects [CVE-2025-31485](https://github.com/api-platform/core/security/advisories/GHSA-428q-q3vv-3fq3)
+
+## v4.1.4
+
+### Bug fixes
+
+* [eaf007536](https://github.com/api-platform/core/commit/eaf00753693a493788f5ad60c4c45295048eb1a7) fix(state): support filter interface on serializer filter parameter provider (#7047)
+* [b0fa2291e](https://github.com/api-platform/core/commit/b0fa2291e50a57789eb14777277769627931cfbd) fix(laravel): error handler only on api routes (#7049)
+* [1eb9da13a](https://github.com/api-platform/core/commit/1eb9da13a7e06a8d380dfa27e23a0f8457ceb2bd) fix(laravel): missing filters (#7056)
+* [a46a76889](https://github.com/api-platform/core/commit/a46a7688958428b76eb7b6181ae1636cd3b7a4bf) fix(symfony): serialization of closure inside the profiler (#7054)
+* [c1b50e2cb](https://github.com/api-platform/core/commit/c1b50e2cb082b00a371bf62c7e86c2f3fea5dadf) fix(doctrine): joinColumn might be an array (#7060)
+* [f4c426d71](https://github.com/api-platform/core/commit/f4c426d719b01debaa993b00d03cce8964057ecc) Revert "fix(doctrine): throw an exception when a filter is not found in a par…" (#7046)
+
+## v4.1.3
+
+### Bug fixes
+
+* [8a2265041](https://github.com/api-platform/core/commit/8a22650419fd32efdafad43493f2327b38dd3ee6) fix(laravel): defer "filters" dependent services (#7045)
+
+## v4.1.2
+
+### Bug fixes
+
+* [42f25cf04](https://github.com/api-platform/core/commit/42f25cf0461c382ce10e2378be5e9428c23eb94a) fix: react@18 for UMD + add Laravel support in update-js.sh (#7028)
+* [77ffc380b](https://github.com/api-platform/core/commit/77ffc380bcd3c22a1eb4fb0c4f1cd265cfd1a898) fix(laravel): do not require tests while autoconfiguring (#7024)
+* [935b9b55d](https://github.com/api-platform/core/commit/935b9b55da0eacce3dd2bbed4584b10b154d97c2) fix(laravel): json api default parameters (#7027)
+* [a2824ff4b](https://github.com/api-platform/core/commit/a2824ff4be6276e37e37a3b4e4fb2e9a0096789c) fix(laravel): defer autoconfiguration (#7040)
+
+
+## v4.1.1
+
+### Bug fixes
+
+* [1e0bc9dc8](https://github.com/api-platform/core/commit/1e0bc9dc8ebe2f947ac0b3bc153047b0b28b0a17) fix(laravel): query extensions with item operations (#7001)
+* [1e7076c65](https://github.com/api-platform/core/commit/1e7076c65aea9a2f09b0dcc6598ef2a705e0bb45) fix(laravel): register ErrorProvider (#7018)
+* [2771363b0](https://github.com/api-platform/core/commit/2771363b03f1b1c27313ecd457f7a4934524151c) fix(validation): deprecate string message for ValidationException constructor (#7005)
+* [500062da2](https://github.com/api-platform/core/commit/500062da2074585979e9a92939bc3b7a3c7554c5) fix(symfony): add a `alwaysBootKernel` property for BC layer (#7007)
+* [8697d6630](https://github.com/api-platform/core/commit/8697d66304d276feeef6f838c8c54291d3563aab) fix(openapi): boolean "true" value in HttpOperation::openapi (#7003)
+* [b1e0c889c](https://github.com/api-platform/core/commit/b1e0c889cc96602afc9c68fccb9da25a6b6fd354) fix(doctrine): correct the use statement for ManagerRegistry (#7004)
+* [fcbd804b2](https://github.com/api-platform/core/commit/fcbd804b29907baba8878ca12ff013732e0326e4) fix(jsonld): duplicate error fields when prefix is enabled (#7021)
+
+### Features
+
+* [129853668](https://github.com/api-platform/core/commit/129853668c3fd66bcfe1a298a0f662c29545f7a4) feat(laravel): stateOptions modelClass for eloquent (#7020)
+* [42991b941](https://github.com/api-platform/core/commit/42991b9418c340e44c9e30360e5dd4d869433859) feat(laravel): openapi export command (#7016)
+* [dd1b89f9b](https://github.com/api-platform/core/commit/dd1b89f9b771544cb8449d7e9f8f4bbd80c615d2) feat(laravel): auto configure our tagged interfaces (#7014)
+
+Also contains [v4.0.20 changes](#v4020).
+
+## v4.1.0
+
+### Bug fixes
+
+* [da37ca91c](https://github.com/api-platform/core/commit/da37ca91c83e4f715c5acbbe3dc0296e8055bebc) fix(laravel): default to file cache instead of cache.default (#6955)
+* [e041d721e](https://github.com/api-platform/core/commit/e041d721ea6fe24026eb021905740b25102d7966) fix: errors retrieval and documentation (#6952)
+* [e6130cbcc](https://github.com/api-platform/core/commit/e6130cbccc1a8963b731769ef34f39e09f5d2cde) fix: missing filters on swagger ui entrypoint (#6950)
+* [01fd74268](https://github.com/api-platform/core/commit/01fd74268cf0e4a289b31ea74bea7f4e089b8361) fix(laravel): restore accidentally removed BooleanFilter
+* [db40a63e7](https://github.com/api-platform/core/commit/db40a63e729fe03be84111dac2b0774fea4ab343) fix(hydra): rdfs:label should not duplicate title (#6748)
+* [deb2ed265](https://github.com/api-platform/core/commit/deb2ed265dfee7b8a73fd3b542aef3e29eca3412) fix(laravel): fix use laravel fillable for writable props (#6898)
+* [67fbe51c5](https://github.com/api-platform/core/commit/67fbe51c570abe1ece6651ae6a037662e9012881) fix: reintroduce the `show_webby` parameter in Laravel config (#6741)
+
+### Features
+
+* [cb5ede1c5](https://github.com/api-platform/core/commit/cb5ede1c5171677a90dd2d96a87e73cd549c0218) feat: add checkMode parameter to control json schema validation (#6974)
+* [771d9401c](https://github.com/api-platform/core/commit/771d9401cffa0463928bb35ab52a56b269d57e1b) feat(elasticsearch): re-introduce v7 support (#6827)
+* [b5372ddee](https://github.com/api-platform/core/commit/b5372ddeef2067333761104f3c17ed1b86001bf4) feat(openapi): filter x-apiplatform-tags to produce different openapi specifications (#6945)
+* [2e2debb94](https://github.com/api-platform/core/commit/2e2debb94b06752262b0d18b736edc22b501266b) feat(mongodb): Replace usage of deprecated method `AggregationBuilder::execute()` (#6933)
+* [4bdf042e5](https://github.com/api-platform/core/commit/4bdf042e5cab1ddb931562cf98a97686d8c415ae) feat(mongodb): Add pagination metadata to the aggregation results (#6912)
+* [b968ccd50](https://github.com/api-platform/core/commit/b968ccd5026afb5562c4c4588929885b86ecb3cb) feat(openapi): document error outputs using json-schemas (#6923)
+* [c97db6bb2](https://github.com/api-platform/core/commit/c97db6bb2f6b2db9a6a17141bdb56bd51e9fc50d) feat: swagger ui persist authorization option (#6877)
+* [00787f32d](https://github.com/api-platform/core/commit/00787f32da54418de7d869cff218e22d8ae2ae1d) feat(laravel): automatically register policies (#6623)
+* [12c42096b](https://github.com/api-platform/core/commit/12c42096bb0006d6ebae60ae5d90e9b356f9a335) feat(metadata): ability to hide an hydra class/operation (#6871)
+* [57f15cf4f](https://github.com/api-platform/core/commit/57f15cf4f38278315c5f31d3949416c9455ba0d0) feat(state): strict query parameters (#6399)
+* [bd0e92936](https://github.com/api-platform/core/commit/bd0e92936f82d3cd4563cd45ebf1f73fd1db9f01) feat(openapi): HTTP Authentication Support for Swagger UI (#6665)
+* [be98f4e01](https://github.com/api-platform/core/commit/be98f4e01a52d8341ef9b65ed2f4e3b46ab31165) feat(graphql): allow to configure max query depth and max query complexity (#6880)
+* [c78ed0b78](https://github.com/api-platform/core/commit/c78ed0b78baf5d2e1b7444a9882ba039c70a3887) feat(laravel): boolean filter (#6806)
+* [d0a442786](https://github.com/api-platform/core/commit/d0a44278630d201b91cbba0774a09f4eeaac88f7) feat(doctrine): enhance getLinksHandler with method validation and typo suggestions (#6874)
+* [f67f6f1ac](https://github.com/api-platform/core/commit/f67f6f1acb6476182c18a3503f2a8bc80ae89a0b)  feat(doctrine): doctrine filters like laravel eloquent filters  (#6775)
+
+## Notes
+
+This version as the 4.0.19 is compatible with Laravel 12.
+The [hydra patch](#6748) changes default `hydra:title` and uses the resource `shortname`. Previously the `hydra:title` information was duplicating the `hydra:description`. 
+The `rdfs:label` got removed from the `hydra:Class` as it was used instead of the `hydra:title`.
+On `hydra:property` `rdfs:label` got renamed to `label` as the `rdfs` namespace is available in the context. 
+The `ApiPlatform\Metadata\ErrorResource` and the `ConstraintViolation` (`ValidationException` class) are now generated directly from your PHP classes, only our `ConstraintViolationList` is hard-written and documents the `ConstraintViolation::violation` property. Therefore, your [own error resources](https://api-platform.com/docs/guides/error-resource/) are also documented. On top of that, we now set the `rdfs:subClassOf` to `hydra:Error`.
+`#[ApiProperty(hydra: false)]` allows you to skip a documented `hydra:supportedProperty` on a class.
+On write operations, we added the [expectsHeader](https://www.hydra-cg.com/spec/latest/core/#hydra:expectsHeader) field. 
+
+## v4.1.0-beta.2
+
+### Bug fixes
+
+* [da37ca91c](https://github.com/api-platform/core/commit/da37ca91c83e4f715c5acbbe3dc0296e8055bebc) fix(laravel): default to file cache instead of cache.default (#6955)
+* [e041d721e](https://github.com/api-platform/core/commit/e041d721ea6fe24026eb021905740b25102d7966) fix: errors retrieval and documentation (#6952)
+* [e6130cbcc](https://github.com/api-platform/core/commit/e6130cbccc1a8963b731769ef34f39e09f5d2cde) fix: missing filters on swagger ui entrypoint (#6950)
+
+### Features
+
+* [771d9401c](https://github.com/api-platform/core/commit/771d9401cffa0463928bb35ab52a56b269d57e1b) feat(elasticsearch): re-introduce v7 support (#6827)
+* [b5372ddee](https://github.com/api-platform/core/commit/b5372ddeef2067333761104f3c17ed1b86001bf4) feat(openapi): filter x-apiplatform-tags to produce different openapi specifications (#6945)
+
+## v4.1.0-beta.1
+
+### Features
+
+* [2e2debb94](https://github.com/api-platform/core/commit/2e2debb94b06752262b0d18b736edc22b501266b) feat(mongodb): Replace usage of deprecated method `AggregationBuilder::execute()` (#6933)
+* [4bdf042e5](https://github.com/api-platform/core/commit/4bdf042e5cab1ddb931562cf98a97686d8c415ae) feat(mongodb): Add pagination metadata to the aggregation results (#6912)
+* [b968ccd50](https://github.com/api-platform/core/commit/b968ccd5026afb5562c4c4588929885b86ecb3cb) feat(openapi): document error outputs using json-schemas (#6923)
+
+## v4.1.0-alpha.2
+
+### Bug fixes
+
+* [01fd74268](https://github.com/api-platform/core/commit/01fd74268cf0e4a289b31ea74bea7f4e089b8361) fix(laravel): restore accidentally removed BooleanFilter
+* [db40a63e7](https://github.com/api-platform/core/commit/db40a63e729fe03be84111dac2b0774fea4ab343) fix(hydra): rdfs:label should not duplicate title (#6748)
+* [deb2ed265](https://github.com/api-platform/core/commit/deb2ed265dfee7b8a73fd3b542aef3e29eca3412) fix(laravel): fix use laravel fillable for writable props (#6898)
+
+### Features
+
+* [c97db6bb2](https://github.com/api-platform/core/commit/c97db6bb2f6b2db9a6a17141bdb56bd51e9fc50d) feat: swagger ui persist authorization option (#6877)
+
+### Notes
+
+The [hydra patch](#6748) changes default `hydra:title` and uses the resource `shortname`. Previously the `hydra:title` information was duplicating the `hydra:description`. 
+The `rdfs:label` got removed from the `hydra:Class` as it was used instead of the `hydra:title`.
+On `hydra:property` `rdfs:label` got renamed to `label` as the `rdfs` namespace is available in the context. 
+The `ApiPlatform\Metadata\ErrorResource` and the `ConstraintViolation` (`ValidationException` class) are now generated directly from your PHP classes, only our `ConstraintViolationList` is hard-written and documents the `ConstraintViolation::violation` property. Therefore, your [own error resources](https://api-platform.com/docs/guides/error-resource/) are also documented. On top of that, we now set the `rdfs:subClassOf` to `hydra:Error`.
+`#[ApiProperty(hydra: false)]` allows you to skip a documented `hydra:supportedProperty` on a class.
+On write operations, we added the [expectsHeader](https://www.hydra-cg.com/spec/latest/core/#hydra:expectsHeader) field. 
+
+
+## v4.1.0-alpha.1
+
+### Bug fixes
+
+* [67fbe51c5](https://github.com/api-platform/core/commit/67fbe51c570abe1ece6651ae6a037662e9012881) fix: reintroduce the `show_webby` parameter in Laravel config (#6741)
+
+### Features
+
+* [00787f32d](https://github.com/api-platform/core/commit/00787f32da54418de7d869cff218e22d8ae2ae1d) feat(laravel): automatically register policies (#6623)
+* [12c42096b](https://github.com/api-platform/core/commit/12c42096bb0006d6ebae60ae5d90e9b356f9a335) feat(metadata): ability to hide an hydra class/operation (#6871)
+* [57f15cf4f](https://github.com/api-platform/core/commit/57f15cf4f38278315c5f31d3949416c9455ba0d0) feat(state): strict query parameters (#6399)
+* [bd0e92936](https://github.com/api-platform/core/commit/bd0e92936f82d3cd4563cd45ebf1f73fd1db9f01) feat(openapi): HTTP Authentication Support for Swagger UI (#6665)
+* [be98f4e01](https://github.com/api-platform/core/commit/be98f4e01a52d8341ef9b65ed2f4e3b46ab31165) feat(graphql): allow to configure max query depth and max query complexity (#6880)
+* [c78ed0b78](https://github.com/api-platform/core/commit/c78ed0b78baf5d2e1b7444a9882ba039c70a3887) feat(laravel): boolean filter (#6806)
+* [d0a442786](https://github.com/api-platform/core/commit/d0a44278630d201b91cbba0774a09f4eeaac88f7) feat(doctrine): enhance getLinksHandler with method validation and typo suggestions (#6874)
+* [f67f6f1ac](https://github.com/api-platform/core/commit/f67f6f1acb6476182c18a3503f2a8bc80ae89a0b)  feat(doctrine): doctrine filters like laravel eloquent filters  (#6775)
+
+## v4.0.22
+
+### Bug fixes
+
+* [60747cc8c](https://github.com/api-platform/core/commit/60747cc8c2fb855798c923b5537888f8d0969568) fix(graphql): access to unauthorized resource using node Relay [CVE-2025-31481](https://github.com/api-platform/core/security/advisories/GHSA-cg3c-245w-728m)
+* [7af65aad1](https://github.com/api-platform/core/commit/7af65aad13037d7649348ee3dcd88e084ef771f8) fix(graphql): property security might be cached w/ different objects [CVE-2025-31485](https://github.com/api-platform/core/security/advisories/GHSA-428q-q3vv-3fq3)
+* [f4c426d71](https://github.com/api-platform/core/commit/f4c426d719b01debaa993b00d03cce8964057ecc) Revert "fix(doctrine): throw an exception when a filter is not found in a par…" (#7046)
+
+## v4.0.21
+
+### Bug fixes
+
+* [7cb5a6db8](https://github.com/api-platform/core/commit/7cb5a6db87241d95e6c324318fe861bd4f1820cf) fix: allow parameter provider as object (#7032)
+* [bb83e9a03](https://github.com/api-platform/core/commit/bb83e9a034c511156aa20a8555bf367374ef5458) fix(symfony): allow to merge array with string in global defaults (#7037)
+* [da2e86809](https://github.com/api-platform/core/commit/da2e86809d4a8dec294dc2fc148d92406f1f7fd1) fix: header parameter should be case insensitive (#7031)
+
+
+### Features
+
+## v4.0.20
+
+### Bug fixes
+
+* [284937039](https://github.com/api-platform/core/commit/284937039c61d4516687c648f4a7581ec1686f3d) fix(doctrine): mapping ArrayAccess deprecation (#6982)
+* [a434173b8](https://github.com/api-platform/core/commit/a434173b82f735041a79cb5f469ee0e731ca5956) fix(doctrine): Add a proper exception when a doctrine manager could not be found for a resource class (#6995)
+
+
+### Features
+
+## v4.0.19
+
+### Bug fixes
+
+* [1dfefda5e](https://github.com/api-platform/core/commit/1dfefda5e22b7ec03780e928e943097dd31ef68f) fix(laravel): add middleware granularity (#6962)
+
+Compatibility with Laravel 12.
+
+## v4.0.18
+
+### Bug fixes
+
+* [7007dcca8](https://github.com/api-platform/core/commit/7007dcca8649814d871db7abe0fd65dc9c94a176) fix(laravel): duplicate middleware in routes
+* [a16147ab7](https://github.com/api-platform/core/commit/a16147ab7b36f5238700c6ee9ee9253ce1424808) fix(laravel): handle route prefix (#6978)
+* [d2e1963c5](https://github.com/api-platform/core/commit/d2e1963c56733b3174ae37cbc27a1374eba80bee) fix(symfony): detach objects to prevent loop when using Doctrine middleware and Mercure (#6936) (#6965)
+
+
+### Features
+
+## v4.0.17
+
+### Bug fixes
+
+* [5124d8c57](https://github.com/api-platform/core/commit/5124d8c571bc4324aa060e4ff808d48f0ffa8d73) fix(laravel): Prevent overwriting existing routes on the router (#6941)
+* [5c7e0d2c0](https://github.com/api-platform/core/commit/5c7e0d2c015b5264b2f857abc7e6cb944582de21) fix(symfony): error wrongly inherit normalization context (#6939)
+* [af35d34d0](https://github.com/api-platform/core/commit/af35d34d01e62e96dd81dadde6a056ce67d47703) fix(laravel): mitigate property metadata read for Error (#6951)
+* [d5b48b1cd](https://github.com/api-platform/core/commit/d5b48b1cd6163ee755211476fdd3d4dd0bf6f7ae) fix(laravel): SwaggerUI custom CSS (#6937)
+* [da796b979](https://github.com/api-platform/core/commit/da796b979384663c3eaf4e4fe4d215b447800844) fix(metadata): allow serializer attribute object in ApiProperty::$serialize (#6946)
+* [de2d298e3](https://github.com/api-platform/core/commit/de2d298e306b196bce834af290aec242807ea39b) fix: ensure template files have a tpl file extension (#6826) (#6829)
+* [b6a67a197](https://github.com/api-platform/core/commit/b6a67a197a668ce15f216cffbcddc637f19c69c2) perf: various optimizations for Laravel/Symfony (#6954)
+
+To save some time during cache warmup we recommend to define uri variables such as: `uriVariables: ['id']`. More details at #6954.
+
+### Features
+
+## v4.0.16
+
+### Bug fixes
+
+* [dc4fc84ba](https://github.com/api-platform/core/commit/dc4fc84ba93e22b4f44a37e90a93c6d079c1c620) fix(graphql): securityAfterResolver not called
+
+### Features
+
+## v4.0.15
+
+### Bug fixes
+
+* [36cee399c](https://github.com/api-platform/core/commit/36cee399cfd519355b03d0406921066a22ab474c) fix(state): skip Content-Location header for GET requests (#6901)
+* [dba9de197](https://github.com/api-platform/core/commit/dba9de197001e91094e594f0e4dc638007cce7a6) fix(symfony): fix property restrictions for root resource with dynamic validation groups (#6908)
+
+### Features
+
+* [421d97ecf](https://github.com/api-platform/core/commit/421d97ecfdbc7d699a3d017d1e3ae3827a38b216) feat(laravel): add support for backed enum normalizers (#6911)
+
+Also contains [v3.4.15 changes](#v3415).
+
+## v4.0.14
+
+### Bug fixes
+
+* [97cdb6b3f](https://github.com/api-platform/core/commit/97cdb6b3f43471789e096c9dc3a0c3c7b6d4e43c) fix(state): remove ProcessorInterface laravel specific type
+* [b12a0d005](https://github.com/api-platform/core/commit/b12a0d005fda58a162b82a3574e6ee877838a55b) fix(graphql): register types for parameter args (#6895)
+
+Also contains [v3.4.14 changes](#v3414).
+
 ## v4.0.13
 
 ### Bug fixes
@@ -9,8 +325,6 @@
 * [f2c998158](https://github.com/api-platform/core/commit/f2c998158a70632a26efcdd29a17d7f3a2cb859c) fix(jsonld): anonymous context hydra_prefix value (#6873)
 
 Also contains [v3.4.10 changes](#v3410).
-
-### Features
 
 ## v4.0.12
 
@@ -23,15 +337,11 @@ Also contains [v3.4.10 changes](#v3410).
 
 Also contains [v3.4.9 changes](#v349).
 
-### Features
-
 ## v4.0.11
 
 ### Bug fixes
 
 * [af66075fd](https://github.com/api-platform/core/commit/af66075fdd6b83bdebc1c4ca33cc0ab7e1a7f8af) fix(laravel): fix foregin keys (relations) beeing in attributes (#6843)
-
-### Features
 
 * [2d59c6369](https://github.com/api-platform/core/commit/2d59c63699b4602cfe4d62504896c6d4121c1be4) feat(laravel): belongs to many relations (#6818)
 
@@ -47,8 +357,6 @@ Also contains [v3.4.8 changes](#v348).
 
 Also contains [v3.4.7 changes](#v347).
 
-### Features
-
 ## v4.0.9
 
 ### Bug fixes
@@ -59,15 +367,11 @@ Also contains [v3.4.7 changes](#v347).
 
 Also contains [v3.4.6 changes](#v346).
 
-### Features
-
 ## v4.0.8
 
 ### Bug fixes
 
 * [dddb97075](https://github.com/api-platform/core/commit/dddb97075af9c6e2517e1881b803c9d31a1913cf) fix(symfony): default formats order (#6780)
-
-### Features
 
 ## v4.0.7
 
@@ -80,8 +384,6 @@ Also contains [v3.4.6 changes](#v346).
 * [736ca045e](https://github.com/api-platform/core/commit/736ca045e6832f04aaa002ddd7b85c55df4696bb) fix(validator): allow to pass both a ConstraintViolationList and a previous exception (#6762)
 * [9ac3661b6](https://github.com/api-platform/core/commit/9ac3661b6a75255832203b87a9ba7994add64061) fix(hydra): store and use hydra context in a local variable (#6765)
 
-### Features
-
 ## v4.0.6
 
 ### Bug fixes
@@ -92,8 +394,6 @@ Also contains [v3.4.6 changes](#v346).
 * [67c5a2a24](https://github.com/api-platform/core/commit/67c5a2a2463bca94f0997b4fab1248a08994465b) fix(laravel): jsonapi error serialization (#6755)
 * [ac6f667f3](https://github.com/api-platform/core/commit/ac6f667f301f6c4c399a707faf00567239bd98d8) fix(laravel): collection relations other than HasMany (#6737)
 
-### Features
-
 * [cecd77149](https://github.com/api-platform/core/commit/cecd77149795c1a455ac72bc3ed0606413e69900) feat(laravel): use laravel cache setting (#6751)
 
 ## v4.0.5
@@ -102,8 +402,6 @@ Also contains [v3.4.6 changes](#v346).
 
 * [4171d5f9c](https://github.com/api-platform/core/commit/4171d5f9cd41731b857c53a186270ba0626baedf) fix(graphql): register query parameter arguments with filters (#6726)
 * [48ab53816](https://github.com/api-platform/core/commit/48ab53816c55e6116aa64ac81f522f4b7b9bb9f6) fix(laravel): make command writes to app instead of src (#6723)
-
-### Features
 
 ## v4.0.4
 
@@ -149,7 +447,7 @@ Also contains [v3.4.6 changes](#v346).
 * [c47e2996e](https://github.com/api-platform/core/commit/c47e2996e51c587c998fde88903703bd6ac9a43c) fix: default format and standard_put values
 * [e327f5f69](https://github.com/api-platform/core/commit/e327f5f69c823c1ed674eefc0eb2551e30fb36bd) fix(symfony): namespace of path segment name generator services (#6642)
 
-Notes: 
+Notes:
 
 `standard_put=true` is now the default, you can set it to `false` using `extra_properties.defaults`
 
@@ -247,6 +545,31 @@ Notes:
 ### Features
 
 * [0d5f35683](https://github.com/api-platform/core/commit/0d5f356839eb6aa9f536044abe4affa736553e76) feat(laravel): laravel component (#5882)
+
+## v3.4.16
+
+### Bug fixes
+
+* [dc4fc84ba](https://github.com/api-platform/core/commit/dc4fc84ba93e22b4f44a37e90a93c6d079c1c620) fix(graphql): securityAfterResolver not called
+* [9eb5c4e94](https://github.com/api-platform/core/commit/9eb5c4e941d0ebf59bc8ef5777b144db9b4a0899) fix(symfony): suggest `DocumentationAction` as replacement for deprecated `SwaggerUiAction` (#6894)
+
+## v3.4.15
+
+### Bug fixes
+
+* [ab03b5544](https://github.com/api-platform/core/commit/ab03b5544f742b98a39cc23fc157f1be7a2e0c63) fix(openapi): typing issue with `openapiContext` in `#[ApiProperty]` (#6910)
+
+## v3.4.14
+
+### Bug fixes
+
+* [0cf752bce](https://github.com/api-platform/core/commit/0cf752bcec692718b2503250e655d05aea670316) fix(metadata): make the schema attribute to fallback to null for parameters in YamlResourceExtractor (#6896)
+* [2b3c55db2](https://github.com/api-platform/core/commit/2b3c55db2a9ecc52f62c441fa8a5696233a30b87) fix(symfony): remove unsolvable deprecation (#6899) see also (#6655)
+* [9493b9b6e](https://github.com/api-platform/core/commit/9493b9b6ec0264ab5b700c861ad1b97455b4f88d) fix(symfony): revert json schema bc break (#6903)
+* [b82f9ac76](https://github.com/api-platform/core/commit/b82f9ac76ce89dd3910849c73da42317ee1339ed) fix(openapi): not forbidden response on openAPI doc (#6886)
+
+I mispublished a v3.4.13 on some repositories to fix them all I bumped 3.4.10 to 3.4.14
+More details at #6888.
 
 ## v3.4.10
 
@@ -494,6 +817,13 @@ You should now install `api-platform/symfony` instead of `api-platform/core`.
 * [7399fcf7e](https://github.com/api-platform/core/commit/7399fcf7eaf28cd649d137da1fdd54f69093e275) feat(symfony): skip error handler (#6463)
 * [74986cb55](https://github.com/api-platform/core/commit/74986cb552182dc645bd1fc967faa0954dd59e0a) feat: inflector as service (#6447)
 * [b47edb2a4](https://github.com/api-platform/core/commit/b47edb2a499c34e79c167f963e3a626a3e9d040a) feat(serializer): context IRI in HAL or JsonApi format (#6215)
+
+## v3.3.15
+
+### Bug fixes
+
+* [dc4fc84ba](https://github.com/api-platform/core/commit/dc4fc84ba93e22b4f44a37e90a93c6d079c1c620) fix(graphql): securityAfterResolver not called 
+* [9eb5c4e94](https://github.com/api-platform/core/commit/9eb5c4e941d0ebf59bc8ef5777b144db9b4a0899) fix(symfony): suggest `DocumentationAction` as replacement for deprecated `SwaggerUiAction` (#6894)
 
 ## v3.3.14
 

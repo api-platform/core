@@ -1,0 +1,9 @@
+extends: [[spectral:oas, recommended]]
+rules:
+  circular-references: false
+  operation-success-response: false
+  oas3-parameter-description: false
+  oas3-missing-example: false
+  description-duplication: false
+  component-description: false
+  paths-kebab-case: false

@@ -24,20 +24,21 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/metadata": "^3.4 || ^4.0",
-        "api-platform/serializer": "^3.4 || ^4.0",
-        "api-platform/state": "^3.4 || ^4.0",
-        "elasticsearch/elasticsearch": "^8.4",
+        "api-platform/metadata": "^4.1.11",
+        "api-platform/serializer": "^4.1.11",
+        "api-platform/state": "^4.1.11",
+        "elasticsearch/elasticsearch": "^7.17 || ^8.4",
         "symfony/cache": "^6.4 || ^7.0",
         "symfony/console": "^6.4 || ^7.0",
         "symfony/property-access": "^6.4 || ^7.0",
-        "symfony/property-info": "^6.4 || ^7.0",
+        "symfony/property-info": "^6.4 || ^7.1",
         "symfony/serializer": "^6.4 || ^7.0",
+        "symfony/type-info": "^7.3",
         "symfony/uid": "^6.4 || ^7.0"
     },
     "require-dev": {
         "phpspec/prophecy-phpunit": "^2.2",
-        "phpunit/phpunit": "^11.2"
+        "phpunit/phpunit": "11.5.x-dev"
     },
     "autoload": {
         "psr-4": {
@@ -60,7 +61,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "4.0.x-dev",
+            "dev-main": "4.2.x-dev",
             "dev-3.4": "3.4.x-dev"
         },
         "symfony": {
@@ -73,5 +74,11 @@
     },
     "scripts": {
         "test": "./vendor/bin/phpunit"
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/soyuka/phpunit"
+        }
+    ]
 }

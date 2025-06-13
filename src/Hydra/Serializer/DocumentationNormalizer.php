@@ -29,11 +29,16 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
-use ApiPlatform\Validator\Exception\ValidationException;
-use Symfony\Component\PropertyInfo\Type;
+use ApiPlatform\Metadata\Util\TypeHelper;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 use const ApiPlatform\JsonLd\HYDRA_CONTEXT;
 
@@ -55,6 +60,7 @@ final class DocumentationNormalizer implements NormalizerInterface
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly ?NameConverterInterface $nameConverter = null,
         private readonly ?array $defaultContext = [],
+        private readonly ?bool $entrypointEnabled = true,
     ) {
     }
 
@@ -71,17 +77,13 @@ final class DocumentationNormalizer implements NormalizerInterface
             $resourceMetadataCollection = $this->resourceMetadataFactory->create($resourceClass);
 
             $resourceMetadata = $resourceMetadataCollection[0];
-            if ($resourceMetadata instanceof ErrorResource && ValidationException::class === $resourceMetadata->getClass()) {
-                continue;
-            }
-
             if (true === $resourceMetadata->getHideHydraOperation()) {
                 continue;
             }
 
             $shortName = $resourceMetadata->getShortName();
-
             $prefixedShortName = $resourceMetadata->getTypes()[0] ?? "#$shortName";
+
             $this->populateEntrypointProperties($resourceMetadata, $shortName, $prefixedShortName, $entrypointProperties, $hydraPrefix, $resourceMetadataCollection);
             $classes[] = $this->getClass($resourceClass, $resourceMetadata, $shortName, $prefixedShortName, $context, $hydraPrefix, $resourceMetadataCollection);
         }
@@ -105,8 +107,8 @@ final class DocumentationNormalizer implements NormalizerInterface
                 '@id' => \sprintf('#Entrypoint/%s', lcfirst($shortName)),
                 '@type' => $hydraPrefix.'Link',
                 'domain' => '#Entrypoint',
-                'rdfs:label' => "The collection of $shortName resources",
-                'rdfs:range' => [
+                'owl:maxCardinality' => 1,
+                'range' => [
                     ['@id' => $hydraPrefix.'Collection'],
                     [
                         'owl:equivalentClass' => [
@@ -117,7 +119,8 @@ final class DocumentationNormalizer implements NormalizerInterface
                 ],
                 $hydraPrefix.'supportedOperation' => $hydraCollectionOperations,
             ],
-            $hydraPrefix.'title' => "The collection of $shortName resources",
+            $hydraPrefix.'title' => "get{$shortName}Collection",
+            $hydraPrefix.'description' => "The collection of $shortName resources",
             $hydraPrefix.'readable' => true,
             $hydraPrefix.'writeable' => false,
         ];
@@ -140,7 +143,6 @@ final class DocumentationNormalizer implements NormalizerInterface
         $class = [
             '@id' => $prefixedShortName,
             '@type' => $hydraPrefix.'Class',
-            'rdfs:label' => $shortName,
             $hydraPrefix.'title' => $shortName,
             $hydraPrefix.'supportedProperty' => $this->getHydraProperties($resourceClass, $resourceMetadata, $shortName, $prefixedShortName, $context, $hydraPrefix),
             $hydraPrefix.'supportedOperation' => $this->getHydraOperations(false, $resourceMetadataCollection, $hydraPrefix),
@@ -148,6 +150,10 @@ final class DocumentationNormalizer implements NormalizerInterface
 
         if (null !== $description) {
             $class[$hydraPrefix.'description'] = $description;
+        }
+
+        if ($resourceMetadata instanceof ErrorResource) {
+            $class['subClassOf'] = 'Error';
         }
 
         if ($isDeprecated) {
@@ -232,6 +238,10 @@ final class DocumentationNormalizer implements NormalizerInterface
                     $propertyName = $this->nameConverter->normalize($propertyName, $class, self::FORMAT, $context);
                 }
 
+                if (false === $propertyMetadata->getHydra()) {
+                    continue;
+                }
+
                 $properties[] = $this->getProperty($propertyMetadata, $propertyName, $prefixedShortName, $shortName, $hydraPrefix);
             }
         }
@@ -254,6 +264,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                 if (('POST' === $operation->getMethod() || $operation instanceof CollectionOperationInterface) !== $collection) {
                     continue;
                 }
+
                 $hydraOperations[] = $this->getHydraOperation($operation, $operation->getShortName(), $hydraPrefix);
             }
         }
@@ -283,49 +294,57 @@ final class DocumentationNormalizer implements NormalizerInterface
         if ('GET' === $method && $operation instanceof CollectionOperationInterface) {
             $hydraOperation += [
                 '@type' => [$hydraPrefix.'Operation', 'schema:FindAction'],
-                $hydraPrefix.'title' => "Retrieves the collection of $shortName resources.",
+                $hydraPrefix.'description' => "Retrieves the collection of $shortName resources.",
                 'returns' => null === $outputClass ? 'owl:Nothing' : $hydraPrefix.'Collection',
             ];
         } elseif ('GET' === $method) {
             $hydraOperation += [
                 '@type' => [$hydraPrefix.'Operation', 'schema:FindAction'],
-                $hydraPrefix.'title' => "Retrieves a $shortName resource.",
+                $hydraPrefix.'description' => "Retrieves a $shortName resource.",
                 'returns' => null === $outputClass ? 'owl:Nothing' : $prefixedShortName,
             ];
         } elseif ('PATCH' === $method) {
             $hydraOperation += [
                 '@type' => $hydraPrefix.'Operation',
-                $hydraPrefix.'title' => "Updates the $shortName resource.",
+                $hydraPrefix.'description' => "Updates the $shortName resource.",
                 'returns' => null === $outputClass ? 'owl:Nothing' : $prefixedShortName,
                 'expects' => null === $inputClass ? 'owl:Nothing' : $prefixedShortName,
             ];
+
+            if (null !== $inputClass) {
+                $possibleValue = [];
+                foreach ($operation->getInputFormats() as $mimeTypes) {
+                    foreach ($mimeTypes as $mimeType) {
+                        $possibleValue[] = $mimeType;
+                    }
+                }
+
+                $hydraOperation['expectsHeader'] = [['headerName' => 'Content-Type', 'possibleValue' => $possibleValue]];
+            }
         } elseif ('POST' === $method) {
             $hydraOperation += [
                 '@type' => [$hydraPrefix.'Operation', 'schema:CreateAction'],
-                $hydraPrefix.'title' => "Creates a $shortName resource.",
+                $hydraPrefix.'description' => "Creates a $shortName resource.",
                 'returns' => null === $outputClass ? 'owl:Nothing' : $prefixedShortName,
                 'expects' => null === $inputClass ? 'owl:Nothing' : $prefixedShortName,
             ];
         } elseif ('PUT' === $method) {
             $hydraOperation += [
                 '@type' => [$hydraPrefix.'Operation', 'schema:ReplaceAction'],
-                $hydraPrefix.'title' => "Replaces the $shortName resource.",
+                $hydraPrefix.'description' => "Replaces the $shortName resource.",
                 'returns' => null === $outputClass ? 'owl:Nothing' : $prefixedShortName,
                 'expects' => null === $inputClass ? 'owl:Nothing' : $prefixedShortName,
             ];
         } elseif ('DELETE' === $method) {
             $hydraOperation += [
                 '@type' => [$hydraPrefix.'Operation', 'schema:DeleteAction'],
-                $hydraPrefix.'title' => "Deletes the $shortName resource.",
+                $hydraPrefix.'description' => "Deletes the $shortName resource.",
                 'returns' => 'owl:Nothing',
             ];
         }
 
-        $hydraOperation[$hydraPrefix.'method'] ?? $hydraOperation[$hydraPrefix.'method'] = $method;
-
-        if (!isset($hydraOperation['rdfs:label']) && isset($hydraOperation[$hydraPrefix.'title'])) {
-            $hydraOperation['rdfs:label'] = $hydraOperation[$hydraPrefix.'title'];
-        }
+        $hydraOperation[$hydraPrefix.'method'] ??= $method;
+        $hydraOperation[$hydraPrefix.'title'] ??= strtolower($method).$shortName.($operation instanceof CollectionOperationInterface ? 'Collection' : '');
 
         ksort($hydraOperation);
 
@@ -343,61 +362,119 @@ final class DocumentationNormalizer implements NormalizerInterface
             return $jsonldContext['@type'];
         }
 
-        $builtInTypes = $propertyMetadata->getBuiltinTypes() ?? [];
         $types = [];
 
-        foreach ($builtInTypes as $type) {
-            if ($type->isCollection() && null !== $collectionType = $type->getCollectionValueTypes()[0] ?? null) {
-                $type = $collectionType;
+        if (method_exists(PropertyInfoExtractor::class, 'getType')) {
+            $nativeType = $propertyMetadata->getNativeType();
+            if (null === $nativeType) {
+                return null;
             }
 
-            switch ($type->getBuiltinType()) {
-                case Type::BUILTIN_TYPE_STRING:
-                    if (!\in_array('xmls:string', $types, true)) {
-                        $types[] = 'xmls:string';
-                    }
-                    break;
-                case Type::BUILTIN_TYPE_INT:
-                    if (!\in_array('xmls:integer', $types, true)) {
-                        $types[] = 'xmls:integer';
-                    }
-                    break;
-                case Type::BUILTIN_TYPE_FLOAT:
-                    if (!\in_array('xmls:decimal', $types, true)) {
-                        $types[] = 'xmls:decimal';
-                    }
-                    break;
-                case Type::BUILTIN_TYPE_BOOL:
-                    if (!\in_array('xmls:boolean', $types, true)) {
-                        $types[] = 'xmls:boolean';
-                    }
-                    break;
-                case Type::BUILTIN_TYPE_OBJECT:
-                    if (null === $className = $type->getClassName()) {
-                        continue 2;
-                    }
+            if ($nativeType->isSatisfiedBy(fn ($t) => $t instanceof CollectionType)) {
+                $nativeType = TypeHelper::getCollectionValueType($nativeType);
+            }
 
-                    if (is_a($className, \DateTimeInterface::class, true)) {
-                        if (!\in_array('xmls:dateTime', $types, true)) {
-                            $types[] = 'xmls:dateTime';
+            // Check for specific types after potentially unwrapping the collection
+            if (null === $nativeType) {
+                return null; // Should not happen if collection had a value type, but safety check
+            }
+
+            if ($nativeType->isIdentifiedBy(TypeIdentifier::STRING)) {
+                $types[] = 'xmls:string';
+            }
+
+            if ($nativeType->isIdentifiedBy(TypeIdentifier::INT)) {
+                $types[] = 'xmls:integer';
+            }
+
+            if ($nativeType->isIdentifiedBy(TypeIdentifier::FLOAT)) {
+                $types[] = 'xmls:decimal';
+            }
+
+            if ($nativeType->isIdentifiedBy(TypeIdentifier::BOOL)) {
+                $types[] = 'xmls:boolean';
+            }
+
+            if ($nativeType->isIdentifiedBy(\DateTimeInterface::class)) {
+                $types[] = 'xmls:dateTime';
+            }
+
+            /** @var class-string|null $className */
+            $className = null;
+
+            $typeIsResourceClass = function (Type $type) use (&$className): bool {
+                return $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($className = $type->getClassName());
+            };
+
+            if ($nativeType->isSatisfiedBy($typeIsResourceClass) && $className) {
+                $resourceMetadata = $this->resourceMetadataFactory->create($className);
+                $operation = $resourceMetadata->getOperation();
+
+                if (!$operation instanceof HttpOperation || !$operation->getTypes()) {
+                    if (!\in_array("#{$operation->getShortName()}", $types, true)) {
+                        $types[] = "#{$operation->getShortName()}";
+                    }
+                } else {
+                    $types = array_unique(array_merge($types, $operation->getTypes()));
+                }
+            }
+        // TODO: remove in 5.x
+        } else {
+            $builtInTypes = $propertyMetadata->getBuiltinTypes() ?? [];
+
+            foreach ($builtInTypes as $type) {
+                if ($type->isCollection() && null !== $collectionType = $type->getCollectionValueTypes()[0] ?? null) {
+                    $type = $collectionType;
+                }
+
+                switch ($type->getBuiltinType()) {
+                    case LegacyType::BUILTIN_TYPE_STRING:
+                        if (!\in_array('xmls:string', $types, true)) {
+                            $types[] = 'xmls:string';
                         }
                         break;
-                    }
+                    case LegacyType::BUILTIN_TYPE_INT:
+                        if (!\in_array('xmls:integer', $types, true)) {
+                            $types[] = 'xmls:integer';
+                        }
+                        break;
+                    case LegacyType::BUILTIN_TYPE_FLOAT:
+                        if (!\in_array('xmls:decimal', $types, true)) {
+                            $types[] = 'xmls:decimal';
+                        }
+                        break;
+                    case LegacyType::BUILTIN_TYPE_BOOL:
+                        if (!\in_array('xmls:boolean', $types, true)) {
+                            $types[] = 'xmls:boolean';
+                        }
+                        break;
+                    case LegacyType::BUILTIN_TYPE_OBJECT:
+                        if (null === $className = $type->getClassName()) {
+                            continue 2;
+                        }
 
-                    if ($this->resourceClassResolver->isResourceClass($className)) {
-                        $resourceMetadata = $this->resourceMetadataFactory->create($className);
-                        $operation = $resourceMetadata->getOperation();
-
-                        if (!$operation instanceof HttpOperation || !$operation->getTypes()) {
-                            if (!\in_array("#{$operation->getShortName()}", $types, true)) {
-                                $types[] = "#{$operation->getShortName()}";
+                        if (is_a($className, \DateTimeInterface::class, true)) {
+                            if (!\in_array('xmls:dateTime', $types, true)) {
+                                $types[] = 'xmls:dateTime';
                             }
                             break;
                         }
 
-                        $types = array_unique(array_merge($types, $operation->getTypes()));
-                        break;
-                    }
+                        if ($this->resourceClassResolver->isResourceClass($className)) {
+                            $resourceMetadata = $this->resourceMetadataFactory->create($className);
+                            $operation = $resourceMetadata->getOperation();
+
+                            if (!$operation instanceof HttpOperation || !$operation->getTypes()) {
+                                if (!\in_array("#{$operation->getShortName()}", $types, true)) {
+                                    $types[] = "#{$operation->getShortName()}";
+                                }
+                                break;
+                            }
+
+                            $types = array_unique(array_merge($types, $operation->getTypes()));
+                            break;
+                        }
+                }
             }
         }
 
@@ -405,11 +482,31 @@ final class DocumentationNormalizer implements NormalizerInterface
             return null;
         }
 
+        $types = array_unique($types);
+
         return 1 === \count($types) ? $types[0] : $types;
     }
 
     private function isSingleRelation(ApiProperty $propertyMetadata): bool
     {
+        if (method_exists(PropertyInfoExtractor::class, 'getType')) {
+            $nativeType = $propertyMetadata->getNativeType();
+            if (null === $nativeType) {
+                return false;
+            }
+
+            if ($nativeType instanceof CollectionType) {
+                return false;
+            }
+
+            $typeIsResourceClass = function (Type $type) use (&$className): bool {
+                return $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($className = $type->getClassName());
+            };
+
+            return $nativeType->isSatisfiedBy($typeIsResourceClass);
+        }
+
+        // TODO: remove in 5.x
         $builtInTypes = $propertyMetadata->getBuiltinTypes() ?? [];
 
         foreach ($builtInTypes as $type) {
@@ -431,32 +528,35 @@ final class DocumentationNormalizer implements NormalizerInterface
      */
     private function getClasses(array $entrypointProperties, array $classes, string $hydraPrefix = ContextBuilder::HYDRA_PREFIX): array
     {
-        $classes[] = [
-            '@id' => '#Entrypoint',
-            '@type' => $hydraPrefix.'Class',
-            $hydraPrefix.'title' => 'The API entrypoint',
-            $hydraPrefix.'supportedProperty' => $entrypointProperties,
-            $hydraPrefix.'supportedOperation' => [
-                '@type' => $hydraPrefix.'Operation',
-                $hydraPrefix.'method' => 'GET',
-                'rdfs:label' => 'The API entrypoint.',
-                'returns' => 'EntryPoint',
-            ],
-        ];
+        if ($this->entrypointEnabled) {
+            $classes[] = [
+                '@id' => '#Entrypoint',
+                '@type' => $hydraPrefix.'Class',
+                $hydraPrefix.'title' => 'Entrypoint',
+                $hydraPrefix.'supportedProperty' => $entrypointProperties,
+                $hydraPrefix.'supportedOperation' => [
+                    '@type' => $hydraPrefix.'Operation',
+                    $hydraPrefix.'method' => 'GET',
+                    $hydraPrefix.'title' => 'index',
+                    $hydraPrefix.'description' => 'The API Entrypoint.',
+                    $hydraPrefix.'returns' => 'Entrypoint',
+                ],
+            ];
+        }
 
-        // Constraint violation
         $classes[] = [
-            '@id' => '#ConstraintViolation',
+            '@id' => '#ConstraintViolationList',
             '@type' => $hydraPrefix.'Class',
-            $hydraPrefix.'title' => 'A constraint violation',
+            $hydraPrefix.'title' => 'ConstraintViolationList',
+            $hydraPrefix.'description' => 'A constraint violation List.',
             $hydraPrefix.'supportedProperty' => [
                 [
                     '@type' => $hydraPrefix.'SupportedProperty',
                     $hydraPrefix.'property' => [
-                        '@id' => '#ConstraintViolation/propertyPath',
+                        '@id' => '#ConstraintViolationList/propertyPath',
                         '@type' => 'rdf:Property',
                         'rdfs:label' => 'propertyPath',
-                        'domain' => '#ConstraintViolation',
+                        'domain' => '#ConstraintViolationList',
                         'range' => 'xmls:string',
                     ],
                     $hydraPrefix.'title' => 'propertyPath',
@@ -467,38 +567,14 @@ final class DocumentationNormalizer implements NormalizerInterface
                 [
                     '@type' => $hydraPrefix.'SupportedProperty',
                     $hydraPrefix.'property' => [
-                        '@id' => '#ConstraintViolation/message',
+                        '@id' => '#ConstraintViolationList/message',
                         '@type' => 'rdf:Property',
                         'rdfs:label' => 'message',
-                        'domain' => '#ConstraintViolation',
+                        'domain' => '#ConstraintViolationList',
                         'range' => 'xmls:string',
                     ],
                     $hydraPrefix.'title' => 'message',
                     $hydraPrefix.'description' => 'The message associated with the violation',
-                    $hydraPrefix.'readable' => true,
-                    $hydraPrefix.'writeable' => false,
-                ],
-            ],
-        ];
-
-        // Constraint violation list
-        $classes[] = [
-            '@id' => '#ConstraintViolationList',
-            '@type' => $hydraPrefix.'Class',
-            'subClassOf' => $hydraPrefix.'Error',
-            $hydraPrefix.'title' => 'A constraint violation list',
-            $hydraPrefix.'supportedProperty' => [
-                [
-                    '@type' => $hydraPrefix.'SupportedProperty',
-                    $hydraPrefix.'property' => [
-                        '@id' => '#ConstraintViolationList/violations',
-                        '@type' => 'rdf:Property',
-                        'rdfs:label' => 'violations',
-                        'domain' => '#ConstraintViolationList',
-                        'range' => '#ConstraintViolation',
-                    ],
-                    $hydraPrefix.'title' => 'violations',
-                    $hydraPrefix.'description' => 'The violations',
                     $hydraPrefix.'readable' => true,
                     $hydraPrefix.'writeable' => false,
                 ],
@@ -524,8 +600,8 @@ final class DocumentationNormalizer implements NormalizerInterface
         $propertyData = ($propertyMetadata->getJsonldContext()[$hydraPrefix.'property'] ?? []) + [
             '@id' => $iri,
             '@type' => false === $propertyMetadata->isReadableLink() ? $hydraPrefix.'Link' : 'rdf:Property',
-            'rdfs:label' => $propertyName,
             'domain' => $prefixedShortName,
+            'label' => $propertyName,
         ];
 
         if (!isset($propertyData['owl:deprecated']) && $propertyMetadata->getDeprecationReason()) {
@@ -544,7 +620,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             '@type' => $hydraPrefix.'SupportedProperty',
             $hydraPrefix.'property' => $propertyData,
             $hydraPrefix.'title' => $propertyName,
-            $hydraPrefix.'required' => $propertyMetadata->isRequired(),
+            $hydraPrefix.'required' => $propertyMetadata->isRequired() ?? false,
             $hydraPrefix.'readable' => $propertyMetadata->isReadable(),
             $hydraPrefix.'writeable' => $propertyMetadata->isWritable() || $propertyMetadata->isInitializable(),
         ];
@@ -571,7 +647,9 @@ final class DocumentationNormalizer implements NormalizerInterface
             $doc[$hydraPrefix.'description'] = $object->getDescription();
         }
 
-        $doc[$hydraPrefix.'entrypoint'] = $this->urlGenerator->generate('api_entrypoint');
+        if ($this->entrypointEnabled) {
+            $doc[$hydraPrefix.'entrypoint'] = $this->urlGenerator->generate('api_entrypoint');
+        }
         $doc[$hydraPrefix.'supportedClass'] = $classes;
 
         return $doc;

@@ -40,7 +40,6 @@ final class PropertyMetadataLoader implements LoaderInterface
 
     public function loadClassMetadata(ClassMetadataInterface $classMetadata): bool
     {
-        $attributesMetadata = $classMetadata->getAttributesMetadata();
         // It's very weird to grab Eloquent's properties in that case as they're never serialized
         // the Serializer makes a call on the abstract class, let's save some unneeded work with a condition
         if (Model::class === $classMetadata->getName()) {

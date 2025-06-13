@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Workbench\Database\Factories;
 
+use ApiPlatform\Laravel\workbench\app\Enums\BookStatus;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Symfony\Component\Uid\Ulid;
 use Workbench\App\Models\Book;
@@ -38,6 +39,7 @@ class BookFactory extends Factory
             'isbn' => fake()->isbn13(),
             'publication_date' => fake()->optional()->date(),
             'is_available' => 1 === random_int(0, 1),
+            'status' => BookStatus::PUBLISHED,
             'internal_note' => fake()->text(),
             'published' => fake()->boolean(100),
         ];

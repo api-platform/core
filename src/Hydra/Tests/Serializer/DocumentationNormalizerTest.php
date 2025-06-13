@@ -32,10 +32,11 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\TypeInfo\Type;
 
 use const ApiPlatform\JsonLd\HYDRA_CONTEXT;
 
@@ -46,6 +47,7 @@ class DocumentationNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
+    #[IgnoreDeprecations]
     public function testNormalize(): void
     {
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
@@ -77,15 +79,15 @@ class DocumentationNormalizerTest extends TestCase
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create('dummy', 'name', Argument::type('array'))->shouldBeCalled()->willReturn(
-            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('name')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)
+            (new ApiProperty())->withNativeType(Type::string())->withDescription('name')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)
         );
         $propertyMetadataFactoryProphecy->create('dummy', 'description', Argument::type('array'))->shouldBeCalled()->willReturn(
-            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('description')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)->withJsonldContext(['@type' => '@id'])
+            (new ApiProperty())->withNativeType(Type::string())->withDescription('description')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)->withJsonldContext(['@type' => '@id'])
         );
         $propertyMetadataFactoryProphecy->create('dummy', 'nameConverted', Argument::type('array'))->shouldBeCalled()->willReturn(
-            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('name converted')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)
+            (new ApiProperty())->withNativeType(Type::string())->withDescription('name converted')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)
         );
-        $propertyMetadataFactoryProphecy->create('dummy', 'relatedDummy', Argument::type('array'))->shouldBeCalled()->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, 'dummy', true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, 'relatedDummy'))])->withDescription('This is a name.')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true));
+        $propertyMetadataFactoryProphecy->create('dummy', 'relatedDummy', Argument::type('array'))->shouldBeCalled()->willReturn((new ApiProperty())->withNativeType(Type::collection(Type::object('dummy'), Type::object('relatedDummy')))->withDescription('This is a name.')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)); // @phpstan-ignore-line
         $propertyMetadataFactoryProphecy->create('dummy', 'iri', Argument::type('array'))->shouldBeCalled()->willReturn((new ApiProperty())->withIris(['https://schema.org/Dummy']));
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -139,7 +141,6 @@ class DocumentationNormalizerTest extends TestCase
                 [
                     '@id' => '#dummy',
                     '@type' => 'hydra:Class',
-                    'rdfs:label' => 'dummy',
                     'hydra:title' => 'dummy',
                     'hydra:description' => 'dummy',
                     'hydra:supportedProperty' => [
@@ -148,7 +149,7 @@ class DocumentationNormalizerTest extends TestCase
                             'hydra:property' => [
                                 '@id' => '#dummy/name',
                                 '@type' => 'rdf:Property',
-                                'rdfs:label' => 'name',
+                                'label' => 'name',
                                 'domain' => '#dummy',
                                 'range' => 'xmls:string',
                             ],
@@ -163,7 +164,7 @@ class DocumentationNormalizerTest extends TestCase
                             'hydra:property' => [
                                 '@id' => '#dummy/description',
                                 '@type' => 'rdf:Property',
-                                'rdfs:label' => 'description',
+                                'label' => 'description',
                                 'domain' => '#dummy',
                                 'range' => '@id',
                             ],
@@ -178,7 +179,7 @@ class DocumentationNormalizerTest extends TestCase
                             'hydra:property' => [
                                 '@id' => '#dummy/name_converted',
                                 '@type' => 'rdf:Property',
-                                'rdfs:label' => 'name_converted',
+                                'label' => 'name_converted',
                                 'domain' => '#dummy',
                                 'range' => 'xmls:string',
                             ],
@@ -193,7 +194,7 @@ class DocumentationNormalizerTest extends TestCase
                             'hydra:property' => [
                                 '@id' => '#dummy/relatedDummy',
                                 '@type' => 'rdf:Property',
-                                'rdfs:label' => 'relatedDummy',
+                                'label' => 'relatedDummy',
                                 'domain' => '#dummy',
                                 'range' => '#relatedDummy',
                             ],
@@ -208,7 +209,7 @@ class DocumentationNormalizerTest extends TestCase
                             'hydra:property' => [
                                 '@id' => 'https://schema.org/Dummy',
                                 '@type' => 'rdf:Property',
-                                'rdfs:label' => 'iri',
+                                'label' => 'iri',
                                 'domain' => '#dummy',
                             ],
                             'hydra:title' => 'iri',
@@ -222,23 +223,23 @@ class DocumentationNormalizerTest extends TestCase
                             '@type' => ['hydra:Operation', 'schema:FindAction'],
                             'hydra:method' => 'GET',
                             'hydra:title' => 'foobar',
-                            'rdfs:label' => 'foobar',
                             'returns' => 'dummy',
                             'hydra:foo' => 'bar',
+                            'hydra:description' => 'Retrieves a dummy resource.',
                         ],
                         [
                             '@type' => ['hydra:Operation', 'schema:ReplaceAction'],
                             'expects' => 'dummy',
                             'hydra:method' => 'PUT',
-                            'hydra:title' => 'Replaces the dummy resource.',
-                            'rdfs:label' => 'Replaces the dummy resource.',
+                            'hydra:title' => 'putdummy',
+                            'hydra:description' => 'Replaces the dummy resource.',
                             'returns' => 'dummy',
                         ],
                         [
                             '@type' => ['hydra:Operation', 'schema:FindAction'],
                             'hydra:method' => 'GET',
-                            'hydra:title' => 'Retrieves a relatedDummy resource.',
-                            'rdfs:label' => 'Retrieves a relatedDummy resource.',
+                            'hydra:title' => 'getrelatedDummy',
+                            'hydra:description' => 'Retrieves a relatedDummy resource.',
                             'returns' => 'relatedDummy',
                         ],
                     ],
@@ -246,16 +247,15 @@ class DocumentationNormalizerTest extends TestCase
                 [
                     '@id' => '#Entrypoint',
                     '@type' => 'hydra:Class',
-                    'hydra:title' => 'The API entrypoint',
+                    'hydra:title' => 'Entrypoint',
                     'hydra:supportedProperty' => [
                         [
                             '@type' => 'hydra:SupportedProperty',
                             'hydra:property' => [
                                 '@id' => '#Entrypoint/dummy',
                                 '@type' => 'hydra:Link',
-                                'rdfs:label' => 'The collection of dummy resources',
                                 'domain' => '#Entrypoint',
-                                'rdfs:range' => [
+                                'range' => [
                                     ['@id' => 'hydra:Collection'],
                                     [
                                         'owl:equivalentClass' => [
@@ -264,25 +264,27 @@ class DocumentationNormalizerTest extends TestCase
                                         ],
                                     ],
                                 ],
+                                'owl:maxCardinality' => 1,
                                 'hydra:supportedOperation' => [
                                     [
                                         '@type' => ['hydra:Operation', 'schema:FindAction'],
                                         'hydra:method' => 'GET',
-                                        'hydra:title' => 'Retrieves the collection of dummy resources.',
-                                        'rdfs:label' => 'Retrieves the collection of dummy resources.',
+                                        'hydra:title' => 'getdummyCollection',
+                                        'hydra:description' => 'Retrieves the collection of dummy resources.',
                                         'returns' => 'hydra:Collection',
                                     ],
                                     [
                                         '@type' => ['hydra:Operation', 'schema:CreateAction'],
                                         'expects' => 'dummy',
                                         'hydra:method' => 'POST',
-                                        'hydra:title' => 'Creates a dummy resource.',
-                                        'rdfs:label' => 'Creates a dummy resource.',
+                                        'hydra:title' => 'postdummy',
+                                        'hydra:description' => 'Creates a dummy resource.',
                                         'returns' => 'dummy',
                                     ],
                                 ],
                             ],
-                            'hydra:title' => 'The collection of dummy resources',
+                            'hydra:title' => 'getdummyCollection',
+                            'hydra:description' => 'The collection of dummy resources',
                             'hydra:readable' => true,
                             'hydra:writeable' => false,
                         ],
@@ -290,22 +292,24 @@ class DocumentationNormalizerTest extends TestCase
                     'hydra:supportedOperation' => [
                         '@type' => 'hydra:Operation',
                         'hydra:method' => 'GET',
-                        'rdfs:label' => 'The API entrypoint.',
-                        'returns' => 'EntryPoint',
+                        'hydra:title' => 'index',
+                        'hydra:description' => 'The API Entrypoint.',
+                        'hydra:returns' => 'Entrypoint',
                     ],
                 ],
                 [
-                    '@id' => '#ConstraintViolation',
+                    '@id' => '#ConstraintViolationList',
                     '@type' => 'hydra:Class',
-                    'hydra:title' => 'A constraint violation',
+                    'hydra:title' => 'ConstraintViolationList',
+                    'hydra:description' => 'A constraint violation List.',
                     'hydra:supportedProperty' => [
                         [
                             '@type' => 'hydra:SupportedProperty',
                             'hydra:property' => [
-                                '@id' => '#ConstraintViolation/propertyPath',
+                                '@id' => '#ConstraintViolationList/propertyPath',
                                 '@type' => 'rdf:Property',
                                 'rdfs:label' => 'propertyPath',
-                                'domain' => '#ConstraintViolation',
+                                'domain' => '#ConstraintViolationList',
                                 'range' => 'xmls:string',
                             ],
                             'hydra:title' => 'propertyPath',
@@ -316,36 +320,14 @@ class DocumentationNormalizerTest extends TestCase
                         [
                             '@type' => 'hydra:SupportedProperty',
                             'hydra:property' => [
-                                '@id' => '#ConstraintViolation/message',
+                                '@id' => '#ConstraintViolationList/message',
                                 '@type' => 'rdf:Property',
                                 'rdfs:label' => 'message',
-                                'domain' => '#ConstraintViolation',
+                                'domain' => '#ConstraintViolationList',
                                 'range' => 'xmls:string',
                             ],
                             'hydra:title' => 'message',
                             'hydra:description' => 'The message associated with the violation',
-                            'hydra:readable' => true,
-                            'hydra:writeable' => false,
-                        ],
-                    ],
-                ],
-                [
-                    '@id' => '#ConstraintViolationList',
-                    '@type' => 'hydra:Class',
-                    'subClassOf' => 'hydra:Error',
-                    'hydra:title' => 'A constraint violation list',
-                    'hydra:supportedProperty' => [
-                        [
-                            '@type' => 'hydra:SupportedProperty',
-                            'hydra:property' => [
-                                '@id' => '#ConstraintViolationList/violations',
-                                '@type' => 'rdf:Property',
-                                'rdfs:label' => 'violations',
-                                'domain' => '#ConstraintViolationList',
-                                'range' => '#ConstraintViolation',
-                            ],
-                            'hydra:title' => 'violations',
-                            'hydra:description' => 'The violations',
                             'hydra:readable' => true,
                             'hydra:writeable' => false,
                         ],
@@ -385,10 +367,10 @@ class DocumentationNormalizerTest extends TestCase
         ]));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create('inputClass', 'a', Argument::type('array'))->shouldBeCalled()->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('a')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true));
-        $propertyMetadataFactoryProphecy->create('inputClass', 'b', Argument::type('array'))->shouldBeCalled()->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('b')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true));
-        $propertyMetadataFactoryProphecy->create('outputClass', 'c', Argument::type('array'))->shouldBeCalled()->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('c')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true));
-        $propertyMetadataFactoryProphecy->create('outputClass', 'd', Argument::type('array'))->shouldBeCalled()->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('d')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true));
+        $propertyMetadataFactoryProphecy->create('inputClass', 'a', Argument::type('array'))->shouldBeCalled()->willReturn((new ApiProperty())->withNativeType(Type::string())->withDescription('a')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true));
+        $propertyMetadataFactoryProphecy->create('inputClass', 'b', Argument::type('array'))->shouldBeCalled()->willReturn((new ApiProperty())->withNativeType(Type::string())->withDescription('b')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true));
+        $propertyMetadataFactoryProphecy->create('outputClass', 'c', Argument::type('array'))->shouldBeCalled()->willReturn((new ApiProperty())->withNativeType(Type::string())->withDescription('c')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true));
+        $propertyMetadataFactoryProphecy->create('outputClass', 'd', Argument::type('array'))->shouldBeCalled()->willReturn((new ApiProperty())->withNativeType(Type::string())->withDescription('d')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true));
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(Argument::type('string'))->willReturn(true);
@@ -407,252 +389,99 @@ class DocumentationNormalizerTest extends TestCase
         );
 
         $expected = [
-            '@context' => [
-                HYDRA_CONTEXT,
+            '@id' => '#dummy',
+            '@type' => 'hydra:Class',
+            'hydra:title' => 'dummy',
+            'hydra:supportedProperty' => [
                 [
-                    '@vocab' => '/doc#',
-                    'hydra' => 'http://www.w3.org/ns/hydra/core#',
-                    'rdf' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-                    'rdfs' => 'http://www.w3.org/2000/01/rdf-schema#',
-                    'xmls' => 'http://www.w3.org/2001/XMLSchema#',
-                    'owl' => 'http://www.w3.org/2002/07/owl#',
-                    'schema' => 'https://schema.org/',
-                    'domain' => [
-                        '@id' => 'rdfs:domain',
-                        '@type' => '@id',
+                    '@type' => 'hydra:SupportedProperty',
+                    'hydra:property' => [
+                        '@id' => '#dummy/a',
+                        '@type' => 'rdf:Property',
+                        'label' => 'a',
+                        'domain' => '#dummy',
+                        'range' => 'xmls:string',
                     ],
-                    'range' => [
-                        '@id' => 'rdfs:range',
-                        '@type' => '@id',
+                    'hydra:title' => 'a',
+                    'hydra:required' => false,
+                    'hydra:readable' => true,
+                    'hydra:writeable' => true,
+                    'hydra:description' => 'a',
+                ],
+                [
+                    '@type' => 'hydra:SupportedProperty',
+                    'hydra:property' => [
+                        '@id' => '#dummy/b',
+                        '@type' => 'rdf:Property',
+                        'label' => 'b',
+                        'domain' => '#dummy',
+                        'range' => 'xmls:string',
                     ],
-                    'subClassOf' => [
-                        '@id' => 'rdfs:subClassOf',
-                        '@type' => '@id',
+                    'hydra:title' => 'b',
+                    'hydra:required' => false,
+                    'hydra:readable' => true,
+                    'hydra:writeable' => true,
+                    'hydra:description' => 'b',
+                ],
+                [
+                    '@type' => 'hydra:SupportedProperty',
+                    'hydra:property' => [
+                        '@id' => '#dummy/c',
+                        '@type' => 'rdf:Property',
+                        'label' => 'c',
+                        'domain' => '#dummy',
+                        'range' => 'xmls:string',
                     ],
+                    'hydra:title' => 'c',
+                    'hydra:required' => false,
+                    'hydra:readable' => true,
+                    'hydra:writeable' => true,
+                    'hydra:description' => 'c',
+                ],
+                [
+                    '@type' => 'hydra:SupportedProperty',
+                    'hydra:property' => [
+                        '@id' => '#dummy/d',
+                        '@type' => 'rdf:Property',
+                        'label' => 'd',
+                        'domain' => '#dummy',
+                        'range' => 'xmls:string',
+                    ],
+                    'hydra:title' => 'd',
+                    'hydra:required' => false,
+                    'hydra:readable' => true,
+                    'hydra:writeable' => true,
+                    'hydra:description' => 'd',
                 ],
             ],
-            '@id' => '/doc',
-            '@type' => 'hydra:ApiDocumentation',
-            'hydra:title' => 'Test Api',
-            'hydra:description' => 'test ApiGerard',
-            'hydra:entrypoint' => '/',
-            'hydra:supportedClass' => [
+            'hydra:supportedOperation' => [
                 [
-                    '@id' => '#dummy',
-                    '@type' => 'hydra:Class',
-                    'rdfs:label' => 'dummy',
-                    'hydra:title' => 'dummy',
-                    'hydra:supportedProperty' => [
-                        [
-                            '@type' => 'hydra:SupportedProperty',
-                            'hydra:property' => [
-                                '@id' => '#dummy/a',
-                                '@type' => 'rdf:Property',
-                                'rdfs:label' => 'a',
-                                'domain' => '#dummy',
-                                'range' => 'xmls:string',
-                            ],
-                            'hydra:title' => 'a',
-                            'hydra:required' => false,
-                            'hydra:readable' => true,
-                            'hydra:writeable' => true,
-                            'hydra:description' => 'a',
-                        ],
-                        [
-                            '@type' => 'hydra:SupportedProperty',
-                            'hydra:property' => [
-                                '@id' => '#dummy/b',
-                                '@type' => 'rdf:Property',
-                                'rdfs:label' => 'b',
-                                'domain' => '#dummy',
-                                'range' => 'xmls:string',
-                            ],
-                            'hydra:title' => 'b',
-                            'hydra:required' => false,
-                            'hydra:readable' => true,
-                            'hydra:writeable' => true,
-                            'hydra:description' => 'b',
-                        ],
-                        [
-                            '@type' => 'hydra:SupportedProperty',
-                            'hydra:property' => [
-                                '@id' => '#dummy/c',
-                                '@type' => 'rdf:Property',
-                                'rdfs:label' => 'c',
-                                'domain' => '#dummy',
-                                'range' => 'xmls:string',
-                            ],
-                            'hydra:title' => 'c',
-                            'hydra:required' => false,
-                            'hydra:readable' => true,
-                            'hydra:writeable' => true,
-                            'hydra:description' => 'c',
-                        ],
-                        [
-                            '@type' => 'hydra:SupportedProperty',
-                            'hydra:property' => [
-                                '@id' => '#dummy/d',
-                                '@type' => 'rdf:Property',
-                                'rdfs:label' => 'd',
-                                'domain' => '#dummy',
-                                'range' => 'xmls:string',
-                            ],
-                            'hydra:title' => 'd',
-                            'hydra:required' => false,
-                            'hydra:readable' => true,
-                            'hydra:writeable' => true,
-                            'hydra:description' => 'd',
-                        ],
+                    '@type' => [
+                        'hydra:Operation',
+                        'schema:FindAction',
                     ],
-                    'hydra:supportedOperation' => [
-                        [
-                            '@type' => [
-                                'hydra:Operation',
-                                'schema:FindAction',
-                            ],
-                            'hydra:method' => 'GET',
-                            'hydra:title' => 'Retrieves a dummy resource.',
-                            'rdfs:label' => 'Retrieves a dummy resource.',
-                            'returns' => 'dummy',
-                        ],
-                        [
-                            '@type' => [
-                                'hydra:Operation',
-                                'schema:ReplaceAction',
-                            ],
-                            'expects' => 'owl:Nothing',
-                            'hydra:method' => 'PUT',
-                            'hydra:title' => 'Replaces the dummy resource.',
-                            'rdfs:label' => 'Replaces the dummy resource.',
-                            'returns' => 'dummy',
-                        ],
-                    ],
-                    'hydra:description' => 'dummy',
+                    'hydra:method' => 'GET',
+                    'hydra:title' => 'getdummy',
+                    'hydra:description' => 'Retrieves a dummy resource.',
+                    'returns' => 'dummy',
                 ],
                 [
-                    '@id' => '#Entrypoint',
-                    '@type' => 'hydra:Class',
-                    'hydra:title' => 'The API entrypoint',
-                    'hydra:supportedProperty' => [
-                        [
-                            '@type' => 'hydra:SupportedProperty',
-                            'hydra:property' => [
-                                '@id' => '#Entrypoint/dummy',
-                                '@type' => 'hydra:Link',
-                                'domain' => '#Entrypoint',
-                                'rdfs:label' => 'The collection of dummy resources',
-                                'rdfs:range' => [
-                                    [
-                                        '@id' => 'hydra:Collection',
-                                    ],
-                                    [
-                                        'owl:equivalentClass' => [
-                                            'owl:onProperty' => [
-                                                '@id' => 'hydra:member',
-                                            ],
-                                            'owl:allValuesFrom' => [
-                                                '@id' => '#dummy',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                                'hydra:supportedOperation' => [
-                                    [
-                                        '@type' => [
-                                            'hydra:Operation',
-                                            'schema:FindAction',
-                                        ],
-                                        'hydra:method' => 'GET',
-                                        'hydra:title' => 'Retrieves the collection of dummy resources.',
-                                        'rdfs:label' => 'Retrieves the collection of dummy resources.',
-                                        'returns' => 'hydra:Collection',
-                                    ],
-                                    [
-                                        '@type' => [
-                                            'hydra:Operation',
-                                            'schema:CreateAction',
-                                        ],
-                                        'expects' => 'dummy',
-                                        'hydra:method' => 'POST',
-                                        'hydra:title' => 'Creates a dummy resource.',
-                                        'rdfs:label' => 'Creates a dummy resource.',
-                                        'returns' => 'owl:Nothing',
-                                    ],
-                                ],
-                            ],
-                            'hydra:title' => 'The collection of dummy resources',
-                            'hydra:readable' => true,
-                            'hydra:writeable' => false,
-                        ],
+                    '@type' => [
+                        'hydra:Operation',
+                        'schema:ReplaceAction',
                     ],
-                    'hydra:supportedOperation' => [
-                        '@type' => 'hydra:Operation',
-                        'hydra:method' => 'GET',
-                        'rdfs:label' => 'The API entrypoint.',
-                        'returns' => 'EntryPoint',
-                    ],
-                ],
-                2 => [
-                    '@id' => '#ConstraintViolation',
-                    '@type' => 'hydra:Class',
-                    'hydra:title' => 'A constraint violation',
-                    'hydra:supportedProperty' => [
-                        [
-                            '@type' => 'hydra:SupportedProperty',
-                            'hydra:property' => [
-                                '@id' => '#ConstraintViolation/propertyPath',
-                                '@type' => 'rdf:Property',
-                                'rdfs:label' => 'propertyPath',
-                                'domain' => '#ConstraintViolation',
-                                'range' => 'xmls:string',
-                            ],
-                            'hydra:title' => 'propertyPath',
-                            'hydra:description' => 'The property path of the violation',
-                            'hydra:readable' => true,
-                            'hydra:writeable' => false,
-                        ],
-                        [
-                            '@type' => 'hydra:SupportedProperty',
-                            'hydra:property' => [
-                                '@id' => '#ConstraintViolation/message',
-                                '@type' => 'rdf:Property',
-                                'rdfs:label' => 'message',
-                                'domain' => '#ConstraintViolation',
-                                'range' => 'xmls:string',
-                            ],
-                            'hydra:title' => 'message',
-                            'hydra:description' => 'The message associated with the violation',
-                            'hydra:readable' => true,
-                            'hydra:writeable' => false,
-                        ],
-                    ],
-                ],
-                [
-                    '@id' => '#ConstraintViolationList',
-                    '@type' => 'hydra:Class',
-                    'subClassOf' => 'hydra:Error',
-                    'hydra:title' => 'A constraint violation list',
-                    'hydra:supportedProperty' => [
-                        [
-                            '@type' => 'hydra:SupportedProperty',
-                            'hydra:property' => [
-                                '@id' => '#ConstraintViolationList/violations',
-                                '@type' => 'rdf:Property',
-                                'rdfs:label' => 'violations',
-                                'domain' => '#ConstraintViolationList',
-                                'range' => '#ConstraintViolation',
-                            ],
-                            'hydra:title' => 'violations',
-                            'hydra:description' => 'The violations',
-                            'hydra:readable' => true,
-                            'hydra:writeable' => false,
-                        ],
-                    ],
+                    'expects' => 'owl:Nothing',
+                    'hydra:method' => 'PUT',
+                    'hydra:title' => 'putdummy',
+                    'hydra:description' => 'Replaces the dummy resource.',
+                    'returns' => 'dummy',
                 ],
             ],
+            'hydra:description' => 'dummy',
         ];
 
-        $this->assertEquals($expected, $documentationNormalizer->normalize($documentation));
+        $doc = $documentationNormalizer->normalize($documentation);
+        $this->assertEquals($expected, $doc['hydra:supportedClass'][0]);
     }
 
     public function testHasHydraContext(): void
@@ -675,7 +504,7 @@ class DocumentationNormalizerTest extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create('dummy', 'name', Argument::type('array'))->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withNativeType(Type::string())
                 ->withDescription('b')
                 ->withReadable(true)
                 ->withWritable(true)
@@ -705,7 +534,7 @@ class DocumentationNormalizerTest extends TestCase
         $this->assertEquals([
             '@id' => '#dummy/name',
             '@type' => 'https://schema.org/Enumeration',
-            'rdfs:label' => 'name',
+            'label' => 'name',
             'domain' => '#dummy',
             'range' => 'xmls:string',
         ], $documentationNormalizer->normalize($documentation)['hydra:supportedClass'][0]['hydra:supportedProperty'][0]['hydra:property']);
@@ -737,15 +566,15 @@ class DocumentationNormalizerTest extends TestCase
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create('dummy', 'name', Argument::type('array'))->shouldBeCalled()->willReturn(
-            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('name')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)
+            (new ApiProperty())->withNativeType(Type::string())->withDescription('name')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)
         );
         $propertyMetadataFactoryProphecy->create('dummy', 'description', Argument::type('array'))->shouldBeCalled()->willReturn(
-            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('description')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)->withJsonldContext(['@type' => '@id'])
+            (new ApiProperty())->withNativeType(Type::string())->withDescription('description')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)->withJsonldContext(['@type' => '@id'])
         );
         $propertyMetadataFactoryProphecy->create('dummy', 'nameConverted', Argument::type('array'))->shouldBeCalled()->willReturn(
-            (new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])->withDescription('name converted')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)
+            (new ApiProperty())->withNativeType(Type::string())->withDescription('name converted')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)
         );
-        $propertyMetadataFactoryProphecy->create('dummy', 'relatedDummy', Argument::type('array'))->shouldBeCalled()->willReturn((new ApiProperty())->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, false, 'dummy', true, null, new Type(Type::BUILTIN_TYPE_OBJECT, false, 'relatedDummy'))])->withDescription('This is a name.')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true));
+        $propertyMetadataFactoryProphecy->create('dummy', 'relatedDummy', Argument::type('array'))->shouldBeCalled()->willReturn((new ApiProperty())->withNativeType(Type::collection(Type::object('dummy'), Type::object('relatedDummy')))->withDescription('This is a name.')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)); // @phpstan-ignore-line
         $propertyMetadataFactoryProphecy->create('dummy', 'iri', Argument::type('array'))->shouldBeCalled()->willReturn((new ApiProperty())->withIris(['https://schema.org/Dummy']));
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -799,7 +628,6 @@ class DocumentationNormalizerTest extends TestCase
                 [
                     '@id' => '#dummy',
                     '@type' => 'Class',
-                    'rdfs:label' => 'dummy',
                     'title' => 'dummy',
                     'description' => 'dummy',
                     'supportedProperty' => [
@@ -808,7 +636,7 @@ class DocumentationNormalizerTest extends TestCase
                             'property' => [
                                 '@id' => '#dummy/name',
                                 '@type' => 'rdf:Property',
-                                'rdfs:label' => 'name',
+                                'label' => 'name',
                                 'domain' => '#dummy',
                                 'range' => 'xmls:string',
                             ],
@@ -823,7 +651,7 @@ class DocumentationNormalizerTest extends TestCase
                             'property' => [
                                 '@id' => '#dummy/description',
                                 '@type' => 'rdf:Property',
-                                'rdfs:label' => 'description',
+                                'label' => 'description',
                                 'domain' => '#dummy',
                                 'range' => '@id',
                             ],
@@ -838,7 +666,7 @@ class DocumentationNormalizerTest extends TestCase
                             'property' => [
                                 '@id' => '#dummy/name_converted',
                                 '@type' => 'rdf:Property',
-                                'rdfs:label' => 'name_converted',
+                                'label' => 'name_converted',
                                 'domain' => '#dummy',
                                 'range' => 'xmls:string',
                             ],
@@ -853,7 +681,7 @@ class DocumentationNormalizerTest extends TestCase
                             'property' => [
                                 '@id' => '#dummy/relatedDummy',
                                 '@type' => 'rdf:Property',
-                                'rdfs:label' => 'relatedDummy',
+                                'label' => 'relatedDummy',
                                 'domain' => '#dummy',
                                 'range' => '#relatedDummy',
                             ],
@@ -868,7 +696,7 @@ class DocumentationNormalizerTest extends TestCase
                             'property' => [
                                 '@id' => 'https://schema.org/Dummy',
                                 '@type' => 'rdf:Property',
-                                'rdfs:label' => 'iri',
+                                'label' => 'iri',
                                 'domain' => '#dummy',
                             ],
                             'title' => 'iri',
@@ -882,23 +710,23 @@ class DocumentationNormalizerTest extends TestCase
                             '@type' => ['Operation', 'schema:FindAction'],
                             'method' => 'GET',
                             'title' => 'foobar',
-                            'rdfs:label' => 'foobar',
                             'returns' => 'dummy',
                             'foo' => 'bar',
+                            'description' => 'Retrieves a dummy resource.',
                         ],
                         [
                             '@type' => ['Operation', 'schema:ReplaceAction'],
                             'expects' => 'dummy',
                             'method' => 'PUT',
-                            'title' => 'Replaces the dummy resource.',
-                            'rdfs:label' => 'Replaces the dummy resource.',
+                            'title' => 'putdummy',
+                            'description' => 'Replaces the dummy resource.',
                             'returns' => 'dummy',
                         ],
                         [
                             '@type' => ['Operation', 'schema:FindAction'],
                             'method' => 'GET',
-                            'title' => 'Retrieves a relatedDummy resource.',
-                            'rdfs:label' => 'Retrieves a relatedDummy resource.',
+                            'title' => 'getrelatedDummy',
+                            'description' => 'Retrieves a relatedDummy resource.',
                             'returns' => 'relatedDummy',
                         ],
                     ],
@@ -906,16 +734,15 @@ class DocumentationNormalizerTest extends TestCase
                 [
                     '@id' => '#Entrypoint',
                     '@type' => 'Class',
-                    'title' => 'The API entrypoint',
+                    'title' => 'Entrypoint',
                     'supportedProperty' => [
                         [
                             '@type' => 'SupportedProperty',
                             'property' => [
                                 '@id' => '#Entrypoint/dummy',
                                 '@type' => 'Link',
-                                'rdfs:label' => 'The collection of dummy resources',
                                 'domain' => '#Entrypoint',
-                                'rdfs:range' => [
+                                'range' => [
                                     ['@id' => 'Collection'],
                                     [
                                         'owl:equivalentClass' => [
@@ -924,25 +751,27 @@ class DocumentationNormalizerTest extends TestCase
                                         ],
                                     ],
                                 ],
+                                'owl:maxCardinality' => 1,
                                 'supportedOperation' => [
                                     [
                                         '@type' => ['Operation', 'schema:FindAction'],
                                         'method' => 'GET',
-                                        'title' => 'Retrieves the collection of dummy resources.',
-                                        'rdfs:label' => 'Retrieves the collection of dummy resources.',
+                                        'title' => 'getdummyCollection',
+                                        'description' => 'Retrieves the collection of dummy resources.',
                                         'returns' => 'Collection',
                                     ],
                                     [
                                         '@type' => ['Operation', 'schema:CreateAction'],
                                         'expects' => 'dummy',
                                         'method' => 'POST',
-                                        'title' => 'Creates a dummy resource.',
-                                        'rdfs:label' => 'Creates a dummy resource.',
+                                        'title' => 'postdummy',
+                                        'description' => 'Creates a dummy resource.',
                                         'returns' => 'dummy',
                                     ],
                                 ],
                             ],
-                            'title' => 'The collection of dummy resources',
+                            'title' => 'getdummyCollection',
+                            'description' => 'The collection of dummy resources',
                             'readable' => true,
                             'writeable' => false,
                         ],
@@ -950,22 +779,24 @@ class DocumentationNormalizerTest extends TestCase
                     'supportedOperation' => [
                         '@type' => 'Operation',
                         'method' => 'GET',
-                        'rdfs:label' => 'The API entrypoint.',
-                        'returns' => 'EntryPoint',
+                        'title' => 'index',
+                        'description' => 'The API Entrypoint.',
+                        'returns' => 'Entrypoint',
                     ],
                 ],
                 [
-                    '@id' => '#ConstraintViolation',
+                    '@id' => '#ConstraintViolationList',
                     '@type' => 'Class',
-                    'title' => 'A constraint violation',
+                    'title' => 'ConstraintViolationList',
+                    'description' => 'A constraint violation List.',
                     'supportedProperty' => [
                         [
                             '@type' => 'SupportedProperty',
                             'property' => [
-                                '@id' => '#ConstraintViolation/propertyPath',
+                                '@id' => '#ConstraintViolationList/propertyPath',
                                 '@type' => 'rdf:Property',
                                 'rdfs:label' => 'propertyPath',
-                                'domain' => '#ConstraintViolation',
+                                'domain' => '#ConstraintViolationList',
                                 'range' => 'xmls:string',
                             ],
                             'title' => 'propertyPath',
@@ -976,10 +807,10 @@ class DocumentationNormalizerTest extends TestCase
                         [
                             '@type' => 'SupportedProperty',
                             'property' => [
-                                '@id' => '#ConstraintViolation/message',
+                                '@id' => '#ConstraintViolationList/message',
                                 '@type' => 'rdf:Property',
                                 'rdfs:label' => 'message',
-                                'domain' => '#ConstraintViolation',
+                                'domain' => '#ConstraintViolationList',
                                 'range' => 'xmls:string',
                             ],
                             'title' => 'message',
@@ -989,30 +820,110 @@ class DocumentationNormalizerTest extends TestCase
                         ],
                     ],
                 ],
+            ],
+            'entrypoint' => '/',
+        ];
+
+        $this->assertEquals($expected, $documentationNormalizer->normalize($documentation, null, [ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX => false]));
+    }
+
+    public function testNormalizeNoEntrypointAndHideHydraOperation(): void
+    {
+        $title = 'Test Api';
+        $desc = 'test ApiGerard';
+        $version = '0.0.0';
+        $documentation = new Documentation(new ResourceNameCollection(['dummy' => 'dummy']), $title, $desc, $version);
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('dummy')->willReturn(new ResourceMetadataCollection('dummy', [
+            (new ApiResource())->withHideHydraOperation(true)->withOperations(new Operations([
+                'get' => new Get(),
+            ])),
+        ]));
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $urlGenerator = $this->prophesize(UrlGeneratorInterface::class);
+        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'], Argument::any())->willReturn('/doc');
+
+        $documentationNormalizer = new DocumentationNormalizer(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $urlGenerator->reveal(),
+            new CustomConverter(),
+            [],
+            false,
+        );
+
+        $expected = [
+            '@context' => [
+                HYDRA_CONTEXT,
+                [
+                    '@vocab' => '/doc#',
+                    'hydra' => 'http://www.w3.org/ns/hydra/core#',
+                    'rdf' => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+                    'rdfs' => 'http://www.w3.org/2000/01/rdf-schema#',
+                    'xmls' => 'http://www.w3.org/2001/XMLSchema#',
+                    'owl' => 'http://www.w3.org/2002/07/owl#',
+                    'schema' => 'https://schema.org/',
+                    'domain' => [
+                        '@id' => 'rdfs:domain',
+                        '@type' => '@id',
+                    ],
+                    'range' => [
+                        '@id' => 'rdfs:range',
+                        '@type' => '@id',
+                    ],
+                    'subClassOf' => [
+                        '@id' => 'rdfs:subClassOf',
+                        '@type' => '@id',
+                    ],
+                ],
+            ],
+            '@id' => '/doc',
+            '@type' => 'ApiDocumentation',
+            'title' => 'Test Api',
+            'description' => 'test ApiGerard',
+            'supportedClass' => [
                 [
                     '@id' => '#ConstraintViolationList',
                     '@type' => 'Class',
-                    'subClassOf' => 'Error',
-                    'title' => 'A constraint violation list',
+                    'title' => 'ConstraintViolationList',
+                    'description' => 'A constraint violation List.',
                     'supportedProperty' => [
                         [
                             '@type' => 'SupportedProperty',
                             'property' => [
-                                '@id' => '#ConstraintViolationList/violations',
+                                '@id' => '#ConstraintViolationList/propertyPath',
                                 '@type' => 'rdf:Property',
-                                'rdfs:label' => 'violations',
+                                'rdfs:label' => 'propertyPath',
                                 'domain' => '#ConstraintViolationList',
-                                'range' => '#ConstraintViolation',
+                                'range' => 'xmls:string',
                             ],
-                            'title' => 'violations',
-                            'description' => 'The violations',
+                            'title' => 'propertyPath',
+                            'description' => 'The property path of the violation',
+                            'readable' => true,
+                            'writeable' => false,
+                        ],
+                        [
+                            '@type' => 'SupportedProperty',
+                            'property' => [
+                                '@id' => '#ConstraintViolationList/message',
+                                '@type' => 'rdf:Property',
+                                'rdfs:label' => 'message',
+                                'domain' => '#ConstraintViolationList',
+                                'range' => 'xmls:string',
+                            ],
+                            'title' => 'message',
+                            'description' => 'The message associated with the violation',
                             'readable' => true,
                             'writeable' => false,
                         ],
                     ],
                 ],
             ],
-            'entrypoint' => '/',
         ];
 
         $this->assertEquals($expected, $documentationNormalizer->normalize($documentation, null, [ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX => false]));

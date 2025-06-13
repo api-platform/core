@@ -31,7 +31,9 @@ use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Util\CamelCaseToSnakeCaseNameConverter;
+use ApiPlatform\State\ApiResource\Error;
 use ApiPlatform\State\CreateProvider;
+use ApiPlatform\Validator\Exception\ValidationException;
 use Psr\Log\LoggerInterface;
 
 trait OperationDefaultsTrait
@@ -42,6 +44,11 @@ trait OperationDefaultsTrait
 
     private function addGlobalDefaults(ApiResource|Operation $operation): ApiResource|Operation
     {
+        // Do not add global defaults for internal resources:
+        if (\in_array($operation->getClass(), [Error::class, ValidationException::class], true)) {
+            return $operation;
+        }
+
         $extraProperties = $this->defaults['extra_properties'] ?? [];
 
         foreach ($this->defaults as $key => $value) {
@@ -63,6 +70,10 @@ trait OperationDefaultsTrait
             $currentValue = $operation->{$getter}();
 
             if (\is_array($currentValue) && $currentValue) {
+                if (\is_string($value)) {
+                    $value = [$value];
+                }
+
                 $operation = $operation->{'with'.$upperKey}(array_merge($value, $currentValue));
             }
 
@@ -117,7 +128,7 @@ trait OperationDefaultsTrait
 
     private function addDefaultGraphQlOperations(ApiResource $resource): ApiResource
     {
-        $operations = enum_exists($resource->getClass()) ? [new QueryCollection(paginationEnabled: false), new Query()] : [new QueryCollection(), new Query(), (new Mutation())->withName('update'), (new DeleteMutation())->withName('delete'), (new Mutation())->withName('create')];
+        $operations = enum_exists($resource->getClass()) ? [new Query(), new QueryCollection(paginationEnabled: false)] : [new Query(), new QueryCollection(), (new Mutation())->withName('update'), (new DeleteMutation())->withName('delete'), (new Mutation())->withName('create')];
         $graphQlOperations = [];
         foreach ($operations as $operation) {
             [$key, $operation] = $this->getOperationWithDefaults($resource, $operation);

@@ -39,7 +39,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.3'
+          - '8.4'
       fail-fast: false
     steps:
       - name: Checkout
@@ -99,7 +99,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.3'
+          - '8.4'
       fail-fast: false
     steps:
       - name: Checkout
@@ -136,7 +136,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.3'
+          - '8.4'
       fail-fast: false
     env:
       APP_DEBUG: '1' # https://github.com/phpstan/phpstan-symfony/issues/37
@@ -201,10 +201,11 @@ jobs:
         php:
           - '8.2'
           - '8.3'
+          - '8.4'
         include:
           - php: '8.2'
-            coverage: true
           - php: '8.3'
+          - php: '8.4'
             coverage: true
       fail-fast: false
     steps:
@@ -245,7 +246,7 @@ jobs:
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           directory: build/logs/phpunit
           name: phpunit-php${{ matrix.php }}
@@ -263,14 +264,16 @@ jobs:
         continue-on-error: true
 
   phpunit-components:
-    name: PHPUnit ${{ matrix.component }} (PHP ${{ matrix.php }})
+    name: PHPUnit ${{ matrix.component }} (PHP ${{ matrix.php.version }} ${{ matrix.php.coverage && 'coverage' || '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
       matrix:
         php:
-          - '8.2'
-          - '8.3'
+          - version: '8.2'
+          - version: '8.3'
+          - version: '8.4'
+            coverage: true
         component:
           - api-platform/doctrine-common
           - api-platform/doctrine-orm
@@ -288,11 +291,6 @@ jobs:
           - api-platform/state
           - api-platform/symfony
           - api-platform/validator
-        include:
-          - php: '8.2'
-            coverage: true
-          - php: '8.3'
-            coverage: true
       fail-fast: false
     steps:
       - name: Checkout
@@ -300,20 +298,22 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php }}
+          php-version: ${{ matrix.php.version }}
           tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
           ini-values: memory_limit=-1
-      - name: Run ${{ matrix.component }} install
+      - name: Linking
         run: |
           composer global require soyuka/pmu
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link . --permanent
+      - name: Run ${{ matrix.component }} install
+        run: |
           composer ${{matrix.component}} update
       - name: Run ${{ matrix.component }} tests
         run: |
           mkdir -p /tmp/build/logs/phpunit
-          composer ${{matrix.component}} test --log-junit "/tmp/build/logs/phpunit/junit.xml" ${{ matrix.coverage && '--coverage-clover /tmp/build/logs/phpunit/clover.xml' || '' }}
+          composer ${{matrix.component}} test --log-junit "/tmp/build/logs/phpunit/junit.xml" ${{ matrix.php.coverage && '--coverage-clover /tmp/build/logs/phpunit/clover.xml' || '' }}
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -323,7 +323,7 @@ jobs:
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           directory: /tmp/build/logs/phpunit
           name: phpunit-php${{ matrix.php }}
@@ -340,6 +340,56 @@ jobs:
           php-coveralls --coverage_clover=/tmp/build/logs/phpunit/clover.xml
         continue-on-error: true
 
+  phpunit-components-fail-deprecation:
+    name: PHPUnit no deprecations ${{ matrix.component }} (PHP ${{ matrix.php.version }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        php:
+          - version: '8.4'
+        component:
+          - api-platform/doctrine-common
+          - api-platform/doctrine-orm
+          - api-platform/doctrine-odm
+          - api-platform/metadata
+          - api-platform/hydra
+          - api-platform/json-api
+          - api-platform/json-schema
+          - api-platform/elasticsearch
+          - api-platform/openapi
+          - api-platform/graphql
+          - api-platform/http-cache
+          - api-platform/ramsey-uuid
+          - api-platform/serializer
+          - api-platform/state
+          - api-platform/symfony
+          - api-platform/validator
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php.version }}
+          tools: pecl, composer
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
+          ini-values: memory_limit=-1
+      - name: Linking
+        run: |
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link . --permanent
+      - name: Run ${{ matrix.component }} install
+        run: |
+          composer ${{matrix.component}} update
+      - name: Run ${{ matrix.component }} tests
+        run: |
+          mkdir -p /tmp/build/logs/phpunit
+          cd $(composer ${{matrix.component}} --cwd)
+          ./vendor/bin/phpunit --fail-on-deprecation --display-deprecations --log-junit "/tmp/build/logs/phpunit/junit.xml" 
+
   behat:
     name: Behat (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
@@ -349,13 +399,12 @@ jobs:
         php:
           - '8.2'
           - '8.3'
+          - '8.4'
         include:
           - php: '8.2'
-            coverage: true
           - php: '8.3'
+          - php: '8.4'
             coverage: true
-          - php: '8.3'
-            coverage: false
       fail-fast: false
     steps:
       - name: Checkout
@@ -405,7 +454,7 @@ jobs:
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           directory: build/logs/behat
           name: behat-php${{ matrix.php }}
@@ -421,26 +470,6 @@ jobs:
           export PATH="$PATH:$HOME/.composer/vendor/bin"
           php-coveralls --coverage_clover=build/logs/behat/clover.xml
         continue-on-error: true
-      - name: Export OpenAPI documents
-        run: |
-          mkdir -p build/out/openapi
-          tests/Fixtures/app/console api:openapi:export -o build/out/openapi/openapi_v3.json
-          tests/Fixtures/app/console api:openapi:export --yaml -o build/out/openapi/openapi_v3.yaml
-      - name: Setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '14'
-      - name: Validate OpenAPI documents
-        run: |
-          npx swagger-cli validate build/out/openapi/openapi_v3.json
-          npx swagger-cli validate build/out/openapi/openapi_v3.yaml
-      - name: Upload OpenAPI artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: openapi-docs-php${{ matrix.php }}
-          path: build/out/openapi
-        continue-on-error: true
 
   postgresql:
     name: Behat (PHP ${{ matrix.php }}) (PostgreSQL)
@@ -449,7 +478,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.3'
+          - '8.4'
       fail-fast: false
     env:
       APP_ENV: postgres
@@ -499,7 +528,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.3'
+          - '8.4'
       fail-fast: false
     services:
       mysql:
@@ -549,8 +578,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.2'
-          - '8.3'
+          - '8.4'
       fail-fast: false
     env:
       APP_ENV: mongodb
@@ -615,7 +643,7 @@ jobs:
           path: build/logs/behat
         continue-on-error: true
       - name: Upload coverage results to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           directory: build/logs/behat
           name: behat-php${{ matrix.php }}
@@ -638,8 +666,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.2'
-          - '8.3'
+          - '8.4'
       fail-fast: false
     env:
       APP_ENV: mercure
@@ -706,7 +733,7 @@ jobs:
           path: build/logs/behat
         continue-on-error: true
       - name: Upload coverage results to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           directory: build/logs/behat
           name: behat-php${{ matrix.php }}
@@ -722,14 +749,66 @@ jobs:
           php-coveralls --coverage_clover=build/logs/behat/clover.xml
         continue-on-error: true
 
-  elasticsearch:
-    name: Behat (PHP ${{ matrix.php }}) (Elasticsearch)
+  elasticsearch-v9:
+    name: Behat (PHP ${{ matrix.php }}) (Elasticsearch v9)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
       matrix:
         php:
-          - '8.3'
+          - '8.4'
+      fail-fast: false
+    env:
+      APP_ENV: elasticsearch
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Configure sysctl limits
+        run: |
+          sudo swapoff -a
+          sudo sysctl -w vm.swappiness=1
+          sudo sysctl -w fs.file-max=262144
+          sudo sysctl -w vm.max_map_count=262144
+      - name: Runs Elasticsearch
+        uses: elastic/elastic-github-actions/elasticsearch@master
+        with:
+          stack-version: '9.0.0'
+          security-enabled: false
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: pecl, composer
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
+          coverage: none
+          ini-values: memory_limit=-1
+      - name: Get composer cache directory
+        id: composercache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composercache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-
+      - name: Update project dependencies
+        run: |
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link .
+      - name: Clear test app cache
+        run: tests/Fixtures/app/console cache:clear --ansi
+      - name: Run Behat tests
+        run: vendor/bin/behat --out=std --format=progress --profile=elasticsearch --no-interaction
+
+  elasticsearch-v8:
+    name: Behat (PHP ${{ matrix.php }}) (Elasticsearch v8)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        php:
+          - '8.4'
       fail-fast: false
     env:
       APP_ENV: elasticsearch
@@ -769,6 +848,60 @@ jobs:
           composer global require soyuka/pmu
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
+          composer require elasticsearch/elasticsearch "^8.4" -W
+      - name: Clear test app cache
+        run: tests/Fixtures/app/console cache:clear --ansi
+      - name: Run Behat tests
+        run: vendor/bin/behat --out=std --format=progress --profile=elasticsearch --no-interaction
+
+  elasticsearch-v7:
+    name: Behat (PHP ${{ matrix.php }}) (Elasticsearch v7)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        php:
+          - '8.3'
+      fail-fast: false
+    env:
+      APP_ENV: elasticsearch
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Configure sysctl limits
+        run: |
+          sudo swapoff -a
+          sudo sysctl -w vm.swappiness=1
+          sudo sysctl -w fs.file-max=262144
+          sudo sysctl -w vm.max_map_count=262144
+      - name: Runs Elasticsearch
+        uses: elastic/elastic-github-actions/elasticsearch@master
+        with:
+          stack-version: '7.17.0'
+          security-enabled: false
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: pecl, composer
+          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
+          coverage: none
+          ini-values: memory_limit=-1
+      - name: Get composer cache directory
+        id: composercache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composercache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-
+      - name: Update project dependencies
+        run: |
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link .
+          composer update elasticsearch/elasticsearch --prefer-lowest
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
@@ -781,7 +914,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.3'
+          - '8.4'
       fail-fast: false
     steps:
       - name: Checkout
@@ -820,7 +953,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.3'
+          - '8.4'
       fail-fast: false
     steps:
       - name: Checkout
@@ -854,7 +987,7 @@ jobs:
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
-        run: vendor/bin/phpunit
+        run: vendor/bin/phpunit --fail-on-deprecation
 
   behat-symfony-next:
     name: Behat (PHP ${{ matrix.php }}) (Symfony dev)
@@ -863,7 +996,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.3'
+          - '8.4'
       fail-fast: false
     steps:
       - name: Checkout
@@ -1008,7 +1141,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.3'
+          - '8.4'
       fail-fast: false
     steps:
       - name: Checkout
@@ -1054,9 +1187,9 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.3'
+          - '8.4'
         include:
-          - php: '8.3'
+          - php: '8.4'
             coverage: true
       fail-fast: false
     steps:
@@ -1106,7 +1239,7 @@ jobs:
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           directory: build/logs/phpunit
           name: phpunit-php${{ matrix.php }}
@@ -1132,7 +1265,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.3'
+          - '8.4'
       fail-fast: false
     steps:
       - name: Checkout
@@ -1172,26 +1305,53 @@ jobs:
           name: behat-logs-php${{ matrix.php }}
           path: build/logs/behat
         continue-on-error: true
-      - name: Export OpenAPI documents
-        run: |
-          mkdir -p build/out/openapi
-          tests/Fixtures/app/console api:openapi:export -o build/out/openapi/openapi_v3.json
-          tests/Fixtures/app/console api:openapi:export --yaml -o build/out/openapi/openapi_v3.yaml
+
+  openapi:
+    name: OpenAPI
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        php:
+          - '8.4'
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: pecl, composer
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
+          ini-values: memory_limit=-1
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: '14'
+          node-version: '22'
+      - name: Get composer cache directory
+        id: composercache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composercache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-
+      - name: Update project dependencies
+        run: |
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link .
+      - name: Clear test app cache
+        run: tests/Fixtures/app/console cache:clear --ansi
+      - name: Export OpenAPI documents
+        run: |
+          mkdir -p build/out/openapi
+          tests/Fixtures/app/console api:openapi:export --yaml -o build/out/openapi/openapi_v3.yaml
       - name: Validate OpenAPI documents
         run: |
-          npx swagger-cli validate build/out/openapi/openapi_v3.json
-          npx swagger-cli validate build/out/openapi/openapi_v3.yaml
-      - name: Upload OpenAPI artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: openapi-docs-php${{ matrix.php }}
-          path: build/out/openapi
-        continue-on-error: true
+          npx @quobix/vacuum lint -r tests/Fixtures/app/ruleset.yaml build/out/openapi/openapi_v3.yaml -d --ignore-array-circle-ref --ignore-polymorph-circle-ref -b --no-clip
 
   laravel:
     name: Laravel (PHP ${{ matrix.php }})
@@ -1202,10 +1362,11 @@ jobs:
         php:
           - '8.2'
           - '8.3'
+          - '8.4'
         include:
           - php: '8.2'
-            coverage: true
           - php: '8.3'
+          - php: '8.4'
             coverage: true
       fail-fast: false
     steps:
@@ -1230,3 +1391,32 @@ jobs:
           composer run-script test
         working-directory: 'src/Laravel'
 
+  laravel-e2e:
+    name: Laravel E2E installation (PHP 8.4)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          tools: pecl, composer
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
+          ini-values: memory_limit=-1
+      - name: Update project dependencies
+        run: |
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link . --permanent
+      - name: Setup laravel project
+        run: |
+          composer global require laravel/installer
+          laravel new test-api-platform-install --pest --no-interaction
+      - name: Install api-platform/laravel
+        run: |
+          composer global link ../src/Laravel --permanent
+          composer require api-platform/laravel:"@dev"
+          php ./artisan api-platform:install
+        working-directory: 'test-api-platform-install'

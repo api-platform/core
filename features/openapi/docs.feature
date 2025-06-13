@@ -80,13 +80,12 @@ Feature: Documentation support
     And the JSON node "paths./api/custom-call/{id}.put" should exist
     # Properties
     And the "id" property exists for the OpenAPI class "Dummy"
-    And the "name" property is required for the OpenAPI class "Dummy"
+    And the "name" property is required for the OpenAPI class "Dummy.jsonld"
     And the "genderType" property exists for the OpenAPI class "Person"
     And the "genderType" property for the OpenAPI class "Person" should be equal to:
     """
     {
       "default": "male",
-      "example": "male",
       "type": ["string", "null"],
       "enum": [
           "male",
@@ -153,10 +152,9 @@ Feature: Documentation support
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters" should have 6 elements
 
     # Subcollection - check schema
-    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.responses.200.content.application/ld+json.schema.properties.hydra:member.items.$ref" should be equal to "#/components/schemas/RelatedToDummyFriend.jsonld-fakemanytomany"
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.responses.200.content.application/ld+json.schema.allOf[1].properties.hydra:member.items.$ref" should be equal to "#/components/schemas/RelatedToDummyFriend.jsonld-fakemanytomany"
 
     # Deprecations
-    And the JSON node "paths./dummies.get.deprecated" should be false
     And the JSON node "paths./deprecated_resources.get.deprecated" should be true
     And the JSON node "paths./deprecated_resources.post.deprecated" should be true
     And the JSON node "paths./deprecated_resources/{id}.get.deprecated" should be true
@@ -166,111 +164,6 @@ Feature: Documentation support
 
     # Formats
     And the OpenAPI class "Dummy.jsonld" exists
-    And the "@id" property exists for the OpenAPI class "Dummy.jsonld"
-    And the JSON node "paths./dummies.get.responses.200.content.application/ld+json" should be equal to:
-    """
-    {
-        "schema": {
-            "type": "object",
-            "properties": {
-                "hydra:member": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/components/schemas/Dummy.jsonld"
-                    }
-                },
-                "hydra:totalItems": {
-                    "type": "integer",
-                    "minimum": 0
-                },
-                "hydra:view": {
-                    "type": "object",
-                    "properties": {
-                        "@id": {
-                            "type": "string",
-                            "format": "iri-reference"
-                        },
-                        "@type": {
-                            "type": "string"
-                        },
-                        "hydra:first": {
-                            "type": "string",
-                            "format": "iri-reference"
-                        },
-                        "hydra:last": {
-                            "type": "string",
-                            "format": "iri-reference"
-                        },
-                        "hydra:previous": {
-                            "type": "string",
-                            "format": "iri-reference"
-                        },
-                        "hydra:next": {
-                            "type": "string",
-                            "format": "iri-reference"
-                        }
-                    },
-                    "example": {
-                        "@id": "string",
-                        "type": "string",
-                        "hydra:first": "string",
-                        "hydra:last": "string",
-                        "hydra:previous": "string",
-                        "hydra:next": "string"
-                    }
-                },
-                "hydra:search": {
-                    "type": "object",
-                    "properties": {
-                        "@type": {
-                            "type": "string"
-                        },
-                        "hydra:template": {
-                            "type": "string"
-                        },
-                        "hydra:variableRepresentation": {
-                            "type": "string"
-                        },
-                        "hydra:mapping": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "@type": {
-                                        "type": "string"
-                                    },
-                                    "variable": {
-                                        "type": "string"
-                                    },
-                                    "property": {
-                                        "type": ["string", "null"]
-                                    },
-                                    "required": {
-                                        "type": "boolean"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            "required": [
-                "hydra:member"
-            ]
-        }
-    }
-    """
-    And the JSON node "paths./dummies.get.responses.200.content.application/json" should be equal to:
-    """
-    {
-        "schema": {
-            "type": "array",
-            "items": {
-                "$ref": "#/components/schemas/Dummy"
-            }
-        }
-    }
-    """
     And the JSON node "paths./override_open_api_responses.post.responses" should be equal to:
     """
     {

@@ -20,9 +20,11 @@ use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Util\CompositeIdentifierParser;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
+use ApiPlatform\Metadata\Util\TypeHelper;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 
 /**
  * {@inheritdoc}
@@ -107,24 +109,46 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
         }
 
         $resourceClass = $this->getResourceClass($item, true);
+
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName);
 
-            $types = $propertyMetadata->getBuiltinTypes();
-            if (null === ($type = $types[0] ?? null)) {
+            // TODO: remove in 5.x
+            if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
+                $types = $propertyMetadata->getBuiltinTypes();
+                if (null === ($type = $types[0] ?? null)) {
+                    continue;
+                }
+
+                try {
+                    if ($type->isCollection()) {
+                        $collectionValueType = $type->getCollectionValueTypes()[0] ?? null;
+
+                        if (null !== $collectionValueType && $collectionValueType->getClassName() === $class) {
+                            return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, \sprintf('%s[0].%s', $propertyName, $property)), $parameterName);
+                        }
+                    }
+
+                    if ($type->getClassName() === $class) {
+                        return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, "$propertyName.$property"), $parameterName);
+                    }
+                } catch (NoSuchPropertyException $e) {
+                    throw new RuntimeException('Not able to retrieve identifiers.', $e->getCode(), $e);
+                }
+            }
+
+            if (null === $type = $propertyMetadata->getNativeType()) {
                 continue;
             }
 
             try {
-                if ($type->isCollection()) {
-                    $collectionValueType = $type->getCollectionValueTypes()[0] ?? null;
+                $collectionValueType = TypeHelper::getCollectionValueType($type);
 
-                    if (null !== $collectionValueType && $collectionValueType->getClassName() === $class) {
-                        return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, \sprintf('%s[0].%s', $propertyName, $property)), $parameterName);
-                    }
+                if ($collectionValueType?->isIdentifiedBy($class)) {
+                    return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, \sprintf('%s[0].%s', $propertyName, $property)), $parameterName);
                 }
 
-                if ($type->getClassName() === $class) {
+                if ($type->isIdentifiedBy($class)) {
                     return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, "$propertyName.$property"), $parameterName);
                 }
             } catch (NoSuchPropertyException $e) {

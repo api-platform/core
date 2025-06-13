@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Laravel\Tests;
 
 use ApiPlatform\Laravel\Test\ApiTestAssertionsTrait;
+use ApiPlatform\Laravel\workbench\app\Enums\BookStatus;
 use Illuminate\Config\Repository;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -79,20 +80,37 @@ class GraphQlTest extends TestCase
 
     public function testGetBooksWithPaginationAndOrder(): void
     {
-        BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
-        $response = $this->postJson('/api/graphql', ['query' => '{
-  books(first: 3, order: {name: "desc"}) {
-    edges {
-      node {
-        id, name, publicationDate, author { id, name }
-      }
-    }
-  }
-}'], ['accept' => ['application/json']]);
+        // Create books in reverse alphabetical order to test the 'asc' order
+        BookFactory::new()
+            ->count(10)
+            ->sequence(fn ($sequence) => ['name' => \chr(122 - $sequence->index)]) // ASCII codes starting from 'z'
+            ->has(AuthorFactory::new())
+            ->create();
+
+        $response = $this->postJson('/api/graphql', [
+            'query' => '
+              query getBooks($first: Int!, $order: orderBookcollection_query!) {
+                books(first: $first, order: $order) {
+                  edges {
+                    node {
+                      id, name, publicationDate, author { id, name }
+                    }
+                  }
+                }
+              }
+            ',
+            'variables' => [
+                'first' => 3,
+                'order' => ['name' => 'asc'],
+            ],
+        ], ['accept' => ['application/json']]);
         $response->assertStatus(200);
         $data = $response->json();
         $this->assertArrayHasKey('data', $data);
         $this->assertCount(3, $data['data']['books']['edges']);
+        $this->assertEquals('q', $data['data']['books']['edges'][0]['node']['name']);
+        $this->assertEquals('r', $data['data']['books']['edges'][1]['node']['name']);
+        $this->assertEquals('s', $data['data']['books']['edges'][2]['node']['name']);
         $this->assertArrayNotHasKey('errors', $data);
     }
 
@@ -116,6 +134,7 @@ class GraphQlTest extends TestCase
                     'name' => fake()->name(),
                     'author' => 'api/authors/'.$author->id,
                     'isbn' => fake()->isbn13(),
+                    'status' => BookStatus::PUBLISHED,
                     'isAvailable' => 1 === random_int(0, 1),
                 ],
             ],

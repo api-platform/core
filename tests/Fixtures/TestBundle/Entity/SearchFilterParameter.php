@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\QueryParameter;
@@ -22,6 +23,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Filter\SearchFilterValueTransformer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Filter\SearchTextAndDateFilter;
 use Doctrine\ORM\Mapping as ORM;
 
+#[ApiResource(openapi: false)]
 #[GetCollection(
     uriTemplate: 'search_filter_parameter{._format}',
     parameters: [

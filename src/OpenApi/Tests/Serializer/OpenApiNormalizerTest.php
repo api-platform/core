@@ -43,15 +43,17 @@ use ApiPlatform\OpenApi\OpenApi;
 use ApiPlatform\OpenApi\Options;
 use ApiPlatform\OpenApi\Serializer\OpenApiNormalizer;
 use ApiPlatform\OpenApi\Tests\Fixtures\Dummy;
+use ApiPlatform\State\ApiResource\Error;
 use ApiPlatform\State\Pagination\PaginationOptions;
+use ApiPlatform\Validator\Exception\ValidationException;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\TypeInfo\Type;
 
 class OpenApiNormalizerTest extends TestCase
 {
@@ -141,11 +143,13 @@ class OpenApiNormalizerTest extends TestCase
         $resourceCollectionMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceCollectionMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
         $resourceCollectionMetadataFactoryProphecy->create('Zorro')->shouldBeCalled()->willReturn($zorroMetadata);
+        $resourceCollectionMetadataFactoryProphecy->create(Error::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Error::class, []));
+        $resourceCollectionMetadataFactoryProphecy->create(ValidationException::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(ValidationException::class, []));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'id', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])
+                ->withNativeType(Type::int())
                 ->withDescription('This is an id.')
                 ->withReadable(true)
                 ->withWritable(false)
@@ -154,7 +158,7 @@ class OpenApiNormalizerTest extends TestCase
         );
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withNativeType(Type::string())
                 ->withDescription('This is a name.')
                 ->withReadable(true)
                 ->withWritable(true)
@@ -166,7 +170,7 @@ class OpenApiNormalizerTest extends TestCase
         );
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'description', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_STRING)])
+                ->withNativeType(Type::string())
                 ->withDescription('This is an initializable but not writable property.')
                 ->withReadable(true)
                 ->withWritable(false)
@@ -178,7 +182,7 @@ class OpenApiNormalizerTest extends TestCase
         );
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'dummyDate', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_OBJECT, true, \DateTime::class)])
+                ->withNativeType(Type::nullable(Type::object(\DateTime::class)))
                 ->withDescription('This is a \DateTimeInterface object.')
                 ->withReadable(true)
                 ->withWritable(true)
@@ -191,7 +195,7 @@ class OpenApiNormalizerTest extends TestCase
 
         $propertyMetadataFactoryProphecy->create('Zorro', 'id', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
-                ->withBuiltinTypes([new Type(Type::BUILTIN_TYPE_INT)])
+                ->withNativeType(Type::int())
                 ->withDescription('This is an id.')
                 ->withReadable(true)
                 ->withWritable(false)
@@ -204,7 +208,7 @@ class OpenApiNormalizerTest extends TestCase
         $propertyNameCollectionFactory = $propertyNameCollectionFactoryProphecy->reveal();
         $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
 
-        $definitionNameFactory = new DefinitionNameFactory(['jsonapi' => true, 'jsonhal' => true, 'jsonld' => true]);
+        $definitionNameFactory = new DefinitionNameFactory();
 
         $schemaFactory = new SchemaFactory(
             resourceMetadataFactory: $resourceMetadataFactory,

@@ -17,6 +17,8 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\QueryParameter;
+use Symfony\Component\TypeInfo\Type\BuiltinType;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 #[GetCollection(
     uriTemplate: 'issue6673_multiple_parameter_provider',
@@ -25,9 +27,11 @@ use ApiPlatform\Metadata\QueryParameter;
     parameters: [
         'a' => new QueryParameter(
             provider: [self::class, 'parameterOneProvider'],
+            nativeType: new BuiltinType(TypeIdentifier::STRING),
         ),
         'b' => new QueryParameter(
             provider: [self::class, 'parameterTwoProvider'],
+            nativeType: new BuiltinType(TypeIdentifier::STRING),
         ),
     ],
     provider: [self::class, 'provide']

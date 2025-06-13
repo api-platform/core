@@ -1,5 +1,7 @@
 providers:
+    - Laravel\Tinker\TinkerServiceProvider
     - ApiPlatform\Laravel\ApiPlatformProvider
+    - ApiPlatform\Laravel\ApiPlatformDeferredProvider
     - Laravel\Sanctum\SanctumServiceProvider
     - Workbench\App\Providers\WorkbenchServiceProvider
 
@@ -29,3 +31,9 @@ workbench:
           to: app/Models
         - from: ./workbench/app/ApiResource/
           to: app/ApiResource
+        - from: ./workbench/app/State/
+          to: app/State
+        - from: ./workbench/app/Modules/
+          to: app/Modules
+        - from: ./workbench/app/Services/
+          to: app/Services

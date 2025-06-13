@@ -60,6 +60,7 @@ Feature: Create-Retrieve-Update-Delete
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Location" should not exist
     And the JSON should be equal to:
     """
     {
@@ -95,18 +96,19 @@ Feature: Create-Retrieve-Update-Delete
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "POST" request to "/dummies"
     Then the response status code should be 400
-    And the JSON node "description" should be equal to "Syntax error"
+    And the JSON node "detail" should be equal to "Syntax error"
 
   Scenario: Get a not found exception
     When I send a "GET" request to "/dummies/42"
     Then the response status code should be 404
+    And the header "Content-Location" should not exist
 
   Scenario: Get a collection
     When I send a "GET" request to "/dummies"
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the header "Content-Location" should be equal to "/dummies.jsonld"
+    And the header "Content-Location" should not exist
     And the JSON should be equal to:
     """
     {
@@ -552,7 +554,7 @@ Feature: Create-Retrieve-Update-Delete
     When I add "Content-Type" header equal to "application/ld+json"
     And I send a "PUT" request to "/dummies/1"
     Then the response status code should be 400
-    And the JSON node "description" should be equal to "Syntax error"
+    And the JSON node "detail" should be equal to "Syntax error"
 
   Scenario: Delete a resource
     When I send a "DELETE" request to "/dummies/1"
@@ -616,6 +618,7 @@ Feature: Create-Retrieve-Update-Delete
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Location" should not exist
     And the JSON should be equal to:
     """
       {
@@ -640,6 +643,7 @@ Feature: Create-Retrieve-Update-Delete
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Location" should not exist
     And the JSON should be equal to:
     """
       {
@@ -657,6 +661,7 @@ Feature: Create-Retrieve-Update-Delete
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Location" should not exist
     And the JSON should be equal to:
     """
     {
@@ -676,6 +681,7 @@ Feature: Create-Retrieve-Update-Delete
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Location" should not exist
     And the JSON should be equal to:
     """
     {
@@ -718,6 +724,7 @@ Feature: Create-Retrieve-Update-Delete
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Location" should not exist
     And the JSON should be equal to:
     """
     {
@@ -737,6 +744,7 @@ Feature: Create-Retrieve-Update-Delete
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the header "Content-Location" should not exist
     And the JSON should be equal to:
     """
     {

@@ -16,7 +16,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6211;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\ArrayPropertyDto;
 
-#[Get(provider: [ArrayPropertyDtoOperation::class, 'provide'], output: ArrayPropertyDto::class)]
+#[Get(provider: [ArrayPropertyDtoOperation::class, 'provide'], output: ArrayPropertyDto::class, openapi: false)]
 class ArrayPropertyDtoOperation
 {
     public static function provide(): ArrayPropertyDto

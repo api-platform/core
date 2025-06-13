@@ -31,21 +31,21 @@
         "doctrine/inflector": "^1.0 || ^2.0",
         "psr/cache": "^1.0 || ^2.0 || ^3.0",
         "psr/log": "^1.0 || ^2.0 || ^3.0",
-        "symfony/property-info": "^6.4 || ^7.0",
+        "symfony/property-info": "^6.4 || ^7.1",
         "symfony/string": "^6.4 || ^7.0",
-        "symfony/type-info": "^7.1"
+        "symfony/type-info": "^7.3"
     },
     "require-dev": {
-        "api-platform/json-schema": "^3.4 || ^4.0",
-        "api-platform/openapi": "^3.4 || ^4.0",
-        "api-platform/state": "^3.4 || ^4.0",
+        "api-platform/json-schema": "^4.1",
+        "api-platform/openapi": "^4.1",
+        "api-platform/state": "^4.1",
         "phpspec/prophecy-phpunit": "^2.2",
-        "phpstan/phpdoc-parser": "^1.13",
-        "phpunit/phpunit": "^11.2",
+        "phpstan/phpdoc-parser": "^1.29 || ^2.0",
+        "phpunit/phpunit": "11.5.x-dev",
         "symfony/config": "^6.4 || ^7.0",
         "symfony/routing": "^6.4 || ^7.0",
         "symfony/var-dumper": "^6.4 || ^7.0",
-        "symfony/web-link": "^6.4 || ^7.0",
+        "symfony/web-link": "^6.4 || ^7.1",
         "symfony/yaml": "^6.4 || ^7.0"
     },
     "suggest": {
@@ -73,7 +73,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "4.0.x-dev",
+            "dev-main": "4.2.x-dev",
             "dev-3.4": "3.4.x-dev"
         },
         "symfony": {
@@ -86,5 +86,11 @@
     },
     "scripts": {
         "test": "./vendor/bin/phpunit"
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/soyuka/phpunit"
+        }
+    ]
 }

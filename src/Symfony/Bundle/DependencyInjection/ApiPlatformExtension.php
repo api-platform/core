@@ -34,6 +34,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\UriVariableTransformerInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
+use ApiPlatform\OpenApi\Model\Tag;
 use ApiPlatform\RamseyUuid\Serializer\UuidDenormalizer;
 use ApiPlatform\State\ApiResource\Error;
 use ApiPlatform\State\ParameterProviderInterface;
@@ -48,6 +49,7 @@ use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -111,10 +113,19 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $patchFormats = $this->getFormats($config['patch_formats']);
         $errorFormats = $this->getFormats($config['error_formats']);
         $docsFormats = $this->getFormats($config['docs_formats']);
+
+        if (!$config['enable_docs']) {
+            // JSON-LD documentation format is mandatory, even if documentation is disabled.
+            $docsFormats = isset($formats['jsonld']) ? ['jsonld' => ['application/ld+json']] : [];
+            // If documentation is disabled, the Hydra documentation for all the resources is hidden by default.
+            if (!isset($config['defaults']['hideHydraOperation']) && !isset($config['defaults']['hide_hydra_operation'])) {
+                $config['defaults']['hideHydraOperation'] = true;
+            }
+        }
         $jsonSchemaFormats = $config['jsonschema_formats'];
 
         if (!$jsonSchemaFormats) {
-            foreach (array_keys($formats) as $f) {
+            foreach (array_merge(array_keys($formats), array_keys($errorFormats)) as $f) {
                 // Distinct JSON-based formats must have names that start with 'json'
                 if (str_starts_with($f, 'json')) {
                     $jsonSchemaFormats[$f] = true;
@@ -134,7 +145,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $patchFormats['jsonapi'] = ['application/vnd.api+json'];
         }
 
-        $this->registerCommonConfiguration($container, $config, $loader, $formats, $patchFormats, $errorFormats, $docsFormats, $jsonSchemaFormats);
+        $this->registerCommonConfiguration($container, $config, $loader, $formats, $patchFormats, $errorFormats, $docsFormats);
         $this->registerMetadataConfiguration($container, $config, $loader);
         $this->registerOAuthConfiguration($container, $config);
         $this->registerOpenApiConfiguration($container, $config, $loader);
@@ -168,13 +179,18 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.uri_variables.transformer');
         $container->registerForAutoconfiguration(ParameterProviderInterface::class)
             ->addTag('api_platform.parameter_provider');
+        $container->registerAttributeForAutoconfiguration(ApiResource::class, static function (ChildDefinition $definition): void {
+            $definition->setAbstract(true)
+                ->addTag('api_platform.resource')
+                ->addTag('container.excluded', ['source' => 'by #[ApiResource] attribute']);
+        });
 
         if (!$container->has('api_platform.state.item_provider')) {
             $container->setAlias('api_platform.state.item_provider', 'api_platform.state_provider.object');
         }
     }
 
-    private function registerCommonConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $formats, array $patchFormats, array $errorFormats, array $docsFormats, array $jsonSchemaFormats): void
+    private function registerCommonConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $formats, array $patchFormats, array $errorFormats, array $docsFormats): void
     {
         $loader->load('state/state.xml');
         $loader->load('symfony/symfony.xml');
@@ -215,7 +231,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.patch_formats', $patchFormats);
         $container->setParameter('api_platform.error_formats', $errorFormats);
         $container->setParameter('api_platform.docs_formats', $docsFormats);
-        $container->setParameter('api_platform.jsonschema_formats', $jsonSchemaFormats);
+        $container->setParameter('api_platform.jsonschema_formats', []);
         $container->setParameter('api_platform.eager_loading.enabled', $this->isConfigEnabled($container, $config['eager_loading']));
         $container->setParameter('api_platform.eager_loading.max_joins', $config['eager_loading']['max_joins']);
         $container->setParameter('api_platform.eager_loading.fetch_partial', $config['eager_loading']['fetch_partial']);
@@ -304,7 +320,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     private function registerMetadataConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
     {
-        [$xmlResources, $yamlResources] = $this->getResourcesToWatch($container, $config);
+        [$xmlResources, $yamlResources, $phpResources] = $this->getResourcesToWatch($container, $config);
 
         $container->setParameter('api_platform.class_name_resources', $this->getClassNameResources());
 
@@ -319,6 +335,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         // V3 metadata
+        $loader->load('metadata/php.xml');
         $loader->load('metadata/xml.xml');
         $loader->load('metadata/links.xml');
         $loader->load('metadata/property.xml');
@@ -337,6 +354,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $container->getDefinition('api_platform.metadata.resource_extractor.yaml')->replaceArgument(0, $yamlResources);
             $container->getDefinition('api_platform.metadata.property_extractor.yaml')->replaceArgument(0, $yamlResources);
         }
+
+        $container->getDefinition('api_platform.metadata.resource_extractor.php_file')->replaceArgument(0, $phpResources);
     }
 
     private function getClassNameResources(): array
@@ -401,7 +420,32 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             }
         }
 
-        $resources = ['yml' => [], 'xml' => [], 'dir' => []];
+        $resources = ['yml' => [], 'xml' => [], 'php' => [], 'dir' => []];
+
+        foreach ($config['mapping']['imports'] ?? [] as $path) {
+            if (is_dir($path)) {
+                foreach (Finder::create()->followLinks()->files()->in($path)->name('/\.php$/')->sortByName() as $file) {
+                    $resources[$file->getExtension()][] = $file->getRealPath();
+                }
+
+                $resources['dir'][] = $path;
+                $container->addResource(new DirectoryResource($path, '/\.php$/'));
+
+                continue;
+            }
+
+            if ($container->fileExists($path, false)) {
+                if (!str_ends_with($path, '.php')) {
+                    throw new RuntimeException(\sprintf('Unsupported mapping type in "%s", supported type is PHP.', $path));
+                }
+
+                $resources['php'][] = $path;
+
+                continue;
+            }
+
+            throw new RuntimeException(\sprintf('Could not open file or directory "%s".', $path));
+        }
 
         foreach ($paths as $path) {
             if (is_dir($path)) {
@@ -430,7 +474,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $container->setParameter('api_platform.resource_class_directories', $resources['dir']);
 
-        return [$resources['xml'], $resources['yml']];
+        return [$resources['xml'], $resources['yml'], $resources['php']];
     }
 
     private function registerOAuthConfiguration(ContainerBuilder $container, array $config): void
@@ -500,6 +544,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.enable_swagger_ui', $config['enable_swagger_ui']);
         $container->setParameter('api_platform.enable_re_doc', $config['enable_re_doc']);
         $container->setParameter('api_platform.swagger.api_keys', $config['swagger']['api_keys']);
+        $container->setParameter('api_platform.swagger.persist_authorization', $config['swagger']['persist_authorization']);
         $container->setParameter('api_platform.swagger.http_auth', $config['swagger']['http_auth']);
         if ($config['openapi']['swagger_ui_extra_configuration'] && $config['swagger']['swagger_ui_extra_configuration']) {
             throw new RuntimeException('You can not set "swagger_ui_extra_configuration" twice - in "openapi" and "swagger" section.');
@@ -535,11 +580,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         if (!$container->has('api_platform.json_schema.schema_factory')) {
             $container->removeDefinition('api_platform.hydra.json_schema.schema_factory');
-        }
-
-        if (!$config['enable_docs']) {
-            $container->removeDefinition('api_platform.hydra.listener.response.add_link_header');
-            $container->removeDefinition('api_platform.hydra.processor.link');
         }
     }
 
@@ -748,13 +788,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $container->setParameter('api_platform.validator.serialize_payload_fields', $config['validator']['serialize_payload_fields']);
-        $container->setParameter('api_platform.validator.query_parameter_validation', $config['validator']['query_parameter_validation']);
-
-        if (!$config['validator']['query_parameter_validation']) {
-            $container->removeDefinition('api_platform.listener.view.validate_query_parameters');
-            $container->removeDefinition('api_platform.validator.query_parameter_validator');
-            $container->removeDefinition('api_platform.symfony.parameter_validator');
-        }
     }
 
     private function registerDataCollectorConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader): void
@@ -810,7 +843,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             return;
         }
 
-        $clientClass = class_exists(\Elasticsearch\Client::class) ? \Elasticsearch\Client::class : \Elastic\Elasticsearch\Client::class;
+        $clientClass = !class_exists(\Elasticsearch\Client::class)
+            // ES v7
+            ? \Elastic\Elasticsearch\Client::class
+            // ES v8 and up
+            : \Elasticsearch\Client::class;
 
         $clientDefinition = new Definition($clientClass);
         $container->setDefinition('api_platform.elasticsearch.client', $clientDefinition);
@@ -850,7 +887,18 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.openapi.contact.email', $config['openapi']['contact']['email']);
         $container->setParameter('api_platform.openapi.license.name', $config['openapi']['license']['name']);
         $container->setParameter('api_platform.openapi.license.url', $config['openapi']['license']['url']);
+        $container->setParameter('api_platform.openapi.license.identifier', $config['openapi']['license']['identifier']);
         $container->setParameter('api_platform.openapi.overrideResponses', $config['openapi']['overrideResponses']);
+
+        $tags = [];
+        foreach ($config['openapi']['tags'] as $tag) {
+            $tags[] = new Tag($tag['name'], $tag['description'] ?? null);
+        }
+
+        $container->setParameter('api_platform.openapi.tags', $tags);
+
+        $container->setParameter('api_platform.openapi.errorResourceClass', $config['openapi']['error_resource_class'] ?? null);
+        $container->setParameter('api_platform.openapi.validationErrorResourceClass', $config['openapi']['validation_error_resource_class'] ?? null);
 
         $loader->load('json_schema.xml');
     }

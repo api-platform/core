@@ -14,8 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonApi\Serializer;
 
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
@@ -83,9 +85,15 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
             $fieldName = $this->nameConverter->normalize($fieldName, $class, self::FORMAT);
         }
 
-        $type = $propertyMetadata->getBuiltinTypes()[0] ?? null;
-        if ($type && null !== $type->getClassName()) {
-            return "data/relationships/$fieldName";
+        if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
+            $type = $propertyMetadata->getBuiltinTypes()[0] ?? null;
+            if ($type && null !== $type->getClassName()) {
+                return "data/relationships/$fieldName";
+            }
+        } else {
+            if ($propertyMetadata->getNativeType()?->isSatisfiedBy(fn ($t) => $t instanceof ObjectType)) {
+                return "data/relationships/$fieldName";
+            }
         }
 
         return "data/attributes/$fieldName";

@@ -14,11 +14,14 @@ declare(strict_types=1);
 namespace ApiPlatform\Laravel\Tests;
 
 use ApiPlatform\Laravel\Test\ApiTestAssertionsTrait;
+use ApiPlatform\Laravel\workbench\app\Enums\BookStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
 use Workbench\Database\Factories\AuthorFactory;
 use Workbench\Database\Factories\BookFactory;
+use Workbench\Database\Factories\GrandSonFactory;
 use Workbench\Database\Factories\WithAccessorFactory;
 
 class EloquentTest extends TestCase
@@ -26,6 +29,19 @@ class EloquentTest extends TestCase
     use ApiTestAssertionsTrait;
     use RefreshDatabase;
     use WithWorkbench;
+
+    public function testBackedEnumsNormalization(): void
+    {
+        BookFactory::new([
+            'status' => BookStatus::DRAFT,
+        ])->has(AuthorFactory::new())->count(10)->create();
+
+        $response = $this->get('/api/books', ['Accept' => ['application/ld+json']]);
+        $book = $response->json()['member'][0];
+
+        $this->assertArrayHasKey('status', $book);
+        $this->assertSame('DRAFT', $book['status']);
+    }
 
     public function testSearchFilter(): void
     {
@@ -416,5 +432,95 @@ class EloquentTest extends TestCase
         $res = $this->get('/api/books?published=0', ['Accept' => ['application/ld+json']]);
         $this->assertEquals($res->getStatusCode(), 200);
         $this->assertEquals($res->json()['totalItems'], 0);
+    }
+
+    public function testBelongsTo(): void
+    {
+        GrandSonFactory::new()->count(1)->create();
+
+        $res = $this->get('/api/grand_sons/1/grand_father', ['Accept' => ['application/ld+json']]);
+        $json = $res->json();
+        $this->assertEquals($json['@id'], '/api/grand_sons/1/grand_father');
+        $this->assertEquals($json['sons'][0], '/api/grand_sons/1');
+    }
+
+    public function testRelationIsHandledOnCreateWithNestedData(): void
+    {
+        $cartData = [
+            'productSku' => 'SKU_TEST_001',
+            'quantity' => 2,
+            'priceAtAddition' => '19.99',
+            'shoppingCart' => [
+                'userIdentifier' => 'user-'.Str::uuid()->toString(),
+                'status' => 'active',
+            ],
+        ];
+
+        $response = $this->postJson('/api/cart_items', $cartData, ['accept' => 'application/ld+json', 'content-type' => 'application/ld+json']);
+        $response->assertStatus(201);
+
+        $response
+            ->assertJson([
+                '@context' => '/api/contexts/CartItem',
+                '@id' => '/api/cart_items/1',
+                '@type' => 'CartItem',
+                'id' => 1,
+                'productSku' => 'SKU_TEST_001',
+                'quantity' => 2,
+                'priceAtAddition' => 19.99,
+                'shoppingCart' => [
+                    '@id' => '/api/shopping_carts/1',
+                    '@type' => 'ShoppingCart',
+                    'userIdentifier' => $cartData['shoppingCart']['userIdentifier'],
+                    'status' => 'active',
+                ],
+            ]);
+    }
+
+    public function testRelationIsHandledOnCreateWithNestedDataToMany(): void
+    {
+        $cartData = [
+            'userIdentifier' => 'user-'.Str::uuid()->toString(),
+            'status' => 'active',
+            'cartItems' => [
+                [
+                    'productSku' => 'SKU_TEST_001',
+                    'quantity' => 2,
+                    'priceAtAddition' => '19.99',
+                ],
+                [
+                    'productSku' => 'SKU_TEST_002',
+                    'quantity' => 1,
+                    'priceAtAddition' => '25.50',
+                ],
+            ],
+        ];
+
+        $response = $this->postJson('/api/shopping_carts', $cartData, ['accept' => 'application/ld+json', 'content-type' => 'application/ld+json']);
+        $response->assertStatus(201);
+        $response->assertJson([
+            '@context' => '/api/contexts/ShoppingCart',
+            '@id' => '/api/shopping_carts/1',
+            '@type' => 'ShoppingCart',
+            'id' => 1,
+            'userIdentifier' => $cartData['userIdentifier'],
+            'status' => 'active',
+            'cartItems' => [
+                [
+                    '@id' => '/api/cart_items/1',
+                    '@type' => 'CartItem',
+                    'productSku' => 'SKU_TEST_001',
+                    'quantity' => 2,
+                    'priceAtAddition' => '19.99',
+                ],
+                [
+                    '@id' => '/api/cart_items/2',
+                    '@type' => 'CartItem',
+                    'productSku' => 'SKU_TEST_002',
+                    'quantity' => 1,
+                    'priceAtAddition' => '25.50',
+                ],
+            ],
+        ]);
     }
 }

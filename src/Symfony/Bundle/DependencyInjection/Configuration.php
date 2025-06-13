@@ -91,7 +91,10 @@ final class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->variableNode('serialize_payload_fields')->defaultValue([])->info('Set to null to serialize all payload fields when a validation error is thrown, or set the fields you want to include explicitly.')->end()
-                        ->booleanNode('query_parameter_validation')->defaultValue(true)->end()
+                        ->booleanNode('query_parameter_validation')
+                            ->defaultValue(true)
+                            ->setDeprecated('api-platform/symfony', '4.2', 'Will be removed in API Platform 5.0.')
+                        ->end()
                     ->end()
                 ->end()
                 ->arrayNode('eager_loading')
@@ -133,6 +136,9 @@ final class Configuration implements ConfigurationInterface
                 ->arrayNode('mapping')
                     ->addDefaultsIfNotSet()
                     ->children()
+                        ->arrayNode('imports')
+                            ->prototype('scalar')->end()
+                        ->end()
                         ->arrayNode('paths')
                             ->prototype('scalar')->end()
                         ->end()
@@ -140,6 +146,7 @@ final class Configuration implements ConfigurationInterface
                 ->end()
                 ->arrayNode('resource_class_directories')
                     ->prototype('scalar')->end()
+                    ->setDeprecated('api-platform/symfony', '4.1', 'The "resource_class_directories" configuration is deprecated, classes using #[ApiResource] attribute are autoconfigured by the dependency injection container.')
                 ->end()
                 ->arrayNode('serializer')
                     ->addDefaultsIfNotSet()
@@ -293,6 +300,7 @@ final class Configuration implements ConfigurationInterface
                 ->arrayNode('swagger')
                     ->addDefaultsIfNotSet()
                     ->children()
+                        ->booleanNode('persist_authorization')->defaultValue(false)->info('Persist the SwaggerUI Authorization in the localStorage.')->end()
                         ->arrayNode('versions')
                             ->info('The active versions of OpenAPI to be exported or used in Swagger UI. The first value is the default.')
                             ->defaultValue($supportedVersions)
@@ -468,7 +476,12 @@ final class Configuration implements ConfigurationInterface
                             ->validate()
                                 ->ifTrue()
                                 ->then(static function (bool $v): bool {
-                                    if (!(class_exists(\Elasticsearch\Client::class) || class_exists(\Elastic\Elasticsearch\Client::class))) {
+                                    if (
+                                        // ES v7
+                                        !class_exists(\Elasticsearch\Client::class)
+                                        // ES v8 and up
+                                        && !class_exists(\Elastic\Elasticsearch\Client::class)
+                                    ) {
                                         throw new InvalidConfigurationException('The elasticsearch/elasticsearch package is required for Elasticsearch support.');
                                     }
 
@@ -502,11 +515,21 @@ final class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->scalarNode('termsOfService')->defaultNull()->info('A URL to the Terms of Service for the API. MUST be in the format of a URL.')->end()
+                        ->arrayNode('tags')
+                            ->info('Global OpenApi tags overriding the default computed tags if specified.')
+                            ->prototype('array')
+                                ->children()
+                                    ->scalarNode('name')->isRequired()->end()
+                                    ->scalarNode('description')->defaultNull()->end()
+                                ->end()
+                            ->end()
+                        ->end()
                         ->arrayNode('license')
                         ->addDefaultsIfNotSet()
                             ->children()
                                 ->scalarNode('name')->defaultNull()->info('The license name used for the API.')->end()
                                 ->scalarNode('url')->defaultNull()->info('URL to the license used for the API. MUST be in the format of a URL.')->end()
+                                ->scalarNode('identifier')->defaultNull()->info('An SPDX license expression for the API. The identifier field is mutually exclusive of the url field.')->end()
                             ->end()
                         ->end()
                         ->variableNode('swagger_ui_extra_configuration')
@@ -517,7 +540,9 @@ final class Configuration implements ConfigurationInterface
                             ->end()
                             ->info('To pass extra configuration to Swagger UI, like docExpansion or filter.')
                         ->end()
-                        ->booleanNode('overrideResponses')->defaultTrue()->info('Whether API Platform adds automatic responses to the OpenAPI documentation.')
+                        ->booleanNode('overrideResponses')->defaultTrue()->info('Whether API Platform adds automatic responses to the OpenAPI documentation.')->end()
+                        ->scalarNode('error_resource_class')->defaultNull()->info('The class used to represent errors in the OpenAPI documentation.')->end()
+                        ->scalarNode('validation_error_resource_class')->defaultNull()->info('The class used to represent validation errors in the OpenAPI documentation.')->end()
                     ->end()
                 ->end()
             ->end();

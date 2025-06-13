@@ -16,9 +16,11 @@ namespace ApiPlatform\Laravel\Eloquent\State;
 use ApiPlatform\Laravel\Eloquent\Extension\QueryExtensionInterface;
 use ApiPlatform\Laravel\Eloquent\Paginator;
 use ApiPlatform\Laravel\Eloquent\PartialPaginator;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\State\Util\StateOptionsTrait;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Psr\Container\ContainerInterface;
@@ -29,6 +31,7 @@ use Psr\Container\ContainerInterface;
 final class CollectionProvider implements ProviderInterface
 {
     use LinksHandlerLocatorTrait;
+    use StateOptionsTrait;
 
     /**
      * @param LinksHandlerInterface<Model>      $linksHandler
@@ -45,8 +48,12 @@ final class CollectionProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        /** @var Model $model */
-        $model = new ($operation->getClass())();
+        $resourceClass = $this->getStateOptionsClass($operation, $operation->getClass(), Options::class);
+        $model = new $resourceClass();
+
+        if (!$model instanceof Model) {
+            throw new RuntimeException(\sprintf('The class "%s" is not an Eloquent model.', $resourceClass));
+        }
 
         if ($handleLinks = $this->getLinksHandler($operation)) {
             $query = $handleLinks($model->query(), $uriVariables, ['operation' => $operation, 'modelClass' => $operation->getClass()] + $context);

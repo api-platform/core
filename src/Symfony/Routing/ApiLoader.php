@@ -36,7 +36,7 @@ final class ApiLoader extends Loader
 
     private readonly XmlFileLoader $fileLoader;
 
-    public function __construct(KernelInterface $kernel, private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly ContainerInterface $container, private readonly array $formats, private readonly array $resourceClassDirectories = [], private readonly bool $graphqlEnabled = false, private readonly bool $entrypointEnabled = true, private readonly bool $docsEnabled = true, private readonly bool $graphiQlEnabled = false, private readonly bool $graphQlPlaygroundEnabled = false)
+    public function __construct(KernelInterface $kernel, private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly ContainerInterface $container, private readonly array $formats, private readonly array $resourceClassDirectories = [], private readonly bool $graphqlEnabled = false, private readonly bool $entrypointEnabled = true, readonly bool $docsEnabled = true, private readonly bool $graphiQlEnabled = false, private readonly bool $graphQlPlaygroundEnabled = false)
     {
         /** @var string[]|string $paths */
         $paths = $kernel->locateResource('@ApiPlatformBundle/Resources/config/routing');
@@ -90,11 +90,10 @@ final class ApiLoader extends Loader
                         $path,
                         [
                             '_controller' => $controller ?? 'api_platform.action.placeholder',
-                            '_format' => null,
                             '_stateless' => $operation->getStateless(),
                             '_api_resource_class' => $resourceClass,
                             '_api_operation_name' => $operationName,
-                        ] + ($operation->getDefaults() ?? []),
+                        ] + ($operation->getDefaults() ?? []) + ['_format' => null],
                         $operation->getRequirements() ?? [],
                         $operation->getOptions() ?? [],
                         $operation->getHost() ?? '',
@@ -124,15 +123,12 @@ final class ApiLoader extends Loader
      */
     private function loadExternalFiles(RouteCollection $routeCollection): void
     {
+        $routeCollection->addCollection($this->fileLoader->load('docs.xml'));
         $routeCollection->addCollection($this->fileLoader->load('genid.xml'));
         $routeCollection->addCollection($this->fileLoader->load('errors.xml'));
 
         if ($this->entrypointEnabled) {
             $routeCollection->addCollection($this->fileLoader->load('api.xml'));
-        }
-
-        if ($this->docsEnabled) {
-            $routeCollection->addCollection($this->fileLoader->load('docs.xml'));
         }
 
         if ($this->graphqlEnabled) {

@@ -13,7 +13,6 @@
         <service id="api_platform.property_accessor" alias="property_accessor" public="false" />
         <service id="api_platform.property_info" alias="property_info" public="false" />
         <service id="api_platform.negotiator" class="Negotiation\Negotiator" public="false" />
-        <service id="api_platform.action.error_page" class="ApiPlatform\Symfony\Action\ErrorPageAction" public="true" />
 
         <service id="api_platform.resource_class_resolver" class="ApiPlatform\Metadata\ResourceClassResolver" public="false">
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
@@ -166,6 +165,7 @@
         <service id="api_platform.state.error_provider" class="ApiPlatform\State\ErrorProvider">
             <argument key="$debug">%kernel.debug%</argument>
             <argument type="service" key="$resourceClassResolver" id="api_platform.resource_class_resolver" />
+            <argument type="service" key="$resourceMetadataCollectionFactory" id="api_platform.metadata.resource.metadata_collection_factory" />
             <tag name="api_platform.state_provider" key="api_platform.state.error_provider" />
         </service>
 

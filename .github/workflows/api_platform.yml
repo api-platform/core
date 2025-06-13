@@ -3,7 +3,7 @@ name: Distribution update
 on:
   push:
     tags:
-      - v*
+  workflow_dispatch: ~
 
 env:
   GH_TOKEN: ${{ github.token }}
@@ -17,6 +17,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Update distribution
-        run: gh workflow run -R api-platform/api-platfom release.yml -f tag=${{ github.ref_name }}
+        run: gh workflow run -R api-platform/api-platform release.yml -f tag=${{ github.ref_name }}
 
 

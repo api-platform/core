@@ -112,6 +112,7 @@ class MainControllerTest extends TestCase
         $body = new \stdClass();
         $response = new Response();
         $request = new Request();
+        $request->attributes->set('exception', new \Exception());
         $request->attributes->set('_api_operation', new Error(uriVariables: ['id' => new Link()]));
 
         $provider->expects($this->once())
@@ -135,6 +136,7 @@ class MainControllerTest extends TestCase
 
         $response = new Response();
         $request = new Request();
+        $request->attributes->set('exception', new \Exception());
         $request->attributes->set('_api_operation', new Get(uriVariables: ['id' => new Link()]));
         $request->attributes->set('id', '1');
 

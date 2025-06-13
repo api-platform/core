@@ -28,6 +28,12 @@ final readonly class SortFilterParameterProvider implements ParameterProviderInt
         $parameters = $operation->getParameters();
         $properties = $parameter->getExtraProperties()['_properties'] ?? [];
         $value = $parameter->getValue();
+
+        // most eloquent filters work with only a single value
+        if (\is_array($value) && array_is_list($value) && 1 === \count($value)) {
+            $value = current($value);
+        }
+
         if (!\is_string($value)) {
             return $operation;
         }

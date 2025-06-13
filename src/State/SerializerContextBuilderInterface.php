@@ -24,6 +24,9 @@ use Symfony\Component\HttpFoundation\Request;
  */
 interface SerializerContextBuilderInterface
 {
+    // @see ApiPlatform\Symfony\Controller\MainController and ApiPlatform\State\Provider\DeserializerProvider
+    public const ASSIGN_OBJECT_TO_POPULATE = 'api_assign_object_to_populate';
+
     /**
      * Creates a serialization context from a Request.
      *
@@ -51,6 +54,7 @@ interface SerializerContextBuilderInterface
      *   api_included?: bool,
      *   attributes?: string[],
      *   deserializer_type?: string,
+     *   api_assign_object_to_populate?: bool,
      * }
      */
     public function createFromRequest(Request $request, bool $normalization, ?array $extractedAttributes = null): array;

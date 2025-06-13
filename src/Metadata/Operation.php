@@ -874,7 +874,7 @@ abstract class Operation extends Metadata
         return $this->read;
     }
 
-    public function withRead(bool $read = true): self
+    public function withRead(bool $read = true): static
     {
         $self = clone $this;
         $self->read = $read;
@@ -887,7 +887,7 @@ abstract class Operation extends Metadata
         return $this->deserialize;
     }
 
-    public function withDeserialize(bool $deserialize = true): self
+    public function withDeserialize(bool $deserialize = true): static
     {
         $self = clone $this;
         $self->deserialize = $deserialize;
@@ -900,7 +900,7 @@ abstract class Operation extends Metadata
         return $this->validate;
     }
 
-    public function withValidate(bool $validate = true): self
+    public function withValidate(bool $validate = true): static
     {
         $self = clone $this;
         $self->validate = $validate;
@@ -913,7 +913,7 @@ abstract class Operation extends Metadata
         return $this->write;
     }
 
-    public function withWrite(bool $write = true): self
+    public function withWrite(bool $write = true): static
     {
         $self = clone $this;
         $self->write = $write;
@@ -926,7 +926,7 @@ abstract class Operation extends Metadata
         return $this->serialize;
     }
 
-    public function withSerialize(bool $serialize = true): self
+    public function withSerialize(bool $serialize = true): static
     {
         $self = clone $this;
         $self->serialize = $serialize;
@@ -939,7 +939,7 @@ abstract class Operation extends Metadata
         return $this->priority;
     }
 
-    public function withPriority(int $priority = 0): self
+    public function withPriority(int $priority = 0): static
     {
         $self = clone $this;
         $self->priority = $priority;
@@ -952,7 +952,7 @@ abstract class Operation extends Metadata
         return $this->name;
     }
 
-    public function withName(string $name = ''): self
+    public function withName(string $name = ''): static
     {
         $self = clone $this;
         $self->name = $name;

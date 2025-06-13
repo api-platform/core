@@ -30,7 +30,7 @@ use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\TypeInfo\Type;
 
 final class LinkFactoryTest extends TestCase
 {
@@ -93,11 +93,11 @@ final class LinkFactoryTest extends TestCase
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('provideCreateLinksFromAttributesCases')]
-    public function testCreateLinksFromAttributes(array $builtinTypes, array $expectedLinks): void
+    public function testCreateLinksFromAttributes(?Type $nativeType, array $expectedLinks): void
     {
         $propertyNameCollectionFactory = new PropertyInfoPropertyNameCollectionFactory(new PropertyInfoExtractor([new ReflectionExtractor()]));
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'dummy')->willReturn((new ApiProperty())->withBuiltinTypes($builtinTypes));
+        $propertyMetadataFactoryProphecy->create(AttributeResource::class, 'dummy')->willReturn((new ApiProperty())->withNativeType($nativeType));
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $linkFactory = new LinkFactory($propertyNameCollectionFactory, $propertyMetadataFactoryProphecy->reveal(), $resourceClassResolverProphecy->reveal());
 
@@ -109,16 +109,16 @@ final class LinkFactoryTest extends TestCase
 
     public static function provideCreateLinksFromAttributesCases(): \Generator
     {
-        yield 'no builtin types' => [
-            [],
+        yield 'no PHP type' => [
+            null,
             [(new Link())->withFromClass(AttributeResource::class)->withFromProperty('dummy')->withToClass(AttributeResource::class)->withParameterName('dummyId')],
         ];
-        yield 'with builtin types' => [
-            [new Type(Type::BUILTIN_TYPE_OBJECT, false, Dummy::class)],
+        yield 'with PHP type' => [
+            Type::object(Dummy::class),
             [(new Link())->withFromClass(AttributeResource::class)->withFromProperty('dummy')->withToClass(Dummy::class)->withParameterName('dummyId')],
         ];
-        yield 'with collection builtin types' => [
-            [new Type(Type::BUILTIN_TYPE_ARRAY, false, Dummy::class, true, null, [new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class)])],
+        yield 'with collection PHP type' => [
+            Type::list(Type::object(RelatedDummy::class)),
             [(new Link())->withFromClass(AttributeResource::class)->withFromProperty('dummy')->withToClass(RelatedDummy::class)->withParameterName('dummyId')],
         ];
     }
@@ -146,7 +146,7 @@ final class LinkFactoryTest extends TestCase
 
         $property = 'test';
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'test')->willReturn(new ApiProperty(builtinTypes: [new Type(builtinType: Type::BUILTIN_TYPE_OBJECT, class: RelatedDummy::class)]));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'test')->willReturn(new ApiProperty(nativeType: Type::object(RelatedDummy::class)));
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(false);

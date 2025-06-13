@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\OpenApi\Command;
 
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\DummyCar;
 use ApiPlatform\OpenApi\OpenApi;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Crud;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6317\Issue6317;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5625\Currency;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
@@ -52,6 +53,7 @@ class OpenApiCommandTest extends KernelTestCase
             DummyCar::class,
             Issue6317::class,
             Currency::class,
+            Crud::class,
         ];
     }
 
@@ -65,12 +67,12 @@ class OpenApiCommandTest extends KernelTestCase
     #[\PHPUnit\Framework\Attributes\Group('orm')]
     public function testExecuteWithYaml(): void
     {
-        // $this->setMetadataClasses([DummyCar::class, Currency::class]);
         $this->tester->run(['command' => 'api:openapi:export', '--yaml' => true]);
 
         $result = $this->tester->getDisplay();
 
         $this->assertYaml($result);
+
         $operationId = 'api_dummy_cars_get_collection';
 
         $expected = <<<YAML
@@ -81,7 +83,7 @@ class OpenApiCommandTest extends KernelTestCase
         - DummyCar
 YAML;
 
-        $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result, 'nested object should be present.');
+        $this->assertStringContainsString($expected, $result, 'nested object should be present.');
 
         $operationId = 'api_dummy_cars_id_get';
         $expected = <<<YAML
@@ -91,14 +93,14 @@ YAML;
       tags: []
 YAML;
 
-        $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result, 'arrays should be correctly formatted.');
+        $this->assertStringContainsString($expected, $result, 'arrays should be correctly formatted.');
         $this->assertStringContainsString('openapi: '.OpenApi::VERSION, $result);
 
         $expected = <<<YAML
 info:
   title: 'My Dummy API'
 YAML;
-        $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result, 'multiline formatting must be preserved (using literal style).');
+        $this->assertStringContainsString($expected, $result, 'multiline formatting must be preserved (using literal style).');
 
         $expected = <<<YAML
     This is a test API.
@@ -106,20 +108,19 @@ YAML;
   version: 0.0.0
 YAML;
 
-        $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result);
+        $this->assertStringContainsString($expected, $result);
 
         $expected = <<<YAML
       security:
         -
-          JWT:
+          oauth:
             - CURRENCY_READ
 YAML;
-        $this->assertStringContainsString(str_replace(\PHP_EOL, "\n", $expected), $result);
+        $this->assertStringContainsString($expected, $result);
     }
 
     public function testWriteToFile(): void
     {
-        // $this->setMetadataClasses([DummyCar::class]);
         /** @var string $tmpFile */
         $tmpFile = tempnam(sys_get_temp_dir(), 'test_write_to_file');
 
@@ -134,7 +135,6 @@ YAML;
      */
     public function testBackedEnumExamplesAreNotLost(): void
     {
-        // $this->setMetadataClasses([Issue6317::class]);
         $this->tester->run(['command' => 'api:openapi:export']);
         $result = $this->tester->getDisplay();
         $json = json_decode($result, true, 512, \JSON_THROW_ON_ERROR);
@@ -147,9 +147,8 @@ YAML;
         };
 
         $assertExample($json['components']['schemas']['Issue6317']['properties'], 'id');
-        $assertExample($json['components']['schemas']['Issue6317.jsonld']['properties'], 'id');
-        $assertExample($json['components']['schemas']['Issue6317.jsonapi']['properties']['data']['properties']['attributes']['properties'], '_id');
-        $assertExample($json['components']['schemas']['Issue6317.jsonhal']['properties'], 'id');
+        $assertExample($json['components']['schemas']['Issue6317.jsonld']['allOf'][1]['properties'], 'id');
+        $this->assertEquals($json['components']['schemas']['Issue6317.jsonhal']['allOf'][1]['$ref'], '#/components/schemas/Issue6317');
     }
 
     private function assertYaml(string $data): void
@@ -160,5 +159,19 @@ YAML;
             $this->fail('Is not valid YAML: '.$exception->getMessage());
         }
         $this->addToAssertionCount(1);
+    }
+
+    public function testFilterXApiPlatformTag(): void
+    {
+        $this->tester->run(['command' => 'api:openapi:export', '--filter-tags' => 'anotherone']);
+        $result = $this->tester->getDisplay();
+        $res = json_decode($result, true, 512, \JSON_THROW_ON_ERROR);
+
+        $this->assertArrayHasKey('Crud', $res['components']['schemas']);
+        $this->assertArrayNotHasKey('/cruds/{id}', $res['paths']);
+        $this->assertArrayHasKey('/cruds', $res['paths']);
+        $this->assertArrayNotHasKey('post', $res['paths']['/cruds']);
+        $this->assertArrayHasKey('get', $res['paths']['/cruds']);
+        $this->assertEquals([['name' => 'Crud', 'description' => 'A resource used for OpenAPI tests.']], $res['tags']);
     }
 }

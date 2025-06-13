@@ -22,6 +22,8 @@ use Orchestra\Testbench\Workbench\Actions\AddAssetSymlinkFolders;
 use Orchestra\Testbench\Workbench\Workbench;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
+use Workbench\App\Services\DummyService;
+use Workbench\App\State\CustomProviderWithDependency;
 
 class WorkbenchServiceProvider extends ServiceProvider
 {
@@ -33,6 +35,9 @@ class WorkbenchServiceProvider extends ServiceProvider
         $config = $this->app['config'];
         $config->set('api-platform.resources', [app_path('Models'), app_path('ApiResource')]);
         $config->set('cache.default', 'null');
+
+        $this->app->singleton(DummyService::class, fn ($app) => new DummyService($app['config']->get('api-platform.title')));
+        $this->app->singleton(CustomProviderWithDependency::class, fn ($app) => new CustomProviderWithDependency($app->make(DummyService::class)));
     }
 
     /**

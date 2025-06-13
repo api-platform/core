@@ -30,7 +30,8 @@ use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
 
 /**
  * Builds the GraphQL types.
@@ -223,8 +224,10 @@ final class TypeBuilder implements ContextAwareTypeBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function isCollection(Type $type): bool
+    public function isCollection(LegacyType $type): bool
     {
+        trigger_deprecation('api-platform/graphql', '4.2', 'The "%s()" method is deprecated and will be removed.', __METHOD__, self::class);
+
         return $type->isCollection() && ($collectionValueType = $type->getCollectionValueTypes()[0] ?? null) && null !== $collectionValueType->getClassName();
     }
 

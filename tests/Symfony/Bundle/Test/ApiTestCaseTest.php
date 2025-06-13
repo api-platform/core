@@ -33,11 +33,14 @@ use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\ExpectationFailedException;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class ApiTestCaseTest extends ApiTestCase
 {
     use RecreateSchemaTrait;
     use SetupClassResourcesTrait;
+
+    protected static ?bool $alwaysBootKernel = false;
 
     /**
      * @return class-string[]
@@ -71,7 +74,8 @@ class ApiTestCaseTest extends ApiTestCase
     public function testAssertJsonContainsWithJsonObjectString(): void
     {
         self::createClient()->request('GET', '/');
-        $this->assertJsonContains(<<<JSON
+        $this->assertJsonContains(
+            <<<JSON
 {
     "@context": "/contexts/Entrypoint"
 }
@@ -85,7 +89,8 @@ JSON
         $this->expectExceptionMessage('$subset must be array or string (JSON array or JSON object)');
 
         self::createClient()->request('GET', '/');
-        $this->assertJsonContains(<<<JSON
+        $this->assertJsonContains(
+            <<<JSON
 "/contexts/Entrypoint"
 JSON
         );
@@ -106,7 +111,8 @@ JSON
     public function testAssertJsonEqualsWithJsonObjectString(): void
     {
         self::createClient()->request('GET', '/contexts/Address');
-        $this->assertJsonEquals(<<<JSON
+        $this->assertJsonEquals(
+            <<<JSON
 {
     "@context": {
         "@vocab": "http://localhost/docs.jsonld#",
@@ -385,5 +391,27 @@ JSON
     {
         self::createClient([], ['headers' => ['accept' => 'application/json']])->request('DELETE', '/something/that/does/not/exist/ever');
         $this->assertResponseStatusCodeSame(404);
+    }
+
+    public function testDoNotRebootKernelOnCreateClient(): void
+    {
+        self::$alwaysBootKernel = false;
+
+        self::bootKernel();
+
+        $mock = $this->createMock(KernelInterface::class);
+
+        // Client need to be retrieved so we must configure the `getContainer`
+        // method
+        $mock->method('getContainer')->willReturn(self::getContainer());
+        $mock->expects($this->never())->method('boot');
+
+        $oldKernel = self::$kernel;
+        self::$kernel = $mock;
+
+        self::createClient();
+
+        // restore old kernel for proper shutdown
+        self::$kernel = $oldKernel;
     }
 }

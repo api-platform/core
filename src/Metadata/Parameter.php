@@ -16,6 +16,7 @@ namespace ApiPlatform\Metadata;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ParameterProviderInterface;
+use Symfony\Component\TypeInfo\Type;
 
 /**
  * @experimental
@@ -26,8 +27,10 @@ abstract class Parameter
      * @param (array<string, mixed>&array{type?: string, default?: string})|null $schema
      * @param array<string, mixed>                                               $extraProperties
      * @param ParameterProviderInterface|callable|string|null                    $provider
+     * @param list<string>                                                       $properties      a list of properties this parameter applies to (works with the :property placeholder)
      * @param FilterInterface|string|null                                        $filter
      * @param mixed                                                              $constraints     an array of Symfony constraints, or an array of Laravel rules
+     * @param Type                                                               $nativeType      the PHP native type, we cast values to an array if its a CollectionType, if not and it's an array with a single value we use it (eg: HTTP Header)
      */
     public function __construct(
         protected ?string $key = null,
@@ -37,6 +40,7 @@ abstract class Parameter
         protected mixed $filter = null,
         protected ?string $property = null,
         protected ?string $description = null,
+        protected ?array $properties = null,
         protected ?bool $required = null,
         protected ?int $priority = null,
         protected ?false $hydra = null,
@@ -45,6 +49,8 @@ abstract class Parameter
         protected ?string $securityMessage = null,
         protected ?array $extraProperties = [],
         protected array|string|null $filterContext = null,
+        protected ?Type $nativeType = null,
+        protected ?bool $castToArray = null,
     ) {
     }
 
@@ -125,6 +131,13 @@ abstract class Parameter
     public function getValue(mixed $default = new ParameterNotFound()): mixed
     {
         return $this->extraProperties['_api_values'] ?? $default;
+    }
+
+    public function setValue(mixed $value): static
+    {
+        $this->extraProperties['_api_values'] = $value;
+
+        return $this;
     }
 
     /**
@@ -248,7 +261,7 @@ abstract class Parameter
         return $self;
     }
 
-    public function withSecurity(string|\Stringable|null $security): self
+    public function withSecurity(string|\Stringable|null $security): static
     {
         $self = clone $this;
         $self->security = $security;
@@ -256,7 +269,7 @@ abstract class Parameter
         return $self;
     }
 
-    public function withSecurityMessage(?string $securityMessage): self
+    public function withSecurityMessage(?string $securityMessage): static
     {
         $self = clone $this;
         $self->securityMessage = $securityMessage;
@@ -271,6 +284,45 @@ abstract class Parameter
     {
         $self = clone $this;
         $self->extraProperties = $extraProperties;
+
+        return $self;
+    }
+
+    public function getProperties(): ?array
+    {
+        return $this->properties;
+    }
+
+    public function withProperties(?array $properties): self
+    {
+        $self = clone $this;
+        $self->properties = $properties;
+
+        return $self;
+    }
+
+    public function getNativeType(): ?Type
+    {
+        return $this->nativeType;
+    }
+
+    public function withNativeType(Type $nativeType): self
+    {
+        $self = clone $this;
+        $self->nativeType = $nativeType;
+
+        return $self;
+    }
+
+    public function getCastToArray(): ?bool
+    {
+        return $this->castToArray;
+    }
+
+    public function withCastToArray(bool $castToArray): self
+    {
+        $self = clone $this;
+        $self->castToArray = $castToArray;
 
         return $self;
     }

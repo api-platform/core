@@ -14,7 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Validator\Metadata\Property\Restriction;
 
 use ApiPlatform\Metadata\ApiProperty;
-use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Range;
 
@@ -48,11 +51,23 @@ final class PropertySchemaRangeRestriction implements PropertySchemaRestrictionM
      */
     public function supports(Constraint $constraint, ApiProperty $propertyMetadata): bool
     {
-        $types = array_map(fn (Type $type) => $type->getBuiltinType(), $propertyMetadata->getBuiltinTypes() ?? []);
-        if ($propertyMetadata->getExtraProperties()['nested_schema'] ?? false) {
-            $types = [Type::BUILTIN_TYPE_INT];
+        if (!$constraint instanceof Range) {
+            return false;
         }
 
-        return $constraint instanceof Range && \count($types) && array_intersect($types, [Type::BUILTIN_TYPE_INT, Type::BUILTIN_TYPE_FLOAT]);
+        if (method_exists(PropertyInfoExtractor::class, 'getType')) {
+            $type = $propertyMetadata->getExtraProperties()['nested_schema'] ?? false
+                ? Type::int()
+                : $propertyMetadata->getNativeType();
+
+            return $type->isIdentifiedBy(TypeIdentifier::INT, TypeIdentifier::FLOAT);
+        }
+
+        $types = array_map(fn (LegacyType $type) => $type->getBuiltinType(), $propertyMetadata->getBuiltinTypes() ?? []);
+        if ($propertyMetadata->getExtraProperties()['nested_schema'] ?? false) {
+            $types = [LegacyType::BUILTIN_TYPE_INT];
+        }
+
+        return \count($types) > 0 && \count(array_intersect($types, [LegacyType::BUILTIN_TYPE_INT, LegacyType::BUILTIN_TYPE_FLOAT])) > 0;
     }
 }

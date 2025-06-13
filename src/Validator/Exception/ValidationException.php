@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Validator\Exception;
 
+use ApiPlatform\JsonSchema\SchemaFactory;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Error as ErrorOperation;
 use ApiPlatform\Metadata\ErrorResource;
 use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
@@ -22,6 +24,7 @@ use ApiPlatform\Metadata\Util\CompositeIdentifierParser;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface as SymfonyHttpExceptionInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\SerializedName;
+use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\WebLink\Link;
 
@@ -33,41 +36,57 @@ use Symfony\Component\WebLink\Link;
 #[ErrorResource(
     uriTemplate: '/validation_errors/{id}',
     status: 422,
-    openapi: false,
     uriVariables: ['id'],
+    openapi: false,
+    outputFormats: ['jsonapi' => ['application/vnd.api+json'], 'jsonld' => ['application/ld+json'], 'json' => ['application/problem+json', 'application/json']],
     provider: 'api_platform.validator.state.error_provider',
-    shortName: 'ConstraintViolationList',
+    shortName: 'ConstraintViolation',
+    description: 'Unprocessable entity',
     operations: [
         new ErrorOperation(
             name: '_api_validation_errors_problem',
             outputFormats: ['json' => ['application/problem+json']],
-            normalizationContext: ['groups' => ['json'],
+            normalizationContext: [
+                SchemaFactory::OPENAPI_DEFINITION_NAME => '',
+                'groups' => ['json'],
+                'ignored_attributes' => ['trace', 'file', 'line', 'code', 'message', 'traceAsString', 'previous'],
                 'skip_null_values' => true,
-            ]),
+            ]
+        ),
         new ErrorOperation(
             name: '_api_validation_errors_hydra',
-            outputFormats: ['jsonld' => ['application/problem+json']],
+            outputFormats: ['jsonld' => ['application/problem+json', 'application/ld+json']],
             links: [new Link(rel: 'http://www.w3.org/ns/json-ld#error', href: 'http://www.w3.org/ns/hydra/error')],
             normalizationContext: [
+                SchemaFactory::OPENAPI_DEFINITION_NAME => '',
                 'groups' => ['jsonld'],
+                'ignored_attributes' => ['trace', 'file', 'line', 'code', 'message', 'traceAsString', 'previous'],
                 'skip_null_values' => true,
             ]
         ),
         new ErrorOperation(
             name: '_api_validation_errors_jsonapi',
             outputFormats: ['jsonapi' => ['application/vnd.api+json']],
-            normalizationContext: ['groups' => ['jsonapi'], 'skip_null_values' => true]
+            normalizationContext: [
+                SchemaFactory::OPENAPI_DEFINITION_NAME => '',
+                'disable_json_schema_serializer_groups' => false,
+                'groups' => ['jsonapi'],
+                'skip_null_values' => true,
+                'ignored_attributes' => ['trace', 'file', 'line', 'code', 'message', 'traceAsString', 'previous'],
+            ]
         ),
     ],
     graphQlOperations: []
 )]
+#[ApiProperty(property: 'traceAsString', hydra: false)]
+#[ApiProperty(property: 'string', hydra: false)]
 class ValidationException extends RuntimeException implements ConstraintViolationListAwareExceptionInterface, \Stringable, ProblemExceptionInterface, HttpExceptionInterface, SymfonyHttpExceptionInterface
 {
     private int $status = 422;
     protected ?string $errorTitle = null;
-    private ConstraintViolationListInterface $constraintViolationList;
+    private array|ConstraintViolationListInterface $constraintViolationList = [];
 
-    public function __construct(string|ConstraintViolationListInterface $message = '', string|int|null $code = null, int|\Throwable|null $previous = null, \Throwable|string|null $errorTitle = null)
+    public function __construct(string|ConstraintViolationListInterface $message = new ConstraintViolationList(), string|int|null $code = null, int|\Throwable|null $previous = null, \Throwable|string|null $errorTitle = null)
     {
         $this->errorTitle = $errorTitle;
 
@@ -78,7 +97,7 @@ class ValidationException extends RuntimeException implements ConstraintViolatio
             return;
         }
 
-        trigger_deprecation('api_platform/core', '3.3', \sprintf('The "%s" exception will have a "%s" first argument in 4.x.', self::class, ConstraintViolationListInterface::class));
+        trigger_deprecation('api_platform/core', '5.0', \sprintf('The "%s" exception will have a "%s" first argument in 5.x.', self::class, ConstraintViolationListInterface::class));
         parent::__construct($message ?: $this->__toString(), $code ?? 0, $previous);
     }
 
@@ -107,24 +126,28 @@ class ValidationException extends RuntimeException implements ConstraintViolatio
     }
 
     #[Groups(['jsonld'])]
+    #[ApiProperty(writable: false, initializable: false)]
     public function getDescription(): string
     {
         return $this->detail;
     }
 
     #[Groups(['jsonld', 'json', 'jsonapi'])]
+    #[ApiProperty(writable: false, initializable: false)]
     public function getType(): string
     {
         return '/validation_errors/'.$this->getId();
     }
 
     #[Groups(['jsonld', 'json', 'jsonapi'])]
+    #[ApiProperty(writable: false, initializable: false)]
     public function getTitle(): ?string
     {
         return $this->errorTitle ?? 'An error occurred';
     }
 
     #[Groups(['jsonld', 'json', 'jsonapi'])]
+    #[ApiProperty(writable: false, initializable: false)]
     private string $detail;
 
     public function getDetail(): ?string
@@ -149,6 +172,7 @@ class ValidationException extends RuntimeException implements ConstraintViolatio
     }
 
     #[Groups(['jsonld', 'json', 'jsonapi'])]
+    #[ApiProperty(writable: false, initializable: false)]
     public function getInstance(): ?string
     {
         return null;
@@ -156,6 +180,19 @@ class ValidationException extends RuntimeException implements ConstraintViolatio
 
     #[SerializedName('violations')]
     #[Groups(['json', 'jsonld'])]
+    #[ApiProperty(
+        jsonldContext: ['@type' => 'ConstraintViolationList'],
+        schema: [
+            'type' => 'array',
+            'items' => [
+                'type' => 'object',
+                'properties' => [
+                    'propertyPath' => ['type' => 'string', 'description' => 'The property path of the violation'],
+                    'message' => ['type' => 'string', 'description' => 'The message associated with the violation'],
+                ],
+            ],
+        ]
+    )]
     public function getConstraintViolationList(): ConstraintViolationListInterface
     {
         return $this->constraintViolationList;

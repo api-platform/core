@@ -27,18 +27,26 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Parameter\CustomGroupParameterProvider
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\TypeInfo\Type\BuiltinType;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\GenericType;
+use Symfony\Component\TypeInfo\Type\UnionType;
+use Symfony\Component\TypeInfo\TypeIdentifier;
+use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\Country;
 
 #[Get(
     uriTemplate: 'with_parameters/{id}{._format}',
     uriVariables: [
-        'id' => new Link(schema: ['type' => 'uuid'], property: 'id'),
+        'id' => new Link(schema: ['type' => 'string', 'format' => 'uuid'], property: 'id'),
     ],
     parameters: [
         'groups' => new QueryParameter(filter: new GroupFilter(parameterName: 'groups', overrideDefaultGroups: false)),
         'group' => new QueryParameter(provider: [self::class, 'provideGroup']),
         'properties' => new QueryParameter(filter: 'my_dummy.property'),
         'service' => new QueryParameter(provider: CustomGroupParameterProvider::class),
+        'object' => new QueryParameter(provider: new CustomGroupParameterProvider()),
         'auth' => new HeaderParameter(provider: [self::class, 'restrictAccess']),
         'priority' => new QueryParameter(provider: [self::class, 'assertSecond'], priority: 10),
         'priorityb' => new QueryParameter(provider: [self::class, 'assertFirst'], priority: 20),
@@ -54,17 +62,67 @@ use Symfony\Component\Validator\Constraints as Assert;
     provider: [self::class, 'collectionProvider']
 )]
 #[GetCollection(
+    uriTemplate: 'with_parameters_country{._format}',
+    parameters: [
+        'country' => new QueryParameter(
+            schema: ['type' => 'string'],
+            constraints: [new Country()],
+            nativeType: new UnionType(
+                new BuiltinType(TypeIdentifier::STRING),
+                new CollectionType(
+                    new GenericType( // @phpstan-ignore-line
+                        new BuiltinType(TypeIdentifier::ARRAY), // @phpstan-ignore-line
+                        new BuiltinType(TypeIdentifier::INT),
+                        new BuiltinType(TypeIdentifier::STRING),
+                    ),
+                    true,
+                ),
+            )
+        ),
+    ],
+    provider: [self::class, 'collectionProvider']
+)]
+#[GetCollection(
+    uriTemplate: 'with_parameters_countries{._format}',
+    parameters: [
+        'country' => new QueryParameter(constraints: [new All([new Country()])], castToArray: true),
+    ],
+    provider: [self::class, 'collectionProvider'],
+)]
+#[GetCollection(
     uriTemplate: 'validate_parameters{._format}',
     parameters: [
         'enum' => new QueryParameter(schema: ['enum' => ['a', 'b'], 'uniqueItems' => true]),
-        'num' => new QueryParameter(schema: ['minimum' => 1, 'maximum' => 3]),
-        'exclusiveNum' => new QueryParameter(schema: ['exclusiveMinimum' => 1, 'exclusiveMaximum' => 3]),
-        'blank' => new QueryParameter(openApi: new OpenApiParameter(name: 'blank', in: 'query', allowEmptyValue: false)),
-        'length' => new QueryParameter(schema: ['maxLength' => 1, 'minLength' => 3]),
+        'num' => new QueryParameter(
+            schema: ['minimum' => 1, 'maximum' => 3],
+            nativeType: new BuiltinType(TypeIdentifier::STRING),
+        ),
+        'exclusiveNum' => new QueryParameter(
+            schema: ['exclusiveMinimum' => 1, 'exclusiveMaximum' => 3],
+            nativeType: new BuiltinType(TypeIdentifier::STRING),
+        ),
+        'blank' => new QueryParameter(
+            openApi: new OpenApiParameter(name: 'blank', in: 'query', allowEmptyValue: false),
+            nativeType: new BuiltinType(TypeIdentifier::STRING),
+        ),
+        'length' => new QueryParameter(
+            schema: ['maxLength' => 1, 'minLength' => 3],
+            nativeType: new BuiltinType(TypeIdentifier::STRING),
+        ),
         'array' => new QueryParameter(schema: ['minItems' => 2, 'maxItems' => 3]),
-        'multipleOf' => new QueryParameter(schema: ['multipleOf' => 2]),
-        'int' => new QueryParameter(property: 'a', constraints: [new Assert\Type('integer')], provider: [self::class, 'toInt']),
-        'pattern' => new QueryParameter(schema: ['pattern' => '\d']),
+        'multipleOf' => new QueryParameter(
+            schema: ['multipleOf' => 2],
+            nativeType: new BuiltinType(TypeIdentifier::STRING),
+        ),
+        'int' => new QueryParameter(
+            property: 'a',
+            constraints: [new Assert\Type('integer')],
+            provider: [self::class, 'toInt'],
+            nativeType: new BuiltinType(TypeIdentifier::STRING),
+        ),
+        'pattern' => new QueryParameter(
+            schema: ['pattern' => '\d', 'type' => 'string'],
+        ),
     ],
     provider: [self::class, 'collectionProvider']
 )]
@@ -76,8 +134,38 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 #[GetCollection(
     uriTemplate: 'with_parameters_header_and_query{._format}',
-    parameters: new Parameters([new QueryParameter(key: 'q'), new HeaderParameter(key: 'q')]),
+    parameters: new Parameters([
+        new QueryParameter(
+            key: 'q',
+        ),
+        new HeaderParameter(
+            key: 'q',
+            nativeType: new BuiltinType(TypeIdentifier::STRING),
+        ),
+    ]),
     provider: [self::class, 'headerAndQueryProvider']
+)]
+#[GetCollection(
+    uriTemplate: 'header_required',
+    parameters: [
+        'Req' => new HeaderParameter(required: true, schema: ['type' => 'string']),
+    ],
+    provider: [self::class, 'headerProvider']
+)]
+#[GetCollection(
+    uriTemplate: 'header_integer',
+    parameters: [
+        'Foo' => new HeaderParameter(
+            schema: [
+                'type' => 'integer',
+                'example' => 3,
+                'minimum' => 1,
+                'maximum' => 5,
+            ],
+            required: true,
+        ),
+    ],
+    provider: [self::class, 'noopProvider']
 )]
 #[QueryParameter(key: 'everywhere')]
 class WithParameter
@@ -127,7 +215,7 @@ class WithParameter
         throw new AccessDeniedHttpException();
     }
 
-    public static function headerAndQueryProvider(Operation $operation, array $uriVariables = [], array $context = [])
+    public static function headerAndQueryProvider(Operation $operation, array $uriVariables = [], array $context = []): JsonResponse
     {
         $parameters = $operation->getParameters();
         $values = [$parameters->get('q', HeaderParameter::class)->getValue(), $parameters->get('q', QueryParameter::class)->getValue()];
@@ -153,5 +241,18 @@ class WithParameter
         ));
 
         return $operation->withParameters($parameters);
+    }
+
+    public static function headerProvider(Operation $operation, array $uriVariables = [], array $context = []): JsonResponse
+    {
+        $parameters = $operation->getParameters();
+        $values = [$parameters->get('Req', HeaderParameter::class)->getValue()];
+
+        return new JsonResponse($values);
+    }
+
+    public static function noopProvider(Operation $operation, array $uriVariables = [], array $context = []): JsonResponse
+    {
+        return new JsonResponse([]);
     }
 }
