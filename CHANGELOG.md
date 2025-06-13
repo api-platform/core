@@ -1,5 +1,24 @@
 # Changelog
 
+## v4.1.16
+
+### Bug fixes
+
+* [4a99a5f6e](https://github.com/api-platform/core/commit/4a99a5f6e7eb13e9e77872dc33ec5b3dc2deef25) fix(laravel): persist HasMany and MorphMany relationships (#7208)
+* [9bfa5fef0](https://github.com/api-platform/core/commit/9bfa5fef0dfa129078118d0ce67f1ec2c8d548d7) fix(metadata): call dynamic validation groups #7184 (#7184)
+* [b2131645d](https://github.com/api-platform/core/commit/b2131645dec11a5dbf8bbe507f578720a84a686e) fix(laravel): route where uses requirements (#7199)
+* [b2b5f99c6](https://github.com/api-platform/core/commit/b2b5f99c64ced9f3580fdaee099d0e34e75d2697) refactor(state): merge parameter and link security  (#7200)
+
+Notes: 
+
+Two providers are now available on parameters (query parameters, header and uri variables `Link`): 
+
+- `ReadLinkParameterProvider` previously used for link security (renamed from `Symfony\Security\State\LinkedReadProvider`)
+- `IriConverterParameterProvider` this allows you to read a resource from an IRI usefull for filters (eg `?author=/authors/1`)
+
+Previous tests on link security were left untouched we removed the experimental class `Symfony\Security\State\LinkAccessCheckerProvider` as well as the `LinkedReadProvider` as they're not used anymore.
+
+
 ## v4.1.15 - v4.1.14 - v4.1.13
 
 There was an issue with the subtree split as we attempted to test lower dependencies on the subtree split, some components where wrongly tagged.
