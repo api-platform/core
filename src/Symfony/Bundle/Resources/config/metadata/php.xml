@@ -9,5 +9,10 @@
             <argument type="collection" />
             <argument type="service" id="service_container" />
         </service>
+
+        <service id="api_platform.metadata.closure_extractor.php_file.resource" class="ApiPlatform\Metadata\Extractor\PhpFileResourceClosureExtractor" public="false">
+            <argument type="collection" />
+            <argument type="service" id="service_container" />
+        </service>
     </services>
 </container>

@@ -356,6 +356,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $container->getDefinition('api_platform.metadata.resource_extractor.php_file')->replaceArgument(0, $phpResources);
+        $container->getDefinition('api_platform.metadata.closure_extractor.php_file.resource')->replaceArgument(0, $phpResources);
     }
 
     private function getClassNameResources(): array

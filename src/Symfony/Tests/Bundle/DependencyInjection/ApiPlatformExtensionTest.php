@@ -299,7 +299,11 @@ class ApiPlatformExtensionTest extends TestCase
         (new ApiPlatformExtension())->load($config, $this->container);
 
         $emptyPhpFile = realpath(__DIR__.'/php/empty_file.php');
+
         $this->assertContainerHasService('api_platform.metadata.resource_extractor.php_file');
         $this->assertSame([$emptyPhpFile], $this->container->getDefinition('api_platform.metadata.resource_extractor.php_file')->getArgument(0));
+
+        $this->assertContainerHasService('api_platform.metadata.closure_extractor.php_file.resource');
+        $this->assertSame([$emptyPhpFile], $this->container->getDefinition('api_platform.metadata.closure_extractor.php_file.resource')->getArgument(0));
     }
 }
