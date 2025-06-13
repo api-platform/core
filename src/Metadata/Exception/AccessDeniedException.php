@@ -11,15 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Symfony\Security\Exception;
+namespace ApiPlatform\Metadata\Exception;
 
-use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException as ExceptionAccessDeniedException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-/**
- * TODO: deprecate in favor of Metadata.
- */
-final class AccessDeniedException extends ExceptionAccessDeniedException implements HttpExceptionInterface
+final class AccessDeniedException extends AccessDeniedHttpException implements HttpExceptionInterface
 {
     public function getStatusCode(): int
     {

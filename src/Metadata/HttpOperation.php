@@ -349,6 +349,9 @@ class HttpOperation extends Operation
         return $this->uriVariables;
     }
 
+    /**
+     * @param array<string, mixed>|array<int, Link>|list<string> $uriVariables
+     */
     public function withUriVariables($uriVariables): static
     {
         $self = clone $this;
