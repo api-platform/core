@@ -14,10 +14,15 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Metadata\ResourceMutatorInterface;
 use Psr\Container\ContainerInterface;
 
-final class CustomResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
+final class MutatorResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
+    /**
+     * @param ContainerInterface<ResourceMutatorInterface[]> $resourceMutators
+     * @param ResourceMetadataCollectionFactoryInterface|null $decorated
+     */
     public function __construct(
         private readonly ContainerInterface $resourceMutators,
         private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null,
@@ -34,8 +39,8 @@ final class CustomResourceMetadataCollectionFactory implements ResourceMetadataC
         $newMetadataCollection = new ResourceMetadataCollection($resourceClass);
 
         foreach ($resourceMetadataCollection as $resource) {
-            foreach ($this->resourceMutators->get($resourceClass) as $mutators) {
-                $resource = $mutators($resource);
+            foreach ($this->resourceMutators->get($resourceClass) as $mutator) {
+                $resource = $mutator($resource);
             }
 
             $newMetadataCollection[] = $resource;
