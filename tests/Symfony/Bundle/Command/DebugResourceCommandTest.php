@@ -37,7 +37,11 @@ class DebugResourceCommandTest extends TestCase
         $application->setCatchExceptions(false);
         $application->setAutoExit(false);
 
-        $application->add(new DebugResourceCommand(new AttributesResourceMetadataCollectionFactory(), new VarCloner(), $dumper ?? new CliDumper()));
+        if (method_exists($application, 'addCommand')) {
+            $application->addCommand(new DebugResourceCommand(new AttributesResourceMetadataCollectionFactory(), new VarCloner(), $dumper ?? new CliDumper()));
+        } else {
+            $application->add(new DebugResourceCommand(new AttributesResourceMetadataCollectionFactory(), new VarCloner(), $dumper ?? new CliDumper()));
+        }
 
         $command = $application->find('debug:api-resource');
 
