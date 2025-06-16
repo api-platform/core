@@ -343,9 +343,9 @@ class AbstractItemNormalizerTest extends TestCase
             SecuredDummy::class,
             'is_granted(\'ROLE_ADMIN\')',
             Argument::that(function (array $context) {
-                return array_key_exists('property', $context)
-                    && array_key_exists('object', $context)
-                    && array_key_exists('previous_object', $context)
+                return \array_key_exists('property', $context)
+                    && \array_key_exists('object', $context)
+                    && \array_key_exists('previous_object', $context)
                     && $context['property'] === 'adminOnlyProperty'
                     && $context['previous_object'] === null
                     && $context['object'] instanceof SecuredDummy;
@@ -396,9 +396,9 @@ class AbstractItemNormalizerTest extends TestCase
             SecuredDummy::class,
             'is_granted(\'ROLE_ADMIN\')',
             Argument::that(function (array $context) {
-                return array_key_exists('property', $context)
-                    && array_key_exists('object', $context)
-                    && array_key_exists('previous_object', $context)
+                return \array_key_exists('property', $context)
+                    && \array_key_exists('object', $context)
+                    && \array_key_exists('previous_object', $context)
                     && $context['property'] === 'adminOnlyProperty'
                     && $context['previous_object'] === null
                     && $context['object'] instanceof SecuredDummy;
@@ -414,7 +414,7 @@ class AbstractItemNormalizerTest extends TestCase
         $operation = new Patch(securityMessage: 'Custom access denied message', extraProperties: ['throw_on_access_denied' => true]);
 
         $normalizer->denormalize($data, SecuredDummy::class, 'json', [
-            'operation' => $operation
+            'operation' => $operation,
         ]);
     }
 
@@ -453,9 +453,9 @@ class AbstractItemNormalizerTest extends TestCase
             SecuredDummy::class,
             'is_granted(\'ROLE_ADMIN\')',
             Argument::that(function (array $context) {
-                return array_key_exists('property', $context)
-                    && array_key_exists('object', $context)
-                    && array_key_exists('previous_object', $context)
+                return \array_key_exists('property', $context)
+                    && \array_key_exists('object', $context)
+                    && \array_key_exists('previous_object', $context)
                     && $context['property'] === 'adminOnlyProperty'
                     && $context['previous_object'] === null
                     && $context['object'] instanceof SecuredDummy;
@@ -471,7 +471,7 @@ class AbstractItemNormalizerTest extends TestCase
         $operation = new Patch(extraProperties: ['throw_on_access_denied' => true]);
 
         $normalizer->denormalize($data, SecuredDummy::class, 'json', [
-            'operation' => $operation
+            'operation' => $operation,
         ]);
     }
 
