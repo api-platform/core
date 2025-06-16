@@ -1029,9 +1029,7 @@ class AbstractItemNormalizerTest extends TestCase
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(DenormalizerInterface::class);
 
-        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), null, null, [], null, null) extends AbstractItemNormalizer {
-        };
-
+        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), null, null, [], null, null) extends AbstractItemNormalizer {};
         $normalizer->setSerializer($serializerProphecy->reveal());
 
         $errors = [];
@@ -1064,18 +1062,7 @@ class AbstractItemNormalizerTest extends TestCase
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(DenormalizerInterface::class);
 
-        $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
-            $propertyAccessorProphecy->reveal(),
-            null,
-            null,
-            [],
-            null,
-            null,
-        ]);
+        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), null, null, [], null, null) extends AbstractItemNormalizer {};
         $normalizer->setSerializer($serializerProphecy->reveal());
 
         $normalizer->denormalize('wrong IRI', Dummy::class, null, ['not_normalizable_value_exceptions' => []]);
@@ -1102,18 +1089,7 @@ class AbstractItemNormalizerTest extends TestCase
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(DenormalizerInterface::class);
 
-        $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
-            $propertyAccessorProphecy->reveal(),
-            null,
-            null,
-            [],
-            null,
-            null,
-        ]);
+        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), null, null, [], null, null) extends AbstractItemNormalizer {};
         $normalizer->setSerializer($serializerProphecy->reveal());
 
         $normalizer->denormalize('/some-iri', Dummy::class, null, ['not_normalizable_value_exceptions' => []]);

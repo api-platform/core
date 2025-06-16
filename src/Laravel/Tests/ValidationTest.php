@@ -57,4 +57,12 @@ class ValidationTest extends TestCase
         $response = $this->postJson('/api/issue_6932', $data, ['accept' => 'application/ld+json', 'content-type' => 'application/ld+json']);
         $response->assertStatus(422);
     }
+
+    public function testRouteWithRequirements(): void
+    {
+        $response = $this->get('api/issue_7194_requirements/test', ['accept' => 'application/ld+json']);
+        $response->assertStatus(404);
+        $response = $this->get('api/issue_7194_requirements/1', ['accept' => 'application/ld+json']);
+        $response->assertStatus(200);
+    }
 }

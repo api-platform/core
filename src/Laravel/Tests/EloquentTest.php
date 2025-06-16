@@ -523,4 +523,19 @@ class EloquentTest extends TestCase
             ],
         ]);
     }
+
+    public function testPostWithEmptyMorphMany(): void
+    {
+        $response = $this->postJson('/api/post_with_morph_manies', [
+            'title' => 'My first post',
+            'content' => 'This is the content of my first post.',
+            'comments' => [['content' => 'hello']],
+        ], ['accept' => 'application/ld+json', 'content-type' => 'application/ld+json']);
+        $response->assertStatus(201);
+        $response->assertJson([
+            'title' => 'My first post',
+            'content' => 'This is the content of my first post.',
+            'comments' => [['content' => 'hello']],
+        ]);
+    }
 }

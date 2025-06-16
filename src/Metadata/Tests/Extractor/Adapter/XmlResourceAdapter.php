@@ -37,7 +37,6 @@ final class XmlResourceAdapter implements ResourceAdapterInterface
         'controller',
         'urlGenerationStrategy',
         'deprecationReason',
-        'elasticsearch',
         'messenger',
         'input',
         'output',
@@ -475,7 +474,6 @@ XML_WRAP
         $node = $resource->addChild('stateOptions');
         $childNode = $node->addChild(array_key_first($values));
         $childNode->addAttribute('index', $values[array_key_first($values)]['index']);
-        $childNode->addAttribute('type', $values[array_key_first($values)]['type']);
     }
 
     private function buildValues(\SimpleXMLElement $resource, array $values): void
