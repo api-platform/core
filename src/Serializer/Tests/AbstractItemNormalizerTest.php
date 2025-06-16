@@ -346,8 +346,8 @@ class AbstractItemNormalizerTest extends TestCase
                 return \array_key_exists('property', $context)
                     && \array_key_exists('object', $context)
                     && \array_key_exists('previous_object', $context)
-                    && $context['property'] === 'adminOnlyProperty'
-                    && $context['previous_object'] === null
+                    && 'adminOnlyProperty' === $context['property']
+                    && null === $context['previous_object']
                     && $context['object'] instanceof SecuredDummy;
             })
         )->willReturn(false);
@@ -399,8 +399,8 @@ class AbstractItemNormalizerTest extends TestCase
                 return \array_key_exists('property', $context)
                     && \array_key_exists('object', $context)
                     && \array_key_exists('previous_object', $context)
-                    && $context['property'] === 'adminOnlyProperty'
-                    && $context['previous_object'] === null
+                    && 'adminOnlyProperty' === $context['property']
+                    && null === $context['previous_object']
                     && $context['object'] instanceof SecuredDummy;
             })
         )->willReturn(false);
@@ -456,8 +456,8 @@ class AbstractItemNormalizerTest extends TestCase
                 return \array_key_exists('property', $context)
                     && \array_key_exists('object', $context)
                     && \array_key_exists('previous_object', $context)
-                    && $context['property'] === 'adminOnlyProperty'
-                    && $context['previous_object'] === null
+                    && 'adminOnlyProperty' === $context['property']
+                    && null === $context['previous_object']
                     && $context['object'] instanceof SecuredDummy;
             })
         )->willReturn(false);
