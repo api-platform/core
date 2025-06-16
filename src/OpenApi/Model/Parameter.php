@@ -55,13 +55,11 @@ final class Parameter
 
     public function canAllowEmptyValue(): ?bool
     {
-        // allowEmptyValue is only valid for parameters where "in" is "query"
         return 'query' === $this->in ? $this->allowEmptyValue : null;
     }
 
     public function getAllowEmptyValue(): ?bool
     {
-        // allowEmptyValue is only valid for parameters where "in" is "query"
         return 'query' === $this->in ? $this->allowEmptyValue : null;
     }
 
