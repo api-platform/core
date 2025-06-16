@@ -17,7 +17,7 @@ final class Parameter
 {
     use ExtensionTrait;
 
-    public function __construct(private string $name, private string $in, private string $description = '', private bool $required = false, private bool $deprecated = false, private ?bool $allowEmptyValue = null, private array $schema = [], private ?string $style = null, private bool $explode = false, private ?bool $allowReserved = null, private $example = null, private ?\ArrayObject $examples = null, private ?\ArrayObject $content = null)
+    public function __construct(private string $name, private string $in, private string $description = '', private bool $required = false, private bool $deprecated = false, private bool $allowEmptyValue = false, private array $schema = [], private ?string $style = null, private bool $explode = false, private bool $allowReserved = false, private $example = null, private ?\ArrayObject $examples = null, private ?\ArrayObject $content = null)
     {
         if (null === $style) {
             if ('query' === $in || 'cookie' === $in) {
@@ -55,12 +55,14 @@ final class Parameter
 
     public function canAllowEmptyValue(): ?bool
     {
-        return $this->allowEmptyValue;
+        // allowEmptyValue is only valid for parameters where "in" is "query"
+        return 'query' === $this->in ? $this->allowEmptyValue : null;
     }
 
     public function getAllowEmptyValue(): ?bool
     {
-        return $this->allowEmptyValue;
+        // allowEmptyValue is only valid for parameters where "in" is "query"
+        return 'query' === $this->in ? $this->allowEmptyValue : null;
     }
 
     public function getSchema(): array
@@ -85,12 +87,12 @@ final class Parameter
 
     public function canAllowReserved(): ?bool
     {
-        return $this->allowReserved;
+        return 'query' === $this->in ? $this->allowReserved : null;
     }
 
     public function getAllowReserved(): ?bool
     {
-        return $this->allowReserved;
+        return 'query' === $this->in ? $this->allowReserved : null;
     }
 
     public function getExample()
@@ -151,7 +153,9 @@ final class Parameter
     public function withAllowEmptyValue(bool $allowEmptyValue): self
     {
         $clone = clone $this;
-        $clone->allowEmptyValue = $allowEmptyValue;
+        if ('query' === $clone->in) {
+            $clone->allowEmptyValue = $allowEmptyValue;
+        }
 
         return $clone;
     }
@@ -183,7 +187,9 @@ final class Parameter
     public function withAllowReserved(bool $allowReserved): self
     {
         $clone = clone $this;
-        $clone->allowReserved = $allowReserved;
+        if ('query' === $clone->in) {
+            $clone->allowReserved = $allowReserved;
+        }
 
         return $clone;
     }
