@@ -36,8 +36,8 @@ final class LinkedDataPlatformProcessor implements ProcessorInterface
      */
     public function __construct(
         private readonly ProcessorInterface $decorated,
-        private readonly ?ResourceClassResolverInterface $resourceClassResolver = null,
-        private readonly ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
+        private readonly ResourceClassResolverInterface $resourceClassResolver,
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
     ) {
     }
 
@@ -48,16 +48,14 @@ final class LinkedDataPlatformProcessor implements ProcessorInterface
             !$response instanceof Response
             || !$operation instanceof HttpOperation
             || $operation instanceof Error
-            || !$this->resourceMetadataCollectionFactory
-            || !($context['resource_class'] ?? null)
             || !$operation->getUriTemplate()
-            || !$this->resourceClassResolver?->isResourceClass($context['resource_class'])
+            || !$this->resourceClassResolver->isResourceClass($context['resource_class'])
         ) {
             return $response;
         }
 
         $allowedMethods = self::DEFAULT_ALLOWED_METHODS;
-        $resourceCollection = $this->resourceMetadataCollectionFactory->create($context['resource_class']);
+        $resourceCollection = $this->resourceMetadataCollectionFactory->create($operation->getClass());
         foreach ($resourceCollection as $resource) {
             foreach ($resource->getOperations() as $op) {
                 if ($op->getUriTemplate() === $operation->getUriTemplate()) {
