@@ -156,6 +156,8 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                     $parameter = $parameter->withNativeType(Type::list(Type::string()));
                 } elseif ('string' === ($parameter->getSchema()['type'] ?? null)) {
                     $parameter = $parameter->withNativeType(Type::string());
+                } elseif ('boolean' === ($parameter->getSchema()['type'] ?? null)) {
+                    $parameter = $parameter->withNativeType(Type::bool());
                 } else {
                     $parameter = $parameter->withNativeType(Type::union(Type::string(), Type::list(Type::string())));
                 }
