@@ -447,6 +447,17 @@ class EloquentTest extends TestCase
         $this->assertEquals($json['sons'][0], '/api/grand_sons/1');
     }
 
+    public function testHasMany(): void
+    {
+        GrandSonFactory::new()->count(1)->create();
+
+        $res = $this->get('/api/grand_fathers/1/grand_sons', ['Accept' => ['application/ld+json']]);
+        $json = $res->json();
+        $this->assertEquals($json['@id'], '/api/grand_fathers/1/grand_sons');
+        $this->assertEquals($json['totalItems'], 1);
+        $this->assertEquals($json['member'][0]['@id'], '/api/grand_sons/1');
+    }
+
     public function testRelationIsHandledOnCreateWithNestedData(): void
     {
         $cartData = [
