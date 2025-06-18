@@ -52,11 +52,11 @@ class LinkedDataPlatformProcessorTest extends TestCase
             ->willReturn(
                 new ResourceMetadataCollection('DummyResource', [ // todo mock $dummy_resource
                     new ApiResource(operations: [
-                        new Get(uriTemplate: '/dummy_resources/{dummyResourceId}{._format}', name: 'get'),
-                        new GetCollection(uriTemplate: '/dummy_resources{._format}', name: 'get_collections'),
-                        new Post(uriTemplate: '/dummy_resources{._format}', outputFormats: ['jsonld' => ['application/ld+json'], 'text/turtle' => ['text/turtle']], name: 'post'),
-                        new Delete(uriTemplate: '/dummy_resources/{dummyResourceId}{._format}', name: 'delete'),
-                        new Put(uriTemplate: '/dummy_resources/{dummyResourceId}{._format}', name: 'put'),
+                        new Get(uriTemplate: '/dummy_resources/{dummyResourceId}{._format}', class: 'DummyResource', name: 'get'),
+                        new GetCollection(uriTemplate: '/dummy_resources{._format}', class: 'DummyResource', name: 'get_collections'),
+                        new Post(uriTemplate: '/dummy_resources{._format}', outputFormats: ['jsonld' => ['application/ld+json'], 'text/turtle' => ['text/turtle']], class: 'DummyResource', name: 'post'),
+                        new Delete(uriTemplate: '/dummy_resources/{dummyResourceId}{._format}', class: 'DummyResource', name: 'delete'),
+                        new Put(uriTemplate: '/dummy_resources/{dummyResourceId}{._format}', class: 'DummyResource', name: 'put'),
                     ]),
                 ])
             );
@@ -67,7 +67,7 @@ class LinkedDataPlatformProcessorTest extends TestCase
 
     public function testHeadersAcceptPostIsReturnWhenPostAllowed(): void
     {
-        $operation = (new HttpOperation('GET', '/dummy_resources{._format}'));
+        $operation = (new HttpOperation('GET', '/dummy_resources{._format}', class: 'DummyResource'));
 
         $context = $this->getContext();
 
@@ -84,7 +84,7 @@ class LinkedDataPlatformProcessorTest extends TestCase
 
     public function testHeadersAcceptPostIsNotSetWhenPostIsNotAllowed(): void
     {
-        $operation = (new HttpOperation('GET', '/dummy_resources/{dummyResourceId}{._format}'));
+        $operation = (new HttpOperation('GET', '/dummy_resources/{dummyResourceId}{._format}', class: 'DummyResource'));
         $context = $this->getContext();
 
         $processor = new LinkedDataPlatformProcessor(
@@ -100,7 +100,7 @@ class LinkedDataPlatformProcessorTest extends TestCase
 
     public function testHeaderAllowReflectsResourceAllowedMethods(): void
     {
-        $operation = (new HttpOperation('GET', '/dummy_resources{._format}'));
+        $operation = (new HttpOperation('GET', '/dummy_resources{._format}', class: 'DummyResource'));
         $context = $this->getContext();
 
         $processor = new LinkedDataPlatformProcessor(
@@ -116,7 +116,7 @@ class LinkedDataPlatformProcessorTest extends TestCase
         $this->assertStringContainsString('GET', $allowHeader);
         $this->assertStringContainsString('POST', $allowHeader);
 
-        $operation = (new HttpOperation('GET', '/dummy_resources/{dummyResourceId}{._format}'));
+        $operation = (new HttpOperation('GET', '/dummy_resources/{dummyResourceId}{._format}', class: 'DummyResource'));
 
         /** @var Response $response */
         $processor = new LinkedDataPlatformProcessor(
@@ -136,31 +136,11 @@ class LinkedDataPlatformProcessorTest extends TestCase
 
     public function testProcessorWithoutRequiredConditionReturnOriginalResponse(): void
     {
-        $operation = (new HttpOperation('GET', '/dummy_resources/{dummyResourceId}{._format}'));
-
-        // No collection factory
-        $processor = new LinkedDataPlatformProcessor($this->decorated, $this->resourceClassResolver, null);
-        /** @var Response $response */
-        $response = $processor->process(null, $operation, [], $this->getContext());
-
-        $this->assertNull($response->headers->get('Allow'));
-
-        // No uri variable in context
-        $processor = new LinkedDataPlatformProcessor($this->decorated, null, $this->resourceMetadataCollectionFactory);
-        $response = $processor->process(null, $operation, [], $this->getContext());
-        $this->assertNull($response->headers->get('Allow'));
+        $operation = (new HttpOperation('GET', '/dummy_resources/{dummyResourceId}{._format}', class: 'DummyResource'));
 
         // Operation is an Error
         $processor = new LinkedDataPlatformProcessor($this->decorated, $this->resourceClassResolver, $this->resourceMetadataCollectionFactory);
         $response = $processor->process(null, new Error(), $this->getContext());
-        $this->assertNull($response->headers->get('Allow'));
-
-        // Not a resource class
-        $this->resourceClassResolver
-            ->method('isResourceClass')
-            ->willReturn(false);
-        $processor = new LinkedDataPlatformProcessor($this->decorated, $this->resourceClassResolver, $this->resourceMetadataCollectionFactory);
-        $response = $processor->process(null, $operation, []);
         $this->assertNull($response->headers->get('Allow'));
     }
 

@@ -49,7 +49,7 @@ final class LinkedDataPlatformProcessor implements ProcessorInterface
             || !$operation instanceof HttpOperation
             || $operation instanceof Error
             || !$operation->getUriTemplate()
-            || !$this->resourceClassResolver->isResourceClass($context['resource_class'])
+            || !$this->resourceClassResolver->isResourceClass($operation->getClass())
         ) {
             return $response;
         }
