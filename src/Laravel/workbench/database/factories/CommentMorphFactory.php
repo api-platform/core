@@ -14,21 +14,21 @@ declare(strict_types=1);
 namespace Workbench\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Workbench\App\Models\Post;
+use Workbench\App\Models\CommentMorph;
 
 /**
- * @template TModel of \Workbench\App\Models\Post
+ * @template TModel of \Workbench\App\Models\CommentMorph
  *
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<TModel>
  */
-class PostFactory extends Factory
+class CommentMorphFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var class-string<TModel>
      */
-    protected $model = Post::class;
+    protected $model = CommentMorph::class;
 
     /**
      * Define the model's default state.
@@ -37,10 +37,10 @@ class PostFactory extends Factory
      */
     public function definition(): array
     {
-        $title = fake()->unique()->sentence(10);
-
         return [
-            'title' => $title,
+            'commentable_id' => PostWithMorphManyFactory::new(),
+            'commentable_type' => PostWithMorphManyFactory::class,
+            'content' => fake()->text(),
         ];
     }
 }

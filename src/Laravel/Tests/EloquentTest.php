@@ -19,9 +19,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
+use Workbench\App\Models\PostWithMorphMany;
 use Workbench\Database\Factories\AuthorFactory;
 use Workbench\Database\Factories\BookFactory;
+use Workbench\Database\Factories\CommentMorphFactory;
 use Workbench\Database\Factories\GrandSonFactory;
+use Workbench\Database\Factories\PostWithMorphManyFactory;
 use Workbench\Database\Factories\WithAccessorFactory;
 
 class EloquentTest extends TestCase
@@ -536,6 +539,43 @@ class EloquentTest extends TestCase
             'title' => 'My first post',
             'content' => 'This is the content of my first post.',
             'comments' => [['content' => 'hello']],
+        ]);
+    }
+
+    public function testPostCommentsCollectionFromMorphMany(): void
+    {
+        PostWithMorphManyFactory::new()->create();
+
+        CommentMorphFactory::new()->count(5)->create([
+            'commentable_id' => 1,
+            'commentable_type' => PostWithMorphMany::class,
+        ]);
+
+        $response = $this->getJson('/api/post_with_morph_manies/1/comments', [
+            'accept' => 'application/ld+json',
+        ]);
+        $response->assertStatus(200);
+        $response->assertJsonCount(5, 'member');
+    }
+
+    public function testPostCommentItemFromMorphMany(): void
+    {
+        PostWithMorphManyFactory::new()->create();
+
+        CommentMorphFactory::new()->count(5)->create([
+            'commentable_id' => 1,
+            'commentable_type' => PostWithMorphMany::class,
+        ])->first();
+
+        $response = $this->getJson('/api/post_with_morph_manies/1/comments/1', [
+            'accept' => 'application/ld+json',
+        ]);
+        $response->assertStatus(200);
+        $response->assertJson([
+            '@context' => '/api/contexts/CommentMorph',
+            '@id' => '/api/post_with_morph_manies/1/comments/1',
+            '@type' => 'CommentMorph',
+            'id' => 1,
         ]);
     }
 }

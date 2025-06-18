@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphOneOrMany;
 
 /**
  * @implements LinksHandlerInterface<Model>
@@ -103,6 +104,13 @@ final class LinksHandler implements LinksHandlerInterface
         if ($from = $link->getFromProperty()) {
             $relation = $this->application->make($link->getFromClass());
             $relationQuery = $relation->{$from}();
+
+            if ($relationQuery instanceof MorphOneOrMany) {
+                return $builder
+                    ->where($relationQuery->getForeignKeyName(), $identifier)
+                    ->where($relationQuery->getMorphType(), $relationQuery->getMorphClass());
+            }
+
             if (!method_exists($relationQuery, 'getQualifiedForeignKeyName') && method_exists($relationQuery, 'getQualifiedForeignPivotKeyName')) {
                 return $builder->getModel()
                     ->join(
