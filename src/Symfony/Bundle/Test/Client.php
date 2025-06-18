@@ -149,10 +149,8 @@ final class Client implements HttpClientInterface
 
     /**
      * Returns the container.
-     *
-     * @return ContainerInterface|null Returns null when the Kernel has been shutdown or not started yet
      */
-    public function getContainer(): ?ContainerInterface
+    public function getContainer(): ContainerInterface
     {
         return $this->kernelBrowser->getContainer();
     }
