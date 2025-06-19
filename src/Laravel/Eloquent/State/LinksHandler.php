@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Laravel\Eloquent\State;
 
 use ApiPlatform\Metadata\Exception\OperationNotFoundException;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\HttpOperation;
@@ -22,6 +23,11 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 /**
  * @implements LinksHandlerInterface<Model>
@@ -101,34 +107,44 @@ final class LinksHandler implements LinksHandlerInterface
         }
 
         if ($from = $link->getFromProperty()) {
-            $relation = $this->application->make($link->getFromClass());
-            $relationQuery = $relation->{$from}();
-            if (!method_exists($relationQuery, 'getQualifiedForeignKeyName') && method_exists($relationQuery, 'getQualifiedForeignPivotKeyName')) {
+            /** @var Model $relatedInstance */
+            $relatedInstance = $this->application->make($link->getFromClass());
+            $relatedInstance->setAttribute($relatedInstance->getKeyName(), $identifier);
+            $relatedInstance->exists = true;
+
+            /** @var Relation<Model, Model, mixed> $relation */
+            $relation = $relatedInstance->{$from}();
+
+            if ($relation instanceof MorphTo) {
+                throw new RuntimeException('Cannot query directly from a MorphTo relationship.');
+            }
+
+            if ($relation instanceof BelongsTo) {
                 return $builder->getModel()
                     ->join(
-                        $relationQuery->getTable(), // @phpstan-ignore-line
-                        $relationQuery->getQualifiedRelatedPivotKeyName(), // @phpstan-ignore-line
-                        $builder->getModel()->getQualifiedKeyName()
-                    )
-                    ->where(
-                        $relationQuery->getQualifiedForeignPivotKeyName(), // @phpstan-ignore-line
+                        $relation->getParent()->getTable(),
+                        $relation->getParent()->getQualifiedKeyName(),
                         $identifier
-                    )
-                    ->select($builder->getModel()->getTable().'.*');
+                    );
             }
 
-            if (method_exists($relationQuery, 'dissociate')) {
-                return $builder->getModel()
-                       ->join(
-                           $relationQuery->getParent()->getTable(), // @phpstan-ignore-line
-                           $relationQuery->getParent()->getQualifiedKeyName(), // @phpstan-ignore-line
-                           $identifier
-                       );
+            if ($relation instanceof HasOneOrMany || $relation instanceof BelongsToMany) {
+                return $relation->getQuery();
             }
 
-            return $builder->getModel()->where($relationQuery->getQualifiedForeignKeyName(), $identifier);
+            if (method_exists($relation, 'getQualifiedForeignKeyName')) {
+                return $relation->getQuery()->where(
+                    $relation->getQualifiedForeignKeyName(),
+                    $identifier
+                );
+            }
+
+            throw new RuntimeException(\sprintf('Unhandled or unknown relationship type: %s for property %s on %s', $relation::class, $from, $relatedInstance::class));
         }
 
-        return $builder->where($builder->getModel()->qualifyColumn($link->getIdentifiers()[0]), $identifier);
+        return $builder->where(
+            $builder->getModel()->qualifyColumn($link->getIdentifiers()[0]),
+            $identifier
+        );
     }
 }
