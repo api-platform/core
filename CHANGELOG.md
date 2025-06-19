@@ -1,5 +1,14 @@
 # Changelog
 
+## v4.1.17
+
+### Bug fixes
+
+* [34a0d54b1](https://github.com/api-platform/core/commit/34a0d54b1fe195a233726ff2e8304c29f43954ca) fix(jsonld): genId false should work with embeded resources (#7219)
+* [c025b8f9f](https://github.com/api-platform/core/commit/c025b8f9f8ab51489dc75e470c057d6fae879fa0) fix(openapi): correct example usage for 3.0 (#7218)
+* [cdda4146b](https://github.com/api-platform/core/commit/cdda4146b429f8e605504e1dc403faa41f0255a7) fix(laravel): Allow `LinksHandler` to handle polymorphic relationships (#7231)
+* [dba97370f](https://github.com/api-platform/core/commit/dba97370fb8996cf4fc1d5b6d8ca92faf4e68637) fix(metadata): boolean type detection from parameter's schema (#7223)
+
 ## v4.1.16
 
 ### Bug fixes
