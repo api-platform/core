@@ -15,6 +15,7 @@ namespace ApiPlatform\Serializer;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Exception\AccessDeniedException;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\IriConverterInterface;
@@ -27,7 +28,6 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\Util\CloneTrait;
-use ApiPlatform\Metadata\Exception\AccessDeniedException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
