@@ -1,4 +1,15 @@
 <?php
+
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
 // ---
 // slug: computed-field
 // name: Compute a field
@@ -12,6 +23,7 @@
 // by modifying the SQL query (via `stateOptions`/`handleLinks`), mapping the computed value
 // to the entity object (via `processor`/`process`), and optionally enabling sorting on it
 // using a custom filter configured via `parameters`.
+
 namespace App\Filter {
     use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
     use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
@@ -44,7 +56,7 @@ namespace App\Filter {
          */
         // Defines the OpenAPI/Swagger schema for this filter parameter.
         // Tells API Platform documentation generators that 'sort[totalQuantity]' expects 'asc' or 'desc'.
-		// This also add constraint violations to the parameter that will reject any wrong values.
+        // This also add constraint violations to the parameter that will reject any wrong values.
         public function getSchema(Parameter $parameter): array
         {
             return ['type' => 'string', 'enum' => ['asc', 'desc']];
@@ -73,15 +85,15 @@ namespace App\Entity {
     #[ORM\Entity]
     // Defines the GetCollection operation for Cart, including computed 'totalQuantity'.
     // Recipe involves:
-	// 1. handleLinks (modify query)
-	// 2. process (map result)
-	// 3. parameters (filters)
+    // 1. setup the repository method (modify query)
+    // 2. process (map result)
+    // 3. parameters (filters)
     #[GetCollection(
         normalizationContext: ['hydra_prefix' => false],
         paginationItemsPerPage: 3,
         paginationPartial: false,
-        // stateOptions: Uses handleLinks to modify the query *before* fetching.
-        stateOptions: new Options(handleLinks: [self::class, 'handleLinks']),
+        // stateOptions: Uses repositoryMethod to modify the query *before* fetching. See App\Repository\CartRepository.
+        stateOptions: new Options(repositoryMethod: 'getCartsWithTotalQuantity'),
         // processor: Uses process to map the result *after* fetching, *before* serialization.
         processor: [self::class, 'process'],
         write: true,
@@ -99,20 +111,6 @@ namespace App\Entity {
     )]
     class Cart
     {
-        // Handles links/joins and modifications to the QueryBuilder *before* data is fetched (via stateOptions).
-        // Adds SQL logic (JOIN, SELECT aggregate, GROUP BY) to calculate 'totalQuantity' at the database level.
-        // The alias 'totalQuantity' created here is crucial for the filter and processor.
-        public static function handleLinks(QueryBuilder $queryBuilder, array $uriVariables, QueryNameGeneratorInterface $queryNameGenerator, array $context): void
-        {
-            // Get the alias for the root entity (Cart), usually 'o'.
-            $rootAlias = $queryBuilder->getRootAliases()[0] ?? 'o';
-            // Generate a unique alias for the joined 'items' relation to avoid conflicts.
-            $itemsAlias = $queryNameGenerator->generateParameterName('items');
-            $queryBuilder->leftJoin(\sprintf('%s.items', $rootAlias), $itemsAlias)
-                ->addSelect(\sprintf('COALESCE(SUM(%s.quantity), 0) AS totalQuantity', $itemsAlias))
-                ->addGroupBy(\sprintf('%s.id', $rootAlias));
-        }
-
         // Processor function called *after* fetching data, *before* serialization.
         // Maps the raw 'totalQuantity' from Doctrine result onto the Cart entity's property.
         // Handles Doctrine's array result structure: [0 => Entity, 'alias' => computedValue].
@@ -234,6 +232,30 @@ namespace App\Entity {
             $this->quantity = $quantity;
 
             return $this;
+        }
+    }
+}
+
+namespace App\Repository {
+    use Doctrine\ORM\EntityRepository;
+    use Doctrine\ORM\QueryBuilder;
+
+    /**
+     * @extends EntityRepository<Cart::class>
+     */
+    class CartRepository extends EntityRepository
+    {
+        // This repository method is used via stateOptions to alter the QueryBuilder *before* data is fetched.
+        // Adds SQL logic (JOIN, SELECT aggregate, GROUP BY) to calculate 'totalQuantity' at the database level.
+        // The alias 'totalQuantity' created here is crucial for the filter and processor.
+        public function getCartsWithTotalQuantity(): QueryBuilder
+        {
+            $queryBuilder = $this->createQueryBuilder('o');
+            $queryBuilder->leftJoin('o.items', 'items')
+                ->addSelect('COALESCE(SUM(items.quantity), 0) AS totalQuantity')
+                ->addGroupBy('o.id');
+
+            return $queryBuilder;
         }
     }
 }
