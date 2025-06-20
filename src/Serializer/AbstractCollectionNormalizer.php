@@ -101,7 +101,7 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
      */
     protected function normalizeRawCollection(iterable $object, ?string $format = null, array $context = []): array|\ArrayObject
     {
-        if (!$object && ($context[Serializer::EMPTY_ARRAY_AS_OBJECT] ?? false) && \is_array($object)) {
+        if ([] === $object && ($context[Serializer::EMPTY_ARRAY_AS_OBJECT] ?? false)) {
             return new \ArrayObject();
         }
 

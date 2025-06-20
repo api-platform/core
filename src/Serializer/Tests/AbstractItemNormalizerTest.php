@@ -1509,7 +1509,7 @@ class AbstractItemNormalizerTest extends TestCase
         if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
             $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn((new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING, true)])->withDescription('')->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(false));
         } else {
-            $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn((new ApiProperty())->withNativeType(Type::nullable(Type::string()))->withDescription('')->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(false)); // @phpstan-ignore-line
+            $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn((new ApiProperty())->withNativeType(Type::nullable(Type::string()))->withDescription('')->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(false));
         }
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
@@ -1738,7 +1738,7 @@ class AbstractItemNormalizerTest extends TestCase
         if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
             $propertyMetadataFactoryProphecy->create(DtoWithNullValue::class, 'dummy', [])->willReturn((new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, nullable: true)])->withDescription('')->withReadable(true)->withWritable(true));
         } else {
-            $propertyMetadataFactoryProphecy->create(DtoWithNullValue::class, 'dummy', [])->willReturn((new ApiProperty())->withNativeType(Type::nullable(Type::object()))->withDescription('')->withReadable(true)->withWritable(true)); // @phpstan-ignore-line
+            $propertyMetadataFactoryProphecy->create(DtoWithNullValue::class, 'dummy', [])->willReturn((new ApiProperty())->withNativeType(Type::nullable(Type::object()))->withDescription('')->withReadable(true)->withWritable(true));
         }
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);

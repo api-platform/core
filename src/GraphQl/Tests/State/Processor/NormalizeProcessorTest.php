@@ -49,7 +49,7 @@ class NormalizeProcessorTest extends TestCase
         $serializerContext = ['resource_class' => $operation->getClass()];
         $normalizer = $this->createMock(NormalizerInterface::class);
         $serializerContextBuilder = $this->createMock(SerializerContextBuilderInterface::class);
-        $serializerContextBuilder->expects($this->once())->method('create')->with($operation->getClass(), $operation, $context, normalization: true)->willReturn($serializerContext);
+        $serializerContextBuilder->expects($this->once())->method('create')->with($operation->getClass(), $operation, $context, true)->willReturn($serializerContext);
         $normalizer->expects($this->once())->method('normalize')->with($body, 'graphql', $serializerContext);
         $processor = new NormalizeProcessor($normalizer, $serializerContextBuilder, new Pagination());
         $processor->process($body, $operation, [], $context);
@@ -73,7 +73,7 @@ class NormalizeProcessorTest extends TestCase
         $normalizer = $this->prophesize(NormalizerInterface::class);
 
         $serializerContextBuilder = $this->createMock(SerializerContextBuilderInterface::class);
-        $serializerContextBuilder->expects($this->once())->method('create')->with($operation->getClass(), $operation, $context, normalization: true)->willReturn($serializerContext);
+        $serializerContextBuilder->expects($this->once())->method('create')->with($operation->getClass(), $operation, $context, true)->willReturn($serializerContext);
         foreach ($collection as $v) {
             $normalizer->normalize($v, 'graphql', $serializerContext)->willReturn(['normalized_item'])->shouldBeCalledOnce();
         }
