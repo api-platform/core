@@ -165,6 +165,7 @@
         "symfony/cache": "^6.4 || ^7.0",
         "symfony/config": "^6.4 || ^7.0",
         "symfony/console": "^6.4 || ^7.0",
+        "symfony/object-mapper": "^7.3",
         "symfony/css-selector": "^6.4 || ^7.0",
         "symfony/dependency-injection": "^6.4 || ^7.0",
         "symfony/doctrine-bridge": "^6.4.2 || ^7.1",
