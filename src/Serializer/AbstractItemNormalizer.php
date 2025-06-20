@@ -276,7 +276,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $attribute = $this->nameConverter ? $this->nameConverter->denormalize((string) $attribute) : $attribute;
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $attribute, $options);
             $attributeExtraProperties = $propertyMetadata->getExtraProperties() ?? [];
-            $throwOnPropertyAccessDenied = (bool) ($attributeExtraProperties['throw_on_access_denied'] ?? $throwOnAccessDenied);
+            $throwOnPropertyAccessDenied = $attributeExtraProperties['throw_on_access_denied'] ?? $throwOnAccessDenied;
             if (!\in_array($attribute, $propertyNames, true)) {
                 continue;
             }
