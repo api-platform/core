@@ -323,6 +323,7 @@ class ItemNormalizerTest extends TestCase
         $propertyMetadata = (new ApiProperty())->withReadable(true)->withWritable(true);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn($propertyMetadata)->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id', [])->willReturn($propertyMetadata)->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getResourceFromIri('fail', $context + ['fetch_data' => true])->willThrow(new InvalidArgumentException());
