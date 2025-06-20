@@ -44,7 +44,6 @@ use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRe
 use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
 use Doctrine\Persistence\ManagerRegistry;
-use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Config\FileLocator;
@@ -338,7 +337,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->getDefinition('api_platform.metadata.resource_extractor.xml')->replaceArgument(0, $xmlResources);
         $container->getDefinition('api_platform.metadata.property_extractor.xml')->replaceArgument(0, $xmlResources);
 
-        if (class_exists(PhpDocParser::class) || interface_exists(DocBlockFactoryInterface::class)) {
+        if (class_exists(PhpDocParser::class)) {
             $loader->load('metadata/php_doc.xml');
         }
 
@@ -468,7 +467,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         foreach (array_keys($config['swagger']['api_keys']) as $keyName) {
             if (!preg_match('/^[a-zA-Z0-9._-]+$/', $keyName)) {
-                trigger_deprecation('api-platform/core', '3.1', \sprintf('The swagger api_keys key "%s" is not valid with OpenAPI 3.1 it should match "^[a-zA-Z0-9._-]+$"', $keyName));
+                throw new RuntimeException(\sprintf('The swagger api_keys key "%s" is not valid, it should match "^[a-zA-Z0-9._-]+$"', $keyName));
             }
         }
 
@@ -568,19 +567,14 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $enabled = $this->isConfigEnabled($container, $config['graphql']);
         $graphqlIntrospectionEnabled = $enabled && $this->isConfigEnabled($container, $config['graphql']['introspection']);
         $graphiqlEnabled = $enabled && $this->isConfigEnabled($container, $config['graphql']['graphiql']);
-        $graphqlPlayGroundEnabled = $enabled && $this->isConfigEnabled($container, $config['graphql']['graphql_playground']);
         $maxQueryDepth = (int) $config['graphql']['max_query_depth'];
         $maxQueryComplexity = (int) $config['graphql']['max_query_complexity'];
-        if ($graphqlPlayGroundEnabled) {
-            trigger_deprecation('api-platform/core', '3.1', 'GraphQL Playground is deprecated and will be removed in API Platform 4.0. Only GraphiQL will be available in the future. Set api_platform.graphql.graphql_playground to false in the configuration to remove this deprecation.');
-        }
 
         $container->setParameter('api_platform.graphql.enabled', $enabled);
         $container->setParameter('api_platform.graphql.max_query_depth', $maxQueryDepth);
         $container->setParameter('api_platform.graphql.max_query_complexity', $maxQueryComplexity);
         $container->setParameter('api_platform.graphql.introspection.enabled', $graphqlIntrospectionEnabled);
         $container->setParameter('api_platform.graphql.graphiql.enabled', $graphiqlEnabled);
-        $container->setParameter('api_platform.graphql.graphql_playground.enabled', $graphqlPlayGroundEnabled);
         $container->setParameter('api_platform.graphql.collection.pagination', $config['graphql']['collection']['pagination']);
 
         if (!$enabled) {
@@ -598,11 +592,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         // @phpstan-ignore-next-line because PHPStan uses the container of the test env cache and in test the parameter kernel.bundles always contains the key TwigBundle
         if (!class_exists(Environment::class) || !isset($container->getParameter('kernel.bundles')['TwigBundle'])) {
-            if ($graphiqlEnabled || $graphqlPlayGroundEnabled) {
-                throw new RuntimeException(\sprintf('GraphiQL and GraphQL Playground interfaces depend on Twig. Please activate TwigBundle for the %s environnement or disable GraphiQL and GraphQL Playground.', $container->getParameter('kernel.environment')));
+            if ($graphiqlEnabled) {
+                throw new RuntimeException(\sprintf('GraphiQL interfaces depend on Twig. Please activate TwigBundle for the %s environnement or disable GraphiQL.', $container->getParameter('kernel.environment')));
             }
             $container->removeDefinition('api_platform.graphql.action.graphiql');
-            $container->removeDefinition('api_platform.graphql.action.graphql_playground');
         }
 
         $container->registerForAutoconfiguration(QueryItemResolverInterface::class)

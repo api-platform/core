@@ -59,12 +59,8 @@ trait LinksHandlerTrait
     /**
      * @throws RuntimeException
      */
-    private function buildAggregation(string $toClass, array $links, array $identifiers, array $context, array $executeOptions, string $previousAggregationClass, Builder $previousAggregationBuilder, ?Operation $operation = null): Builder
+    private function buildAggregation(string $toClass, array $links, array $identifiers, array $context, array $executeOptions, string $previousAggregationClass, Builder $previousAggregationBuilder, Operation $operation): Builder
     {
-        if (!$operation) {
-            trigger_deprecation('api-platform/core', '3.2', 'In API Platform 4 the last argument "operation" will be required and this trait will be internal. Use the "handleLinks" feature instead.');
-        }
-
         if (\count($links) <= 0) {
             return $previousAggregationBuilder;
         }
@@ -88,10 +84,8 @@ trait LinksHandlerTrait
 
         $manager = $this->managerRegistry->getManagerForClass($aggregationClass);
         if (!$manager instanceof DocumentManager) {
-            if ($operation) {
-                $aggregationClass = $this->getLinkFromClass($link, $operation);
-                $manager = $this->managerRegistry->getManagerForClass($aggregationClass);
-            }
+            $aggregationClass = $this->getLinkFromClass($link, $operation);
+            $manager = $this->managerRegistry->getManagerForClass($aggregationClass);
 
             if (!$manager instanceof DocumentManager) {
                 throw new RuntimeException(\sprintf('The manager for "%s" must be an instance of "%s".', $aggregationClass, DocumentManager::class));
