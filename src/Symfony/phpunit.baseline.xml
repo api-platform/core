@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<files version="1">
+ <file path="vendor/symfony/contracts/Deprecation/function.php">
+  <line number="25" hash="c6af5d66288d0667e424978000f29571e4954b81">
+   <issue><![CDATA[Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Type" class is deprecated. Use "Symfony\Component\TypeInfo\Type" class from "symfony/type-info" instead.]]></issue>
+   <issue><![CDATA[Since symfony/validator 7.1: Not passing a value for the "requireTld" option to the Url constraint is deprecated. Its default value will change to "true".]]></issue>
+  </line>
+ </file>
+ <file path="vendor/symfony/validator/Constraints/Url.php">
+  <line number="68" hash="d190c47bc56cc227d124b726a3f2119933543051">
+   <issue><![CDATA[Since symfony/validator 7.1: Not passing a value for the "requireTld" option to the Url constraint is deprecated. Its default value will change to "true".]]></issue>
+  </line>
+ </file>
+</files>

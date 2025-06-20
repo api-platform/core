@@ -28,9 +28,9 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/json-schema": "^4.1.11",
-        "api-platform/metadata": "^4.1.11",
-        "api-platform/state": "^4.1.11",
+        "api-platform/json-schema": "4.2.x-dev as dev-main",
+        "api-platform/metadata": "4.2.x-dev as dev-main",
+        "api-platform/state": "4.2.x-dev as dev-main",
         "symfony/console": "^6.4 || ^7.0",
         "symfony/filesystem": "^6.4 || ^7.0",
         "symfony/property-access": "^6.4 || ^7.0",

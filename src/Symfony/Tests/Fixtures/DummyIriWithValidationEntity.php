@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class DummyIriWithValidationEntity
 {
-    #[Assert\Url(requireTld: true)]
+    #[Assert\Url()]
     public $dummyUrl;
 
     #[Assert\Email]
