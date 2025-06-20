@@ -194,7 +194,6 @@ class HttpOperation extends Operation
         $output = null,
         $mercure = null,
         $messenger = null,
-        ?bool $elasticsearch = null,
         ?int $urlGenerationStrategy = null,
         ?bool $read = null,
         ?bool $deserialize = null,
@@ -246,7 +245,6 @@ class HttpOperation extends Operation
             output: $output,
             mercure: $mercure,
             messenger: $messenger,
-            elasticsearch: $elasticsearch,
             urlGenerationStrategy: $urlGenerationStrategy,
             read: $read,
             deserialize: $deserialize,
@@ -357,6 +355,9 @@ class HttpOperation extends Operation
         return $this->uriVariables;
     }
 
+    /**
+     * @param array<string, mixed>|array<int, Link>|list<string> $uriVariables
+     */
     public function withUriVariables($uriVariables): static
     {
         $self = clone $this;

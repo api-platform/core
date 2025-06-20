@@ -16,9 +16,11 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\IdenticalTo;
 
 #[ApiResource]
 #[Post]
@@ -38,6 +40,19 @@ use Symfony\Component\Serializer\Annotation\Groups;
     normalizationContext: ['groups' => ['company_employees_read']]
 )]
 #[GetCollection]
+#[GetCollection(
+    uriTemplate: '/companies-by-name/{name}/employees',
+    uriVariables: [
+        'name' => new Link(
+            identifiers: ['name'],
+            fromClass: Company::class,
+            toProperty: 'company',
+            security: 'company.name == "Test" or company.name == "NotTest"',
+            extraProperties: ['uri_template' => '/company-by-name/{name}'],
+            constraints: [new IdenticalTo('Test')]
+        ),
+    ],
+)]
 #[ORM\Entity]
 class Employee
 {

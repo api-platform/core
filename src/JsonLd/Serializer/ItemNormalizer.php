@@ -111,7 +111,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         } elseif ($this->contextBuilder instanceof AnonymousContextBuilderInterface) {
             if ($context['api_collection_sub_level'] ?? false) {
                 unset($context['api_collection_sub_level']);
-                $context['output']['genid'] = true;
+                $context['output']['gen_id'] ??= true;
                 $context['output']['iri'] = null;
             }
 
@@ -124,7 +124,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             unset($context['operation'], $context['operation_name']);
         }
 
-        if (true === ($context['force_iri_generation'] ?? true) && $iri = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context)) {
+        if (true === ($context['output']['gen_id'] ?? true) && true === ($context['force_iri_generation'] ?? true) && $iri = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context)) {
             $context['iri'] = $iri;
             $metadata['@id'] = $iri;
         }

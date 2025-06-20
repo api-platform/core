@@ -1,5 +1,51 @@
 # Changelog
 
+## v4.1.17
+
+### Bug fixes
+
+* [34a0d54b1](https://github.com/api-platform/core/commit/34a0d54b1fe195a233726ff2e8304c29f43954ca) fix(jsonld): genId false should work with embeded resources (#7219)
+* [c025b8f9f](https://github.com/api-platform/core/commit/c025b8f9f8ab51489dc75e470c057d6fae879fa0) fix(openapi): correct example usage for 3.0 (#7218)
+* [cdda4146b](https://github.com/api-platform/core/commit/cdda4146b429f8e605504e1dc403faa41f0255a7) fix(laravel): Allow `LinksHandler` to handle polymorphic relationships (#7231)
+* [dba97370f](https://github.com/api-platform/core/commit/dba97370fb8996cf4fc1d5b6d8ca92faf4e68637) fix(metadata): boolean type detection from parameter's schema (#7223)
+
+## v4.1.16
+
+### Bug fixes
+
+* [4a99a5f6e](https://github.com/api-platform/core/commit/4a99a5f6e7eb13e9e77872dc33ec5b3dc2deef25) fix(laravel): persist HasMany and MorphMany relationships (#7208)
+* [9bfa5fef0](https://github.com/api-platform/core/commit/9bfa5fef0dfa129078118d0ce67f1ec2c8d548d7) fix(metadata): call dynamic validation groups #7184 (#7184)
+* [b2131645d](https://github.com/api-platform/core/commit/b2131645dec11a5dbf8bbe507f578720a84a686e) fix(laravel): route where uses requirements (#7199)
+* [b2b5f99c6](https://github.com/api-platform/core/commit/b2b5f99c64ced9f3580fdaee099d0e34e75d2697) refactor(state): merge parameter and link security  (#7200)
+
+Notes: 
+
+Two providers are now available on parameters (query parameters, header and uri variables `Link`): 
+
+- `ReadLinkParameterProvider` previously used for link security (renamed from `Symfony\Security\State\LinkedReadProvider`)
+- `IriConverterParameterProvider` this allows you to read a resource from an IRI usefull for filters (eg `?author=/authors/1`)
+
+Previous tests on link security were left untouched we removed the experimental class `Symfony\Security\State\LinkAccessCheckerProvider` as well as the `LinkedReadProvider` as they're not used anymore.
+
+
+## v4.1.15 - v4.1.14 - v4.1.13
+
+There was an issue with the subtree split as we attempted to test lower dependencies on the subtree split, some components where wrongly tagged.
+
+The proper fix is at: https://github.com/api-platform/core/pull/7196
+
+### Bug fixes
+
+* [4bdfd6063](https://github.com/api-platform/core/commit/4bdfd6063a6e80fc9cc33ff16c0ec98fec688291) fix(symfony, laravel) skip webhooks when generates routing (#7175)
+* [582076cb6](https://github.com/api-platform/core/commit/582076cb6c0dbcde205fc49d97a0f50405544d0b) fix(openapi): duplicate get path for webhooks (#7174)
+* [84b967930](https://github.com/api-platform/core/commit/84b96793043c939f333c1aa2e96f69b23d3e9ece) fix(laravel): persist morph relations (#7170)
+* [d51cddba2](https://github.com/api-platform/core/commit/d51cddba2a7618c08e511582ac2f41a6b0eaf657) fix(laravel): index on non-primary key (#7183)
+* [fdb485dd2](https://github.com/api-platform/core/commit/fdb485dd2af56f7664bd90705d81e8f58c8b494a) fix(openapi): `example` and `default` with nullable value not being shown
+
+### Features
+
+* [79d08db6a](https://github.com/api-platform/core/commit/79d08db6a4728303b37440c610c96a490d44780a) feat(elasticsearch): add support for v9 (#7180)
+
 ## v4.1.11 - v4.1.12
 
 ### Bug fixes

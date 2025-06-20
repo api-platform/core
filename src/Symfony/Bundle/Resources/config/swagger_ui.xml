@@ -27,19 +27,5 @@
 
             <tag name="api_platform.state_processor" priority="-100" key="api_platform.swagger_ui.processor" />
         </service>
-
-        <service id="api_platform.swagger_ui.action" class="ApiPlatform\Symfony\Bundle\SwaggerUi\SwaggerUiAction" public="true">
-            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
-            <argument type="service" id="twig" on-invalid="null" />
-            <argument type="service" id="router" />
-            <argument type="service" id="api_platform.serializer" />
-            <argument type="service" id="api_platform.openapi.factory" />
-            <argument type="service" id="api_platform.openapi.options" />
-            <argument type="service" id="api_platform.swagger_ui.context" />
-            <argument>%api_platform.docs_formats%</argument>
-            <argument>%api_platform.oauth.clientId%</argument>
-            <argument>%api_platform.oauth.clientSecret%</argument>
-            <argument>%api_platform.oauth.pkce%</argument>
-        </service>
     </services>
 </container>

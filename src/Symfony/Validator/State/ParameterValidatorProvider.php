@@ -13,8 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Validator\State;
 
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
+use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\Util\ParameterParserTrait;
@@ -52,12 +54,25 @@ final class ParameterValidatorProvider implements ProviderInterface
         }
 
         $constraintViolationList = new ConstraintViolationList();
-        foreach ($operation->getParameters() ?? [] as $parameter) {
+        $parameters = $operation->getParameters() ?? new Parameters();
+
+        if ($operation instanceof HttpOperation) {
+            foreach ($operation->getUriVariables() ?? [] as $key => $uriVariable) {
+                if ($uriVariable->getValue() instanceof ParameterNotFound) {
+                    $uriVariable->setValue($uriVariables[$key] ?? new ParameterNotFound());
+                }
+
+                $parameters->add($key, $uriVariable->withKey($key));
+            }
+        }
+
+        foreach ($parameters as $parameter) {
             if (!$constraints = $parameter->getConstraints()) {
                 continue;
             }
 
             $value = $parameter->getValue();
+
             if ($value instanceof ParameterNotFound) {
                 $value = null;
             }

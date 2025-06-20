@@ -56,14 +56,10 @@ final class BackedEnumProvider implements ProviderInterface
             if (!is_numeric($id)) {
                 return null;
             }
-            $enum = $resourceClass::tryFrom((int) $id);
-        } else {
-            $enum = $resourceClass::tryFrom($id);
+
+            return $resourceClass::tryFrom((int) $id);
         }
 
-        // @deprecated enums will be indexable only by value in 4.0
-        $enum ??= array_reduce($resourceClass::cases(), static fn ($c, \BackedEnum $case) => $id === $case->name ? $case : $c, null);
-
-        return $enum;
+        return $resourceClass::tryFrom($id);
     }
 }

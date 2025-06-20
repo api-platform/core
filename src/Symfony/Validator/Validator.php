@@ -16,7 +16,6 @@ namespace ApiPlatform\Symfony\Validator;
 use ApiPlatform\Validator\Exception\ValidationException;
 use ApiPlatform\Validator\ValidatorInterface;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Validator\ValidatorInterface as SymfonyValidatorInterface;
 
 /**
@@ -26,8 +25,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface as SymfonyValidator
  */
 final class Validator implements ValidatorInterface
 {
-    public function __construct(private readonly SymfonyValidatorInterface $validator, private readonly ?ContainerInterface $container = null)
+    use ValidationGroupsExtractorTrait;
+
+    public function __construct(private readonly SymfonyValidatorInterface $validator, ?ContainerInterface $container = null)
     {
+        $this->container = $container;
     }
 
     /**
@@ -35,25 +37,7 @@ final class Validator implements ValidatorInterface
      */
     public function validate(object $data, array $context = []): void
     {
-        if (null !== $validationGroups = $context['groups'] ?? null) {
-            if (
-                $this->container
-                && \is_string($validationGroups)
-                && $this->container->has($validationGroups)
-                && ($service = $this->container->get($validationGroups))
-                && \is_callable($service)
-            ) {
-                $validationGroups = $service($data);
-            } elseif (\is_callable($validationGroups)) {
-                $validationGroups = $validationGroups($data);
-            }
-
-            if (!$validationGroups instanceof GroupSequence) {
-                $validationGroups = (array) $validationGroups;
-            }
-        }
-
-        $violations = $this->validator->validate($data, null, $validationGroups);
+        $violations = $this->validator->validate($data, null, $this->getValidationGroups($context['groups'] ?? null, $data));
         if (0 !== \count($violations)) {
             throw new ValidationException($violations);
         }

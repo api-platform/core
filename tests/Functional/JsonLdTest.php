@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\GenIdFalse\AggregateRating;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\GenIdFalse\GenIdFalse;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6810\JsonLdContextOutput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6465\Bar;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6465\Foo;
@@ -32,7 +34,7 @@ class JsonLdTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [Foo::class, Bar::class, JsonLdContextOutput::class];
+        return [Foo::class, Bar::class, JsonLdContextOutput::class, GenIdFalse::class, AggregateRating::class];
     }
 
     /**
@@ -65,6 +67,27 @@ class JsonLdTest extends ApiTestCase
             'hydra' => 'http://www.w3.org/ns/hydra/core#',
             'foo' => 'Output/foo',
         ]);
+    }
+
+    public function testGenIdFalseOnResource(): void
+    {
+        $r = self::createClient()->request(
+            'GET',
+            '/gen_id_falsy',
+        );
+        $this->assertJsonContains([
+            'aggregateRating' => ['ratingValue' => 2, 'ratingCount' => 3],
+        ]);
+        $this->assertArrayNotHasKey('@id', $r->toArray()['aggregateRating']);
+    }
+
+    public function testShouldIgnoreProperty(): void
+    {
+        $r = self::createClient()->request(
+            'GET',
+            '/contexts/GenIdFalse',
+        );
+        $this->assertArrayNotHasKey('shouldBeIgnored', $r->toArray()['@context']);
     }
 
     protected function setUp(): void

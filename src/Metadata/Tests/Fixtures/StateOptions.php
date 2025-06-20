@@ -19,7 +19,6 @@ class StateOptions implements OptionsInterface
 {
     public function __construct(
         protected ?string $index = null,
-        protected ?string $type = null,
     ) {
     }
 
@@ -32,19 +31,6 @@ class StateOptions implements OptionsInterface
     {
         $self = clone $this;
         $self->index = $index;
-
-        return $self;
-    }
-
-    public function getType(): ?string
-    {
-        return $this->type;
-    }
-
-    public function withType(?string $type): self
-    {
-        $self = clone $this;
-        $self->type = $type;
 
         return $self;
     }
