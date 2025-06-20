@@ -53,15 +53,26 @@ trait BackedEnumFilterTrait
                 continue;
             }
             $propertyName = $this->normalizePropertyName($property);
-            $description[$propertyName] = [
-                'property' => $propertyName,
-                'type' => 'string',
-                'required' => false,
-                'schema' => [
+            $filterParameterNames = [$propertyName];
+            $filterParameterNames[] = $propertyName.'[]';
+
+            foreach ($filterParameterNames as $filterParameterName) {
+                $isCollection = str_ends_with($filterParameterName, '[]');
+
+                $enumValues = array_map(fn (\BackedEnum $case) => $case->value, $this->enumTypes[$property]::cases());
+
+                $schema = $isCollection
+                    ? ['type' => 'array', 'items' => ['type' => 'string', 'enum' => $enumValues]]
+                    : ['type' => 'string', 'enum' => $enumValues];
+
+                $description[$filterParameterName] = [
+                    'property' => $propertyName,
                     'type' => 'string',
-                    'enum' => array_map(fn (\BackedEnum $case) => $case->value, $this->enumTypes[$property]::cases()),
-                ],
-            ];
+                    'required' => false,
+                    'is_collection' => $isCollection,
+                    'schema' => $schema,
+                ];
+            }
         }
 
         return $description;
