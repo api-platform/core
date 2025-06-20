@@ -19,7 +19,6 @@ use ApiPlatform\Metadata\Exception\AccessDeniedException;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\IriConverterInterface;
-use ApiPlatform\Metadata\Metadata;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -269,31 +268,26 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $propertyNames = iterator_to_array($this->propertyNameCollectionFactory->create($resourceClass, $options));
 
         $operation = $context['operation'] ?? null;
-        $extraProperties = $operation instanceof Metadata ?
-            $operation->getExtraProperties() :
-            ($context['extra_properties'] ?? []);
-
-        $throwOnAccessDenied = $extraProperties['throw_on_access_denied'] ?? false;
+        $throwOnAccessDenied = $operation?->getExtraProperties()['throw_on_access_denied'] ?? false;
         $securityMessage = $operation?->getSecurityMessage() ?? null;
 
         // Revert attributes that aren't allowed to be changed after a post-denormalize check
         foreach (array_keys($data) as $attribute) {
             $attribute = $this->nameConverter ? $this->nameConverter->denormalize((string) $attribute) : $attribute;
-            $attributeMeta = $this->propertyMetadataFactory->create($resourceClass, $attribute, $options);
-            $attributeExtraProperties = $attributeMeta->getExtraProperties() ?? [];
-            $throwOnAccessDenied = (bool) ($attributeExtraProperties['throw_on_access_denied'] ?? $throwOnAccessDenied);
+            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $attribute, $options);
+            $attributeExtraProperties = $propertyMetadata->getExtraProperties() ?? [];
+            $throwOnPropertyAccessDenied = (bool) ($attributeExtraProperties['throw_on_access_denied'] ?? $throwOnAccessDenied);
             if (!\in_array($attribute, $propertyNames, true)) {
                 continue;
             }
 
             if (!$this->canAccessAttributePostDenormalize($object, $previousObject, $attribute, $context)) {
-                if ($throwOnAccessDenied) {
+                if ($throwOnPropertyAccessDenied) {
                     throw new AccessDeniedException($securityMessage ?? 'Access denied');
                 }
                 if (null !== $previousObject) {
                     $this->setValue($object, $attribute, $this->propertyAccessor->getValue($previousObject, $attribute));
                 } else {
-                    $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $attribute, $options);
                     $this->setValue($object, $attribute, $propertyMetadata->getDefault());
                 }
             }
