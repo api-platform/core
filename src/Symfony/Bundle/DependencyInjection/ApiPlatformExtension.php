@@ -168,6 +168,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerMakerConfiguration($container, $config, $loader);
         $this->registerArgumentResolverConfiguration($loader);
         $this->registerLinkSecurityConfiguration($loader, $config);
+        $this->registerJsonStreamerConfiguration($loader, $config);
 
         $container->registerForAutoconfiguration(FilterInterface::class)
             ->addTag('api_platform.filter');
@@ -918,6 +919,13 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         if ($config['enable_link_security']) {
             $loader->load('link_security.xml');
+        }
+    }
+
+    private function registerJsonStreamerConfiguration(XmlFileLoader $loader, array $config): void
+    {
+        if ($config['enable_json_streamer']) {
+            $loader->load('json_streamer.xml');
         }
     }
 }
