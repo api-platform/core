@@ -41,7 +41,7 @@ use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\PropertyCollectionIriOnly;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\PropertyCollectionIriOnlyRelation;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\RelatedDummy;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\SecuredDummy;
-use ApiPlatform\Symfony\Security\Exception\AccessDeniedException;
+use ApiPlatform\Metadata\Exception\AccessDeniedException;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
