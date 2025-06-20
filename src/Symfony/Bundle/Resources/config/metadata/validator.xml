@@ -22,6 +22,10 @@
             <tag name="api_platform.metadata.property_schema_restriction"/>
         </service>
 
+        <service id="api_platform.metadata.property_schema.css_color_restriction" class="ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaCssColorRestriction" public="false">
+            <tag name="api_platform.metadata.property_schema_restriction"/>
+        </service>
+
         <service id="api_platform.metadata.property_schema.greater_than_or_equal_restriction" class="ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaGreaterThanOrEqualRestriction" public="false">
             <tag name="api_platform.metadata.property_schema_restriction"/>
         </service>
