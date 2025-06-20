@@ -51,7 +51,7 @@ class SchemaFactoryTest extends TestCase
         $propertyNameCollectionFactory->create(Dummy::class, ['enable_getter_setter_extraction' => true, 'schema_type' => Schema::TYPE_OUTPUT])->willReturn(new PropertyNameCollection());
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
 
-        $definitionNameFactory = new DefinitionNameFactory();
+        $definitionNameFactory = new DefinitionNameFactory(null);
 
         $baseSchemaFactory = new BaseSchemaFactory(
             resourceMetadataFactory: $resourceMetadataFactory->reveal(),

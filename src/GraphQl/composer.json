@@ -21,11 +21,11 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/metadata": "^4.1.11",
-        "api-platform/state": "^4.1.11",
-        "api-platform/serializer": "^4.1.11",
-        "symfony/property-info": "^6.4 || ^7.1",
-        "symfony/serializer": "^6.4 || ^7.0",
+        "api-platform/metadata": "4.2.x-dev as dev-main",
+        "api-platform/state": "4.2.x-dev as dev-main",
+        "api-platform/serializer": "4.2.x-dev as dev-main",
+        "symfony/property-info": "^6.4.20 || ^7.1",
+        "symfony/serializer": "^6.4 || ^7.1",
         "symfony/type-info": "^7.3",
         "webonyx/graphql-php": "^15.0",
         "willdurand/negotiation": "^3.1"
@@ -36,7 +36,6 @@
         "twig/twig": "^1.42.3 || ^2.12 || ^3.0",
         "symfony/mercure-bundle": "*",
         "symfony/routing": "^6.4 || ^7.0",
-        "symfony/type-info": "^7.3",
         "phpunit/phpunit": "11.5.x-dev"
     },
     "autoload": {
