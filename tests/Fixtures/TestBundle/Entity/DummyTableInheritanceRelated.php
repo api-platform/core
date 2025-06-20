@@ -37,7 +37,7 @@ class DummyTableInheritanceRelated
     #[ORM\OneToMany(targetEntity: DummyTableInheritance::class, mappedBy: 'parent')]
     #[ORM\OrderBy(['id' => 'ASC'])]
     #[Groups(['default'])]
-    private Collection|iterable $children;
+    private Collection $children;
 
     public function __construct()
     {
@@ -49,12 +49,12 @@ class DummyTableInheritanceRelated
         return $this->id;
     }
 
-    public function getChildren(): Collection|iterable
+    public function getChildren(): Collection
     {
         return $this->children;
     }
 
-    public function setChildren(Collection|iterable $children)
+    public function setChildren(Collection $children)
     {
         $this->children = $children;
 

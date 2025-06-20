@@ -30,7 +30,7 @@ class DummyTableInheritanceRelated
      * @var Collection<int, DummyTableInheritance> Related children
      */
     #[Groups(['default'])]
-    private Collection|iterable $children;
+    private Collection $children;
 
     public function __construct()
     {
@@ -42,12 +42,12 @@ class DummyTableInheritanceRelated
         return $this->id;
     }
 
-    public function getChildren(): Collection|iterable
+    public function getChildren(): Collection
     {
         return $this->children;
     }
 
-    public function setChildren(Collection|iterable $children)
+    public function setChildren(Collection $children)
     {
         $this->children = $children;
 

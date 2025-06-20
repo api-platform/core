@@ -35,7 +35,7 @@ class CircularReference
     public $parent;
     #[Groups(['circular'])]
     #[ODM\ReferenceMany(targetDocument: self::class, mappedBy: 'parent')]
-    public Collection|iterable $children;
+    public Collection $children;
 
     public function __construct()
     {

@@ -30,7 +30,7 @@ class Relation2
     #[ORM\GeneratedValue]
     public $id;
     #[ORM\OneToMany(targetEntity: Relation1::class, mappedBy: 'relation2')]
-    public Collection|iterable $relation1s;
+    public Collection $relation1s;
 
     public function __construct()
     {

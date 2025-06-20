@@ -54,7 +54,7 @@ class ThirdLevel
     public $badFourthLevel;
 
     #[ORM\OneToMany(mappedBy: 'thirdLevel', targetEntity: RelatedDummy::class)]
-    public Collection|iterable $relatedDummies;
+    public Collection $relatedDummies;
 
     public function __construct()
     {

@@ -34,7 +34,7 @@ class Pet
     #[ODM\Field(type: 'string')]
     public $name;
     #[ODM\ReferenceMany(targetDocument: PersonToPet::class, mappedBy: 'pet')]
-    public Collection|iterable $people;
+    public Collection $people;
 
     public function __construct()
     {

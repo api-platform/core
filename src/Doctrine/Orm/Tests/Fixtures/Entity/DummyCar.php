@@ -41,19 +41,19 @@ class DummyCar
     private DummyCarIdentifier $id;
     #[ApiFilter(SearchFilter::class, properties: ['colors.prop' => 'ipartial', 'colors' => 'exact'])]
     #[ORM\OneToMany(targetEntity: DummyCarColor::class, mappedBy: 'car')]
-    private Collection|iterable $colors;
+    private Collection $colors;
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[ORM\OneToMany(targetEntity: DummyCarColor::class, mappedBy: 'car')]
-    private Collection|iterable|null $secondColors = null;
+    private ?Collection $secondColors = null;
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[ORM\OneToMany(targetEntity: DummyCarColor::class, mappedBy: 'car')]
-    private Collection|iterable|null $thirdColors = null;
+    private ?Collection $thirdColors = null;
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[ORM\ManyToMany(targetEntity: UuidIdentifierDummy::class, indexBy: 'uuid')]
     #[ORM\JoinColumn(name: 'car_id', referencedColumnName: 'id_id')]
     #[ORM\InverseJoinColumn(name: 'uuid_uuid', referencedColumnName: 'uuid')]
     #[ORM\JoinTable(name: 'uuid_cars')]
-    private Collection|iterable|null $uuid = null;
+    private ?Collection $uuid = null;
 
     #[ApiFilter(SearchFilter::class, strategy: 'partial')]
     #[ORM\Column(type: 'string')]
@@ -80,12 +80,12 @@ class DummyCar
         return $this->id;
     }
 
-    public function getColors(): Collection|iterable
+    public function getColors(): Collection
     {
         return $this->colors;
     }
 
-    public function setColors(Collection|iterable $colors): self
+    public function setColors(Collection $colors): self
     {
         $this->colors = $colors;
 

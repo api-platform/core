@@ -45,7 +45,7 @@ class Answer
     private ?Question $question = null;
     #[Serializer\Groups(['foobar'])]
     #[ODM\ReferenceMany(targetDocument: Question::class, mappedBy: 'answer')]
-    private Collection|iterable $relatedQuestions;
+    private Collection $relatedQuestions;
 
     public function __construct()
     {
@@ -99,7 +99,7 @@ class Answer
     /**
      * Get related question.
      */
-    public function getRelatedQuestions(): Collection|iterable
+    public function getRelatedQuestions(): Collection
     {
         return $this->relatedQuestions;
     }

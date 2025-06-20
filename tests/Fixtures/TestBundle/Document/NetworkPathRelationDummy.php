@@ -26,7 +26,7 @@ class NetworkPathRelationDummy
     #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
     #[ODM\ReferenceMany(targetDocument: NetworkPathDummy::class, mappedBy: 'networkPathRelationDummy')]
-    public Collection|iterable $networkPathDummies;
+    public Collection $networkPathDummies;
 
     public function __construct()
     {

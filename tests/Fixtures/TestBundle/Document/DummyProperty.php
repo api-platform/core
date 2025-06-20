@@ -58,11 +58,11 @@ class DummyProperty
     #[ODM\ReferenceOne(targetDocument: DummyGroup::class, cascade: ['persist'], nullable: true)]
     public $group;
     /**
-     * @var DummyGroup[]|null
+     * @var Collection<DummyGroup>|null
      */
     #[Groups(['dummy_read', 'dummy_graphql_read', 'dummy_write'])]
     #[ODM\ReferenceMany(targetDocument: DummyGroup::class, cascade: ['persist'])]
-    public Collection|iterable|null $groups = null;
+    public ?Collection $groups = null;
     /**
      * @var string|null
      */

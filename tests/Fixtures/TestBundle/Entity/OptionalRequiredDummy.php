@@ -53,7 +53,7 @@ class OptionalRequiredDummy
 
     #[ORM\OneToMany(targetEntity: RelatedToDummyFriend::class, cascade: ['persist'], mappedBy: 'relatedDummy')]
     #[Groups(['fakemanytomany', 'friends'])]
-    public Collection|iterable $relatedToDummyFriend;
+    public Collection $relatedToDummyFriend;
 
     public function __construct()
     {
@@ -93,7 +93,7 @@ class OptionalRequiredDummy
     /**
      * Get relatedToDummyFriend.
      */
-    public function getRelatedToDummyFriend(): Collection|iterable
+    public function getRelatedToDummyFriend(): Collection
     {
         return $this->relatedToDummyFriend;
     }

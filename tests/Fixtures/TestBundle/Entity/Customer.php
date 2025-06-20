@@ -34,7 +34,7 @@ class Customer
     #[ORM\ManyToMany(targetEntity: Address::class)]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['order_read'])]
-    public Collection|iterable $addresses;
+    public Collection $addresses;
 
     public function __construct()
     {

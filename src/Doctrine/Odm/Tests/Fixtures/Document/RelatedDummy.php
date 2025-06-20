@@ -43,7 +43,7 @@ class RelatedDummy extends ParentDummy implements \Stringable
     #[ODM\ReferenceOne(targetDocument: ThirdLevel::class, cascade: ['persist'], nullable: true, storeAs: 'id', inversedBy: 'relatedDummies')]
     public ?ThirdLevel $thirdLevel = null;
     #[ODM\ReferenceMany(targetDocument: RelatedToDummyFriend::class, cascade: ['persist'], mappedBy: 'relatedDummy', storeAs: 'id')]
-    public Collection|iterable $relatedToDummyFriend;
+    public Collection $relatedToDummyFriend;
     #[ODM\Field(type: 'bool')]
     public ?bool $dummyBoolean = null;
     #[ODM\EmbedOne(targetDocument: EmbeddableDummy::class)]
@@ -121,7 +121,7 @@ class RelatedDummy extends ParentDummy implements \Stringable
     /**
      * Get relatedToDummyFriend.
      */
-    public function getRelatedToDummyFriend(): Collection|iterable
+    public function getRelatedToDummyFriend(): Collection
     {
         return $this->relatedToDummyFriend;
     }

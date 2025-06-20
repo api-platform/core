@@ -35,7 +35,7 @@ class CompositeItem implements \Stringable
     private ?string $field1 = null;
     #[ORM\OneToMany(targetEntity: CompositeRelation::class, mappedBy: 'compositeItem', fetch: 'EAGER')]
     #[Groups(['default'])]
-    private Collection|iterable $compositeValues;
+    private Collection $compositeValues;
 
     public function __construct()
     {
@@ -71,7 +71,7 @@ class CompositeItem implements \Stringable
     /**
      * Gets compositeValues.
      */
-    public function getCompositeValues(): Collection|iterable
+    public function getCompositeValues(): Collection
     {
         return $this->compositeValues;
     }

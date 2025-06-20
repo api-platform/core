@@ -83,7 +83,7 @@ class Dummy
     #[ApiProperty(push: true)]
     public ?RelatedDummy $relatedDummy = null;
 
-    public Collection|iterable $relatedDummies;
+    public Collection $relatedDummies;
 
     /**
      * @phpstan-ignore-next-line
@@ -251,7 +251,7 @@ class Dummy
         return $this->dummy;
     }
 
-    public function getRelatedDummies(): Collection|iterable
+    public function getRelatedDummies(): Collection
     {
         return $this->relatedDummies;
     }

@@ -36,7 +36,7 @@ class Pet
     #[Groups(['people.pets'])]
     public $name;
     #[ORM\OneToMany(targetEntity: PersonToPet::class, mappedBy: 'pet')]
-    public Collection|iterable $people;
+    public Collection $people;
 
     public function __construct()
     {

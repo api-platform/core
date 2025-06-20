@@ -15,6 +15,8 @@ namespace ApiPlatform\OpenApi\Tests\Fixtures;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 /**
  * Dummy.
@@ -81,7 +83,7 @@ class Dummy
     #[ApiProperty(push: true)]
     public ?RelatedDummy $relatedDummy = null;
 
-    public iterable $relatedDummies;
+    public Collection $relatedDummies;
 
     /**
      * @var array|null serialize data
@@ -104,7 +106,7 @@ class Dummy
 
     public function __construct()
     {
-        $this->relatedDummies = [];
+        $this->relatedDummies = new ArrayCollection();
     }
 
     public function getId()

@@ -32,7 +32,7 @@ class FourthLevel
     #[ODM\Field(type: 'int')]
     private ?int $level = 4;
     #[ODM\ReferenceMany(targetDocument: ThirdLevel::class, cascade: ['persist'], mappedBy: 'badFourthLevel', storeAs: 'id')]
-    public Collection|iterable|null $badThirdLevel = null;
+    public ?Collection $badThirdLevel = null;
 
     public function getId(): ?int
     {

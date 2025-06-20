@@ -27,7 +27,7 @@ abstract class VoDummyVehicle
      */
     #[Groups(['car_read', 'car_write'])]
     #[ODM\ReferenceMany(targetDocument: VoDummyDriver::class, cascade: ['persist'])]
-    private Collection|iterable $drivers;
+    private Collection $drivers;
 
     public function __construct(
         #[Groups(['car_read', 'car_write'])] #[ODM\Field] private string $make,
@@ -50,7 +50,7 @@ abstract class VoDummyVehicle
     /**
      * @return Collection<VoDummyDriver>
      */
-    public function getDrivers(): Collection|iterable
+    public function getDrivers(): Collection
     {
         return $this->drivers;
     }

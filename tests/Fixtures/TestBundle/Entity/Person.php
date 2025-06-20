@@ -50,10 +50,10 @@ class Person
 
     #[ORM\OneToMany(targetEntity: PersonToPet::class, mappedBy: 'person')]
     #[Groups(['people.pets'])]
-    public Collection|iterable $pets;
+    public Collection $pets;
 
     #[ORM\OneToMany(targetEntity: Greeting::class, mappedBy: 'sender')]
-    public Collection|iterable|null $sentGreetings = null;
+    public ?Collection $sentGreetings = null;
 
     public function __construct()
     {

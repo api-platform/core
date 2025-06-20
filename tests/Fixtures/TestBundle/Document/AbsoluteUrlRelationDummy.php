@@ -26,7 +26,7 @@ class AbsoluteUrlRelationDummy
     #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private $id;
     #[ODM\ReferenceMany(targetDocument: AbsoluteUrlDummy::class, mappedBy: 'absoluteUrlRelationDummy')]
-    public Collection|iterable $absoluteUrlDummies;
+    public Collection $absoluteUrlDummies;
 
     public function __construct()
     {

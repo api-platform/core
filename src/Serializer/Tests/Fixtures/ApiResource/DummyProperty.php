@@ -51,7 +51,7 @@ class DummyProperty
     #[Groups(['dummy_read', 'dummy_graphql_read', 'dummy_write'])]
     public $group;
     #[Groups(['dummy_read', 'dummy_graphql_read', 'dummy_write'])]
-    public Collection|iterable|null $groups = null;
+    public ?Collection $groups = null;
     /**
      * @var string|null
      */

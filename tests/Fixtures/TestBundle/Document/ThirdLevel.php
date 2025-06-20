@@ -52,7 +52,7 @@ class ThirdLevel
     #[ODM\ReferenceOne(targetDocument: FourthLevel::class, cascade: ['persist'])]
     public $badFourthLevel;
     #[ODM\ReferenceMany(mappedBy: 'thirdLevel', targetDocument: RelatedDummy::class)]
-    public Collection|iterable $relatedDummies;
+    public Collection $relatedDummies;
 
     public function __construct()
     {

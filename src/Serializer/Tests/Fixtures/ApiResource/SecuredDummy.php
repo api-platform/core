@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -83,7 +84,7 @@ class SecuredDummy
      * A collection of dummies that only admins can access.
      */
     #[ApiProperty(security: "is_granted('ROLE_ADMIN')")]
-    public Collection|iterable $relatedDummies;
+    public Collection $relatedDummies;
 
     /**
      * A dummy that only admins can access.
@@ -97,7 +98,7 @@ class SecuredDummy
      * A collection of dummies that only users can access. The security on RelatedSecuredDummy shouldn't be run.
      */
     #[ApiProperty(security: "is_granted('ROLE_USER')")]
-    public Collection|iterable $relatedSecuredDummies;
+    public Collection $relatedSecuredDummies;
 
     /**
      * A dummy that only users can access. The security on RelatedSecuredDummy shouldn't be run.
@@ -108,7 +109,7 @@ class SecuredDummy
     /**
      * Collection of dummies that anyone can access. There is no ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
      */
-    public iterable $publicRelatedSecuredDummies;
+    public Collection $publicRelatedSecuredDummies;
 
     /**
      * A dummy that anyone can access. There is no ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
@@ -117,9 +118,9 @@ class SecuredDummy
 
     public function __construct()
     {
-        $this->relatedDummies = [];
-        $this->relatedSecuredDummies = [];
-        $this->publicRelatedSecuredDummies = [];
+        $this->relatedDummies = new ArrayCollection();
+        $this->relatedSecuredDummies = new ArrayCollection();
+        $this->publicRelatedSecuredDummies = new ArrayCollection();
     }
 
     public function getId(): ?int

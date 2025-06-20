@@ -52,7 +52,7 @@ class DummyWithCollectDenormalizationErrors
     public ?RelatedDummy $relatedDummy = null;
 
     #[ORM\ManyToMany(targetEntity: RelatedDummy::class)]
-    public Collection|iterable $relatedDummies;
+    public Collection $relatedDummies;
 
     public function __construct(string $baz, ?string $qux = null)
     {

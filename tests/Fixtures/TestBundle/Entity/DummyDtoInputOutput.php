@@ -53,5 +53,5 @@ class DummyDtoInputOutput
     #[ORM\Column(type: 'float')]
     public $num;
     #[ORM\ManyToMany(targetEntity: RelatedDummy::class)]
-    public Collection|iterable|null $relatedDummies = null;
+    public ?Collection $relatedDummies = null;
 }

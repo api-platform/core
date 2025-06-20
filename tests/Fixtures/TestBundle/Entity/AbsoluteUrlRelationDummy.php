@@ -28,7 +28,7 @@ class AbsoluteUrlRelationDummy
     #[ORM\Column(type: 'integer')]
     private $id;
     #[ORM\OneToMany(targetEntity: AbsoluteUrlDummy::class, mappedBy: 'absoluteUrlRelationDummy')]
-    public Collection|iterable $absoluteUrlDummies;
+    public Collection $absoluteUrlDummies;
 
     public function __construct()
     {

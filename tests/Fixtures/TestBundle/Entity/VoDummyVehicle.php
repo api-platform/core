@@ -27,7 +27,7 @@ abstract class VoDummyVehicle
      */
     #[ORM\ManyToMany(targetEntity: VoDummyDriver::class, cascade: ['persist'])]
     #[Groups(['car_read', 'car_write'])]
-    private Collection|iterable $drivers;
+    private Collection $drivers;
 
     public function __construct(
         #[ORM\Column] #[Groups(['car_read', 'car_write'])] private string $make,
@@ -50,7 +50,7 @@ abstract class VoDummyVehicle
     /**
      * @return Collection<VoDummyDriver>
      */
-    public function getDrivers(): Collection|iterable
+    public function getDrivers(): Collection
     {
         return $this->drivers;
     }

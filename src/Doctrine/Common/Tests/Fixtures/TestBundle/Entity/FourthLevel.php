@@ -46,7 +46,7 @@ class FourthLevel
     #[Groups(['barcelona', 'chicago'])]
     private int $level = 4;
     #[ORM\OneToMany(targetEntity: ThirdLevel::class, cascade: ['persist'], mappedBy: 'badFourthLevel')]
-    public Collection|iterable|null $badThirdLevel = null;
+    public ?Collection $badThirdLevel = null;
 
     public function getId(): ?int
     {

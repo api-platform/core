@@ -37,7 +37,7 @@ class CircularReference
     public $parent;
     #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parent')]
     #[Groups(['circular'])]
-    public Collection|iterable $children;
+    public Collection $children;
 
     public function __construct()
     {

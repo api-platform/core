@@ -44,7 +44,7 @@ class DummyWithEmbedManyOmittingTargetDocument
         return $this->id;
     }
 
-    public function getEmbeddedDummies(): Collection|iterable
+    public function getEmbeddedDummies(): Collection
     {
         return $this->embeddedDummies;
     }

@@ -48,10 +48,10 @@ class Person
 
     #[Groups(['people.pets'])]
     #[ODM\ReferenceMany(targetDocument: PersonToPet::class, mappedBy: 'person')]
-    public Collection|iterable $pets;
+    public Collection $pets;
 
     #[ODM\ReferenceMany(targetDocument: Greeting::class, mappedBy: 'sender')]
-    public Collection|iterable|null $sentGreetings = null;
+    public ?Collection $sentGreetings = null;
 
     public function __construct()
     {

@@ -52,7 +52,7 @@ class RelatedNormalizedDummy
      */
     #[ORM\ManyToMany(targetEntity: CustomNormalizedDummy::class)]
     #[Groups(['related_output', 'related_input'])]
-    public Collection|iterable $customNormalizedDummy;
+    public Collection $customNormalizedDummy;
 
     public function __construct()
     {
@@ -74,12 +74,12 @@ class RelatedNormalizedDummy
         return $this->name;
     }
 
-    public function getCustomNormalizedDummy(): Collection|iterable
+    public function getCustomNormalizedDummy(): Collection
     {
         return $this->customNormalizedDummy;
     }
 
-    public function setCustomNormalizedDummy(Collection|iterable $customNormalizedDummy): void
+    public function setCustomNormalizedDummy(Collection $customNormalizedDummy): void
     {
         $this->customNormalizedDummy = $customNormalizedDummy;
     }

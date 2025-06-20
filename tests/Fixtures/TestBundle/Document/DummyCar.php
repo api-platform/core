@@ -45,19 +45,19 @@ class DummyCar
     #[ApiFilter(SearchFilter::class, properties: ['colors.prop' => 'ipartial', 'colors' => 'exact'])]
     #[Serializer\Groups(['colors'])]
     #[ODM\ReferenceMany(targetDocument: DummyCarColor::class, mappedBy: 'car')]
-    private Collection|iterable $colors;
+    private Collection $colors;
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[Serializer\Groups(['colors'])]
     #[ODM\ReferenceMany(targetDocument: DummyCarColor::class, mappedBy: 'car')]
-    private Collection|iterable $secondColors;
+    private Collection $secondColors;
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[Serializer\Groups(['colors'])]
     #[ODM\ReferenceMany(targetDocument: DummyCarColor::class, mappedBy: 'car')]
-    private Collection|iterable $thirdColors;
+    private Collection $thirdColors;
     #[ApiFilter(SearchFilter::class, strategy: 'exact')]
     #[Serializer\Groups(['colors'])]
     #[ODM\ReferenceMany(targetDocument: UuidIdentifierDummy::class)]
-    private Collection|iterable $uuid;
+    private Collection $uuid;
     #[ApiFilter(SearchFilter::class, strategy: 'partial')]
     #[ODM\Field(type: 'string')]
     private ?string $name = null;
@@ -84,44 +84,44 @@ class DummyCar
         return $this->id;
     }
 
-    public function getColors(): Collection|iterable
+    public function getColors(): Collection
     {
         return $this->colors;
     }
 
-    public function setColors(Collection|iterable $colors): self
+    public function setColors(Collection $colors): self
     {
         $this->colors = $colors;
 
         return $this;
     }
 
-    public function getSecondColors(): Collection|iterable
+    public function getSecondColors(): Collection
     {
         return $this->secondColors;
     }
 
-    public function setSecondColors(Collection|iterable $secondColors): void
+    public function setSecondColors(Collection $secondColors): void
     {
         $this->secondColors = $secondColors;
     }
 
-    public function getThirdColors(): Collection|iterable
+    public function getThirdColors(): Collection
     {
         return $this->thirdColors;
     }
 
-    public function setThirdColors(Collection|iterable $thirdColors): void
+    public function setThirdColors(Collection $thirdColors): void
     {
         $this->thirdColors = $thirdColors;
     }
 
-    public function getUuid(): Collection|iterable
+    public function getUuid(): Collection
     {
         return $this->uuid;
     }
 
-    public function setUuid(Collection|iterable $uuid): void
+    public function setUuid(Collection $uuid): void
     {
         $this->uuid = $uuid;
     }

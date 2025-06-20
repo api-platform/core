@@ -33,7 +33,7 @@ class CompositeItem implements \Stringable
     private ?string $field1 = null;
     #[Groups(['default'])]
     #[ODM\ReferenceMany(targetDocument: CompositeRelation::class, mappedBy: 'compositeItem')]
-    private Collection|iterable $compositeValues;
+    private Collection $compositeValues;
 
     public function __construct()
     {
@@ -67,7 +67,7 @@ class CompositeItem implements \Stringable
     /**
      * Gets compositeValues.
      */
-    public function getCompositeValues(): Collection|iterable
+    public function getCompositeValues(): Collection
     {
         return $this->compositeValues;
     }
