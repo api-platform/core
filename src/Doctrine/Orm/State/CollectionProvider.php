@@ -56,7 +56,7 @@ final class CollectionProvider implements ProviderInterface
         $manager = $this->managerRegistry->getManagerForClass($entityClass);
 
         $repository = $manager->getRepository($entityClass);
-        if (!method_exists($repository, 'createQueryBuilder')) {
+        if (!method_exists($repository, 'createQueryBuilder')) { // @phpstan-ignore-line function.alreadyNarrowedType
             throw new RuntimeException('The repository class must have a "createQueryBuilder" method.');
         }
 

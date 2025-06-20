@@ -77,8 +77,6 @@ class SerializerContextBuilderTest extends TestCase
             }
         }
 
-        \assert($operation instanceof Operation);
-
         return $operation;
     }
 

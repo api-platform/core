@@ -1171,9 +1171,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             }
 
             if (
-                ($t instanceof CollectionType && $collectionValueType instanceof ObjectType && (null !== ($className = $collectionValueType->getClassName())))
-                || ($t instanceof LegacyType && $t->isCollection() && null !== $collectionValueType && null !== ($className = $collectionValueType->getClassName()))
+                ($t instanceof CollectionType && $collectionValueType instanceof ObjectType)
+                || ($t instanceof LegacyType && $t->isCollection() && null !== $collectionValueType && null !== $collectionValueType->getClassName())
             ) {
+                $className = $collectionValueType->getClassName();
                 if (!$this->serializer instanceof DenormalizerInterface) {
                     throw new LogicException(\sprintf('The injected serializer must be an instance of "%s".', DenormalizerInterface::class));
                 }

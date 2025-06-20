@@ -37,11 +37,15 @@ class RequestDataCollectorTest extends TestCase
 {
     use ProphecyTrait;
 
-    private ObjectProphecy|Request $request;
-    private MockObject|Response $response;
-    private ObjectProphecy|ParameterBag $attributes;
-    private ObjectProphecy|ResourceMetadataCollectionFactoryInterface $metadataFactory;
-    private ObjectProphecy|ContainerInterface $filterLocator;
+    /** @var ObjectProphecy<Request> */
+    private ObjectProphecy $request;
+    private MockObject&Response $response;
+    /** @var ObjectProphecy<ParameterBag> */
+    private ObjectProphecy $attributes;
+    /** @var ObjectProphecy<ResourceMetadataCollectionFactoryInterface> */
+    private ObjectProphecy $metadataFactory;
+    /** @var ObjectProphecy<ContainerInterface> */
+    private ObjectProphecy $filterLocator;
 
     protected function setUp(): void
     {
