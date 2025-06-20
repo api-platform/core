@@ -86,9 +86,7 @@ class Dummy
     public Collection|iterable $relatedDummies;
 
     /**
-     * @phpstan-ignore-next-line
-     *
-     * @var Collection<int|float, RelatedDummy>
+     * @var Collection<int, RelatedDummy>
      */
     public Collection $relatedDummiesWithUnionTypes;
 

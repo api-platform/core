@@ -49,7 +49,6 @@ final class SortExtension implements RequestBodySearchCollectionExtensionInterfa
         if (
             $operation
             && null !== ($defaultOrder = $operation->getOrder())
-            && \is_array($defaultOrder)
         ) {
             foreach ($defaultOrder as $property => $direction) {
                 if (\is_int($property)) {

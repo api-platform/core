@@ -82,10 +82,6 @@ final class ReadProvider implements ProviderInterface
                 return $item;
             }
 
-            if (!\is_object($item)) {
-                throw new \LogicException('Item from read provider should be a nullable object.');
-            }
-
             if (isset($context['graphql_context']) && !enum_exists($item::class)) {
                 $context['graphql_context']['previous_object'] = clone $item;
             }
@@ -124,6 +120,9 @@ final class ReadProvider implements ProviderInterface
         $filters = $args;
 
         foreach ($filters as $name => $value) {
+            // Prevent numeric keys like `'1'`
+            $name = (string) $name;
+
             if (\is_array($value)) {
                 if (strpos($name, '_list')) {
                     $name = substr($name, 0, \strlen($name) - \strlen('_list'));
@@ -136,7 +135,7 @@ final class ReadProvider implements ProviderInterface
                 $filters[$name] = $this->getNormalizedFilters($value);
             }
 
-            if (\is_string($name) && strpos($name, $this->nestingSeparator)) {
+            if (strpos($name, $this->nestingSeparator)) {
                 // Gives a chance to relations/nested fields.
                 $index = array_search($name, array_keys($filters), true);
                 $filters =

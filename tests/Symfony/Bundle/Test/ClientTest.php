@@ -47,7 +47,6 @@ class ClientTest extends ApiTestCase
     public function testRequest(): void
     {
         $client = self::createClient();
-        $client->getKernelBrowser();
         $this->assertSame(static::$kernel, $client->getKernel());
 
         $client->enableProfiler();

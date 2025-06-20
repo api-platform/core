@@ -277,7 +277,7 @@ class SchemaFactoryTest extends TestCase
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(NotAResourceWithUnionIntersectTypes::class, 'ignoredProperty', Argument::cetera())->willReturn(
             (new ApiProperty())
-                ->withNativeType(Type::nullable(Type::string())) // @phpstan-ignore-line
+                ->withNativeType(Type::nullable(Type::string()))
                 ->withReadable(true)
                 ->withSchema(['type' => ['string', 'null']])
         );

@@ -72,7 +72,7 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
 
         $decoratedProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $fooPropertyMetadata = (new ApiProperty())
-            ->withNativeType(Type::nullable(Type::array())) // @phpstan-ignore-line
+            ->withNativeType(Type::nullable(Type::array()))
             ->withReadable(false)
             ->withWritable(true);
         $decoratedProphecy->create(Dummy::class, 'foo', $context)->willReturn($fooPropertyMetadata);
@@ -80,7 +80,7 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
             ->withNativeType(Type::nullable(Type::object(RelatedDummy::class)));
         $decoratedProphecy->create(Dummy::class, 'relatedDummy', $context)->willReturn($relatedDummyPropertyMetadata);
         $nameConvertedPropertyMetadata = (new ApiProperty())
-            ->withNativeType(Type::nullable(Type::string())); // @phpstan-ignore-line
+            ->withNativeType(Type::nullable(Type::string()));
         $decoratedProphecy->create(Dummy::class, 'nameConverted', $context)->willReturn($nameConvertedPropertyMetadata);
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
@@ -126,7 +126,7 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(DummyIgnoreProperty::class)->willReturn(true);
 
-        $ignoredPropertyMetadata = (new ApiProperty())->withNativeType(Type::nullable(Type::string())); // @phpstan-ignore-line
+        $ignoredPropertyMetadata = (new ApiProperty())->withNativeType(Type::nullable(Type::string()));
 
         $options = [
             'normalization_groups' => ['dummy'],

@@ -50,10 +50,10 @@ class PropertyInfoToTypeInfoHelperTest extends TestCase
         yield [Type::int(), [new LegacyType('int')]];
         yield [Type::object(\stdClass::class), [new LegacyType('object', false, \stdClass::class)]];
         yield [
-            Type::generic(Type::object('Foo'), Type::string(), Type::int()), // @phpstan-ignore-line
-            [new LegacyType('object', false, 'Foo', false, [new LegacyType('string')], new LegacyType('int'))],
+            Type::generic(Type::object(\stdClass::class), Type::string(), Type::int()),
+            [new LegacyType('object', false, 'stdClass', false, [new LegacyType('string')], new LegacyType('int'))],
         ];
-        yield [Type::nullable(Type::int()), [new LegacyType('int', true)]]; // @phpstan-ignore-line
+        yield [Type::nullable(Type::int()), [new LegacyType('int', true)]];
         yield [Type::union(Type::int(), Type::string()), [new LegacyType('int'), new LegacyType('string')]];
         yield [
             Type::union(Type::int(), Type::string(), Type::null()),
@@ -97,7 +97,7 @@ class PropertyInfoToTypeInfoHelperTest extends TestCase
             [new LegacyType('array', false, null, true, new LegacyType('int'), new LegacyType('string'))],
             Type::collection(Type::builtin(TypeIdentifier::ARRAY), Type::string(), Type::int()), // @phpstan-ignore-line
         ];
-        yield [[new LegacyType('int', true)], Type::nullable(Type::int())]; // @phpstan-ignore-line
+        yield [[new LegacyType('int', true)], Type::nullable(Type::int())];
         yield [[new LegacyType('int'), new LegacyType('string')], Type::union(Type::int(), Type::string())];
         yield [
             [new LegacyType('int', true), new LegacyType('string', true)],

@@ -43,7 +43,7 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
     public function testEnum(): void
     {
         $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
-        $apiProperty = new ApiProperty(nativeType: Type::nullable(Type::enum(IntEnumAsIdentifier::class))); // @phpstan-ignore-line
+        $apiProperty = new ApiProperty(nativeType: Type::nullable(Type::enum(IntEnumAsIdentifier::class)));
         $decorated = $this->createMock(PropertyMetadataFactoryInterface::class);
         $decorated->expects($this->once())->method('create')->with(DummyWithEnum::class, 'intEnumAsIdentifier')->willReturn($apiProperty);
         $schemaPropertyMetadataFactory = new SchemaPropertyMetadataFactory($resourceClassResolver, $decorated);
@@ -71,7 +71,7 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
     {
         $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
         $apiProperty = new ApiProperty(
-            nativeType: Type::nullable(Type::enum(IntEnumAsIdentifier::class)), // @phpstan-ignore-line
+            nativeType: Type::nullable(Type::enum(IntEnumAsIdentifier::class)),
             openapiContext: ['type' => 'object', 'properties' => ['alpha' => ['type' => 'integer']]],
         );
         $decorated = $this->createMock(PropertyMetadataFactoryInterface::class);

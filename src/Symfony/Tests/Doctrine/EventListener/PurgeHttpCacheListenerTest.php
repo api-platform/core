@@ -164,7 +164,7 @@ class PurgeHttpCacheListenerTest extends TestCase
         $classMetadata = new ClassMetadata(DummyNoGetOperation::class);
         $emProphecy->getClassMetadata(DummyNoGetOperation::class)->willReturn($classMetadata)->shouldBeCalled();
 
-        $changeSet = ['lorem' => 'ipsum'];
+        $changeSet = ['lorem' => ['ipsum1', 'ipsum2']];
         $eventArgs = new PreUpdateEventArgs($dummyNoGetOperation, $emProphecy->reveal(), $changeSet);
 
         $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal());

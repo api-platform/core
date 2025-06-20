@@ -25,7 +25,7 @@ trait ResourceExtractorTrait
 {
     private function buildArrayValue(\SimpleXMLElement|array|null $resource, string $key, mixed $default = null): ?array
     {
-        if (\is_object($resource) && $resource instanceof \SimpleXMLElement) {
+        if (\is_object($resource)) {
             if (!isset($resource->{$key.'s'}->{$key})) {
                 return $default;
             }
@@ -61,7 +61,7 @@ trait ResourceExtractorTrait
             case 'integer':
                 return (int) $resource[$key];
             case 'bool':
-                if (\is_object($resource) && $resource instanceof \SimpleXMLElement) {
+                if (\is_object($resource)) {
                     return (bool) XmlUtils::phpize($resource[$key]);
                 }
 
