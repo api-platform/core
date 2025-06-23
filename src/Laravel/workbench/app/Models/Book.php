@@ -37,6 +37,8 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Symfony\Component\TypeInfo\Type\BuiltinType;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 use Workbench\App\Http\Requests\BookFormRequest;
 
 #[ApiResource(
@@ -79,7 +81,7 @@ use Workbench\App\Http\Requests\BookFormRequest;
     property: 'name'
 )]
 #[QueryParameter(key: 'properties', filter: PropertyFilter::class)]
-#[QueryParameter(key: 'published', filter: BooleanFilter::class)]
+#[QueryParameter(key: 'published', filter: BooleanFilter::class, nativeType: new BuiltinType(TypeIdentifier::BOOL))]
 class Book extends Model
 {
     use HasFactory;

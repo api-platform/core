@@ -171,7 +171,77 @@ use Symfony\Component\Validator\Constraints\Country;
                 'minimum' => 1,
                 'maximum' => 5,
             ],
-            required: true,
+        ),
+    ],
+    provider: [self::class, 'noopProvider']
+)]
+#[GetCollection(
+    uriTemplate: 'header_float',
+    parameters: [
+        'Bar' => new HeaderParameter(
+            schema: [
+                'type' => 'number',
+                'example' => 42.0,
+                'minimum' => 1.0,
+                'maximum' => 100.0,
+                'multipleOf' => 0.01,
+            ],
+            castToNativeType: true
+        ),
+    ],
+    provider: [self::class, 'noopProvider']
+)]
+#[GetCollection(
+    uriTemplate: 'header_boolean',
+    parameters: [
+        'Lorem' => new HeaderParameter(
+            schema: [
+                'type' => 'boolean',
+            ],
+            castToNativeType: true,
+        ),
+    ],
+    provider: [self::class, 'noopProvider']
+)]
+#[GetCollection(
+    uriTemplate: 'query_integer',
+    parameters: [
+        'Foo' => new QueryParameter(
+            schema: [
+                'type' => 'integer',
+                'example' => 3,
+                'minimum' => 1,
+                'maximum' => 5,
+            ],
+            castToNativeType: true
+        ),
+    ],
+    provider: [self::class, 'noopProvider']
+)]
+#[GetCollection(
+    uriTemplate: 'query_float',
+    parameters: [
+        'Bar' => new QueryParameter(
+            schema: [
+                'type' => 'number',
+                'example' => 42.0,
+                'minimum' => 1.0,
+                'maximum' => 100.0,
+                'multipleOf' => 0.01,
+            ],
+            castToNativeType: true
+        ),
+    ],
+    provider: [self::class, 'noopProvider']
+)]
+#[GetCollection(
+    uriTemplate: 'query_boolean',
+    parameters: [
+        'Lorem' => new QueryParameter(
+            schema: [
+                'type' => 'boolean',
+            ],
+            castToNativeType: true,
         ),
     ],
     provider: [self::class, 'noopProvider']
