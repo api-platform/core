@@ -214,7 +214,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             }
 
             $path = $this->getPath($path);
-            $method = $operation->getMethod() ?? 'GET';
+            $method = $operation->getMethod();
 
             if (!\in_array($method, PathItem::$methods, true)) {
                 continue;
@@ -618,7 +618,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         foreach ($resourceMetadataCollection as $resource) {
             foreach ($resource->getOperations() as $operationName => $operation) {
                 $parameters = [];
-                $method = $operation instanceof HttpOperation ? $operation->getMethod() : 'GET';
+                $method = $operation->getMethod();
                 if (
                     $operationName === $operation->getName()
                     || isset($links[$operationName])

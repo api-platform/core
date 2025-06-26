@@ -103,7 +103,7 @@ final class ApiLoader extends Loader
                         $operation->getOptions() ?? [],
                         $operation->getHost() ?? '',
                         $operation->getSchemes() ?? [],
-                        [$operation->getMethod() ?? 'GET'],
+                        [$operation->getMethod()],
                         $operation->getCondition() ?? ''
                     );
 

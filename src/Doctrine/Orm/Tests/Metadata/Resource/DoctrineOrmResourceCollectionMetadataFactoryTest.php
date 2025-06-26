@@ -21,7 +21,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -34,7 +34,7 @@ class DoctrineOrmResourceCollectionMetadataFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    private function getResourceMetadataCollectionFactory(Operation $operation)
+    private function getResourceMetadataCollectionFactory(HttpOperation $operation)
     {
         $resourceMetadataCollectionFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataCollectionFactory->create($operation->getClass())->willReturn(new ResourceMetadataCollection($operation->getClass(), [
@@ -63,7 +63,7 @@ class DoctrineOrmResourceCollectionMetadataFactoryTest extends TestCase
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('operationProvider')]
-    public function testWithProvider(Operation $operation, ?string $expectedProvider = null, ?string $expectedProcessor = null): void
+    public function testWithProvider(HttpOperation $operation, ?string $expectedProvider = null, ?string $expectedProcessor = null): void
     {
         $objectManager = $this->prophesize(EntityManagerInterface::class);
         $managerRegistry = $this->prophesize(ManagerRegistry::class);

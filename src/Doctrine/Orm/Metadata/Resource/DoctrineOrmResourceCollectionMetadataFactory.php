@@ -16,7 +16,6 @@ namespace ApiPlatform\Doctrine\Orm\Metadata\Resource;
 use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
 use ApiPlatform\Doctrine\Orm\State\ItemProvider;
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\Operation;
@@ -41,12 +40,10 @@ final class DoctrineOrmResourceCollectionMetadataFactory implements ResourceMeta
     {
         $resourceMetadataCollection = $this->decorated->create($resourceClass);
 
-        /** @var ApiResource $resourceMetadata */
         foreach ($resourceMetadataCollection as $i => $resourceMetadata) {
             $operations = $resourceMetadata->getOperations();
 
             if ($operations) {
-                /** @var Operation $operation */
                 foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
                     $entityClass = $this->getStateOptionsClass($operation, $operation->getClass(), Options::class);
 
