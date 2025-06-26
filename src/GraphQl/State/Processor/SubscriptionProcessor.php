@@ -33,7 +33,7 @@ final class SubscriptionProcessor implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
         $data = $this->decorated->process($data, $operation, $uriVariables, $context);
-        if (!$operation instanceof GraphQlOperation || !($mercure = $operation->getMercure())) {
+        if (!$operation instanceof Subscription || !($mercure = $operation->getMercure())) {
             return $data;
         }
 

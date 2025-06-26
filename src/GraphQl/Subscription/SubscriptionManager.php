@@ -131,7 +131,7 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
     private function getResourceId(mixed $privateField, object $previousObject): string
     {
         $id = $previousObject->{'get'.ucfirst($privateField)}()->getId();
-        if ($id instanceof \Stringable) {
+        if ($id instanceof \Stringable || is_numeric($id)) {
             return (string) $id;
         }
 
@@ -149,39 +149,61 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
         $resourceMetadata = $this->resourceMetadataCollectionFactory->create($resourceClass);
         $shortName = $resourceMetadata->getOperation()->getShortName();
 
-        $mercure = $resourceMetadata->getOperation()->getMercure() ?? false;
-        $private = $mercure['private'] ?? false;
-        $privateFieldsConfig = $mercure['private_fields'] ?? [];
-        $privateFieldData = [];
-        if ($private && $privateFieldsConfig) {
-            foreach ($privateFieldsConfig as $privateField) {
-                $privateFieldData['__private_field_'.$privateField] = $this->getResourceId($privateField, $object);
-            }
-        }
-
-        $iri = $this->iriConverter->getIriFromResource($object);
-        // Add collection subscriptions
-        $subscriptions = array_merge(
-            $this->getSubscriptionsFromIri($this->getCollectionIri($iri), $privateFieldData),
-            $this->getSubscriptionsFromIri($iri)
-        );
-
         $payloads = [];
-        foreach ($subscriptions as [$subscriptionId, $subscriptionFields, $subscriptionResult]) {
-            if ($privateFieldData) {
-                $fieldDiff = array_intersect_assoc($subscriptionFields, $privateFieldData);
-                if ($fieldDiff !== $privateFieldData) {
+        foreach ($resourceMetadata as $apiResource) {
+            foreach ($apiResource->getGraphQlOperations() as $operation) {
+                if (!$operation instanceof Subscription) {
                     continue;
                 }
-            }
-            $resolverContext = ['fields' => $subscriptionFields, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true];
-            $operation = (new Subscription())->withName('mercure_subscription')->withShortName($shortName);
-            $data = $this->normalizeProcessor->process($object, $operation, [], $resolverContext);
+                $mercure = $resourceMetadata->getOperation()->getMercure() ?? false;
+                $operationMercure = $operation->getMercure() ?? false;
+                if ($mercure !== false && $operationMercure !== false) {
+                    /** @noinspection SlowArrayOperationsInLoopInspection */
+                    $mercure = array_merge($mercure, $operationMercure);
+                }
+                $private = $mercure['private'] ?? false;
+                $privateFieldsConfig = $mercure['private_fields'] ?? [];
+                $privateFieldData = [];
+                if ($private && $privateFieldsConfig) {
+                    foreach ($privateFieldsConfig as $privateField) {
+                        $privateFieldData['__private_field_' . $privateField] = $this->getResourceId(
+                            $privateField,
+                            $object
+                        );
+                    }
+                }
 
-            unset($data['clientSubscriptionId']);
+                $iri = $this->iriConverter->getIriFromResource($object);
+                // Add collection subscriptions
+                $subscriptions = array_merge(
+                    $this->getSubscriptionsFromIri($this->getCollectionIri($iri), $privateFieldData),
+                    $this->getSubscriptionsFromIri($iri)
+                );
 
-            if ($data !== $subscriptionResult) {
-                $payloads[] = [$subscriptionId, $data];
+                foreach ($subscriptions as [$subscriptionId, $subscriptionFields, $subscriptionResult]) {
+                    if ($privateFieldData) {
+                        $fieldDiff = array_intersect_assoc($subscriptionFields, $privateFieldData);
+                        if ($fieldDiff !== $privateFieldData) {
+                            continue;
+                        }
+                    }
+                    $resolverContext = [
+                        'fields'          => $subscriptionFields,
+                        'is_collection'   => false,
+                        'is_mutation'     => false,
+                        'is_subscription' => true
+                    ];
+                    $subscriptionOperation = (new Subscription())->withName('mercure_subscription')->withShortName(
+                        $shortName
+                    );
+                    $data = $this->normalizeProcessor->process($object, $subscriptionOperation, [], $resolverContext);
+
+                    unset($data['clientSubscriptionId']);
+
+                    if ($data !== $subscriptionResult) {
+                        $payloads[] = [$subscriptionId, $data];
+                    }
+                }
             }
         }
 
