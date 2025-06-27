@@ -251,7 +251,7 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface, Js
         return ['type' => 'string', 'format' => 'date'];
     }
 
-    public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array|null
+    public function getOpenApiParameters(Parameter $parameter): array
     {
         $in = $parameter instanceof QueryParameter ? 'query' : 'header';
         $key = $parameter->getKey();

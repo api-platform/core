@@ -119,7 +119,7 @@ final class TypeConverter implements TypeConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function resolveType(string $type): ?GraphQLType
+    public function resolveType(string $type): GraphQLType
     {
         try {
             $astTypeNode = Parser::parseType($type);

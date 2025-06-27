@@ -29,7 +29,7 @@ class TagCollectorDefault implements TagCollectorInterface
         }
     }
 
-    private function addResourceToContext(array $context): void
+    private function addResourceToContext(array &$context): void
     {
         $iri = $context['iri'];
 

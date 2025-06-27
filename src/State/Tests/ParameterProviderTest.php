@@ -34,7 +34,7 @@ final class ParameterProviderTest extends TestCase
             {
                 if ('test' === $id) {
                     return new class implements ParameterProviderInterface {
-                        public function provide(Parameter $parameter, array $parameters = [], array $context = []): ?Operation
+                        public function provide(Parameter $parameter, array $parameters = [], array $context = []): Operation
                         {
                             return new Get(name: 'ok');
                         }
