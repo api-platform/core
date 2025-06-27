@@ -108,6 +108,15 @@ final class ValidationTest extends ApiTestCase
                 ],
             ],
             [
+                'numMultipleType=5',
+                [
+                    [
+                        'propertyPath' => 'numMultipleType',
+                        'message' => 'This value should satisfy at least one of the following constraints: [1] This value should be between 1 and 3. [2] Each element of this collection should satisfy its own set of constraints.',
+                    ],
+                ],
+            ],
+            [
                 'exclusiveNum=5',
                 [
                     ['propertyPath' => 'exclusiveNum', 'message' => 'This value should be less than 3.'],
