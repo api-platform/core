@@ -70,7 +70,7 @@ final class DoctrineOrmPropertyMetadataFactory implements PropertyMetadataFactor
 
         if ($doctrineClassMetadata instanceof ClassMetadata && \in_array($property, $doctrineClassMetadata->getFieldNames(), true)) {
             $fieldMapping = $doctrineClassMetadata->getFieldMapping($property);
-            if (class_exists(FieldMapping::class) && $fieldMapping instanceof FieldMapping) {
+            if (class_exists(FieldMapping::class)) {
                 $propertyMetadata = $propertyMetadata->withDefault($fieldMapping->default ?? $propertyMetadata->getDefault());
             } else {
                 $propertyMetadata = $propertyMetadata->withDefault($fieldMapping['options']['default'] ?? $propertyMetadata->getDefault());

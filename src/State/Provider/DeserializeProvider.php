@@ -75,7 +75,7 @@ final class DeserializeProvider implements ProviderInterface
             throw new UnsupportedMediaTypeHttpException('Format not supported.');
         }
 
-        if ($operation instanceof HttpOperation && null === ($serializerContext[SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE] ?? null)) {
+        if (null === ($serializerContext[SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE] ?? null)) {
             $method = $operation->getMethod();
             $assignObjectToPopulate = 'POST' === $method
                 || 'PATCH' === $method

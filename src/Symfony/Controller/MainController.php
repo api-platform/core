@@ -49,7 +49,7 @@ final class MainController
     {
         $operation = $this->initializeOperation($request);
 
-        if (!$operation || !$operation instanceof HttpOperation) {
+        if (!$operation instanceof HttpOperation) {
             throw new RuntimeException('Not an HTTP API operation.');
         }
 

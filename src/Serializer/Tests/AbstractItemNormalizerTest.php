@@ -1204,7 +1204,7 @@ class AbstractItemNormalizerTest extends TestCase
         $errors = [];
         $actual = $normalizer->denormalize($data, Dummy::class, null, ['not_normalizable_value_exceptions' => &$errors]);
         $this->assertEmpty($actual->relatedDummies);
-        $this->assertCount(1, $errors); // @phpstan-ignore-line method.impossibleType (false positive)
+        $this->assertCount(1, $errors);
         $this->assertInstanceOf(NotNormalizableValueException::class, $errors[0]);
         $this->assertSame('relatedDummies[0]', $errors[0]->getPath());
         $this->assertSame('Invalid IRI "wrong".', $errors[0]->getMessage());

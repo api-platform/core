@@ -186,7 +186,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $openapiAttribute = $operation->getOpenapi();
 
             // Operation ignored from OpenApi
-            if ($operation instanceof HttpOperation && false === $openapiAttribute) {
+            if (false === $openapiAttribute) {
                 continue;
             }
 
@@ -386,7 +386,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $existingResponses = $openapiOperation->getResponses() ?: [];
             $overrideResponses = $operation->getExtraProperties()[self::OVERRIDE_OPENAPI_RESPONSES] ?? $this->openApiOptions->getOverrideResponses();
             $errors = null;
-            if ($operation instanceof HttpOperation && null !== ($errors = $operation->getErrors())) {
+            if (null !== ($errors = $operation->getErrors())) {
                 /** @var array<class-string|string, Error> */
                 $errorOperations = [];
                 foreach ($errors as $error) {
@@ -629,7 +629,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 }
 
                 // Operation ignored from OpenApi
-                if ($operation instanceof HttpOperation && (false === $operation->getOpenapi() || $operation->getOpenapi() instanceof Webhook)) {
+                if (false === $operation->getOpenapi() || $operation->getOpenapi() instanceof Webhook) {
                     continue;
                 }
 

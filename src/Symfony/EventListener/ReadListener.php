@@ -15,7 +15,6 @@ namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Metadata\Exception\InvalidIdentifierException;
 use ApiPlatform\Metadata\Exception\InvalidUriVariableException;
-use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\UriVariablesConverterInterface;
 use ApiPlatform\Metadata\Util\CloneTrait;
@@ -73,7 +72,7 @@ final class ReadListener
         }
 
         $uriVariables = [];
-        if (!$request->attributes->has('exception') && $operation instanceof HttpOperation) {
+        if (!$request->attributes->has('exception')) {
             try {
                 $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $operation->getClass());
             } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
