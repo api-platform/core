@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Extractor;
 
-use ApiPlatform\Elasticsearch\State\Options;
+use ApiPlatform\Doctrine\Odm\State\Options as OdmOptions;
+use ApiPlatform\Doctrine\Orm\State\Options as OrmOptions;
+use ApiPlatform\Elasticsearch\State\Options as ElasticsearchOptions;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\HeaderParameter;
@@ -417,9 +419,20 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
         $configuration = reset($stateOptions);
         switch (key($stateOptions)) {
             case 'elasticsearchOptions':
-                if (class_exists(Options::class)) {
-                    return new Options($configuration['index'] ?? null);
+                if (class_exists(ElasticsearchOptions::class)) {
+                    return new ElasticsearchOptions($configuration['index'] ?? null);
                 }
+                break;
+            case 'doctrineOdmOptions':
+                if (class_exists(OdmOptions::class)) {
+                    return new OdmOptions($configuration['documentClass'] ?? null);
+                }
+                break;
+            case 'doctrineOrmOptions':
+                if (class_exists(OrmOptions::class)) {
+                    return new OrmOptions($configuration['entityClass'] ?? null);
+                }
+                break;
         }
 
         return null;

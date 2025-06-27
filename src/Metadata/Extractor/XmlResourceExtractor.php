@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Extractor;
 
-use ApiPlatform\Elasticsearch\State\Options;
+use ApiPlatform\Doctrine\Odm\State\Options as OdmOptions;
+use ApiPlatform\Doctrine\Orm\State\Options as OrmOptions;
+use ApiPlatform\Elasticsearch\State\Options as ElasticsearchOptions;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\HeaderParameter;
@@ -468,13 +470,23 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
         if (!$stateOptions) {
             return null;
         }
-        $elasticsearchOptions = $stateOptions->elasticsearchOptions ?? null;
-        if ($elasticsearchOptions) {
-            if (class_exists(Options::class)) {
-                return new Options(
-                    isset($elasticsearchOptions['index']) ? (string) $elasticsearchOptions['index'] : null,
-                );
-            }
+
+        if (isset($stateOptions->elasticsearchOptions) && class_exists(ElasticsearchOptions::class)) {
+            return new ElasticsearchOptions(
+                isset($stateOptions->elasticsearchOptions['index']) ? (string) $stateOptions->elasticsearchOptions['index'] : null,
+            );
+        }
+
+        if (isset($stateOptions->doctrineOdmOptions) && class_exists(OdmOptions::class)) {
+            return new OdmOptions(
+                isset($stateOptions->doctrineOdmOptions['documentClass']) ? (string) $stateOptions->doctrineOdmOptions['documentClass'] : null,
+            );
+        }
+
+        if (isset($stateOptions->doctrineOrmOptions) && class_exists(OrmOptions::class)) {
+            return new OrmOptions(
+                isset($stateOptions->doctrineOrmOptions['entityClass']) ? (string) $stateOptions->doctrineOrmOptions['entityClass'] : null,
+            );
         }
 
         return null;
