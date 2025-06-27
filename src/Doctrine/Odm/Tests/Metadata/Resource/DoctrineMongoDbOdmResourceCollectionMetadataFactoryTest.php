@@ -21,7 +21,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -34,7 +34,7 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactoryTest extends Test
 {
     use ProphecyTrait;
 
-    private function getResourceMetadataCollectionFactory(Operation $operation)
+    private function getResourceMetadataCollectionFactory(HttpOperation $operation)
     {
         if (!class_exists(DocumentManager::class)) {
             $this->markTestSkipped('ODM not installed');
@@ -71,7 +71,7 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactoryTest extends Test
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('operationProvider')]
-    public function testWithProvider(Operation $operation, ?string $expectedProvider = null, ?string $expectedProcessor = null): void
+    public function testWithProvider(HttpOperation $operation, ?string $expectedProvider = null, ?string $expectedProcessor = null): void
     {
         if (!class_exists(DocumentManager::class)) {
             $this->markTestSkipped('ODM not installed');

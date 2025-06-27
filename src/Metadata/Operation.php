@@ -20,6 +20,7 @@ use ApiPlatform\State\OptionsInterface;
  */
 abstract class Operation extends Metadata
 {
+    use CascadeFromResource;
     use WithResourceTrait;
 
     /**
@@ -861,7 +862,7 @@ abstract class Operation extends Metadata
         );
     }
 
-    public function withOperation($operation)
+    public function withOperation(self $operation): static
     {
         return $this->copyFrom($operation);
     }

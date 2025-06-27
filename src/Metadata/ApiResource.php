@@ -31,20 +31,24 @@ use ApiPlatform\State\OptionsInterface;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class ApiResource extends Metadata
 {
+    use CascadeToOperationsTrait;
     use WithResourceTrait;
 
+    /**
+     * @var Operations<HttpOperation>
+     */
     protected ?Operations $operations;
 
     /**
-     * @param array<int, HttpOperation>|array<string, HttpOperation>|Operations|null $operations   Operations is a list of HttpOperation
-     * @param array<string, Link>|array<string, mixed[]>|string[]|string|null        $uriVariables
-     * @param array<string, string>                                                  $headers
-     * @param string|callable|null                                                   $provider
-     * @param string|callable|null                                                   $processor
-     * @param mixed|null                                                             $mercure
-     * @param mixed|null                                                             $messenger
-     * @param mixed|null                                                             $input
-     * @param mixed|null                                                             $output
+     * @param list<HttpOperation>|array<string, HttpOperation>|Operations<HttpOperation>|null $operations   Operations is a list of HttpOperation
+     * @param array<string, Link>|array<string, mixed[]>|string[]|string|null                 $uriVariables
+     * @param array<string, string>                                                           $headers
+     * @param string|callable|null                                                            $provider
+     * @param string|callable|null                                                            $processor
+     * @param mixed|null                                                                      $mercure
+     * @param mixed|null                                                                      $messenger
+     * @param mixed|null                                                                      $input
+     * @param mixed|null                                                                      $output
      */
     public function __construct(
         /**
@@ -1012,6 +1016,7 @@ class ApiResource extends Metadata
             extraProperties: $extraProperties
         );
 
+        /* @var Operations<HttpOperation> $operations> */
         $this->operations = null === $operations ? null : new Operations($operations);
         $this->provider = $provider;
         $this->processor = $processor;
@@ -1020,11 +1025,17 @@ class ApiResource extends Metadata
         }
     }
 
+    /**
+     * @return Operations<HttpOperation>
+     */
     public function getOperations(): ?Operations
     {
         return $this->operations;
     }
 
+    /**
+     * @param Operations<HttpOperation> $operations
+     */
     public function withOperations(Operations $operations): static
     {
         $self = clone $this;

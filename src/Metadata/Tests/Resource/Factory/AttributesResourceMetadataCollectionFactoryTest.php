@@ -71,13 +71,25 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
                     provider: AttributeResourceProvider::class,
                     operations: [
                         '_api_AttributeResource_get' => new Get(
-                            shortName: 'AttributeResource', class: AttributeResource::class, normalizationContext: ['skip_null_values' => true], priority: 1, provider: AttributeResourceProvider::class,
+                            shortName: 'AttributeResource',
+                            class: AttributeResource::class,
+                            normalizationContext: ['skip_null_values' => true],
+                            priority: 1,
+                            provider: AttributeResourceProvider::class,
                         ),
                         '_api_AttributeResource_put' => new Put(
-                            shortName: 'AttributeResource', class: AttributeResource::class, normalizationContext: ['skip_null_values' => true], priority: 2, provider: AttributeResourceProvider::class,
+                            shortName: 'AttributeResource',
+                            class: AttributeResource::class,
+                            normalizationContext: ['skip_null_values' => true],
+                            priority: 2,
+                            provider: AttributeResourceProvider::class,
                         ),
                         '_api_AttributeResource_delete' => new Delete(
-                            shortName: 'AttributeResource', class: AttributeResource::class, normalizationContext: ['skip_null_values' => true], priority: 3, provider: AttributeResourceProvider::class,
+                            shortName: 'AttributeResource',
+                            class: AttributeResource::class,
+                            normalizationContext: ['skip_null_values' => true],
+                            priority: 3,
+                            provider: AttributeResourceProvider::class,
                         ),
                     ],
                     graphQlOperations: $this->getDefaultGraphqlOperations('AttributeResource', AttributeResource::class, AttributeResourceProvider::class)

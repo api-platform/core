@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\ErrorResource;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
@@ -67,6 +68,9 @@ final class FormatsResourceMetadataCollectionFactory implements ResourceMetadata
         return $resourceMetadataCollection;
     }
 
+    /**
+     * @param Operations<HttpOperation> $operations
+     */
     private function normalize(array $resourceInputFormats, array $resourceOutputFormats, Operations $operations): Operations
     {
         $newOperations = [];
