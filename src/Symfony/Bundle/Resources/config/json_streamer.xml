@@ -11,7 +11,7 @@
 
         <service id="api_platform.json_streamer.stream_reader" class="Symfony\Component\JsonStreamer\JsonStreamReader">
             <argument type="tagged_locator" tag="json_streamer.value_transformer" />
-            <argument type="service" id="api_platform.jsonld.json_streamer.read.property_metadata_loader" />
+            <argument type="service" id="json_streamer.read.property_metadata_loader" />
             <argument>%.json_streamer.stream_readers_dir%</argument>
             <argument>%.json_streamer.lazy_ghosts_dir%</argument>
         </service>
@@ -19,23 +19,28 @@
         <service id="api_platform.jsonld.json_streamer.write.property_metadata_loader" class="ApiPlatform\JsonLd\JsonStreamer\WritePropertyMetadataLoader">
             <argument type="service" id="json_streamer.write.property_metadata_loader" />
             <argument type="service" id="api_platform.resource_class_resolver" />
-            <argument type="service" id="api_platform.router" />
         </service>
 
-        <service id="api_platform.jsonld.json_streamer.read.property_metadata_loader" class="ApiPlatform\JsonLd\JsonStreamer\ReadPropertyMetadataLoader">
-            <argument type="service" id="json_streamer.read.property_metadata_loader" />
-            <argument type="service" id="api_platform.resource_class_resolver" />
-            <argument type="service" id="api_platform.router" />
-        </service>
-
-        <service id="api_platform.jsonld.json_streamer.write.value_transformer.iri" class="ApiPlatform\JsonLd\JsonStreamer\IriValueTransformer">
+        <service id="api_platform.jsonld.json_streamer.write.value_transformer.iri" class="ApiPlatform\JsonLd\JsonStreamer\ValueTransformer\IriValueTransformer">
             <argument type="service" id="api_platform.iri_converter" />
+            <tag name="json_streamer.value_transformer"/>
+        </service>
+
+        <service id="api_platform.jsonld.json_streamer.write.value_transformer.type" class="ApiPlatform\JsonLd\JsonStreamer\ValueTransformer\TypeValueTransformer">
+            <tag name="json_streamer.value_transformer"/>
+        </service>
+
+        <service id="api_platform.jsonld.json_streamer.write.value_transformer.context" class="ApiPlatform\JsonLd\JsonStreamer\ValueTransformer\ContextValueTransformer">
+            <argument type="service" id="api_platform.router" />
             <tag name="json_streamer.value_transformer"/>
         </service>
 
         <service id="api_platform.state_processor.json_streamer" class="ApiPlatform\Hydra\State\JsonStreamerProcessor" decorates="api_platform.state_processor.main" decoration-priority="190">
             <argument type="service" id="api_platform.state_processor.json_streamer.inner" />
             <argument type="service" id="api_platform.json_streamer.stream_writer" />
+            <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.resource_class_resolver" />
+            <argument type="service" id="api_platform.metadata.operation.metadata_factory" />
             <argument>%api_platform.collection.pagination.page_parameter_name%</argument>
             <argument>%api_platform.collection.pagination.enabled_parameter_name%</argument>
             <argument>%api_platform.url_generation_strategy%</argument>

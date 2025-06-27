@@ -29,7 +29,7 @@ final class JsonStreamerProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        if (!$operation instanceof HttpOperation || !($request = $context['request'] ?? null)) {
+        if (!$operation instanceof HttpOperation || !$operation->getJsonStream() || !($request = $context['request'] ?? null)) {
             return $this->decorated?->provide($operation, $uriVariables, $context);
         }
 

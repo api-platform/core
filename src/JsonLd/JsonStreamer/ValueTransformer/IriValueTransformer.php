@@ -1,11 +1,21 @@
 <?php
 
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
-namespace ApiPlatform\JsonLd\JsonStreamer;
+namespace ApiPlatform\JsonLd\JsonStreamer\ValueTransformer;
 
 use ApiPlatform\Hydra\Collection;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use Symfony\Component\JsonStreamer\ValueTransformer\ValueTransformerInterface;
@@ -20,6 +30,10 @@ final class IriValueTransformer implements ValueTransformerInterface
 
     public function transform(mixed $value, array $options = []): mixed
     {
+        if (!isset($options['operation'])) {
+            throw new RuntimeException('Operation is not defined');
+        }
+
         if ($options['_current_object'] instanceof Collection) {
             return $this->iriConverter->getIriFromResource($options['operation']->getClass(), UrlGeneratorInterface::ABS_PATH, $options['operation']);
         }

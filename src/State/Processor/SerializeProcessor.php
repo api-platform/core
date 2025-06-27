@@ -18,8 +18,6 @@ use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ResourceList;
 use ApiPlatform\State\SerializerContextBuilderInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\JsonStreamer\StreamWriterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\WebLink\GenericLinkProvider;
