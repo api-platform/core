@@ -24,11 +24,17 @@
             <argument key="$logger" type="service" id="logger" on-invalid="null" />
         </service>
 
+        <service id="api_platform.state_provider.parameter" class="ApiPlatform\State\Provider\ParameterProvider">
+            <argument>null</argument>
+            <argument type="tagged_locator" tag="api_platform.parameter_provider" index-by="key" />
+        </service>
+
         <!-- kernel.request priority must be < 8 to be executed after the Firewall -->
         <service id="api_platform.listener.request.read" class="ApiPlatform\Symfony\EventListener\ReadListener">
             <argument type="service" id="api_platform.state_provider.read" />
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <argument type="service" id="api_platform.uri_variables.converter" />
+            <argument type="service" id="api_platform.state_provider.parameter" on-invalid="null" />
 
             <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="4" />
         </service>
@@ -99,11 +105,6 @@
             <argument key="$identifiersExtractor">null</argument>
             <argument key="$resourceClassResolver" type="service" id="api_platform.resource_class_resolver"/>
             <argument key="$negotiator" type="service" id="api_platform.negotiator"/>
-        </service>
-
-        <service id="api_platform.state_provider.parameter" class="ApiPlatform\State\Provider\ParameterProvider" decorates="api_platform.state_provider.read" decoration-priority="100">
-            <argument type="service" id="api_platform.state_provider.parameter.inner" />
-            <argument type="tagged_locator" tag="api_platform.parameter_provider" index-by="key" />
         </service>
 
         <service id="api_platform.state_processor.documentation" alias="api_platform.state_processor.respond" />

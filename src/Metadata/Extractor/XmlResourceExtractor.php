@@ -110,7 +110,6 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             'description' => $this->phpize($resource, 'description', 'string'),
             'urlGenerationStrategy' => $this->phpize($resource, 'urlGenerationStrategy', 'integer'),
             'deprecationReason' => $this->phpize($resource, 'deprecationReason', 'string'),
-            'elasticsearch' => $this->phpize($resource, 'elasticsearch', 'bool'),
             'messenger' => $this->phpize($resource, 'messenger', 'bool|string'),
             'mercure' => $this->buildMercure($resource),
             'input' => $this->phpize($resource, 'input', 'bool|string'),
@@ -459,7 +458,6 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             if (class_exists(Options::class)) {
                 return new Options(
                     isset($elasticsearchOptions['index']) ? (string) $elasticsearchOptions['index'] : null,
-                    isset($elasticsearchOptions['type']) ? (string) $elasticsearchOptions['type'] : null,
                 );
             }
         }

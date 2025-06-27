@@ -133,6 +133,12 @@ abstract class Parameter
         return $this->extraProperties['_api_values'] ?? $default;
     }
 
+    /**
+     * Only use this in a parameter provider, the ApiPlatform\State\Provider\ParameterProvider
+     * resets this value to extract the correct value on each request.
+     * It's also possible to set the `_api_query_parameters` request attribute directly and
+     * API Platform will extract the value from there.
+     */
     public function setValue(mixed $value): static
     {
         $this->extraProperties['_api_values'] = $value;

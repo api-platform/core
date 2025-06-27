@@ -254,10 +254,8 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             [$requestMimeTypes, $responseMimeTypes] = $this->getMimeTypes($operation);
 
-            if ($path) {
-                $pathItem = $paths->getPath($path) ?: new PathItem();
-            } elseif (!$pathItem) {
-                $pathItem = new PathItem();
+            if (null === $pathItem) {
+                $pathItem = $paths->getPath($path) ?? new PathItem();
             }
 
             $forceSchemaCollection = $operation instanceof CollectionOperationInterface && 'GET' === $method;

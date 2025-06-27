@@ -101,14 +101,6 @@ class ValidationException extends RuntimeException implements ConstraintViolatio
         parent::__construct($message ?: $this->__toString(), $code ?? 0, $previous);
     }
 
-    /**
-     * @deprecated
-     */
-    public function getErrorTitle(): ?string
-    {
-        return $this->errorTitle;
-    }
-
     public function getId(): string
     {
         $ids = [];

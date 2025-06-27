@@ -25,7 +25,7 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/metadata": "^4.1.11",
+        "api-platform/metadata": "4.2.x-dev as dev-main",
         "symfony/console": "^6.4 || ^7.0",
         "symfony/property-info": "^6.4 || ^7.1",
         "symfony/serializer": "^6.4 || ^7.0",
@@ -57,7 +57,8 @@
     "extra": {
         "branch-alias": {
             "dev-main": "4.2.x-dev",
-            "dev-3.4": "3.4.x-dev"
+            "dev-3.4": "3.4.x-dev",
+            "dev-4.1": "4.1.x-dev"
         },
         "symfony": {
             "require": "^6.4 || ^7.0"

@@ -11,19 +11,19 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Symfony\Security\State;
+namespace ApiPlatform\State\Tests\Provider;
 
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
+use ApiPlatform\State\Provider\SecurityParameterProvider;
 use ApiPlatform\State\ProviderInterface;
-use ApiPlatform\Symfony\Security\Exception\AccessDeniedException;
-use ApiPlatform\Symfony\Security\ResourceAccessCheckerInterface;
-use ApiPlatform\Symfony\Security\State\LinkAccessCheckerProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-class LinkAccessCheckerProviderTest extends TestCase
+final class SecurityParameterProviderTest extends TestCase
 {
     public function testIsGrantedLink(): void
     {
@@ -39,14 +39,14 @@ class LinkAccessCheckerProviderTest extends TestCase
         $request->attributes = $parameterBag;
         $request->attributes->set('bar', $barObj);
         $resourceAccessChecker = $this->createMock(ResourceAccessCheckerInterface::class);
-        $resourceAccessChecker->expects($this->once())->method('isGranted')->with('Bar', 'is_granted("some_voter", "bar")', ['object' => $obj, 'previous_object' => null, 'request' => $request, 'bar' => $barObj])->willReturn(true);
-        $accessChecker = new LinkAccessCheckerProvider($decorated, $resourceAccessChecker);
-        $accessChecker->provide($operation, [], ['request' => $request]);
+        $resourceAccessChecker->expects($this->once())->method('isGranted')->with('Bar', 'is_granted("some_voter", "bar")', ['object' => $obj, 'previous_object' => null, 'request' => $request, 'bar' => $barObj, 'barId' => 1, 'operation' => $operation])->willReturn(true);
+        $accessChecker = new SecurityParameterProvider($decorated, $resourceAccessChecker);
+        $accessChecker->provide($operation, ['barId' => 1], ['request' => $request]);
     }
 
     public function testIsNotGrantedLink(): void
     {
-        $this->expectException(AccessDeniedException::class);
+        $this->expectException(AccessDeniedHttpException::class);
 
         $obj = new \stdClass();
         $barObj = new \stdClass();
@@ -60,14 +60,14 @@ class LinkAccessCheckerProviderTest extends TestCase
         $request->attributes = $parameterBag;
         $request->attributes->set('bar', $barObj);
         $resourceAccessChecker = $this->createMock(ResourceAccessCheckerInterface::class);
-        $resourceAccessChecker->expects($this->once())->method('isGranted')->with('Bar', 'is_granted("some_voter", "bar")', ['object' => $obj, 'previous_object' => null, 'request' => $request, 'bar' => $barObj])->willReturn(false);
-        $accessChecker = new LinkAccessCheckerProvider($decorated, $resourceAccessChecker);
-        $accessChecker->provide($operation, [], ['request' => $request]);
+        $resourceAccessChecker->expects($this->once())->method('isGranted')->with('Bar', 'is_granted("some_voter", "bar")', ['object' => $obj, 'previous_object' => null, 'request' => $request, 'bar' => $barObj, 'barId' => 1, 'operation' => $operation])->willReturn(false);
+        $accessChecker = new SecurityParameterProvider($decorated, $resourceAccessChecker);
+        $accessChecker->provide($operation, ['barId' => 1], ['request' => $request]);
     }
 
     public function testSecurityMessageLink(): void
     {
-        $this->expectException(AccessDeniedException::class);
+        $this->expectException(AccessDeniedHttpException::class);
         $this->expectExceptionMessage('You are not admin.');
 
         $obj = new \stdClass();
@@ -82,8 +82,8 @@ class LinkAccessCheckerProviderTest extends TestCase
         $request->attributes = $parameterBag;
         $request->attributes->set('bar', $barObj);
         $resourceAccessChecker = $this->createMock(ResourceAccessCheckerInterface::class);
-        $resourceAccessChecker->expects($this->once())->method('isGranted')->with('Bar', 'is_granted("some_voter", "bar")', ['object' => $obj, 'previous_object' => null, 'request' => $request, 'bar' => $barObj])->willReturn(false);
-        $accessChecker = new LinkAccessCheckerProvider($decorated, $resourceAccessChecker);
-        $accessChecker->provide($operation, [], ['request' => $request]);
+        $resourceAccessChecker->expects($this->once())->method('isGranted')->with('Bar', 'is_granted("some_voter", "bar")', ['object' => $obj, 'previous_object' => null, 'request' => $request, 'bar' => $barObj, 'barId' => 1, 'operation' => $operation])->willReturn(false);
+        $accessChecker = new SecurityParameterProvider($decorated, $resourceAccessChecker);
+        $accessChecker->provide($operation, ['barId' => 1], ['request' => $request]);
     }
 }

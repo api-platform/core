@@ -15,12 +15,14 @@ namespace ApiPlatform\Serializer\Tests;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Exception\AccessDeniedException;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operations;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
@@ -304,6 +306,173 @@ class AbstractItemNormalizerTest extends TestCase
             'resources' => [],
             'root_operation' => new GetCollection('/property_collection_iri_onlies'),
         ]));
+    }
+
+    public function testDenormalizeWithSecuredPropertyAndThrowOnAccessDeniedExtraPropertyInAttributeMetaThrowsAccessDeniedExceptionWithSecurityMessage(): void
+    {
+        $data = [
+            'title' => 'foo',
+            'adminOnlyProperty' => 'secret',
+        ];
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(SecuredDummy::class, [])->willReturn(new PropertyNameCollection(['title', 'adminOnlyProperty']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+
+        if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
+            $propertyMetadataFactoryProphecy->create(SecuredDummy::class, 'title', [])->willReturn((new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])->withDescription('')->withReadable(false)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(SecuredDummy::class, 'adminOnlyProperty', [])->willReturn((new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])->withDescription('')->withReadable(true)->withSecurityPostDenormalize('is_granted(\'ROLE_ADMIN\')')->withExtraProperties(['throw_on_access_denied' => true]));
+        } else {
+            $propertyMetadataFactoryProphecy->create(SecuredDummy::class, 'title', [])->willReturn((new ApiProperty())->withNativeType(Type::string())->withDescription('')->withReadable(false)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(SecuredDummy::class, 'adminOnlyProperty', [])->willReturn((new ApiProperty())->withNativeType(Type::string())->withDescription('')->withReadable(true)->withSecurityPostDenormalize('is_granted(\'ROLE_ADMIN\')')->withExtraProperties(['throw_on_access_denied' => true]));
+        }
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, SecuredDummy::class)->willReturn(SecuredDummy::class);
+        $resourceClassResolverProphecy->isResourceClass(SecuredDummy::class)->willReturn(true);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+
+        $resourceAccessChecker = $this->prophesize(ResourceAccessCheckerInterface::class);
+        $resourceAccessChecker->isGranted(
+            SecuredDummy::class,
+            'is_granted(\'ROLE_ADMIN\')',
+            Argument::that(function (array $context) {
+                return \array_key_exists('property', $context)
+                    && \array_key_exists('object', $context)
+                    && \array_key_exists('previous_object', $context)
+                    && 'adminOnlyProperty' === $context['property']
+                    && null === $context['previous_object']
+                    && $context['object'] instanceof SecuredDummy;
+            })
+        )->willReturn(false);
+
+        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), null, null, [], null, $resourceAccessChecker->reveal()) extends AbstractItemNormalizer {};
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $this->expectException(AccessDeniedException::class);
+        $this->expectExceptionMessage('Access denied');
+
+        $normalizer->denormalize($data, SecuredDummy::class);
+    }
+
+    public function testDenormalizeWithSecuredPropertyAndThrowOnAccessDeniedExtraPropertyInOperationAndSecurityMessageInOperationThrowsAccessDeniedExceptionWithSecurityMessage(): void
+    {
+        $data = [
+            'title' => 'foo',
+            'adminOnlyProperty' => 'secret',
+        ];
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(SecuredDummy::class, [])->willReturn(new PropertyNameCollection(['title', 'adminOnlyProperty']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+
+        if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
+            $propertyMetadataFactoryProphecy->create(SecuredDummy::class, 'title', [])->willReturn((new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])->withDescription('')->withReadable(false)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(SecuredDummy::class, 'adminOnlyProperty', [])->willReturn((new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])->withDescription('')->withReadable(true)->withSecurityPostDenormalize('is_granted(\'ROLE_ADMIN\')'));
+        } else {
+            $propertyMetadataFactoryProphecy->create(SecuredDummy::class, 'title', [])->willReturn((new ApiProperty())->withNativeType(Type::string())->withDescription('')->withReadable(false)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(SecuredDummy::class, 'adminOnlyProperty', [])->willReturn((new ApiProperty())->withNativeType(Type::string())->withDescription('')->withReadable(true)->withSecurityPostDenormalize('is_granted(\'ROLE_ADMIN\')'));
+        }
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, SecuredDummy::class)->willReturn(SecuredDummy::class);
+        $resourceClassResolverProphecy->isResourceClass(SecuredDummy::class)->willReturn(true);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+
+        $resourceAccessChecker = $this->prophesize(ResourceAccessCheckerInterface::class);
+        $resourceAccessChecker->isGranted(
+            SecuredDummy::class,
+            'is_granted(\'ROLE_ADMIN\')',
+            Argument::that(function (array $context) {
+                return \array_key_exists('property', $context)
+                    && \array_key_exists('object', $context)
+                    && \array_key_exists('previous_object', $context)
+                    && 'adminOnlyProperty' === $context['property']
+                    && null === $context['previous_object']
+                    && $context['object'] instanceof SecuredDummy;
+            })
+        )->willReturn(false);
+
+        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), null, null, [], null, $resourceAccessChecker->reveal()) extends AbstractItemNormalizer {};
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $this->expectException(AccessDeniedException::class);
+        $this->expectExceptionMessage('Custom access denied message');
+
+        $operation = new Patch(securityMessage: 'Custom access denied message', extraProperties: ['throw_on_access_denied' => true]);
+
+        $normalizer->denormalize($data, SecuredDummy::class, 'json', [
+            'operation' => $operation,
+        ]);
+    }
+
+    public function testDenormalizeWithSecuredPropertyAndThrowOnAccessDeniedExtraPropertyInOperationThrowsAccessDeniedException(): void
+    {
+        $data = [
+            'title' => 'foo',
+            'adminOnlyProperty' => 'secret',
+        ];
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(SecuredDummy::class, [])->willReturn(new PropertyNameCollection(['title', 'adminOnlyProperty']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+
+        if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
+            $propertyMetadataFactoryProphecy->create(SecuredDummy::class, 'title', [])->willReturn((new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])->withDescription('')->withReadable(false)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(SecuredDummy::class, 'adminOnlyProperty', [])->willReturn((new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])->withDescription('')->withReadable(true)->withSecurityPostDenormalize('is_granted(\'ROLE_ADMIN\')'));
+        } else {
+            $propertyMetadataFactoryProphecy->create(SecuredDummy::class, 'title', [])->willReturn((new ApiProperty())->withNativeType(Type::string())->withDescription('')->withReadable(false)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(SecuredDummy::class, 'adminOnlyProperty', [])->willReturn((new ApiProperty())->withNativeType(Type::string())->withDescription('')->withReadable(true)->withSecurityPostDenormalize('is_granted(\'ROLE_ADMIN\')'));
+        }
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, SecuredDummy::class)->willReturn(SecuredDummy::class);
+        $resourceClassResolverProphecy->isResourceClass(SecuredDummy::class)->willReturn(true);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+
+        $resourceAccessChecker = $this->prophesize(ResourceAccessCheckerInterface::class);
+        $resourceAccessChecker->isGranted(
+            SecuredDummy::class,
+            'is_granted(\'ROLE_ADMIN\')',
+            Argument::that(function (array $context) {
+                return \array_key_exists('property', $context)
+                    && \array_key_exists('object', $context)
+                    && \array_key_exists('previous_object', $context)
+                    && 'adminOnlyProperty' === $context['property']
+                    && null === $context['previous_object']
+                    && $context['object'] instanceof SecuredDummy;
+            })
+        )->willReturn(false);
+
+        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), null, null, [], null, $resourceAccessChecker->reveal()) extends AbstractItemNormalizer {};
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $this->expectException(AccessDeniedException::class);
+        $this->expectExceptionMessage('Access denied');
+
+        $operation = new Patch(extraProperties: ['throw_on_access_denied' => true]);
+
+        $normalizer->denormalize($data, SecuredDummy::class, 'json', [
+            'operation' => $operation,
+        ]);
     }
 
     public function testDenormalizeWithSecuredProperty(): void
@@ -1029,9 +1198,7 @@ class AbstractItemNormalizerTest extends TestCase
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(DenormalizerInterface::class);
 
-        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), null, null, [], null, null) extends AbstractItemNormalizer {
-        };
-
+        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), null, null, [], null, null) extends AbstractItemNormalizer {};
         $normalizer->setSerializer($serializerProphecy->reveal());
 
         $errors = [];
@@ -1064,18 +1231,7 @@ class AbstractItemNormalizerTest extends TestCase
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(DenormalizerInterface::class);
 
-        $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
-            $propertyAccessorProphecy->reveal(),
-            null,
-            null,
-            [],
-            null,
-            null,
-        ]);
+        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), null, null, [], null, null) extends AbstractItemNormalizer {};
         $normalizer->setSerializer($serializerProphecy->reveal());
 
         $normalizer->denormalize('wrong IRI', Dummy::class, null, ['not_normalizable_value_exceptions' => []]);
@@ -1102,18 +1258,7 @@ class AbstractItemNormalizerTest extends TestCase
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(DenormalizerInterface::class);
 
-        $normalizer = $this->getMockForAbstractClass(AbstractItemNormalizer::class, [
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
-            $propertyAccessorProphecy->reveal(),
-            null,
-            null,
-            [],
-            null,
-            null,
-        ]);
+        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), null, null, [], null, null) extends AbstractItemNormalizer {};
         $normalizer->setSerializer($serializerProphecy->reveal());
 
         $normalizer->denormalize('/some-iri', Dummy::class, null, ['not_normalizable_value_exceptions' => []]);

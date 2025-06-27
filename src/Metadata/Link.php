@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata;
 
 use ApiPlatform\OpenApi;
+use Symfony\Component\TypeInfo\Type;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER)]
 final class Link extends Parameter
@@ -27,7 +28,8 @@ final class Link extends Parameter
         private ?array $identifiers = null,
         private ?bool $compositeIdentifier = null,
         private ?string $expandedValue = null,
-        ?string $security = null,
+
+        string|\Stringable|null $security = null,
         ?string $securityMessage = null,
         private ?string $securityObjectName = null,
 
@@ -37,9 +39,15 @@ final class Link extends Parameter
         mixed $provider = null,
         mixed $filter = null,
         ?string $property = null,
+        ?array $properties = null,
         ?string $description = null,
         ?bool $required = null,
         array $extraProperties = [],
+
+        mixed $constraints = null,
+        array|string|null $filterContext = null,
+        ?Type $nativeType = null,
+        ?bool $castToArray = null,
     ) {
         // For the inverse property shortcut
         if ($this->parameterName && class_exists($this->parameterName)) {
@@ -53,11 +61,16 @@ final class Link extends Parameter
             provider: $provider,
             filter: $filter,
             property: $property,
+            properties: $properties,
             description: $description,
             required: $required,
+            constraints: $constraints,
             security: $security,
             securityMessage: $securityMessage,
-            extraProperties: $extraProperties
+            extraProperties: $extraProperties,
+            filterContext: $filterContext,
+            nativeType: $nativeType,
+            castToArray: $castToArray,
         );
     }
 

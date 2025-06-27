@@ -218,6 +218,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('state/provider.xml');
             $loader->load('state/processor.xml');
         }
+        $loader->load('state/parameter_provider.xml');
 
         $container->setParameter('api_platform.enable_entrypoint', $config['enable_entrypoint']);
         $container->setParameter('api_platform.enable_docs', $config['enable_docs']);
@@ -493,10 +494,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.oauth.refreshUrl', $config['oauth']['refreshUrl']);
         $container->setParameter('api_platform.oauth.scopes', $config['oauth']['scopes']);
         $container->setParameter('api_platform.oauth.pkce', $config['oauth']['pkce']);
-
-        if ($container->hasDefinition('api_platform.swagger_ui.action')) {
-            $container->getDefinition('api_platform.swagger_ui.action')->setArgument(10, $config['oauth']['pkce']);
-        }
     }
 
     /**

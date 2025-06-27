@@ -15,6 +15,7 @@ namespace ApiPlatform\Serializer;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Exception\AccessDeniedException;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\IriConverterInterface;
@@ -266,18 +267,27 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $options = $this->getFactoryOptions($context);
         $propertyNames = iterator_to_array($this->propertyNameCollectionFactory->create($resourceClass, $options));
 
+        $operation = $context['operation'] ?? null;
+        $throwOnAccessDenied = $operation?->getExtraProperties()['throw_on_access_denied'] ?? false;
+        $securityMessage = $operation?->getSecurityMessage() ?? null;
+
         // Revert attributes that aren't allowed to be changed after a post-denormalize check
         foreach (array_keys($data) as $attribute) {
             $attribute = $this->nameConverter ? $this->nameConverter->denormalize((string) $attribute) : $attribute;
+            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $attribute, $options);
+            $attributeExtraProperties = $propertyMetadata->getExtraProperties() ?? [];
+            $throwOnPropertyAccessDenied = $attributeExtraProperties['throw_on_access_denied'] ?? $throwOnAccessDenied;
             if (!\in_array($attribute, $propertyNames, true)) {
                 continue;
             }
 
             if (!$this->canAccessAttributePostDenormalize($object, $previousObject, $attribute, $context)) {
+                if ($throwOnPropertyAccessDenied) {
+                    throw new AccessDeniedException($securityMessage ?? 'Access denied');
+                }
                 if (null !== $previousObject) {
                     $this->setValue($object, $attribute, $this->propertyAccessor->getValue($previousObject, $attribute));
                 } else {
-                    $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $attribute, $options);
                     $this->setValue($object, $attribute, $propertyMetadata->getDefault());
                 }
             }
@@ -744,7 +754,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                     && ($className = $collectionValueType->getClassName())
                     && $this->resourceClassResolver->isResourceClass($className)
                 ) {
-                    $childContext = $this->createChildContext($this->createOperationContext($context, $className), $attribute, $format);
+                    $childContext = $this->createChildContext($this->createOperationContext($context, $className, $propertyMetadata), $attribute, $format);
 
                     // @see ApiPlatform\Hal\Serializer\ItemNormalizer:getComponents logic for intentional duplicate content
                     // @see ApiPlatform\JsonApi\Serializer\ItemNormalizer:getComponents logic for intentional duplicate content
@@ -781,7 +791,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                     ($className = $type->getClassName())
                     && $this->resourceClassResolver->isResourceClass($className)
                 ) {
-                    $childContext = $this->createChildContext($this->createOperationContext($context, $className), $attribute, $format);
+                    $childContext = $this->createChildContext($this->createOperationContext($context, $className, $propertyMetadata), $attribute, $format);
                     unset($childContext['iri'], $childContext['uri_variables'], $childContext['item_uri_template']);
                     if ('jsonld' === $format && $uriTemplate = $propertyMetadata->getUriTemplate()) {
                         $operation = $this->resourceMetadataCollectionFactory->create($className)->getOperation(
@@ -823,9 +833,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
                 // Anonymous resources
                 if ($className) {
-                    $childContext = $this->createChildContext($this->createOperationContext($context, $className), $attribute, $format);
-                    $childContext['output']['gen_id'] = $propertyMetadata->getGenId() ?? true;
-
+                    $childContext = $this->createChildContext($this->createOperationContext($context, $className, $propertyMetadata), $attribute, $format);
                     $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
 
                     return $this->serializer->normalize($attributeValue, $format, $childContext);
@@ -833,11 +841,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
                 if ('array' === $type->getBuiltinType()) {
                     if ($className = ($type->getCollectionValueTypes()[0] ?? null)?->getClassName()) {
-                        $context = $this->createOperationContext($context, $className);
+                        $context = $this->createOperationContext($context, $className, $propertyMetadata);
                     }
 
                     $childContext = $this->createChildContext($context, $attribute, $format);
-                    $childContext['output']['gen_id'] = $propertyMetadata->getGenId() ?? true;
+                    $childContext['output']['gen_id'] ??= $propertyMetadata->getGenId() ?? true;
 
                     $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
 
@@ -877,7 +885,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         foreach ($types as $type) {
             if ($type instanceof CollectionType && $type->getCollectionValueType()->isSatisfiedBy($typeIsResourceClass)) {
-                $childContext = $this->createChildContext($this->createOperationContext($context, $className), $attribute, $format);
+                $childContext = $this->createChildContext($this->createOperationContext($context, $className, $propertyMetadata), $attribute, $format);
 
                 // @see ApiPlatform\Hal\Serializer\ItemNormalizer:getComponents logic for intentional duplicate content
                 // @see ApiPlatform\JsonApi\Serializer\ItemNormalizer:getComponents logic for intentional duplicate content
@@ -911,7 +919,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             }
 
             if ($type->isSatisfiedBy($typeIsResourceClass)) {
-                $childContext = $this->createChildContext($this->createOperationContext($context, $className), $attribute, $format);
+                $childContext = $this->createChildContext($this->createOperationContext($context, $className, $propertyMetadata), $attribute, $format);
                 unset($childContext['iri'], $childContext['uri_variables'], $childContext['item_uri_template']);
                 if ('jsonld' === $format && $uriTemplate = $propertyMetadata->getUriTemplate()) {
                     $operation = $this->resourceMetadataCollectionFactory->create($className)->getOperation(
@@ -953,9 +961,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
             // Anonymous resources
             if ($className) {
-                $childContext = $this->createChildContext($this->createOperationContext($context, $className), $attribute, $format);
-                $childContext['output']['gen_id'] = $propertyMetadata->getGenId() ?? true;
-
+                $childContext = $this->createChildContext($this->createOperationContext($context, $className, $propertyMetadata), $attribute, $format);
                 $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
 
                 return $this->serializer->normalize($attributeValue, $format, $childContext);
@@ -963,12 +969,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
             if ($type instanceof CollectionType) {
                 if (($subType = $type->getCollectionValueType()) instanceof ObjectType) {
-                    $context = $this->createOperationContext($context, $subType->getClassName());
+                    $context = $this->createOperationContext($context, $subType->getClassName(), $propertyMetadata);
                 }
 
                 $childContext = $this->createChildContext($context, $attribute, $format);
-                $childContext['output']['gen_id'] = $propertyMetadata->getGenId() ?? true;
-
                 $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
 
                 return $this->serializer->normalize($attributeValue, $format, $childContext);
@@ -1024,12 +1028,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function normalizeRelation(ApiProperty $propertyMetadata, ?object $relatedObject, string $resourceClass, ?string $format, array $context): \ArrayObject|array|string|null
     {
-        if (null === $relatedObject || !empty($context['attributes']) || $propertyMetadata->isReadableLink()) {
+        if (null === $relatedObject || !empty($context['attributes']) || $propertyMetadata->isReadableLink() || false === ($context['output']['gen_id'] ?? true)) {
             if (!$this->serializer instanceof NormalizerInterface) {
                 throw new LogicException(\sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
             }
 
-            $relatedContext = $this->createOperationContext($context, $resourceClass);
+            $relatedContext = $this->createOperationContext($context, $resourceClass, $propertyMetadata);
             $normalizedRelatedObject = $this->serializer->normalize($relatedObject, $format, $relatedContext);
             if (!\is_string($normalizedRelatedObject) && !\is_array($normalizedRelatedObject) && !$normalizedRelatedObject instanceof \ArrayObject && null !== $normalizedRelatedObject) {
                 throw new UnexpectedValueException('Expected normalized relation to be an IRI, array, \ArrayObject or null');
@@ -1150,7 +1154,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 || ($t instanceof LegacyType && null !== ($className = $t->getClassName()) && $this->resourceClassResolver->isResourceClass($className))
             ) {
                 $resourceClass = $this->resourceClassResolver->getResourceClass(null, $className);
-                $childContext = $this->createChildContext($this->createOperationContext($context, $resourceClass), $attribute, $format);
+                $childContext = $this->createChildContext($this->createOperationContext($context, $resourceClass, $propertyMetadata), $attribute, $format);
 
                 try {
                     return $this->denormalizeRelation($attribute, $propertyMetadata, $resourceClass, $value, $format, $childContext);
