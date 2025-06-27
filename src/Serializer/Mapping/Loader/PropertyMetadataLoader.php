@@ -134,7 +134,7 @@ final class PropertyMetadataLoader implements LoaderInterface
     }
 
     /**
-     * @param ApiProperty[] $attributes
+     * @param array<string, array<mixed>> $attributes
      */
     private function addAttributeMetadata(ApiProperty $attribute, array &$attributes): void
     {

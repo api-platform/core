@@ -531,7 +531,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     }
 
     /**
-     * @return array[array<string, string>, array<string, string>]
+     * @return array{array<string, string>, array<string, string>}
      */
     private function getMimeTypes(HttpOperation $operation): array
     {

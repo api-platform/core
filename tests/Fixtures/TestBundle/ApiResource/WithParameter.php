@@ -73,8 +73,8 @@ use Symfony\Component\Validator\Constraints\Country;
             nativeType: new UnionType(
                 new BuiltinType(TypeIdentifier::STRING),
                 new CollectionType(
-                    new GenericType( // @phpstan-ignore-line
-                        new BuiltinType(TypeIdentifier::ARRAY), // @phpstan-ignore-line
+                    new GenericType(
+                        new BuiltinType(TypeIdentifier::ARRAY),
                         new BuiltinType(TypeIdentifier::INT),
                         new BuiltinType(TypeIdentifier::STRING),
                     ),

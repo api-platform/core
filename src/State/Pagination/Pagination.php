@@ -88,6 +88,7 @@ final class Pagination
             return ($offset = ($context['count'] ?? 0) - $last) < 0 ? 0 : $offset;
         }
 
+        /** @var int|float $offset */
         $offset = ($this->getPage($context) - 1) * $limit;
 
         if (!\is_int($offset)) {

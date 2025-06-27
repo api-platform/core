@@ -48,7 +48,7 @@ class Business
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     #[Groups(['w', 'r'])]
     private $name;
-    /** @var Collection<int, Employee>|Employee[] */
+    /** @var Collection<int, Employee> */
     #[ORM\JoinTable(name: 'issue5584_business_users')]
     #[ORM\ManyToMany(targetEntity: Employee::class, inversedBy: 'businesses')]
     #[Groups(['w', 'r'])]
