@@ -56,7 +56,7 @@ trait CascadeToOperationsTrait
     /**
      * @param Operations<HttpOperation>|list<GraphQlOperation> $operations
      *
-     * @return array[string, HttpOperation]|list<GraphQlOperation>
+     * @return array<string, HttpOperation>|list<GraphQlOperation>
      */
     private function getMutatedOperations(iterable $operations, ApiResource $apiResource): iterable
     {
