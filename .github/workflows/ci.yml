@@ -1087,15 +1087,16 @@ jobs:
           ini-values: memory_limit=-1
       # Not in pecl
       - name: Setup mongodb
+        shell: bash
         run: |
           curl -sLO https://github.com/mongodb/mongo-php-driver/releases/download/1.17.2/php_mongodb-1.17.2-8.3-nts-x64.zip
           unzip -q php_mongodb-1.17.2-8.3-nts-x64.zip php_mongodb.dll
-          mv php_mongodb.dll C:\tools\php\ext
-          echo "extension=php_mongodb.dll" >> C:\tools\php\php.ini
+          mv php_mongodb.dll C:/tools/php/ext
+          echo "extension=php_mongodb.dll" >> C:/tools/php/php.ini
       - name: Get composer cache directory
         id: composercache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
         shell: bash
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
@@ -1104,18 +1105,21 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Keep windows path
         id: get-cwd
+        shell: bash
         run: |
           cwd=$(php -r 'echo(str_replace("\\", "\\\\", $_SERVER["argv"][1]));' '${{ github.workspace }}')
           echo cwd=$cwd >> $GITHUB_OUTPUT
-        shell: bash
       - name: Update project dependencies
+        shell: bash
         run: |
           composer global require soyuka/pmu
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link . --working-directory='${{ steps.get-cwd.outputs.cwd }}'
       - name: Clear test app cache
+        shell: bash
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
+        shell: bash
         run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction
 
   phpunit-symfony-lowest:
