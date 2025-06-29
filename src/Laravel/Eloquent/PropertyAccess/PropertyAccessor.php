@@ -32,7 +32,11 @@ final class PropertyAccessor implements PropertyAccessorInterface
     }
 
     /**
-     * @param array<mixed, mixed>|object $objectOrArray
+     * @template T of object|array<mixed, mixed>
+     *
+     * @param T $objectOrArray
+     *
+     * @param-out ($objectOrArray is array<mixed, mixed> ? array<mixed, mixed> : T) $objectOrArray
      */
     public function setValue(object|array &$objectOrArray, string|PropertyPathInterface $propertyPath, mixed $value): void
     {
