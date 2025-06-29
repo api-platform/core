@@ -59,6 +59,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpClient\ScopingHttpClient;
+use Symfony\Component\ObjectMapper\ObjectMapper;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -169,6 +170,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerArgumentResolverConfiguration($loader);
         $this->registerLinkSecurityConfiguration($loader, $config);
 
+        if (class_exists(ObjectMapper::class)) {
+            $loader->load('state/object_mapper.xml');
+        }
         $container->registerForAutoconfiguration(FilterInterface::class)
             ->addTag('api_platform.filter');
         $container->registerForAutoconfiguration(ProviderInterface::class)
