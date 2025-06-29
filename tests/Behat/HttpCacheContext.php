@@ -22,7 +22,6 @@ use FriendsOfBehat\SymfonyExtension\Context\Environment\InitializedSymfonyExtens
 use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
