@@ -226,7 +226,11 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 $subDefinitionName = $this->definitionNameFactory->create($className, $format, $className, null, $serializerContext);
 
                 if (isset($subSchema->getDefinitions()[$subDefinitionName])) {
-                    unset($subSchema->getDefinitions()[$subDefinitionName]['properties']['@id']);
+                    // @see https://github.com/api-platform/core/issues/7162
+                    // Need to rebuild the definition without @id property and set it back to the sub-schema
+                    $subSchemaDefinition = $subSchema->getDefinitions()[$subDefinitionName]->getArrayCopy();
+                    unset($subSchemaDefinition['properties']['@id']);
+                    $subSchema->getDefinitions()[$subDefinitionName] = new \ArrayObject($subSchemaDefinition);
                 }
             }
 
