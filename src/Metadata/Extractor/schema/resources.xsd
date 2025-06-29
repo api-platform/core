@@ -386,12 +386,26 @@
     <xsd:complexType name="stateOptions">
         <xsd:choice>
             <xsd:element ref="elasticsearchOptions"/>
+            <xsd:element ref="doctrineOdmOptions"/>
+            <xsd:element ref="doctrineOrmOptions"/>
         </xsd:choice>
     </xsd:complexType>
 
     <xsd:element name="elasticsearchOptions">
         <xsd:complexType>
             <xsd:attribute name="index" type="xsd:string"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="doctrineOdmOptions">
+        <xsd:complexType>
+            <xsd:attribute name="documentClass" type="xsd:string"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="doctrineOrmOptions">
+        <xsd:complexType>
+            <xsd:attribute name="entityClass" type="xsd:string"/>
         </xsd:complexType>
     </xsd:element>
 

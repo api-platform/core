@@ -23,7 +23,7 @@ trait ValidationGroupsExtractorTrait
      */
     private ?ContainerInterface $container = null;
 
-    public function getValidationGroups(\Closure|array|string|null $validationGroups, ?object $data = null): string|array|GroupSequence|null
+    public function getValidationGroups(\Closure|array|GroupSequence|string|null $validationGroups, ?object $data = null): string|array|GroupSequence|null
     {
         if (null === $validationGroups) {
             return $validationGroups;

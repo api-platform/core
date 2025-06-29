@@ -3,6 +3,8 @@ name: CI
 on:
   push:
   pull_request:
+  pull_request_target:
+    types: [opened, reopened, synchronize]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
@@ -14,9 +16,7 @@ env:
 
 jobs:
   commitlint:
-    if: github.event_name == 'pull_request'
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    if: github.event_name == 'pull_request_target'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,14 +24,14 @@ jobs:
           fetch-depth: 0
       - name: Run commitlint
         run: |
-            commit=$(gh api \
-              /repos/${{ github.repository }}/pulls/${{github.event.number}}/commits \
-              | jq -r '.[0].commit.message' \
-              | head -n 1)
+            base_sha="${{ github.event.pull_request.base.sha }}"
+            head_sha="${{ github.event.pull_request.head.sha }}"
+            first_commit_sha=$(git rev-list --no-merges --reverse $base_sha..$head_sha | head -n 1)
+            commit_message=$(git log -1 --pretty=%B $first_commit_sha)
             # we can't use npx see https://github.com/conventional-changelog/commitlint/issues/613
             echo '{}' > package.json
             npm install --no-fund --no-audit @commitlint/config-conventional @commitlint/cli
-            echo $commit | ./node_modules/.bin/commitlint -g .commitlintrc
+            echo "$commit_message" | ./node_modules/.bin/commitlint -g .commitlintrc
 
   architecture:
     name: Check components interdependencies
@@ -1050,7 +1050,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.3'
+          - '8.4'
       fail-fast: false
     env:
       APP_ENV: sqlite
@@ -1063,20 +1063,13 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, fileinfo
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, fileinfo, mongodb
           coverage: none
           ini-values: memory_limit=-1
-      # Not in pecl
-      - name: Setup mongodb
-        run: |
-          curl -sLO https://github.com/mongodb/mongo-php-driver/releases/download/1.17.2/php_mongodb-1.17.2-8.3-nts-x64.zip
-          unzip -q php_mongodb-1.17.2-8.3-nts-x64.zip php_mongodb.dll
-          mv php_mongodb.dll C:\tools\php\ext
-          echo "extension=php_mongodb.dll" >> C:\tools\php\php.ini
       - name: Get composer cache directory
         id: composercache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
         shell: bash
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
@@ -1085,18 +1078,22 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Keep windows path
         id: get-cwd
+        shell: bash
         run: |
           cwd=$(php -r 'echo(str_replace("\\", "\\\\", $_SERVER["argv"][1]));' '${{ github.workspace }}')
           echo cwd=$cwd >> $GITHUB_OUTPUT
-        shell: bash
       - name: Update project dependencies
+        shell: bash
         run: |
+          php -m
           composer global require soyuka/pmu
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link . --working-directory='${{ steps.get-cwd.outputs.cwd }}'
       - name: Clear test app cache
+        shell: bash
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
+        shell: bash
         run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction
 
   phpunit-symfony-lowest:
