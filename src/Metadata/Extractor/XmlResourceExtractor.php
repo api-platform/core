@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Extractor;
 
-use ApiPlatform\Elasticsearch\State\Options;
+use ApiPlatform\Doctrine\Odm\State\Options as OdmOptions;
+use ApiPlatform\Doctrine\Orm\State\Options as OrmOptions;
+use ApiPlatform\Elasticsearch\State\Options as ElasticsearchOptions;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\HeaderParameter;
@@ -178,8 +180,23 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
         $openapi = $resource->openapi;
         $data = [];
         $attributes = $openapi->attributes();
-        foreach ($attributes as $attribute) {
-            $data[$attribute->getName()] = $this->phpize($attributes, 'deprecated', 'deprecated' === $attribute->getName() ? 'bool' : 'string');
+
+        /*
+         * \SimpleXMLElement should not be read in an iteration because of a known bug in SimpleXML lib that resets the iterator
+         * and leads to infinite loop
+         * https://bugs.php.net/bug.php?id=55098
+         * https://github.com/php/php-src/issues/12208
+         * https://github.com/php/php-src/issues/12192
+         *
+         * attribute names are stored in an iteration and values are fetched in another one
+         */
+        $attributeNames = [];
+        foreach ($attributes as $name => $attribute) {
+            $attributeNames[] = $name;
+        }
+
+        foreach ($attributeNames as $attributeName) {
+            $data[$attributeName] = $this->phpize($attributes, $attributeName, 'deprecated' === $attributeName ? 'bool' : 'string');
         }
 
         $data['tags'] = $this->buildArrayValue($resource, 'tag');
@@ -453,13 +470,23 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
         if (!$stateOptions) {
             return null;
         }
-        $elasticsearchOptions = $stateOptions->elasticsearchOptions ?? null;
-        if ($elasticsearchOptions) {
-            if (class_exists(Options::class)) {
-                return new Options(
-                    isset($elasticsearchOptions['index']) ? (string) $elasticsearchOptions['index'] : null,
-                );
-            }
+
+        if (isset($stateOptions->elasticsearchOptions) && class_exists(ElasticsearchOptions::class)) {
+            return new ElasticsearchOptions(
+                isset($stateOptions->elasticsearchOptions['index']) ? (string) $stateOptions->elasticsearchOptions['index'] : null,
+            );
+        }
+
+        if (isset($stateOptions->doctrineOdmOptions) && class_exists(OdmOptions::class)) {
+            return new OdmOptions(
+                isset($stateOptions->doctrineOdmOptions['documentClass']) ? (string) $stateOptions->doctrineOdmOptions['documentClass'] : null,
+            );
+        }
+
+        if (isset($stateOptions->doctrineOrmOptions) && class_exists(OrmOptions::class)) {
+            return new OrmOptions(
+                isset($stateOptions->doctrineOrmOptions['entityClass']) ? (string) $stateOptions->doctrineOrmOptions['entityClass'] : null,
+            );
         }
 
         return null;

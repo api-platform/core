@@ -49,17 +49,17 @@
         "illuminate/container": "^11.0 || ^12.0",
         "symfony/type-info": "^7.2",
         "symfony/web-link": "^6.4 || ^7.1",
-        "willdurand/negotiation": "^3.1",
-        "phpstan/phpdoc-parser": "^1.29 || ^2.0",
-        "phpdocumentor/reflection-docblock": "^5.1"
+        "willdurand/negotiation": "^3.1"
     },
     "require-dev": {
+        "api-platform/graphql": "^4.1",
         "doctrine/dbal": "^4.0",
         "larastan/larastan": "^2.0 || ^3.0",
+        "laravel/sanctum": "^4.0",
         "orchestra/testbench": "^9.1",
-        "phpunit/phpunit": "11.5.x-dev",
-        "api-platform/graphql": "^4.1",
-        "laravel/sanctum": "^4.0"
+        "phpdocumentor/type-resolver": "^1.7",
+        "phpstan/phpdoc-parser": "^1.29 || ^2.0",
+        "phpunit/phpunit": "11.5.x-dev"
     },
     "autoload": {
         "psr-4": {
@@ -75,7 +75,7 @@
     },
     "suggest": {
         "api-platform/graphql": "Enable GraphQl support.",
-        "phpdocumentor/reflection-docblock": ""
+        "phpstan/phpdoc-parser": "To support extracting metadata from PHPDoc."
     },
     "extra": {
         "laravel": {

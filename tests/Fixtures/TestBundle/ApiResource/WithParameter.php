@@ -95,10 +95,16 @@ use Symfony\Component\Validator\Constraints\Country;
 #[GetCollection(
     uriTemplate: 'validate_parameters{._format}',
     parameters: [
-        'enum' => new QueryParameter(schema: ['enum' => ['a', 'b'], 'uniqueItems' => true]),
+        'enum' => new QueryParameter(
+            schema: ['enum' => ['a', 'b'], 'uniqueItems' => true],
+            castToArray: true
+        ),
         'num' => new QueryParameter(
             schema: ['minimum' => 1, 'maximum' => 3],
             nativeType: new BuiltinType(TypeIdentifier::STRING),
+        ),
+        'numMultipleType' => new QueryParameter(
+            schema: ['minimum' => 1, 'maximum' => 3],
         ),
         'exclusiveNum' => new QueryParameter(
             schema: ['exclusiveMinimum' => 1, 'exclusiveMaximum' => 3],

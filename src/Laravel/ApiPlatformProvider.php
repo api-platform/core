@@ -158,10 +158,10 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use Negotiation\Negotiator;
-use phpDocumentor\Reflection\DocBlockFactory;
+use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
@@ -196,13 +196,13 @@ class ApiPlatformProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/config/api-platform.php', 'api-platform');
 
         $this->app->singleton(PropertyInfoExtractorInterface::class, function () {
-            $phpDocExtractor = class_exists(DocBlockFactory::class) ? new PhpDocExtractor() : null;
+            $phpstanExtractor = class_exists(PhpDocParser::class) ? new PhpStanExtractor() : null;
             $reflectionExtractor = new ReflectionExtractor();
 
             return new PropertyInfoExtractor(
                 [$reflectionExtractor],
-                $phpDocExtractor ? [$phpDocExtractor, $reflectionExtractor] : [$reflectionExtractor],
-                $phpDocExtractor ? [$phpDocExtractor] : [],
+                $phpstanExtractor ? [$phpstanExtractor, $reflectionExtractor] : [$reflectionExtractor],
+                [],
                 [$reflectionExtractor],
                 [$reflectionExtractor]
             );
