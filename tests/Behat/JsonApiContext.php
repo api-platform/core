@@ -121,10 +121,6 @@ final class JsonApiContext implements Context
     {
         $actual = (array) $this->getValueOfNode($node);
 
-        if (!\is_array($actual)) {
-            throw new \Exception(\sprintf('The "%s" node value is not an array', $node));
-        }
-
         $expected = $actual;
         ksort($expected);
 

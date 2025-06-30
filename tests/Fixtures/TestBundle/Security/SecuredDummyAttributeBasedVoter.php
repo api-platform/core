@@ -45,7 +45,7 @@ final class SecuredDummyAttributeBasedVoter extends Voter
             return false;
         }
 
-        if (!\in_array($subject, array_keys(self::RBAC), true) || !\is_array(self::RBAC[$subject])) {
+        if (!\array_key_exists($subject, self::RBAC)) {
             return false;
         }
 

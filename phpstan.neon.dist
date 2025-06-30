@@ -55,6 +55,18 @@ parameters:
 				- tests/Fixtures/TestBundle/Entity/
 				- src/OpenApi/Factory/OpenApiFactory.php
 		-
+			message: '#is never assigned .* so it can be removed from the property type.#'
+			paths:
+				- src/Doctrine/Common/Tests/Fixtures/
+				- src/Doctrine/Orm/Tests/Fixtures/
+				- src/Doctrine/Odm/Tests/Fixtures/
+				- src/Elasticsearch/Tests/Fixtures/
+				- src/GraphQl/Tests/Fixtures/
+				- src/JsonSchema/Tests/Fixtures/
+				- src/Metadata/Tests/Fixtures/
+				- src/Serializer/Tests/Fixtures/
+				- tests/Fixtures/
+		-
 			message: '#is never written, only read.#'
 			paths:
 				- tests/Fixtures/TestBundle/Document/
@@ -102,13 +114,4 @@ parameters:
 
 		# TODO For PHPStan 2.0
 		-
-		    path: tests/
-		    identifier: function.alreadyNarrowedType
-		-
-		    identifier: property.unusedType
-		-
 		    identifier: varTag.nativeType
-		-
-		    identifier: trait.unused
-		-
-		    identifier: catch.neverThrown
