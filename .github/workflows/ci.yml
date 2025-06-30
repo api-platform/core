@@ -3,8 +3,6 @@ name: CI
 on:
   push:
   pull_request:
-  pull_request_target:
-    types: [opened, reopened, synchronize]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
@@ -15,24 +13,6 @@ env:
   COMPOSER_ROOT_VERSION: "4.1.x-dev"
 
 jobs:
-  commitlint:
-    if: github.event_name == 'pull_request_target'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Run commitlint
-        run: |
-            base_sha="${{ github.event.pull_request.base.sha }}"
-            head_sha="${{ github.event.pull_request.head.sha }}"
-            first_commit_sha=$(git rev-list --no-merges --reverse $base_sha..$head_sha | head -n 1)
-            commit_message=$(git log -1 --pretty=%B $first_commit_sha)
-            # we can't use npx see https://github.com/conventional-changelog/commitlint/issues/613
-            echo '{}' > package.json
-            npm install --no-fund --no-audit @commitlint/config-conventional @commitlint/cli
-            echo "$commit_message" | ./node_modules/.bin/commitlint -g .commitlintrc
-
   architecture:
     name: Check components interdependencies
     runs-on: ubuntu-latest
