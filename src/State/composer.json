@@ -32,12 +32,7 @@
         "psr/container": "^1.0 || ^2.0",
         "symfony/http-kernel": "^6.4 || ^7.0",
         "symfony/serializer": "^6.4 || ^7.0",
-        "symfony/cache-contracts": "^3.4",
-        "symfony/deprecation-contracts": "^3.4",
-        "symfony/event-dispatcher-contracts": "^3.4",
-        "symfony/http-client-contracts": "^3.4",
-        "symfony/service-contracts": "^3.4",
-        "symfony/translation-contracts": "^3.4"
+        "symfony/contracts": "^3.1"
     },
     "require-dev": {
         "api-platform/validator": "^4.1",
