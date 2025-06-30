@@ -39,7 +39,11 @@ trait PropertyHelperTrait
      */
     protected function getClassMetadata(string $resourceClass): ClassMetadata
     {
-        /** @var ?ManagerRegistry $managerRegistry */
+        /**
+         * @var ?ManagerRegistry $managerRegistry
+         *
+         * @phpstan-ignore varTag.nativeType (https://github.com/phpstan/phpstan/issues/9515)
+         */
         $managerRegistry = $this->getManagerRegistry();
         $manager = $managerRegistry?->getManagerForClass($resourceClass);
 

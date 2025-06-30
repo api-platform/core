@@ -121,7 +121,7 @@ YAML;
 
     public function testWriteToFile(): void
     {
-        /** @var string $tmpFile */
+        /** @var non-falsy-string $tmpFile */
         $tmpFile = tempnam(sys_get_temp_dir(), 'test_write_to_file');
 
         $this->tester->run(['command' => 'api:openapi:export', '--output' => $tmpFile]);

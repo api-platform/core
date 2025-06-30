@@ -105,7 +105,6 @@ final class ContentNegotiationProvider implements ProviderInterface
             return null;
         }
 
-        /** @var string $contentType */
         $formats = $operation->getInputFormats() ?? [];
         if ($format = $this->getMimeTypeFormat($contentType, $formats)) {
             return $format;

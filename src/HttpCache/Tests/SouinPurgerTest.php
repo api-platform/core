@@ -14,15 +14,13 @@ declare(strict_types=1);
 namespace ApiPlatform\HttpCache\Tests;
 
 use ApiPlatform\HttpCache\SouinPurger;
-use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Promise\PromiseInterface;
-use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
+use Symfony\Contracts\HttpClient\ResponseStreamInterface;
 
 /**
  * @author Sylvain Combraque <darkweak@protonmail.com>
@@ -59,35 +57,24 @@ class SouinPurgerTest extends TestCase
 
     public function testMultiChunkedTags(): void
     {
-        /** @var HttpClientInterface $client */
-        $client = new class implements ClientInterface {
+        $client = new class implements HttpClientInterface {
             public array $sentRegexes = [];
 
-            public function send(RequestInterface $request, array $options = []): ResponseInterface
-            {
-                throw new \LogicException('Not implemented');
-            }
-
-            public function sendAsync(RequestInterface $request, array $options = []): PromiseInterface
-            {
-                throw new \LogicException('Not implemented');
-            }
-
-            public function request($method, $uri, array $options = []): ResponseInterface
+            public function request(string $method, string $url, array $options = []): ResponseInterface
             {
                 $this->sentRegexes[] = $options['headers']['Surrogate-Key'];
 
-                return new Response();
+                return new MockResponse();
             }
 
-            public function requestAsync($method, $uri, array $options = []): PromiseInterface
+            public function stream(ResponseInterface|iterable $responses, ?float $timeout = null): ResponseStreamInterface
             {
                 throw new \LogicException('Not implemented');
             }
 
-            public function getConfig($option = null): void
+            public function withOptions(array $options): static
             {
-                throw new \LogicException('Not implemented');
+                return $this;
             }
         };
         $purger = new SouinPurger([$client]);
@@ -96,71 +83,49 @@ class SouinPurgerTest extends TestCase
         self::assertSame([
             implode(', ', $this->generateXResourcesTags(146)),
             implode(', ', $this->generateXResourcesTags(200, 146)),
-        ], $client->sentRegexes); // @phpstan-ignore-line
+        ], $client->sentRegexes);
     }
 
     public function testPurgeWithMultipleClients(): void
     {
-        /** @var HttpClientInterface $client1 */
-        $client1 = new class implements ClientInterface {
-            public $requests = [];
+        $client1 = new class implements HttpClientInterface {
+            public array $requests = [];
 
-            public function send(RequestInterface $request, array $options = []): ResponseInterface
-            {
-                throw new \LogicException('Not implemented');
-            }
-
-            public function sendAsync(RequestInterface $request, array $options = []): PromiseInterface
-            {
-                throw new \LogicException('Not implemented');
-            }
-
-            public function request($method, $uri, array $options = []): ResponseInterface
+            public function request(string $method, string $url, array $options = []): ResponseInterface
             {
                 $this->requests[] = [$method, 'http://dummy_host/dummy_api_path/souin_api', $options];
 
-                return new Response();
+                return new MockResponse();
             }
 
-            public function requestAsync($method, $uri, array $options = []): PromiseInterface
+            public function stream(ResponseInterface|iterable $responses, ?float $timeout = null): ResponseStreamInterface
             {
                 throw new \LogicException('Not implemented');
             }
 
-            public function getConfig($option = null): void
+            public function withOptions(array $options): static
             {
-                throw new \LogicException('Not implemented');
+                return $this;
             }
         };
-        /** @var HttpClientInterface $client2 */
-        $client2 = new class implements ClientInterface {
-            public $requests = [];
+        $client2 = new class implements HttpClientInterface {
+            public array $requests = [];
 
-            public function send(RequestInterface $request, array $options = []): ResponseInterface
-            {
-                throw new \LogicException('Not implemented');
-            }
-
-            public function sendAsync(RequestInterface $request, array $options = []): PromiseInterface
-            {
-                throw new \LogicException('Not implemented');
-            }
-
-            public function request($method, $uri, array $options = []): ResponseInterface
+            public function request(string $method, string $url, array $options = []): ResponseInterface
             {
                 $this->requests[] = [$method, 'http://dummy_host/dummy_api_path/souin_api', $options];
 
-                return new Response();
+                return new MockResponse();
             }
 
-            public function requestAsync($method, $uri, array $options = []): PromiseInterface
+            public function stream(ResponseInterface|iterable $responses, ?float $timeout = null): ResponseStreamInterface
             {
                 throw new \LogicException('Not implemented');
             }
 
-            public function getConfig($option = null): void
+            public function withOptions(array $options): static
             {
-                throw new \LogicException('Not implemented');
+                return $this;
             }
         };
 
@@ -170,12 +135,12 @@ class SouinPurgerTest extends TestCase
             Request::METHOD_PURGE,
             'http://dummy_host/dummy_api_path/souin_api',
             ['headers' => ['Surrogate-Key' => '/foo']],
-        ], $client1->requests[0]); // @phpstan-ignore-line
+        ], $client1->requests[0]);
         self::assertSame([
             Request::METHOD_PURGE,
             'http://dummy_host/dummy_api_path/souin_api',
             ['headers' => ['Surrogate-Key' => '/foo']],
-        ], $client2->requests[0]); // @phpstan-ignore-line
+        ], $client2->requests[0]);
     }
 
     public function testGetResponseHeaders(): void

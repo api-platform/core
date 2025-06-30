@@ -109,9 +109,6 @@ parameters:
 			message: '#^Service "[^"]+" is private.$#'
 			path: src
 
+
 		# Allow extra assertions in tests: https://github.com/phpstan/phpstan-strict-rules/issues/130
 		- '#^Call to (static )?method PHPUnit\\Framework\\Assert::.* will always evaluate to true\.$#'
-
-		# TODO For PHPStan 2.0
-		-
-		    identifier: varTag.nativeType
