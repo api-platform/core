@@ -32,7 +32,7 @@
         "psr/container": "^1.0 || ^2.0",
         "symfony/http-kernel": "^6.4 || ^7.0",
         "symfony/serializer": "^6.4 || ^7.0",
-        "symfony/contracts": "^3.0"
+        "symfony/translation-contracts": "^3.0"
     },
     "require-dev": {
         "api-platform/validator": "^4.1",
