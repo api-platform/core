@@ -124,7 +124,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
             unset($context['operation'], $context['operation_name']);
         }
 
-        if (true === ($context['output']['gen_id'] ?? true) && true === ($context['force_iri_generation'] ?? true) && $iri = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context)) {
+        $operation = $context['operation'] ?? null;
+        if (true === ($context['output']['gen_id'] ?? true) && true === ($context['force_iri_generation'] ?? true) && $iri = $this->iriConverter->getIriFromResource($object, $operation?->getUrlGenerationStrategy() ?? UrlGeneratorInterface::ABS_PATH, $operation, $context)) {
             $context['iri'] = $iri;
             $metadata['@id'] = $iri;
         }
