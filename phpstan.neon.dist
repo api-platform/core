@@ -5,6 +5,7 @@ parameters:
 		- tests
 		- tests/Fixtures/app/console
 	inferPrivatePropertyTypeFromConstructor: true
+	treatPhpDocTypesAsCertain: false
 	symfony:
 		containerXmlPath: tests/Fixtures/app/var/cache/test/AppKernelTestDebugContainer.xml
 		constantHassers: false
@@ -108,10 +109,6 @@ parameters:
 		-
 		    identifier: varTag.nativeType
 		-
-		    identifier: isset.offset
-		-
 		    identifier: trait.unused
-		-
-		    identifier: instanceof.alwaysTrue
 		-
 		    identifier: catch.neverThrown

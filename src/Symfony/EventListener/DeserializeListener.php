@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\EventListener;
 
-use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\SerializerContextBuilderInterface;
@@ -62,7 +61,7 @@ final class DeserializeListener
             return;
         }
 
-        if (null === $operation->canDeserialize() && $operation instanceof HttpOperation) {
+        if (null === $operation->canDeserialize()) {
             $operation = $operation->withDeserialize(\in_array($method, ['POST', 'PUT', 'PATCH'], true));
         }
 

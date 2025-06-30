@@ -36,7 +36,7 @@ final class OperationTest extends TestCase
 
         $this->assertSame($operation->getShortName(), 'test');
         $this->assertSame($operation->canRead(), false);
-        $this->assertSame($operation instanceof CollectionOperationInterface, true);
+        $this->assertInstanceOf(CollectionOperationInterface::class, $operation);
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('operationProvider')]

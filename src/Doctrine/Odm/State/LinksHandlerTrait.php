@@ -20,7 +20,6 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Util\StateOptionsTrait;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -93,10 +92,6 @@ trait LinksHandlerTrait
         }
 
         $classMetadata = $manager->getClassMetadata($aggregationClass);
-
-        if (!$classMetadata instanceof ClassMetadata) {
-            throw new RuntimeException(\sprintf('The class metadata for "%s" must be an instance of "%s".', $aggregationClass, ClassMetadata::class));
-        }
 
         $aggregation = $previousAggregationBuilder;
         if ($aggregationClass !== $previousAggregationClass) {

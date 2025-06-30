@@ -65,7 +65,7 @@ final class ItemProvider implements ProviderInterface
         }
 
         $repository = $manager->getRepository($entityClass);
-        if (!method_exists($repository, 'createQueryBuilder')) { // @phpstan-ignore-line function.alreadyNarrowedType
+        if (!method_exists($repository, 'createQueryBuilder')) {
             throw new RuntimeException('The repository class must have a "createQueryBuilder" method.');
         }
 

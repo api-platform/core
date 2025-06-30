@@ -16,7 +16,6 @@ namespace ApiPlatform\Symfony\EventListener;
 use ApiPlatform\Metadata\Error;
 use ApiPlatform\Metadata\Exception\InvalidIdentifierException;
 use ApiPlatform\Metadata\Exception\InvalidUriVariableException;
-use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\UriVariablesConverterInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
@@ -70,7 +69,7 @@ final class WriteListener
         }
 
         $uriVariables = $request->attributes->get('_api_uri_variables') ?? [];
-        if (!$uriVariables && !$operation instanceof Error && $operation instanceof HttpOperation) {
+        if (!$uriVariables && !$operation instanceof Error) {
             try {
                 $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $operation->getClass());
             } catch (InvalidIdentifierException|InvalidUriVariableException $e) {

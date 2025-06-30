@@ -629,7 +629,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('graphql.xml');
 
-        // @phpstan-ignore-next-line because PHPStan uses the container of the test env cache and in test the parameter kernel.bundles always contains the key TwigBundle
         if (!class_exists(Environment::class) || !isset($container->getParameter('kernel.bundles')['TwigBundle'])) {
             if ($graphiqlEnabled) {
                 throw new RuntimeException(\sprintf('GraphiQL interfaces depend on Twig. Please activate TwigBundle for the %s environnement or disable GraphiQL.', $container->getParameter('kernel.environment')));

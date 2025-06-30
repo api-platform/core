@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Elasticsearch\State;
 
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
-use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\InflectorInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Util\Inflector;
@@ -49,9 +48,9 @@ final class ItemProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?object
     {
         $resourceClass = $operation->getClass();
-        $options = $operation->getStateOptions() instanceof Options ? $operation->getStateOptions() : new Options(index: $this->getIndex($operation));
+        $options = $operation->getStateOptions();
         if (!$options instanceof Options) {
-            throw new RuntimeException(\sprintf('The "%s" provider was called without "%s".', self::class, Options::class));
+            $options = new Options(index: $this->getIndex($operation));
         }
 
         $params = [

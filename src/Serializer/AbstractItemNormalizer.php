@@ -909,7 +909,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
                 $data = $this->normalizeCollectionOfRelations($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
                 $context['data'] = $data;
-                $context['type'] = ($nullable && $type instanceof Type) ? Type::nullable($type) : $type;
+                $context['type'] = $nullable ? Type::nullable($type) : $type;
 
                 if ($this->tagCollector) {
                     $this->tagCollector->collect($context);

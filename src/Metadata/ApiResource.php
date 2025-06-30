@@ -1026,7 +1026,7 @@ class ApiResource extends Metadata
     }
 
     /**
-     * @return Operations<HttpOperation>
+     * @return Operations<HttpOperation>|null
      */
     public function getOperations(): ?Operations
     {
