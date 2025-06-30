@@ -277,7 +277,7 @@ final class PropertyFilter implements FilterInterface, OpenApiParameterFilterInt
         ];
     }
 
-    public function getOpenApiParameters(MetadataParameter $parameter): Parameter|array|null
+    public function getOpenApiParameters(MetadataParameter $parameter): Parameter
     {
         $example = \sprintf(
             '%1$s[]={propertyName}&%1$s[]={anotherPropertyName}',

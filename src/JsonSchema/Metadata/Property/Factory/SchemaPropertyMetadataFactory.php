@@ -62,7 +62,7 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             }
         }
 
-        $extraProperties = $propertyMetadata->getExtraProperties() ?? [];
+        $extraProperties = $propertyMetadata->getExtraProperties();
         // see AttributePropertyMetadataFactory
         if (true === ($extraProperties[self::JSON_SCHEMA_USER_DEFINED] ?? false)) {
             // schema seems to have been declared by the user: do not override nor complete user value

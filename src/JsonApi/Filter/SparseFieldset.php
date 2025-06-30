@@ -33,7 +33,7 @@ final class SparseFieldset implements OpenApiParameterFilterInterface, JsonSchem
         ];
     }
 
-    public function getOpenApiParameters(MetadataParameter $parameter): Parameter|array|null
+    public function getOpenApiParameters(MetadataParameter $parameter): Parameter
     {
         return new Parameter(
             name: ($k = $parameter->getKey()).'[]',

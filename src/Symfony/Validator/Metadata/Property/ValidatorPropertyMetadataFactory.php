@@ -94,7 +94,7 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
     {
         $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
 
-        $extraProperties = $propertyMetadata->getExtraProperties() ?? [];
+        $extraProperties = $propertyMetadata->getExtraProperties();
         // see AttributePropertyMetadataFactory
         if (true === ($extraProperties[SchemaPropertyMetadataFactory::JSON_SCHEMA_USER_DEFINED] ?? false)) {
             // schema seems to have been declared by the user: do not override nor complete user value

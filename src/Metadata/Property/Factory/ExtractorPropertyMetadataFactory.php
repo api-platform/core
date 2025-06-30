@@ -133,7 +133,7 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
         // can't know later if the schema has been defined by the user or by API Platform
         // store extra key to make this difference
         if (null !== $propertyMetadata->getSchema()) {
-            $extraProperties = $propertyMetadata->getExtraProperties() ?? [];
+            $extraProperties = $propertyMetadata->getExtraProperties();
             $propertyMetadata = $propertyMetadata->withExtraProperties([SchemaPropertyMetadataFactory::JSON_SCHEMA_USER_DEFINED => true] + $extraProperties);
         }
 

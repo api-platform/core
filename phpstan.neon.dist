@@ -106,11 +106,6 @@ parameters:
 		-
 		    identifier: property.unusedType
 		-
-		    identifier: return.unusedType
-		-
-		    path: tests/
-		    identifier: void.pure
-		-
 		    identifier: varTag.nativeType
 		-
 		    identifier: isset.offset

@@ -572,7 +572,7 @@ final class ApiProperty
         return $this->initializable;
     }
 
-    public function getExtraProperties(): ?array
+    public function getExtraProperties(): array
     {
         return $this->extraProperties;
     }
