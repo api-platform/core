@@ -42,55 +42,54 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
 
     public function retrieveSubscriptionId(array $context, ?array $result, ?Operation $operation = null): ?string
     {
+        $iri = $operation ? $this->getIdentifierFromOperation($operation, $context['args'] ?? []) : $this->getIdentifierFromContext($context);
+        if (empty($iri)) {
+            return null;
+        }
+
         /** @var ResolveInfo $info */
         $info = $context['info'];
         $fields = $info->getFieldSelection(\PHP_INT_MAX);
         $this->arrayRecursiveSort($fields, 'ksort');
-        $iri = $operation ? $this->getIdentifierFromOperation($operation, $context['args'] ?? []) : $this->getIdentifierFromContext($context);
-        if (null === $iri) {
-            return null;
-        }
-        $subscriptionsCacheItem = $this->subscriptionsCache->getItem($this->encodeIriToCacheKey($iri));
-        $subscriptions = [];
-        if ($subscriptionsCacheItem->isHit()) {
-            $subscriptions = $subscriptionsCacheItem->get();
-            foreach ($subscriptions as [$subscriptionId, $subscriptionFields, $subscriptionResult]) {
-                if ($subscriptionFields === $fields) {
-                    return $subscriptionId;
-                }
+
+        $options = $operation ? ($operation->getMercure() ?? false) : false;
+        $private = $options['private'] ?? false;
+        $privateFields = $options['private_fields'] ?? [];
+        $previousObject = $context['graphql_context']['previous_object'] ?? null;
+        $privateFieldData = [];
+        if ($private && $privateFields && $previousObject) {
+            foreach ($options['private_fields'] as $privateField) {
+                $fieldData = $this->getResourceId($privateField, $previousObject);
+                $fields['__private_field_'.$privateField] = $fieldData;
+                $privateFieldData[] = $fieldData;
             }
         }
-
-        $subscriptionId = $this->subscriptionIdentifierGenerator->generateSubscriptionIdentifier($fields);
-        unset($result['clientSubscriptionId']);
-        $subscriptions[] = [$subscriptionId, $fields, $result];
-        $subscriptionsCacheItem->set($subscriptions);
-        $this->subscriptionsCache->save($subscriptionsCacheItem);
+        if ($operation instanceof Subscription && $operation->isCollection()) {
+            $subscriptionId = $this->updateSubscriptionCollectionCacheData(
+                $iri,
+                $fields,
+                $privateFieldData
+            );
+        } else {
+            $subscriptionId = $this->updateSubscriptionItemCacheData(
+                $iri,
+                $fields,
+                $result,
+                $private,
+                $privateFields,
+                $previousObject
+            );
+        }
 
         return $subscriptionId;
     }
 
-    public function getPushPayloads(object $object): array
+    public function getPushPayloads(object $object, string $type): array
     {
-        $iri = $this->iriConverter->getIriFromResource($object);
-        $subscriptions = $this->getSubscriptionsFromIri($iri);
-
-        $resourceClass = $this->getObjectClass($object);
-        $resourceMetadata = $this->resourceMetadataCollectionFactory->create($resourceClass);
-        $shortName = $resourceMetadata->getOperation()->getShortName();
-
-        $payloads = [];
-        foreach ($subscriptions as [$subscriptionId, $subscriptionFields, $subscriptionResult]) {
-            $resolverContext = ['fields' => $subscriptionFields, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true];
-            /** @var Operation */
-            $operation = (new Subscription())->withName('update_subscription')->withShortName($shortName);
-            $data = $this->normalizeProcessor->process($object, $operation, [], $resolverContext);
-
-            unset($data['clientSubscriptionId']);
-
-            if ($data !== $subscriptionResult) {
-                $payloads[] = [$subscriptionId, $data];
-            }
+        if ('delete' === $type) {
+            $payloads = $this->getDeletePushPayloads($object);
+        } else {
+            $payloads = $this->getCreatedOrUpdatedPayloads($object);
         }
 
         return $payloads;
@@ -99,9 +98,15 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
     /**
      * @return array<array>
      */
-    private function getSubscriptionsFromIri(string $iri): array
+    private function getSubscriptionsFromIri(string $iri, array $fields = []): array
     {
-        $subscriptionsCacheItem = $this->subscriptionsCache->getItem($this->encodeIriToCacheKey($iri));
+        $subscriptionsCacheItem = $this->subscriptionsCache->getItem(
+            $this->generatePrivateCacheKeyPart(
+                $this->encodeIriToCacheKey($iri),
+                $fields
+            )
+
+        );
 
         if ($subscriptionsCacheItem->isHit()) {
             return $subscriptionsCacheItem->get();
@@ -110,8 +115,192 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
         return [];
     }
 
+    private function removeItemFromSubscriptionCache(string $iri): void
+    {
+        $cacheKey = $this->encodeIriToCacheKey($iri);
+        if ($this->subscriptionsCache->hasItem($cacheKey)) {
+            $this->subscriptionsCache->deleteItem($cacheKey);
+        }
+    }
+
     private function encodeIriToCacheKey(string $iri): string
     {
         return str_replace('/', '_', $iri);
     }
+
+    private function getResourceId(mixed $privateField, object $previousObject): string
+    {
+        $id = $previousObject->{'get'.ucfirst($privateField)}()->getId();
+        if ($id instanceof \Stringable || is_numeric($id)) {
+            return (string) $id;
+        }
+
+        return $id;
+    }
+
+    private function getCollectionIri(string $iri): string
+    {
+        return substr($iri, 0, strrpos($iri, '/'));
+    }
+
+    private function getCreatedOrUpdatedPayloads(object $object): array
+    {
+        $resourceClass = $this->getObjectClass($object);
+        $resourceMetadata = $this->resourceMetadataCollectionFactory->create($resourceClass);
+        $shortName = $resourceMetadata->getOperation()->getShortName();
+
+        $payloads = [];
+        foreach ($resourceMetadata as $apiResource) {
+            foreach ($apiResource->getGraphQlOperations() as $operation) {
+                if (!$operation instanceof Subscription) {
+                    continue;
+                }
+                $mercure = $resourceMetadata->getOperation()->getMercure() ?? false;
+                $operationMercure = $operation->getMercure() ?? false;
+                if ($mercure !== false && $operationMercure !== false) {
+                    /** @noinspection SlowArrayOperationsInLoopInspection */
+                    $mercure = array_merge($mercure, $operationMercure);
+                }
+                $private = $mercure['private'] ?? false;
+                $privateFieldsConfig = $mercure['private_fields'] ?? [];
+                $privateFieldData = [];
+                if ($private && $privateFieldsConfig) {
+                    foreach ($privateFieldsConfig as $privateField) {
+                        $privateFieldData['__private_field_' . $privateField] = $this->getResourceId(
+                            $privateField,
+                            $object
+                        );
+                    }
+                }
+
+                $iri = $this->iriConverter->getIriFromResource($object);
+                // Add collection subscriptions
+                $subscriptions = array_merge(
+                    $this->getSubscriptionsFromIri($this->getCollectionIri($iri), $privateFieldData),
+                    $this->getSubscriptionsFromIri($iri)
+                );
+
+                foreach ($subscriptions as [$subscriptionId, $subscriptionFields, $subscriptionResult]) {
+                    if ($privateFieldData) {
+                        $fieldDiff = array_intersect_assoc($subscriptionFields, $privateFieldData);
+                        if ($fieldDiff !== $privateFieldData) {
+                            continue;
+                        }
+                    }
+                    $resolverContext = [
+                        'fields'          => $subscriptionFields,
+                        'is_collection'   => false,
+                        'is_mutation'     => false,
+                        'is_subscription' => true
+                    ];
+                    $subscriptionOperation = (new Subscription())->withName('mercure_subscription')->withShortName(
+                        $shortName
+                    );
+                    $data = $this->normalizeProcessor->process($object, $subscriptionOperation, [], $resolverContext);
+
+                    unset($data['clientSubscriptionId']);
+
+                    if ($data !== $subscriptionResult) {
+                        $payloads[] = [$subscriptionId, $data];
+                    }
+                }
+            }
+        }
+
+        return $payloads;
+    }
+
+    private function getDeletePushPayloads(object $object): array
+    {
+        $iri = $object->id;
+        $subscriptions = array_merge(
+            $this->getSubscriptionsFromIri($iri),
+            $this->getSubscriptionsFromIri($this->getCollectionIri($iri), $object->private),
+        );
+
+        $payloads = [];
+        $payload = ['type' => 'delete', 'payload' => ['id' => $object->id, 'iri' => $object->iri, 'type' => $object->type]];
+        foreach ($subscriptions as [$subscriptionId, $subscriptionFields, $subscriptionResult]) {
+            $payloads[] = [$subscriptionId, $payload];
+        }
+        $this->removeItemFromSubscriptionCache($iri);
+
+        return $payloads;
+    }
+
+    private function updateSubscriptionItemCacheData(
+        string $iri,
+        array $fields,
+        ?array $result,
+        bool $private,
+        array $privateFields,
+        ?object $previousObject,
+    ): string {
+        $subscriptionsCacheItem = $this->subscriptionsCache->getItem($this->encodeIriToCacheKey($iri));
+        $subscriptions = [];
+        if ($subscriptionsCacheItem->isHit()) {
+            /*
+             * @var array<array{string, array<string, string|array>, array<string, string|array>}>
+             */
+            $subscriptions = $subscriptionsCacheItem->get();
+            foreach ($subscriptions as [$subscriptionId, $subscriptionFields, $subscriptionResult]) {
+                if ($subscriptionFields === $fields) {
+                    return $subscriptionId;
+                }
+            }
+        }
+
+        unset($result['clientSubscriptionId']);
+        if ($private && $privateFields && $previousObject) {
+            $subscriptionId = $this->subscriptionIdentifierGenerator->generateSubscriptionIdentifier($fields);
+            foreach ($privateFields as $privateField) {
+                unset($result['__private_field_'.$privateField]);
+            }
+        } else {
+            $subscriptionId = $this->subscriptionIdentifierGenerator->generateSubscriptionIdentifier($fields);
+        }
+        $subscriptions[] = [$subscriptionId, $fields, $result];
+        $subscriptionsCacheItem->set($subscriptions);
+        $this->subscriptionsCache->save($subscriptionsCacheItem);
+
+        return $subscriptionId;
+    }
+
+    private function updateSubscriptionCollectionCacheData(
+        string $iri,
+        array  $fields,
+        array  $privateFieldData,
+    ): string {
+
+        $subscriptionCollectionCacheItem = $this->subscriptionsCache->getItem(
+            $this->generatePrivateCacheKeyPart(
+                $this->encodeIriToCacheKey($this->getCollectionIri($iri)),
+                $privateFieldData
+            ),
+        );
+        $collectionSubscriptions = [];
+        if ($subscriptionCollectionCacheItem->isHit()) {
+            $collectionSubscriptions = $subscriptionCollectionCacheItem->get();
+            foreach ($collectionSubscriptions as [$subscriptionId, $subscriptionFields, $result]) {
+                if ($subscriptionFields === $fields) {
+                    return $subscriptionId;
+                }
+            }
+        }
+        $subscriptionId = $this->subscriptionIdentifierGenerator->generateSubscriptionIdentifier($fields + ['__collection' => true]);
+        $collectionSubscriptions[] = [$subscriptionId, $fields, []];
+        $subscriptionCollectionCacheItem->set($collectionSubscriptions);
+        $this->subscriptionsCache->save($subscriptionCollectionCacheItem);
+
+        return $subscriptionId;
+    }
+
+    private function generatePrivateCacheKeyPart(string $iriKey, array $fields = []): string
+    {
+        if (empty($fields)) {
+            return $iriKey;
+        }
+        return $iriKey.'_'.implode('_', $fields);
+    }
+
 }
