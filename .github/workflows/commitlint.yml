@@ -12,11 +12,18 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Fetch PR head
+        run: git fetch origin pull/${{ github.event.pull_request.number }}/head:pr_head
       - name: Run commitlint
         run: |
-            base_sha="${{ github.event.pull_request.base.sha }}"
-            head_sha="${{ github.event.pull_request.head.sha }}"
-            first_commit_sha=$(git rev-list --no-merges --reverse $base_sha..$head_sha | head -n 1)
+            merge_base_sha=$(git merge-base HEAD pr_head)
+            first_commit_sha=$(git rev-list --no-merges --reverse $merge_base_sha..pr_head | head -n 1)
+
+            if [ -z "$first_commit_sha" ]; then
+              echo "Could not determine the first commit of the PR. Skipping."
+              exit 0
+            fi
+
             commit_message=$(git log -1 --pretty=%B $first_commit_sha)
             # we can't use npx see https://github.com/conventional-changelog/commitlint/issues/613
             echo '{}' > package.json
