@@ -13,9 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\GenIdFalse;
 
-use ApiPlatform\Metadata\NotExposed;
-
-#[NotExposed()]
 class LevelSecond
 {
     public function __construct(public LevelThird $levelThird)

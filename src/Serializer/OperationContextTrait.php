@@ -34,7 +34,7 @@ trait OperationContextTrait
             $context['root_operation_name'] = $context['operation_name'] ?? $context['graphql_operation_name'];
         }
 
-        unset($context['iri'], $context['uri_variables'], $context['item_uri_template'], $context['force_resource_class'], $context['output']['gen_id']);
+        unset($context['iri'], $context['uri_variables'], $context['item_uri_template'], $context['force_resource_class']);
 
         // At some point we should merge the jsonld context here, there's a TODO to simplify this somewhere else
         if ($propertyMetadata) {

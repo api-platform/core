@@ -17,7 +17,6 @@ use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\GenIdFalse\AggregateRating;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\GenIdFalse\GenIdFalse;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\GenIdFalse\LevelFirst;
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\GenIdFalse\LevelSecond;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\GenIdFalse\LevelThird;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6810\JsonLdContextOutput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6465\Bar;
@@ -37,7 +36,7 @@ class JsonLdTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [Foo::class, Bar::class, JsonLdContextOutput::class, GenIdFalse::class, AggregateRating::class, LevelFirst::class, LevelSecond::class, LevelThird::class];
+        return [Foo::class, Bar::class, JsonLdContextOutput::class, GenIdFalse::class, AggregateRating::class, LevelFirst::class, LevelThird::class];
     }
 
     /**
@@ -90,11 +89,9 @@ class JsonLdTest extends ApiTestCase
             'GET',
             '/levelfirst/1',
         );
-        $this->assertJsonContains([
-            'levelSecond' => [
-                'levelThird' => '/levelthird/3',
-            ],
-        ]);
+        $res = $r->toArray();
+        $this->assertArrayNotHasKey('@id', $res['levelSecond']);
+        $this->assertArrayHasKey('@id', $res['levelSecond'][0]['levelThird']);
     }
 
     public function testShouldIgnoreProperty(): void

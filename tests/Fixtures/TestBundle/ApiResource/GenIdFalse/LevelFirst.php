@@ -21,12 +21,15 @@ use ApiPlatform\Metadata\Operation;
 #[ApiResource(operations: [new Get(uriTemplate: '/levelfirst/{id}', provider: [self::class, 'provider'])])]
 class LevelFirst
 {
-    public function __construct(public string $id, #[ApiProperty(genId: false)] public LevelSecond $levelSecond)
+    /**
+     * @param list<LevelSecond> $levelSecond
+     */
+    public function __construct(public string $id, #[ApiProperty(genId: false)] public array $levelSecond)
     {
     }
 
     public static function provider(Operation $operation, array $uriVariables = [], array $context = []): self
     {
-        return new self($uriVariables['id'], new LevelSecond(new LevelThird('3', 'L3 Name')));
+        return new self($uriVariables['id'], [new LevelSecond(new LevelThird('3', 'L3 Name'))]);
     }
 }
