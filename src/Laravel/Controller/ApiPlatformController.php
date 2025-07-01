@@ -103,7 +103,7 @@ class ApiPlatformController extends Controller
     {
         $uriVariables = [];
         foreach ($operation->getUriVariables() ?? [] as $parameterName => $_) {
-            $parameter = $request->route($parameterName);
+            $parameter = $request->route((string) $parameterName);
             if (\is_string($parameter) && ($format = $request->attributes->get('_format')) && str_contains($parameter, $format)) {
                 $parameter = substr($parameter, 0, \strlen($parameter) - (\strlen($format) + 1));
             }

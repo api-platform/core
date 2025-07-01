@@ -32,7 +32,7 @@ final class NotExposedOperationResourceMetadataCollectionFactory implements Reso
     public static string $skolemUriTemplate = '/.well-known/genid/{id}';
 
     private LinkFactoryInterface $linkFactory;
-    private ResourceMetadataCollectionFactoryInterface|null $decorated;
+    private ?ResourceMetadataCollectionFactoryInterface $decorated;
 
     public function __construct(LinkFactoryInterface $linkFactory, ?ResourceMetadataCollectionFactoryInterface $decorated = null)
     {
