@@ -13,6 +13,8 @@ class NestedPatchTest extends ApiTestCase
     use RecreateSchemaTrait;
     use SetupClassResourcesTrait;
 
+    protected static ?bool $alwaysBootKernel = false;
+
     public static function getResources(): array {
         return [Foo6225::class, Bar6225::class];
     }
