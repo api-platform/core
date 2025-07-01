@@ -107,4 +107,14 @@ class ItemNormalizer extends AbstractItemNormalizer
 
         return $uriVariables;
     }
+
+    protected function getAllowedAttributes(string|object $classOrObject, array $context, bool $attributesAsString = false): array|bool
+    {
+        $allowedAttributes = parent::getAllowedAttributes($classOrObject, $context, $attributesAsString);
+        if (\is_array($allowedAttributes) && ($context['api_denormalize'] ?? false)) {
+            $allowedAttributes = array_merge($allowedAttributes, ['id']);
+        }
+
+        return $allowedAttributes;
+    }
 }
