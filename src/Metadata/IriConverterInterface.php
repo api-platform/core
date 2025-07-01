@@ -15,6 +15,7 @@ namespace ApiPlatform\Metadata;
 
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
+use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 
 /**
@@ -40,6 +41,7 @@ interface IriConverterInterface
      * @param object|class-string                                                                                                                       $resource
      * @param array<string, mixed>|array{force_resource_class?: string|class-string, item_uri_template?: string, uri_variables?: array<string, string>} $context
      *
+     * @throws OperationNotFoundException
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */

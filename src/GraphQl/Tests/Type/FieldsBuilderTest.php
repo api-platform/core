@@ -855,7 +855,6 @@ class FieldsBuilderTest extends TestCase
 
         $this->typeConverterProphecy->resolveType(Argument::type('string'))->willReturn(GraphQLType::string());
 
-        /** @var Operation $operation */
         $operation = (new Query())->withName('operation')->withShortName('shortName');
         $args = $this->fieldsBuilder->resolveResourceArgs($args, $operation);
 

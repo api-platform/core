@@ -230,7 +230,7 @@ final class ApiProperty
         private array $extraProperties = [],
     ) {
         $this->types = \is_string($types) ? (array) $types : $types;
-        $this->serialize = \is_array($serialize) ? $serialize : [$serialize];
+        $this->serialize = (null === $serialize || \is_array($serialize)) ? $serialize : [$serialize];
         $this->nativeType = $nativeType;
 
         if ($this->builtinTypes) {

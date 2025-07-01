@@ -232,7 +232,7 @@ final class PublishMercureUpdatesListener
             // This may change in the feature, because it's not JSON Merge Patch compliant,
             // and I'm not a fond of this approach.
             $iri = $options['topics'] ?? $object->iri;
-            /** @var string $data */
+            /** @var non-empty-string $data */
             $data = json_encode(['@id' => $object->id] + ($this->includeType ? ['@type' => $object->type] : []), \JSON_THROW_ON_ERROR);
         } else {
             $resourceClass = $this->getObjectClass($object);

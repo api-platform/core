@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 
 /**
@@ -28,6 +29,7 @@ interface IdentifiersExtractorInterface
      * @param array<string, mixed> $context
      *
      * @throws RuntimeException
+     * @throws InvalidArgumentException
      *
      * @return array<string, mixed>
      */

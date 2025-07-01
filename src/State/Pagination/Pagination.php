@@ -88,7 +88,11 @@ final class Pagination
             return ($offset = ($context['count'] ?? 0) - $last) < 0 ? 0 : $offset;
         }
 
-        /** @var int|float $offset */
+        /**
+         * @var int|float $offset
+         *
+         * @phpstan-ignore-next-line varTag.nativeType (https://github.com/phpstan/phpstan/issues/6683)
+         */
         $offset = ($this->getPage($context) - 1) * $limit;
 
         if (!\is_int($offset)) {

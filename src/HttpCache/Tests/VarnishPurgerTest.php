@@ -14,15 +14,13 @@ declare(strict_types=1);
 namespace ApiPlatform\HttpCache\Tests;
 
 use ApiPlatform\HttpCache\VarnishPurger;
-use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Promise\PromiseInterface;
-use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
+use Symfony\Contracts\HttpClient\ResponseStreamInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -59,10 +57,9 @@ class VarnishPurgerTest extends TestCase
 
     public function testEmptyTags(): void
     {
-        $clientProphecy1 = $this->prophesize(ClientInterface::class);
+        $clientProphecy1 = $this->prophesize(HttpClientInterface::class);
         $clientProphecy1->request()->shouldNotBeCalled();
 
-        /** @var HttpClientInterface $client */
         $client = $clientProphecy1->reveal();
         $purger = new VarnishPurger([$client]);
         $purger->purge([]);
@@ -71,42 +68,31 @@ class VarnishPurgerTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('provideChunkHeaderCases')]
     public function testItChunksHeaderToAvoidHittingVarnishLimit(int $maxHeaderLength, array $iris, array $regexesToSend): void
     {
-        /** @var HttpClientInterface $client */
-        $client = new class implements ClientInterface {
+        $client = new class implements HttpClientInterface {
             public array $sentRegexes = [];
 
-            public function send(RequestInterface $request, array $options = []): ResponseInterface
-            {
-                throw new \LogicException('Not implemented');
-            }
-
-            public function sendAsync(RequestInterface $request, array $options = []): PromiseInterface
-            {
-                throw new \LogicException('Not implemented');
-            }
-
-            public function request($method, $uri, array $options = []): ResponseInterface
+            public function request(string $method, string $url, array $options = []): ResponseInterface
             {
                 $this->sentRegexes[] = $options['headers']['ApiPlatform-Ban-Regex'];
 
-                return new Response();
+                return new MockResponse();
             }
 
-            public function requestAsync($method, $uri, array $options = []): PromiseInterface
+            public function stream(ResponseInterface|iterable $responses, ?float $timeout = null): ResponseStreamInterface
             {
                 throw new \LogicException('Not implemented');
             }
 
-            public function getConfig($option = null): void
+            public function withOptions(array $options): static
             {
-                throw new \LogicException('Not implemented');
+                return $this;
             }
         };
 
         $purger = new VarnishPurger([$client], $maxHeaderLength);
         $purger->purge($iris);
 
-        self::assertSame($regexesToSend, $client->sentRegexes); // @phpstan-ignore-line
+        self::assertSame($regexesToSend, $client->sentRegexes);
     }
 
     public static function provideChunkHeaderCases(): \Generator
