@@ -40,7 +40,7 @@ class Bar6225
     private Uuid $id;
 
     #[ORM\OneToOne(mappedBy: 'bar', cascade: ['persist', 'remove'])]
-    private Foo6225 $foo;
+    private ?Foo6225 $foo;
 
     #[ORM\Column(length: 255)]
     #[Groups(['Foo:Write', 'Foo:Read'])]
