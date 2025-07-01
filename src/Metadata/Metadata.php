@@ -224,15 +224,12 @@ abstract class Metadata
         return $self;
     }
 
-    /**
-     * @return array|bool|mixed|null
-     */
-    public function getMercure()
+    public function getMercure(): mixed
     {
         return $this->mercure;
     }
 
-    public function withMercure($mercure): static
+    public function withMercure(mixed $mercure): static
     {
         $self = clone $this;
         $self->mercure = $mercure;
@@ -240,12 +237,12 @@ abstract class Metadata
         return $self;
     }
 
-    public function getMessenger()
+    public function getMessenger(): mixed
     {
         return $this->messenger;
     }
 
-    public function withMessenger($messenger): static
+    public function withMessenger(mixed $messenger): static
     {
         $self = clone $this;
         $self->messenger = $messenger;
@@ -253,12 +250,12 @@ abstract class Metadata
         return $self;
     }
 
-    public function getInput()
+    public function getInput(): mixed
     {
         return $this->input;
     }
 
-    public function withInput($input): static
+    public function withInput(mixed $input): static
     {
         $self = clone $this;
         $self->input = $input;
@@ -266,12 +263,12 @@ abstract class Metadata
         return $self;
     }
 
-    public function getOutput()
+    public function getOutput(): mixed
     {
         return $this->output;
     }
 
-    public function withOutput($output): static
+    public function withOutput(mixed $output): static
     {
         $self = clone $this;
         $self->output = $output;

@@ -26,7 +26,7 @@ final class MediaType
         return $this->schema;
     }
 
-    public function getExample()
+    public function getExample(): mixed
     {
         return $this->example;
     }

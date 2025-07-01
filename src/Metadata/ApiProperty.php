@@ -345,12 +345,12 @@ final class ApiProperty
         return $self;
     }
 
-    public function getDefault()
+    public function getDefault(): mixed
     {
         return $this->default;
     }
 
-    public function withDefault($default): static
+    public function withDefault(mixed $default): static
     {
         $self = clone $this;
         $self->default = $default;
@@ -587,6 +587,8 @@ final class ApiProperty
 
     /**
      * Gets IRI of this property.
+     *
+     * @return string[]
      */
     public function getIris()
     {
@@ -608,6 +610,8 @@ final class ApiProperty
 
     /**
      * Whether to generate a skolem iri on anonymous resources.
+     *
+     * @return bool
      */
     public function getGenId()
     {

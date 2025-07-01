@@ -20,7 +20,7 @@ final class Schema extends \ArrayObject
     use ExtensionTrait;
     private readonly JsonSchema $schema;
 
-    public function __construct(private $discriminator = null, private bool $readOnly = false, private bool $writeOnly = false, private ?string $xml = null, private $externalDocs = null, private $example = null, private bool $deprecated = false)
+    public function __construct(private mixed $discriminator = null, private bool $readOnly = false, private bool $writeOnly = false, private ?string $xml = null, private mixed $externalDocs = null, private mixed $example = null, private bool $deprecated = false)
     {
         $this->schema = new JsonSchema();
 
@@ -48,7 +48,7 @@ final class Schema extends \ArrayObject
         return new \ArrayObject(array_merge($this->schema->getArrayCopy(true), $this->getArrayCopy()));
     }
 
-    public function getDiscriminator()
+    public function getDiscriminator(): mixed
     {
         return $this->discriminator;
     }
@@ -68,12 +68,12 @@ final class Schema extends \ArrayObject
         return $this->xml;
     }
 
-    public function getExternalDocs()
+    public function getExternalDocs(): mixed
     {
         return $this->externalDocs;
     }
 
-    public function getExample()
+    public function getExample(): mixed
     {
         return $this->example;
     }
@@ -83,7 +83,7 @@ final class Schema extends \ArrayObject
         return $this->deprecated;
     }
 
-    public function withDiscriminator($discriminator): self
+    public function withDiscriminator(mixed $discriminator): self
     {
         $clone = clone $this;
         $clone->discriminator = $discriminator;
@@ -115,7 +115,7 @@ final class Schema extends \ArrayObject
         return $clone;
     }
 
-    public function withExternalDocs($externalDocs): self
+    public function withExternalDocs(mixed $externalDocs): self
     {
         $clone = clone $this;
         $clone->externalDocs = $externalDocs;
@@ -123,7 +123,7 @@ final class Schema extends \ArrayObject
         return $clone;
     }
 
-    public function withExample($example): self
+    public function withExample(mixed $example): self
     {
         $clone = clone $this;
         $clone->example = $example;

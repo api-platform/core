@@ -22,5 +22,8 @@ use Psr\Container\ContainerInterface;
  */
 interface SerializerAwareProviderInterface
 {
+    /**
+     * @return void
+     */
     public function setSerializerLocator(ContainerInterface $serializerLocator);
 }

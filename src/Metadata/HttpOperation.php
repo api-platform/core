@@ -287,7 +287,7 @@ class HttpOperation extends Operation
         return $this->uriTemplate;
     }
 
-    public function withUriTemplate(?string $uriTemplate = null)
+    public function withUriTemplate(?string $uriTemplate = null): static
     {
         $self = clone $this;
         $self->uriTemplate = $uriTemplate;
@@ -311,11 +311,17 @@ class HttpOperation extends Operation
         return $self;
     }
 
+    /**
+     * @return array<int|string, string|string[]>|string|null
+     */
     public function getFormats()
     {
         return $this->formats;
     }
 
+    /**
+     * @param array<int|string, string|string[]>|string|null $formats
+     */
     public function withFormats($formats = null): static
     {
         $self = clone $this;
@@ -324,11 +330,17 @@ class HttpOperation extends Operation
         return $self;
     }
 
+    /**
+     * @return array<int|string, string|string[]>|string|null
+     */
     public function getInputFormats()
     {
         return $this->inputFormats;
     }
 
+    /**
+     * @param array<int|string, string|string[]>|string|null $inputFormats
+     */
     public function withInputFormats($inputFormats = null): static
     {
         $self = clone $this;
@@ -337,11 +349,17 @@ class HttpOperation extends Operation
         return $self;
     }
 
+    /**
+     * @return array<int|string, string|string[]>|string|null
+     */
     public function getOutputFormats()
     {
         return $this->outputFormats;
     }
 
+    /**
+     * @param array<int|string, string|string[]>|string|null $outputFormats
+     */
     public function withOutputFormats($outputFormats = null): static
     {
         $self = clone $this;
@@ -350,6 +368,9 @@ class HttpOperation extends Operation
         return $self;
     }
 
+    /**
+     * @return array<string, mixed>|array<int, Link>|list<string>|null
+     */
     public function getUriVariables()
     {
         return $this->uriVariables;
