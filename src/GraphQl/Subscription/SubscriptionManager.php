@@ -130,7 +130,10 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
 
     private function getResourceId(mixed $privateField, object $previousObject): string
     {
-        $id = $previousObject->{'get'.ucfirst($privateField)}()->getId();
+        $id = $previousObject->{'get'.ucfirst($privateField)}();
+        if (is_object($id) && method_exists($id, 'getId')) {
+            $id = $id->getId();
+        }
         if ($id instanceof \Stringable || is_numeric($id)) {
             return (string) $id;
         }
