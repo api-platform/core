@@ -27,11 +27,9 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
             return;
         }
 
-        \assert($parameter instanceof Parameter);
-
         $values = (array) $parameter->getValue();
 
-        //TODO: handle nested properties
+        // TODO: handle nested properties
         $property = $parameter->getProperty();
 
         $aggregationBuilder
