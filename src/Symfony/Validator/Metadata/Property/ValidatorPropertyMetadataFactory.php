@@ -17,8 +17,6 @@ use ApiPlatform\JsonSchema\Metadata\Property\Factory\SchemaPropertyMetadataFacto
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRestrictionMetadataInterface;
-use ApiPlatform\Symfony\Validator\ValidationGroupsExtractorTrait;
-use Psr\Container\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Bic;
 use Symfony\Component\Validator\Constraints\CardScheme;
@@ -28,6 +26,7 @@ use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Constraints\DateTime;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\Iban;
 use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Constraints\Isbn;
@@ -49,10 +48,6 @@ use Symfony\Component\Validator\Mapping\PropertyMetadataInterface as ValidatorPr
  */
 final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
-    use ValidationGroupsExtractorTrait {
-        getValidationGroups as extractValidationGroups;
-    }
-
     /**
      * @var string[] A list of constraint classes making the entity required
      */
@@ -78,13 +73,8 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
     /**
      * @param PropertySchemaRestrictionMetadataInterface[] $restrictionsMetadata
      */
-    public function __construct(
-        private readonly ValidatorMetadataFactoryInterface $validatorMetadataFactory,
-        private readonly PropertyMetadataFactoryInterface $decorated,
-        private readonly iterable $restrictionsMetadata = [],
-        ?ContainerInterface $container = null,
-    ) {
-        $this->container = $container;
+    public function __construct(private readonly ValidatorMetadataFactoryInterface $validatorMetadataFactory, private readonly PropertyMetadataFactoryInterface $decorated, private readonly iterable $restrictionsMetadata = [])
+    {
     }
 
     /**
@@ -162,8 +152,14 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
      */
     private function getValidationGroups(ValidatorClassMetadataInterface $classMetadata, array $options): array
     {
-        if (null !== ($groups = $this->extractValidationGroups($options['validation_groups'] ?? null))) {
-            return $groups;
+        if (isset($options['validation_groups'])) {
+            if ($options['validation_groups'] instanceof GroupSequence) {
+                return $options['validation_groups']->groups;
+            }
+
+            if (!\is_callable($options['validation_groups'])) {
+                return $options['validation_groups'];
+            }
         }
 
         if (!method_exists($classMetadata, 'getDefaultGroup')) {
