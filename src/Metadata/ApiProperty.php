@@ -48,13 +48,13 @@ final class ApiProperty
      * @param bool|null                                                                                                                                   $push                    https://api-platform.com/docs/core/push-relations/
      * @param string|\Stringable|null                                                                                                                     $security                https://api-platform.com/docs/core/security
      * @param string|\Stringable|null                                                                                                                     $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
-     * @param string[]                                                                                                                                    $types                   the RDF types of this property
-     * @param string[]                                                                                                                                    $iris
-     * @param LegacyType[]                                                                                                                                $builtinTypes
+     * @param string[]|null                                                                                                                               $types                   the RDF types of this property
+     * @param string[]|null                                                                                                                               $iris
+     * @param LegacyType[]|null                                                                                                                           $builtinTypes
      * @param string|null                                                                                                                                 $uriTemplate             (experimental) whether to return the subRessource collection IRI instead of an iterable of IRI
      * @param string|null                                                                                                                                 $property                The property name
      * @param Context|Groups|Ignore|SerializedName|SerializedPath|MaxDepth|array<array-key, Context|Groups|Ignore|SerializedName|SerializedPath|MaxDepth> $serialize               Serializer attributes
-     * @param Type                                                                                                                                        $nativeType              The internal PHP type
+     * @param Type|null                                                                                                                                   $nativeType              The internal PHP type
      */
     public function __construct(
         private ?string $description = null,
@@ -507,7 +507,7 @@ final class ApiProperty
     /**
      * deprecated since 4.2, use "getNativeType" instead.
      *
-     * @return LegacyType[]
+     * @return LegacyType[]|null
      */
     public function getBuiltinTypes(): ?array
     {
@@ -588,7 +588,7 @@ final class ApiProperty
     /**
      * Gets IRI of this property.
      *
-     * @return string[]
+     * @return string[]|null
      */
     public function getIris()
     {
@@ -611,7 +611,7 @@ final class ApiProperty
     /**
      * Whether to generate a skolem iri on anonymous resources.
      *
-     * @return bool
+     * @return bool|null
      */
     public function getGenId()
     {
