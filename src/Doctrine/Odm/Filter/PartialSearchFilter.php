@@ -28,14 +28,12 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
             return;
         }
 
-        \assert($parameter instanceof Parameter);
-
         $value = $parameter->getValue();
         if (!\is_string($value) || '' === $value) {
             return;
         }
 
-        //TODO: handle nested properties
+        // TODO: handle nested properties
         $property = $parameter->getProperty();
         $escapedValue = preg_quote($value, '/');
 

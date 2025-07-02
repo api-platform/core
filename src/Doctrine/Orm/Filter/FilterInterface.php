@@ -16,6 +16,7 @@ namespace ApiPlatform\Doctrine\Orm\Filter;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\FilterInterface as BaseFilterInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Parameter;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -27,6 +28,8 @@ interface FilterInterface extends BaseFilterInterface
 {
     /**
      * Applies the filter.
+     *
+     * @param array{'parameter'?: Parameter} $context
      */
     public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void;
 }
