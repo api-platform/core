@@ -14,22 +14,17 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Mutator\OperationMutatorCollectionInterface;
+use ApiPlatform\Metadata\Mutator\ResourceMutatorCollectionInterface;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Metadata\OperationMutatorInterface;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Metadata\ResourceMutatorInterface;
-use Psr\Container\ContainerInterface;
 
 final class MutatorResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    /**
-     * @param ContainerInterface<ResourceMutatorInterface[]>  $resourceMutators
-     * @param ContainerInterface<OperationMutatorInterface[]> $operationMutators
-     */
     public function __construct(
-        private readonly ContainerInterface $resourceMutators,
-        private readonly ContainerInterface $operationMutators,
+        private readonly ResourceMutatorCollectionInterface $resourceMutators,
+        private readonly OperationMutatorCollectionInterface $operationMutators,
         private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null,
     ) {
     }

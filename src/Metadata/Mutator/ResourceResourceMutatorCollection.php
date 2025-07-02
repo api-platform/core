@@ -13,19 +13,18 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Mutator;
 
-use ApiPlatform\Metadata\OperationMutatorInterface;
-use Psr\Container\ContainerInterface;
+use ApiPlatform\Metadata\ResourceMutatorInterface;
 
-final class OperationMutatorCollection implements ContainerInterface
+/**
+ * @internal
+ */
+final class ResourceResourceMutatorCollection implements ResourceMutatorCollectionInterface
 {
-    private array $mutators = [];
+    private array $mutators;
 
-    /**
-     * Adds a mutator to the container for a given operation name.
-     */
-    public function add(string $operationName, OperationMutatorInterface $mutator): void
+    public function addMutator(string $resourceClass, ResourceMutatorInterface $mutator): void
     {
-        $this->mutators[$operationName][] = $mutator;
+        $this->mutators[$resourceClass][] = $mutator;
     }
 
     public function get(string $id): array

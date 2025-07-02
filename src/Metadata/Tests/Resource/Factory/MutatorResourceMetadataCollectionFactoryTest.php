@@ -15,8 +15,8 @@ namespace ApiPlatform\Metadata\Tests\Resource\Factory;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\HttpOperation;
-use ApiPlatform\Metadata\Mutator\OperationMutatorCollection;
-use ApiPlatform\Metadata\Mutator\ResourceMutatorCollection;
+use ApiPlatform\Metadata\Mutator\OperationResourceMutatorCollection;
+use ApiPlatform\Metadata\Mutator\ResourceResourceMutatorCollection;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\OperationMutatorInterface;
 use ApiPlatform\Metadata\Operations;
@@ -35,10 +35,10 @@ final class MutatorResourceMetadataCollectionFactoryTest extends TestCase
         $resourceMetadataCollection = new ResourceMetadataCollection($resourceClass);
         $resourceMetadataCollection[] = (new ApiResource())->withClass($resourceClass);
 
-        $resourceMutatorCollection = new ResourceMutatorCollection();
+        $resourceMutatorCollection = new ResourceResourceMutatorCollection();
         $resourceMutatorCollection->addMutator($resourceClass, new DummyResourceMutator());
 
-        $customResourceMetadataCollectionFactory = new MutatorResourceMetadataCollectionFactory($resourceMutatorCollection, new OperationMutatorCollection(), $decorated);
+        $customResourceMetadataCollectionFactory = new MutatorResourceMetadataCollectionFactory($resourceMutatorCollection, new OperationResourceMutatorCollection(), $decorated);
 
         $decorated->expects($this->once())->method('create')->with($resourceClass)->willReturn(
             $resourceMetadataCollection,
@@ -62,10 +62,10 @@ final class MutatorResourceMetadataCollectionFactoryTest extends TestCase
         $resourceMetadataCollection = new ResourceMetadataCollection($resourceClass);
         $resourceMetadataCollection[] = (new ApiResource())->withClass($resourceClass)->withOperations($operations);
 
-        $operationMutatorCollection = new OperationMutatorCollection();
-        $operationMutatorCollection->addMutator('_api_Dummy_get', new DummyOperationMutator());
+        $operationMutatorCollection = new OperationResourceMutatorCollection();
+        $operationMutatorCollection->add('_api_Dummy_get', new DummyOperationMutator());
 
-        $customResourceMetadataCollectionFactory = new MutatorResourceMetadataCollectionFactory(new ResourceMutatorCollection(), $operationMutatorCollection, $decorated);
+        $customResourceMetadataCollectionFactory = new MutatorResourceMetadataCollectionFactory(new ResourceResourceMutatorCollection(), $operationMutatorCollection, $decorated);
 
         $decorated->expects($this->once())->method('create')->with($resourceClass)->willReturn(
             $resourceMetadataCollection,

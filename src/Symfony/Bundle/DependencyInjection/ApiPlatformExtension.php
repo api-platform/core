@@ -192,7 +192,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
                 ->addTag('container.excluded', ['source' => 'by #[ApiResource] attribute']);
         });
         $container->registerAttributeForAutoconfiguration(AsResourceMutator::class,
-            static function (ChildDefinition $definition, AsResourceMutator $attribute, \ReflectionClass $reflector): void {
+            static function (ChildDefinition $definition, AsResourceMutator $attribute, \Reflector $reflector): void {
+                if (!$reflector instanceof \ReflectionClass) {
+                    return;
+                }
+
                 if (!is_a($reflector->name, ResourceMutatorInterface::class, true)) {
                     throw new RuntimeException(\sprintf('Resource mutator "%s" should implement %s', $reflector->name, ResourceMutatorInterface::class));
                 }
@@ -204,7 +208,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         );
 
         $container->registerAttributeForAutoconfiguration(AsOperationMutator::class,
-            static function (ChildDefinition $definition, AsOperationMutator $attribute, \ReflectionClass $reflector): void {
+            static function (ChildDefinition $definition, AsOperationMutator $attribute, \Reflector $reflector): void {
+                if (!$reflector instanceof \ReflectionClass) {
+                    return;
+                }
+
                 if (!is_a($reflector->name, OperationMutatorInterface::class, true)) {
                     throw new RuntimeException(\sprintf('Operation mutator "%s" should implement %s', $reflector->name, OperationMutatorInterface::class));
                 }
