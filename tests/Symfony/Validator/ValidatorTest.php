@@ -20,6 +20,7 @@ use ApiPlatform\Validator\Exception\ValidationException;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
@@ -118,5 +119,23 @@ class ValidatorTest extends TestCase
 
         $validator = new Validator($symfonyValidator, $containerProphecy->reveal());
         $validator->validate(new DummyEntity(), ['groups' => 'foo']);
+    }
+
+    public function testValidatorWithGroupSequence(): void
+    {
+        $data = new DummyEntity();
+        $expectedValidationGroups = new GroupSequence(['foo', 'bar']);
+
+        $constraintViolationListProphecy = $this->prophesize(ConstraintViolationListInterface::class);
+        $constraintViolationListProphecy->count()->willReturn(0);
+
+        $symfonyValidatorProphecy = $this->prophesize(SymfonyValidatorInterface::class);
+        $symfonyValidatorProphecy->validate($data, null, $expectedValidationGroups)->willreturn($constraintViolationListProphecy->reveal())->shouldBeCalled();
+        $symfonyValidator = $symfonyValidatorProphecy->reveal();
+
+        $containerProphecy = $this->prophesize(ContainerInterface::class);
+
+        $validator = new Validator($symfonyValidator, $containerProphecy->reveal());
+        $validator->validate(new DummyEntity(), ['groups' => $expectedValidationGroups]);
     }
 }
