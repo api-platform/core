@@ -18,9 +18,12 @@ use Psr\Container\ContainerInterface;
 
 final class OperationMutatorCollection implements ContainerInterface
 {
-    private array $mutators;
+    private array $mutators = [];
 
-    public function addMutator(string $operationName, OperationMutatorInterface $mutator): void
+    /**
+     * Adds a mutator to the container for a given operation name.
+     */
+    public function add(string $operationName, OperationMutatorInterface $mutator): void
     {
         $this->mutators[$operationName][] = $mutator;
     }

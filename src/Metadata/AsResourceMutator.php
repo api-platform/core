@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata;
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
-final class AsResourceMutator
+class AsResourceMutator
 {
     /**
      * @param class-string $resourceClass

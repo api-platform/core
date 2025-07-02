@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata;
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
-final class AsOperationMutator
+class AsOperationMutator
 {
     public function __construct(
         public readonly string $operationName,

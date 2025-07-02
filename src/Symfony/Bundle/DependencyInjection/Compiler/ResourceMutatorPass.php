@@ -31,7 +31,7 @@ class ResourceMutatorPass implements CompilerPassInterface
 
         foreach ($mutators as $id => $tags) {
             foreach ($tags as $tag) {
-                $definition->addMethodCall('addMutator', [
+                $definition->addMethodCall('add', [
                     $tag['resourceClass'],
                     new Reference($id),
                 ]);
