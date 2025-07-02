@@ -18,7 +18,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\ParameterProviderFilterInterface;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
-use ApiPlatform\State\Provider\IriConverterParameterProvider;
+use ApiPlatform\State\ParameterProvider\IriConverterParameterProvider;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
 final class IriFilter implements FilterInterface, OpenApiParameterFilterInterface, ParameterProviderFilterInterface
