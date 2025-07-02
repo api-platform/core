@@ -335,7 +335,10 @@ final class PublishMercureUpdatesListener
 
     private function getResourceId(string $privateField, object $object): string
     {
-        $id = $object->{'get'.ucfirst($privateField)}()->getId();
+        $id = $object->{'get'.ucfirst($privateField)}();
+        if (is_object($id) && method_exists($id, 'getId')) {
+            $id = $id->getId();
+        }
         if ($id instanceof \Stringable || is_numeric($id)) {
             return (string) $id;
         }
