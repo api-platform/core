@@ -15,6 +15,7 @@ namespace ApiPlatform\Doctrine\Odm\Filter;
 
 use ApiPlatform\Metadata\FilterInterface as BaseFilterInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Parameter;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
 /**
@@ -26,6 +27,8 @@ interface FilterInterface extends BaseFilterInterface
 {
     /**
      * Applies the filter.
+     *
+     * @param array{'parameter'?: Parameter, ...} $context
      */
     public function apply(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void;
 }

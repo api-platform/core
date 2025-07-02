@@ -29,14 +29,12 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
             return;
         }
 
-        \assert($parameter instanceof Parameter);
-
         $value = $parameter->getValue();
         if (!\is_array($value)) {
             $value = [$value];
         }
 
-        //TODO: handle nested properties
+        // TODO: handle nested properties
         $property = $parameter->getProperty();
 
         $aggregationBuilder
