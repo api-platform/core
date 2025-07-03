@@ -1,5 +1,45 @@
 # Changelog
 
+## v4.2.0-alpha.1
+
+Introducing new Symfony components!
+
+### Features
+
+* [1290ebb88](https://github.com/api-platform/core/commit/1290ebb88680dde94e536dfc19d9b330612e0909) feat(serializer): ability to throw access denied exception when denormalizing secured properties (#7221)
+* [1862d03b7](https://github.com/api-platform/core/commit/1862d03b77c941cac13ed7bcbf1d555d50614b4f) feat(symfony): add error classes options to open api config (#7143)
+* [202c60fcb](https://github.com/api-platform/core/commit/202c60fcb05be41bbe0bf03a3314ab3b7e9fed64) feat(openapi): license identifier (#7141)
+* [24a1cf5a2](https://github.com/api-platform/core/commit/24a1cf5a2f9d56df791abdb625ec83594ee4f0f9) feat(elasticsearch): add support for v9 (#7180)
+* [2a13100f4](https://github.com/api-platform/core/commit/2a13100f4edeb02191a3da891d99c1d054710166) feat(serializer): (un)set object-to-populate through denormalization context (#7124)
+* [3ab0b8d0f](https://github.com/api-platform/core/commit/3ab0b8d0fba6a56014752d90a007f57483502551) feat(metadata): use PHP file as resource format
+* [4abf17b3c](https://github.com/api-platform/core/commit/4abf17b3c49491ee1f77f951028422dacae90456) feat(symfony): CSS Color Schema Restriction for Property Validation  (#7215)
+* [4b1b94cad](https://github.com/api-platform/core/commit/4b1b94cad1bdd2e9c3d94cc22b7e3519a0d6c609) feat(symfony): autoconfigure classes using `#[ApiResource]` attribute (#6943)
+* [bf09616cf](https://github.com/api-platform/core/commit/bf09616cfbbc2c19a9d04a7be3edc8a9bc0c07ef) feat(httpcache): add more cache directives to AddHeadersProcessor (#7008)
+
+Object Mapper:
+
+* [a42034dc3](https://github.com/api-platform/core/commit/a42034dc384ab1b372ea5bf4452db37791c3b739) feat(symfony): object mapper with state options (#6801)
+
+TypeInfo:
+
+* [7c796de0d](https://github.com/api-platform/core/commit/7c796de0d8d0dc6dd7c4d7a3da0afb61823b6258) feat(serializer): type info (#7104)
+* [350d6d707](https://github.com/api-platform/core/commit/350d6d707a95587679b13c2a8670206b480d9ab2) feat(hydra): use `TypeInfo`'s `Type` (#7099)
+* [55461a83c](https://github.com/api-platform/core/commit/55461a83cbb804fb73167d5196337b6a04e38c22) feat: Use `Type` of `TypeInfo` instead of `PropertyInfo` (#6979)
+* [827e1f725](https://github.com/api-platform/core/commit/827e1f725b5f2a560cd0aaf9b63e7e7e8a9b329d) feat(elasticsearch): use `TypeInfo` type (#7098)
+* [a1952e304](https://github.com/api-platform/core/commit/a1952e30403c2ccf98d5cffb667720c3f4c753bf) feat(openapi): use `TypeInfo`'s `Type` (#7096)
+* [dd3356824](https://github.com/api-platform/core/commit/dd33568245de962ff99efcd8079d2c6f8daf8061) feat(laravel): use `TypeInfo`'s `Type` (#7101)
+* [143d512ef](https://github.com/api-platform/core/commit/143d512ef24b988a9b80b3da28c9a36e4b346c76) feat(jsonapi): use `TypeInfo`'s `Type` (#7100)
+* [1d579d095](https://github.com/api-platform/core/commit/1d579d095616a6025d63526f14402eaef173346b) feat(hal): use `TypeInfo` type (#7097)
+
+### Bug fixes
+
+* [0411cd9cc](https://github.com/api-platform/core/commit/0411cd9cc73f085a1918a13a3798e0c5aee5bbff) fix(jsonld): duplicate error fields when prefix is enabled (#7074)
+* [073c0e282](https://github.com/api-platform/core/commit/073c0e2822c9d93d3303ee64178bed19e6e61080) !fix(openapi): allowReserved, allowEmtpyValue defaults to null
+* [76c80a67c](https://github.com/api-platform/core/commit/76c80a67cdaf9615c598bf0fa3e37a89ce7589ba) fix: command name deprecation
+* [79edced67](https://github.com/api-platform/core/commit/79edced67ccca1a7b80455dd94203501d9c4fa89) !fix(json-schema): share invariable sub-schemas
+* [cff61eab8](https://github.com/api-platform/core/commit/cff61eab8643f8ed08d59c0684e77740d0d81b04) fix(metadata): append php file resource extractor (#7193)
+* [f3d4afe03](https://github.com/api-platform/core/commit/f3d4afe032385f3b665131a365e42706930f0730) fix(symfony): validator type-info
+
 ## v4.1.18
 
 ### Bug fixes
