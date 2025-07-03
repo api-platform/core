@@ -37,14 +37,22 @@ use Symfony\Component\WebLink\Link;
     status: 422,
     uriVariables: ['id'],
     openapi: false,
-    outputFormats: ['jsonapi' => ['application/vnd.api+json'], 'jsonld' => ['application/ld+json'], 'json' => ['application/problem+json', 'application/json']],
+    outputFormats: [
+        'jsonapi' => ['application/vnd.api+json'],
+        'jsonld' => ['application/ld+json'],
+        'json' => ['application/problem+json', 'application/json'],
+        'xml' => ['application/xml', 'text/xml'],
+    ],
     provider: 'api_platform.validator.state.error_provider',
     shortName: 'ConstraintViolation',
     description: 'Unprocessable entity',
     operations: [
         new ErrorOperation(
             name: '_api_validation_errors_problem',
-            outputFormats: ['json' => ['application/problem+json']],
+            outputFormats: [
+                'json' => ['application/problem+json'],
+                'xml' => ['application/xml', 'text/xml'],
+            ],
             normalizationContext: [
                 'groups' => ['json'],
                 'ignored_attributes' => ['trace', 'file', 'line', 'code', 'message', 'traceAsString', 'previous'],
