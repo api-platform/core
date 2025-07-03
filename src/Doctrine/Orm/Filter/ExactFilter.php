@@ -13,15 +13,16 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Filter;
 
+use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Metadata\Parameter;
-use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use Doctrine\ORM\QueryBuilder;
 
 final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterface
 {
+    use OpenApiFilterTrait;
+
     public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         if (!$parameter = $context['parameter'] ?? null) {
@@ -40,15 +41,5 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
         $queryBuilder
             ->andWhere(\sprintf('%s.%s = :%s', $alias, $property, $parameterName))
             ->setParameter($parameterName, $value);
-    }
-
-    public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array|null
-    {
-        return new OpenApiParameter(name: $parameter->getKey().'[]', in: 'query', style: 'deepObject', explode: true);
-    }
-
-    public function getDescription(string $resourceClass): array
-    {
-        return [];
     }
 }

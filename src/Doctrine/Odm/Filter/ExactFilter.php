@@ -13,14 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Filter;
 
+use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Metadata\Parameter;
-use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
 final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterface
 {
+    use OpenApiFilterTrait;
+
     public function apply(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
         if (!$parameter = $context['parameter'] ?? null) {
@@ -36,15 +37,5 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
             ->match()
             ->field($property)
             ->in($values);
-    }
-
-    public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array|null
-    {
-        return new OpenApiParameter(name: $parameter->getKey().'[]', in: 'query', style: 'deepObject', explode: true);
-    }
-
-    public function getDescription(string $resourceClass): array
-    {
-        return [];
     }
 }
