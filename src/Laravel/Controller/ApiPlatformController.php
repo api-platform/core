@@ -103,6 +103,7 @@ class ApiPlatformController extends Controller
     {
         $uriVariables = [];
         foreach ($operation->getUriVariables() ?? [] as $parameterName => $_) {
+            // TODO: use $link->getParameterName() instead but be sure it is filled correctly in metadata fist
             $parameter = $request->route((string) $parameterName);
             if (\is_string($parameter) && ($format = $request->attributes->get('_format')) && str_contains($parameter, $format)) {
                 $parameter = substr($parameter, 0, \strlen($parameter) - (\strlen($format) + 1));
