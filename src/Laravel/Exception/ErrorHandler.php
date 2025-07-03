@@ -27,6 +27,7 @@ use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionsHandler;
 use Negotiation\Negotiator;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
@@ -54,6 +55,7 @@ class ErrorHandler extends ExceptionsHandler
         private readonly ?array $exceptionToStatus = null,
         private readonly ?bool $debug = false,
         private readonly ?array $errorFormats = null,
+        private readonly ?ExceptionHandler $decorated = null,
     ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->negotiator = $negotiator;
@@ -65,7 +67,7 @@ class ErrorHandler extends ExceptionsHandler
         $apiOperation = $this->initializeOperation($request);
 
         if (!$apiOperation) {
-            return parent::render($request, $exception);
+            return $this->decorated ? $this->decorated->render($request, $exception) : parent::render($request, $exception);
         }
 
         $formats = $this->errorFormats ?? ['jsonproblem' => ['application/problem+json']];
@@ -157,9 +159,12 @@ class ErrorHandler extends ExceptionsHandler
         }
 
         try {
-            return $this->apiPlatformController->__invoke($dup);
+            $response = $this->apiPlatformController->__invoke($dup);
+            $this->decorated->render($dup, $exception);
+
+            return $response;
         } catch (\Throwable $e) {
-            return parent::render($dup, $e);
+            return $this->decorated ? $this->decorated->render($request, $exception) : parent::render($request, $exception);
         }
     }
 

@@ -16,6 +16,7 @@ namespace ApiPlatform\Symfony\Routing;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\InvalidIdentifierException;
+use ApiPlatform\Metadata\Exception\InvalidUriVariableException;
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\Exception\RuntimeException;
@@ -99,7 +100,7 @@ final class IriConverter implements IriConverterInterface
 
         try {
             $uriVariables = $this->getOperationUriVariables($operation, $parameters, $attributes['resource_class']);
-        } catch (InvalidIdentifierException $e) {
+        } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
 

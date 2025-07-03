@@ -16,6 +16,8 @@ namespace ApiPlatform\Tests\Functional;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\GenIdFalse\AggregateRating;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\GenIdFalse\GenIdFalse;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\GenIdFalse\LevelFirst;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\GenIdFalse\LevelThird;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6810\JsonLdContextOutput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6465\Bar;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6465\Foo;
@@ -34,7 +36,7 @@ class JsonLdTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [Foo::class, Bar::class, JsonLdContextOutput::class, GenIdFalse::class, AggregateRating::class];
+        return [Foo::class, Bar::class, JsonLdContextOutput::class, GenIdFalse::class, AggregateRating::class, LevelFirst::class, LevelThird::class];
     }
 
     /**
@@ -79,6 +81,17 @@ class JsonLdTest extends ApiTestCase
             'aggregateRating' => ['ratingValue' => 2, 'ratingCount' => 3],
         ]);
         $this->assertArrayNotHasKey('@id', $r->toArray()['aggregateRating']);
+    }
+
+    public function testGenIdFalseOnNestedResource(): void
+    {
+        $r = self::createClient()->request(
+            'GET',
+            '/levelfirst/1',
+        );
+        $res = $r->toArray();
+        $this->assertArrayNotHasKey('@id', $res['levelSecond']);
+        $this->assertArrayHasKey('@id', $res['levelSecond'][0]['levelThird']);
     }
 
     public function testShouldIgnoreProperty(): void

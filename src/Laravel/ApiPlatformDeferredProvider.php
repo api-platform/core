@@ -83,7 +83,7 @@ use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\Provider\ParameterProvider;
 use ApiPlatform\State\Provider\SecurityParameterProvider;
 use ApiPlatform\State\ProviderInterface;
-use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerInterface;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
@@ -252,9 +252,9 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
             );
         });
 
-        $this->app->singleton(
-            ExceptionHandlerInterface::class,
-            function (Application $app) {
+        $this->app->extend(
+            ExceptionHandler::class,
+            function (ExceptionHandler $decorated, Application $app) {
                 /** @var ConfigRepository */
                 $config = $app['config'];
 
@@ -267,7 +267,8 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
                     $app->make(Negotiator::class),
                     $config->get('api-platform.exception_to_status'),
                     $config->get('app.debug'),
-                    $config->get('api-platform.error_formats')
+                    $config->get('api-platform.error_formats'),
+                    $decorated
                 );
             }
         );

@@ -1,5 +1,28 @@
 # Changelog
 
+## v4.1.18
+
+### Bug fixes
+
+* [0e712d969](https://github.com/api-platform/core/commit/0e712d9692f018b9816764ada9fa4c7b02b5e028) fix(symfony): catch InvalidUriVariableException in IriConverter (#7271)
+* [221e5d97f](https://github.com/api-platform/core/commit/221e5d97f9e1114d642c834e29392a35967a9960) fix(openapi): command options mode (`InputOption::VALUE_REQUIRED`) (#7266)
+* [3ed6f30f5](https://github.com/api-platform/core/commit/3ed6f30f5ce60ac45a1a1df6bac9372a7b712d51) fix(symfony): fix resolving groups in ValidationGroupsExtractorTrait when GroupSequence (#7272)
+* [6e4e46bfe](https://github.com/api-platform/core/commit/6e4e46bfef0aaa87b2bdc56a1b28510fcdaa2914) fix(json-schema): Rebuild sub-schema definition without `@id` property when `genId` is `false` (#7162) (#7251)
+* [803165228](https://github.com/api-platform/core/commit/80316522807be2af25657f2936341ce2f527c364) fix(symfony): missing GroupSequence type for validation groups
+* [85e18a2d6](https://github.com/api-platform/core/commit/85e18a2d665baf791027a93106d6a6c293464883) fix(metadata): support stateOptions in YAML and XML for Doctrine ORM/ODM (#7217)
+* [88e0073bf](https://github.com/api-platform/core/commit/88e0073bf2eb9c27a35d6a04a32919908cdae704) fix(validator): error xml format output
+* [bf271d139](https://github.com/api-platform/core/commit/bf271d139aa6cd6c74d2dd0ee5a482d03a1afca4) fix(validator): parameter validation list<string>|string (#7245)
+* [d3e73f09a](https://github.com/api-platform/core/commit/d3e73f09afd6bde5763e0c2c7a4a0203f857d7c3) fix(metadata): read every OpenApiOperation attributes in Xml instead of only "deprecated" (#7189)
+* [e40bb19a6](https://github.com/api-platform/core/commit/e40bb19a6d80d60e5f06ac02b5bbf1aaac08e46a) fix(laravel): decorate error handler (#7247)
+* [f0604a07e](https://github.com/api-platform/core/commit/f0604a07e79ba2ee6a47cee20fcdaebbb68bbcaf) fix: getcontainer return type (#7230)
+* [f46c0a3f4](https://github.com/api-platform/core/commit/f46c0a3f47265d48d2863860d0e274f83367c929) fix(jsonld): reset gen_id configuration (#7264)
+* [f82464431](https://github.com/api-platform/core/commit/f8246443134b07fe6a2b591642af1ed3a5f40b44)  fix(state): depend only on translation contracts (#7262)
+* [fa37c1eba](https://github.com/api-platform/core/commit/fa37c1eba871c533c2e3436a915d0f02dd2baa78) fix(state): error xml format output (#7273)
+
+### Experimental Features
+
+* [8885000db](https://github.com/api-platform/core/commit/8885000dbfa610146ff8f3187d41a0dde9b22e26) feat(state): cast parameter values to validate with the Type constraint (#7240)
+
 ## v4.1.17
 
 ### Bug fixes
