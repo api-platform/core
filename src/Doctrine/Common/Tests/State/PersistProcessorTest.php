@@ -61,7 +61,7 @@ class PersistProcessorTest extends TestCase
         $objectManagerProphecy->persist($dummy)->shouldNotBeCalled();
         $objectManagerProphecy->flush()->shouldBeCalled();
         $objectManagerProphecy->refresh($dummy)->shouldBeCalled();
-        $objectManagerProphecy->getClassMetadata(Dummy::class)->willReturn(null)->shouldBeCalled();
+        $objectManagerProphecy->getClassMetadata(Dummy::class)->willReturn(new ClassMetadata(Dummy::class))->shouldBeCalled();
 
         $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($objectManagerProphecy->reveal())->shouldBeCalled();
