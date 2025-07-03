@@ -148,6 +148,18 @@ trait ParameterValidationConstraints
             $assertions[] = new Type(type: 'array');
         }
 
+        if (isset($schema['type']) && $parameter->getCastToNativeType()) {
+            $assertion = match ($schema['type']) {
+                'boolean', 'integer' => new Type(type: $schema['type']),
+                'number' => new Type(type: 'float'),
+                default => null,
+            };
+
+            if ($assertion) {
+                $assertions[] = $assertion;
+            }
+        }
+
         return $assertions;
     }
 }

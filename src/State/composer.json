@@ -28,7 +28,7 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/metadata": "^4.1.11",
+        "api-platform/metadata": "^4.1.18",
         "psr/container": "^1.0 || ^2.0",
         "symfony/http-kernel": "^6.4 || ^7.0",
         "symfony/serializer": "^6.4 || ^7.0",

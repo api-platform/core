@@ -42,10 +42,8 @@ trait ParameterParserTrait
 
     /**
      * @param array<string, mixed> $values
-     *
-     * @return array<mixed, mixed>|ParameterNotFound|array
      */
-    private function extractParameterValues(Parameter $parameter, array $values): string|ParameterNotFound|array
+    private function extractParameterValues(Parameter $parameter, array $values): mixed
     {
         $accessors = null;
         $key = $parameter->getKey();
@@ -72,7 +70,6 @@ trait ParameterParserTrait
                 $value = $value[$accessor];
             } else {
                 $value = new ParameterNotFound();
-                continue;
             }
         }
 
@@ -98,6 +95,14 @@ trait ParameterParserTrait
 
         if (!$isCollection && $parameter instanceof HeaderParameter && \is_array($value) && array_is_list($value) && 1 === \count($value)) {
             $value = $value[0];
+        }
+
+        if (true === $parameter->getCastToNativeType() && ($castFn = $parameter->getCastFn())) {
+            if (\is_array($value)) {
+                $value = array_map(fn ($v) => $castFn($v, $parameter), $value);
+            } else {
+                $value = $castFn($value, $parameter);
+            }
         }
 
         return $value;
