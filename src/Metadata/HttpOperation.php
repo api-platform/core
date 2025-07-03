@@ -30,11 +30,11 @@ class HttpOperation extends Operation
     public const METHOD_OPTIONS = 'OPTIONS';
 
     /** @var array<int|string, string|string[]>|null */
-    protected ?array $formats;
+    protected $formats;
     /** @var array<int|string, string|string[]>|null */
-    protected ?array $inputFormats;
+    protected $inputFormats;
     /** @var array<int|string, string|string[]>|null */
-    protected ?array $outputFormats;
+    protected $outputFormats;
 
     /**
      * @param string[]|null                                  $types         the RDF types of this property

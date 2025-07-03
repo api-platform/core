@@ -610,10 +610,8 @@ final class ApiProperty
 
     /**
      * Whether to generate a skolem iri on anonymous resources.
-     *
-     * @return bool|null
      */
-    public function getGenId()
+    public function getGenId(): ?bool
     {
         return $this->genId;
     }
