@@ -46,7 +46,11 @@ final class PropertySchemaFormatTest extends TestCase
     public static function supportsProvider(): \Generator
     {
         yield 'email' => [new Email(), new ApiProperty(), true];
-        yield 'url' => [new Url(), new ApiProperty(), true];
+        if (property_exists(Url::class, 'requireTld')) {
+            yield 'url' => [new Url(requireTld: true), new ApiProperty(), true];
+        } else {
+            yield 'url' => [new Url(), new ApiProperty(), true];
+        }
         if (class_exists(Hostname::class)) {
             yield 'hostname' => [new Hostname(), new ApiProperty(), true];
         }
@@ -67,7 +71,11 @@ final class PropertySchemaFormatTest extends TestCase
     public static function createProvider(): \Generator
     {
         yield 'email' => [new Email(), new ApiProperty(), ['format' => 'email']];
-        yield 'url' => [new Url(), new ApiProperty(), ['format' => 'uri']];
+        if (property_exists(Url::class, 'requireTld')) {
+            yield 'url' => [new Url(requireTld: true), new ApiProperty(), ['format' => 'uri']];
+        } else {
+            yield 'url' => [new Url(), new ApiProperty(), ['format' => 'uri']];
+        }
         if (class_exists(Hostname::class)) {
             yield 'hostname' => [new Hostname(), new ApiProperty(), ['format' => 'hostname']];
         }
