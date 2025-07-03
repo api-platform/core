@@ -36,7 +36,10 @@ use Symfony\Component\WebLink\Link;
             errors: [],
             name: '_api_errors_problem',
             routeName: '_api_errors',
-            outputFormats: ['json' => ['application/problem+json', 'application/json']],
+            outputFormats: [
+                'json' => ['application/problem+json', 'application/json'],
+                'xml' => ['application/xml', 'text/xml'],
+            ],
             hideHydraOperation: true,
             normalizationContext: [
                 SchemaFactory::OPENAPI_DEFINITION_NAME => '',

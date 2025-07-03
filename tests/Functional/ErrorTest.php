@@ -91,4 +91,21 @@ final class ErrorTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(415);
         $this->assertJsonContains(['detail' => 'The content-type "application/json" is not supported. Supported MIME types are "application/xml".']);
     }
+
+    public function testXmlError(): void
+    {
+        self::createClient()->request('GET', '/notfound', [
+            'headers' => ['accept' => 'text/xml'],
+        ]);
+
+        $this->assertResponseStatusCodeSame(404);
+        $this->assertResponseHeaderSame('content-type', 'application/xml; charset=utf-8');
+
+        self::createClient()->request('GET', '/notfound', [
+            'headers' => ['accept' => 'application/xml'],
+        ]);
+
+        $this->assertResponseStatusCodeSame(404);
+        $this->assertResponseHeaderSame('content-type', 'application/xml; charset=utf-8');
+    }
 }
