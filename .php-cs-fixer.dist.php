@@ -33,7 +33,7 @@ return (new PhpCsFixer\Config())
     ->setRules([
         '@DoctrineAnnotation' => true,
         '@PHP71Migration' => true,
-        '@PHP71Migration:risky' => true,
+        '@PHP70Migration:risky' => true,
         '@PHPUnit60Migration:risky' => true,
         '@Symfony' => true,
         '@Symfony:risky' => true,
@@ -76,7 +76,7 @@ return (new PhpCsFixer\Config())
         ],
         'no_superfluous_elseif' => true,
         'no_superfluous_phpdoc_tags' => [
-            'allow_mixed' => false,
+            'allow_mixed' => true, // For PHPStan
             'allow_unused_params' => true,
         ],
         'no_unset_cast' => true,
@@ -97,9 +97,6 @@ return (new PhpCsFixer\Config())
         'php_unit_set_up_tear_down_visibility' => true,
         'php_unit_test_annotation' => [
             'style' => 'prefix',
-        ],
-        'phpdoc_add_missing_param_annotation' => [
-            'only_untyped' => true,
         ],
         'phpdoc_no_alias_tag' => true,
         'phpdoc_order' => true,

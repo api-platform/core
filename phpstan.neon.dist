@@ -1,5 +1,5 @@
 parameters:
-	level: 5
+	level: 6
 	paths:
 		- src
 		- tests
@@ -112,3 +112,63 @@ parameters:
 
 		# Allow extra assertions in tests: https://github.com/phpstan/phpstan-strict-rules/issues/130
 		- '#^Call to (static )?method PHPUnit\\Framework\\Assert::.* will always evaluate to true\.$#'
+
+		# Level 6
+		-
+			identifier: missingType.iterableValue
+		-
+			identifier: missingType.generics
+		-
+			identifier: missingType.property
+			paths:
+				- src/Doctrine/Common/Tests
+				- src/Doctrine/Odm/Tests
+				- src/Doctrine/Orm/Tests
+				- src/Elasticsearch/Tests
+				- src/Hydra/Tests
+				- src/JsonApi/Tests
+				- src/JsonSchema/Tests
+				- src/Metadata/Tests
+				- src/Serializer/Tests
+				- src/Symfony/Tests
+				- tests
+		-
+			identifier: missingType.parameter
+			paths:
+				- src/Doctrine/Common/Tests
+				- src/Doctrine/Odm/Tests
+				- src/Doctrine/Orm/Tests
+				- src/Elasticsearch/Tests
+				- src/GraphQl/Tests
+				- src/Hydra/Tests
+				- src/JsonApi/Tests
+				- src/JsonSchema/Tests
+				- src/Metadata/Tests
+				- src/OpenApi/Tests
+				- src/Serializer/Tests
+				- src/Symfony/Bundle/Test
+				- src/Symfony/Tests
+				- tests
+				- src # TODO
+		-
+			identifier: missingType.return
+			paths:
+				- src/Doctrine/Common/Tests
+				- src/Doctrine/Odm/Tests
+				- src/Doctrine/Orm/Tests
+				- src/Elasticsearch/Tests
+				- src/GraphQl/Tests
+				- src/Hydra/Tests
+				- src/JsonApi/Tests
+				- src/JsonSchema/Tests
+				- src/Metadata/Tests
+				- src/OpenApi/Tests
+				- src/Serializer/Tests
+				- src/Symfony/Tests
+				- tests
+		-
+			identifier: argument.templateType
+			paths:
+				- src/Symfony/Bundle/Test
+				- tests
+				- src # TODO

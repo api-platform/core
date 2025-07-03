@@ -29,10 +29,10 @@ final class NotExposedOperationResourceMetadataCollectionFactory implements Reso
 {
     use OperationDefaultsTrait;
 
-    public static $skolemUriTemplate = '/.well-known/genid/{id}';
+    public static string $skolemUriTemplate = '/.well-known/genid/{id}';
 
-    private $linkFactory;
-    private $decorated;
+    private LinkFactoryInterface $linkFactory;
+    private ?ResourceMetadataCollectionFactoryInterface $decorated;
 
     public function __construct(LinkFactoryInterface $linkFactory, ?ResourceMetadataCollectionFactoryInterface $decorated = null)
     {

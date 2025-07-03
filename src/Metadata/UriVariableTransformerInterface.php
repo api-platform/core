@@ -25,6 +25,8 @@ interface UriVariableTransformerInterface
      * @param array $context Options available to the transformer
      *
      * @throws InvalidUriVariableException Occurs when the URI variable could not be transformed
+     *
+     * @return mixed
      */
     public function transform(mixed $value, array $types, array $context = []);
 

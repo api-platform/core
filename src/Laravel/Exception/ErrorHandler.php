@@ -77,7 +77,7 @@ class ErrorHandler extends ExceptionsHandler
             $operation = null;
             foreach ($resourceCollection as $resource) {
                 foreach ($resource->getOperations() as $op) {
-                    foreach ($op->getOutputFormats() as $key => $value) {
+                    foreach ($op->getOutputFormats() ?? [] as $key => $value) {
                         if ($key === $format) {
                             $operation = $op;
                             break 3;

@@ -17,7 +17,7 @@ final class Link
 {
     use ExtensionTrait;
 
-    public function __construct(private string $operationId, private ?\ArrayObject $parameters = null, private $requestBody = null, private string $description = '', private ?Server $server = null)
+    public function __construct(private string $operationId, private ?\ArrayObject $parameters = null, private mixed $requestBody = null, private string $description = '', private ?Server $server = null)
     {
     }
 
@@ -31,7 +31,7 @@ final class Link
         return $this->parameters;
     }
 
-    public function getRequestBody()
+    public function getRequestBody(): mixed
     {
         return $this->requestBody;
     }
@@ -62,7 +62,7 @@ final class Link
         return $clone;
     }
 
-    public function withRequestBody($requestBody): self
+    public function withRequestBody(mixed $requestBody): self
     {
         $clone = clone $this;
         $clone->requestBody = $requestBody;

@@ -17,7 +17,7 @@ final class Header
 {
     use ExtensionTrait;
 
-    public function __construct(private readonly string $in = 'header', private string $description = '', private bool $required = false, private bool $deprecated = false, private bool $allowEmptyValue = false, private array $schema = [], private ?string $style = null, private bool $explode = false, private bool $allowReserved = false, private $example = null, private ?\ArrayObject $examples = null, private ?\ArrayObject $content = null)
+    public function __construct(private readonly string $in = 'header', private string $description = '', private bool $required = false, private bool $deprecated = false, private bool $allowEmptyValue = false, private array $schema = [], private ?string $style = null, private bool $explode = false, private bool $allowReserved = false, private mixed $example = null, private ?\ArrayObject $examples = null, private ?\ArrayObject $content = null)
     {
         if (null === $style) {
             $this->style = 'simple';
@@ -84,7 +84,7 @@ final class Header
         return $this->allowReserved;
     }
 
-    public function getExample()
+    public function getExample(): mixed
     {
         return $this->example;
     }

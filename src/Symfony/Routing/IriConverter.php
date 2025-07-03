@@ -49,8 +49,8 @@ final class IriConverter implements IriConverterInterface
     use ResourceClassInfoTrait;
     use UriVariablesResolverTrait;
 
-    private $localOperationCache = [];
-    private $localIdentifiersExtractorOperationCache = [];
+    private array $localOperationCache = [];
+    private array $localIdentifiersExtractorOperationCache = [];
 
     public function __construct(private readonly ProviderInterface $provider, private readonly RouterInterface $router, private readonly IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ?UriVariablesConverterInterface $uriVariablesConverter = null, private readonly ?IriConverterInterface $decorated = null, private readonly ?OperationMetadataFactoryInterface $operationMetadataFactory = null)
     {

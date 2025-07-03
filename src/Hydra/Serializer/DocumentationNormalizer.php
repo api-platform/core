@@ -313,7 +313,7 @@ final class DocumentationNormalizer implements NormalizerInterface
 
             if (null !== $inputClass) {
                 $possibleValue = [];
-                foreach ($operation->getInputFormats() as $mimeTypes) {
+                foreach ($operation->getInputFormats() ?? [] as $mimeTypes) {
                     foreach ($mimeTypes as $mimeType) {
                         $possibleValue[] = $mimeType;
                     }

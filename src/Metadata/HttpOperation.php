@@ -29,6 +29,13 @@ class HttpOperation extends Operation
     public const METHOD_HEAD = 'HEAD';
     public const METHOD_OPTIONS = 'OPTIONS';
 
+    /** @var array<int|string, string|string[]>|null */
+    protected $formats;
+    /** @var array<int|string, string|string[]>|null */
+    protected $inputFormats;
+    /** @var array<int|string, string|string[]>|null */
+    protected $outputFormats;
+
     /**
      * @param string[]|null                                  $types         the RDF types of this property
      * @param array<int|string, string|string[]>|string|null $formats       {@see https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation}
@@ -90,9 +97,9 @@ class HttpOperation extends Operation
         protected string $method = 'GET',
         protected ?string $uriTemplate = null,
         protected ?array $types = null,
-        protected $formats = null,
-        protected $inputFormats = null,
-        protected $outputFormats = null,
+        $formats = null,
+        $inputFormats = null,
+        $outputFormats = null,
         protected $uriVariables = null,
         protected ?string $routePrefix = null,
         protected ?string $routeName = null,
@@ -214,6 +221,10 @@ class HttpOperation extends Operation
         ?bool $queryParameterValidationEnabled = null,
         array $extraProperties = [],
     ) {
+        $this->formats = (null === $formats || \is_array($formats)) ? $formats : [$formats];
+        $this->inputFormats = (null === $inputFormats || \is_array($inputFormats)) ? $inputFormats : [$inputFormats];
+        $this->outputFormats = (null === $outputFormats || \is_array($outputFormats)) ? $outputFormats : [$outputFormats];
+
         parent::__construct(
             shortName: $shortName,
             class: $class,
@@ -287,7 +298,7 @@ class HttpOperation extends Operation
         return $this->uriTemplate;
     }
 
-    public function withUriTemplate(?string $uriTemplate = null)
+    public function withUriTemplate(?string $uriTemplate = null): static
     {
         $self = clone $this;
         $self->uriTemplate = $uriTemplate;
@@ -311,45 +322,66 @@ class HttpOperation extends Operation
         return $self;
     }
 
+    /**
+     * @return array<int|string, string|string[]>|null
+     */
     public function getFormats()
     {
         return $this->formats;
     }
 
+    /**
+     * @param array<int|string, string|string[]>|string|null $formats
+     */
     public function withFormats($formats = null): static
     {
         $self = clone $this;
-        $self->formats = $formats;
+        $self->formats = (null === $formats || \is_array($formats)) ? $formats : [$formats];
 
         return $self;
     }
 
+    /**
+     * @return array<int|string, string|string[]>|null
+     */
     public function getInputFormats()
     {
         return $this->inputFormats;
     }
 
+    /**
+     * @param array<int|string, string|string[]>|string|null $inputFormats
+     */
     public function withInputFormats($inputFormats = null): static
     {
         $self = clone $this;
-        $self->inputFormats = $inputFormats;
+        $self->inputFormats = (null === $inputFormats || \is_array($inputFormats)) ? $inputFormats : [$inputFormats];
 
         return $self;
     }
 
+    /**
+     * @return array<int|string, string|string[]>|null
+     */
     public function getOutputFormats()
     {
         return $this->outputFormats;
     }
 
+    /**
+     * @param array<int|string, string|string[]>|string|null $outputFormats
+     */
     public function withOutputFormats($outputFormats = null): static
     {
         $self = clone $this;
-        $self->outputFormats = $outputFormats;
+        $self->outputFormats = (null === $outputFormats || \is_array($outputFormats)) ? $outputFormats : [$outputFormats];
 
         return $self;
     }
 
+    /**
+     * @return array<string, mixed>|array<int, Link>|list<string>|null
+     */
     public function getUriVariables()
     {
         return $this->uriVariables;

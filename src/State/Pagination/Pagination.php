@@ -227,7 +227,7 @@ final class Pagination
     /**
      * Gets the given pagination parameter name from the given context.
      */
-    private function getParameterFromContext(array $context, string $parameterName, mixed $default = null)
+    private function getParameterFromContext(array $context, string $parameterName, mixed $default = null): mixed
     {
         $filters = $context['filters'] ?? [];
 

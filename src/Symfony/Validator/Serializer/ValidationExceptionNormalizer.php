@@ -53,6 +53,9 @@ class ValidationExceptionNormalizer implements NormalizerInterface
         return $data instanceof ValidationException && $this->decorated->supportsNormalization($data, $format, $context);
     }
 
+    /**
+     * @param string|null $format
+     */
     public function getSupportedTypes($format): array
     {
         return [ValidationException::class => false];

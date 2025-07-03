@@ -26,11 +26,11 @@ use Symfony\Component\Routing\RouterInterface;
  */
 final class SkolemIriConverter implements IriConverterInterface
 {
-    public static $skolemUriTemplate = '/.well-known/genid/{id}';
+    public static string $skolemUriTemplate = '/.well-known/genid/{id}';
 
-    private $objectHashMap;
-    private $classHashMap = [];
-    private $router;
+    private \SplObjectStorage $objectHashMap;
+    private array $classHashMap = [];
+    private RouterInterface $router;
 
     public function __construct(RouterInterface $router)
     {
