@@ -20,6 +20,9 @@ use ApiPlatform\Metadata\ParameterProviderFilterInterface;
 use ApiPlatform\State\ParameterProvider\IriConverterParameterProvider;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
+/**
+ * @author Vincent Amstoutz <vincent.amstoutz.dev@gmail.com>
+ */
 final class IriFilter implements FilterInterface, OpenApiParameterFilterInterface, ParameterProviderFilterInterface
 {
     use OpenApiFilterTrait;

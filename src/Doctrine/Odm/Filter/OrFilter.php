@@ -18,6 +18,9 @@ use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
+/**
+ * @author Vincent Amstoutz <vincent.amstoutz.dev@gmail.com>
+ */
 final class OrFilter implements FilterInterface, OpenApiParameterFilterInterface
 {
     use OpenApiFilterTrait;

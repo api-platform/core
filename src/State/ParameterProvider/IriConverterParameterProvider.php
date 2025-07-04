@@ -24,7 +24,7 @@ use ApiPlatform\State\ParameterProviderInterface;
 /**
  * @experimental
  *
- * @author Vincent Amstoutz
+ * @author Vincent Amstoutz <vincent.amstoutz.dev@gmail.com>
  */
 final readonly class IriConverterParameterProvider implements ParameterProviderInterface
 {
