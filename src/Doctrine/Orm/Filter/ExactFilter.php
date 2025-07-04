@@ -19,6 +19,9 @@ use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\QueryBuilder;
 
+/**
+ * @author Vincent Amstoutz <vincent.amstoutz.dev@gmail.com>
+ */
 final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterface
 {
     use OpenApiFilterTrait;
