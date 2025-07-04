@@ -19,6 +19,9 @@ use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use MongoDB\BSON\Regex;
 
+/**
+ * @author Vincent Amstoutz <vincent.amstoutz.dev@gmail.com>
+ */
 final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilterInterface
 {
     use OpenApiFilterTrait;

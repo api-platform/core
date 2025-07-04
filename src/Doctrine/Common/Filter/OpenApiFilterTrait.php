@@ -16,6 +16,9 @@ namespace ApiPlatform\Doctrine\Common\Filter;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 
+/**
+ * @author Vincent Amstoutz <vincent.amstoutz.dev@gmail.com>
+ */
 trait OpenApiFilterTrait
 {
     public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array|null

@@ -21,6 +21,9 @@ use ApiPlatform\Metadata\ParameterProviderFilterInterface;
 use ApiPlatform\State\ParameterProvider\IriConverterParameterProvider;
 use Doctrine\ORM\QueryBuilder;
 
+/**
+ * @author Vincent Amstoutz <vincent.amstoutz.dev@gmail.com>
+ */
 final class OrFilter implements FilterInterface, OpenApiParameterFilterInterface, ParameterProviderFilterInterface
 {
     use OpenApiFilterTrait;
