@@ -29,7 +29,7 @@ interface FilterInterface extends BaseFilterInterface
     /**
      * Applies the filter.
      *
-     * @param array{'parameter'?: Parameter} $context
+     * @param array{filters?: array<string, mixed>|array, parameter?: Parameter, ...} $context
      */
     public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void;
 }

@@ -28,7 +28,7 @@ interface FilterInterface extends BaseFilterInterface
     /**
      * Applies the filter.
      *
-     * @param array{'parameter'?: Parameter, ...} $context
+     * @param array|array{filters?: array<string, mixed>|array, parameter?: Parameter, mongodb_odm_sort_fields?: array, ...} $context
      */
     public function apply(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void;
 }

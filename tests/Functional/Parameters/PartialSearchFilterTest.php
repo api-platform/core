@@ -130,10 +130,8 @@ final class PartialSearchFilterTest extends ApiTestCase
         $chicken2->setName('Henriette');
         $chicken2->setChickenCoop($chickenCoop2);
 
-        if (method_exists($chickenCoop1, 'addChicken')) {
-            $chickenCoop1->addChicken($chicken1);
-            $chickenCoop2->addChicken($chicken2);
-        }
+        $chickenCoop1->addChicken($chicken1);
+        $chickenCoop2->addChicken($chicken2);
 
         $manager->persist($chickenCoop1);
         $manager->persist($chickenCoop2);
