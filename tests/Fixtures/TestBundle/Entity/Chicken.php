@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
+use ApiPlatform\Doctrine\Orm\Filter\IriFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrFilter;
 use ApiPlatform\Doctrine\Orm\Filter\PartialSearchFilter;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
@@ -27,6 +29,10 @@ use Doctrine\ORM\Mapping as ORM;
         'namePartial' => new QueryParameter(
             filter: new PartialSearchFilter(),
             property: 'name',
+        ),
+        'relation' => new QueryParameter(
+            filter: new OrFilter(new IriFilter(), new ExactFilter()),
+            property: 'chickenCoop'
         ),
     ],
 )]

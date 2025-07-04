@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\ParameterProvider;
 
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
@@ -40,18 +42,22 @@ final readonly class IriConverterParameterProvider implements ParameterProviderI
 
         $iriConverterContext = ['fetch_data' => $parameter->getExtraProperties()['fetch_data'] ?? false];
 
-        if (\is_array($value)) {
-            $entities = [];
-            foreach ($value as $v) {
-                $entities[] = $this->iriConverter->getResourceFromIri($v, $iriConverterContext);
+        try {
+            if (\is_array($value)) {
+                $entities = [];
+                foreach ($value as $v) {
+                    $entities[] = $this->iriConverter->getResourceFromIri($v, $iriConverterContext);
+                }
+
+                $parameter->setValue($entities);
+
+                return $operation;
             }
 
-            $parameter->setValue($entities);
-
+            $parameter->setValue($this->iriConverter->getResourceFromIri($value, $iriConverterContext));
+        } catch (InvalidArgumentException|ItemNotFoundException) {
             return $operation;
         }
-
-        $parameter->setValue($this->iriConverter->getResourceFromIri($value, $iriConverterContext));
 
         return $operation;
     }
