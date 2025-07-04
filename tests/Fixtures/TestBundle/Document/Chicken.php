@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Doctrine\Odm\Filter\ExactFilter;
+use ApiPlatform\Doctrine\Odm\Filter\IriFilter;
+use ApiPlatform\Doctrine\Odm\Filter\OrFilter;
 use ApiPlatform\Doctrine\Odm\Filter\PartialSearchFilter;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
@@ -28,6 +30,10 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
             filter: new PartialSearchFilter(),
             property: 'name',
         ),
+        'relation' => new QueryParameter(
+            filter: new OrFilter(new IriFilter(), new ExactFilter()),
+            property: 'chickenCoop'
+        ),
     ],
 )]
 class Chicken
@@ -41,7 +47,7 @@ class Chicken
     #[ODM\ReferenceOne(targetDocument: ChickenCoop::class, inversedBy: 'chickens')]
     private ?ChickenCoop $chickenCoop = null;
 
-    public function getId(): ?int
+    public function getId(): ?string
     {
         return $this->id;
     }
