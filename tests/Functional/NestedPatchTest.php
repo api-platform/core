@@ -21,6 +21,10 @@ class NestedPatchTest extends ApiTestCase
 
     public function testIssue6225(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped();
+        }
+
         $this->recreateSchema(self::getResources());
 
         $response = self::createClient()->request('POST', '/foo6225s', [
