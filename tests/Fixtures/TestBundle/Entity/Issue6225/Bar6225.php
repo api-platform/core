@@ -14,13 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6225;
 
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Link;
-use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
 
@@ -56,7 +50,8 @@ class Bar6225
         return $this->foo;
     }
 
-    public function setFoo(Foo6225 $foo): static {
+    public function setFoo(Foo6225 $foo): static
+    {
         $this->foo = $foo;
 
         return $this;
@@ -67,7 +62,8 @@ class Bar6225
         return $this->someProperty;
     }
 
-    public function setSomeProperty(string $someProperty): static {
+    public function setSomeProperty(string $someProperty): static
+    {
         $this->someProperty = $someProperty;
 
         return $this;

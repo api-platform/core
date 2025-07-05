@@ -74,7 +74,7 @@ class ItemNormalizer extends AbstractItemNormalizer
         // scenario it will not be present in parent::getAllowedAttributes
         if (isset($data['id'], $context['resource_class'])) {
             $parentAllowedAttributes = parent::getAllowedAttributes($class, $context, true);
-            if (is_array($parentAllowedAttributes) && !in_array('id', $parentAllowedAttributes)) {
+            if (\is_array($parentAllowedAttributes) && !\in_array('id', $parentAllowedAttributes, true)) {
                 unset($data['id']);
             }
         }

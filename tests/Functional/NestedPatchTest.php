@@ -1,5 +1,16 @@
 <?php
 
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
 namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
@@ -15,7 +26,8 @@ class NestedPatchTest extends ApiTestCase
 
     protected static ?bool $alwaysBootKernel = false;
 
-    public static function getResources(): array {
+    public static function getResources(): array
+    {
         return [Foo6225::class, Bar6225::class];
     }
 
@@ -30,12 +42,12 @@ class NestedPatchTest extends ApiTestCase
         $response = self::createClient()->request('POST', '/foo6225s', [
             'json' => [
                 'bar' => [
-                    'someProperty' => 'abc'
-                ]
+                    'someProperty' => 'abc',
+                ],
             ],
             'headers' => [
-                'accept' => 'application/json'
-            ]
+                'accept' => 'application/json',
+            ],
         ]);
         static::assertResponseIsSuccessful();
         $responseContent = json_decode($response->getContent(), true);
@@ -46,21 +58,21 @@ class NestedPatchTest extends ApiTestCase
             'json' => [
                 'bar' => [
                     'id' => $createdBarId,
-                    'someProperty' => 'def'
-                ]
+                    'someProperty' => 'def',
+                ],
             ],
             'headers' => [
                 'accept' => 'application/json',
-                'content-type' => 'application/merge-patch+json'
-            ]
+                'content-type' => 'application/merge-patch+json',
+            ],
         ]);
         static::assertResponseIsSuccessful();
         static::assertEquals([
             'id' => $createdFooId,
             'bar' => [
                 'id' => $createdBarId,
-                'someProperty' => 'def'
-            ]
+                'someProperty' => 'def',
+            ],
         ], json_decode($patchResponse->getContent(), true));
     }
 }
