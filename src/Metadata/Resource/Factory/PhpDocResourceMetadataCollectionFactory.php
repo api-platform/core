@@ -133,12 +133,11 @@ final class PhpDocResourceMetadataCollectionFactory implements ResourceMetadataC
         }
 
         $rawDocNode = $reflectionClass->getDocComment();
-
         if (!$rawDocNode) {
             return null;
         }
 
-        if (!class_exists(TokenIterator::class)) {
+        if (!$this->phpDocParser || !$this->lexer) {
             return null;
         }
 
