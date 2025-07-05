@@ -513,6 +513,10 @@ final class ApiProperty
     {
         trigger_deprecation('api-platform/metadata', '4.2', 'The "%s()" method is deprecated, use "%s::getNativeType()" instead.', __METHOD__, self::class);
 
+        if (null === $this->builtinTypes && null !== $this->nativeType) {
+            $this->builtinTypes = PropertyInfoToTypeInfoHelper::convertTypeToLegacyTypes($this->nativeType) ?? [];
+        }
+
         return $this->builtinTypes;
     }
 
@@ -541,7 +545,6 @@ final class ApiProperty
     {
         $self = clone $this;
         $self->nativeType = $nativeType;
-        $self->builtinTypes = PropertyInfoToTypeInfoHelper::convertTypeToLegacyTypes($nativeType) ?? [];
 
         return $self;
     }
