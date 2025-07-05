@@ -30,6 +30,12 @@
             <argument type="service" id="service_container" on-invalid="null" />
         </service>
 
+        <service id="api_platform.metadata.resource.metadata_collection_factory.mutator" class="ApiPlatform\Metadata\Resource\Factory\MutatorResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="800" public="false" >
+            <argument type="service" id="api_platform.metadata.mutator_collection.resource" />
+            <argument type="service" id="api_platform.metadata.mutator_collection.operation" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.mutator.inner" />
+        </service>
+
         <service id="api_platform.metadata.resource.metadata_collection_factory.concerns" class="ApiPlatform\Metadata\Resource\Factory\ConcernsResourceMetadataCollectionFactory" decorates="api_platform.metadata.resource.metadata_collection_factory" decoration-priority="800" public="false">
             <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory.concerns.inner" />
         </service>
