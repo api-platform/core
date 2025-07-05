@@ -30,7 +30,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
     ],
     stateOptions: new Options(entityClass: Dummy::class)
 )]
-#[ApiFilter(CustomFilter::class)]
+#[ApiFilter(CustomFilter::class, id: 'custom_filter')]
 class DummyResource
 {
     #[ApiProperty(identifier: true)]
