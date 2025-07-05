@@ -138,6 +138,10 @@ final class PhpDocResourceMetadataCollectionFactory implements ResourceMetadataC
             return null;
         }
 
+        if (!class_exists(TokenIterator::class)) {
+            return null;
+        }
+
         $tokens = new TokenIterator($this->lexer->tokenize($rawDocNode));
         $phpDocNode = $this->phpDocParser->parse($tokens);
         $tokens->consumeTokenType(Lexer::TOKEN_END);
