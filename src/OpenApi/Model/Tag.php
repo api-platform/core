@@ -47,7 +47,7 @@ final class Tag
         return $clone;
     }
 
-    public function getExternalDocs(): string
+    public function getExternalDocs(): ?string
     {
         return $this->externalDocs;
     }

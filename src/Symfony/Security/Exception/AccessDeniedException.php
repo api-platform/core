@@ -16,6 +16,9 @@ namespace ApiPlatform\Symfony\Security\Exception;
 use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException as ExceptionAccessDeniedException;
 
+/**
+ * TODO: deprecate in favor of Metadata.
+ */
 final class AccessDeniedException extends ExceptionAccessDeniedException implements HttpExceptionInterface
 {
     public function getStatusCode(): int

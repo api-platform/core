@@ -33,17 +33,17 @@ final class ClassLevelAttributePropertyNameCollectionFactory implements Property
             return $parentPropertyNameCollection ?? new PropertyNameCollection();
         }
 
-        $properties = $parentPropertyNameCollection ? iterator_to_array($parentPropertyNameCollection) : [];
+        $properties = $parentPropertyNameCollection ? array_flip(iterator_to_array($parentPropertyNameCollection)) : [];
 
         $refl = new \ReflectionClass($resourceClass);
         $attributes = $refl->getAttributes(ApiProperty::class);
         foreach ($attributes as $attribute) {
             $instance = $attribute->newInstance();
             if ($property = $instance->getProperty()) {
-                $properties[] = $property;
+                $properties[$property] = true;
             }
         }
 
-        return new PropertyNameCollection($properties);
+        return new PropertyNameCollection(array_keys($properties));
     }
 }

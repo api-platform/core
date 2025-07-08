@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<files version="1">
+ <file path="vendor/symfony/property-info/Type.php">
+  <line number="14" hash="4ae33c31826c25b82a796a6fec924f56f5dc32ac">
+   <issue><![CDATA[Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Type" class is deprecated. Use "Symfony\Component\TypeInfo\Type" class from "symfony/type-info" instead.]]></issue>
+  </line>
+ </file>
+</files>

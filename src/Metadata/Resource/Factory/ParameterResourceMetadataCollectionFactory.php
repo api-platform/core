@@ -28,10 +28,13 @@ use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use ApiPlatform\Serializer\Filter\FilterInterface as SerializerFilterInterface;
+use ApiPlatform\State\Parameter\ValueCaster;
 use ApiPlatform\State\Util\StateOptionsTrait;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
  * Prepares Parameters documentation by reading its filter details and declaring an OpenApi parameter.
@@ -148,6 +151,36 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             }
 
             $parameter = $this->setDefaults($key, $parameter, $resourceClass, $properties, $operation);
+            // We don't do any type cast yet, a query parameter or an header is always a string or a list of strings
+            if (null === $parameter->getNativeType()) {
+                // this forces the type to be only a list
+                if ('array' === ($parameter->getSchema()['type'] ?? null)) {
+                    $parameter = $parameter->withNativeType(Type::list(Type::string()));
+                } elseif ('string' === ($parameter->getSchema()['type'] ?? null)) {
+                    $parameter = $parameter->withNativeType(Type::string());
+                } elseif ('boolean' === ($parameter->getSchema()['type'] ?? null)) {
+                    $parameter = $parameter->withNativeType(Type::bool());
+                } elseif ('integer' === ($parameter->getSchema()['type'] ?? null)) {
+                    $parameter = $parameter->withNativeType(Type::int());
+                } elseif ('number' === ($parameter->getSchema()['type'] ?? null)) {
+                    $parameter = $parameter->withNativeType(Type::float());
+                } else {
+                    $parameter = $parameter->withNativeType(Type::union(Type::string(), Type::list(Type::string())));
+                }
+            }
+
+            if ($parameter->getCastToNativeType() && null === $parameter->getCastFn() && ($nativeType = $parameter->getNativeType())) {
+                if ($nativeType->isIdentifiedBy(TypeIdentifier::BOOL)) {
+                    $parameter = $parameter->withCastFn([ValueCaster::class, 'toBool']);
+                }
+                if ($nativeType->isIdentifiedBy(TypeIdentifier::INT)) {
+                    $parameter = $parameter->withCastFn([ValueCaster::class, 'toInt']);
+                }
+                if ($nativeType->isIdentifiedBy(TypeIdentifier::FLOAT)) {
+                    $parameter = $parameter->withCastFn([ValueCaster::class, 'toFloat']);
+                }
+            }
+
             $priority = $parameter->getPriority() ?? $internalPriority--;
             $parameters->add($key, $parameter->withPriority($priority));
         }

@@ -10,7 +10,7 @@
       <directory>./Tests/</directory>
     </testsuite>
   </testsuites>
-  <source>
+  <source baseline="phpunit.baseline.xml">
     <deprecationTrigger>
         <function>trigger_deprecation</function>
         <method>Doctrine\Deprecations\Deprecation::trigger</method>

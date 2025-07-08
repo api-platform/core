@@ -59,10 +59,13 @@ final class ValidationTest extends ApiTestCase
                 'enum[]=c&enum[]=c',
                 [
                     [
-                        'message' => 'This collection should contain only unique elements.',
+                        'propertyPath' => 'enum[0]', 'message' => 'The value you selected is not a valid choice.',
                     ],
                     [
-                        'propertyPath' => 'enum', 'message' => 'The value you selected is not a valid choice.',
+                        'propertyPath' => 'enum[1]', 'message' => 'The value you selected is not a valid choice.',
+                    ],
+                    [
+                        'message' => 'This collection should contain only unique elements.',
                     ],
                 ],
             ],
@@ -101,7 +104,16 @@ final class ValidationTest extends ApiTestCase
             [
                 'num=5',
                 [
-                    ['propertyPath' => 'num', 'message' => 'This value should be less than or equal to 3.'],
+                    ['propertyPath' => 'num', 'message' => 'This value should be between 1 and 3.'],
+                ],
+            ],
+            [
+                'numMultipleType=5',
+                [
+                    [
+                        'propertyPath' => 'numMultipleType',
+                        'message' => 'This value should satisfy at least one of the following constraints: [1] This value should be between 1 and 3. [2] Each element of this collection should satisfy its own set of constraints.',
+                    ],
                 ],
             ],
             [

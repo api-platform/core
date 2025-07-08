@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata;
 
 use ApiPlatform\Metadata\Exception\InvalidIdentifierException;
+use ApiPlatform\Metadata\Exception\InvalidUriVariableException;
 
 /**
  * Identifier converter.
@@ -29,6 +30,7 @@ interface UriVariablesConverterInterface
      * @param string $class The class to which the URI variables belong to
      *
      * @throws InvalidIdentifierException
+     * @throws InvalidUriVariableException
      *
      * @return array Array indexed by identifiers properties with their values denormalized
      */

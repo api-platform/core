@@ -1,5 +1,109 @@
 # Changelog
 
+## v4.1.18
+
+### Bug fixes
+
+* [0e712d969](https://github.com/api-platform/core/commit/0e712d9692f018b9816764ada9fa4c7b02b5e028) fix(symfony): catch InvalidUriVariableException in IriConverter (#7271)
+* [221e5d97f](https://github.com/api-platform/core/commit/221e5d97f9e1114d642c834e29392a35967a9960) fix(openapi): command options mode (`InputOption::VALUE_REQUIRED`) (#7266)
+* [3ed6f30f5](https://github.com/api-platform/core/commit/3ed6f30f5ce60ac45a1a1df6bac9372a7b712d51) fix(symfony): fix resolving groups in ValidationGroupsExtractorTrait when GroupSequence (#7272)
+* [6e4e46bfe](https://github.com/api-platform/core/commit/6e4e46bfef0aaa87b2bdc56a1b28510fcdaa2914) fix(json-schema): Rebuild sub-schema definition without `@id` property when `genId` is `false` (#7162) (#7251)
+* [803165228](https://github.com/api-platform/core/commit/80316522807be2af25657f2936341ce2f527c364) fix(symfony): missing GroupSequence type for validation groups
+* [85e18a2d6](https://github.com/api-platform/core/commit/85e18a2d665baf791027a93106d6a6c293464883) fix(metadata): support stateOptions in YAML and XML for Doctrine ORM/ODM (#7217)
+* [88e0073bf](https://github.com/api-platform/core/commit/88e0073bf2eb9c27a35d6a04a32919908cdae704) fix(validator): error xml format output
+* [bf271d139](https://github.com/api-platform/core/commit/bf271d139aa6cd6c74d2dd0ee5a482d03a1afca4) fix(validator): parameter validation list<string>|string (#7245)
+* [d3e73f09a](https://github.com/api-platform/core/commit/d3e73f09afd6bde5763e0c2c7a4a0203f857d7c3) fix(metadata): read every OpenApiOperation attributes in Xml instead of only "deprecated" (#7189)
+* [e40bb19a6](https://github.com/api-platform/core/commit/e40bb19a6d80d60e5f06ac02b5bbf1aaac08e46a) fix(laravel): decorate error handler (#7247)
+* [f0604a07e](https://github.com/api-platform/core/commit/f0604a07e79ba2ee6a47cee20fcdaebbb68bbcaf) fix: getcontainer return type (#7230)
+* [f46c0a3f4](https://github.com/api-platform/core/commit/f46c0a3f47265d48d2863860d0e274f83367c929) fix(jsonld): reset gen_id configuration (#7264)
+* [f82464431](https://github.com/api-platform/core/commit/f8246443134b07fe6a2b591642af1ed3a5f40b44)  fix(state): depend only on translation contracts (#7262)
+* [fa37c1eba](https://github.com/api-platform/core/commit/fa37c1eba871c533c2e3436a915d0f02dd2baa78) fix(state): error xml format output (#7273)
+
+### Experimental Features
+
+* [8885000db](https://github.com/api-platform/core/commit/8885000dbfa610146ff8f3187d41a0dde9b22e26) feat(state): cast parameter values to validate with the Type constraint (#7240)
+
+## v4.1.17
+
+### Bug fixes
+
+* [34a0d54b1](https://github.com/api-platform/core/commit/34a0d54b1fe195a233726ff2e8304c29f43954ca) fix(jsonld): genId false should work with embeded resources (#7219)
+* [c025b8f9f](https://github.com/api-platform/core/commit/c025b8f9f8ab51489dc75e470c057d6fae879fa0) fix(openapi): correct example usage for 3.0 (#7218)
+* [cdda4146b](https://github.com/api-platform/core/commit/cdda4146b429f8e605504e1dc403faa41f0255a7) fix(laravel): Allow `LinksHandler` to handle polymorphic relationships (#7231)
+* [dba97370f](https://github.com/api-platform/core/commit/dba97370fb8996cf4fc1d5b6d8ca92faf4e68637) fix(metadata): boolean type detection from parameter's schema (#7223)
+
+## v4.1.16
+
+### Bug fixes
+
+* [4a99a5f6e](https://github.com/api-platform/core/commit/4a99a5f6e7eb13e9e77872dc33ec5b3dc2deef25) fix(laravel): persist HasMany and MorphMany relationships (#7208)
+* [9bfa5fef0](https://github.com/api-platform/core/commit/9bfa5fef0dfa129078118d0ce67f1ec2c8d548d7) fix(metadata): call dynamic validation groups #7184 (#7184)
+* [b2131645d](https://github.com/api-platform/core/commit/b2131645dec11a5dbf8bbe507f578720a84a686e) fix(laravel): route where uses requirements (#7199)
+* [b2b5f99c6](https://github.com/api-platform/core/commit/b2b5f99c64ced9f3580fdaee099d0e34e75d2697) refactor(state): merge parameter and link security  (#7200)
+
+Notes: 
+
+Two providers are now available on parameters (query parameters, header and uri variables `Link`): 
+
+- `ReadLinkParameterProvider` previously used for link security (renamed from `Symfony\Security\State\LinkedReadProvider`)
+- `IriConverterParameterProvider` this allows you to read a resource from an IRI usefull for filters (eg `?author=/authors/1`)
+
+Previous tests on link security were left untouched we removed the experimental class `Symfony\Security\State\LinkAccessCheckerProvider` as well as the `LinkedReadProvider` as they're not used anymore.
+
+
+## v4.1.15 - v4.1.14 - v4.1.13
+
+There was an issue with the subtree split as we attempted to test lower dependencies on the subtree split, some components where wrongly tagged.
+
+The proper fix is at: https://github.com/api-platform/core/pull/7196
+
+### Bug fixes
+
+* [4bdfd6063](https://github.com/api-platform/core/commit/4bdfd6063a6e80fc9cc33ff16c0ec98fec688291) fix(symfony, laravel) skip webhooks when generates routing (#7175)
+* [582076cb6](https://github.com/api-platform/core/commit/582076cb6c0dbcde205fc49d97a0f50405544d0b) fix(openapi): duplicate get path for webhooks (#7174)
+* [84b967930](https://github.com/api-platform/core/commit/84b96793043c939f333c1aa2e96f69b23d3e9ece) fix(laravel): persist morph relations (#7170)
+* [d51cddba2](https://github.com/api-platform/core/commit/d51cddba2a7618c08e511582ac2f41a6b0eaf657) fix(laravel): index on non-primary key (#7183)
+* [fdb485dd2](https://github.com/api-platform/core/commit/fdb485dd2af56f7664bd90705d81e8f58c8b494a) fix(openapi): `example` and `default` with nullable value not being shown
+
+### Features
+
+* [79d08db6a](https://github.com/api-platform/core/commit/79d08db6a4728303b37440c610c96a490d44780a) feat(elasticsearch): add support for v9 (#7180)
+
+## v4.1.11 - v4.1.12
+
+### Bug fixes
+
+* [b14a463a9](https://github.com/api-platform/core/commit/b14a463a9da8a285eba1b0adc63ca4121efb0dce) fix(laravel): register error handler without graphql
+
+## v4.1.10
+
+### Bug fixes
+
+* [329acf21e](https://github.com/api-platform/core/commit/329acf21e3a8618136a21b9121c5891f1fe6b9e8) fix(metadata): infer parameter string type from schema (#7161)
+* [5459ba375](https://github.com/api-platform/core/commit/5459ba375b0e7ffd1c783a6e18a6452769eaff46) fix(metadata): parameter cast to array flag (#7160)
+* [fe73002bf](https://github.com/api-platform/core/commit/fe73002bf5ae64adb1eb9e310dc62ff158de094d) fix(laravel): duplicated property names
+* [b0390080e](https://github.com/api-platform/core/commit/b0390080e90be9ac494c8b4d968e59a4962f32ca) fix(laravel): name convert validation property path
+* [730d17a30](https://github.com/api-platform/core/commit/730d17a306df4b92082484a19e82c5e150537331) fix(laravel): validate the model instead of body
+* [4d66f5ef3](https://github.com/api-platform/core/commit/4d66f5ef313fe3857611e8345702a10019c79ec5) fix(laravel): persist embeded relations with groups
+* [39123942a](https://github.com/api-platform/core/commit/39123942a0e1ff9dfb1e46f4a410160e3cd3fbd7) fix(laravel): register error handler without graphql
+* [fd010ea1b](https://github.com/api-platform/core/commit/fd010ea1be86073f5d8905d5640846390ade7ce6) fix(openapi): nullable externalDocs return type
+* [470c2e8bd](https://github.com/api-platform/core/commit/470c2e8bdf8d7a7502c02d2b681ced2001e2c1cc) fix(httpcache): iri cache tag for collection operation with path parameter
+* [9c0dbb653](https://github.com/api-platform/core/commit/9c0dbb65319beb89193e653e14c99352ac529a55) fix(state): do not expose FQCN in DeserializeProvider on PartialDenormalizationException (#7158)
+* [f78986000](https://github.com/api-platform/core/commit/f789860009888582791611a31d6084c620050615) fix(serializer): exception message to not expose resource FQCN (#7156)
+
+### Features
+
+* [767fa926b](https://github.com/api-platform/core/commit/767fa926b10bef771e896300b8e796287392d8c0) feat(laravel): add name_converter option
+
+## v4.1.9
+
+### Bug fixes
+
+* [4dd0cdfc4](https://github.com/api-platform/core/commit/4dd0cdfc4a7f4cc73e7e67a49ee790ed1aaf5707) fix(doctrine): support integer-backed enums in BackedEnumFilter (#7127)
+* [70a922573](https://github.com/api-platform/core/commit/70a9225737bece18ad4b66b8ac636c38b2a1008a) fix: error formats (#7148)
+* [723d041c4](https://github.com/api-platform/core/commit/723d041c47467d8be0d8a0f20431da9de0a87c5a) fix(metadata): xml PHPize HTTP cache headers (#7140)
+* [d3d0ca21b](https://github.com/api-platform/core/commit/d3d0ca21bd45a8383e3e51166a65162be93655bf) fix(serializer): invalid uri variable 400 response (#7135)
+
 ## v4.1.8
 
 ### Bug fixes

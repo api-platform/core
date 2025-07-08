@@ -13,10 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\Util;
 
+use ApiPlatform\Metadata\HeaderParameter;
 use ApiPlatform\Metadata\HeaderParameterInterface;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\State\ParameterNotFound;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\UnionType;
 
 /**
  * @internal
@@ -39,10 +42,8 @@ trait ParameterParserTrait
 
     /**
      * @param array<string, mixed> $values
-     *
-     * @return array<mixed, mixed>|ParameterNotFound|array
      */
-    private function extractParameterValues(Parameter $parameter, array $values): string|ParameterNotFound|array
+    private function extractParameterValues(Parameter $parameter, array $values): mixed
     {
         $accessors = null;
         $key = $parameter->getKey();
@@ -64,16 +65,43 @@ trait ParameterParserTrait
         }
 
         $value = $values[$key] ?? new ParameterNotFound();
-        if (!$accessors) {
-            return $value;
-        }
-
-        foreach ($accessors as $accessor) {
+        foreach ($accessors ?? [] as $accessor) {
             if (\is_array($value) && isset($value[$accessor])) {
                 $value = $value[$accessor];
             } else {
                 $value = new ParameterNotFound();
-                continue;
+            }
+        }
+
+        if ($value instanceof ParameterNotFound) {
+            return $value;
+        }
+
+        $isCollectionType = fn ($t) => $t instanceof CollectionType;
+        $isCollection = $parameter->getNativeType()?->isSatisfiedBy($isCollectionType) ?? false;
+
+        // type-info 7.2
+        if (!$isCollection && $parameter->getNativeType() instanceof UnionType) {
+            foreach ($parameter->getNativeType()->getTypes() as $t) {
+                if ($isCollection = $t->isSatisfiedBy($isCollectionType)) {
+                    break;
+                }
+            }
+        }
+
+        if ($isCollection && true === $parameter->getCastToArray() && !\is_array($value)) {
+            $value = [$value];
+        }
+
+        if (!$isCollection && $parameter instanceof HeaderParameter && \is_array($value) && array_is_list($value) && 1 === \count($value)) {
+            $value = $value[0];
+        }
+
+        if (true === $parameter->getCastToNativeType() && ($castFn = $parameter->getCastFn())) {
+            if (\is_array($value)) {
+                $value = array_map(fn ($v) => $castFn($v, $parameter), $value);
+            } else {
+                $value = $castFn($value, $parameter);
             }
         }
 

@@ -15,10 +15,9 @@ namespace ApiPlatform\Laravel\Eloquent;
 
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
 use Illuminate\Pagination\AbstractPaginator;
-use IteratorAggregate;
 
 /**
- * @implements IteratorAggregate<mixed,object>
+ * @implements \IteratorAggregate<mixed,object>
  * @implements PartialPaginatorInterface<object>
  */
 final class PartialPaginator implements PartialPaginatorInterface, \IteratorAggregate

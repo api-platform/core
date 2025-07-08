@@ -42,7 +42,6 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\Serializer\Serializer;
 
 /**
  * Base item normalizer.
@@ -228,13 +227,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                     throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
                 }
 
-                throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the "%s" resource "string" (IRI), "%s" given.', $resourceClass, \gettype($data)), $data, [$resourceClass], $context['deserialization_path'] ?? null, true, $e->getCode(), $e);
+                throw NotNormalizableValueException::createForUnexpectedDataType($e->getMessage(), $data, [$resourceClass], $context['deserialization_path'] ?? null, true, $e->getCode(), $e);
             } catch (InvalidArgumentException $e) {
                 if (!isset($context['not_normalizable_value_exceptions'])) {
                     throw new UnexpectedValueException(\sprintf('Invalid IRI "%s".', $data), $e->getCode(), $e);
                 }
 
-                throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the "%s" resource "string" (IRI), "%s" given.', $resourceClass, \gettype($data)), $data, [$resourceClass], $context['deserialization_path'] ?? null, true, $e->getCode(), $e);
+                throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Invalid IRI "%s".', $data), $data, [$resourceClass], $context['deserialization_path'] ?? null, true, $e->getCode(), $e);
             }
         }
 
@@ -592,7 +591,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                     throw new UnexpectedValueException(\sprintf('Invalid IRI "%s".', $value), $e->getCode(), $e);
                 }
 
-                throw NotNormalizableValueException::createForUnexpectedDataType($e->getMessage(), $value, [$className], $context['deserialization_path'] ?? null, true, $e->getCode(), $e);
+                throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Invalid IRI "%s".', $value), $value, [$className], $context['deserialization_path'] ?? null, true, $e->getCode(), $e);
             }
         }
 
@@ -671,7 +670,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 && ($className = $collectionValueType->getClassName())
                 && $this->resourceClassResolver->isResourceClass($className)
             ) {
-                $childContext = $this->createChildContext($this->createOperationContext($context, $className), $attribute, $format);
+                $childContext = $this->createChildContext($this->createOperationContext($context, $className, $propertyMetadata), $attribute, $format);
 
                 // @see ApiPlatform\Hal\Serializer\ItemNormalizer:getComponents logic for intentional duplicate content
                 // @see ApiPlatform\JsonApi\Serializer\ItemNormalizer:getComponents logic for intentional duplicate content
@@ -708,7 +707,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 ($className = $type->getClassName())
                 && $this->resourceClassResolver->isResourceClass($className)
             ) {
-                $childContext = $this->createChildContext($this->createOperationContext($context, $className), $attribute, $format);
+                $childContext = $this->createChildContext($this->createOperationContext($context, $className, $propertyMetadata), $attribute, $format);
                 unset($childContext['iri'], $childContext['uri_variables'], $childContext['item_uri_template']);
                 if ('jsonld' === $format && $uriTemplate = $propertyMetadata->getUriTemplate()) {
                     $operation = $this->resourceMetadataCollectionFactory->create($className)->getOperation(
@@ -750,9 +749,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
             // Anonymous resources
             if ($className) {
-                $childContext = $this->createChildContext($this->createOperationContext($context, $className), $attribute, $format);
-                $childContext['output']['gen_id'] = $propertyMetadata->getGenId() ?? true;
-
+                $childContext = $this->createChildContext($this->createOperationContext($context, $className, $propertyMetadata), $attribute, $format);
                 $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
 
                 return $this->serializer->normalize($attributeValue, $format, $childContext);
@@ -760,12 +757,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
             if ('array' === $type->getBuiltinType()) {
                 if ($className = ($type->getCollectionValueTypes()[0] ?? null)?->getClassName()) {
-                    $context = $this->createOperationContext($context, $className);
+                    $context = $this->createOperationContext($context, $className, $propertyMetadata);
                 }
 
                 $childContext = $this->createChildContext($context, $attribute, $format);
-                $childContext['output']['gen_id'] = $propertyMetadata->getGenId() ?? true;
-
                 $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
 
                 return $this->serializer->normalize($attributeValue, $format, $childContext);
@@ -821,12 +816,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function normalizeRelation(ApiProperty $propertyMetadata, ?object $relatedObject, string $resourceClass, ?string $format, array $context): \ArrayObject|array|string|null
     {
-        if (null === $relatedObject || !empty($context['attributes']) || $propertyMetadata->isReadableLink()) {
+        if (null === $relatedObject || !empty($context['attributes']) || $propertyMetadata->isReadableLink() || false === ($context['output']['gen_id'] ?? true)) {
             if (!$this->serializer instanceof NormalizerInterface) {
                 throw new LogicException(\sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
             }
 
-            $relatedContext = $this->createOperationContext($context, $resourceClass);
+            $relatedContext = $this->createOperationContext($context, $resourceClass, $propertyMetadata);
             $normalizedRelatedObject = $this->serializer->normalize($relatedObject, $format, $relatedContext);
             if (!\is_string($normalizedRelatedObject) && !\is_array($normalizedRelatedObject) && !$normalizedRelatedObject instanceof \ArrayObject && null !== $normalizedRelatedObject) {
                 throw new UnexpectedValueException('Expected normalized relation to be an IRI, array, \ArrayObject or null');
@@ -918,7 +913,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 && $this->resourceClassResolver->isResourceClass($className)
             ) {
                 $resourceClass = $this->resourceClassResolver->getResourceClass(null, $className);
-                $childContext = $this->createChildContext($this->createOperationContext($context, $resourceClass), $attribute, $format);
+                $childContext = $this->createChildContext($this->createOperationContext($context, $resourceClass, $propertyMetadata), $attribute, $format);
 
                 try {
                     return $this->denormalizeRelation($attribute, $propertyMetadata, $resourceClass, $value, $format, $childContext);

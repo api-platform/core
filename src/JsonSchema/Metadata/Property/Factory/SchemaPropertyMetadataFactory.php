@@ -88,14 +88,19 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
 
         $types = $propertyMetadata->getBuiltinTypes() ?? [];
 
-        if (!\array_key_exists('default', $propertySchema) && !empty($default = $propertyMetadata->getDefault()) && (!\count($types) || null === ($className = $types[0]->getClassName()) || !$this->isResourceClass($className))) {
+        if (
+            !\array_key_exists('default', $propertySchema)
+            && null !== ($default = $propertyMetadata->getDefault())
+            && false === (\is_array($default) && empty($default))
+            && (!\count($types) || null === ($className = $types[0]->getClassName()) || !$this->isResourceClass($className))
+        ) {
             if ($default instanceof \BackedEnum) {
                 $default = $default->value;
             }
             $propertySchema['default'] = $default;
         }
 
-        if (!\array_key_exists('example', $propertySchema) && !empty($example = $propertyMetadata->getExample())) {
+        if (!\array_key_exists('example', $propertySchema) && null !== ($example = $propertyMetadata->getExample()) && false === (\is_array($example) && empty($example))) {
             $propertySchema['example'] = $example;
         }
 
@@ -104,7 +109,8 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
         }
 
         // never override the following keys if at least one is already set or if there's a custom openapi context
-        if ([] === $types
+        if (
+            [] === $types
             || ($propertySchema['type'] ?? $propertySchema['$ref'] ?? $propertySchema['anyOf'] ?? $propertySchema['allOf'] ?? $propertySchema['oneOf'] ?? false)
             || \array_key_exists('type', $propertyMetadata->getOpenapiContext() ?? [])
         ) {

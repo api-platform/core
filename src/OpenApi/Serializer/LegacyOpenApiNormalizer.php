@@ -45,6 +45,11 @@ final class LegacyOpenApiNormalizer implements NormalizerInterface
                     }
                     unset($schemas[$name]['properties'][$property]['type']);
                 }
+
+                if (\is_array($value['examples'] ?? false)) {
+                    $schemas[$name]['properties'][$property]['example'] = $value['examples'];
+                    unset($schemas[$name]['properties'][$property]['examples']);
+                }
             }
         }
 
