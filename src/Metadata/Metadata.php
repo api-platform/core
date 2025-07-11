@@ -15,9 +15,6 @@ namespace ApiPlatform\Metadata;
 
 use ApiPlatform\State\OptionsInterface;
 
-/**
- * @internal
- */
 abstract class Metadata
 {
     protected ?Parameters $parameters = null;
