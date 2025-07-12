@@ -15,6 +15,9 @@ namespace ApiPlatform\Metadata;
 
 use ApiPlatform\State\OptionsInterface;
 
+/**
+ * @psalm-inheritors ApiResource|Operation
+ */
 abstract class Metadata
 {
     protected ?Parameters $parameters = null;
