@@ -126,6 +126,10 @@ final class PhpDocResourceMetadataCollectionFactory implements ResourceMetadataC
             return $this->docBlocks[$class];
         }
 
+        if (!$this->phpDocParser || !$this->lexer) {
+            return null;
+        }
+
         try {
             $reflectionClass = new \ReflectionClass($class);
         } catch (\ReflectionException) {
@@ -133,7 +137,6 @@ final class PhpDocResourceMetadataCollectionFactory implements ResourceMetadataC
         }
 
         $rawDocNode = $reflectionClass->getDocComment();
-
         if (!$rawDocNode) {
             return null;
         }
