@@ -97,7 +97,12 @@ use Symfony\Component\Validator\Constraints\Country;
     parameters: [
         'enum' => new QueryParameter(
             schema: ['enum' => ['a', 'b'], 'uniqueItems' => true],
-            castToArray: true
+            castToArray: true,
+            openApi: new OpenApiParameter(name: 'enum', in: 'query', style: 'deepObject')
+        ),
+        'enumNotDeepObject' => new QueryParameter(
+            schema: ['enum' => ['a', 'b'], 'uniqueItems' => true],
+            castToArray: true,
         ),
         'num' => new QueryParameter(
             schema: ['minimum' => 1, 'maximum' => 3],
