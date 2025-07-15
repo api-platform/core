@@ -16,6 +16,10 @@ services:
         arguments: [ { 'id': ~, 'name': 'desc', 'description': ~, 'relatedDummy.name': ~, 'embeddedDummy.dummyName': 'desc', 'relatedDummy.symfony': ~, 'dummyDate': ~} ]
         tags:      [ { name: 'api_platform.filter', id: 'my_dummy.order' } ]
 
+    app.some_custom_filter_without_description:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\Filter\NoDescriptionFilter'
+        tags:      [ { name: 'api_platform.filter', id: 'some_custom_filter_without_description' } ]
+
     app.my_dummy_resource.date_filter:
         parent:    'api_platform.doctrine.orm.date_filter'
         arguments: [ { 'dummyDate': ~, 'relatedDummy.dummyDate': ~, 'embeddedDummy.dummyDate': ~ } ]

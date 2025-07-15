@@ -267,6 +267,14 @@ use Symfony\Component\Validator\Constraints\Country;
     ],
     provider: [self::class, 'noopProvider'],
 )]
+#[GetCollection(
+    uriTemplate: 'with_parameters_filter_without_property{._format}',
+    parameters: [
+        'myParam' => new QueryParameter(filter: 'some_custom_filter_without_description'),
+    ],
+    provider: [self::class, 'collectionProvider'],
+)]
+
 #[QueryParameter(key: 'everywhere')]
 class WithParameter
 {

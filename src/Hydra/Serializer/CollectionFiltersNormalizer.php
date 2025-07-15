@@ -152,16 +152,20 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
                         continue;
                     }
 
-                    if (($prop = $parameter->getProperty()) && ($description['property'] ?? null) !== $prop) {
+                    if (!($descriptionProperty = $description['property'] ?? null)) {
+                        continue;
+                    }
+
+                    if (($prop = $parameter->getProperty()) && $descriptionProperty !== $prop) {
                         continue;
                     }
 
                     // :property is a pattern allowed when defining parameters
-                    $k = str_replace(':property', $description['property'], $key);
-                    $variable = str_replace($description['property'], $k, $variable);
+                    $k = str_replace(':property', $descriptionProperty, $key);
+                    $variable = str_replace($descriptionProperty, $k, $variable);
                     $variables[] = $variable;
-                    $m = ['@type' => 'IriTemplateMapping', 'variable' => $variable, 'property' => $description['property'], 'required' => $description['required']];
-                    if (null !== ($required = $parameter->getRequired())) {
+                    $m = ['@type' => 'IriTemplateMapping', 'variable' => $variable, 'property' => $descriptionProperty];
+                    if (null !== ($required = $parameter->getRequired() ?? $description['required'] ?? null)) {
                         $m['required'] = $required;
                     }
                     $mapping[] = $m;

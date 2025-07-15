@@ -41,4 +41,14 @@ final class HydraTest extends ApiTestCase
             ],
         ]], $response->toArray());
     }
+
+    public function testNoPropertyDescription(): void
+    {
+        $response = self::createClient()->request('GET', 'with_parameters_filter_without_property.jsonld');
+        $this->assertArraySubset(['hydra:search' => [
+            'hydra:template' => '/with_parameters_filter_without_property.jsonld{?}',
+            'hydra:mapping' => [
+            ],
+        ]], $response->toArray());
+    }
 }
