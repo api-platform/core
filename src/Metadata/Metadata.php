@@ -16,7 +16,7 @@ namespace ApiPlatform\Metadata;
 use ApiPlatform\State\OptionsInterface;
 
 /**
- * @internal
+ * @psalm-inheritors ApiResource|Operation
  */
 abstract class Metadata
 {
