@@ -43,6 +43,15 @@ final class BackedEnumFilterTest extends DoctrineOrmFilterTestCase
                 'invalid case for nested property' => [
                     \sprintf('SELECT o FROM %s o', Dummy::class),
                 ],
+                'valid case (multiple values)' => [
+                    \sprintf('SELECT o FROM %s o WHERE o.dummyBackedEnum IN (:dummyBackedEnum_p1)', Dummy::class),
+                    [
+                        'dummyBackedEnum_p1' => [
+                            'one',
+                            'two',
+                        ],
+                    ],
+                ],
             ]
         );
     }
