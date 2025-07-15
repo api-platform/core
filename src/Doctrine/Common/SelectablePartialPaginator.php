@@ -35,7 +35,7 @@ final class SelectablePartialPaginator implements \IteratorAggregate, PartialPag
      * @param Selectable<array-key,T> $selectable
      */
     public function __construct(
-        readonly Selectable $selectable,
+        public readonly Selectable $selectable,
         private readonly float $currentPage,
         private readonly float $itemsPerPage,
     ) {
