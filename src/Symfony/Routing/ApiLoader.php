@@ -37,7 +37,7 @@ final class ApiLoader extends Loader
 
     private readonly XmlFileLoader $fileLoader;
 
-    public function __construct(KernelInterface $kernel, private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly ContainerInterface $container, private readonly array $formats, private readonly array $resourceClassDirectories = [], private readonly bool $graphqlEnabled = false, private readonly bool $entrypointEnabled = true, readonly bool $docsEnabled = true, private readonly bool $graphiQlEnabled = false)
+    public function __construct(KernelInterface $kernel, private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly ContainerInterface $container, private readonly array $formats, private readonly array $resourceClassDirectories = [], private readonly bool $graphqlEnabled = false, private readonly bool $entrypointEnabled = true, public readonly bool $docsEnabled = true, private readonly bool $graphiQlEnabled = false)
     {
         /** @var string[]|string $paths */
         $paths = $kernel->locateResource('@ApiPlatformBundle/Resources/config/routing');
