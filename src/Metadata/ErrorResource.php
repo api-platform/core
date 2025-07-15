@@ -83,6 +83,7 @@ class ErrorResource extends ApiResource
         $provider = null,
         $processor = null,
         ?OptionsInterface $stateOptions = null,
+        ?bool $jsonStream = null,
         array $extraProperties = [],
     ) {
         parent::__construct(
@@ -149,6 +150,7 @@ class ErrorResource extends ApiResource
             provider: $provider,
             processor: $processor,
             stateOptions: $stateOptions,
+            jsonStream: $jsonStream,
             extraProperties: $extraProperties
         );
     }

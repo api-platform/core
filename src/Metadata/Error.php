@@ -94,6 +94,7 @@ final class Error extends HttpOperation
         $processor = null,
         ?OptionsInterface $stateOptions = null,
         ?bool $hideHydraOperation = null,
+        ?bool $jsonStream = null,
         array $extraProperties = [],
     ) {
         parent::__construct(
@@ -169,6 +170,7 @@ final class Error extends HttpOperation
             processor: $processor,
             stateOptions: $stateOptions,
             hideHydraOperation: $hideHydraOperation,
+            jsonStream: $jsonStream,
             extraProperties: $extraProperties,
         );
     }
