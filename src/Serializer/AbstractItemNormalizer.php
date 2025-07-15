@@ -399,11 +399,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $class;
         }
 
-        if (!isset($data[$mapping->getTypeProperty()])) {
+        // @phpstan-ignore-next-line function.alreadyNarrowedType
+        $defaultType = method_exists($mapping, 'getDefaultType') ? $mapping->getDefaultType() : null;
+        if (!isset($data[$mapping->getTypeProperty()]) && null === $defaultType) {
             throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Type property "%s" not found for the abstract object "%s".', $mapping->getTypeProperty(), $class), null, ['string'], isset($context['deserialization_path']) ? $context['deserialization_path'].'.'.$mapping->getTypeProperty() : $mapping->getTypeProperty());
         }
 
-        $type = $data[$mapping->getTypeProperty()];
+        $type = $data[$mapping->getTypeProperty()] ?? $defaultType;
         if (null === ($mappedClass = $mapping->getClassForType($type))) {
             throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type "%s" is not a valid value.', $type), $type, ['string'], isset($context['deserialization_path']) ? $context['deserialization_path'].'.'.$mapping->getTypeProperty() : $mapping->getTypeProperty(), true);
         }
