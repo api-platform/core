@@ -202,6 +202,7 @@ final class ErrorListener extends SymfonyErrorListener
             'jsonproblem' => '_api_errors_problem',
             'jsonld' => '_api_errors_hydra',
             'jsonapi' => '_api_errors_jsonapi',
+            'xml' => '_api_errors_xml',
             'html' => '_api_errors_problem', // This will be intercepted by the SwaggerUiProvider
             default => '_api_errors_problem',
         };
