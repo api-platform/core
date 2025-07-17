@@ -25,15 +25,14 @@
         "php": ">=8.2",
         "api-platform/metadata": "^4.1.11",
         "symfony/type-info": "^7.3",
+        "symfony/http-kernel": "^6.4 || ^7.1",
+        "symfony/serializer": "^6.4 || ^7.1",
+        "symfony/validator": "^6.4 || ^7.1",
         "symfony/web-link": "^6.4 || ^7.1"
     },
     "require-dev": {
         "phpspec/prophecy-phpunit": "^2.2",
-        "symfony/serializer": "^6.4 || ^7.0",
-        "phpunit/phpunit": "11.5.x-dev",
-        "symfony/validator": "^6.4 || ^7.0",
-        "symfony/http-kernel": "^6.4 || ^7.0",
-        "symfony/type-info": "^7.3"
+        "phpunit/phpunit": "11.5.x-dev"
     },
     "autoload": {
         "psr-4": {

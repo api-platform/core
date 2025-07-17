@@ -107,13 +107,13 @@ Feature: Documentation support
     #And the "isDummyBoolean" property exists for the OpenAPI class "DummyBoolean"
     #And the "isDummyBoolean" property is not read only for the OpenAPI class "DummyBoolean"
     # Filters
-    And the JSON node "paths./dummies.get.parameters[3].name" should be equal to "dummyBoolean"
-    And the JSON node "paths./dummies.get.parameters[3].in" should be equal to "query"
-    And the JSON node "paths./dummies.get.parameters[3].required" should be false
-    And the JSON node "paths./dummies.get.parameters[3].schema.type" should be equal to "boolean"
+    And the JSON node "paths./dummies.get.parameters[4].name" should be equal to "dummyBoolean"
+    And the JSON node "paths./dummies.get.parameters[4].in" should be equal to "query"
+    And the JSON node "paths./dummies.get.parameters[4].required" should be false
+    And the JSON node "paths./dummies.get.parameters[4].schema.type" should be equal to "boolean"
 
-    And the JSON node "paths./dummy_cars.get.parameters[8].name" should be equal to "foobar[]"
-    And the JSON node "paths./dummy_cars.get.parameters[8].description" should be equal to "Allows you to reduce the response to contain only the properties you need. If your desired property is nested, you can address it using nested arrays. Example: foobar[]={propertyName}&foobar[]={anotherPropertyName}&foobar[{nestedPropertyParent}][]={nestedProperty}"
+    And the JSON node "paths./dummy_cars.get.parameters[9].name" should be equal to "foobar[]"
+    And the JSON node "paths./dummy_cars.get.parameters[9].description" should be equal to "Allows you to reduce the response to contain only the properties you need. If your desired property is nested, you can address it using nested arrays. Example: foobar[]={propertyName}&foobar[]={anotherPropertyName}&foobar[{nestedPropertyParent}][]={nestedProperty}"
 
     # Webhook
     And the JSON node "webhooks.a.get.description" should be equal to "Something else here for example"
@@ -140,16 +140,16 @@ Feature: Documentation support
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[3].required" should be false
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[3].schema.type" should be equal to "boolean"
 
-    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[4].name" should be equal to "name"
-    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[4].in" should be equal to "query"
-    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[4].required" should be false
-    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[4].schema.type" should be equal to "string"
-
-    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[5].name" should be equal to "description"
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[5].name" should be equal to "name"
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[5].in" should be equal to "query"
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[5].required" should be false
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[5].schema.type" should be equal to "string"
 
-    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters" should have 6 elements
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[6].name" should be equal to "description"
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[6].in" should be equal to "query"
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters[6].required" should be false
+
+    And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.parameters" should have 7 elements
 
     # Subcollection - check schema
     And the JSON node "paths./related_dummies/{id}/related_to_dummy_friends.get.responses.200.content.application/ld+json.schema.allOf[1].properties.hydra:member.items.$ref" should be equal to "#/components/schemas/RelatedToDummyFriend.jsonld-fakemanytomany"

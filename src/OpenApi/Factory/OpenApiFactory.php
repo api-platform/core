@@ -845,6 +845,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             );
         }
 
+        if ($operation->getPaginationClientPartial() ?? $this->paginationOptions->isClientPartialPaginationEnabled()) {
+            $parameters[] = new Parameter($this->paginationOptions->getPartialPaginationParameterName(), 'query', 'Enable or disable partial pagination', false, false, true, ['type' => 'boolean']);
+        }
+
         return $parameters;
     }
 

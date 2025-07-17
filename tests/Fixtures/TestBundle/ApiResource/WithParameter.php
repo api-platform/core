@@ -97,7 +97,12 @@ use Symfony\Component\Validator\Constraints\Country;
     parameters: [
         'enum' => new QueryParameter(
             schema: ['enum' => ['a', 'b'], 'uniqueItems' => true],
-            castToArray: true
+            castToArray: true,
+            openApi: new OpenApiParameter(name: 'enum', in: 'query', style: 'deepObject')
+        ),
+        'enumNotDeepObject' => new QueryParameter(
+            schema: ['enum' => ['a', 'b'], 'uniqueItems' => true],
+            castToArray: true,
         ),
         'num' => new QueryParameter(
             schema: ['minimum' => 1, 'maximum' => 3],
@@ -267,6 +272,14 @@ use Symfony\Component\Validator\Constraints\Country;
     ],
     provider: [self::class, 'noopProvider'],
 )]
+#[GetCollection(
+    uriTemplate: 'with_parameters_filter_without_property{._format}',
+    parameters: [
+        'myParam' => new QueryParameter(filter: 'some_custom_filter_without_description'),
+    ],
+    provider: [self::class, 'collectionProvider'],
+)]
+
 #[QueryParameter(key: 'everywhere')]
 class WithParameter
 {

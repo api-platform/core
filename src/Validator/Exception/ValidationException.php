@@ -52,7 +52,6 @@ use Symfony\Component\WebLink\Link;
             name: '_api_validation_errors_problem',
             outputFormats: [
                 'json' => ['application/problem+json'],
-                'xml' => ['application/xml', 'text/xml'],
             ],
             normalizationContext: [
                 SchemaFactory::OPENAPI_DEFINITION_NAME => '',
@@ -81,6 +80,17 @@ use Symfony\Component\WebLink\Link;
                 'groups' => ['jsonapi'],
                 'skip_null_values' => true,
                 'ignored_attributes' => ['trace', 'file', 'line', 'code', 'message', 'traceAsString', 'previous'],
+            ]
+        ),
+        new ErrorOperation(
+            name: '_api_validation_errors_xml',
+            outputFormats: [
+                'xml' => ['application/xml', 'text/xml'],
+            ],
+            normalizationContext: [
+                'groups' => ['json'],
+                'ignored_attributes' => ['trace', 'file', 'line', 'code', 'message', 'traceAsString', 'previous'],
+                'skip_null_values' => true,
             ]
         ),
     ],

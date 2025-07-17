@@ -115,7 +115,12 @@ final class ParameterValidatorProvider implements ProviderInterface
             return str_replace(':property', $violation->getPropertyPath(), $key);
         }
 
-        if ($p = $violation->getPropertyPath()) {
+        $openApi = $parameter->getOpenApi();
+        if (false === $openApi) {
+            $openApi = null;
+        }
+
+        if ('deepObject' === $openApi?->getStyle() && $p = $violation->getPropertyPath()) {
             return $key.$p;
         }
 

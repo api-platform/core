@@ -38,7 +38,6 @@ use Symfony\Component\WebLink\Link;
             routeName: '_api_errors',
             outputFormats: [
                 'json' => ['application/problem+json', 'application/json'],
-                'xml' => ['application/xml', 'text/xml'],
             ],
             hideHydraOperation: true,
             normalizationContext: [
@@ -71,6 +70,21 @@ use Symfony\Component\WebLink\Link;
                 SchemaFactory::OPENAPI_DEFINITION_NAME => '',
                 'disable_json_schema_serializer_groups' => false,
                 'groups' => ['jsonapi'],
+                'skip_null_values' => true,
+                'ignored_attributes' => ['trace', 'file', 'line', 'code', 'message', 'traceAsString', 'previous'],
+            ],
+        ),
+        new Operation(
+            errors: [],
+            name: '_api_errors_xml',
+            routeName: '_api_errors',
+            outputFormats: [
+                'xml' => ['application/xml', 'text/xml'],
+            ],
+            hideHydraOperation: true,
+            normalizationContext: [
+                SchemaFactory::OPENAPI_DEFINITION_NAME => '',
+                'groups' => ['jsonproblem'],
                 'skip_null_values' => true,
                 'ignored_attributes' => ['trace', 'file', 'line', 'code', 'message', 'traceAsString', 'previous'],
             ],
