@@ -26,8 +26,9 @@ class Options extends CommonOptions implements OptionsInterface
     public function __construct(
         protected ?string $entityClass = null,
         mixed $handleLinks = null,
+        ?string $repositoryMethod = null,
     ) {
-        parent::__construct(handleLinks: $handleLinks);
+        parent::__construct(handleLinks: $handleLinks, repositoryMethod: $repositoryMethod);
     }
 
     public function getEntityClass(): ?string
