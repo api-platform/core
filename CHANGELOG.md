@@ -1,5 +1,17 @@
 # Changelog
 
+## v4.1.19
+
+### Bug fixes
+
+* [2c06a22e2](https://github.com/api-platform/core/commit/2c06a22e244e5b0683558589a7ed2d7dd34a16a2) fix(validation): moving dependency from require-dev to require (#7296)
+* [2cde06246](https://github.com/api-platform/core/commit/2cde06246cd593ad094de9c8f0ad1b178608f275) fix(openapi): output `partial` query parameter to OpenAPI when `pagination_client_enabled` is true (#7295)
+* [6bc112193](https://github.com/api-platform/core/commit/6bc11219320315af1a811ab49a4c451498f75430) fix(metadata): do not fail if phpstan/phpdoc-parser is missing (#7279)
+* [871e5d3e1](https://github.com/api-platform/core/commit/871e5d3e1916e0d8bd1b4e1c4d983cd270a0922f) fix(symfony): restore graphql_playground option (#7274)
+* [d1e6772e3](https://github.com/api-platform/core/commit/d1e6772e32f632a5612f79ec58cad874af938694) fix(validation): property path on deepObject style (#7179)
+* [d35e46b14](https://github.com/api-platform/core/commit/d35e46b1426063dbed4b59d1f07dbbde398a390e) fix(hydra): "property" may not be defined (#7293)
+* [f3a54a239](https://github.com/api-platform/core/commit/f3a54a239e21c18716967e579d2cd2120a52ece1) fix: json formatted resource should not get xml errors #7287 (#7297)
+
 ## v4.1.18
 
 ### Bug fixes
