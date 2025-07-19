@@ -113,8 +113,11 @@ class Dummy
     #[ORM\ManyToOne(targetEntity: RelatedDummy::class)]
     public ?RelatedDummy $relatedDummy = null;
 
+    /**
+     * @var Collection<int, RelatedDummy>
+     */
     #[ORM\ManyToMany(targetEntity: RelatedDummy::class)]
-    public Collection|iterable $relatedDummies;
+    public Collection $relatedDummies;
 
     /**
      * @var array|null serialize data
@@ -318,7 +321,10 @@ class Dummy
         return $this->dummy;
     }
 
-    public function getRelatedDummies(): Collection|iterable
+    /**
+     * @return Collection<int, RelatedDummy>
+     */
+    public function getRelatedDummies(): Collection
     {
         return $this->relatedDummies;
     }
