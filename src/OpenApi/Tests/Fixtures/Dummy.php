@@ -213,11 +213,6 @@ class Dummy
         $this->relatedDummy = $relatedDummy;
     }
 
-    public function addRelatedDummy(RelatedDummy $relatedDummy): void
-    {
-        $this->relatedDummies->add($relatedDummy);
-    }
-
     public function isDummyBoolean(): ?bool
     {
         return $this->dummyBoolean;

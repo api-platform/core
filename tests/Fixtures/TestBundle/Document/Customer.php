@@ -29,9 +29,13 @@ class Customer
     #[Groups(['order_read'])]
     #[ODM\Field(type: 'string')]
     public $name;
+
+    /**
+     * @var Collection<int, Address>
+     */
     #[Groups(['order_read'])]
     #[ODM\ReferenceMany(targetDocument: Address::class)]
-    public Collection|iterable $addresses;
+    public Collection $addresses;
 
     public function __construct()
     {

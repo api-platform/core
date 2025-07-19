@@ -83,7 +83,7 @@ class SecuredDummy
      * A collection of dummies that only admins can access.
      */
     #[ApiProperty(security: "is_granted('ROLE_ADMIN')")]
-    public Collection|iterable $relatedDummies;
+    public iterable $relatedDummies;
 
     /**
      * A dummy that only admins can access.
@@ -97,7 +97,7 @@ class SecuredDummy
      * A collection of dummies that only users can access. The security on RelatedSecuredDummy shouldn't be run.
      */
     #[ApiProperty(security: "is_granted('ROLE_USER')")]
-    public Collection|iterable $relatedSecuredDummies;
+    public iterable $relatedSecuredDummies;
 
     /**
      * A dummy that only users can access. The security on RelatedSecuredDummy shouldn't be run.

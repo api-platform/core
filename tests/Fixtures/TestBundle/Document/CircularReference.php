@@ -33,9 +33,13 @@ class CircularReference
     #[Groups(['circular'])]
     #[ODM\ReferenceOne(targetDocument: self::class, inversedBy: 'children')]
     public $parent;
+
+    /**
+     * @var Collection<int, self>
+     */
     #[Groups(['circular'])]
     #[ODM\ReferenceMany(targetDocument: self::class, mappedBy: 'parent')]
-    public Collection|iterable $children;
+    public Collection $children;
 
     public function __construct()
     {

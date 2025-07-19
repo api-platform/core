@@ -50,7 +50,7 @@ class Answer
      */
     #[ORM\OneToMany(targetEntity: Question::class, mappedBy: 'answer')]
     #[Serializer\Groups(['foobar'])]
-    private Collection|iterable $relatedQuestions;
+    private Collection $relatedQuestions;
 
     public function __construct()
     {
@@ -106,7 +106,7 @@ class Answer
     /**
      * Get related question.
      */
-    public function getRelatedQuestions(): Collection|iterable
+    public function getRelatedQuestions(): Collection
     {
         return $this->relatedQuestions;
     }
