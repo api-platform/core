@@ -46,12 +46,18 @@ class Person
     #[Groups(['people.pets'])]
     public array $academicGrades = [];
 
+    /**
+     * @var Collection<int, PersonToPet>
+     */
     #[Groups(['people.pets'])]
     #[ODM\ReferenceMany(targetDocument: PersonToPet::class, mappedBy: 'person')]
-    public Collection|iterable $pets;
+    public Collection $pets;
 
+    /**
+     * @var Collection<int, Greeting>
+     */
     #[ODM\ReferenceMany(targetDocument: Greeting::class, mappedBy: 'sender')]
-    public Collection|iterable|null $sentGreetings = null;
+    public Collection $sentGreetings;
 
     public function __construct()
     {
