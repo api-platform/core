@@ -51,9 +51,13 @@ class OptionalRequiredDummy
     #[Groups(['barcelona', 'chicago', 'friends'])]
     public ThirdLevel $thirdLevelRequired;
 
+
+    /**
+     * @var Collection<int, RelatedToDummyFriend>
+     */
     #[ORM\OneToMany(targetEntity: RelatedToDummyFriend::class, cascade: ['persist'], mappedBy: 'relatedDummy')]
     #[Groups(['fakemanytomany', 'friends'])]
-    public Collection|iterable $relatedToDummyFriend;
+    public Collection $relatedToDummyFriend;
 
     public function __construct()
     {
@@ -91,9 +95,11 @@ class OptionalRequiredDummy
     }
 
     /**
-     * Get relatedToDummyFriend.
+     *  Get relatedToDummyFriend.
+     *
+     * @return Collection<int, RelatedToDummyFriend>
      */
-    public function getRelatedToDummyFriend(): Collection|iterable
+    public function getRelatedToDummyFriend(): Collection
     {
         return $this->relatedToDummyFriend;
     }

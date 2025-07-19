@@ -82,9 +82,12 @@ class RelatedDummy extends ParentDummy implements \Stringable
     #[Groups(['barcelona', 'chicago', 'friends'])]
     public ?ThirdLevel $thirdLevel = null;
 
+    /**
+     * @var Collection<int, RelatedToDummyFriend>
+     */
     #[ORM\OneToMany(targetEntity: RelatedToDummyFriend::class, cascade: ['persist'], mappedBy: 'relatedDummy')]
     #[Groups(['fakemanytomany', 'friends'])]
-    public Collection|iterable $relatedToDummyFriend;
+    public Collection $relatedToDummyFriend;
 
     /**
      * @var bool|null A dummy bool
@@ -168,8 +171,10 @@ class RelatedDummy extends ParentDummy implements \Stringable
 
     /**
      * Get relatedToDummyFriend.
+     *
+     * @return Collection<int, RelatedToDummyFriend>
      */
-    public function getRelatedToDummyFriend(): Collection|iterable
+    public function getRelatedToDummyFriend(): Collection
     {
         return $this->relatedToDummyFriend;
     }
