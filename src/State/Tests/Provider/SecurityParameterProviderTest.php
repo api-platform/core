@@ -31,7 +31,7 @@ final class SecurityParameterProviderTest extends TestCase
         $barObj = new \stdClass();
         $operation = new GetCollection(uriVariables: [
             'barId' => new Link(toProperty: 'bar', fromClass: 'Bar', security: 'is_granted("some_voter", "bar")'),
-        ], class: 'Foo');
+        ], class: \stdClass::class);
         $decorated = $this->createMock(ProviderInterface::class);
         $decorated->method('provide')->willReturn($obj);
         $request = $this->createMock(Request::class);
@@ -52,7 +52,7 @@ final class SecurityParameterProviderTest extends TestCase
         $barObj = new \stdClass();
         $operation = new GetCollection(uriVariables: [
             'barId' => new Link(toProperty: 'bar', fromClass: 'Bar', security: 'is_granted("some_voter", "bar")'),
-        ], class: 'Foo');
+        ], class: \stdClass::class);
         $decorated = $this->createMock(ProviderInterface::class);
         $decorated->method('provide')->willReturn($obj);
         $request = $this->createMock(Request::class);
@@ -74,7 +74,7 @@ final class SecurityParameterProviderTest extends TestCase
         $barObj = new \stdClass();
         $operation = new GetCollection(uriVariables: [
             'barId' => new Link(toProperty: 'bar', fromClass: 'Bar', security: 'is_granted("some_voter", "bar")', securityMessage: 'You are not admin.'),
-        ], class: 'Foo');
+        ], class: \stdClass::class);
         $decorated = $this->createMock(ProviderInterface::class);
         $decorated->method('provide')->willReturn($obj);
         $request = $this->createMock(Request::class);

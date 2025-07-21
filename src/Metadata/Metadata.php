@@ -23,6 +23,7 @@ abstract class Metadata
     protected ?Parameters $parameters = null;
 
     /**
+     * @param class-string                                                                      $class
      * @param string|null                                                                       $deprecationReason       https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
      * @param string|\Stringable|null                                                           $security                https://api-platform.com/docs/core/security
      * @param string|\Stringable|null                                                           $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
@@ -104,11 +105,17 @@ abstract class Metadata
         return $self;
     }
 
+    /**
+     * @return class-string|null
+     */
     public function getClass(): ?string
     {
         return $this->class;
     }
 
+    /**
+     * @param class-string $class
+     */
     public function withClass(string $class): static
     {
         $self = clone $this;

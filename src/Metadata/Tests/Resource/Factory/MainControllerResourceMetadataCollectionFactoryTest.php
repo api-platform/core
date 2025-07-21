@@ -29,14 +29,14 @@ class MainControllerResourceMetadataCollectionFactoryTest extends TestCase
         $decorated->method('create')->willReturn(new ResourceMetadataCollection('Dummy', [
             new ApiResource(
                 shortName: 'AttributeResource',
-                class: 'Dummy',
+                class: \stdClass::class,
                 operations: [
-                    'get' => new Get(shortName: 'AttributeResource', class: 'Dummy'),
+                    'get' => new Get(shortName: 'AttributeResource', class: \stdClass::class),
                 ]
             ),
         ]));
 
-        $apiResource = (new MainControllerResourceMetadataCollectionFactory($decorated))->create('Dummy');
+        $apiResource = (new MainControllerResourceMetadataCollectionFactory($decorated))->create(\stdClass::class);
         $operation = $apiResource->getOperation();
         $this->assertInstanceOf(HttpOperation::class, $operation);
         $this->assertEquals($operation->getController(), 'api_platform.symfony.main_controller');

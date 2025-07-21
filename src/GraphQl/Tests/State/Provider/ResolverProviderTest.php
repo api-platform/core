@@ -28,7 +28,7 @@ class ResolverProviderTest extends TestCase
     public function testProvide(): void
     {
         $res = new \stdClass();
-        $operation = new QueryCollection(class: 'dummy', resolver: 'foo');
+        $operation = new QueryCollection(class: \stdClass::class, resolver: 'foo');
         $context = [];
         $decorated = $this->createMock(ProviderInterface::class);
         $resolverMock = $this->createMock(QueryItemResolverInterface::class);

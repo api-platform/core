@@ -51,7 +51,7 @@ class AddTagsProcessorTest extends TestCase
 
     public function testAddTagsCollection(): void
     {
-        $operation = new GetCollection(class: 'Foo', uriVariables: ['id' => new Link()]);
+        $operation = new GetCollection(class: \stdClass::class, uriVariables: ['id' => new Link()]);
         $response = $this->createMock(Response::class);
         $response->method('isCacheable')->willReturn(true);
         $response->headers = $this->createMock(ResponseHeaderBag::class);
@@ -65,7 +65,7 @@ class AddTagsProcessorTest extends TestCase
         $decorated = $this->createMock(ProcessorInterface::class);
         $decorated->method('process')->willReturn($response);
         $iriConverter = $this->createMock(IriConverterInterface::class);
-        $iriConverter->expects($this->once())->method('getIriFromResource')->with('Foo', UrlGeneratorInterface::ABS_PATH, $operation, ['uri_variables' => ['id' => 1]])->willReturn('/foos/1/bars');
+        $iriConverter->expects($this->once())->method('getIriFromResource')->with(\stdClass::class, UrlGeneratorInterface::ABS_PATH, $operation, ['uri_variables' => ['id' => 1]])->willReturn('/foos/1/bars');
         $processor = new AddTagsProcessor($decorated, $iriConverter);
         $processor->process($response, $operation, [], $context);
     }

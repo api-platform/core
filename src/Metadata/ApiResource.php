@@ -42,6 +42,7 @@ class ApiResource extends Metadata
     /**
      * @param list<HttpOperation>|array<string, HttpOperation>|Operations<HttpOperation>|null $operations   Operations is a list of HttpOperation
      * @param array<string, Link>|array<string, mixed[]>|string[]|string|null                 $uriVariables
+     * @param class-string                                                                    $class
      * @param array<string, string>                                                           $headers
      * @param string|callable|null                                                            $provider
      * @param string|callable|null                                                            $processor
