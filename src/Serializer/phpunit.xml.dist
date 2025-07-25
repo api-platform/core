@@ -8,7 +8,7 @@
       <directory>./Tests/</directory>
     </testsuite>
   </testsuites>
-  <source ignoreSuppressionOfDeprecations="true" ignoreIndirectDeprecations="false">
+  <source ignoreSuppressionOfDeprecations="true" ignoreIndirectDeprecations="false" baseline="phpunit.baseline.xml">
     <deprecationTrigger>
         <function>trigger_deprecation</function>
     </deprecationTrigger>

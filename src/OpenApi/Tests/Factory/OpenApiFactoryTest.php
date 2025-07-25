@@ -182,6 +182,7 @@ class OpenApiFactoryTest extends TestCase
                 'paginatedDummyCollection' => (new GetCollection())->withUriTemplate('/paginated')
                     ->withPaginationClientEnabled(true)
                     ->withPaginationClientItemsPerPage(true)
+                    ->withPaginationClientPartial(true)
                     ->withPaginationItemsPerPage(20)
                     ->withPaginationMaximumItemsPerPage(80)
                     ->withOperation($baseOperation),
@@ -992,6 +993,9 @@ class OpenApiFactoryTest extends TestCase
                     'maximum' => 80,
                 ]),
                 new Parameter('pagination', 'query', 'Enable or disable pagination', false, false, true, [
+                    'type' => 'boolean',
+                ]),
+                new Parameter('partial', 'query', 'Enable or disable partial pagination', false, false, true, [
                     'type' => 'boolean',
                 ]),
             ]

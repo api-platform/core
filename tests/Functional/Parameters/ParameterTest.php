@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Functional\Parameters;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\WithParameter;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class ParameterTest extends ApiTestCase
 {
@@ -96,8 +97,17 @@ final class ParameterTest extends ApiTestCase
     {
         $response = self::createClient()->request('GET', 'with_parameters_header_and_query?q=blabla', ['headers' => ['q' => '(complex stuff)']]);
         $this->assertEquals($response->toArray(), [
-            ['(complex stuff)'],
+            '(complex stuff)',
             'blabla',
+        ]);
+    }
+
+    public function testHeaderAndQueryWithArray(): void
+    {
+        $response = self::createClient()->request('GET', 'with_parameters_header_and_query?q[]=blabla', ['headers' => ['q' => '(complex stuff)']]);
+        $this->assertEquals($response->toArray(), [
+            '(complex stuff)',
+            ['blabla'],
         ]);
     }
 
@@ -108,5 +118,100 @@ final class ParameterTest extends ApiTestCase
 
         self::createClient()->request('GET', 'header_required', ['headers' => []]);
         $this->assertResponseStatusCodeSame(422);
+    }
+
+    #[DataProvider('provideHeaderValues')]
+    public function testHeaderParameter(string $url, array $headers, int $expectedStatusCode): void
+    {
+        self::createClient()->request('GET', $url, ['headers' => $headers]);
+        $this->assertResponseStatusCodeSame($expectedStatusCode);
+    }
+
+    public static function provideHeaderValues(): iterable
+    {
+        // header_integer
+        yield 'missing header header_integer' => ['header_integer', [], 200];
+        yield 'valid integer header_integer' => ['header_integer', ['Foo' => '3'], 200];
+        yield 'too high header_integer' => ['header_integer', ['Foo' => '6'], 422];
+        yield 'too low header_integer' => ['header_integer', ['Foo' => '0'], 422];
+        yield 'invalid integer header_integer' => ['header_integer', ['Foo' => 'string'], 422];
+
+        // header_float
+        yield 'missing header header_float' => ['header_float', [], 200];
+        yield 'valid float header_float' => ['header_float', ['Bar' => '3.5'], 200];
+        yield 'valid integer header_float' => ['header_float', ['Bar' => '3'], 200];
+        yield 'too high header_float' => ['header_float', ['Bar' => '600'], 422];
+        yield 'too low header_float' => ['header_float', ['Bar' => '0'], 422];
+        yield 'invalid number header_float' => ['header_float', ['Bar' => 'string'], 422];
+
+        // header_boolean
+        yield 'missing header header_boolean' => ['header_boolean', [], 200];
+        yield 'valid boolean false header_boolean' => ['header_boolean', ['Lorem' => 'false'], 200];
+        yield 'valid boolean true header_boolean' => ['header_boolean', ['Lorem' => 'true'], 200];
+        yield 'valid boolean 0 header_boolean' => ['header_boolean', ['Lorem' => 0], 200];
+        yield 'valid boolean 0 string header_boolean' => ['header_boolean', ['Lorem' => '0'], 200];
+        yield 'valid boolean 1 header_boolean' => ['header_boolean', ['Lorem' => 1], 200];
+        yield 'valid boolean 1 string header_boolean' => ['header_boolean', ['Lorem' => '1'], 200];
+        yield 'invalid boolean header_boolean' => ['header_boolean', ['Lorem' => 'string'], 422];
+    }
+
+    #[DataProvider('provideQueryValues')]
+    public function testQueryParameter(string $url, array $query, int $expectedStatusCode): void
+    {
+        self::createClient()->request('GET', $url, ['query' => $query]);
+        $this->assertResponseStatusCodeSame($expectedStatusCode);
+    }
+
+    public static function provideQueryValues(): iterable
+    {
+        // query_integer
+        yield 'valid integer query_integer' => ['query_integer', ['Foo' => '3'], 200];
+        yield 'too high query_integer' => ['query_integer', ['Foo' => '6'], 422];
+        yield 'too low query_integer' => ['query_integer', ['Foo' => '0'], 422];
+        yield 'invalid integer query_integer' => ['query_integer', ['Foo' => 'string'], 422];
+
+        // query_float
+        yield 'valid float query_float' => ['query_float', ['Bar' => '3.5'], 200];
+        yield 'valid integer query_float' => ['query_float', ['Bar' => '3'], 200];
+        yield 'too high query_float' => ['query_float', ['Bar' => '600'], 422];
+        yield 'too low query_float' => ['query_float', ['Bar' => '0'], 422];
+        yield 'invalid number query_float' => ['query_float', ['Bar' => 'string'], 422];
+
+        // query_boolean
+        yield 'valid boolean false query_boolean' => ['query_boolean', ['Lorem' => false], 200];
+        yield 'valid boolean false string query_boolean' => ['query_boolean', ['Lorem' => 'false'], 200];
+        yield 'valid boolean true query_boolean' => ['query_boolean', ['Lorem' => true], 200];
+        yield 'valid boolean true string query_boolean' => ['query_boolean', ['Lorem' => 'true'], 200];
+        yield 'valid boolean 0 query_boolean' => ['query_boolean', ['Lorem' => 0], 200];
+        yield 'valid boolean 0 string query_boolean' => ['query_boolean', ['Lorem' => '0'], 200];
+        yield 'valid boolean 1 query_boolean' => ['query_boolean', ['Lorem' => 1], 200];
+        yield 'valid boolean 1 string query_boolean' => ['query_boolean', ['Lorem' => '1'], 200];
+        yield 'invalid boolean query_boolean' => ['query_boolean', ['Lorem' => 'string'], 422];
+    }
+
+    #[DataProvider('provideCountryValues')]
+    public function testIssue7157(string $queryParameter, int $expectedStatusCode): void
+    {
+        self::createClient()->request('GET', 'with_parameters_country?'.$queryParameter);
+        $this->assertResponseStatusCodeSame($expectedStatusCode);
+    }
+
+    public static function provideCountryValues(): iterable
+    {
+        yield 'valid country' => ['country=FR', 200];
+        yield 'array of countries' => ['country[]=FR', 422];
+    }
+
+    #[DataProvider('provideCountriesValues')]
+    public function testIssue7157WithCountries(string $queryParameter, int $expectedStatusCode): void
+    {
+        self::createClient()->request('GET', 'with_parameters_countries?'.$queryParameter);
+        $this->assertResponseStatusCodeSame($expectedStatusCode);
+    }
+
+    public static function provideCountriesValues(): iterable
+    {
+        yield 'valid country' => ['country=FR', 200];
+        yield 'array of countries' => ['country[]=FR', 200];
     }
 }

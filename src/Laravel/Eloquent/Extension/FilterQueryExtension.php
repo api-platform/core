@@ -53,6 +53,11 @@ final readonly class FilterQueryExtension implements QueryExtensionInterface
                 continue;
             }
 
+            // most eloquent filters work with only a single value
+            if (\is_array($values) && array_is_list($values) && 1 === \count($values)) {
+                $values = current($values);
+            }
+
             $filter = $filterId instanceof FilterInterface ? $filterId : ($this->filterLocator->has($filterId) ? $this->filterLocator->get($filterId) : null);
             if ($filter instanceof FilterInterface) {
                 $builder = $filter->apply($builder, $values, $parameter, $context + ($parameter->getFilterContext() ?? []));

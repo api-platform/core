@@ -34,7 +34,7 @@ final class CollectionPaginator implements \IteratorAggregate, PaginatorInterfac
      * @param ReadableCollection<array-key,T> $collection
      */
     public function __construct(
-        readonly ReadableCollection $collection,
+        public readonly ReadableCollection $collection,
         private readonly float $currentPage,
         private readonly float $itemsPerPage,
     ) {

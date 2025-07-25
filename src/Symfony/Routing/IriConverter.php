@@ -16,6 +16,7 @@ namespace ApiPlatform\Symfony\Routing;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\InvalidIdentifierException;
+use ApiPlatform\Metadata\Exception\InvalidUriVariableException;
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\Exception\RuntimeException;
@@ -99,7 +100,7 @@ final class IriConverter implements IriConverterInterface
 
         try {
             $uriVariables = $this->getOperationUriVariables($operation, $parameters, $attributes['resource_class']);
-        } catch (InvalidIdentifierException $e) {
+        } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
 
@@ -121,7 +122,7 @@ final class IriConverter implements IriConverterInterface
             $operation = $this->operationMetadataFactory->create($context['item_uri_template']);
         }
 
-        $localOperationCacheKey = ($operation?->getName() ?? '').$resourceClass.(\is_string($resource) ? '_c' : '_i');
+        $localOperationCacheKey = ($operation?->getName() ?? '').$resourceClass.((\is_string($resource) || $operation instanceof CollectionOperationInterface) ? '_c' : '_i');
         if ($operation && isset($this->localOperationCache[$localOperationCacheKey])) {
             return $this->generateSymfonyRoute($resource, $referenceType, $this->localOperationCache[$localOperationCacheKey], $context, $this->localIdentifiersExtractorOperationCache[$localOperationCacheKey] ?? null);
         }

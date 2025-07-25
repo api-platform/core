@@ -33,12 +33,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
+use Symfony\Component\HttpFoundation\EventStreamResponse;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
-use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -153,21 +153,13 @@ class ItemNormalizerTest extends TestCase
 
         $normalizer->setSerializer($this->prophesize(SerializerInterface::class)->reveal());
 
-        $circularReferenceLimit = 2;
-        if (!interface_exists(AdvancedNameConverterInterface::class) && method_exists($normalizer, 'setCircularReferenceLimit')) {
-            $normalizer->setCircularReferenceLimit($circularReferenceLimit);
-
-            $context = [
-                'circular_reference_limit' => [spl_object_hash($circularReferenceEntity) => 2],
-                'cache_error' => function (): void {},
-            ];
-        } else {
-            $context = [
-                'circular_reference_limit' => $circularReferenceLimit,
-                'circular_reference_limit_counters' => [spl_object_hash($circularReferenceEntity) => 2],
-                'cache_error' => function (): void {},
-            ];
-        }
+        // Symfony >= 7.3
+        $splObject = class_exists(EventStreamResponse::class) ? spl_object_id($circularReferenceEntity) : spl_object_hash($circularReferenceEntity);
+        $context = [
+            'circular_reference_limit' => 2,
+            'circular_reference_limit_counters' => [$splObject => 2],
+            'cache_error' => function (): void {},
+        ];
 
         $this->assertSame('/circular_references/1', $normalizer->normalize($circularReferenceEntity, ItemNormalizer::FORMAT, $context));
     }

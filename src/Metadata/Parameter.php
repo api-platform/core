@@ -16,6 +16,7 @@ namespace ApiPlatform\Metadata;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ParameterProviderInterface;
+use Symfony\Component\TypeInfo\Type;
 
 /**
  * @experimental
@@ -26,9 +27,12 @@ abstract class Parameter
      * @param (array<string, mixed>&array{type?: string, default?: string})|null $schema
      * @param array<string, mixed>                                               $extraProperties
      * @param ParameterProviderInterface|callable|string|null                    $provider
-     * @param list<string>                                                       $properties      a list of properties this parameter applies to (works with the :property placeholder)
+     * @param list<string>                                                       $properties       a list of properties this parameter applies to (works with the :property placeholder)
      * @param FilterInterface|string|null                                        $filter
-     * @param mixed                                                              $constraints     an array of Symfony constraints, or an array of Laravel rules
+     * @param mixed                                                              $constraints      an array of Symfony constraints, or an array of Laravel rules
+     * @param Type                                                               $nativeType       the PHP native type, we cast values to an array if its a CollectionType, if not and it's an array with a single value we use it (eg: HTTP Header)
+     * @param ?bool                                                              $castToNativeType whether API Platform should cast your parameter to the nativeType declared
+     * @param ?callable(mixed): mixed                                            $castFn           the closure used to cast your parameter, this gets called only when $castToNativeType is set
      */
     public function __construct(
         protected ?string $key = null,
@@ -47,6 +51,10 @@ abstract class Parameter
         protected ?string $securityMessage = null,
         protected ?array $extraProperties = [],
         protected array|string|null $filterContext = null,
+        protected ?Type $nativeType = null,
+        protected ?bool $castToArray = null,
+        protected ?bool $castToNativeType = null,
+        protected mixed $castFn = null,
     ) {
     }
 
@@ -129,6 +137,12 @@ abstract class Parameter
         return $this->extraProperties['_api_values'] ?? $default;
     }
 
+    /**
+     * Only use this in a parameter provider, the ApiPlatform\State\Provider\ParameterProvider
+     * resets this value to extract the correct value on each request.
+     * It's also possible to set the `_api_query_parameters` request attribute directly and
+     * API Platform will extract the value from there.
+     */
     public function setValue(mixed $value): static
     {
         $this->extraProperties['_api_values'] = $value;
@@ -293,6 +307,61 @@ abstract class Parameter
     {
         $self = clone $this;
         $self->properties = $properties;
+
+        return $self;
+    }
+
+    public function getNativeType(): ?Type
+    {
+        return $this->nativeType;
+    }
+
+    public function withNativeType(Type $nativeType): self
+    {
+        $self = clone $this;
+        $self->nativeType = $nativeType;
+
+        return $self;
+    }
+
+    public function getCastToArray(): ?bool
+    {
+        return $this->castToArray;
+    }
+
+    public function withCastToArray(bool $castToArray): self
+    {
+        $self = clone $this;
+        $self->castToArray = $castToArray;
+
+        return $self;
+    }
+
+    public function getCastToNativeType(): ?bool
+    {
+        return $this->castToNativeType;
+    }
+
+    public function withCastToNativeType(bool $castToNativeType): self
+    {
+        $self = clone $this;
+        $self->castToNativeType = $castToNativeType;
+
+        return $self;
+    }
+
+    public function getCastFn(): ?callable
+    {
+        return $this->castFn;
+    }
+
+    /**
+     * @param callable(mixed): mixed $castFn
+     */
+    public function withCastFn(mixed $castFn): self
+    {
+        $self = clone $this;
+        $self->castFn = $castFn;
 
         return $self;
     }

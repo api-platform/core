@@ -312,7 +312,7 @@ class ApiLoaderTest extends TestCase
 
         $resourceMetadataFactory = $resourceMetadataFactoryProphecy->reveal();
 
-        return new ApiLoader($kernelProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactory, $containerProphecy->reveal(), ['jsonld' => ['application/ld+json']], [], false, true, true, false, false);
+        return new ApiLoader($kernelProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactory, $containerProphecy->reveal(), ['jsonld' => ['application/ld+json']], [], false, true, true, false);
     }
 
     private function getRoute(string $path, string $controller, ?bool $stateless, string $resourceClass, array $identifiers, string $operationName, array $extraDefaults = [], array $methods = [], array $requirements = [], array $options = [], string $host = '', array $schemes = [], string $condition = ''): Route
@@ -321,7 +321,7 @@ class ApiLoaderTest extends TestCase
             $path,
             [
                 '_controller' => $controller,
-                '_format' => null,
+                '_format' => $extraDefaults['_format'] ?? null,
                 '_stateless' => $stateless,
                 '_api_resource_class' => $resourceClass,
                 '_api_operation_name' => $operationName,

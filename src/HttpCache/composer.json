@@ -23,8 +23,8 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/metadata": "^4.1",
-        "api-platform/state": "^4.1",
+        "api-platform/metadata": "^4.1.11",
+        "api-platform/state": "^4.1.11",
         "symfony/http-foundation": "^6.4 || ^7.0"
     },
     "require-dev": {
@@ -55,7 +55,8 @@
     "extra": {
         "branch-alias": {
             "dev-main": "4.2.x-dev",
-            "dev-3.4": "3.4.x-dev"
+            "dev-3.4": "3.4.x-dev",
+            "dev-4.1": "4.1.x-dev"
         },
         "symfony": {
             "require": "^6.4 || ^7.0"

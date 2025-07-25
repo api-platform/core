@@ -148,6 +148,7 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         }
 
         // here the object can be different from the resource given by the $context['api_resource'] value
+        // TODO: this is probably not used anymore and is slow we get that @type way earlier, remove this
         if (isset($context['api_resource'])) {
             $jsonLdContext['@type'] = $this->resourceMetadataFactory->create($this->getObjectClass($context['api_resource']))[0]->getShortName();
         }

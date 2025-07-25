@@ -205,7 +205,22 @@ If you include code from another project, please mention it in the Pull Request 
 This section is for maintainers.
 
 1. Update the JavaScript dependencies by running `./update-js.sh` (always check if it works in a browser)
-2. Update the `CHANGELOG.md` file (be sure to include Pull Request numbers when appropriate)
-3. Create a signed tag: `git tag -s vX.Y.Z -m "Version X.Y.Z"`
-4. Create a release using GitHub's UI and copy the changelog 
-5. Create a new release of `api-platform/api-platform`
+2. Update the `CHANGELOG.md` file (be sure to include Pull Request numbers when appropriate) we use:
+
+```bash
+bash generate-changelog.sh v4.1.11 v4.1.12 > CHANGELOG.new
+mv CHANGELOG.new CHANGELOG.md
+```
+4. Update `composer.json` `version` node and use 
+
+```bash
+composer blend --json-path=version 
+```
+
+This will update all the sub-components `composer.json`.
+
+4. Create a signed tag: `git tag -s vX.Y.Z -m "Version X.Y.Z"`
+5. `git push upstream tag vX.Y.Z`
+6. `gh release create --generate-notes vX.Y.Z`
+7. Create a new release of `api-platform/api-platform`
+

@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Workbench\App\Models\Comment;
 
 /**
- * @template TModel of \Workbench\App\Models\Author
+ * @template TModel of \Workbench\App\Models\Comment
  *
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<TModel>
  */

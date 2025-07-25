@@ -36,7 +36,9 @@ use Symfony\Component\WebLink\Link;
             errors: [],
             name: '_api_errors_problem',
             routeName: '_api_errors',
-            outputFormats: ['json' => ['application/problem+json', 'application/json']],
+            outputFormats: [
+                'json' => ['application/problem+json', 'application/json'],
+            ],
             hideHydraOperation: true,
             normalizationContext: [
                 SchemaFactory::OPENAPI_DEFINITION_NAME => '',
@@ -73,6 +75,21 @@ use Symfony\Component\WebLink\Link;
             ],
         ),
         new Operation(
+            errors: [],
+            name: '_api_errors_xml',
+            routeName: '_api_errors',
+            outputFormats: [
+                'xml' => ['application/xml', 'text/xml'],
+            ],
+            hideHydraOperation: true,
+            normalizationContext: [
+                SchemaFactory::OPENAPI_DEFINITION_NAME => '',
+                'groups' => ['jsonproblem'],
+                'skip_null_values' => true,
+                'ignored_attributes' => ['trace', 'file', 'line', 'code', 'message', 'traceAsString', 'previous'],
+            ],
+        ),
+        new Operation(
             name: '_api_errors',
             hideHydraOperation: true,
             extraProperties: ['_api_disable_swagger_provider' => true],
@@ -81,10 +98,16 @@ use Symfony\Component\WebLink\Link;
                 'jsonapi' => ['application/vnd.api+json'],
                 'jsonld' => ['application/ld+json'],
                 'json' => ['application/problem+json', 'application/json'],
+                'xml' => ['application/xml', 'text/xml'],
             ],
         ),
     ],
-    outputFormats: ['jsonapi' => ['application/vnd.api+json'], 'jsonld' => ['application/ld+json'], 'json' => ['application/problem+json', 'application/json']],
+    outputFormats: [
+        'jsonapi' => ['application/vnd.api+json'],
+        'jsonld' => ['application/ld+json'],
+        'json' => ['application/problem+json', 'application/json'],
+        'xml' => ['application/xml', 'text/xml'],
+    ],
     provider: 'api_platform.state.error_provider',
     graphQlOperations: [],
     description: 'A representation of common errors.',

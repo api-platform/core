@@ -14,7 +14,14 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\GenIdFalse\AggregateRating;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\GenIdFalse\GenIdFalse;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\GenIdFalse\LevelFirst;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\GenIdFalse\LevelThird;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6810\JsonLdContextOutput;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7298\ImageModuleResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7298\PageResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7298\TitleModuleResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6465\Bar;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6465\Foo;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
@@ -32,7 +39,7 @@ class JsonLdTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [Foo::class, Bar::class, JsonLdContextOutput::class];
+        return [Foo::class, Bar::class, JsonLdContextOutput::class, GenIdFalse::class, AggregateRating::class, LevelFirst::class, LevelThird::class, PageResource::class, TitleModuleResource::class, ImageModuleResource::class];
     }
 
     /**
@@ -64,6 +71,61 @@ class JsonLdTest extends ApiTestCase
             '@vocab' => 'http://localhost/docs.jsonld#',
             'hydra' => 'http://www.w3.org/ns/hydra/core#',
             'foo' => 'Output/foo',
+        ]);
+    }
+
+    public function testGenIdFalseOnResource(): void
+    {
+        $r = self::createClient()->request(
+            'GET',
+            '/gen_id_falsy',
+        );
+        $this->assertJsonContains([
+            'aggregateRating' => ['ratingValue' => 2, 'ratingCount' => 3],
+        ]);
+        $this->assertArrayNotHasKey('@id', $r->toArray()['aggregateRating']);
+    }
+
+    public function testGenIdFalseOnNestedResource(): void
+    {
+        $r = self::createClient()->request(
+            'GET',
+            '/levelfirst/1',
+        );
+        $res = $r->toArray();
+        $this->assertArrayNotHasKey('@id', $res['levelSecond']);
+        $this->assertArrayHasKey('@id', $res['levelSecond'][0]['levelThird']);
+    }
+
+    public function testShouldIgnoreProperty(): void
+    {
+        $r = self::createClient()->request(
+            'GET',
+            '/contexts/GenIdFalse',
+        );
+        $this->assertArrayNotHasKey('shouldBeIgnored', $r->toArray()['@context']);
+    }
+
+    public function testIssue7298(): void
+    {
+        self::createClient()->request(
+            'GET',
+            '/page_resources/page-1',
+        );
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains([
+            'modules' => [
+                [
+                    '@type' => 'TitleModuleResource',
+                    'id' => 'title-module-1',
+                    'title' => 'My Title',
+                ],
+                [
+                    '@type' => 'ImageModule',
+                    'id' => 'image-module-1',
+                    'url' => 'http://example.com/image.jpg',
+                ],
+            ],
         ]);
     }
 

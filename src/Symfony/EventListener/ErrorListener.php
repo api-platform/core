@@ -68,8 +68,9 @@ final class ErrorListener extends SymfonyErrorListener
     protected function duplicateRequest(\Throwable $exception, Request $request): Request
     {
         $format = $this->getRequestFormat($request, $this->errorFormats, false);
-        // Because ErrorFormatGuesser is buggy in some cases
-        $request->setRequestFormat($format);
+        // Reset the request format as it may be that the original request format negotiation won't have the same result
+        // when an error occurs
+        $request->setRequestFormat(null);
         $apiOperation = $this->initializeOperation($request);
 
         // TODO: add configuration flag to:
@@ -201,6 +202,7 @@ final class ErrorListener extends SymfonyErrorListener
             'jsonproblem' => '_api_errors_problem',
             'jsonld' => '_api_errors_hydra',
             'jsonapi' => '_api_errors_jsonapi',
+            'xml' => '_api_errors_xml',
             'html' => '_api_errors_problem', // This will be intercepted by the SwaggerUiProvider
             default => '_api_errors_problem',
         };

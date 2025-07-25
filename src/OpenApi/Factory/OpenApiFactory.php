@@ -251,10 +251,8 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             [$requestMimeTypes, $responseMimeTypes] = $this->getMimeTypes($operation);
 
-            if ($path) {
-                $pathItem = $paths->getPath($path) ?: new PathItem();
-            } elseif (!$pathItem) {
-                $pathItem = new PathItem();
+            if (null === $pathItem) {
+                $pathItem = $paths->getPath($path) ?? new PathItem();
             }
 
             $forceSchemaCollection = $operation instanceof CollectionOperationInterface && 'GET' === $method;
@@ -755,6 +753,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
         if ($operation->getPaginationClientEnabled() ?? $this->paginationOptions->isPaginationClientEnabled()) {
             $parameters[] = new Parameter($this->paginationOptions->getPaginationClientEnabledParameterName(), 'query', 'Enable or disable pagination', false, false, true, ['type' => 'boolean']);
+        }
+
+        if ($operation->getPaginationClientPartial() ?? $this->paginationOptions->isClientPartialPaginationEnabled()) {
+            $parameters[] = new Parameter($this->paginationOptions->getPartialPaginationParameterName(), 'query', 'Enable or disable partial pagination', false, false, true, ['type' => 'boolean']);
         }
 
         return $parameters;
