@@ -16,7 +16,6 @@ namespace ApiPlatform\Symfony\Bundle;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AttributeFilterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AttributeResourcePass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AuthenticatorManagerPass;
-use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\DataProviderPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ElasticsearchClientPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlResolverPass;
@@ -44,7 +43,6 @@ final class ApiPlatformBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new DataProviderPass());
         // Run the compiler pass before the {@see ResolveInstanceofConditionalsPass} to allow autoconfiguration of generated filter definitions.
         $container->addCompilerPass(new AttributeFilterPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 101);
         $container->addCompilerPass(new AttributeResourcePass());

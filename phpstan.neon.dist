@@ -104,12 +104,6 @@ parameters:
 				- src/Serializer/AbstractConstraintViolationListNormalizer.php
 				- src/Symfony/Validator/Serializer/ValidationExceptionNormalizer.php
 
-		# See https://github.com/phpstan/phpstan-symfony/issues/27
-		-
-			message: '#^Service "[^"]+" is private.$#'
-			path: src
-
-
 		# Allow extra assertions in tests: https://github.com/phpstan/phpstan-strict-rules/issues/130
 		- '#^Call to (static )?method PHPUnit\\Framework\\Assert::.* will always evaluate to true\.$#'
 
