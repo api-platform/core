@@ -262,7 +262,7 @@ final class PropertyFilter implements FilterInterface, OpenApiParameterFilterInt
         return $result;
     }
 
-    private function denormalizePropertyName($property): string
+    private function denormalizePropertyName(string $property): string
     {
         return null !== $this->nameConverter ? $this->nameConverter->denormalize($property) : $property;
     }

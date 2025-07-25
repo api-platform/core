@@ -81,7 +81,7 @@ trait DateFilterTrait
         ];
     }
 
-    private function normalizeValue($value, string $operator): ?string
+    private function normalizeValue(mixed $value, string $operator): ?string
     {
         if (false === \is_string($value)) {
             $this->getLogger()->notice('Invalid filter ignored', [

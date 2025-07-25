@@ -79,7 +79,7 @@ trait NumericFilterTrait
         return isset(self::DOCTRINE_NUMERIC_TYPES[(string) $this->getDoctrineFieldType($property, $resourceClass)]);
     }
 
-    protected function normalizeValues($value, string $property): ?array
+    protected function normalizeValues(mixed $value, string $property): ?array
     {
         if (!is_numeric($value) && (!\is_array($value) || !$this->isNumericArray($value))) {
             $this->getLogger()->notice('Invalid filter ignored', [

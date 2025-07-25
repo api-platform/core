@@ -40,6 +40,9 @@ final class ErrorNormalizer implements NormalizerInterface
         return $data instanceof Error;
     }
 
+    /**
+     * @param string|null $format
+     */
     public function getSupportedTypes($format): array
     {
         return [

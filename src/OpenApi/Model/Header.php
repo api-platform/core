@@ -163,7 +163,7 @@ final class Header
         return $clone;
     }
 
-    public function withExample($example): self
+    public function withExample(mixed $example): self
     {
         $clone = clone $this;
         $clone->example = $example;

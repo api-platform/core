@@ -75,7 +75,7 @@ trait BooleanFilterTrait
         return isset(self::DOCTRINE_BOOLEAN_TYPES[(string) $this->getDoctrineFieldType($property, $resourceClass)]);
     }
 
-    private function normalizeValue($value, string $property): ?bool
+    private function normalizeValue(mixed $value, string $property): ?bool
     {
         if (\in_array($value, [true, 'true', '1'], true)) {
             return true;
