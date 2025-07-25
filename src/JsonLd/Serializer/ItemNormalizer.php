@@ -115,6 +115,10 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 $context['output']['iri'] = null;
             }
 
+            if ($this->resourceClassResolver->isResourceClass($resourceClass)) {
+                $context['output']['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
+            }
+
             // We should improve what's behind the context creation, its probably more complicated then it should
             $metadata = $this->createJsonLdContext($this->contextBuilder, $object, $context);
         }
