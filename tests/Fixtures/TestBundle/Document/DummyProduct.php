@@ -37,15 +37,23 @@ class DummyProduct
      */
     #[ODM\Id(strategy: 'None', type: 'int')]
     private ?int $id = null;
+
+    /**
+     * @var Collection<int, DummyAggregateOffer>
+     */
     #[ODM\ReferenceMany(targetDocument: DummyAggregateOffer::class, mappedBy: 'product', cascade: ['persist'])]
-    private Collection|iterable $offers;
+    private Collection $offers;
     /**
      * @var string The tour name
      */
     #[ODM\Field]
     private string $name;
+
+    /**
+     * @var Collection<int, self>
+     */
     #[ODM\ReferenceMany(targetDocument: self::class, mappedBy: 'parent')]
-    private Collection|iterable $relatedProducts;
+    private Collection $relatedProducts;
     #[ODM\ReferenceOne(targetDocument: self::class, inversedBy: 'relatedProducts')]
     private $parent;
 
@@ -55,12 +63,18 @@ class DummyProduct
         $this->relatedProducts = new ArrayCollection();
     }
 
-    public function getOffers(): Collection|iterable
+    /**
+     * @return Collection<int, DummyAggregateOffer>
+     */
+    public function getOffers(): Collection
     {
         return $this->offers;
     }
 
-    public function setOffers(Collection|iterable $offers): void
+    /**
+     * @param Collection<int, DummyAggregateOffer> $offers
+     */
+    public function setOffers(Collection $offers): void
     {
         $this->offers = $offers;
     }
@@ -91,12 +105,18 @@ class DummyProduct
         $this->name = $name;
     }
 
-    public function getRelatedProducts(): Collection|iterable
+    /**
+     * @return Collection<int, self>
+     */
+    public function getRelatedProducts(): Collection
     {
         return $this->relatedProducts;
     }
 
-    public function setRelatedProducts(Collection|iterable $relatedProducts): void
+    /**
+     * @param Collection<int, self> $relatedProducts
+     */
+    public function setRelatedProducts(Collection $relatedProducts): void
     {
         $this->relatedProducts = $relatedProducts;
     }
