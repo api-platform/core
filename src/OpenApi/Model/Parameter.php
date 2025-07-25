@@ -17,7 +17,7 @@ final class Parameter
 {
     use ExtensionTrait;
 
-    public function __construct(private string $name, private string $in, private string $description = '', private bool $required = false, private bool $deprecated = false, private bool $allowEmptyValue = false, private array $schema = [], private ?string $style = null, private bool $explode = false, private bool $allowReserved = false, private $example = null, private ?\ArrayObject $examples = null, private ?\ArrayObject $content = null)
+    public function __construct(private string $name, private string $in, private string $description = '', private bool $required = false, private bool $deprecated = false, private ?bool $allowEmptyValue = false, private array $schema = [], private ?string $style = null, private bool $explode = false, private ?bool $allowReserved = false, private $example = null, private ?\ArrayObject $examples = null, private ?\ArrayObject $content = null)
     {
         if (null === $style) {
             if ('query' === $in || 'cookie' === $in) {
@@ -148,7 +148,7 @@ final class Parameter
         return $clone;
     }
 
-    public function withAllowEmptyValue(bool $allowEmptyValue): self
+    public function withAllowEmptyValue(?bool $allowEmptyValue): self
     {
         $clone = clone $this;
         $clone->allowEmptyValue = $allowEmptyValue;
@@ -180,7 +180,7 @@ final class Parameter
         return $clone;
     }
 
-    public function withAllowReserved(bool $allowReserved): self
+    public function withAllowReserved(?bool $allowReserved): self
     {
         $clone = clone $this;
         $clone->allowReserved = $allowReserved;
