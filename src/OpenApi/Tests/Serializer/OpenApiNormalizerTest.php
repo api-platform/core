@@ -98,10 +98,10 @@ class OpenApiNormalizerTest extends TestCase
     public function testNormalize(): void
     {
         $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
-        $resourceNameCollectionFactoryProphecy->create()->shouldBeCalled()->willReturn(new ResourceNameCollection([Dummy::class, 'Zorro']));
+        $resourceNameCollectionFactoryProphecy->create()->shouldBeCalled()->willReturn(new ResourceNameCollection([Dummy::class, \stdClass::class]));
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description', 'dummyDate']));
-        $propertyNameCollectionFactoryProphecy->create('Zorro', Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['id']));
+        $propertyNameCollectionFactoryProphecy->create(\stdClass::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['id']));
 
         $baseOperation = (new HttpOperation())->withTypes(['http://schema.example.com/Dummy'])
                                               ->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats'])
@@ -127,7 +127,7 @@ class OpenApiNormalizerTest extends TestCase
         $zorroBaseOperation = (new HttpOperation())
             ->withTypes(['http://schema.example.com/Zorro'])
             ->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats'])
-            ->withClass('Zorro')
+            ->withClass(\stdClass::class)
             ->withShortName('Zorro')
             ->withDescription('This is zorro.');
 
@@ -142,7 +142,7 @@ class OpenApiNormalizerTest extends TestCase
 
         $resourceCollectionMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceCollectionMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn($dummyMetadata);
-        $resourceCollectionMetadataFactoryProphecy->create('Zorro')->shouldBeCalled()->willReturn($zorroMetadata);
+        $resourceCollectionMetadataFactoryProphecy->create(\stdClass::class)->shouldBeCalled()->willReturn($zorroMetadata);
         $resourceCollectionMetadataFactoryProphecy->create(Error::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Error::class, []));
         $resourceCollectionMetadataFactoryProphecy->create(ValidationException::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(ValidationException::class, []));
 
@@ -193,7 +193,7 @@ class OpenApiNormalizerTest extends TestCase
                 ->withSchema(['type' => 'string', 'format' => 'date-time', 'description' => 'This is a \DateTimeInterface object.'])
         );
 
-        $propertyMetadataFactoryProphecy->create('Zorro', 'id', Argument::any())->shouldBeCalled()->willReturn(
+        $propertyMetadataFactoryProphecy->create(\stdClass::class, 'id', Argument::any())->shouldBeCalled()->willReturn(
             (new ApiProperty())
                 ->withNativeType(Type::int())
                 ->withDescription('This is an id.')

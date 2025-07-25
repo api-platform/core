@@ -27,14 +27,14 @@ class DenormalizeProviderTest extends TestCase
     {
         $objectToPopulate = null;
         $context = ['args' => ['input' => ['test']]];
-        $operation = new Mutation(class: 'dummy');
+        $operation = new Mutation(class: \stdClass::class);
         $serializerContext = ['resource_class' => $operation->getClass()];
         $decorated = $this->createMock(ProviderInterface::class);
         $decorated->expects($this->once())->method('provide')->willReturn($objectToPopulate);
         $denormalizer = $this->createMock(DenormalizerInterface::class);
         $serializerContextBuilder = $this->createMock(SerializerContextBuilderInterface::class);
         $serializerContextBuilder->expects($this->once())->method('create')->with($operation->getClass(), $operation, $context, false)->willReturn($serializerContext);
-        $denormalizer->expects($this->once())->method('denormalize')->with(['test'], 'dummy', 'graphql', $serializerContext)->willReturn(new \stdClass());
+        $denormalizer->expects($this->once())->method('denormalize')->with(['test'], \stdClass::class, 'graphql', $serializerContext)->willReturn(new \stdClass());
         $provider = new DenormalizeProvider($decorated, $denormalizer, $serializerContextBuilder);
         $provider->provide($operation, [], $context);
     }
@@ -43,14 +43,14 @@ class DenormalizeProviderTest extends TestCase
     {
         $objectToPopulate = new \stdClass();
         $context = ['args' => ['input' => ['test']]];
-        $operation = new Mutation(class: 'dummy');
+        $operation = new Mutation(class: \stdClass::class);
         $serializerContext = ['resource_class' => $operation->getClass(), 'object_to_populate' => $objectToPopulate];
         $decorated = $this->createMock(ProviderInterface::class);
         $decorated->expects($this->once())->method('provide')->willReturn($objectToPopulate);
         $denormalizer = $this->createMock(DenormalizerInterface::class);
         $serializerContextBuilder = $this->createMock(SerializerContextBuilderInterface::class);
         $serializerContextBuilder->expects($this->once())->method('create')->with($operation->getClass(), $operation, $context, false)->willReturn($serializerContext);
-        $denormalizer->expects($this->once())->method('denormalize')->with(['test'], 'dummy', 'graphql', $serializerContext)->willReturn(new \stdClass());
+        $denormalizer->expects($this->once())->method('denormalize')->with(['test'], \stdClass::class, 'graphql', $serializerContext)->willReturn(new \stdClass());
         $provider = new DenormalizeProvider($decorated, $denormalizer, $serializerContextBuilder);
         $provider->provide($operation, [], $context);
     }
@@ -59,14 +59,14 @@ class DenormalizeProviderTest extends TestCase
     {
         $objectToPopulate = new \stdClass();
         $context = ['args' => ['input' => ['test']]];
-        $operation = new Query(class: 'dummy');
+        $operation = new Query(class: \stdClass::class);
         $serializerContext = ['resource_class' => $operation->getClass()];
         $decorated = $this->createMock(ProviderInterface::class);
         $decorated->expects($this->once())->method('provide')->willReturn($objectToPopulate);
         $denormalizer = $this->createMock(DenormalizerInterface::class);
         $serializerContextBuilder = $this->createMock(SerializerContextBuilderInterface::class);
         $serializerContextBuilder->expects($this->never())->method('create')->with($operation->getClass(), $operation, $context, false)->willReturn($serializerContext);
-        $denormalizer->expects($this->never())->method('denormalize')->with(['test'], 'dummy', 'graphql', $serializerContext)->willReturn(new \stdClass());
+        $denormalizer->expects($this->never())->method('denormalize')->with(['test'], \stdClass::class, 'graphql', $serializerContext)->willReturn(new \stdClass());
         $provider = new DenormalizeProvider($decorated, $denormalizer, $serializerContextBuilder);
         $provider->provide($operation, [], $context);
     }
@@ -75,14 +75,14 @@ class DenormalizeProviderTest extends TestCase
     {
         $objectToPopulate = new \stdClass();
         $context = ['args' => ['input' => ['test']]];
-        $operation = new Query(class: 'dummy', deserialize: false);
+        $operation = new Query(class: \stdClass::class, deserialize: false);
         $serializerContext = ['resource_class' => $operation->getClass()];
         $decorated = $this->createMock(ProviderInterface::class);
         $decorated->expects($this->once())->method('provide')->willReturn($objectToPopulate);
         $denormalizer = $this->createMock(DenormalizerInterface::class);
         $serializerContextBuilder = $this->createMock(SerializerContextBuilderInterface::class);
         $serializerContextBuilder->expects($this->never())->method('create')->with($operation->getClass(), $operation, $context, false)->willReturn($serializerContext);
-        $denormalizer->expects($this->never())->method('denormalize')->with(['test'], 'dummy', 'graphql', $serializerContext)->willReturn(new \stdClass());
+        $denormalizer->expects($this->never())->method('denormalize')->with(['test'], \stdClass::class, 'graphql', $serializerContext)->willReturn(new \stdClass());
         $provider = new DenormalizeProvider($decorated, $denormalizer, $serializerContextBuilder);
         $provider->provide($operation, [], $context);
     }

@@ -129,10 +129,10 @@ class FieldsBuilderTest extends TestCase
     public static function itemQueryFieldsProvider(): array
     {
         return [
-            'no resource field configuration' => ['resourceClass', (new Query())->withClass('resourceClass')->withName('action'), [], null, null, []],
-            'nested item query' => ['resourceClass', (new Query())->withNested(true)->withClass('resourceClass')->withName('action')->withShortName('ShortName'), [], new ObjectType(['name' => 'item', 'fields' => []]), function (): void {
+            'no resource field configuration' => [\stdClass::class, (new Query())->withClass(\stdClass::class)->withName('action'), [], null, null, []],
+            'nested item query' => [\stdClass::class, (new Query())->withNested(true)->withClass(\stdClass::class)->withName('action')->withShortName('ShortName'), [], new ObjectType(['name' => 'item', 'fields' => []]), function (): void {
             }, []],
-            'nominal standard type case with deprecation reason and description' => ['resourceClass', (new Query())->withClass('resourceClass')->withName('action')->withShortName('ShortName')->withDeprecationReason('not useful')->withDescription('Custom description.'), [], GraphQLType::string(), null,
+            'nominal standard type case with deprecation reason and description' => [\stdClass::class, (new Query())->withClass(\stdClass::class)->withName('action')->withShortName('ShortName')->withDeprecationReason('not useful')->withDescription('Custom description.'), [], GraphQLType::string(), null,
                 [
                     'actionShortName' => [
                         'type' => GraphQLType::string(),
@@ -145,7 +145,7 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
-            'nominal item case' => ['resourceClass', (new Query())->withClass('resourceClass')->withName('action')->withShortName('ShortName'), [], $graphqlType = new ObjectType(['name' => 'item', 'fields' => []]), $resolver = function (): void {
+            'nominal item case' => [\stdClass::class, (new Query())->withClass(\stdClass::class)->withName('action')->withShortName('ShortName'), [], $graphqlType = new ObjectType(['name' => 'item', 'fields' => []]), $resolver = function (): void {
             },
                 [
                     'actionShortName' => [
@@ -160,7 +160,7 @@ class FieldsBuilderTest extends TestCase
                 ],
             ],
             'empty overridden args and add fields' => [
-                'resourceClass', (new Query())->withClass('resourceClass')->withShortName('ShortName'), ['args' => [], 'name' => 'customActionName'], GraphQLType::string(), null,
+                \stdClass::class, (new Query())->withClass(\stdClass::class)->withShortName('ShortName'), ['args' => [], 'name' => 'customActionName'], GraphQLType::string(), null,
                 [
                     'shortName' => [
                         'type' => GraphQLType::string(),
@@ -173,7 +173,7 @@ class FieldsBuilderTest extends TestCase
                 ],
             ],
             'override args with custom ones' => [
-                'resourceClass', (new Query())->withClass('resourceClass')->withShortName('ShortName'), ['args' => ['customArg' => ['type' => 'a type']]], GraphQLType::string(), null,
+                \stdClass::class, (new Query())->withClass(\stdClass::class)->withShortName('ShortName'), ['args' => ['customArg' => ['type' => 'a type']]], GraphQLType::string(), null,
                 [
                     'shortName' => [
                         'type' => GraphQLType::string(),
@@ -221,10 +221,10 @@ class FieldsBuilderTest extends TestCase
     public static function collectionQueryFieldsProvider(): array
     {
         return [
-            'no resource field configuration' => ['resourceClass', (new QueryCollection())->withClass('resourceClass')->withName('action'), [], null, null, []],
-            'nested collection query' => ['resourceClass', (new QueryCollection())->withNested(true)->withClass('resourceClass')->withName('action')->withShortName('ShortName'), [], GraphQLType::listOf(new ObjectType(['name' => 'collection', 'fields' => []])), function (): void {
+            'no resource field configuration' => [\stdClass::class, (new QueryCollection())->withClass(\stdClass::class)->withName('action'), [], null, null, []],
+            'nested collection query' => [\stdClass::class, (new QueryCollection())->withNested(true)->withClass(\stdClass::class)->withName('action')->withShortName('ShortName'), [], GraphQLType::listOf(new ObjectType(['name' => 'collection', 'fields' => []])), function (): void {
             }, []],
-            'nominal collection case with deprecation reason and description' => ['resourceClass', (new QueryCollection())->withClass('resourceClass')->withName('action')->withShortName('ShortName')->withDeprecationReason('not useful')->withDescription('Custom description.'), [], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection', 'fields' => []])), $resolver = function (): void {
+            'nominal collection case with deprecation reason and description' => [\stdClass::class, (new QueryCollection())->withClass(\stdClass::class)->withName('action')->withShortName('ShortName')->withDeprecationReason('not useful')->withDescription('Custom description.'), [], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection', 'fields' => []])), $resolver = function (): void {
             },
                 [
                     'actionShortNames' => [
@@ -253,7 +253,7 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
-            'collection with filters' => ['resourceClass', (new QueryCollection())->withClass('resourceClass')->withName('action')->withShortName('ShortName')->withFilters(['my_filter']), [], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection', 'fields' => []])), $resolver = function (): void {
+            'collection with filters' => [\stdClass::class, (new QueryCollection())->withClass(\stdClass::class)->withName('action')->withShortName('ShortName')->withFilters(['my_filter']), [], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection', 'fields' => []])), $resolver = function (): void {
             },
                 [
                     'actionShortNames' => [
@@ -287,7 +287,7 @@ class FieldsBuilderTest extends TestCase
                 ],
             ],
             'collection empty overridden args and add fields' => [
-                'resourceClass', (new QueryCollection())->withArgs([])->withClass('resourceClass')->withName('action')->withShortName('ShortName'), ['args' => [], 'name' => 'customActionName'], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection', 'fields' => []])), $resolver = function (): void {
+                \stdClass::class, (new QueryCollection())->withArgs([])->withClass(\stdClass::class)->withName('action')->withShortName('ShortName'), ['args' => [], 'name' => 'customActionName'], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection', 'fields' => []])), $resolver = function (): void {
                 },
                 [
                     'actionShortNames' => [
@@ -301,7 +301,7 @@ class FieldsBuilderTest extends TestCase
                 ],
             ],
             'collection override args with custom ones' => [
-                'resourceClass', (new QueryCollection())->withClass('resourceClass')->withName('action')->withShortName('ShortName'), ['args' => ['customArg' => ['type' => 'a type']]], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection', 'fields' => []])), $resolver = function (): void {
+                \stdClass::class, (new QueryCollection())->withClass(\stdClass::class)->withName('action')->withShortName('ShortName'), ['args' => ['customArg' => ['type' => 'a type']]], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection', 'fields' => []])), $resolver = function (): void {
                 },
                 [
                     'actionShortNames' => [
@@ -317,7 +317,7 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
-            'collection with page-based pagination enabled' => ['resourceClass', (new QueryCollection())->withClass('resourceClass')->withName('action')->withShortName('ShortName')->withPaginationType('page')->withFilters(['my_filter']), [], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection', 'fields' => []])), $resolver = function (): void {
+            'collection with page-based pagination enabled' => [\stdClass::class, (new QueryCollection())->withClass(\stdClass::class)->withName('action')->withShortName('ShortName')->withPaginationType('page')->withFilters(['my_filter']), [], $graphqlType = GraphQLType::listOf(new ObjectType(['name' => 'collection', 'fields' => []])), $resolver = function (): void {
             },
                 [
                     'actionShortNames' => [
@@ -357,7 +357,7 @@ class FieldsBuilderTest extends TestCase
     public static function mutationFieldsProvider(): array
     {
         return [
-            'nominal case with deprecation reason' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('action')->withShortName('ShortName')->withDeprecationReason('not useful'), $graphqlType = new ObjectType(['name' => 'mutation', 'fields' => []]), $inputGraphqlType = new ObjectType(['name' => 'input', 'fields' => []]), $mutationResolver = function (): void {
+            'nominal case with deprecation reason' => [\stdClass::class, (new Mutation())->withClass(\stdClass::class)->withName('action')->withShortName('ShortName')->withDeprecationReason('not useful'), $graphqlType = new ObjectType(['name' => 'mutation', 'fields' => []]), $inputGraphqlType = new ObjectType(['name' => 'input', 'fields' => []]), $mutationResolver = function (): void {
             },
                 [
                     'actionShortName' => [
@@ -377,7 +377,7 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
-            'custom description' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('action')->withShortName('ShortName')->withDescription('Custom description.'), $graphqlType = new ObjectType(['name' => 'mutation', 'fields' => []]), $inputGraphqlType = new ObjectType(['name' => 'input', 'fields' => []]), $mutationResolver = function (): void {
+            'custom description' => [\stdClass::class, (new Mutation())->withClass(\stdClass::class)->withName('action')->withShortName('ShortName')->withDescription('Custom description.'), $graphqlType = new ObjectType(['name' => 'mutation', 'fields' => []]), $inputGraphqlType = new ObjectType(['name' => 'input', 'fields' => []]), $mutationResolver = function (): void {
             },
                 [
                     'actionShortName' => [
@@ -417,9 +417,9 @@ class FieldsBuilderTest extends TestCase
     public static function subscriptionFieldsProvider(): array
     {
         return [
-            'mercure not enabled' => ['resourceClass', (new Subscription())->withClass('resourceClass')->withName('action')->withShortName('ShortName'), new ObjectType(['name' => 'subscription', 'fields' => []]), new ObjectType(['name' => 'input', 'fields' => []]), null, [],
+            'mercure not enabled' => [\stdClass::class, (new Subscription())->withClass(\stdClass::class)->withName('action')->withShortName('ShortName'), new ObjectType(['name' => 'subscription', 'fields' => []]), new ObjectType(['name' => 'input', 'fields' => []]), null, [],
             ],
-            'nominal case with deprecation reason' => ['resourceClass', (new Subscription())->withClass('resourceClass')->withName('action')->withShortName('ShortName')->withMercure(true)->withDeprecationReason('not useful'), $graphqlType = new ObjectType(['name' => 'subscription', 'fields' => []]), $inputGraphqlType = new ObjectType(['name' => 'input', 'fields' => []]), $subscriptionResolver = function (): void {
+            'nominal case with deprecation reason' => [\stdClass::class, (new Subscription())->withClass(\stdClass::class)->withName('action')->withShortName('ShortName')->withMercure(true)->withDeprecationReason('not useful'), $graphqlType = new ObjectType(['name' => 'subscription', 'fields' => []]), $inputGraphqlType = new ObjectType(['name' => 'input', 'fields' => []]), $subscriptionResolver = function (): void {
             },
                 [
                     'actionShortNameSubscribe' => [
@@ -439,7 +439,7 @@ class FieldsBuilderTest extends TestCase
                     ],
                 ],
             ],
-            'custom description' => ['resourceClass', (new Subscription())->withClass('resourceClass')->withName('action')->withShortName('ShortName')->withMercure(true)->withDescription('Custom description.'), $graphqlType = new ObjectType(['name' => 'subscription', 'fields' => []]), $inputGraphqlType = new ObjectType(['name' => 'input', 'fields' => []]), $subscriptionResolver = function (): void {
+            'custom description' => [\stdClass::class, (new Subscription())->withClass(\stdClass::class)->withName('action')->withShortName('ShortName')->withMercure(true)->withDescription('Custom description.'), $graphqlType = new ObjectType(['name' => 'subscription', 'fields' => []]), $inputGraphqlType = new ObjectType(['name' => 'input', 'fields' => []]), $subscriptionResolver = function (): void {
             },
                 [
                     'actionShortNameSubscribe' => [
@@ -506,12 +506,12 @@ class FieldsBuilderTest extends TestCase
     {
         $advancedNameConverterFactory = function (self $that): AdvancedNameConverterInterface {
             $advancedNameConverterProphecy = $that->prophesize(AdvancedNameConverterInterface::class);
-            $advancedNameConverterProphecy->normalize('field', 'resourceClass')->willReturn('normalizedField');
+            $advancedNameConverterProphecy->normalize('field', \stdClass::class)->willReturn('normalizedField');
 
             return $advancedNameConverterProphecy->reveal();
         };
 
-        yield 'query' => ['resourceClass', (new Query())->withClass('resourceClass'),
+        yield 'query' => [\stdClass::class, (new Query())->withClass(\stdClass::class),
             [
                 'property' => new ApiProperty(),
                 'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(true)->withWritable(false),
@@ -539,7 +539,7 @@ class FieldsBuilderTest extends TestCase
                 ],
             ],
         ];
-        yield 'query with advanced name converter' => ['resourceClass', (new Query())->withClass('resourceClass'),
+        yield 'query with advanced name converter' => [\stdClass::class, (new Query())->withClass(\stdClass::class),
             [
                 'field' => (new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withWritable(false),
             ],
@@ -558,7 +558,7 @@ class FieldsBuilderTest extends TestCase
             ],
             $advancedNameConverterFactory,
         ];
-        yield 'query input' => ['resourceClass', (new Query())->withClass('resourceClass'),
+        yield 'query input' => [\stdClass::class, (new Query())->withClass(\stdClass::class),
             [
                 'property' => new ApiProperty(),
                 'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
@@ -578,7 +578,7 @@ class FieldsBuilderTest extends TestCase
                 ],
             ],
         ];
-        yield 'query with simple non-null string array property' => ['resourceClass', (new Query())->withClass('resourceClass'),
+        yield 'query with simple non-null string array property' => [\stdClass::class, (new Query())->withClass(\stdClass::class),
             [
                 'property' => (new ApiProperty())->withNativeType(Type::list(Type::string()))->withReadable(true)->withWritable(false),
             ],
@@ -596,7 +596,7 @@ class FieldsBuilderTest extends TestCase
                 ],
             ],
         ];
-        yield 'query with nested resources' => ['resourceClass', (new Query())->withClass('resourceClass'),
+        yield 'query with nested resources' => [\stdClass::class, (new Query())->withClass(\stdClass::class),
             [
                 'propertyNestedResource' => (new ApiProperty())->withNativeType(Type::object('nestedResourceClass'))->withReadable(true)->withWritable(true),
             ],
@@ -615,7 +615,7 @@ class FieldsBuilderTest extends TestCase
                 ],
             ],
         ];
-        yield 'mutation non input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('mutation'),
+        yield 'mutation non input' => [\stdClass::class, (new Mutation())->withClass(\stdClass::class)->withName('mutation'),
             [
                 'property' => new ApiProperty(),
                 'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
@@ -644,7 +644,7 @@ class FieldsBuilderTest extends TestCase
                 ],
             ],
         ];
-        yield 'mutation input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('mutation'),
+        yield 'mutation input' => [\stdClass::class, (new Mutation())->withClass(\stdClass::class)->withName('mutation'),
             [
                 'property' => new ApiProperty(),
                 'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withDescription('propertyBool description')->withReadable(false)->withWritable(true)->withDeprecationReason('not useful'),
@@ -681,7 +681,7 @@ class FieldsBuilderTest extends TestCase
                 'clientMutationId' => GraphQLType::string(),
             ],
         ];
-        yield 'custom mutation' => ['resourceClass', (new Mutation())->withResolver('resolver')->withName('mutation'),
+        yield 'custom mutation' => [\stdClass::class, (new Mutation())->withResolver('resolver')->withName('mutation'),
             [
                 'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withDescription('propertyBool description')->withReadable(false)->withWritable(true),
             ],
@@ -697,7 +697,7 @@ class FieldsBuilderTest extends TestCase
                 'clientMutationId' => GraphQLType::string(),
             ],
         ];
-        yield 'mutation nested input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('mutation'),
+        yield 'mutation nested input' => [\stdClass::class, (new Mutation())->withClass(\stdClass::class)->withName('mutation'),
             [
                 'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
             ],
@@ -716,7 +716,7 @@ class FieldsBuilderTest extends TestCase
                 'clientMutationId' => GraphQLType::string(),
             ],
         ];
-        yield 'delete mutation input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('delete'),
+        yield 'delete mutation input' => [\stdClass::class, (new Mutation())->withClass(\stdClass::class)->withName('delete'),
             [
                 'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
             ],
@@ -728,7 +728,7 @@ class FieldsBuilderTest extends TestCase
                 'clientMutationId' => GraphQLType::string(),
             ],
         ];
-        yield 'create mutation input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('create'),
+        yield 'create mutation input' => [\stdClass::class, (new Mutation())->withClass(\stdClass::class)->withName('create'),
             [
                 'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
             ],
@@ -744,7 +744,7 @@ class FieldsBuilderTest extends TestCase
                 'clientMutationId' => GraphQLType::string(),
             ],
         ];
-        yield 'update mutation input' => ['resourceClass', (new Mutation())->withClass('resourceClass')->withName('update'),
+        yield 'update mutation input' => [\stdClass::class, (new Mutation())->withClass(\stdClass::class)->withName('update'),
             [
                 'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
             ],
@@ -763,7 +763,7 @@ class FieldsBuilderTest extends TestCase
                 'clientMutationId' => GraphQLType::string(),
             ],
         ];
-        yield 'subscription non input' => ['resourceClass', (new Subscription())->withClass('resourceClass'),
+        yield 'subscription non input' => [\stdClass::class, (new Subscription())->withClass(\stdClass::class),
             [
                 'property' => new ApiProperty(),
                 'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
@@ -783,7 +783,7 @@ class FieldsBuilderTest extends TestCase
                 ],
             ],
         ];
-        yield 'subscription input' => ['resourceClass', (new Subscription())->withClass('resourceClass'),
+        yield 'subscription input' => [\stdClass::class, (new Subscription())->withClass(\stdClass::class),
             [
                 'property' => new ApiProperty(),
                 'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withDescription('propertyBool description')->withReadable(false)->withWritable(true)->withDeprecationReason('not useful'),
@@ -798,13 +798,13 @@ class FieldsBuilderTest extends TestCase
                 'clientSubscriptionId' => GraphQLType::string(),
             ],
         ];
-        yield 'null io metadata non input' => ['resourceClass', (new Query())->withClass('resourceClass'),
+        yield 'null io metadata non input' => [\stdClass::class, (new Query())->withClass(\stdClass::class),
             [
                 'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
             ],
             false, 0, ['class' => null], [],
         ];
-        yield 'null io metadata input' => ['resourceClass', (new Query())->withClass('resourceClass'),
+        yield 'null io metadata input' => [\stdClass::class, (new Query())->withClass(\stdClass::class),
             [
                 'propertyBool' => (new ApiProperty())->withNativeType(Type::bool())->withReadable(false)->withWritable(true),
             ],
@@ -813,7 +813,7 @@ class FieldsBuilderTest extends TestCase
                 'clientMutationId' => GraphQLType::string(),
             ],
         ];
-        yield 'invalid types' => ['resourceClass', (new Query())->withClass('resourceClass'),
+        yield 'invalid types' => [\stdClass::class, (new Query())->withClass(\stdClass::class),
             [
                 'propertyInvalidType' => (new ApiProperty())->withNativeType(Type::null())->withReadable(true)->withWritable(false),
                 'propertyNotRegisteredType' => (new ApiProperty())->withNativeType(Type::callable())->withReadable(true)->withWritable(false),

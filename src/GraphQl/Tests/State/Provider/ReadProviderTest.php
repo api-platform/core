@@ -28,7 +28,7 @@ class ReadProviderTest extends TestCase
     public function testProvide(): void
     {
         $context = ['args' => ['id' => '/dummy/1']];
-        $operation = new Query(class: 'dummy');
+        $operation = new Query(class: \stdClass::class);
         $decorated = $this->createMock(ProviderInterface::class);
         $iriConverter = $this->createMock(IriConverterInterface::class);
         $iriConverter->expects($this->once())->method('getResourceFromIri')->with('/dummy/1');
@@ -45,7 +45,7 @@ class ReadProviderTest extends TestCase
     public function testProvideNotExistedResource(): void
     {
         $context = ['args' => ['id' => '/dummy/1']];
-        $operation = new Query(class: 'dummy');
+        $operation = new Query(class: \stdClass::class);
         $decorated = $this->createMock(ProviderInterface::class);
         $iriConverter = $this->createMock(IriConverterInterface::class);
         $iriConverter->expects($this->once())->method('getResourceFromIri')->with('/dummy/1');
@@ -61,8 +61,8 @@ class ReadProviderTest extends TestCase
     {
         $info = $this->createMock(ResolveInfo::class);
         $info->fieldName = '';
-        $context = ['root_class' => 'dummy', 'source' => [], 'info' => $info, 'filters' => []];
-        $operation = new QueryCollection(class: 'dummy');
+        $context = ['root_class' => \stdClass::class, 'source' => [], 'info' => $info, 'filters' => []];
+        $operation = new QueryCollection(class: \stdClass::class);
         $decorated = $this->createMock(ProviderInterface::class);
         $decorated->expects($this->once())->method('provide')->with($operation, [], ['a'] + $context);
         $iriConverter = $this->createMock(IriConverterInterface::class);
