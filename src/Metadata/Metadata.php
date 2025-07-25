@@ -83,6 +83,7 @@ abstract class Metadata
         protected ?bool $queryParameterValidationEnabled = null,
         protected ?bool $strictQueryParameterValidation = null,
         protected ?bool $hideHydraOperation = null,
+        protected ?bool $jsonStream = null,
         protected array $extraProperties = [],
     ) {
         if (\is_array($parameters) && $parameters) {
@@ -678,6 +679,19 @@ abstract class Metadata
     {
         $self = clone $this;
         $self->hideHydraOperation = $hideHydraOperation;
+
+        return $self;
+    }
+
+    public function getJsonStream(): ?bool
+    {
+        return $this->jsonStream;
+    }
+
+    public function withJsonStream(bool $jsonStream): static
+    {
+        $self = clone $this;
+        $self->jsonStream = $jsonStream;
 
         return $self;
     }

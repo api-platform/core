@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hydra\Serializer;
 
+use ApiPlatform\Hydra\IriTemplateMapping;
+use ApiPlatform\Hydra\State\Util\SearchHelperTrait;
 use ApiPlatform\JsonLd\Serializer\HydraPrefixTrait;
 use ApiPlatform\Metadata\FilterInterface;
-use ApiPlatform\Metadata\Parameters;
-use ApiPlatform\Metadata\QueryParameterInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\State\Util\StateOptionsTrait;
@@ -34,6 +34,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 final class CollectionFiltersNormalizer implements NormalizerInterface, NormalizerAwareInterface
 {
     use HydraPrefixTrait;
+    use SearchHelperTrait;
     use StateOptionsTrait;
     private ?ContainerInterface $filterLocator = null;
 
@@ -108,7 +109,13 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
 
         if ($currentFilters || ($parameters && \count($parameters))) {
             $hydraPrefix = $this->getHydraPrefix($context + $this->defaultContext);
-            $data[$hydraPrefix.'search'] = $this->getSearch($resourceClass, $requestParts, $currentFilters, $parameters, $hydraPrefix);
+            ['mapping' => $mapping, 'keys' => $keys] = $this->getSearchMappingAndKeys($operation, $resourceClass, $currentFilters, $parameters, [$this, 'getFilter']);
+            $data[$hydraPrefix.'search'] = [
+                '@type' => $hydraPrefix.'IriTemplate',
+                $hydraPrefix.'template' => \sprintf('%s{?%s}', $requestParts['path'], implode(',', $keys)),
+                $hydraPrefix.'variableRepresentation' => 'BasicRepresentation',
+                $hydraPrefix.'mapping' => $this->convertMappingToArray($mapping),
+            ];
         }
 
         return $data;
@@ -125,88 +132,28 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
     }
 
     /**
-     * Returns the content of the Hydra search property.
+     * @param list<IriTemplateMapping> $mapping
      *
-     * @param FilterInterface[] $filters
+     * @return array<array<string, mixed>>
      */
-    private function getSearch(string $resourceClass, array $parts, array $filters, ?Parameters $parameters, string $hydraPrefix): array
+    private function convertMappingToArray(array $mapping): array
     {
-        $variables = [];
-        $mapping = [];
-        foreach ($filters as $filter) {
-            foreach ($filter->getDescription($resourceClass) as $variable => $data) {
-                $variables[] = $variable;
-                $mapping[] = ['@type' => 'IriTemplateMapping', 'variable' => $variable, 'property' => $data['property'] ?? null, 'required' => $data['required'] ?? false];
+        $convertedMapping = [];
+        foreach ($mapping as $m) {
+            $converted = [
+                '@type' => 'IriTemplateMapping',
+                'variable' => $m->variable,
+                'property' => $m->property,
+            ];
+
+            if (null !== ($r = $m->required)) {
+                $converted['required'] = $r;
             }
+
+            $convertedMapping[] = $converted;
         }
 
-        foreach ($parameters ?? [] as $key => $parameter) {
-            // Each IriTemplateMapping maps a variable used in the template to a property
-            if (!$parameter instanceof QueryParameterInterface || false === $parameter->getHydra()) {
-                continue;
-            }
-
-            if (($filterId = $parameter->getFilter()) && \is_string($filterId) && ($filter = $this->getFilter($filterId))) {
-                $filterDescription = $filter->getDescription($resourceClass);
-
-                foreach ($filterDescription as $variable => $description) {
-                    // // This is a practice induced by PHP and is not necessary when implementing URI template
-                    if (str_ends_with((string) $variable, '[]')) {
-                        continue;
-                    }
-
-                    if (!($descriptionProperty = $description['property'] ?? null)) {
-                        continue;
-                    }
-
-                    if (($prop = $parameter->getProperty()) && $descriptionProperty !== $prop) {
-                        continue;
-                    }
-
-                    // :property is a pattern allowed when defining parameters
-                    $k = str_replace(':property', $descriptionProperty, $key);
-                    $variable = str_replace($descriptionProperty, $k, $variable);
-                    $variables[] = $variable;
-                    $m = ['@type' => 'IriTemplateMapping', 'variable' => $variable, 'property' => $descriptionProperty];
-                    if (null !== ($required = $parameter->getRequired() ?? $description['required'] ?? null)) {
-                        $m['required'] = $required;
-                    }
-                    $mapping[] = $m;
-                }
-
-                if ($filterDescription) {
-                    continue;
-                }
-            }
-
-            if (str_contains($key, ':property') && $parameter->getProperties()) {
-                $required = $parameter->getRequired();
-                foreach ($parameter->getProperties() as $prop) {
-                    $k = str_replace(':property', $prop, $key);
-                    $m = ['@type' => 'IriTemplateMapping', 'variable' => $k, 'property' => $prop];
-                    $variables[] = $k;
-                    if (null !== $required) {
-                        $m['required'] = $required;
-                    }
-                    $mapping[] = $m;
-                }
-
-                continue;
-            }
-
-            if (!($property = $parameter->getProperty())) {
-                continue;
-            }
-
-            $m = ['@type' => 'IriTemplateMapping', 'variable' => $key, 'property' => $property];
-            $variables[] = $key;
-            if (null !== ($required = $parameter->getRequired())) {
-                $m['required'] = $required;
-            }
-            $mapping[] = $m;
-        }
-
-        return ['@type' => $hydraPrefix.'IriTemplate', $hydraPrefix.'template' => \sprintf('%s{?%s}', $parts['path'], implode(',', $variables)), $hydraPrefix.'variableRepresentation' => 'BasicRepresentation', $hydraPrefix.'mapping' => $mapping];
+        return $convertedMapping;
     }
 
     /**

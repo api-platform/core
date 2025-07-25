@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="api_platform.jsonld.state_processor.json_streamer" class="ApiPlatform\Hydra\State\JsonStreamerProcessor" decorates="api_platform.state_processor.main" decoration-priority="190">
+            <argument type="service" id="api_platform.jsonld.state_processor.json_streamer.inner" />
+            <argument type="service" id="api_platform.jsonld.json_streamer.stream_writer" />
+            <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.resource_class_resolver" />
+            <argument type="service" id="api_platform.metadata.operation.metadata_factory" />
+            <argument>%api_platform.collection.pagination.page_parameter_name%</argument>
+            <argument>%api_platform.collection.pagination.enabled_parameter_name%</argument>
+            <argument>%api_platform.url_generation_strategy%</argument>
+        </service>
+
+        <service id="api_platform.jsonld.state_provider.json_streamer" class="ApiPlatform\Hydra\State\JsonStreamerProvider" decorates="api_platform.state_provider.main" decoration-priority="310">
+            <argument type="service" id="api_platform.jsonld.state_provider.json_streamer.inner" />
+            <argument type="service" id="api_platform.jsonld.json_streamer.stream_reader" />
+        </service>
+    </services>
+</container>

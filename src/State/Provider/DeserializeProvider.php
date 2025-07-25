@@ -59,7 +59,7 @@ final class DeserializeProvider implements ProviderInterface, StopwatchAwareInte
 
         $data = $this->decorated ? $this->decorated->provide($operation, $uriVariables, $context) : $request->attributes->get('data');
 
-        if (!$operation->canDeserialize()) {
+        if (!$operation->canDeserialize() || $context['request']->attributes->has('deserialized')) {
             return $data;
         }
 

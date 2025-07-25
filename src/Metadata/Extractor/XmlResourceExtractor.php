@@ -145,6 +145,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             'extraProperties' => $this->buildExtraProperties($resource, 'extraProperties'),
             'read' => $this->phpize($resource, 'read', 'bool'),
             'write' => $this->phpize($resource, 'write', 'bool'),
+            'jsonStream' => $this->phpize($resource, 'jsonStream', 'bool'),
         ];
     }
 

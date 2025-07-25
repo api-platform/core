@@ -65,6 +65,7 @@ final class XmlResourceAdapter implements ResourceAdapterInterface
         'hideHydraOperation',
         'stateOptions',
         'collectDenormalizationErrors',
+        'jsonStream',
         'links',
         'parameters',
     ];
@@ -542,6 +543,11 @@ XML_WRAP
                 $this->buildValues($childNode->addChild('schema'), $value['schema']);
             }
         }
+    }
+
+    private function buildJsonStream(\SimpleXMLElement $resource, bool $value): void
+    {
+        $resource->addAttribute('jsonStream', $this->parse($value));
     }
 
     private function parse($value): ?string

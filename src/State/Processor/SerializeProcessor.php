@@ -42,8 +42,11 @@ final class SerializeProcessor implements ProcessorInterface, StopwatchAwareInte
     /**
      * @param ProcessorInterface<mixed, mixed>|null $processor
      */
-    public function __construct(private readonly ?ProcessorInterface $processor, private readonly SerializerInterface $serializer, private readonly SerializerContextBuilderInterface $serializerContextBuilder)
-    {
+    public function __construct(
+        private readonly ?ProcessorInterface $processor,
+        private readonly SerializerInterface $serializer,
+        private readonly SerializerContextBuilderInterface $serializerContextBuilder,
+    ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])

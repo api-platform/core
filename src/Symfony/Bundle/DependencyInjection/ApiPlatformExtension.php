@@ -172,6 +172,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerMakerConfiguration($container, $config, $loader);
         $this->registerArgumentResolverConfiguration($loader);
         $this->registerLinkSecurityConfiguration($loader, $config);
+        $this->registerJsonStreamerConfiguration($container, $loader, $formats, $config);
 
         if (class_exists(ObjectMapper::class)) {
             $loader->load('state/object_mapper.xml');
@@ -191,7 +192,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
                 ->addTag('api_platform.resource')
                 ->addTag('container.excluded', ['source' => 'by #[ApiResource] attribute']);
         });
-        $container->registerAttributeForAutoconfiguration(AsResourceMutator::class,
+        $container->registerAttributeForAutoconfiguration(
+            AsResourceMutator::class,
             static function (ChildDefinition $definition, AsResourceMutator $attribute, \Reflector $reflector): void {
                 if (!$reflector instanceof \ReflectionClass) {
                     return;
@@ -207,7 +209,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             },
         );
 
-        $container->registerAttributeForAutoconfiguration(AsOperationMutator::class,
+        $container->registerAttributeForAutoconfiguration(
+            AsOperationMutator::class,
             static function (ChildDefinition $definition, AsOperationMutator $attribute, \Reflector $reflector): void {
                 if (!$reflector instanceof \ReflectionClass) {
                     return;
@@ -977,6 +980,33 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         if ($config['enable_link_security']) {
             $loader->load('link_security.xml');
+        }
+    }
+
+    private function registerJsonStreamerConfiguration(ContainerBuilder $container, XmlFileLoader $loader, array $formats, array $config): void
+    {
+        if (!$config['enable_json_streamer']) {
+            return;
+        }
+
+        if (isset($formats['jsonld'])) {
+            $container->setParameter('.json_streamer.stream_writers_dir.jsonld', '%kernel.cache_dir%/json_streamer/stream_writer/jsonld');
+            $container->setParameter('.json_streamer.stream_readers_dir.jsonld', '%kernel.cache_dir%/json_streamer/stream_reader/jsonld');
+            $container->setParameter('.json_streamer.lazy_ghosts_dir.jsonld', '%kernel.cache_dir%/json_streamer/lazy_ghost/jsonld');
+        }
+
+        $loader->load('json_streamer/common.xml');
+
+        if ($config['use_symfony_listeners']) {
+            $loader->load('json_streamer/events.xml');
+        } else {
+            if (isset($formats['jsonld'])) {
+                $loader->load('json_streamer/hydra.xml');
+            }
+
+            if (isset($formats['json'])) {
+                $loader->load('json_streamer/json.xml');
+            }
         }
     }
 }
