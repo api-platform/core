@@ -38,6 +38,9 @@ final class ObjectNormalizer implements NormalizerInterface, DenormalizerInterfa
         return self::FORMAT === $format && $this->decorated->supportsNormalization($data, $format, $context);
     }
 
+    /**
+     * @param string|null $format
+     */
     public function getSupportedTypes($format): array
     {
         return self::FORMAT === $format ? $this->decorated->getSupportedTypes($format) : [];

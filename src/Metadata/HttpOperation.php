@@ -468,6 +468,9 @@ class HttpOperation extends Operation
         return $this->stateless;
     }
 
+    /**
+     * @param bool $stateless
+     */
     public function withStateless($stateless): static
     {
         $self = clone $this;

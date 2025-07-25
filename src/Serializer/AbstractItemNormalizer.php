@@ -413,7 +413,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         return $mappedClass;
     }
 
-    protected function createConstructorArgument($parameterData, string $key, \ReflectionParameter $constructorParameter, array $context, ?string $format = null): mixed
+    protected function createConstructorArgument(mixed $parameterData, string $key, \ReflectionParameter $constructorParameter, array $context, ?string $format = null): mixed
     {
         return $this->createAndValidateAttributeValue($constructorParameter->name, $parameterData, $format, $context);
     }
@@ -422,6 +422,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      * {@inheritdoc}
      *
      * Unused in this context.
+     *
+     * @param object      $object
+     * @param string|null $format
      *
      * @return string[]
      */
@@ -1079,9 +1082,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     private function createAndValidateAttributeValue(string $attribute, mixed $value, ?string $format = null, array $context = []): mixed
     {
         $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $this->getFactoryOptions($context));
-        $denormalizationException = null;
 
-        $types = [];
         $type = null;
         if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
             $types = $propertyMetadata->getBuiltinTypes() ?? [];
@@ -1090,7 +1091,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $types = $type instanceof CompositeTypeInterface ? $type->getTypes() : (null === $type ? [] : [$type]);
         }
 
-        $isMultipleTypes = \count($types) > 1;
         $className = null;
         $typeIsResourceClass = function (Type $type) use (&$className): bool {
             return $type instanceof ObjectType ? $this->resourceClassResolver->isResourceClass($className = $type->getClassName()) : false;

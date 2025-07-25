@@ -77,6 +77,9 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
         return DocumentNormalizer::FORMAT !== $format && $this->decorated->supportsNormalization($data, $format);
     }
 
+    /**
+     * @param string|null $format
+     */
     public function getSupportedTypes($format): array
     {
         return DocumentNormalizer::FORMAT !== $format ? $this->decorated->getSupportedTypes($format) : [];

@@ -22,10 +22,14 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\VarDumper\Cloner\ClonerInterface;
+use Symfony\Component\VarDumper\Dumper\DataDumperInterface;
 
 #[AsCommand(name: 'debug:api-resource')]
 final class DebugResourceCommand extends Command
 {
+    /**
+     * @param DataDumperInterface $dumper
+     */
     public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ClonerInterface $cloner, private $dumper)
     {
         parent::__construct();

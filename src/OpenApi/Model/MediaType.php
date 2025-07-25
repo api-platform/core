@@ -17,7 +17,7 @@ final class MediaType
 {
     use ExtensionTrait;
 
-    public function __construct(private ?\ArrayObject $schema = null, private $example = null, private ?\ArrayObject $examples = null, private ?Encoding $encoding = null)
+    public function __construct(private ?\ArrayObject $schema = null, private mixed $example = null, private ?\ArrayObject $examples = null, private ?Encoding $encoding = null)
     {
     }
 
@@ -49,7 +49,7 @@ final class MediaType
         return $clone;
     }
 
-    public function withExample($example): self
+    public function withExample(mixed $example): self
     {
         $clone = clone $this;
         $clone->example = $example;

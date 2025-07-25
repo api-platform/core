@@ -80,6 +80,9 @@ final class ValidationExceptionNormalizer implements NormalizerInterface
         return $data instanceof Error && ($data->getPrevious() instanceof ConstraintViolationListAwareExceptionInterface);
     }
 
+    /**
+     * @param string|null $format
+     */
     public function getSupportedTypes($format): array
     {
         return [

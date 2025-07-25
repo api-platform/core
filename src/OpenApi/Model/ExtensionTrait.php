@@ -17,7 +17,7 @@ trait ExtensionTrait
 {
     private array $extensionProperties = [];
 
-    public function withExtensionProperty(string $key, $value): mixed
+    public function withExtensionProperty(string $key, mixed $value): mixed
     {
         if (!str_starts_with($key, 'x-')) {
             $key = 'x-'.$key;

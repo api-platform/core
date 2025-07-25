@@ -40,7 +40,7 @@ final class RemoveProcessor implements ProcessorInterface
     /**
      * Gets the Doctrine object manager associated with given data.
      */
-    private function getManager($data): ?DoctrineObjectManager
+    private function getManager(mixed $data): ?DoctrineObjectManager
     {
         return \is_object($data) ? $this->managerRegistry->getManagerForClass($this->getObjectClass($data)) : null;
     }
