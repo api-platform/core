@@ -1,0 +1,38 @@
+<?php
+
+declare(strict_types=1);
+
+namespace ApiPlatform\JsonLd\JsonStreamer;
+
+use ApiPlatform\Hydra\Collection;
+use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
+use Symfony\Component\JsonStreamer\ValueTransformer\ValueTransformerInterface;
+use Symfony\Component\TypeInfo\Type;
+
+final class IriValueTransformer implements ValueTransformerInterface
+{
+    public function __construct(
+        private readonly IriConverterInterface $iriConverter,
+    ) {
+    }
+
+    public function transform(mixed $value, array $options = []): mixed
+    {
+        if ($options['_current_object'] instanceof Collection) {
+            return $this->iriConverter->getIriFromResource($options['operation']->getClass(), UrlGeneratorInterface::ABS_PATH, $options['operation']);
+        }
+
+        return $this->iriConverter->getIriFromResource(
+            $options['_current_object'],
+            UrlGeneratorInterface::ABS_PATH,
+            $options['operation'] instanceof CollectionOperationInterface ? null : $options['operation'],
+        );
+    }
+
+    public static function getStreamValueType(): Type
+    {
+        return Type::string();
+    }
+}

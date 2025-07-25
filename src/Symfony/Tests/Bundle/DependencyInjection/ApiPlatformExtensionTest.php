@@ -35,6 +35,7 @@ use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\JsonStreamer\JsonStreamWriter;
 
 class ApiPlatformExtensionTest extends TestCase
 {
@@ -42,6 +43,7 @@ class ApiPlatformExtensionTest extends TestCase
         'title' => 'title',
         'description' => 'description',
         'version' => 'version',
+        'enable_json_streamer' => true,
         'serializer' => ['hydra_prefix' => true],
         'formats' => [
             'json' => ['mime_types' => ['json']],

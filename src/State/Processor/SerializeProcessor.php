@@ -18,6 +18,8 @@ use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ResourceList;
 use ApiPlatform\State\SerializerContextBuilderInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\JsonStreamer\StreamWriterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\WebLink\GenericLinkProvider;
@@ -38,8 +40,11 @@ final class SerializeProcessor implements ProcessorInterface
     /**
      * @param ProcessorInterface<mixed, mixed>|null $processor
      */
-    public function __construct(private readonly ?ProcessorInterface $processor, private readonly SerializerInterface $serializer, private readonly SerializerContextBuilderInterface $serializerContextBuilder)
-    {
+    public function __construct(
+        private readonly ?ProcessorInterface $processor,
+        private readonly SerializerInterface $serializer,
+        private readonly SerializerContextBuilderInterface $serializerContextBuilder,
+    ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
