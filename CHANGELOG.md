@@ -1,5 +1,12 @@
 # Changelog
 
+## v4.1.20
+
+### Bug fixes
+
+* [c41a0bca4](https://github.com/api-platform/core/commit/c41a0bca49778663743a52e9da9ddb3b1439c2f8) fix(jsonld): child class @type shortName (#7312)
+* [d26088ba1](https://github.com/api-platform/core/commit/d26088ba1080f9fb8d94db5b476b0322d2a14ab2) chore: allow doctrine-persistence:^4.0 (#7309)
+
 ## v4.1.19
 
 ### Bug fixes
