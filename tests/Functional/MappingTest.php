@@ -14,10 +14,13 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\FirstResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResourceOdm;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\SecondResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MappedDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MappedEntity;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SameEntity;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -33,7 +36,7 @@ final class MappingTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [MappedResource::class, MappedResourceOdm::class];
+        return [MappedResource::class, MappedResourceOdm::class, FirstResource::class, SecondResource::class];
     }
 
     public function testShouldMapBetweenResourceAndEntity(): void
@@ -66,6 +69,29 @@ final class MappingTest extends ApiTestCase
 
         $r = self::createClient()->request('PATCH', $uri, ['json' => ['username' => 'ba zar'], 'headers' => ['content-type' => 'application/merge-patch+json']]);
         $this->assertJsonContains(['username' => 'ba zar']);
+    }
+
+    public function testShouldMapToTheCorrectResource(): void
+    {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('MongoDB not tested.');
+        }
+
+        if (!$this->getContainer()->has('object_mapper')) {
+            $this->markTestSkipped('ObjectMapper not installed');
+        }
+
+        $this->recreateSchema([SameEntity::class]);
+        $manager = $this->getManager();
+        $e = new SameEntity();
+        $e->setName('foo');
+        $manager->persist($e);
+        $manager->flush();
+
+        self::createClient()->request('GET', '/seconds');
+        $this->assertJsonContains(['hydra:member' => [
+            ['name' => 'foo', 'extra' => 'field'],
+        ]]);
     }
 
     private function loadFixtures(): void

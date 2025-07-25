@@ -42,6 +42,6 @@ final class ObjectMapperProcessor implements ProcessorInterface
             return $this->decorated->process($data, $operation, $uriVariables, $context);
         }
 
-        return $this->objectMapper->map($this->decorated->process($this->objectMapper->map($data), $operation, $uriVariables, $context));
+        return $this->objectMapper->map($this->decorated->process($this->objectMapper->map($data), $operation, $uriVariables, $context), $operation->getClass());
     }
 }

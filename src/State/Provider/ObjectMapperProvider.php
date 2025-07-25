@@ -64,9 +64,9 @@ final class ObjectMapperProvider implements ProviderInterface
         }
 
         if ($data instanceof PaginatorInterface) {
-            $data = new ArrayPaginator(array_map(fn ($v) => $this->objectMapper->map($v), iterator_to_array($data)), 0, \count($data));
+            $data = new ArrayPaginator(array_map(fn ($v) => $this->objectMapper->map($v, $operation->getClass()), iterator_to_array($data)), 0, \count($data));
         } else {
-            $data = $this->objectMapper->map($data);
+            $data = $this->objectMapper->map($data, $operation->getClass());
         }
 
         $request?->attributes->set('data', $data);
