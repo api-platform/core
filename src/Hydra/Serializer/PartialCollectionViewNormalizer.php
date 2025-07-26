@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hydra\Serializer;
 
+use ApiPlatform\Hydra\State\Util\PaginationHelperTrait;
 use ApiPlatform\JsonLd\Serializer\HydraPrefixTrait;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -20,8 +21,6 @@ use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\IriHelper;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
-use ApiPlatform\Hydra\State\Util\PaginationHelperTrait;
-use ApiPlatform\Hydra\PartialCollectionView;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
@@ -63,7 +62,7 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
             throw new UnexpectedValueException('Expected data to be an array');
         }
 
-        $paginated = ($object instanceof PartialPaginatorInterface);
+        $paginated = $object instanceof PartialPaginatorInterface;
         if ($paginated && $object instanceof PaginatorInterface) {
             $paginated = 1. !== $object->getLastPage();
         }

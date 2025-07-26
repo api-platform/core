@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonLd\JsonStreamer\ValueTransformer;
 
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use Symfony\Component\JsonStreamer\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\TypeInfo\Type;
-use ApiPlatform\Metadata\Exception\RuntimeException;
 
 final class ContextValueTransformer implements ValueTransformerInterface
 {
@@ -30,6 +30,7 @@ final class ContextValueTransformer implements ValueTransformerInterface
         if (!isset($options['operation'])) {
             throw new RuntimeException('Operation is not defined');
         }
+
         return $this->urlGenerator->generate('api_jsonld_context', ['shortName' => $options['operation']->getShortName()], $options['operation']->getUrlGenerationStrategy());
     }
 

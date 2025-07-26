@@ -14,28 +14,24 @@ declare(strict_types=1);
 namespace ApiPlatform\Hydra\State;
 
 use ApiPlatform\Hydra\Collection;
-use ApiPlatform\Hydra\IriTemplate;
-use ApiPlatform\Hydra\IriTemplateMapping;
 use ApiPlatform\Hydra\PartialCollectionView;
+use ApiPlatform\Hydra\State\Util\PaginationHelperTrait;
+use ApiPlatform\Hydra\State\Util\SearchHelperTrait;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Error;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
-use ApiPlatform\Metadata\QueryParameterInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
-use ApiPlatform\Metadata\Util\IriHelper;
-use ApiPlatform\State\Util\HttpResponseStatusTrait;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\Util\HttpResponseHeadersTrait;
+use ApiPlatform\State\Util\HttpResponseStatusTrait;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\JsonStreamer\StreamWriterInterface;
-use ApiPlatform\Hydra\State\Util\PaginationHelperTrait;
-use ApiPlatform\Hydra\State\Util\SearchHelperTrait;
 use Symfony\Component\TypeInfo\Type;
 
 /**

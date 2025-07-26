@@ -13,15 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Hydra\Serializer;
 
+use ApiPlatform\Hydra\IriTemplate\IriTemplateMapping;
+use ApiPlatform\Hydra\State\Util\SearchHelperTrait;
 use ApiPlatform\JsonLd\Serializer\HydraPrefixTrait;
 use ApiPlatform\Metadata\FilterInterface;
-use ApiPlatform\Metadata\Parameters;
-use ApiPlatform\Metadata\QueryParameterInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\State\Util\StateOptionsTrait;
-use ApiPlatform\Hydra\State\Util\SearchHelperTrait;
-use ApiPlatform\Hydra\IriTemplate\IriTemplateMapping;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
@@ -36,8 +34,8 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 final class CollectionFiltersNormalizer implements NormalizerInterface, NormalizerAwareInterface
 {
     use HydraPrefixTrait;
-    use StateOptionsTrait;
     use SearchHelperTrait;
+    use StateOptionsTrait;
     private ?ContainerInterface $filterLocator = null;
 
     /**
