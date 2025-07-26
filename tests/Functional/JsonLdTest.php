@@ -49,11 +49,19 @@ class JsonLdTest extends ApiTestCase
             $this->markTestSkipped();
         }
 
-        $response = self::createClient()->request('POST', '/foo/1/validate', [
+        $buffer = '';
+        ob_start(function (string $chunk) use (&$buffer): void {
+            $buffer .= $chunk;
+        });
+
+        self::createClient()->request('POST', '/foo/1/validate', [
             'json' => ['bar' => '/bar6465s/2'],
         ]);
 
-        $res = $response->toArray();
+        ob_get_clean();
+
+        $res = json_decode($buffer, true);
+        dump($res);
         $this->assertEquals('Bar two', $res['title']);
     }
 
@@ -123,12 +131,14 @@ class JsonLdTest extends ApiTestCase
             $schemaTool = new SchemaTool($manager);
             @$schemaTool->createSchema($classes);
         } catch (\Exception $e) {
-            return;
         }
 
         $foo = new Foo();
         $foo->title = 'Foo';
         $manager->persist($foo);
+        $foo1 = new Foo();
+        $foo1->title = 'Foo1';
+        $manager->persist($foo1);
         $bar = new Bar();
         $bar->title = 'Bar one';
         $manager->persist($bar);
