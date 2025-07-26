@@ -141,12 +141,12 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         foreach ($mapping as $m) {
             $converted = [
                 '@type' => 'IriTemplateMapping',
-                'variable' => $m->getVariable(),
-                'property' => $m->getProperty(),
+                'variable' => $m->variable,
+                'property' => $m->property,
             ];
 
-            if (null !== $m->isRequired()) {
-                $converted['required'] = $m->isRequired();
+            if (null !== ($r = $m->required)) {
+                $converted['required'] = $r;
             }
 
             $convertedMapping[] = $converted;

@@ -66,11 +66,16 @@ trait SearchHelperTrait
                 $filterDescription = $filter->getDescription($resourceClass);
 
                 foreach ($filterDescription as $variable => $description) {
+                    // // This is a practice induced by PHP and is not necessary when implementing URI template
                     if (str_ends_with((string) $variable, '[]')) {
                         continue;
                     }
 
-                    if (($prop = $parameter->getProperty()) && ($description['property'] ?? null) !== $prop) {
+                    if (!($descriptionProperty = $description['property'] ?? null)) {
+                        continue;
+                    }
+
+                    if (($prop = $parameter->getProperty()) && $descriptionProperty !== $prop) {
                         continue;
                     }
 
