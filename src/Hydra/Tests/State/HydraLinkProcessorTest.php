@@ -42,7 +42,12 @@ class HydraLinkProcessorTest extends TestCase
         $context = ['request' => $request];
         $decorated = $this->createMock(ProcessorInterface::class);
         $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
-        $urlGenerator->expects($this->once())->method('generate')->with('api_doc', ['_format' => 'jsonld'], UrlGeneratorInterface::ABS_URL)->willReturn('/docs');
+        $urlGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->with('api_doc', ['_format' => 'jsonld'], UrlGeneratorInterface::ABS_PATH)
+            ->willReturn('/docs')
+        ;
         (new HydraLinkProcessor($decorated, $urlGenerator))->process($data, $operation, [], $context);
     }
 }
