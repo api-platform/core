@@ -72,6 +72,68 @@ class NotSkipNullToOneRelationTest extends ApiTestCase
                     'self' => [
                         'href' => $itemIri,
                     ],
+                    'relatedEntity' => null,
+                    'relatedEntity2' => [
+                        'href' => '/related_entities/1',
+                    ],
+                ],
+                'collection' => [
+                    [
+                        '_links' => [
+                            'self' => [
+                                'href' => '/related_entities/1',
+                            ],
+                        ],
+                        'id' => 1,
+                    ],
+                    [
+                        '_links' => [
+                            'self' => [
+                                'href' => '/related_entities/2',
+                            ],
+                        ],
+                        'id' => 2,
+                    ],
+                ],
+            ]
+        );
+    }
+
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     * @throws \JsonException
+     */
+    public function testNullRelationsAreSkippedByDefault(): void
+    {
+        $itemIri = str_replace(
+            '{id}',
+            ToOneRelationPropertyMayBeNull::ENTITY_ID.'',
+            ToOneRelationPropertyMayBeNull::ITEM_SKIP_NULL_TO_ONE_RELATION_ROUTE
+        );
+        $this->checkRoutesAreCorrectlySetUp();
+
+        self::createClient()->request(
+            'GET',
+            $itemIri,
+            [
+                'headers' => [
+                    'accept' => 'application/hal+json',
+                ],
+            ]
+        );
+
+        $this->assertResponseStatusCodeSame(200);
+
+        $this->assertJsonEquals(
+            [
+                '_links' => [
+                    'self' => [
+                        'href' => $itemIri,
+                    ],
                     'relatedEntity2' => [
                         'href' => '/related_entities/1',
                     ],

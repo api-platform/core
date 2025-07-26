@@ -65,6 +65,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     use ContextTrait;
     use InputOutputMetadataTrait;
     use OperationContextTrait;
+    /**
+     * Flag to control whether to one relation with the value `null` should be output
+     * when normalizing or omitted.
+     */
+    public const SKIP_NULL_TO_ONE_RELATIONS = 'skip_null_to_one_relations';
 
     protected PropertyAccessorInterface $propertyAccessor;
     protected array $localCache = [];

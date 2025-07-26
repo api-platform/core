@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Serializer\AbstractItemNormalizer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
@@ -28,6 +29,13 @@ use Doctrine\Common\Collections\Collection;
         ),
         new Get(
             uriTemplate: self::ITEM_ROUTE.'{._format}',
+            normalizationContext: [
+                AbstractItemNormalizer::SKIP_NULL_TO_ONE_RELATIONS => false,
+            ],
+            provider: [self::class, 'provide']
+        ),
+        new Get(
+            uriTemplate: self::ITEM_SKIP_NULL_TO_ONE_RELATION_ROUTE.'{._format}',
             provider: [self::class, 'provide']
         ),
     ],
@@ -36,6 +44,8 @@ class ToOneRelationPropertyMayBeNull
 {
     public const ROUTE = '/my-route';
     public const ITEM_ROUTE = self::ROUTE.'/{id}';
+    public const SKIP_NULL_TO_ONE_RELATION_ROUTE = '/skip-null-relation-route';
+    public const ITEM_SKIP_NULL_TO_ONE_RELATION_ROUTE = self::SKIP_NULL_TO_ONE_RELATION_ROUTE.'/{id}';
     public const ENTITY_ID = 1;
 
     /** @noinspection PhpPropertyOnlyWrittenInspection */
