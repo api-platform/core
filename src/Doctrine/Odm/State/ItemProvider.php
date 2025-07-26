@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Odm\State;
 
 use ApiPlatform\Doctrine\Common\State\LinksHandlerLocatorTrait;
+use ApiPlatform\Doctrine\Common\State\ResourceTransformerLocatorTrait;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationItemExtensionInterface;
 use ApiPlatform\Doctrine\Odm\Extension\AggregationResultItemExtensionInterface;
 use ApiPlatform\Metadata\Exception\RuntimeException;
@@ -36,15 +37,20 @@ final class ItemProvider implements ProviderInterface
 {
     use LinksHandlerLocatorTrait;
     use LinksHandlerTrait;
+    use ResourceTransformerLocatorTrait;
     use StateOptionsTrait;
 
     /**
      * @param AggregationItemExtensionInterface[] $itemExtensions
      */
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ManagerRegistry $managerRegistry, private readonly iterable $itemExtensions = [], ?ContainerInterface $handleLinksLocator = null)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ManagerRegistry $managerRegistry,
+        private readonly iterable $itemExtensions = [],
+        ?ContainerInterface $handleLinksLocator = null,
+        ?ContainerInterface $resourceTransformerLocator = null)
     {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->handleLinksLocator = $handleLinksLocator;
+        $this->resourceTransformerLocator = $resourceTransformerLocator;
         $this->managerRegistry = $managerRegistry;
     }
 
@@ -77,12 +83,18 @@ final class ItemProvider implements ProviderInterface
             $extension->applyToItem($aggregationBuilder, $documentClass, $uriVariables, $operation, $context);
 
             if ($extension instanceof AggregationResultItemExtensionInterface && $extension->supportsResult($documentClass, $operation, $context)) {
-                return $extension->getResult($aggregationBuilder, $documentClass, $operation, $context);
+                $result = $extension->getResult($aggregationBuilder, $documentClass, $operation, $context);
+                break;
             }
         }
 
         $executeOptions = $operation->getExtraProperties()['doctrine_mongodb']['execute_options'] ?? [];
 
-        return $aggregationBuilder->hydrate($documentClass)->getAggregation($executeOptions)->getIterator()->current() ?: null;
+        $result = $result ?? ($aggregationBuilder->hydrate($documentClass)->getAggregation($executeOptions)->getIterator()->current() ?: null);
+
+        return match ($transformer = $this->getToResourceTransformer($operation)) {
+            null => $result,
+            default => (null !== $result) ? $transformer($result) : null,
+        };
     }
 }

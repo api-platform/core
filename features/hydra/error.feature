@@ -16,7 +16,7 @@ Feature: Error handling
     And the header "Content-Type" should be equal to "application/problem+json; charset=utf-8"
     And the header "Link" should contain '<http://www.w3.org/ns/hydra/error>; rel="http://www.w3.org/ns/json-ld#error"'
     And the JSON node "type" should exist
-    And the JSON node "title" should not exists
+    And the JSON node "title" should not exist
     And the JSON node "hydra:title" should be equal to "An error occurred"
     And the JSON node "detail" should exist
     And the JSON node "description" should not exist
