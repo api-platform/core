@@ -49,19 +49,11 @@ class JsonLdTest extends ApiTestCase
             $this->markTestSkipped();
         }
 
-        $buffer = '';
-        ob_start(function (string $chunk) use (&$buffer): void {
-            $buffer .= $chunk;
-        });
-
-        self::createClient()->request('POST', '/foo/1/validate', [
+        $response = self::createClient()->request('POST', '/foo/1/validate', [
             'json' => ['bar' => '/bar6465s/2'],
         ]);
 
-        ob_get_clean();
-
-        $res = json_decode($buffer, true);
-        dump($res);
+        $res = $response->toArray();
         $this->assertEquals('Bar two', $res['title']);
     }
 
