@@ -33,8 +33,9 @@
             <argument type="service" id="api_platform.json_schema.backward_compatible_schema_factory.inner" />
         </service>
 
-        <service id="api_platform.json_schema.definition_name_factory" class="ApiPlatform\JsonSchema\DefinitionNameFactory"></service>
-
+        <service id="api_platform.json_schema.definition_name_factory" class="ApiPlatform\JsonSchema\DefinitionNameFactory">
+            <argument>%api_platform.formats%</argument>
+        </service>
     </services>
 
 </container>
