@@ -334,6 +334,10 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
                         $wrapCase((string) $queryBuilder->expr()->concat("'% '", $keyValueParameter, "'%'"))
                     )
                 ),
+                self::STRATEGY_PATTERN => $queryBuilder->expr()->like(
+                    $wrapCase($aliasedField),
+                    $wrapCase($keyValueParameter)
+                ),
                 default => throw new InvalidArgumentException(\sprintf('strategy %s does not exist.', $strategy)),
             };
         }
