@@ -225,7 +225,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
                     description: $this->phpize($parameter, 'description', 'string'),
                     required: $this->phpize($parameter, 'required', 'bool'),
                     deprecated: $this->phpize($parameter, 'deprecated', 'bool', false),
-                    allowEmptyValue: $this->phpize($parameter, 'allowEmptyValue', 'bool', false),
+                    allowEmptyValue: $this->phpize($parameter, 'allowEmptyValue', 'bool', null),
                     schema: isset($parameter->schema->values) ? $this->buildValues($parameter->schema->values) : [],
                     style: $this->phpize($parameter, 'style', 'string'),
                     explode: $this->phpize($parameter, 'explode', 'bool', false),
