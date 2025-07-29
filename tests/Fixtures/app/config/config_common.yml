@@ -447,6 +447,11 @@ services:
         tags:
             - name: 'serializer.normalizer'
 
+    ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\TransformedDummyEntityRessourceTransformer:
+        tags: 
+            - name: 'api_platform.doctrine.orm.resource_transformer'
+
+
     api_platform.http_cache.tag_collector:
         class: ApiPlatform\Tests\Fixtures\TestBundle\HttpCache\TagCollectorDefault
         public: true
