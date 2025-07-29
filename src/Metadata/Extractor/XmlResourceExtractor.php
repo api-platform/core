@@ -229,7 +229,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
                     schema: isset($parameter->schema->values) ? $this->buildValues($parameter->schema->values) : [],
                     style: $this->phpize($parameter, 'style', 'string'),
                     explode: $this->phpize($parameter, 'explode', 'bool', false),
-                    allowReserved: $this->phpize($parameter, 'allowReserved', 'bool', false),
+                    allowReserved: $this->phpize($parameter, 'allowReserved', 'bool', null),
                     example: $this->phpize($parameter, 'example', 'string'),
                     examples: isset($parameter->examples->values) ? new \ArrayObject($this->buildValues($parameter->examples->values)) : null,
                     content: isset($parameter->content->values) ? new \ArrayObject($this->buildValues($parameter->content->values)) : null,
