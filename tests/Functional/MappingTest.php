@@ -17,9 +17,13 @@ use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\FirstResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResourceOdm;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResourceWithRelation;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResourceWithRelationRelated;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\SecondResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MappedDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MappedEntity;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MappedResourceWithRelationEntity;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MappedResourceWithRelationRelatedEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SameEntity;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
@@ -36,12 +40,12 @@ final class MappingTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [MappedResource::class, MappedResourceOdm::class, FirstResource::class, SecondResource::class];
+        return [MappedResource::class, MappedResourceOdm::class, FirstResource::class, SecondResource::class, MappedResourceWithRelation::class, MappedResourceWithRelationRelated::class];
     }
 
     public function testShouldMapBetweenResourceAndEntity(): void
     {
-        if (!$this->getContainer()->has('object_mapper')) {
+        if (!$this->getContainer()->has('api_platform.object_mapper')) {
             $this->markTestSkipped('ObjectMapper not installed');
         }
 
@@ -77,7 +81,7 @@ final class MappingTest extends ApiTestCase
             $this->markTestSkipped('MongoDB not tested.');
         }
 
-        if (!$this->getContainer()->has('object_mapper')) {
+        if (!$this->getContainer()->has('api_platform.object_mapper')) {
             $this->markTestSkipped('ObjectMapper not installed');
         }
 
@@ -92,6 +96,44 @@ final class MappingTest extends ApiTestCase
         $this->assertJsonContains(['hydra:member' => [
             ['name' => 'foo', 'extra' => 'field'],
         ]]);
+    }
+
+    public function testMapPutAllowCreate(): void
+    {
+        if (!$this->getContainer()->has('api_platform.object_mapper')) {
+            $this->markTestSkipped('ObjectMapper not installed');
+        }
+
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('MongoDB is not tested');
+        }
+
+        $this->recreateSchema([MappedResourceWithRelationEntity::class, MappedResourceWithRelationRelatedEntity::class]);
+        $manager = $this->getManager();
+
+        $e = new MappedResourceWithRelationRelatedEntity();
+        $e->name = 'test';
+        $manager->persist($e);
+        $manager->flush();
+
+        self::createClient()->request('PUT', '/mapped_resource_with_relations/4', [
+            'json' => [
+                '@id' => '/mapped_resource_with_relations/4',
+                'relation' => '/mapped_resource_with_relation_relateds/'.$e->getId(),
+            ],
+            'headers' => [
+                'content-type' => 'application/ld+json',
+            ],
+        ]);
+
+        $this->assertJsonContains([
+            '@context' => '/contexts/MappedResourceWithRelation',
+            '@id' => '/mapped_resource_with_relations/4',
+            '@type' => 'MappedResourceWithRelation',
+            'id' => '4',
+            'relationName' => 'test',
+            'relation' => '/mapped_resource_with_relation_relateds/1',
+        ]);
     }
 
     private function loadFixtures(): void

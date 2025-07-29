@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\State\Processor;
 
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\ObjectMapper\ClearObjectMapInterface;
 use ApiPlatform\State\ProcessorInterface;
 use Symfony\Component\ObjectMapper\Attribute\Map;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
@@ -42,6 +43,12 @@ final class ObjectMapperProcessor implements ProcessorInterface
             return $this->decorated->process($data, $operation, $uriVariables, $context);
         }
 
-        return $this->objectMapper->map($this->decorated->process($this->objectMapper->map($data), $operation, $uriVariables, $context), $operation->getClass());
+        $data = $this->objectMapper->map($this->decorated->process($this->objectMapper->map($data), $operation, $uriVariables, $context), $operation->getClass());
+
+        if ($this->objectMapper instanceof ClearObjectMapInterface) {
+            $this->objectMapper->clearObjectMap();
+        }
+
+        return $data;
     }
 }
