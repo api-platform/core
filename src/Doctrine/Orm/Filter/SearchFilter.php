@@ -29,6 +29,8 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Uid\Ulid;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * The search filter allows to filter a collection by given properties.
@@ -194,7 +196,6 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
         }
 
         $metadata = $this->getNestedMetadata($resourceClass, $associations);
-
         if ($metadata->hasField($field)) {
             if ('id' === $field) {
                 $values = array_map($this->getIdFromValue(...), $values);
@@ -253,6 +254,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
         $expected = \count($values);
         $values = array_filter($values, static fn ($value) => null !== $value);
+        $values = array_map(static fn ($value) => $value instanceof Uuid || $value instanceof Ulid ? $value->toBinary() : $value, $values);
         if ($expected > \count($values)) {
             /*
              * Shouldn't this actually fail harder?
@@ -270,7 +272,6 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
             $associationAlias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $alias, $associationField);
             $associationField = $associationFieldIdentifier;
         }
-
         $this->addWhereByStrategy($strategy, $queryBuilder, $queryNameGenerator, $associationAlias, $associationField, $values, $caseSensitive);
     }
 
