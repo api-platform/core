@@ -53,12 +53,12 @@ final class Parameter
         return $this->deprecated;
     }
 
-    public function canAllowEmptyValue(): bool
+    public function canAllowEmptyValue(): ?bool
     {
         return $this->allowEmptyValue;
     }
 
-    public function getAllowEmptyValue(): bool
+    public function getAllowEmptyValue(): ?bool
     {
         return $this->allowEmptyValue;
     }
@@ -83,12 +83,12 @@ final class Parameter
         return $this->explode;
     }
 
-    public function canAllowReserved(): bool
+    public function canAllowReserved(): ?bool
     {
         return $this->allowReserved;
     }
 
-    public function getAllowReserved(): bool
+    public function getAllowReserved(): ?bool
     {
         return $this->allowReserved;
     }
