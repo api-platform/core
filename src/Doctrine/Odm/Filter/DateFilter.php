@@ -134,7 +134,7 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface, Js
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
+    protected function filterProperty(string $property, mixed $value, Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
         // Expect $value to be an array having the period as keys and the date value as values
         if (
@@ -202,7 +202,7 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface, Js
     /**
      * Adds the match stage according to the chosen null management.
      */
-    private function addMatch(Builder $aggregationBuilder, string $field, string $operator, $value, ?string $nullManagement = null): void
+    private function addMatch(Builder $aggregationBuilder, string $field, string $operator, mixed $value, ?string $nullManagement = null): void
     {
         $value = $this->normalizeValue($value, $operator);
 

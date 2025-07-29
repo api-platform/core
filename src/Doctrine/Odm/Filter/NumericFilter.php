@@ -122,7 +122,7 @@ final class NumericFilter extends AbstractFilter implements JsonSchemaFilterInte
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
+    protected function filterProperty(string $property, mixed $value, Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
         if (
             !$this->isPropertyEnabled($property, $resourceClass)

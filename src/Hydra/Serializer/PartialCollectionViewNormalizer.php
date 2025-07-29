@@ -117,6 +117,9 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         return $this->collectionNormalizer->supportsNormalization($data, $format, $context);
     }
 
+    /**
+     * @param string|null $format
+     */
     public function getSupportedTypes($format): array
     {
         return $this->collectionNormalizer->getSupportedTypes($format);
@@ -132,6 +135,9 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         }
     }
 
+    /**
+     * @param object $object
+     */
     private function cursorPaginationFields(array $fields, int $direction, $object): array
     {
         $paginationFilters = [];

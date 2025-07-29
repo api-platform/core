@@ -149,7 +149,6 @@ parameters:
 				- src/Symfony/Bundle/Test
 				- src/Symfony/Tests
 				- tests
-				- src # TODO
 		-
 			identifier: missingType.return
 			paths:

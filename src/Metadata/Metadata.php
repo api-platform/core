@@ -155,6 +155,9 @@ abstract class Metadata
         return $this->deprecationReason;
     }
 
+    /**
+     * @param string $deprecationReason
+     */
     public function withDeprecationReason($deprecationReason): static
     {
         $self = clone $this;
@@ -457,7 +460,7 @@ abstract class Metadata
         return $this->security instanceof \Stringable ? (string) $this->security : $this->security;
     }
 
-    public function withSecurity($security): static
+    public function withSecurity(string|\Stringable|null $security = null): static
     {
         $self = clone $this;
         $self->security = $security;
@@ -483,7 +486,7 @@ abstract class Metadata
         return $this->securityPostDenormalize instanceof \Stringable ? (string) $this->securityPostDenormalize : $this->securityPostDenormalize;
     }
 
-    public function withSecurityPostDenormalize($securityPostDenormalize): static
+    public function withSecurityPostDenormalize(string|\Stringable|null $securityPostDenormalize = null): static
     {
         $self = clone $this;
         $self->securityPostDenormalize = $securityPostDenormalize;

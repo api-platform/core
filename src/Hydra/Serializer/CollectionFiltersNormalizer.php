@@ -59,6 +59,9 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         return $this->collectionNormalizer->supportsNormalization($data, $format, $context);
     }
 
+    /**
+     * @param string|null $format
+     */
     public function getSupportedTypes($format): array
     {
         return $this->collectionNormalizer->getSupportedTypes($format);

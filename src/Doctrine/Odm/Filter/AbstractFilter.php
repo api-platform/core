@@ -60,7 +60,7 @@ abstract class AbstractFilter implements FilterInterface, PropertyAwareFilterInt
     /**
      * Passes a property through the filter.
      */
-    abstract protected function filterProperty(string $property, $value, Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void;
+    abstract protected function filterProperty(string $property, mixed $value, Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void;
 
     public function hasManagerRegistry(): bool
     {
