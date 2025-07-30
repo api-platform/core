@@ -26,6 +26,7 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\Util\CloneTrait;
+use ApiPlatform\Serializer\Exception\CustomUserMessageNotNormalizableValueException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -327,7 +328,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                     try {
                         $params[] = $this->createConstructorArgument($data[$key], $key, $constructorParameter, $attributeContext, $format);
                     } catch (NotNormalizableValueException $exception) {
-                        if (!isset($context['not_normalizable_value_exceptions'])) {
+                        if (!isset($context['not_normalizable_value_exceptions']) && !$exception instanceof CustomUserMessageNotNormalizableValueException) {
                             throw $exception;
                         }
                         $context['not_normalizable_value_exceptions'][] = $exception;
@@ -506,7 +507,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $this->setValue($object, $attribute, $this->createAttributeValue($attribute, $value, $format, $context));
         } catch (NotNormalizableValueException $exception) {
             // Only throw if collecting denormalization errors is disabled.
-            if (!isset($context['not_normalizable_value_exceptions'])) {
+            if (!isset($context['not_normalizable_value_exceptions']) && !$exception instanceof CustomUserMessageNotNormalizableValueException) {
                 throw $exception;
             }
         }
@@ -859,7 +860,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         try {
             return $this->createAndValidateAttributeValue($attribute, $value, $format, $context);
         } catch (NotNormalizableValueException $exception) {
-            if (!isset($context['not_normalizable_value_exceptions'])) {
+            if (!isset($context['not_normalizable_value_exceptions']) && !$exception instanceof CustomUserMessageNotNormalizableValueException) {
                 throw $exception;
             }
             $context['not_normalizable_value_exceptions'][] = $exception;

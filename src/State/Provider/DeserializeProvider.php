@@ -15,6 +15,7 @@ namespace ApiPlatform\State\Provider;
 
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Serializer\Exception\CustomUserMessageNotNormalizableValueException;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\SerializerContextBuilderInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
@@ -97,6 +98,14 @@ final class DeserializeProvider implements ProviderInterface
 
             $violations = new ConstraintViolationList();
             foreach ($e->getErrors() as $exception) {
+                if ($exception instanceof CustomUserMessageNotNormalizableValueException) {
+                    $message = $exception->getMessageKey();
+                    $parameters = $exception->getMessageData();
+
+                    $violations->add(new ConstraintViolation($this->translator->trans($message, $parameters, 'validators'), $message, $parameters, null, $exception->getPath()));
+                    continue;
+                }
+
                 if (!$exception instanceof NotNormalizableValueException) {
                     continue;
                 }
