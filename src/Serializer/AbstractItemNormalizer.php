@@ -203,7 +203,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             try {
                 return $this->serializer->denormalize($data, $inputClass, $format, $context);
             } catch (NotNormalizableValueException $e) {
-                throw new UnexpectedValueException('The input data is misformatted.', $e->getCode(), $e);
+                $originalMessage = $e->getMessage();
+                $newMessage = '' !== $originalMessage
+                    ? \sprintf('The input data is misformatted: %s', $originalMessage)
+                    : 'The input data is misformatted.';
+
+                throw new UnexpectedValueException($newMessage, $e->getCode(), $e);
             }
         }
 
