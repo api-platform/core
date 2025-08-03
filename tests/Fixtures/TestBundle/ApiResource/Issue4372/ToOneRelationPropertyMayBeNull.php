@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
     operations: [
@@ -31,11 +32,15 @@ use Doctrine\Common\Collections\Collection;
             uriTemplate: self::ITEM_ROUTE.'{._format}',
             normalizationContext: [
                 AbstractItemNormalizer::SKIP_NULL_TO_ONE_RELATIONS => false,
+                'groups' => ['default', 'read'],
             ],
             provider: [self::class, 'provide']
         ),
         new Get(
             uriTemplate: self::ITEM_SKIP_NULL_TO_ONE_RELATION_ROUTE.'{._format}',
+            normalizationContext: [
+                'groups' => ['default', 'read'],
+            ],
             provider: [self::class, 'provide']
         ),
     ],
@@ -48,17 +53,26 @@ class ToOneRelationPropertyMayBeNull
     public const ITEM_SKIP_NULL_TO_ONE_RELATION_ROUTE = self::SKIP_NULL_TO_ONE_RELATION_ROUTE.'/{id}';
     public const ENTITY_ID = 1;
 
-    /** @noinspection PhpPropertyOnlyWrittenInspection */
     #[ApiProperty(identifier: true)]
-    private ?int $id = null; // @phpstan-ignore-line
+    #[Groups(['read'])]
+    public ?int $id = null;
 
     #[ApiProperty]
     public ?RelatedEntity $relatedEntity = null;
 
+    #[ApiProperty(readableLink: true)]
+    #[Groups(['read'])]
+    public ?RelatedEntity $relatedEmbeddedEntity = null;
+
     #[ApiProperty]
     public ?RelatedEntity $relatedEntity2 = null;
 
+    #[ApiProperty(readableLink: true)]
+    #[Groups(['read'])]
+    public ?RelatedEntity $relatedEmbeddedEntity2 = null;
+
     #[ApiProperty]
+    #[Groups(['read'])]
     public Collection $collection;
 
     public function __construct()
@@ -76,6 +90,7 @@ class ToOneRelationPropertyMayBeNull
         $toOneRelationPropertyMayBeNull = new self();
         $toOneRelationPropertyMayBeNull->id = self::ENTITY_ID;
         $toOneRelationPropertyMayBeNull->relatedEntity2 = $relatedEntity1;
+        $toOneRelationPropertyMayBeNull->relatedEmbeddedEntity2 = $relatedEntity1;
         $toOneRelationPropertyMayBeNull->collection = new ArrayCollection([$relatedEntity1, $relatedEntity2]);
 
         return $toOneRelationPropertyMayBeNull;

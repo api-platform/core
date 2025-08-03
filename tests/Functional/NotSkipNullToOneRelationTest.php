@@ -68,12 +68,23 @@ class NotSkipNullToOneRelationTest extends ApiTestCase
 
         $this->assertJsonEquals(
             [
+                '_embedded' => [
+                    'relatedEmbeddedEntity' => null,
+                    'relatedEmbeddedEntity2' => [
+                        '_links' => [
+                            'self' => [
+                                'href' => '/related_entities/1',
+                            ],
+                        ],
+                        'id' => 1,
+                    ],
+                ],
                 '_links' => [
                     'self' => [
-                        'href' => $itemIri,
+                        'href' => '/my-route/1',
                     ],
-                    'relatedEntity' => null,
-                    'relatedEntity2' => [
+                    'relatedEmbeddedEntity' => null,
+                    'relatedEmbeddedEntity2' => [
                         'href' => '/related_entities/1',
                     ],
                 ],
@@ -95,6 +106,7 @@ class NotSkipNullToOneRelationTest extends ApiTestCase
                         'id' => 2,
                     ],
                 ],
+                'id' => 1,
             ]
         );
     }
@@ -130,11 +142,21 @@ class NotSkipNullToOneRelationTest extends ApiTestCase
 
         $this->assertJsonEquals(
             [
+                '_embedded' => [
+                    'relatedEmbeddedEntity2' => [
+                        '_links' => [
+                            'self' => [
+                                'href' => '/related_entities/1',
+                            ],
+                        ],
+                        'id' => 1,
+                    ],
+                ],
                 '_links' => [
                     'self' => [
-                        'href' => $itemIri,
+                        'href' => '/skip-null-relation-route/1',
                     ],
-                    'relatedEntity2' => [
+                    'relatedEmbeddedEntity2' => [
                         'href' => '/related_entities/1',
                     ],
                 ],
@@ -156,6 +178,7 @@ class NotSkipNullToOneRelationTest extends ApiTestCase
                         'id' => 2,
                     ],
                 ],
+                'id' => 1,
             ]
         );
     }
