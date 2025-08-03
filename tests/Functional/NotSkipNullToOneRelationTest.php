@@ -47,6 +47,9 @@ class NotSkipNullToOneRelationTest extends ApiTestCase
      */
     public function testNullRelationsAreNotSkippedWhenConfigured(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('Not tested with mongodb.');
+        }
         $itemIri = str_replace(
             '{id}',
             ToOneRelationPropertyMayBeNull::ENTITY_ID.'',
@@ -121,6 +124,9 @@ class NotSkipNullToOneRelationTest extends ApiTestCase
      */
     public function testNullRelationsAreSkippedByDefault(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('Not tested with mongodb.');
+        }
         $itemIri = str_replace(
             '{id}',
             ToOneRelationPropertyMayBeNull::ENTITY_ID.'',
@@ -214,5 +220,10 @@ class NotSkipNullToOneRelationTest extends ApiTestCase
                 ],
             ]
         );
+    }
+
+    private function isMongoDB(): bool
+    {
+        return 'mongodb' === static::getContainer()->getParameter('kernel.environment');
     }
 }
