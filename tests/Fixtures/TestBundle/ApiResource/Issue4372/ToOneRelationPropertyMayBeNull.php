@@ -50,7 +50,7 @@ class ToOneRelationPropertyMayBeNull
 
     /** @noinspection PhpPropertyOnlyWrittenInspection */
     #[ApiProperty(identifier: true)]
-    private ?int $id = null;
+    private ?int $id = null; // @phpstan-ignore-line
 
     #[ApiProperty]
     public ?RelatedEntity $relatedEntity = null;
