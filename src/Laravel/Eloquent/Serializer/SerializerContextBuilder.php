@@ -17,13 +17,19 @@ use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface
 use ApiPlatform\State\SerializerContextBuilderInterface;
 use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+use Symfony\Component\Serializer\NameConverter\SnakeCaseToCamelCaseNameConverter;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 final class SerializerContextBuilder implements SerializerContextBuilderInterface
 {
+    /**
+     * @param class-string $nameConverterClass
+     */
     public function __construct(
         private readonly SerializerContextBuilderInterface $decorated,
         private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
+        private readonly ?string $nameConverterClass = null,
     ) {
     }
 
@@ -35,6 +41,12 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         $context = $this->decorated->createFromRequest($request, $normalization, $extractedAttributes);
         if (!isset($context['resource_class']) || !is_a($context['resource_class'], Model::class, true)) {
             return $context;
+        }
+
+        if (SnakeCaseToCamelCaseNameConverter::class === $this->nameConverterClass) {
+            $context[SnakeCaseToCamelCaseNameConverter::REQUIRE_CAMEL_CASE_PROPERTIES] = true;
+        } elseif (CamelCaseToSnakeCaseNameConverter::class === $this->nameConverterClass) {
+            $context[CamelCaseToSnakeCaseNameConverter::REQUIRE_SNAKE_CASE_PROPERTIES] = true;
         }
 
         if (!isset($context[AbstractNormalizer::ATTRIBUTES])) {
