@@ -305,14 +305,16 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
             $attributeValue = $this->getAttributeValue($object, $relation['name'], $format, $childContext);
 
-            if (empty($attributeValue)) {
+            if (empty($attributeValue) && ($context[self::SKIP_NULL_TO_ONE_RELATIONS] ?? $this->defaultContext[self::SKIP_NULL_TO_ONE_RELATIONS] ?? true)) {
                 continue;
             }
 
             if ('one' === $relation['cardinality']) {
                 if ('links' === $type) {
-                    $data[$key][$relationName]['href'] = $this->getRelationIri($attributeValue);
-                    continue;
+                    if (null !== $attributeValue) {
+                        $data[$key][$relationName]['href'] = $this->getRelationIri($attributeValue);
+                        continue;
+                    }
                 }
 
                 $data[$key][$relationName] = $attributeValue;

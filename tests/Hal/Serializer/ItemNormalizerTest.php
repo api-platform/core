@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue4372\RelatedEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\ActivableInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\Author;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\Book;
@@ -28,6 +29,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\TimestampableInt
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -419,5 +421,148 @@ class ItemNormalizerTest extends TestCase
         ];
 
         $this->assertEquals($expected, $normalizer->normalize($level1, ItemNormalizer::FORMAT, [ObjectNormalizer::ENABLE_MAX_DEPTH => true]));
+    }
+
+    #[DataProvider('getSkipNullToOneRelationCases')]
+    public function testSkipNullToOneRelation($context, $expected)
+    {
+        $dummy = new Dummy();
+        $dummy->setAlias(null);
+        $dummy->relatedDummy = null;
+
+        $propertyNameCollection = new PropertyNameCollection(['alias', 'relatedDummy']);
+        $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->willReturn($propertyNameCollection);
+
+        $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturnCallback(function ($resourceClass, $propertyName, $groups) {
+            if ('alias' == $propertyName) {
+                return (new ApiProperty())->withNativeType(Type::string())->withDescription('')->withReadable(true);
+            }
+            if ('relatedDummy' == $propertyName) {
+                return (new ApiProperty())->withNativeType(Type::object(RelatedDummy::class))->withDescription('')->withReadable(true)->withWritable(false);
+            }
+        });
+
+        $iriConverter = $this->createMock(IriConverterInterface::class);
+        $iriConverter->method('getIriFromResource')->willReturn('/dummies/1');
+
+        $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('getResourceClass')->willReturnCallback(function ($resource) {
+            if ($resource instanceof Dummy) {
+                return Dummy::class;
+            }
+            if (null == $resource) {
+                return RelatedDummy::class;
+            }
+        });
+        $resourceClassResolver->method('isResourceClass')->willReturn(true);
+
+        /**
+         * @var SerializerInterface&NormalizerInterface $serializer
+         */
+        $serializer = $this->createMockForIntersectionOfInterfaces([SerializerInterface::class, NormalizerInterface::class]);
+        $serializer->method('normalize')->with(null, null, self::anything())->willReturn(null);
+
+        $nameConverter = self::createMock(NameConverterInterface::class);
+        $nameConverter->method('normalize')->willReturnCallback(function ($propertyName) {
+            if ('alias' == $propertyName) {
+                return 'alias';
+            }
+            if ('relatedDummy' == $propertyName) {
+                return 'related_dummy';
+            }
+        });
+
+        $normalizer = new ItemNormalizer(
+            propertyNameCollectionFactory: $propertyNameCollectionFactory,
+            propertyMetadataFactory: $propertyMetadataFactory,
+            iriConverter: $iriConverter,
+            resourceClassResolver: $resourceClassResolver,
+            propertyAccessor: null,
+            nameConverter: $nameConverter,
+            classMetadataFactory: null,
+            defaultContext: [],
+            resourceMetadataCollectionFactory: null,
+            resourceAccessChecker: null,
+            tagCollector: null,
+        );
+        $normalizer->setSerializer($serializer);
+
+        self::assertThat($expected, self::equalTo($normalizer->normalize($dummy, null, $context)));
+    }
+
+    public static function getSkipNullToOneRelationCases()
+    {
+        yield [
+            ['skip_null_to_one_relations' => true],
+            [
+                '_links' => [
+                    'self' => [
+                        'href' => '/dummies/1',
+                    ],
+                ],
+                'alias' => null,
+            ],
+        ];
+
+        yield [
+            ['skip_null_to_one_relations' => false],
+            [
+                '_links' => [
+                    'self' => [
+                        'href' => '/dummies/1',
+                    ],
+                    'related_dummy' => null,
+                ],
+                'alias' => null,
+            ]];
+    }
+
+    /**
+     * @return string|void
+     */
+    private static function convertPropertyNames($propertyName)
+    {
+        if ('relatedEntity' == $propertyName) {
+            return 'related_entity';
+        }
+        if ('relatedEmbeddedEntity' == $propertyName) {
+            return 'related_embedded_entity';
+        }
+        if ('collection' == $propertyName) {
+            return 'collection';
+        }
+        if ('relatedEntity2' == $propertyName) {
+            return 'related_entity2';
+        }
+        if ('relatedEmbeddedEntity2' == $propertyName) {
+            return 'related_embedded_entity2';
+        }
+
+        return $propertyName;
+    }
+
+    /**
+     * @return ApiProperty|void
+     */
+    private static function createPropertyMetadata($propertyName)
+    {
+        $relatedPropertyMeta = (new ApiProperty())->withNativeType(Type::object(RelatedEntity::class))->withDescription('')->withReadable(true)->withWritable(false)->withReadableLink(true);
+        if ('relatedEntity' == $propertyName) {
+            return $relatedPropertyMeta;
+        }
+        if ('relatedEmbeddedEntity' == $propertyName) {
+            return $relatedPropertyMeta;
+        }
+        if ('relatedEntity2' == $propertyName) {
+            return $relatedPropertyMeta;
+        }
+
+        if ('relatedEmbeddedEntity2' == $propertyName) {
+            return $relatedPropertyMeta;
+        }
+
+        return (new ApiProperty())->withNativeType(Type::string())->withDescription('')->withReadable(true);
     }
 }
