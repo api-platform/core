@@ -136,6 +136,7 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
         ?\Throwable $previous = null,
         private ?array $meta = null,
         private ?array $source = null,
+        private ?string $description = null,
     ) {
         parent::__construct($title, $status, $previous);
 
@@ -186,7 +187,12 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
     #[ApiProperty(writable: false, initializable: false)]
     public function getDescription(): ?string
     {
-        return $this->detail;
+        return $this->description ?? $this->detail;
+    }
+
+    public function setDescription(?string $description = null): void
+    {
+        $this->description = $description;
     }
 
     public static function createFromException(\Exception|\Throwable $exception, int $status): self
