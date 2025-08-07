@@ -17,7 +17,6 @@ use ApiPlatform\Symfony\Bundle\ApiPlatformBundle;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AttributeFilterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AttributeResourcePass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AuthenticatorManagerPass;
-use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\DataProviderPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ElasticsearchClientPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlResolverPass;
@@ -43,7 +42,6 @@ class ApiPlatformBundleTest extends TestCase
     public function testBuild(): void
     {
         $containerProphecy = $this->prophesize(ContainerBuilder::class);
-        $containerProphecy->addCompilerPass(Argument::type(DataProviderPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(AttributeFilterPass::class), PassConfig::TYPE_BEFORE_OPTIMIZATION, 101)->willReturn($containerProphecy->reveal())->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(AttributeResourcePass::class))->shouldBeCalled()->willReturn($containerProphecy->reveal())->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(FilterPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
