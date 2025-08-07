@@ -262,10 +262,10 @@ class ApiPlatformProvider extends ServiceProvider
             return new CachePropertyMetadataFactory(
                 new SchemaPropertyMetadataFactory(
                     $app->make(ResourceClassResolverInterface::class),
-                    new PropertyInfoPropertyMetadataFactory(
-                        $app->make(PropertyInfoExtractorInterface::class),
-                        new SerializerPropertyMetadataFactory(
-                            $app->make(SerializerClassMetadataFactory::class),
+                    new SerializerPropertyMetadataFactory(
+                        $app->make(SerializerClassMetadataFactory::class),
+                        new PropertyInfoPropertyMetadataFactory(
+                            $app->make(PropertyInfoExtractorInterface::class),
                             new AttributePropertyMetadataFactory(
                                 new EloquentAttributePropertyMetadataFactory(
                                     new EloquentPropertyMetadataFactory(

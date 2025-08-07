@@ -369,4 +369,13 @@ class JsonLdTest extends TestCase
             '@type' => 'Collection',
         ]);
     }
+
+    public function testCustomRelation(): void
+    {
+        $response = $this->get('/api/home', headers: ['accept' => ['application/ld+json']]);
+        $home = $response->json();
+        $this->assertArrayHasKey('order', $home);
+        $this->assertArrayHasKey('id', $home['order']);
+        $this->assertArrayHasKey('number', $home['order']);
+    }
 }
