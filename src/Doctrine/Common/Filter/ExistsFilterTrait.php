@@ -70,7 +70,7 @@ trait ExistsFilterTrait
 
     abstract protected function normalizePropertyName(string $property): string;
 
-    private function normalizeValue($value, string $property): ?bool
+    private function normalizeValue(mixed $value, string $property): ?bool
     {
         if (\in_array($value, [true, 'true', '1', '', null], true)) {
             return true;

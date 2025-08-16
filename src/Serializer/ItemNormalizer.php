@@ -16,6 +16,7 @@ namespace ApiPlatform\Serializer;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -93,15 +94,17 @@ class ItemNormalizer extends AbstractItemNormalizer
         }
     }
 
-    private function getContextUriVariables(array $data, $operation, array $context): array
+    private function getContextUriVariables(array $data, Operation $operation, array $context): array
     {
         $uriVariables = $context['uri_variables'] ?? [];
 
-        $operationUriVariables = $operation->getUriVariables();
-        if ((null !== $uriVariable = array_shift($operationUriVariables)) && \count($uriVariable->getIdentifiers())) {
-            $identifier = $uriVariable->getIdentifiers()[0];
-            if (isset($data[$identifier])) {
-                $uriVariables[$uriVariable->getParameterName()] = $data[$identifier];
+        if ($operation instanceof HttpOperation) {
+            $operationUriVariables = $operation->getUriVariables();
+            if ((null !== $uriVariable = array_shift($operationUriVariables)) && \count($uriVariable->getIdentifiers())) {
+                $identifier = $uriVariable->getIdentifiers()[0];
+                if (isset($data[$identifier])) {
+                    $uriVariables[$uriVariable->getParameterName()] = $data[$identifier];
+                }
             }
         }
 

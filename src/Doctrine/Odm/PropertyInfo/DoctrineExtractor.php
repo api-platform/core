@@ -41,6 +41,8 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
     /**
      * {@inheritdoc}
      *
+     * @param string $class
+     *
      * @return string[]|null
      */
     public function getProperties($class, array $context = []): ?array
@@ -110,6 +112,9 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
      * {@inheritdoc}
      *
      * // deprecated since 4.2 use "getType" instead
+     *
+     * @param string $class
+     * @param string $property
      *
      * @return LegacyType[]|null
      */
@@ -183,6 +188,9 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
 
     /**
      * {@inheritdoc}
+     *
+     * @param string $class
+     * @param string $property
      */
     public function isReadable($class, $property, array $context = []): ?bool
     {
@@ -191,6 +199,9 @@ final class DoctrineExtractor implements PropertyListExtractorInterface, Propert
 
     /**
      * {@inheritdoc}
+     *
+     * @param string $class
+     * @param string $property
      */
     public function isWritable($class, $property, array $context = []): ?bool
     {

@@ -32,6 +32,9 @@ final class ResourceFieldResolver
     {
     }
 
+    /**
+     * @param array $context
+     */
     public function __invoke(?array $source, array $args, $context, ResolveInfo $info): mixed
     {
         $property = null;

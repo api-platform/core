@@ -27,6 +27,9 @@ final class OpenApi
     private string $openapi = self::VERSION;
     private Components $components;
 
+    /**
+     * @param array|null $externalDocs
+     */
     public function __construct(private Info $info, private array $servers, private Paths $paths, ?Components $components = null, private array $security = [], private array $tags = [], private $externalDocs = null, private ?string $jsonSchemaDialect = null, private readonly ?\ArrayObject $webhooks = null)
     {
         $this->components = $components ?? new Components();

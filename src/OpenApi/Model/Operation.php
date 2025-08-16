@@ -22,6 +22,9 @@ final class Operation
         $this->extensionProperties = $extensionProperties;
     }
 
+    /**
+     * @param string $status
+     */
     public function addResponse(Response $response, $status = 'default'): self
     {
         $this->responses[$status] = $response;

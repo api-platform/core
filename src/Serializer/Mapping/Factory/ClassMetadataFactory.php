@@ -27,6 +27,8 @@ final class ClassMetadataFactory implements ClassMetadataFactoryInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param string|object $value
      */
     public function getMetadataFor($value): ClassMetadataInterface
     {
@@ -38,6 +40,12 @@ final class ClassMetadataFactory implements ClassMetadataFactoryInterface
      */
     public function hasMetadataFor(mixed $value): bool
     {
-        return $this->decorated->hasMetadataFor(\is_object($value) ? $this->getObjectClass($value) : $this->getRealClassName($value));
+        if (\is_object($value)) {
+            $value = $this->getObjectClass($value);
+        } elseif (\is_string($value)) {
+            $value = $this->getRealClassName($value);
+        }
+
+        return $this->decorated->hasMetadataFor($value);
     }
 }
