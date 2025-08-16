@@ -19,14 +19,18 @@ use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\State\ProcessorInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager as DoctrineObjectManager;
+use Psr\Container\ContainerInterface;
 
 final class PersistProcessor implements ProcessorInterface
 {
     use ClassInfoTrait;
     use LinksHandlerTrait;
+    use ResourceTransformerLocatorTrait;
 
-    public function __construct(private readonly ManagerRegistry $managerRegistry)
+    public function __construct(private readonly ManagerRegistry $managerRegistry,
+        ?ContainerInterface $resourceTransformerLocator = null)
     {
+        $this->resourceTransformerLocator = $resourceTransformerLocator;
     }
 
     /**
@@ -38,6 +42,12 @@ final class PersistProcessor implements ProcessorInterface
      */
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
+        // if a transformer is defined, start with that
+        $data = match ($transformer = $this->getFromResourceTransformer($operation)) {
+            null => $data,
+            default => $transformer($data, $this->getManager($operation, $this->managerRegistry)),
+        };
+
         if (
             !\is_object($data)
             || !$manager = $this->managerRegistry->getManagerForClass($class = $this->getObjectClass($data))
@@ -104,7 +114,10 @@ final class PersistProcessor implements ProcessorInterface
         $manager->flush();
         $manager->refresh($data);
 
-        return $data;
+        return match ($transformer = $this->getToResourceTransformer($operation)) {
+            null => $data,
+            default => $transformer($data, $operation, $uriVariables, $context),
+        };
     }
 
     /**
