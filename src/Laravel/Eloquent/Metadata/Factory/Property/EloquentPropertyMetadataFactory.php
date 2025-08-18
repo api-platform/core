@@ -64,7 +64,7 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
         }
 
         if ($model->getKeyName() === $property) {
-            $propertyMetadata = $propertyMetadata->withIdentifier(true)->withWritable($propertyMetadata->isWritable() ?? false);
+            $propertyMetadata = $propertyMetadata->withIdentifier(true);
         }
 
         foreach ($this->modelMetadata->getAttributes($model) as $p) {
@@ -88,17 +88,6 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
 
             $propertyMetadata = $propertyMetadata
                 ->withBuiltinTypes([$type]);
-
-            // If these are set let the SerializerPropertyMetadataFactory do the work
-            if (!isset($options['denormalization_groups'])) {
-                $propertyMetadata = $propertyMetadata
-                    ->withWritable($propertyMetadata->isWritable() ?? true === $p['fillable']);
-            }
-
-            if (!isset($options['normalization_groups'])) {
-                $propertyMetadata = $propertyMetadata
-                    ->withReadable($propertyMetadata->isReadable() ?? false === $p['hidden']);
-            }
 
             return $propertyMetadata;
         }

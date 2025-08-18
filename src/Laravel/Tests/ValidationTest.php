@@ -48,6 +48,16 @@ class ValidationTest extends TestCase
         $response->assertStatus(422);
     }
 
+    public function testCamelCaseValid(): void
+    {
+        $data = [
+            'surName' => 'ok',
+        ];
+
+        $response = $this->postJson('/api/issue_6932', $data, ['accept' => 'application/ld+json', 'content-type' => 'application/ld+json']);
+        $response->assertStatus(201);
+    }
+
     public function testValidationSnakeCase(): void
     {
         $data = [
