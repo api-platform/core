@@ -16,7 +16,6 @@ namespace ApiPlatform\Symfony\Doctrine\EventListener;
 use ApiPlatform\HttpCache\PurgerInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\OperationNotFoundException;
-use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
@@ -27,6 +26,8 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping\AssociationMapping;
 use Doctrine\ORM\PersistentCollection;
+use Symfony\Component\ObjectMapper\Attribute\Map;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -41,7 +42,11 @@ final class PurgeHttpCacheListener
     private readonly PropertyAccessorInterface $propertyAccessor;
     private array $tags = [];
 
-    public function __construct(private readonly PurgerInterface $purger, private readonly IriConverterInterface $iriConverter, private readonly ResourceClassResolverInterface $resourceClassResolver, ?PropertyAccessorInterface $propertyAccessor = null)
+    public function __construct(private readonly PurgerInterface $purger,
+        private readonly IriConverterInterface $iriConverter,
+        private readonly ResourceClassResolverInterface $resourceClassResolver,
+        ?PropertyAccessorInterface $propertyAccessor = null,
+        private readonly ?ObjectMapperInterface $objectMapper = null)
     {
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
     }
@@ -110,36 +115,47 @@ final class PurgeHttpCacheListener
 
     private function gatherResourceAndItemTags(object $entity, bool $purgeItem): void
     {
-        try {
-            $iri = $this->iriConverter->getIriFromResource($entity, UrlGeneratorInterface::ABS_PATH, new GetCollection());
-            $this->tags[$iri] = $iri;
+        $resources = $this->getResourcesForEntity($entity);
 
-            if ($purgeItem) {
-                $this->addTagForItem($entity);
+        foreach ($resources as $resource) {
+            try {
+                $iri = $this->iriConverter->getIriFromResource($resource, UrlGeneratorInterface::ABS_PATH, new GetCollection());
+                $this->tags[$iri] = $iri;
+
+                if ($purgeItem) {
+                    $this->addTagForItem($entity);
+                }
+            } catch (OperationNotFoundException|InvalidArgumentException) {
             }
-        } catch (OperationNotFoundException|InvalidArgumentException) {
         }
     }
 
     private function gatherRelationTags(EntityManagerInterface $em, object $entity): void
     {
         $associationMappings = $em->getClassMetadata($entity::class)->getAssociationMappings();
+
         /** @var array|AssociationMapping $associationMapping according to the version of doctrine orm */
         foreach ($associationMappings as $property => $associationMapping) {
             if ($associationMapping instanceof AssociationMapping && ($associationMapping->targetEntity ?? null) && !$this->resourceClassResolver->isResourceClass($associationMapping->targetEntity)) {
+                return;
+            }
+            if (!$this->propertyAccessor->isReadable($entity, $property)) {
                 return;
             }
 
             if (
                 \is_array($associationMapping)
                 && \array_key_exists('targetEntity', $associationMapping)
-                && !$this->resourceClassResolver->isResourceClass($associationMapping['targetEntity'])) {
+                && !$this->resourceClassResolver->isResourceClass($associationMapping['targetEntity'])
+                && (
+                    !$this->objectMapper
+                    || !(new \ReflectionClass($associationMapping['targetEntity']))->getAttributes(Map::class)
+                )
+            ) {
                 return;
             }
 
-            if ($this->propertyAccessor->isReadable($entity, $property)) {
-                $this->addTagsFor($this->propertyAccessor->getValue($entity, $property));
-            }
+            $this->addTagsFor($this->propertyAccessor->getValue($entity, $property));
         }
     }
 
@@ -166,14 +182,42 @@ final class PurgeHttpCacheListener
 
     private function addTagForItem(mixed $value): void
     {
-        if (!$this->resourceClassResolver->isResourceClass($this->getObjectClass($value))) {
-            return;
+        $resources = $this->getResourcesForEntity($value);
+
+        foreach ($resources as $resource) {
+            try {
+                $iri = $this->iriConverter->getIriFromResource($resource);
+                $this->tags[$iri] = $iri;
+            } catch (OperationNotFoundException|InvalidArgumentException) {
+            }
+        }
+    }
+
+    private function getResourcesForEntity(object $entity): array
+    {
+        $resources = [];
+
+        if (!$this->resourceClassResolver->isResourceClass($class = $this->getObjectClass($entity))) {
+            // is the entity mapped to resource(s)?
+            if (!$this->objectMapper) {
+                return [];
+            }
+
+            $mapAttributes = (new \ReflectionClass($class))->getAttributes(Map::class);
+
+            if (!$mapAttributes) {
+                return [];
+            }
+
+            // loop over all mappings to fetch all resources mapped to this entity
+            $resources = array_map(
+                fn ($mapAttribute) => $this->objectMapper->map($entity, $mapAttribute->newInstance()->target),
+                $mapAttributes
+            );
+        } else {
+            $resources[] = $entity;
         }
 
-        try {
-            $iri = $this->iriConverter->getIriFromResource($value);
-            $this->tags[$iri] = $iri;
-        } catch (RuntimeException|InvalidArgumentException) {
-        }
+        return $resources;
     }
 }

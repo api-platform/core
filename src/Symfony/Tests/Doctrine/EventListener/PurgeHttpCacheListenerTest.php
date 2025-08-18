@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Symfony\Doctrine\EventListener\PurgeHttpCacheListener;
+use ApiPlatform\Symfony\Tests\Fixtures\MappedEntity;
 use ApiPlatform\Symfony\Tests\Fixtures\NotAResource;
 use ApiPlatform\Symfony\Tests\Fixtures\TestBundle\Entity\ContainNonResource;
 use ApiPlatform\Symfony\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -157,6 +158,7 @@ class PurgeHttpCacheListenerTest extends TestCase
         $iriConverterProphecy->getIriFromResource($dummyNoGetOperation)->shouldNotBeCalled();
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(DummyNoGetOperation::class)->willReturn(true)->shouldBeCalled();
         $resourceClassResolverProphecy->getResourceClass(Argument::type(DummyNoGetOperation::class))->willReturn(DummyNoGetOperation::class)->shouldNotBeCalled();
 
         $emProphecy = $this->prophesize(EntityManagerInterface::class);
@@ -259,6 +261,38 @@ class PurgeHttpCacheListenerTest extends TestCase
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
         $propertyAccessorProphecy->isReadable(Argument::type(Dummy::class), 'relatedDummies')->willReturn(true);
         $propertyAccessorProphecy->getValue(Argument::type(Dummy::class), 'relatedDummies')->willReturn($collection)->shouldBeCalled();
+
+        $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal());
+        $listener->onFlush($eventArgs);
+        $listener->postFlush();
+    }
+
+    public function testMappedResources(): void
+    {
+        $mappedEntity = new MappedEntity();
+
+        $purgerProphecy = $this->prophesize(PurgerInterface::class);
+        $purgerProphecy->purge(['/mapped_ressources'])->shouldBeCalled();
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource(Argument::type(MappedEntity::class), UrlGeneratorInterface::ABS_PATH, new GetCollection())->willReturn('/mapped_ressources')->shouldBeCalled();
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(MappedEntity::class)->willReturn(true)->shouldBeCalled();
+
+        $uowProphecy = $this->prophesize(UnitOfWork::class);
+        $uowProphecy->getScheduledEntityInsertions()->willReturn([$mappedEntity])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityUpdates()->willReturn([])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityDeletions()->willReturn([])->shouldBeCalled();
+
+        $emProphecy = $this->prophesize(EntityManagerInterface::class);
+        $emProphecy->getUnitOfWork()->willReturn($uowProphecy->reveal())->shouldBeCalled();
+        $classMetadata = new ClassMetadata(MappedEntity::class);
+        $classMetadata->associationMappings = [];
+        $emProphecy->getClassMetadata(MappedEntity::class)->willReturn($classMetadata)->shouldBeCalled();
+        $eventArgs = new OnFlushEventArgs($emProphecy->reveal());
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
 
         $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal());
         $listener->onFlush($eventArgs);
