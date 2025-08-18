@@ -89,7 +89,7 @@ trait BackedEnumFilterTrait
      */
     abstract protected function isBackedEnumField(string $property, string $resourceClass): bool;
 
-    private function normalizeValue($value, string $property): mixed
+    private function normalizeValue(mixed $value, string $property): mixed
     {
         $firstCase = $this->enumTypes[$property]::cases()[0] ?? null;
         if (

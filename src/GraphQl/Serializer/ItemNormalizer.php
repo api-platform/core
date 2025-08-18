@@ -62,6 +62,9 @@ final class ItemNormalizer extends BaseItemNormalizer
         return self::FORMAT === $format && parent::supportsNormalization($data, $format, $context);
     }
 
+    /**
+     * @param string|null $format
+     */
     public function getSupportedTypes($format): array
     {
         return self::FORMAT === $format ? parent::getSupportedTypes($format) : [];
@@ -149,8 +152,12 @@ final class ItemNormalizer extends BaseItemNormalizer
 
     /**
      * {@inheritdoc}
+     *
+     * @param object      $object
+     * @param string      $attribute
+     * @param string|null $format
      */
-    protected function setAttributeValue($object, $attribute, $value, $format = null, array $context = []): void
+    protected function setAttributeValue($object, $attribute, mixed $value, $format = null, array $context = []): void
     {
         if ('_id' === $attribute) {
             $attribute = 'id';

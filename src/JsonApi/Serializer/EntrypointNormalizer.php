@@ -73,6 +73,9 @@ final class EntrypointNormalizer implements NormalizerInterface
         return self::FORMAT === $format && $data instanceof Entrypoint;
     }
 
+    /**
+     * @param string|null $format
+     */
     public function getSupportedTypes($format): array
     {
         return self::FORMAT === $format ? [Entrypoint::class => true] : [];

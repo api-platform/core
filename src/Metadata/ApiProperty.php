@@ -376,6 +376,9 @@ final class ApiProperty
         return $this->deprecationReason;
     }
 
+    /**
+     * @param string $deprecationReason
+     */
     public function withDeprecationReason($deprecationReason): static
     {
         $self = clone $this;
@@ -389,6 +392,9 @@ final class ApiProperty
         return $this->fetchable;
     }
 
+    /**
+     * @param bool $fetchable
+     */
     public function withFetchable($fetchable): static
     {
         $self = clone $this;
@@ -402,6 +408,9 @@ final class ApiProperty
         return $this->fetchEager;
     }
 
+    /**
+     * @param bool $fetchEager
+     */
     public function withFetchEager($fetchEager): static
     {
         $self = clone $this;
@@ -415,6 +424,9 @@ final class ApiProperty
         return $this->jsonldContext;
     }
 
+    /**
+     * @param array $jsonldContext
+     */
     public function withJsonldContext($jsonldContext): static
     {
         $self = clone $this;
@@ -428,6 +440,9 @@ final class ApiProperty
         return $this->openapiContext;
     }
 
+    /**
+     * @param array $openapiContext
+     */
     public function withOpenapiContext($openapiContext): static
     {
         $self = clone $this;
@@ -441,6 +456,9 @@ final class ApiProperty
         return $this->jsonSchemaContext;
     }
 
+    /**
+     * @param array $jsonSchemaContext
+     */
     public function withJsonSchemaContext($jsonSchemaContext): static
     {
         $self = clone $this;
@@ -454,6 +472,9 @@ final class ApiProperty
         return $this->push;
     }
 
+    /**
+     * @param bool $push
+     */
     public function withPush($push): static
     {
         $self = clone $this;
@@ -467,7 +488,7 @@ final class ApiProperty
         return $this->security instanceof \Stringable ? (string) $this->security : $this->security;
     }
 
-    public function withSecurity($security): static
+    public function withSecurity(string|\Stringable|null $security = null): static
     {
         $self = clone $this;
         $self->security = $security;
@@ -480,7 +501,7 @@ final class ApiProperty
         return $this->securityPostDenormalize instanceof \Stringable ? (string) $this->securityPostDenormalize : $this->securityPostDenormalize;
     }
 
-    public function withSecurityPostDenormalize($securityPostDenormalize): static
+    public function withSecurityPostDenormalize(string|\Stringable|null $securityPostDenormalize = null): static
     {
         $self = clone $this;
         $self->securityPostDenormalize = $securityPostDenormalize;

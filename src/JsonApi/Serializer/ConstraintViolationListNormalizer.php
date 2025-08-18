@@ -60,6 +60,9 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
         return self::FORMAT === $format && $data instanceof ConstraintViolationListInterface;
     }
 
+    /**
+     * @param string|null $format
+     */
     public function getSupportedTypes($format): array
     {
         return self::FORMAT === $format ? [ConstraintViolationListInterface::class => true] : [];

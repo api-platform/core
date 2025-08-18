@@ -51,6 +51,9 @@ final class HttpExceptionNormalizer implements NormalizerInterface
         return $data instanceof Error && $data->getPrevious() instanceof HttpExceptionInterface;
     }
 
+    /**
+     * @param string|null $format
+     */
     public function getSupportedTypes($format): array
     {
         return [

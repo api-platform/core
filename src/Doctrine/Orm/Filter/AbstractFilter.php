@@ -57,7 +57,7 @@ abstract class AbstractFilter implements FilterInterface, PropertyAwareFilterInt
      * @param class-string         $resourceClass
      * @param array<string, mixed> $context
      */
-    abstract protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void;
+    abstract protected function filterProperty(string $property, mixed $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void;
 
     public function hasManagerRegistry(): bool
     {

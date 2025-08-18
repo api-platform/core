@@ -110,7 +110,7 @@ final class PersistProcessor implements ProcessorInterface
     /**
      * Checks if doctrine does not manage data automatically.
      */
-    private function isDeferredExplicit(DoctrineObjectManager $manager, $data): bool
+    private function isDeferredExplicit(DoctrineObjectManager $manager, object $data): bool
     {
         $classMetadata = $manager->getClassMetadata($this->getObjectClass($data));
         if ($classMetadata && method_exists($classMetadata, 'isChangeTrackingDeferredExplicit')) { // @phpstan-ignore-line metadata can be null

@@ -15,6 +15,9 @@ namespace ApiPlatform\Symfony\Bundle\SwaggerUi;
 
 final class SwaggerUiContext
 {
+    /**
+     * @param string|null $assetPackage
+     */
     public function __construct(private readonly bool $swaggerUiEnabled = false, private readonly bool $showWebby = true, private readonly bool $reDocEnabled = false, private readonly bool $graphQlEnabled = false, private readonly bool $graphiQlEnabled = false, private $assetPackage = null, private readonly array $extraConfiguration = [])
     {
     }

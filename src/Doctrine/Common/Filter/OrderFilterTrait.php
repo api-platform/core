@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Common\Filter;
 
 use ApiPlatform\Doctrine\Common\PropertyHelperTrait;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 
 /**
  * Trait for ordering the collection by given properties.
@@ -70,11 +71,19 @@ trait OrderFilterTrait
 
     abstract protected function normalizePropertyName(string $property): string;
 
-    private function normalizeValue($value, string $property): ?string
+    private function normalizeValue(mixed $value, string $property): ?string
     {
         if (empty($value) && null !== $defaultDirection = $this->getProperties()[$property]['default_direction'] ?? null) {
             // fallback to default direction
             $value = $defaultDirection;
+        }
+
+        if (!\is_string($value)) {
+            $this->getLogger()->notice('Invalid filter ignored', [
+                'exception' => new InvalidArgumentException(\sprintf('Invalid string value for "%s" property', $property)),
+            ]);
+
+            return null;
         }
 
         $value = strtoupper($value);
