@@ -64,7 +64,8 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "4.2.x-dev",
+            "dev-main": "4.3.x-dev",
+            "dev-4.2": "4.2.x-dev",
             "dev-3.4": "3.4.x-dev",
             "dev-4.1": "4.1.x-dev"
         },
