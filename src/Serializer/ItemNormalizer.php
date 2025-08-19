@@ -69,6 +69,17 @@ class ItemNormalizer extends AbstractItemNormalizer
             }
         }
 
+        // See https://github.com/api-platform/core/pull/7270 - id may be an allowed attribute due to being added in the
+        // overridden getAllowedAttributes below, in order to allow updating a nested item via ID. But in this case it
+        // may not "really" be an allowed attribute, ie we don't want to actually use it in denormalization. In this
+        // scenario it will not be present in parent::getAllowedAttributes
+        if (isset($data['id'], $context['resource_class'])) {
+            $parentAllowedAttributes = parent::getAllowedAttributes($class, $context, true);
+            if (\is_array($parentAllowedAttributes) && !\in_array('id', $parentAllowedAttributes, true)) {
+                unset($data['id']);
+            }
+        }
+
         return parent::denormalize($data, $class, $format, $context);
     }
 
@@ -109,5 +120,15 @@ class ItemNormalizer extends AbstractItemNormalizer
         }
 
         return $uriVariables;
+    }
+
+    protected function getAllowedAttributes(string|object $classOrObject, array $context, bool $attributesAsString = false): array|bool
+    {
+        $allowedAttributes = parent::getAllowedAttributes($classOrObject, $context, $attributesAsString);
+        if (\is_array($allowedAttributes) && ($context['api_denormalize'] ?? false)) {
+            $allowedAttributes = array_merge($allowedAttributes, ['id']);
+        }
+
+        return $allowedAttributes;
     }
 }

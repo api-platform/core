@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @implements LinksHandlerInterface<Model>
@@ -109,8 +110,22 @@ final class LinksHandler implements LinksHandlerInterface
         if ($from = $link->getFromProperty()) {
             /** @var Model $relatedInstance */
             $relatedInstance = $this->application->make($link->getFromClass());
-            $relatedInstance->setAttribute($relatedInstance->getKeyName(), $identifier);
-            $relatedInstance->exists = true;
+
+            $identifierField = $link->getIdentifiers()[0];
+
+            if ($identifierField !== $relatedInstance->getKeyName()) {
+                $relatedInstance = $relatedInstance
+                    ->newQuery()
+                    ->where($identifierField, $identifier)
+                    ->first();
+            } else {
+                $relatedInstance->setAttribute($identifierField, $identifier);
+                $relatedInstance->exists = true;
+            }
+
+            if (!$relatedInstance) {
+                throw new NotFoundHttpException('Not Found');
+            }
 
             /** @var Relation<Model, Model, mixed> $relation */
             $relation = $relatedInstance->{$from}();

@@ -148,7 +148,7 @@ final class Parameter
         return $clone;
     }
 
-    public function withAllowEmptyValue(bool $allowEmptyValue): self
+    public function withAllowEmptyValue(?bool $allowEmptyValue): self
     {
         $clone = clone $this;
         $clone->allowEmptyValue = $allowEmptyValue;
@@ -180,7 +180,7 @@ final class Parameter
         return $clone;
     }
 
-    public function withAllowReserved(bool $allowReserved): self
+    public function withAllowReserved(?bool $allowReserved): self
     {
         $clone = clone $this;
         $clone->allowReserved = $allowReserved;
