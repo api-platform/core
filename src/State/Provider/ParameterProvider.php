@@ -21,6 +21,8 @@ use ApiPlatform\State\Exception\ProviderNotFoundException;
 use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ParameterProvider\ReadLinkParameterProvider;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\State\StopwatchAwareInterface;
+use ApiPlatform\State\StopwatchAwareTrait;
 use ApiPlatform\State\Util\ParameterParserTrait;
 use ApiPlatform\State\Util\RequestParser;
 use Psr\Container\ContainerInterface;
@@ -32,9 +34,10 @@ use Psr\Container\ContainerInterface;
  *
  * @experimental
  */
-final class ParameterProvider implements ProviderInterface
+final class ParameterProvider implements ProviderInterface, StopwatchAwareInterface
 {
     use ParameterParserTrait;
+    use StopwatchAwareTrait;
 
     public function __construct(private readonly ?ProviderInterface $decorated = null, private readonly ?ContainerInterface $locator = null)
     {
@@ -42,6 +45,7 @@ final class ParameterProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
+        $this->stopwatch?->start('api_platform.provider.parameter');
         $request = $context['request'] ?? null;
         if ($request && null === $request->attributes->get('_api_query_parameters')) {
             $queryString = RequestParser::getQueryString($request);
@@ -95,6 +99,7 @@ final class ParameterProvider implements ProviderInterface
 
         $request?->attributes->set('_api_operation', $operation);
         $context['operation'] = $operation;
+        $this->stopwatch?->stop('api_platform.provider.parameter');
 
         return $this->decorated?->provide($operation, $uriVariables, $context);
     }

@@ -226,6 +226,33 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if (!$container->has('api_platform.state.item_provider')) {
             $container->setAlias('api_platform.state.item_provider', 'api_platform.state_provider.object');
         }
+
+        if ($container->getParameter('kernel.debug')) {
+            $this->injectStopwatch($container);
+        }
+    }
+
+    private function injectStopwatch(ContainerBuilder $container): void
+    {
+        $services = [
+            'api_platform.state_processor.add_link_header',
+            'api_platform.state_processor.respond',
+            'api_platform.state_processor.serialize',
+            'api_platform.state_processor.write',
+            'api_platform.state_provider.content_negotiation',
+            'api_platform.state_provider.deserialize',
+            'api_platform.state_provider.parameter',
+            'api_platform.state_provider.read',
+        ];
+
+        foreach ($services as $id) {
+            if (!$container->hasDefinition($id)) {
+                continue;
+            }
+
+            $definition = $container->getDefinition($id);
+            $definition->addMethodCall('setStopwatch', [new Reference('debug.stopwatch', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE)]);
+        }
     }
 
     private function registerCommonConfiguration(ContainerBuilder $container, array $config, XmlFileLoader $loader, array $formats, array $patchFormats, array $errorFormats, array $docsFormats): void

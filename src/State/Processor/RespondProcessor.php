@@ -27,6 +27,8 @@ use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\Util\CloneTrait;
 use ApiPlatform\State\ProcessorInterface;
+use ApiPlatform\State\StopwatchAwareInterface;
+use ApiPlatform\State\StopwatchAwareTrait;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface as SymfonyHttpExceptionInterface;
 
@@ -35,10 +37,11 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface as SymfonyHttp
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class RespondProcessor implements ProcessorInterface
+final class RespondProcessor implements ProcessorInterface, StopwatchAwareInterface
 {
     use ClassInfoTrait;
     use CloneTrait;
+    use StopwatchAwareTrait;
 
     public const METHOD_TO_CODE = [
         'POST' => Response::HTTP_CREATED,
@@ -61,6 +64,8 @@ final class RespondProcessor implements ProcessorInterface
         if (!($request = $context['request'] ?? null)) {
             return $data;
         }
+
+        $this->stopwatch?->start('api_platform.processor.respond');
 
         $headers = [
             'Content-Type' => \sprintf('%s; charset=utf-8', $request->getMimeType($request->getRequestFormat())),
@@ -143,6 +148,8 @@ final class RespondProcessor implements ProcessorInterface
             } catch (InvalidArgumentException|ItemNotFoundException|RuntimeException) {
             }
         }
+
+        $this->stopwatch?->stop('api_platform.processor.respond');
 
         return new Response(
             $data,
