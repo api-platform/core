@@ -64,7 +64,7 @@ abstract class Parameter
     }
 
     /**
-     * @return array{type?: string, default?: string, ...array<string, mixed>}|null $schema
+     * @return array{type?: string, default?: string, ...<string, mixed>}|null $schema
      */
     public function getSchema(): ?array
     {
@@ -180,7 +180,7 @@ abstract class Parameter
     }
 
     /**
-     * @param array{type?: string, default?: string, ...array<string, mixed>}|null $schema
+     * @param array{type?: string, default?: string, ...<string, mixed>}|null $schema
      */
     public function withSchema(array $schema): static
     {
