@@ -80,7 +80,7 @@ class AppKernel extends Kernel
             $bundles[] = new FriendsOfBehatSymfonyExtensionBundle();
         }
 
-        if (class_exists(DoctrineMongoDBBundle::class)) {
+        if (extension_loaded('mongodb') && class_exists(DoctrineMongoDBBundle::class)) {
             $bundles[] = new DoctrineMongoDBBundle();
         }
 
