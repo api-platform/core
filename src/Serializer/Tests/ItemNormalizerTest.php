@@ -316,14 +316,14 @@ class ItemNormalizerTest extends TestCase
         $operation = new Get(uriVariables: ['id' => new Link(identifiers: ['id'], parameterName: 'id')]);
         $obj = new Dummy();
 
-        $propertyNameCollection = new PropertyNameCollection(['name']);
+        $propertyNameCollection = new PropertyNameCollection(['id', 'name']);
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn($propertyNameCollection)->shouldBeCalled();
 
         $propertyMetadata = (new ApiProperty())->withReadable(true)->withWritable(true);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn($propertyMetadata)->shouldBeCalled();
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id', [])->willReturn($propertyMetadata)->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id', [])->willReturn((new ApiProperty())->withIdentifier(true))->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getResourceFromIri('fail', $context + ['fetch_data' => true])->willThrow(new InvalidArgumentException());
