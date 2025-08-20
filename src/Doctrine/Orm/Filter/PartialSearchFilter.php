@@ -15,6 +15,7 @@ namespace ApiPlatform\Doctrine\Orm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\QueryBuilder;
@@ -24,29 +25,35 @@ use Doctrine\ORM\QueryBuilder;
  */
 final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilterInterface
 {
+    use BackwardCompatibleFilterDescriptionTrait;
     use OpenApiFilterTrait;
 
     public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
-        if (!$parameter = $context['parameter'] ?? null) {
-            return;
-        }
-
-        $value = $parameter->getValue();
+        $parameter = $context['parameter'];
+        $values = (array) $parameter->getValue();
 
         $property = $parameter->getProperty();
         $alias = $queryBuilder->getRootAliases()[0];
         $field = $alias.'.'.$property;
 
-        $parameterName = $queryNameGenerator->generateParameterName($property);
+        $likeExpressions = [];
+        foreach ($values as $val) {
+            $parameterName = $queryNameGenerator->generateParameterName($property);
+            $likeExpressions[] = $queryBuilder->expr()->like(
+                'LOWER('.$field.')',
+                ':'.$parameterName
+            );
 
-        $likeExpression = $queryBuilder->expr()->like(
-            'LOWER('.$field.')',
-            ':'.$parameterName
-        );
+            $queryBuilder->setParameter($parameterName, '%'.strtolower($val).'%');
+        }
 
-        $queryBuilder
-            ->andWhere($likeExpression)
-            ->setParameter($parameterName, '%'.strtolower($value).'%');
+        if (1 === \count($likeExpressions)) {
+            $queryBuilder->{$context['whereClause'] ?? 'andWhere'}($likeExpressions[0]);
+        } else {
+            $queryBuilder->{$context['whereClause'] ?? 'andWhere'}(
+                $queryBuilder->expr()->orX(...$likeExpressions)
+            );
+        }
     }
 }

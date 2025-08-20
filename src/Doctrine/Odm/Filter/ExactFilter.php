@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Odm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
+use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
@@ -23,22 +24,18 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
  */
 final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterface
 {
+    use BackwardCompatibleFilterDescriptionTrait;
     use OpenApiFilterTrait;
 
     public function apply(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
-        if (!$parameter = $context['parameter'] ?? null) {
-            return;
-        }
-
-        $values = (array) $parameter->getValue();
-
-        // TODO: handle nested properties
+        $parameter = $context['parameter'];
+        $value = $parameter->getValue();
         $property = $parameter->getProperty();
 
         $aggregationBuilder
             ->match()
             ->field($property)
-            ->in($values);
+            ->{(is_iterable($value)) ? 'in' : 'equals'}($value);
     }
 }

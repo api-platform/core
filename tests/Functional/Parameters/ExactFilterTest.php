@@ -36,6 +36,8 @@ final class ExactFilterTest extends ApiTestCase
     use RecreateSchemaTrait;
     use SetupClassResourcesTrait;
 
+    protected static ?bool $alwaysBootKernel = false;
+
     /**
      * @return class-string[]
      */
@@ -49,8 +51,6 @@ final class ExactFilterTest extends ApiTestCase
      */
     protected function setUp(): void
     {
-        self::$alwaysBootKernel = false;
-
         $entities = $this->isMongoDB()
             ? [DocumentChicken::class, DocumentChickenCoop::class]
             : [Chicken::class, ChickenCoop::class];

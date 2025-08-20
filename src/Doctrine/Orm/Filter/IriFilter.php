@@ -15,6 +15,7 @@ namespace ApiPlatform\Doctrine\Orm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\ParameterProviderFilterInterface;
@@ -26,27 +27,30 @@ use Doctrine\ORM\QueryBuilder;
  */
 final class IriFilter implements FilterInterface, OpenApiParameterFilterInterface, ParameterProviderFilterInterface
 {
+    use BackwardCompatibleFilterDescriptionTrait;
     use OpenApiFilterTrait;
 
     public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
-        if (!$parameter = $context['parameter'] ?? null) {
-            return;
-        }
+        $parameter = $context['parameter'];
 
         $value = $parameter->getValue();
-        if (!\is_array($value)) {
-            $value = [$value];
-        }
 
         $property = $parameter->getProperty();
         $alias = $queryBuilder->getRootAliases()[0];
         $parameterName = $queryNameGenerator->generateParameterName($property);
 
-        $queryBuilder
-            ->join(\sprintf('%s.%s', $alias, $property), $parameterName)
-            ->andWhere(\sprintf('%s IN(:%s)', $parameterName, $parameterName))
-            ->setParameter($parameterName, $value);
+        $queryBuilder->join(\sprintf('%s.%s', $alias, $property), $parameterName);
+
+        if (\is_array($value)) {
+            $queryBuilder
+                ->{$context['whereClause'] ?? 'andWhere'}(\sprintf('%s IN (:%s)', $parameterName, $parameterName));
+        } else {
+            $queryBuilder
+                ->{$context['whereClause'] ?? 'andWhere'}(\sprintf('%s = :%s', $parameterName, $parameterName));
+        }
+
+        $queryBuilder->setParameter($parameterName, $value);
     }
 
     public static function getParameterProvider(): string

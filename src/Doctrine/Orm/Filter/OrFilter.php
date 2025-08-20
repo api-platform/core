@@ -15,38 +15,36 @@ namespace ApiPlatform\Doctrine\Orm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Metadata\ParameterProviderFilterInterface;
-use ApiPlatform\State\ParameterProvider\IriConverterParameterProvider;
 use Doctrine\ORM\QueryBuilder;
 
 /**
  * @author Vincent Amstoutz <vincent.amstoutz.dev@gmail.com>
  */
-final class OrFilter implements FilterInterface, OpenApiParameterFilterInterface, ParameterProviderFilterInterface
+final class OrFilter implements FilterInterface, OpenApiParameterFilterInterface
 {
+    use BackwardCompatibleFilterDescriptionTrait;
     use OpenApiFilterTrait;
 
     /**
-     * @var array<FilterInterface>
+     * @param array<FilterInterface> $filters
      */
-    private readonly array $filters;
-
-    public function __construct(FilterInterface ...$filters)
+    public function __construct(private readonly array $filters)
     {
-        $this->filters = $filters;
     }
 
     public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         foreach ($this->filters as $filter) {
-            $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
+            $filter->apply(
+                $queryBuilder,
+                $queryNameGenerator,
+                $resourceClass,
+                $operation,
+                ['whereClause' => 'orWhere'] + $context
+            );
         }
-    }
-
-    public static function getParameterProvider(): string
-    {
-        return IriConverterParameterProvider::class;
     }
 }

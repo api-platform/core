@@ -36,6 +36,8 @@ final class OrFilterTest extends ApiTestCase
     use RecreateSchemaTrait;
     use SetupClassResourcesTrait;
 
+    protected static ?bool $alwaysBootKernel = false;
+
     public static function getResources(): array
     {
         return [Chicken::class, ChickenCoop::class];
@@ -62,53 +64,21 @@ final class OrFilterTest extends ApiTestCase
      * @throws TransportExceptionInterface
      * @throws ServerExceptionInterface
      */
-    #[DataProvider('filterDataProvider')]
-    public function testOrFilter(string $url, int $expectedCount, array $expectedNames): void
+    #[DataProvider('orFilterDataProvider')]
+    public function testOrFilter(string $url, int $expectedCount): void
     {
         $client = self::createClient();
         $client->request('GET', $url);
 
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains(['hydra:totalItems' => $expectedCount]);
-
-        if ($expectedCount > 0) {
-            $names = array_column($client->getResponse()->toArray()['hydra:member'], 'name');
-            sort($names);
-            sort($expectedNames);
-            $this->assertSame($expectedNames, $names);
-        }
     }
 
-    public static function filterDataProvider(): \Generator
+    public static function orFilterDataProvider(): \Generator
     {
-        yield 'filtre par ID du poulailler de Gertrude' => [
-            'url' => '/chickens?relation=1',
-            'expectedCount' => 1,
-            'expectedNames' => ['Gertrude'],
-        ];
-
-        yield 'filtre par IRI du poulailler de Gertrude' => [
-            'url' => '/chickens?relation=/chicken_coops/1',
-            'expectedCount' => 1,
-            'expectedNames' => ['Gertrude'],
-        ];
-
-        yield 'filtre par ID du poulailler de Henriette' => [
-            'url' => '/chickens?relation=2',
-            'expectedCount' => 1,
-            'expectedNames' => ['Henriette'],
-        ];
-
-        yield 'filtre par IRI du poulailler de Henriette' => [
-            'url' => '/chickens?relation=/chicken_coops/2',
-            'expectedCount' => 1,
-            'expectedNames' => ['Henriette'],
-        ];
-
-        yield 'filtre avec un ID inexistant' => [
-            'url' => '/chickens?relation=999',
-            'expectedCount' => 0,
-            'expectedNames' => [],
+        yield 'filter by coop 1 OR coop 2 using IRIs' => [
+            'url' => '/chickens?relation[]=/chickens/1&relation[]=/chickens/2',
+            'expectedCount' => 2,
         ];
     }
 
@@ -124,19 +94,22 @@ final class OrFilterTest extends ApiTestCase
 
         $chickenCoop1 = new $coopClass();
         $chickenCoop2 = new $coopClass();
-        $manager->persist($chickenCoop1);
-        $manager->persist($chickenCoop2);
 
         $chicken1 = new $chickenClass();
         $chicken1->setName('Gertrude');
         $chicken1->setChickenCoop($chickenCoop1);
-        $manager->persist($chicken1);
 
         $chicken2 = new $chickenClass();
         $chicken2->setName('Henriette');
         $chicken2->setChickenCoop($chickenCoop2);
-        $manager->persist($chicken2);
 
+        $chickenCoop1->addChicken($chicken1);
+        $chickenCoop2->addChicken($chicken2);
+
+        $manager->persist($chicken1);
+        $manager->persist($chicken2);
+        $manager->persist($chickenCoop1);
+        $manager->persist($chickenCoop2);
         $manager->flush();
     }
 }

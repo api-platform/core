@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
+use ApiPlatform\Doctrine\Odm\Filter\ExactFilter;
 use ApiPlatform\Doctrine\Odm\Filter\IriFilter;
+use ApiPlatform\Doctrine\Odm\Filter\OrFilter;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -23,7 +25,13 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 #[ODM\Document]
 #[GetCollection(
     normalizationContext: ['hydra_prefix' => false],
-    parameters: ['chickens' => new QueryParameter(filter: new IriFilter())])
+    parameters: [
+        'chickens' => new QueryParameter(filter: new IriFilter()),
+        'relation' => new QueryParameter(
+            filter: new OrFilter([new IriFilter(), new ExactFilter()]),
+            property: 'chickens'
+        ),
+    ])
 ]
 class ChickenCoop
 {

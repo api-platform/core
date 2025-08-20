@@ -36,6 +36,8 @@ final class PartialSearchFilterTest extends ApiTestCase
     use RecreateSchemaTrait;
     use SetupClassResourcesTrait;
 
+    protected static ?bool $alwaysBootKernel = false;
+
     /**
      * @return class-string[]
      */
@@ -49,8 +51,6 @@ final class PartialSearchFilterTest extends ApiTestCase
      */
     protected function setUp(): void
     {
-        self::$alwaysBootKernel = false;
-
         $entities = $this->isMongoDB()
             ? [DocumentChicken::class, DocumentChickenCoop::class]
             : [Chicken::class, ChickenCoop::class];
@@ -106,6 +106,24 @@ final class PartialSearchFilterTest extends ApiTestCase
 
         yield 'filter by partial name with no matching entities' => [
             '/chickens?namePartial=Zebra',
+            0,
+            [],
+        ];
+
+        yield 'filter with multiple partial names "rude" OR "iette"' => [
+            '/chickens?namePartial[]=rude&namePartial[]=iette',
+            2,
+            ['Gertrude', 'Henriette'],
+        ];
+
+        yield 'filter with multiple partial names, one matching "Gert," the other not matching "Zebra"' => [
+            '/chickens?namePartial[]=Gert&namePartial[]=Zebra',
+            1,
+            ['Gertrude'],
+        ];
+
+        yield 'filter with multiple partial names without matches' => [
+            '/chickens?namePartial[]=Toto&namePartial[]=Match',
             0,
             [],
         ];

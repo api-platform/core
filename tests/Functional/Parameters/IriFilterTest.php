@@ -57,8 +57,6 @@ final class IriFilterTest extends ApiTestCase
      */
     protected function setUp(): void
     {
-        self::$alwaysBootKernel = false;
-
         $this->recreateSchema([$this->isMongoDB() ? DocumentChicken::class : Chicken::class, $this->isMongoDB() ? DocumentChickenCoop::class : ChickenCoop::class]);
         $this->loadFixtures();
     }
