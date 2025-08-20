@@ -84,7 +84,14 @@ final class PurgeHttpCacheListener
         $uow = $em->getUnitOfWork();
 
         foreach ($uow->getScheduledEntityInsertions() as $entity) {
-            $this->gatherResourceAndItemTags($entity, false);
+            // For new entities, only purge the collection IRI
+            try {
+                if ($this->resourceClassResolver->isResourceClass($this->getObjectClass($entity))) {
+                    $iri = $this->iriConverter->getIriFromResource($entity, UrlGeneratorInterface::ABS_PATH, new GetCollection());
+                    $this->tags[$iri] = $iri;
+                }
+            } catch (OperationNotFoundException|InvalidArgumentException) {
+            }
             $this->gatherRelationTags($em, $entity);
         }
 

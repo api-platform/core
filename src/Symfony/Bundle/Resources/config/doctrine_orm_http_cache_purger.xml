@@ -13,7 +13,7 @@
             <argument type="service" id="api_platform.iri_converter" />
             <argument type="service" id="api_platform.resource_class_resolver" />
             <argument type="service" id="api_platform.property_accessor" />
-            <argument type="service" id="object_mapper" on-invalid="null" />
+            <argument type="service" id="api_platform.object_mapper" on-invalid="null" />
             <tag name="doctrine.event_listener" event="preUpdate" />
             <tag name="doctrine.event_listener" event="onFlush" />
             <tag name="doctrine.event_listener" event="postFlush" />
