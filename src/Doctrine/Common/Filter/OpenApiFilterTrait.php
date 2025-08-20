@@ -25,9 +25,4 @@ trait OpenApiFilterTrait
     {
         return new OpenApiParameter(name: $parameter->getKey().'[]', in: 'query', style: 'deepObject', explode: true);
     }
-
-    public function getDescription(string $resourceClass): array
-    {
-        return [];
-    }
 }

@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
 use ApiPlatform\Doctrine\Orm\Filter\IriFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrFilter;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -23,7 +25,13 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 #[GetCollection(
     normalizationContext: ['hydra_prefix' => false],
-    parameters: ['chickens' => new QueryParameter(filter: new IriFilter())]
+    parameters: [
+        'chickens' => new QueryParameter(filter: new IriFilter()),
+        'relation' => new QueryParameter(
+            filter: new OrFilter([new IriFilter(), new ExactFilter()]),
+            property: 'chickens'
+        ),
+    ]
 )]
 class ChickenCoop
 {

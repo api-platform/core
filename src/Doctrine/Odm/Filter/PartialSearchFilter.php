@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Odm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
+use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
@@ -24,18 +25,13 @@ use MongoDB\BSON\Regex;
  */
 final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilterInterface
 {
+    use BackwardCompatibleFilterDescriptionTrait;
     use OpenApiFilterTrait;
 
     public function apply(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
-        if (!$parameter = $context['parameter'] ?? null) {
-            return;
-        }
-
+        $parameter = $context['parameter'];
         $value = $parameter->getValue();
-        if (!\is_string($value) || '' === $value) {
-            return;
-        }
 
         // TODO: handle nested properties
         $property = $parameter->getProperty();

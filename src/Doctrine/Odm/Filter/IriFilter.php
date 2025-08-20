@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Odm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
+use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\ParameterProviderFilterInterface;
@@ -25,26 +26,19 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
  */
 final class IriFilter implements FilterInterface, OpenApiParameterFilterInterface, ParameterProviderFilterInterface
 {
+    use BackwardCompatibleFilterDescriptionTrait;
     use OpenApiFilterTrait;
 
     public function apply(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
-        if (!$parameter = $context['parameter'] ?? null) {
-            return;
-        }
-
+        $parameter = $context['parameter'];
         $value = $parameter->getValue();
-        if (!\is_array($value)) {
-            $value = [$value];
-        }
-
-        // TODO: handle nested properties
         $property = $parameter->getProperty();
 
         $aggregationBuilder
             ->match()
             ->field($property)
-            ->in($value);
+            ->{(is_iterable($value)) ? 'in' : 'equals'}($value);
     }
 
     public static function getParameterProvider(): string
