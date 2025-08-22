@@ -31,11 +31,22 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
     public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         $parameter = $context['parameter'];
-        $values = (array) $parameter->getValue();
-
         $property = $parameter->getProperty();
         $alias = $queryBuilder->getRootAliases()[0];
         $field = $alias.'.'.$property;
+        $parameterName = $queryNameGenerator->generateParameterName($property);
+        $values = $parameter->getValue();
+
+        if (!is_iterable($values)) {
+            $queryBuilder->setParameter($parameterName, '%'.strtolower($values).'%');
+
+            $queryBuilder->{$context['whereClause'] ?? 'andWhere'}($queryBuilder->expr()->like(
+                'LOWER('.$field.')',
+                ':'.$parameterName
+            ));
+
+            return;
+        }
 
         $likeExpressions = [];
         foreach ($values as $val) {
@@ -44,16 +55,11 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
                 'LOWER('.$field.')',
                 ':'.$parameterName
             );
-
             $queryBuilder->setParameter($parameterName, '%'.strtolower($val).'%');
         }
 
-        if (1 === \count($likeExpressions)) {
-            $queryBuilder->{$context['whereClause'] ?? 'andWhere'}($likeExpressions[0]);
-        } else {
-            $queryBuilder->{$context['whereClause'] ?? 'andWhere'}(
-                $queryBuilder->expr()->orX(...$likeExpressions)
-            );
-        }
+        $queryBuilder->{$context['whereClause'] ?? 'andWhere'}(
+            $queryBuilder->expr()->orX(...$likeExpressions)
+        );
     }
 }
