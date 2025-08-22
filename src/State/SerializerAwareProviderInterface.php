@@ -19,6 +19,8 @@ use Psr\Container\ContainerInterface;
  * Injects serializer in providers.
  *
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
+ *
+ * @deprecated in 4.2, to be removed in 5.0 because it violates the dependency injection principle.
  */
 interface SerializerAwareProviderInterface
 {
