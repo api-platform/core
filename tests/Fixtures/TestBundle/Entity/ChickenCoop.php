@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
 use ApiPlatform\Doctrine\Orm\Filter\IriFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrFilter;
+use ApiPlatform\Doctrine\Orm\Filter\PartialSearchFilter;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -29,7 +30,11 @@ use Doctrine\ORM\Mapping as ORM;
         'chickens' => new QueryParameter(filter: new IriFilter()),
         'relation' => new QueryParameter(
             filter: new OrFilter([new IriFilter(), new ExactFilter()]),
-            property: 'chickens'
+            property: 'chickens',
+        ),
+        'relationBis' => new QueryParameter(
+            filter: new OrFilter([new ExactFilter(), new PartialSearchFilter()]),
+            property: 'chickens',
         ),
     ]
 )]

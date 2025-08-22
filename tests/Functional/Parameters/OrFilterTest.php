@@ -80,6 +80,21 @@ final class OrFilterTest extends ApiTestCase
             'url' => '/chickens?relation[]=/chickens/1&relation[]=/chickens/2',
             'expectedCount' => 2,
         ];
+
+        yield 'relationBis: filter by coop 1 (IRI) OR coop 2 (partial name)' => [
+            'url' => '/chickens?relationBis[]=/chicken_coops/1&relationBis[]=Henri',
+            'expectedCount' => 2,
+        ];
+
+        yield 'relationBis: filter by coop 1 (partial name) OR coop 2 (partial name)' => [
+            'url' => '/chickens?relationBis[]=Gertrude&relationBis[]=Henri',
+            'expectedCount' => 2,
+        ];
+
+        yield 'relationBis: filter by partial name matching both coops' => [
+            'url' => '/chickens?relationBis[]=Coop',
+            'expectedCount' => 2,
+        ];
     }
 
     /**
