@@ -1,5 +1,22 @@
 # Changelog
 
+## v4.1.21
+
+### Bug fixes
+
+* [04414e4fc](https://github.com/api-platform/core/commit/04414e4fc144244cf849ca122bfaacc638baa425) fix(serializer): improve #7270 by reducing inconsistencies (#7346)
+* [2e6911c35](https://github.com/api-platform/core/commit/2e6911c359ef750edbccda9f89c14edd29bdca4d) fix(openapi): sync typehints between properties and getter/canner for alllowReserved and allowEmptyValue (#7322)
+* [385953a92](https://github.com/api-platform/core/commit/385953a920d8b8c1c5e644b25d28b211c5ba7008) fix(jsonapi): handle type error when handling validation errors (#7330)
+* [4f717c1e1](https://github.com/api-platform/core/commit/4f717c1e1aee2edb7bded054aacf31b52df30f27) fix(openapi): allow null on allowReserved and allowEmptyValue properties (#7315)
+* [c46c57918](https://github.com/api-platform/core/commit/c46c5791841f909af10faf1dd756eed772b6dc15) fix(doctrine): do not consider empty string as a current date (#7291)
+* [d1073bc67](https://github.com/api-platform/core/commit/d1073bc67ca06b1abe6563c90efcbff4cfe050e4) fix(laravel): read property type before serialization (#7332)
+* [d1abfc0fa](https://github.com/api-platform/core/commit/d1abfc0faf6dcef5d364ff719bdfd97e15275a28) fix(openapi): nullable default values in operation openapi definition (#7321)
+* [e7502b65a](https://github.com/api-platform/core/commit/e7502b65a12608d0926129a2dfc93a5d6f11fd01) fix(serializer): nested denormalization when allow_extra_attributes=false (#7270)
+
+### Features
+
+* [2d501b315](https://github.com/api-platform/core/commit/2d501b315e2dfacf5fb5c83e136b09c56bdd2b7e) feat(laravel): support composite identifiers within `Link` (#7342)
+
 ## v4.1.20
 
 ### Bug fixes
