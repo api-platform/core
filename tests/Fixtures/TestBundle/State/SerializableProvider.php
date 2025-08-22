@@ -15,15 +15,26 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\State;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use ApiPlatform\State\SerializerAwareProviderInterface;
-use ApiPlatform\State\SerializerAwareProviderTrait;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
  */
-class SerializableProvider implements ProviderInterface, SerializerAwareProviderInterface
+readonly class SerializableProvider implements ProviderInterface, ServiceSubscriberInterface
 {
-    use SerializerAwareProviderTrait;
+    public function __construct(private ContainerInterface $container)
+    {
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function getSubscribedServices(): array
+    {
+        return ['serializer' => SerializerInterface::class];
+    }
 
     /**
      * {@inheritDoc}
@@ -37,5 +48,14 @@ class SerializableProvider implements ProviderInterface, SerializerAwareProvider
     "bar": "Ipsum"
 }
 JSON, $operation->getClass(), 'json');
+    }
+
+    private function getSerializer(): SerializerInterface
+    {
+        if (!$this->container->has('serializer')) {
+            throw new \LogicException('The serializer service is not available. Did you forget to install symfony/serializer?');
+        }
+
+        return $this->container->get('serializer');
     }
 }
