@@ -31,15 +31,28 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
     public function apply(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
         $parameter = $context['parameter'];
-        $value = $parameter->getValue();
-
-        // TODO: handle nested properties
         $property = $parameter->getProperty();
-        $escapedValue = preg_quote($value, '/');
+        $values = (array) $parameter->getValue();
 
-        $aggregationBuilder
-            ->match()
-            ->field($property)
-            ->equals(new Regex($escapedValue, 'i'));
+        if (1 === \count($values)) {
+            $escapedValue = preg_quote((string) $values[0], '/');
+            $aggregationBuilder
+                ->match()
+                ->field($property)
+                ->equals(new Regex($escapedValue, 'i'));
+
+            return;
+        }
+
+        $match = $aggregationBuilder->match();
+        foreach ($values as $value) {
+            $escapedValue = preg_quote((string) $value, '/');
+
+            $match->addOr(
+                $match->expr()
+                    ->field($property)
+                    ->equals(new Regex($escapedValue, 'i'))
+            );
+        }
     }
 }
