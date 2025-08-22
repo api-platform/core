@@ -43,6 +43,7 @@ class ApiPlatformBundleTest extends TestCase
     public function testBuild(): void
     {
         $containerProphecy = $this->prophesize(ContainerBuilder::class);
+        // TODO: remove in 5.x
         $containerProphecy->addCompilerPass(Argument::type(DataProviderPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(AttributeFilterPass::class), PassConfig::TYPE_BEFORE_OPTIMIZATION, 101)->willReturn($containerProphecy->reveal())->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(AttributeResourcePass::class))->shouldBeCalled()->willReturn($containerProphecy->reveal())->shouldBeCalled();

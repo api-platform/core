@@ -30,6 +30,13 @@ trait SerializerAwareProviderTrait
 
     public function setSerializerLocator(ContainerInterface $serializerLocator): void
     {
+        trigger_deprecation(
+            'api-platform/core',
+            '4.2',
+            'The "%s" interface is deprecated and will be removed in 5.0. It violates the dependency injection principle.',
+            SerializerAwareProviderInterface::class
+        );
+
         $this->serializerLocator = $serializerLocator;
     }
 
