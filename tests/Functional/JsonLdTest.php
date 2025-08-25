@@ -149,12 +149,14 @@ class JsonLdTest extends ApiTestCase
             $schemaTool = new SchemaTool($manager);
             @$schemaTool->createSchema($classes);
         } catch (\Exception $e) {
-            return;
         }
 
         $foo = new Foo();
         $foo->title = 'Foo';
         $manager->persist($foo);
+        $foo1 = new Foo();
+        $foo1->title = 'Foo1';
+        $manager->persist($foo1);
         $bar = new Bar();
         $bar->title = 'Bar one';
         $manager->persist($bar);

@@ -163,6 +163,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     'Lorem ipsum' => 'Dolor sit amet',
                 ],
             ],
+            'jsonStream' => true,
             'mercure' => true,
             'stateOptions' => [
                 'elasticsearchOptions' => [
@@ -472,6 +473,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         'filters',
         'order',
         'extraProperties',
+        'jsonStream',
     ];
     private const EXTENDED_BASE = [
         'uriTemplate',
@@ -753,5 +755,10 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         }
 
         return $parameters;
+    }
+
+    private function withJsonStream(bool $value): bool
+    {
+        return $value;
     }
 }

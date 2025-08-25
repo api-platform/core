@@ -111,7 +111,10 @@ class PartialCollectionViewNormalizerTest extends TestCase
     private function normalizePaginator(bool $partial = false, bool $cursor = false)
     {
         $paginatorProphecy = $this->prophesize($partial ? PartialPaginatorInterface::class : PaginatorInterface::class);
-        $paginatorProphecy->getCurrentPage()->willReturn(3)->shouldBeCalled();
+
+        if (!$cursor) {
+            $paginatorProphecy->getCurrentPage()->willReturn(3)->shouldBeCalled();
+        }
 
         $decoratedNormalize = ['foo' => 'bar'];
 

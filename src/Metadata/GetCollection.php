@@ -99,6 +99,7 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
         array|string|null $middleware = null,
         ?bool $strictQueryParameterValidation = null,
         protected ?bool $hideHydraOperation = null,
+        ?bool $jsonStream = null,
         array $extraProperties = [],
         private ?string $itemUriTemplate = null,
     ) {
@@ -174,6 +175,7 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
             provider: $provider,
             processor: $processor,
             parameters: $parameters,
+            jsonStream: $jsonStream,
             extraProperties: $extraProperties,
             rules: $rules,
             policy: $policy,

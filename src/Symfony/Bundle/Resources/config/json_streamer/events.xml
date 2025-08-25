@@ -1,0 +1,63 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="api_platform.jsonld.state_processor.json_streamer" class="ApiPlatform\Hydra\State\JsonStreamerProcessor">
+            <argument>null</argument>
+            <argument type="service" id="api_platform.jsonld.json_streamer.stream_writer" />
+            <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.resource_class_resolver" />
+            <argument type="service" id="api_platform.metadata.operation.metadata_factory" />
+            <argument>%api_platform.collection.pagination.page_parameter_name%</argument>
+            <argument>%api_platform.collection.pagination.enabled_parameter_name%</argument>
+            <argument>%api_platform.url_generation_strategy%</argument>
+        </service>
+
+        <service id="api_platform.jsonld.state_provider.json_streamer" class="ApiPlatform\Hydra\State\JsonStreamerProvider">
+            <argument>null</argument>
+            <argument type="service" id="api_platform.jsonld.json_streamer.stream_reader" />
+        </service>
+
+        <service id="api_platform.state_processor.json_streamer" class="ApiPlatform\Serializer\State\JsonStreamerProcessor">
+            <argument>null</argument>
+            <argument type="service" id="json_streamer.stream_writer" />
+            <argument type="service" id="api_platform.iri_converter" />
+            <argument type="service" id="api_platform.resource_class_resolver" />
+            <argument type="service" id="api_platform.metadata.operation.metadata_factory" />
+        </service>
+
+        <service id="api_platform.state_provider.json_streamer" class="ApiPlatform\Serializer\State\JsonStreamerProvider">
+            <argument>null</argument>
+            <argument type="service" id="json_streamer.stream_reader" />
+        </service>
+
+        <service id="api_platform.listener.request.json_streamer_deserialize" class="ApiPlatform\Symfony\EventListener\JsonStreamerDeserializeListener">
+            <argument type="service" id="api_platform.state_provider.json_streamer" />
+            <argument>json</argument>
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="3" />
+        </service>
+
+        <service id="api_platform.listener.request.jsonld_streamer_deserialize" class="ApiPlatform\Symfony\EventListener\JsonStreamerDeserializeListener">
+            <argument type="service" id="api_platform.jsonld.state_provider.json_streamer" />
+            <argument>jsonld</argument>
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest" priority="3" />
+        </service>
+
+        <service id="api_platform.listener.view.json_streamer_serialize" class="ApiPlatform\Symfony\EventListener\JsonStreamerSerializeListener">
+            <argument type="service" id="api_platform.state_processor.json_streamer" />
+            <argument>json</argument>
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="17" />
+        </service>
+
+        <service id="api_platform.listener.view.jsonld_streamer_serialize" class="ApiPlatform\Symfony\EventListener\JsonStreamerSerializeListener">
+            <argument type="service" id="api_platform.jsonld.state_processor.json_streamer" />
+            <argument>jsonld</argument>
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <tag name="kernel.event_listener" event="kernel.view" method="onKernelView" priority="17" />
+        </service>
+    </services>
+</container>

@@ -338,6 +338,7 @@ resources:
             parameters: null
             strictQueryParameterValidation: false
             hideHydraOperation: false
+            jsonStream: true
             extraProperties:
                 custom_property: 'Lorem ipsum dolor sit amet'
                 another_custom_property:

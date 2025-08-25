@@ -116,7 +116,7 @@
         "symfony/property-info": "^6.4 || ^7.1",
         "symfony/serializer": "^6.4 || ^7.0",
         "symfony/translation-contracts": "^3.3",
-        "symfony/type-info": "^7.3",
+        "symfony/type-info": "^7.3 || 7.4.x-dev",
         "symfony/validator": "^6.4 || ^7.1",
         "symfony/web-link": "^6.4 || ^7.1",
         "willdurand/negotiation": "^3.1"
@@ -176,9 +176,10 @@
         "symfony/expression-language": "^6.4 || ^7.0",
         "symfony/finder": "^6.4 || ^7.0",
         "symfony/form": "^6.4 || ^7.0",
-        "symfony/framework-bundle": "^6.4 || ^7.0",
+        "symfony/framework-bundle": "7.4.x-dev",
         "symfony/http-client": "^6.4 || ^7.0",
         "symfony/intl": "^6.4 || ^7.0",
+        "symfony/json-streamer": "7.4.x-dev",
         "symfony/maker-bundle": "^1.24",
         "symfony/mercure-bundle": "*",
         "symfony/messenger": "^6.4 || ^7.0",
@@ -212,6 +213,7 @@
         "symfony/uid": "To support Symfony UUID/ULID identifiers.",
         "symfony/messenger": "To support messenger integration.",
         "symfony/web-profiler-bundle": "To use the data collector.",
+        "symfony/json-streamer": "To use the JSON Streamer component.",
         "webonyx/graphql-php": "To support GraphQL."
     },
     "type": "library",

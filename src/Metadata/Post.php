@@ -97,6 +97,7 @@ final class Post extends HttpOperation
         mixed $rules = null,
         ?string $policy = null,
         array|string|null $middleware = null,
+        ?bool $jsonStream = null,
         array $extraProperties = [],
         private ?string $itemUriTemplate = null,
         ?bool $strictQueryParameterValidation = null,
@@ -181,6 +182,7 @@ final class Post extends HttpOperation
             middleware: $middleware,
             strictQueryParameterValidation: $strictQueryParameterValidation,
             hideHydraOperation: $hideHydraOperation,
+            jsonStream: $jsonStream,
             extraProperties: $extraProperties
         );
     }

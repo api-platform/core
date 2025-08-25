@@ -102,6 +102,7 @@ class YamlExtractorTest extends TestCase
                     'links' => null,
                     'headers' => null,
                     'parameters' => null,
+                    'jsonStream' => null,
                 ],
             ],
             Program::class => [
@@ -173,6 +174,7 @@ class YamlExtractorTest extends TestCase
                     'links' => null,
                     'headers' => null,
                     'parameters' => null,
+                    'jsonStream' => null,
                 ],
                 [
                     'uriTemplate' => '/users/{author}/programs{._format}',
@@ -315,6 +317,7 @@ class YamlExtractorTest extends TestCase
                             'links' => null,
                             'headers' => ['hello' => 'world'],
                             'parameters' => null,
+                            'jsonStream' => null,
                         ],
                         [
                             'name' => null,
@@ -400,6 +403,7 @@ class YamlExtractorTest extends TestCase
                             'links' => null,
                             'headers' => ['hello' => 'world'],
                             'parameters' => ['author' => new QueryParameter(schema: ['type' => 'string'], required: true, key: 'author', description: 'hello')],
+                            'jsonStream' => null,
                         ],
                     ],
                     'graphQlOperations' => null,
@@ -411,6 +415,7 @@ class YamlExtractorTest extends TestCase
                     'links' => null,
                     'headers' => ['hello' => 'world'],
                     'parameters' => null,
+                    'jsonStream' => null,
                 ],
             ],
             SingleFileConfigDummy::class => [
@@ -482,6 +487,7 @@ class YamlExtractorTest extends TestCase
                     'links' => null,
                     'headers' => null,
                     'parameters' => null,
+                    'jsonStream' => null,
                 ],
             ],
         ], $extractor->getResources());

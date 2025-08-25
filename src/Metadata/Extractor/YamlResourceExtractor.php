@@ -171,6 +171,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             'messenger' => $this->buildMessenger($resource),
             'read' => $this->phpize($resource, 'read', 'bool'),
             'write' => $this->phpize($resource, 'write', 'bool'),
+            'jsonStream' => $this->phpize($resource, 'jsonStream', 'bool'),
         ];
     }
 
