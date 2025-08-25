@@ -13,21 +13,25 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\ParameterProvider;
 
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ParameterProviderInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * @experimental
  *
- * @author Vincent Amstoutz
+ * @author Vincent Amstoutz <vincent.amstoutz.dev@gmail.com>
  */
 final readonly class IriConverterParameterProvider implements ParameterProviderInterface
 {
     public function __construct(
         private IriConverterInterface $iriConverter,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -43,7 +47,18 @@ final readonly class IriConverterParameterProvider implements ParameterProviderI
         if (\is_array($value)) {
             $entities = [];
             foreach ($value as $v) {
-                $entities[] = $this->iriConverter->getResourceFromIri($v, $iriConverterContext);
+                try {
+                    $entities[] = $this->iriConverter->getResourceFromIri($v, $iriConverterContext);
+                } catch (InvalidArgumentException|ItemNotFoundException $exception) {
+                    $this->logger->error(
+                        message: 'Operation failed due to an invalid argument or a missing item',
+                        context: [
+                            'exception' => $exception->getMessage(),
+                        ]
+                    );
+
+                    break;
+                }
             }
 
             $parameter->setValue($entities);
