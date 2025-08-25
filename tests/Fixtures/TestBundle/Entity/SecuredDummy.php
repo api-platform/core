@@ -108,11 +108,13 @@ class SecuredDummy
 
     /**
      * A collection of dummies that only admins can access.
+     *
+     * @var Collection<int, RelatedDummy>
      */
     #[ApiProperty(security: "is_granted('ROLE_ADMIN')")]
     #[ORM\ManyToMany(targetEntity: RelatedDummy::class)]
     #[ORM\JoinTable(name: 'secured_dummy_related_dummy')]
-    public Collection|iterable $relatedDummies;
+    public Collection $relatedDummies;
 
     /**
      * A dummy that only admins can access.
@@ -126,11 +128,13 @@ class SecuredDummy
 
     /**
      * A collection of dummies that only users can access. The security on RelatedSecuredDummy shouldn't be run.
+     *
+     * @var Collection<int, RelatedSecuredDummy>
      */
     #[ApiProperty(security: "is_granted('ROLE_USER')")]
     #[ORM\ManyToMany(targetEntity: RelatedSecuredDummy::class)]
     #[ORM\JoinTable(name: 'secured_dummy_related_secured_dummy')]
-    public Collection|iterable $relatedSecuredDummies;
+    public Collection $relatedSecuredDummies;
 
     /**
      * A dummy that only users can access. The security on RelatedSecuredDummy shouldn't be run.
@@ -144,10 +148,12 @@ class SecuredDummy
 
     /**
      * Collection of dummies that anyone can access. There is no ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
+     *
+     * @var Collection<int, RelatedSecuredDummy>
      */
     #[ORM\ManyToMany(targetEntity: RelatedSecuredDummy::class)]
     #[ORM\JoinTable(name: 'secured_dummy_public_related_secured_dummy')]
-    public Collection|iterable $publicRelatedSecuredDummies;
+    public Collection $publicRelatedSecuredDummies;
 
     /**
      * A dummy that anyone can access. There is no ApiProperty security, and the security on RelatedSecuredDummy shouldn't be run.
@@ -235,7 +241,10 @@ class SecuredDummy
         $this->relatedDummies->add($relatedDummy);
     }
 
-    public function getRelatedDummies(): Collection|iterable
+    /**
+     * @return Collection<int, RelatedDummy>
+     */
+    public function getRelatedDummies(): Collection
     {
         return $this->relatedDummies;
     }
@@ -255,7 +264,10 @@ class SecuredDummy
         $this->relatedSecuredDummies->add($relatedSecuredDummy);
     }
 
-    public function getRelatedSecuredDummies(): Collection|iterable
+    /**
+     * @return Collection<int, RelatedSecuredDummy>
+     */
+    public function getRelatedSecuredDummies(): Collection
     {
         return $this->relatedSecuredDummies;
     }
@@ -275,7 +287,10 @@ class SecuredDummy
         $this->publicRelatedSecuredDummies->add($publicRelatedSecuredDummy);
     }
 
-    public function getPublicRelatedSecuredDummies(): Collection|iterable
+    /**
+     * @return Collection<int, RelatedSecuredDummy>
+     */
+    public function getPublicRelatedSecuredDummies(): Collection
     {
         return $this->publicRelatedSecuredDummies;
     }

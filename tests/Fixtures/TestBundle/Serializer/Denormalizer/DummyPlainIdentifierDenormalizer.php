@@ -20,6 +20,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedDummy as RelatedDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy as DummyEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy as RelatedDummyEntity;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -50,12 +51,13 @@ class DummyPlainIdentifierDenormalizer implements DenormalizerInterface, Denorma
             ]] + $context);
         }
 
-        if (!empty($data['relatedDummies'])) {
+        if (isset($data['relatedDummies'])) {
             foreach ($data['relatedDummies'] as $k => $v) {
                 $data['relatedDummies'][$k] = $this->iriConverter->getIriFromResource($relatedDummyClass, UrlGeneratorInterface::ABS_PATH, new Get(), ['uri_variables' => [
                     'id' => $v,
                 ]] + $context);
             }
+            $data['relatedDummies'] = new ArrayCollection($data['relatedDummies']);
         }
 
         return $this->denormalizer->denormalize($data, $class, $format, $context + [self::class => true]);

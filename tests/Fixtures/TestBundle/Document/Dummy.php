@@ -96,8 +96,12 @@ class Dummy
     public $dummyPrice;
     #[ODM\ReferenceOne(targetDocument: RelatedDummy::class, storeAs: 'id', nullable: true)]
     public ?RelatedDummy $relatedDummy = null;
+
+    /**
+     * @var Collection<int, RelatedDummy>
+     */
     #[ODM\ReferenceMany(targetDocument: RelatedDummy::class, storeAs: 'id', nullable: true)]
-    public Collection|iterable $relatedDummies;
+    public Collection $relatedDummies;
     #[ODM\Field(type: 'hash', nullable: true)]
     public array $jsonData = [];
     #[ODM\Field(type: 'collection', nullable: true)]
