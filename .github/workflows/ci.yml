@@ -425,7 +425,7 @@ jobs:
       - name: Run Behat tests (PHP ${{ matrix.php }})
         run: |
           mkdir -p build/logs/behat
-          vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --no-interaction ${{ matrix.coverage && '--profile=default-coverage' || '--profile=default' }}
+          vendor/bin/behat -vvv --out=std --format=progress --format=junit --out=build/logs/behat/junit --no-interaction ${{ matrix.coverage && '--profile=default-coverage' || '--profile=default' }}
       - name: Merge code coverage reports
         if: matrix.coverage
         run: |
@@ -508,7 +508,7 @@ jobs:
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
         run: |
-          vendor/bin/behat --out=std --format=progress --profile=postgres --no-interaction -vv
+          vendor/bin/behat -vvv --out=std --format=progress --profile=postgres --no-interaction
 
   mysql:
     name: Behat (PHP ${{ matrix.php }}) (MySQL)
@@ -558,7 +558,7 @@ jobs:
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
-        run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction --tags '~@!mysql'
+        run: vendor/bin/behat -vvv --out=std --format=progress --profile=default --no-interaction --tags '~@!mysql'
 
   mongodb:
     name: PHPUnit + Behat (PHP ${{ matrix.php }}) (MongoDB)
@@ -616,7 +616,7 @@ jobs:
       - name: Run Behat tests
         run: |
           mkdir -p build/logs/behat
-          vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=mongodb-coverage --no-interaction
+          vendor/bin/behat -vvv --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=mongodb-coverage --no-interaction
       - name: Merge code coverage reports
         run: |
           wget -qO /usr/local/bin/phpcov https://phar.phpunit.de/phpcov.phar
@@ -706,7 +706,7 @@ jobs:
       - name: Run Behat tests
         run: |
           mkdir -p build/logs/behat
-          vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=mercure-coverage --no-interaction
+          vendor/bin/behat -vvv --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=mercure-coverage --no-interaction
       - name: Merge code coverage reports
         run: |
           wget -qO /usr/local/bin/phpcov https://phar.phpunit.de/phpcov.phar
@@ -788,7 +788,7 @@ jobs:
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
-        run: vendor/bin/behat --out=std --format=progress --profile=elasticsearch --no-interaction
+        run: vendor/bin/behat -vvv --out=std --format=progress --profile=elasticsearch --no-interaction
 
   elasticsearch-v8:
     name: Behat (PHP ${{ matrix.php }}) (Elasticsearch v8)
@@ -841,7 +841,7 @@ jobs:
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
-        run: vendor/bin/behat --out=std --format=progress --profile=elasticsearch --no-interaction
+        run: vendor/bin/behat -vvv --out=std --format=progress --profile=elasticsearch --no-interaction
 
   elasticsearch-v7:
     name: Behat (PHP ${{ matrix.php }}) (Elasticsearch v7)
@@ -894,7 +894,7 @@ jobs:
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
-        run: vendor/bin/behat --out=std --format=progress --profile=elasticsearch --no-interaction
+        run: vendor/bin/behat -vvv --out=std --format=progress --profile=elasticsearch --no-interaction
 
   phpunit-no-deprecations:
     name: PHPUnit (PHP ${{ matrix.php }}) (no deprecations)
@@ -1021,7 +1021,7 @@ jobs:
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
-        run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction
+        run: vendor/bin/behat -vvv --out=std --format=progress --profile=default --no-interaction
 
   windows-behat:
     name: Windows Behat (PHP ${{ matrix.php }}) (SQLite)
@@ -1074,7 +1074,7 @@ jobs:
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
         shell: bash
-        run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction
+        run: vendor/bin/behat -vvv --out=std --format=progress --profile=default --no-interaction
 
   phpunit-symfony-lowest:
     name: PHPUnit (PHP ${{ matrix.php }}) (Symfony lowest)
@@ -1162,7 +1162,7 @@ jobs:
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
-        run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction --tags='~@disableForSymfonyLowest'
+        run: vendor/bin/behat -vvv --out=std --format=progress --profile=default --no-interaction --tags='~@disableForSymfonyLowest'
 
   phpunit_listeners:
     name: PHPUnit event listeners (PHP ${{ matrix.php }})
@@ -1283,7 +1283,7 @@ jobs:
       - name: Run Behat tests (PHP 8)
         run: |
           mkdir -p build/logs/behat
-          vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=symfony_listeners --no-interaction
+          vendor/bin/behat -vvv --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=symfony_listeners --no-interaction
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4
