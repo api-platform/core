@@ -21,6 +21,11 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ChickenCoop;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Doctrine\ODM\MongoDB\MongoDBException;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 final class IriFilterTest extends ApiTestCase
 {
@@ -37,6 +42,13 @@ final class IriFilterTest extends ApiTestCase
         return [ChickenCoop::class, Chicken::class];
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
     public function testIriFilter(): void
     {
         $client = $this->createClient();
@@ -45,6 +57,13 @@ final class IriFilterTest extends ApiTestCase
         $this->assertEquals(['/chickens/2'], $res['member'][0]['chickens']);
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws DecodingExceptionInterface
+     * @throws ClientExceptionInterface
+     */
     public function testIriFilterMultiple(): void
     {
         $client = $this->createClient();
