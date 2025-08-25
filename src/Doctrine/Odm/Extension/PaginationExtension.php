@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Odm\Extension;
 
 use ApiPlatform\Doctrine\Odm\Paginator;
+use ApiPlatform\Doctrine\Odm\PartialPaginator;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\Pagination;
@@ -50,25 +51,31 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
             return;
         }
 
-        $context = $this->addCountToContext(clone $aggregationBuilder, $context);
-
         [, $offset, $limit] = $this->pagination->getPagination($operation, $context);
+
+        if ($this->pagination->isPartialEnabled($operation, $context)) {
+            $aggregationBuilder
+                ->skip($offset)
+                ->limit($limit + 1);
+
+            return;
+        }
+
+        $context = $this->addCountToContext(clone $aggregationBuilder, $context);
 
         $manager = $this->managerRegistry->getManagerForClass($resourceClass);
         if (!$manager instanceof DocumentManager) {
             throw new RuntimeException(\sprintf('The manager for "%s" must be an instance of "%s".', $resourceClass, DocumentManager::class));
         }
 
-        /**
-         * @var DocumentRepository
-         */
+        /** @var DocumentRepository $repository */
         $repository = $manager->getRepository($resourceClass);
 
         $facet = $aggregationBuilder->facet();
         $addFields = $aggregationBuilder->addFields();
 
         // Get the results slice, from $offset to $offset + $limit
-        // MongoDB does not support $limit: O, so we return an empty array directly
+        // MongoDB does not support $limit: 0, so we return an empty array directly
         if ($limit > 0) {
             $facet->field('results')->pipeline($repository->createAggregationBuilder()->skip($offset)->limit($limit));
         } else {
@@ -110,6 +117,16 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
 
         $attribute = $operation?->getExtraProperties()['doctrine_mongodb'] ?? [];
         $executeOptions = $attribute['execute_options'] ?? [];
+
+        if ($this->pagination->isPartialEnabled($operation, $context)) {
+            [, $offset, $limit] = $this->pagination->getPagination($operation, $context);
+
+            return new PartialPaginator(
+                $aggregationBuilder->hydrate($resourceClass)->getAggregation($executeOptions)->getIterator(),
+                $offset,
+                $limit
+            );
+        }
 
         return new Paginator($aggregationBuilder->getAggregation($executeOptions)->getIterator(), $manager->getUnitOfWork(), $resourceClass);
     }
