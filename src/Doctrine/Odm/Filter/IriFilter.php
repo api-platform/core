@@ -33,12 +33,18 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
     {
         $parameter = $context['parameter'];
         $value = $parameter->getValue();
-        $property = $parameter->getProperty();
+
+        $isIterable = is_iterable($value);
+        if ($isIterable) {
+            $ids = array_map(static fn (object $object) => $object->getId(), iterator_to_array($value));
+        } else {
+            $ids = \is_object($value) ? $value->getId() : $value;
+        }
 
         $aggregationBuilder
             ->match()
-            ->field($property)
-            ->{(is_iterable($value)) ? 'in' : 'equals'}($value);
+            ->field('id')
+            ->{$isIterable ? 'in' : 'equals'}($ids);
     }
 
     public static function getParameterProvider(): string

@@ -30,8 +30,12 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
     public function apply(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
         $parameter = $context['parameter'];
-        $value = $parameter->getValue();
         $property = $parameter->getProperty();
+
+        $value = $parameter->getValue();
+        if (is_numeric($value)) {
+            $property .= '.id';
+        }
 
         $aggregationBuilder
             ->match()
