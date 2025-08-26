@@ -21,10 +21,12 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * Registers data providers.
  *
- * @internal
+ * @internal since 4.2
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
+ *
+ * TODO: remove in 5.x
  */
 final class DataProviderPass implements CompilerPassInterface
 {

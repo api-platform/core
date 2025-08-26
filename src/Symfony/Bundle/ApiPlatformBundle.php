@@ -44,6 +44,7 @@ final class ApiPlatformBundle extends Bundle
     {
         parent::build($container);
 
+        // TODO: remove in 5.x
         $container->addCompilerPass(new DataProviderPass());
         // Run the compiler pass before the {@see ResolveInstanceofConditionalsPass} to allow autoconfiguration of generated filter definitions.
         $container->addCompilerPass(new AttributeFilterPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 101);
