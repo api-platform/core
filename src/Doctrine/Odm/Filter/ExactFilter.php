@@ -60,33 +60,24 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
         }
 
         $mapping = $classMetadata->getFieldMapping($property);
-        $targetDocument = $mapping['targetDocument'];
-        $repository = $documentManager->getRepository($targetDocument);
-        $method = $classMetadata->isCollectionValuedAssociation($property) ? 'includesReferenceTo' : 'references';
+        $method = $classMetadata->isSingleValuedAssociation($property) ? 'references' : 'includesReferenceTo';
 
         if (is_iterable($value)) {
-            $documents = [];
-            foreach ($value as $v) {
-                if ($doc = $repository->find($v)) {
-                    $documents[] = $doc;
-                }
-            }
-
             $match = $aggregationBuilder->match();
             $or = $match->expr();
-            foreach ($documents as $doc) {
-                $or->addOr($match->expr()->field($property)->{$method}($doc));
+
+            foreach ($value as $v) {
+                $or->addOr($match->expr()->field($property)->{$method}($documentManager->getPartialReference($mapping['targetDocument'], $v)));
             }
+
             $match->addAnd($or);
 
             return;
         }
 
-        $referencedDoc = $repository->find($value);
-
         $aggregationBuilder
             ->match()
             ->field($property)
-            ->{$method}($referencedDoc);
+            ->{$method}($documentManager->getPartialReference($mapping['targetDocument'], $value));
     }
 }

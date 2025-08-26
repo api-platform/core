@@ -17,45 +17,42 @@ use ApiPlatform\Doctrine\Common\Filter\LoggerAwareInterface;
 use ApiPlatform\Doctrine\Common\Filter\LoggerAwareTrait;
 use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
 use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareTrait;
-use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
 use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
-use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
-/**
- * @author Vincent Amstoutz <vincent.amstoutz.dev@gmail.com>
- */
-final class OrFilter implements FilterInterface, OpenApiParameterFilterInterface, ManagerRegistryAwareInterface, LoggerAwareInterface
+final class FreeTextQueryFilter implements FilterInterface, ManagerRegistryAwareInterface, LoggerAwareInterface
 {
     use BackwardCompatibleFilterDescriptionTrait;
     use LoggerAwareTrait;
     use ManagerRegistryAwareTrait;
-    use OpenApiFilterTrait;
 
     /**
-     * @param FilterInterface[] $filters
+     * @param list<string> $properties an array of properties, defaults to `parameter->getProperties()`
      */
-    private array $filters;
-
-    public function __construct(FilterInterface ...$filters)
+    public function __construct(private readonly FilterInterface $filter, private readonly ?array $properties = null)
     {
-        $this->filters = $filters;
     }
 
     public function apply(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
-        foreach ($this->filters as $filter) {
-            if ($filter instanceof ManagerRegistryAwareInterface) {
-                $filter->setManagerRegistry($this->getManagerRegistry());
-            }
+        if ($this->filter instanceof ManagerRegistryAwareInterface) {
+            $this->filter->setManagerRegistry($this->getManagerRegistry());
+        }
 
-            if ($filter instanceof LoggerAwareInterface) {
-                $filter->setLogger($this->getLogger());
-            }
+        if ($this->filter instanceof LoggerAwareInterface) {
+            $this->filter->setLogger($this->getLogger());
+        }
 
-            $context = ['whereClause' => 'orWhere'] + $context;
-            $filter->apply($aggregationBuilder, $resourceClass, $operation, $context);
+        $parameter = $context['parameter'];
+        foreach ($this->properties ?? $parameter->getProperties() ?? [] as $property) {
+            $newContext = ['parameter' => $parameter->withProperty($property)] + $context;
+            $this->filter->apply(
+                $aggregationBuilder,
+                $resourceClass,
+                $operation,
+                $newContext,
+            );
         }
     }
 }

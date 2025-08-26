@@ -42,7 +42,8 @@ final readonly class IriConverterParameterProvider implements ParameterProviderI
             return $operation;
         }
 
-        $iriConverterContext = ['fetch_data' => $parameter->getExtraProperties()['fetch_data'] ?? false];
+        $extraProperties = $parameter->getExtraProperties();
+        $iriConverterContext = ['fetch_data' => $extraProperties['fetch_data'] ?? false];
 
         if (\is_array($value)) {
             $entities = [];
@@ -50,6 +51,10 @@ final readonly class IriConverterParameterProvider implements ParameterProviderI
                 try {
                     $entities[] = $this->iriConverter->getResourceFromIri($v, $iriConverterContext);
                 } catch (InvalidArgumentException|ItemNotFoundException $exception) {
+                    if ($exception instanceof ItemNotFoundException && true === ($extraProperties['throw_not_found'] ?? false)) {
+                        throw $exception;
+                    }
+
                     $this->logger->error(
                         message: 'Operation failed due to an invalid argument or a missing item',
                         context: [
@@ -66,7 +71,20 @@ final readonly class IriConverterParameterProvider implements ParameterProviderI
             return $operation;
         }
 
-        $parameter->setValue($this->iriConverter->getResourceFromIri($value, $iriConverterContext));
+        try {
+            $parameter->setValue($this->iriConverter->getResourceFromIri($value, $iriConverterContext));
+        } catch (InvalidArgumentException|ItemNotFoundException $exception) {
+            if ($exception instanceof ItemNotFoundException && true === ($extraProperties['throw_not_found'] ?? false)) {
+                throw $exception;
+            }
+
+            $this->logger->error(
+                message: 'Operation failed due to an invalid argument or a missing item',
+                context: [
+                    'exception' => $exception->getMessage(),
+                ]
+            );
+        }
 
         return $operation;
     }

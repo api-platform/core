@@ -33,24 +33,22 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
     public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         $parameter = $context['parameter'];
-
         $value = $parameter->getValue();
-
         $property = $parameter->getProperty();
         $alias = $queryBuilder->getRootAliases()[0];
         $parameterName = $queryNameGenerator->generateParameterName($property);
 
         $queryBuilder->join(\sprintf('%s.%s', $alias, $property), $parameterName);
 
-        if (\is_array($value)) {
+        if (is_iterable($value)) {
             $queryBuilder
                 ->{$context['whereClause'] ?? 'andWhere'}(\sprintf('%s IN (:%s)', $parameterName, $parameterName));
+            $queryBuilder->setParameter($parameterName, $value);
         } else {
             $queryBuilder
                 ->{$context['whereClause'] ?? 'andWhere'}(\sprintf('%s = :%s', $parameterName, $parameterName));
+            $queryBuilder->setParameter($parameterName, $value);
         }
-
-        $queryBuilder->setParameter($parameterName, $value);
     }
 
     public static function getParameterProvider(): string

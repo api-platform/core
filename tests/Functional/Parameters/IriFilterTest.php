@@ -21,11 +21,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ChickenCoop;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Doctrine\ODM\MongoDB\MongoDBException;
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 final class IriFilterTest extends ApiTestCase
 {
@@ -42,32 +37,18 @@ final class IriFilterTest extends ApiTestCase
         return [ChickenCoop::class, Chicken::class];
     }
 
-    /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
-     */
     public function testIriFilter(): void
     {
         $client = $this->createClient();
-        $res = $client->request('GET', '/chicken_coops?chickens=/chickens/2')->toArray();
+        $res = $client->request('GET', '/chickens?chickenCoop=/chicken_coops/2')->toArray();
         $this->assertCount(1, $res['member']);
-        $this->assertEquals(['/chickens/2'], $res['member'][0]['chickens']);
+        $this->assertEquals('/chicken_coops/2', $res['member'][0]['chickenCoop']);
     }
 
-    /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
-     */
     public function testIriFilterMultiple(): void
     {
         $client = $this->createClient();
-        $res = $client->request('GET', '/chicken_coops?chickens[]=/chickens/2&chickens[]=/chickens/1')->toArray();
+        $res = $client->request('GET', '/chickens?chickenCoop[]=/chicken_coops/2&chickenCoop[]=/chicken_coops/1')->toArray();
         $this->assertCount(2, $res['member']);
     }
 

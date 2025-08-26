@@ -20,11 +20,6 @@ use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Doctrine\ODM\MongoDB\MongoDBException;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 /**
  * @author Vincent Amstoutz <vincent.amstoutz.dev@gmail.com>
@@ -55,13 +50,6 @@ final class ExistsFilterTest extends ApiTestCase
         $this->loadFixtures($entityClass);
     }
 
-    /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
-     */
     #[DataProvider('existsFilterScenariosProvider')]
     public function testExistsFilterResponses(string $url, int $expectedCount): void
     {

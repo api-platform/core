@@ -32,7 +32,6 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
     {
         $parameter = $context['parameter'];
         $value = $parameter->getValue();
-
         $property = $parameter->getProperty();
         $alias = $queryBuilder->getRootAliases()[0];
         $parameterName = $queryNameGenerator->generateParameterName($property);

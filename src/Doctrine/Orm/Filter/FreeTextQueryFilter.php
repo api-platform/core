@@ -17,26 +17,21 @@ use ApiPlatform\Doctrine\Common\Filter\LoggerAwareInterface;
 use ApiPlatform\Doctrine\Common\Filter\LoggerAwareTrait;
 use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
 use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareTrait;
-use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
-use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\QueryBuilder;
 
-/**
- * @author Vincent Amstoutz <vincent.amstoutz.dev@gmail.com>
- *
- * @experimental
- */
-final class OrFilter implements FilterInterface, OpenApiParameterFilterInterface, ManagerRegistryAwareInterface, LoggerAwareInterface
+final class FreeTextQueryFilter implements FilterInterface, ManagerRegistryAwareInterface, LoggerAwareInterface
 {
     use BackwardCompatibleFilterDescriptionTrait;
     use LoggerAwareTrait;
     use ManagerRegistryAwareTrait;
-    use OpenApiFilterTrait;
 
-    public function __construct(private readonly FilterInterface $filter)
+    /**
+     * @param list<string> $properties an array of properties, defaults to `parameter->getProperties()`
+     */
+    public function __construct(private readonly FilterInterface $filter, private readonly ?array $properties = null)
     {
     }
 
@@ -50,12 +45,15 @@ final class OrFilter implements FilterInterface, OpenApiParameterFilterInterface
             $this->filter->setLogger($this->getLogger());
         }
 
-        $this->filter->apply(
-            $queryBuilder,
-            $queryNameGenerator,
-            $resourceClass,
-            $operation,
-            ['whereClause' => 'orWhere'] + $context
-        );
+        $parameter = $context['parameter'];
+        foreach ($this->properties ?? $parameter->getProperties() ?? [] as $property) {
+            $this->filter->apply(
+                $queryBuilder,
+                $queryNameGenerator,
+                $resourceClass,
+                $operation,
+                ['parameter' => $parameter->withProperty($property)] + $context
+            );
+        }
     }
 }

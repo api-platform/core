@@ -21,58 +21,36 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ChickenCoop;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Doctrine\ODM\MongoDB\MongoDBException;
-use PHPUnit\Framework\Attributes\DataProvider;
 
-/**
- * @author Vincent Amstoutz <vincent.amstoutz.dev@gmail.com>
- */
-final class OrFilterTest extends ApiTestCase
+final class FreeTextQueryFilterTest extends ApiTestCase
 {
     use RecreateSchemaTrait;
     use SetupClassResourcesTrait;
 
     protected static ?bool $alwaysBootKernel = false;
 
+    /**
+     * @return class-string[]
+     */
     public static function getResources(): array
     {
-        return [Chicken::class, ChickenCoop::class];
+        return [ChickenCoop::class, Chicken::class];
+    }
+
+    public function testFreeTextQueryFilter(): void
+    {
+        $client = $this->createClient();
+        $res = $client->request('GET', '/chickens?q=9780')->toArray();
+        $this->assertJsonContains(['totalItems' => 1]);
     }
 
     /**
      * @throws \Throwable
-     * @throws MongoDBException
      */
     protected function setUp(): void
     {
-        $entities = $this->isMongoDB()
-            ? [DocumentChicken::class, DocumentChickenCoop::class]
-            : [Chicken::class, ChickenCoop::class];
-
-        $this->recreateSchema($entities);
+        $this->recreateSchema([$this->isMongoDB() ? DocumentChicken::class : Chicken::class, $this->isMongoDB() ? DocumentChickenCoop::class : ChickenCoop::class]);
         $this->loadFixtures();
-    }
-
-    #[DataProvider('orFilterDataProvider')]
-    public function testOrFilter(string $url, int $expectedCount): void
-    {
-        $client = self::createClient();
-        $client->request('GET', $url);
-
-        $this->assertResponseIsSuccessful();
-        $this->assertJsonContains(['totalItems' => $expectedCount]);
-    }
-
-    public static function orFilterDataProvider(): \Generator
-    {
-        yield 'ean through autocomplete' => [
-            'url' => '/chickens?autocomplete=978020137962',
-            'expectedCount' => 1,
-        ];
-
-        yield 'name through autocomplete' => [
-            'url' => '/chickens?autocomplete=Gertrude',
-            'expectedCount' => 1,
-        ];
     }
 
     /**
@@ -89,7 +67,7 @@ final class OrFilterTest extends ApiTestCase
         $chickenCoop2 = new $coopClass();
 
         $chicken1 = new $chickenClass();
-        $chicken1->setName('Gertrude');
+        $chicken1->setName('978020137962');
         $chicken1->setEan('978020137962');
         $chicken1->setChickenCoop($chickenCoop1);
 

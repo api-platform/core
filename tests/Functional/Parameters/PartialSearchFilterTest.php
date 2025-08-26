@@ -22,11 +22,6 @@ use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Doctrine\ODM\MongoDB\MongoDBException;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 /**
  * @author Vincent Amstoutz <vincent.amstoutz.dev@gmail.com>
@@ -59,13 +54,6 @@ final class PartialSearchFilterTest extends ApiTestCase
         $this->loadFixtures();
     }
 
-    /**
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
-     * @throws TransportExceptionInterface
-     */
     #[DataProvider('partialSearchFilterProvider')]
     public function testPartialSearchFilter(string $url, int $expectedCount, array $expectedNames): void
     {
@@ -73,7 +61,7 @@ final class PartialSearchFilterTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
 
         $responseData = $response->toArray();
-        $filteredItems = $responseData['hydra:member'];
+        $filteredItems = $responseData['member'];
 
         $this->assertCount($expectedCount, $filteredItems, \sprintf('Expected %d items for URL %s', $expectedCount, $url));
 

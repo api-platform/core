@@ -14,6 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Doctrine\Odm\Filter\ExactFilter;
+use ApiPlatform\Doctrine\Odm\Filter\FreeTextQueryFilter;
+use ApiPlatform\Doctrine\Odm\Filter\IriFilter;
+use ApiPlatform\Doctrine\Odm\Filter\OrFilter;
 use ApiPlatform\Doctrine\Odm\Filter\PartialSearchFilter;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
@@ -21,13 +24,16 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 #[ODM\Document]
 #[GetCollection(
+    normalizationContext: ['hydra_prefix' => false],
     parameters: [
-        'chickenCoop' => new QueryParameter(filter: new ExactFilter()),
+        'chickenCoop' => new QueryParameter(filter: new IriFilter()),
         'name' => new QueryParameter(filter: new ExactFilter()),
         'namePartial' => new QueryParameter(
             filter: new PartialSearchFilter(),
             property: 'name',
         ),
+        'autocomplete' => new QueryParameter(filter: new FreeTextQueryFilter(new OrFilter(new ExactFilter())), properties: ['name', 'ean']),
+        'q' => new QueryParameter(filter: new FreeTextQueryFilter(new PartialSearchFilter()), properties: ['name', 'ean']),
     ],
 )]
 class Chicken
@@ -37,6 +43,9 @@ class Chicken
 
     #[ODM\Field(type: 'string')]
     private string $name;
+
+    #[ODM\Field(type: 'string', nullable: true)]
+    private ?string $ean;
 
     #[ODM\ReferenceOne(targetDocument: ChickenCoop::class, inversedBy: 'chickens')]
     private ?ChickenCoop $chickenCoop = null;
@@ -54,6 +63,18 @@ class Chicken
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getEan(): ?string
+    {
+        return $this->ean;
+    }
+
+    public function setEan(string $ean): self
+    {
+        $this->ean = $ean;
 
         return $this;
     }
