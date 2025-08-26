@@ -23,6 +23,8 @@ use ApiPlatform\Metadata\ParameterProviderFilterInterface;
 use ApiPlatform\State\ParameterProvider\IriConverterParameterProvider;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\Mapping\MappingException;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
  * @author Vincent Amstoutz <vincent.amstoutz.dev@gmail.com>
@@ -33,21 +35,49 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
     use ManagerRegistryAwareTrait;
     use OpenApiFilterTrait;
 
+    /**
+     * @throws MappingException
+     */
     public function apply(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
         $parameter = $context['parameter'];
         $property = $parameter->getProperty();
         $value = $parameter->getValue();
 
-        $documentManager = $this->getManagerRegistry()?->getManagerForClass($resourceClass);
-
+        $documentManager = $this->getManagerRegistry()->getManagerForClass($resourceClass);
         if (!$documentManager instanceof DocumentManager) {
             return;
         }
 
         $classMetadata = $documentManager->getClassMetadata($resourceClass);
-
         if (!$classMetadata->hasReference($property)) {
+            return;
+        }
+
+        $mapping = $classMetadata->getFieldMapping($property);
+
+        if (isset($mapping['mappedBy'])) {
+            $propertyAccessor = PropertyAccess::createPropertyAccessor();
+            $mappedByProperty = $mapping['mappedBy'];
+            $identifier = '_id';
+
+            if (is_iterable($value)) {
+                $ids = [];
+                foreach ($value as $v) {
+                    if ($relatedDoc = $propertyAccessor->getValue($v, $mappedByProperty)) {
+                        $ids[] = $propertyAccessor->getValue($relatedDoc, 'id');
+                    }
+                }
+
+                $aggregationBuilder->match()->field($identifier)->in($ids);
+
+                return;
+            }
+
+            if ($relatedDoc = $propertyAccessor->getValue($value, $mappedByProperty)) {
+                $aggregationBuilder->match()->field($identifier)->equals($propertyAccessor->getValue($relatedDoc, 'id'));
+            }
+
             return;
         }
 
