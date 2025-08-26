@@ -58,6 +58,7 @@
         "symfony/expression-language": "^6.4 || ^7.0",
         "symfony/intl": "^6.4 || ^7.0",
         "symfony/mercure-bundle": "*",
+        "symfony/object-mapper": "^7.0",
         "symfony/routing": "^6.4 || ^7.0",
         "symfony/type-info": "^7.3",
         "symfony/validator": "^6.4 || ^7.0",

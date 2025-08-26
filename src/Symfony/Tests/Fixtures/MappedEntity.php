@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Tests\Fixtures;
 
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResource;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\ObjectMapper\Attribute\Map;
 
