@@ -41,6 +41,10 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
     {
         $parameter = $context['parameter'];
         $value = $parameter->getValue();
+        $operator = $context['operator'] ?? 'addAnd';
+        $match = $context['match'] = $context['match'] ??
+            $aggregationBuilder
+            ->matchExpr();
 
         $documentManager = $this->getManagerRegistry()->getManagerForClass($resourceClass);
         if (!$documentManager instanceof DocumentManager) {
@@ -56,22 +60,24 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
         $method = $classMetadata->isSingleValuedAssociation($property) ? 'references' : 'includesReferenceTo';
 
         if (is_iterable($value)) {
-            $match = $aggregationBuilder->match();
-            $or = $match->expr();
+            $or = $aggregationBuilder->matchExpr();
 
             foreach ($value as $v) {
-                $or->addOr($match->expr()->field($property)->{$method}($v));
+                $or->addOr($aggregationBuilder->matchExpr()->field($property)->{$method}($v));
             }
 
-            $match->addAnd($or);
+            $match->{$operator}($or);
 
             return;
         }
 
-        $aggregationBuilder
-            ->match()
-            ->field($property)
-            ->{$method}($value);
+        $match
+            ->{$operator}(
+                $aggregationBuilder
+                    ->matchExpr()
+                    ->field($property)
+                    ->{$method}($value)
+            );
     }
 
     public static function getParameterProvider(): string

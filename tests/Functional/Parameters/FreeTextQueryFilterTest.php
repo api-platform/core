@@ -40,7 +40,7 @@ final class FreeTextQueryFilterTest extends ApiTestCase
     public function testFreeTextQueryFilter(): void
     {
         $client = $this->createClient();
-        $res = $client->request('GET', '/chickens?q=9780')->toArray();
+        $client->request('GET', '/chickens?q=9780')->toArray();
         $this->assertJsonContains(['totalItems' => 1]);
     }
 

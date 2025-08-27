@@ -33,29 +33,24 @@ final class OrFilter implements FilterInterface, OpenApiParameterFilterInterface
     use ManagerRegistryAwareTrait;
     use OpenApiFilterTrait;
 
-    /**
-     * @param FilterInterface[] $filters
-     */
-    private array $filters;
-
-    public function __construct(FilterInterface ...$filters)
+    public function __construct(private readonly FilterInterface $filter)
     {
-        $this->filters = $filters;
     }
 
     public function apply(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
-        foreach ($this->filters as $filter) {
-            if ($filter instanceof ManagerRegistryAwareInterface) {
-                $filter->setManagerRegistry($this->getManagerRegistry());
-            }
+        if ($this->filter instanceof ManagerRegistryAwareInterface) {
+            $this->filter->setManagerRegistry($this->getManagerRegistry());
+        }
 
-            if ($filter instanceof LoggerAwareInterface) {
-                $filter->setLogger($this->getLogger());
-            }
+        if ($this->filter instanceof LoggerAwareInterface) {
+            $this->filter->setLogger($this->getLogger());
+        }
 
-            $context = ['whereClause' => 'orWhere'] + $context;
-            $filter->apply($aggregationBuilder, $resourceClass, $operation, $context);
+        $newContext = ['operator' => 'addOr'] + $context;
+        $this->filter->apply($aggregationBuilder, $resourceClass, $operation, $newContext);
+        if (isset($newContext['match'])) {
+            $context['match'] = $newContext['match'];
         }
     }
 }

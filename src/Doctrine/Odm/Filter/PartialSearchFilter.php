@@ -33,26 +33,31 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
         $parameter = $context['parameter'];
         $property = $parameter->getProperty();
         $values = $parameter->getValue();
+        $match = $context['match'] = $context['match'] ??
+            $aggregationBuilder
+            ->matchExpr();
+        $operator = $context['operator'] ?? 'addAnd';
 
         if (!is_iterable($values)) {
             $escapedValue = preg_quote($values, '/');
-            $aggregationBuilder
-                ->match()
-                ->field($property)
-                ->equals(new Regex($escapedValue, 'i'));
+            $match->{$operator}(
+                $aggregationBuilder->matchExpr()->field($property)->equals(new Regex($escapedValue, 'i'))
+            );
 
             return;
         }
 
-        $match = $aggregationBuilder->match();
+        $or = $aggregationBuilder->matchExpr();
         foreach ($values as $value) {
             $escapedValue = preg_quote($value, '/');
 
-            $match->addOr(
-                $match->expr()
+            $or->addOr(
+                $aggregationBuilder->matchExpr()
                     ->field($property)
                     ->equals(new Regex($escapedValue, 'i'))
             );
         }
+
+        $match->{$operator}($or);
     }
 }

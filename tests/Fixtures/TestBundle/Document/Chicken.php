@@ -27,6 +27,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
     normalizationContext: ['hydra_prefix' => false],
     parameters: [
         'chickenCoop' => new QueryParameter(filter: new IriFilter()),
+        'chickenCoopId' => new QueryParameter(filter: new ExactFilter(), property: 'chickenCoop'),
         'name' => new QueryParameter(filter: new ExactFilter()),
         'namePartial' => new QueryParameter(
             filter: new PartialSearchFilter(),

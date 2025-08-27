@@ -87,19 +87,19 @@ final class ExactFilterTest extends ApiTestCase
         ];
 
         yield 'filter by exact coop id' => [
-            '/chickens?chickenCoop=1',
+            '/chickens?chickenCoopId=1',
             1,
             ['Gertrude'],
         ];
 
         yield 'filter by coop id and correct name' => [
-            '/chickens?chickenCoop=1&name=Gertrude',
+            '/chickens?chickenCoopId=1&name=Gertrude',
             1,
             ['Gertrude'],
         ];
 
         yield 'filter by coop id and incorrect name' => [
-            '/chickens?chickenCoop=1&name=Henriette',
+            '/chickens?chickenCoopId=1&name=Henriette',
             0,
             [],
         ];

@@ -42,6 +42,10 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
         $parameter = $context['parameter'];
         $property = $parameter->getProperty();
         $value = $parameter->getValue();
+        $operator = $context['operator'] ?? 'addAnd';
+        $match = $context['match'] = $context['match'] ??
+            $aggregationBuilder
+            ->matchExpr();
 
         $documentManager = $this->getManagerRegistry()->getManagerForClass($resourceClass);
         if (!$documentManager instanceof DocumentManager) {
@@ -51,10 +55,8 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
         $classMetadata = $documentManager->getClassMetadata($resourceClass);
 
         if (!$classMetadata->hasReference($property)) {
-            $aggregationBuilder
-                ->match()
-                ->field($property)
-                ->{is_iterable($value) ? 'in' : 'equals'}($value);
+            $match
+                ->{$operator}($aggregationBuilder->matchExpr()->field($property)->{is_iterable($value) ? 'in' : 'equals'}($value));
 
             return;
         }
@@ -63,21 +65,22 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
         $method = $classMetadata->isSingleValuedAssociation($property) ? 'references' : 'includesReferenceTo';
 
         if (is_iterable($value)) {
-            $match = $aggregationBuilder->match();
-            $or = $match->expr();
+            $or = $aggregationBuilder->matchExpr();
 
             foreach ($value as $v) {
-                $or->addOr($match->expr()->field($property)->{$method}($documentManager->getPartialReference($mapping['targetDocument'], $v)));
+                $or->addOr($aggregationBuilder->matchExpr()->field($property)->{$method}($documentManager->getPartialReference($mapping['targetDocument'], $v)));
             }
 
-            $match->addAnd($or);
+            $match->{$operator}($or);
 
             return;
         }
 
-        $aggregationBuilder
-            ->match()
-            ->field($property)
-            ->{$method}($documentManager->getPartialReference($mapping['targetDocument'], $value));
+        $match
+            ->{$operator}(
+                $aggregationBuilder->matchExpr()
+                    ->field($property)
+                    ->{$method}($documentManager->getPartialReference($mapping['targetDocument'], $value))
+            );
     }
 }
