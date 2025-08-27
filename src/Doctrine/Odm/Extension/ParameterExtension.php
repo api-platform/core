@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Extension;
 
+use ApiPlatform\Doctrine\Common\Filter\LoggerAwareInterface;
 use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
 use ApiPlatform\Doctrine\Common\ParameterValueExtractorTrait;
 use ApiPlatform\Doctrine\Odm\Filter\AbstractFilter;
@@ -22,6 +23,7 @@ use ApiPlatform\State\ParameterNotFound;
 use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Reads operation parameters and execute its filter.
@@ -35,6 +37,7 @@ final class ParameterExtension implements AggregationCollectionExtensionInterfac
     public function __construct(
         private readonly ContainerInterface $filterLocator,
         private readonly ?ManagerRegistry $managerRegistry = null,
+        private readonly ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -67,6 +70,10 @@ final class ParameterExtension implements AggregationCollectionExtensionInterfac
                 $filter->setManagerRegistry($this->managerRegistry);
             }
 
+            if ($this->logger && $filter instanceof LoggerAwareInterface && !$filter->hasLogger()) {
+                $filter->setLogger($this->logger);
+            }
+
             if ($filter instanceof AbstractFilter && !$filter->getProperties()) {
                 $propertyKey = $parameter->getProperty() ?? $parameter->getKey();
 
@@ -82,12 +89,19 @@ final class ParameterExtension implements AggregationCollectionExtensionInterfac
                 $filter->setProperties($properties ?? []);
             }
 
-            $filterContext = ['filters' => $values, 'parameter' => $parameter];
+            $filterContext = ['filters' => $values, 'parameter' => $parameter, 'match' => $context['match'] ?? null];
             $filter->apply($aggregationBuilder, $resourceClass, $operation, $filterContext);
             // update by reference
             if (isset($filterContext['mongodb_odm_sort_fields'])) {
                 $context['mongodb_odm_sort_fields'] = $filterContext['mongodb_odm_sort_fields'];
             }
+            if (isset($filterContext['match'])) {
+                $context['match'] = $filterContext['match'];
+            }
+        }
+
+        if (isset($context['match'])) {
+            $aggregationBuilder->match()->addAnd($context['match']);
         }
     }
 

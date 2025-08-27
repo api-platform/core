@@ -50,6 +50,8 @@ interface FilterInterface
      * @param class-string $resourceClass
      *
      * @return array<string, array{property?: string, type?: string, required?: bool, description?: string, strategy?: string, is_collection?: bool, openapi?: \ApiPlatform\OpenApi\Model\Parameter, schema?: array<string, mixed>}>
+     *
+     * @deprecated in 4.2, to be removed in 5.0
      */
     public function getDescription(string $resourceClass): array;
 }

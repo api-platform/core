@@ -17,11 +17,6 @@ use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue4372\RelatedEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue4372\ToOneRelationPropertyMayBeNull;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class NotSkipNullToOneRelationTest extends ApiTestCase
 {
@@ -37,14 +32,6 @@ class NotSkipNullToOneRelationTest extends ApiTestCase
         return [ToOneRelationPropertyMayBeNull::class, RelatedEntity::class];
     }
 
-    /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
-     * @throws \JsonException
-     */
     public function testNullRelationsAreNotSkippedWhenConfigured(): void
     {
         if ($this->isMongoDB()) {
@@ -114,14 +101,6 @@ class NotSkipNullToOneRelationTest extends ApiTestCase
         );
     }
 
-    /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
-     * @throws \JsonException
-     */
     public function testNullRelationsAreSkippedByDefault(): void
     {
         if ($this->isMongoDB()) {
@@ -189,13 +168,6 @@ class NotSkipNullToOneRelationTest extends ApiTestCase
         );
     }
 
-    /**
-     * @throws ClientExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
-     */
     private function checkRoutesAreCorrectlySetUp(): void
     {
         self::createClient()->request(

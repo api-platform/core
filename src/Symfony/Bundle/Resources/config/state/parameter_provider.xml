@@ -6,6 +6,7 @@
     <services>
         <service id="api_platform.state_provider.parameter.iri_converter" class="ApiPlatform\State\ParameterProvider\IriConverterParameterProvider" public="false">
             <argument type="service" id="api_platform.iri_converter"/>
+            <argument type="service" id="logger" on-invalid="ignore" />
 
             <tag name="api_platform.parameter_provider" key="ApiPlatform\State\ParameterProvider\IriConverterParameterProvider" priority="-895" />
         </service>
