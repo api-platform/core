@@ -88,6 +88,7 @@ use ApiPlatform\Laravel\Eloquent\Metadata\ResourceClassResolver as EloquentResou
 use ApiPlatform\Laravel\Eloquent\PropertyAccess\PropertyAccessor as EloquentPropertyAccessor;
 use ApiPlatform\Laravel\Eloquent\PropertyInfo\EloquentExtractor;
 use ApiPlatform\Laravel\Eloquent\Serializer\EloquentNameConverter;
+use ApiPlatform\Laravel\Eloquent\Serializer\Mapping\Loader\RelationMetadataLoader;
 use ApiPlatform\Laravel\Eloquent\Serializer\SerializerContextBuilder as EloquentSerializerContextBuilder;
 use ApiPlatform\Laravel\GraphQl\Controller\EntrypointController as GraphQlEntrypointController;
 use ApiPlatform\Laravel\GraphQl\Controller\GraphiQlController;
@@ -218,12 +219,21 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->bind(LoaderInterface::class, AttributeLoader::class);
         $this->app->bind(ClassMetadataFactoryInterface::class, ClassMetadataFactory::class);
         $this->app->singleton(ClassMetadataFactory::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+            $nameConverter = $config->get('api-platform.name_converter', SnakeCaseToCamelCaseNameConverter::class);
+            if ($nameConverter && class_exists($nameConverter)) {
+                $nameConverter = new EloquentNameConverter($app->make($nameConverter));
+            }
+
             return new ClassMetadataFactory(
                 new LoaderChain([
                     new PropertyMetadataLoader(
                         $app->make(PropertyNameCollectionFactoryInterface::class),
+                        $nameConverter
                     ),
                     new AttributeLoader(),
+                    // new RelationMetadataLoader($app->make(ModelMetadata::class)),
                 ])
             );
         });
@@ -261,6 +271,10 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->singleton(PropertyMetadataFactoryInterface::class, function (Application $app) {
             /** @var ConfigRepository $config */
             $config = $app['config'];
+            $nameConverter = $config->get('api-platform.name_converter', SnakeCaseToCamelCaseNameConverter::class);
+            if ($nameConverter && class_exists($nameConverter)) {
+                $nameConverter = new EloquentNameConverter($app->make($nameConverter));
+            }
 
             return new CachePropertyMetadataFactory(
                 new SchemaPropertyMetadataFactory(
@@ -274,7 +288,8 @@ class ApiPlatformProvider extends ServiceProvider
                                     new EloquentPropertyMetadataFactory(
                                         $app->make(ModelMetadata::class),
                                     ),
-                                )
+                                ),
+                                $nameConverter
                             ),
                             $app->make(ResourceClassResolverInterface::class)
                         ),
@@ -287,6 +302,10 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->singleton(PropertyNameCollectionFactoryInterface::class, function (Application $app) {
             /** @var ConfigRepository $config */
             $config = $app['config'];
+            $nameConverter = $config->get('api-platform.name_converter', SnakeCaseToCamelCaseNameConverter::class);
+            if ($nameConverter && class_exists($nameConverter)) {
+                $nameConverter = new EloquentNameConverter($app->make($nameConverter));
+            }
 
             return new CachePropertyNameCollectionMetadataFactory(
                 new ClassLevelAttributePropertyNameCollectionFactory(
@@ -296,7 +315,8 @@ class ApiPlatformProvider extends ServiceProvider
                             new PropertyInfoPropertyNameCollectionFactory($app->make(PropertyInfoExtractorInterface::class)),
                             $app->make(ResourceClassResolverInterface::class)
                         )
-                    )
+                    ),
+                    $nameConverter
                 ),
                 true === $config->get('app.debug') ? 'array' : $config->get('api-platform.cache', 'file')
             );
