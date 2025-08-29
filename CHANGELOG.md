@@ -110,6 +110,12 @@ TypeInfo:
 * [cff61eab8](https://github.com/api-platform/core/commit/cff61eab8643f8ed08d59c0684e77740d0d81b04) fix(metadata): append php file resource extractor (#7193)
 * [f3d4afe03](https://github.com/api-platform/core/commit/f3d4afe032385f3b665131a365e42706930f0730) fix(symfony): validator type-info
 
+## v4.1.22
+
+### Bug fixes
+
+* [11bba62c2](https://github.com/api-platform/core/commit/11bba62c2aa0f60b09955f7cf55d7135938c0e48) fix(laravel): serialization issue with camelCase relation (#7356)
+
 ## v4.1.21
 
 ### Bug fixes

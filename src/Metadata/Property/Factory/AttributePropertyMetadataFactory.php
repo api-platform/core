@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\Util\Reflection;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Creates a property metadata from {@see ApiProperty} attribute.
@@ -26,8 +27,10 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
  */
 final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryInterface
 {
-    public function __construct(private readonly ?PropertyMetadataFactoryInterface $decorated = null)
-    {
+    public function __construct(
+        private readonly ?PropertyMetadataFactoryInterface $decorated = null,
+        private readonly ?NameConverterInterface $nameConverter = null,
+    ) {
     }
 
     /**
@@ -93,7 +96,7 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
         $attributes = $reflectionClass->getAttributes(ApiProperty::class);
         foreach ($attributes as $attribute) {
             $instance = $attribute->newInstance();
-            if ($instance->getProperty() === $property) {
+            if ($instance->getProperty() === ($this->nameConverter?->denormalize($property) ?? $property)) {
                 return $this->createMetadata($instance, $parentPropertyMetadata);
             }
         }
