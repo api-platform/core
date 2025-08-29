@@ -50,6 +50,7 @@ use ApiPlatform\Validator\Exception\ValidationException;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Ramsey\Uuid\Uuid;
+use Symfony\Bundle\FrameworkBundle\Controller\ControllerHelper;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -62,6 +63,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpClient\ScopingHttpClient;
+use Symfony\Component\JsonStreamer\JsonStreamWriter;
 use Symfony\Component\ObjectMapper\ObjectMapper;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Uid\AbstractUid;
@@ -987,6 +989,15 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         if (!$config['enable_json_streamer']) {
             return;
+        }
+
+        if (!class_exists(JsonStreamWriter::class)) {
+            throw new RuntimeException('symfony/json-streamer is not installed.');
+        }
+
+        // @TODO symfony/json-streamer:>=7.4.1 add composer conflict
+        if (!class_exists(ControllerHelper::class)) {
+            throw new RuntimeException('Symfony symfony/json-stream:^7.4 is needed.');
         }
 
         if (isset($formats['jsonld'])) {

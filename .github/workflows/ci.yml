@@ -124,6 +124,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      # https://github.com/staabm/phpstan-todo-by#prerequisite
+      -   name: Get tags
+          run: git fetch --tags origin
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
