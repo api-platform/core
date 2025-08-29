@@ -31,8 +31,6 @@ use Psr\Container\ContainerInterface;
  * Loops over parameters to:
  *   - compute its values set as extra properties from the Parameter object (`_api_values`)
  *   - call the Parameter::provider if any and updates the Operation
- *
- * @experimental
  */
 final class ParameterProvider implements ProviderInterface, StopwatchAwareInterface
 {

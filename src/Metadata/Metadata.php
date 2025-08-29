@@ -73,9 +73,6 @@ abstract class Metadata
         protected $provider = null,
         protected $processor = null,
         protected ?OptionsInterface $stateOptions = null,
-        /*
-         * @experimental
-         */
         array|Parameters|null $parameters = null,
         protected mixed $rules = null,
         protected ?string $policy = null,

@@ -39,8 +39,6 @@ use Symfony\Component\Validator\Constraints\Unique;
 
 /**
  * Helper to get a set of validation constraints for a given Parameter.
- *
- * @experimental
  */
 trait ParameterValidationConstraints
 {

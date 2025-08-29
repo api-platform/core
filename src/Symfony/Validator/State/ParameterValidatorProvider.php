@@ -29,8 +29,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Validates parameters using the Symfony validator.
- *
- * @experimental
  */
 final class ParameterValidatorProvider implements ProviderInterface
 {

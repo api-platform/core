@@ -20,8 +20,6 @@ use ApiPlatform\Metadata\Operation;
  * An ItemProvider that just creates a new object.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- *
- * @experimental
  */
 final class ObjectProvider implements ProviderInterface
 {
