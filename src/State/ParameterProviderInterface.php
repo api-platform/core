@@ -18,8 +18,6 @@ use ApiPlatform\Metadata\Parameter;
 
 /**
  * Optionnaly transforms request parameters and provides modification to the current Operation.
- *
- * @experimental
  */
 interface ParameterProviderInterface
 {

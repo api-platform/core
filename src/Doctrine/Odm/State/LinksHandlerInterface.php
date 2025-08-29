@@ -16,9 +16,6 @@ namespace ApiPlatform\Doctrine\Odm\State;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
-/**
- * @experimental
- */
 interface LinksHandlerInterface
 {
     /**

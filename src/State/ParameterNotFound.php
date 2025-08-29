@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\State;
 
 /**
- * @experimental
+ * Represents a query or header parameter that was not present during this request.
  */
 final class ParameterNotFound
 {
