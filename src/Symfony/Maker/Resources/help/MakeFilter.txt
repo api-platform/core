@@ -1,0 +1,9 @@
+The <info>%command.name%</info> command generates a new API Platform filter class for Doctrine ORM or ODM (MongoDB).
+
+<info>php %command.full_name% type name</info>
+
+<info>Important:</info>
+- If you omit the argument, the command will prompt you to choose the filter type interactively.
+- If you omit the argument, the command will ask you to enter the class name interactively.
+
+<info>Elasticsearch isn't supported yet.</info>
