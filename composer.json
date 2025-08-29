@@ -176,7 +176,7 @@
         "symfony/expression-language": "^6.4 || ^7.0",
         "symfony/finder": "^6.4 || ^7.0",
         "symfony/form": "^6.4 || ^7.0",
-        "symfony/framework-bundle": "7.4.x-dev",
+        "symfony/framework-bundle": "^6.4 || ^7.0 || 7.4.x-dev",
         "symfony/http-client": "^6.4 || ^7.0",
         "symfony/intl": "^6.4 || ^7.0",
         "symfony/json-streamer": "7.4.x-dev",
