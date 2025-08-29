@@ -25,17 +25,9 @@ use Doctrine\ODM\MongoDB\UnitOfWork;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-final class Paginator implements \IteratorAggregate, PaginatorInterface, HasNextPagePaginatorInterface
+final class Paginator extends AbstractPaginator implements PaginatorInterface, HasNextPagePaginatorInterface
 {
-    private readonly \ArrayIterator $iterator;
-
-    private readonly int $firstResult;
-
-    private readonly int $maxResults;
-
     private readonly int $totalItems;
-
-    private readonly int $count;
 
     public function __construct(Iterator $mongoDbOdmIterator, UnitOfWork $unitOfWork, string $resourceClass)
     {
@@ -44,6 +36,8 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface, HasNext
         if (array_diff_key(['results' => 1, 'count' => 1, '__api_first_result__' => 1, '__api_max_results__' => 1], $result)) {
             throw new RuntimeException('The result of the query must contain only "__api_first_result__", "__api_max_results__", "results" and "count" fields.');
         }
+
+        parent::__construct($result);
 
         // The "count" facet contains the total number of documents,
         // it is not set when the query does not return any document
@@ -60,21 +54,6 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface, HasNext
                 $result['results'],
             ));
         }
-
-        $this->firstResult = $result['__api_first_result__'];
-        $this->maxResults = $result['__api_max_results__'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getCurrentPage(): float
-    {
-        if (0 >= $this->maxResults) {
-            return 1.;
-        }
-
-        return floor($this->firstResult / $this->maxResults) + 1.;
     }
 
     /**
@@ -92,33 +71,9 @@ final class Paginator implements \IteratorAggregate, PaginatorInterface, HasNext
     /**
      * {@inheritdoc}
      */
-    public function getItemsPerPage(): float
-    {
-        return (float) $this->maxResults;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getTotalItems(): float
     {
         return (float) $this->totalItems;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getIterator(): \Traversable
-    {
-        return $this->iterator;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function count(): int
-    {
-        return $this->count;
     }
 
     /**
