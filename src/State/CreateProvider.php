@@ -29,8 +29,6 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  *
- * @experimental
- *
  * @internal
  */
 final class CreateProvider implements ProviderInterface

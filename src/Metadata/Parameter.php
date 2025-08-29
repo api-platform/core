@@ -18,9 +18,6 @@ use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ParameterProviderInterface;
 use Symfony\Component\TypeInfo\Type;
 
-/**
- * @experimental
- */
 abstract class Parameter
 {
     /**

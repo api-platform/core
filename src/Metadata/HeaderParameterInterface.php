@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata;
 
 /**
- * @experimental
+ * A HTTP header parameter.
  */
 interface HeaderParameterInterface
 {
