@@ -15,6 +15,7 @@ namespace ApiPlatform\Metadata\Property\Factory;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Gathers "virtual" properties created using the ApiProperty attribute at class level.
@@ -23,6 +24,7 @@ final class ClassLevelAttributePropertyNameCollectionFactory implements Property
 {
     public function __construct(
         private readonly ?PropertyNameCollectionFactoryInterface $decorated = null,
+        private readonly ?NameConverterInterface $nameConverter = null,
     ) {
     }
 
@@ -40,7 +42,7 @@ final class ClassLevelAttributePropertyNameCollectionFactory implements Property
         foreach ($attributes as $attribute) {
             $instance = $attribute->newInstance();
             if ($property = $instance->getProperty()) {
-                $properties[$property] = true;
+                $properties[$this->nameConverter?->denormalize($property) ?? $property] = true;
             }
         }
 

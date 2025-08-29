@@ -25,6 +25,7 @@ use Workbench\Database\Factories\BookFactory;
 use Workbench\Database\Factories\CommentMorphFactory;
 use Workbench\Database\Factories\GrandSonFactory;
 use Workbench\Database\Factories\PostWithMorphManyFactory;
+use Workbench\Database\Factories\TimeSlotFactory;
 use Workbench\Database\Factories\WithAccessorFactory;
 
 class EloquentTest extends TestCase
@@ -587,6 +588,30 @@ class EloquentTest extends TestCase
             '@id' => '/api/post_with_morph_manies/1/comments/1',
             '@type' => 'CommentMorph',
             'id' => 1,
+        ]);
+    }
+
+    public function testCreateDeliveryRequestWithPickupSlot(): void
+    {
+        $pickupTimeSlot = TimeSlotFactory::new()->create(['note' => 'Morning slot']);
+
+        $response = $this->postJson('/api/delivery_requests', [
+            'pickupTimeSlot' => '/api/time_slots/'.$pickupTimeSlot->id, // @phpstan-ignore-line
+            'note' => 'This is a test note.',
+        ], ['accept' => 'application/ld+json', 'content-type' => 'application/ld+json']);
+
+        $response->assertStatus(201);
+        $response->assertJson([
+            '@context' => '/api/contexts/DeliveryRequest',
+            '@id' => '/api/delivery_requests/1',
+            '@type' => 'DeliveryRequest',
+            'pickupTimeSlot' => [
+                '@id' => '/api/time_slots/'.$pickupTimeSlot->id, // @phpstan-ignore-line
+                '@type' => 'TimeSlot',
+                'name' => $pickupTimeSlot->name, // @phpstan-ignore-line
+                'note' => $pickupTimeSlot->note, // @phpstan-ignore-line
+            ],
+            'note' => 'This is a test note.',
         ]);
     }
 }
