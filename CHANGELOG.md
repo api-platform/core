@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.1.22
+
+### Bug fixes
+
+* [11bba62c2](https://github.com/api-platform/core/commit/11bba62c2aa0f60b09955f7cf55d7135938c0e48) fix(laravel): serialization issue with camelCase relation (#7356)
+
 ## v4.1.21
 
 ### Bug fixes
@@ -77,9 +83,9 @@
 * [b2131645d](https://github.com/api-platform/core/commit/b2131645dec11a5dbf8bbe507f578720a84a686e) fix(laravel): route where uses requirements (#7199)
 * [b2b5f99c6](https://github.com/api-platform/core/commit/b2b5f99c64ced9f3580fdaee099d0e34e75d2697) refactor(state): merge parameter and link security  (#7200)
 
-Notes: 
+Notes:
 
-Two providers are now available on parameters (query parameters, header and uri variables `Link`): 
+Two providers are now available on parameters (query parameters, header and uri variables `Link`):
 
 - `ReadLinkParameterProvider` previously used for link security (renamed from `Symfony\Security\State\LinkedReadProvider`)
 - `IriConverterParameterProvider` this allows you to read a resource from an IRI usefull for filters (eg `?author=/authors/1`)
@@ -260,12 +266,12 @@ Also contains [v4.0.20 changes](#v4020).
 ## Notes
 
 This version as the 4.0.19 is compatible with Laravel 12.
-The [hydra patch](#6748) changes default `hydra:title` and uses the resource `shortname`. Previously the `hydra:title` information was duplicating the `hydra:description`. 
+The [hydra patch](#6748) changes default `hydra:title` and uses the resource `shortname`. Previously the `hydra:title` information was duplicating the `hydra:description`.
 The `rdfs:label` got removed from the `hydra:Class` as it was used instead of the `hydra:title`.
-On `hydra:property` `rdfs:label` got renamed to `label` as the `rdfs` namespace is available in the context. 
+On `hydra:property` `rdfs:label` got renamed to `label` as the `rdfs` namespace is available in the context.
 The `ApiPlatform\Metadata\ErrorResource` and the `ConstraintViolation` (`ValidationException` class) are now generated directly from your PHP classes, only our `ConstraintViolationList` is hard-written and documents the `ConstraintViolation::violation` property. Therefore, your [own error resources](https://api-platform.com/docs/guides/error-resource/) are also documented. On top of that, we now set the `rdfs:subClassOf` to `hydra:Error`.
 `#[ApiProperty(hydra: false)]` allows you to skip a documented `hydra:supportedProperty` on a class.
-On write operations, we added the [expectsHeader](https://www.hydra-cg.com/spec/latest/core/#hydra:expectsHeader) field. 
+On write operations, we added the [expectsHeader](https://www.hydra-cg.com/spec/latest/core/#hydra:expectsHeader) field.
 
 ## v4.1.0-beta.2
 
@@ -302,12 +308,12 @@ On write operations, we added the [expectsHeader](https://www.hydra-cg.com/spec/
 
 ### Notes
 
-The [hydra patch](#6748) changes default `hydra:title` and uses the resource `shortname`. Previously the `hydra:title` information was duplicating the `hydra:description`. 
+The [hydra patch](#6748) changes default `hydra:title` and uses the resource `shortname`. Previously the `hydra:title` information was duplicating the `hydra:description`.
 The `rdfs:label` got removed from the `hydra:Class` as it was used instead of the `hydra:title`.
-On `hydra:property` `rdfs:label` got renamed to `label` as the `rdfs` namespace is available in the context. 
+On `hydra:property` `rdfs:label` got renamed to `label` as the `rdfs` namespace is available in the context.
 The `ApiPlatform\Metadata\ErrorResource` and the `ConstraintViolation` (`ValidationException` class) are now generated directly from your PHP classes, only our `ConstraintViolationList` is hard-written and documents the `ConstraintViolation::violation` property. Therefore, your [own error resources](https://api-platform.com/docs/guides/error-resource/) are also documented. On top of that, we now set the `rdfs:subClassOf` to `hydra:Error`.
 `#[ApiProperty(hydra: false)]` allows you to skip a documented `hydra:supportedProperty` on a class.
-On write operations, we added the [expectsHeader](https://www.hydra-cg.com/spec/latest/core/#hydra:expectsHeader) field. 
+On write operations, we added the [expectsHeader](https://www.hydra-cg.com/spec/latest/core/#hydra:expectsHeader) field.
 
 
 ## v4.1.0-alpha.1
@@ -927,7 +933,7 @@ You should now install `api-platform/symfony` instead of `api-platform/core`.
 
 ### Bug fixes
 
-* [dc4fc84ba](https://github.com/api-platform/core/commit/dc4fc84ba93e22b4f44a37e90a93c6d079c1c620) fix(graphql): securityAfterResolver not called 
+* [dc4fc84ba](https://github.com/api-platform/core/commit/dc4fc84ba93e22b4f44a37e90a93c6d079c1c620) fix(graphql): securityAfterResolver not called
 * [9eb5c4e94](https://github.com/api-platform/core/commit/9eb5c4e941d0ebf59bc8ef5777b144db9b4a0899) fix(symfony): suggest `DocumentationAction` as replacement for deprecated `SwaggerUiAction` (#6894)
 
 ## v3.3.14
