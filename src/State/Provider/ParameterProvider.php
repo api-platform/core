@@ -77,7 +77,7 @@ final class ParameterProvider implements ProviderInterface
                 unset($parameter->getExtraProperties()['_api_values']);
             }
 
-            if (($default = $parameter->getSchema()['default'] ?? false) && ($value instanceof ParameterNotFound || !$value)) {
+            if (null !== ($default = $parameter->getSchema()['default'] ?? true) && $value instanceof ParameterNotFound) {
                 $value = $default;
             }
 
