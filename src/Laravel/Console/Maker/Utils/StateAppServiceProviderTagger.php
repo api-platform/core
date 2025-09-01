@@ -16,7 +16,7 @@ namespace ApiPlatform\Laravel\Console\Maker\Utils;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 
-final readonly class AppServiceProviderTagger
+final readonly class StateAppServiceProviderTagger
 {
     /** @var string */
     private const APP_SERVICE_PROVIDER_PATH = 'Providers/AppServiceProvider.php';
