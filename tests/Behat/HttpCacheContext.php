@@ -50,7 +50,14 @@ final class HttpCacheContext implements Context
     {
         $purger = $this->driverContainer->get('test.api_platform.http_cache.purger');
 
-        $purgedIris = implode(',', $purger->getIris());
+        $iris = explode(',', $iris);
+        sort($iris);
+        $iris = implode(',', $iris);
+
+        $purgedIris = $purger->getIris();
+        sort($purgedIris);
+        $purgedIris = implode(',', $purgedIris);
+
         $purger->clear();
 
         if ($iris !== $purgedIris) {

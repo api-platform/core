@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Symfony\Doctrine\EventListener\PurgeHttpCacheListener;
 use ApiPlatform\Symfony\Tests\Fixtures\MappedEntity;
+use ApiPlatform\Symfony\Tests\Fixtures\MappedResource;
 use ApiPlatform\Symfony\Tests\Fixtures\NotAResource;
 use ApiPlatform\Symfony\Tests\Fixtures\TestBundle\Entity\ContainNonResource;
 use ApiPlatform\Symfony\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -35,6 +36,7 @@ use Doctrine\ORM\UnitOfWork;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
@@ -215,7 +217,8 @@ class PurgeHttpCacheListenerTest extends TestCase
         $propertyAccessorProphecy->getValue(Argument::type(ContainNonResource::class), 'notAResource')->shouldBeCalled()->willReturn($nonResource1);
         $propertyAccessorProphecy->getValue(Argument::type(ContainNonResource::class), 'collectionOfNotAResource')->shouldBeCalled()->willReturn($collectionOfNotAResource);
 
-        $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal());
+        $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal());
         $listener->onFlush($eventArgs);
         $listener->postFlush();
     }
@@ -229,7 +232,7 @@ class PurgeHttpCacheListenerTest extends TestCase
         $collection = [$dummy1, $dummy2];
 
         $purgerProphecy = $this->prophesize(PurgerInterface::class);
-        $purgerProphecy->purge(['/dummies', '/dummies/1', '/dummies/2'])->shouldBeCalled();
+        $purgerProphecy->purge(['/dummies/1', '/dummies/2', '/dummies'])->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResource(Argument::type(Dummy::class), UrlGeneratorInterface::ABS_PATH, new GetCollection())->willReturn('/dummies')->shouldBeCalled();
@@ -270,15 +273,30 @@ class PurgeHttpCacheListenerTest extends TestCase
     public function testMappedResources(): void
     {
         $mappedEntity = new MappedEntity();
+        $mappedEntity->setFirstName('first');
+        $mappedEntity->setlastName('last');
+
+        $mappedResource = new MappedResource();
+        $mappedResource->username = $mappedEntity->getFirstName().' '.$mappedEntity->getLastName();
 
         $purgerProphecy = $this->prophesize(PurgerInterface::class);
         $purgerProphecy->purge(['/mapped_ressources'])->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResource(Argument::type(MappedEntity::class), UrlGeneratorInterface::ABS_PATH, new GetCollection())->willReturn('/mapped_ressources')->shouldBeCalled();
+        // the entity is not a resource, shouldn't be called
+        $iriConverterProphecy->getIriFromResource(
+            Argument::type(MappedEntity::class), UrlGeneratorInterface::ABS_PATH, new GetCollection()
+        )->shouldNotBeCalled();
+        // this should be called instead
+        $iriConverterProphecy->getIriFromResource(
+            Argument::type(MappedResource::class), UrlGeneratorInterface::ABS_PATH, new GetCollection()
+        )->willReturn('/mapped_ressources')->shouldBeCalled();
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(MappedEntity::class)->willReturn(true)->shouldBeCalled();
+        $resourceClassResolverProphecy->isResourceClass(MappedEntity::class)->willReturn(false)->shouldBeCalled();
+
+        $objectMapperProphecy = $this->prophesize(ObjectMapperInterface::class);
+        $objectMapperProphecy->map($mappedEntity, MappedResource::class)->shouldBeCalled()->willReturn($mappedResource);
 
         $uowProphecy = $this->prophesize(UnitOfWork::class);
         $uowProphecy->getScheduledEntityInsertions()->willReturn([$mappedEntity])->shouldBeCalled();
@@ -294,7 +312,10 @@ class PurgeHttpCacheListenerTest extends TestCase
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
 
-        $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal());
+        $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(),
+            $objectMapperProphecy->reveal()
+        );
         $listener->onFlush($eventArgs);
         $listener->postFlush();
     }

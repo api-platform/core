@@ -42,6 +42,8 @@ final class PurgeHttpCacheListener
     private readonly PropertyAccessorInterface $propertyAccessor;
     private array $tags = [];
 
+    private array $scheduledInsertions = [];
+
     public function __construct(private readonly PurgerInterface $purger,
         private readonly IriConverterInterface $iriConverter,
         private readonly ResourceClassResolverInterface $resourceClassResolver,
@@ -75,7 +77,7 @@ final class PurgeHttpCacheListener
     }
 
     /**
-     * Collects tags from inserted and deleted entities, including relations.
+     * Collects tags from updated and deleted entities, including relations.
      */
     public function onFlush(OnFlushEventArgs $eventArgs): void
     {
@@ -83,15 +85,8 @@ final class PurgeHttpCacheListener
         $em = method_exists($eventArgs, 'getObjectManager') ? $eventArgs->getObjectManager() : $eventArgs->getEntityManager();
         $uow = $em->getUnitOfWork();
 
-        foreach ($uow->getScheduledEntityInsertions() as $entity) {
-            // For new entities, only purge the collection IRI
-            try {
-                if ($this->resourceClassResolver->isResourceClass($this->getObjectClass($entity))) {
-                    $iri = $this->iriConverter->getIriFromResource($entity, UrlGeneratorInterface::ABS_PATH, new GetCollection());
-                    $this->tags[$iri] = $iri;
-                }
-            } catch (OperationNotFoundException|InvalidArgumentException) {
-            }
+        foreach ($this->scheduledInsertions = $uow->getScheduledEntityInsertions() as $entity) {
+            // inserts shouldn't add new related entities, we should be able to gather related tags already
             $this->gatherRelationTags($em, $entity);
         }
 
@@ -111,6 +106,11 @@ final class PurgeHttpCacheListener
      */
     public function postFlush(): void
     {
+        // since IRIs can't always be generated for new entities (missing auto-generated IDs), we need to gather the related IRIs after flush()
+        foreach ($this->scheduledInsertions as $entity) {
+            $this->gatherResourceAndItemTags($entity, false);
+        }
+
         if (empty($this->tags)) {
             return;
         }
