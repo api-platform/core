@@ -232,7 +232,7 @@ class PurgeHttpCacheListenerTest extends TestCase
         $collection = [$dummy1, $dummy2];
 
         $purgerProphecy = $this->prophesize(PurgerInterface::class);
-        $purgerProphecy->purge(['/dummies', '/dummies/1', '/dummies/2'])->shouldBeCalled();
+        $purgerProphecy->purge(['/dummies/1', '/dummies/2', '/dummies'])->shouldBeCalled();
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResource(Argument::type(Dummy::class), UrlGeneratorInterface::ABS_PATH, new GetCollection())->willReturn('/dummies')->shouldBeCalled();

@@ -132,8 +132,7 @@ final class PurgeHttpCacheListener
                 if ($purgeItem) {
                     $this->addTagForItem($entity);
                 }
-            } catch (OperationNotFoundException|InvalidArgumentException $e) {
-                dd($e);
+            } catch (OperationNotFoundException|InvalidArgumentException) {
             }
         }
     }
