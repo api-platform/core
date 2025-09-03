@@ -31,7 +31,11 @@ interface ContextAwareTypeBuilderInterface
     /**
      * Gets the object type of the given resource.
      *
-     * @param array<string, mixed>&array{input?: bool, wrapped?: bool, depth?: int} $context
+     * @param array<string, mixed> $context
+     *
+     * @phpstan-param array<string, mixed> $context
+     *
+     * @psalm-param array{input?: bool, wrapped?: bool, depth?: int, ...<string, mixed>} $context
      *
      * @return GraphQLType the object type, possibly wrapped by NonNull
      */

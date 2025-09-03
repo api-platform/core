@@ -29,8 +29,12 @@ interface ProviderInterface
     /**
      * Provides data.
      *
-     * @param array<string, mixed>                                                   $uriVariables
-     * @param array<string, mixed>|array{request?: Request, resource_class?: string} $context
+     * @param array<string, mixed> $uriVariables
+     * @param array<string, mixed> $context
+     *
+     * @phpstan-param array<string, mixed> $context
+     *
+     * @psalm-param array{request?: Request, resource_class?: string, ...<string, mixed>} $context
      *
      * @return T|PartialPaginatorInterface<T>|iterable<T>|null
      */

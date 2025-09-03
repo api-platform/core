@@ -256,7 +256,11 @@ final class ModelMetadata
     /**
      * Gets the default value for the given column.
      *
-     * @param array<string, mixed>&array{name: string, default: string} $column
+     * @param array<string, mixed> $column
+     *
+     * @phpstan-param array<string, mixed> $column
+     *
+     * @psalm-param array{name: string, default: string, ...<string, mixed>} $column
      */
     private function getColumnDefault(array $column, Model $model): mixed
     {

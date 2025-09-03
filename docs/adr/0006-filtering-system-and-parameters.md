@@ -193,8 +193,8 @@ During the `Provider` phase (`RequestEvent::REQUEST`), we could use a `Parameter
 interface ParameterProviderInterface
 {
     /**
-     * @param array<string, mixed>                                                                             $parameters
-     * @param array<string, mixed>|array{request?: Request, resource_class?: string, operation: HttpOperation} $context
+     * @param array<string, mixed> $parameters
+     * @param array<string, mixed> $context
      */
     public function provide(Parameter $parameter, array $parameters = [], array $context = []): ?HttpOperation;
 }

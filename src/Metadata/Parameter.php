@@ -21,15 +21,19 @@ use Symfony\Component\TypeInfo\Type;
 abstract class Parameter
 {
     /**
-     * @param (array<string, mixed>&array{type?: string, default?: mixed})|null $schema
-     * @param array<string, mixed>                                              $extraProperties
-     * @param ParameterProviderInterface|callable|string|null                   $provider
-     * @param list<string>                                                      $properties       a list of properties this parameter applies to (works with the :property placeholder)
-     * @param FilterInterface|string|null                                       $filter
-     * @param mixed                                                             $constraints      an array of Symfony constraints, or an array of Laravel rules
-     * @param Type                                                              $nativeType       the PHP native type, we cast values to an array if its a CollectionType, if not and it's an array with a single value we use it (eg: HTTP Header)
-     * @param ?bool                                                             $castToNativeType whether API Platform should cast your parameter to the nativeType declared
-     * @param ?callable(mixed): mixed                                           $castFn           the closure used to cast your parameter, this gets called only when $castToNativeType is set
+     * @param array<string, mixed>|null                       $schema
+     * @param array<string, mixed>                            $extraProperties
+     * @param ParameterProviderInterface|callable|string|null $provider
+     * @param list<string>                                    $properties       a list of properties this parameter applies to (works with the :property placeholder)
+     * @param FilterInterface|string|null                     $filter
+     * @param mixed                                           $constraints      an array of Symfony constraints, or an array of Laravel rules
+     * @param Type                                            $nativeType       the PHP native type, we cast values to an array if its a CollectionType, if not and it's an array with a single value we use it (eg: HTTP Header)
+     * @param ?bool                                           $castToNativeType whether API Platform should cast your parameter to the nativeType declared
+     * @param ?callable(mixed): mixed                         $castFn           the closure used to cast your parameter, this gets called only when $castToNativeType is set
+     *
+     * @phpstan-param array<string, mixed>|null $schema
+     *
+     * @psalm-param array{type?: string, default?: mixed, ...<string, mixed>}|null $schema
      */
     public function __construct(
         protected ?string $key = null,
@@ -61,7 +65,11 @@ abstract class Parameter
     }
 
     /**
-     * @return (array<string, mixed>&array{type?: string, default?: mixed})|null $schema
+     * @return array<string, mixed>|null
+     *
+     * @phpstan-return array<string, mixed>|null
+     *
+     * @psalm-return array{type?: string, default?: string, ...<string, mixed>}|null
      */
     public function getSchema(): ?array
     {
