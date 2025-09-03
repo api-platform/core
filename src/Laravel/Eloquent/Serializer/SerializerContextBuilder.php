@@ -39,7 +39,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
     public function createFromRequest(Request $request, bool $normalization, ?array $extractedAttributes = null): array
     {
         $context = $this->decorated->createFromRequest($request, $normalization, $extractedAttributes);
-        if (!isset($context['resource_class']) || !is_a($context['resource_class'], Model::class, true)) {
+        if (!isset($context['resource_class']) || !is_string($context['resource_class']) || !is_a($context['resource_class'], Model::class, true)) {
             return $context;
         }
 
