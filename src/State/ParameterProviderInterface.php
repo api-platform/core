@@ -15,6 +15,7 @@ namespace ApiPlatform\State;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Optionnaly transforms request parameters and provides modification to the current Operation.
@@ -22,8 +23,12 @@ use ApiPlatform\Metadata\Parameter;
 interface ParameterProviderInterface
 {
     /**
-     * @param array<string, mixed>                                                                         $parameters
-     * @param array<string, mixed>|array{request?: Request, resource_class?: string, operation: Operation} $context
+     * @param array<string, mixed> $parameters
+     * @param array<string, mixed> $context
+     *
+     * @phpstan-param array<string, mixed> $context
+     *
+     * @psalm-param array{request?: Request, resource_class?: string, operation: Operation, ...<string, mixed>} $context
      */
     public function provide(Parameter $parameter, array $parameters = [], array $context = []): ?Operation;
 }

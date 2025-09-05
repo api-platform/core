@@ -72,7 +72,11 @@ final class Router implements RouterInterface, UrlGeneratorInterface
     /**
      * {@inheritdoc}
      *
-     * @return array<string, mixed>|array{_api_resource_class?: class-string|string, _api_operation_name?: string, uri_variables?: array<string, mixed>}
+     * @return array<string, mixed>
+     *
+     * @phpstan-return array<string, mixed>
+     *
+     * @psalm-return array{_api_resource_class?: class-string|string, _api_operation_name?: string, uri_variables?: array<string, mixed>, ...<string, mixed>}
      */
     public function match(string $pathInfo): array
     {

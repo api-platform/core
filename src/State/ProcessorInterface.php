@@ -29,9 +29,13 @@ interface ProcessorInterface
     /**
      * Handles the state.
      *
-     * @param T1                                                                                                                        $data
-     * @param array<string, mixed>                                                                                                      $uriVariables
-     * @param array<string, mixed>&array{request?: Request, previous_data?: mixed, resource_class?: string|null, original_data?: mixed} $context
+     * @param T1                   $data
+     * @param array<string, mixed> $uriVariables
+     * @param array<string, mixed> $context
+     *
+     * @phpstan-param array<string, mixed> $context
+     *
+     * @psalm-param array{request?: Request, previous_data?: mixed, resource_class?: string|null, original_data?: mixed, ...<string, mixed>} $context
      *
      * @return T2
      */

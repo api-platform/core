@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\Exception\RuntimeException;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Converts item and resources to IRI and vice versa.
@@ -28,7 +29,11 @@ interface IriConverterInterface
     /**
      * Retrieves an item from its IRI.
      *
-     * @param array<string, mixed>|array{request?: Request, resource_class?: string|class-string} $context
+     * @param array<string, mixed> $context
+     *
+     * @phpstan-param array<string, mixed> $context
+     *
+     * @psalm-param array{request?: Request, resource_class?: string|class-string, ...<string, mixed>} $context
      *
      * @throws InvalidArgumentException
      * @throws ItemNotFoundException
@@ -38,8 +43,12 @@ interface IriConverterInterface
     /**
      * Gets the IRI associated with the given item.
      *
-     * @param object|class-string                                                                                                                       $resource
-     * @param array<string, mixed>|array{force_resource_class?: string|class-string, item_uri_template?: string, uri_variables?: array<string, string>} $context
+     * @param object|class-string  $resource
+     * @param array<string, mixed> $context
+     *
+     * @phpstan-param array<string, mixed> $context
+     *
+     * @psalm-param array{force_resource_class?: string|class-string, item_uri_template?: string, uri_variables?: array<string, string>, ...<string, mixed>} $context
      *
      * @throws OperationNotFoundException
      * @throws InvalidArgumentException

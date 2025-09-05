@@ -32,7 +32,11 @@ interface SerializerContextBuilderInterface
      *
      * @throws RuntimeException
      *
-     * @return array<string, mixed>&array{
+     * @return array<string, mixed>
+     *
+     * @phpstan-return array<string, mixed>
+     *
+     * @psalm-return array{
      *   groups?: string[]|string,
      *   operation_name?: string,
      *   operation?: HttpOperation,
@@ -55,6 +59,7 @@ interface SerializerContextBuilderInterface
      *   attributes?: string[],
      *   deserializer_type?: string,
      *   api_assign_object_to_populate?: bool,
+     *   ...<string, mixed>
      * }
      */
     public function createFromRequest(Request $request, bool $normalization, ?array $extractedAttributes = null): array;
