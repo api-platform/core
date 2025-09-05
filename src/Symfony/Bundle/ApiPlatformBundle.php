@@ -53,7 +53,7 @@ final class ApiPlatformBundle extends Bundle
         $container->addCompilerPass(new ElasticsearchClientPass());
         $container->addCompilerPass(new GraphQlTypePass());
         $container->addCompilerPass(new GraphQlResolverPass());
-        $container->addCompilerPass(new MetadataAwareNameConverterPass());
+        $container->addCompilerPass(new MetadataAwareNameConverterPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 100);
         $container->addCompilerPass(new TestClientPass());
         $container->addCompilerPass(new TestMercureHubPass());
         $container->addCompilerPass(new AuthenticatorManagerPass());
