@@ -1,5 +1,12 @@
 # Changelog
 
+## v4.1.23
+
+### Bug fixes
+
+* [254cbdd00](https://github.com/api-platform/core/commit/254cbdd0062ade7f3b2d7745e90cc309f8b9b627) fix(symfony): only set name_converter for the default serializer (#6101) (#7365)
+* [dcbc529a0](https://github.com/api-platform/core/commit/dcbc529a0e2d65218b227f0ece46972402726cfd) fix: pagination via cursor on ApiResource operations (#7368)
+
 ## v4.1.22
 
 ### Bug fixes
