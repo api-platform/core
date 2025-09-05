@@ -183,6 +183,13 @@ TypeInfo:
 * [cff61eab8](https://github.com/api-platform/core/commit/cff61eab8643f8ed08d59c0684e77740d0d81b04) fix(metadata): append php file resource extractor (#7193)
 * [f3d4afe03](https://github.com/api-platform/core/commit/f3d4afe032385f3b665131a365e42706930f0730) fix(symfony): validator type-info
 
+## v4.1.23
+
+### Bug fixes
+
+* [254cbdd00](https://github.com/api-platform/core/commit/254cbdd0062ade7f3b2d7745e90cc309f8b9b627) fix(symfony): only set name_converter for the default serializer (#6101) (#7365)
+* [dcbc529a0](https://github.com/api-platform/core/commit/dcbc529a0e2d65218b227f0ece46972402726cfd) fix: pagination via cursor on ApiResource operations (#7368)
+
 ## v4.1.22
 
 ### Bug fixes
