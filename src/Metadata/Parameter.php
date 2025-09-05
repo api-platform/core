@@ -61,7 +61,7 @@ abstract class Parameter
     }
 
     /**
-     * @return (array<string, mixed>&array{type?: string, default?: string})|null $schema
+     * @return (array<string, mixed>&array{type?: string, default?: mixed})|null $schema
      */
     public function getSchema(): ?array
     {
