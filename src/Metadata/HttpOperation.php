@@ -239,6 +239,7 @@ class HttpOperation extends Operation
             paginationClientPartial: $paginationClientPartial,
             paginationFetchJoinCollection: $paginationFetchJoinCollection,
             paginationUseOutputWalkers: $paginationUseOutputWalkers,
+            paginationViaCursor: $paginationViaCursor,
             order: $order,
             description: $description,
             normalizationContext: $normalizationContext,

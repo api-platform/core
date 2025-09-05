@@ -60,4 +60,11 @@ final class OperationTest extends TestCase
         yield [new Mutation(...$args)];
         yield [new Subscription(...$args)];
     }
+
+    public function testPaginationViaCursor(): void
+    {
+        $a = [];
+        $operation = (new GetCollection())->withPaginationViaCursor($a);
+        $this->assertEquals($a, $operation->getPaginationViaCursor());
+    }
 }

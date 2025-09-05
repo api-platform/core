@@ -51,7 +51,7 @@ class ApiPlatformBundleTest extends TestCase
         $containerProphecy->addCompilerPass(Argument::type(ElasticsearchClientPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(GraphQlTypePass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(GraphQlResolverPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
-        $containerProphecy->addCompilerPass(Argument::type(MetadataAwareNameConverterPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
+        $containerProphecy->addCompilerPass(Argument::type(MetadataAwareNameConverterPass::class), PassConfig::TYPE_BEFORE_OPTIMIZATION, 100)->willReturn($containerProphecy->reveal())->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(TestClientPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(TestMercureHubPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(AuthenticatorManagerPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
