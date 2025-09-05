@@ -14,6 +14,11 @@
             <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
             <tag name="maker.command" />
         </service>
+
+        <service id="api_platform.maker.command.filter" class="ApiPlatform\Symfony\Maker\MakeFilter">
+            <argument type="service" id="api_platform.metadata.resource.name_collection_factory" />
+            <tag name="maker.command" />
+        </service>
     </services>
 
 </container>
