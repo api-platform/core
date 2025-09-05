@@ -79,7 +79,7 @@ final class ParameterProvider implements ProviderInterface, StopwatchAwareInterf
                 unset($parameter->getExtraProperties()['_api_values']);
             }
 
-            if (($default = $parameter->getSchema()['default'] ?? false) && ($value instanceof ParameterNotFound || !$value)) {
+            if (null !== ($default = $parameter->getSchema()['default'] ?? null) && $value instanceof ParameterNotFound) {
                 $value = $default;
             }
 
