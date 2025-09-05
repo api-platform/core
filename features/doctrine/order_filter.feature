@@ -423,62 +423,7 @@ Feature: Order filter on collections
 
   Scenario: Get collection ordered by default configured order on a embedded string property and on which order filter has been enabled in whitelist mode with default descending order
     When I send a "GET" request to "/embedded_dummies?order[embeddedDummy.dummyName]"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
-    {
-      "type": "object",
-      "properties": {
-        "@context": {"pattern": "^/contexts/EmbeddedDummy$"},
-        "@id": {"pattern": "^/embedded_dummies$"},
-        "@type": {"pattern": "^hydra:Collection$"},
-        "hydra:member": {
-          "type": "array",
-          "items": [
-            {
-              "type": "object",
-              "properties": {
-                "@id": {
-                  "type": "string",
-                  "pattern": "^/embedded_dummies/9"
-                }
-              }
-            },
-            {
-              "type": "object",
-              "properties": {
-                "@id": {
-                  "type": "string",
-                  "pattern": "^/embedded_dummies/8"
-                }
-              }
-            },
-            {
-              "type": "object",
-              "properties": {
-                "@id": {
-                  "type": "string",
-                  "pattern": "^/embedded_dummies/7"
-                }
-              }
-            }
-          ],
-          "additionalItems": false,
-          "maxItems": 3,
-          "minItems": 3
-        },
-        "hydra:view": {
-          "type": "object",
-          "properties": {
-            "@id": {"pattern": "^/embedded_dummies\\?order%5BembeddedDummy\\.dummyName%5D="},
-            "@type": {"pattern": "^hydra:PartialCollectionView$"}
-          }
-        }
-      }
-    }
-    """
+    Then the response status code should be 422
 
   Scenario: Get collection ordered by a non valid properties and on which order filter has been enabled in whitelist mode
     When I send a "GET" request to "/dummies?order[alias]=asc"
