@@ -15,10 +15,8 @@ namespace ApiPlatform\Laravel\Console\Maker\Utils;
 
 trait SuccessMessageTrait
 {
-    private function writeSuccessMessage(string $filePath, StateTypeEnum $stateTypeEnum): void
+    private function writeSuccessMessage(string $filePath, string $customText): void
     {
-        $stateText = strtolower($stateTypeEnum->name);
-
         $this->newLine();
         $this->line(' <bg=green;fg=white>          </>');
         $this->line(' <bg=green;fg=white> Success! </>');
@@ -26,6 +24,6 @@ trait SuccessMessageTrait
         $this->newLine();
         $this->line('<fg=blue>created</>: <fg=white;options=underscore>'.$filePath.'</>');
         $this->newLine();
-        $this->line("Next: Open your new state $stateText class and start customizing it.");
+        $this->line("Next: Open your new $customText class and start customizing it.");
     }
 }
