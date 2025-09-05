@@ -23,9 +23,6 @@ use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use ApiPlatform\Validator\Util\ParameterValidationConstraints;
 use Psr\Container\ContainerInterface;
 
-/**
- * @experimental
- */
 final class ParameterValidationResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
     use ParameterValidationConstraints;

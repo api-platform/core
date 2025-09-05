@@ -51,7 +51,7 @@ final class ApiProperty
      * @param string[]|null                                                                                                                               $types                   the RDF types of this property
      * @param string[]|null                                                                                                                               $iris
      * @param LegacyType[]|null                                                                                                                           $builtinTypes
-     * @param string|null                                                                                                                                 $uriTemplate             (experimental) whether to return the subRessource collection IRI instead of an iterable of IRI
+     * @param string|null                                                                                                                                 $uriTemplate             whether to return the subRessource collection IRI instead of an iterable of IRI
      * @param string|null                                                                                                                                 $property                The property name
      * @param Context|Groups|Ignore|SerializedName|SerializedPath|MaxDepth|array<array-key, Context|Groups|Ignore|SerializedName|SerializedPath|MaxDepth> $serialize               Serializer attributes
      * @param Type|null                                                                                                                                   $nativeType              The internal PHP type
@@ -650,8 +650,6 @@ final class ApiProperty
 
     /**
      * Whether to return the subRessource collection IRI instead of an iterable of IRI.
-     *
-     * @experimental
      */
     public function getUriTemplate(): ?string
     {

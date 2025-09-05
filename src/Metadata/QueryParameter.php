@@ -13,9 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
-/**
- * @experimental
- */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class QueryParameter extends Parameter implements QueryParameterInterface
 {

@@ -17,9 +17,6 @@ use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\QueryBuilder;
 
-/**
- * @experimental
- */
 interface LinksHandlerInterface
 {
     /**

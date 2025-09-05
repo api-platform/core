@@ -38,8 +38,6 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
  * Prepares Parameters documentation by reading its filter details and declaring an OpenApi parameter.
- *
- * @experimental
  */
 final class ParameterResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
