@@ -63,10 +63,8 @@ final class OperationTest extends TestCase
 
     public function testPaginationViaCursor(): void
     {
-        $operation = (new GetCollection())->withPaginationViaCursor(true);
-        $this->assertTrue($operation->canPaginateViaCursor());
-
-        $operation = (new GetCollection())->withPaginationViaCursor(false);
-        $this->assertFalse($operation->canPaginateViaCursor());
+        $a = [];
+        $operation = (new GetCollection())->withPaginationViaCursor($a);
+        $this->assertEquals($a, $operation->getPaginationViaCursor());
     }
 }
