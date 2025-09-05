@@ -22,14 +22,14 @@ use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class MakeStateProviderCommandTest extends TestCase
+class MakeFilterCommandTest extends TestCase
 {
     use WithWorkbench;
 
     /** @var string */
-    private const MAKE_STATE_PROVIDER_COMMAND = 'make:state-provider';
+    private const MAKE_FILTER_COMMAND = 'make:filter';
     /** @var string */
-    private const STATE_PROVIDER_CLASS_NAME = 'Choose a class name for your state provider (e.g. <fg=yellow>AwesomeStateProvider</>)';
+    private const FILTER_CLASS_NAME = 'Choose a class name for your filter (e.g. <fg=yellow>AwesomeFilter</>)';
 
     private Filesystem $filesystem;
     private PathResolver $pathResolver;
@@ -52,39 +52,39 @@ class MakeStateProviderCommandTest extends TestCase
     /**
      * @throws FileNotFoundException
      */
-    public function testMakeStateProviderCommand(): void
+    public function testMakeStateFilterCommand(): void
     {
-        $providerName = 'MyStateProvider';
-        $filePath = $this->pathResolver->generateStateFilename($providerName);
-        $appServiceProviderPath = $this->pathResolver->getServiceProviderFilePath();
+        $filterName = 'MyFilter';
+        $filePath = $this->pathResolver->generateFilterFilename($filterName);
+        $appServiceFilterPath = $this->pathResolver->getServiceProviderFilePath();
 
-        $this->artisan(self::MAKE_STATE_PROVIDER_COMMAND)
-            ->expectsQuestion(self::STATE_PROVIDER_CLASS_NAME, $providerName)
+        $this->artisan(self::MAKE_FILTER_COMMAND)
+            ->expectsQuestion(self::FILTER_CLASS_NAME, $filterName)
             ->expectsOutputToContain('Success!')
             ->expectsOutputToContain("created: $filePath")
-            ->expectsOutputToContain('Next: Open your new State Provider class and start customizing it.')
+            ->expectsOutputToContain('Next: Open your new Eloquent Filter class and start customizing it.')
             ->assertExitCode(Command::SUCCESS);
 
         $this->assertFileExists($filePath);
 
-        $appServiceProviderContent = $this->filesystem->get($appServiceProviderPath);
-        $this->assertStringContainsString('use ApiPlatform\State\ProviderInterface;', $appServiceProviderContent);
-        $this->assertStringContainsString("use App\State\\$providerName;", $appServiceProviderContent);
-        $this->assertStringContainsString('$this->app->tag(MyStateProvider::class, ProviderInterface::class);', $appServiceProviderContent);
+        $appServiceFilterContent = $this->filesystem->get($appServiceFilterPath);
+        $this->assertStringContainsString('use App\\Filter\\MyFilter;', $appServiceFilterContent);
+        $this->assertStringContainsString('use ApiPlatform\Laravel\Eloquent\Filter\FilterInterface;', $appServiceFilterContent);
+        $this->assertStringContainsString('$this->app->tag(MyFilter::class, FilterInterface::class);', $appServiceFilterContent);
 
         $this->filesystem->delete($filePath);
     }
 
-    public function testWhenStateProviderClassAlreadyExists(): void
+    public function testWhenStateFilterClassAlreadyExists(): void
     {
-        $providerName = 'ExistingProvider';
-        $existingFile = $this->pathResolver->generateStateFilename($providerName);
-        $this->filesystem->put($existingFile, '<?php // Existing provider');
+        $filterName = 'ExistingFilter';
+        $existingFile = $this->pathResolver->generateFilterFilename($filterName);
+        $this->filesystem->put($existingFile, '<?php // Existing filter');
 
         $expectedError = \sprintf('[ERROR] The file "%s" can\'t be generated because it already exists.', $existingFile);
 
-        $this->artisan(self::MAKE_STATE_PROVIDER_COMMAND)
-            ->expectsQuestion(self::STATE_PROVIDER_CLASS_NAME, $providerName)
+        $this->artisan(self::MAKE_FILTER_COMMAND)
+            ->expectsQuestion(self::FILTER_CLASS_NAME, $filterName)
             ->expectsOutput($expectedError)
             ->assertExitCode(Command::FAILURE);
 
@@ -94,8 +94,8 @@ class MakeStateProviderCommandTest extends TestCase
     #[DataProvider('nullProvider')]
     public function testMakeStateFilterCommandWithoutGivenClassName(?string $value): void
     {
-        $this->artisan(self::MAKE_STATE_PROVIDER_COMMAND)
-            ->expectsQuestion(self::STATE_PROVIDER_CLASS_NAME, $value)
+        $this->artisan(self::MAKE_FILTER_COMMAND)
+            ->expectsQuestion(self::FILTER_CLASS_NAME, $value)
             ->assertExitCode(Command::FAILURE);
     }
 

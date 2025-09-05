@@ -13,22 +13,24 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Console\Maker;
 
-use ApiPlatform\Laravel\Console\Maker\Utils\StateAppServiceProviderTagger;
-use ApiPlatform\Laravel\Console\Maker\Utils\StateTemplateGenerator;
-use ApiPlatform\Laravel\Console\Maker\Utils\StateTypeEnum;
+use ApiPlatform\Laravel\Console\Maker\Utils\FilterAppServiceProviderTagger;
+use ApiPlatform\Laravel\Console\Maker\Utils\FilterTemplateGenerator;
 use ApiPlatform\Laravel\Console\Maker\Utils\SuccessMessageTrait;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 
-abstract class AbstractMakeStateCommand extends Command
+final class MakeFilterCommand extends Command
 {
     use SuccessMessageTrait;
 
+    protected $signature = 'make:filter';
+    protected $description = 'Creates an API Platform filter';
+
     public function __construct(
         private readonly Filesystem $filesystem,
-        private readonly StateTemplateGenerator $stateTemplateGenerator,
-        private readonly StateAppServiceProviderTagger $stateAppServiceProviderTagger,
+        private readonly FilterTemplateGenerator $filterTemplateGenerator,
+        private readonly FilterAppServiceProviderTagger $filterAppServiceProviderTagger,
     ) {
         parent::__construct();
     }
@@ -38,37 +40,34 @@ abstract class AbstractMakeStateCommand extends Command
      */
     public function handle(): int
     {
-        $stateType = $this->getStateType()->name;
-        $stateName = $this->ask(\sprintf('Choose a class name for your state %s (e.g. <fg=yellow>AwesomeState%s</>)', strtolower($stateType), ucfirst($stateType)));
-        if (null === $stateName || '' === $stateName) {
+        $nameArgument = $this->ask('Choose a class name for your filter (e.g. <fg=yellow>AwesomeFilter</>)');
+        if (null === $nameArgument || '' === $nameArgument) {
             $this->error('[ERROR] The name argument cannot be blank.');
 
             return self::FAILURE;
         }
 
-        $directoryPath = base_path('app/State/');
+        $directoryPath = base_path('app/Filter/');
         $this->filesystem->ensureDirectoryExists($directoryPath);
 
-        $filePath = $this->stateTemplateGenerator->getFilePath($directoryPath, $stateName);
+        $filePath = $this->filterTemplateGenerator->getFilePath($directoryPath, $nameArgument);
         if ($this->filesystem->exists($filePath)) {
             $this->error(\sprintf('[ERROR] The file "%s" can\'t be generated because it already exists.', $filePath));
 
             return self::FAILURE;
         }
 
-        $this->stateTemplateGenerator->generate($filePath, $stateName, $this->getStateType());
+        $this->filterTemplateGenerator->generate($filePath, $nameArgument);
         if (!$this->filesystem->exists($filePath)) {
             $this->error(\sprintf('[ERROR] The file "%s" could not be created.', $filePath));
 
             return self::FAILURE;
         }
 
-        $this->stateAppServiceProviderTagger->addTagToServiceProvider($stateName, $this->getStateType());
+        $this->filterAppServiceProviderTagger->addTagToServiceProvider($nameArgument);
 
-        $this->writeSuccessMessage($filePath, \sprintf('State %s', ucfirst($this->getStateType()->name)));
+        $this->writeSuccessMessage($filePath, 'Eloquent Filter');
 
         return self::SUCCESS;
     }
-
-    abstract protected function getStateType(): StateTypeEnum;
 }

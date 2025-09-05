@@ -956,6 +956,7 @@ class ApiPlatformProvider extends ServiceProvider
                 Console\InstallCommand::class,
                 Console\Maker\MakeStateProcessorCommand::class,
                 Console\Maker\MakeStateProviderCommand::class,
+                Console\Maker\MakeFilterCommand::class,
                 OpenApiCommand::class,
             ]);
         }
