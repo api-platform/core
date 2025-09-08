@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Configuration;
 use Doctrine\ORM\OptimisticLockException;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Controller\ControllerHelper;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -74,7 +75,7 @@ class ConfigurationTest extends TestCase
         $this->assertEquals([
             'title' => 'title',
             'description' => 'description',
-            'enable_json_streamer' => class_exists(JsonStreamWriter::class),
+            'enable_json_streamer' => class_exists(ControllerHelper::class) && class_exists(JsonStreamWriter::class),
             'version' => '1.0.0',
             'show_webby' => true,
             'formats' => [

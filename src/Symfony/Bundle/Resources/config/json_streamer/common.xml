@@ -19,6 +19,8 @@
         <service id="api_platform.jsonld.json_streamer.write.property_metadata_loader" class="ApiPlatform\JsonLd\JsonStreamer\WritePropertyMetadataLoader">
             <argument type="service" id="json_streamer.write.property_metadata_loader" />
             <argument type="service" id="api_platform.resource_class_resolver" />
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
         </service>
 
         <service id="api_platform.jsonld.json_streamer.write.value_transformer.iri" class="ApiPlatform\JsonLd\JsonStreamer\ValueTransformer\IriValueTransformer">
@@ -27,6 +29,8 @@
         </service>
 
         <service id="api_platform.jsonld.json_streamer.write.value_transformer.type" class="ApiPlatform\JsonLd\JsonStreamer\ValueTransformer\TypeValueTransformer">
+            <argument type="service" id="api_platform.resource_class_resolver" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
             <tag name="json_streamer.value_transformer"/>
         </service>
 

@@ -15,6 +15,8 @@ namespace ApiPlatform\JsonLd\JsonStreamer;
 
 use ApiPlatform\Hydra\Collection;
 use ApiPlatform\Hydra\IriTemplate;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\TypeHelper;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadata;
@@ -26,6 +28,8 @@ final class WritePropertyMetadataLoader implements PropertyMetadataLoaderInterfa
     public function __construct(
         private readonly PropertyMetadataLoaderInterface $loader,
         private readonly ResourceClassResolverInterface $resourceClassResolver,
+        private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
+        private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory,
     ) {
     }
 
@@ -47,23 +51,47 @@ final class WritePropertyMetadataLoader implements PropertyMetadataLoaderInterfa
             return $properties;
         }
 
-        $properties['@id'] = new PropertyMetadata(
-            'id', // virtual property
-            Type::mixed(), // virtual property
-            ['api_platform.jsonld.json_streamer.write.value_transformer.iri'],
-        );
+        $originalClassName = TypeHelper::getClassName($context['original_type']);
+        $hasIri = true;
+        $virtualProperty = 'id';
+
+        foreach ($this->propertyNameCollectionFactory->create($originalClassName) as $property) {
+            $propertyMetadata = $this->propertyMetadataFactory->create($originalClassName, $property);
+            if ($propertyMetadata->isIdentifier()) {
+                $virtualProperty = $property;
+            }
+
+            if ($className === $originalClassName) {
+                continue;
+            }
+
+            if ($propertyMetadata->getNativeType()->isIdentifiedBy($className)) {
+                $hasIri = $propertyMetadata->getGenId();
+                $virtualProperty = iterator_to_array($this->propertyNameCollectionFactory->create($className))[0];
+            }
+        }
+
+        if ($hasIri) {
+            $properties['@id'] = new PropertyMetadata(
+                $virtualProperty, // virtual property
+                Type::mixed(), // virtual property
+                ['api_platform.jsonld.json_streamer.write.value_transformer.iri'],
+            );
+        }
 
         $properties['@type'] = new PropertyMetadata(
-            'id', // virtual property
+            $virtualProperty, // virtual property
             Type::mixed(), // virtual property
             ['api_platform.jsonld.json_streamer.write.value_transformer.type'],
         );
 
-        $originalClassName = TypeHelper::getClassName($context['original_type']);
+        if ($className !== $originalClassName) {
+            return $properties;
+        }
 
         if (Collection::class === $originalClassName || ($this->resourceClassResolver->isResourceClass($originalClassName) && !isset($context['generated_classes'][Collection::class]))) {
             $properties['@context'] = new PropertyMetadata(
-                'id', // virual property
+                $virtualProperty, // virual property
                 Type::string(), // virtual property
                 ['api_platform.jsonld.json_streamer.write.value_transformer.context'],
             );
