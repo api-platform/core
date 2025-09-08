@@ -25,4 +25,6 @@ interface ResourceMutatorCollectionInterface extends ContainerInterface
      * @return list<ResourceMutatorInterface>
      */
     public function get(string $id): array;
+
+    public function add(string $resourceClass, ResourceMutatorInterface $mutator): void;
 }

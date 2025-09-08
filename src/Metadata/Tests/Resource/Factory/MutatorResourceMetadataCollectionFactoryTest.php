@@ -36,7 +36,7 @@ final class MutatorResourceMetadataCollectionFactoryTest extends TestCase
         $resourceMetadataCollection[] = (new ApiResource())->withClass($resourceClass);
 
         $resourceMutatorCollection = new ResourceResourceMutatorCollection();
-        $resourceMutatorCollection->addMutator($resourceClass, new DummyResourceMutator());
+        $resourceMutatorCollection->add($resourceClass, new DummyResourceMutator());
 
         $customResourceMetadataCollectionFactory = new MutatorResourceMetadataCollectionFactory($resourceMutatorCollection, new OperationResourceMutatorCollection(), $decorated);
 

@@ -22,7 +22,7 @@ final class ResourceResourceMutatorCollection implements ResourceMutatorCollecti
 {
     private array $mutators;
 
-    public function addMutator(string $resourceClass, ResourceMutatorInterface $mutator): void
+    public function add(string $resourceClass, ResourceMutatorInterface $mutator): void
     {
         $this->mutators[$resourceClass][] = $mutator;
     }

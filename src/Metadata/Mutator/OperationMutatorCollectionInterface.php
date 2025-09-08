@@ -25,4 +25,6 @@ interface OperationMutatorCollectionInterface extends ContainerInterface
      * @return list<OperationMutatorInterface>
      */
     public function get(string $id): mixed;
+
+    public function add(string $operationName, OperationMutatorInterface $mutator): void;
 }
