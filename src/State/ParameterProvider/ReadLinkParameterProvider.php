@@ -89,6 +89,12 @@ final class ReadLinkParameterProvider implements ParameterProviderInterface
 
         $context['request']?->attributes->set($securityObjectName, $relation);
 
+        if ($parameter instanceof Link) {
+            $uriVariables = $operation->getUriVariables();
+            $uriVariables[$parameter->getKey()] = $parameter;
+            $operation = $operation->withUriVariables($uriVariables);
+        }
+
         return $operation;
     }
 

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional\Parameters;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\LinkParameterProviderResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\WithParameter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Company;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -35,7 +36,7 @@ final class LinkProviderParameterTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [WithParameter::class, Dummy::class, Employee::class, Company::class];
+        return [WithParameter::class, Dummy::class, Employee::class, Company::class, LinkParameterProviderResource::class];
     }
 
     /**
@@ -161,5 +162,24 @@ final class LinkProviderParameterTest extends ApiTestCase
 
         $response = self::createClient()->request('GET', '/companies-by-name/NotTest/employees');
         self::assertEquals(422, $response->getStatusCode());
+    }
+
+    public function testUriVariableHasDummy(): void
+    {
+        if ('mongodb' === $container->getParameter('kernel.environment')) {
+            $this->markTestSkipped();
+        }
+
+        $manager = $this->getManager();
+        $dummy = new Dummy();
+        $dummy->setName('hi');
+        $manager->persist($dummy);
+        $manager->flush();
+
+        self::createClient()->request('GET', '/link_parameter_provider_resources/'.$dummy->getId());
+
+        $this->assertJsonContains([
+            'dummy' => '/dummies/1',
+        ]);
     }
 }
