@@ -14,10 +14,14 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\AggregateRating;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Product;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\JsonStreamResource;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
+use Symfony\Bundle\FrameworkBundle\Controller\ControllerHelper;
+use Symfony\Component\JsonStreamer\JsonStreamWriter;
 
 class JsonStreamerTest extends ApiTestCase
 {
@@ -30,7 +34,7 @@ class JsonStreamerTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [JsonStreamResource::class];
+        return [JsonStreamResource::class, Product::class, AggregateRating::class];
     }
 
     protected function setUp(): void
@@ -98,6 +102,10 @@ class JsonStreamerTest extends ApiTestCase
     public function testJsonStreamerJsonLd(): void
     {
         $container = static::getContainer();
+        if (false === (class_exists(ControllerHelper::class) && class_exists(JsonStreamWriter::class))) {
+            $this->markTestSkipped('JsonStreamer component not installed.');
+        }
+
         if ('mongodb' === $container->getParameter('kernel.environment')) {
             $this->markTestSkipped();
         }
@@ -123,6 +131,9 @@ class JsonStreamerTest extends ApiTestCase
 
     public function testJsonStreamerCollectionJsonLd(): void
     {
+        if (false === (class_exists(ControllerHelper::class) && class_exists(JsonStreamWriter::class))) {
+            $this->markTestSkipped('JsonStreamer component not installed.');
+        }
         $container = static::getContainer();
         if ('mongodb' === $container->getParameter('kernel.environment')) {
             $this->markTestSkipped();
@@ -153,6 +164,9 @@ class JsonStreamerTest extends ApiTestCase
 
     public function testJsonStreamerJson(): void
     {
+        if (false === (class_exists(ControllerHelper::class) && class_exists(JsonStreamWriter::class))) {
+            $this->markTestSkipped('JsonStreamer component not installed.');
+        }
         $container = static::getContainer();
         if ('mongodb' === $container->getParameter('kernel.environment')) {
             $this->markTestSkipped();
@@ -179,6 +193,9 @@ class JsonStreamerTest extends ApiTestCase
 
     public function testJsonStreamerCollectionJson(): void
     {
+        if (false === (class_exists(ControllerHelper::class) && class_exists(JsonStreamWriter::class))) {
+            $this->markTestSkipped('JsonStreamer component not installed.');
+        }
         $container = static::getContainer();
         if ('mongodb' === $container->getParameter('kernel.environment')) {
             $this->markTestSkipped();
@@ -203,6 +220,9 @@ class JsonStreamerTest extends ApiTestCase
 
     public function testJsonStreamerWriteJsonLd(): void
     {
+        if (false === (class_exists(ControllerHelper::class) && class_exists(JsonStreamWriter::class))) {
+            $this->markTestSkipped('JsonStreamer component not installed.');
+        }
         $container = static::getContainer();
         if ('mongodb' === $container->getParameter('kernel.environment')) {
             $this->markTestSkipped();
@@ -298,5 +318,30 @@ class JsonStreamerTest extends ApiTestCase
         $manager = $registry->getManager();
         $jsonStreamResource = $manager->find(JsonStreamResource::class, $res['id']);
         $this->assertNotNull($jsonStreamResource);
+    }
+
+    public function testJsonStreamerJsonLdGenIdFalseWithDifferentTypeThenShortname(): void
+    {
+        if (false === (class_exists(ControllerHelper::class) && class_exists(JsonStreamWriter::class))) {
+            $this->markTestSkipped('JsonStreamer component not installed.');
+        }
+        $container = static::getContainer();
+        if ('mongodb' === $container->getParameter('kernel.environment')) {
+            $this->markTestSkipped();
+        }
+
+        $buffer = '';
+        ob_start(function (string $chunk) use (&$buffer): void {
+            $buffer .= $chunk;
+        });
+
+        self::createClient()->request('GET', '/json-stream-products/test', ['headers' => ['accept' => 'application/ld+json']]);
+
+        ob_get_clean();
+
+        $res = json_decode($buffer, true);
+        $this->assertArrayNotHasKey('@id', $res['aggregateRating']);
+        $this->assertEquals('https://schema.org/AggregateRating', $res['aggregateRating']['@type']);
+        $this->assertEquals('https://schema.org/Product', $res['@type']);
     }
 }
