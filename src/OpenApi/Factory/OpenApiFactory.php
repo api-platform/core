@@ -498,11 +498,13 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
     private function buildOpenApiResponse(array $existingResponses, int|string $status, string $description, ?Operation $openapiOperation = null, ?HttpOperation $operation = null, ?array $responseMimeTypes = null, ?array $operationOutputSchemas = null, ?ResourceMetadataCollection $resourceMetadataCollection = null): Operation
     {
+        $noOutput = \is_array($operation?->getOutput()) && null === $operation->getOutput()['class'];
+
         if (isset($existingResponses[$status])) {
             return $openapiOperation;
         }
         $responseLinks = $responseContent = null;
-        if ($responseMimeTypes && $operationOutputSchemas) {
+        if ($responseMimeTypes && $operationOutputSchemas && !$noOutput) {
             $responseContent = $this->buildContent($responseMimeTypes, $operationOutputSchemas);
         }
         if ($resourceMetadataCollection && $operation) {

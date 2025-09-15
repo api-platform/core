@@ -96,23 +96,24 @@ use Symfony\Component\Validator\Constraints\Country;
     uriTemplate: 'validate_parameters{._format}',
     parameters: [
         'enum' => new QueryParameter(
-            schema: ['enum' => ['a', 'b'], 'uniqueItems' => true],
+            schema: ['enum' => ['a', 'b'], 'uniqueItems' => true, 'type' => 'array'],
             castToArray: true,
             openApi: new OpenApiParameter(name: 'enum', in: 'query', style: 'deepObject')
         ),
         'enumNotDeepObject' => new QueryParameter(
-            schema: ['enum' => ['a', 'b'], 'uniqueItems' => true],
+            schema: ['enum' => ['a', 'b'], 'uniqueItems' => true, 'type' => 'string'],
             castToArray: true,
+            castToNativeType: true,
         ),
         'num' => new QueryParameter(
-            schema: ['minimum' => 1, 'maximum' => 3],
+            schema: ['minimum' => 1, 'maximum' => 3, 'type' => 'integer'],
             nativeType: new BuiltinType(TypeIdentifier::STRING),
         ),
         'numMultipleType' => new QueryParameter(
-            schema: ['minimum' => 1, 'maximum' => 3],
+            schema: ['minimum' => 1, 'maximum' => 3, 'type' => 'array'],
         ),
         'exclusiveNum' => new QueryParameter(
-            schema: ['exclusiveMinimum' => 1, 'exclusiveMaximum' => 3],
+            schema: ['exclusiveMinimum' => 1, 'exclusiveMaximum' => 3, 'type' => 'integer'],
             nativeType: new BuiltinType(TypeIdentifier::STRING),
         ),
         'blank' => new QueryParameter(
@@ -120,12 +121,12 @@ use Symfony\Component\Validator\Constraints\Country;
             nativeType: new BuiltinType(TypeIdentifier::STRING),
         ),
         'length' => new QueryParameter(
-            schema: ['maxLength' => 1, 'minLength' => 3],
+            schema: ['maxLength' => 1, 'minLength' => 3, 'type' => 'integer'],
             nativeType: new BuiltinType(TypeIdentifier::STRING),
         ),
-        'array' => new QueryParameter(schema: ['minItems' => 2, 'maxItems' => 3]),
+        'array' => new QueryParameter(schema: ['minItems' => 2, 'maxItems' => 3, 'type' => 'integer']),
         'multipleOf' => new QueryParameter(
-            schema: ['multipleOf' => 2],
+            schema: ['multipleOf' => 2, 'type' => 'integer'],
             nativeType: new BuiltinType(TypeIdentifier::STRING),
         ),
         'int' => new QueryParameter(
