@@ -30,7 +30,7 @@ class Bar6225
 
     #[ORM\Id]
     #[ORM\Column(type: 'symfony_uuid', unique: true)]
-    #[Groups(['Foo:Read'])]
+    #[Groups(['Foo:Read', 'Foo:Write'])]
     private Uuid $id;
 
     #[ORM\OneToOne(mappedBy: 'bar', cascade: ['persist', 'remove'])]

@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Hal\JsonSchema;
+namespace ApiPlatform\Hal\Tests\JsonSchema;
 
 use ApiPlatform\Hal\JsonSchema\SchemaFactory;
-use ApiPlatform\Hydra\JsonSchema\SchemaFactory as HydraSchemaFactory;
+use ApiPlatform\Hal\Tests\Fixtures\Dummy;
 use ApiPlatform\JsonSchema\DefinitionNameFactory;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactory as BaseSchemaFactory;
@@ -27,41 +27,42 @@ use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
 
 class SchemaFactoryTest extends TestCase
 {
-    use ProphecyTrait;
-
     private SchemaFactory $schemaFactory;
 
     protected function setUp(): void
     {
-        $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $resourceMetadataFactory->create(Dummy::class)->willReturn(
-            new ResourceMetadataCollection(Dummy::class, [
-                (new ApiResource())->withOperations(new Operations([
-                    'get' => (new Get())->withName('get'),
-                ])),
-            ]));
-        $propertyNameCollectionFactory = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactory->create(Dummy::class, ['enable_getter_setter_extraction' => true, 'schema_type' => Schema::TYPE_OUTPUT])->willReturn(new PropertyNameCollection());
-        $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $resourceMetadataFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactory->method('create')
+            ->with(Dummy::class)
+            ->willReturn(
+                new ResourceMetadataCollection(Dummy::class, [
+                    (new ApiResource())->withOperations(new Operations([
+                        'get' => (new Get())->withName('get'),
+                    ])),
+                ])
+            );
+
+        $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')
+            ->with(Dummy::class, ['enable_getter_setter_extraction' => true, 'schema_type' => Schema::TYPE_OUTPUT])
+            ->willReturn(new PropertyNameCollection());
+
+        $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
 
         $definitionNameFactory = new DefinitionNameFactory(['jsonapi' => true, 'jsonhal' => true, 'jsonld' => true]);
 
         $baseSchemaFactory = new BaseSchemaFactory(
-            resourceMetadataFactory: $resourceMetadataFactory->reveal(),
-            propertyNameCollectionFactory: $propertyNameCollectionFactory->reveal(),
-            propertyMetadataFactory: $propertyMetadataFactory->reveal(),
+            resourceMetadataFactory: $resourceMetadataFactory,
+            propertyNameCollectionFactory: $propertyNameCollectionFactory,
+            propertyMetadataFactory: $propertyMetadataFactory,
             definitionNameFactory: $definitionNameFactory,
         );
 
-        $hydraSchemaFactory = new HydraSchemaFactory($baseSchemaFactory);
-
-        $this->schemaFactory = new SchemaFactory($hydraSchemaFactory);
+        $this->schemaFactory = new SchemaFactory($baseSchemaFactory);
     }
 
     public function testBuildSchema(): void

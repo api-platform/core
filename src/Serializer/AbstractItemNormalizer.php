@@ -622,7 +622,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function getFactoryOptions(array $context): array
     {
-        $options = [];
+        $options = ['api_allow_update' => $context['api_allow_update'] ?? false];
         if (isset($context[self::GROUPS])) {
             /* @see https://github.com/symfony/symfony/blob/v4.2.6/src/Symfony/Component/PropertyInfo/Extractor/SerializerExtractor.php */
             $options['serializer_groups'] = (array) $context[self::GROUPS];
