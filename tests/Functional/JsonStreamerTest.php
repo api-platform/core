@@ -272,6 +272,10 @@ class JsonStreamerTest extends ApiTestCase
 
     public function testJsonStreamerWriteJson(): void
     {
+        if (false === (class_exists(ControllerHelper::class) && class_exists(JsonStreamWriter::class))) {
+            $this->markTestSkipped('JsonStreamer component not installed.');
+        }
+
         $container = static::getContainer();
         if ('mongodb' === $container->getParameter('kernel.environment')) {
             $this->markTestSkipped();
