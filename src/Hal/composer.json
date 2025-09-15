@@ -1,5 +1,5 @@
 {
-    "name": "api-platform/json-hal",
+    "name": "api-platform/hal",
     "description": "API Hal support",
     "type": "library",
     "keywords": [
