@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Hal\Serializer;
+namespace ApiPlatform\Hal\Tests\Serializer;
 
 use ApiPlatform\Hal\Serializer\ItemNormalizer;
 use ApiPlatform\Metadata\ApiProperty;
@@ -20,7 +20,6 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue4372\RelatedEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\ActivableInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\Author;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\Book;
@@ -35,7 +34,6 @@ use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
-use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -117,13 +115,13 @@ class ItemNormalizerTest extends TestCase
 
         $propertyNameCollection = new PropertyNameCollection(['name', 'relatedDummy']);
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn($propertyNameCollection);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::type('array'))->willReturn($propertyNameCollection);
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn(
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::type('array'))->willReturn(
             (new ApiProperty())->withNativeType(Type::string())->withDescription('')->withReadable(true)
         );
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn(
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', Argument::type('array'))->willReturn(
             (new ApiProperty())->withNativeType(Type::object(RelatedDummy::class))->withDescription('')->withReadable(true)->withWritable(false)->withWritableLink(false)
         );
 
@@ -181,13 +179,13 @@ class ItemNormalizerTest extends TestCase
 
         $propertyNameCollection = new PropertyNameCollection(['author', 'library']);
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(Book::class, [])->willReturn($propertyNameCollection);
+        $propertyNameCollectionFactoryProphecy->create(Book::class, Argument::type('array'))->willReturn($propertyNameCollection);
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Book::class, 'author', [])->willReturn(
+        $propertyMetadataFactoryProphecy->create(Book::class, 'author', Argument::type('array'))->willReturn(
             (new ApiProperty())->withNativeType(Type::intersection(Type::object(ActivableInterface::class), Type::object(TimestampableInterface::class)))->withReadable(true)
         );
-        $propertyMetadataFactoryProphecy->create(Book::class, 'library', [])->willReturn(
+        $propertyMetadataFactoryProphecy->create(Book::class, 'library', Argument::type('array'))->willReturn(
             (new ApiProperty())->withNativeType(Type::intersection(Type::object(ActivableInterface::class), Type::object(TimestampableInterface::class)))->withReadable(true)
         );
 
@@ -239,13 +237,13 @@ class ItemNormalizerTest extends TestCase
 
         $propertyNameCollection = new PropertyNameCollection(['name', 'relatedDummy']);
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(Dummy::class, [])->willReturn($propertyNameCollection);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::type('array'))->willReturn($propertyNameCollection);
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', [])->willReturn(
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::type('array'))->willReturn(
             (new ApiProperty())->withNativeType(Type::string())->withDescription('')->withReadable(true)
         );
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', [])->willReturn(
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', Argument::type('array'))->willReturn(
             (new ApiProperty())->withNativeType(Type::object(RelatedDummy::class))->withDescription('')->withReadable(true)->withWritable(false)->withReadableLink(false)
         );
 
@@ -317,16 +315,16 @@ class ItemNormalizerTest extends TestCase
 
         $propertyNameCollection = new PropertyNameCollection(['id', 'name', 'child']);
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(MaxDepthDummy::class, [])->willReturn($propertyNameCollection);
+        $propertyNameCollectionFactoryProphecy->create(MaxDepthDummy::class, Argument::type('array'))->willReturn($propertyNameCollection);
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(MaxDepthDummy::class, 'id', [])->willReturn(
+        $propertyMetadataFactoryProphecy->create(MaxDepthDummy::class, 'id', Argument::type('array'))->willReturn(
             (new ApiProperty())->withNativeType(Type::int())->withDescription('')->withReadable(true)
         );
-        $propertyMetadataFactoryProphecy->create(MaxDepthDummy::class, 'name', [])->willReturn(
+        $propertyMetadataFactoryProphecy->create(MaxDepthDummy::class, 'name', Argument::type('array'))->willReturn(
             (new ApiProperty())->withNativeType(Type::string())->withDescription('')->withReadable(true)
         );
-        $propertyMetadataFactoryProphecy->create(MaxDepthDummy::class, 'child', [])->willReturn(
+        $propertyMetadataFactoryProphecy->create(MaxDepthDummy::class, 'child', Argument::type('array'))->willReturn(
             (new ApiProperty())->withNativeType(Type::object(MaxDepthDummy::class))->withDescription('')->withReadable(true)->withWritable(false)->withReadableLink(true)
         );
 
@@ -350,7 +348,7 @@ class ItemNormalizerTest extends TestCase
             $resourceClassResolverProphecy->reveal(),
             null,
             null,
-            new ClassMetadataFactory(class_exists(AttributeLoader::class) ? new AttributeLoader() : new AnnotationLoader())
+            new ClassMetadataFactory(new AttributeLoader())
         );
         $serializer = new Serializer([$normalizer]);
         $normalizer->setSerializer($serializer);
@@ -423,8 +421,12 @@ class ItemNormalizerTest extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($level1, ItemNormalizer::FORMAT, [ObjectNormalizer::ENABLE_MAX_DEPTH => true]));
     }
 
+    /**
+     * @param array<int,mixed> $context
+     * @param array<int,mixed> $expected
+     */
     #[DataProvider('getSkipNullToOneRelationCases')]
-    public function testSkipNullToOneRelation($context, $expected)
+    public function testSkipNullToOneRelation(array $context, array $expected): void
     {
         $dummy = new Dummy();
         $dummy->setAlias(null);
@@ -458,9 +460,6 @@ class ItemNormalizerTest extends TestCase
         });
         $resourceClassResolver->method('isResourceClass')->willReturn(true);
 
-        /**
-         * @var SerializerInterface&NormalizerInterface $serializer
-         */
         $serializer = $this->createMockForIntersectionOfInterfaces([SerializerInterface::class, NormalizerInterface::class]);
         $serializer->method('normalize')->with(null, null, self::anything())->willReturn(null);
 
@@ -487,12 +486,13 @@ class ItemNormalizerTest extends TestCase
             resourceAccessChecker: null,
             tagCollector: null,
         );
-        $normalizer->setSerializer($serializer);
+
+        $normalizer->setSerializer($serializer); // @phpstan-ignore-line
 
         self::assertThat($expected, self::equalTo($normalizer->normalize($dummy, null, $context)));
     }
 
-    public static function getSkipNullToOneRelationCases()
+    public static function getSkipNullToOneRelationCases(): iterable
     {
         yield [
             ['skip_null_to_one_relations' => true],
@@ -517,52 +517,5 @@ class ItemNormalizerTest extends TestCase
                 ],
                 'alias' => null,
             ]];
-    }
-
-    /**
-     * @return string|void
-     */
-    private static function convertPropertyNames($propertyName)
-    {
-        if ('relatedEntity' == $propertyName) {
-            return 'related_entity';
-        }
-        if ('relatedEmbeddedEntity' == $propertyName) {
-            return 'related_embedded_entity';
-        }
-        if ('collection' == $propertyName) {
-            return 'collection';
-        }
-        if ('relatedEntity2' == $propertyName) {
-            return 'related_entity2';
-        }
-        if ('relatedEmbeddedEntity2' == $propertyName) {
-            return 'related_embedded_entity2';
-        }
-
-        return $propertyName;
-    }
-
-    /**
-     * @return ApiProperty|void
-     */
-    private static function createPropertyMetadata($propertyName)
-    {
-        $relatedPropertyMeta = (new ApiProperty())->withNativeType(Type::object(RelatedEntity::class))->withDescription('')->withReadable(true)->withWritable(false)->withReadableLink(true);
-        if ('relatedEntity' == $propertyName) {
-            return $relatedPropertyMeta;
-        }
-        if ('relatedEmbeddedEntity' == $propertyName) {
-            return $relatedPropertyMeta;
-        }
-        if ('relatedEntity2' == $propertyName) {
-            return $relatedPropertyMeta;
-        }
-
-        if ('relatedEmbeddedEntity2' == $propertyName) {
-            return $relatedPropertyMeta;
-        }
-
-        return (new ApiProperty())->withNativeType(Type::string())->withDescription('')->withReadable(true);
     }
 }

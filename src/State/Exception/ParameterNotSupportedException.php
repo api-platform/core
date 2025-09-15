@@ -28,7 +28,7 @@ final class ParameterNotSupportedException extends RuntimeException implements P
         return '/error/400';
     }
 
-    public function getTitle(): ?string
+    public function getTitle(): string
     {
         return $this->message;
     }

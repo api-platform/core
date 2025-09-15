@@ -24,6 +24,7 @@
         "php": ">=8.2",
         "api-platform/state": "^4.1.11",
         "api-platform/metadata": "^4.1.11",
+        "api-platform/documentation": "^4.1.11",
         "api-platform/serializer": "^4.1.11",
         "symfony/type-info": "^7.3"
     },
@@ -64,8 +65,8 @@
         "test": "./vendor/bin/phpunit"
     },
     "require-dev": {
-        "symfony/type-info": "^7.3",
-        "phpunit/phpunit": "11.5.x-dev"
+        "phpunit/phpunit": "11.5.x-dev",
+        "api-platform/json-schema": "^4.1.11"
     },
     "repositories": [
         {

@@ -194,10 +194,6 @@ class ErrorHandler extends ExceptionsHandler
             return $exception->getStatusCode();
         }
 
-        if ($exception instanceof SymfonyHttpExceptionInterface) {
-            return $exception->getStatusCode();
-        }
-
         if ($exception instanceof RequestExceptionInterface || $exception instanceof InvalidUriVariableException) {
             return 400;
         }
