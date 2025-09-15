@@ -74,7 +74,9 @@ final class PropertyInfoPropertyMetadataFactory implements PropertyMetadataFacto
             $propertyMetadata = $propertyMetadata->withReadable($readable);
         }
 
-        if (null === $propertyMetadata->isWritable() && null !== $writable = $this->propertyInfo->isWritable($resourceClass, $property, $options)) {
+        // A property might not be writable and we can still want to update it,
+        // this leaves the choice to the SerializerPropertyMetadataFactory
+        if (false === ($options['api_allow_update'] ?? false) && null === $propertyMetadata->isWritable() && null !== $writable = $this->propertyInfo->isWritable($resourceClass, $property, $options)) {
             $propertyMetadata = $propertyMetadata->withWritable($writable);
         }
 

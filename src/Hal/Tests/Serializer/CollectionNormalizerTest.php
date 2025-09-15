@@ -23,7 +23,6 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
 use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -31,14 +30,12 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class CollectionNormalizerTest extends TestCase
 {
-    use ProphecyTrait;
-
     #[\PHPUnit\Framework\Attributes\Group('legacy')]
     public function testSupportsNormalize(): void
     {
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page', $resourceMetadataFactoryProphecy->reveal());
+        $resourceClassResolverMock = $this->createMock(ResourceClassResolverInterface::class);
+        $resourceMetadataFactoryMock = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $normalizer = new CollectionNormalizer($resourceClassResolverMock, 'page', $resourceMetadataFactoryMock);
 
         $this->assertTrue($normalizer->supportsNormalization([], CollectionNormalizer::FORMAT, ['resource_class' => 'Foo']));
         $this->assertTrue($normalizer->supportsNormalization([], CollectionNormalizer::FORMAT, ['resource_class' => 'Foo', 'api_sub_level' => true]));
@@ -113,48 +110,47 @@ class CollectionNormalizerTest extends TestCase
         );
     }
 
-    private function normalizePaginator(bool $partial = false)
+    private function normalizePaginator(bool $partial = false): array
     {
-        $paginatorProphecy = $this->prophesize(PaginatorInterface::class);
         if ($partial) {
-            $paginatorProphecy = $this->prophesize(PartialPaginatorInterface::class);
+            $paginator = $this->createMock(PartialPaginatorInterface::class);
+        } else {
+            $paginator = $this->createMock(PaginatorInterface::class);
         }
 
-        $paginatorProphecy->getCurrentPage()->willReturn(3);
-        $paginatorProphecy->getItemsPerPage()->willReturn(12);
-        $paginatorProphecy->rewind()->will(function (): void {});
-        $paginatorProphecy->valid()->willReturn(true, false);
-        $paginatorProphecy->current()->willReturn('foo');
-        $paginatorProphecy->next()->will(function (): void {});
+        $paginator->method('getCurrentPage')->willReturn(3.);
+        $paginator->method('getItemsPerPage')->willReturn(12.);
+        $paginator->method('valid')->willReturnOnConsecutiveCalls(true, false); // @phpstan-ignore-line
+        $paginator->method('current')->willReturn('foo'); // @phpstan-ignore-line
 
         if (!$partial) {
-            $paginatorProphecy->getLastPage()->willReturn(7);
-            $paginatorProphecy->getTotalItems()->willReturn(1312);
+            $paginator->method('getLastPage')->willReturn(7.); // @phpstan-ignore-line
+            $paginator->method('getTotalItems')->willReturn(1312.); // @phpstan-ignore-line
         } else {
-            $paginatorProphecy->count()->willReturn(12);
+            $paginator->method('count')->willReturn(12);
         }
 
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass($paginatorProphecy, 'Foo')->willReturn('Foo');
+        $resourceClassResolverMock = $this->createMock(ResourceClassResolverInterface::class);
+        $resourceClassResolverMock->method('getResourceClass')->with($paginator, 'Foo')->willReturn('Foo');
 
-        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $resourceMetadataFactoryProphecy->create('Foo')->willReturn(new ResourceMetadataCollection('Foo', [
+        $resourceMetadataFactoryMock = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryMock->method('create')->with('Foo')->willReturn(new ResourceMetadataCollection('Foo', [
             (new ApiResource())->withShortName('Foo')->withOperations(new Operations([
                 'bar' => (new GetCollection())->withShortName('Foo'),
             ])),
         ]));
 
-        $itemNormalizer = $this->prophesize(NormalizerInterface::class);
-        $itemNormalizer->normalize('foo', CollectionNormalizer::FORMAT, [
+        $itemNormalizer = $this->createMock(NormalizerInterface::class);
+        $itemNormalizer->method('normalize')->with('foo', CollectionNormalizer::FORMAT, [
             'resource_class' => 'Foo',
             'api_sub_level' => true,
             'root_operation_name' => 'bar',
         ])->willReturn(['_links' => ['self' => '/me'], 'name' => 'Kévin']);
 
-        $normalizer = new CollectionNormalizer($resourceClassResolverProphecy->reveal(), 'page', $resourceMetadataFactoryProphecy->reveal());
-        $normalizer->setNormalizer($itemNormalizer->reveal());
+        $normalizer = new CollectionNormalizer($resourceClassResolverMock, 'page', $resourceMetadataFactoryMock);
+        $normalizer->setNormalizer($itemNormalizer);
 
-        return $normalizer->normalize($paginatorProphecy->reveal(), CollectionNormalizer::FORMAT, [
+        return $normalizer->normalize($paginator, CollectionNormalizer::FORMAT, [
             'resource_class' => 'Foo',
             'operation_name' => 'bar',
         ]);

@@ -13,7 +13,7 @@
             <argument type="service" id="api_platform.metadata.property.metadata_factory.property_info.inner" />
         </service>
 
-        <service id="api_platform.metadata.property.metadata_factory.attribute" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="20" class="ApiPlatform\Metadata\Property\Factory\AttributePropertyMetadataFactory" public="false">
+        <service id="api_platform.metadata.property.metadata_factory.attribute" decorates="api_platform.metadata.property.metadata_factory" decoration-priority="35" class="ApiPlatform\Metadata\Property\Factory\AttributePropertyMetadataFactory" public="false">
             <argument type="service" id="api_platform.metadata.property.metadata_factory.attribute.inner" />
         </service>
 

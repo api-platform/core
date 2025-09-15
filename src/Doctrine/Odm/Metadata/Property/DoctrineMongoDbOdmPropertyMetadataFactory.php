@@ -57,6 +57,10 @@ final class DoctrineMongoDbOdmPropertyMetadataFactory implements PropertyMetadat
                     break;
                 }
 
+                if ($options['api_allow_update'] ?? false) {
+                    break;
+                }
+
                 $propertyMetadata = $propertyMetadata->withWritable(false);
 
                 break;

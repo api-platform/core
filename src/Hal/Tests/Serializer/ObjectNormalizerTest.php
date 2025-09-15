@@ -14,10 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Hal\Serializer;
 
 use ApiPlatform\Hal\Serializer\ObjectNormalizer;
+use ApiPlatform\Hal\Tests\Fixtures\Dummy;
 use ApiPlatform\Metadata\IriConverterInterface;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -26,19 +25,17 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class ObjectNormalizerTest extends TestCase
 {
-    use ProphecyTrait;
-
     public function testDoesNotSupportDenormalization(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('jsonhal is a read-only format.');
 
-        $normalizerInterfaceProphecy = $this->prophesize(NormalizerInterface::class);
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $normalizerInterfaceMock = $this->createMock(NormalizerInterface::class);
+        $iriConverterMock = $this->createMock(IriConverterInterface::class);
 
         $normalizer = new ObjectNormalizer(
-            $normalizerInterfaceProphecy->reveal(),
-            $iriConverterProphecy->reveal()
+            $normalizerInterfaceMock,
+            $iriConverterMock
         );
 
         $this->assertFalse($normalizer->supportsDenormalization('foo', 'type', 'format'));
@@ -50,18 +47,15 @@ class ObjectNormalizerTest extends TestCase
     {
         $std = new \stdClass();
         $dummy = new Dummy();
-        $dummy->setDescription('hello');
 
-        $normalizerInterfaceProphecy = $this->prophesize(NormalizerInterface::class);
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $normalizerInterfaceMock = $this->createMock(NormalizerInterface::class);
+        $iriConverterMock = $this->createMock(IriConverterInterface::class);
         $normalizer = new ObjectNormalizer(
-            $normalizerInterfaceProphecy->reveal(),
-            $iriConverterProphecy->reveal()
+            $normalizerInterfaceMock,
+            $iriConverterMock
         );
 
-        $normalizerInterfaceProphecy->supportsNormalization($dummy, 'xml', [])->willReturn(true);
-        $normalizerInterfaceProphecy->supportsNormalization($std, ObjectNormalizer::FORMAT, [])->willReturn(true);
-        $normalizerInterfaceProphecy->supportsNormalization($dummy, ObjectNormalizer::FORMAT, [])->willReturn(true);
+        $normalizerInterfaceMock->method('supportsNormalization')->willReturn(true);
 
         $this->assertFalse($normalizer->supportsNormalization($dummy, 'xml'));
         $this->assertTrue($normalizer->supportsNormalization($std, ObjectNormalizer::FORMAT));

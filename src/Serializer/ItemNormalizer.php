@@ -118,15 +118,4 @@ class ItemNormalizer extends AbstractItemNormalizer
 
         return $uriVariables;
     }
-
-    protected function getAllowedAttributes(string|object $classOrObject, array $context, bool $attributesAsString = false): array|bool
-    {
-        $allowedAttributes = parent::getAllowedAttributes($classOrObject, $context, $attributesAsString);
-        // id is a special case handled above it causes issues not allowing it
-        if (\is_array($allowedAttributes) && ($context['api_denormalize'] ?? false) && !\in_array('id', $allowedAttributes, true)) {
-            $allowedAttributes[] = 'id';
-        }
-
-        return $allowedAttributes;
-    }
 }

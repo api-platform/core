@@ -71,10 +71,10 @@ class HttpOperation extends Operation
      *     immutable?: bool,
      * }|null $cacheHeaders {@see https://api-platform.com/docs/core/performance/#setting-custom-http-cache-headers}
      * @param array<string, string>|null $headers
-     * @param array{
+     * @param list<array{
      *     field: string,
      *     direction: string,
-     * }|null $paginationViaCursor {@see https://api-platform.com/docs/core/pagination/#cursor-based-pagination}
+     * }>|null $paginationViaCursor {@see https://api-platform.com/docs/core/pagination/#cursor-based-pagination}
      * @param array|null $normalizationContext   {@see https://api-platform.com/docs/core/serialization/#using-serialization-groups}
      * @param array|null $denormalizationContext {@see https://api-platform.com/docs/core/serialization/#using-serialization-groups}
      * @param array|null $hydraContext           {@see https://api-platform.com/docs/core/extending-jsonld-context/#hydra}

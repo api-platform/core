@@ -34,7 +34,6 @@ parameters:
 		- src/Doctrine/*/vendor/*
 		- src/*/vendor/*
 		# Symfony 6 support
-		- tests/Hal/Serializer/ItemNormalizerTest.php
 		- src/Symfony/Bundle/ArgumentResolver/CompatibleValueResolverInterface.php
 	earlyTerminatingMethodCalls:
 		PHPUnit\Framework\Constraint\Constraint:

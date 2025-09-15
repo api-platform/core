@@ -44,7 +44,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
 
     private function getIdentifierValue(object $item, Link $link): mixed
     {
-        if ($item instanceof ($link->getFromClass())) {
+        if (is_a($item, $link->getFromClass(), true)) {
             return $this->getEloquentProperty($item, $link->getIdentifiers()[0]);
         }
 

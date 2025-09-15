@@ -56,6 +56,10 @@ final class DoctrineOrmPropertyMetadataFactory implements PropertyMetadataFactor
                     break;
                 }
 
+                if ($options['api_allow_update'] ?? false) {
+                    break;
+                }
+
                 if ($doctrineClassMetadata instanceof ClassMetadata) {
                     $writable = $doctrineClassMetadata->isIdentifierNatural();
                 } else {
