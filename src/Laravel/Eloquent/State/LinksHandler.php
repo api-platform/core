@@ -47,7 +47,9 @@ final class LinksHandler implements LinksHandlerInterface
 
         if ($operation instanceof HttpOperation) {
             foreach (array_reverse($operation->getUriVariables() ?? []) as $uriVariable => $link) {
-                $builder = $this->buildQuery($builder, $link, $uriVariables[$uriVariable]);
+                if (isset($uriVariables[$uriVariable])) {
+                    $builder = $this->buildQuery($builder, $link, $uriVariables[$uriVariable]);
+                }
             }
 
             return $builder;
