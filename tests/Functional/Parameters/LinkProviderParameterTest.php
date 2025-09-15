@@ -166,6 +166,7 @@ final class LinkProviderParameterTest extends ApiTestCase
 
     public function testUriVariableHasDummy(): void
     {
+        $container = static::getContainer();
         if ('mongodb' === $container->getParameter('kernel.environment')) {
             $this->markTestSkipped();
         }
