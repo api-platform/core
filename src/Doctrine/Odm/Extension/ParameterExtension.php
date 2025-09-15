@@ -89,7 +89,7 @@ final class ParameterExtension implements AggregationCollectionExtensionInterfac
                 $filter->setProperties($properties ?? []);
             }
 
-            $filterContext = ['filters' => $values, 'parameter' => $parameter, 'match' => $context['match'] ?? null];
+            $filterContext = ['filters' => $values, 'parameter' => $parameter, 'match' => $context['match'] ?? null, 'search' => $context['search'] ?? null];
             $filter->apply($aggregationBuilder, $resourceClass, $operation, $filterContext);
             // update by reference
             if (isset($filterContext['mongodb_odm_sort_fields'])) {
@@ -97,6 +97,9 @@ final class ParameterExtension implements AggregationCollectionExtensionInterfac
             }
             if (isset($filterContext['match'])) {
                 $context['match'] = $filterContext['match'];
+            }
+            if (isset($filterContext['search'])) {
+                $context['search'] = $filterContext['search'];
             }
         }
 
