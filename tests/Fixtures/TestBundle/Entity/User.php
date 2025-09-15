@@ -37,7 +37,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
  */
 #[ApiResource(operations: [
     new Post(
-        uriTemplate: '/users/password_reset_request',
+        uriTemplate: '/users_reset/password_reset_request',
         messenger: 'input',
         input: PasswordResetRequest::class,
         output: PasswordResetRequestResult::class,
