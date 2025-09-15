@@ -145,6 +145,7 @@ return [
     // we recommend using "file" or "acpu"
     'cache' => 'file',
 
+    // install `api-platform/http-cache`
     // 'http_cache' => [
     //     'etag' => false,
     //     'max_age' => null,
