@@ -25,25 +25,22 @@ use ApiPlatform\Metadata\Resource\ResourceNameCollection;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class EntrypointNormalizerTest extends TestCase
 {
-    use ProphecyTrait;
-
     public function testSupportNormalization(): void
     {
         $collection = new ResourceNameCollection();
         $entrypoint = new Entrypoint($collection);
 
-        $factoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
+        $factoryMock = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $iriConverterMock = $this->createMock(IriConverterInterface::class);
+        $urlGeneratorMock = $this->createMock(UrlGeneratorInterface::class);
 
-        $normalizer = new EntrypointNormalizer($factoryProphecy->reveal(), $iriConverterProphecy->reveal(), $urlGeneratorProphecy->reveal());
+        $normalizer = new EntrypointNormalizer($factoryMock, $iriConverterMock, $urlGeneratorMock);
 
         $this->assertTrue($normalizer->supportsNormalization($entrypoint, EntrypointNormalizer::FORMAT));
         $this->assertFalse($normalizer->supportsNormalization($entrypoint, 'json'));
@@ -57,23 +54,23 @@ class EntrypointNormalizerTest extends TestCase
     {
         $collection = new ResourceNameCollection([Dummy::class]);
         $entrypoint = new Entrypoint($collection);
-        $factoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $factoryMock = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
         $operation = (new GetCollection())->withShortName('Dummy')->withClass(Dummy::class);
-        $factoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection('Dummy', [
+        $factoryMock->expects($this->once())->method('create')->with(Dummy::class)->willReturn(new ResourceMetadataCollection('Dummy', [
             (new ApiResource('Dummy'))
                 ->withShortName('Dummy')
                 ->withOperations(new Operations([
                     'get' => $operation,
                 ])),
-        ]))->shouldBeCalled();
+        ]));
 
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, $operation)->willReturn('/api/dummies')->shouldBeCalled();
+        $iriConverterMock = $this->createMock(IriConverterInterface::class);
+        $iriConverterMock->expects($this->once())->method('getIriFromResource')->with(Dummy::class, UrlGeneratorInterface::ABS_PATH, $operation)->willReturn('/api/dummies');
 
-        $urlGeneratorProphecy = $this->prophesize(UrlGeneratorInterface::class);
-        $urlGeneratorProphecy->generate('api_entrypoint')->willReturn('/api')->shouldBeCalled();
+        $urlGeneratorMock = $this->createMock(UrlGeneratorInterface::class);
+        $urlGeneratorMock->expects($this->once())->method('generate')->with('api_entrypoint')->willReturn('/api');
 
-        $normalizer = new EntrypointNormalizer($factoryProphecy->reveal(), $iriConverterProphecy->reveal(), $urlGeneratorProphecy->reveal());
+        $normalizer = new EntrypointNormalizer($factoryMock, $iriConverterMock, $urlGeneratorMock);
 
         $expected = [
             '_links' => [
