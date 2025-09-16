@@ -1406,6 +1406,8 @@ jobs:
       - name: Install api-platform/laravel
         run: |
           composer global link ../src/Laravel --permanent
+          composer config minimum-stability dev
+          composer config prefer-stable true
           composer require api-platform/laravel:"@dev"
           php ./artisan api-platform:install
         working-directory: 'test-api-platform-install'
