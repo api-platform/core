@@ -67,19 +67,22 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
                 if ($this->isPropertyNested($field, $resourceClass)) {
                     [$field] = $this->addLookupsForNestedProperty($field, $aggregationBuilder, $resourceClass, true);
                 }
-                $this->addSort(
-                    $aggregationBuilder,
-                    $context['mongodb_odm_sort_fields'] = ($context['mongodb_odm_sort_fields'] ?? []) + [$field => $order]
-                );
+
+                $context['mongodb_odm_sort_fields'] = ($context['mongodb_odm_sort_fields'] ?? []) + [$field => $order];
+                if ($this->isSearchPipeline($aggregationBuilder)) {
+                    $aggregationBuilder->getStage(0)
+                        ->sort($context['mongodb_odm_sort_fields']);
+                } else {
+                    $aggregationBuilder->sort($context['mongodb_odm_sort_fields']);
+                }
             }
 
             return;
         }
 
-        if (null !== $this->order) {
+        if (null !== $this->order && !$this->isSearchPipeline($aggregationBuilder)) {
             foreach ($identifiers as $identifier) {
-                $this->addSort(
-                    $aggregationBuilder,
+                $aggregationBuilder->sort(
                     $context['mongodb_odm_sort_fields'] = ($context['mongodb_odm_sort_fields'] ?? []) + [$identifier => $this->order]
                 );
             }
@@ -89,18 +92,6 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
     protected function getManagerRegistry(): ManagerRegistry
     {
         return $this->managerRegistry;
-    }
-
-    private function addSort(Builder $aggregationBuilder, array $sortFields): void
-    {
-        $firstStage = $aggregationBuilder->getPipeline(0);
-        if ($firstStage instanceof Search) {
-            // The $search stage supports "sort" for performance, it's always first if present
-            $firstStage->sort($sortFields);
-        } else {
-            // Append a $sort stage at the end of the pipeline
-            $aggregationBuilder->sort($sortFields);
-        }
     }
 
     private function hasSortStage(Builder $aggregationBuilder): bool
@@ -114,6 +105,16 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
             }
         } catch (\OutOfRangeException) {
             // There is no more stages on the aggregation builder
+            return false;
+        }
+    }
+
+    private function isSearchPipeline(Builder $aggregationBuilder): bool
+    {
+        try {
+            return $aggregationBuilder->getStage(0) instanceof Search;
+        } catch (\OutOfRangeException) {
+            // Empty pipeline
             return false;
         }
     }
