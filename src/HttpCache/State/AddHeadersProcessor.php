@@ -29,8 +29,16 @@ final class AddHeadersProcessor implements ProcessorInterface
     /**
      * @param ProcessorInterface<T1, T2> $decorated
      */
-    public function __construct(private readonly ProcessorInterface $decorated, private readonly bool $etag = false, private readonly ?int $maxAge = null, private readonly ?int $sharedMaxAge = null, private readonly ?array $vary = null, private readonly ?bool $public = null, private readonly ?int $staleWhileRevalidate = null, private readonly ?int $staleIfError = null)
-    {
+    public function __construct(
+        private readonly ProcessorInterface $decorated,
+        private readonly bool $etag = false,
+        private readonly ?int $maxAge = null,
+        private readonly ?int $sharedMaxAge = null,
+        private readonly ?array $vary = null,
+        private readonly ?bool $public = null,
+        private readonly ?int $staleWhileRevalidate = null,
+        private readonly ?int $staleIfError = null,
+    ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed

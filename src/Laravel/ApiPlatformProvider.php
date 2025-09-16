@@ -49,6 +49,7 @@ use ApiPlatform\Hal\Serializer\CollectionNormalizer as HalCollectionNormalizer;
 use ApiPlatform\Hal\Serializer\EntrypointNormalizer as HalEntrypointNormalizer;
 use ApiPlatform\Hal\Serializer\ItemNormalizer as HalItemNormalizer;
 use ApiPlatform\Hal\Serializer\ObjectNormalizer as HalObjectNormalizer;
+use ApiPlatform\HttpCache\State\AddHeadersProcessor;
 use ApiPlatform\Hydra\JsonSchema\SchemaFactory as HydraSchemaFactory;
 use ApiPlatform\Hydra\Serializer\CollectionFiltersNormalizer as HydraCollectionFiltersNormalizer;
 use ApiPlatform\Hydra\Serializer\CollectionNormalizer as HydraCollectionNormalizer;
@@ -88,7 +89,6 @@ use ApiPlatform\Laravel\Eloquent\Metadata\ResourceClassResolver as EloquentResou
 use ApiPlatform\Laravel\Eloquent\PropertyAccess\PropertyAccessor as EloquentPropertyAccessor;
 use ApiPlatform\Laravel\Eloquent\PropertyInfo\EloquentExtractor;
 use ApiPlatform\Laravel\Eloquent\Serializer\EloquentNameConverter;
-use ApiPlatform\Laravel\Eloquent\Serializer\Mapping\Loader\RelationMetadataLoader;
 use ApiPlatform\Laravel\Eloquent\Serializer\SerializerContextBuilder as EloquentSerializerContextBuilder;
 use ApiPlatform\Laravel\GraphQl\Controller\EntrypointController as GraphQlEntrypointController;
 use ApiPlatform\Laravel\GraphQl\Controller\GraphiQlController;
@@ -403,8 +403,25 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->bind(ProviderInterface::class, ContentNegotiationProvider::class);
 
-        $this->app->singleton(RespondProcessor::class, function () {
-            return new AddLinkHeaderProcessor(new RespondProcessor(), new HttpHeaderSerializer());
+        $this->app->singleton(RespondProcessor::class, function (Application $app) {
+            $decorated = new RespondProcessor();
+            if (class_exists(AddHeadersProcessor::class)) {
+                /** @var ConfigRepository */
+                $config = $app['config']->get('api-platform.http_cache') ?? [];
+
+                $decorated = new AddHeadersProcessor(
+                    $decorated,
+                    etag: $config['etag'] ?? false,
+                    maxAge: $config['max_age'] ?? null,
+                    sharedMaxAge: $config['shared_max_age'] ?? null,
+                    vary: $config['vary'] ?? null,
+                    public: $config['public'] ?? null,
+                    staleWhileRevalidate: $config['stale_while_revalidate'] ?? null,
+                    staleIfError: $config['stale_if_error'] ?? null
+                );
+            }
+
+            return new AddLinkHeaderProcessor($decorated, new HttpHeaderSerializer());
         });
 
         $this->app->singleton(SerializeProcessor::class, function (Application $app) {
@@ -555,7 +572,8 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(LoggerInterface::class),
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(ResourceAccessCheckerInterface::class),
-                $defaultContext
+                $defaultContext,
+                // $app->make(TagCollectorInterface::class)
             );
         });
 
@@ -603,6 +621,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $defaultContext,
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(ResourceAccessCheckerInterface::class),
+                // $app->make(TagCollectorInterface::class),
             );
         });
 
@@ -848,7 +867,6 @@ class ApiPlatformProvider extends ServiceProvider
                 $defaultContext,
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(ResourceAccessCheckerInterface::class),
-                null
                 // $app->make(TagCollectorInterface::class),
             );
         });
@@ -943,7 +961,8 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(NameConverterInterface::class),
                 $app->make(ClassMetadataFactoryInterface::class),
                 $defaultContext,
-                $app->make(ResourceAccessCheckerInterface::class)
+                $app->make(ResourceAccessCheckerInterface::class),
+                // $app->make(TagCollectorInterface::class)
             );
         });
 

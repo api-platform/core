@@ -183,6 +183,20 @@ TypeInfo:
 * [cff61eab8](https://github.com/api-platform/core/commit/cff61eab8643f8ed08d59c0684e77740d0d81b04) fix(metadata): append php file resource extractor (#7193)
 * [f3d4afe03](https://github.com/api-platform/core/commit/f3d4afe032385f3b665131a365e42706930f0730) fix(symfony): validator type-info
 
+## v4.1.24
+
+### Bug fixes
+
+* [07112a27d](https://github.com/api-platform/core/commit/07112a27d89c6099ac56e152d61fd434015f4f5a) fix(laravel): remove duplication code exception
+* [4abec444e](https://github.com/api-platform/core/commit/4abec444e80d8c6d0925a1b4159006993980305b) fix(metadata): compute isWritable during updates (#7383)
+* [7c117d9f7](https://github.com/api-platform/core/commit/7c117d9f758a11fcea1034983e04c40505eb9924) fix: phpdoc for HttpOperation paginationViaCursor parameter (#7379)
+
+### Features
+
+Laravel compatibility with `api-platform/http-cache`:
+
+* [fa2bc95ff](https://github.com/api-platform/core/commit/fa2bc95ff87e00262fa5e28ad4f06d4c5a2c912e) fix(laravel): http cache compatibility (#7380)
+
 ## v4.1.23
 
 ### Bug fixes
