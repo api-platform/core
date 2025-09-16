@@ -1,5 +1,25 @@
 # Changelog
 
+## v4.2.0-beta.1
+
+### Bug fixes
+
+* [2c5c9e451](https://github.com/api-platform/core/commit/2c5c9e4516944ccfe11e1e69cfaba87f1cd85da4) fix(openapi): no content schema (#7384)
+* [4f0864c1a](https://github.com/api-platform/core/commit/4f0864c1a1b9ecdfe0ba4488b99b84cf851240d3) fix(symfony): remove deprecation about jsonopenapi
+* [5a8d4d282](https://github.com/api-platform/core/commit/5a8d4d2827fba63868cc6b392c383fd8ae5c65cd) fix(jsonld): various json streamer fixes (#7374)
+* [62a9cc821](https://github.com/api-platform/core/commit/62a9cc821dc0d6469e434b5d18339af75b15fc6f) fix(state)!: parameter default value overrides falsy value
+* [6db55be8c](https://github.com/api-platform/core/commit/6db55be8c9e82717a49e92269ca96a2dbd41bf1e) fix(metadata): wrong method name in resource mutator
+* [b80ab9a59](https://github.com/api-platform/core/commit/b80ab9a5940e1638600e8281cf506ab9649912d3) fix(httpcache): collection iri invalidation for mapped entities (#7353)
+* [c9692b509](https://github.com/api-platform/core/commit/c9692b509d5b641104addbadb349b9bcab83e251) fix(state): transform uri variable using ReadLinkParameterProvider (#7375)
+* [ce4e97fe8](https://github.com/api-platform/core/commit/ce4e97fe8c5e5f99f603a9efb372bdae1f855e4a) fix(hal): rename package
+
+### Features
+
+* [b948209b9](https://github.com/api-platform/core/commit/b948209b97a3a952b884c8c755c1bb9e63e81689) feat(laravel): add make:filter command to generate API Platform filters (#7364)
+* [ebd85f502](https://github.com/api-platform/core/commit/ebd85f50218988443662f37e2eb7f5d85026f6cf) feat(symfony): add make:filter command to generate API Platform filters (#7355)
+
+Also includes patches from v4.1.24 and v4.2.0-alpha fixes
+
 ## v4.2.0-alpha.3
 
 ### Bug fixes
