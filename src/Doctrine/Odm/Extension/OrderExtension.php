@@ -97,7 +97,7 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
     private function hasSortStage(Builder $aggregationBuilder): bool
     {
         try {
-            for ($index = 0; true; $index++) {
+            for ($index = 0; true; ++$index) {
                 if ($aggregationBuilder->getStage($index) instanceof Sort) {
                     // If at least one stage is sort, then it has sorting
                     return true;

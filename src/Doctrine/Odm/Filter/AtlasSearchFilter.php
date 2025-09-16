@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Filter;
@@ -84,7 +93,7 @@ final class AtlasSearchFilter implements FilterInterface, OpenApiParameterFilter
                     ->fuzzy(maxEdits: 1);
                 break;
             default:
-                throw new \InvalidArgumentException(sprintf('Unsupported operator "%s" for AtlasSearchFilter', $this->operator));
+                throw new \InvalidArgumentException(\sprintf('Unsupported operator "%s" for AtlasSearchFilter', $this->operator));
         }
     }
 }
