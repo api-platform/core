@@ -32,7 +32,6 @@ final class AtlasSearchFilter implements FilterInterface, OpenApiParameterFilter
         private readonly string $index = 'default',
         private readonly string $operator = 'text',
         private readonly string $term = 'must',
-        private readonly ?array $facet = null,
     ) {
     }
 
@@ -49,19 +48,10 @@ final class AtlasSearchFilter implements FilterInterface, OpenApiParameterFilter
         if (!isset($context['search'])) {
             $searchStage = $context['search']['stage'] = $aggregationBuilder->search();
             $searchStage->index($this->index);
-
-            if ($this->facet) {
-                $searchStage->facet()
-                    ->operator($compound = $searchStage->compound())
-                    ->add(...$this->facet);
-            } else {
-                $compound = $context['search']['compound'] = $searchStage->compound();
-            }
-            $context['search']['compound'] = $compound;
-        } else {
-            $compound = $context['search']['compound'];
+            $context['search']['compound'] = $searchStage->compound();
         }
 
+        $compound = $context['search']['compound'];
         $compound->{$this->term}();
 
         switch ($this->operator) {
