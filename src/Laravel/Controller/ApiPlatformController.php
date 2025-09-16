@@ -13,12 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Controller;
 
+use ApiPlatform\HttpCache\PurgerInterface;
+use ApiPlatform\Laravel\Eloquent\Listener\PurgeHttpCacheListener;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Event;
 use Symfony\Component\HttpFoundation\Response;
 
 class ApiPlatformController extends Controller
@@ -91,6 +94,11 @@ class ApiPlatformController extends Controller
 
         if (null === $operation->canSerialize()) {
             $operation = $operation->withSerialize(true);
+        }
+
+        if (interface_exists(PurgerInterface::class)) {
+            Event::listen('eloquent.saved: *', [PurgeHttpCacheListener::class, 'handleModelSaved']);
+            Event::listen('eloquent.deleted: *', [PurgeHttpCacheListener::class, 'handleModelDeleted']);
         }
 
         return $this->processor->process($body, $operation, $uriVariables, $context);

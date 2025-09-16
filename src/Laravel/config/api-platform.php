@@ -144,4 +144,22 @@ return [
 
     // we recommend using "file" or "acpu"
     'cache' => 'file',
+
+    // install `api-platform/http-cache`
+    // 'http_cache' => [
+    //     'etag' => false,
+    //     'max_age' => null,
+    //     'shared_max_age' => null,
+    //     'vary' => null,
+    //     'public' => null,
+    //     'stale_while_revalidate' => null,
+    //     'stale_if_error' => null,
+    //     'invalidation' => [
+    //         'urls' => [],
+    //         'scoped_clients' => [],
+    //         'max_header_length' => 7500,
+    //         'request_options' => [],
+    //         'purger' => ApiPlatform\HttpCache\SouinPurger::class,
+    //     ],
+    // ]
 ];
