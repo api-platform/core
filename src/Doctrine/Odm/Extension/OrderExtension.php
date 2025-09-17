@@ -17,6 +17,7 @@ use ApiPlatform\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Doctrine\Odm\PropertyHelperTrait as MongoDbOdmPropertyHelperTrait;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
+use Doctrine\ODM\MongoDB\Aggregation\Stage\Search;
 use Doctrine\ODM\MongoDB\Aggregation\Stage\Sort;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -66,15 +67,20 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
                 if ($this->isPropertyNested($field, $resourceClass)) {
                     [$field] = $this->addLookupsForNestedProperty($field, $aggregationBuilder, $resourceClass, true);
                 }
-                $aggregationBuilder->sort(
-                    $context['mongodb_odm_sort_fields'] = ($context['mongodb_odm_sort_fields'] ?? []) + [$field => $order]
-                );
+
+                $context['mongodb_odm_sort_fields'] = ($context['mongodb_odm_sort_fields'] ?? []) + [$field => $order];
+                if ($this->isSearchPipeline($aggregationBuilder)) {
+                    $aggregationBuilder->getStage(0)
+                        ->sort($context['mongodb_odm_sort_fields']);
+                } else {
+                    $aggregationBuilder->sort($context['mongodb_odm_sort_fields']);
+                }
             }
 
             return;
         }
 
-        if (null !== $this->order) {
+        if (null !== $this->order && !$this->isSearchPipeline($aggregationBuilder)) {
             foreach ($identifiers as $identifier) {
                 $aggregationBuilder->sort(
                     $context['mongodb_odm_sort_fields'] = ($context['mongodb_odm_sort_fields'] ?? []) + [$identifier => $this->order]
@@ -90,24 +96,26 @@ final class OrderExtension implements AggregationCollectionExtensionInterface
 
     private function hasSortStage(Builder $aggregationBuilder): bool
     {
-        $shouldStop = false;
-        $index = 0;
-
-        do {
-            try {
+        try {
+            for ($index = 0; true; ++$index) {
                 if ($aggregationBuilder->getStage($index) instanceof Sort) {
                     // If at least one stage is sort, then it has sorting
                     return true;
                 }
-            } catch (\OutOfRangeException $outOfRangeException) {
-                // There is no more stages on the aggregation builder
-                $shouldStop = true;
             }
+        } catch (\OutOfRangeException) {
+            // There is no more stages on the aggregation builder
+            return false;
+        }
+    }
 
-            ++$index;
-        } while (!$shouldStop);
-
-        // No stage was sort, and we iterated through all stages
-        return false;
+    private function isSearchPipeline(Builder $aggregationBuilder): bool
+    {
+        try {
+            return $aggregationBuilder->getStage(0) instanceof Search;
+        } catch (\OutOfRangeException) {
+            // Empty pipeline
+            return false;
+        }
     }
 }
