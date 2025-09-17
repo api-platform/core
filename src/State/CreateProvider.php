@@ -28,8 +28,6 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  * @see ApiPlatform\Tests\Fixtures\TestBundle\Entity\SubresourceEmployee
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
- *
- * @internal
  */
 final class CreateProvider implements ProviderInterface
 {
