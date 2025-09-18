@@ -1,5 +1,77 @@
 # Changelog
 
+## v4.2.0
+
+### Features
+
+* [092a3a4f8](https://github.com/api-platform/core/commit/092a3a4f89563109b3dac18351da25051f7aa745) feat(mongodb): partial paginator (#7352)
+* [1290ebb88](https://github.com/api-platform/core/commit/1290ebb88680dde94e536dfc19d9b330612e0909) feat(serializer): ability to throw access denied exception when denormalizing secured properties (#7221)
+* [1862d03b7](https://github.com/api-platform/core/commit/1862d03b77c941cac13ed7bcbf1d555d50614b4f) feat(symfony): add error classes options to open api config (#7143)
+* [24a1cf5a2](https://github.com/api-platform/core/commit/24a1cf5a2f9d56df791abdb625ec83594ee4f0f9) feat(elasticsearch): add support for v9 (#7180)
+* [26d2394b7](https://github.com/api-platform/core/commit/26d2394b70342f99bb8a4699529f7a5c113830bb) feat(doctrine): new search filters (#7121)
+* [2a13100f4](https://github.com/api-platform/core/commit/2a13100f4edeb02191a3da891d99c1d054710166) feat(serializer): (un)set object-to-populate through denormalization context (#7124)
+* [3ab0b8d0f](https://github.com/api-platform/core/commit/3ab0b8d0fba6a56014752d90a007f57483502551) feat(metadata): use PHP file as resource format
+* [4abf17b3c](https://github.com/api-platform/core/commit/4abf17b3c49491ee1f77f951028422dacae90456) feat(symfony): CSS Color Schema Restriction for Property Validation (#7215)
+* [4b1b94cad](https://github.com/api-platform/core/commit/4b1b94cad1bdd2e9c3d94cc22b7e3519a0d6c609) feat(symfony): Autoconfigure classes using `#[ApiResource]` attribute (#6943)
+* [6491bfc7a](https://github.com/api-platform/core/commit/6491bfc7a88af5722a98645ff648a461c9990b7e) feat(doctrine): improve http cache invalidation using the info from the mapping (#7319)
+* [9e9cf648d](https://github.com/api-platform/core/commit/9e9cf648d6cbe21f9c7b07d54e797ac08ffc45eb) feat(metadata): introduce metadata mutators for resource & operations (#7213)
+* [a42034dc3](https://github.com/api-platform/core/commit/a42034dc384ab1b372ea5bf4452db37791c3b739) feat(symfony): object mapper with state options (#6801)
+* [a8b82172a](https://github.com/api-platform/core/commit/a8b82172afa48f04438786aa13d00a33eb8956e1) feat(doctrine): support integer-backed enums in BackedEnumFilter (#7129)
+* [b52187d91](https://github.com/api-platform/core/commit/b52187d91eca6cf08d60dee80d19d42516a7e8b7) feat(serializer): handle defaultType for DiscriminatorMap (#7284)
+* [b948209b9](https://github.com/api-platform/core/commit/b948209b97a3a952b884c8c755c1bb9e63e81689) feat(laravel): add make:filter command to generate API Platform filters (#7364)
+* [ebd85f502](https://github.com/api-platform/core/commit/ebd85f50218988443662f37e2eb7f5d85026f6cf) feat(symfony): add make:filter command to generate API Platform filters (#7355)
+* [bf09616cf](https://github.com/api-platform/core/commit/bf09616cfbbc2c19a9d04a7be3edc8a9bc0c07ef) feat(httpcache): add more cache directives to AddHeadersProcessor (#7008)
+* [ceeaf51e8](https://github.com/api-platform/core/commit/ceeaf51e806e772c2801cfaaa1286fc081a10a3e) feat: json streamer (#7225)
+* [f25d7d1a6](https://github.com/api-platform/core/commit/f25d7d1a6e0ed3fb60a01ccda60729721a82d215) feat(metadata): ability to set description on an Error (#7329)
+
+### Breaking changes
+
+* [073c0e282](https://github.com/api-platform/core/commit/073c0e2822c9d93d3303ee64178bed19e6e61080) fix(openapi)!: allowReserved, allowEmtpyValue defaults to null
+* [62a9cc821](https://github.com/api-platform/core/commit/62a9cc821dc0d6469e434b5d18339af75b15fc6f) fix(state)!: parameter default value overrides falsy value
+* [79edced67](https://github.com/api-platform/core/commit/79edced67ccca1a7b80455dd94203501d9c4fa89) fix(json-schema): share invariable sub-schemas
+
+### TypeInfo
+
+* [143d512ef](https://github.com/api-platform/core/commit/143d512ef24b988a9b80b3da28c9a36e4b346c76) feat(jsonapi): use `TypeInfo`'s `Type` (#7100)
+* [1d579d095](https://github.com/api-platform/core/commit/1d579d095616a6025d63526f14402eaef173346b) feat(hal): use `TypeInfo` type (#7097)
+* [350d6d707](https://github.com/api-platform/core/commit/350d6d707a95587679b13c2a8670206b480d9ab2) feat(hydra): use `TypeInfo`'s `Type` (#7099)
+* [55461a83c](https://github.com/api-platform/core/commit/55461a83cbb804fb73167d5196337b6a04e38c22) feat: Use `Type` of `TypeInfo` instead of `PropertyInfo` (#6979)
+* [7c796de0d](https://github.com/api-platform/core/commit/7c796de0d8d0dc6dd7c4d7a3da0afb61823b6258) feat(serializer): type info (#7104)
+* [827e1f725](https://github.com/api-platform/core/commit/827e1f725b5f2a560cd0aaf9b63e7e7e8a9b329d) feat(elasticsearch): use `TypeInfo` type (#7098)
+* [a1952e304](https://github.com/api-platform/core/commit/a1952e30403c2ccf98d5cffb667720c3f4c753bf) feat(openapi): use `TypeInfo`'s `Type` (#7096)
+* [dd3356824](https://github.com/api-platform/core/commit/dd33568245de962ff99efcd8079d2c6f8daf8061) feat(laravel): use `TypeInfo`'s `Type` (#7101)
+
+### Bug fixes
+
+* [02a764950](https://github.com/api-platform/core/commit/02a7649509f3f69abb74c94805707b0c253521fb) fix(symfony): explicitly set the target class when mapping entities to resources (#7311)
+* [0411cd9cc](https://github.com/api-platform/core/commit/0411cd9cc73f085a1918a13a3798e0c5aee5bbff) fix(jsonld): duplicate error fields when prefix is enabled (#7021) (#7074)
+* [1acf8f764](https://github.com/api-platform/core/commit/1acf8f764f5a3fca56ed2f970d61f737226c694a) fix(symfony): only set name_converter for the default serializer (#6101) (#7365)
+* [2c5c9e451](https://github.com/api-platform/core/commit/2c5c9e4516944ccfe11e1e69cfaba87f1cd85da4) fix(openapi): no content schema (#7384)
+* [321c68f12](https://github.com/api-platform/core/commit/321c68f1216c9ea1486e0d6b08a228d50fdf17a6) fix: pagination via cursor on ApiResource operations (#7368)
+* [5a8d4d282](https://github.com/api-platform/core/commit/5a8d4d2827fba63868cc6b392c383fd8ae5c65cd) fix(jsonld): various json streamer fixes (#7374)
+* [9389b4f46](https://github.com/api-platform/core/commit/9389b4f4637b925e55ee68c3f62c88828014c14f) fix(laravel): restore accidentally removed BooleanFilter (#6881)
+* [b80ab9a59](https://github.com/api-platform/core/commit/b80ab9a5940e1638600e8281cf506ab9649912d3) fix(httpcache): collection iri invalidation for mapped entities (#7353)
+* [c9692b509](https://github.com/api-platform/core/commit/c9692b509d5b641104addbadb349b9bcab83e251) fix(state): transform uri variable using ReadLinkParameterProvider (#7375)
+* [d06b1a0a0](https://github.com/api-platform/core/commit/d06b1a0a0e9dcde7fcdb585b435cd617620b098b) fix(state): object-mapper reuse related entity (#7300)
+* [ecb3f6cef](https://github.com/api-platform/core/commit/ecb3f6cefcf87a0e040cb528a6cb2b31ca97663a) fix(httpcache): only map entites that are persisted
+* [d921dd37a](https://github.com/api-platform/core/commit/d921dd37a489646ae6f5760e1a853031ceaa8598) fix(mongodb): make `ParameterExtension` context more generic (#7389)
+
+### Miscellaneous
+
+* [04f252e7f](https://github.com/api-platform/core/commit/04f252e7ff7bf8705399dea17b1374027c31f6ff) fix(symfony): missing finder dependency
+* [1806cfae6](https://github.com/api-platform/core/commit/1806cfae683f907b6800852e6b2c7bc9ffb59fc1) feat(symfony): stop watch system provider/processor
+* [202c60fcb](https://github.com/api-platform/core/commit/202c60fcb05be41bbe0bf03a3314ab3b7e9fed64) feat(openapi): license identifier (#7141)
+* [4f0864c1a](https://github.com/api-platform/core/commit/4f0864c1a1b9ecdfe0ba4488b99b84cf851240d3) fix(symfony): remove deprecation about jsonopenapi
+* [6db55be8c](https://github.com/api-platform/core/commit/6db55be8c9e82717a49e92269ca96a2dbd41bf1e) fix(metadata): wrong method name in resource mutator
+* [76c80a67c](https://github.com/api-platform/core/commit/76c80a67cdaf9615c598bf0fa3e37a89ce7589ba) fix: command name deprecation
+* [77b292bfe](https://github.com/api-platform/core/commit/77b292bfefcf655b7ade95bd23046dff5c38c464) feat(metadata): class is now class-string (#7307)
+* [95451fbee](https://github.com/api-platform/core/commit/95451fbee6a0d1cd984216eba0074916243ad701) feat(state): remove @internal from the CreateProvider
+* [ce4e97fe8](https://github.com/api-platform/core/commit/ce4e97fe8c5e5f99f603a9efb372bdae1f855e4a) fix(hal): rename package
+* [cff61eab8](https://github.com/api-platform/core/commit/cff61eab8643f8ed08d59c0684e77740d0d81b04) fix(metadata): append php file resource extractor (#7193)
+* [de9e7f576](https://github.com/api-platform/core/commit/de9e7f576039d9943f7e9b70e41886d3a9406655) feat(hal): allow to output null links for hal+json
+* [f010fd456](https://github.com/api-platform/core/commit/f010fd456dcb3b068b1033882d1cdc235d892d81) fix(serializer): deprecate SerializerAwareProviderInterface and SerializableProvider (#7348)
+* [f3d4afe03](https://github.com/api-platform/core/commit/f3d4afe032385f3b665131a365e42706930f0730) fix(symfony): validator type-info
+
 ## v4.2.0-beta.1
 
 ### Bug fixes
