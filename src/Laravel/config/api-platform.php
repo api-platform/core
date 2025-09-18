@@ -99,9 +99,8 @@ return [
         'enabled' => true,
         // 'apiKeys' => [
         //    'api' => [
-        //        'type' => 'Bearer',
-        //        'name' => 'Authentication Token',
-        //        'in' => 'header'
+        //        'name' => 'Authorization',
+        //        'type' => 'header',
         //    ]
         // ],
         // 'oauth' => [
