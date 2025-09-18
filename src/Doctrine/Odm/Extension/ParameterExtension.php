@@ -89,7 +89,7 @@ final class ParameterExtension implements AggregationCollectionExtensionInterfac
                 $filter->setProperties($properties ?? []);
             }
 
-            $context['filters']  = $values;
+            $context['filters'] = $values;
             $context['parameter'] = $parameter;
 
             $filter->apply($aggregationBuilder, $resourceClass, $operation, $context);
