@@ -20,6 +20,8 @@ use ApiPlatform\Metadata\Util\CloneTrait;
 use ApiPlatform\State\Exception\ProviderNotFoundException;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\SerializerContextBuilderInterface;
+use ApiPlatform\State\StopwatchAwareInterface;
+use ApiPlatform\State\StopwatchAwareTrait;
 use ApiPlatform\State\UriVariablesResolverTrait;
 use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\State\Util\RequestParser;
@@ -31,10 +33,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ReadProvider implements ProviderInterface
+final class ReadProvider implements ProviderInterface, StopwatchAwareInterface
 {
     use CloneTrait;
     use OperationRequestInitiatorTrait;
+    use StopwatchAwareTrait;
     use UriVariablesResolverTrait;
 
     public function __construct(
@@ -54,6 +57,8 @@ final class ReadProvider implements ProviderInterface
         if (!$operation->canRead()) {
             return null;
         }
+
+        $this->stopwatch?->start('api_platform.provider.read');
 
         if (null === ($filters = $request?->attributes->get('_api_filters')) && $request) {
             $queryString = RequestParser::getQueryString($request);
@@ -95,6 +100,8 @@ final class ReadProvider implements ProviderInterface
 
         $request?->attributes->set('data', $data);
         $request?->attributes->set('previous_data', $this->clone($data));
+
+        $this->stopwatch?->stop('api_platform.provider.read');
 
         return $data;
     }

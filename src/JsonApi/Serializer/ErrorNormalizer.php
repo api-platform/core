@@ -75,6 +75,9 @@ final class ErrorNormalizer implements NormalizerInterface
         return self::FORMAT === $format && ($data instanceof \Exception || $data instanceof FlattenException);
     }
 
+    /**
+     * @param string|null $format
+     */
     public function getSupportedTypes($format): array
     {
         if (self::FORMAT === $format) {

@@ -31,7 +31,11 @@ use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryItemResolverInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\AsOperationMutator;
+use ApiPlatform\Metadata\AsResourceMutator;
 use ApiPlatform\Metadata\FilterInterface;
+use ApiPlatform\Metadata\OperationMutatorInterface;
+use ApiPlatform\Metadata\ResourceMutatorInterface;
 use ApiPlatform\Metadata\UriVariableTransformerInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\OpenApi\Model\Tag;
@@ -44,9 +48,9 @@ use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRe
 use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
 use Doctrine\Persistence\ManagerRegistry;
-use phpDocumentor\Reflection\DocBlockFactoryInterface;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Ramsey\Uuid\Uuid;
+use Symfony\Bundle\FrameworkBundle\Controller\ControllerHelper;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -59,6 +63,8 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpClient\ScopingHttpClient;
+use Symfony\Component\JsonStreamer\JsonStreamWriter;
+use Symfony\Component\ObjectMapper\ObjectMapper;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -168,7 +174,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerMakerConfiguration($container, $config, $loader);
         $this->registerArgumentResolverConfiguration($loader);
         $this->registerLinkSecurityConfiguration($loader, $config);
+        $this->registerJsonStreamerConfiguration($container, $loader, $formats, $config);
 
+        if (class_exists(ObjectMapper::class)) {
+            $loader->load('state/object_mapper.xml');
+        }
         $container->registerForAutoconfiguration(FilterInterface::class)
             ->addTag('api_platform.filter');
         $container->registerForAutoconfiguration(ProviderInterface::class)
@@ -184,9 +194,69 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
                 ->addTag('api_platform.resource')
                 ->addTag('container.excluded', ['source' => 'by #[ApiResource] attribute']);
         });
+        $container->registerAttributeForAutoconfiguration(
+            AsResourceMutator::class,
+            static function (ChildDefinition $definition, AsResourceMutator $attribute, \Reflector $reflector): void {
+                if (!$reflector instanceof \ReflectionClass) {
+                    return;
+                }
+
+                if (!is_a($reflector->name, ResourceMutatorInterface::class, true)) {
+                    throw new RuntimeException(\sprintf('Resource mutator "%s" should implement %s', $reflector->name, ResourceMutatorInterface::class));
+                }
+
+                $definition->addTag('api_platform.resource_mutator', [
+                    'resourceClass' => $attribute->resourceClass,
+                ]);
+            },
+        );
+
+        $container->registerAttributeForAutoconfiguration(
+            AsOperationMutator::class,
+            static function (ChildDefinition $definition, AsOperationMutator $attribute, \Reflector $reflector): void {
+                if (!$reflector instanceof \ReflectionClass) {
+                    return;
+                }
+
+                if (!is_a($reflector->name, OperationMutatorInterface::class, true)) {
+                    throw new RuntimeException(\sprintf('Operation mutator "%s" should implement %s', $reflector->name, OperationMutatorInterface::class));
+                }
+
+                $definition->addTag('api_platform.operation_mutator', [
+                    'operationName' => $attribute->operationName,
+                ]);
+            },
+        );
 
         if (!$container->has('api_platform.state.item_provider')) {
             $container->setAlias('api_platform.state.item_provider', 'api_platform.state_provider.object');
+        }
+
+        if ($container->getParameter('kernel.debug')) {
+            $this->injectStopwatch($container);
+        }
+    }
+
+    private function injectStopwatch(ContainerBuilder $container): void
+    {
+        $services = [
+            'api_platform.state_processor.add_link_header',
+            'api_platform.state_processor.respond',
+            'api_platform.state_processor.serialize',
+            'api_platform.state_processor.write',
+            'api_platform.state_provider.content_negotiation',
+            'api_platform.state_provider.deserialize',
+            'api_platform.state_provider.parameter',
+            'api_platform.state_provider.read',
+        ];
+
+        foreach ($services as $id) {
+            if (!$container->hasDefinition($id)) {
+                continue;
+            }
+
+            $definition = $container->getDefinition($id);
+            $definition->addMethodCall('setStopwatch', [new Reference('debug.stopwatch', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE)]);
         }
     }
 
@@ -218,6 +288,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('state/provider.xml');
             $loader->load('state/processor.xml');
         }
+        $loader->load('state/parameter_provider.xml');
 
         $container->setParameter('api_platform.enable_entrypoint', $config['enable_entrypoint']);
         $container->setParameter('api_platform.enable_docs', $config['enable_docs']);
@@ -341,11 +412,12 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('metadata/property.xml');
         $loader->load('metadata/resource.xml');
         $loader->load('metadata/operation.xml');
+        $loader->load('metadata/mutator.xml');
 
         $container->getDefinition('api_platform.metadata.resource_extractor.xml')->replaceArgument(0, $xmlResources);
         $container->getDefinition('api_platform.metadata.property_extractor.xml')->replaceArgument(0, $xmlResources);
 
-        if (class_exists(PhpDocParser::class) || interface_exists(DocBlockFactoryInterface::class)) {
+        if (class_exists(PhpDocParser::class)) {
             $loader->load('metadata/php_doc.xml');
         }
 
@@ -493,10 +565,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.oauth.refreshUrl', $config['oauth']['refreshUrl']);
         $container->setParameter('api_platform.oauth.scopes', $config['oauth']['scopes']);
         $container->setParameter('api_platform.oauth.pkce', $config['oauth']['pkce']);
-
-        if ($container->hasDefinition('api_platform.swagger_ui.action')) {
-            $container->getDefinition('api_platform.swagger_ui.action')->setArgument(10, $config['oauth']['pkce']);
-        }
     }
 
     /**
@@ -506,7 +574,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         foreach (array_keys($config['swagger']['api_keys']) as $keyName) {
             if (!preg_match('/^[a-zA-Z0-9._-]+$/', $keyName)) {
-                trigger_deprecation('api-platform/core', '3.1', \sprintf('The swagger api_keys key "%s" is not valid with OpenAPI 3.1 it should match "^[a-zA-Z0-9._-]+$"', $keyName));
+                throw new RuntimeException(\sprintf('The swagger api_keys key "%s" is not valid, it should match "^[a-zA-Z0-9._-]+$"', $keyName));
             }
         }
 
@@ -606,19 +674,14 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $enabled = $this->isConfigEnabled($container, $config['graphql']);
         $graphqlIntrospectionEnabled = $enabled && $this->isConfigEnabled($container, $config['graphql']['introspection']);
         $graphiqlEnabled = $enabled && $this->isConfigEnabled($container, $config['graphql']['graphiql']);
-        $graphqlPlayGroundEnabled = $enabled && $this->isConfigEnabled($container, $config['graphql']['graphql_playground']);
         $maxQueryDepth = (int) $config['graphql']['max_query_depth'];
         $maxQueryComplexity = (int) $config['graphql']['max_query_complexity'];
-        if ($graphqlPlayGroundEnabled) {
-            trigger_deprecation('api-platform/core', '3.1', 'GraphQL Playground is deprecated and will be removed in API Platform 4.0. Only GraphiQL will be available in the future. Set api_platform.graphql.graphql_playground to false in the configuration to remove this deprecation.');
-        }
 
         $container->setParameter('api_platform.graphql.enabled', $enabled);
         $container->setParameter('api_platform.graphql.max_query_depth', $maxQueryDepth);
         $container->setParameter('api_platform.graphql.max_query_complexity', $maxQueryComplexity);
         $container->setParameter('api_platform.graphql.introspection.enabled', $graphqlIntrospectionEnabled);
         $container->setParameter('api_platform.graphql.graphiql.enabled', $graphiqlEnabled);
-        $container->setParameter('api_platform.graphql.graphql_playground.enabled', $graphqlPlayGroundEnabled);
         $container->setParameter('api_platform.graphql.collection.pagination', $config['graphql']['collection']['pagination']);
 
         if (!$enabled) {
@@ -634,13 +697,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('graphql.xml');
 
-        // @phpstan-ignore-next-line because PHPStan uses the container of the test env cache and in test the parameter kernel.bundles always contains the key TwigBundle
         if (!class_exists(Environment::class) || !isset($container->getParameter('kernel.bundles')['TwigBundle'])) {
-            if ($graphiqlEnabled || $graphqlPlayGroundEnabled) {
-                throw new RuntimeException(\sprintf('GraphiQL and GraphQL Playground interfaces depend on Twig. Please activate TwigBundle for the %s environnement or disable GraphiQL and GraphQL Playground.', $container->getParameter('kernel.environment')));
+            if ($graphiqlEnabled) {
+                throw new RuntimeException(\sprintf('GraphiQL interfaces depend on Twig. Please activate TwigBundle for the %s environnement or disable GraphiQL.', $container->getParameter('kernel.environment')));
             }
             $container->removeDefinition('api_platform.graphql.action.graphiql');
-            $container->removeDefinition('api_platform.graphql.action.graphql_playground');
         }
 
         $container->registerForAutoconfiguration(QueryItemResolverInterface::class)
@@ -921,6 +982,42 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         if ($config['enable_link_security']) {
             $loader->load('link_security.xml');
+        }
+    }
+
+    private function registerJsonStreamerConfiguration(ContainerBuilder $container, XmlFileLoader $loader, array $formats, array $config): void
+    {
+        if (!$config['enable_json_streamer']) {
+            return;
+        }
+
+        if (!class_exists(JsonStreamWriter::class)) {
+            throw new RuntimeException('symfony/json-streamer is not installed.');
+        }
+
+        // @TODO symfony/json-streamer:>=7.4.1 add composer conflict
+        if (!class_exists(ControllerHelper::class)) {
+            throw new RuntimeException('Symfony symfony/json-stream:^7.4 is needed.');
+        }
+
+        if (isset($formats['jsonld'])) {
+            $container->setParameter('.json_streamer.stream_writers_dir.jsonld', '%kernel.cache_dir%/json_streamer/stream_writer/jsonld');
+            $container->setParameter('.json_streamer.stream_readers_dir.jsonld', '%kernel.cache_dir%/json_streamer/stream_reader/jsonld');
+            $container->setParameter('.json_streamer.lazy_ghosts_dir.jsonld', '%kernel.cache_dir%/json_streamer/lazy_ghost/jsonld');
+        }
+
+        $loader->load('json_streamer/common.xml');
+
+        if ($config['use_symfony_listeners']) {
+            $loader->load('json_streamer/events.xml');
+        } else {
+            if (isset($formats['jsonld'])) {
+                $loader->load('json_streamer/hydra.xml');
+            }
+
+            if (isset($formats['json'])) {
+                $loader->load('json_streamer/json.xml');
+            }
         }
     }
 }

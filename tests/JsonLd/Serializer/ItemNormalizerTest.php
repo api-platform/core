@@ -58,7 +58,7 @@ class ItemNormalizerTest extends TestCase
 
         $propertyMetadata = (new ApiProperty())->withReadable(true);
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::any())->willReturn($propertyMetadata);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::type('array'))->willReturn($propertyMetadata);
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResource($dummy, UrlGeneratorInterface::ABS_PATH, null, Argument::any())->willReturn('/dummies/1988');

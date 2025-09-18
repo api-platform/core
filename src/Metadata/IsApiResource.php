@@ -15,6 +15,8 @@ namespace ApiPlatform\Metadata;
 
 /**
  * @author Kévin Dunglas <kevin@dunglas.dev>
+ *
+ * @phpstan-ignore trait.unused
  */
 trait IsApiResource
 {

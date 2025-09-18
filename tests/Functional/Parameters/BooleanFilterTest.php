@@ -20,11 +20,6 @@ use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Doctrine\ODM\MongoDB\MongoDBException;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 final class BooleanFilterTest extends ApiTestCase
 {
@@ -53,13 +48,6 @@ final class BooleanFilterTest extends ApiTestCase
         $this->loadFixtures($entityClass);
     }
 
-    /**
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
-     * @throws TransportExceptionInterface
-     */
     #[DataProvider('booleanFilterScenariosProvider')]
     public function testBooleanFilterResponses(string $url, int $expectedActiveItemCount, bool $expectedActiveStatus): void
     {
@@ -88,13 +76,6 @@ final class BooleanFilterTest extends ApiTestCase
         yield 'enabled_alias_numeric_0' => ['/filtered_boolean_parameters?enabled=0', 1, false];
     }
 
-    /**
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     */
     #[DataProvider('booleanFilterNullAndEmptyScenariosProvider')]
     public function testBooleanFilterWithNullAndEmptyValues(string $url): void
     {

@@ -30,36 +30,39 @@
         "php": ">=8.2",
         "api-platform/documentation": "^4.1.11",
         "api-platform/hydra": "^4.1.11",
-        "api-platform/json-hal": "^4.1.11",
+        "api-platform/json-api": "^4.1.11",
+        "api-platform/hal": "^4.2.0-beta.1",
         "api-platform/json-schema": "^4.1.11",
         "api-platform/jsonld": "^4.1.11",
-        "api-platform/json-api": "^4.1.11",
         "api-platform/metadata": "^4.1.11",
         "api-platform/openapi": "^4.1.11",
         "api-platform/serializer": "^4.1.11",
         "api-platform/state": "^4.1.11",
         "illuminate/config": "^11.0 || ^12.0",
-        "laravel/framework": "^11.0 || ^12.0",
+        "illuminate/container": "^11.0 || ^12.0",
         "illuminate/contracts": "^11.0 || ^12.0",
         "illuminate/database": "^11.0 || ^12.0",
         "illuminate/http": "^11.0 || ^12.0",
         "illuminate/pagination": "^11.0 || ^12.0",
         "illuminate/routing": "^11.0 || ^12.0",
         "illuminate/support": "^11.0 || ^12.0",
-        "illuminate/container": "^11.0 || ^12.0",
+        "laravel/framework": "^11.0 || ^12.0",
+        "symfony/deprecation-contracts": "^3.6",
         "symfony/type-info": "^7.2",
         "symfony/web-link": "^6.4 || ^7.1",
-        "willdurand/negotiation": "^3.1",
-        "phpstan/phpdoc-parser": "^1.29 || ^2.0",
-        "phpdocumentor/reflection-docblock": "^5.1"
+        "willdurand/negotiation": "^3.1"
     },
     "require-dev": {
+        "api-platform/graphql": "^4.1",
+        "api-platform/http-cache": "^4.1",
         "doctrine/dbal": "^4.0",
         "larastan/larastan": "^2.0 || ^3.0",
+        "laravel/sanctum": "^4.0",
         "orchestra/testbench": "^9.1",
+        "phpdocumentor/type-resolver": "^1.7",
+        "phpstan/phpdoc-parser": "^1.29 || ^2.0",
         "phpunit/phpunit": "11.5.x-dev",
-        "api-platform/graphql": "^4.1",
-        "laravel/sanctum": "^4.0"
+        "symfony/http-client": "^7.3"
     },
     "autoload": {
         "psr-4": {
@@ -75,18 +78,22 @@
     },
     "suggest": {
         "api-platform/graphql": "Enable GraphQl support.",
-        "phpdocumentor/reflection-docblock": ""
+        "api-platform/http-cache": "Enable HTTP Cache support.",
+        "phpstan/phpdoc-parser": "To support extracting metadata from PHPDoc."
     },
     "extra": {
         "laravel": {
             "providers": [
                 "ApiPlatform\\Laravel\\ApiPlatformProvider",
-                "ApiPlatform\\Laravel\\ApiPlatformDeferredProvider"
+                "ApiPlatform\\Laravel\\ApiPlatformDeferredProvider",
+                "ApiPlatform\\Laravel\\Eloquent\\ApiPlatformEventProvider"
             ]
         },
         "branch-alias": {
-            "dev-main": "4.2.x-dev",
-            "dev-3.4": "3.4.x-dev"
+            "dev-main": "4.3.x-dev",
+            "dev-4.2": "4.2.x-dev",
+            "dev-3.4": "3.4.x-dev",
+            "dev-4.1": "4.1.x-dev"
         },
         "symfony": {
             "require": "^6.4 || ^7.1"

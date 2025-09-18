@@ -176,7 +176,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             unset($propertySchema['type']);
         }
 
-        $extraProperties = $propertyMetadata->getExtraProperties() ?? [];
+        $extraProperties = $propertyMetadata->getExtraProperties();
         // see AttributePropertyMetadataFactory
         if (true === ($extraProperties[SchemaPropertyMetadataFactory::JSON_SCHEMA_USER_DEFINED] ?? false)) {
             // schema seems to have been declared by the user: do not override nor complete user value
@@ -246,7 +246,11 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 $subDefinitionName = $this->definitionNameFactory->create($className, $format, $className, null, $serializerContext);
 
                 if (isset($subSchema->getDefinitions()[$subDefinitionName])) {
-                    unset($subSchema->getDefinitions()[$subDefinitionName]['properties']['@id']);
+                    // @see https://github.com/api-platform/core/issues/7162
+                    // Need to rebuild the definition without @id property and set it back to the sub-schema
+                    $subSchemaDefinition = $subSchema->getDefinitions()[$subDefinitionName]->getArrayCopy();
+                    unset($subSchemaDefinition['properties']['@id']);
+                    $subSchema->getDefinitions()[$subDefinitionName] = new \ArrayObject($subSchemaDefinition);
                 }
             }
 
@@ -291,7 +295,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             $additionalPropertySchema ?? []
         );
 
-        $extraProperties = $propertyMetadata->getExtraProperties() ?? [];
+        $extraProperties = $propertyMetadata->getExtraProperties();
         // see AttributePropertyMetadataFactory
         if (true === ($extraProperties[SchemaPropertyMetadataFactory::JSON_SCHEMA_USER_DEFINED] ?? false)) {
             // schema seems to have been declared by the user: do not override nor complete user value

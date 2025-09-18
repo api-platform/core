@@ -16,6 +16,7 @@
         "httpcache",
         "hydra",
         "httpcache",
+        "hal",
         "jsonapi",
         "graphql",
         "openapi",

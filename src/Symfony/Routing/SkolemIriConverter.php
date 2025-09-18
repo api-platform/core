@@ -26,11 +26,11 @@ use Symfony\Component\Routing\RouterInterface;
  */
 final class SkolemIriConverter implements IriConverterInterface
 {
-    public static $skolemUriTemplate = '/.well-known/genid/{id}';
+    public static string $skolemUriTemplate = '/.well-known/genid/{id}';
 
-    private $objectHashMap;
-    private $classHashMap = [];
-    private $router;
+    private \SplObjectStorage $objectHashMap;
+    private array $classHashMap = [];
+    private RouterInterface $router;
 
     public function __construct(RouterInterface $router)
     {
@@ -49,7 +49,7 @@ final class SkolemIriConverter implements IriConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function getIriFromResource(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, ?Operation $operation = null, array $context = []): ?string
+    public function getIriFromResource(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, ?Operation $operation = null, array $context = []): string
     {
         $referenceType = $operation ? ($operation->getUrlGenerationStrategy() ?? $referenceType) : $referenceType;
         if (($isObject = \is_object($resource)) && $this->objectHashMap->contains($resource)) {

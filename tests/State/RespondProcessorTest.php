@@ -18,13 +18,11 @@ use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\State\Processor\RespondProcessor;
-use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Employee;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
 class RespondProcessorTest extends TestCase
@@ -74,7 +72,6 @@ class RespondProcessorTest extends TestCase
                 return ($args[2] ?? null)?->getUriTemplate() ?? '/default';
             });
 
-        /** @var ProcessorInterface<string, Response> $respondProcessor */
         $respondProcessor = new RespondProcessor($iriConverter->reveal(), $resourceClassResolver->reveal(), $operationMetadataFactory->reveal());
 
         $response = $respondProcessor->process('content', $canonicalUriTemplateRedirectingOperation, context: [
@@ -106,7 +103,6 @@ class RespondProcessorTest extends TestCase
     {
         $operation = new Get();
 
-        /** @var ProcessorInterface<string, Response> $respondProcessor */
         $respondProcessor = new RespondProcessor();
         $req = new Request();
         $req->attributes->set('exception', new TooManyRequestsHttpException(32));
@@ -121,7 +117,6 @@ class RespondProcessorTest extends TestCase
     {
         $operation = new Get(headers: ['foo' => 'bar']);
 
-        /** @var ProcessorInterface<string, Response> $respondProcessor */
         $respondProcessor = new RespondProcessor();
         $req = new Request();
         $response = $respondProcessor->process('content', $operation, context: [

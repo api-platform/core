@@ -20,11 +20,6 @@ use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Doctrine\ODM\MongoDB\MongoDBException;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 final class RangeFilterTest extends ApiTestCase
 {
@@ -52,13 +47,6 @@ final class RangeFilterTest extends ApiTestCase
         $this->loadFixtures($entityClass);
     }
 
-    /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
-     */
     #[DataProvider('rangeFilterScenariosProvider')]
     public function testRangeFilterResponses(string $url, int $expectedCount): void
     {
@@ -93,13 +81,6 @@ final class RangeFilterTest extends ApiTestCase
         yield 'amount_alias_lte_and_between' => ['/filtered_range_parameters?amount[lte]=30&amount[between]=15..40', 2];
     }
 
-    /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
-     */
     #[DataProvider('nullAndEmptyScenariosProvider')]
     public function testRangeFilterWithNullAndEmptyValues(string $url, int $expectedCount): void
     {

@@ -16,13 +16,14 @@ namespace ApiPlatform\Metadata;
 use ApiPlatform\State\OptionsInterface;
 
 /**
- * @internal
+ * @psalm-inheritors ApiResource|Operation
  */
 abstract class Metadata
 {
     protected ?Parameters $parameters = null;
 
     /**
+     * @param class-string                                                                      $class
      * @param string|null                                                                       $deprecationReason       https://api-platform.com/docs/core/deprecations/#deprecating-resource-classes-operations-and-properties
      * @param string|\Stringable|null                                                           $security                https://api-platform.com/docs/core/security
      * @param string|\Stringable|null                                                           $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
@@ -46,7 +47,6 @@ abstract class Metadata
         protected ?bool $collectDenormalizationErrors = null,
         protected ?array $validationContext = null,
         protected ?array $filters = null,
-        protected ?bool $elasticsearch = null,
         protected $mercure = null,
         protected $messenger = null,
         protected $input = null,
@@ -73,9 +73,6 @@ abstract class Metadata
         protected $provider = null,
         protected $processor = null,
         protected ?OptionsInterface $stateOptions = null,
-        /*
-         * @experimental
-         */
         array|Parameters|null $parameters = null,
         protected mixed $rules = null,
         protected ?string $policy = null,
@@ -83,6 +80,7 @@ abstract class Metadata
         protected ?bool $queryParameterValidationEnabled = null,
         protected ?bool $strictQueryParameterValidation = null,
         protected ?bool $hideHydraOperation = null,
+        protected ?bool $jsonStream = null,
         protected array $extraProperties = [],
     ) {
         if (\is_array($parameters) && $parameters) {
@@ -105,11 +103,17 @@ abstract class Metadata
         return $self;
     }
 
+    /**
+     * @return class-string|null
+     */
     public function getClass(): ?string
     {
         return $this->class;
     }
 
+    /**
+     * @param class-string $class
+     */
     public function withClass(string $class): static
     {
         $self = clone $this;
@@ -149,6 +153,9 @@ abstract class Metadata
         return $this->deprecationReason;
     }
 
+    /**
+     * @param string $deprecationReason
+     */
     public function withDeprecationReason($deprecationReason): static
     {
         $self = clone $this;
@@ -225,34 +232,12 @@ abstract class Metadata
         return $self;
     }
 
-    /**
-     * @deprecated this will be removed in v4
-     */
-    public function getElasticsearch(): ?bool
-    {
-        return $this->elasticsearch;
-    }
-
-    /**
-     * @deprecated this will be removed in v4
-     */
-    public function withElasticsearch(bool $elasticsearch): static
-    {
-        $self = clone $this;
-        $self->elasticsearch = $elasticsearch;
-
-        return $self;
-    }
-
-    /**
-     * @return array|bool|mixed|null
-     */
-    public function getMercure()
+    public function getMercure(): mixed
     {
         return $this->mercure;
     }
 
-    public function withMercure($mercure): static
+    public function withMercure(mixed $mercure): static
     {
         $self = clone $this;
         $self->mercure = $mercure;
@@ -260,12 +245,12 @@ abstract class Metadata
         return $self;
     }
 
-    public function getMessenger()
+    public function getMessenger(): mixed
     {
         return $this->messenger;
     }
 
-    public function withMessenger($messenger): static
+    public function withMessenger(mixed $messenger): static
     {
         $self = clone $this;
         $self->messenger = $messenger;
@@ -273,12 +258,12 @@ abstract class Metadata
         return $self;
     }
 
-    public function getInput()
+    public function getInput(): mixed
     {
         return $this->input;
     }
 
-    public function withInput($input): static
+    public function withInput(mixed $input): static
     {
         $self = clone $this;
         $self->input = $input;
@@ -286,12 +271,12 @@ abstract class Metadata
         return $self;
     }
 
-    public function getOutput()
+    public function getOutput(): mixed
     {
         return $this->output;
     }
 
-    public function withOutput($output): static
+    public function withOutput(mixed $output): static
     {
         $self = clone $this;
         $self->output = $output;
@@ -473,7 +458,7 @@ abstract class Metadata
         return $this->security instanceof \Stringable ? (string) $this->security : $this->security;
     }
 
-    public function withSecurity($security): static
+    public function withSecurity(string|\Stringable|null $security = null): static
     {
         $self = clone $this;
         $self->security = $security;
@@ -499,7 +484,7 @@ abstract class Metadata
         return $this->securityPostDenormalize instanceof \Stringable ? (string) $this->securityPostDenormalize : $this->securityPostDenormalize;
     }
 
-    public function withSecurityPostDenormalize($securityPostDenormalize): static
+    public function withSecurityPostDenormalize(string|\Stringable|null $securityPostDenormalize = null): static
     {
         $self = clone $this;
         $self->securityPostDenormalize = $securityPostDenormalize;
@@ -691,6 +676,19 @@ abstract class Metadata
     {
         $self = clone $this;
         $self->hideHydraOperation = $hideHydraOperation;
+
+        return $self;
+    }
+
+    public function getJsonStream(): ?bool
+    {
+        return $this->jsonStream;
+    }
+
+    public function withJsonStream(bool $jsonStream): static
+    {
+        $self = clone $this;
+        $self->jsonStream = $jsonStream;
 
         return $self;
     }

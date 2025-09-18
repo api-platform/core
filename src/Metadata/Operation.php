@@ -20,6 +20,7 @@ use ApiPlatform\State\OptionsInterface;
  */
 abstract class Operation extends Metadata
 {
+    use CascadeFromResource;
     use WithResourceTrait;
 
     /**
@@ -47,18 +48,17 @@ abstract class Operation extends Metadata
      *     class?: string|null,
      *     name?: string,
      * }|string|false|null $output {@see https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation}
-     * @param string|array|bool|null   $mercure       {@see https://api-platform.com/docs/core/mercure}
-     * @param string|bool|null         $messenger     {@see https://api-platform.com/docs/core/messenger/#dispatching-a-resource-through-the-message-bus}
-     * @param bool|null                $elasticsearch {@see https://api-platform.com/docs/core/elasticsearch/}
-     * @param bool|null                $read          {@see https://api-platform.com/docs/core/events/#the-event-system}
-     * @param bool|null                $deserialize   {@see https://api-platform.com/docs/core/events/#the-event-system}
-     * @param bool|null                $validate      {@see https://api-platform.com/docs/core/events/#the-event-system}
-     * @param bool|null                $write         {@see https://api-platform.com/docs/core/events/#the-event-system}
-     * @param bool|null                $serialize     {@see https://api-platform.com/docs/core/events/#the-event-system}
-     * @param bool|null                $fetchPartial  {@see https://api-platform.com/docs/core/performance/#fetch-partial}
-     * @param bool|null                $forceEager    {@see https://api-platform.com/docs/core/performance/#force-eager}
-     * @param string|callable|null     $provider      {@see https://api-platform.com/docs/core/state-providers/#state-providers}
-     * @param string|callable|null     $processor     {@see https://api-platform.com/docs/core/state-processors/#state-processors}
+     * @param string|array|bool|null   $mercure      {@see https://api-platform.com/docs/core/mercure}
+     * @param string|bool|null         $messenger    {@see https://api-platform.com/docs/core/messenger/#dispatching-a-resource-through-the-message-bus}
+     * @param bool|null                $read         {@see https://api-platform.com/docs/core/events/#the-event-system}
+     * @param bool|null                $deserialize  {@see https://api-platform.com/docs/core/events/#the-event-system}
+     * @param bool|null                $validate     {@see https://api-platform.com/docs/core/events/#the-event-system}
+     * @param bool|null                $write        {@see https://api-platform.com/docs/core/events/#the-event-system}
+     * @param bool|null                $serialize    {@see https://api-platform.com/docs/core/events/#the-event-system}
+     * @param bool|null                $fetchPartial {@see https://api-platform.com/docs/core/performance/#fetch-partial}
+     * @param bool|null                $forceEager   {@see https://api-platform.com/docs/core/performance/#force-eager}
+     * @param string|callable|null     $provider     {@see https://api-platform.com/docs/core/state-providers/#state-providers}
+     * @param string|callable|null     $processor    {@see https://api-platform.com/docs/core/state-processors/#state-processors}
      * @param array<string, Parameter> $parameters
      */
     public function __construct(
@@ -786,7 +786,6 @@ abstract class Operation extends Metadata
          * @var string|bool|null
          */
         protected $messenger = null,
-        protected ?bool $elasticsearch = null,
         protected ?int $urlGenerationStrategy = null,
         protected ?bool $read = null,
         protected ?bool $deserialize = null,
@@ -813,6 +812,7 @@ abstract class Operation extends Metadata
         ?bool $queryParameterValidationEnabled = null,
         protected ?bool $strictQueryParameterValidation = null,
         protected ?bool $hideHydraOperation = null,
+        protected ?bool $jsonStream = null,
         protected array $extraProperties = [],
     ) {
         parent::__construct(
@@ -826,7 +826,6 @@ abstract class Operation extends Metadata
             collectDenormalizationErrors: $collectDenormalizationErrors,
             validationContext: $validationContext,
             filters: $filters,
-            elasticsearch: $elasticsearch,
             mercure: $mercure,
             messenger: $messenger,
             input: $input,
@@ -860,11 +859,12 @@ abstract class Operation extends Metadata
             queryParameterValidationEnabled: $queryParameterValidationEnabled,
             strictQueryParameterValidation: $strictQueryParameterValidation,
             hideHydraOperation: $hideHydraOperation,
+            jsonStream: $jsonStream,
             extraProperties: $extraProperties,
         );
     }
 
-    public function withOperation($operation)
+    public function withOperation(self $operation): static
     {
         return $this->copyFrom($operation);
     }

@@ -61,7 +61,7 @@ final class EntrypointNormalizer implements NormalizerInterface
                     }
 
                     try {
-                        $entrypoint[$key] = $this->iriConverter->getIriFromResource($resourceClass, UrlGeneratorInterface::ABS_PATH, $operation); // @phpstan-ignore-line phpstan issue as type is CollectionOperationInterface & Operation
+                        $entrypoint[$key] = $this->iriConverter->getIriFromResource($resourceClass, UrlGeneratorInterface::ABS_PATH, $operation);
                     } catch (InvalidArgumentException|OperationNotFoundException) {
                         // Ignore resources without GET operations
                     }
@@ -82,6 +82,9 @@ final class EntrypointNormalizer implements NormalizerInterface
         return self::FORMAT === $format && $data instanceof Entrypoint;
     }
 
+    /**
+     * @param string|null $format
+     */
     public function getSupportedTypes($format): array
     {
         return self::FORMAT === $format ? [Entrypoint::class => true] : [];

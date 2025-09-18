@@ -32,7 +32,7 @@ final class ApiGatewayNormalizer implements NormalizerInterface
         self::API_GATEWAY => false,
     ];
 
-    public function __construct(private readonly NormalizerInterface $documentationNormalizer, $defaultContext = [])
+    public function __construct(private readonly NormalizerInterface $documentationNormalizer, array $defaultContext = [])
     {
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
@@ -42,7 +42,7 @@ final class ApiGatewayNormalizer implements NormalizerInterface
      *
      * @throws UnexpectedValueException
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
         $data = $this->documentationNormalizer->normalize($object, $format, $context);
         if (!\is_array($data)) {
@@ -119,6 +119,9 @@ final class ApiGatewayNormalizer implements NormalizerInterface
         return $this->documentationNormalizer->supportsNormalization($data, $format);
     }
 
+    /**
+     * @param string|null $format
+     */
     public function getSupportedTypes($format): array
     {
         return $this->documentationNormalizer->getSupportedTypes($format);

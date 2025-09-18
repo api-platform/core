@@ -17,12 +17,14 @@ use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Configuration;
 use Doctrine\ORM\OptimisticLockException;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Controller\ControllerHelper;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\JsonStreamer\JsonStreamWriter;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
 /**
@@ -73,6 +75,7 @@ class ConfigurationTest extends TestCase
         $this->assertEquals([
             'title' => 'title',
             'description' => 'description',
+            'enable_json_streamer' => class_exists(ControllerHelper::class) && class_exists(JsonStreamWriter::class),
             'version' => '1.0.0',
             'show_webby' => true,
             'formats' => [
@@ -114,9 +117,6 @@ class ConfigurationTest extends TestCase
             'graphql' => [
                 'enabled' => true,
                 'default_ide' => 'graphiql',
-                'graphql_playground' => [
-                    'enabled' => true,
-                ],
                 'graphiql' => [
                     'enabled' => true,
                 ],

@@ -62,7 +62,7 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             }
         }
 
-        $extraProperties = $propertyMetadata->getExtraProperties() ?? [];
+        $extraProperties = $propertyMetadata->getExtraProperties();
         // see AttributePropertyMetadataFactory
         if (true === ($extraProperties[self::JSON_SCHEMA_USER_DEFINED] ?? false)) {
             // schema seems to have been declared by the user: do not override nor complete user value
@@ -116,14 +116,14 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             $propertySchema['readOnly'] = true;
         }
 
-        if (!\array_key_exists('default', $propertySchema) && !empty($default = $propertyMetadata->getDefault()) && !$isResourceClass) {
+        if (!\array_key_exists('default', $propertySchema) && null !== ($default = $propertyMetadata->getDefault()) && false === (\is_array($default) && empty($default)) && !$isResourceClass) {
             if ($default instanceof \BackedEnum) {
                 $default = $default->value;
             }
             $propertySchema['default'] = $default;
         }
 
-        if (!\array_key_exists('example', $propertySchema) && !empty($example = $propertyMetadata->getExample())) {
+        if (!\array_key_exists('example', $propertySchema) && null !== ($example = $propertyMetadata->getExample()) && false === (\is_array($example) && empty($example))) {
             $propertySchema['example'] = $example;
         }
 

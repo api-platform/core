@@ -13,12 +13,15 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Controller;
 
+use ApiPlatform\HttpCache\PurgerInterface;
+use ApiPlatform\Laravel\Eloquent\Listener\PurgeHttpCacheListener;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Event;
 use Symfony\Component\HttpFoundation\Response;
 
 class ApiPlatformController extends Controller
@@ -93,6 +96,11 @@ class ApiPlatformController extends Controller
             $operation = $operation->withSerialize(true);
         }
 
+        if (interface_exists(PurgerInterface::class)) {
+            Event::listen('eloquent.saved: *', [PurgeHttpCacheListener::class, 'handleModelSaved']);
+            Event::listen('eloquent.deleted: *', [PurgeHttpCacheListener::class, 'handleModelDeleted']);
+        }
+
         return $this->processor->process($body, $operation, $uriVariables, $context);
     }
 
@@ -103,7 +111,8 @@ class ApiPlatformController extends Controller
     {
         $uriVariables = [];
         foreach ($operation->getUriVariables() ?? [] as $parameterName => $_) {
-            $parameter = $request->route($parameterName);
+            // TODO: use $link->getParameterName() instead but be sure it is filled correctly in metadata fist
+            $parameter = $request->route((string) $parameterName);
             if (\is_string($parameter) && ($format = $request->attributes->get('_format')) && str_contains($parameter, $format)) {
                 $parameter = substr($parameter, 0, \strlen($parameter) - (\strlen($format) + 1));
             }

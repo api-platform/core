@@ -186,13 +186,7 @@ final class QueryBuilderHelper
      */
     private static function mapRootAliases(array $rootAliases, array $rootEntities): array
     {
-        /** @var false|array $aliasMap */
-        $aliasMap = array_combine($rootAliases, $rootEntities);
-        if (false === $aliasMap) {
-            throw new \LogicException('Number of root aliases and root entities do not match.');
-        }
-
-        return $aliasMap;
+        return array_combine($rootAliases, $rootEntities);
     }
 
     /**

@@ -26,6 +26,7 @@ use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Constraints\DateTime;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\Iban;
 use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Constraints\Isbn;
@@ -83,7 +84,7 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
     {
         $propertyMetadata = $this->decorated->create($resourceClass, $property, $options);
 
-        $extraProperties = $propertyMetadata->getExtraProperties() ?? [];
+        $extraProperties = $propertyMetadata->getExtraProperties();
         // see AttributePropertyMetadataFactory
         if (true === ($extraProperties[SchemaPropertyMetadataFactory::JSON_SCHEMA_USER_DEFINED] ?? false)) {
             // schema seems to have been declared by the user: do not override nor complete user value
@@ -151,11 +152,14 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
      */
     private function getValidationGroups(ValidatorClassMetadataInterface $classMetadata, array $options): array
     {
-        if (
-            isset($options['validation_groups'])
-            && !\is_callable($options['validation_groups'])
-        ) {
-            return $options['validation_groups'];
+        if (isset($options['validation_groups'])) {
+            if ($options['validation_groups'] instanceof GroupSequence) {
+                return $options['validation_groups']->groups;
+            }
+
+            if (!\is_callable($options['validation_groups'])) {
+                return $options['validation_groups'];
+            }
         }
 
         if (!method_exists($classMetadata, 'getDefaultGroup')) {

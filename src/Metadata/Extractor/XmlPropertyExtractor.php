@@ -110,10 +110,10 @@ final class XmlPropertyExtractor extends AbstractPropertyExtractor
         return $data;
     }
 
-    private function buildArrayValue(?\SimpleXMLElement $resource, string $key, mixed $default = null)
+    private function buildArrayValue(?\SimpleXMLElement $resource, string $key): ?array
     {
         if (!isset($resource->{$key.'s'}->{$key})) {
-            return $default;
+            return null;
         }
 
         return (array) $resource->{$key.'s'}->{$key};

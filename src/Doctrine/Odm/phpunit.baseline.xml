@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<files version="1">
+ <file path="vendor/symfony/deprecation-contracts/function.php">
+  <line number="25" hash="c6af5d66288d0667e424978000f29571e4954b81">
+   <issue><![CDATA[Since symfony/property-info 7.3: The "Symfony\Component\PropertyInfo\Type" class is deprecated. Use "Symfony\Component\TypeInfo\Type" class from "symfony/type-info" instead.]]></issue>
+  </line>
+ </file>
+</files>

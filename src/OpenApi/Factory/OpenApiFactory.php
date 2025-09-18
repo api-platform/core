@@ -186,7 +186,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $openapiAttribute = $operation->getOpenapi();
 
             // Operation ignored from OpenApi
-            if ($operation instanceof HttpOperation && false === $openapiAttribute) {
+            if (false === $openapiAttribute) {
                 continue;
             }
 
@@ -214,7 +214,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             }
 
             $path = $this->getPath($path);
-            $method = $operation->getMethod() ?? 'GET';
+            $method = $operation->getMethod();
 
             if (!\in_array($method, PathItem::$methods, true)) {
                 continue;
@@ -254,10 +254,8 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             [$requestMimeTypes, $responseMimeTypes] = $this->getMimeTypes($operation);
 
-            if ($path) {
-                $pathItem = $paths->getPath($path) ?: new PathItem();
-            } elseif (!$pathItem) {
-                $pathItem = new PathItem();
+            if (null === $pathItem) {
+                $pathItem = $paths->getPath($path) ?? new PathItem();
             }
 
             $forceSchemaCollection = $operation instanceof CollectionOperationInterface && 'GET' === $method;
@@ -388,7 +386,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $existingResponses = $openapiOperation->getResponses() ?: [];
             $overrideResponses = $operation->getExtraProperties()[self::OVERRIDE_OPENAPI_RESPONSES] ?? $this->openApiOptions->getOverrideResponses();
             $errors = null;
-            if ($operation instanceof HttpOperation && null !== ($errors = $operation->getErrors())) {
+            if (null !== ($errors = $operation->getErrors())) {
                 /** @var array<class-string|string, Error> */
                 $errorOperations = [];
                 foreach ($errors as $error) {
@@ -500,11 +498,13 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
     private function buildOpenApiResponse(array $existingResponses, int|string $status, string $description, ?Operation $openapiOperation = null, ?HttpOperation $operation = null, ?array $responseMimeTypes = null, ?array $operationOutputSchemas = null, ?ResourceMetadataCollection $resourceMetadataCollection = null): Operation
     {
+        $noOutput = \is_array($operation?->getOutput()) && null === $operation->getOutput()['class'];
+
         if (isset($existingResponses[$status])) {
             return $openapiOperation;
         }
         $responseLinks = $responseContent = null;
-        if ($responseMimeTypes && $operationOutputSchemas) {
+        if ($responseMimeTypes && $operationOutputSchemas && !$noOutput) {
             $responseContent = $this->buildContent($responseMimeTypes, $operationOutputSchemas);
         }
         if ($resourceMetadataCollection && $operation) {
@@ -533,7 +533,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     }
 
     /**
-     * @return array[array<string, string>, array<string, string>]
+     * @return array{array<string, string>, array<string, string>}
      */
     private function getMimeTypes(HttpOperation $operation): array
     {
@@ -620,7 +620,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         foreach ($resourceMetadataCollection as $resource) {
             foreach ($resource->getOperations() as $operationName => $operation) {
                 $parameters = [];
-                $method = $operation instanceof HttpOperation ? $operation->getMethod() : 'GET';
+                $method = $operation->getMethod();
                 if (
                     $operationName === $operation->getName()
                     || isset($links[$operationName])
@@ -631,7 +631,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 }
 
                 // Operation ignored from OpenApi
-                if ($operation instanceof HttpOperation && (false === $operation->getOpenapi() || $operation->getOpenapi() instanceof Webhook)) {
+                if (false === $operation->getOpenapi() || $operation->getOpenapi() instanceof Webhook) {
                     continue;
                 }
 
@@ -845,6 +845,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 null,
                 ['type' => 'boolean'],
             );
+        }
+
+        if ($operation->getPaginationClientPartial() ?? $this->paginationOptions->isClientPartialPaginationEnabled()) {
+            $parameters[] = new Parameter($this->paginationOptions->getPartialPaginationParameterName(), 'query', 'Enable or disable partial pagination', false, false, true, ['type' => 'boolean']);
         }
 
         return $parameters;

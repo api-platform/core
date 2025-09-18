@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Console\Maker;
 
-use ApiPlatform\Laravel\Console\Maker\Utils\AppServiceProviderTagger;
+use ApiPlatform\Laravel\Console\Maker\Utils\StateAppServiceProviderTagger;
 use ApiPlatform\Laravel\Console\Maker\Utils\StateTemplateGenerator;
 use ApiPlatform\Laravel\Console\Maker\Utils\StateTypeEnum;
 use ApiPlatform\Laravel\Console\Maker\Utils\SuccessMessageTrait;
@@ -28,7 +28,7 @@ abstract class AbstractMakeStateCommand extends Command
     public function __construct(
         private readonly Filesystem $filesystem,
         private readonly StateTemplateGenerator $stateTemplateGenerator,
-        private readonly AppServiceProviderTagger $appServiceProviderTagger,
+        private readonly StateAppServiceProviderTagger $stateAppServiceProviderTagger,
     ) {
         parent::__construct();
     }
@@ -38,7 +38,13 @@ abstract class AbstractMakeStateCommand extends Command
      */
     public function handle(): int
     {
-        $stateName = $this->askForStateName();
+        $stateType = $this->getStateType()->name;
+        $stateName = $this->ask(\sprintf('Choose a class name for your state %s (e.g. <fg=yellow>AwesomeState%s</>)', strtolower($stateType), ucfirst($stateType)));
+        if (null === $stateName || '' === $stateName) {
+            $this->error('[ERROR] The name argument cannot be blank.');
+
+            return self::FAILURE;
+        }
 
         $directoryPath = base_path('app/State/');
         $this->filesystem->ensureDirectoryExists($directoryPath);
@@ -57,24 +63,11 @@ abstract class AbstractMakeStateCommand extends Command
             return self::FAILURE;
         }
 
-        $this->appServiceProviderTagger->addTagToServiceProvider($stateName, $this->getStateType());
+        $this->stateAppServiceProviderTagger->addTagToServiceProvider($stateName, $this->getStateType());
 
-        $this->writeSuccessMessage($filePath, $this->getStateType());
+        $this->writeSuccessMessage($filePath, \sprintf('State %s', ucfirst($this->getStateType()->name)));
 
         return self::SUCCESS;
-    }
-
-    protected function askForStateName(): string
-    {
-        do {
-            $stateType = $this->getStateType()->name;
-            $stateName = $this->ask(\sprintf('Choose a class name for your state %s (e.g. <fg=yellow>AwesomeState%s</>)', strtolower($stateType), ucfirst($stateType)));
-            if (empty($stateName)) {
-                $this->error('[ERROR] This value cannot be blank.');
-            }
-        } while (empty($stateName));
-
-        return $stateName;
     }
 
     abstract protected function getStateType(): StateTypeEnum;

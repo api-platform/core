@@ -15,7 +15,6 @@ namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Metadata\Exception\InvalidIdentifierException;
 use ApiPlatform\Metadata\Exception\InvalidUriVariableException;
-use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\UriVariablesConverterInterface;
 use ApiPlatform\Metadata\Util\CloneTrait;
@@ -44,6 +43,7 @@ final class ReadListener
         private readonly ProviderInterface $provider,
         ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
         ?UriVariablesConverterInterface $uriVariablesConverter = null,
+        private readonly ?ProviderInterface $parameterProvider = null,
     ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
         $this->uriVariablesConverter = $uriVariablesConverter;
@@ -72,7 +72,7 @@ final class ReadListener
         }
 
         $uriVariables = [];
-        if (!$request->attributes->has('exception') && $operation instanceof HttpOperation) {
+        if (!$request->attributes->has('exception')) {
             try {
                 $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $operation->getClass());
             } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
@@ -83,10 +83,12 @@ final class ReadListener
         }
 
         $request->attributes->set('_api_uri_variables', $uriVariables);
-        $this->provider->provide($operation, $uriVariables, [
+        $context = [
             'request' => $request,
             'uri_variables' => $uriVariables,
             'resource_class' => $operation->getClass(),
-        ]);
+        ];
+        $this->parameterProvider?->provide($operation, $uriVariables, $context);
+        $this->provider->provide($operation, $uriVariables, $context);
     }
 }

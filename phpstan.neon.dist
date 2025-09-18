@@ -1,10 +1,11 @@
 parameters:
-	level: 5
+	level: 6
 	paths:
 		- src
 		- tests
 		- tests/Fixtures/app/console
 	inferPrivatePropertyTypeFromConstructor: true
+	treatPhpDocTypesAsCertain: false
 	symfony:
 		containerXmlPath: tests/Fixtures/app/var/cache/test/AppKernelTestDebugContainer.xml
 		constantHassers: false
@@ -14,10 +15,10 @@ parameters:
 		# We're aliasing classes for phpunit in this file, it needs to be added here see phpstan/#2194
 		- src/Symfony/Bundle/Test/Constraint/ArraySubset.php
 		- tests/Fixtures/app/AppKernel.php
+
 	excludePaths:
 		# uses larastan
 		- src/Laravel
-		- src/Symfony/Bundle/Command/OpenApiCommand.php
 		# Symfony config
 		- tests/Fixtures/app/config/config_swagger.php
 		# Symfony cache
@@ -33,10 +34,6 @@ parameters:
 		- src/Doctrine/*/vendor/*
 		- src/*/vendor/*
 		# Symfony 6 support
-		- src/OpenApi/Serializer/CacheableSupportsMethodInterface.php
-		- src/Serializer/CacheableSupportsMethodInterface.php
-		- tests/Hal/Serializer/ItemNormalizerTest.php
-		- tests/Symfony/Validator/Metadata/Property/ValidatorPropertyMetadataFactoryTest.php
 		- src/Symfony/Bundle/ArgumentResolver/CompatibleValueResolverInterface.php
 	earlyTerminatingMethodCalls:
 		PHPUnit\Framework\Constraint\Constraint:
@@ -58,6 +55,18 @@ parameters:
 				- tests/Fixtures/TestBundle/Entity/
 				- src/OpenApi/Factory/OpenApiFactory.php
 		-
+			message: '#is never assigned .* so it can be removed from the property type.#'
+			paths:
+				- src/Doctrine/Common/Tests/Fixtures/
+				- src/Doctrine/Orm/Tests/Fixtures/
+				- src/Doctrine/Odm/Tests/Fixtures/
+				- src/Elasticsearch/Tests/Fixtures/
+				- src/GraphQl/Tests/Fixtures/
+				- src/JsonSchema/Tests/Fixtures/
+				- src/Metadata/Tests/Fixtures/
+				- src/Serializer/Tests/Fixtures/
+				- tests/Fixtures/
+		-
 			message: '#is never written, only read.#'
 			paths:
 				- tests/Fixtures/TestBundle/Document/
@@ -73,11 +82,17 @@ parameters:
 		- '#Method Symfony\\Component\\Serializer\\NameConverter\\NameConverterInterface::normalize\(\) invoked with (2|3|4) parameters, 1 required\.#'
 
 		# Expected, due to backward compatibility
-		-
-			message: "#Call to function method_exists\\(\\) with ApiPlatform\\\\JsonApi\\\\Serializer\\\\ItemNormalizer and 'setCircularReferenc…' will always evaluate to false\\.#"
-			path: src/JsonApi/Tests/Serializer/ItemNormalizerTest.php
 		- '#Method GraphQL\\Type\\Definition\\WrappingType::getWrappedType\(\) invoked with 1 parameter, 0 required\.#'
 		- '#Access to an undefined property GraphQL\\Type\\Definition\\NamedType&GraphQL\\Type\\Definition\\Type::\$name\.#'
+		- "#Call to function method_exists\\(\\) with GraphQL\\\\Type\\\\Definition\\\\Type&GraphQL\\\\Type\\\\Definition\\\\WrappingType and 'getInnermostType' will always evaluate to true\\.#"
+		- "#Call to function method_exists\\(\\) with Symfony\\\\Component\\\\Console\\\\Application and 'addCommand' will always evaluate to false\\.#"
+		- "#Call to function method_exists\\(\\) with 'Symfony\\\\\\\\Component\\\\\\\\PropertyInfo\\\\\\\\PropertyInfoExtractor' and 'getType' will always evaluate to true\\.#"
+		- "#Call to function method_exists\\(\\) with 'Symfony\\\\\\\\Component\\\\\\\\HttpFoundation\\\\\\\\Request' and 'getContentTypeFormat' will always evaluate to true\\.#"
+		- '#Call to an undefined method Symfony\\Component\\HttpFoundation\\Request::getContentType\(\)\.#'
+		- "#Call to function method_exists\\(\\) with 'Symfony\\\\\\\\Component\\\\\\\\Serializer\\\\\\\\Serializer' and 'getSupportedTypes' will always evaluate to true\\.#"
+		- "#Call to function method_exists\\(\\) with Symfony\\\\Component\\\\Serializer\\\\Normalizer\\\\NormalizerInterface and 'getSupportedTypes' will always evaluate to true\\.#"
+		- "#Call to function method_exists\\(\\) with Doctrine\\\\ODM\\\\MongoDB\\\\Configuration and 'setMetadataCache' will always evaluate to true\\.#"
+		- "#Call to function method_exists\\(\\) with Doctrine\\\\ODM\\\\MongoDB\\\\Mapping\\\\ClassMetadata\\|Doctrine\\\\ORM\\\\Mapping\\\\ClassMetadata and 'isChangeTrackingDef…' will always evaluate to true\\.#"
 		-
 			message: '#Instanceof between Symfony\\Component\\Serializer\\NameConverter\\NameConverterInterface and Symfony\\Component\\Serializer\\NameConverter\\MetadataAwareNameConverter will always evaluate to false\.#'
 			paths:
@@ -93,4 +108,66 @@ parameters:
 		-
 			message: '#^Service "[^"]+" is private.$#'
 			path: src
-		- '#Call to an undefined method Symfony\\Component\\HttpFoundation\\Request::getContentType\(\)\.#'
+
+
+		# Allow extra assertions in tests: https://github.com/phpstan/phpstan-strict-rules/issues/130
+		- '#^Call to (static )?method PHPUnit\\Framework\\Assert::.* will always evaluate to true\.$#'
+
+		# Level 6
+		-
+			identifier: missingType.iterableValue
+		-
+			identifier: missingType.generics
+		-
+			identifier: missingType.property
+			paths:
+				- src/Doctrine/Common/Tests
+				- src/Doctrine/Odm/Tests
+				- src/Doctrine/Orm/Tests
+				- src/Elasticsearch/Tests
+				- src/Hydra/Tests
+				- src/JsonApi/Tests
+				- src/JsonSchema/Tests
+				- src/Metadata/Tests
+				- src/Serializer/Tests
+				- src/Symfony/Tests
+				- tests
+		-
+			identifier: missingType.parameter
+			paths:
+				- src/Doctrine/Common/Tests
+				- src/Doctrine/Odm/Tests
+				- src/Doctrine/Orm/Tests
+				- src/Elasticsearch/Tests
+				- src/GraphQl/Tests
+				- src/Hydra/Tests
+				- src/JsonApi/Tests
+				- src/JsonSchema/Tests
+				- src/Metadata/Tests
+				- src/OpenApi/Tests
+				- src/Serializer/Tests
+				- src/Symfony/Bundle/Test
+				- src/Symfony/Tests
+				- tests
+		-
+			identifier: missingType.return
+			paths:
+				- src/Doctrine/Common/Tests
+				- src/Doctrine/Odm/Tests
+				- src/Doctrine/Orm/Tests
+				- src/Elasticsearch/Tests
+				- src/GraphQl/Tests
+				- src/Hydra/Tests
+				- src/JsonApi/Tests
+				- src/JsonSchema/Tests
+				- src/Metadata/Tests
+				- src/OpenApi/Tests
+				- src/Serializer/Tests
+				- src/Symfony/Tests
+				- tests
+		-
+			identifier: argument.templateType
+			paths:
+				- src/Symfony/Bundle/Test
+				- tests
+				- src # TODO

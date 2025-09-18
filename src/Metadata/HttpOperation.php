@@ -29,6 +29,13 @@ class HttpOperation extends Operation
     public const METHOD_HEAD = 'HEAD';
     public const METHOD_OPTIONS = 'OPTIONS';
 
+    /** @var array<int|string, string|string[]>|null */
+    protected $formats;
+    /** @var array<int|string, string|string[]>|null */
+    protected $inputFormats;
+    /** @var array<int|string, string|string[]>|null */
+    protected $outputFormats;
+
     /**
      * @param string[]|null                                  $types         the RDF types of this property
      * @param array<int|string, string|string[]>|string|null $formats       {@see https://api-platform.com/docs/core/content-negotiation/#configuring-formats-for-a-specific-resource-or-operation}
@@ -64,10 +71,10 @@ class HttpOperation extends Operation
      *     immutable?: bool,
      * }|null $cacheHeaders {@see https://api-platform.com/docs/core/performance/#setting-custom-http-cache-headers}
      * @param array<string, string>|null $headers
-     * @param array{
+     * @param list<array{
      *     field: string,
      *     direction: string,
-     * }|null $paginationViaCursor {@see https://api-platform.com/docs/core/pagination/#cursor-based-pagination}
+     * }>|null $paginationViaCursor {@see https://api-platform.com/docs/core/pagination/#cursor-based-pagination}
      * @param array|null $normalizationContext   {@see https://api-platform.com/docs/core/serialization/#using-serialization-groups}
      * @param array|null $denormalizationContext {@see https://api-platform.com/docs/core/serialization/#using-serialization-groups}
      * @param array|null $hydraContext           {@see https://api-platform.com/docs/core/extending-jsonld-context/#hydra}
@@ -90,9 +97,9 @@ class HttpOperation extends Operation
         protected string $method = 'GET',
         protected ?string $uriTemplate = null,
         protected ?array $types = null,
-        protected $formats = null,
-        protected $inputFormats = null,
-        protected $outputFormats = null,
+        $formats = null,
+        $inputFormats = null,
+        $outputFormats = null,
         protected $uriVariables = null,
         protected ?string $routePrefix = null,
         protected ?string $routeName = null,
@@ -194,7 +201,6 @@ class HttpOperation extends Operation
         $output = null,
         $mercure = null,
         $messenger = null,
-        ?bool $elasticsearch = null,
         ?int $urlGenerationStrategy = null,
         ?bool $read = null,
         ?bool $deserialize = null,
@@ -213,8 +219,13 @@ class HttpOperation extends Operation
         ?string $policy = null,
         array|string|null $middleware = null,
         ?bool $queryParameterValidationEnabled = null,
+        ?bool $jsonStream = null,
         array $extraProperties = [],
     ) {
+        $this->formats = (null === $formats || \is_array($formats)) ? $formats : [$formats];
+        $this->inputFormats = (null === $inputFormats || \is_array($inputFormats)) ? $inputFormats : [$inputFormats];
+        $this->outputFormats = (null === $outputFormats || \is_array($outputFormats)) ? $outputFormats : [$outputFormats];
+
         parent::__construct(
             shortName: $shortName,
             class: $class,
@@ -228,6 +239,7 @@ class HttpOperation extends Operation
             paginationClientPartial: $paginationClientPartial,
             paginationFetchJoinCollection: $paginationFetchJoinCollection,
             paginationUseOutputWalkers: $paginationUseOutputWalkers,
+            paginationViaCursor: $paginationViaCursor,
             order: $order,
             description: $description,
             normalizationContext: $normalizationContext,
@@ -246,7 +258,6 @@ class HttpOperation extends Operation
             output: $output,
             mercure: $mercure,
             messenger: $messenger,
-            elasticsearch: $elasticsearch,
             urlGenerationStrategy: $urlGenerationStrategy,
             read: $read,
             deserialize: $deserialize,
@@ -267,6 +278,7 @@ class HttpOperation extends Operation
             queryParameterValidationEnabled: $queryParameterValidationEnabled,
             strictQueryParameterValidation: $strictQueryParameterValidation,
             hideHydraOperation: $hideHydraOperation,
+            jsonStream: $jsonStream,
             extraProperties: $extraProperties
         );
     }
@@ -289,7 +301,7 @@ class HttpOperation extends Operation
         return $this->uriTemplate;
     }
 
-    public function withUriTemplate(?string $uriTemplate = null)
+    public function withUriTemplate(?string $uriTemplate = null): static
     {
         $self = clone $this;
         $self->uriTemplate = $uriTemplate;
@@ -313,50 +325,74 @@ class HttpOperation extends Operation
         return $self;
     }
 
+    /**
+     * @return array<int|string, string|string[]>|null
+     */
     public function getFormats()
     {
         return $this->formats;
     }
 
+    /**
+     * @param array<int|string, string|string[]>|string|null $formats
+     */
     public function withFormats($formats = null): static
     {
         $self = clone $this;
-        $self->formats = $formats;
+        $self->formats = (null === $formats || \is_array($formats)) ? $formats : [$formats];
 
         return $self;
     }
 
+    /**
+     * @return array<int|string, string|string[]>|null
+     */
     public function getInputFormats()
     {
         return $this->inputFormats;
     }
 
+    /**
+     * @param array<int|string, string|string[]>|string|null $inputFormats
+     */
     public function withInputFormats($inputFormats = null): static
     {
         $self = clone $this;
-        $self->inputFormats = $inputFormats;
+        $self->inputFormats = (null === $inputFormats || \is_array($inputFormats)) ? $inputFormats : [$inputFormats];
 
         return $self;
     }
 
+    /**
+     * @return array<int|string, string|string[]>|null
+     */
     public function getOutputFormats()
     {
         return $this->outputFormats;
     }
 
+    /**
+     * @param array<int|string, string|string[]>|string|null $outputFormats
+     */
     public function withOutputFormats($outputFormats = null): static
     {
         $self = clone $this;
-        $self->outputFormats = $outputFormats;
+        $self->outputFormats = (null === $outputFormats || \is_array($outputFormats)) ? $outputFormats : [$outputFormats];
 
         return $self;
     }
 
+    /**
+     * @return array<string, mixed>|array<int, Link>|list<string>|null
+     */
     public function getUriVariables()
     {
         return $this->uriVariables;
     }
 
+    /**
+     * @param array<string, mixed>|array<int, Link>|list<string> $uriVariables
+     */
     public function withUriVariables($uriVariables): static
     {
         $self = clone $this;
@@ -435,6 +471,9 @@ class HttpOperation extends Operation
         return $this->stateless;
     }
 
+    /**
+     * @param bool $stateless
+     */
     public function withStateless($stateless): static
     {
         $self = clone $this;

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Odm\Extension;
 
 use ApiPlatform\Doctrine\Odm\Paginator;
+use ApiPlatform\Doctrine\Odm\PartialPaginator;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\Pagination;
@@ -50,7 +51,9 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
             return;
         }
 
-        $context = $this->addCountToContext(clone $aggregationBuilder, $context);
+        if ($doesCount = !$this->pagination->isPartialEnabled($operation, $context)) {
+            $context = $this->addCountToContext(clone $aggregationBuilder, $context);
+        }
 
         [, $offset, $limit] = $this->pagination->getPagination($operation, $context);
 
@@ -76,7 +79,9 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
         }
 
         // Count the total number of items
-        $facet->field('count')->pipeline($repository->createAggregationBuilder()->count('count'));
+        if ($doesCount) {
+            $facet->field('count')->pipeline($repository->createAggregationBuilder()->count('count'));
+        }
 
         // Store pagination metadata, read by the Paginator
         // Using __ to avoid field names mapping
@@ -111,7 +116,13 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
         $attribute = $operation?->getExtraProperties()['doctrine_mongodb'] ?? [];
         $executeOptions = $attribute['execute_options'] ?? [];
 
-        return new Paginator($aggregationBuilder->getAggregation($executeOptions)->getIterator(), $manager->getUnitOfWork(), $resourceClass);
+        $iterator = $aggregationBuilder->getAggregation($executeOptions)->getIterator();
+
+        if ($this->pagination->isPartialEnabled($operation, $context)) {
+            return new PartialPaginator($iterator, $manager->getUnitOfWork(), $resourceClass);
+        }
+
+        return new Paginator($iterator, $manager->getUnitOfWork(), $resourceClass);
     }
 
     private function addCountToContext(Builder $aggregationBuilder, array $context): array

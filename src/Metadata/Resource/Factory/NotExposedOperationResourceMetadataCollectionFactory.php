@@ -29,10 +29,10 @@ final class NotExposedOperationResourceMetadataCollectionFactory implements Reso
 {
     use OperationDefaultsTrait;
 
-    public static $skolemUriTemplate = '/.well-known/genid/{id}';
+    public static string $skolemUriTemplate = '/.well-known/genid/{id}';
 
-    private $linkFactory;
-    private $decorated;
+    private LinkFactoryInterface $linkFactory;
+    private ?ResourceMetadataCollectionFactoryInterface $decorated;
 
     public function __construct(LinkFactoryInterface $linkFactory, ?ResourceMetadataCollectionFactoryInterface $decorated = null)
     {
@@ -70,8 +70,7 @@ final class NotExposedOperationResourceMetadataCollectionFactory implements Reso
 
         // No item operation has been found on all resources for resource class: generate one on the last resource
         // Helpful to generate an IRI for a resource without declaring the Get operation
-        /** @var HttpOperation $operation */
-        [$key, $operation] = $this->getOperationWithDefaults(resource: $resource, operation: new NotExposed(), generated: true, ignoredOptions: ['uriTemplate', 'uriVariables']); // @phpstan-ignore-line $resource is defined if count > 0
+        [$key, $operation] = $this->getOperationWithDefaults($resource, new NotExposed(), true, ['uriTemplate', 'uriVariables']); // @phpstan-ignore-line $resource is defined if count > 0
 
         if (!$this->linkFactory->createLinksFromIdentifiers($operation)) {
             $operation = $operation->withUriTemplate(self::$skolemUriTemplate);

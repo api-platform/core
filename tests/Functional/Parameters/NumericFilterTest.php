@@ -20,11 +20,6 @@ use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Doctrine\ODM\MongoDB\MongoDBException;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 final class NumericFilterTest extends ApiTestCase
 {
@@ -52,13 +47,6 @@ final class NumericFilterTest extends ApiTestCase
         $this->loadFixtures($entityClass);
     }
 
-    /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
-     */
     #[DataProvider('rangeFilterScenariosProvider')]
     public function testRangeFilterResponses(string $url, int $expectedCount): void
     {
@@ -78,13 +66,6 @@ final class NumericFilterTest extends ApiTestCase
         yield 'amount_alias_int_equal' => ['/filtered_numeric_parameters?amount=20', 2];
     }
 
-    /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
-     */
     #[DataProvider('nullAndEmptyScenariosProvider')]
     public function testRangeFilterWithNullAndEmptyValues(string $url, int $expectedCount): void
     {

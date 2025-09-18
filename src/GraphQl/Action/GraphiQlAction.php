@@ -26,6 +26,9 @@ use Twig\Environment as TwigEnvironment;
  */
 final class GraphiQlAction
 {
+    /**
+     * @param string|null $assetPackage
+     */
     public function __construct(private readonly TwigEnvironment $twig, private readonly RouterInterface $router, private readonly bool $graphiqlEnabled = false, private readonly string $title = '', private $assetPackage = null)
     {
     }

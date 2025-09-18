@@ -9,7 +9,7 @@ Feature: JSON DTO input and output
 
   @createSchema
   Scenario: Request a password reset
-    And I send a "POST" request to "/users/password_reset_request" with body:
+    And I send a "POST" request to "/users_reset/password_reset_request" with body:
     """
     {
       "email": "user@example.com"
@@ -27,7 +27,7 @@ Feature: JSON DTO input and output
 
   @createSchema
   Scenario: Request a password reset for a non-existent user
-    And I send a "POST" request to "/users/password_reset_request" with body:
+    And I send a "POST" request to "/users_reset/password_reset_request" with body:
     """
     {
       "email": "does-not-exist@example.com"

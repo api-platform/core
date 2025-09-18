@@ -56,6 +56,17 @@ final class ValidationTest extends ApiTestCase
     {
         return [
             [
+                'enumNotDeepObject[]=c&enumNotDeepObject[]=c',
+                [
+                    [
+                        'propertyPath' => 'enumNotDeepObject', 'message' => 'The value you selected is not a valid choice.',
+                    ],
+                    [
+                        'message' => 'This collection should contain only unique elements.',
+                    ],
+                ],
+            ],
+            [
                 'enum[]=c&enum[]=c',
                 [
                     [
@@ -105,6 +116,15 @@ final class ValidationTest extends ApiTestCase
                 'num=5',
                 [
                     ['propertyPath' => 'num', 'message' => 'This value should be between 1 and 3.'],
+                ],
+            ],
+            [
+                'numMultipleType=5',
+                [
+                    [
+                        'propertyPath' => 'numMultipleType',
+                        'message' => 'This value should satisfy at least one of the following constraints: [1] This value should be between 1 and 3. [2] Each element of this collection should satisfy its own set of constraints.',
+                    ],
                 ],
             ],
             [

@@ -151,6 +151,7 @@
         <service id="api_platform.doctrine.orm.extension.parameter_extension" class="ApiPlatform\Doctrine\Orm\Extension\ParameterExtension" public="false">
             <argument type="service" id="api_platform.filter_locator" />
             <argument type="service" id="doctrine" on-invalid="null"/>
+            <argument type="service" id="logger" on-invalid="null"/>
             <tag name="api_platform.doctrine.orm.query_extension.collection" priority="-16" />
             <tag name="api_platform.doctrine.orm.query_extension.item" priority="-9" />
         </service>

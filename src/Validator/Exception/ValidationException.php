@@ -38,14 +38,21 @@ use Symfony\Component\WebLink\Link;
     status: 422,
     uriVariables: ['id'],
     openapi: false,
-    outputFormats: ['jsonapi' => ['application/vnd.api+json'], 'jsonld' => ['application/ld+json'], 'json' => ['application/problem+json', 'application/json']],
+    outputFormats: [
+        'jsonapi' => ['application/vnd.api+json'],
+        'jsonld' => ['application/ld+json'],
+        'json' => ['application/problem+json', 'application/json'],
+        'xml' => ['application/xml', 'text/xml'],
+    ],
     provider: 'api_platform.validator.state.error_provider',
     shortName: 'ConstraintViolation',
     description: 'Unprocessable entity',
     operations: [
         new ErrorOperation(
             name: '_api_validation_errors_problem',
-            outputFormats: ['json' => ['application/problem+json']],
+            outputFormats: [
+                'json' => ['application/problem+json'],
+            ],
             normalizationContext: [
                 SchemaFactory::OPENAPI_DEFINITION_NAME => '',
                 'groups' => ['json'],
@@ -75,6 +82,17 @@ use Symfony\Component\WebLink\Link;
                 'ignored_attributes' => ['trace', 'file', 'line', 'code', 'message', 'traceAsString', 'previous'],
             ]
         ),
+        new ErrorOperation(
+            name: '_api_validation_errors_xml',
+            outputFormats: [
+                'xml' => ['application/xml', 'text/xml'],
+            ],
+            normalizationContext: [
+                'groups' => ['json'],
+                'ignored_attributes' => ['trace', 'file', 'line', 'code', 'message', 'traceAsString', 'previous'],
+                'skip_null_values' => true,
+            ]
+        ),
     ],
     graphQlOperations: []
 )]
@@ -99,14 +117,6 @@ class ValidationException extends RuntimeException implements ConstraintViolatio
 
         trigger_deprecation('api_platform/core', '5.0', \sprintf('The "%s" exception will have a "%s" first argument in 5.x.', self::class, ConstraintViolationListInterface::class));
         parent::__construct($message ?: $this->__toString(), $code ?? 0, $previous);
-    }
-
-    /**
-     * @deprecated
-     */
-    public function getErrorTitle(): ?string
-    {
-        return $this->errorTitle;
     }
 
     public function getId(): string

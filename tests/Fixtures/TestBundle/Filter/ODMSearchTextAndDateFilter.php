@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class ODMSearchTextAndDateFilter implements FilterInterface
 {
-    public function __construct(#[Autowire('@api_platform.doctrine_mongodb.odm.search_filter.instance')] readonly FilterInterface $searchFilter, #[Autowire('@api_platform.doctrine_mongodb.odm.date_filter.instance')] readonly FilterInterface $dateFilter, protected ?array $properties = null, array $dateFilterProperties = [], array $searchFilterProperties = [])
+    public function __construct(#[Autowire('@api_platform.doctrine_mongodb.odm.search_filter.instance')] public readonly FilterInterface $searchFilter, #[Autowire('@api_platform.doctrine_mongodb.odm.date_filter.instance')] public readonly FilterInterface $dateFilter, protected ?array $properties = null, array $dateFilterProperties = [], array $searchFilterProperties = [])
     {
         if ($searchFilter instanceof PropertyAwareFilterInterface) {
             $searchFilter->setProperties($searchFilterProperties);

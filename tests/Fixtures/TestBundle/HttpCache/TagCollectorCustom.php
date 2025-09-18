@@ -69,7 +69,7 @@ class TagCollectorCustom implements TagCollectorInterface
         $this->addCacheTagForResource($context, $iri);
     }
 
-    private function addCacheTagForResource(array $context, string $iri): void
+    private function addCacheTagForResource(array &$context, string $iri): void
     {
         $context['resources'][$iri] = $iri;
     }

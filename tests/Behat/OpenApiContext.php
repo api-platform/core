@@ -144,8 +144,7 @@ final class OpenApiContext implements Context
      */
     private function getPropertyInfo(string $propertyName, string $className): \stdClass
     {
-        /** @var iterable $properties */
-        $properties = $this->getProperties($className);
+        $properties = (array) $this->getProperties($className);
         foreach ($properties as $classPropertyName => $property) {
             if ($classPropertyName === $propertyName) {
                 return $property;

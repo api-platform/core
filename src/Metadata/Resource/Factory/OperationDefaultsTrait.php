@@ -36,6 +36,9 @@ use ApiPlatform\State\CreateProvider;
 use ApiPlatform\Validator\Exception\ValidationException;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @internal since api-platform 4.2
+ */
 trait OperationDefaultsTrait
 {
     private CamelCaseToSnakeCaseNameConverter $camelCaseToSnakeCaseNameConverter;
@@ -96,7 +99,10 @@ trait OperationDefaultsTrait
         return $this->addGlobalDefaults($resource);
     }
 
-    private function getDefaultHttpOperations($resource): iterable
+    /**
+     * @return Operations<HttpOperation>|array<int,HttpOperation>
+     */
+    private function getDefaultHttpOperations(ApiResource $resource): iterable
     {
         if (enum_exists($resource->getClass())) {
             return new Operations([new GetCollection(paginationEnabled: false), new Get()]);
@@ -175,30 +181,14 @@ trait OperationDefaultsTrait
         return $resource->withGraphQlOperations($graphQlOperations);
     }
 
+    /**
+     * @param list<string> $ignoredOptions
+     *
+     * @return array<int,mixed>
+     */
     private function getOperationWithDefaults(ApiResource $resource, Operation $operation, bool $generated = false, array $ignoredOptions = []): array
     {
-        // Inherit from resource defaults
-        foreach (get_class_methods($resource) as $methodName) {
-            if (!str_starts_with($methodName, 'get')) {
-                continue;
-            }
-
-            if (\in_array(lcfirst(substr($methodName, 3)), $ignoredOptions, true)) {
-                continue;
-            }
-
-            if (!method_exists($operation, $methodName) || null !== $operation->{$methodName}()) {
-                continue;
-            }
-
-            if (null === ($value = $resource->{$methodName}())) {
-                continue;
-            }
-
-            $operation = $operation->{'with'.substr($methodName, 3)}($value);
-        }
-
-        $operation = $operation->withExtraProperties(array_merge(
+        $operation = $operation->cascadeFromResource($resource, $ignoredOptions)->withExtraProperties(array_merge(
             $resource->getExtraProperties(),
             $operation->getExtraProperties(),
             $generated ? ['generated_operation' => true] : []
@@ -249,6 +239,7 @@ trait OperationDefaultsTrait
             '_api_%s_%s%s',
             $path ?: ($operation->getShortName() ?? $this->getDefaultShortname($resourceClass)),
             strtolower($operation->getMethod()),
-            $operation instanceof CollectionOperationInterface ? '_collection' : '');
+            $operation instanceof CollectionOperationInterface ? '_collection' : ''
+        );
     }
 }

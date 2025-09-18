@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Extractor;
 
-use ApiPlatform\Elasticsearch\State\Options;
+use ApiPlatform\Doctrine\Odm\State\Options as OdmOptions;
+use ApiPlatform\Doctrine\Orm\State\Options as OrmOptions;
+use ApiPlatform\Elasticsearch\State\Options as ElasticsearchOptions;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\HeaderParameter;
@@ -110,7 +112,6 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             'description' => $this->phpize($resource, 'description', 'string'),
             'urlGenerationStrategy' => $this->phpize($resource, 'urlGenerationStrategy', 'integer'),
             'deprecationReason' => $this->phpize($resource, 'deprecationReason', 'string'),
-            'elasticsearch' => $this->phpize($resource, 'elasticsearch', 'bool'),
             'messenger' => $this->phpize($resource, 'messenger', 'bool|string'),
             'mercure' => $this->buildMercure($resource),
             'input' => $this->phpize($resource, 'input', 'bool|string'),
@@ -144,6 +145,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             'extraProperties' => $this->buildExtraProperties($resource, 'extraProperties'),
             'read' => $this->phpize($resource, 'read', 'bool'),
             'write' => $this->phpize($resource, 'write', 'bool'),
+            'jsonStream' => $this->phpize($resource, 'jsonStream', 'bool'),
         ];
     }
 
@@ -179,8 +181,23 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
         $openapi = $resource->openapi;
         $data = [];
         $attributes = $openapi->attributes();
-        foreach ($attributes as $attribute) {
-            $data[$attribute->getName()] = $this->phpize($attributes, 'deprecated', 'deprecated' === $attribute->getName() ? 'bool' : 'string');
+
+        /*
+         * \SimpleXMLElement should not be read in an iteration because of a known bug in SimpleXML lib that resets the iterator
+         * and leads to infinite loop
+         * https://bugs.php.net/bug.php?id=55098
+         * https://github.com/php/php-src/issues/12208
+         * https://github.com/php/php-src/issues/12192
+         *
+         * attribute names are stored in an iteration and values are fetched in another one
+         */
+        $attributeNames = [];
+        foreach ($attributes as $name => $attribute) {
+            $attributeNames[] = $name;
+        }
+
+        foreach ($attributeNames as $attributeName) {
+            $data[$attributeName] = $this->phpize($attributes, $attributeName, 'deprecated' === $attributeName ? 'bool' : 'string');
         }
 
         $data['tags'] = $this->buildArrayValue($resource, 'tag');
@@ -208,12 +225,12 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
                     in: $this->phpize($parameter, 'in', 'string'),
                     description: $this->phpize($parameter, 'description', 'string'),
                     required: $this->phpize($parameter, 'required', 'bool'),
-                    deprecated: $this->phpize($parameter, 'deprecated', 'bool'),
-                    allowEmptyValue: $this->phpize($parameter, 'allowEmptyValue', 'bool'),
-                    schema: isset($parameter->schema->values) ? $this->buildValues($parameter->schema->values) : null,
+                    deprecated: $this->phpize($parameter, 'deprecated', 'bool', false),
+                    allowEmptyValue: $this->phpize($parameter, 'allowEmptyValue', 'bool', null),
+                    schema: isset($parameter->schema->values) ? $this->buildValues($parameter->schema->values) : [],
                     style: $this->phpize($parameter, 'style', 'string'),
-                    explode: $this->phpize($parameter, 'explode', 'bool'),
-                    allowReserved: $this->phpize($parameter, 'allowReserved', 'bool'),
+                    explode: $this->phpize($parameter, 'explode', 'bool', false),
+                    allowReserved: $this->phpize($parameter, 'allowReserved', 'bool', null),
                     example: $this->phpize($parameter, 'example', 'string'),
                     examples: isset($parameter->examples->values) ? new \ArrayObject($this->buildValues($parameter->examples->values)) : null,
                     content: isset($parameter->content->values) ? new \ArrayObject($this->buildValues($parameter->content->values)) : null,
@@ -454,14 +471,23 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
         if (!$stateOptions) {
             return null;
         }
-        $elasticsearchOptions = $stateOptions->elasticsearchOptions ?? null;
-        if ($elasticsearchOptions) {
-            if (class_exists(Options::class)) {
-                return new Options(
-                    isset($elasticsearchOptions['index']) ? (string) $elasticsearchOptions['index'] : null,
-                    isset($elasticsearchOptions['type']) ? (string) $elasticsearchOptions['type'] : null,
-                );
-            }
+
+        if (isset($stateOptions->elasticsearchOptions) && class_exists(ElasticsearchOptions::class)) {
+            return new ElasticsearchOptions(
+                isset($stateOptions->elasticsearchOptions['index']) ? (string) $stateOptions->elasticsearchOptions['index'] : null,
+            );
+        }
+
+        if (isset($stateOptions->doctrineOdmOptions) && class_exists(OdmOptions::class)) {
+            return new OdmOptions(
+                isset($stateOptions->doctrineOdmOptions['documentClass']) ? (string) $stateOptions->doctrineOdmOptions['documentClass'] : null,
+            );
+        }
+
+        if (isset($stateOptions->doctrineOrmOptions) && class_exists(OrmOptions::class)) {
+            return new OrmOptions(
+                isset($stateOptions->doctrineOrmOptions['entityClass']) ? (string) $stateOptions->doctrineOrmOptions['entityClass'] : null,
+            );
         }
 
         return null;

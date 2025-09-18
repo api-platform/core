@@ -49,6 +49,7 @@ use ApiPlatform\Hal\Serializer\CollectionNormalizer as HalCollectionNormalizer;
 use ApiPlatform\Hal\Serializer\EntrypointNormalizer as HalEntrypointNormalizer;
 use ApiPlatform\Hal\Serializer\ItemNormalizer as HalItemNormalizer;
 use ApiPlatform\Hal\Serializer\ObjectNormalizer as HalObjectNormalizer;
+use ApiPlatform\HttpCache\State\AddHeadersProcessor;
 use ApiPlatform\Hydra\JsonSchema\SchemaFactory as HydraSchemaFactory;
 use ApiPlatform\Hydra\Serializer\CollectionFiltersNormalizer as HydraCollectionFiltersNormalizer;
 use ApiPlatform\Hydra\Serializer\CollectionNormalizer as HydraCollectionNormalizer;
@@ -86,6 +87,8 @@ use ApiPlatform\Laravel\Eloquent\Metadata\IdentifiersExtractor as EloquentIdenti
 use ApiPlatform\Laravel\Eloquent\Metadata\ModelMetadata;
 use ApiPlatform\Laravel\Eloquent\Metadata\ResourceClassResolver as EloquentResourceClassResolver;
 use ApiPlatform\Laravel\Eloquent\PropertyAccess\PropertyAccessor as EloquentPropertyAccessor;
+use ApiPlatform\Laravel\Eloquent\PropertyInfo\EloquentExtractor;
+use ApiPlatform\Laravel\Eloquent\Serializer\EloquentNameConverter;
 use ApiPlatform\Laravel\Eloquent\Serializer\SerializerContextBuilder as EloquentSerializerContextBuilder;
 use ApiPlatform\Laravel\GraphQl\Controller\EntrypointController as GraphQlEntrypointController;
 use ApiPlatform\Laravel\GraphQl\Controller\GraphiQlController;
@@ -159,10 +162,10 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use Negotiation\Negotiator;
-use phpDocumentor\Reflection\DocBlockFactory;
+use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
@@ -196,15 +199,16 @@ class ApiPlatformProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/config/api-platform.php', 'api-platform');
 
-        $this->app->singleton(PropertyInfoExtractorInterface::class, function () {
-            $phpDocExtractor = class_exists(DocBlockFactory::class) ? new PhpDocExtractor() : null;
+        $this->app->singleton(PropertyInfoExtractorInterface::class, function (Application $app) {
+            $phpstanExtractor = class_exists(PhpDocParser::class) ? new PhpStanExtractor() : null;
             $reflectionExtractor = new ReflectionExtractor();
+            $eloquentExtractor = new EloquentExtractor($app->make(ModelMetadata::class));
 
             return new PropertyInfoExtractor(
                 [$reflectionExtractor],
-                $phpDocExtractor ? [$phpDocExtractor, $reflectionExtractor] : [$reflectionExtractor],
-                $phpDocExtractor ? [$phpDocExtractor] : [],
-                [$reflectionExtractor],
+                $phpstanExtractor ? [$phpstanExtractor, $reflectionExtractor] : [$reflectionExtractor],
+                [],
+                [$eloquentExtractor],
                 [$reflectionExtractor]
             );
         });
@@ -216,12 +220,21 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->bind(LoaderInterface::class, AttributeLoader::class);
         $this->app->bind(ClassMetadataFactoryInterface::class, ClassMetadataFactory::class);
         $this->app->singleton(ClassMetadataFactory::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+            $nameConverter = $config->get('api-platform.name_converter', SnakeCaseToCamelCaseNameConverter::class);
+            if ($nameConverter && class_exists($nameConverter)) {
+                $nameConverter = new EloquentNameConverter($app->make($nameConverter));
+            }
+
             return new ClassMetadataFactory(
                 new LoaderChain([
                     new PropertyMetadataLoader(
                         $app->make(PropertyNameCollectionFactoryInterface::class),
+                        $nameConverter
                     ),
                     new AttributeLoader(),
+                    // new RelationMetadataLoader($app->make(ModelMetadata::class)),
                 ])
             );
         });
@@ -259,20 +272,25 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->singleton(PropertyMetadataFactoryInterface::class, function (Application $app) {
             /** @var ConfigRepository $config */
             $config = $app['config'];
+            $nameConverter = $config->get('api-platform.name_converter', SnakeCaseToCamelCaseNameConverter::class);
+            if ($nameConverter && class_exists($nameConverter)) {
+                $nameConverter = new EloquentNameConverter($app->make($nameConverter));
+            }
 
             return new CachePropertyMetadataFactory(
                 new SchemaPropertyMetadataFactory(
                     $app->make(ResourceClassResolverInterface::class),
-                    new PropertyInfoPropertyMetadataFactory(
-                        $app->make(PropertyInfoExtractorInterface::class),
-                        new SerializerPropertyMetadataFactory(
-                            $app->make(SerializerClassMetadataFactory::class),
+                    new SerializerPropertyMetadataFactory(
+                        $app->make(SerializerClassMetadataFactory::class),
+                        new PropertyInfoPropertyMetadataFactory(
+                            $app->make(PropertyInfoExtractorInterface::class),
                             new AttributePropertyMetadataFactory(
                                 new EloquentAttributePropertyMetadataFactory(
                                     new EloquentPropertyMetadataFactory(
                                         $app->make(ModelMetadata::class),
                                     ),
-                                )
+                                ),
+                                $nameConverter
                             ),
                             $app->make(ResourceClassResolverInterface::class)
                         ),
@@ -285,6 +303,10 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->singleton(PropertyNameCollectionFactoryInterface::class, function (Application $app) {
             /** @var ConfigRepository $config */
             $config = $app['config'];
+            $nameConverter = $config->get('api-platform.name_converter', SnakeCaseToCamelCaseNameConverter::class);
+            if ($nameConverter && class_exists($nameConverter)) {
+                $nameConverter = new EloquentNameConverter($app->make($nameConverter));
+            }
 
             return new CachePropertyNameCollectionMetadataFactory(
                 new ClassLevelAttributePropertyNameCollectionFactory(
@@ -294,7 +316,8 @@ class ApiPlatformProvider extends ServiceProvider
                             new PropertyInfoPropertyNameCollectionFactory($app->make(PropertyInfoExtractorInterface::class)),
                             $app->make(ResourceClassResolverInterface::class)
                         )
-                    )
+                    ),
+                    $nameConverter
                 ),
                 true === $config->get('app.debug') ? 'array' : $config->get('api-platform.cache', 'file')
             );
@@ -316,7 +339,7 @@ class ApiPlatformProvider extends ServiceProvider
             $config = $app['config'];
             $nameConverter = $config->get('api-platform.name_converter', SnakeCaseToCamelCaseNameConverter::class);
             if ($nameConverter && class_exists($nameConverter)) {
-                $nameConverter = $app->make($nameConverter);
+                $nameConverter = new EloquentNameConverter($app->make($nameConverter));
             }
 
             $defaultContext = $config->get('api-platform.serializer', []);
@@ -381,21 +404,33 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->bind(ProviderInterface::class, ContentNegotiationProvider::class);
 
-        $this->app->singleton(RespondProcessor::class, function () {
-            return new RespondProcessor();
-        });
+        $this->app->singleton(RespondProcessor::class, function (Application $app) {
+            $decorated = new RespondProcessor();
+            if (class_exists(AddHeadersProcessor::class)) {
+                /** @var ConfigRepository */
+                $config = $app['config']->get('api-platform.http_cache') ?? [];
 
-        $this->app->singleton(AddLinkHeaderProcessor::class, function (Application $app) {
-            return new AddLinkHeaderProcessor($app->make(RespondProcessor::class), new HttpHeaderSerializer());
-        });
+                $decorated = new AddHeadersProcessor(
+                    $decorated,
+                    etag: $config['etag'] ?? false,
+                    maxAge: $config['max_age'] ?? null,
+                    sharedMaxAge: $config['shared_max_age'] ?? null,
+                    vary: $config['vary'] ?? null,
+                    public: $config['public'] ?? null,
+                    staleWhileRevalidate: $config['stale_while_revalidate'] ?? null,
+                    staleIfError: $config['stale_if_error'] ?? null
+                );
+            }
 
+            return new AddLinkHeaderProcessor($decorated, new HttpHeaderSerializer());
+        });
         $this->app->singleton(LinkedDataPlatformProcessor::class, function (Application $app) {
             return new LinkedDataPlatformProcessor(
                 $app->make(AddLinkHeaderProcessor::class), // Original service
                 $app->make(ResourceClassResolverInterface::class),
                 $app->make(ResourceMetadataCollectionFactoryInterface::class)
             );
-        });
+        }
 
         $this->app->singleton(SerializeProcessor::class, function (Application $app) {
             return new SerializeProcessor($app->make(LinkedDataPlatformProcessor::class), $app->make(Serializer::class), $app->make(SerializerContextBuilderInterface::class));
@@ -413,9 +448,13 @@ class ApiPlatformProvider extends ServiceProvider
         });
         $this->app->bind(SerializerContextBuilderInterface::class, EloquentSerializerContextBuilder::class);
         $this->app->singleton(EloquentSerializerContextBuilder::class, function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+
             return new EloquentSerializerContextBuilder(
                 $app->make(SerializerContextBuilder::class),
-                $app->make(PropertyNameCollectionFactoryInterface::class)
+                $app->make(PropertyNameCollectionFactoryInterface::class),
+                $config->get('api-platform.name_converter', SnakeCaseToCamelCaseNameConverter::class)
             );
         });
 
@@ -541,7 +580,8 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(LoggerInterface::class),
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(ResourceAccessCheckerInterface::class),
-                $defaultContext
+                $defaultContext,
+                // $app->make(TagCollectorInterface::class)
             );
         });
 
@@ -589,6 +629,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $defaultContext,
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(ResourceAccessCheckerInterface::class),
+                // $app->make(TagCollectorInterface::class),
             );
         });
 
@@ -834,7 +875,6 @@ class ApiPlatformProvider extends ServiceProvider
                 $defaultContext,
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(ResourceAccessCheckerInterface::class),
-                null
                 // $app->make(TagCollectorInterface::class),
             );
         });
@@ -929,7 +969,8 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(NameConverterInterface::class),
                 $app->make(ClassMetadataFactoryInterface::class),
                 $defaultContext,
-                $app->make(ResourceAccessCheckerInterface::class)
+                $app->make(ResourceAccessCheckerInterface::class),
+                // $app->make(TagCollectorInterface::class)
             );
         });
 
@@ -942,6 +983,7 @@ class ApiPlatformProvider extends ServiceProvider
                 Console\InstallCommand::class,
                 Console\Maker\MakeStateProcessorCommand::class,
                 Console\Maker\MakeStateProviderCommand::class,
+                Console\Maker\MakeFilterCommand::class,
                 OpenApiCommand::class,
             ]);
         }

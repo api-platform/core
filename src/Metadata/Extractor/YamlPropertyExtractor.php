@@ -101,10 +101,10 @@ final class YamlPropertyExtractor extends AbstractPropertyExtractor
         }
     }
 
-    private function buildAttribute(array $resource, string $key, mixed $default = null)
+    private function buildAttribute(array $resource, string $key): ?array
     {
         if (empty($resource[$key])) {
-            return $default;
+            return null;
         }
 
         if (!\is_array($resource[$key])) {

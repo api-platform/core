@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7228\ValidationGroupSequence;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyWithCollectDenormalizationErrors;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
@@ -33,7 +34,7 @@ final class ValidationTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [DummyWithCollectDenormalizationErrors::class, RelatedDummy::class];
+        return [DummyWithCollectDenormalizationErrors::class, RelatedDummy::class, ValidationGroupSequence::class];
     }
 
     public function testPostWithDenormalizationErrorsCollected(): void
@@ -129,5 +130,11 @@ final class ValidationTest extends ApiTestCase
         $violationRelatedDummies = $findViolation('relatedDummies');
         $this->assertNotNull($violationRelatedDummies);
         $this->assertSame('This value should be of type array.', $violationRelatedDummies['message']);
+    }
+
+    public function testValidationGroupSequence(): void
+    {
+        $this->createClient()->request('POST', 'issue7228', ['headers' => ['content-type' => 'application/ld+json'], 'json' => ['id' => '1']]);
+        $this->assertResponseIsSuccessful();
     }
 }

@@ -34,13 +34,13 @@ class ValidateListenerTest extends TestCase
         $provider = $this->createMock(ProviderInterface::class);
         $provider->expects($this->once())->method('provide');
         $metadata = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
-        $metadata->expects($this->once())->method('create')->with('class')->willReturn(new ResourceMetadataCollection('class', [
+        $metadata->expects($this->once())->method('create')->with(\stdClass::class)->willReturn(new ResourceMetadataCollection(\stdClass::class, [
             new ApiResource(operations: [
                 'operation' => new Post(),
             ]),
         ]));
 
-        $request = new Request([], [], ['_api_operation_name' => 'operation', '_api_resource_class' => 'class']);
+        $request = new Request([], [], ['_api_operation_name' => 'operation', '_api_resource_class' => \stdClass::class]);
         $listener = new ValidateListener($provider, $metadata);
         $listener->onKernelView(
             new ViewEvent(
@@ -58,7 +58,7 @@ class ValidateListenerTest extends TestCase
         $provider = $this->createMock(ProviderInterface::class);
         $provider->expects($this->once())->method('provide');
         $metadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
-        $request = new Request([], [], ['_api_operation' => new Post(), '_api_operation_name' => 'operation', '_api_resource_class' => 'class']);
+        $request = new Request([], [], ['_api_operation' => new Post(), '_api_operation_name' => 'operation', '_api_resource_class' => \stdClass::class]);
         $listener = new ValidateListener($provider, $metadata);
         $listener->onKernelView(
             new ViewEvent(
@@ -72,14 +72,14 @@ class ValidateListenerTest extends TestCase
 
     public function testCallproviderContext(): void
     {
-        $operation = new Post(class: 'class');
+        $operation = new Post(class: \stdClass::class);
         $controllerResult = new \stdClass();
         $uriVariables = ['id' => 3];
-        $request = new Request([], [], ['_api_operation' => $operation, '_api_operation_name' => 'operation', '_api_resource_class' => 'class', '_api_uri_variables' => $uriVariables]);
+        $request = new Request([], [], ['_api_operation' => $operation, '_api_operation_name' => 'operation', '_api_resource_class' => \stdClass::class, '_api_uri_variables' => $uriVariables]);
         $request->setMethod($operation->getMethod());
         $provider = $this->createMock(ProviderInterface::class);
         $provider->expects($this->once())->method('provide')
-            ->with($operation->withValidate(true), $uriVariables, ['request' => $request, 'uri_variables' => $uriVariables, 'resource_class' => 'class']);
+            ->with($operation->withValidate(true), $uriVariables, ['request' => $request, 'uri_variables' => $uriVariables, 'resource_class' => \stdClass::class]);
         $metadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
         $listener = new ValidateListener($provider, $metadata);
         $listener->onKernelView(
@@ -94,14 +94,14 @@ class ValidateListenerTest extends TestCase
 
     public function testDeleteNoValidate(): void
     {
-        $operation = new Delete(class: 'class');
+        $operation = new Delete(class: \stdClass::class);
         $controllerResult = new \stdClass();
         $uriVariables = ['id' => 3];
-        $request = new Request([], [], ['_api_operation' => $operation, '_api_operation_name' => 'operation', '_api_resource_class' => 'class', '_api_uri_variables' => $uriVariables]);
+        $request = new Request([], [], ['_api_operation' => $operation, '_api_operation_name' => 'operation', '_api_resource_class' => \stdClass::class, '_api_uri_variables' => $uriVariables]);
         $request->setMethod($operation->getMethod());
         $provider = $this->createMock(ProviderInterface::class);
         $provider->expects($this->once())->method('provide')
-            ->with($operation->withValidate(false), $uriVariables, ['request' => $request, 'uri_variables' => $uriVariables, 'resource_class' => 'class']);
+            ->with($operation->withValidate(false), $uriVariables, ['request' => $request, 'uri_variables' => $uriVariables, 'resource_class' => \stdClass::class]);
         $metadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
         $listener = new ValidateListener($provider, $metadata);
         $listener->onKernelView(
@@ -116,14 +116,14 @@ class ValidateListenerTest extends TestCase
 
     public function testDeleteForceValidate(): void
     {
-        $operation = new Delete(class: 'class', validate: true);
+        $operation = new Delete(class: \stdClass::class, validate: true);
         $controllerResult = new \stdClass();
         $uriVariables = ['id' => 3];
-        $request = new Request([], [], ['_api_operation' => $operation, '_api_operation_name' => 'operation', '_api_resource_class' => 'class', '_api_uri_variables' => $uriVariables]);
+        $request = new Request([], [], ['_api_operation' => $operation, '_api_operation_name' => 'operation', '_api_resource_class' => \stdClass::class, '_api_uri_variables' => $uriVariables]);
         $request->setMethod($operation->getMethod());
         $provider = $this->createMock(ProviderInterface::class);
         $provider->expects($this->once())->method('provide')
-            ->with($operation->withValidate(true), $uriVariables, ['request' => $request, 'uri_variables' => $uriVariables, 'resource_class' => 'class']);
+            ->with($operation->withValidate(true), $uriVariables, ['request' => $request, 'uri_variables' => $uriVariables, 'resource_class' => \stdClass::class]);
         $metadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
         $listener = new ValidateListener($provider, $metadata);
         $listener->onKernelView(
@@ -143,7 +143,7 @@ class ValidateListenerTest extends TestCase
         $provider = $this->createMock(ProviderInterface::class);
         $provider->expects($this->never())->method('provide');
         $metadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
-        $metadata->method('create')->willReturn(new ResourceMetadataCollection('class'));
+        $metadata->method('create')->willReturn(new ResourceMetadataCollection(\stdClass::class));
         $request = new Request([], [], $attributes);
         $listener = new ValidateListener($provider, $metadata);
         $listener->onKernelView(

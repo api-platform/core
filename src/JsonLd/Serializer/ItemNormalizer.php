@@ -83,6 +83,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
         return self::FORMAT === $format && parent::supportsNormalization($data, $format, $context);
     }
 
+    /**
+     * @param string|null $format
+     */
     public function getSupportedTypes($format): array
     {
         return self::FORMAT === $format ? parent::getSupportedTypes($format) : [];
@@ -111,20 +114,24 @@ final class ItemNormalizer extends AbstractItemNormalizer
         } elseif ($this->contextBuilder instanceof AnonymousContextBuilderInterface) {
             if ($context['api_collection_sub_level'] ?? false) {
                 unset($context['api_collection_sub_level']);
-                $context['output']['genid'] = true;
+                $context['output']['gen_id'] ??= true;
                 $context['output']['iri'] = null;
+            }
+
+            if ($this->resourceClassResolver->isResourceClass($resourceClass)) {
+                $context['output']['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
             }
 
             // We should improve what's behind the context creation, its probably more complicated then it should
             $metadata = $this->createJsonLdContext($this->contextBuilder, $object, $context);
         }
 
-        // maybe not needed anymore
-        if (isset($context['operation']) && $previousResourceClass !== $resourceClass) {
-            unset($context['operation'], $context['operation_name']);
+        // Special case: non-resource got serialized and contains a resource therefore we need to reset part of the context
+        if ($previousResourceClass !== $resourceClass) {
+            unset($context['operation'], $context['operation_name'], $context['output']);
         }
 
-        if (true === ($context['force_iri_generation'] ?? true) && $iri = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context)) {
+        if (true === ($context['output']['gen_id'] ?? true) && true === ($context['force_iri_generation'] ?? true) && $iri = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context)) {
             $context['iri'] = $iri;
             $metadata['@id'] = $iri;
         }
@@ -136,9 +143,12 @@ final class ItemNormalizer extends AbstractItemNormalizer
             return $data;
         }
 
-        if (!isset($metadata['@type']) && $isResourceClass) {
-            $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
+        $operation = $context['operation'] ?? null;
+        if ($isResourceClass && !$operation) {
+            $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
+        }
 
+        if (!isset($metadata['@type']) && $operation) {
             $types = $operation instanceof HttpOperation ? $operation->getTypes() : null;
             if (null === $types) {
                 $types = [$operation->getShortName()];

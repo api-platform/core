@@ -125,8 +125,14 @@ final class BackedEnumFilter extends AbstractFilter
             return;
         }
 
-        $value = $this->normalizeValue($value, $property);
-        if (null === $value) {
+        $values = \is_array($value) ? $value : [$value];
+
+        $normalizedValues = array_filter(array_map(
+            fn ($v) => $this->normalizeValue($v, $property),
+            $values
+        ));
+
+        if (empty($normalizedValues)) {
             return;
         }
 
@@ -139,9 +145,17 @@ final class BackedEnumFilter extends AbstractFilter
 
         $valueParameter = $queryNameGenerator->generateParameterName($field);
 
+        if (1 === \count($values)) {
+            $queryBuilder
+                ->andWhere(\sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
+                ->setParameter($valueParameter, $values[0]);
+
+            return;
+        }
+
         $queryBuilder
-            ->andWhere(\sprintf('%s.%s = :%s', $alias, $field, $valueParameter))
-            ->setParameter($valueParameter, $value);
+            ->andWhere(\sprintf('%s.%s IN (:%s)', $alias, $field, $valueParameter))
+            ->setParameter($valueParameter, $values);
     }
 
     /**
@@ -163,7 +177,7 @@ final class BackedEnumFilter extends AbstractFilter
             $fieldMapping = (array) $fieldMapping;
         }
 
-        if (!$enumType = $fieldMapping['enumType']) {
+        if (!($enumType = $fieldMapping['enumType'] ?? null)) {
             return false;
         }
 

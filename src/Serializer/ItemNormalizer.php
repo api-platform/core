@@ -16,6 +16,7 @@ namespace ApiPlatform\Serializer;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -31,6 +32,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Generic item normalizer.
+ *
+ * TODO: do not hardcode "id"
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
@@ -59,7 +62,9 @@ class ItemNormalizer extends AbstractItemNormalizer
             }
 
             if (isset($context['resource_class'])) {
-                $this->updateObjectToPopulate($data, $context);
+                if ($this->updateObjectToPopulate($data, $context)) {
+                    unset($data['id']);
+                }
             } else {
                 // See https://github.com/api-platform/core/pull/2326 to understand this message.
                 $this->logger->warning('The "resource_class" key is missing from the context.', [
@@ -71,10 +76,12 @@ class ItemNormalizer extends AbstractItemNormalizer
         return parent::denormalize($data, $class, $format, $context);
     }
 
-    private function updateObjectToPopulate(array $data, array &$context): void
+    private function updateObjectToPopulate(array $data, array &$context): bool
     {
         try {
             $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri((string) $data['id'], $context + ['fetch_data' => true]);
+
+            return true;
         } catch (InvalidArgumentException) {
             $operation = $this->resourceMetadataCollectionFactory?->create($context['resource_class'])->getOperation();
             if (
@@ -91,17 +98,21 @@ class ItemNormalizer extends AbstractItemNormalizer
 
             $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri($iri, $context + ['fetch_data' => true]);
         }
+
+        return false;
     }
 
-    private function getContextUriVariables(array $data, $operation, array $context): array
+    private function getContextUriVariables(array $data, Operation $operation, array $context): array
     {
         $uriVariables = $context['uri_variables'] ?? [];
 
-        $operationUriVariables = $operation->getUriVariables();
-        if ((null !== $uriVariable = array_shift($operationUriVariables)) && \count($uriVariable->getIdentifiers())) {
-            $identifier = $uriVariable->getIdentifiers()[0];
-            if (isset($data[$identifier])) {
-                $uriVariables[$uriVariable->getParameterName()] = $data[$identifier];
+        if ($operation instanceof HttpOperation) {
+            $operationUriVariables = $operation->getUriVariables();
+            if ((null !== $uriVariable = array_shift($operationUriVariables)) && \count($uriVariable->getIdentifiers())) {
+                $identifier = $uriVariable->getIdentifiers()[0];
+                if (isset($data[$identifier])) {
+                    $uriVariables[$uriVariable->getParameterName()] = $data[$identifier];
+                }
             }
         }
 

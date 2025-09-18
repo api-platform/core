@@ -22,14 +22,13 @@ use FriendsOfBehat\SymfonyExtension\Context\Environment\InitializedSymfonyExtens
 use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class HttpCacheContext implements Context
 {
-    public function __construct(private readonly KernelInterface $kernel, private ContainerInterface $driverContainer)
+    public function __construct(private ContainerInterface $driverContainer)
     {
     }
 
@@ -49,9 +48,16 @@ final class HttpCacheContext implements Context
      */
     public function irisShouldBePurged(string $iris): void
     {
-        $purger = $this->kernel->getContainer()->get('behat.driver.service_container')->get('test.api_platform.http_cache.purger');
+        $purger = $this->driverContainer->get('test.api_platform.http_cache.purger');
 
-        $purgedIris = implode(',', $purger->getIris());
+        $iris = explode(',', $iris);
+        sort($iris);
+        $iris = implode(',', $iris);
+
+        $purgedIris = $purger->getIris();
+        sort($purgedIris);
+        $purgedIris = implode(',', $purgedIris);
+
         $purger->clear();
 
         if ($iris !== $purgedIris) {

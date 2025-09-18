@@ -75,7 +75,7 @@ class DummyValidatedEntity
     /**
      * @var string A dummy url
      */
-    #[Assert\Url(requireTld: true)]
+    #[Assert\Url()]
     public $dummyUrl;
 
     /**

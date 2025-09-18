@@ -8,11 +8,9 @@
       <directory>./Tests/</directory>
     </testsuite>
   </testsuites>
-  <source ignoreSuppressionOfDeprecations="true" ignoreIndirectDeprecations="false">
+  <source ignoreSuppressionOfDeprecations="true" ignoreIndirectDeprecations="false" baseline="phpunit.baseline.xml">
     <deprecationTrigger>
         <function>trigger_deprecation</function>
-        <method>Doctrine\Deprecations\Deprecation::trigger</method>
-        <method>Doctrine\Deprecations\Deprecation::delegateTriggerToBackend</method>
     </deprecationTrigger>
     <include>
       <directory>./</directory>

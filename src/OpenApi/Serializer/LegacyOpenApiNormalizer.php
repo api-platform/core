@@ -22,7 +22,7 @@ final class LegacyOpenApiNormalizer implements NormalizerInterface
         self::SPEC_VERSION => '3.1.0',
     ];
 
-    public function __construct(private readonly NormalizerInterface $decorated, $defaultContext = [])
+    public function __construct(private readonly NormalizerInterface $decorated, array $defaultContext = [])
     {
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
@@ -45,6 +45,11 @@ final class LegacyOpenApiNormalizer implements NormalizerInterface
                     }
                     unset($schemas[$name]['properties'][$property]['type']);
                 }
+
+                if (\is_array($value['examples'] ?? false)) {
+                    $schemas[$name]['properties'][$property]['example'] = $value['examples'];
+                    unset($schemas[$name]['properties'][$property]['examples']);
+                }
             }
         }
 
@@ -59,6 +64,9 @@ final class LegacyOpenApiNormalizer implements NormalizerInterface
         return $this->decorated->supportsNormalization($data, $format, $context);
     }
 
+    /**
+     * @param string|null $format
+     */
     public function getSupportedTypes($format): array
     {
         return $this->decorated->getSupportedTypes($format);

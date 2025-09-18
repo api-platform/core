@@ -41,6 +41,7 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         $filterLocator->method('get')->willReturn(new class implements FilterInterface {
             public function getDescription(string $resourceClass): array
             {
+                // @phpstan-ignore-next-line return.type
                 return [
                     'hydra' => [
                         'property' => 'hydra',

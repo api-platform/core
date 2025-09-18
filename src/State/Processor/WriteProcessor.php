@@ -16,6 +16,8 @@ namespace ApiPlatform\State\Processor;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\State\ProcessorInterface;
+use ApiPlatform\State\StopwatchAwareInterface;
+use ApiPlatform\State\StopwatchAwareTrait;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -29,9 +31,10 @@ use Symfony\Component\HttpFoundation\Response;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-final class WriteProcessor implements ProcessorInterface
+final class WriteProcessor implements ProcessorInterface, StopwatchAwareInterface
 {
     use ClassInfoTrait;
+    use StopwatchAwareTrait;
 
     /**
      * @param ProcessorInterface<mixed, mixed> $processor
@@ -51,7 +54,9 @@ final class WriteProcessor implements ProcessorInterface
             return $this->processor ? $this->processor->process($data, $operation, $uriVariables, $context) : $data;
         }
 
+        $this->stopwatch?->start('api_platform.processor.write');
         $data = $this->callableProcessor->process($data, $operation, $uriVariables, $context);
+        $this->stopwatch?->stop('api_platform.processor.write');
 
         return $this->processor ? $this->processor->process($data, $operation, $uriVariables, $context) : $data;
     }

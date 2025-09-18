@@ -19,9 +19,13 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
+use Workbench\App\Models\PostWithMorphMany;
 use Workbench\Database\Factories\AuthorFactory;
 use Workbench\Database\Factories\BookFactory;
+use Workbench\Database\Factories\CommentMorphFactory;
 use Workbench\Database\Factories\GrandSonFactory;
+use Workbench\Database\Factories\PostWithMorphManyFactory;
+use Workbench\Database\Factories\TimeSlotFactory;
 use Workbench\Database\Factories\WithAccessorFactory;
 
 class EloquentTest extends TestCase
@@ -444,6 +448,17 @@ class EloquentTest extends TestCase
         $this->assertEquals($json['sons'][0], '/api/grand_sons/1');
     }
 
+    public function testHasMany(): void
+    {
+        GrandSonFactory::new()->count(1)->create();
+
+        $res = $this->get('/api/grand_fathers/1/grand_sons', ['Accept' => ['application/ld+json']]);
+        $json = $res->json();
+        $this->assertEquals($json['@id'], '/api/grand_fathers/1/grand_sons');
+        $this->assertEquals($json['totalItems'], 1);
+        $this->assertEquals($json['member'][0]['@id'], '/api/grand_sons/1');
+    }
+
     public function testRelationIsHandledOnCreateWithNestedData(): void
     {
         $cartData = [
@@ -521,6 +536,82 @@ class EloquentTest extends TestCase
                     'priceAtAddition' => '25.50',
                 ],
             ],
+        ]);
+    }
+
+    public function testPostWithEmptyMorphMany(): void
+    {
+        $response = $this->postJson('/api/post_with_morph_manies', [
+            'title' => 'My first post',
+            'content' => 'This is the content of my first post.',
+            'comments' => [['content' => 'hello']],
+        ], ['accept' => 'application/ld+json', 'content-type' => 'application/ld+json']);
+        $response->assertStatus(201);
+        $response->assertJson([
+            'title' => 'My first post',
+            'content' => 'This is the content of my first post.',
+            'comments' => [['content' => 'hello']],
+        ]);
+    }
+
+    public function testPostCommentsCollectionFromMorphMany(): void
+    {
+        PostWithMorphManyFactory::new()->create();
+
+        CommentMorphFactory::new()->count(5)->create([
+            'commentable_id' => 1,
+            'commentable_type' => PostWithMorphMany::class,
+        ]);
+
+        $response = $this->getJson('/api/post_with_morph_manies/1/comments', [
+            'accept' => 'application/ld+json',
+        ]);
+        $response->assertStatus(200);
+        $response->assertJsonCount(5, 'member');
+    }
+
+    public function testPostCommentItemFromMorphMany(): void
+    {
+        PostWithMorphManyFactory::new()->create();
+
+        CommentMorphFactory::new()->count(5)->create([
+            'commentable_id' => 1,
+            'commentable_type' => PostWithMorphMany::class,
+        ])->first();
+
+        $response = $this->getJson('/api/post_with_morph_manies/1/comments/1', [
+            'accept' => 'application/ld+json',
+        ]);
+        $response->assertStatus(200);
+        $response->assertJson([
+            '@context' => '/api/contexts/CommentMorph',
+            '@id' => '/api/post_with_morph_manies/1/comments/1',
+            '@type' => 'CommentMorph',
+            'id' => 1,
+        ]);
+    }
+
+    public function testCreateDeliveryRequestWithPickupSlot(): void
+    {
+        $pickupTimeSlot = TimeSlotFactory::new()->create(['note' => 'Morning slot']);
+
+        $response = $this->postJson('/api/delivery_requests', [
+            'pickupTimeSlot' => '/api/time_slots/'.$pickupTimeSlot->id, // @phpstan-ignore-line
+            'note' => 'This is a test note.',
+        ], ['accept' => 'application/ld+json', 'content-type' => 'application/ld+json']);
+
+        $response->assertStatus(201);
+        $response->assertJson([
+            '@context' => '/api/contexts/DeliveryRequest',
+            '@id' => '/api/delivery_requests/1',
+            '@type' => 'DeliveryRequest',
+            'pickupTimeSlot' => [
+                '@id' => '/api/time_slots/'.$pickupTimeSlot->id, // @phpstan-ignore-line
+                '@type' => 'TimeSlot',
+                'name' => $pickupTimeSlot->name, // @phpstan-ignore-line
+                'note' => $pickupTimeSlot->note, // @phpstan-ignore-line
+            ],
+            'note' => 'This is a test note.',
         ]);
     }
 }

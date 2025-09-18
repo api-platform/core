@@ -20,11 +20,6 @@ use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Doctrine\ODM\MongoDB\MongoDBException;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 final class DateFilterTest extends ApiTestCase
 {
@@ -52,13 +47,6 @@ final class DateFilterTest extends ApiTestCase
         $this->loadFixtures($entityClass);
     }
 
-    /**
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
-     */
     #[DataProvider('dateFilterScenariosProvider')]
     public function testDateFilterResponses(string $url, int $expectedCount): void
     {
@@ -90,13 +78,6 @@ final class DateFilterTest extends ApiTestCase
         yield 'date_alias_old_way_after_last_one' => ['/filtered_date_parameters?date_old_way[after]=2024-12-31', 1];
     }
 
-    /**
-     * @throws RedirectionExceptionInterface
-     * @throws DecodingExceptionInterface
-     * @throws ClientExceptionInterface
-     * @throws TransportExceptionInterface
-     * @throws ServerExceptionInterface
-     */
     #[DataProvider('dateFilterNullAndEmptyScenariosProvider')]
     public function testDateFilterWithNullAndEmptyValues(string $url, int $expectedCount): void
     {

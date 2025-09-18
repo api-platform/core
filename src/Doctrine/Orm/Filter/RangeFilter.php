@@ -116,7 +116,7 @@ final class RangeFilter extends AbstractFilter implements RangeFilterInterface, 
     /**
      * {@inheritdoc}
      */
-    protected function filterProperty(string $property, $values, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
+    protected function filterProperty(string $property, mixed $values, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         if (
             !\is_array($values)
@@ -227,7 +227,7 @@ final class RangeFilter extends AbstractFilter implements RangeFilterInterface, 
         }
     }
 
-    public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array|null
+    public function getOpenApiParameters(Parameter $parameter): array
     {
         $in = $parameter instanceof QueryParameter ? 'query' : 'header';
         $key = $parameter->getKey();

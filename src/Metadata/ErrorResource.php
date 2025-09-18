@@ -25,9 +25,9 @@ class ErrorResource extends ApiResource
         ?string $description = null,
         array|string|null $types = null,
         $operations = null,
-        $formats = null,
-        $inputFormats = null,
-        $outputFormats = null,
+        array|string|null $formats = null,
+        array|string|null $inputFormats = null,
+        array|string|null $outputFormats = null,
         $uriVariables = null,
         ?string $routePrefix = null,
         ?array $defaults = null,
@@ -52,7 +52,6 @@ class ErrorResource extends ApiResource
         OpenApiOperation|bool|null $openapi = null,
         ?array $validationContext = null,
         ?array $filters = null,
-        ?bool $elasticsearch = null,
         $mercure = null,
         $messenger = null,
         $input = null,
@@ -84,6 +83,7 @@ class ErrorResource extends ApiResource
         $provider = null,
         $processor = null,
         ?OptionsInterface $stateOptions = null,
+        ?bool $jsonStream = null,
         array $extraProperties = [],
     ) {
         parent::__construct(
@@ -119,7 +119,6 @@ class ErrorResource extends ApiResource
             openapi: $openapi,
             validationContext: $validationContext,
             filters: $filters,
-            elasticsearch: $elasticsearch,
             mercure: $mercure,
             messenger: $messenger,
             input: $input,
@@ -151,6 +150,7 @@ class ErrorResource extends ApiResource
             provider: $provider,
             processor: $processor,
             stateOptions: $stateOptions,
+            jsonStream: $jsonStream,
             extraProperties: $extraProperties
         );
     }

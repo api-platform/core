@@ -81,6 +81,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
         return self::FORMAT === $format && parent::supportsNormalization($data, $format, $context);
     }
 
+    /**
+     * @param string|null $format
+     */
     public function getSupportedTypes($format): array
     {
         return self::FORMAT === $format ? parent::getSupportedTypes($format) : [];
@@ -154,7 +157,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function getAttributes($object, $format = null, array $context = []): array
+    protected function getAttributes(object $object, ?string $format = null, array $context = []): array
     {
         return $this->getComponents($object, $format, $context)['states'];
     }
@@ -305,14 +308,16 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
             $attributeValue = $this->getAttributeValue($object, $relation['name'], $format, $childContext);
 
-            if (empty($attributeValue)) {
+            if (empty($attributeValue) && ($context[self::SKIP_NULL_TO_ONE_RELATIONS] ?? $this->defaultContext[self::SKIP_NULL_TO_ONE_RELATIONS] ?? true)) {
                 continue;
             }
 
             if ('one' === $relation['cardinality']) {
                 if ('links' === $type) {
-                    $data[$key][$relationName]['href'] = $this->getRelationIri($attributeValue);
-                    continue;
+                    if (null !== $attributeValue) {
+                        $data[$key][$relationName]['href'] = $this->getRelationIri($attributeValue);
+                        continue;
+                    }
                 }
 
                 $data[$key][$relationName] = $attributeValue;

@@ -67,7 +67,7 @@ final class DocumentationNormalizer implements NormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
         $classes = [];
         $entrypointProperties = [];
@@ -313,7 +313,7 @@ final class DocumentationNormalizer implements NormalizerInterface
 
             if (null !== $inputClass) {
                 $possibleValue = [];
-                foreach ($operation->getInputFormats() as $mimeTypes) {
+                foreach ($operation->getInputFormats() ?? [] as $mimeTypes) {
                     foreach ($mimeTypes as $mimeType) {
                         $possibleValue[] = $mimeType;
                     }
@@ -685,6 +685,9 @@ final class DocumentationNormalizer implements NormalizerInterface
         return self::FORMAT === $format && $data instanceof Documentation;
     }
 
+    /**
+     * @param string|null $format
+     */
     public function getSupportedTypes($format): array
     {
         return self::FORMAT === $format ? [Documentation::class => true] : [];

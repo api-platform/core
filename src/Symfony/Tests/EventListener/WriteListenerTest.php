@@ -37,13 +37,13 @@ class WriteListenerTest extends TestCase
         $processor = $this->createMock(ProcessorInterface::class);
         $processor->expects($this->once())->method('process')->willReturn(new Response());
         $metadata = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
-        $metadata->expects($this->once())->method('create')->with('class')->willReturn(new ResourceMetadataCollection('class', [
+        $metadata->expects($this->once())->method('create')->with(\stdClass::class)->willReturn(new ResourceMetadataCollection(\stdClass::class, [
             new ApiResource(operations: [
                 'operation' => new Get(),
             ]),
         ]));
 
-        $request = new Request([], [], ['_api_operation_name' => 'operation', '_api_resource_class' => 'class']);
+        $request = new Request([], [], ['_api_operation_name' => 'operation', '_api_resource_class' => \stdClass::class]);
         $listener = new WriteListener($processor, $metadata);
         $listener->onKernelView(
             new ViewEvent(
@@ -61,7 +61,7 @@ class WriteListenerTest extends TestCase
         $processor = $this->createMock(ProcessorInterface::class);
         $processor->expects($this->once())->method('process')->willReturn(new Response());
         $metadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
-        $request = new Request([], [], ['_api_operation' => new Get(), '_api_operation_name' => 'operation', '_api_resource_class' => 'class']);
+        $request = new Request([], [], ['_api_operation' => new Get(), '_api_operation_name' => 'operation', '_api_resource_class' => \stdClass::class]);
         $listener = new WriteListener($processor, $metadata);
         $listener->onKernelView(
             new ViewEvent(
@@ -75,15 +75,15 @@ class WriteListenerTest extends TestCase
 
     public function testCallProcessorContext(): void
     {
-        $operation = new Get(class: 'class');
+        $operation = new Get(class: \stdClass::class);
         $controllerResult = new \stdClass();
         $originalData = new \stdClass();
         $uriVariables = ['id' => 3];
         $returnValue = new \stdClass();
-        $request = new Request([], [], ['_api_operation' => $operation, '_api_operation_name' => 'operation', '_api_resource_class' => 'class', '_api_uri_variables' => $uriVariables, 'previous_data' => $originalData]);
+        $request = new Request([], [], ['_api_operation' => $operation, '_api_operation_name' => 'operation', '_api_resource_class' => \stdClass::class, '_api_uri_variables' => $uriVariables, 'previous_data' => $originalData]);
         $processor = $this->createMock(ProcessorInterface::class);
         $processor->expects($this->once())->method('process')
-            ->with($controllerResult, $operation, $uriVariables, ['request' => $request, 'uri_variables' => $uriVariables, 'resource_class' => 'class', 'previous_data' => $originalData])->willReturn($returnValue);
+            ->with($controllerResult, $operation, $uriVariables, ['request' => $request, 'uri_variables' => $uriVariables, 'resource_class' => \stdClass::class, 'previous_data' => $originalData])->willReturn($returnValue);
         $metadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
         $listener = new WriteListener($processor, $metadata);
         $listener->onKernelView(
@@ -104,7 +104,7 @@ class WriteListenerTest extends TestCase
         $processor = $this->createMock(ProcessorInterface::class);
         $processor->expects($this->never())->method('process')->willReturn(new Response());
         $metadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
-        $metadata->method('create')->willReturn(new ResourceMetadataCollection('class'));
+        $metadata->method('create')->willReturn(new ResourceMetadataCollection(\stdClass::class));
         $request = new Request([], [], $attributes);
         $listener = new WriteListener($processor, $metadata);
         $listener->onKernelView(
@@ -128,13 +128,13 @@ class WriteListenerTest extends TestCase
     public function testWriteWithUriVariables(): void
     {
         $controllerResult = new \stdClass();
-        $operation = new Post(uriVariables: ['id' => new Link(identifiers: ['id'])], class: 'class');
+        $operation = new Post(uriVariables: ['id' => new Link(identifiers: ['id'])], class: \stdClass::class);
         $provider = $this->createMock(ProcessorInterface::class);
         $provider->expects($this->once())->method('process')->with($controllerResult, $operation->withWrite(true), ['id' => 3]);
         $metadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
         $uriVariablesConverter = $this->createMock(UriVariablesConverterInterface::class);
-        $uriVariablesConverter->expects($this->once())->method('convert')->with(['id' => '3'], 'class')->willReturn(['id' => 3]);
-        $request = new Request([], [], ['_api_operation' => $operation, '_api_operation_name' => 'operation', '_api_resource_class' => 'class', 'id' => '3']);
+        $uriVariablesConverter->expects($this->once())->method('convert')->with(['id' => '3'], \stdClass::class)->willReturn(['id' => 3]);
+        $request = new Request([], [], ['_api_operation' => $operation, '_api_operation_name' => 'operation', '_api_resource_class' => \stdClass::class, 'id' => '3']);
         $request->setMethod($operation->getMethod());
         $listener = new WriteListener($provider, $metadata, uriVariablesConverter: $uriVariablesConverter);
         $listener->onKernelView(

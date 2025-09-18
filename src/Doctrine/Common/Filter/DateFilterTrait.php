@@ -81,11 +81,19 @@ trait DateFilterTrait
         ];
     }
 
-    private function normalizeValue($value, string $operator): ?string
+    private function normalizeValue(mixed $value, string $operator): ?string
     {
         if (false === \is_string($value)) {
             $this->getLogger()->notice('Invalid filter ignored', [
                 'exception' => new InvalidArgumentException(\sprintf('Invalid value for "[%s]", expected string', $operator)),
+            ]);
+
+            return null;
+        }
+
+        if ('' === $value) {
+            $this->getLogger()->notice('Invalid filter ignored', [
+                'exception' => new InvalidArgumentException(\sprintf('Invalid value for "[%s]", expected non-empty string', $operator)),
             ]);
 
             return null;

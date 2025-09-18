@@ -93,4 +93,61 @@ class ConstraintViolationNormalizerTest extends TestCase
             (new ConstraintViolationListNormalizer($propertyMetadataFactoryProphecy->reveal(), $nameConverterProphecy->reveal()))->normalize($constraintViolationList)
         );
     }
+
+    public function testNormalizeWithStringRoot(): void
+    {
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+
+        // Create a violation with a string root (simulating query parameter validation)
+        $constraintViolationList = new ConstraintViolationList([
+            new ConstraintViolation('Invalid page value.', 'Invalid page value.', [], 'page', 'page', 'invalid'),
+        ]);
+
+        $normalizer = new ConstraintViolationListNormalizer($propertyMetadataFactoryProphecy->reveal());
+
+        $result = $normalizer->normalize($constraintViolationList);
+
+        $this->assertEquals(
+            [
+                'errors' => [
+                    [
+                        'detail' => 'Invalid page value.',
+                        'source' => [
+                            'pointer' => 'data/attributes/page',
+                        ],
+                    ],
+                ],
+            ],
+            $result
+        );
+    }
+
+    public function testNormalizeWithNullRoot(): void
+    {
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+
+        // Create a violation with a null root
+        $constraintViolationList = new ConstraintViolationList([
+            new ConstraintViolation('Invalid value.', 'Invalid value.', [], null, 'field', 'invalid'),
+        ]);
+
+        $normalizer = new ConstraintViolationListNormalizer($propertyMetadataFactoryProphecy->reveal());
+
+        // This should not throw a TypeError and should handle the null root gracefully
+        $result = $normalizer->normalize($constraintViolationList);
+
+        $this->assertEquals(
+            [
+                'errors' => [
+                    [
+                        'detail' => 'Invalid value.',
+                        'source' => [
+                            'pointer' => 'data/attributes/field',
+                        ],
+                    ],
+                ],
+            ],
+            $result
+        );
+    }
 }

@@ -43,6 +43,9 @@ final class ObjectNormalizer implements NormalizerInterface
         return self::FORMAT === $format && $this->decorated->supportsNormalization($data, $format, $context);
     }
 
+    /**
+     * @param string|null $format
+     */
     public function getSupportedTypes($format): array
     {
         return self::FORMAT === $format ? $this->decorated->getSupportedTypes($format) : [];
@@ -53,7 +56,7 @@ final class ObjectNormalizer implements NormalizerInterface
      *
      * @throws UnexpectedValueException
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
         if (isset($context['api_resource'])) {
             $originalResource = $context['api_resource'];

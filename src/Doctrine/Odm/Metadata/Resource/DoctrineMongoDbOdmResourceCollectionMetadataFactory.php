@@ -16,7 +16,6 @@ namespace ApiPlatform\Doctrine\Odm\Metadata\Resource;
 use ApiPlatform\Doctrine\Odm\State\CollectionProvider;
 use ApiPlatform\Doctrine\Odm\State\ItemProvider;
 use ApiPlatform\Doctrine\Odm\State\Options;
-use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\Operation;
@@ -41,12 +40,10 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactory implements Resou
     {
         $resourceMetadataCollection = $this->decorated->create($resourceClass);
 
-        /** @var ApiResource $resourceMetadata */
         foreach ($resourceMetadataCollection as $i => $resourceMetadata) {
             $operations = $resourceMetadata->getOperations();
 
             if ($operations) {
-                /** @var Operation $operation */
                 foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
                     $documentClass = $this->getStateOptionsClass($operation, $operation->getClass(), Options::class);
                     if (!$this->managerRegistry->getManagerForClass($documentClass) instanceof DocumentManager) {

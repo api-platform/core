@@ -19,11 +19,10 @@ use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AuthenticatorManager
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\DataProviderPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ElasticsearchClientPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
-use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlMutationResolverPass;
-use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlQueryResolverPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlResolverPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlTypePass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\MetadataAwareNameConverterPass;
+use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\MutatorPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\SerializerMappingLoaderPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\TestClientPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\TestMercureHubPass;
@@ -45,6 +44,7 @@ final class ApiPlatformBundle extends Bundle
     {
         parent::build($container);
 
+        // TODO: remove in 5.x
         $container->addCompilerPass(new DataProviderPass());
         // Run the compiler pass before the {@see ResolveInstanceofConditionalsPass} to allow autoconfiguration of generated filter definitions.
         $container->addCompilerPass(new AttributeFilterPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 101);
@@ -52,15 +52,12 @@ final class ApiPlatformBundle extends Bundle
         $container->addCompilerPass(new FilterPass());
         $container->addCompilerPass(new ElasticsearchClientPass());
         $container->addCompilerPass(new GraphQlTypePass());
-        // These two are deprecated
-        $container->addCompilerPass(new GraphQlQueryResolverPass());
-        $container->addCompilerPass(new GraphQlMutationResolverPass());
-        // We can use this one only in 4.0
         $container->addCompilerPass(new GraphQlResolverPass());
-        $container->addCompilerPass(new MetadataAwareNameConverterPass());
+        $container->addCompilerPass(new MetadataAwareNameConverterPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 100);
         $container->addCompilerPass(new TestClientPass());
         $container->addCompilerPass(new TestMercureHubPass());
         $container->addCompilerPass(new AuthenticatorManagerPass());
         $container->addCompilerPass(new SerializerMappingLoaderPass());
+        $container->addCompilerPass(new MutatorPass());
     }
 }

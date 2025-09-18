@@ -38,10 +38,13 @@ final class ValidateProvider implements ProviderInterface
     public function __construct(
         private readonly ProviderInterface $inner,
         private readonly Application $app,
-        // TODO: trigger deprecation in API Platform 4.2 when this is not defined
         private readonly ?NormalizerInterface $normalizer = null,
         ?NameConverterInterface $nameConverter = null,
     ) {
+        if (!$normalizer) {
+            trigger_deprecation('api-platform/laravel', '4.2', 'Not using the normalizer in %s is deprecated.', self::class);
+        }
+
         $this->nameConverter = $nameConverter;
     }
 
@@ -113,7 +116,6 @@ final class ValidateProvider implements ProviderInterface
         }
 
         // hopefully this path never gets used, its there for BC-layer only
-        // TODO: deprecation in API Platform 4.2
         // TODO: remove in 5.0
         if ($s = json_encode($body)) {
             return json_decode($s, true);

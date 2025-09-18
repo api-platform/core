@@ -35,13 +35,13 @@ class ReadListenerTest extends TestCase
         $provider = $this->createMock(ProviderInterface::class);
         $provider->expects($this->once())->method('provide');
         $metadata = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
-        $metadata->expects($this->once())->method('create')->with('class')->willReturn(new ResourceMetadataCollection('class', [
+        $metadata->expects($this->once())->method('create')->with(\stdClass::class)->willReturn(new ResourceMetadataCollection(\stdClass::class, [
             new ApiResource(operations: [
                 'operation' => new Get(),
             ]),
         ]));
 
-        $request = new Request([], [], ['_api_operation_name' => 'operation', '_api_resource_class' => 'class']);
+        $request = new Request([], [], ['_api_operation_name' => 'operation', '_api_resource_class' => \stdClass::class]);
         $listener = new ReadListener($provider, $metadata);
         $listener->onKernelRequest(
             new RequestEvent(
@@ -57,7 +57,7 @@ class ReadListenerTest extends TestCase
         $provider = $this->createMock(ProviderInterface::class);
         $provider->expects($this->once())->method('provide');
         $metadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
-        $request = new Request([], [], ['_api_operation' => new Get(), '_api_operation_name' => 'operation', '_api_resource_class' => 'class']);
+        $request = new Request([], [], ['_api_operation' => new Get(), '_api_operation_name' => 'operation', '_api_resource_class' => \stdClass::class]);
         $listener = new ReadListener($provider, $metadata);
         $listener->onKernelRequest(
             new RequestEvent(
@@ -74,7 +74,7 @@ class ReadListenerTest extends TestCase
         $provider = $this->createMock(ProviderInterface::class);
         $provider->expects($this->never())->method('provide');
         $metadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
-        $metadata->method('create')->willReturn(new ResourceMetadataCollection('class'));
+        $metadata->method('create')->willReturn(new ResourceMetadataCollection(\stdClass::class));
         $listener = new ReadListener($provider, $metadata);
         $listener->onKernelRequest(
             new RequestEvent(
@@ -99,7 +99,7 @@ class ReadListenerTest extends TestCase
         $provider = $this->createMock(ProviderInterface::class);
         $provider->expects($this->once())->method('provide')->with($operation);
         $metadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
-        $request = new Request([], [], ['_api_operation' => $operation, '_api_operation_name' => 'operation', '_api_resource_class' => 'class']);
+        $request = new Request([], [], ['_api_operation' => $operation, '_api_operation_name' => 'operation', '_api_resource_class' => \stdClass::class]);
         $listener = new ReadListener($provider, $metadata);
         $listener->onKernelRequest(
             new RequestEvent(
@@ -112,13 +112,13 @@ class ReadListenerTest extends TestCase
 
     public function testReadWithUriVariables(): void
     {
-        $operation = new Get(uriVariables: ['id' => new Link(identifiers: ['id'])], class: 'class');
+        $operation = new Get(uriVariables: ['id' => new Link(identifiers: ['id'])], class: \stdClass::class);
         $provider = $this->createMock(ProviderInterface::class);
         $provider->expects($this->once())->method('provide')->with($operation->withRead(true), ['id' => 3]);
         $metadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
         $uriVariablesConverter = $this->createMock(UriVariablesConverterInterface::class);
-        $uriVariablesConverter->expects($this->once())->method('convert')->with(['id' => '3'], 'class')->willReturn(['id' => 3]);
-        $request = new Request([], [], ['_api_operation' => $operation, '_api_operation_name' => 'operation', '_api_resource_class' => 'class', 'id' => '3']);
+        $uriVariablesConverter->expects($this->once())->method('convert')->with(['id' => '3'], \stdClass::class)->willReturn(['id' => 3]);
+        $request = new Request([], [], ['_api_operation' => $operation, '_api_operation_name' => 'operation', '_api_resource_class' => \stdClass::class, 'id' => '3']);
         $listener = new ReadListener($provider, $metadata, $uriVariablesConverter);
         $listener->onKernelRequest(
             new RequestEvent(
@@ -135,7 +135,7 @@ class ReadListenerTest extends TestCase
         $provider = $this->createMock(ProviderInterface::class);
         $provider->expects($this->once())->method('provide')->with($operation);
         $metadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
-        $request = new Request([], [], ['_api_operation' => new Post(), '_api_operation_name' => 'operation', '_api_resource_class' => 'class']);
+        $request = new Request([], [], ['_api_operation' => new Post(), '_api_operation_name' => 'operation', '_api_resource_class' => \stdClass::class]);
         $request->setMethod('POST');
         $listener = new ReadListener($provider, $metadata);
         $listener->onKernelRequest(

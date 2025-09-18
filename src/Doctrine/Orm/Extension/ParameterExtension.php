@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Extension;
 
+use ApiPlatform\Doctrine\Common\Filter\LoggerAwareInterface;
 use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
 use ApiPlatform\Doctrine\Common\ParameterValueExtractorTrait;
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
@@ -23,6 +24,7 @@ use ApiPlatform\State\ParameterNotFound;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Reads operation parameters and execute its filter.
@@ -36,6 +38,7 @@ final class ParameterExtension implements QueryCollectionExtensionInterface, Que
     public function __construct(
         private readonly ContainerInterface $filterLocator,
         private readonly ?ManagerRegistry $managerRegistry = null,
+        private readonly ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -66,6 +69,10 @@ final class ParameterExtension implements QueryCollectionExtensionInterface, Que
 
             if ($this->managerRegistry && $filter instanceof ManagerRegistryAwareInterface && !$filter->hasManagerRegistry()) {
                 $filter->setManagerRegistry($this->managerRegistry);
+            }
+
+            if ($this->logger && $filter instanceof LoggerAwareInterface && !$filter->hasLogger()) {
+                $filter->setLogger($this->logger);
             }
 
             if ($filter instanceof AbstractFilter && !$filter->getProperties()) {

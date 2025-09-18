@@ -29,8 +29,8 @@ class SouinPurger extends SurrogateKeysPurger
     /**
      * @param HttpClientInterface[] $clients
      */
-    public function __construct(iterable $clients)
+    public function __construct(iterable $clients, int $maxHeaderLength = self::MAX_HEADER_SIZE_PER_BATCH)
     {
-        parent::__construct($clients, self::MAX_HEADER_SIZE_PER_BATCH, self::HEADER, self::SEPARATOR);
+        parent::__construct($clients, $maxHeaderLength, self::HEADER, self::SEPARATOR);
     }
 }

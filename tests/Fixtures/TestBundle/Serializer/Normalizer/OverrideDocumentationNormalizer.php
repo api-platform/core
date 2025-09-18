@@ -31,7 +31,7 @@ final class OverrideDocumentationNormalizer implements NormalizerInterface
      *
      * @throws ExceptionInterface
      */
-    public function normalize($object, $format = null, array $context = []): \ArrayObject|array|string|int|float|bool|null
+    public function normalize($object, $format = null, array $context = []): array
     {
         $data = $this->documentationNormalizer->normalize($object, $format, $context);
         if (!\is_array($data)) {

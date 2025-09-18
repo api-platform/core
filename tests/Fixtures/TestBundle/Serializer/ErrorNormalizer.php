@@ -22,7 +22,7 @@ final class ErrorNormalizer implements NormalizerInterface
     {
     }
 
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array|\ArrayObject
     {
         $a = $this->decorated->normalize($object, $format, $context);
         $a['hello'] = 'world';

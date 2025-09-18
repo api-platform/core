@@ -36,7 +36,7 @@ final class OperationTest extends TestCase
 
         $this->assertSame($operation->getShortName(), 'test');
         $this->assertSame($operation->canRead(), false);
-        $this->assertSame($operation instanceof CollectionOperationInterface, true);
+        $this->assertInstanceOf(CollectionOperationInterface::class, $operation);
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('operationProvider')]
@@ -59,5 +59,12 @@ final class OperationTest extends TestCase
         yield [new QueryCollection(...$args)];
         yield [new Mutation(...$args)];
         yield [new Subscription(...$args)];
+    }
+
+    public function testPaginationViaCursor(): void
+    {
+        $a = [];
+        $operation = (new GetCollection())->withPaginationViaCursor($a);
+        $this->assertEquals($a, $operation->getPaginationViaCursor());
     }
 }

@@ -48,7 +48,7 @@ trait JsonLdContextTrait
         return $data;
     }
 
-    private function createJsonLdContext(AnonymousContextBuilderInterface $contextBuilder, $object, array &$context): array
+    private function createJsonLdContext(AnonymousContextBuilderInterface $contextBuilder, object $object, array &$context): array
     {
         $anonymousContext = ($context['output'] ?? []) + ['api_resource' => $context['api_resource'] ?? null];
 

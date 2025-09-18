@@ -10,28 +10,9 @@ concurrency:
 
 env:
   COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  COMPOSER_ROOT_VERSION: "4.1.x-dev"
 
 jobs:
-  commitlint:
-    if: github.event_name == 'pull_request'
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Run commitlint
-        run: |
-            commit=$(gh api \
-              /repos/${{ github.repository }}/pulls/${{github.event.number}}/commits \
-              | jq -r '.[0].commit.message' \
-              | head -n 1)
-            # we can't use npx see https://github.com/conventional-changelog/commitlint/issues/613
-            echo '{}' > package.json
-            npm install --no-fund --no-audit @commitlint/config-conventional @commitlint/cli
-            echo $commit | ./node_modules/.bin/commitlint -g .commitlintrc
-
   architecture:
     name: Check components interdependencies
     runs-on: ubuntu-latest
@@ -143,6 +124,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      # https://github.com/staabm/phpstan-todo-by#prerequisite
+      -   name: Get tags
+          run: git fetch --tags origin
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -264,7 +248,7 @@ jobs:
         continue-on-error: true
 
   phpunit-components:
-    name: PHPUnit ${{ matrix.component }} (PHP ${{ matrix.php.version }} ${{ matrix.php.coverage && 'coverage' || '' }}
+    name: PHPUnit ${{ matrix.component }} (PHP ${{ matrix.php.version }} ${{ matrix.php.coverage && 'coverage' || '' }}${{ matrix.php.lowest && 'lowest' || '' }})
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -274,6 +258,8 @@ jobs:
           - version: '8.3'
           - version: '8.4'
             coverage: true
+          - version: '8.4'
+            lowest: true
         component:
           - api-platform/doctrine-common
           - api-platform/doctrine-orm
@@ -302,18 +288,24 @@ jobs:
           tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
           ini-values: memory_limit=-1
-      - name: Linking
+      - name: PMU
         run: |
           composer global require soyuka/pmu
           composer global config allow-plugins.soyuka/pmu true --no-interaction
-          composer global link . --permanent
-      - name: Run ${{ matrix.component }} install
+      - name: Linking
+        if: ${{ !matrix.php.lowest }}
         run: |
+          composer global link . --permanent
           composer ${{matrix.component}} update
+      - name: Run ${{ matrix.component }} install
+        if: ${{ matrix.php.lowest }}
+        run: |
+          cd $(composer ${{matrix.component}} --cwd)
+          composer update${{ matrix.php.lowest && ' --prefer-lowest --prefer-source' || '' }}
       - name: Run ${{ matrix.component }} tests
         run: |
           mkdir -p /tmp/build/logs/phpunit
-          composer ${{matrix.component}} test --log-junit "/tmp/build/logs/phpunit/junit.xml" ${{ matrix.php.coverage && '--coverage-clover /tmp/build/logs/phpunit/clover.xml' || '' }}
+          composer ${{matrix.component}} test -- --log-junit "/tmp/build/logs/phpunit/junit.xml" ${{ matrix.php.coverage && '--coverage-clover /tmp/build/logs/phpunit/clover.xml' || '' }}${{ matrix.php.lowest && ' --ignore-baseline' || '' }}
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -1041,7 +1033,7 @@ jobs:
     strategy:
       matrix:
         php:
-          - '8.3'
+          - '8.4'
       fail-fast: false
     env:
       APP_ENV: sqlite
@@ -1054,20 +1046,13 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, fileinfo
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, fileinfo, mongodb
           coverage: none
           ini-values: memory_limit=-1
-      # Not in pecl
-      - name: Setup mongodb
-        run: |
-          curl -sLO https://github.com/mongodb/mongo-php-driver/releases/download/1.17.2/php_mongodb-1.17.2-8.3-nts-x64.zip
-          unzip -q php_mongodb-1.17.2-8.3-nts-x64.zip php_mongodb.dll
-          mv php_mongodb.dll C:\tools\php\ext
-          echo "extension=php_mongodb.dll" >> C:\tools\php\php.ini
       - name: Get composer cache directory
         id: composercache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
         shell: bash
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
@@ -1076,18 +1061,22 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Keep windows path
         id: get-cwd
+        shell: bash
         run: |
           cwd=$(php -r 'echo(str_replace("\\", "\\\\", $_SERVER["argv"][1]));' '${{ github.workspace }}')
           echo cwd=$cwd >> $GITHUB_OUTPUT
-        shell: bash
       - name: Update project dependencies
+        shell: bash
         run: |
+          php -m
           composer global require soyuka/pmu
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link . --working-directory='${{ steps.get-cwd.outputs.cwd }}'
       - name: Clear test app cache
+        shell: bash
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
+        shell: bash
         run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction
 
   phpunit-symfony-lowest:
@@ -1417,6 +1406,8 @@ jobs:
       - name: Install api-platform/laravel
         run: |
           composer global link ../src/Laravel --permanent
+          composer config minimum-stability dev
+          composer config prefer-stable true
           composer require api-platform/laravel:"@dev"
           php ./artisan api-platform:install
         working-directory: 'test-api-platform-install'

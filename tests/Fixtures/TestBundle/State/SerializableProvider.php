@@ -20,6 +20,8 @@ use ApiPlatform\State\SerializerAwareProviderTrait;
 
 /**
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
+ *
+ * @deprecated in 4.2, to be removed in 5.0 because it violates the dependency injection principle.
  */
 class SerializableProvider implements ProviderInterface, SerializerAwareProviderInterface
 {
@@ -36,7 +38,6 @@ class SerializableProvider implements ProviderInterface, SerializerAwareProvider
     "foo": "Lorem",
     "bar": "Ipsum"
 }
-JSON
-            , $operation->getClass(), 'json');
+JSON, $operation->getClass(), 'json');
     }
 }

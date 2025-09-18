@@ -39,7 +39,7 @@ final class EntrypointNormalizer implements NormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
         $entrypoint = ['links' => ['self' => $this->urlGenerator->generate('api_entrypoint', [], UrlGeneratorInterface::ABS_URL)]];
 
@@ -53,7 +53,7 @@ final class EntrypointNormalizer implements NormalizerInterface
                     }
 
                     try {
-                        $iri = $this->iriConverter->getIriFromResource($resourceClass, UrlGeneratorInterface::ABS_URL, $operation); // @phpstan-ignore-line phpstan issue as type is CollectionOperationInterface & Operation
+                        $iri = $this->iriConverter->getIriFromResource($resourceClass, UrlGeneratorInterface::ABS_URL, $operation);
                         $entrypoint['links'][lcfirst($resource->getShortName())] = $iri;
                     } catch (InvalidArgumentException) {
                         // Ignore resources without GET operations
@@ -73,6 +73,9 @@ final class EntrypointNormalizer implements NormalizerInterface
         return self::FORMAT === $format && $data instanceof Entrypoint;
     }
 
+    /**
+     * @param string|null $format
+     */
     public function getSupportedTypes($format): array
     {
         return self::FORMAT === $format ? [Entrypoint::class => true] : [];

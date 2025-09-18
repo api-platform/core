@@ -17,6 +17,8 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\SerializerContextBuilderInterface;
+use ApiPlatform\State\StopwatchAwareInterface;
+use ApiPlatform\State\StopwatchAwareTrait;
 use ApiPlatform\Validator\Exception\ValidationException;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -30,8 +32,10 @@ use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorTrait;
 
-final class DeserializeProvider implements ProviderInterface
+final class DeserializeProvider implements ProviderInterface, StopwatchAwareInterface
 {
+    use StopwatchAwareTrait;
+
     public function __construct(
         private readonly ?ProviderInterface $decorated,
         private readonly SerializerInterface $serializer,
@@ -55,9 +59,11 @@ final class DeserializeProvider implements ProviderInterface
 
         $data = $this->decorated ? $this->decorated->provide($operation, $uriVariables, $context) : $request->attributes->get('data');
 
-        if (!$operation->canDeserialize()) {
+        if (!$operation->canDeserialize() || $context['request']->attributes->has('deserialized')) {
             return $data;
         }
+
+        $this->stopwatch?->start('api_platform.provider.deserialize');
 
         $contentType = $request->headers->get('CONTENT_TYPE');
         if (null === $contentType || '' === $contentType) {
@@ -75,7 +81,7 @@ final class DeserializeProvider implements ProviderInterface
             throw new UnsupportedMediaTypeHttpException('Format not supported.');
         }
 
-        if ($operation instanceof HttpOperation && null === ($serializerContext[SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE] ?? null)) {
+        if (null === ($serializerContext[SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE] ?? null)) {
             $method = $operation->getMethod();
             $assignObjectToPopulate = 'POST' === $method
                 || 'PATCH' === $method
@@ -94,7 +100,7 @@ final class DeserializeProvider implements ProviderInterface
         unset($serializerContext[SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE]);
 
         try {
-            return $this->serializer->deserialize((string) $request->getContent(), $serializerContext['deserializer_type'] ?? $operation->getClass(), $format, $serializerContext);
+            $data = $this->serializer->deserialize((string) $request->getContent(), $serializerContext['deserializer_type'] ?? $operation->getClass(), $format, $serializerContext);
         } catch (PartialDenormalizationException $e) {
             if (!class_exists(ConstraintViolationList::class)) {
                 throw $e;
@@ -117,6 +123,8 @@ final class DeserializeProvider implements ProviderInterface
                 throw new ValidationException($violations);
             }
         }
+
+        $this->stopwatch?->stop('api_platform.provider.deserialize');
 
         return $data;
     }

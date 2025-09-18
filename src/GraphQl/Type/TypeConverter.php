@@ -119,7 +119,7 @@ final class TypeConverter implements TypeConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function resolveType(string $type): ?GraphQLType
+    public function resolveType(string $type): GraphQLType
     {
         try {
             $astTypeNode = Parser::parseType($type);
@@ -246,7 +246,7 @@ final class TypeConverter implements TypeConverterInterface
     private function resolveAstTypeNode(TypeNode $astTypeNode, string $fromType): ?GraphQLType
     {
         if ($astTypeNode instanceof NonNullTypeNode) {
-            /** @var NullableType|null $nullableAstTypeNode */
+            /** @var (GraphQLType&NullableType)|null $nullableAstTypeNode */
             $nullableAstTypeNode = $this->resolveNullableAstTypeNode($astTypeNode->type, $fromType);
 
             return $nullableAstTypeNode ? GraphQLType::nonNull($nullableAstTypeNode) : null;

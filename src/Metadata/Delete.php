@@ -80,7 +80,6 @@ final class Delete extends HttpOperation implements DeleteOperationInterface
         $output = null,
         $mercure = null,
         $messenger = null,
-        ?bool $elasticsearch = null,
         ?int $urlGenerationStrategy = null,
         ?bool $read = null,
         ?bool $deserialize = null,
@@ -100,6 +99,7 @@ final class Delete extends HttpOperation implements DeleteOperationInterface
         array|string|null $middleware = null,
         ?bool $strictQueryParameterValidation = null,
         protected ?bool $hideHydraOperation = null,
+        ?bool $jsonStream = null,
         array $extraProperties = [],
     ) {
         parent::__construct(
@@ -161,7 +161,6 @@ final class Delete extends HttpOperation implements DeleteOperationInterface
             output: $output,
             mercure: $mercure,
             messenger: $messenger,
-            elasticsearch: $elasticsearch,
             urlGenerationStrategy: $urlGenerationStrategy,
             read: $read,
             deserialize: $deserialize,
@@ -177,6 +176,7 @@ final class Delete extends HttpOperation implements DeleteOperationInterface
             rules: $rules,
             policy: $policy,
             middleware: $middleware,
+            jsonStream: $jsonStream,
             extraProperties: $extraProperties,
             collectDenormalizationErrors: $collectDenormalizationErrors,
             parameters: $parameters,

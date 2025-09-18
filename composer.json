@@ -47,7 +47,9 @@
     "extra": {
         "branch-alias": {
             "dev-3.4": "3.4.x-dev",
-            "dev-main": "4.0.x-dev"
+            "dev-4.1": "4.1.x-dev",
+            "dev-4.2": "4.2.x-dev",
+            "dev-main": "4.3.x-dev"
         },
         "symfony": {
             "require": "^6.4 || ^7.1"
@@ -104,7 +106,7 @@
     },
     "require": {
         "php": ">=8.2",
-        "doctrine/inflector": "^1.0 || ^2.0",
+        "doctrine/inflector": "^2.0",
         "psr/cache": "^1.0 || ^2.0 || ^3.0",
         "psr/container": "^1.0 || ^2.0",
         "symfony/deprecation-contracts": "^3.1",
@@ -114,11 +116,13 @@
         "symfony/property-info": "^6.4 || ^7.1",
         "symfony/serializer": "^6.4 || ^7.0",
         "symfony/translation-contracts": "^3.3",
-        "symfony/type-info": "v7.3.0-RC1",
+        "symfony/type-info": "^7.3 || 7.4.x-dev",
+        "symfony/validator": "^6.4 || ^7.1",
         "symfony/web-link": "^6.4 || ^7.1",
         "willdurand/negotiation": "^3.1"
     },
     "require-dev": {
+        "ext-mongodb": "^1.21 || ^2.0",
         "behat/behat": "^3.11",
         "behat/mink": "^1.9",
         "doctrine/cache": "^1.11 || ^2.1",
@@ -140,17 +144,17 @@
         "illuminate/pagination": "^11.0 || ^12.0",
         "illuminate/routing": "^11.0 || ^12.0",
         "illuminate/support": "^11.0 || ^12.0",
-        "jangregor/phpstan-prophecy": "^1.0",
+        "jangregor/phpstan-prophecy": "^2.1.11",
         "justinrainbow/json-schema": "^5.2.11",
         "laravel/framework": "^11.0 || ^12.0",
         "orchestra/testbench": "^9.1",
         "phpspec/prophecy-phpunit": "^2.2",
         "phpstan/extension-installer": "^1.1",
         "phpstan/phpdoc-parser": "^1.29 || ^2.0",
-        "phpstan/phpstan": "^1.10",
-        "phpstan/phpstan-doctrine": "^1.0",
-        "phpstan/phpstan-phpunit": "^1.0",
-        "phpstan/phpstan-symfony": "^1.0",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-doctrine": "^2.0",
+        "phpstan/phpstan-phpunit": "^2.0",
+        "phpstan/phpstan-symfony": "^2.0",
         "phpunit/phpunit": "11.5.x-dev",
         "psr/log": "^1.0 || ^2.0 || ^3.0",
         "ramsey/uuid": "^4.7",
@@ -172,12 +176,14 @@
         "symfony/expression-language": "^6.4 || ^7.0",
         "symfony/finder": "^6.4 || ^7.0",
         "symfony/form": "^6.4 || ^7.0",
-        "symfony/framework-bundle": "^6.4 || ^7.0",
+        "symfony/framework-bundle": "^6.4 || ^7.0 || 7.4.x-dev",
         "symfony/http-client": "^6.4 || ^7.0",
         "symfony/intl": "^6.4 || ^7.0",
+        "symfony/json-streamer": "7.4.x-dev",
         "symfony/maker-bundle": "^1.24",
         "symfony/mercure-bundle": "*",
         "symfony/messenger": "^6.4 || ^7.0",
+        "symfony/object-mapper": "7.4.x-dev",
         "symfony/routing": "^6.4 || ^7.0",
         "symfony/security-bundle": "^6.4 || ^7.0",
         "symfony/security-core": "^6.4 || ^7.0",
@@ -207,6 +213,7 @@
         "symfony/uid": "To support Symfony UUID/ULID identifiers.",
         "symfony/messenger": "To support messenger integration.",
         "symfony/web-profiler-bundle": "To use the data collector.",
+        "symfony/json-streamer": "To use the JSON Streamer component.",
         "webonyx/graphql-php": "To support GraphQL."
     },
     "type": "library",

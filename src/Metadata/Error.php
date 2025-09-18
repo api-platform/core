@@ -80,7 +80,6 @@ final class Error extends HttpOperation
         $output = null,
         $mercure = null,
         $messenger = null,
-        ?bool $elasticsearch = null,
         ?int $urlGenerationStrategy = null,
         ?bool $read = null,
         ?bool $deserialize = null,
@@ -95,6 +94,7 @@ final class Error extends HttpOperation
         $processor = null,
         ?OptionsInterface $stateOptions = null,
         ?bool $hideHydraOperation = null,
+        ?bool $jsonStream = null,
         array $extraProperties = [],
     ) {
         parent::__construct(
@@ -156,7 +156,6 @@ final class Error extends HttpOperation
             output: $output,
             mercure: $mercure,
             messenger: $messenger,
-            elasticsearch: $elasticsearch,
             urlGenerationStrategy: $urlGenerationStrategy,
             read: $read,
             deserialize: $deserialize,
@@ -171,6 +170,7 @@ final class Error extends HttpOperation
             processor: $processor,
             stateOptions: $stateOptions,
             hideHydraOperation: $hideHydraOperation,
+            jsonStream: $jsonStream,
             extraProperties: $extraProperties,
         );
     }

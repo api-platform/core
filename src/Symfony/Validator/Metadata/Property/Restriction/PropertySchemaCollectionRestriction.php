@@ -76,7 +76,7 @@ final class PropertySchemaCollectionRestriction implements PropertySchemaRestric
 
         foreach ($nestedConstraints as $nestedConstraint) {
             foreach ($this->restrictionsMetadata as $restrictionMetadata) {
-                if ($restrictionMetadata->supports($nestedConstraint, $propertyMetadata->withExtraProperties(($propertyMetadata->getExtraProperties() ?? []) + ['nested_schema' => true])) && !empty($nestedConstraintRestriction = $restrictionMetadata->create($nestedConstraint, $propertyMetadata))) {
+                if ($restrictionMetadata->supports($nestedConstraint, $propertyMetadata->withExtraProperties($propertyMetadata->getExtraProperties() + ['nested_schema' => true])) && !empty($nestedConstraintRestriction = $restrictionMetadata->create($nestedConstraint, $propertyMetadata))) {
                     $propertyRestrictions[] = $nestedConstraintRestriction;
                 }
             }

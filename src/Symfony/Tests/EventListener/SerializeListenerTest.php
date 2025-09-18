@@ -34,13 +34,13 @@ class SerializeListenerTest extends TestCase
         $processor = $this->createMock(ProcessorInterface::class);
         $processor->expects($this->once())->method('process')->willReturn(new Response());
         $metadata = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
-        $metadata->expects($this->once())->method('create')->with('class')->willReturn(new ResourceMetadataCollection('class', [
+        $metadata->expects($this->once())->method('create')->with(\stdClass::class)->willReturn(new ResourceMetadataCollection(\stdClass::class, [
             new ApiResource(operations: [
                 'operation' => new Get(),
             ]),
         ]));
 
-        $request = new Request([], [], ['_api_operation_name' => 'operation', '_api_resource_class' => 'class']);
+        $request = new Request([], [], ['_api_operation_name' => 'operation', '_api_resource_class' => \stdClass::class]);
         $listener = new SerializeListener($processor, $metadata);
         $listener->onKernelView(
             new ViewEvent(
@@ -58,7 +58,7 @@ class SerializeListenerTest extends TestCase
         $processor = $this->createMock(ProcessorInterface::class);
         $processor->expects($this->once())->method('process')->willReturn(new Response());
         $metadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
-        $request = new Request([], [], ['_api_operation' => new Get(), '_api_operation_name' => 'operation', '_api_resource_class' => 'class']);
+        $request = new Request([], [], ['_api_operation' => new Get(), '_api_operation_name' => 'operation', '_api_resource_class' => \stdClass::class]);
         $listener = new SerializeListener($processor, $metadata);
         $listener->onKernelView(
             new ViewEvent(
@@ -72,13 +72,13 @@ class SerializeListenerTest extends TestCase
 
     public function testCallProcessorContext(): void
     {
-        $operation = new Get(class: 'class');
+        $operation = new Get(class: \stdClass::class);
         $controllerResult = new \stdClass();
         $uriVariables = ['id' => 3];
-        $request = new Request([], [], ['_api_operation' => $operation, '_api_operation_name' => 'operation', '_api_resource_class' => 'class', '_api_uri_variables' => $uriVariables]);
+        $request = new Request([], [], ['_api_operation' => $operation, '_api_operation_name' => 'operation', '_api_resource_class' => \stdClass::class, '_api_uri_variables' => $uriVariables]);
         $processor = $this->createMock(ProcessorInterface::class);
         $processor->expects($this->once())->method('process')
-            ->with($controllerResult, $operation->withSerialize(true), $uriVariables, ['request' => $request, 'uri_variables' => $uriVariables, 'resource_class' => 'class'])->willReturn(new Response());
+            ->with($controllerResult, $operation->withSerialize(true), $uriVariables, ['request' => $request, 'uri_variables' => $uriVariables, 'resource_class' => \stdClass::class])->willReturn(new Response());
         $metadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
         $listener = new SerializeListener($processor, $metadata);
         $listener->onKernelView(
@@ -98,7 +98,7 @@ class SerializeListenerTest extends TestCase
         $processor = $this->createMock(ProcessorInterface::class);
         $processor->expects($this->never())->method('process')->willReturn(new Response());
         $metadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
-        $metadata->method('create')->willReturn(new ResourceMetadataCollection('class'));
+        $metadata->method('create')->willReturn(new ResourceMetadataCollection(\stdClass::class));
         $request = new Request([], [], $attributes);
         $listener = new SerializeListener($processor, $metadata);
         $listener->onKernelView(

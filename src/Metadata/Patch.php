@@ -80,7 +80,6 @@ final class Patch extends HttpOperation
         $output = null,
         $mercure = null,
         $messenger = null,
-        ?bool $elasticsearch = null,
         ?int $urlGenerationStrategy = null,
         ?bool $read = null,
         ?bool $deserialize = null,
@@ -100,6 +99,7 @@ final class Patch extends HttpOperation
         array|string|null $middleware = null,
         ?bool $strictQueryParameterValidation = null,
         ?bool $hideHydraOperation = null,
+        ?bool $jsonStream = null,
         array $extraProperties = [],
     ) {
         parent::__construct(
@@ -162,7 +162,6 @@ final class Patch extends HttpOperation
             output: $output,
             mercure: $mercure,
             messenger: $messenger,
-            elasticsearch: $elasticsearch,
             urlGenerationStrategy: $urlGenerationStrategy,
             read: $read,
             deserialize: $deserialize,
@@ -182,6 +181,7 @@ final class Patch extends HttpOperation
             middleware: $middleware,
             strictQueryParameterValidation: $strictQueryParameterValidation,
             hideHydraOperation: $hideHydraOperation,
+            jsonStream: $jsonStream,
             extraProperties: $extraProperties
         );
     }

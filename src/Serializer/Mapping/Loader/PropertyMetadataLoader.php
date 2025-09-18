@@ -28,14 +28,17 @@ use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Loader for PHP attributes using ApiProperty.
  */
 final class PropertyMetadataLoader implements LoaderInterface
 {
-    public function __construct(private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory)
-    {
+    public function __construct(
+        private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
+        private readonly ?NameConverterInterface $nameConverter = null,
+    ) {
     }
 
     public function loadClassMetadata(ClassMetadataInterface $classMetadata): bool
@@ -134,11 +137,11 @@ final class PropertyMetadataLoader implements LoaderInterface
     }
 
     /**
-     * @param ApiProperty[] $attributes
+     * @param array<string, array<mixed>> $attributes
      */
     private function addAttributeMetadata(ApiProperty $attribute, array &$attributes): void
     {
-        if (($prop = $attribute->getProperty()) && ($value = $attribute->getSerialize())) {
+        if (($prop = $this->nameConverter?->denormalize($attribute->getProperty()) ?? $attribute->getProperty()) && ($value = $attribute->getSerialize())) {
             $attributes[$prop] = $value;
         }
     }

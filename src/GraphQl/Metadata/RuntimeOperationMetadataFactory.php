@@ -30,7 +30,7 @@ final class RuntimeOperationMetadataFactory implements OperationMetadataFactoryI
     {
     }
 
-    public function create(string $uriTemplate, array $context = []): ?Operation
+    public function create(string $uriTemplate, array $context = []): Operation
     {
         try {
             $parameters = $this->router->match($uriTemplate);

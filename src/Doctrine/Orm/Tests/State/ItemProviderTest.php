@@ -328,7 +328,7 @@ class ItemProviderTest extends TestCase
 
     public function testHandleLinksCallable(): void
     {
-        $class = 'foo';
+        $class = \stdClass::class;
         $resourceMetadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
         $query = $this->createStub($this->getQueryClass());
         $query->method('getOneOrNullResult')->willReturn(null);

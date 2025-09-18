@@ -18,13 +18,16 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Util\ContentNegotiationTrait;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\State\StopwatchAwareInterface;
+use ApiPlatform\State\StopwatchAwareTrait;
 use Negotiation\Negotiator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 
-final class ContentNegotiationProvider implements ProviderInterface
+final class ContentNegotiationProvider implements ProviderInterface, StopwatchAwareInterface
 {
     use ContentNegotiationTrait;
+    use StopwatchAwareTrait;
 
     /**
      * @param array<string, string[]> $formats
@@ -41,12 +44,14 @@ final class ContentNegotiationProvider implements ProviderInterface
             return $this->decorated?->provide($operation, $uriVariables, $context);
         }
 
+        $this->stopwatch?->start('api_platform.provider.content_negotiation');
         $isErrorOperation = $operation instanceof ErrorOperation;
 
         $formats = $operation->getOutputFormats() ?? ($isErrorOperation ? $this->errorFormats : $this->formats);
         $this->addRequestFormats($request, $formats);
         $request->attributes->set('input_format', $this->getInputFormat($operation, $request));
         $request->setRequestFormat($this->getRequestFormat($request, $formats, !$isErrorOperation));
+        $this->stopwatch?->stop('api_platform.provider.content_negotiation');
 
         return $this->decorated?->provide($operation, $uriVariables, $context);
     }
@@ -105,7 +110,6 @@ final class ContentNegotiationProvider implements ProviderInterface
             return null;
         }
 
-        /** @var string $contentType */
         $formats = $operation->getInputFormats() ?? [];
         if ($format = $this->getMimeTypeFormat($contentType, $formats)) {
             return $format;

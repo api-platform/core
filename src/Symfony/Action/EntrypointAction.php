@@ -39,7 +39,7 @@ final class EntrypointAction
     ) {
     }
 
-    public function __invoke(Request $request)
+    public function __invoke(Request $request): mixed
     {
         static::$resourceNameCollection = $this->resourceNameCollectionFactory->create();
         $context = [

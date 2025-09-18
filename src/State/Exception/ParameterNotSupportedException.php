@@ -28,22 +28,22 @@ final class ParameterNotSupportedException extends RuntimeException implements P
         return '/error/400';
     }
 
-    public function getTitle(): ?string
+    public function getTitle(): string
     {
         return $this->message;
     }
 
-    public function getStatus(): ?int
+    public function getStatus(): int
     {
         return 400;
     }
 
-    public function getDetail(): ?string
+    public function getDetail(): string
     {
         return \sprintf('Parameter "%s" not supported', $this->parameter);
     }
 
-    public function getInstance(): ?string
+    public function getInstance(): string
     {
         return $this->parameter;
     }

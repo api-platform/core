@@ -70,7 +70,7 @@ class Issue7135Test extends ApiTestCase
         ]);
 
         self::assertEquals(400, $response->getStatusCode());
-        self::assertJsonContains(['detail' => 'Identifier "id" could not be transformed.']);
+        self::assertJsonContains(['detail' => 'Invalid IRI "pull-request-7135/bar/invalid-uuid".']);
     }
 
     public function testInvalidGetRequestWhenIdentifierIsUuid(): void

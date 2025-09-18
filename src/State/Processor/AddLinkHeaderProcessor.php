@@ -15,6 +15,8 @@ namespace ApiPlatform\State\Processor;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
+use ApiPlatform\State\StopwatchAwareInterface;
+use ApiPlatform\State\StopwatchAwareTrait;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 
@@ -24,8 +26,10 @@ use Symfony\Component\WebLink\HttpHeaderSerializer;
  *
  * @implements ProcessorInterface<T1, T2>
  */
-final class AddLinkHeaderProcessor implements ProcessorInterface
+final class AddLinkHeaderProcessor implements ProcessorInterface, StopwatchAwareInterface
 {
+    use StopwatchAwareTrait;
+
     /**
      * @param ProcessorInterface<T1, T2> $decorated
      */
@@ -44,11 +48,13 @@ final class AddLinkHeaderProcessor implements ProcessorInterface
             return $response;
         }
 
+        $this->stopwatch?->start('api_platform.processor.add_link_header');
         // We add our header here as Symfony does it only for the main Request and we want it to be done on errors (sub-request) as well
         $linksProvider = $request->attributes->get('_api_platform_links');
         if ($this->serializer && ($links = $linksProvider?->getLinks())) {
             $response->headers->set('Link', $this->serializer->serialize($links));
         }
+        $this->stopwatch?->stop('api_platform.processor.add_link_header');
 
         return $response;
     }

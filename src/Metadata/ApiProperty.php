@@ -48,13 +48,13 @@ final class ApiProperty
      * @param bool|null                                                                                                                                   $push                    https://api-platform.com/docs/core/push-relations/
      * @param string|\Stringable|null                                                                                                                     $security                https://api-platform.com/docs/core/security
      * @param string|\Stringable|null                                                                                                                     $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
-     * @param string[]                                                                                                                                    $types                   the RDF types of this property
-     * @param string[]                                                                                                                                    $iris
-     * @param LegacyType[]                                                                                                                                $builtinTypes
-     * @param string|null                                                                                                                                 $uriTemplate             (experimental) whether to return the subRessource collection IRI instead of an iterable of IRI
+     * @param string[]|null                                                                                                                               $types                   the RDF types of this property
+     * @param string[]|null                                                                                                                               $iris
+     * @param LegacyType[]|null                                                                                                                           $builtinTypes
+     * @param string|null                                                                                                                                 $uriTemplate             whether to return the subRessource collection IRI instead of an iterable of IRI
      * @param string|null                                                                                                                                 $property                The property name
      * @param Context|Groups|Ignore|SerializedName|SerializedPath|MaxDepth|array<array-key, Context|Groups|Ignore|SerializedName|SerializedPath|MaxDepth> $serialize               Serializer attributes
-     * @param Type                                                                                                                                        $nativeType              The internal PHP type
+     * @param Type|null                                                                                                                                   $nativeType              The internal PHP type
      */
     public function __construct(
         private ?string $description = null,
@@ -230,7 +230,7 @@ final class ApiProperty
         private array $extraProperties = [],
     ) {
         $this->types = \is_string($types) ? (array) $types : $types;
-        $this->serialize = \is_array($serialize) ? $serialize : [$serialize];
+        $this->serialize = (null === $serialize || \is_array($serialize)) ? $serialize : [$serialize];
         $this->nativeType = $nativeType;
 
         if ($this->builtinTypes) {
@@ -345,12 +345,12 @@ final class ApiProperty
         return $self;
     }
 
-    public function getDefault()
+    public function getDefault(): mixed
     {
         return $this->default;
     }
 
-    public function withDefault($default): static
+    public function withDefault(mixed $default): static
     {
         $self = clone $this;
         $self->default = $default;
@@ -376,6 +376,9 @@ final class ApiProperty
         return $this->deprecationReason;
     }
 
+    /**
+     * @param string $deprecationReason
+     */
     public function withDeprecationReason($deprecationReason): static
     {
         $self = clone $this;
@@ -389,6 +392,9 @@ final class ApiProperty
         return $this->fetchable;
     }
 
+    /**
+     * @param bool $fetchable
+     */
     public function withFetchable($fetchable): static
     {
         $self = clone $this;
@@ -402,6 +408,9 @@ final class ApiProperty
         return $this->fetchEager;
     }
 
+    /**
+     * @param bool $fetchEager
+     */
     public function withFetchEager($fetchEager): static
     {
         $self = clone $this;
@@ -415,6 +424,9 @@ final class ApiProperty
         return $this->jsonldContext;
     }
 
+    /**
+     * @param array $jsonldContext
+     */
     public function withJsonldContext($jsonldContext): static
     {
         $self = clone $this;
@@ -428,6 +440,9 @@ final class ApiProperty
         return $this->openapiContext;
     }
 
+    /**
+     * @param array $openapiContext
+     */
     public function withOpenapiContext($openapiContext): static
     {
         $self = clone $this;
@@ -441,6 +456,9 @@ final class ApiProperty
         return $this->jsonSchemaContext;
     }
 
+    /**
+     * @param array $jsonSchemaContext
+     */
     public function withJsonSchemaContext($jsonSchemaContext): static
     {
         $self = clone $this;
@@ -454,6 +472,9 @@ final class ApiProperty
         return $this->push;
     }
 
+    /**
+     * @param bool $push
+     */
     public function withPush($push): static
     {
         $self = clone $this;
@@ -467,7 +488,7 @@ final class ApiProperty
         return $this->security instanceof \Stringable ? (string) $this->security : $this->security;
     }
 
-    public function withSecurity($security): static
+    public function withSecurity(string|\Stringable|null $security = null): static
     {
         $self = clone $this;
         $self->security = $security;
@@ -480,7 +501,7 @@ final class ApiProperty
         return $this->securityPostDenormalize instanceof \Stringable ? (string) $this->securityPostDenormalize : $this->securityPostDenormalize;
     }
 
-    public function withSecurityPostDenormalize($securityPostDenormalize): static
+    public function withSecurityPostDenormalize(string|\Stringable|null $securityPostDenormalize = null): static
     {
         $self = clone $this;
         $self->securityPostDenormalize = $securityPostDenormalize;
@@ -507,11 +528,15 @@ final class ApiProperty
     /**
      * deprecated since 4.2, use "getNativeType" instead.
      *
-     * @return LegacyType[]
+     * @return LegacyType[]|null
      */
     public function getBuiltinTypes(): ?array
     {
         trigger_deprecation('api-platform/metadata', '4.2', 'The "%s()" method is deprecated, use "%s::getNativeType()" instead.', __METHOD__, self::class);
+
+        if (null === $this->builtinTypes && null !== $this->nativeType) {
+            $this->builtinTypes = PropertyInfoToTypeInfoHelper::convertTypeToLegacyTypes($this->nativeType) ?? [];
+        }
 
         return $this->builtinTypes;
     }
@@ -541,7 +566,6 @@ final class ApiProperty
     {
         $self = clone $this;
         $self->nativeType = $nativeType;
-        $self->builtinTypes = PropertyInfoToTypeInfoHelper::convertTypeToLegacyTypes($nativeType) ?? [];
 
         return $self;
     }
@@ -572,7 +596,7 @@ final class ApiProperty
         return $this->initializable;
     }
 
-    public function getExtraProperties(): ?array
+    public function getExtraProperties(): array
     {
         return $this->extraProperties;
     }
@@ -587,6 +611,8 @@ final class ApiProperty
 
     /**
      * Gets IRI of this property.
+     *
+     * @return string[]|null
      */
     public function getIris()
     {
@@ -609,7 +635,7 @@ final class ApiProperty
     /**
      * Whether to generate a skolem iri on anonymous resources.
      */
-    public function getGenId()
+    public function getGenId(): ?bool
     {
         return $this->genId;
     }
@@ -624,8 +650,6 @@ final class ApiProperty
 
     /**
      * Whether to return the subRessource collection IRI instead of an iterable of IRI.
-     *
-     * @experimental
      */
     public function getUriTemplate(): ?string
     {

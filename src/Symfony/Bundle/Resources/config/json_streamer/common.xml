@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="api_platform.jsonld.json_streamer.stream_writer" class="Symfony\Component\JsonStreamer\JsonStreamWriter">
+            <argument type="tagged_locator" tag="json_streamer.value_transformer" />
+            <argument type="service" id="api_platform.jsonld.json_streamer.write.property_metadata_loader" />
+            <argument>%.json_streamer.stream_writers_dir.jsonld%</argument>
+        </service>
+
+        <service id="api_platform.jsonld.json_streamer.stream_reader" class="Symfony\Component\JsonStreamer\JsonStreamReader">
+            <argument type="tagged_locator" tag="json_streamer.value_transformer" />
+            <argument type="service" id="json_streamer.read.property_metadata_loader" />
+            <argument>%.json_streamer.stream_readers_dir.jsonld%</argument>
+            <argument>%.json_streamer.lazy_ghosts_dir.jsonld%</argument>
+        </service>
+
+        <service id="api_platform.jsonld.json_streamer.write.property_metadata_loader" class="ApiPlatform\JsonLd\JsonStreamer\WritePropertyMetadataLoader">
+            <argument type="service" id="json_streamer.write.property_metadata_loader" />
+            <argument type="service" id="api_platform.resource_class_resolver" />
+            <argument type="service" id="api_platform.metadata.property.name_collection_factory" />
+            <argument type="service" id="api_platform.metadata.property.metadata_factory" />
+        </service>
+
+        <service id="api_platform.jsonld.json_streamer.write.value_transformer.iri" class="ApiPlatform\JsonLd\JsonStreamer\ValueTransformer\IriValueTransformer">
+            <argument type="service" id="api_platform.iri_converter" />
+            <tag name="json_streamer.value_transformer"/>
+        </service>
+
+        <service id="api_platform.jsonld.json_streamer.write.value_transformer.type" class="ApiPlatform\JsonLd\JsonStreamer\ValueTransformer\TypeValueTransformer">
+            <argument type="service" id="api_platform.resource_class_resolver" />
+            <argument type="service" id="api_platform.metadata.resource.metadata_collection_factory" />
+            <tag name="json_streamer.value_transformer"/>
+        </service>
+
+        <service id="api_platform.jsonld.json_streamer.write.value_transformer.context" class="ApiPlatform\JsonLd\JsonStreamer\ValueTransformer\ContextValueTransformer">
+            <argument type="service" id="api_platform.router" />
+            <tag name="json_streamer.value_transformer"/>
+        </service>
+
+    </services>
+</container>

@@ -80,7 +80,6 @@ final class Post extends HttpOperation
         $output = null,
         $mercure = null,
         $messenger = null,
-        ?bool $elasticsearch = null,
         ?int $urlGenerationStrategy = null,
         ?bool $read = null,
         ?bool $deserialize = null,
@@ -98,6 +97,7 @@ final class Post extends HttpOperation
         mixed $rules = null,
         ?string $policy = null,
         array|string|null $middleware = null,
+        ?bool $jsonStream = null,
         array $extraProperties = [],
         private ?string $itemUriTemplate = null,
         ?bool $strictQueryParameterValidation = null,
@@ -163,7 +163,6 @@ final class Post extends HttpOperation
             output: $output,
             mercure: $mercure,
             messenger: $messenger,
-            elasticsearch: $elasticsearch,
             urlGenerationStrategy: $urlGenerationStrategy,
             read: $read,
             deserialize: $deserialize,
@@ -183,6 +182,7 @@ final class Post extends HttpOperation
             middleware: $middleware,
             strictQueryParameterValidation: $strictQueryParameterValidation,
             hideHydraOperation: $hideHydraOperation,
+            jsonStream: $jsonStream,
             extraProperties: $extraProperties
         );
     }

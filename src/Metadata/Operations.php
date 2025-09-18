@@ -15,13 +15,18 @@ namespace ApiPlatform\Metadata;
 
 /**
  * An Operation dictionnary.
+ *
+ * @template-covariant T of Operation
  */
 final class Operations implements \IteratorAggregate, \Countable
 {
+    /**
+     * @var list<array{0: string, 1: T}>
+     */
     private array $operations = [];
 
     /**
-     * @param array<string|int, Operation> $operations
+     * @param list<T>|array<string, T> $operations
      */
     public function __construct(array $operations = [])
     {
@@ -42,6 +47,9 @@ final class Operations implements \IteratorAggregate, \Countable
         $this->sort();
     }
 
+    /**
+     * @return \Iterator<string, T>
+     */
     public function getIterator(): \Traversable
     {
         return (function (): \Generator {
@@ -97,7 +105,7 @@ final class Operations implements \IteratorAggregate, \Countable
 
     public function sort(): self
     {
-        usort($this->operations, fn ($a, $b): int|float => $a[1]->getPriority() - $b[1]->getPriority());
+        usort($this->operations, fn ($a, $b): int => $a[1]->getPriority() - $b[1]->getPriority());
 
         return $this;
     }

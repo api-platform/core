@@ -60,6 +60,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         $context['operation'] = $operation;
         $context['resource_class'] = $attributes['resource_class'];
         $context['skip_null_values'] ??= true;
+        $context[AbstractItemNormalizer::SKIP_NULL_TO_ONE_RELATIONS] ??= true;
         $context['iri_only'] ??= false;
         $context['request_uri'] = $request->getRequestUri();
         $context['uri'] = $request->getUri();

@@ -23,6 +23,9 @@ use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use ApiPlatform\Serializer\Filter\GroupFilter;
+use ApiPlatform\State\ParameterProvider\IriConverterParameterProvider;
+use ApiPlatform\State\ParameterProvider\ReadLinkParameterProvider;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Parameter\CustomGroupParameterProvider;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -70,8 +73,8 @@ use Symfony\Component\Validator\Constraints\Country;
             nativeType: new UnionType(
                 new BuiltinType(TypeIdentifier::STRING),
                 new CollectionType(
-                    new GenericType( // @phpstan-ignore-line
-                        new BuiltinType(TypeIdentifier::ARRAY), // @phpstan-ignore-line
+                    new GenericType(
+                        new BuiltinType(TypeIdentifier::ARRAY),
                         new BuiltinType(TypeIdentifier::INT),
                         new BuiltinType(TypeIdentifier::STRING),
                     ),
@@ -92,13 +95,25 @@ use Symfony\Component\Validator\Constraints\Country;
 #[GetCollection(
     uriTemplate: 'validate_parameters{._format}',
     parameters: [
-        'enum' => new QueryParameter(schema: ['enum' => ['a', 'b'], 'uniqueItems' => true]),
+        'enum' => new QueryParameter(
+            schema: ['enum' => ['a', 'b'], 'uniqueItems' => true, 'type' => 'array'],
+            castToArray: true,
+            openApi: new OpenApiParameter(name: 'enum', in: 'query', style: 'deepObject')
+        ),
+        'enumNotDeepObject' => new QueryParameter(
+            schema: ['enum' => ['a', 'b'], 'uniqueItems' => true, 'type' => 'string'],
+            castToArray: true,
+            castToNativeType: true,
+        ),
         'num' => new QueryParameter(
-            schema: ['minimum' => 1, 'maximum' => 3],
+            schema: ['minimum' => 1, 'maximum' => 3, 'type' => 'integer'],
             nativeType: new BuiltinType(TypeIdentifier::STRING),
         ),
+        'numMultipleType' => new QueryParameter(
+            schema: ['minimum' => 1, 'maximum' => 3, 'type' => 'array'],
+        ),
         'exclusiveNum' => new QueryParameter(
-            schema: ['exclusiveMinimum' => 1, 'exclusiveMaximum' => 3],
+            schema: ['exclusiveMinimum' => 1, 'exclusiveMaximum' => 3, 'type' => 'integer'],
             nativeType: new BuiltinType(TypeIdentifier::STRING),
         ),
         'blank' => new QueryParameter(
@@ -106,12 +121,12 @@ use Symfony\Component\Validator\Constraints\Country;
             nativeType: new BuiltinType(TypeIdentifier::STRING),
         ),
         'length' => new QueryParameter(
-            schema: ['maxLength' => 1, 'minLength' => 3],
+            schema: ['maxLength' => 1, 'minLength' => 3, 'type' => 'integer'],
             nativeType: new BuiltinType(TypeIdentifier::STRING),
         ),
-        'array' => new QueryParameter(schema: ['minItems' => 2, 'maxItems' => 3]),
+        'array' => new QueryParameter(schema: ['minItems' => 2, 'maxItems' => 3, 'type' => 'integer']),
         'multipleOf' => new QueryParameter(
-            schema: ['multipleOf' => 2],
+            schema: ['multipleOf' => 2, 'type' => 'integer'],
             nativeType: new BuiltinType(TypeIdentifier::STRING),
         ),
         'int' => new QueryParameter(
@@ -162,11 +177,110 @@ use Symfony\Component\Validator\Constraints\Country;
                 'minimum' => 1,
                 'maximum' => 5,
             ],
-            required: true,
         ),
     ],
     provider: [self::class, 'noopProvider']
 )]
+#[GetCollection(
+    uriTemplate: 'header_float',
+    parameters: [
+        'Bar' => new HeaderParameter(
+            schema: [
+                'type' => 'number',
+                'example' => 42.0,
+                'minimum' => 1.0,
+                'maximum' => 100.0,
+                'multipleOf' => 0.01,
+            ],
+            castToNativeType: true
+        ),
+    ],
+    provider: [self::class, 'noopProvider']
+)]
+#[GetCollection(
+    uriTemplate: 'header_boolean',
+    parameters: [
+        'Lorem' => new HeaderParameter(
+            schema: [
+                'type' => 'boolean',
+            ],
+            castToNativeType: true,
+        ),
+    ],
+    provider: [self::class, 'noopProvider']
+)]
+#[GetCollection(
+    uriTemplate: 'query_integer',
+    parameters: [
+        'Foo' => new QueryParameter(
+            schema: [
+                'type' => 'integer',
+                'example' => 3,
+                'minimum' => 1,
+                'maximum' => 5,
+            ],
+            castToNativeType: true
+        ),
+    ],
+    provider: [self::class, 'noopProvider']
+)]
+#[GetCollection(
+    uriTemplate: 'query_float',
+    parameters: [
+        'Bar' => new QueryParameter(
+            schema: [
+                'type' => 'number',
+                'example' => 42.0,
+                'minimum' => 1.0,
+                'maximum' => 100.0,
+                'multipleOf' => 0.01,
+            ],
+            castToNativeType: true
+        ),
+    ],
+    provider: [self::class, 'noopProvider']
+)]
+#[GetCollection(
+    uriTemplate: 'query_boolean',
+    parameters: [
+        'Lorem' => new QueryParameter(
+            schema: [
+                'type' => 'boolean',
+            ],
+            castToNativeType: true,
+        ),
+    ],
+    provider: [self::class, 'noopProvider']
+)]
+#[Get(
+    uriTemplate: 'with_parameters_iris',
+    parameters: [
+        'dummy' => new QueryParameter(provider: IriConverterParameterProvider::class),
+    ],
+    provider: [self::class, 'provideDummyFromParameter'],
+)]
+#[Get(
+    uriTemplate: 'with_parameters_links',
+    parameters: [
+        'dummy' => new QueryParameter(provider: ReadLinkParameterProvider::class, extraProperties: ['resource_class' => Dummy::class]),
+    ],
+    provider: [self::class, 'provideDummyFromParameter'],
+)]
+#[Get(
+    uriTemplate: 'with_parameters_links_no_not_found',
+    parameters: [
+        'dummy' => new QueryParameter(provider: ReadLinkParameterProvider::class, extraProperties: ['resource_class' => Dummy::class, 'throw_not_found' => false]),
+    ],
+    provider: [self::class, 'noopProvider'],
+)]
+#[GetCollection(
+    uriTemplate: 'with_parameters_filter_without_property{._format}',
+    parameters: [
+        'myParam' => new QueryParameter(filter: 'some_custom_filter_without_description'),
+    ],
+    provider: [self::class, 'collectionProvider'],
+)]
+
 #[QueryParameter(key: 'everywhere')]
 class WithParameter
 {
@@ -235,12 +349,9 @@ class WithParameter
             $value = (int) $value;
         }
 
-        $parameters = $operation->getParameters();
-        $parameters->add($parameter->getKey(), $parameter = $parameter->withExtraProperties(
-            $parameter->getExtraProperties() + ['_api_values' => $value]
-        ));
+        $parameter->setValue($value);
 
-        return $operation->withParameters($parameters);
+        return $operation;
     }
 
     public static function headerProvider(Operation $operation, array $uriVariables = [], array $context = []): JsonResponse
@@ -254,5 +365,10 @@ class WithParameter
     public static function noopProvider(Operation $operation, array $uriVariables = [], array $context = []): JsonResponse
     {
         return new JsonResponse([]);
+    }
+
+    public static function provideDummyFromParameter(Operation $operation, array $uriVariables = [], array $context = []): object|array
+    {
+        return $operation->getParameters()->get('dummy')->getValue();
     }
 }

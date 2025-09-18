@@ -16,6 +16,7 @@ namespace ApiPlatform\Symfony\Routing;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+use ApiPlatform\OpenApi\Attributes\Webhook;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Config\Resource\DirectoryResource;
@@ -36,9 +37,8 @@ final class ApiLoader extends Loader
 
     private readonly XmlFileLoader $fileLoader;
 
-    public function __construct(KernelInterface $kernel, private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly ContainerInterface $container, private readonly array $formats, private readonly array $resourceClassDirectories = [], private readonly bool $graphqlEnabled = false, private readonly bool $entrypointEnabled = true, readonly bool $docsEnabled = true, private readonly bool $graphiQlEnabled = false, private readonly bool $graphQlPlaygroundEnabled = false)
+    public function __construct(KernelInterface $kernel, private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly ContainerInterface $container, private readonly array $formats, private readonly array $resourceClassDirectories = [], private readonly bool $graphqlEnabled = false, private readonly bool $entrypointEnabled = true, public readonly bool $docsEnabled = true, private readonly bool $graphiQlEnabled = false)
     {
-        /** @var string[]|string $paths */
         $paths = $kernel->locateResource('@ApiPlatformBundle/Resources/config/routing');
         $this->fileLoader = new XmlFileLoader(new FileLocator($paths));
     }
@@ -57,6 +57,10 @@ final class ApiLoader extends Loader
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
             foreach ($this->resourceMetadataFactory->create($resourceClass) as $resourceMetadata) {
                 foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
+                    if ($operation->getOpenapi() instanceof Webhook) {
+                        continue;
+                    }
+
                     if ($operation->getRouteName()) {
                         continue;
                     }
@@ -98,7 +102,7 @@ final class ApiLoader extends Loader
                         $operation->getOptions() ?? [],
                         $operation->getHost() ?? '',
                         $operation->getSchemes() ?? [],
-                        [$operation->getMethod() ?? 'GET'],
+                        [$operation->getMethod()],
                         $operation->getCondition() ?? ''
                     );
 
@@ -141,12 +145,6 @@ final class ApiLoader extends Loader
             $graphiQlCollection = $this->fileLoader->load('graphql/graphiql.xml');
             $graphiQlCollection->addDefaults(['_graphql' => true]);
             $routeCollection->addCollection($graphiQlCollection);
-        }
-
-        if ($this->graphQlPlaygroundEnabled) {
-            $graphQlPlaygroundCollection = $this->fileLoader->load('graphql/graphql_playground.xml');
-            $graphQlPlaygroundCollection->addDefaults(['_graphql' => true]);
-            $routeCollection->addCollection($graphQlPlaygroundCollection);
         }
 
         if (isset($this->formats['jsonld'])) {

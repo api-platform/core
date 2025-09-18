@@ -262,7 +262,7 @@ final class PropertyFilter implements FilterInterface, OpenApiParameterFilterInt
         return $result;
     }
 
-    private function denormalizePropertyName($property): string
+    private function denormalizePropertyName(string $property): string
     {
         return null !== $this->nameConverter ? $this->nameConverter->denormalize($property) : $property;
     }
@@ -277,7 +277,7 @@ final class PropertyFilter implements FilterInterface, OpenApiParameterFilterInt
         ];
     }
 
-    public function getOpenApiParameters(MetadataParameter $parameter): Parameter|array|null
+    public function getOpenApiParameters(MetadataParameter $parameter): Parameter
     {
         $example = \sprintf(
             '%1$s[]={propertyName}&%1$s[]={anotherPropertyName}',

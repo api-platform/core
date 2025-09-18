@@ -60,6 +60,9 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
         return self::FORMAT === $format && $data instanceof ConstraintViolationListInterface;
     }
 
+    /**
+     * @param string|null $format
+     */
     public function getSupportedTypes($format): array
     {
         return self::FORMAT === $format ? [ConstraintViolationListInterface::class => true] : [];
@@ -73,7 +76,13 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
             return 'data';
         }
 
-        $class = $violation->getRoot()::class;
+        $root = $violation->getRoot();
+
+        if (!\is_object($root)) {
+            return "data/attributes/$fieldName";
+        }
+
+        $class = $root::class;
         $propertyMetadata = $this->propertyMetadataFactory
             ->create(
                 // Im quite sure this requires some thought in case of validations over relationships

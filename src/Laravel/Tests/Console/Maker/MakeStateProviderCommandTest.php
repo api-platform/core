@@ -20,6 +20,7 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class MakeStateProviderCommandTest extends TestCase
 {
@@ -61,7 +62,7 @@ class MakeStateProviderCommandTest extends TestCase
             ->expectsQuestion(self::STATE_PROVIDER_CLASS_NAME, $providerName)
             ->expectsOutputToContain('Success!')
             ->expectsOutputToContain("created: $filePath")
-            ->expectsOutputToContain('Next: Open your new state provider class and start customizing it.')
+            ->expectsOutputToContain('Next: Open your new State Provider class and start customizing it.')
             ->assertExitCode(Command::SUCCESS);
 
         $this->assertFileExists($filePath);
@@ -90,20 +91,18 @@ class MakeStateProviderCommandTest extends TestCase
         $this->filesystem->delete($existingFile);
     }
 
-    public function testMakeStateProviderCommandWithoutGivenClassName(): void
+    #[DataProvider('nullProvider')]
+    public function testMakeStateFilterCommandWithoutGivenClassName(?string $value): void
     {
-        $providerName = 'NoEmptyClassName';
-        $filePath = $this->pathResolver->generateStateFilename($providerName);
-
         $this->artisan(self::MAKE_STATE_PROVIDER_COMMAND)
-            ->expectsQuestion(self::STATE_PROVIDER_CLASS_NAME, '')
-            ->expectsOutput('[ERROR] This value cannot be blank.')
-            ->expectsQuestion(self::STATE_PROVIDER_CLASS_NAME, $providerName)
-            ->assertExitCode(Command::SUCCESS);
+            ->expectsQuestion(self::STATE_PROVIDER_CLASS_NAME, $value)
+            ->assertExitCode(Command::FAILURE);
+    }
 
-        $this->assertFileExists($filePath);
-
-        $this->filesystem->delete($filePath);
+    public static function nullProvider(): \Generator
+    {
+        yield 'null value used' => ['value' => null];
+        yield 'empty string used' => ['value' => ''];
     }
 
     /**

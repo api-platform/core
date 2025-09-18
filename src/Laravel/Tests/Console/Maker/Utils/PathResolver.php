@@ -20,13 +20,13 @@ final readonly class PathResolver
         return base_path('app/Providers/AppServiceProvider.php');
     }
 
-    public function generateStateFilename(string $stateFilename): string
+    public function generateFilterFilename(string $stateFilename): string
     {
-        return $this->getStateDirectoryPath().$stateFilename.'.php';
+        return \sprintf('%s/app/Filter/%s.php', base_path(), $stateFilename);
     }
 
-    public function getStateDirectoryPath(): string
+    public function generateStateFilename(string $stateFilename): string
     {
-        return base_path('app/State/');
+        return \sprintf('%s/app/State/%s.php', base_path(), $stateFilename);
     }
 }

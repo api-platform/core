@@ -82,7 +82,6 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
         $payloads = [];
         foreach ($subscriptions as [$subscriptionId, $subscriptionFields, $subscriptionResult]) {
             $resolverContext = ['fields' => $subscriptionFields, 'is_collection' => false, 'is_mutation' => false, 'is_subscription' => true];
-            /** @var Operation */
             $operation = (new Subscription())->withName('update_subscription')->withShortName($shortName);
             $data = $this->normalizeProcessor->process($object, $operation, [], $resolverContext);
 

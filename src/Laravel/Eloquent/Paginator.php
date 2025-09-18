@@ -16,10 +16,9 @@ namespace ApiPlatform\Laravel\Eloquent;
 use ApiPlatform\State\Pagination\HasNextPagePaginatorInterface;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
-use IteratorAggregate;
 
 /**
- * @implements IteratorAggregate<mixed,object>
+ * @implements \IteratorAggregate<mixed,object>
  * @implements PaginatorInterface<object>
  */
 final class Paginator implements PaginatorInterface, HasNextPagePaginatorInterface, \IteratorAggregate

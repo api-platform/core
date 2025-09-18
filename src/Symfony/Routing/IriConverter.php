@@ -16,6 +16,7 @@ namespace ApiPlatform\Symfony\Routing;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\InvalidIdentifierException;
+use ApiPlatform\Metadata\Exception\InvalidUriVariableException;
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\Exception\RuntimeException;
@@ -49,8 +50,8 @@ final class IriConverter implements IriConverterInterface
     use ResourceClassInfoTrait;
     use UriVariablesResolverTrait;
 
-    private $localOperationCache = [];
-    private $localIdentifiersExtractorOperationCache = [];
+    private array $localOperationCache = [];
+    private array $localIdentifiersExtractorOperationCache = [];
 
     public function __construct(private readonly ProviderInterface $provider, private readonly RouterInterface $router, private readonly IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, ?UriVariablesConverterInterface $uriVariablesConverter = null, private readonly ?IriConverterInterface $decorated = null, private readonly ?OperationMetadataFactoryInterface $operationMetadataFactory = null)
     {
@@ -99,7 +100,7 @@ final class IriConverter implements IriConverterInterface
 
         try {
             $uriVariables = $this->getOperationUriVariables($operation, $parameters, $attributes['resource_class']);
-        } catch (InvalidIdentifierException $e) {
+        } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
             throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
 
@@ -113,7 +114,7 @@ final class IriConverter implements IriConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function getIriFromResource(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, ?Operation $operation = null, array $context = []): ?string
+    public function getIriFromResource(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, ?Operation $operation = null, array $context = []): string
     {
         $resourceClass = $context['force_resource_class'] ?? (\is_string($resource) ? $resource : $this->getObjectClass($resource));
 

@@ -25,9 +25,15 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[GetCollection]
 #[Get]
 #[Post]
-#[ApiResource(uriTemplate: '/employees/{employeeId}/rooms/{roomId}/company/{companyId}', uriVariables: ['employeeId' => ['from_class' => Employee::class, 'from_property' => 'company']])]
+#[ApiResource(
+    uriTemplate: '/employees/{employeeId}/rooms/{roomId}/company/{companyId}',
+    uriVariables: ['employeeId' => ['from_class' => Employee::class, 'from_property' => 'company']]
+)]
 #[Get]
-#[ApiResource(uriTemplate: '/employees/{employeeId}/company', uriVariables: ['employeeId' => ['from_class' => Employee::class, 'from_property' => 'company']])]
+#[ApiResource(
+    uriTemplate: '/employees/{employeeId}/company',
+    uriVariables: ['employeeId' => ['from_class' => Employee::class, 'from_property' => 'company']]
+)]
 #[ODM\Document]
 class Company
 {

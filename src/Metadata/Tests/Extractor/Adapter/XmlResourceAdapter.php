@@ -37,7 +37,6 @@ final class XmlResourceAdapter implements ResourceAdapterInterface
         'controller',
         'urlGenerationStrategy',
         'deprecationReason',
-        'elasticsearch',
         'messenger',
         'input',
         'output',
@@ -66,6 +65,7 @@ final class XmlResourceAdapter implements ResourceAdapterInterface
         'hideHydraOperation',
         'stateOptions',
         'collectDenormalizationErrors',
+        'jsonStream',
         'links',
         'parameters',
     ];
@@ -475,7 +475,6 @@ XML_WRAP
         $node = $resource->addChild('stateOptions');
         $childNode = $node->addChild(array_key_first($values));
         $childNode->addAttribute('index', $values[array_key_first($values)]['index']);
-        $childNode->addAttribute('type', $values[array_key_first($values)]['type']);
     }
 
     private function buildValues(\SimpleXMLElement $resource, array $values): void
@@ -544,6 +543,11 @@ XML_WRAP
                 $this->buildValues($childNode->addChild('schema'), $value['schema']);
             }
         }
+    }
+
+    private function buildJsonStream(\SimpleXMLElement $resource, bool $value): void
+    {
+        $resource->addAttribute('jsonStream', $this->parse($value));
     }
 
     private function parse($value): ?string
