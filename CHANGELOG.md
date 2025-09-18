@@ -4,6 +4,7 @@
 
 ### Features
 
+* [ceeaf51e8](https://github.com/api-platform/core/commit/ceeaf51e806e772c2801cfaaa1286fc081a10a3e) feat: json streamer (#7225)
 * [092a3a4f8](https://github.com/api-platform/core/commit/092a3a4f89563109b3dac18351da25051f7aa745) feat(mongodb): partial paginator (#7352)
 * [1290ebb88](https://github.com/api-platform/core/commit/1290ebb88680dde94e536dfc19d9b330612e0909) feat(serializer): ability to throw access denied exception when denormalizing secured properties (#7221)
 * [1862d03b7](https://github.com/api-platform/core/commit/1862d03b77c941cac13ed7bcbf1d555d50614b4f) feat(symfony): add error classes options to open api config (#7143)
@@ -21,7 +22,6 @@
 * [b948209b9](https://github.com/api-platform/core/commit/b948209b97a3a952b884c8c755c1bb9e63e81689) feat(laravel): add make:filter command to generate API Platform filters (#7364)
 * [ebd85f502](https://github.com/api-platform/core/commit/ebd85f50218988443662f37e2eb7f5d85026f6cf) feat(symfony): add make:filter command to generate API Platform filters (#7355)
 * [bf09616cf](https://github.com/api-platform/core/commit/bf09616cfbbc2c19a9d04a7be3edc8a9bc0c07ef) feat(httpcache): add more cache directives to AddHeadersProcessor (#7008)
-* [ceeaf51e8](https://github.com/api-platform/core/commit/ceeaf51e806e772c2801cfaaa1286fc081a10a3e) feat: json streamer (#7225)
 * [f25d7d1a6](https://github.com/api-platform/core/commit/f25d7d1a6e0ed3fb60a01ccda60729721a82d215) feat(metadata): ability to set description on an Error (#7329)
 
 ### Breaking changes
