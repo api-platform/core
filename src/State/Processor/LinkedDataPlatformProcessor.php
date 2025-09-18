@@ -54,17 +54,21 @@ final class LinkedDataPlatformProcessor implements ProcessorInterface
             return $response;
         }
 
+        $acceptPost = null;
         $allowedMethods = self::DEFAULT_ALLOWED_METHODS;
         $resourceCollection = $this->resourceMetadataCollectionFactory->create($operation->getClass());
         foreach ($resourceCollection as $resource) {
             foreach ($resource->getOperations() as $op) {
                 if ($op->getUriTemplate() === $operation->getUriTemplate()) {
                     $allowedMethods[] = $method = $op->getMethod();
-                    if ('POST' === $method && \is_array($outputFormats = $op->getOutputFormats())) {
-                        $response->headers->set('Accept-Post', implode(', ', array_merge(...array_values($outputFormats))));
+                    if ('POST' === $method && $outputFormats = $op->getOutputFormats()) {
+                        $acceptPost = $outputFormats;
                     }
                 }
             }
+        }
+        if ($acceptPost) {
+            $response->headers->set('Accept-Post', implode(', ', array_values($acceptPost)));
         }
 
         $response->headers->set('Allow', implode(', ', $allowedMethods));
