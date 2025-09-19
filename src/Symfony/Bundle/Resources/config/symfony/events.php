@@ -90,6 +90,14 @@ return function (ContainerConfigurator $container) {
         ->decorate('api_platform.state_processor.respond', null, 0)
         ->args([service('api_platform.state_processor.add_link_header.inner')]);
 
+    $services->set('api_platform.state_processor.linked_data_platform', 'ApiPlatform\State\Processor\LinkedDataPlatformProcessor')
+        ->decorate('api_platform.state_processor.add_link_header', null, 0)
+        ->args([
+            service('api_platform.state_processor.linked_data_platform.inner'),
+            service('api_platform.resource_class_resolver'),
+            service('api_platform.metadata.resource.metadata_collection_factory'),
+        ]);
+
     $services->set('api_platform.listener.view.write', 'ApiPlatform\Symfony\EventListener\WriteListener')
         ->args([
             service('api_platform.state_processor.write'),
