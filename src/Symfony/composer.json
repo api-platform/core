@@ -71,7 +71,6 @@
         "api-platform/graphql": "To support GraphQL.",
         "api-platform/hal": "to support the HAL format",
         "api-platform/ramsey-uuid": "To support Ramsey's UUID identifiers.",
-        "ocramius/package-versions": "To display the API Platform's version in the debug bar.",
         "phpstan/phpdoc-parser": "To support extracting metadata from PHPDoc.",
         "psr/cache-implementation": "To use metadata caching.",
         "symfony/cache": "To have metadata caching when using Symfony integration.",
