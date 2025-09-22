@@ -17,6 +17,7 @@ use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Crud;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\CrudOpenApiApiPlatformTag;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 class OpenApiTest extends ApiTestCase
 {
@@ -32,8 +33,11 @@ class OpenApiTest extends ApiTestCase
         return [Crud::class, CrudOpenApiApiPlatformTag::class];
     }
 
+    #[IgnoreDeprecations]
     public function testErrorsAreDocumented(): void
     {
+        $this->expectUserDeprecationMessage("Since api-platform/core 4.2: Set 'enable_json_merge_patch_schema' on extra properties to enable JSON Schema, where all required properties are optional, for JSON Merge Patch requests. This behavior will be the default starting from 5.0.");
+
         $response = self::createClient()->request('GET', '/docs', [
             'headers' => ['Accept' => 'application/vnd.openapi+json'],
         ]);
