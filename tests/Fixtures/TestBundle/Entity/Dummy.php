@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Patch;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -32,6 +33,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(filters: ['my_dummy.boolean', 'my_dummy.date', 'my_dummy.exists', 'my_dummy.numeric', 'my_dummy.order', 'my_dummy.range', 'my_dummy.search', 'my_dummy.property'], extraProperties: ['standard_put' => false], normalizationContext: [AbstractNormalizer::IGNORED_ATTRIBUTES => ['dummyDateWithFormat']])]
 #[ApiResource(uriTemplate: '/related_owned_dummies/{id}/owning_dummy{._format}', uriVariables: ['id' => new Link(fromClass: RelatedOwnedDummy::class, identifiers: ['id'], fromProperty: 'owningDummy')], status: 200, filters: ['my_dummy.boolean', 'my_dummy.date', 'my_dummy.exists', 'my_dummy.numeric', 'my_dummy.order', 'my_dummy.range', 'my_dummy.search', 'my_dummy.property'], operations: [new Get()], normalizationContext: [AbstractNormalizer::IGNORED_ATTRIBUTES => ['dummyDateWithFormat']])]
 #[ApiResource(uriTemplate: '/related_owning_dummies/{id}/owned_dummy{._format}', uriVariables: ['id' => new Link(fromClass: RelatedOwningDummy::class, identifiers: ['id'], fromProperty: 'ownedDummy')], status: 200, filters: ['my_dummy.boolean', 'my_dummy.date', 'my_dummy.exists', 'my_dummy.numeric', 'my_dummy.order', 'my_dummy.range', 'my_dummy.search', 'my_dummy.property'], operations: [new Get()], normalizationContext: [AbstractNormalizer::IGNORED_ATTRIBUTES => ['dummyDateWithFormat']])]
+#[Patch(uriTemplate: '/dummies/{id}/json_merge_patch', extraProperties: ['enable_json_merge_patch_schema' => true])]
 #[ORM\Entity]
 class Dummy
 {

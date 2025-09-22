@@ -121,6 +121,21 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $this->assertStringNotContainsString('@type', $result);
     }
 
+    public function testExecuteWithJsonMergePatchTypeInput(): void
+    {
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--operation' => '_api_/dummies/{id}{._format}_patch', '--format' => 'json', '--type' => 'input']);
+        $result = $this->tester->getDisplay();
+        $json = json_decode($result, associative: true);
+
+        $this->assertEquals(['name'], $json['definitions']['Dummy']['required']);
+
+        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--operation' => '_api_/dummies/{id}/json_merge_patch_patch', '--format' => 'json', '--type' => 'input']);
+        $result = $this->tester->getDisplay();
+        $json = json_decode($result, associative: true);
+
+        $this->assertNull($json['definitions']['Dummy']['required']);
+    }
+
     /**
      * Test issue #5998.
      */
