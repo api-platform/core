@@ -45,5 +45,5 @@ interface IriConverterInterface
      * @throws InvalidArgumentException
      * @throws RuntimeException
      */
-    public function getIriFromResource(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, ?Operation $operation = null, array $context = []): ?string;
+    public function getIriFromResource(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, ?Operation $operation = null, array $context = []): string;
 }

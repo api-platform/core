@@ -91,7 +91,7 @@ class IriConverter implements IriConverterInterface
     /**
      * @param array<string, mixed> $context
      */
-    public function getIriFromResource(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, ?Operation $operation = null, array $context = []): ?string
+    public function getIriFromResource(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, ?Operation $operation = null, array $context = []): string
     {
         $resourceClass = $context['force_resource_class'] ?? (\is_string($resource) ? $resource : $this->getObjectClass($resource));
         if ($resource instanceof Relation) {
