@@ -189,10 +189,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.uri_variables.transformer');
         $container->registerForAutoconfiguration(ParameterProviderInterface::class)
             ->addTag('api_platform.parameter_provider');
-        $container->registerAttributeForAutoconfiguration(ApiResource::class, static function (ChildDefinition $definition): void {
-            $definition->setAbstract(true)
-                ->addTag('api_platform.resource')
-                ->addTag('container.excluded', ['source' => 'by #[ApiResource] attribute']);
+        $container->registerAttributeForAutoconfiguration(ApiResource::class, static function (ChildDefinition $definition, ApiResource $attribute): void {
+            $definition->addTag('api_platform.resource');
+            if ($attribute->registerAsController) {
+                $definition->setAbstract(true)->addTag('container.excluded', ['source' => 'by #[ApiResource] attribute']);
+            };
         });
         $container->registerAttributeForAutoconfiguration(
             AsResourceMutator::class,

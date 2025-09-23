@@ -971,6 +971,14 @@ class ApiResource extends Metadata
         protected ?bool $hideHydraOperation = null,
         ?bool $jsonStream = null,
         protected array $extraProperties = [],
+
+        /**
+         * Let the resource class be registered as a service.
+         * Use it only if the class does not hold values.
+         *
+         * @var bool|null
+         */
+        public bool $registerAsController = false,
     ) {
         parent::__construct(
             shortName: $shortName,
