@@ -218,7 +218,7 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             } elseif (1 === \count($schemas)) {
                 $schema = current($schemas);
             } else {
-                $schema = ['anyOf' => $schemas];
+                $schema = ['anyOf' => array_values($schemas)];
             }
 
             return $this->applyNullability($schema, $isNullable);
