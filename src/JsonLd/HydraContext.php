@@ -547,7 +547,10 @@ const HYDRA_CONTEXT = [
             '@id' => 'hydra:memberAssertion',
             'label' => 'member assertion',
             'comment' => 'Semantics of each member provided by the collection.',
-            'domain' => 'hydra:Collection',
+            'domainIncludes' => [
+                'hydra:Collection',
+                'hydra:Class',
+            ],
             'isDefinedBy' => 'http://www.w3.org/ns/hydra/core',
             'vs:term_status' => 'testing',
         ],
@@ -716,7 +719,10 @@ const HYDRA_CONTEXT = [
             'label' => 'variable representation',
             'comment' => 'The representation format to use when expanding the IRI template.',
             'range' => 'hydra:VariableRepresentation',
-            'domain' => 'hydra:IriTemplateMapping',
+            'domainIncludes' => [
+                'hydra:IriTemplateMapping',
+                'hydra:IriTemplate',
+            ],
             'isDefinedBy' => 'http://www.w3.org/ns/hydra/core',
             'vs:term_status' => 'testing',
         ],
