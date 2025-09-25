@@ -118,7 +118,13 @@ final class ParameterValidatorProvider implements ProviderInterface
             $openApi = null;
         }
 
-        if ('deepObject' === $openApi?->getStyle() && $p = $violation->getPropertyPath()) {
+        if (\is_array($openApi)) {
+            foreach ($openApi as $oa) {
+                if ('deepObject' === $oa->getStyle() && ($oa->getName() === $key || str_starts_with($oa->getName(), $key.'['))) {
+                    return $key.$violation->getPropertyPath();
+                }
+            }
+        } elseif ('deepObject' === $openApi?->getStyle() && $p = $violation->getPropertyPath()) {
             return $key.$p;
         }
 
