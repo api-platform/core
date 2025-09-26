@@ -32,7 +32,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Question;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\ApplicationTester;
@@ -122,22 +121,15 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $this->assertStringNotContainsString('@type', $result);
     }
 
-    #[IgnoreDeprecations]
     public function testExecuteWithJsonMergePatchTypeInput(): void
     {
-        $this->expectUserDeprecationMessage("Since api-platform/core 4.2: Set 'enable_json_merge_patch_schema' on extra properties to enable JSON Schema, where all required properties are optional, for JSON Merge Patch requests. This behavior will be the default starting from 5.0.");
-
         $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--operation' => '_api_/dummies/{id}{._format}_patch', '--format' => 'json', '--type' => 'input']);
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
 
-        $this->assertEquals(['name'], $json['definitions']['Dummy']['required']);
-
-        $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--operation' => '_api_/dummies/{id}/json_merge_patch_patch', '--format' => 'json', '--type' => 'input']);
-        $result = $this->tester->getDisplay();
-        $json = json_decode($result, associative: true);
-
-        $this->assertNull($json['definitions']['Dummy']['required']);
+        $this->assertArrayNotHasKey('Dummy', $json['definitions']);
+        $this->assertArrayHasKey('Dummy.jsonMergePatch', $json['definitions']);
+        $this->assertArrayNotHasKey('required', $json['definitions']['Dummy.jsonMergePatch']);
     }
 
     /**

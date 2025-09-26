@@ -19,7 +19,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -42,11 +41,8 @@ final class ApiPlatformProfilerPanelTest extends WebTestCase
         ];
     }
 
-    #[IgnoreDeprecations]
     public function testDebugBarContentNotResourceClass(): void
     {
-        $this->expectUserDeprecationMessage("Since api-platform/core 4.2: Set 'enable_json_merge_patch_schema' on extra properties to enable JSON Schema, where all required properties are optional, for JSON Merge Patch requests. This behavior will be the default starting from 5.0.");
-
         $client = static::createClient();
         $client->enableProfiler();
         // Using html to get default Swagger UI
@@ -84,11 +80,8 @@ final class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertSame($this->isMongoDB() ? DocumentDummy::class : Dummy::class, $block->filterXPath('//div[@class="sf-toolbar-info-piece"][./b[contains(., "Resource Class")]]/span')->html());
     }
 
-    #[IgnoreDeprecations]
     public function testProfilerGeneralLayoutNotResourceClass(): void
     {
-        $this->expectUserDeprecationMessage("Since api-platform/core 4.2: Set 'enable_json_merge_patch_schema' on extra properties to enable JSON Schema, where all required properties are optional, for JSON Merge Patch requests. This behavior will be the default starting from 5.0.");
-
         $client = static::createClient();
         $client->enableProfiler();
         // Using html to get default Swagger UI

@@ -19,7 +19,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Crud;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6317\Issue6317;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5625\Currency;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\ApplicationTester;
@@ -58,22 +57,16 @@ class OpenApiCommandTest extends KernelTestCase
         ];
     }
 
-    #[IgnoreDeprecations]
     public function testExecute(): void
     {
-        $this->expectUserDeprecationMessage("Since api-platform/core 4.2: Set 'enable_json_merge_patch_schema' on extra properties to enable JSON Schema, where all required properties are optional, for JSON Merge Patch requests. This behavior will be the default starting from 5.0.");
-
         $this->tester->run(['command' => 'api:openapi:export']);
 
         $this->assertJson($this->tester->getDisplay());
     }
 
     #[\PHPUnit\Framework\Attributes\Group('orm')]
-    #[IgnoreDeprecations]
     public function testExecuteWithYaml(): void
     {
-        $this->expectUserDeprecationMessage("Since api-platform/core 4.2: Set 'enable_json_merge_patch_schema' on extra properties to enable JSON Schema, where all required properties are optional, for JSON Merge Patch requests. This behavior will be the default starting from 5.0.");
-
         $this->tester->run(['command' => 'api:openapi:export', '--yaml' => true]);
 
         $result = $this->tester->getDisplay();
@@ -126,11 +119,8 @@ YAML;
         $this->assertStringContainsString($expected, $result);
     }
 
-    #[IgnoreDeprecations]
     public function testWriteToFile(): void
     {
-        $this->expectUserDeprecationMessage("Since api-platform/core 4.2: Set 'enable_json_merge_patch_schema' on extra properties to enable JSON Schema, where all required properties are optional, for JSON Merge Patch requests. This behavior will be the default starting from 5.0.");
-
         /** @var non-falsy-string $tmpFile */
         $tmpFile = tempnam(sys_get_temp_dir(), 'test_write_to_file');
 
@@ -143,11 +133,8 @@ YAML;
     /**
      * Test issue #6317.
      */
-    #[IgnoreDeprecations]
     public function testBackedEnumExamplesAreNotLost(): void
     {
-        $this->expectUserDeprecationMessage("Since api-platform/core 4.2: Set 'enable_json_merge_patch_schema' on extra properties to enable JSON Schema, where all required properties are optional, for JSON Merge Patch requests. This behavior will be the default starting from 5.0.");
-
         $this->tester->run(['command' => 'api:openapi:export']);
         $result = $this->tester->getDisplay();
         $json = json_decode($result, true, 512, \JSON_THROW_ON_ERROR);
