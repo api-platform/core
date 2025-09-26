@@ -496,22 +496,26 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         }
     }
 
-    private function buildOpenApiResponse(array $existingResponses, int|string $status, string $description, ?Operation $openapiOperation = null, ?HttpOperation $operation = null, ?array $responseMimeTypes = null, ?array $operationOutputSchemas = null, ?ResourceMetadataCollection $resourceMetadataCollection = null): Operation
+    /**
+     * @param array<Response> $existingResponses
+     *
+     * @return Operation
+     */
+    private function buildOpenApiResponse(array $existingResponses, int|string $status, string $description, Operation $openapiOperation, ?HttpOperation $operation = null, ?array $responseMimeTypes = null, ?array $operationOutputSchemas = null, ?ResourceMetadataCollection $resourceMetadataCollection = null): Operation
     {
         $noOutput = \is_array($operation?->getOutput()) && null === $operation->getOutput()['class'];
 
-        if (isset($existingResponses[$status])) {
-            return $openapiOperation;
-        }
-        $responseLinks = $responseContent = null;
-        if ($responseMimeTypes && $operationOutputSchemas && !$noOutput) {
-            $responseContent = $this->buildContent($responseMimeTypes, $operationOutputSchemas);
-        }
-        if ($resourceMetadataCollection && $operation) {
-            $responseLinks = $this->getLinks($resourceMetadataCollection, $operation);
+        $response = $existingResponses[$status] ?? new Response($description);
+
+        if (!$response->getContent() && $responseMimeTypes && $operationOutputSchemas && !$noOutput) {
+            $response = $response->withContent($this->buildContent($responseMimeTypes, $operationOutputSchemas));
         }
 
-        return $openapiOperation->withResponse($status, new Response($description, $responseContent, null, $responseLinks));
+        if (!$response->getLinks() && $resourceMetadataCollection && $operation) {
+            $response = $response->withLinks($this->getLinks($resourceMetadataCollection, $operation));
+        }
+
+        return $openapiOperation->withResponse($status, $response);
     }
 
     /**

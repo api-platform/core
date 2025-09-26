@@ -237,6 +237,7 @@ class OpenApiFactoryTest extends TestCase
                     responses: [
                         '200' => new OpenApiResponse(
                             description: 'Success',
+                            content: new \ArrayObject([]),
                         ),
                     ],
                 )),
@@ -1106,7 +1107,11 @@ class OpenApiFactoryTest extends TestCase
                         'link' => ['$ref' => '#/components/schemas/Dummy'],
                     ])
                 ),
-                '400' => new Response('Error'),
+                '400' => new Response(
+                    'Error',
+                    content: new \ArrayObject(['application/problem+json' => new MediaType(schema: new \ArrayObject(['$ref' => '#/components/schemas/Error']))]),
+                    links: new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
+                ),
                 '422' => new Response(
                     'Unprocessable entity',
                     content: new \ArrayObject(['application/problem+json' => new MediaType(schema: new \ArrayObject(['$ref' => '#/components/schemas/Error']))]),
@@ -1150,7 +1155,11 @@ class OpenApiFactoryTest extends TestCase
                         'link' => ['$ref' => '#/components/schemas/Dummy'],
                     ])
                 ),
-                '400' => new Response('Error'),
+                '400' => new Response(
+                    'Error',
+                    content: new \ArrayObject(['application/problem+json' => new MediaType(schema: new \ArrayObject(['$ref' => '#/components/schemas/Error']))]),
+                    links: new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
+                ),
                 '422' => new Response(
                     'Unprocessable entity',
                     content: new \ArrayObject(['application/problem+json' => new MediaType(schema: new \ArrayObject(['$ref' => '#/components/schemas/Error']))]),
@@ -1177,7 +1186,8 @@ class OpenApiFactoryTest extends TestCase
             ['Dummy'],
             [
                 '200' => new Response(
-                    'Success'
+                    'Success',
+                    content: new \ArrayObject([]),
                 ),
             ],
             'Retrieves the collection of Dummy resources.',
