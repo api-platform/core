@@ -37,7 +37,6 @@ use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
 use Symfony\Component\HttpClient\Messenger\PingWebhookMessageHandler;
 use Symfony\Component\HttpFoundation\Session\SessionFactory;
 use Symfony\Component\HttpKernel\Kernel;
@@ -238,9 +237,6 @@ class AppKernel extends Kernel
         }
 
         $twigConfig = ['strict_variables' => '%kernel.debug%'];
-        if (interface_exists(ErrorRendererInterface::class)) {
-            $twigConfig['exception_controller'] = null;
-        }
         $c->prependExtensionConfig('twig', $twigConfig);
 
         $useSymfonyListeners = (bool) ($_SERVER['USE_SYMFONY_LISTENERS'] ?? false);
