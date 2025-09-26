@@ -22,11 +22,15 @@ use Symfony\Component\Serializer\Attribute\Groups;
  */
 class NotAResource
 {
+    /**
+     * @param array<GenericChild<object>> $items
+     */
     public function __construct(
         #[Groups('contain_non_resource')]
         private $foo,
         #[Groups('contain_non_resource')]
         private $bar,
+        private array $items,
     ) {
     }
 
@@ -38,5 +42,13 @@ class NotAResource
     public function getBar()
     {
         return $this->bar;
+    }
+
+    /**
+     * @return array<GenericChild<object>>
+     */
+    public function getItems()
+    {
+        return $this->items;
     }
 }

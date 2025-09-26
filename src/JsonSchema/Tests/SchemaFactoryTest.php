@@ -19,6 +19,7 @@ use ApiPlatform\JsonSchema\SchemaFactory;
 use ApiPlatform\JsonSchema\Tests\Fixtures\ApiResource\OverriddenOperationDummy;
 use ApiPlatform\JsonSchema\Tests\Fixtures\DummyResourceInterface;
 use ApiPlatform\JsonSchema\Tests\Fixtures\Enum\GenderTypeEnum;
+use ApiPlatform\JsonSchema\Tests\Fixtures\GenericChild;
 use ApiPlatform\JsonSchema\Tests\Fixtures\NotAResource;
 use ApiPlatform\JsonSchema\Tests\Fixtures\NotAResourceWithUnionIntersectTypes;
 use ApiPlatform\JsonSchema\Tests\Fixtures\Serializable;
@@ -126,7 +127,7 @@ class SchemaFactoryTest extends TestCase
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(NotAResource::class, Argument::cetera())->willReturn(new PropertyNameCollection(['foo', 'bar', 'genderType']));
+        $propertyNameCollectionFactoryProphecy->create(NotAResource::class, Argument::cetera())->willReturn(new PropertyNameCollection(['foo', 'bar', 'genderType', 'items']));
 
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(NotAResource::class, 'foo', Argument::cetera())->willReturn(
@@ -150,9 +151,28 @@ class SchemaFactoryTest extends TestCase
                 ->withDefault('male')
                 ->withSchema(['type' => 'object', 'default' => 'male', 'example' => 'male'])
         );
+        $propertyMetadataFactoryProphecy->create(NotAResource::class, 'items', Argument::cetera())->willReturn(
+            (new ApiProperty())
+                ->withNativeType(
+                    Type::generic(Type::object(GenericChild::class), Type::int()),
+                )
+                ->withReadable(true)
+                ->withSchema(['type' => Schema::UNKNOWN_TYPE])
+        );
+
+        $propertyNameCollectionFactoryProphecy->create(GenericChild::class, Argument::cetera())
+            ->willReturn(new PropertyNameCollection(['property']));
+        $propertyMetadataFactoryProphecy->create(GenericChild::class, 'property', Argument::cetera())
+            ->willReturn(
+                (new ApiProperty())
+                    ->withNativeType(Type::string())
+                    ->withReadable(true)
+                    ->withSchema(['type' => 'string'])
+            );
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->isResourceClass(NotAResource::class)->willReturn(false);
+        $resourceClassResolverProphecy->isResourceClass(GenericChild::class)->willReturn(false);
 
         $definitionNameFactory = new DefinitionNameFactory();
 
@@ -194,6 +214,10 @@ class SchemaFactoryTest extends TestCase
         $this->assertSame('object', $definitions[$rootDefinitionKey]['properties']['genderType']['type']);
         $this->assertSame('male', $definitions[$rootDefinitionKey]['properties']['genderType']['default']);
         $this->assertSame('male', $definitions[$rootDefinitionKey]['properties']['genderType']['example']);
+
+        $this->assertArrayHasKey('items', $definitions[$rootDefinitionKey]['properties']);
+        $this->assertArrayHasKey('$ref', $definitions[$rootDefinitionKey]['properties']['items']);
+        $this->assertSame('#/definitions/GenericChild', $definitions[$rootDefinitionKey]['properties']['items']['$ref']);
     }
 
     #[IgnoreDeprecations]
