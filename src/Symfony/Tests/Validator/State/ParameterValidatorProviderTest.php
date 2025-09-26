@@ -15,7 +15,6 @@ namespace ApiPlatform\Symfony\Tests\Validator\State;
 
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
-use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Parameter as ModelParameter;
@@ -25,9 +24,8 @@ use ApiPlatform\Symfony\Validator\State\ParameterValidatorProvider;
 use ApiPlatform\Validator\Exception\ValidationException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
-// use Symfony\Component\Validator\Constraint\NotBlank;
-use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class ParameterValidatorProviderTest extends TestCase
