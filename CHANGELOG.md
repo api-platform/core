@@ -1,5 +1,16 @@
 # Changelog
 
+## v4.1.25
+
+### Bug fixes
+
+* [54352d853](https://github.com/api-platform/core/commit/54352d853b219327ed58d40e1f54c46f2193c1a9) fix(jsonld): hydra context w3.org updates (#7410)
+* [85f198a56](https://github.com/api-platform/core/commit/85f198a5618d5e955b2fbcfb079fe7286af05413) fix(laravel): filter should query correct property
+* [91b17f1f3](https://github.com/api-platform/core/commit/91b17f1f3731339023910f795d686111a8941920) fix(laravel): correct the example of swagger_ui.apiKeys config (#7392)
+
+
+### Features
+
 ## v4.1.24
 
 ### Bug fixes
