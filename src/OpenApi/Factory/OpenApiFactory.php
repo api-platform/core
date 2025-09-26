@@ -498,8 +498,6 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
     /**
      * @param array<Response> $existingResponses
-     *
-     * @return Operation
      */
     private function buildOpenApiResponse(array $existingResponses, int|string $status, string $description, Operation $openapiOperation, ?HttpOperation $operation = null, ?array $responseMimeTypes = null, ?array $operationOutputSchemas = null, ?ResourceMetadataCollection $resourceMetadataCollection = null): Operation
     {
