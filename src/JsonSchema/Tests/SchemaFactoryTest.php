@@ -124,6 +124,10 @@ class SchemaFactoryTest extends TestCase
 
     public function testBuildSchemaForNonResourceClass(): void
     {
+        if (!method_exists(PropertyInfoExtractor::class, 'getType')) { // @phpstan-ignore-line symfony/property-info 6.4 is still allowed and this may be true
+            $this->markTestSkipped('This test only supports type-info component');
+        }
+
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
