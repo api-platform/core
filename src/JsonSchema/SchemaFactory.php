@@ -29,6 +29,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
+use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
@@ -349,11 +350,17 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                     $valueType = TypeHelper::getCollectionValueType($t);
                 }
 
-                if (!$valueType instanceof ObjectType) {
+                if (!$valueType instanceof ObjectType && !$valueType instanceof GenericType) {
                     continue;
                 }
 
-                $className = $valueType->getClassName();
+                if ($valueType instanceof ObjectType) {
+                    $className = $valueType->getClassName();
+                } else {
+                    // GenericType
+                    $className = $valueType->getWrappedType()->getClassName();
+                }
+
                 $subSchemaInstance = new Schema($version);
                 $subSchemaInstance->setDefinitions($schema->getDefinitions());
                 $subSchemaFactory = $this->schemaFactory ?: $this;
