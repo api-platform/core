@@ -60,7 +60,7 @@ final readonly class FilterQueryExtension implements QueryExtensionInterface
 
             $filter = $filterId instanceof FilterInterface ? $filterId : ($this->filterLocator->has($filterId) ? $this->filterLocator->get($filterId) : null);
             if ($filter instanceof FilterInterface) {
-                $builder = $filter->apply($builder, $values, $parameter, $context + ($parameter->getFilterContext() ?? []));
+                $builder = $filter->apply($builder, $values, $parameter->withKey($parameter->getExtraProperties()['_query_property'] ?? $parameter->getKey()), $context + ($parameter->getFilterContext() ?? []));
             }
         }
 
