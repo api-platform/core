@@ -146,6 +146,10 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
 
     public function testUnionTypeAnyOfIsArray(): void
     {
+        if (!method_exists(PropertyInfoExtractor::class, 'getType')) { // @phpstan-ignore-line symfony/property-info 6.4 is still allowed and this may be true
+            $this->markTestSkipped('This test only supports type-info component');
+        }
+
         $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
         $apiProperty = new ApiProperty(nativeType: Type::union(Type::string(), Type::int()));
         $decorated = $this->createMock(PropertyMetadataFactoryInterface::class);
