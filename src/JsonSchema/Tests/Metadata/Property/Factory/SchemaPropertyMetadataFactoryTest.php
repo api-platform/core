@@ -16,6 +16,7 @@ namespace ApiPlatform\JsonSchema\Tests\Metadata\Property\Factory;
 use ApiPlatform\JsonSchema\Metadata\Property\Factory\SchemaPropertyMetadataFactory;
 use ApiPlatform\JsonSchema\Tests\Fixtures\DummyWithCustomOpenApiContext;
 use ApiPlatform\JsonSchema\Tests\Fixtures\DummyWithEnum;
+use ApiPlatform\JsonSchema\Tests\Fixtures\DummyWithUnionTypeProperty;
 use ApiPlatform\JsonSchema\Tests\Fixtures\Enum\IntEnumAsIdentifier;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -115,10 +116,11 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
     public function testWithCustomOpenApiContextWithoutTypeDefinition(): void
     {
         $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
-        $apiProperty = new ApiProperty(
-            openapiContext: ['description' => 'My description'],
-            nativeType: Type::bool(),
-        );
+        $apiProperty =
+            new ApiProperty(
+                openapiContext: ['description' => 'My description'],
+                nativeType: Type::bool(),
+            );
         $decorated = $this->createMock(PropertyMetadataFactoryInterface::class);
         $decorated->expects($this->once())->method('create')->with(DummyWithCustomOpenApiContext::class, 'foo')->willReturn($apiProperty);
         $schemaPropertyMetadataFactory = new SchemaPropertyMetadataFactory($resourceClassResolver, $decorated);
@@ -127,10 +129,11 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
             'type' => 'boolean',
         ], $apiProperty->getSchema());
 
-        $apiProperty = new ApiProperty(
-            openapiContext: ['iris' => 'https://schema.org/Date'],
-            nativeType: Type::object(\DateTimeImmutable::class),
-        );
+        $apiProperty =
+            new ApiProperty(
+                openapiContext: ['iris' => 'https://schema.org/Date'],
+                nativeType: Type::object(\DateTimeImmutable::class),
+            );
         $decorated = $this->createMock(PropertyMetadataFactoryInterface::class);
         $decorated->expects($this->once())->method('create')->with(DummyWithCustomOpenApiContext::class, 'bar')->willReturn($apiProperty);
         $schemaPropertyMetadataFactory = new SchemaPropertyMetadataFactory($resourceClassResolver, $decorated);
@@ -139,5 +142,25 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
             'type' => 'string',
             'format' => 'date-time',
         ], $apiProperty->getSchema());
+    }
+
+    public function testUnionTypeAnyOfIsArray(): void
+    {
+        $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
+        $apiProperty = new ApiProperty(nativeType: Type::union(Type::string(), Type::int()));
+        $decorated = $this->createMock(PropertyMetadataFactoryInterface::class);
+        $decorated->expects($this->once())->method('create')->with(DummyWithUnionTypeProperty::class, 'unionProperty')->willReturn($apiProperty);
+
+        $schemaPropertyMetadataFactory = new SchemaPropertyMetadataFactory($resourceClassResolver, $decorated);
+        $apiProperty = $schemaPropertyMetadataFactory->create(DummyWithUnionTypeProperty::class, 'unionProperty');
+
+        $expectedSchema = [
+            'anyOf' => [
+                ['type' => 'integer'],
+                ['type' => 'string'],
+            ],
+        ];
+
+        $this->assertEquals($expectedSchema, $apiProperty->getSchema());
     }
 }
