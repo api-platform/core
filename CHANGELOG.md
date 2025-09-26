@@ -275,6 +275,14 @@ TypeInfo:
 * [cff61eab8](https://github.com/api-platform/core/commit/cff61eab8643f8ed08d59c0684e77740d0d81b04) fix(metadata): append php file resource extractor (#7193)
 * [f3d4afe03](https://github.com/api-platform/core/commit/f3d4afe032385f3b665131a365e42706930f0730) fix(symfony): validator type-info
 
+## v4.1.25
+
+### Bug fixes
+
+* [54352d853](https://github.com/api-platform/core/commit/54352d853b219327ed58d40e1f54c46f2193c1a9) fix(jsonld): hydra context w3.org updates (#7410)
+* [85f198a56](https://github.com/api-platform/core/commit/85f198a5618d5e955b2fbcfb079fe7286af05413) fix(laravel): filter should query correct property
+* [91b17f1f3](https://github.com/api-platform/core/commit/91b17f1f3731339023910f795d686111a8941920) fix(laravel): correct the example of swagger_ui.apiKeys config (#7392)
+
 ## v4.1.24
 
 ### Bug fixes
