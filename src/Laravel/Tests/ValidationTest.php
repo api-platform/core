@@ -75,4 +75,14 @@ class ValidationTest extends TestCase
         $response = $this->get('api/issue_7194_requirements/1', ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
     }
+
+    public function testGetCollectionWithFormRequestValidation(): void
+    {
+        $response = $this->get('/api/slots/dropoff', ['accept' => 'application/ld+json']);
+        $response->assertStatus(422);
+        $response->assertJsonFragment(['violations' => [
+            ['propertyPath' => 'pickupDate', 'message' => 'The pickup date field is required.'],
+            ['propertyPath' => 'pickupSlotId', 'message' => 'The pickup slot id field is required.'],
+        ]]);
+    }
 }
