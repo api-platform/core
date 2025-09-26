@@ -89,6 +89,8 @@ use ApiPlatform\Laravel\Eloquent\Metadata\ResourceClassResolver as EloquentResou
 use ApiPlatform\Laravel\Eloquent\PropertyAccess\PropertyAccessor as EloquentPropertyAccessor;
 use ApiPlatform\Laravel\Eloquent\PropertyInfo\EloquentExtractor;
 use ApiPlatform\Laravel\Eloquent\Serializer\EloquentNameConverter;
+use ApiPlatform\Laravel\Eloquent\Serializer\Mapping\Loader\AttributeLoader as EloquentAttributeLoader;
+use ApiPlatform\Laravel\Eloquent\Serializer\Mapping\Loader\RelationMetadataLoader;
 use ApiPlatform\Laravel\Eloquent\Serializer\SerializerContextBuilder as EloquentSerializerContextBuilder;
 use ApiPlatform\Laravel\GraphQl\Controller\EntrypointController as GraphQlEntrypointController;
 use ApiPlatform\Laravel\GraphQl\Controller\GraphiQlController;
@@ -174,7 +176,6 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
-use Symfony\Component\Serializer\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\SnakeCaseToCamelCaseNameConverter;
@@ -216,7 +217,6 @@ class ApiPlatformProvider extends ServiceProvider
             return new ModelMetadata();
         });
 
-        $this->app->bind(LoaderInterface::class, AttributeLoader::class);
         $this->app->bind(ClassMetadataFactoryInterface::class, ClassMetadataFactory::class);
         $this->app->singleton(ClassMetadataFactory::class, function (Application $app) {
             /** @var ConfigRepository */
@@ -232,8 +232,8 @@ class ApiPlatformProvider extends ServiceProvider
                         $app->make(PropertyNameCollectionFactoryInterface::class),
                         $nameConverter
                     ),
-                    new AttributeLoader(),
-                    // new RelationMetadataLoader($app->make(ModelMetadata::class)),
+                    new EloquentAttributeLoader(new AttributeLoader()),
+                    new RelationMetadataLoader($app->make(ModelMetadata::class)),
                 ])
             );
         });
@@ -330,8 +330,8 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->bind(PropertyAccessorInterface::class, function () {
-            return new EloquentPropertyAccessor();
+        $this->app->bind(PropertyAccessorInterface::class, function (Application $app) {
+            return new EloquentPropertyAccessor(null, $app->make(ModelMetadata::class));
         });
 
         $this->app->bind(NameConverterInterface::class, function (Application $app) {
