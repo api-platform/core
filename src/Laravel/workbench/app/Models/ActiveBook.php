@@ -13,42 +13,38 @@ declare(strict_types=1);
 
 namespace Workbench\App\Models;
 
+use ApiPlatform\Laravel\Eloquent\Filter\OrderFilter;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\QueryParameter;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Workbench\App\Http\Requests\StoreSlotRequest;
 
 #[ApiResource(
     operations: [
-        new GetCollection(),
         new Get(),
-        new Post(
-            rules: StoreSlotRequest::class,
-        ),
-        new Put(),
-        new Patch(),
-        new Delete(),
-    ],
+        new GetCollection(),
+    ]
 )]
-class Slot extends Model
+#[QueryParameter(key: 'sort[:property]', filter: OrderFilter::class, properties: ['isActive'])]
+class ActiveBook extends Model
 {
     use HasFactory;
-    protected $table = 'slots';
+
+    protected $table = 'active_books';
 
     protected $fillable = [
         'name',
-        'area_id',
+        'is_active',
     ];
 
-    public function area(): BelongsTo
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
+
+    public function getIsActiveAttribute(bool $value): bool
     {
-        return $this->belongsTo(Area::class);
+        return $value;
     }
 }

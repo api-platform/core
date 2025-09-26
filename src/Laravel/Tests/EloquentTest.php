@@ -19,7 +19,9 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
+use Workbench\App\Http\Requests\StoreSlotRequest;
 use Workbench\App\Models\PostWithMorphMany;
+use Workbench\Database\Factories\AreaFactory;
 use Workbench\Database\Factories\AuthorFactory;
 use Workbench\Database\Factories\BookFactory;
 use Workbench\Database\Factories\CommentMorphFactory;
@@ -613,5 +615,21 @@ class EloquentTest extends TestCase
             ],
             'note' => 'This is a test note.',
         ]);
+    }
+
+    public function testIriIsNotDenormalizedBeforeFormRequestValidation(): void
+    {
+        $area = AreaFactory::new()->create();
+
+        $this->postJson(
+            '/api/slots',
+            [
+                'name' => 'Morning Slot',
+                'area' => '/api/areas/'.$area->id, // @phpstan-ignore-line
+            ],
+            ['accept' => 'application/ld+json', 'content-type' => 'application/ld+json']
+        )->assertStatus(201);
+
+        $this->assertSame(StoreSlotRequest::$receivedArea->name, $area->name); // @phpstan-ignore-line
     }
 }
