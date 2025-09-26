@@ -1,5 +1,22 @@
 # Changelog
 
+## v4.2.1
+
+### Bug fixes
+
+* [059e6a09e](https://github.com/api-platform/core/commit/059e6a09e272f7422390df83f5488ed81ea8d5b3) fix(symfony): remove suggest ocramius/package-versions (#7395)
+* [3b0c44177](https://github.com/api-platform/core/commit/3b0c4417743187a3f6e1e61c92370dd11a71734d) fix(openapi): ability to override description in response (#7412)
+* [54bdce504](https://github.com/api-platform/core/commit/54bdce5042b6b712a7e32e54bfcda7af4833f669) fix(symfony): openapi property path for validation
+* [65e137fca](https://github.com/api-platform/core/commit/65e137fca534cae02dd746c87ce99e32d8cace3b) fix: make default value of `pagination_maximum_items_per_page` same as Laravel version (#7396)
+* [6916bea95](https://github.com/api-platform/core/commit/6916bea95effc959967ef56618f913323d340a18) fix(serializer): require api-platform/metadata:^4.2 (#7409)
+* [82d0dd7e0](https://github.com/api-platform/core/commit/82d0dd7e0dca66be608f102717b2868ef3696f94) fix(symfony): openapi property path for validation (#7411)
+* [a5102d9a2](https://github.com/api-platform/core/commit/a5102d9a2b7cf36313234635a24ba235f2ac912d) fix(schema): anyOf must contains an array, not an object (#7399)
+* [dfe4fd7f2](https://github.com/api-platform/core/commit/dfe4fd7f24aa2419e9cd0fe9478d10b88ffe6569) fix: handle generic array in JsonSchema (#7414)
+
+Also includes [v4.1.25 bug fixes](#v4125)
+
+### Features
+
 ## v4.2.0
 
 ### Features
