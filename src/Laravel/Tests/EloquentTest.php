@@ -625,11 +625,11 @@ class EloquentTest extends TestCase
             '/api/slots',
             [
                 'name' => 'Morning Slot',
-                'area' => '/api/areas/'.$area->id,
+                'area' => '/api/areas/'.$area->id, // @phpstan-ignore-line
             ],
             ['accept' => 'application/ld+json', 'content-type' => 'application/ld+json']
         )->assertStatus(201);
 
-        $this->assertSame(StoreSlotRequest::$receivedArea->name, $area->name);
+        $this->assertSame(StoreSlotRequest::$receivedArea->name, $area->name); // @phpstan-ignore-line
     }
 }
