@@ -43,6 +43,8 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     use ResourceMetadataTrait;
     use SchemaUriPrefixTrait;
 
+    private const JSON_MERGE_PATCH_SCHEMA_POSTFIX = '.jsonMergePatch';
+
     private ?SchemaFactoryInterface $schemaFactory = null;
     // Edge case where the related resource is not readable (for example: NotExposed) but we have groups to read the whole related object
     public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
@@ -90,6 +92,11 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         // In case of FORCE_SUBSCHEMA an object can be writable through another class even though it has no POST operation
         if (!($serializerContext[self::FORCE_SUBSCHEMA] ?? false) && Schema::TYPE_OUTPUT !== $type && !\in_array($method, ['POST', 'PATCH', 'PUT'], true)) {
             return $schema;
+        }
+
+        $isJsonMergePatch = 'json' === $format && 'PATCH' === $method && Schema::TYPE_INPUT === $type;
+        if ($isJsonMergePatch) {
+            $definitionName .= self::JSON_MERGE_PATCH_SCHEMA_POSTFIX;
         }
 
         if (!isset($schema['$ref']) && !isset($schema['type'])) {
@@ -141,7 +148,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             }
 
             $normalizedPropertyName = $this->nameConverter ? $this->nameConverter->normalize($propertyName, $inputOrOutputClass, $format, $serializerContext) : $propertyName;
-            if ($propertyMetadata->isRequired()) {
+            if ($propertyMetadata->isRequired() && !$isJsonMergePatch) {
                 $definition['required'][] = $normalizedPropertyName;
             }
 
