@@ -190,6 +190,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 'type' => 'object',
                 'required' => [
                     $hydraPrefix.'member',
+                    'items' => ['type' => 'object'],
                 ],
                 'properties' => [
                     $hydraPrefix.'member' => [
