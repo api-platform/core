@@ -23,7 +23,7 @@
         "parametervalidator",
         "serializer",
         "jsonschema",
-        "validation",
+        "validator",
         "state",
         "test"
       ]
