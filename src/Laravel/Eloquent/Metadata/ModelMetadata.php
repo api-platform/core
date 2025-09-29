@@ -15,7 +15,6 @@ namespace ApiPlatform\Laravel\Eloquent\Metadata;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -28,12 +27,12 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 final class ModelMetadata
 {
     /**
-     * @var array<class-string, Collection<string, mixed>>
+     * @var array<class-string, array<string, mixed>>
      */
     private $attributesLocalCache = [];
 
     /**
-     * @var array<class-string, Collection<int, mixed>>
+     * @var array<class-string, array<string, mixed>>
      */
     private $relationsLocalCache = [];
 
@@ -63,9 +62,9 @@ final class ModelMetadata
     /**
      * Gets the column attributes for the given model.
      *
-     * @return Collection<string, mixed>
+     * @return array<string, mixed>
      */
-    public function getAttributes(Model $model): Collection
+    public function getAttributes(Model $model): array
     {
         if (isset($this->attributesLocalCache[$model::class])) {
             return $this->attributesLocalCache[$model::class];
@@ -78,13 +77,15 @@ final class ModelMetadata
         $indexes = $schema->getIndexes($table);
         $relations = $this->getRelations($model);
 
-        return $this->attributesLocalCache[$model::class] = collect($columns)
-            ->reject(
-                fn ($column) => $relations->contains(
-                    fn ($relation) => $relation['foreign_key'] === $column['name']
-                )
-            )
-            ->map(fn ($column) => [
+        $foreignKeys = array_flip(array_column($relations, 'foreign_key'));
+        $attributes = [];
+
+        foreach ($columns as $column) {
+            if (isset($foreignKeys[$column['name']])) {
+                continue;
+            }
+
+            $attributes[$column['name']] = [
                 'name' => $column['name'],
                 'type' => $column['type'],
                 'increments' => $column['auto_increment'],
@@ -96,8 +97,10 @@ final class ModelMetadata
                 'appended' => null,
                 'cast' => $this->getCastType($column['name'], $model),
                 'primary' => $this->isColumnPrimaryKey($indexes, $column['name']),
-            ])
-            ->merge($this->getVirtualAttributes($model, $columns));
+            ];
+        }
+
+        return $this->attributesLocalCache[$model::class] = array_merge($attributes, $this->getVirtualAttributes($model, $columns));
     }
 
     /**
@@ -119,30 +122,43 @@ final class ModelMetadata
      *
      * @param array<string, mixed> $columns
      *
-     * @return Collection<int, mixed>
+     * @return array<string, mixed>
      */
-    private function getVirtualAttributes(Model $model, array $columns): Collection
+    private function getVirtualAttributes(Model $model, array $columns): array
     {
         $class = new \ReflectionClass($model);
+        $virtualAttributes = [];
 
-        return collect($class->getMethods())
-            ->reject(
-                fn (\ReflectionMethod $method) => $method->isStatic()
-                    || $method->isAbstract()
-                    || Model::class === $method->getDeclaringClass()->getName()
-            )
-            ->mapWithKeys(function (\ReflectionMethod $method) use ($model) {
-                if (1 === preg_match('/^get(.+)Attribute$/', $method->getName(), $matches)) {
-                    return [Str::snake($matches[1]) => 'accessor'];
-                }
-                if ($model->hasAttributeMutator($method->getName())) {
-                    return [Str::snake($method->getName()) => 'attribute'];
-                }
+        $columnNames = array_flip(array_column($columns, 'name'));
 
-                return [];
-            })
-            ->reject(fn ($cast, $name) => collect($columns)->contains('name', $name))
-            ->map(fn ($cast, $name) => [
+        foreach ($class->getMethods() as $method) {
+            if (
+                $method->isStatic()
+                || $method->isAbstract()
+                // Skips methods from the base Eloquent Model class
+                || Model::class === $method->getDeclaringClass()->getName()
+            ) {
+                continue;
+            }
+
+            $methodName = $method->getName();
+            $name = null;
+            $cast = null;
+
+            if (1 === preg_match('/^get(.+)Attribute$/', $methodName, $matches)) {
+                $name = Str::snake($matches[1]);
+                $cast = 'accessor';
+            } elseif ($model->hasAttributeMutator($methodName)) {
+                $name = Str::snake($methodName);
+                $cast = 'attribute';
+            }
+
+            // If the method is not a virtual attribute, or if it conflicts with a real column, skip it.
+            if (null === $name || isset($columnNames[$name])) {
+                continue;
+            }
+
+            $virtualAttributes[$name] = [
                 'name' => $name,
                 'type' => null,
                 'increments' => false,
@@ -153,42 +169,41 @@ final class ModelMetadata
                 'hidden' => $this->attributeIsHidden($name, $model),
                 'appended' => $model->hasAppended($name),
                 'cast' => $cast,
-            ])
-            ->values();
+            ];
+        }
+
+        return $virtualAttributes;
     }
 
     /**
      * Gets the relations from the given model.
      *
-     * @return Collection<int, mixed>
+     * @return array<string, mixed>
      */
-    public function getRelations(Model $model): Collection
+    public function getRelations(Model $model): array
     {
         if (isset($this->relationsLocalCache[$model::class])) {
             return $this->relationsLocalCache[$model::class];
         }
 
-        return $this->relationsLocalCache[$model::class] = collect(get_class_methods($model))
-            ->map(fn ($method) => new \ReflectionMethod($model, $method))
-            ->reject(
-                fn (\ReflectionMethod $method) => $method->isStatic()
-                    || $method->isAbstract()
-                    || Model::class === $method->getDeclaringClass()->getName()
-                    || $method->getNumberOfParameters() > 0
-                    || $this->attributeIsHidden($method->getName(), $model)
-            )
-            ->filter(function (\ReflectionMethod $method) {
-                if (
-                    $method->getReturnType() instanceof \ReflectionNamedType
-                    && is_subclass_of($method->getReturnType()->getName(), Relation::class)
-                ) {
-                    return true;
-                }
+        $relations = [];
+        $class = new \ReflectionClass($model);
 
-                if (false === $method->getFileName()) {
-                    return false;
-                }
+        foreach ($class->getMethods() as $method) {
+            if (
+                $method->isStatic()
+                || $method->isAbstract()
+                || $method->getNumberOfParameters() > 0
+                || Model::class === $method->getDeclaringClass()->getName()
+                || $this->attributeIsHidden($method->getName(), $model)
+            ) {
+                continue;
+            }
 
+            $isRelation = false;
+            if ($method->getReturnType() instanceof \ReflectionNamedType && is_subclass_of($method->getReturnType()->getName(), Relation::class)) {
+                $isRelation = true;
+            } elseif (false !== $method->getFileName()) {
                 $file = new \SplFileObject($method->getFileName());
                 $file->seek($method->getStartLine() - 1);
                 $code = '';
@@ -197,30 +212,37 @@ final class ModelMetadata
                     if (\is_string($current)) {
                         $code .= trim($current);
                     }
-
                     $file->next();
                 }
 
-                return collect(self::RELATION_METHODS)
-                    ->contains(fn ($relationMethod) => str_contains($code, '$this->'.$relationMethod.'('));
-            })
-            ->map(function (\ReflectionMethod $method) use ($model) {
-                $relation = $method->invoke($model);
-
-                if (!$relation instanceof Relation) {
-                    return null;
+                foreach (self::RELATION_METHODS as $relationMethod) {
+                    if (str_contains($code, '$this->'.$relationMethod.'(')) {
+                        $isRelation = true;
+                        break;
+                    }
                 }
+            }
 
-                return [
-                    'name' => $this->relationNameConverter->normalize($method->getName()),
-                    'method_name' => $method->getName(),
-                    'type' => $relation::class,
-                    'related' => \get_class($relation->getRelated()),
-                    'foreign_key' => method_exists($relation, 'getForeignKeyName') ? $relation->getForeignKeyName() : null,
-                ];
-            })
-            ->filter()
-            ->values();
+            if (!$isRelation) {
+                continue;
+            }
+
+            $relation = $method->invoke($model);
+            if (!$relation instanceof Relation) {
+                continue;
+            }
+
+            $relationName = $this->relationNameConverter->normalize($method->getName());
+            $relations[$relationName] = [
+                'name' => $relationName,
+                'method_name' => $method->getName(),
+                'type' => $relation::class,
+                'related' => \get_class($relation->getRelated()),
+                'foreign_key' => method_exists($relation, 'getForeignKeyName') ? $relation->getForeignKeyName() : null,
+            ];
+        }
+
+        return $this->relationsLocalCache[$model::class] = $relations;
     }
 
     /**
@@ -236,21 +258,25 @@ final class ModelMetadata
             return 'attribute';
         }
 
-        return $this->getCastsWithDates($model)->get($column) ?? null;
+        return $this->getCastsWithDates($model)[$column] ?? null;
     }
 
     /**
      * Gets the model casts, including any date casts.
      *
-     * @return Collection<string, mixed>
+     * @return array<string, mixed>
      */
-    private function getCastsWithDates(Model $model): Collection
+    private function getCastsWithDates(Model $model): array
     {
-        return collect($model->getDates())
-            ->filter()
-            ->flip()
-            ->map(fn () => 'datetime')
-            ->merge($model->getCasts());
+        $dateCasts = [];
+
+        foreach ($model->getDates() as $date) {
+            if (!empty($date)) {
+                $dateCasts[$date] = 'datetime';
+            }
+        }
+
+        return array_merge($dateCasts, $model->getCasts());
     }
 
     /**

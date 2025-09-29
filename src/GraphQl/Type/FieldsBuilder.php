@@ -78,7 +78,7 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
             return [];
         }
 
-        $fieldName = lcfirst('item_query' === $operation->getName() ? $operation->getShortName() : $operation->getName().$operation->getShortName());
+        $fieldName = lcfirst('item_query' === $operation->getName() ? ($operation->getShortName() ?? $operation->getName()) : $operation->getName().$operation->getShortName());
 
         if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $operation->getDescription(), $operation->getDeprecationReason(), new Type(Type::BUILTIN_TYPE_OBJECT, true, $resourceClass), $resourceClass, false, $operation)) {
             $args = $this->resolveResourceArgs($configuration['args'] ?? [], $operation);
