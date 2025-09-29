@@ -133,7 +133,7 @@ trait ParameterValidationConstraints
         }
 
         if ($required && false !== $allowEmptyValue) {
-            $assertions[] = new NotNull(message: \sprintf('The parameter "%s" is required.', $parameter->getKey()));
+            $assertions[] = new NotNull();
         }
 
         if (isset($schema['minItems']) || isset($schema['maxItems'])) {
