@@ -467,7 +467,7 @@ class ApiPlatformProvider extends ServiceProvider
             $config = $app['config'];
             $defaultContext = $config->get('api-platform.serializer', []);
 
-            return new ObjectNormalizer(defaultContext: $defaultContext);
+            return new ObjectNormalizer($app->make(ClassMetadataFactoryInterface::class), defaultContext: $defaultContext);
         });
 
         $this->app->singleton(DateTimeNormalizer::class, function (Application $app) {
