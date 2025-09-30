@@ -9,4 +9,4 @@ Feature: Default values of HTTP cache headers
     Then the response status code should be 200
     And the header "Etag" should be equal to '"032297ac74d75a50"'
     And the header "Cache-Control" should be equal to "max-age=60, public, s-maxage=3600"
-    And the header "Vary" should be equal to "Accept, Cookie"
+    And the header "Vary" should be equal to "Accept, Cookie, Accept-Language"

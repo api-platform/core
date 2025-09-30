@@ -16,7 +16,7 @@ Feature: Validate filters based upon filter description
   Scenario: Required filter should throw an error if not set
     When I am on "/filter_validators"
     Then the response status code should be 422
-    And the JSON node "detail" should be equal to 'required: This value should not be blank.\nrequired-allow-empty: The parameter "required-allow-empty" is required.'
+    And the JSON node "detail" should be equal to 'required: This value should not be blank.\nrequired-allow-empty: This value should not be null.'
 
   Scenario: Required filter should not throw an error if set
     When I am on "/array_filter_validators?arrayRequired[]=foo&indexedArrayRequired[foo]=foo"
