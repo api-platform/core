@@ -504,12 +504,15 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         $noOutput = \is_array($operation?->getOutput()) && null === $operation->getOutput()['class'];
 
         $response = $existingResponses[$status] ?? new Response($description);
+        if (null === $response->getDescription()) {
+            $response = $response->withDescription($description);
+        }
 
-        if (!$response->getContent() && $responseMimeTypes && $operationOutputSchemas && !$noOutput) {
+        if (null === $response->getContent() && $responseMimeTypes && $operationOutputSchemas && !$noOutput) {
             $response = $response->withContent($this->buildContent($responseMimeTypes, $operationOutputSchemas));
         }
 
-        if (!$response->getLinks() && $resourceMetadataCollection && $operation) {
+        if (null === $response->getLinks() && $resourceMetadataCollection && $operation) {
             $response = $response->withLinks($this->getLinks($resourceMetadataCollection, $operation));
         }
 

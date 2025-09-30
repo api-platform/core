@@ -262,6 +262,18 @@ class OpenApiFactoryTest extends TestCase
                         ),
                     ],
                 )),
+                'postDummyItemWithEmptyResponse' => (new Post())->withUriTemplate('/dummyitems/noresponse')->withOperation($baseOperation)->withOpenapi(new OpenApiOperation(
+                    responses: [
+                        '201' => new OpenApiResponse(
+                            description: '',
+                            content: new \ArrayObject(),
+                            headers: new \ArrayObject(),
+                            links: new \ArrayObject(),
+                        ),
+                        '400' => new OpenApiResponse(),
+                    ],
+                    requestBody: new RequestBody(''),
+                )),
                 'postDummyItemWithoutInput' => (new Post())->withUriTemplate('/dummyitem/noinput')->withOperation($baseOperation)->withInput(false),
                 'getDummyCollectionWithErrors' => (new GetCollection())->withUriTemplate('erroredDummies')->withErrors([DummyErrorResource::class])->withOperation($baseOperation),
             ])
@@ -1208,6 +1220,40 @@ class OpenApiFactoryTest extends TestCase
                 ]),
             ]
         ), $dummyItemPath->getGet());
+
+        $emptyReponsePath = $paths->getPath('/dummyitems/noresponse');
+        $this->assertEquals(new Operation(
+            'postDummyItemWithEmptyResponse',
+            ['Dummy'],
+            [
+                '201' => new Response(
+                    '',
+                    new \ArrayObject(),
+                    new \ArrayObject(),
+                    new \ArrayObject()
+                ),
+                '400' => new Response(
+                    'Invalid input',
+                    content: new \ArrayObject(['application/problem+json' => new MediaType(schema: new \ArrayObject(['$ref' => '#/components/schemas/Error']))]),
+                    links: new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
+                ),
+                '422' => new Response(
+                    'Unprocessable entity',
+                    content: new \ArrayObject(['application/problem+json' => new MediaType(schema: new \ArrayObject(['$ref' => '#/components/schemas/Error']))]),
+                    links: new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
+                ),
+            ],
+            'Creates a Dummy resource.',
+            'Creates a Dummy resource.',
+            null,
+            [],
+            new RequestBody(
+                '',
+                content: new \ArrayObject([
+                    'application/ld+json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.jsonld'])),
+                ]),
+            ),
+        ), $emptyReponsePath->getPost());
 
         $emptyRequestBodyPath = $paths->getPath('/dummyitem/noinput');
         $this->assertEquals(new Operation(
