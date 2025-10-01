@@ -85,6 +85,7 @@ class ApiPlatformController extends Controller
             $uriVariables = $this->getUriVariables($request, $operation);
         }
 
+        $context['resource'] = $request->attributes->get('resource');
         $context['previous_data'] = $request->attributes->get('previous_data');
         $context['data'] = $request->attributes->get('data');
 

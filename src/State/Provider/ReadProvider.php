@@ -98,6 +98,7 @@ final class ReadProvider implements ProviderInterface, StopwatchAwareInterface
             throw new NotFoundHttpException('Not Found', $e ?? null);
         }
 
+        $request?->attributes->set('resource', $data);
         $request?->attributes->set('data', $data);
         $request?->attributes->set('previous_data', $this->clone($data));
 

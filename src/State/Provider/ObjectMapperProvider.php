@@ -69,6 +69,7 @@ final class ObjectMapperProvider implements ProviderInterface
             $data = $this->objectMapper->map($data, $operation->getClass());
         }
 
+        $request?->attributes->set('resource', $data);
         $request?->attributes->set('data', $data);
         $request?->attributes->set('previous_data', $this->clone($data));
 
