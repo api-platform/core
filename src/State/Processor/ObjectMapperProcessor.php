@@ -35,11 +35,12 @@ final class ObjectMapperProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        if (!$this->objectMapper || !$operation->canWrite()) {
-            return $this->decorated->process($data, $operation, $uriVariables, $context);
-        }
-
-        if (!(new \ReflectionClass($operation->getClass()))->getAttributes(Map::class)) {
+        if (
+            !$this->objectMapper
+            || !$operation->canWrite()
+            || !is_a($data, $operation->getClass(), true)
+            || !(new \ReflectionClass($operation->getClass()))->getAttributes(Map::class)
+        ) {
             return $this->decorated->process($data, $operation, $uriVariables, $context);
         }
 
