@@ -17,6 +17,7 @@ use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\FirstResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResourceOdm;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResourceWithInput;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResourceWithRelation;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResourceWithRelationRelated;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\SecondResource;
@@ -40,7 +41,15 @@ final class MappingTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [MappedResource::class, MappedResourceOdm::class, FirstResource::class, SecondResource::class, MappedResourceWithRelation::class, MappedResourceWithRelationRelated::class];
+        return [
+            MappedResource::class,
+            MappedResourceOdm::class,
+            FirstResource::class,
+            SecondResource::class,
+            MappedResourceWithRelation::class,
+            MappedResourceWithRelationRelated::class,
+            MappedResourceWithInput::class,
+        ];
     }
 
     public function testShouldMapBetweenResourceAndEntity(): void
@@ -134,6 +143,28 @@ final class MappingTest extends ApiTestCase
             'relationName' => 'test',
             'relation' => '/mapped_resource_with_relation_relateds/1',
         ]);
+    }
+
+    public function testShouldNotMapWhenInput(): void
+    {
+        if (!$this->getContainer()->has('api_platform.object_mapper')) {
+            $this->markTestSkipped('ObjectMapper not installed');
+        }
+
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('MongoDB not tested');
+        }
+
+        $this->recreateSchema([MappedEntity::class]);
+        $this->loadFixtures();
+        $r = self::createClient()->request('POST', 'mapped_resource_with_input', [
+            'headers' => [
+                'content-type' => 'application/ld+json',
+            ],
+            'json' => ['name' => 'test', 'id' => '1'],
+        ]);
+
+        $this->assertJsonContains(['username' => 'test']);
     }
 
     private function loadFixtures(): void
