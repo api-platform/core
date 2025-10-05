@@ -142,10 +142,8 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
             $baseName = Schema::TYPE_OUTPUT === $type ? self::ITEM_BASE_SCHEMA_NAME : self::ITEM_BASE_SCHEMA_OUTPUT_NAME;
 
-            if ($this->isResourceClass($inputOrOutputClass)) {
-                if (!isset($definitions[$baseName])) {
-                    $definitions[$baseName] = Schema::TYPE_OUTPUT === $type ? self::ITEM_BASE_SCHEMA_OUTPUT : self::ITEM_BASE_SCHEMA;
-                }
+            if (!isset($definitions[$baseName])) {
+                $definitions[$baseName] = Schema::TYPE_OUTPUT === $type ? self::ITEM_BASE_SCHEMA_OUTPUT : self::ITEM_BASE_SCHEMA;
             }
 
             $allOf = new \ArrayObject(['allOf' => [

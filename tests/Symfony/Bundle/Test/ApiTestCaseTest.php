@@ -20,6 +20,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\DirectMercure as DirectMercur
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Address;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DirectMercure;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoCustom;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoInputOutput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6041\NumericValidated;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6146\Issue6146Child;
@@ -191,6 +192,13 @@ JSON;
     {
         self::createClient()->request('GET', '/resource_interfaces/some-id', ['headers' => ['Accept' => $mimeType]]);
         $this->assertMatchesResourceItemJsonSchema(ResourceInterface::class, format: $format);
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerFormats')]
+    public function testAssertMatchesResourceItemJsonSchemaWithCustomOutput(string $format, string $mimeType): void
+    {
+        self::createClient()->request('GET', '/dummy_dto_custom_output/some-id', ['headers' => ['Accept' => $mimeType]]);
+        $this->assertMatchesResourceItemJsonSchema(DummyDtoCustom::class, operationName: 'dummy_dto_custom_output_collection', format: $format);
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('providerFormats')]
