@@ -134,23 +134,24 @@ class JsonSchemaTest extends ApiTestCase
 
         $schema = $this->schemaFactory->buildSchema(BagOfTests::class, 'jsonld', Schema::TYPE_INPUT);
 
-        $this->assertEquals($schema['definitions']['BagOfTests.jsonld-write']['properties']['tests'], new \ArrayObject([
+        $base = $schema['definitions']['BagOfTests.jsonld-write']['allOf'][1];
+        $this->assertEquals($base['properties']['tests'], new \ArrayObject([
             'type' => 'string',
             'foo' => 'bar',
         ]));
 
-        $this->assertEquals($schema['definitions']['BagOfTests.jsonld-write']['properties']['nonResourceTests'], new \ArrayObject([
+        $this->assertEquals($base['properties']['nonResourceTests'], new \ArrayObject([
             'type' => 'array',
             'items' => [
                 '$ref' => '#/definitions/NonResourceTestEntity.jsonld-write',
             ],
         ]));
 
-        $this->assertEquals($schema['definitions']['BagOfTests.jsonld-write']['properties']['description'], new \ArrayObject([
+        $this->assertEquals($base['properties']['description'], new \ArrayObject([
             'maxLength' => 255,
         ]));
 
-        $this->assertEquals($schema['definitions']['BagOfTests.jsonld-write']['properties']['type'], new \ArrayObject([
+        $this->assertEquals($base['properties']['type'], new \ArrayObject([
             '$ref' => '#/definitions/TestEntity.jsonld-write',
         ]));
     }

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\JsonSchema\Command;
 
+use ApiPlatform\Symfony\Bundle\Test\Constraint\MatchesJsonSchema;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Animal;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\AnimalObservation;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\BackedEnumIntegerResource;
@@ -116,9 +117,8 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => $this->entityClass, '--operation' => '_api_/dummies{._format}_post', '--format' => 'jsonld', '--type' => 'input']);
         $result = $this->tester->getDisplay();
 
-        $this->assertStringNotContainsString('@id', $result);
-        $this->assertStringNotContainsString('@context', $result);
-        $this->assertStringNotContainsString('@type', $result);
+        $constraint = new MatchesJsonSchema(json_decode($result));
+        static::assertThat(['name' => 'test'], $constraint);
     }
 
     public function testExecuteWithJsonMergePatchTypeInput(): void

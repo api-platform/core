@@ -36,9 +36,9 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     use ResourceMetadataTrait;
     use SchemaUriPrefixTrait;
 
-    private const ITEM_BASE_SCHEMA_NAME = 'HydraItemBaseSchema';
-    private const ITEM_BASE_SCHEMA_OUTPUT_NAME = 'HydraOutputBaseSchema';
-    private const COLLECTION_BASE_SCHEMA_NAME = 'HydraCollectionBaseSchema';
+    private const INPUT_ITEM_SCHEMA_NAME = 'HydraInputItemBaseSchema';
+    private const OUTPUT_ITEM_SCHEMA_NAME = 'HydraItemBaseSchema';
+    private const COLLECTION_SCHEMA_NAME = 'HydraCollectionBaseSchema';
     private const BASE_PROP = [
         'type' => 'string',
     ];
@@ -46,7 +46,8 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         '@id' => self::BASE_PROP,
         '@type' => self::BASE_PROP,
     ];
-    private const ITEM_BASE_SCHEMA = [
+    // This is the base for both input and output, and serves as the complete definition for an INPUT schema.
+    private const BASE_ITEM_SCHEMA = [
         'type' => 'object',
         'properties' => [
             '@context' => [
@@ -70,10 +71,10 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             ],
         ] + self::BASE_PROPS,
     ];
-
-    private const ITEM_BASE_SCHEMA_OUTPUT = [
+    // The OUTPUT schema is the base schema with the addition of required fields.
+    private const OUTPUT_ITEM_SCHEMA = [
         'required' => ['@id', '@type'],
-    ] + self::ITEM_BASE_SCHEMA;
+    ] + self::BASE_ITEM_SCHEMA;
 
     /**
      * @var array<string, true>
@@ -104,9 +105,10 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
      */
     public function buildSchema(string $className, string $format = 'jsonld', string $type = Schema::TYPE_OUTPUT, ?Operation $operation = null, ?Schema $schema = null, ?array $serializerContext = null, bool $forceCollection = false): Schema
     {
-        if ('jsonld' !== $format || 'input' === $type) {
+        if ('jsonld' !== $format) {
             return $this->schemaFactory->buildSchema($className, $format, $type, $operation, $schema, $serializerContext, $forceCollection);
         }
+
         if (!$this->isResourceClass($className)) {
             $operation = null;
             $inputOrOutputClass = null;
@@ -140,10 +142,11 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 return $schema;
             }
 
-            $baseName = Schema::TYPE_OUTPUT === $type ? self::ITEM_BASE_SCHEMA_NAME : self::ITEM_BASE_SCHEMA_OUTPUT_NAME;
+            $isOutput = Schema::TYPE_OUTPUT === $type;
+            $baseName = $isOutput ? self::OUTPUT_ITEM_SCHEMA_NAME : self::INPUT_ITEM_SCHEMA_NAME;
 
             if (!isset($definitions[$baseName])) {
-                $definitions[$baseName] = Schema::TYPE_OUTPUT === $type ? self::ITEM_BASE_SCHEMA_OUTPUT : self::ITEM_BASE_SCHEMA;
+                $definitions[$baseName] = $isOutput ? self::OUTPUT_ITEM_SCHEMA : self::BASE_ITEM_SCHEMA;
             }
 
             $allOf = new \ArrayObject(['allOf' => [
@@ -171,7 +174,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
         $hydraPrefix = $this->getHydraPrefix($serializerContext + $this->defaultContext);
 
-        if (!isset($definitions[self::COLLECTION_BASE_SCHEMA_NAME])) {
+        if (!isset($definitions[self::COLLECTION_SCHEMA_NAME])) {
             switch ($schema->getVersion()) {
                 // JSON Schema + OpenAPI 3.1
                 case Schema::VERSION_OPENAPI:
@@ -184,7 +187,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                     break;
             }
 
-            $definitions[self::COLLECTION_BASE_SCHEMA_NAME] = [
+            $definitions[self::COLLECTION_SCHEMA_NAME] = [
                 'type' => 'object',
                 'required' => [
                     $hydraPrefix.'member',
@@ -261,7 +264,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         $schema['type'] = 'object';
         $schema['description'] = "$definitionName collection.";
         $schema['allOf'] = [
-            ['$ref' => $prefix.self::COLLECTION_BASE_SCHEMA_NAME],
+            ['$ref' => $prefix.self::COLLECTION_SCHEMA_NAME],
             [
                 'type' => 'object',
                 'properties' => [
