@@ -104,7 +104,15 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
      */
     public function buildSchema(string $className, string $format = 'jsonld', string $type = Schema::TYPE_OUTPUT, ?Operation $operation = null, ?Schema $schema = null, ?array $serializerContext = null, bool $forceCollection = false): Schema
     {
-        if ('jsonld' !== $format || 'input' === $type) {
+        // The input schema must not include `@id` or `@type` as required fields, so it should be a pure JSON schema.
+        // Strictly speaking, it is possible to include `@id` or `@context` in the input,
+        // but the generated JSON Schema does not include `"additionalProperties": false` by default,
+        // so it is possible to include `@id` or `@context` in the input even if the input schema is a JSON schema.
+        if (Schema::TYPE_INPUT === $type) {
+            $format = 'json';
+        }
+
+        if ('jsonld' !== $format) {
             return $this->schemaFactory->buildSchema($className, $format, $type, $operation, $schema, $serializerContext, $forceCollection);
         }
         if (!$this->isResourceClass($className)) {
