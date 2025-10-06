@@ -141,7 +141,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
 
-        $this->assertEquals($json['definitions']['SaveProduct.jsonld']['properties']['codes']['items']['$ref'], '#/definitions/ProductCode.jsonld');
+        $this->assertEquals($json['definitions']['SaveProduct']['properties']['codes']['items']['$ref'], '#/definitions/ProductCode');
     }
 
     /**
