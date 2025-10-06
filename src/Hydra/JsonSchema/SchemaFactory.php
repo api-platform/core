@@ -37,7 +37,6 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     use SchemaUriPrefixTrait;
 
     private const ITEM_BASE_SCHEMA_NAME = 'HydraItemBaseSchema';
-    private const ITEM_BASE_SCHEMA_OUTPUT_NAME = 'HydraOutputBaseSchema';
     private const COLLECTION_BASE_SCHEMA_NAME = 'HydraCollectionBaseSchema';
     private const BASE_PROP = [
         'type' => 'string',
@@ -69,11 +68,8 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 ],
             ],
         ] + self::BASE_PROPS,
-    ];
-
-    private const ITEM_BASE_SCHEMA_OUTPUT = [
         'required' => ['@id', '@type'],
-    ] + self::ITEM_BASE_SCHEMA;
+    ];
 
     /**
      * @var array<string, true>
@@ -148,10 +144,10 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 return $schema;
             }
 
-            $baseName = Schema::TYPE_OUTPUT === $type ? self::ITEM_BASE_SCHEMA_OUTPUT_NAME : self::ITEM_BASE_SCHEMA_NAME;
+            $baseName = self::ITEM_BASE_SCHEMA_NAME;
 
             if (!isset($definitions[$baseName])) {
-                $definitions[$baseName] = Schema::TYPE_OUTPUT === $type ? self::ITEM_BASE_SCHEMA_OUTPUT : self::ITEM_BASE_SCHEMA;
+                $definitions[$baseName] = self::ITEM_BASE_SCHEMA;
             }
 
             $allOf = new \ArrayObject(['allOf' => [
