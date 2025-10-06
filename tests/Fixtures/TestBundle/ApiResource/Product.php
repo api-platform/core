@@ -15,6 +15,8 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[Get(
     types: ['https://schema.org/Product'],
@@ -23,12 +25,19 @@ use ApiPlatform\Metadata\Get;
     provider: [self::class, 'provide'],
     jsonStream: true
 )]
+#[GetCollection(
+    types: ['https://schema.org/Product'],
+    uriTemplate: '/json-stream-products',
+    provider: [self::class, 'provide'],
+    normalizationContext: ['groups' => ['with_aggregate_rating'], 'hydra_prefix' => false]
+)]
 class Product
 {
     #[ApiProperty(identifier: true)]
     public string $code;
 
     #[ApiProperty(genId: false, iris: ['https://schema.org/aggregateRating'])]
+    #[Groups(['with_aggregate_rating'])]
     public AggregateRating $aggregateRating;
 
     #[ApiProperty(property: 'name', iris: ['https://schema.org/name'])]

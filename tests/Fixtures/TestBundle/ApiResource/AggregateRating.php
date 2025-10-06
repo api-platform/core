@@ -15,13 +15,16 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(types: 'https://schema.org/AggregateRating', operations: [])]
 final class AggregateRating
 {
     public function __construct(
+        #[Groups(['with_aggregate_rating'])]
         #[ApiProperty(iris: ['https://schema.org/ratingValue'])]
         public float $ratingValue,
+        #[Groups(['with_aggregate_rating'])]
         #[ApiProperty(iris: ['https://schema.org/reviewCount'])]
         public int $reviewCount,
     ) {

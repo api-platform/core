@@ -17,9 +17,12 @@ use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Symfony\Bundle\Test\Constraint\MatchesJsonSchema;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\AggregateRating;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\Book;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5501\BrokenDocs;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5501\Related;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Product;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ResourceWithEnumProperty;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5793\BagOfTests;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5793\TestEntity;
@@ -61,6 +64,8 @@ class JsonSchemaTest extends ApiTestCase
             Book::class,
             JsonSchemaResource::class,
             JsonSchemaResourceRelated::class,
+            Product::class,
+            AggregateRating::class,
         ];
     }
 
@@ -211,5 +216,11 @@ class JsonSchemaTest extends ApiTestCase
 
         $schema = $this->schemaFactory->buildSchema(JsonSchemaResource::class, 'json', Schema::TYPE_OUTPUT);
         $this->assertTrue($schema['definitions']['Resource']['properties']['resourceRelated']['readOnly'] ?? false);
+    }
+
+    public function testGenIdFalse()
+    {
+        $schema = $this->schemaFactory->buildSchema(Product::class, 'jsonld', Schema::TYPE_OUTPUT, $this->operationMetadataFactory->create('_api_/json-stream-products_get_collection'));
+        $this->assertThat(['member' => [['aggregateRating' => ['ratingValue' => '1.0', 'reviewCount' => 1]]]], new MatchesJsonSchema($schema));
     }
 }

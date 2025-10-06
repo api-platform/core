@@ -245,21 +245,18 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             }
 
             $subSchemaFactory = $this->schemaFactory ?: $this;
-            $subSchema = $subSchemaFactory->buildSchema($className, $format, $parentType, null, $subSchema, $serializerContext + [self::FORCE_SUBSCHEMA => true], false);
+            $subSchema = $subSchemaFactory->buildSchema(
+                $className,
+                $format,
+                $parentType,
+                null,
+                $subSchema,
+                $serializerContext + [self::FORCE_SUBSCHEMA => true, 'gen_id' => $propertyMetadata->getGenId() ?? true],
+                false,
+            );
+
             if (!isset($subSchema['$ref'])) {
                 continue;
-            }
-
-            if (false === $propertyMetadata->getGenId()) {
-                $subDefinitionName = $this->definitionNameFactory->create($className, $format, $className, null, $serializerContext);
-
-                if (isset($subSchema->getDefinitions()[$subDefinitionName])) {
-                    // @see https://github.com/api-platform/core/issues/7162
-                    // Need to rebuild the definition without @id property and set it back to the sub-schema
-                    $subSchemaDefinition = $subSchema->getDefinitions()[$subDefinitionName]->getArrayCopy();
-                    unset($subSchemaDefinition['properties']['@id']);
-                    $subSchema->getDefinitions()[$subDefinitionName] = new \ArrayObject($subSchemaDefinition);
-                }
             }
 
             if ($isCollection) {
@@ -371,16 +368,17 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 $subSchemaInstance = new Schema($version);
                 $subSchemaInstance->setDefinitions($schema->getDefinitions());
                 $subSchemaFactory = $this->schemaFactory ?: $this;
-                $subSchemaResult = $subSchemaFactory->buildSchema($className, $format, $parentType, null, $subSchemaInstance, $serializerContext + [self::FORCE_SUBSCHEMA => true], false);
+                $subSchemaResult = $subSchemaFactory->buildSchema(
+                    $className,
+                    $format,
+                    $parentType,
+                    null,
+                    $subSchemaInstance,
+                    $serializerContext + [self::FORCE_SUBSCHEMA => true, 'gen_id' => $propertyMetadata->getGenId() ?? true],
+                    false,
+                );
                 if (!isset($subSchemaResult['$ref'])) {
                     continue;
-                }
-
-                if (false === $propertyMetadata->getGenId()) {
-                    $subDefinitionName = $this->definitionNameFactory->create($className, $format, $className, null, $serializerContext);
-                    if (isset($subSchemaResult->getDefinitions()[$subDefinitionName]['properties']['@id'])) {
-                        unset($subSchemaResult->getDefinitions()[$subDefinitionName]['properties']['@id']);
-                    }
                 }
 
                 if ($isCollection) {
