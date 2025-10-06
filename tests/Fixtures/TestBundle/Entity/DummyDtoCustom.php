@@ -35,7 +35,7 @@ use Doctrine\ORM\Mapping as ORM;
         new Delete(),
         new Post(input: CustomInputDto::class, processor: CustomInputDtoProcessor::class),
         new GetCollection(),
-        new GetCollection(output: CustomOutputDto::class, uriTemplate: 'dummy_dto_custom_output', provider: CustomOutputDtoProvider::class),
+        new GetCollection(output: CustomOutputDto::class, uriTemplate: 'dummy_dto_custom_output', provider: CustomOutputDtoProvider::class, name: 'dummy_dto_custom_output_collection'),
         new Get(output: CustomOutputDto::class, uriTemplate: 'dummy_dto_custom_output/{id}', provider: CustomOutputDtoProvider::class),
         new Post(output: false, uriTemplate: 'dummy_dto_custom_post_without_output'),
     ]
