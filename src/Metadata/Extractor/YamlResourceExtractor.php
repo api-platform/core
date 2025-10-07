@@ -276,7 +276,6 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             $resource['openapi']['parameters'] = $parameters;
         }
 
-
         return new OpenApiOperation(...$resource['openapi']);
     }
 
