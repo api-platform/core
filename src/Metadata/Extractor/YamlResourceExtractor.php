@@ -236,13 +236,12 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                 'externalDocs' => new ExternalDocumentation(description: $value['description'] ?? '', url: $value['url'] ?? ''),
                 'requestBody' => new RequestBody(description: $value['description'] ?? '', content: isset($value['content']) ? new \ArrayObject($value['content'] ?? []) : null, required: $value['required'] ?? false),
                 'callbacks' => new \ArrayObject($value ?? []),
-                'responses' => array_map(fn (array $response): Response => 
-                    new Response(
-                        description: $response['description'] ?? '',
-                        headers: isset($response['headers']) ? new \ArrayObject($response['headers']) : null,
-                        content: isset($response['content']) ? new \ArrayObject($response['content']) : null,
-                        links: isset($response['links']) ? new \ArrayObject($response['links']) : null
-                    ), $value),
+                'responses' => array_map(fn (array $response): Response => new Response(
+                    description: $response['description'] ?? '',
+                    headers: isset($response['headers']) ? new \ArrayObject($response['headers']) : null,
+                    content: isset($response['content']) ? new \ArrayObject($response['content']) : null,
+                    links: isset($response['links']) ? new \ArrayObject($response['links']) : null
+                ), $value),
                 default => $value,
             };
 
