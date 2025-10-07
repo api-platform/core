@@ -37,7 +37,6 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     use SchemaUriPrefixTrait;
 
     private const ITEM_BASE_SCHEMA_NAME = 'HydraItemBaseSchema';
-    private const ITEM_BASE_SCHEMA_OUTPUT_NAME = 'HydraOutputBaseSchema';
     private const COLLECTION_BASE_SCHEMA_NAME = 'HydraCollectionBaseSchema';
     private const BASE_PROP = [
         'type' => 'string',
@@ -69,11 +68,8 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 ],
             ],
         ] + self::BASE_PROPS,
-    ];
-
-    private const ITEM_BASE_SCHEMA_OUTPUT = [
         'required' => ['@id', '@type'],
-    ] + self::ITEM_BASE_SCHEMA;
+    ];
 
     /**
      * @var array<string, true>
@@ -104,7 +100,15 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
      */
     public function buildSchema(string $className, string $format = 'jsonld', string $type = Schema::TYPE_OUTPUT, ?Operation $operation = null, ?Schema $schema = null, ?array $serializerContext = null, bool $forceCollection = false): Schema
     {
-        if ('jsonld' !== $format || 'input' === $type) {
+        // The input schema must not include `@id` or `@type` as required fields, so it should be a pure JSON schema.
+        // Strictly speaking, it is possible to include `@id` or `@context` in the input,
+        // but the generated JSON Schema does not include `"additionalProperties": false` by default,
+        // so it is possible to include `@id` or `@context` in the input even if the input schema is a JSON schema.
+        if (Schema::TYPE_INPUT === $type) {
+            $format = 'json';
+        }
+
+        if ('jsonld' !== $format) {
             return $this->schemaFactory->buildSchema($className, $format, $type, $operation, $schema, $serializerContext, $forceCollection);
         }
         if (!$this->isResourceClass($className)) {
@@ -140,10 +144,10 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 return $schema;
             }
 
-            $baseName = Schema::TYPE_OUTPUT === $type ? self::ITEM_BASE_SCHEMA_NAME : self::ITEM_BASE_SCHEMA_OUTPUT_NAME;
+            $baseName = self::ITEM_BASE_SCHEMA_NAME;
 
             if (!isset($definitions[$baseName])) {
-                $definitions[$baseName] = Schema::TYPE_OUTPUT === $type ? self::ITEM_BASE_SCHEMA_OUTPUT : self::ITEM_BASE_SCHEMA;
+                $definitions[$baseName] = self::ITEM_BASE_SCHEMA;
             }
 
             $allOf = new \ArrayObject(['allOf' => [
