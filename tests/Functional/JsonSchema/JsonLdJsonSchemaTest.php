@@ -14,7 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional\JsonSchema;
 
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
+use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7426\Boat;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5793\BagOfTests;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6212\Nest;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
@@ -27,6 +29,7 @@ final class JsonLdJsonSchemaTest extends ApiTestCase
     use SetupClassResourcesTrait;
 
     protected SchemaFactoryInterface $schemaFactory;
+    protected OperationMetadataFactoryInterface $operationMetadataFactory;
 
     protected static ?bool $alwaysBootKernel = false;
 
@@ -35,13 +38,14 @@ final class JsonLdJsonSchemaTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [RelatedDummy::class, ThirdLevel::class, RelatedToDummyFriend::class];
+        return [RelatedDummy::class, ThirdLevel::class, RelatedToDummyFriend::class, Boat::class];
     }
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->schemaFactory = self::getContainer()->get('api_platform.json_schema.schema_factory');
+        $this->operationMetadataFactory = self::getContainer()->get('api_platform.metadata.operation.metadata_factory');
     }
 
     public function testSubSchemaJsonLd(): void
@@ -168,5 +172,12 @@ final class JsonLdJsonSchemaTest extends ApiTestCase
         $this->assertContains(['type' => 'null'], $schema['definitions']['Nest.jsonld']['allOf'][1]['properties']['owner']['anyOf']);
 
         $this->assertArrayHasKey('Nest.jsonld', $schema['definitions']);
+    }
+
+    public function testSchemaWithoutGetOperation(): void
+    {
+        $schema = $this->schemaFactory->buildSchema(Boat::class, 'jsonld', 'output', $this->operationMetadataFactory->create('_api_/boats{._format}_get_collection'));
+
+        $this->assertEquals(['$ref' => '#/definitions/HydraItemBaseSchema'], $schema->getDefinitions()['Boat.jsonld-boat.read']['allOf'][0]);
     }
 }

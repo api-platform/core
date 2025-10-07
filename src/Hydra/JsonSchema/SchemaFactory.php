@@ -117,68 +117,34 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             $format = 'json';
         }
 
-        if ('jsonld' !== $format) {
+        if ('jsonld' !== $format || !$this->isResourceClass($className)) {
             return $this->schemaFactory->buildSchema($className, $format, $type, $operation, $schema, $serializerContext, $forceCollection);
         }
-        if (!$this->isResourceClass($className)) {
-            $operation = null;
-            $inputOrOutputClass = null;
-            $serializerContext ??= [];
-        } else {
-            $operation = $this->findOperation($className, $type, $operation, $serializerContext, $format);
-            $inputOrOutputClass = $this->findOutputClass($className, $type, $operation, $serializerContext);
-            $serializerContext ??= $this->getSerializerContext($operation, $type);
-        }
+
+        $operation = $this->findOperation($className, $type, $operation, $serializerContext, $format);
+        $inputOrOutputClass = $this->findOutputClass($className, $type, $operation, $serializerContext);
+        $serializerContext ??= $this->getSerializerContext($operation, $type);
 
         if (null === $inputOrOutputClass) {
             // input or output disabled
             return $this->schemaFactory->buildSchema($className, $format, $type, $operation, $schema, $serializerContext, $forceCollection);
         }
 
-        $definitionName = $this->definitionNameFactory->create($className, $format, $inputOrOutputClass, $operation, $serializerContext);
-
-        // JSON-LD is slightly different then JSON:API or HAL
-        // All the references that are resources must also be in JSON-LD therefore combining
-        // the HydraItemBaseSchema and the JSON schema is harder (unless we loop again through all relationship)
-        // The less intensive path is to compute the jsonld schemas, then to combine in an allOf
         $schema = $this->schemaFactory->buildSchema($className, 'jsonld', $type, $operation, $schema, $serializerContext, $forceCollection);
         $definitions = $schema->getDefinitions();
-
         $prefix = $this->getSchemaUriPrefix($schema->getVersion());
         $collectionKey = $schema->getItemsDefinitionKey();
-        $key = $schema->getRootDefinitionKey() ?? $collectionKey;
 
         if (!$collectionKey) {
-            if ($this->transformed[$definitionName] ?? false) {
-                return $schema;
+            $definitionName = $schema->getRootDefinitionKey() ?? $this->definitionNameFactory->create($className, $format, $inputOrOutputClass, $operation, $serializerContext);
+            $this->decorateItemDefinition($definitionName, $definitions, $prefix, $type, $serializerContext);
+
+            if (isset($definitions[$definitionName])) {
+                $currentDefinitions = $schema->getDefinitions();
+                $schema->exchangeArray([]); // Clear the schema
+                $schema['$ref'] = $prefix.$definitionName;
+                $schema->setDefinitions($currentDefinitions);
             }
-
-            $hasNoId = Schema::TYPE_OUTPUT === $type && false === ($serializerContext['gen_id'] ?? true);
-            $baseName = self::ITEM_BASE_SCHEMA_NAME;
-
-            if ($hasNoId) {
-                $baseName = self::ITEM_WITHOUT_ID_BASE_SCHEMA_NAME;
-            }
-
-            if (!isset($definitions[$baseName])) {
-                $definitions[$baseName] = $hasNoId ? self::ITEM_BASE_SCHEMA_WITHOUT_ID : self::ITEM_BASE_SCHEMA_WITH_ID;
-            }
-
-            $allOf = new \ArrayObject(['allOf' => [
-                ['$ref' => $prefix.$baseName],
-                $definitions[$key],
-            ]]);
-
-            if (isset($definitions[$key]['description'])) {
-                $allOf['description'] = $definitions[$key]['description'];
-            }
-
-            $definitions[$definitionName] = $allOf;
-            unset($definitions[$definitionName]['allOf'][1]['description']);
-
-            $schema['$ref'] = $prefix.$definitionName;
-
-            $this->transformed[$definitionName] = true;
 
             return $schema;
         }
@@ -206,11 +172,11 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 'type' => 'object',
                 'required' => [
                     $hydraPrefix.'member',
-                    'items' => ['type' => 'object'],
                 ],
                 'properties' => [
                     $hydraPrefix.'member' => [
                         'type' => 'array',
+                        'items' => ['type' => 'object'],
                     ],
                     $hydraPrefix.'totalItems' => [
                         'type' => 'integer',
@@ -276,6 +242,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             ];
         }
 
+        $definitionName = $this->definitionNameFactory->create($className, $format, $inputOrOutputClass, $operation, $serializerContext);
         $schema['type'] = 'object';
         $schema['description'] = "$definitionName collection.";
         $schema['allOf'] = [
@@ -293,6 +260,10 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
         unset($schema['items']);
 
+        if (isset($definitions[$collectionKey])) {
+            $this->decorateItemDefinition($collectionKey, $definitions, $prefix, $type, $serializerContext);
+        }
+
         return $schema;
     }
 
@@ -301,5 +272,36 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         if ($this->schemaFactory instanceof SchemaFactoryAwareInterface) {
             $this->schemaFactory->setSchemaFactory($schemaFactory);
         }
+    }
+
+    private function decorateItemDefinition(string $definitionName, \ArrayObject $definitions, string $prefix, string $type, ?array $serializerContext): void
+    {
+        if (!isset($definitions[$definitionName]) || ($this->transformed[$definitionName] ?? false)) {
+            return;
+        }
+
+        $hasNoId = Schema::TYPE_OUTPUT === $type && false === ($serializerContext['gen_id'] ?? true);
+        $baseName = self::ITEM_BASE_SCHEMA_NAME;
+        if ($hasNoId) {
+            $baseName = self::ITEM_WITHOUT_ID_BASE_SCHEMA_NAME;
+        }
+
+        if (!isset($definitions[$baseName])) {
+            $definitions[$baseName] = $hasNoId ? self::ITEM_BASE_SCHEMA_WITHOUT_ID : self::ITEM_BASE_SCHEMA_WITH_ID;
+        }
+
+        $allOf = new \ArrayObject(['allOf' => [
+            ['$ref' => $prefix.$baseName],
+            $definitions[$definitionName],
+        ]]);
+
+        if (isset($definitions[$definitionName]['description'])) {
+            $allOf['description'] = $definitions[$definitionName]['description'];
+        }
+
+        $definitions[$definitionName] = $allOf;
+        unset($definitions[$definitionName]['allOf'][1]['description']);
+
+        $this->transformed[$definitionName] = true;
     }
 }
