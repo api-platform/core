@@ -20,6 +20,7 @@ use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
 use ApiPlatform\Metadata\Operation;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\QueryBuilder;
 
 final class FreeTextQueryFilter implements FilterInterface, ManagerRegistryAwareInterface, LoggerAwareInterface
@@ -46,14 +47,26 @@ final class FreeTextQueryFilter implements FilterInterface, ManagerRegistryAware
         }
 
         $parameter = $context['parameter'];
+        $qb = clone $queryBuilder;
+        $qb->resetDQLPart('where');
+        $qb->setParameters(new ArrayCollection());
         foreach ($this->properties ?? $parameter->getProperties() ?? [] as $property) {
             $this->filter->apply(
-                $queryBuilder,
+                $qb,
                 $queryNameGenerator,
                 $resourceClass,
                 $operation,
                 ['parameter' => $parameter->withProperty($property)] + $context
             );
         }
+
+        $queryBuilder->andWhere($qb->getDQLPart('where'));
+        $parameters = $queryBuilder->getParameters();
+
+        foreach ($qb->getParameters() as $p) {
+            $parameters->add($p);
+        }
+
+        $queryBuilder->setParameters($parameters);
     }
 }
