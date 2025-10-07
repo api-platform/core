@@ -20,6 +20,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Chicken;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ChickenCoop;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
+use Doctrine\Bundle\DoctrineBundle\DataCollector\DoctrineDataCollector;
 use Doctrine\ODM\MongoDB\MongoDBException;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -60,6 +61,22 @@ final class OrFilterTest extends ApiTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains(['totalItems' => $expectedCount]);
+    }
+
+    public function testOrFilterWithAnd(): void
+    {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped();
+        }
+        $client = self::createClient();
+        $client->enableProfiler();
+        $client->request('GET', '/chickens?autocomplete=978020137962&chickenCoop=/chicken_coops/2');
+        $profile = $client->getProfile();
+        $this->assertResponseIsSuccessful();
+
+        /** @var DoctrineDataCollector */
+        $db = $profile->getCollector('db');
+        $this->assertStringContainsString('WHERE c1_.id = ? AND (c2_.name = ? OR c2_.ean = ?))', end($db->getQueries()['default'])['sql']);
     }
 
     public static function orFilterDataProvider(): \Generator
