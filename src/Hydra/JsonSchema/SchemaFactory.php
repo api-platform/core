@@ -37,7 +37,9 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     use SchemaUriPrefixTrait;
 
     private const ITEM_BASE_SCHEMA_NAME = 'HydraItemBaseSchema';
+    private const ITEM_WITHOUT_ID_BASE_SCHEMA_NAME = 'HydraItemBaseSchemaWithoutId';
     private const COLLECTION_BASE_SCHEMA_NAME = 'HydraCollectionBaseSchema';
+
     private const BASE_PROP = [
         'type' => 'string',
     ];
@@ -68,7 +70,14 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 ],
             ],
         ] + self::BASE_PROPS,
+    ];
+
+    private const ITEM_BASE_SCHEMA_WITH_ID = self::ITEM_BASE_SCHEMA + [
         'required' => ['@id', '@type'],
+    ];
+
+    private const ITEM_BASE_SCHEMA_WITHOUT_ID = self::ITEM_BASE_SCHEMA + [
+        'required' => ['@type'],
     ];
 
     /**
@@ -144,10 +153,15 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 return $schema;
             }
 
+            $hasNoId = Schema::TYPE_OUTPUT === $type && false === ($serializerContext['gen_id'] ?? true);
             $baseName = self::ITEM_BASE_SCHEMA_NAME;
 
+            if ($hasNoId) {
+                $baseName = self::ITEM_WITHOUT_ID_BASE_SCHEMA_NAME;
+            }
+
             if (!isset($definitions[$baseName])) {
-                $definitions[$baseName] = self::ITEM_BASE_SCHEMA;
+                $definitions[$baseName] = $hasNoId ? self::ITEM_BASE_SCHEMA_WITHOUT_ID : self::ITEM_BASE_SCHEMA_WITH_ID;
             }
 
             $allOf = new \ArrayObject(['allOf' => [

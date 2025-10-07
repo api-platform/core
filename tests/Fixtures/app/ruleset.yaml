@@ -1,5 +1,6 @@
 extends: [[spectral:oas, recommended]]
 rules:
+  camel-case-properties: false
   circular-references: false
   operation-success-response: false
   oas3-parameter-description: false

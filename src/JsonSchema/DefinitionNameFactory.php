@@ -63,6 +63,10 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
             $name = $groups ? \sprintf('%s-%s', $prefix, implode('_', $groups)) : $prefix;
         }
 
+        if (false === ($serializerContext['gen_id'] ?? true)) {
+            $name .= '_noid';
+        }
+
         return $this->encodeDefinitionName($name);
     }
 
