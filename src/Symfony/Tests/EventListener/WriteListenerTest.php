@@ -83,7 +83,14 @@ class WriteListenerTest extends TestCase
         $request = new Request([], [], ['_api_operation' => $operation, '_api_operation_name' => 'operation', '_api_resource_class' => \stdClass::class, '_api_uri_variables' => $uriVariables, 'previous_data' => $originalData]);
         $processor = $this->createMock(ProcessorInterface::class);
         $processor->expects($this->once())->method('process')
-            ->with($controllerResult, $operation, $uriVariables, ['request' => $request, 'uri_variables' => $uriVariables, 'resource_class' => \stdClass::class, 'previous_data' => $originalData])->willReturn($returnValue);
+            ->with($controllerResult, $operation, $uriVariables, [
+                'request' => $request,
+                'uri_variables' => $uriVariables,
+                'resource_class' => \stdClass::class,
+                'previous_data' => $originalData,
+                'read_data' => null,
+                'data' => null,
+            ])->willReturn($returnValue);
         $metadata = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
         $listener = new WriteListener($processor, $metadata);
         $listener->onKernelView(
