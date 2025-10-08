@@ -35,11 +35,12 @@
         "symfony/translation-contracts": "^3.0"
     },
     "require-dev": {
-        "api-platform/validator": "^4.1",
         "api-platform/serializer": "^4.1",
-        "symfony/type-info": "^7.3",
+        "api-platform/validator": "^4.1",
         "phpunit/phpunit": "11.5.x-dev",
         "symfony/http-foundation": "^6.4 || ^7.0",
+        "symfony/object-mapper": "^7.3",
+        "symfony/type-info": "^7.3",
         "symfony/web-link": "^6.4 || ^7.1",
         "willdurand/negotiation": "^3.1"
     },
