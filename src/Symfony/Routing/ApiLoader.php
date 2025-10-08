@@ -127,7 +127,10 @@ final class ApiLoader extends Loader
      */
     private function loadExternalFiles(RouteCollection $routeCollection): void
     {
-        $routeCollection->addCollection($this->fileLoader->load('docs.php'));
+        if ($this->docsEnabled || isset($this->formats['jsonld'])) {
+            $routeCollection->addCollection($this->fileLoader->load('docs.php'));
+        }
+
         $routeCollection->addCollection($this->fileLoader->load('genid.php'));
         $routeCollection->addCollection($this->fileLoader->load('errors.php'));
 
