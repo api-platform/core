@@ -25,6 +25,7 @@ use ApiPlatform\OpenApi\Model\ExternalDocumentation;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use ApiPlatform\OpenApi\Model\RequestBody;
+use ApiPlatform\OpenApi\Model\Response;
 use ApiPlatform\State\OptionsInterface;
 use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\WebLink\Link;
@@ -204,12 +205,12 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
 
         if (isset($openapi->responses->response)) {
             foreach ($openapi->responses->response as $response) {
-                $data['responses'][(string) $response->attributes()->status] = [
-                    'description' => $this->phpize($response, 'description', 'string'),
-                    'content' => isset($response->content->values) ? $this->buildValues($response->content->values) : null,
-                    'headers' => isset($response->headers->values) ? $this->buildValues($response->headers->values) : null,
-                    'links' => isset($response->links->values) ? $this->buildValues($response->links->values) : null,
-                ];
+                $data['responses'][(string) $response->attributes()->status] = new Response(
+                    description: $this->phpize($response, 'description', 'string'),
+                    content: isset($response->content->values) ? new \ArrayObject($this->buildValues($response->content->values)) : null,
+                    headers: isset($response->headers->values) ? new \ArrayObject($this->buildValues($response->headers->values)) : null,
+                    links: isset($response->links->values) ? new \ArrayObject($this->buildValues($response->links->values)) : null,
+                );
             }
         }
 

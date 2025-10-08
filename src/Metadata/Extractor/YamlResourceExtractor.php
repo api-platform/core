@@ -25,6 +25,7 @@ use ApiPlatform\OpenApi\Model\ExternalDocumentation;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use ApiPlatform\OpenApi\Model\RequestBody;
+use ApiPlatform\OpenApi\Model\Response;
 use ApiPlatform\State\OptionsInterface;
 use Symfony\Component\WebLink\Link;
 use Symfony\Component\Yaml\Exception\ParseException;
@@ -235,6 +236,12 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                 'externalDocs' => new ExternalDocumentation(description: $value['description'] ?? '', url: $value['url'] ?? ''),
                 'requestBody' => new RequestBody(description: $value['description'] ?? '', content: isset($value['content']) ? new \ArrayObject($value['content'] ?? []) : null, required: $value['required'] ?? false),
                 'callbacks' => new \ArrayObject($value ?? []),
+                'responses' => array_map(fn (array $response): Response => new Response(
+                    description: $response['description'] ?? '',
+                    headers: isset($response['headers']) ? new \ArrayObject($response['headers']) : null,
+                    content: isset($response['content']) ? new \ArrayObject($response['content']) : null,
+                    links: isset($response['links']) ? new \ArrayObject($response['links']) : null
+                ), $value),
                 default => $value,
             };
 
