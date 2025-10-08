@@ -236,6 +236,8 @@ final class Client implements HttpClientInterface
 
     public function loginUser(UserInterface $user, string $firewallContext = 'main'): self
     {
+        $this->kernelBrowser->getKernel()->boot();
+
         $this->kernelBrowser->loginUser($user, $firewallContext);
 
         return $this;
