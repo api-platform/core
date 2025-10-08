@@ -38,6 +38,7 @@ final class ObjectMapperProcessor implements ProcessorInterface
         if (
             !$this->objectMapper
             || !$operation->canWrite()
+            || null === $data
             || !is_a($data, $operation->getClass(), true)
             || !(new \ReflectionClass($operation->getClass()))->getAttributes(Map::class)
         ) {
