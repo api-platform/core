@@ -127,7 +127,10 @@ final class ApiLoader extends Loader
      */
     private function loadExternalFiles(RouteCollection $routeCollection): void
     {
-        $routeCollection->addCollection($this->fileLoader->load('docs.xml'));
+        if ($this->docsEnabled) {
+            $routeCollection->addCollection($this->fileLoader->load('docs.xml'));
+        }
+
         $routeCollection->addCollection($this->fileLoader->load('genid.xml'));
         $routeCollection->addCollection($this->fileLoader->load('errors.xml'));
 
