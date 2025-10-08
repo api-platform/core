@@ -135,6 +135,8 @@ class ConfigurationTest extends TestCase
             'elasticsearch' => [
                 'enabled' => false,
                 'hosts' => [],
+                'ssl_ca_bundle' => null,
+                'ssl_verification' => true,
             ],
             'oauth' => [
                 'enabled' => false,
@@ -438,5 +440,56 @@ class ConfigurationTest extends TestCase
         ]);
 
         $this->assertEquals(['name' => 'test3', 'description' => null], $config['openapi']['tags'][1]);
+    }
+
+    public function testElasticsearchSslCaBundleConfiguration(): void
+    {
+        $config = $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'elasticsearch' => [
+                    'enabled' => true,
+                    'hosts' => ['https://localhost:9200'],
+                    'ssl_ca_bundle' => '/path/to/ca-bundle.crt',
+                ],
+            ],
+        ]);
+
+        $this->assertTrue($config['elasticsearch']['enabled']);
+        $this->assertSame('/path/to/ca-bundle.crt', $config['elasticsearch']['ssl_ca_bundle']);
+        $this->assertTrue($config['elasticsearch']['ssl_verification']);
+    }
+
+    public function testElasticsearchSslVerificationDisabled(): void
+    {
+        $config = $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'elasticsearch' => [
+                    'enabled' => true,
+                    'hosts' => ['https://localhost:9200'],
+                    'ssl_verification' => false,
+                ],
+            ],
+        ]);
+
+        $this->assertTrue($config['elasticsearch']['enabled']);
+        $this->assertFalse($config['elasticsearch']['ssl_verification']);
+        $this->assertNull($config['elasticsearch']['ssl_ca_bundle']);
+    }
+
+    public function testElasticsearchSslCaBundleAndVerificationDisabledMutuallyExclusive(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "ssl_ca_bundle" and "ssl_verification: false" options cannot be used together. Either provide a CA bundle path or disable SSL verification, not both.');
+
+        $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'elasticsearch' => [
+                    'enabled' => true,
+                    'hosts' => ['https://localhost:9200'],
+                    'ssl_ca_bundle' => '/path/to/ca-bundle.crt',
+                    'ssl_verification' => false,
+                ],
+            ],
+        ]);
     }
 }
