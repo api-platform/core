@@ -99,6 +99,7 @@ final class ReadProvider implements ProviderInterface, StopwatchAwareInterface
         }
 
         $request?->attributes->set('data', $data);
+        $request?->attributes->set('read_data', $data); // data may be lost when deserialization occurs, especially when using an Input see DeserializeProvider
         $request?->attributes->set('previous_data', $this->clone($data));
 
         $this->stopwatch?->stop('api_platform.provider.read');

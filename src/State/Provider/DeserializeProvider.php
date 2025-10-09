@@ -126,6 +126,8 @@ final class DeserializeProvider implements ProviderInterface, StopwatchAwareInte
 
         $this->stopwatch?->stop('api_platform.provider.deserialize');
 
+        $request->attributes->set('data', $data);
+
         return $data;
     }
 

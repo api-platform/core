@@ -81,7 +81,9 @@ final class WriteListener
             'request' => $request,
             'uri_variables' => $uriVariables,
             'resource_class' => $operation->getClass(),
-            'previous_data' => false === $operation->canRead() ? null : $request->attributes->get('previous_data'),
+            'previous_data' => false === $operation->canRead() ? null : $request->attributes->get('previous_data'), // this is a clone
+            'read_data' => false === $operation->canRead() ? null : $request->attributes->get('read_data'), // this is what we read
+            'data' => false === $operation->canRead() ? null : $request->attributes->get('data'), // this should be the same as getControllerResult but is the result of deserialization
         ]);
 
         if ($data) {
