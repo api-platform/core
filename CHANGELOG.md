@@ -1,5 +1,24 @@
 # Changelog
 
+## v4.2.2
+
+### Bug fixes
+
+* [0b8237918](https://github.com/api-platform/core/commit/0b8237918774e4765f35f13521a18d4c36ac0ea7) fix(state): object mapper with input different (#7435)
+* [1094a52d6](https://github.com/api-platform/core/commit/1094a52d68ef8d0982c09f978a0d5c1b2da6734b) fix(metadata): allow description and other fields to be override seperately (#7442)
+* [133028e38](https://github.com/api-platform/core/commit/133028e38a2135725bdc7463c7fe2d013ca81afb) fix(state): object mapper on delete operation (#7447)
+* [1a4636200](https://github.com/api-platform/core/commit/1a46362004ecfdf6891b0e3daa1044cf80d25605) fix(doctrine): group or filter in an AndWhere #7441 (#7445)
+* [55fd65795](https://github.com/api-platform/core/commit/55fd65795b6b2ea6def8ef2cc6dc0cc107e220dd)  fix(validator): validation exception without constraint violation list
+* [5b59f8914](https://github.com/api-platform/core/commit/5b59f8914f40889f35b7017102049cfd537c22ab) fix(jsonschema/jsonld): make `@id` and `@type` properties required only in the JSON-LD schema for output (#7397)
+* [654339e03](https://github.com/api-platform/core/commit/654339e03d6eff2b7486dcd35d145e963f2c5d83) fix(openapi): Improve response override (#7428)
+* [6c267408a](https://github.com/api-platform/core/commit/6c267408a099aceeef44a2410361963024153adc) fix(hydra): genId false schema (#7440)
+* [70bdf2959](https://github.com/api-platform/core/commit/70bdf2959c29ceca091f00b362a1872b0c2a27bc) fix(symfony): ensure the kernel is booted before using `KernelBrowser::loginUser()` (#7446)
+* [9c918c657](https://github.com/api-platform/core/commit/9c918c65795fcb8b27ea82f2fb14f8dcd79b09ef) fix(symfony): align listeners context (#7449)
+* [abe0438be](https://github.com/api-platform/core/commit/abe0438be3abf82896ae7937a9a78795361d7179) fix(jsonschema): make all required properties optional in PATCH operation with 'json' format (#7398)
+* [e1ce9456b](https://github.com/api-platform/core/commit/e1ce9456b20067df22dea968f5089046110ecf6c) fix(openapi): define items type for HydraCollectionBaseSchema hydra:member (#7419)
+* [e52e825db](https://github.com/api-platform/core/commit/e52e825dbd4af1ff1a9a1dca49ded68481dcec10) fix(openapi): allow assertMatchesJsonSchema with custom output dto (#7438)
+* [f3c811d0f](https://github.com/api-platform/core/commit/f3c811d0f4b7bb6ac7dcf0967bdbeba65069a362) fix(hydra): add base schema to item of a collection (#7444)
+
 ## v4.2.1
 
 ### Bug fixes
