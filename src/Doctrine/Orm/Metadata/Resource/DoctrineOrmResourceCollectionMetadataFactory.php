@@ -19,6 +19,8 @@ use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\Util\StateOptionsTrait;
@@ -44,10 +46,19 @@ final class DoctrineOrmResourceCollectionMetadataFactory implements ResourceMeta
             $operations = $resourceMetadata->getOperations();
 
             if ($operations) {
-                foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
+                foreach ($operations as $operationName => $operation) {
                     $entityClass = $this->getStateOptionsClass($operation, $operation->getClass(), Options::class);
 
-                    if (!$this->managerRegistry->getManagerForClass($entityClass) instanceof EntityManagerInterface) {
+                    $manager = $this->managerRegistry->getManagerForClass($entityClass);
+                    if (!$manager instanceof EntityManagerInterface) {
+                        continue;
+                    }
+
+                    $classMetadata = $manager->getClassMetadata($entityClass);
+                    // @see https://www.doctrine-project.org/projects/doctrine-orm/en/3.5/reference/improving-performance.html#read-only-entities
+                    // Read-Only allows to persist new entities of a kind and remove existing ones, they are just not considered for updates.
+                    if ($classMetadata->isReadOnly && ($operation instanceof Put || $operation instanceof Patch)) {
+                        $operations->remove($operationName);
                         continue;
                     }
 

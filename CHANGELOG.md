@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Features
+
+* [6067febe4](https://github.com/api-platform/core/commit/6067febe40d529ed8d30f85069ca957f87771f6b) feat(doctrine): Remove PUT & PATCH for readonly entity (#7019)
+
 ## v4.2.2
 
 ### Bug fixes
