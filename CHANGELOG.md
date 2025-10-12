@@ -4,7 +4,7 @@
 
 ### Features
 
-* [6067febe4](https://github.com/api-platform/core/commit/6067febe40d529ed8d30f85069ca957f87771f6b) feat(doctrine): Remove PUT & PATCH for readonly entity (#7019)
+* [ba0c76c](https://github.com/api-platform/core/commit/ba0c76c6f5c8afa8622e87a155b8b99f453d6453) feat(doctrine): remove put & path for readonly entity (#7019)
 
 ## v4.2.2
 
