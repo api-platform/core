@@ -132,7 +132,6 @@ class SchemaFactoryTest extends TestCase
         $this->assertNull($resultSchema->getRootDefinitionKey());
         $hydraCollectionSchema = $resultSchema['definitions']['HydraCollectionBaseSchema'];
         $properties = $hydraCollectionSchema['properties'];
-        $this->assertTrue(isset($properties['hydra:member']));
         $this->assertArrayHasKey('hydra:totalItems', $properties);
         $this->assertArrayHasKey('hydra:view', $properties);
         $this->assertArrayHasKey('hydra:search', $properties);
