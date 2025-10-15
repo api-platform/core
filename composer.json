@@ -181,8 +181,10 @@
         "symfony/intl": "^6.4 || ^7.0",
         "symfony/json-streamer": "7.4.x-dev",
         "symfony/maker-bundle": "^1.24",
+        "symfony/mcp-bundle": "dev-main",
         "symfony/mercure-bundle": "*",
         "symfony/messenger": "^6.4 || ^7.0",
+        "symfony/monolog-bundle": "4.x-dev",
         "symfony/object-mapper": "7.4.x-dev",
         "symfony/routing": "^6.4 || ^7.0",
         "symfony/security-bundle": "^6.4 || ^7.0",
@@ -218,5 +220,6 @@
     "type": "library",
     "repositories": [
         {"type": "vcs", "url": "https://github.com/soyuka/phpunit"}
-    ]
+    ],
+    "minimum-stability": "dev"
 }

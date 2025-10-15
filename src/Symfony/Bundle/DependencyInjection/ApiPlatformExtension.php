@@ -50,6 +50,7 @@ use ApiPlatform\Validator\Exception\ValidationException;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Ramsey\Uuid\Uuid;
+use Symfony\AI\McpBundle\McpBundle;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerHelper;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
@@ -175,6 +176,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerArgumentResolverConfiguration($loader);
         $this->registerLinkSecurityConfiguration($loader, $config);
         $this->registerJsonStreamerConfiguration($container, $loader, $formats, $config);
+        $this->registerMcpConfiguration($loader);
 
         if (class_exists(ObjectMapper::class)) {
             $loader->load('state/object_mapper.php');
@@ -1011,5 +1013,14 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
                 $loader->load('json_streamer/json.php');
             }
         }
+    }
+
+    private function registerMcpConfiguration(PhpFileLoader $loader): void
+    {
+        if (!class_exists(McpBundle::class)) {
+            throw new RuntimeException('symfony/mcp-bundle is not installed.');
+        }
+
+        $loader->load('mcp.php');
     }
 }
