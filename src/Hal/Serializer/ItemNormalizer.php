@@ -320,6 +320,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
                     }
                 }
 
+                $attributeValue['_links']['parent']['href'] = $this->getRelationIri($data);
+
                 $data[$key][$relationName] = $attributeValue;
                 continue;
             }
