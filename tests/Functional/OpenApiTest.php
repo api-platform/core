@@ -33,6 +33,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyFriend;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue7436\Issue7436;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\JsonSchemaResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\JsonSchemaResourceRelated;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\NoCollectionDummy;
@@ -100,6 +101,7 @@ class OpenApiTest extends ApiTestCase
             JsonSchemaResource::class,
             JsonSchemaResourceRelated::class,
             WrappedResponseEntity::class,
+            Issue7436::class,
         ];
     }
 
@@ -609,5 +611,28 @@ class OpenApiTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+json; charset=utf-8');
         $this->assertJson($response->getContent());
+    }
+
+    public function testMultipartOperationHasCorrectOpenApiSchema(): void
+    {
+        $response = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ]);
+        $this->assertResponseIsSuccessful();
+        $json = $response->toArray();
+
+        $this->assertSame(
+            [
+                'type' => ['string', 'null'],
+                'format' => 'binary',
+            ],
+            $json['components']['schemas']['Issue7436']['properties']['file']
+        );
+        $this->assertSame(
+            [
+                'multipart/form-data' => ['schema' => ['$ref' => '#/components/schemas/Issue7436']],
+            ],
+            $json['paths']['/issue7436s']['post']['requestBody']['content']
+        );
     }
 }
