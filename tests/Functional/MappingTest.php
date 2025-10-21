@@ -17,12 +17,14 @@ use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\FirstResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResourceOdm;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResourceSourceOnly;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResourceWithInput;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResourceWithRelation;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResourceWithRelationRelated;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\SecondResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MappedDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MappedEntity;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MappedEntitySourceOnly;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MappedResourceWithRelationEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MappedResourceWithRelationRelatedEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SameEntity;
@@ -49,6 +51,7 @@ final class MappingTest extends ApiTestCase
             MappedResourceWithRelation::class,
             MappedResourceWithRelationRelated::class,
             MappedResourceWithInput::class,
+            MappedResourceSourceOnly::class,
         ];
     }
 
@@ -165,6 +168,52 @@ final class MappingTest extends ApiTestCase
         ]);
 
         $this->assertJsonContains(['username' => 'test']);
+    }
+
+    public function testShouldMapWithSourceOnly(): void
+    {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('MongoDB not tested');
+        }
+
+        if (!$this->getContainer()->has('api_platform.object_mapper')) {
+            $this->markTestSkipped('ObjectMapper not installed');
+        }
+
+        $this->recreateSchema([MappedEntitySourceOnly::class]);
+        $manager = $this->getManager();
+
+        for ($i = 0; $i < 10; ++$i) {
+            $e = new MappedEntitySourceOnly();
+            $e->setLastName('A'.$i);
+            $e->setFirstName('B'.$i);
+            $manager->persist($e);
+        }
+
+        $manager->flush();
+
+        $r = self::createClient()->request('GET', '/mapped_resource_source_onlies');
+        $this->assertJsonContains(['member' => [
+            ['username' => 'B0 A0'],
+            ['username' => 'B1 A1'],
+            ['username' => 'B2 A2'],
+        ]]);
+
+        $r = self::createClient()->request('POST', 'mapped_resource_source_onlies', ['json' => ['username' => 'so yuka']]);
+        $this->assertJsonContains(['username' => 'so yuka']);
+
+        $manager = $this->getManager();
+        $repo = $manager->getRepository(MappedEntitySourceOnly::class);
+        $persisted = $repo->findOneBy(['id' => $r->toArray()['id']]);
+        $this->assertSame('so', $persisted->getFirstName());
+        $this->assertSame('yuka', $persisted->getLastName());
+
+        $uri = $r->toArray()['@id'];
+        self::createClient()->request('GET', $uri);
+        $this->assertJsonContains(['username' => 'so yuka']);
+
+        $r = self::createClient()->request('PATCH', $uri, ['json' => ['username' => 'ba zar'], 'headers' => ['content-type' => 'application/merge-patch+json']]);
+        $this->assertJsonContains(['username' => 'ba zar']);
     }
 
     private function loadFixtures(): void
