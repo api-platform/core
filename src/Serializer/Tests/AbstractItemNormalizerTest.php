@@ -1439,6 +1439,57 @@ class AbstractItemNormalizerTest extends TestCase
         $this->assertEquals(array_keys($operationCacheKey), [\sprintf('%s%s%s%s', Dummy::class, 'operation_name', 'root_operation_name', 'n')]);
         $this->assertEquals(current($operationCacheKey), ['serializer_groups' => ['group'], 'api_allow_update' => false]);
     }
+
+    public function testDenormalizeRelationContext(): void
+    {
+        $data = [
+            'relatedDummy' => '/dummies/1',
+        ];
+
+        $relatedDummy1 = new RelatedDummy();
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::type('array'))->willReturn(new PropertyNameCollection(['relatedDummy']));
+
+        // BC layer for api-platform/metadata < 4.1
+        if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
+            $relatedDummyType = new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class);
+            $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+            $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([$relatedDummyType])->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(false));
+        } else {
+            $relatedDummyType = Type::object(RelatedDummy::class);
+            $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+            $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType($relatedDummyType)->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(false));
+        }
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getResourceFromIri('/dummies/1', Argument::that(function (array $context) {
+            $this->assertArrayHasKey('denormalizeRelation', $context);
+            $this->assertTrue($context['denormalizeRelation']);
+
+            return true;
+        }))->willReturn($relatedDummy1);
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass(null, RelatedDummy::class)->willReturn(RelatedDummy::class);
+        $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+
+        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), null, null, [], null, null) extends AbstractItemNormalizer {};
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $actual = $normalizer->denormalize($data, Dummy::class);
+
+        $this->assertInstanceOf(Dummy::class, $actual);
+
+        $propertyAccessorProphecy->setValue($actual, 'relatedDummy', $relatedDummy1)->shouldHaveBeenCalled();
+    }
 }
 
 class ObjectWithBasicProperties
