@@ -81,6 +81,7 @@ final class JsonLdJsonSchemaTest extends ApiTestCase
                             '$ref' => '#/definitions/TestEntity.jsonld-read',
                         ]),
                     ],
+                    'required' => ['id', 'description', 'tests', 'nonResourceTests', 'type'],
                 ]),
             ],
         ]);
@@ -105,6 +106,7 @@ final class JsonLdJsonSchemaTest extends ApiTestCase
                     ],
                 ]),
             ],
+            'required' => ['id', 'nullableString', 'nullableInt'],
         ]);
 
         $expectedTestEntitySchema = new \ArrayObject([
@@ -132,6 +134,7 @@ final class JsonLdJsonSchemaTest extends ApiTestCase
                             ],
                         ]),
                     ],
+                    'required' => ['id', 'nullableString', 'nullableInt'],
                 ]),
             ],
         ]);

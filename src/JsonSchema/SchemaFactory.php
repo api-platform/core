@@ -83,7 +83,10 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
         $validationGroups = $operation ? $this->getValidationGroups($operation) : [];
         $version = $schema->getVersion();
+
         $definitionName = $this->definitionNameFactory->create($className, $format, $inputOrOutputClass, $operation, $serializerContext);
+        $definitionName .= '.'.$type;
+
         $method = $operation instanceof HttpOperation ? $operation->getMethod() : 'GET';
         if (!$operation) {
             $method = Schema::TYPE_INPUT === $type ? 'POST' : 'GET';
@@ -143,12 +146,18 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         foreach ($this->propertyNameCollectionFactory->create($inputOrOutputClass, $options) as $propertyName) {
             $propertyMetadata = $this->propertyMetadataFactory->create($inputOrOutputClass, $propertyName, $options);
 
-            if (false === $propertyMetadata->isReadable() && false === $propertyMetadata->isWritable()) {
+            if (
+                Schema::TYPE_INPUT === $type && false === $propertyMetadata->isWritable()
+                || Schema::TYPE_OUTPUT === $type && false === $propertyMetadata->isReadable()
+            ) {
                 continue;
             }
 
             $normalizedPropertyName = $this->nameConverter ? $this->nameConverter->normalize($propertyName, $inputOrOutputClass, $format, $serializerContext) : $propertyName;
-            if ($propertyMetadata->isRequired() && !$isJsonMergePatch) {
+
+            // Property should be considered as required for output since they are "always" in the response body.
+            // @see https://github.com/api-platform/core/issues/7457
+            if (Schema::TYPE_OUTPUT === $type || $propertyMetadata->isRequired() && !$isJsonMergePatch) {
                 $definition['required'][] = $normalizedPropertyName;
             }
 
