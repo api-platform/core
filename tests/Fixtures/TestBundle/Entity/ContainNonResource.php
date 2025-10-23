@@ -27,9 +27,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity]
 class ContainNonResource
 {
-    #[ORM\Column(type: 'integer')]
+    /**
+     * @var string
+     */
+    #[ORM\Column(type: 'string')]
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'AUTO')]
     #[Groups('contain_non_resource')]
     public $id;
     /**
