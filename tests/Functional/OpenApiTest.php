@@ -138,6 +138,7 @@ class OpenApiTest extends ApiTestCase
                 ['$ref' => '#/components/schemas/HydraItemBaseSchema'],
                 [
                     'type' => 'object',
+                    'required' => ['title', 'detail', 'status', 'instance', 'type', 'description'],
                     'properties' => [
                         'title' => [
                             'readOnly' => true,
@@ -243,6 +244,7 @@ class OpenApiTest extends ApiTestCase
             ['$ref' => '#/components/schemas/HydraItemBaseSchema'],
             [
                 'type' => 'object',
+                'required' => ['id'],
                 'properties' => [
                     'id' => ['type' => 'string'],
                 ],
@@ -326,7 +328,25 @@ class OpenApiTest extends ApiTestCase
         $this->assertArrayHasKey('put', $json['paths']['/api/custom-call/{id}']);
 
         $this->assertArrayHasKey('id', $json['components']['schemas']['Dummy']['properties']);
-        $this->assertSame(['name'], $json['components']['schemas']['Dummy']['required']);
+        $this->assertSame([
+            'id',
+            'name',
+            'alias',
+            'foo',
+            'description',
+            'dummy',
+            'dummyBoolean',
+            'dummyDate',
+            'dummyFloat',
+            'dummyPrice',
+            'relatedDummy',
+            'relatedDummies',
+            'jsonData',
+            'arrayData',
+            'name_converted',
+            'relatedOwnedDummy',
+            'relatedOwningDummy',
+        ], $json['components']['schemas']['Dummy']['required']);
         $this->assertArrayHasKey('genderType', $json['components']['schemas']['Person']['properties']);
         $this->assertEquals([
             'default' => 'male',
