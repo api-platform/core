@@ -1008,7 +1008,7 @@ class AbstractItemNormalizerTest extends TestCase
             'name' => 'foo',
             'relatedDummy' => ['foo' => 'bar'],
             'relatedDummies' => [['bar' => 'baz']],
-            'relatedDummiesWithUnionTypes' => [0 => ['bar' => 'qux'], 1. => ['bar' => 'quux']],
+            'relatedDummiesWithUnionTypes' => [0 => ['bar' => 'qux'], 1 => ['bar' => 'quux']],
         ];
 
         $relatedDummy1 = new RelatedDummy();
@@ -1072,7 +1072,7 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->setValue($actual, 'name', 'foo')->shouldHaveBeenCalled();
         $propertyAccessorProphecy->setValue($actual, 'relatedDummy', $relatedDummy1)->shouldHaveBeenCalled();
         $propertyAccessorProphecy->setValue($actual, 'relatedDummies', [$relatedDummy2])->shouldHaveBeenCalled();
-        $propertyAccessorProphecy->setValue($actual, 'relatedDummiesWithUnionTypes', [0 => $relatedDummy3, 1. => $relatedDummy4])->shouldHaveBeenCalled();
+        $propertyAccessorProphecy->setValue($actual, 'relatedDummiesWithUnionTypes', [0 => $relatedDummy3, 1 => $relatedDummy4])->shouldHaveBeenCalled();
     }
 
     public function testBadRelationType(): void
