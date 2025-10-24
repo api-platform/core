@@ -4,6 +4,7 @@
 
 ### Features
 
+* [21aa2572d](https://github.com/api-platform/core/commit/21aa2572d8fef2b3f05f7307c51348a6c9767e45) feat(elasticsearch): add SSL options for Elasticsearch configuration (#4059)
 * [ba0c76c](https://github.com/api-platform/core/commit/ba0c76c6f5c8afa8622e87a155b8b99f453d6453) feat(doctrine): remove put & path for readonly entity (#7019)
 
 ## v4.2.2

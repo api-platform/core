@@ -69,6 +69,8 @@ class ElasticsearchClientPassTest extends TestCase
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getParameter('api_platform.elasticsearch.enabled')->willReturn(true)->shouldBeCalled();
         $containerBuilderProphecy->getParameter('api_platform.elasticsearch.hosts')->willReturn(['http://localhost:9200'])->shouldBeCalled();
+        $containerBuilderProphecy->getParameter('api_platform.elasticsearch.ssl_ca_bundle')->willReturn(null)->shouldBeCalled();
+        $containerBuilderProphecy->getParameter('api_platform.elasticsearch.ssl_verification')->willReturn(true)->shouldBeCalled();
         $containerBuilderProphecy->has('logger')->willReturn(true)->shouldBeCalled();
         $containerBuilderProphecy->getDefinition('api_platform.elasticsearch.client')->willReturn($clientDefinitionProphecy->reveal())->shouldBeCalled();
 
@@ -89,6 +91,8 @@ class ElasticsearchClientPassTest extends TestCase
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getParameter('api_platform.elasticsearch.enabled')->willReturn(true)->shouldBeCalled();
         $containerBuilderProphecy->getParameter('api_platform.elasticsearch.hosts')->willReturn([])->shouldBeCalled();
+        $containerBuilderProphecy->getParameter('api_platform.elasticsearch.ssl_ca_bundle')->willReturn(null)->shouldBeCalled();
+        $containerBuilderProphecy->getParameter('api_platform.elasticsearch.ssl_verification')->willReturn(true)->shouldBeCalled();
         $containerBuilderProphecy->has('logger')->willReturn(false)->shouldBeCalled();
         $containerBuilderProphecy->getDefinition('api_platform.elasticsearch.client')->willReturn($clientDefinitionProphecy->reveal())->shouldBeCalled();
 
@@ -101,5 +105,103 @@ class ElasticsearchClientPassTest extends TestCase
         $containerBuilderProphecy->getParameter('api_platform.elasticsearch.enabled')->willReturn(false)->shouldBeCalled();
 
         (new ElasticsearchClientPass())->process($containerBuilderProphecy->reveal());
+    }
+
+    public function testProcessWithSslCaBundle(): void
+    {
+        $clientBuilder = class_exists(\Elasticsearch\ClientBuilder::class)
+            // ES v7
+            ? \Elasticsearch\ClientBuilder::class
+            // ES v8 and up
+            : \Elastic\Elasticsearch\ClientBuilder::class;
+
+        $clientDefinition = $this->createMock(Definition::class);
+        $clientDefinition->expects($this->once())
+            ->method('setFactory')
+            ->with([$clientBuilder, 'fromConfig'])
+            ->willReturnSelf();
+
+        $clientDefinition->expects($this->once())
+            ->method('setArguments')
+            ->with($this->callback(function ($arguments) {
+                $config = $arguments[0];
+
+                return isset($config['hosts'])
+                    && $config['hosts'] === ['https://localhost:9200']
+                    && isset($config['CABundle'])
+                    && '/path/to/ca-bundle.crt' === $config['CABundle']
+                    && isset($config['logger'])
+                    && $config['logger'] instanceof Reference;
+            }))
+            ->willReturnSelf();
+
+        $containerBuilder = $this->createMock(ContainerBuilder::class);
+        $containerBuilder->method('getParameter')
+            ->willReturnMap([
+                ['api_platform.elasticsearch.enabled', true],
+                ['api_platform.elasticsearch.hosts', ['https://localhost:9200']],
+                ['api_platform.elasticsearch.ssl_ca_bundle', '/path/to/ca-bundle.crt'],
+                ['api_platform.elasticsearch.ssl_verification', true],
+            ]);
+
+        $containerBuilder->expects($this->once())
+            ->method('has')
+            ->with('logger')
+            ->willReturn(true);
+
+        $containerBuilder->expects($this->once())
+            ->method('getDefinition')
+            ->with('api_platform.elasticsearch.client')
+            ->willReturn($clientDefinition);
+
+        (new ElasticsearchClientPass())->process($containerBuilder);
+    }
+
+    public function testProcessWithSslVerificationDisabled(): void
+    {
+        $clientBuilder = class_exists(\Elasticsearch\ClientBuilder::class)
+            ? \Elasticsearch\ClientBuilder::class
+            : \Elastic\Elasticsearch\ClientBuilder::class;
+
+        $clientDefinition = $this->createMock(Definition::class);
+        $clientDefinition->expects($this->once())
+            ->method('setFactory')
+            ->with([$clientBuilder, 'fromConfig'])
+            ->willReturnSelf();
+
+        $clientDefinition->expects($this->once())
+            ->method('setArguments')
+            ->with($this->callback(function ($arguments) {
+                $config = $arguments[0];
+
+                return isset($config['hosts'])
+                    && $config['hosts'] === ['https://localhost:9200']
+                    && isset($config['SSLVerification'])
+                    && false === $config['SSLVerification']
+                    && isset($config['logger'])
+                    && $config['logger'] instanceof Reference;
+            }))
+            ->willReturnSelf();
+
+        $containerBuilder = $this->createMock(ContainerBuilder::class);
+        $containerBuilder->method('getParameter')
+            ->willReturnMap([
+                ['api_platform.elasticsearch.enabled', true],
+                ['api_platform.elasticsearch.hosts', ['https://localhost:9200']],
+                ['api_platform.elasticsearch.ssl_ca_bundle', null],
+                ['api_platform.elasticsearch.ssl_verification', false],
+            ]);
+
+        $containerBuilder->expects($this->once())
+            ->method('has')
+            ->with('logger')
+            ->willReturn(true);
+
+        $containerBuilder->expects($this->once())
+            ->method('getDefinition')
+            ->with('api_platform.elasticsearch.client')
+            ->willReturn($clientDefinition);
+
+        (new ElasticsearchClientPass())->process($containerBuilder);
     }
 }

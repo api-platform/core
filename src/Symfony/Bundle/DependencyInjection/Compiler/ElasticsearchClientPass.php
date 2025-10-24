@@ -56,6 +56,14 @@ final class ElasticsearchClientPass implements CompilerPassInterface
             }
         }
 
+        if ($sslCaBundle = $container->getParameter('api_platform.elasticsearch.ssl_ca_bundle')) {
+            $clientConfiguration['CABundle'] = $sslCaBundle;
+        }
+
+        if (false === $container->getParameter('api_platform.elasticsearch.ssl_verification')) {
+            $clientConfiguration['SSLVerification'] = false;
+        }
+
         $clientDefinition = $container->getDefinition('api_platform.elasticsearch.client');
 
         if (!$clientConfiguration) {
