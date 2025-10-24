@@ -458,7 +458,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $operationInputSchemas = [];
                     foreach ($requestMimeTypes as $operationFormat) {
                         $operationInputSchema = null;
-                        if (str_starts_with($operationFormat, 'json')) {
+                        if (str_starts_with($operationFormat, 'json') || 'multipart' === $operationFormat) {
                             $operationInputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_INPUT, $operation, $schema, null, $forceSchemaCollection);
                             $this->appendSchemaDefinitions($schemas, $operationInputSchema->getDefinitions());
                         }
