@@ -22,7 +22,7 @@ use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Config\Resource\DirectoryResource;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Routing\Loader\XmlFileLoader;
+use Symfony\Component\Routing\Loader\PhpFileLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -35,12 +35,12 @@ final class ApiLoader extends Loader
 {
     public const DEFAULT_ACTION_PATTERN = 'api_platform.action.';
 
-    private readonly XmlFileLoader $fileLoader;
+    private readonly PhpFileLoader $fileLoader;
 
     public function __construct(KernelInterface $kernel, private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly ContainerInterface $container, private readonly array $formats, private readonly array $resourceClassDirectories = [], private readonly bool $graphqlEnabled = false, private readonly bool $entrypointEnabled = true, public readonly bool $docsEnabled = true, private readonly bool $graphiQlEnabled = false)
     {
         $paths = $kernel->locateResource('@ApiPlatformBundle/Resources/config/routing');
-        $this->fileLoader = new XmlFileLoader(new FileLocator($paths));
+        $this->fileLoader = new PhpFileLoader(new FileLocator($paths));
     }
 
     /**
@@ -127,28 +127,28 @@ final class ApiLoader extends Loader
      */
     private function loadExternalFiles(RouteCollection $routeCollection): void
     {
-        $routeCollection->addCollection($this->fileLoader->load('docs.xml'));
-        $routeCollection->addCollection($this->fileLoader->load('genid.xml'));
-        $routeCollection->addCollection($this->fileLoader->load('errors.xml'));
+        $routeCollection->addCollection($this->fileLoader->load('docs.php'));
+        $routeCollection->addCollection($this->fileLoader->load('genid.php'));
+        $routeCollection->addCollection($this->fileLoader->load('errors.php'));
 
         if ($this->entrypointEnabled) {
-            $routeCollection->addCollection($this->fileLoader->load('api.xml'));
+            $routeCollection->addCollection($this->fileLoader->load('api.php'));
         }
 
         if ($this->graphqlEnabled) {
-            $graphqlCollection = $this->fileLoader->load('graphql/graphql.xml');
+            $graphqlCollection = $this->fileLoader->load('graphql/graphql.php');
             $graphqlCollection->addDefaults(['_graphql' => true]);
             $routeCollection->addCollection($graphqlCollection);
         }
 
         if ($this->graphiQlEnabled) {
-            $graphiQlCollection = $this->fileLoader->load('graphql/graphiql.xml');
+            $graphiQlCollection = $this->fileLoader->load('graphql/graphiql.php');
             $graphiQlCollection->addDefaults(['_graphql' => true]);
             $routeCollection->addCollection($graphiQlCollection);
         }
 
         if (isset($this->formats['jsonld'])) {
-            $routeCollection->addCollection($this->fileLoader->load('jsonld.xml'));
+            $routeCollection->addCollection($this->fileLoader->load('jsonld.php'));
         }
     }
 }
