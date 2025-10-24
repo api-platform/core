@@ -585,6 +585,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                     throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
                 }
 
+                if (isset($context['denormalize_throw_on_not_found'])) {
+                    return null;
+                }
+
                 throw NotNormalizableValueException::createForUnexpectedDataType($e->getMessage(), $value, [$className], $context['deserialization_path'] ?? null, true, $e->getCode(), $e);
             } catch (InvalidArgumentException $e) {
                 if (!isset($context['not_normalizable_value_exceptions'])) {
