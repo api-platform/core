@@ -579,10 +579,14 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     {
         if (\is_string($value)) {
             try {
-                return $this->iriConverter->getResourceFromIri($value, $context + ['fetch_data' => true, 'denormalizeRelation' => true]);
+                return $this->iriConverter->getResourceFromIri($value, $context + ['fetch_data' => true]);
             } catch (ItemNotFoundException $e) {
                 if (!isset($context['not_normalizable_value_exceptions'])) {
                     throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
+                }
+
+                if (isset($context['denormalize_throw_on_not_found'])) {
+                    return null;
                 }
 
                 throw NotNormalizableValueException::createForUnexpectedDataType($e->getMessage(), $value, [$className], $context['deserialization_path'] ?? null, true, $e->getCode(), $e);
