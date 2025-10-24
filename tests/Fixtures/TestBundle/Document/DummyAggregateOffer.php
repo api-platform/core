@@ -38,8 +38,12 @@ class DummyAggregateOffer
      */
     #[ODM\Id(strategy: 'INCREMENT', type: 'int')]
     private ?int $id = null;
+
+    /**
+     * @var Collection<int, DummyOffer>
+     */
     #[ODM\ReferenceMany(targetDocument: DummyOffer::class, mappedBy: 'aggregate', cascade: ['persist'])]
-    private Collection|iterable $offers;
+    private Collection $offers;
     /**
      * @var DummyProduct The dummy product
      */
@@ -56,12 +60,18 @@ class DummyAggregateOffer
         $this->offers = new ArrayCollection();
     }
 
-    public function getOffers(): Collection|iterable
+    /**
+     * @return Collection<int, DummyOffer>
+     */
+    public function getOffers(): Collection
     {
         return $this->offers;
     }
 
-    public function setOffers(Collection|iterable $offers): void
+    /**
+     * @param Collection<int, DummyOffer> $offers
+     */
+    public function setOffers(Collection $offers): void
     {
         $this->offers = $offers;
     }
