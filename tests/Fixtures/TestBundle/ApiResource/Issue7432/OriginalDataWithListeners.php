@@ -33,7 +33,10 @@ class OriginalDataWithListeners
     {
         \assert($data instanceof UserVerifyInput);
         \assert($context['previous_data'] instanceof self);
+        \assert($context['read_data'] instanceof self);
+        \assert($context['previous_data'] !== $context['read_data']);
         \assert($context['request']->attributes->get('data') instanceof UserVerifyInput);
+        \assert($context['request']->attributes->get('read_data') instanceof self);
         \assert($context['request']->attributes->get('previous_data') instanceof self);
         \assert($context['data'] instanceof UserVerifyInput);
         $context['previous_data']->code = $data->code;

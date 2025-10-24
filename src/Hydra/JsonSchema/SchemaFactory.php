@@ -170,14 +170,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
             $definitions[self::COLLECTION_BASE_SCHEMA_NAME] = [
                 'type' => 'object',
-                'required' => [
-                    $hydraPrefix.'member',
-                ],
                 'properties' => [
-                    $hydraPrefix.'member' => [
-                        'type' => 'array',
-                        'items' => ['type' => 'object'],
-                    ],
                     $hydraPrefix.'totalItems' => [
                         'type' => 'integer',
                         'minimum' => 0,
@@ -249,6 +242,9 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             ['$ref' => $prefix.self::COLLECTION_BASE_SCHEMA_NAME],
             [
                 'type' => 'object',
+                'required' => [
+                    $hydraPrefix.'member',
+                ],
                 'properties' => [
                     $hydraPrefix.'member' => [
                         'type' => 'array',
