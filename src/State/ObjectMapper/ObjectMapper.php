@@ -13,10 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\ObjectMapper;
 
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use Symfony\Component\ObjectMapper\ObjectMapperAwareInterface;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 
-final class ObjectMapper implements ObjectMapperInterface, ClearObjectMapInterface
+final class ObjectMapper implements ObjectMapperInterface, ClearObjectMapInterface, ObjectMapperAwareInterface
 {
     private ?\SplObjectStorage $objectMap = null;
 
@@ -47,5 +48,16 @@ final class ObjectMapper implements ObjectMapperInterface, ClearObjectMapInterfa
         foreach ($this->objectMap as $k) {
             $this->objectMap->detach($k);
         }
+    }
+
+    public function withObjectMapper(ObjectMapperInterface $objectMapper): static
+    {
+        if (!$this->decorated instanceof ObjectMapperAwareInterface) {
+            throw new RuntimeException(\sprintf('Given object mapper "%s" does not implements %s.', get_debug_type($this->decorated), ObjectMapperAwareInterface::class));
+        }
+
+        $this->decorated->withObjectMapper($objectMapper);
+
+        return $this;
     }
 }
