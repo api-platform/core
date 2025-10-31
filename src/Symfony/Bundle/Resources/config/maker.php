@@ -17,14 +17,14 @@ return function (ContainerConfigurator $container) {
     $services = $container->services();
 
     $services->set('api_platform.maker.command.state_processor', 'ApiPlatform\Symfony\Maker\MakeStateProcessor')
-        ->args([service('api_platform.metadata.resource.name_collection_factory')])
+        ->args([param('api_platform.maker.namespace_prefix')])
         ->tag('maker.command');
 
     $services->set('api_platform.maker.command.state_provider', 'ApiPlatform\Symfony\Maker\MakeStateProvider')
-        ->args([service('api_platform.metadata.resource.name_collection_factory')])
+        ->args([param('api_platform.maker.namespace_prefix')])
         ->tag('maker.command');
 
     $services->set('api_platform.maker.command.filter', 'ApiPlatform\Symfony\Maker\MakeFilter')
-        ->args([service('api_platform.metadata.resource.name_collection_factory')])
+        ->args([param('api_platform.maker.namespace_prefix')])
         ->tag('maker.command');
 };

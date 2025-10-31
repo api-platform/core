@@ -56,6 +56,25 @@ class MakeStateProviderTest extends KernelTestCase
         $this->assertStringContainsString('Next: Open your new state provider class and start customizing it.', $display);
     }
 
+    public function testMakeStateProviderWithCustomNamespace(): void
+    {
+        $inputs = ['name' => 'CustomStateProvider', '--namespace-prefix' => 'Api\\State\\'];
+        $newProviderFile = self::tempFile('src/Api/State/CustomStateProvider.php');
+
+        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:state-provider'));
+        $tester->execute($inputs);
+
+        $this->assertFileExists($newProviderFile);
+
+        // Unify line endings
+        $expected = preg_replace('~\R~u', "\r\n", file_get_contents(__DIR__.'/../../Fixtures/Symfony/Maker/NamespacedCustomStateProvider.fixture'));
+        $result = preg_replace('~\R~u', "\r\n", file_get_contents($newProviderFile));
+        $this->assertStringContainsString($expected, $result);
+
+        $display = $tester->getDisplay();
+        $this->assertStringContainsString('Success!', $display);
+    }
+
     public static function stateProviderDataProvider(): \Generator
     {
         yield 'Generate state provider' => [

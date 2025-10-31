@@ -23,9 +23,14 @@ use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 
 final class MakeFilter extends AbstractMaker
 {
+    public function __construct(private readonly string $namespacePrefix = '')
+    {
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -50,6 +55,7 @@ final class MakeFilter extends AbstractMaker
         $command
             ->addArgument('type', InputArgument::REQUIRED, \sprintf('Choose a type for your filter (<fg=yellow>%s</>)', self::getFilterTypesAsString()))
             ->addArgument('name', InputArgument::REQUIRED, 'Choose a class name for your filter (e.g. <fg=yellow>AwesomeFilter</>)')
+            ->addOption('namespace-prefix', 'p', InputOption::VALUE_REQUIRED, 'Specify the namespace prefix to use for the filter class', $this->namespacePrefix.'Filter')
             ->setHelp(file_get_contents(__DIR__.'/Resources/help/MakeFilter.txt'));
     }
 
@@ -75,7 +81,7 @@ final class MakeFilter extends AbstractMaker
 
         $filterNameDetails = $generator->createClassNameDetails(
             name: $input->getArgument('name'),
-            namespacePrefix: 'Filter\\'
+            namespacePrefix: trim($input->getOption('namespace-prefix'), '\\').'\\'
         );
         $filterName = \sprintf('%sFilter', ucfirst($type->value));
 

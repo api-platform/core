@@ -229,6 +229,7 @@ class ConfigurationTest extends TestCase
             ],
             'maker' => [
                 'enabled' => true,
+                'namespace_prefix' => '',
             ],
             'use_symfony_listeners' => false,
             'handle_symfony_errors' => false,
