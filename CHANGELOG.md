@@ -1,5 +1,16 @@
 # Changelog
 
+## v4.1.26
+
+### Bug fixes
+
+* [4fa6d3fa2](https://github.com/api-platform/core/commit/4fa6d3fa2a8d26b33318a19298cea3cd5ee43470) fix(laravel): groups with input/output
+* [99718d954](https://github.com/api-platform/core/commit/99718d9547ab8b064f1184c7ec2b15d882853dcb) fix(serializer): resilient denormalizeRelation capability (#7474)
+* [a26c35840](https://github.com/api-platform/core/commit/a26c358404ed1c100dc3472fe00600368bb611f3) fix(doctrine): properly set properties according to interface (#7487)
+* [a2867e986](https://github.com/api-platform/core/commit/a2867e986cea5c63ca79b19cf9a1b929edb94b79) fix(laravel): serializer attributes on Eloquent methods (#7416)
+* [ddf4c0b5e](https://github.com/api-platform/core/commit/ddf4c0b5e6bd048ef9b702cd77b89bbbcbbf9a1f) fix(graphql): stateOptions to get filter class (#7485)
+* [fafbe5c7b](https://github.com/api-platform/core/commit/fafbe5c7b1418c33baea2506458449562001d2fa) fix(validator): custom message was not translated (#7424)
+
 ## v4.1.25
 
 ### Bug fixes
