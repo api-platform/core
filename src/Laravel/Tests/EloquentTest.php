@@ -23,7 +23,9 @@ use Workbench\App\Http\Requests\StoreSlotRequest;
 use Workbench\App\Models\PostWithMorphMany;
 use Workbench\Database\Factories\AreaFactory;
 use Workbench\Database\Factories\AuthorFactory;
+use Workbench\Database\Factories\AuthorWithGroupFactory;
 use Workbench\Database\Factories\BookFactory;
+use Workbench\Database\Factories\BookWithRelationFactory;
 use Workbench\Database\Factories\CommentMorphFactory;
 use Workbench\Database\Factories\GrandSonFactory;
 use Workbench\Database\Factories\PostWithMorphManyFactory;
@@ -631,5 +633,18 @@ class EloquentTest extends TestCase
         )->assertStatus(201);
 
         $this->assertSame(StoreSlotRequest::$receivedArea->name, $area->name); // @phpstan-ignore-line
+    }
+
+    public function testSerializationGroupsOnRelationMethod(): void
+    {
+        $author = AuthorWithGroupFactory::new()->create();
+        $book = BookWithRelationFactory::new(['author_with_group_id' => $author->id])->create(); // @phpstan-ignore-line
+
+        $response = $this->get('/api/book_with_relations/'.$book->id, ['Accept' => ['application/ld+json']]); // @phpstan-ignore-line
+        $response->assertStatus(200);
+        $json = $response->json();
+
+        $this->assertArrayHasKey('authorWithGroup', $json);
+        $this->assertSame('/api/author_with_groups/'.$author->id, $json['authorWithGroup']['@id']); // @phpstan-ignore-line
     }
 }
