@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata;
 
 use ApiPlatform\State\OptionsInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * ⚠ This class and its children offer no backward compatibility regarding positional parameters.
@@ -612,7 +613,7 @@ abstract class Operation extends Metadata
         protected ?array $normalizationContext = null,
         protected ?array $denormalizationContext = null,
         protected ?bool $collectDenormalizationErrors = null,
-        protected string|\Stringable|null $security = null,
+        protected string|\Stringable|IsGranted|array|null $security = null,
         protected ?string $securityMessage = null,
         protected string|\Stringable|null $securityPostDenormalize = null,
         protected ?string $securityPostDenormalizeMessage = null,

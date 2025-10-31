@@ -15,6 +15,7 @@ namespace ApiPlatform\Metadata;
 
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\State\OptionsInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class ErrorResource extends ApiResource
@@ -70,7 +71,7 @@ class ErrorResource extends ApiResource
         ?int $paginationMaximumItemsPerPage = null,
         ?bool $paginationPartial = null,
         ?string $paginationType = null,
-        string|\Stringable|null $security = null,
+        string|\Stringable|IsGranted|array|null $security = null,
         ?string $securityMessage = null,
         string|\Stringable|null $securityPostDenormalize = null,
         ?string $securityPostDenormalizeMessage = null,

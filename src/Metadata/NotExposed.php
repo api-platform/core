@@ -16,6 +16,7 @@ namespace ApiPlatform\Metadata;
 use ApiPlatform\OpenApi\Attributes\Webhook;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\State\OptionsInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * A NotExposed operation is an operation declared for internal usage,
@@ -80,7 +81,7 @@ final class NotExposed extends HttpOperation
         ?array $normalizationContext = null,
         ?array $denormalizationContext = null,
         ?bool $collectDenormalizationErrors = null,
-        string|\Stringable|null $security = null,
+        string|\Stringable|IsGranted|array|null $security = null,
         ?string $securityMessage = null,
         string|\Stringable|null $securityPostDenormalize = null,
         ?string $securityPostDenormalizeMessage = null,

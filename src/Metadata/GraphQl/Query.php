@@ -15,6 +15,7 @@ namespace ApiPlatform\Metadata\GraphQl;
 
 use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\State\OptionsInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class Query extends Operation
@@ -44,7 +45,7 @@ class Query extends Operation
         ?array $normalizationContext = null,
         ?array $denormalizationContext = null,
         ?bool $collectDenormalizationErrors = null,
-        string|\Stringable|null $security = null,
+        string|\Stringable|IsGranted|array|null $security = null,
         ?string $securityMessage = null,
         string|\Stringable|null $securityPostDenormalize = null,
         ?string $securityPostDenormalizeMessage = null,

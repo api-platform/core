@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation as AbstractOperation;
 use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\State\OptionsInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class Operation extends AbstractOperation
 {
@@ -61,7 +62,7 @@ class Operation extends AbstractOperation
         ?array $normalizationContext = null,
         ?array $denormalizationContext = null,
         ?bool $collectDenormalizationErrors = null,
-        string|\Stringable|null $security = null,
+        string|\Stringable|IsGranted|array|null $security = null,
         ?string $securityMessage = null,
         string|\Stringable|null $securityPostDenormalize = null,
         ?string $securityPostDenormalizeMessage = null,

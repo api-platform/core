@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\Security\Exception\AccessDeniedException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * Allows access based on the ApiPlatform\Metadata\ResourceAccessCheckerInterface.
@@ -69,23 +70,33 @@ final class AccessCheckerProvider implements ProviderInterface
             return $body;
         }
 
-        if ($operation instanceof HttpOperation) {
-            $request = $context['request'] ?? null;
-
-            $resourceAccessCheckerContext = [
-                'object' => $body,
-                'previous_object' => $request?->attributes->get('previous_data'),
-                'request' => $request,
-            ];
-        } else {
-            $resourceAccessCheckerContext = [
-                'object' => $body,
-                'previous_object' => $context['graphql_context']['previous_object'] ?? null,
-            ];
+        if (!\is_array($isGranted)) {
+            $isGranted = [$isGranted];
         }
 
-        if (!$this->resourceAccessChecker->isGranted($operation->getClass(), $isGranted, $resourceAccessCheckerContext)) {
-            $operation instanceof GraphQlOperation ? throw new AccessDeniedHttpException($message ?? 'Access Denied.') : throw new AccessDeniedException($message ?? 'Access Denied.');
+        foreach ($isGranted as $attribute) {
+            if ($attribute instanceof IsGranted) {
+                continue;
+            }
+
+            if ($operation instanceof HttpOperation) {
+                $request = $context['request'] ?? null;
+
+                $resourceAccessCheckerContext = [
+                    'object' => $body,
+                    'previous_object' => $request?->attributes->get('previous_data'),
+                    'request' => $request,
+                ];
+            } else {
+                $resourceAccessCheckerContext = [
+                    'object' => $body,
+                    'previous_object' => $context['graphql_context']['previous_object'] ?? null,
+                ];
+            }
+
+            if (!$this->resourceAccessChecker->isGranted($operation->getClass(), $attribute, $resourceAccessCheckerContext)) {
+                $operation instanceof GraphQlOperation ? throw new AccessDeniedHttpException($message ?? 'Access Denied.') : throw new AccessDeniedException($message ?? 'Access Denied.');
+            }
         }
 
         return $body;

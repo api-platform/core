@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata;
 
 use ApiPlatform\State\OptionsInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * @psalm-inheritors ApiResource|Operation
@@ -64,7 +65,7 @@ abstract class Metadata
         protected ?bool $paginationClientPartial = null,
         protected ?bool $paginationFetchJoinCollection = null,
         protected ?bool $paginationUseOutputWalkers = null,
-        protected string|\Stringable|null $security = null,
+        protected string|\Stringable|IsGranted|array|null $security = null,
         protected ?string $securityMessage = null,
         protected string|\Stringable|null $securityPostDenormalize = null,
         protected ?string $securityPostDenormalizeMessage = null,
@@ -453,12 +454,12 @@ abstract class Metadata
         return $self;
     }
 
-    public function getSecurity(): ?string
+    public function getSecurity(): string|\Stringable|IsGranted|array|null
     {
-        return $this->security instanceof \Stringable ? (string) $this->security : $this->security;
+        return $this->security;
     }
 
-    public function withSecurity(string|\Stringable|null $security = null): static
+    public function withSecurity(string|\Stringable|IsGranted|array|null $security = null): static
     {
         $self = clone $this;
         $self->security = $security;

@@ -16,6 +16,7 @@ namespace ApiPlatform\Metadata;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\State\OptionsInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * Resource metadata attribute.
@@ -949,7 +950,7 @@ class ApiResource extends Metadata
          * </div>
          */
         protected ?string $paginationType = null,
-        protected string|\Stringable|null $security = null,
+        protected string|\Stringable|IsGranted|array|null $security = null,
         protected ?string $securityMessage = null,
         protected string|\Stringable|null $securityPostDenormalize = null,
         protected ?string $securityPostDenormalizeMessage = null,

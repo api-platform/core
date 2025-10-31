@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
 use ApiPlatform\OpenApi\Attributes\Webhook;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\State\OptionsInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\WebLink\Link as WebLink;
 
 class HttpOperation extends Operation
@@ -188,7 +189,7 @@ class HttpOperation extends Operation
         ?array $normalizationContext = null,
         ?array $denormalizationContext = null,
         ?bool $collectDenormalizationErrors = null,
-        string|\Stringable|null $security = null,
+        string|\Stringable|IsGranted|array|null $security = null,
         ?string $securityMessage = null,
         string|\Stringable|null $securityPostDenormalize = null,
         ?string $securityPostDenormalizeMessage = null,
