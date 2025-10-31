@@ -730,6 +730,45 @@ Feature: Search filter on collections
     """
 
   @createSchema
+  Scenario: Get collection by ulid 01H2ZS93NBKJW5W4Y01S8TZ43M
+    Given there is a UidBasedId resource with id "01H2ZS93NBKJW5W4Y01S8TZ43M"
+    When I send a "GET" request to "/uid_based_ids?id=/uid_based_ids/01H2ZS93NBKJW5W4Y01S8TZ43M"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    And the JSON should be valid according to this schema:
+    """
+    {
+      "type": "object",
+      "properties": {
+        "@context": {"pattern": "^/contexts/UidBasedId"},
+        "@id": {"pattern": "^/uid_based_ids"},
+        "@type": {"pattern": "^hydra:Collection$"},
+        "hydra:member": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "@id": {
+                "oneOf": [
+                  {"pattern": "^/uid_based_ids/01H2ZS93NBKJW5W4Y01S8TZ43M"}
+                ]
+              }
+            }
+          }
+        },
+        "hydra:view": {
+          "type": "object",
+          "properties": {
+            "@id": {"pattern": "^/uid_based_ids\\?id=%2Fuid_based_ids%2F01H2ZS93NBKJW5W4Y01S8TZ43M"},
+            "@type": {"pattern": "^hydra:PartialCollectionView$"}
+          }
+        }
+      }
+    }
+    """
+
+  @createSchema
   Scenario: Get collection ordered by a non valid properties
     When I send a "GET" request to "/dummies?unknown=0"
     Given there are 30 dummy objects
