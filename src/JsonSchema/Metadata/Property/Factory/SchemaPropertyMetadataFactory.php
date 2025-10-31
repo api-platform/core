@@ -280,6 +280,7 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
                 TypeIdentifier::OBJECT => ['type' => 'object'],
                 TypeIdentifier::RESOURCE => ['type' => 'string'],
                 TypeIdentifier::CALLABLE => ['type' => 'string'],
+                TypeIdentifier::MIXED => ['type' => 'string'],
                 default => ['type' => 'null'],
             };
 
