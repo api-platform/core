@@ -37,8 +37,12 @@ final class Parameters implements \IteratorAggregate, \Countable
                 $parameterName = $parameter->getKey();
             }
 
-            $this->parameters[] = [$parameterName, $parameter];
+            $key = \sprintf('%s.%s', $parameter::class, $parameterName);
+
+            $this->parameters[$key] = [$parameterName, $parameter];
         }
+
+        $this->parameters = array_values($this->parameters);
 
         $this->sort();
     }
