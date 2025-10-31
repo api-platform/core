@@ -61,6 +61,25 @@ class MakeFilterTest extends KernelTestCase
         $this->assertStringContainsString(' Next: Open your filter class and start customizing it.', $display);
     }
 
+    public function testMakeFilterWithCustomNamespace(): void
+    {
+        $inputs = ['name' => 'CustomOrmFilter', 'type' => 'orm', '--namespace-prefix' => 'Api\\Filter\\'];
+        $newFilterFile = self::tempFile('src/Api/Filter/CustomOrmFilter.php');
+
+        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:filter'));
+        $tester->execute($inputs);
+
+        $this->assertFileExists($newFilterFile);
+
+        // Unify line endings
+        $expected = preg_replace('~\R~u', "\r\n", file_get_contents(__DIR__.'/../../Fixtures/Symfony/Maker/NamespacedCustomOrmFilter.fixture'));
+        $result = preg_replace('~\R~u', "\r\n", file_get_contents($newFilterFile));
+        $this->assertStringContainsString($expected, $result);
+
+        $display = $tester->getDisplay();
+        $this->assertStringContainsString('Success!', $display);
+    }
+
     public static function filterProvider(): \Generator
     {
         yield 'Generate ORM filter' => ['orm', 'CustomOrmFilter', true];

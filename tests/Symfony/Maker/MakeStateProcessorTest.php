@@ -56,6 +56,25 @@ class MakeStateProcessorTest extends KernelTestCase
         $this->assertStringContainsString('Next: Open your new state processor class and start customizing it.', $display);
     }
 
+    public function testMakeStateProcessorWithCustomNamespace(): void
+    {
+        $inputs = ['name' => 'CustomStateProcessor', '--namespace-prefix' => 'Api\\State\\'];
+        $newProviderFile = self::tempFile('src/Api/State/CustomStateProcessor.php');
+
+        $tester = new CommandTester((new Application(self::bootKernel()))->find('make:state-processor'));
+        $tester->execute($inputs);
+
+        $this->assertFileExists($newProviderFile);
+
+        // Unify line endings
+        $expected = preg_replace('~\R~u', "\r\n", file_get_contents(__DIR__.'/../../Fixtures/Symfony/Maker/NamespacedCustomStateProcessor.fixture'));
+        $result = preg_replace('~\R~u', "\r\n", file_get_contents($newProviderFile));
+        $this->assertStringContainsString($expected, $result);
+
+        $display = $tester->getDisplay();
+        $this->assertStringContainsString('Success!', $display);
+    }
+
     public static function stateProcessorProvider(): \Generator
     {
         yield 'Generate state processor' => [
