@@ -16,6 +16,7 @@ namespace ApiPlatform\Metadata;
 use ApiPlatform\OpenApi\Attributes\Webhook;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\State\OptionsInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class Patch extends HttpOperation
@@ -67,11 +68,11 @@ final class Patch extends HttpOperation
         ?array $normalizationContext = null,
         ?array $denormalizationContext = null,
         ?bool $collectDenormalizationErrors = null,
-        string|\Stringable|null $security = null,
+        string|\Stringable|IsGranted|array|null $security = null,
         ?string $securityMessage = null,
-        string|\Stringable|null $securityPostDenormalize = null,
+        string|\Stringable|IsGranted|array|null $securityPostDenormalize = null,
         ?string $securityPostDenormalizeMessage = null,
-        string|\Stringable|null $securityPostValidation = null,
+        string|\Stringable|IsGranted|array|null $securityPostValidation = null,
         ?string $securityPostValidationMessage = null,
         ?string $deprecationReason = null,
         ?array $filters = null,

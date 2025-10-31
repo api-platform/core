@@ -37,4 +37,11 @@ return function (ContainerConfigurator $container) {
             service('api_platform.state_provider.security_parameter.inner'),
             service('api_platform.security.resource_access_checker'),
         ]);
+
+    $services->set('api_platform.state_provider.is_granted_access_checker', 'ApiPlatform\Symfony\Security\State\IsGrantedAccessCheckerProvider')
+        ->decorate('api_platform.state_provider.read', null, 0)
+        ->args([
+            service('api_platform.state_provider.is_granted_access_checker.inner'),
+            service('security.authorization_checker')->ignoreOnInvalid(),
+        ]);
 };
