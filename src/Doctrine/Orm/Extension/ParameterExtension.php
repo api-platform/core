@@ -15,6 +15,7 @@ namespace ApiPlatform\Doctrine\Orm\Extension;
 
 use ApiPlatform\Doctrine\Common\Filter\LoggerAwareInterface;
 use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
+use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterInterface;
 use ApiPlatform\Doctrine\Common\ParameterValueExtractorTrait;
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
@@ -75,19 +76,21 @@ final class ParameterExtension implements QueryCollectionExtensionInterface, Que
                 $filter->setLogger($this->logger);
             }
 
-            if ($filter instanceof AbstractFilter && !$filter->getProperties()) {
+            if ($filter instanceof PropertyAwareFilterInterface) {
+                $properties = [];
                 $propertyKey = $parameter->getProperty() ?? $parameter->getKey();
+                if ($filter instanceof AbstractFilter) {
+                    $properties = $filter->getProperties() ?? [];
 
-                if (str_contains($propertyKey, ':property')) {
-                    $extraProperties = $parameter->getExtraProperties()['_properties'] ?? [];
-                    foreach (array_keys($extraProperties) as $property) {
-                        $properties[$property] = $parameter->getFilterContext();
+                    if (str_contains($propertyKey, ':property')) {
+                        $extraProperties = $parameter->getExtraProperties()['_properties'] ?? [];
+                        foreach (array_keys($extraProperties) as $property) {
+                            $properties[$property] = $parameter->getFilterContext();
+                        }
                     }
-                } else {
-                    $properties = [$propertyKey => $parameter->getFilterContext()];
                 }
 
-                $filter->setProperties($properties ?? []);
+                $filter->setProperties($properties + [$propertyKey => $parameter->getFilterContext()]);
             }
 
             $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation,
