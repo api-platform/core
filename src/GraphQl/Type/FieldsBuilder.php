@@ -31,6 +31,7 @@ use ApiPlatform\Metadata\Util\Inflector;
 use ApiPlatform\Metadata\Util\PropertyInfoToTypeInfoHelper;
 use ApiPlatform\Metadata\Util\TypeHelper;
 use ApiPlatform\State\Pagination\Pagination;
+use ApiPlatform\State\Util\StateOptionsTrait;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\NonNull;
@@ -55,6 +56,8 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  */
 final class FieldsBuilder implements FieldsBuilderEnumInterface
 {
+    use StateOptionsTrait;
+
     private readonly ContextAwareTypeBuilderInterface $typeBuilder;
 
     public function __construct(private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ResourceClassResolverInterface $resourceClassResolver, private readonly TypesContainerInterface $typesContainer, ContextAwareTypeBuilderInterface $typeBuilder, private readonly TypeConverterInterface $typeConverter, private readonly ResolverFactoryInterface $resolverFactory, private readonly ContainerInterface $filterLocator, private readonly Pagination $pagination, private readonly ?NameConverterInterface $nameConverter, private readonly string $nestingSeparator, private readonly ?InflectorInterface $inflector = new Inflector())
@@ -85,7 +88,7 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
             return [];
         }
 
-        $fieldName = lcfirst('item_query' === $operation->getName() ? $operation->getShortName() : $operation->getName().$operation->getShortName());
+        $fieldName = lcfirst('item_query' === $operation->getName() ? ($operation->getShortName() ?? $operation->getName()) : $operation->getName().$operation->getShortName());
 
         if ($fieldConfiguration = $this->getResourceFieldConfiguration(null, $operation->getDescription(), $operation->getDeprecationReason(), Type::nullable(Type::object($resourceClass)), $resourceClass, false, $operation)) {
             $args = $this->resolveResourceArgs($configuration['args'] ?? [], $operation);
@@ -606,7 +609,8 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
                 continue;
             }
 
-            foreach ($this->filterLocator->get($filterId)->getDescription($resourceClass) as $key => $description) {
+            $entityClass = $this->getStateOptionsClass($resourceOperation, $resourceOperation->getClass());
+            foreach ($this->filterLocator->get($filterId)->getDescription($entityClass) as $key => $description) {
                 $filterType = \in_array($description['type'], TypeIdentifier::values(), true) ? Type::builtin($description['type']) : Type::object($description['type']);
                 if (!($description['required'] ?? false)) {
                     $filterType = Type::nullable($filterType);

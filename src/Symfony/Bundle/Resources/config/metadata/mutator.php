@@ -16,7 +16,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 return function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.metadata.mutator_collection.resource', 'ApiPlatform\Metadata\Mutator\ResourceResourceMutatorCollection');
+    $services->set('api_platform.metadata.mutator_collection.resource', 'ApiPlatform\Metadata\Mutator\ResourceMutatorCollection');
 
-    $services->set('api_platform.metadata.mutator_collection.operation', 'ApiPlatform\Metadata\Mutator\OperationResourceMutatorCollection');
+    $services->set('api_platform.metadata.mutator_collection.operation', 'ApiPlatform\Metadata\Mutator\OperationMutatorCollection');
 };

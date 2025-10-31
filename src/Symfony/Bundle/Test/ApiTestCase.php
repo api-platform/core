@@ -50,7 +50,7 @@ abstract class ApiTestCase extends KernelTestCase
             trigger_deprecation(
                 'api-platform/symfony',
                 '4.1.0',
-                'In API Platform 5.0, the kernel will not always be booted when a new client is created (see https://github.com/api-platform/core/issues/6971).',
+                'Currently, the kernel will always be booted when a new client is created, but in API Platform 5.0, it will not be booted unless you set `static::$alwaysBootKernel` to `true` (the default will be `false`). See https://github.com/api-platform/core/issues/6971 for more information.',
             );
         }
 

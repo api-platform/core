@@ -59,7 +59,7 @@ final class ObjectMapperProvider implements ProviderInterface
 
         $entityClass ??= $data::class;
 
-        if (!(new \ReflectionClass($entityClass))->getAttributes(Map::class)) {
+        if (!(new \ReflectionClass($operation->getClass()))->getAttributes(Map::class) && !(new \ReflectionClass($entityClass))->getAttributes(Map::class)) {
             return $data;
         }
 
