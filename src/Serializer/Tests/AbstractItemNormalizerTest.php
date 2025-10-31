@@ -1084,10 +1084,18 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::type('array'))->willReturn(new PropertyNameCollection(['relatedDummy']));
 
-        $relatedDummyType = new Type(Type::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class);
+        // BC layer for api-platform/metadata < 4.1
+        if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
+            $relatedDummyType = new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class);
 
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([$relatedDummyType])->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(false));
+            $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+            $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([$relatedDummyType])->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(false));
+        } else {
+            $relatedDummyType = Type::object(RelatedDummy::class);
+
+            $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+            $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType($relatedDummyType)->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(false));
+        }
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getResourceFromIri('/dummies/not_found', Argument::type('array'))->willThrow(new ItemNotFoundException());
