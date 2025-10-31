@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Eloquent\PropertyAccess;
 
+use ApiPlatform\Laravel\Eloquent\Metadata\ModelMetadata;
 use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -27,6 +28,7 @@ final class PropertyAccessor implements PropertyAccessorInterface
 
     public function __construct(
         ?PropertyAccessorInterface $inner = null,
+        private readonly ?ModelMetadata $modelMetadata = null,
     ) {
         $this->inner = $inner ?? PropertyAccess::createPropertyAccessor();
     }
@@ -53,6 +55,11 @@ final class PropertyAccessor implements PropertyAccessorInterface
     public function getValue(object|array $objectOrArray, string|PropertyPathInterface $propertyPath): mixed
     {
         if ($objectOrArray instanceof Model) {
+            $key = (string) $propertyPath;
+            if (\array_key_exists($key, $relations = $this->modelMetadata->getRelations($objectOrArray))) {
+                return $objectOrArray->{$relations[$key]['method_name']};
+            }
+
             return $objectOrArray->{$propertyPath};
         }
 

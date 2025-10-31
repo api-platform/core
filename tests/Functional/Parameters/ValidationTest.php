@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional\Parameters;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\TranslateValidationError;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ValidateParameterBeforeProvider;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\WithParameter;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
@@ -29,13 +30,13 @@ final class ValidationTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [WithParameter::class, ValidateParameterBeforeProvider::class];
+        return [WithParameter::class, ValidateParameterBeforeProvider::class, TranslateValidationError::class];
     }
 
     public function testWithGroupFilter(): void
     {
         $response = self::createClient()->request('GET', 'with_parameters_collection');
-        $this->assertArraySubset(['violations' => [['message' => 'The parameter "hydra" is required.']]], $response->toArray(false));
+        $this->assertArraySubset(['violations' => [['message' => 'This value should not be null.']]], $response->toArray(false));
         $response = self::createClient()->request('GET', 'with_parameters_collection?hydra');
         $this->assertResponseIsSuccessful();
     }
@@ -184,5 +185,14 @@ final class ValidationTest extends ApiTestCase
     {
         self::createClient()->request('GET', 'validate_parameters?pattern=2');
         $this->assertResponseIsSuccessful();
+    }
+
+    public function testTranslationValidation(): void
+    {
+        $res = self::createClient()->request('GET', 'translate_validation_error', ['headers' => ['accept-language' => 'es']]);
+        $this->assertSame([
+            ['propertyPath' => 'name', 'message' => 'Este valor no debería estar vacío.', 'code' => 'c1051bb4-d103-4f74-8988-acbcafc7fdc3'],
+            ['propertyPath' => 'surname', 'message' => 'Este valor no debería ser nulo.', 'code' => 'ad32d13f-c3d4-423b-909a-857b961eb720'],
+        ], $res->toArray(false)['violations']);
     }
 }

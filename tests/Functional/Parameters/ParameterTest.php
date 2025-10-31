@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional\Parameters;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\TranslateValidationError;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\WithParameter;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -29,7 +30,7 @@ final class ParameterTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [WithParameter::class];
+        return [WithParameter::class, TranslateValidationError::class];
     }
 
     public function testWithGroupFilter(): void

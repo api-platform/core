@@ -378,4 +378,23 @@ class JsonLdTest extends TestCase
         $this->assertArrayHasKey('id', $home['order']);
         $this->assertArrayHasKey('number', $home['order']);
     }
+
+    public function testPostIssue7338Input(): void
+    {
+        $data = [
+            'title' => 'Test Title',
+            'description' => 'Test Description', // description should not be denormalized because of serialization groups
+        ];
+
+        $response = $this->postJson('/api/issue7338_reproducers/input', $data, ['accept' => 'application/ld+json', 'content-type' => 'application/ld+json']);
+        $response->assertStatus(201);
+        $response->assertJson(['title' => 'Test Title']);
+    }
+
+    public function testGetIssue7338Output(): void
+    {
+        $response = $this->getJson('/api/issue7338_reproducers/1/output', ['accept' => 'application/ld+json']);
+        $response->assertStatus(200);
+        $response->assertJson(['name' => 'Test Name']);
+    }
 }

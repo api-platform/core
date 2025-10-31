@@ -139,6 +139,7 @@ class AppKernel extends Kernel
                 'annotations' => false,
                 'handle_all_throwables' => true,
                 'uid' => ['default_uuid_version' => 7, 'time_based_uuid_version' => 7],
+                'set_locale_from_accept_language' => true,
             ];
         } else {
             $config = [
@@ -155,6 +156,7 @@ class AppKernel extends Kernel
                 'router' => ['utf8' => true],
                 'http_method_override' => false,
                 'annotations' => false,
+                'set_locale_from_accept_language' => true,
             ];
         }
 
