@@ -248,7 +248,7 @@ jobs:
         continue-on-error: true
 
   phpunit-components:
-    name: PHPUnit ${{ matrix.component }} (PHP ${{ matrix.php.version }} ${{ matrix.php.coverage && 'coverage' || '' }}${{ matrix.php.lowest && 'lowest' || '' }})
+    name: PHPUnit ${{ matrix.component }} (PHP ${{ matrix.php.version }} ${{ matrix.php.coverage && 'coverage' || '' }}${{ matrix.php.lowest && 'lowest' || '' }}${{ matrix.php.minimal-changes && 'minimal-changes' || '' }})
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -260,6 +260,8 @@ jobs:
             coverage: true
           - version: '8.4'
             lowest: true
+          - version: '8.4'
+            minimal-changes: true
         component:
           - api-platform/doctrine-common
           - api-platform/doctrine-orm
@@ -293,15 +295,15 @@ jobs:
           composer global require soyuka/pmu
           composer global config allow-plugins.soyuka/pmu true --no-interaction
       - name: Linking
-        if: ${{ !matrix.php.lowest }}
+        if: ${{ !matrix.php.lowest && !matrix.php.minimal-changes }}
         run: |
           composer global link . --permanent
           composer ${{matrix.component}} update
       - name: Run ${{ matrix.component }} install
-        if: ${{ matrix.php.lowest }}
+        if: ${{ matrix.php.lowest || matrix.php.minimal-changes }}
         run: |
           cd $(composer ${{matrix.component}} --cwd)
-          composer update${{ matrix.php.lowest && ' --prefer-lowest --prefer-source' || '' }}
+          composer update${{ matrix.php.lowest && ' --prefer-lowest --prefer-source' || '' }}${{ matrix.php.minimal-changes && ' --minimal-changes' || '' }}
       - name: Run ${{ matrix.component }} tests
         run: |
           mkdir -p /tmp/build/logs/phpunit
