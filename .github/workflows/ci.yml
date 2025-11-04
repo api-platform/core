@@ -10,7 +10,7 @@ concurrency:
 
 env:
   COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  COMPOSER_ROOT_VERSION: "4.1.x-dev"
+  COMPOSER_ROOT_VERSION: "4.2.x-dev"
 
 jobs:
   architecture:
