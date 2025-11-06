@@ -38,12 +38,6 @@ final class WritePropertyMetadataLoader implements PropertyMetadataLoaderInterfa
         $properties = $this->loader->load($className, $options, $context);
 
         if (IriTemplate::class === $className) {
-            $properties['template'] = new PropertyMetadata(
-                'template',
-                Type::string(),
-                ['api_platform.hydra.json_streamer.write.value_transformer.template'],
-            );
-
             return $properties;
         }
 
