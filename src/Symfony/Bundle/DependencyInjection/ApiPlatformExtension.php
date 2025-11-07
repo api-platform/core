@@ -964,6 +964,12 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             return;
         }
 
+        $namespaceprefix = $config['maker']['namespace_prefix'] ?? '';
+        if ('' !== $namespaceprefix) {
+            $namespaceprefix = trim($namespaceprefix, '\\').'\\';
+        }
+        $container->setParameter('api_platform.maker.namespace_prefix', $namespaceprefix);
+
         $loader->load('maker.php');
     }
 

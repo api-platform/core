@@ -657,6 +657,9 @@ final class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('maker')
                     ->{class_exists(MakerBundle::class) ? 'canBeDisabled' : 'canBeEnabled'}()
+                    ->children()
+                        ->scalarNode('namespace_prefix')->defaultValue('')->info('Add a prefix to all maker generated classes. e.g set it to "Api" to set the maker namespace to "App\\Api\\" (if the maker.root_namespace config is App). e.g. App\\Api\\State\\MyStateProcessor')->end()
+                    ->end()
                 ->end()
             ->end();
     }

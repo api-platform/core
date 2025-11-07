@@ -21,9 +21,14 @@ use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 
 final class MakeStateProvider extends AbstractMaker
 {
+    public function __construct(private readonly string $namespacePrefix = '')
+    {
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -47,6 +52,7 @@ final class MakeStateProvider extends AbstractMaker
     {
         $command
             ->addArgument('name', InputArgument::REQUIRED, 'Choose a class name for your state provider (e.g. <fg=yellow>AwesomeStateProvider</>)')
+            ->addOption('namespace-prefix', 'p', InputOption::VALUE_REQUIRED, 'Specify the namespace prefix to use for the state provider class', $this->namespacePrefix.'State')
             ->setHelp(file_get_contents(__DIR__.'/Resources/help/MakeStateProvider.txt'));
     }
 
@@ -64,7 +70,7 @@ final class MakeStateProvider extends AbstractMaker
     {
         $stateProviderClassNameDetails = $generator->createClassNameDetails(
             $input->getArgument('name'),
-            'State\\'
+            trim($input->getOption('namespace-prefix'), '\\').'\\'
         );
 
         $generator->generateClass(
