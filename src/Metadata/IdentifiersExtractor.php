@@ -62,6 +62,9 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
         return $this->getIdentifiersFromOperation($item, $operation, $context);
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     private function getIdentifiersFromOperation(object $item, Operation $operation, array $context = []): array
     {
         if ($operation instanceof HttpOperation) {
@@ -75,7 +78,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
             if (1 < (is_countable($link->getIdentifiers()) ? \count($link->getIdentifiers()) : 0)) {
                 $compositeIdentifiers = [];
                 foreach ($link->getIdentifiers() as $identifier) {
-                    $compositeIdentifiers[$identifier] = $this->getIdentifierValue($item, $link->getFromClass() ?? $operation->getClass(), $identifier, $link->getParameterName());
+                    $compositeIdentifiers[$identifier] = $this->getIdentifierValue($item, $link->getFromClass() ?? $operation->getClass(), $identifier, $link->getParameterName(), null, $context, $operation);
                 }
 
                 $identifiers[$link->getParameterName()] = CompositeIdentifierParser::stringify($compositeIdentifiers);
@@ -83,7 +86,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
             }
 
             $parameterName = $link->getParameterName();
-            $identifiers[$parameterName] = $this->getIdentifierValue($item, $link->getFromClass() ?? $operation->getClass(), $link->getIdentifiers()[0] ?? $k, $parameterName, $link->getToProperty());
+            $identifiers[$parameterName] = $this->getIdentifierValue($item, $link->getFromClass() ?? $operation->getClass(), $link->getIdentifiers()[0] ?? $k, $parameterName, $link->getToProperty(), $context, $operation);
         }
 
         return $identifiers;
@@ -91,14 +94,25 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
 
     /**
      * Gets the value of the given class property.
+     *
+     * @param array<string, mixed> $context
      */
-    private function getIdentifierValue(object $item, string $class, string $property, string $parameterName, ?string $toProperty = null): float|bool|int|string
+    private function getIdentifierValue(object $item, string $class, string $property, string $parameterName, ?string $toProperty, array $context, Operation $operation): float|bool|int|string
     {
         if ($item instanceof $class) {
             try {
                 return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, $property), $parameterName);
             } catch (NoSuchPropertyException $e) {
                 throw new RuntimeException('Not able to retrieve identifiers.', $e->getCode(), $e);
+            }
+        }
+
+        // ItemUriTemplate is defined on a collection and we read the identifier alghough the PHP class may be different
+        if (isset($context['item_uri_template']) && $operation->getClass() === $class) {
+            try {
+                return $this->resolveIdentifierValue($this->propertyAccessor->getValue($item, $property), $parameterName);
+            } catch (NoSuchPropertyException $e) {
+                throw new RuntimeException(\sprintf('Could not retrieve identifier "%s" for class "%s" using itemUriTemplate "%s". Check that the property exists and is accessible.', $property, $class, $context['item_uri_template']), $e->getCode(), $e);
             }
         }
 

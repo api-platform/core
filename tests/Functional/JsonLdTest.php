@@ -22,6 +22,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6810\JsonLdContextOut
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7298\ImageModuleResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7298\PageResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7298\TitleModuleResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ItemUriTemplateWithCollection\Recipe;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ItemUriTemplateWithCollection\RecipeCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6465\Bar;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6465\Foo;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
@@ -39,7 +41,20 @@ class JsonLdTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [Foo::class, Bar::class, JsonLdContextOutput::class, GenIdFalse::class, AggregateRating::class, LevelFirst::class, LevelThird::class, PageResource::class, TitleModuleResource::class, ImageModuleResource::class];
+        return [
+            Foo::class,
+            Bar::class,
+            JsonLdContextOutput::class,
+            GenIdFalse::class,
+            AggregateRating::class,
+            LevelFirst::class,
+            LevelThird::class,
+            PageResource::class,
+            TitleModuleResource::class,
+            ImageModuleResource::class,
+            Recipe::class,
+            RecipeCollection::class,
+        ];
     }
 
     /**
@@ -124,6 +139,30 @@ class JsonLdTest extends ApiTestCase
                     '@type' => 'ImageModule',
                     'id' => 'image-module-1',
                     'url' => 'http://example.com/image.jpg',
+                ],
+            ],
+        ]);
+    }
+
+    public function testItemUriTemplate(): void
+    {
+        self::createClient()->request(
+            'GET',
+            '/item_uri_template_recipes',
+        );
+        $this->assertResponseIsSuccessful();
+
+        $this->assertJsonContains([
+            'member' => [
+                [
+                    '@type' => 'RecipeCollection',
+                    '@id' => '/item_uri_template_recipes/1',
+                    'name' => 'Dummy Recipe',
+                ],
+                [
+                    '@type' => 'RecipeCollection',
+                    '@id' => '/item_uri_template_recipes/2',
+                    'name' => 'Dummy Recipe 2',
                 ],
             ],
         ]);
