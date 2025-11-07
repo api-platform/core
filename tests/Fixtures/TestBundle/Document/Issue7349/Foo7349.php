@@ -11,24 +11,28 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue7349;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document\Issue7349;
 
 use ApiPlatform\Metadata\ApiResource;
-use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-#[ORM\Entity]
+/**
+ * Foo7349.
+ *
+ * @author Maxime Valin <contact@maximeval.in>
+ */
+
 #[ApiResource]
+#[ODM\Document]
 class Foo7349
 {
     /**
-     * @var ?int id
+     * @var int id
      */
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'AUTO')]
-    #[ORM\Column(type: 'integer')]
-    private ?int $id = null;
+    #[ODM\Id(type: 'int', strategy: 'INCREMENT')]
+    private int $id;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ODM\Field(type: 'string')]
     private string $name;
 
     public function getId(): ?int
