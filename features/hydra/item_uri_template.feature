@@ -146,13 +146,13 @@ Feature: Exposing a collection of objects should use the specified operation to 
       "hydra:member":[
         {
           "@id":"/item_referenced_in_collection/a",
-          "@type":"CollectionReferencingItem",
+          "@type":"ItemReferencedInCollection",
           "id":"a",
           "name":"hello"
         },
         {
           "@id":"/item_referenced_in_collection/b",
-          "@type":"CollectionReferencingItem",
+          "@type":"ItemReferencedInCollection",
           "id":"b",
           "name":"you"
         }
