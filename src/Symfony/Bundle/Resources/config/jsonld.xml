@@ -31,6 +31,7 @@
             <argument>%api_platform.serializer.default_context%</argument>
             <argument type="service" id="api_platform.security.resource_access_checker" on-invalid="ignore" />
             <argument type="service" id="api_platform.http_cache.tag_collector" on-invalid="ignore" />
+            <argument type="service" id="api_platform.metadata.operation.metadata_factory" on-invalid="ignore" />
 
             <!-- Run before serializer.normalizer.json_serializable -->
             <tag name="serializer.normalizer" priority="-890" />
