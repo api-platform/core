@@ -337,7 +337,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->getDefinition('api_platform.metadata.resource_extractor.xml')->replaceArgument(0, $xmlResources);
         $container->getDefinition('api_platform.metadata.property_extractor.xml')->replaceArgument(0, $xmlResources);
 
-        if (class_exists(PhpDocParser::class)) {
+        if ($config['enable_phpdoc_parser'] && class_exists(PhpDocParser::class)) {
             $loader->load('metadata/php_doc.xml');
         }
 
