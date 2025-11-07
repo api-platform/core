@@ -22,6 +22,8 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
     use ResourceClassInfoTrait;
 
     private const GLUE = '.';
+    private const JSON_MERGE_PATCH_SCHEMA_POSTFIX = 'jsonMergePatch';
+
     private array $prefixCache = [];
 
     public function __construct(private ?array $distinctFormats = null)
@@ -50,8 +52,9 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
         // TODO: remove in 5.0
         $v = $this->distinctFormats ? ($this->distinctFormats[$format] ?? false) : true;
 
-        if ('json' !== $format && $v) {
+        if (!\in_array($format, ['json', 'merge-patch+json'], true) && $v) {
             // JSON is the default, and so isn't included in the definition name
+            // JSON merge patch is postfixed at the end
             $prefix .= self::GLUE.$format;
         }
 
@@ -65,6 +68,10 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
 
         if (false === ($serializerContext['gen_id'] ?? true)) {
             $name .= '_noid';
+        }
+
+        if ('merge-patch+json' === $format) {
+            $name .= self::GLUE.self::JSON_MERGE_PATCH_SCHEMA_POSTFIX;
         }
 
         return $this->encodeDefinitionName($name);
