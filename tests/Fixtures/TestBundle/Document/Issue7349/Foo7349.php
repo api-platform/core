@@ -21,7 +21,6 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *
  * @author Maxime Valin <contact@maximeval.in>
  */
-
 #[ApiResource]
 #[ODM\Document]
 class Foo7349

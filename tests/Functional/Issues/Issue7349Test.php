@@ -17,7 +17,6 @@ use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\Concerns\WithWorkbench;
-use Orchestra\Testbench\TestCase;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -27,8 +26,8 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 class Issue7349Test extends ApiTestCase
 {
     use RecreateSchemaTrait;
-    use WithWorkbench;
     use RefreshDatabase;
+    use WithWorkbench;
 
     /**
      * When using partial pagination, totalItems should not be present.
