@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity()]
@@ -21,7 +22,10 @@ use Doctrine\ORM\Mapping as ORM;
 #[ApiResource(
     jsonStream: true,
     paginationEnabled: false,
-    normalizationContext: ['hydra_prefix' => false]
+    normalizationContext: ['hydra_prefix' => false],
+    parameters: [
+        'q' => new QueryParameter(property: 'FreeTextQuery'),
+    ]
 )]
 class JsonStreamResource
 {
