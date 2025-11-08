@@ -23,4 +23,15 @@ return function (ContainerConfigurator $container) {
         ]);
 
     $services->alias('ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface', 'api_platform.metadata.operation.metadata_factory');
+
+    $services->set('api_platform.metadata.operation.metadata_factory.cached', 'ApiPlatform\Metadata\Operation\Factory\CacheOperationMetadataFactory')
+        ->decorate('api_platform.metadata.operation.metadata_factory', null, -10)
+        ->args([
+            service('api_platform.cache.metadata.operation'),
+            service('api_platform.metadata.operation.metadata_factory.cached.inner'),
+        ]);
+
+    $services->set('api_platform.cache.metadata.operation')
+        ->parent('cache.system')
+        ->tag('cache.pool');
 };
