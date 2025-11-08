@@ -1,10 +1,7 @@
 # Changelog
 
 ## v4.2.3
-
-### Bug fixes
-
-* [4fa6d3fa2](https://github.com/api-platform/core/commit/4fa6d3fa2a8d26b33318a19298cea3cd5ee43470) fix(laravel): groups with input/output
+<<<<<<< HEAD
 * [9416083f7](https://github.com/api-platform/core/commit/9416083f7631b28093f3c79db995862338477137) fix(state): object mapper aware interface (#7486)
 * [99718d954](https://github.com/api-platform/core/commit/99718d9547ab8b064f1184c7ec2b15d882853dcb) fix(serializer): resilient denormalizeRelation capability (#7474)
 * [9b2f98610](https://github.com/api-platform/core/commit/9b2f98610cbf661335416880fcd25052468107b3) fix(metadata): eliminate duplicate keys in the constructor of `Parameters` (#7492)
@@ -332,6 +329,17 @@ TypeInfo:
 * [79edced67](https://github.com/api-platform/core/commit/79edced67ccca1a7b80455dd94203501d9c4fa89) !fix(json-schema): share invariable sub-schemas
 * [cff61eab8](https://github.com/api-platform/core/commit/cff61eab8643f8ed08d59c0684e77740d0d81b04) fix(metadata): append php file resource extractor (#7193)
 * [f3d4afe03](https://github.com/api-platform/core/commit/f3d4afe032385f3b665131a365e42706930f0730) fix(symfony): validator type-info
+
+## v4.1.26
+
+### Bug fixes
+
+* [4fa6d3fa2](https://github.com/api-platform/core/commit/4fa6d3fa2a8d26b33318a19298cea3cd5ee43470) fix(laravel): groups with input/output
+* [99718d954](https://github.com/api-platform/core/commit/99718d9547ab8b064f1184c7ec2b15d882853dcb) fix(serializer): resilient denormalizeRelation capability (#7474)
+* [a26c35840](https://github.com/api-platform/core/commit/a26c358404ed1c100dc3472fe00600368bb611f3) fix(doctrine): properly set properties according to interface (#7487)
+* [a2867e986](https://github.com/api-platform/core/commit/a2867e986cea5c63ca79b19cf9a1b929edb94b79) fix(laravel): serializer attributes on Eloquent methods (#7416)
+* [ddf4c0b5e](https://github.com/api-platform/core/commit/ddf4c0b5e6bd048ef9b702cd77b89bbbcbbf9a1f) fix(graphql): stateOptions to get filter class (#7485)
+* [fafbe5c7b](https://github.com/api-platform/core/commit/fafbe5c7b1418c33baea2506458449562001d2fa) fix(validator): custom message was not translated (#7424)
 
 ## v4.1.25
 
