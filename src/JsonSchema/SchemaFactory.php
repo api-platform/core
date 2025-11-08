@@ -43,8 +43,6 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     use ResourceMetadataTrait;
     use SchemaUriPrefixTrait;
 
-    private const JSON_MERGE_PATCH_SCHEMA_POSTFIX = '.jsonMergePatch';
-
     private ?SchemaFactoryInterface $schemaFactory = null;
     // Edge case where the related resource is not readable (for example: NotExposed) but we have groups to read the whole related object
     public const OPENAPI_DEFINITION_NAME = 'openapi_definition_name';
@@ -83,7 +81,6 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
         $validationGroups = $operation ? $this->getValidationGroups($operation) : [];
         $version = $schema->getVersion();
-        $definitionName = $this->definitionNameFactory->create($className, $format, $inputOrOutputClass, $operation, $serializerContext);
         $method = $operation instanceof HttpOperation ? $operation->getMethod() : 'GET';
         if (!$operation) {
             $method = Schema::TYPE_INPUT === $type ? 'POST' : 'GET';
@@ -95,9 +92,12 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
 
         $isJsonMergePatch = 'json' === $format && 'PATCH' === $method && Schema::TYPE_INPUT === $type;
-        if ($isJsonMergePatch) {
-            $definitionName .= self::JSON_MERGE_PATCH_SCHEMA_POSTFIX;
-        }
+        $definitionFormat = match (true) {
+            default => $format,
+            $isJsonMergePatch => 'merge-patch+json',
+        };
+
+        $definitionName = $this->definitionNameFactory->create($className, $definitionFormat, $inputOrOutputClass, $operation, $serializerContext);
 
         if (!isset($schema['$ref']) && !isset($schema['type'])) {
             $ref = $this->getSchemaUriPrefix($version).$definitionName;

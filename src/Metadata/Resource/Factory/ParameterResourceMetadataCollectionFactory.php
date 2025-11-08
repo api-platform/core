@@ -120,6 +120,10 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         $propertyNames = $properties = [];
         $parameters = $operation->getParameters() ?? new Parameters();
         foreach ($parameters as $key => $parameter) {
+            if (!$parameter->getKey()) {
+                $parameter = $parameter->withKey($key);
+            }
+
             ['propertyNames' => $propertyNames, 'properties' => $properties] = $this->getProperties($resourceClass, $parameter);
             if (null === $parameter->getProvider() && (($f = $parameter->getFilter()) && $f instanceof ParameterProviderFilterInterface)) {
                 $parameters->add($key, $parameter->withProvider($f->getParameterProvider()));

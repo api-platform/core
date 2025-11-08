@@ -160,6 +160,7 @@ class JsonStreamerTest extends ApiTestCase
         $this->assertEquals('JsonStreamResource', $res['member'][0]['@type']);
         $this->assertArrayHasKey('totalItems', $res);
         $this->assertIsInt($res['totalItems']);
+        $this->assertArrayHasKey('search', $res);
     }
 
     public function testJsonStreamerJson(): void
