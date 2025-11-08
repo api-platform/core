@@ -22,8 +22,11 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6810\JsonLdContextOut
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7298\ImageModuleResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7298\PageResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7298\TitleModuleResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ItemUriTemplateWithCollection\Recipe;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ItemUriTemplateWithCollection\RecipeCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6465\Bar;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6465\Foo;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Recipe as EntityRecipe;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -39,7 +42,20 @@ class JsonLdTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [Foo::class, Bar::class, JsonLdContextOutput::class, GenIdFalse::class, AggregateRating::class, LevelFirst::class, LevelThird::class, PageResource::class, TitleModuleResource::class, ImageModuleResource::class];
+        return [
+            Foo::class,
+            Bar::class,
+            JsonLdContextOutput::class,
+            GenIdFalse::class,
+            AggregateRating::class,
+            LevelFirst::class,
+            LevelThird::class,
+            PageResource::class,
+            TitleModuleResource::class,
+            ImageModuleResource::class,
+            Recipe::class,
+            RecipeCollection::class,
+        ];
     }
 
     /**
@@ -129,6 +145,83 @@ class JsonLdTest extends ApiTestCase
         ]);
     }
 
+    public function testItemUriTemplate(): void
+    {
+        self::createClient()->request(
+            'GET',
+            '/item_uri_template_recipes',
+        );
+        $this->assertResponseIsSuccessful();
+
+        $this->assertJsonContains([
+            'member' => [
+                [
+                    '@type' => 'RecipeCollection',
+                    '@id' => '/item_uri_template_recipes/1',
+                    'name' => 'Dummy Recipe',
+                ],
+                [
+                    '@type' => 'RecipeCollection',
+                    '@id' => '/item_uri_template_recipes/2',
+                    'name' => 'Dummy Recipe 2',
+                ],
+            ],
+        ]);
+    }
+
+    public function testItemUriTemplateWithStateOption(): void
+    {
+        $container = static::getContainer();
+        $registry = $container->get('doctrine');
+        $manager = $registry->getManager();
+        for ($i = 0; $i < 10; ++$i) {
+            $recipe = new EntityRecipe();
+            $recipe->name = "Recipe $i";
+            $recipe->description = "Description of recipe $i";
+            $recipe->author = "Author $i";
+            $recipe->recipeIngredient = [
+                "Ingredient 1 for recipe $i",
+                "Ingredient 2 for recipe $i",
+            ];
+            $recipe->recipeInstructions = "Instructions for recipe $i";
+            $recipe->prepTime = '10 minutes';
+            $recipe->cookTime = '20 minutes';
+            $recipe->totalTime = '30 minutes';
+            $recipe->recipeCategory = "Category $i";
+            $recipe->recipeCuisine = "Cuisine $i";
+            $recipe->suitableForDiet = "Diet $i";
+
+            $manager->persist($recipe);
+        }
+        $manager->flush();
+
+        self::createClient()->request(
+            'GET',
+            '/item_uri_template_recipes_state_option',
+        );
+        $this->assertResponseIsSuccessful();
+
+        $this->assertJsonContains([
+            'member' => [
+                [
+                    '@type' => 'Recipe',
+                    '@id' => '/item_uri_template_recipes_state_option/1',
+                    'name' => 'Recipe 0',
+                ],
+                [
+                    '@type' => 'Recipe',
+                    '@id' => '/item_uri_template_recipes_state_option/2',
+                    'name' => 'Recipe 1',
+                ],
+                [
+                    '@type' => 'Recipe',
+                    '@id' => '/item_uri_template_recipes_state_option/3',
+                    'name' => 'Recipe 2',
+                ],
+            ],
+        ]);
+    }
+
     protected function setUp(): void
     {
         self::bootKernel();
@@ -141,7 +234,7 @@ class JsonLdTest extends ApiTestCase
         }
 
         $classes = [];
-        foreach ([Foo::class, Bar::class] as $entityClass) {
+        foreach ([Foo::class, Bar::class, EntityRecipe::class] as $entityClass) {
             $classes[] = $manager->getClassMetadata($entityClass);
         }
 
