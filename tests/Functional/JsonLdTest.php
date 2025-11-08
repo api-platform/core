@@ -172,6 +172,10 @@ class JsonLdTest extends ApiTestCase
     public function testItemUriTemplateWithStateOption(): void
     {
         $container = static::getContainer();
+        if ('mongodb' === $container->getParameter('kernel.environment')) {
+            $this->markTestSkipped();
+        }
+
         $registry = $container->get('doctrine');
         $manager = $registry->getManager();
         for ($i = 0; $i < 10; ++$i) {
