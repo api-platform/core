@@ -402,7 +402,7 @@ Feature: JSON-LD DTO input and output
             "required": ["@id", "@type", "foo", "bar"],
             "properties": {
               "@id": {"pattern": "^/.well-known/genid/.+$"},
-              "@type": {"pattern": "^DummyCollectionDtoOutput$"},
+              "@type": {"pattern": "^DummyFooCollectionDto$"},
               "foo": {"type": "string"},
               "bar": {"type": "integer"}
             }
