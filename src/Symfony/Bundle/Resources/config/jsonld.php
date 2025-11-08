@@ -42,6 +42,7 @@ return function (ContainerConfigurator $container) {
             '%api_platform.serializer.default_context%',
             service('api_platform.security.resource_access_checker')->ignoreOnInvalid(),
             service('api_platform.http_cache.tag_collector')->ignoreOnInvalid(),
+            service('api_platform.metadata.operation.metadata_factory')->ignoreOnInvalid()
         ])
         ->tag('serializer.normalizer', ['priority' => -890]);
 
