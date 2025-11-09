@@ -14,11 +14,13 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional\Parameters;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7469TestResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\LinkParameterProviderResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\WithParameter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Company;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Employee;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue7469Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy;
 use ApiPlatform\Tests\RecreateSchemaTrait;
@@ -36,7 +38,7 @@ final class LinkProviderParameterTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [WithParameter::class, Dummy::class, Employee::class, Company::class, LinkParameterProviderResource::class];
+        return [WithParameter::class, Dummy::class, Employee::class, Company::class, LinkParameterProviderResource::class, Issue7469TestResource::class, Issue7469Dummy::class];
     }
 
     /**
@@ -44,7 +46,7 @@ final class LinkProviderParameterTest extends ApiTestCase
      */
     protected function setUp(): void
     {
-        $this->recreateSchema([Dummy::class, RelatedOwnedDummy::class, RelatedDummy::class, Employee::class, Company::class]);
+        $this->recreateSchema([Dummy::class, RelatedOwnedDummy::class, RelatedDummy::class, Employee::class, Company::class, Issue7469Dummy::class]);
     }
 
     public function testReadDummyProviderFromQueryParameter(): void
@@ -182,5 +184,42 @@ final class LinkProviderParameterTest extends ApiTestCase
         $this->assertJsonContains([
             'dummy' => '/dummies/1',
         ]);
+    }
+
+    public function testCollectionIdIsCorrect(): void
+    {
+        $container = static::getContainer();
+        if ('mongodb' === $container->getParameter('kernel.environment')) {
+            $this->markTestSkipped();
+        }
+
+        $manager = $this->getManager();
+        $dummy = new Dummy();
+        $dummy->setName('hi');
+        $manager->persist($dummy);
+        $manager->flush();
+
+        self::createClient()->request('GET', '/link_parameter_provider_resources/'.$dummy->getId());
+
+        $this->assertJsonContains([
+            '@id' => '/link_parameter_provider_resources/1',
+        ]);
+    }
+
+    public function testIssue7469IriGenerationFailsForLinkedResource(): void
+    {
+        $container = static::getContainer();
+        if ('mongodb' === $container->getParameter('kernel.environment')) {
+            $this->markTestSkipped();
+        }
+
+        $manager = $this->getManager();
+        $issue7469Dummy = new Issue7469Dummy();
+        $issue7469Dummy->name = 'Linked Dummy';
+        $manager->persist($issue7469Dummy);
+        $manager->flush();
+
+        $r = self::createClient()->request('GET', '/issue_7469_test_resources/'.$issue7469Dummy->id, ['headers' => ['Accept' => 'application/ld+json']]);
+        $this->assertResponseIsSuccessful();
     }
 }
