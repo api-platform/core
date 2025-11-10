@@ -13,7 +13,7 @@ Feature: Documentation support
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
     # Context
-    And the Hydra context matches the online resource "http://www.w3.org/ns/hydra/context.jsonld"
+    And the Hydra context matches the online resource "http://www.w3.org/ns/hydra/context.jsonld.output"
     And the JSON node "@context[1].@vocab" should be equal to "http://example.com/docs.jsonld#"
     And the JSON node "@context[1].hydra" should be equal to "http://www.w3.org/ns/hydra/core#"
     And the JSON node "@context[1].rdf" should be equal to "http://www.w3.org/1999/02/22-rdf-syntax-ns#"

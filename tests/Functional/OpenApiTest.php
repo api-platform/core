@@ -130,7 +130,7 @@ class OpenApiTest extends ApiTestCase
 
         // problem detail https://datatracker.ietf.org/doc/html/rfc7807#section-3.1
         foreach (['title', 'detail', 'instance', 'type', 'status'] as $key) {
-            $this->assertArrayHasKey($key, $res['components']['schemas']['Error']['properties']);
+            $this->assertArrayHasKey($key, $res['components']['schemas']['Error.output']['properties']);
         }
 
         foreach (['title', 'detail', 'instance', 'type', 'status', '@id', '@type', '@context'] as $key) {
@@ -184,12 +184,12 @@ class OpenApiTest extends ApiTestCase
                         ],
                     ],
                 ],
-            ], 'description' => 'A representation of common errors.'], $res['components']['schemas']['Error.jsonld']);
+            ], 'description' => 'A representation of common errors.'], $res['components']['schemas']['Error.jsonld.output']);
         }
 
         foreach (['id', 'title', 'detail', 'instance', 'type', 'status', 'meta', 'source'] as $key) {
             $this->assertSame(['allOf' => [
-                ['$ref' => '#/components/schemas/Error'],
+                ['$ref' => '#/components/schemas/Error.output'],
                 ['type' => 'object', 'properties' => [
                     'source' => [
                         'type' => 'object',
@@ -198,7 +198,7 @@ class OpenApiTest extends ApiTestCase
                         'type' => 'string',
                     ],
                 ]],
-            ]], $res['components']['schemas']['Error.jsonapi']['properties']['errors']['items']);
+            ]], $res['components']['schemas']['Error.jsonapi.output']['properties']['errors']['items']);
         }
     }
 
@@ -284,40 +284,55 @@ class OpenApiTest extends ApiTestCase
         ], $json['components']['securitySchemes']);
 
         // Supported classes
-        $this->assertArrayHasKey('AbstractDummy', $json['components']['schemas']);
-        $this->assertArrayHasKey('CircularReference', $json['components']['schemas']);
-        $this->assertArrayHasKey('CircularReference-circular', $json['components']['schemas']);
-        $this->assertArrayHasKey('CompositeItem', $json['components']['schemas']);
-        $this->assertArrayHasKey('CompositeLabel', $json['components']['schemas']);
-        $this->assertArrayHasKey('ConcreteDummy', $json['components']['schemas']);
-        $this->assertArrayHasKey('CustomIdentifierDummy', $json['components']['schemas']);
-        $this->assertArrayHasKey('CustomNormalizedDummy-input', $json['components']['schemas']);
-        $this->assertArrayHasKey('CustomNormalizedDummy-output', $json['components']['schemas']);
-        $this->assertArrayHasKey('CustomWritableIdentifierDummy', $json['components']['schemas']);
-        $this->assertArrayHasKey('Dummy', $json['components']['schemas']);
-        $this->assertArrayHasKey('DummyBoolean', $json['components']['schemas']);
-        $this->assertArrayHasKey('RelatedDummy', $json['components']['schemas']);
-        $this->assertArrayHasKey('DummyTableInheritance', $json['components']['schemas']);
-        $this->assertArrayHasKey('DummyTableInheritanceChild', $json['components']['schemas']);
-        $this->assertArrayHasKey('OverriddenOperationDummy-overridden_operation_dummy_get', $json['components']['schemas']);
-        $this->assertArrayHasKey('OverriddenOperationDummy-overridden_operation_dummy_put', $json['components']['schemas']);
-        $this->assertArrayHasKey('OverriddenOperationDummy-overridden_operation_dummy_read', $json['components']['schemas']);
-        $this->assertArrayHasKey('OverriddenOperationDummy-overridden_operation_dummy_write', $json['components']['schemas']);
-        $this->assertArrayHasKey('Person', $json['components']['schemas']);
-        $this->assertArrayHasKey('NoCollectionDummy', $json['components']['schemas']);
-        $this->assertArrayHasKey('RelatedToDummyFriend', $json['components']['schemas']);
-        $this->assertArrayHasKey('RelatedToDummyFriend-fakemanytomany', $json['components']['schemas']);
-        $this->assertArrayHasKey('DummyFriend', $json['components']['schemas']);
-        $this->assertArrayHasKey('RelationEmbedder-barcelona', $json['components']['schemas']);
-        $this->assertArrayHasKey('RelationEmbedder-chicago', $json['components']['schemas']);
-        $this->assertArrayHasKey('User-user_user-read', $json['components']['schemas']);
-        $this->assertArrayHasKey('User-user_user-write', $json['components']['schemas']);
-        $this->assertArrayHasKey('UuidIdentifierDummy', $json['components']['schemas']);
-        $this->assertArrayHasKey('ThirdLevel', $json['components']['schemas']);
-        $this->assertArrayHasKey('DummyCar', $json['components']['schemas']);
-        $this->assertArrayHasKey('DummyWebhook', $json['components']['schemas']);
-        $this->assertArrayNotHasKey('ParentDummy', $json['components']['schemas']);
-        $this->assertArrayNotHasKey('UnknownDummy', $json['components']['schemas']);
+        $this->assertArrayHasKey('AbstractDummy.input', $json['components']['schemas']);
+        $this->assertArrayHasKey('AbstractDummy.output', $json['components']['schemas']);
+        $this->assertArrayHasKey('CircularReference.input', $json['components']['schemas']);
+        $this->assertArrayHasKey('CircularReference.output', $json['components']['schemas']);
+        $this->assertArrayHasKey('CircularReference.output-circular', $json['components']['schemas']);
+        $this->assertArrayHasKey('CompositeItem.output', $json['components']['schemas']);
+        $this->assertArrayHasKey('CompositeLabel.input', $json['components']['schemas']);
+        $this->assertArrayHasKey('CompositeLabel.output', $json['components']['schemas']);
+        $this->assertArrayHasKey('ConcreteDummy.input', $json['components']['schemas']);
+        $this->assertArrayHasKey('ConcreteDummy.output', $json['components']['schemas']);
+        $this->assertArrayHasKey('CustomIdentifierDummy.input', $json['components']['schemas']);
+        $this->assertArrayHasKey('CustomIdentifierDummy.output', $json['components']['schemas']);
+        $this->assertArrayHasKey('CustomNormalizedDummy.input-input', $json['components']['schemas']);
+        $this->assertArrayHasKey('CustomNormalizedDummy.output-output', $json['components']['schemas']);
+        $this->assertArrayHasKey('CustomWritableIdentifierDummy.input', $json['components']['schemas']);
+        $this->assertArrayHasKey('CustomWritableIdentifierDummy.output', $json['components']['schemas']);
+        $this->assertArrayHasKey('Dummy.input', $json['components']['schemas']);
+        $this->assertArrayHasKey('Dummy.output', $json['components']['schemas']);
+        $this->assertArrayHasKey('DummyBoolean.input', $json['components']['schemas']);
+        $this->assertArrayHasKey('DummyBoolean.output', $json['components']['schemas']);
+        $this->assertArrayHasKey('RelatedDummy.input', $json['components']['schemas']);
+        $this->assertArrayHasKey('RelatedDummy.output', $json['components']['schemas']);
+        $this->assertArrayHasKey('DummyTableInheritance.input', $json['components']['schemas']);
+        $this->assertArrayHasKey('DummyTableInheritance.output', $json['components']['schemas']);
+        $this->assertArrayHasKey('DummyTableInheritanceChild.input', $json['components']['schemas']);
+        $this->assertArrayHasKey('DummyTableInheritanceChild.output', $json['components']['schemas']);
+        $this->assertArrayHasKey('OverriddenOperationDummy.output-overridden_operation_dummy_get', $json['components']['schemas']);
+        $this->assertArrayHasKey('OverriddenOperationDummy.input-overridden_operation_dummy_put', $json['components']['schemas']);
+        $this->assertArrayHasKey('OverriddenOperationDummy.output-overridden_operation_dummy_read', $json['components']['schemas']);
+        $this->assertArrayHasKey('OverriddenOperationDummy.input-overridden_operation_dummy_write', $json['components']['schemas']);
+        $this->assertArrayHasKey('Person.input', $json['components']['schemas']);
+        $this->assertArrayHasKey('Person.output', $json['components']['schemas']);
+        $this->assertArrayHasKey('NoCollectionDummy.input', $json['components']['schemas']);
+        $this->assertArrayHasKey('NoCollectionDummy.output', $json['components']['schemas']);
+        $this->assertArrayHasKey('RelatedToDummyFriend.input', $json['components']['schemas']);
+        $this->assertArrayHasKey('RelatedToDummyFriend.output', $json['components']['schemas']);
+        $this->assertArrayHasKey('RelatedToDummyFriend.output-fakemanytomany', $json['components']['schemas']);
+        $this->assertArrayHasKey('DummyFriend.input', $json['components']['schemas']);
+        $this->assertArrayHasKey('DummyFriend.output', $json['components']['schemas']);
+        $this->assertArrayHasKey('RelationEmbedder.output-barcelona', $json['components']['schemas']);
+        $this->assertArrayHasKey('RelationEmbedder.input-chicago', $json['components']['schemas']);
+        $this->assertArrayHasKey('User.output-user_user-read', $json['components']['schemas']);
+        $this->assertArrayHasKey('User.input-user_user-write', $json['components']['schemas']);
+        $this->assertArrayHasKey('UuidIdentifierDummy.output', $json['components']['schemas']);
+        $this->assertArrayHasKey('ThirdLevel.output', $json['components']['schemas']);
+        $this->assertArrayHasKey('DummyCar.output', $json['components']['schemas']);
+        $this->assertArrayHasKey('DummyWebhook.output', $json['components']['schemas']);
+        $this->assertArrayNotHasKey('ParentDummy.output', $json['components']['schemas']);
+        $this->assertArrayNotHasKey('UnknownDummy.output', $json['components']['schemas']);
 
         $this->assertArrayHasKey('/relation_embedders/{id}/custom', $json['paths']);
         $this->assertArrayHasKey('/override/swagger', $json['paths']);
@@ -325,9 +340,9 @@ class OpenApiTest extends ApiTestCase
         $this->assertArrayHasKey('get', $json['paths']['/api/custom-call/{id}']);
         $this->assertArrayHasKey('put', $json['paths']['/api/custom-call/{id}']);
 
-        $this->assertArrayHasKey('id', $json['components']['schemas']['Dummy']['properties']);
-        $this->assertSame(['name'], $json['components']['schemas']['Dummy']['required']);
-        $this->assertArrayHasKey('genderType', $json['components']['schemas']['Person']['properties']);
+        $this->assertArrayHasKey('id', $json['components']['schemas']['Dummy.output']['properties']);
+        $this->assertSame(['name'], $json['components']['schemas']['Dummy.output']['required']);
+        $this->assertArrayHasKey('genderType', $json['components']['schemas']['Person.output']['properties']);
         $this->assertEquals([
             'default' => 'male',
             'type' => ['string', 'null'],
@@ -336,13 +351,13 @@ class OpenApiTest extends ApiTestCase
                 'female',
                 null,
             ],
-        ], $json['components']['schemas']['Person']['properties']['genderType']);
-        $this->assertArrayHasKey('playMode', $json['components']['schemas']['VideoGame']['properties']);
+        ], $json['components']['schemas']['Person.output']['properties']['genderType']);
+        $this->assertArrayHasKey('playMode', $json['components']['schemas']['VideoGame.output']['properties']);
         $this->assertEquals([
             'default' => 'SinglePlayer',
             'enum' => ['CoOp', 'MultiPlayer', 'SinglePlayer'],
             'type' => 'string',
-        ], $json['components']['schemas']['VideoGame']['properties']['playMode']);
+        ], $json['components']['schemas']['VideoGame.output']['properties']['playMode']);
 
         // Filters
         $this->assertSame('dummyBoolean', $json['paths']['/dummies']['get']['parameters'][4]['name']);
@@ -390,7 +405,7 @@ class OpenApiTest extends ApiTestCase
         $this->assertCount(7, $json['paths']['/related_dummies/{id}/related_to_dummy_friends']['get']['parameters']);
 
         // Subcollection - check schema
-        $this->assertSame('#/components/schemas/RelatedToDummyFriend.jsonld-fakemanytomany', $json['paths']['/related_dummies/{id}/related_to_dummy_friends']['get']['responses']['200']['content']['application/ld+json']['schema']['allOf'][1]['properties']['hydra:member']['items']['$ref']);
+        $this->assertSame('#/components/schemas/RelatedToDummyFriend.jsonld.output-fakemanytomany', $json['paths']['/related_dummies/{id}/related_to_dummy_friends']['get']['responses']['200']['content']['application/ld+json']['schema']['allOf'][1]['properties']['hydra:member']['items']['$ref']);
 
         // Deprecations
         $this->assertTrue($json['paths']['/deprecated_resources']['get']['deprecated']);
@@ -401,7 +416,7 @@ class OpenApiTest extends ApiTestCase
         $this->assertTrue($json['paths']['/deprecated_resources/{id}']['patch']['deprecated']);
 
         // Formats
-        $this->assertArrayHasKey('Dummy.jsonld', $json['components']['schemas']);
+        $this->assertArrayHasKey('Dummy.jsonld.output', $json['components']['schemas']);
         $this->assertEquals([
             '204' => [
                 'description' => 'User activated',
@@ -450,9 +465,9 @@ class OpenApiTest extends ApiTestCase
         $json = $response->toArray();
 
         $this->assertSame('/', $json['basePath']);
-        $this->assertSame('The dummy id.', $json['components']['schemas']['RamseyUuidDummy']['properties']['id']['description']);
-        $this->assertArrayNotHasKey('RelatedDummy-barcelona', $json['components']['schemas']);
-        $this->assertArrayHasKey('RelatedDummybarcelona', $json['components']['schemas']);
+        $this->assertSame('The dummy id.', $json['components']['schemas']['RamseyUuidDummyinput']['properties']['id']['description']);
+        $this->assertArrayNotHasKey('RelatedDummy.output-barcelona', $json['components']['schemas']);
+        $this->assertArrayHasKey('RelatedDummyoutputbarcelona', $json['components']['schemas']);
     }
 
     public function testRetrieveTheOpenApiDocumentationToSeeIfShortNamePropertyIsUsed(): void
@@ -466,19 +481,19 @@ class OpenApiTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
         $json = $response->toArray();
 
-        $this->assertArrayHasKey('Resource', $json['components']['schemas']);
-        $this->assertArrayHasKey('ResourceRelated', $json['components']['schemas']);
+        $this->assertArrayHasKey('Resource.output', $json['components']['schemas']);
+        $this->assertArrayHasKey('ResourceRelated.output', $json['components']['schemas']);
         $this->assertEquals([
             'readOnly' => true,
             'anyOf' => [
                 [
-                    '$ref' => '#/components/schemas/ResourceRelated',
+                    '$ref' => '#/components/schemas/ResourceRelated.output',
                 ],
                 [
                     'type' => 'null',
                 ],
             ],
-        ], $json['components']['schemas']['Resource']['properties']['resourceRelated']);
+        ], $json['components']['schemas']['Resource.output']['properties']['resourceRelated']);
     }
 
     public function testRetrieveTheJsonOpenApiDocumentation(): void
@@ -546,12 +561,12 @@ class OpenApiTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
         $json = $response->toArray();
 
-        $this->assertArrayHasKey('WrappedResponseEntity-read', $json['components']['schemas']);
-        $this->assertArrayHasKey('id', $json['components']['schemas']['WrappedResponseEntity-read']['properties']);
-        $this->assertEquals(['type' => 'string'], $json['components']['schemas']['WrappedResponseEntity-read']['properties']['id']);
-        $this->assertArrayHasKey('WrappedResponseEntity.CustomOutputEntityWrapperDto-read', $json['components']['schemas']);
-        $this->assertArrayHasKey('data', $json['components']['schemas']['WrappedResponseEntity.CustomOutputEntityWrapperDto-read']['properties']);
-        $this->assertEquals(['$ref' => '#/components/schemas/WrappedResponseEntity-read'], $json['components']['schemas']['WrappedResponseEntity.CustomOutputEntityWrapperDto-read']['properties']['data']);
+        $this->assertArrayHasKey('WrappedResponseEntity.output-read', $json['components']['schemas']);
+        $this->assertArrayHasKey('id', $json['components']['schemas']['WrappedResponseEntity.output-read']['properties']);
+        $this->assertEquals(['type' => 'string'], $json['components']['schemas']['WrappedResponseEntity.output-read']['properties']['id']);
+        $this->assertArrayHasKey('WrappedResponseEntity.CustomOutputEntityWrapperDto.output-read', $json['components']['schemas']);
+        $this->assertArrayHasKey('data', $json['components']['schemas']['WrappedResponseEntity.CustomOutputEntityWrapperDto.output-read']['properties']);
+        $this->assertEquals(['$ref' => '#/components/schemas/WrappedResponseEntity.output-read'], $json['components']['schemas']['WrappedResponseEntity.CustomOutputEntityWrapperDto.output-read']['properties']['data']);
     }
 
     public function testRetrieveTheOpenApiDocumentationWith30Specification(): void
@@ -564,12 +579,12 @@ class OpenApiTest extends ApiTestCase
         $this->assertEquals([
             ['type' => 'integer'],
             ['type' => 'null'],
-        ], $json['components']['schemas']['DummyBoolean']['properties']['id']['anyOf']);
+        ], $json['components']['schemas']['DummyBoolean.output']['properties']['id']['anyOf']);
         $this->assertEquals([
             ['type' => 'boolean'],
             ['type' => 'null'],
-        ], $json['components']['schemas']['DummyBoolean']['properties']['isDummyBoolean']['anyOf']);
-        $this->assertArrayNotHasKey('owl:maxCardinality', $json['components']['schemas']['DummyBoolean']['properties']['isDummyBoolean']);
+        ], $json['components']['schemas']['DummyBoolean.output']['properties']['isDummyBoolean']['anyOf']);
+        $this->assertArrayNotHasKey('owl:maxCardinality', $json['components']['schemas']['DummyBoolean.output']['properties']['isDummyBoolean']);
     }
 
     public function testRetrieveTheOpenApiDocumentationInJson(): void

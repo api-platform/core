@@ -204,8 +204,8 @@ class JsonSchemaTest extends ApiTestCase
     public function testSchemaWithUnknownType(): void
     {
         $schema = $this->schemaFactory->buildSchema(Book::class, 'json', Schema::TYPE_OUTPUT, $this->operationMetadataFactory->create('_api_/issue-5452/books{._format}_get_collection'));
-        $this->assertContains(['$ref' => '#/definitions/ActivableInterface'], $schema['definitions']['Book']['properties']['library']['anyOf']);
-        $this->assertContains(['$ref' => '#/definitions/TimestampableInterface'], $schema['definitions']['Book']['properties']['library']['anyOf']);
+        $this->assertContains(['$ref' => '#/definitions/ActivableInterface.output'], $schema['definitions']['Book.output']['properties']['library']['anyOf']);
+        $this->assertContains(['$ref' => '#/definitions/TimestampableInterface.output'], $schema['definitions']['Book.output']['properties']['library']['anyOf']);
     }
 
     public function testReadOnlySchema(): void

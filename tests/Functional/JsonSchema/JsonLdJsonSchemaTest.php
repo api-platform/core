@@ -74,11 +74,11 @@ final class JsonLdJsonSchemaTest extends ApiTestCase
                         'nonResourceTests' => new \ArrayObject([
                             'type' => 'array',
                             'items' => [
-                                '$ref' => '#/definitions/NonResourceTestEntity.jsonld-read',
+                                '$ref' => '#/definitions/NonResourceTestEntity.jsonld.output-read',
                             ],
                         ]),
                         'type' => new \ArrayObject([
-                            '$ref' => '#/definitions/TestEntity.jsonld-read',
+                            '$ref' => '#/definitions/TestEntity.jsonld.output-read',
                         ]),
                     ],
                 ]),
@@ -137,15 +137,15 @@ final class JsonLdJsonSchemaTest extends ApiTestCase
         ]);
 
         $this->assertArrayHasKey('definitions', $schema);
-        $this->assertArrayHasKey('BagOfTests.jsonld-read', $schema['definitions']);
-        $this->assertArrayHasKey('NonResourceTestEntity.jsonld-read', $schema['definitions']);
-        $this->assertArrayHasKey('TestEntity.jsonld-read', $schema['definitions']);
+        $this->assertArrayHasKey('BagOfTests.jsonld.output-read', $schema['definitions']);
+        $this->assertArrayHasKey('NonResourceTestEntity.jsonld.output-read', $schema['definitions']);
+        $this->assertArrayHasKey('TestEntity.jsonld.output-read', $schema['definitions']);
 
-        $this->assertEquals($expectedBagOfTestsSchema, $schema['definitions']['BagOfTests.jsonld-read']);
-        $this->assertEquals($expectedNonResourceTestEntitySchema, $schema['definitions']['NonResourceTestEntity.jsonld-read']);
-        $this->assertEquals($expectedTestEntitySchema, $schema['definitions']['TestEntity.jsonld-read']);
+        $this->assertEquals($expectedBagOfTestsSchema, $schema['definitions']['BagOfTests.jsonld.output-read']);
+        $this->assertEquals($expectedNonResourceTestEntitySchema, $schema['definitions']['NonResourceTestEntity.jsonld.output-read']);
+        $this->assertEquals($expectedTestEntitySchema, $schema['definitions']['TestEntity.jsonld.output-read']);
 
-        $this->assertEquals('#/definitions/BagOfTests.jsonld-read', $schema['$ref']);
+        $this->assertEquals('#/definitions/BagOfTests.jsonld.output-read', $schema['$ref']);
     }
 
     public function testSchemaJsonLdCollection(): void
@@ -153,31 +153,31 @@ final class JsonLdJsonSchemaTest extends ApiTestCase
         $schema = $this->schemaFactory->buildSchema(BagOfTests::class, 'jsonld', forceCollection: true);
 
         $this->assertArrayHasKey('definitions', $schema);
-        $this->assertArrayHasKey('BagOfTests.jsonld-read', $schema['definitions']);
-        $this->assertArrayHasKey('NonResourceTestEntity.jsonld-read', $schema['definitions']);
-        $this->assertArrayHasKey('TestEntity.jsonld-read', $schema['definitions']);
+        $this->assertArrayHasKey('BagOfTests.jsonld.output-read', $schema['definitions']);
+        $this->assertArrayHasKey('NonResourceTestEntity.jsonld.output-read', $schema['definitions']);
+        $this->assertArrayHasKey('TestEntity.jsonld.output-read', $schema['definitions']);
         $this->assertArrayHasKey('HydraItemBaseSchema', $schema['definitions']);
         $this->assertArrayHasKey('HydraCollectionBaseSchema', $schema['definitions']);
 
         $this->assertEquals(['$ref' => '#/definitions/HydraCollectionBaseSchema'], $schema['allOf'][0]);
-        $this->assertEquals(['$ref' => '#/definitions/BagOfTests.jsonld-read'], $schema['allOf'][1]['properties']['hydra:member']['items']);
+        $this->assertEquals(['$ref' => '#/definitions/BagOfTests.jsonld.output-read'], $schema['allOf'][1]['properties']['hydra:member']['items']);
     }
 
     public function testArraySchemaWithMultipleUnionTypes(): void
     {
         $schema = $this->schemaFactory->buildSchema(Nest::class, 'jsonld', 'output');
 
-        $this->assertContains(['$ref' => '#/definitions/Robin.jsonld'], $schema['definitions']['Nest.jsonld']['allOf'][1]['properties']['owner']['anyOf']);
-        $this->assertContains(['$ref' => '#/definitions/Wren.jsonld'], $schema['definitions']['Nest.jsonld']['allOf'][1]['properties']['owner']['anyOf']);
-        $this->assertContains(['type' => 'null'], $schema['definitions']['Nest.jsonld']['allOf'][1]['properties']['owner']['anyOf']);
+        $this->assertContains(['$ref' => '#/definitions/Robin.jsonld.output'], $schema['definitions']['Nest.jsonld.output']['allOf'][1]['properties']['owner']['anyOf']);
+        $this->assertContains(['$ref' => '#/definitions/Wren.jsonld.output'], $schema['definitions']['Nest.jsonld.output']['allOf'][1]['properties']['owner']['anyOf']);
+        $this->assertContains(['type' => 'null'], $schema['definitions']['Nest.jsonld.output']['allOf'][1]['properties']['owner']['anyOf']);
 
-        $this->assertArrayHasKey('Nest.jsonld', $schema['definitions']);
+        $this->assertArrayHasKey('Nest.jsonld.output', $schema['definitions']);
     }
 
     public function testSchemaWithoutGetOperation(): void
     {
         $schema = $this->schemaFactory->buildSchema(Boat::class, 'jsonld', 'output', $this->operationMetadataFactory->create('_api_/boats{._format}_get_collection'));
 
-        $this->assertEquals(['$ref' => '#/definitions/HydraItemBaseSchema'], $schema->getDefinitions()['Boat.jsonld-boat.read']['allOf'][0]);
+        $this->assertEquals(['$ref' => '#/definitions/HydraItemBaseSchema'], $schema->getDefinitions()['Boat.jsonld.output-boat.read']['allOf'][0]);
     }
 }

@@ -146,9 +146,9 @@ YAML;
             $this->assertArrayNotHasKey('example', $properties['ordinal']); // jsonldContext
         };
 
-        $assertExample($json['components']['schemas']['Issue6317']['properties'], 'id');
-        $assertExample($json['components']['schemas']['Issue6317.jsonld']['allOf'][1]['properties'], 'id');
-        $this->assertEquals($json['components']['schemas']['Issue6317.jsonhal']['allOf'][1]['$ref'], '#/components/schemas/Issue6317');
+        $assertExample($json['components']['schemas']['Issue6317.output']['properties'], 'id');
+        $assertExample($json['components']['schemas']['Issue6317.jsonld.output']['allOf'][1]['properties'], 'id');
+        $this->assertEquals($json['components']['schemas']['Issue6317.jsonhal.output']['allOf'][1]['$ref'], '#/components/schemas/Issue6317.output');
     }
 
     private function assertYaml(string $data): void
@@ -167,7 +167,7 @@ YAML;
         $result = $this->tester->getDisplay();
         $res = json_decode($result, true, 512, \JSON_THROW_ON_ERROR);
 
-        $this->assertArrayHasKey('Crud', $res['components']['schemas']);
+        $this->assertArrayHasKey('Crud.output', $res['components']['schemas']);
         $this->assertArrayNotHasKey('/cruds/{id}', $res['paths']);
         $this->assertArrayHasKey('/cruds', $res['paths']);
         $this->assertArrayNotHasKey('post', $res['paths']['/cruds']);

@@ -128,8 +128,8 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $json = json_decode($result, associative: true);
 
         $this->assertArrayNotHasKey('Dummy', $json['definitions']);
-        $this->assertArrayHasKey('Dummy.jsonMergePatch', $json['definitions']);
-        $this->assertArrayNotHasKey('required', $json['definitions']['Dummy.jsonMergePatch']);
+        $this->assertArrayHasKey('Dummy.input.jsonMergePatch', $json['definitions']);
+        $this->assertArrayNotHasKey('required', $json['definitions']['Dummy.input.jsonMergePatch']);
     }
 
     /**
@@ -141,7 +141,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
 
-        $this->assertEquals($json['definitions']['SaveProduct']['properties']['codes']['items']['$ref'], '#/definitions/ProductCode');
+        $this->assertEquals($json['definitions']['SaveProduct.input']['properties']['codes']['items']['$ref'], '#/definitions/ProductCode.input');
     }
 
     /**
@@ -153,8 +153,8 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
 
-        $this->assertEquals('#/definitions/DummyFriend', $json['definitions']['Issue6299.Issue6299OutputDto.jsonld']['allOf'][1]['properties']['itemDto']['$ref']);
-        $this->assertEquals('#/definitions/DummyDate', $json['definitions']['Issue6299.Issue6299OutputDto.jsonld']['allOf'][1]['properties']['collectionDto']['items']['$ref']);
+        $this->assertEquals('#/definitions/DummyFriend', $json['definitions']['Issue6299.Issue6299OutputDto.jsonld.output']['allOf'][1]['properties']['itemDto']['$ref']);
+        $this->assertEquals('#/definitions/DummyDate', $json['definitions']['Issue6299.Issue6299OutputDto.jsonld.output']['allOf'][1]['properties']['collectionDto']['items']['$ref']);
     }
 
     /**
@@ -165,7 +165,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => Issue6317::class, '--type' => 'output', '--format' => 'jsonld']);
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
-        $properties = $json['definitions']['Issue6317.jsonld']['allOf'][1]['properties'];
+        $properties = $json['definitions']['Issue6317.jsonld.output']['allOf'][1]['properties'];
         $this->assertArrayHasKey('example', $properties['id']);
         $this->assertArrayHasKey('example', $properties['name']);
         $this->assertArrayNotHasKey('example', $properties['ordinal']);
@@ -181,7 +181,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $this->tester->run(['command' => 'api:json-schema:generate', 'resource' => 'ApiPlatform\Tests\Fixtures\TestBundle\Entity\DisableIdGeneration', '--type' => 'output', '--format' => 'jsonld']);
         $result = $this->tester->getDisplay();
         $json = json_decode($result, associative: true);
-        $this->assertArrayNotHasKey('@id', $json['definitions']['DisableIdGenerationItem.jsonld_noid']['properties']);
+        $this->assertArrayNotHasKey('@id', $json['definitions']['DisableIdGenerationItem.jsonld.output_noid']['properties']);
     }
 
     #[DataProvider('arrayPropertyTypeSyntaxProvider')]
@@ -199,9 +199,9 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
         $json = json_decode($result, true);
         $definitions = $json['definitions'];
 
-        $this->assertArrayHasKey('TestApiDocHashmapArrayObjectIssue.jsonld', $definitions);
+        $this->assertArrayHasKey('TestApiDocHashmapArrayObjectIssue.jsonld.output', $definitions);
 
-        $ressourceDefinitions = $definitions['TestApiDocHashmapArrayObjectIssue.jsonld']['allOf'][1];
+        $ressourceDefinitions = $definitions['TestApiDocHashmapArrayObjectIssue.jsonld.output']['allOf'][1];
 
         $this->assertEquals('object', $ressourceDefinitions['type']);
         $this->assertEquals($expectedProperties, $ressourceDefinitions['properties'][$propertyName]);
@@ -214,7 +214,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
             [
                 'type' => 'array',
                 'items' => [
-                    '$ref' => '#/definitions/Foo.jsonld',
+                    '$ref' => '#/definitions/Foo.jsonld.output',
                 ],
             ],
         ];
@@ -223,7 +223,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
             [
                 'type' => 'array',
                 'items' => [
-                    '$ref' => '#/definitions/Foo.jsonld',
+                    '$ref' => '#/definitions/Foo.jsonld.output',
                 ],
             ],
         ];
@@ -232,7 +232,7 @@ class JsonSchemaGenerateCommandTest extends KernelTestCase
             [
                 'type' => 'object',
                 'additionalProperties' => [
-                    '$ref' => '#/definitions/Foo.jsonld',
+                    '$ref' => '#/definitions/Foo.jsonld.output',
                 ],
             ],
         ];
