@@ -27,6 +27,7 @@ use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping\AssociationMapping;
 use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\ObjectMapper\Attribute\Map;
+use Symfony\Component\ObjectMapper\Metadata\ObjectMapperMetadataFactoryInterface;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -48,7 +49,8 @@ final class PurgeHttpCacheListener
         private readonly IriConverterInterface $iriConverter,
         private readonly ResourceClassResolverInterface $resourceClassResolver,
         ?PropertyAccessorInterface $propertyAccessor = null,
-        private readonly ?ObjectMapperInterface $objectMapper = null)
+        private readonly ?ObjectMapperInterface $objectMapper = null,
+        private readonly ?ObjectMapperMetadataFactoryInterface $objectMapperMetadata = null)
     {
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
     }
@@ -153,13 +155,21 @@ final class PurgeHttpCacheListener
             if (
                 \is_array($associationMapping)
                 && \array_key_exists('targetEntity', $associationMapping)
-                && !$this->resourceClassResolver->isResourceClass($associationMapping['targetEntity'])
-                && (
-                    !$this->objectMapper
-                    || !(new \ReflectionClass($associationMapping['targetEntity']))->getAttributes(Map::class)
-                )
+                && ($targetEntity = $associationMapping['targetEntity'])
+                && !$this->resourceClassResolver->isResourceClass($targetEntity)
             ) {
-                return;
+                if (!$this->objectMapper) {
+                    return;
+                }
+
+                $targetRefl = new \ReflectionClass($targetEntity);
+                if ($this->objectMapperMetadata) {
+                    if (!$this->objectMapperMetadata->create($targetRefl->newInstanceWithoutConstructor())) {
+                        return;
+                    }
+                } elseif (!$targetRefl->getAttributes(Map::class)) {
+                    return;
+                }
             }
 
             $this->addTagsFor($this->propertyAccessor->getValue($entity, $property));
@@ -210,17 +220,30 @@ final class PurgeHttpCacheListener
                 return [];
             }
 
-            $mapAttributes = (new \ReflectionClass($class))->getAttributes(Map::class);
+            if ($this->objectMapperMetadata) {
+                $mappings = $this->objectMapperMetadata->create($entity);
 
-            if (!$mapAttributes) {
-                return [];
+                if (!$mappings) {
+                    return [];
+                }
+
+                $resources = array_map(
+                    fn ($mapping) => $this->objectMapper->map($entity, $mapping->target),
+                    $mappings
+                );
+            } else {
+                $mapAttributes = (new \ReflectionClass($class))->getAttributes(Map::class);
+
+                if (!$mapAttributes) {
+                    return [];
+                }
+
+                // loop over all mappings to fetch all resources mapped to this entity
+                $resources = array_map(
+                    fn ($mapAttribute) => $this->objectMapper->map($entity, $mapAttribute->newInstance()->target),
+                    $mapAttributes
+                );
             }
-
-            // loop over all mappings to fetch all resources mapped to this entity
-            $resources = array_map(
-                fn ($mapAttribute) => $this->objectMapper->map($entity, $mapAttribute->newInstance()->target),
-                $mapAttributes
-            );
         } else {
             $resources[] = $entity;
         }

@@ -31,4 +31,9 @@ class MappedResourceWithRelationRelatedEntity
     {
         return $this->id;
     }
+
+    public function setId(?int $id = null)
+    {
+        $this->id = $id;
+    }
 }

@@ -35,6 +35,7 @@ return function (ContainerConfigurator $container) {
         ->args([
             service('api_platform.object_mapper')->nullOnInvalid(),
             service('api_platform.state_provider.object_mapper.inner'),
+            service('api_platform.object_mapper.metadata_factory'),
         ]);
 
     $services->set('api_platform.state_processor.object_mapper', 'ApiPlatform\State\Processor\ObjectMapperProcessor')
@@ -42,5 +43,6 @@ return function (ContainerConfigurator $container) {
         ->args([
             service('api_platform.object_mapper')->nullOnInvalid(),
             service('api_platform.state_processor.object_mapper.inner'),
+            service('api_platform.object_mapper.metadata_factory'),
         ]);
 };

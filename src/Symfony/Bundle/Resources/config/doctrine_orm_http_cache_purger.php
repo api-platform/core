@@ -23,6 +23,7 @@ return function (ContainerConfigurator $container) {
             service('api_platform.resource_class_resolver'),
             service('api_platform.property_accessor'),
             service('api_platform.object_mapper')->nullOnInvalid(),
+            service('api_platform.object_mapper.metadata_factory')->nullOnInvalid(),
         ])
         ->tag('doctrine.event_listener', ['event' => 'preUpdate'])
         ->tag('doctrine.event_listener', ['event' => 'onFlush'])

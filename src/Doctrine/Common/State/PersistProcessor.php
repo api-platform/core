@@ -78,6 +78,7 @@ final class PersistProcessor implements ProcessorInterface
                         $reflectionProperty->setValue($newData, $newValue);
                     }
                 }
+            // We create a new entity through PUT
             } else {
                 foreach (array_reverse($links) as $link) {
                     if ($link->getExpandedValue() || !$link->getFromClass()) {
@@ -91,6 +92,45 @@ final class PersistProcessor implements ProcessorInterface
                         $reflectionProperty = $reflectionProperties[$identifierProperty];
                         $reflectionProperty->setValue($newData, $this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null));
                     }
+                }
+
+                $classMetadata = $manager->getClassMetadata($class);
+                foreach ($reflectionProperties as $propertyName => $reflectionProperty) {
+                    if ($classMetadata->isIdentifier($propertyName)) {
+                        continue;
+                    }
+
+                    $value = $reflectionProperty->getValue($newData);
+
+                    if (!\is_object($value)) {
+                        continue;
+                    }
+
+                    if (
+                        !($relManager = $this->managerRegistry->getManagerForClass($class = $this->getObjectClass($value)))
+                        || $relManager->contains($value)
+                    ) {
+                        continue;
+                    }
+
+                    if (\PHP_VERSION_ID > 80400) {
+                        $r = new \ReflectionClass($value);
+                        if ($r->isUninitializedLazyObject($value)) {
+                            $r->initializeLazyObject($value);
+                        }
+                    }
+
+                    $metadata = $manager->getClassMetadata($class);
+                    $identifiers = $metadata->getIdentifierValues($value);
+
+                    // Do not get reference for partial objects or objects with null identifiers
+                    if (!$identifiers || \count($identifiers) !== \count(array_filter($identifiers, static fn ($v) => null !== $v))) {
+                        continue;
+                    }
+
+                    \assert(method_exists($relManager, 'getReference'));
+
+                    $reflectionProperty->setValue($newData, $relManager->getReference($class, $identifiers));
                 }
             }
 
