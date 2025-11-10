@@ -192,6 +192,7 @@
         "symfony/twig-bundle": "^6.4 || ^7.0",
         "symfony/uid": "^6.4 || ^7.0",
         "symfony/validator": "^6.4 || ^7.0",
+        "symfony/var-exporter": "^7.3 || ^7.4.x-dev",
         "symfony/web-profiler-bundle": "^6.4 || ^7.0",
         "symfony/yaml": "^6.4 || ^7.0",
         "twig/twig": "^1.42.3 || ^2.12 || ^3.0",
