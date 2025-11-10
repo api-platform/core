@@ -17,16 +17,10 @@ use ApiPlatform\Metadata\Exception\RuntimeException;
 use Symfony\Component\ObjectMapper\ObjectMapperAwareInterface;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 
-final class ObjectMapper implements ObjectMapperInterface, ClearObjectMapInterface, ObjectMapperAwareInterface
+final class ObjectMapper implements ObjectMapperInterface
 {
-    private ?\SplObjectStorage $objectMap = null;
-
     public function __construct(private ObjectMapperInterface $decorated)
     {
-        if (null === $this->objectMap) {
-            $this->objectMap = new \SplObjectStorage();
-        }
-
         if ($this->decorated instanceof ObjectMapperAwareInterface) {
             $this->decorated = $this->decorated->withObjectMapper($this);
         }
@@ -34,20 +28,7 @@ final class ObjectMapper implements ObjectMapperInterface, ClearObjectMapInterfa
 
     public function map(object $source, object|string|null $target = null): object
     {
-        if (!\is_object($target) && isset($this->objectMap[$source])) {
-            $target = $this->objectMap[$source];
-        }
-        $mapped = $this->decorated->map($source, $target);
-        $this->objectMap[$mapped] = $source;
-
-        return $mapped;
-    }
-
-    public function clearObjectMap(): void
-    {
-        foreach ($this->objectMap as $k) {
-            $this->objectMap->detach($k);
-        }
+        return $this->decorated->map($source, $target);
     }
 
     public function withObjectMapper(ObjectMapperInterface $objectMapper): static

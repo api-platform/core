@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\State\Processor;
 
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\State\ObjectMapper\ClearObjectMapInterface;
 use ApiPlatform\State\ProcessorInterface;
 use Symfony\Component\ObjectMapper\Attribute\Map;
+use Symfony\Component\ObjectMapper\Metadata\ObjectMapperMetadataFactoryInterface;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 
 /**
@@ -30,27 +30,46 @@ final class ObjectMapperProcessor implements ProcessorInterface
     public function __construct(
         private readonly ?ObjectMapperInterface $objectMapper,
         private readonly ProcessorInterface $decorated,
+        private readonly ?ObjectMapperMetadataFactoryInterface $objectMapperMetadata = null,
     ) {
+        // TODO: 4.3 add this deprecation
+        // if (!$objectMapperMetadata) {
+        //     trigger_deprecation('api-platform/state', '4.3', 'Not injecting "%s" in "%s" will not be possible anymore in 5.0.', ObjectMapperMetadataFactoryInterface::class, __CLASS__);
+        // }
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
+        $class = $operation->getInput()['class'] ?? $operation->getClass();
+
         if (
             !$this->objectMapper
             || !$operation->canWrite()
             || null === $data
-            || !is_a($data, $operation->getClass(), true)
-            || !(new \ReflectionClass($operation->getClass()))->getAttributes(Map::class)
+            || !is_a($data, $class, true)
         ) {
             return $this->decorated->process($data, $operation, $uriVariables, $context);
         }
 
-        $data = $this->objectMapper->map($this->decorated->process($this->objectMapper->map($data), $operation, $uriVariables, $context), $operation->getClass());
-
-        if ($this->objectMapper instanceof ClearObjectMapInterface) {
-            $this->objectMapper->clearObjectMap();
+        if ($this->objectMapperMetadata) {
+            if (!$this->objectMapperMetadata->create($data)) {
+                return $this->decorated->process($data, $operation, $uriVariables, $context);
+            }
+        } elseif (!(new \ReflectionClass($operation->getClass()))->getAttributes(Map::class)) {
+            return $this->decorated->process($data, $operation, $uriVariables, $context);
         }
 
-        return $data;
+        // return the Resource representation of the persisted entity
+        return $this->objectMapper->map(
+            // persist the entity
+            $this->decorated->process(
+                // maps the Resource to an Entity
+                $this->objectMapper->map($data),
+                $operation,
+                $uriVariables,
+                $context,
+            ),
+            $operation->getClass()
+        );
     }
 }
