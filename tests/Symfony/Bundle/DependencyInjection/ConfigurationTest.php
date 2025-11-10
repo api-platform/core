@@ -237,6 +237,7 @@ class ConfigurationTest extends TestCase
             'serializer' => [
                 'hydra_prefix' => null,
             ],
+            'enable_phpdoc_parser' => true,
         ], $config);
     }
 
