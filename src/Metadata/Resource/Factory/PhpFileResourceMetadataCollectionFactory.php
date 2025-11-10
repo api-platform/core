@@ -17,6 +17,9 @@ use ApiPlatform\Metadata\Extractor\ResourceExtractorInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Metadata\Util\CamelCaseToSnakeCaseNameConverter;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 final class PhpFileResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
@@ -25,7 +28,12 @@ final class PhpFileResourceMetadataCollectionFactory implements ResourceMetadata
     public function __construct(
         private readonly ResourceExtractorInterface $metadataExtractor,
         private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null,
+        ?LoggerInterface $logger = null,
+        array $defaults = [],
     ) {
+        $this->logger = $logger ?? new NullLogger();
+        $this->defaults = $defaults;
+        $this->camelCaseToSnakeCaseNameConverter = new CamelCaseToSnakeCaseNameConverter();
     }
 
     /**
