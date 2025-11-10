@@ -17,7 +17,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
-final class DefinitionNameFactory implements DefinitionNameFactoryInterface
+final class DefinitionNameFactory implements TypeAwareDefinitionNameFactoryInterface
 {
     use ResourceClassInfoTrait;
 
@@ -33,7 +33,7 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
         }
     }
 
-    public function create(string $className, string $format = 'json', ?string $inputOrOutputClass = null, ?Operation $operation = null, array $serializerContext = []): string
+    public function create(string $className, string $format = 'json', ?string $inputOrOutputClass = null, ?Operation $operation = null, array $serializerContext = [], string $type = Schema::TYPE_OUTPUT): string
     {
         if ($operation) {
             $prefix = $operation->getShortName();
@@ -57,6 +57,8 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
             // JSON merge patch is postfixed at the end
             $prefix .= self::GLUE.$format;
         }
+
+        $prefix .= self::GLUE.$type;
 
         $definitionName = $serializerContext[SchemaFactory::OPENAPI_DEFINITION_NAME] ?? null;
         if (null !== $definitionName) {

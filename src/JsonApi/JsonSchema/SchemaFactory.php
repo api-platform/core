@@ -20,6 +20,7 @@ use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryAwareInterface;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\JsonSchema\SchemaUriPrefixTrait;
+use ApiPlatform\JsonSchema\TypeAwareDefinitionNameFactoryInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -173,7 +174,11 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
 
         $schema = $this->schemaFactory->buildSchema($className, 'json', $type, $operation, $schema, $jsonApiSerializerContext, $forceCollection);
-        $definitionName = $this->definitionNameFactory->create($inputOrOutputClass, $format, $className, $operation, $jsonApiSerializerContext);
+        if ($this->definitionNameFactory instanceof TypeAwareDefinitionNameFactoryInterface) {
+            $definitionName = $this->definitionNameFactory->create($inputOrOutputClass, $format, $className, $operation, $serializerContext, $type);
+        } else {
+            $definitionName = $this->definitionNameFactory->create($inputOrOutputClass, $format, $className, $operation, $serializerContext);
+        }
         $prefix = $this->getSchemaUriPrefix($schema->getVersion());
         $definitions = $schema->getDefinitions();
         $collectionKey = $schema->getItemsDefinitionKey();
