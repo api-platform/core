@@ -43,7 +43,8 @@ return function (ContainerConfigurator $container) {
         ->args([
             service('api_platform.metadata.resource_extractor.php_file'),
             service('api_platform.metadata.resource.metadata_collection_factory.php_file.inner'),
-            service('service_container')->nullOnInvalid(),
+            service('logger')->nullOnInvalid(),
+            '%api_platform.defaults%',
         ]);
 
     $services->set('api_platform.metadata.resource.metadata_collection_factory.mutator', 'ApiPlatform\Metadata\Resource\Factory\MutatorResourceMetadataCollectionFactory')
