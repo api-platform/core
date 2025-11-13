@@ -1,5 +1,12 @@
 # Changelog
 
+## v4.1.27
+
+### Bug fixes
+
+* [3df65aa86](https://github.com/api-platform/core/commit/3df65aa86e9e4ececd5e64104b8815b3f8320d8e) fix(symfony): allow disabling PHPStan PhpDocParser (#7507)
+* [7c76fb8ea](https://github.com/api-platform/core/commit/7c76fb8ea0dac24ec3f8a1495a9416facdad23f1)  fix(jsonld): read identifier with itemUriTemplate (#7517)
+
 ## v4.1.26
 
 ### Bug fixes
