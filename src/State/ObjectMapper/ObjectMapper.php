@@ -17,28 +17,44 @@ use ApiPlatform\Metadata\Exception\RuntimeException;
 use Symfony\Component\ObjectMapper\ObjectMapperAwareInterface;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 
-final class ObjectMapper implements ObjectMapperInterface
-{
-    public function __construct(private ObjectMapperInterface $decorated)
+if (class_exists(ObjectMapperAwareInterface::class)) {
+    final class ObjectMapper implements ObjectMapperInterface
     {
-        if ($this->decorated instanceof ObjectMapperAwareInterface) {
-            $this->decorated = $this->decorated->withObjectMapper($this);
-        }
-    }
-
-    public function map(object $source, object|string|null $target = null): object
-    {
-        return $this->decorated->map($source, $target);
-    }
-
-    public function withObjectMapper(ObjectMapperInterface $objectMapper): static
-    {
-        if (!$this->decorated instanceof ObjectMapperAwareInterface) {
-            throw new RuntimeException(\sprintf('Given object mapper "%s" does not implements %s.', get_debug_type($this->decorated), ObjectMapperAwareInterface::class));
+        public function __construct(private ObjectMapperInterface $decorated)
+        {
         }
 
-        $this->decorated->withObjectMapper($objectMapper);
+        public function map(object $source, object|string|null $target = null): object
+        {
+            return $this->decorated->map($source, $target);
+        }
+    }
+} else {
+    final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInterface
+    {
+        public function __construct(private ObjectMapperInterface $decorated)
+        {
+            if ($this->decorated instanceof ObjectMapperAwareInterface) {
+                $this->decorated = $this->decorated->withObjectMapper($this);
+            }
+        }
 
-        return $this;
+        public function map(object $source, object|string|null $target = null): object
+        {
+            return $this->decorated->map($source, $target);
+        }
+
+        public function withObjectMapper(ObjectMapperInterface $objectMapper): static
+        {
+            $s = clone $this;
+
+            if (!$s->decorated instanceof ObjectMapperAwareInterface) {
+                throw new RuntimeException(\sprintf('Given object mapper "%s" does not implements %s.', get_debug_type($this->decorated), ObjectMapperAwareInterface::class));
+            }
+
+            $s->decorated->withObjectMapper($objectMapper);
+
+            return $s;
+        }
     }
 }
