@@ -28,7 +28,7 @@
         "api-platform/serializer": "^4.1.11",
         "api-platform/state": "^4.1.11",
         "symfony/error-handler": "^6.4 || ^7.0",
-        "symfony/http-foundation": "^6.4 || ^7.0"
+        "symfony/http-foundation": "^6.4.14 || ^7.0"
     },
     "require-dev": {
         "phpspec/prophecy": "^1.19",
