@@ -1,5 +1,18 @@
 # Changelog
 
+## v4.2.4
+
+### Bug fixes
+
+* [20f288959](https://github.com/api-platform/core/commit/20f288959a9d196dc64f859040306120b2496934) fix: multiple :property template operations on a single resource (#7461)
+* [44f227112](https://github.com/api-platform/core/commit/44f227112a2dd2380169643b70d783dbdd7e4936) fix(symfony): inject api-platform default configuration in the php resource metadata factory (#7525)
+* [921d7c8fe](https://github.com/api-platform/core/commit/921d7c8fe4fe61dbfcf3da8fbff7157b2866eb3e) fix(state): create PUT has relation with lazy mapper (#7521)
+* [951422e15](https://github.com/api-platform/core/commit/951422e15602ed2a4e0b66c7b8f8970cc0b3ac36) fix(openapi): maintain json schema for non-json operations (#7528)
+* [98fc35221](https://github.com/api-platform/core/commit/98fc352212e679d2753f94703989cb15b8f12891) fix(symfony): object mapper compatibility (#7531)
+* [a5c44624d](https://github.com/api-platform/core/commit/a5c44624d1a14488f1cb1a38033c8e44fe3111b4) fix(json-schema): pagination less schema with disabled pagination (#7506)
+* [da2324e82](https://github.com/api-platform/core/commit/da2324e82a53b03b1058606424c1175ab04373cd) fix(jsonschema): move jsonMergePatch postfix to DefinitionNameFactory (#7510)
+* [dc0df6110](https://github.com/api-platform/core/commit/dc0df6110366948869e20d94324380e12833a918) fix(iri): json streamer iri template does not need metadata (#7511)
+
 ## v4.2.3
 
 * [9416083f7](https://github.com/api-platform/core/commit/9416083f7631b28093f3c79db995862338477137) fix(state): object mapper aware interface (#7486)
