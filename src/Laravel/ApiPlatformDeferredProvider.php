@@ -51,6 +51,7 @@ use ApiPlatform\Laravel\State\SwaggerUiProcessor;
 use ApiPlatform\Laravel\State\ValidateProvider;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\InflectorInterface;
+use ApiPlatform\Metadata\Laravel\SkipAutoconfigure;
 use ApiPlatform\Metadata\Operation\PathSegmentNameGeneratorInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -101,6 +102,15 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
     {
         $directory = app_path();
         $classes = ReflectionClassRecursiveIterator::getReflectionClassesFromDirectories([$directory], '(?!.*Test\.php$)');
+
+        foreach ($classes as $className => $refl) {
+            foreach ($refl->getAttributes() as $attribute) {
+                if (SkipAutoconfigure::class === $attribute->getName()) {
+                    unset($classes[$className]);
+                    break;
+                }
+            }
+        }
 
         $this->autoconfigure($classes, QueryExtensionInterface::class, [FilterQueryExtension::class]);
         $this->app->singleton(ItemProvider::class, function (Application $app) {
