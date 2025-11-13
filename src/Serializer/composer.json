@@ -28,7 +28,7 @@
         "symfony/property-access": "^6.4 || ^7.0",
         "symfony/property-info": "^6.4 || ^7.1",
         "symfony/serializer": "^6.4 || ^7.0",
-        "symfony/validator": "^6.4 || ^7.0"
+        "symfony/validator": "^6.4.11 || ^7.0"
     },
     "require-dev": {
         "api-platform/doctrine-common": "^4.2",
