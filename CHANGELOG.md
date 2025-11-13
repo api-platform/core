@@ -1,7 +1,7 @@
 # Changelog
 
 ## v4.2.3
-<<<<<<< HEAD
+
 * [9416083f7](https://github.com/api-platform/core/commit/9416083f7631b28093f3c79db995862338477137) fix(state): object mapper aware interface (#7486)
 * [99718d954](https://github.com/api-platform/core/commit/99718d9547ab8b064f1184c7ec2b15d882853dcb) fix(serializer): resilient denormalizeRelation capability (#7474)
 * [9b2f98610](https://github.com/api-platform/core/commit/9b2f98610cbf661335416880fcd25052468107b3) fix(metadata): eliminate duplicate keys in the constructor of `Parameters` (#7492)
@@ -13,7 +13,6 @@
 * [ebe6dc9a2](https://github.com/api-platform/core/commit/ebe6dc9a2417a3fa46ba358abd32bbcfb895b76e) fix(jsonschema): fallback the schema for `mixed` properties to `string|null` instead of `null` (#7489)
 * [fa6e206cc](https://github.com/api-platform/core/commit/fa6e206cc3cf20aa4535ad2fd83d9e53f56e713c) fix(state): detect mapping on source (#7475)
 * [fafbe5c7b](https://github.com/api-platform/core/commit/fafbe5c7b1418c33baea2506458449562001d2fa) fix(validator): custom message was not translated (#7424)
-
 
 ### Features
 
