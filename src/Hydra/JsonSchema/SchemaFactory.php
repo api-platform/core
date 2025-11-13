@@ -38,6 +38,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
     private const ITEM_BASE_SCHEMA_NAME = 'HydraItemBaseSchema';
     private const ITEM_WITHOUT_ID_BASE_SCHEMA_NAME = 'HydraItemBaseSchemaWithoutId';
+    private const COLLECTION_BASE_SCHEMA_NAME_NO_PAGINATION = 'HydraCollectionBaseSchemaNoPagination';
     private const COLLECTION_BASE_SCHEMA_NAME = 'HydraCollectionBaseSchema';
 
     private const BASE_PROP = [
@@ -155,7 +156,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
         $hydraPrefix = $this->getHydraPrefix($serializerContext + $this->defaultContext);
 
-        if (!isset($definitions[self::COLLECTION_BASE_SCHEMA_NAME])) {
+        if (!isset($definitions[self::COLLECTION_BASE_SCHEMA_NAME_NO_PAGINATION])) {
             switch ($schema->getVersion()) {
                 // JSON Schema + OpenAPI 3.1
                 case Schema::VERSION_OPENAPI:
@@ -168,48 +169,12 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                     break;
             }
 
-            $definitions[self::COLLECTION_BASE_SCHEMA_NAME] = [
+            $definitions[self::COLLECTION_BASE_SCHEMA_NAME_NO_PAGINATION] = [
                 'type' => 'object',
                 'properties' => [
                     $hydraPrefix.'totalItems' => [
                         'type' => 'integer',
                         'minimum' => 0,
-                    ],
-                    $hydraPrefix.'view' => [
-                        'type' => 'object',
-                        'properties' => [
-                            '@id' => [
-                                'type' => 'string',
-                                'format' => 'iri-reference',
-                            ],
-                            '@type' => [
-                                'type' => 'string',
-                            ],
-                            $hydraPrefix.'first' => [
-                                'type' => 'string',
-                                'format' => 'iri-reference',
-                            ],
-                            $hydraPrefix.'last' => [
-                                'type' => 'string',
-                                'format' => 'iri-reference',
-                            ],
-                            $hydraPrefix.'previous' => [
-                                'type' => 'string',
-                                'format' => 'iri-reference',
-                            ],
-                            $hydraPrefix.'next' => [
-                                'type' => 'string',
-                                'format' => 'iri-reference',
-                            ],
-                        ],
-                        'example' => [
-                            '@id' => 'string',
-                            'type' => 'string',
-                            $hydraPrefix.'first' => 'string',
-                            $hydraPrefix.'last' => 'string',
-                            $hydraPrefix.'previous' => 'string',
-                            $hydraPrefix.'next' => 'string',
-                        ],
                     ],
                     $hydraPrefix.'search' => [
                         'type' => 'object',
@@ -233,13 +198,60 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                     ],
                 ],
             ];
+
+            $definitions[self::COLLECTION_BASE_SCHEMA_NAME] = [
+                'allOf' => [
+                    ['$ref' => $prefix.self::COLLECTION_BASE_SCHEMA_NAME_NO_PAGINATION],
+                    [
+                        'type' => 'object',
+                        'properties' => [
+                            $hydraPrefix.'view' => [
+                                'type' => 'object',
+                                'properties' => [
+                                    '@id' => [
+                                        'type' => 'string',
+                                        'format' => 'iri-reference',
+                                    ],
+                                    '@type' => [
+                                        'type' => 'string',
+                                    ],
+                                    $hydraPrefix.'first' => [
+                                        'type' => 'string',
+                                        'format' => 'iri-reference',
+                                    ],
+                                    $hydraPrefix.'last' => [
+                                        'type' => 'string',
+                                        'format' => 'iri-reference',
+                                    ],
+                                    $hydraPrefix.'previous' => [
+                                        'type' => 'string',
+                                        'format' => 'iri-reference',
+                                    ],
+                                    $hydraPrefix.'next' => [
+                                        'type' => 'string',
+                                        'format' => 'iri-reference',
+                                    ],
+                                ],
+                                'example' => [
+                                    '@id' => 'string',
+                                    'type' => 'string',
+                                    $hydraPrefix.'first' => 'string',
+                                    $hydraPrefix.'last' => 'string',
+                                    $hydraPrefix.'previous' => 'string',
+                                    $hydraPrefix.'next' => 'string',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ];
         }
 
         $definitionName = $this->definitionNameFactory->create($className, $format, $inputOrOutputClass, $operation, $serializerContext);
         $schema['type'] = 'object';
         $schema['description'] = "$definitionName collection.";
         $schema['allOf'] = [
-            ['$ref' => $prefix.self::COLLECTION_BASE_SCHEMA_NAME],
+            ['$ref' => $prefix.(false === $operation->getPaginationEnabled() ? self::COLLECTION_BASE_SCHEMA_NAME_NO_PAGINATION : self::COLLECTION_BASE_SCHEMA_NAME)],
             [
                 'type' => 'object',
                 'required' => [

@@ -129,19 +129,24 @@ class SchemaFactoryTest extends TestCase
         $this->assertTrue(isset($resultSchema['allOf'][0]['$ref']));
         $this->assertEquals($resultSchema['allOf'][0]['$ref'], '#/definitions/JsonApiCollectionBaseSchema');
 
-        $jsonApiCollectionBaseSchema = $resultSchema['definitions']['JsonApiCollectionBaseSchema'];
-        $this->assertTrue(isset($jsonApiCollectionBaseSchema['properties']));
-        $this->assertArrayHasKey('links', $jsonApiCollectionBaseSchema['properties']);
-        $this->assertArrayHasKey('self', $jsonApiCollectionBaseSchema['properties']['links']['properties']);
-        $this->assertArrayHasKey('first', $jsonApiCollectionBaseSchema['properties']['links']['properties']);
-        $this->assertArrayHasKey('prev', $jsonApiCollectionBaseSchema['properties']['links']['properties']);
-        $this->assertArrayHasKey('next', $jsonApiCollectionBaseSchema['properties']['links']['properties']);
-        $this->assertArrayHasKey('last', $jsonApiCollectionBaseSchema['properties']['links']['properties']);
+        $jsonApiCollectionBaseSchemaNoPagination = $resultSchema['definitions']['JsonApiCollectionBaseSchemaNoPagination'];
+        $this->assertTrue(isset($jsonApiCollectionBaseSchemaNoPagination['properties']));
+        $this->assertArrayHasKey('links', $jsonApiCollectionBaseSchemaNoPagination['properties']);
+        $this->assertArrayHasKey('self', $jsonApiCollectionBaseSchemaNoPagination['properties']['links']['properties']);
+        $this->assertArrayHasKey('meta', $jsonApiCollectionBaseSchemaNoPagination['properties']);
+        $this->assertArrayHasKey('totalItems', $jsonApiCollectionBaseSchemaNoPagination['properties']['meta']['properties']);
 
-        $this->assertArrayHasKey('meta', $jsonApiCollectionBaseSchema['properties']);
-        $this->assertArrayHasKey('totalItems', $jsonApiCollectionBaseSchema['properties']['meta']['properties']);
-        $this->assertArrayHasKey('itemsPerPage', $jsonApiCollectionBaseSchema['properties']['meta']['properties']);
-        $this->assertArrayHasKey('currentPage', $jsonApiCollectionBaseSchema['properties']['meta']['properties']);
+        $jsonApiCollectionBaseSchema = $resultSchema['definitions']['JsonApiCollectionBaseSchema'];
+        $this->assertArrayHasKey('allOf', $jsonApiCollectionBaseSchema);
+        $this->assertSame(['$ref' => '#/definitions/JsonApiCollectionBaseSchemaNoPagination'], $jsonApiCollectionBaseSchema['allOf'][0]);
+        $this->assertArrayHasKey('first', $jsonApiCollectionBaseSchema['allOf'][1]['properties']['links']['properties']);
+        $this->assertArrayHasKey('prev', $jsonApiCollectionBaseSchema['allOf'][1]['properties']['links']['properties']);
+        $this->assertArrayHasKey('next', $jsonApiCollectionBaseSchema['allOf'][1]['properties']['links']['properties']);
+        $this->assertArrayHasKey('last', $jsonApiCollectionBaseSchema['allOf'][1]['properties']['links']['properties']);
+
+        $this->assertArrayHasKey('meta', $jsonApiCollectionBaseSchema['allOf'][1]['properties']);
+        $this->assertArrayHasKey('itemsPerPage', $jsonApiCollectionBaseSchema['allOf'][1]['properties']['meta']['properties']);
+        $this->assertArrayHasKey('currentPage', $jsonApiCollectionBaseSchema['allOf'][1]['properties']['meta']['properties']);
 
         $objectSchema = $resultSchema['allOf'][1];
         $this->assertArrayHasKey('data', $objectSchema['properties']);

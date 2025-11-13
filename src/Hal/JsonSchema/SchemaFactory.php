@@ -35,6 +35,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     use SchemaUriPrefixTrait;
 
     private const COLLECTION_BASE_SCHEMA_NAME = 'HalCollectionBaseSchema';
+    private const COLLECTION_BASE_SCHEMA_NAME_NO_PAGINATION = 'HalCollectionBaseSchemaNoPagination';
 
     private const HREF_PROP = [
         'href' => [
@@ -122,10 +123,14 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
 
         if (($schema['type'] ?? '') === 'array') {
-            if (!isset($definitions[self::COLLECTION_BASE_SCHEMA_NAME])) {
-                $definitions[self::COLLECTION_BASE_SCHEMA_NAME] = [
+            if (!isset($definitions[self::COLLECTION_BASE_SCHEMA_NAME_NO_PAGINATION])) {
+                $definitions[self::COLLECTION_BASE_SCHEMA_NAME_NO_PAGINATION] = [
                     'type' => 'object',
                     'properties' => [
+                        'totalItems' => [
+                            'type' => 'integer',
+                            'minimum' => 0,
+                        ],
                         '_embedded' => [
                             'anyOf' => [
                                 [
@@ -139,34 +144,10 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                                 ['type' => 'object'],
                             ],
                         ],
-                        'totalItems' => [
-                            'type' => 'integer',
-                            'minimum' => 0,
-                        ],
-                        'itemsPerPage' => [
-                            'type' => 'integer',
-                            'minimum' => 0,
-                        ],
                         '_links' => [
                             'type' => 'object',
                             'properties' => [
                                 'self' => [
-                                    'type' => 'object',
-                                    'properties' => self::HREF_PROP,
-                                ],
-                                'first' => [
-                                    'type' => 'object',
-                                    'properties' => self::HREF_PROP,
-                                ],
-                                'last' => [
-                                    'type' => 'object',
-                                    'properties' => self::HREF_PROP,
-                                ],
-                                'next' => [
-                                    'type' => 'object',
-                                    'properties' => self::HREF_PROP,
-                                ],
-                                'previous' => [
                                     'type' => 'object',
                                     'properties' => self::HREF_PROP,
                                 ],
@@ -175,6 +156,41 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                     ],
                     'required' => ['_links', '_embedded'],
                 ];
+
+                $definitions[self::COLLECTION_BASE_SCHEMA_NAME] = [
+                    'allOf' => [
+                        ['$ref' => $prefix.self::COLLECTION_BASE_SCHEMA_NAME_NO_PAGINATION],
+                        [
+                            'type' => 'object',
+                            'properties' => [
+                                'itemsPerPage' => [
+                                    'type' => 'integer',
+                                    'minimum' => 0,
+                                ],
+                                '_links' => [
+                                    'properties' => [
+                                        'first' => [
+                                            'type' => 'object',
+                                            'properties' => self::HREF_PROP,
+                                        ],
+                                        'last' => [
+                                            'type' => 'object',
+                                            'properties' => self::HREF_PROP,
+                                        ],
+                                        'next' => [
+                                            'type' => 'object',
+                                            'properties' => self::HREF_PROP,
+                                        ],
+                                        'previous' => [
+                                            'type' => 'object',
+                                            'properties' => self::HREF_PROP,
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ];
             }
 
             unset($schema['items']);
@@ -182,7 +198,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
             $schema['description'] = "$definitionName collection.";
             $schema['allOf'] = [
-                ['$ref' => $prefix.self::COLLECTION_BASE_SCHEMA_NAME],
+                ['$ref' => $prefix.(false === $operation->getPaginationEnabled() ? self::COLLECTION_BASE_SCHEMA_NAME_NO_PAGINATION : self::COLLECTION_BASE_SCHEMA_NAME)],
                 [
                     'type' => 'object',
                     'properties' => [
