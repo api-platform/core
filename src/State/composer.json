@@ -40,9 +40,12 @@
         "phpunit/phpunit": "11.5.x-dev",
         "symfony/http-foundation": "^6.4 || ^7.0",
         "symfony/object-mapper": "^7.3",
-        "symfony/type-info": "^7.3",
+        "symfony/type-info": "^7.3 || 7.4.x-dev",
         "symfony/web-link": "^6.4 || ^7.1",
         "willdurand/negotiation": "^3.1"
+    },
+    "conflicts": {
+        "symfony/object-mapper": "<7.3.4"
     },
     "autoload": {
         "psr-4": {
