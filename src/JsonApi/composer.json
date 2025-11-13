@@ -28,7 +28,7 @@
         "api-platform/serializer": "^4.2",
         "api-platform/state": "^4.2",
         "symfony/error-handler": "^6.4 || ^7.0",
-        "symfony/http-foundation": "^6.4 || ^7.0",
+        "symfony/http-foundation": "^6.4.14 || ^7.0",
         "symfony/type-info": "^7.3"
     },
     "require-dev": {
