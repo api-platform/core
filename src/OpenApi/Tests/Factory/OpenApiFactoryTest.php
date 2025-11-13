@@ -658,7 +658,9 @@ class OpenApiFactoryTest extends TestCase
         $this->assertEquals($components->getSchemas(), new \ArrayObject([
             'Dummy' => $dummySchema->getDefinitions(),
             'Dummy.OutputDto' => $dummySchema->getDefinitions(),
+            'Dummy.OutputDto.csv' => $dummySchema->getDefinitions(),
             'Dummy.jsonld' => $dummySchema->getDefinitions(),
+            'Dummy.csv' => $dummySchema->getDefinitions(),
             'Dummy.OutputDto.jsonld' => $dummySchema->getDefinitions(),
             'Parameter.jsonld' => $parameterSchema,
             'DummyErrorResource' => $dummyErrorSchema->getDefinitions(),
@@ -897,7 +899,7 @@ class OpenApiFactoryTest extends TestCase
                     'Dummy resource updated',
                     new \ArrayObject([
                         'application/json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto'])),
-                        'text/csv' => new \ArrayObject(),
+                        'text/csv' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto.csv'])),
                     ]),
                     null,
                     new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$request.path.id']), null, 'This is a dummy')])
@@ -926,7 +928,7 @@ class OpenApiFactoryTest extends TestCase
                 'The updated Dummy resource',
                 new \ArrayObject([
                     'application/json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy'])),
-                    'text/csv' => new \ArrayObject(),
+                    'text/csv' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.csv'])),
                 ]),
                 true
             )

@@ -93,6 +93,7 @@ use Symfony\Component\Validator\Constraints\Country;
     provider: [self::class, 'collectionProvider'],
 )]
 #[GetCollection(
+    openapi: false,
     uriTemplate: 'validate_parameters{._format}',
     parameters: [
         'enum' => new QueryParameter(
