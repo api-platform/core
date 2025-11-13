@@ -24,7 +24,7 @@
     "require": {
         "php": ">=8.2",
         "api-platform/metadata": "^4.2",
-        "api-platform/state": "^4.2",
+        "api-platform/state": "^4.2.4",
         "symfony/http-foundation": "^6.4.14 || ^7.0"
     },
     "require-dev": {

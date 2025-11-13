@@ -25,8 +25,8 @@
         "api-platform/documentation": "^4.2",
         "api-platform/json-schema": "^4.2",
         "api-platform/metadata": "^4.2",
-        "api-platform/serializer": "^4.2",
-        "api-platform/state": "^4.2",
+        "api-platform/serializer": "^4.2.4",
+        "api-platform/state": "^4.2.4",
         "symfony/error-handler": "^6.4 || ^7.0",
         "symfony/http-foundation": "^6.4.14 || ^7.0",
         "symfony/type-info": "^7.3"

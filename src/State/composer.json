@@ -35,8 +35,8 @@
         "symfony/translation-contracts": "^3.0"
     },
     "require-dev": {
-        "api-platform/serializer": "^4.2",
-        "api-platform/validator": "^4.2",
+        "api-platform/serializer": "^4.2.4",
+        "api-platform/validator": "^4.2.4",
         "phpunit/phpunit": "11.5.x-dev",
         "symfony/http-foundation": "^6.4.14 || ^7.0",
         "symfony/object-mapper": "^7.3",
