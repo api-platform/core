@@ -13,27 +13,25 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResourceWithRelationRelated;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\ObjectMapper\Attribute\Map;
 
+#[ApiResource]
+#[GetCollection(
+    paginationEnabled: false,
+    paginationItemsPerPage: 3,
+)]
 #[ORM\Entity]
-#[Map(target: MappedResourceWithRelationRelated::class)]
-class MappedResourceWithRelationRelatedEntity
+class PaginationDisabledEntity
 {
-    #[ORM\Id, ORM\Column, ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private ?int $id = null;
-
-    #[ORM\Column]
-    public string $name;
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function setId(?int $id = null)
-    {
-        $this->id = $id;
     }
 }

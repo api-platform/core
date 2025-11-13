@@ -7,6 +7,19 @@
 * [21aa2572d](https://github.com/api-platform/core/commit/21aa2572d8fef2b3f05f7307c51348a6c9767e45) feat(elasticsearch): add SSL options for Elasticsearch configuration (#4059)
 * [ba0c76c](https://github.com/api-platform/core/commit/ba0c76c6f5c8afa8622e87a155b8b99f453d6453) feat(doctrine): remove put & path for readonly entity (#7019)
 
+## v4.2.4
+
+### Bug fixes
+
+* [20f288959](https://github.com/api-platform/core/commit/20f288959a9d196dc64f859040306120b2496934) fix: multiple :property template operations on a single resource (#7461)
+* [44f227112](https://github.com/api-platform/core/commit/44f227112a2dd2380169643b70d783dbdd7e4936) fix(symfony): inject api-platform default configuration in the php resource metadata factory (#7525)
+* [921d7c8fe](https://github.com/api-platform/core/commit/921d7c8fe4fe61dbfcf3da8fbff7157b2866eb3e) fix(state): create PUT has relation with lazy mapper (#7521)
+* [951422e15](https://github.com/api-platform/core/commit/951422e15602ed2a4e0b66c7b8f8970cc0b3ac36) fix(openapi): maintain json schema for non-json operations (#7528)
+* [98fc35221](https://github.com/api-platform/core/commit/98fc352212e679d2753f94703989cb15b8f12891) fix(symfony): object mapper compatibility (#7531)
+* [a5c44624d](https://github.com/api-platform/core/commit/a5c44624d1a14488f1cb1a38033c8e44fe3111b4) fix(json-schema): pagination less schema with disabled pagination (#7506)
+* [da2324e82](https://github.com/api-platform/core/commit/da2324e82a53b03b1058606424c1175ab04373cd) fix(jsonschema): move jsonMergePatch postfix to DefinitionNameFactory (#7510)
+* [dc0df6110](https://github.com/api-platform/core/commit/dc0df6110366948869e20d94324380e12833a918) fix(iri): json streamer iri template does not need metadata (#7511)
+
 ## v4.2.3
 
 * [9416083f7](https://github.com/api-platform/core/commit/9416083f7631b28093f3c79db995862338477137) fix(state): object mapper aware interface (#7486)
@@ -20,7 +33,6 @@
 * [ebe6dc9a2](https://github.com/api-platform/core/commit/ebe6dc9a2417a3fa46ba358abd32bbcfb895b76e) fix(jsonschema): fallback the schema for `mixed` properties to `string|null` instead of `null` (#7489)
 * [fa6e206cc](https://github.com/api-platform/core/commit/fa6e206cc3cf20aa4535ad2fd83d9e53f56e713c) fix(state): detect mapping on source (#7475)
 * [fafbe5c7b](https://github.com/api-platform/core/commit/fafbe5c7b1418c33baea2506458449562001d2fa) fix(validator): custom message was not translated (#7424)
-
 
 ### Features
 
@@ -336,6 +348,13 @@ TypeInfo:
 * [79edced67](https://github.com/api-platform/core/commit/79edced67ccca1a7b80455dd94203501d9c4fa89) !fix(json-schema): share invariable sub-schemas
 * [cff61eab8](https://github.com/api-platform/core/commit/cff61eab8643f8ed08d59c0684e77740d0d81b04) fix(metadata): append php file resource extractor (#7193)
 * [f3d4afe03](https://github.com/api-platform/core/commit/f3d4afe032385f3b665131a365e42706930f0730) fix(symfony): validator type-info
+
+## v4.1.27
+
+### Bug fixes
+
+* [3df65aa86](https://github.com/api-platform/core/commit/3df65aa86e9e4ececd5e64104b8815b3f8320d8e) fix(symfony): allow disabling PHPStan PhpDocParser (#7507)
+* [7c76fb8ea](https://github.com/api-platform/core/commit/7c76fb8ea0dac24ec3f8a1495a9416facdad23f1)  fix(jsonld): read identifier with itemUriTemplate (#7517)
 
 ## v4.1.26
 

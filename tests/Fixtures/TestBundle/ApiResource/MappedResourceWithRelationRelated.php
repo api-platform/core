@@ -32,8 +32,6 @@ use Symfony\Component\ObjectMapper\Attribute\Map;
 #[Map(target: MappedResourceWithRelationRelatedEntity::class)]
 class MappedResourceWithRelationRelated
 {
-    #[Map(if: false)]
     public string $id;
-
     public string $name;
 }

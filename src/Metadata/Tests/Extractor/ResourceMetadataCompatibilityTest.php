@@ -572,11 +572,11 @@ final class ResourceMetadataCompatibilityTest extends TestCase
 
             foreach ($fixtures as $parameter => $value) {
                 if (method_exists($this, 'with'.ucfirst($parameter))) {
-                    $value = $this->{'with'.ucfirst($parameter)}($value, $fixtures);
+                    $value = $this->{'with'.ucfirst($parameter)}($value, $fixtures); // @phpstan-ignore-line
                 }
 
                 if (method_exists($resource, 'with'.ucfirst($parameter))) {
-                    $resource = $resource->{'with'.ucfirst($parameter)}($value, $fixtures);
+                    $resource = $resource->{'with'.ucfirst($parameter)}($value, $fixtures); // @phpstan-ignore-line
                     continue;
                 }
 

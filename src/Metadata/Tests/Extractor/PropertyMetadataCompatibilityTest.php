@@ -110,11 +110,11 @@ final class PropertyMetadataCompatibilityTest extends TestCase
 
         foreach (self::FIXTURES as $parameter => $value) {
             if (method_exists($this, 'with'.ucfirst($parameter))) {
-                $value = $this->{'with'.ucfirst($parameter)}($value, self::FIXTURES);
+                $value = $this->{'with'.ucfirst($parameter)}($value, self::FIXTURES); // @phpstan-ignore-line
             }
 
             if (method_exists($property, 'with'.ucfirst($parameter))) {
-                $property = $property->{'with'.ucfirst($parameter)}($value, self::FIXTURES);
+                $property = $property->{'with'.ucfirst($parameter)}($value, self::FIXTURES); // @phpstan-ignore-line
                 continue;
             }
 

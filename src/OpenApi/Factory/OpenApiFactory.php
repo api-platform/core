@@ -266,11 +266,8 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             foreach ($responseMimeTypes as $operationFormat) {
                 $operationOutputSchema = null;
-                // Having JSONSchema for non-json schema makes no sense
-                if (str_starts_with($operationFormat, 'json')) {
-                    $operationOutputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_OUTPUT, $operation, $schema, null, $forceSchemaCollection);
-                    $this->appendSchemaDefinitions($schemas, $operationOutputSchema->getDefinitions());
-                }
+                $operationOutputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_OUTPUT, $operation, $schema, null, $forceSchemaCollection);
+                $this->appendSchemaDefinitions($schemas, $operationOutputSchema->getDefinitions());
 
                 $operationOutputSchemas[$operationFormat] = $operationOutputSchema;
             }
@@ -458,10 +455,8 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $operationInputSchemas = [];
                     foreach ($requestMimeTypes as $operationFormat) {
                         $operationInputSchema = null;
-                        if (str_starts_with($operationFormat, 'json')) {
-                            $operationInputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_INPUT, $operation, $schema, null, $forceSchemaCollection);
-                            $this->appendSchemaDefinitions($schemas, $operationInputSchema->getDefinitions());
-                        }
+                        $operationInputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_INPUT, $operation, $schema, null, $forceSchemaCollection);
+                        $this->appendSchemaDefinitions($schemas, $operationInputSchema->getDefinitions());
 
                         $operationInputSchemas[$operationFormat] = $operationInputSchema;
                     }
@@ -999,11 +994,8 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $operationErrorSchemas = [];
             foreach ($responseMimeTypes as $operationFormat) {
                 $operationErrorSchema = null;
-                // Having JSONSchema for non-json schema makes no sense
-                if (str_starts_with($operationFormat, 'json')) {
-                    $operationErrorSchema = $this->jsonSchemaFactory->buildSchema($errorResource->getClass(), $operationFormat, Schema::TYPE_OUTPUT, null, $schema);
-                    $this->appendSchemaDefinitions($schemas, $operationErrorSchema->getDefinitions());
-                }
+                $operationErrorSchema = $this->jsonSchemaFactory->buildSchema($errorResource->getClass(), $operationFormat, Schema::TYPE_OUTPUT, null, $schema);
+                $this->appendSchemaDefinitions($schemas, $operationErrorSchema->getDefinitions());
                 $operationErrorSchemas[$operationFormat] = $operationErrorSchema;
             }
 

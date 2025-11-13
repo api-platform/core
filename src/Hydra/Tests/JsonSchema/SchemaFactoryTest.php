@@ -130,11 +130,18 @@ class SchemaFactoryTest extends TestCase
     {
         $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_OUTPUT, new GetCollection());
         $this->assertNull($resultSchema->getRootDefinitionKey());
-        $hydraCollectionSchema = $resultSchema['definitions']['HydraCollectionBaseSchema'];
-        $properties = $hydraCollectionSchema['properties'];
+        $hydraCollectionSchemaNoPagination = $resultSchema['definitions']['HydraCollectionBaseSchemaNoPagination'];
+        $properties = $hydraCollectionSchemaNoPagination['properties'];
         $this->assertArrayHasKey('hydra:totalItems', $properties);
-        $this->assertArrayHasKey('hydra:view', $properties);
         $this->assertArrayHasKey('hydra:search', $properties);
+
+        $hydraCollectionSchema = $resultSchema['definitions']['HydraCollectionBaseSchema'];
+        $this->assertArrayHasKey('allOf', $hydraCollectionSchema);
+        $this->assertSame([
+            '$ref' => '#/definitions/HydraCollectionBaseSchemaNoPagination',
+        ], $hydraCollectionSchema['allOf'][0]);
+        $properties = $hydraCollectionSchema['allOf'][1]['properties'];
+        $this->assertArrayHasKey('hydra:view', $properties);
         $this->assertArrayNotHasKey('@context', $properties);
 
         $this->assertTrue(isset($properties['hydra:view']));
@@ -152,10 +159,16 @@ class SchemaFactoryTest extends TestCase
     {
         $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_OUTPUT, new GetCollection(), null, [ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX => false]);
         $this->assertNull($resultSchema->getRootDefinitionKey());
-        $hydraCollectionSchema = $resultSchema['definitions']['HydraCollectionBaseSchema'];
-        $properties = $hydraCollectionSchema['properties'];
+        $hydraCollectionSchemaNoPagination = $resultSchema['definitions']['HydraCollectionBaseSchemaNoPagination'];
+        $properties = $hydraCollectionSchemaNoPagination['properties'];
         $this->assertArrayHasKey('totalItems', $properties);
-        $this->assertArrayHasKey('view', $properties);
         $this->assertArrayHasKey('search', $properties);
+
+        $hydraCollectionSchema = $resultSchema['definitions']['HydraCollectionBaseSchema'];
+        $this->assertSame([
+            '$ref' => '#/definitions/HydraCollectionBaseSchemaNoPagination',
+        ], $hydraCollectionSchema['allOf'][0]);
+        $properties = $hydraCollectionSchema['allOf'][1]['properties'];
+        $this->assertArrayHasKey('view', $properties);
     }
 }

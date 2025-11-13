@@ -22,8 +22,8 @@
     "require": {
         "php": ">=8.2",
         "api-platform/metadata": "^4.2",
-        "api-platform/state": "^4.2",
-        "api-platform/serializer": "^4.2",
+        "api-platform/state": "^4.2.4",
+        "api-platform/serializer": "^4.2.4",
         "symfony/property-info": "^7.1",
         "symfony/serializer": "^6.4 || ^7.1",
         "symfony/type-info": "^7.3",
@@ -32,7 +32,7 @@
     },
     "require-dev": {
         "phpspec/prophecy-phpunit": "^2.2",
-        "api-platform/validator": "^4.2",
+        "api-platform/validator": "^4.2.4",
         "twig/twig": "^1.42.3 || ^2.12 || ^3.0",
         "symfony/mercure-bundle": "*",
         "symfony/routing": "^6.4 || ^7.0",

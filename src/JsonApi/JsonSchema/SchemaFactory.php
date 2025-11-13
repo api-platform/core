@@ -49,56 +49,8 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     public const DISABLE_JSON_SCHEMA_SERIALIZER_GROUPS = 'disable_json_schema_serializer_groups';
 
     private const COLLECTION_BASE_SCHEMA_NAME = 'JsonApiCollectionBaseSchema';
+    private const COLLECTION_BASE_SCHEMA_NAME_NO_PAGINATION = 'JsonApiCollectionBaseSchemaNoPagination';
 
-    private const LINKS_PROPS = [
-        'type' => 'object',
-        'properties' => [
-            'self' => [
-                'type' => 'string',
-                'format' => 'iri-reference',
-            ],
-            'first' => [
-                'type' => 'string',
-                'format' => 'iri-reference',
-            ],
-            'prev' => [
-                'type' => 'string',
-                'format' => 'iri-reference',
-            ],
-            'next' => [
-                'type' => 'string',
-                'format' => 'iri-reference',
-            ],
-            'last' => [
-                'type' => 'string',
-                'format' => 'iri-reference',
-            ],
-        ],
-        'example' => [
-            'self' => 'string',
-            'first' => 'string',
-            'prev' => 'string',
-            'next' => 'string',
-            'last' => 'string',
-        ],
-    ];
-    private const META_PROPS = [
-        'type' => 'object',
-        'properties' => [
-            'totalItems' => [
-                'type' => 'integer',
-                'minimum' => 0,
-            ],
-            'itemsPerPage' => [
-                'type' => 'integer',
-                'minimum' => 0,
-            ],
-            'currentPage' => [
-                'type' => 'integer',
-                'minimum' => 0,
-            ],
-        ],
-    ];
     private const RELATION_PROPS = [
         'type' => 'object',
         'properties' => [
@@ -217,17 +169,87 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             return $schema;
         }
 
-        if (!isset($definitions[self::COLLECTION_BASE_SCHEMA_NAME])) {
-            $definitions[self::COLLECTION_BASE_SCHEMA_NAME] = [
+        if (!isset($definitions[self::COLLECTION_BASE_SCHEMA_NAME_NO_PAGINATION])) {
+            $definitions[self::COLLECTION_BASE_SCHEMA_NAME_NO_PAGINATION] = [
                 'type' => 'object',
                 'properties' => [
-                    'links' => self::LINKS_PROPS,
-                    'meta' => self::META_PROPS,
+                    'links' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'self' => [
+                                'type' => 'string',
+                                'format' => 'iri-reference',
+                            ],
+                        ],
+                        'example' => [
+                            'self' => 'string',
+                        ],
+                    ],
+                    'meta' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'totalItems' => [
+                                'type' => 'integer',
+                                'minimum' => 0,
+                            ],
+                        ],
+                    ],
                     'data' => [
                         'type' => 'array',
                     ],
                 ],
                 'required' => ['data'],
+            ];
+
+            $definitions[self::COLLECTION_BASE_SCHEMA_NAME] = [
+                'allOf' => [
+                    ['$ref' => $prefix.self::COLLECTION_BASE_SCHEMA_NAME_NO_PAGINATION],
+                    [
+                        'type' => 'object',
+                        'properties' => [
+                            'links' => [
+                                'type' => 'object',
+                                'properties' => [
+                                    'first' => [
+                                        'type' => 'string',
+                                        'format' => 'iri-reference',
+                                    ],
+                                    'prev' => [
+                                        'type' => 'string',
+                                        'format' => 'iri-reference',
+                                    ],
+                                    'next' => [
+                                        'type' => 'string',
+                                        'format' => 'iri-reference',
+                                    ],
+                                    'last' => [
+                                        'type' => 'string',
+                                        'format' => 'iri-reference',
+                                    ],
+                                ],
+                                'example' => [
+                                    'first' => 'string',
+                                    'prev' => 'string',
+                                    'next' => 'string',
+                                    'last' => 'string',
+                                ],
+                            ],
+                            'meta' => [
+                                'type' => 'object',
+                                'properties' => [
+                                    'itemsPerPage' => [
+                                        'type' => 'integer',
+                                        'minimum' => 0,
+                                    ],
+                                    'currentPage' => [
+                                        'type' => 'integer',
+                                        'minimum' => 0,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
             ];
         }
 
@@ -239,7 +261,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
         $schema['description'] = "$definitionName collection.";
         $schema['allOf'] = [
-            ['$ref' => $prefix.self::COLLECTION_BASE_SCHEMA_NAME],
+            ['$ref' => $prefix.(false === $operation->getPaginationEnabled() ? self::COLLECTION_BASE_SCHEMA_NAME_NO_PAGINATION : self::COLLECTION_BASE_SCHEMA_NAME)],
             ['type' => 'object', 'properties' => [
                 'data' => [
                     'type' => 'array',
