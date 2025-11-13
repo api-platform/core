@@ -42,7 +42,7 @@
         "symfony/property-access": "^6.4 || ^7.0",
         "symfony/serializer": "^6.4 || ^7.0",
         "symfony/uid": "^6.4 || ^7.0",
-        "symfony/validator": "^6.4 || ^7.0",
+        "symfony/validator": "^6.4.11 || ^7.0",
         "symfony/yaml": "^6.4 || ^7.0"
     },
     "autoload": {

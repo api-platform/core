@@ -27,7 +27,7 @@
         "symfony/type-info": "^7.3",
         "symfony/http-kernel": "^6.4 || ^7.1",
         "symfony/serializer": "^6.4 || ^7.1",
-        "symfony/validator": "^6.4 || ^7.1",
+        "symfony/validator": "^6.4.11 || ^7.1",
         "symfony/web-link": "^6.4 || ^7.1"
     },
     "require-dev": {

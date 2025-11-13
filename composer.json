@@ -118,7 +118,7 @@
         "symfony/serializer": "^6.4 || ^7.0",
         "symfony/translation-contracts": "^3.3",
         "symfony/type-info": "^7.3 || 7.4.x-dev",
-        "symfony/validator": "^6.4 || ^7.1",
+        "symfony/validator": "^6.4.11 || ^7.1",
         "symfony/web-link": "^6.4 || ^7.1",
         "willdurand/negotiation": "^3.1"
     },
@@ -192,7 +192,6 @@
         "symfony/string": "^6.4 || ^7.0",
         "symfony/twig-bundle": "^6.4 || ^7.0",
         "symfony/uid": "^6.4 || ^7.0",
-        "symfony/validator": "^6.4 || ^7.0",
         "symfony/var-exporter": "^7.3 || ^7.4.x-dev",
         "symfony/web-profiler-bundle": "^6.4 || ^7.0",
         "symfony/yaml": "^6.4 || ^7.0",
