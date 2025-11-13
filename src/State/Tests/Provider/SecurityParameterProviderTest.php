@@ -30,7 +30,7 @@ final class SecurityParameterProviderTest extends TestCase
         $obj = new \stdClass();
         $barObj = new \stdClass();
         $operation = new GetCollection(uriVariables: [
-            'barId' => new Link(toProperty: 'bar', fromClass: 'Bar', security: 'is_granted("some_voter", "bar")'),
+            'barId' => new Link(toProperty: 'bar', fromClass: $barObj::class, security: 'is_granted("some_voter", "bar")'),
         ], class: \stdClass::class);
         $decorated = $this->createMock(ProviderInterface::class);
         $decorated->method('provide')->willReturn($obj);
@@ -39,7 +39,7 @@ final class SecurityParameterProviderTest extends TestCase
         $request->attributes = $parameterBag;
         $request->attributes->set('bar', $barObj);
         $resourceAccessChecker = $this->createMock(ResourceAccessCheckerInterface::class);
-        $resourceAccessChecker->expects($this->once())->method('isGranted')->with('Bar', 'is_granted("some_voter", "bar")', ['object' => $obj, 'previous_object' => null, 'request' => $request, 'bar' => $barObj, 'barId' => 1, 'operation' => $operation])->willReturn(true);
+        $resourceAccessChecker->expects($this->once())->method('isGranted')->with($barObj::class, 'is_granted("some_voter", "bar")', ['object' => $obj, 'previous_object' => null, 'request' => $request, 'bar' => $barObj, 'barId' => 1, 'operation' => $operation])->willReturn(true);
         $accessChecker = new SecurityParameterProvider($decorated, $resourceAccessChecker);
         $accessChecker->provide($operation, ['barId' => 1], ['request' => $request]);
     }
@@ -51,7 +51,7 @@ final class SecurityParameterProviderTest extends TestCase
         $obj = new \stdClass();
         $barObj = new \stdClass();
         $operation = new GetCollection(uriVariables: [
-            'barId' => new Link(toProperty: 'bar', fromClass: 'Bar', security: 'is_granted("some_voter", "bar")'),
+            'barId' => new Link(toProperty: 'bar', fromClass: $barObj::class, security: 'is_granted("some_voter", "bar")'),
         ], class: \stdClass::class);
         $decorated = $this->createMock(ProviderInterface::class);
         $decorated->method('provide')->willReturn($obj);
@@ -60,7 +60,7 @@ final class SecurityParameterProviderTest extends TestCase
         $request->attributes = $parameterBag;
         $request->attributes->set('bar', $barObj);
         $resourceAccessChecker = $this->createMock(ResourceAccessCheckerInterface::class);
-        $resourceAccessChecker->expects($this->once())->method('isGranted')->with('Bar', 'is_granted("some_voter", "bar")', ['object' => $obj, 'previous_object' => null, 'request' => $request, 'bar' => $barObj, 'barId' => 1, 'operation' => $operation])->willReturn(false);
+        $resourceAccessChecker->expects($this->once())->method('isGranted')->with($barObj::class, 'is_granted("some_voter", "bar")', ['object' => $obj, 'previous_object' => null, 'request' => $request, 'bar' => $barObj, 'barId' => 1, 'operation' => $operation])->willReturn(false);
         $accessChecker = new SecurityParameterProvider($decorated, $resourceAccessChecker);
         $accessChecker->provide($operation, ['barId' => 1], ['request' => $request]);
     }
@@ -73,7 +73,7 @@ final class SecurityParameterProviderTest extends TestCase
         $obj = new \stdClass();
         $barObj = new \stdClass();
         $operation = new GetCollection(uriVariables: [
-            'barId' => new Link(toProperty: 'bar', fromClass: 'Bar', security: 'is_granted("some_voter", "bar")', securityMessage: 'You are not admin.'),
+            'barId' => new Link(toProperty: 'bar', fromClass: $barObj::class, security: 'is_granted("some_voter", "bar")', securityMessage: 'You are not admin.'),
         ], class: \stdClass::class);
         $decorated = $this->createMock(ProviderInterface::class);
         $decorated->method('provide')->willReturn($obj);
@@ -82,7 +82,7 @@ final class SecurityParameterProviderTest extends TestCase
         $request->attributes = $parameterBag;
         $request->attributes->set('bar', $barObj);
         $resourceAccessChecker = $this->createMock(ResourceAccessCheckerInterface::class);
-        $resourceAccessChecker->expects($this->once())->method('isGranted')->with('Bar', 'is_granted("some_voter", "bar")', ['object' => $obj, 'previous_object' => null, 'request' => $request, 'bar' => $barObj, 'barId' => 1, 'operation' => $operation])->willReturn(false);
+        $resourceAccessChecker->expects($this->once())->method('isGranted')->with($barObj::class, 'is_granted("some_voter", "bar")', ['object' => $obj, 'previous_object' => null, 'request' => $request, 'bar' => $barObj, 'barId' => 1, 'operation' => $operation])->willReturn(false);
         $accessChecker = new SecurityParameterProvider($decorated, $resourceAccessChecker);
         $accessChecker->provide($operation, ['barId' => 1], ['request' => $request]);
     }

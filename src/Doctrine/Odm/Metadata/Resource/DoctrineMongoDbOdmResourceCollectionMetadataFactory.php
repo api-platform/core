@@ -18,11 +18,14 @@ use ApiPlatform\Doctrine\Odm\State\ItemProvider;
 use ApiPlatform\Doctrine\Odm\State\Options;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\DeleteOperationInterface;
+use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\Util\StateOptionsTrait;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 
 final class DoctrineMongoDbOdmResourceCollectionMetadataFactory implements ResourceMetadataCollectionFactoryInterface
@@ -86,6 +89,10 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactory implements Resou
 
         if (null === $operation->getProvider()) {
             $operation = $operation->withProvider($this->getProvider($operation));
+
+            if ($operation instanceof HttpOperation) {
+                $operation = $operation->withRequirements($this->getRequirements($operation));
+            }
         }
 
         if (null === $operation->getProcessor()) {
@@ -93,6 +100,54 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactory implements Resou
         }
 
         return $operation;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function getRequirements(HttpOperation $operation): array
+    {
+        $requirements = $operation->getRequirements() ?? [];
+        $uriVariables = (array) ($operation->getUriVariables() ?? []);
+
+        foreach ($uriVariables as $paramName => $uriVariable) {
+            if (isset($requirements[$paramName])) {
+                continue;
+            }
+
+            if (!$uriVariable instanceof Link) {
+                continue;
+            }
+
+            $identifiers = $uriVariable->getIdentifiers();
+            if (1 !== \count($identifiers)) {
+                continue;
+            }
+            $fieldName = $identifiers[0];
+
+            $fromClass = $uriVariable->getFromClass();
+            if (null === $fromClass) {
+                continue;
+            }
+            $classMetadata = $this->managerRegistry->getManagerForClass($fromClass)?->getClassMetadata($fromClass);
+
+            $requirement = null;
+            if ($classMetadata instanceof ClassMetadata && $classMetadata->hasField($fieldName)) {
+                $fieldMapping = $classMetadata->getFieldMapping($fieldName);
+                $requirement = match ($fieldMapping['type']) {
+                    'uuid', 'guid' => '^[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$',
+                    'ulid' => '^[0-7][0-9a-hjkmnp-tv-zA-HJKMNP-TV-Z]{25}$',
+                    'smallint', 'integer', 'bigint' => '^-?[0-9]+$',
+                    default => null,
+                };
+            }
+
+            if (null !== $requirement) {
+                $requirements[$paramName] = $requirement;
+            }
+        }
+
+        return $requirements;
     }
 
     private function getProvider(Operation $operation): string
