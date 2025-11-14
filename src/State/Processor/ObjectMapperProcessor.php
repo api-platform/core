@@ -64,7 +64,7 @@ final class ObjectMapperProcessor implements ProcessorInterface
             // persist the entity
             $this->decorated->process(
                 // maps the Resource to an Entity
-                $this->objectMapper->map($data),
+                $this->objectMapper->map($data, $context['request']?->attributes->get('entity_data')),
                 $operation,
                 $uriVariables,
                 $context,
