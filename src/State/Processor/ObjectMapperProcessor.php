@@ -55,7 +55,7 @@ final class ObjectMapperProcessor implements ProcessorInterface
             if (!$this->objectMapperMetadata->create($data)) {
                 return $this->decorated->process($data, $operation, $uriVariables, $context);
             }
-        } elseif (!(new \ReflectionClass($operation->getClass()))->getAttributes(Map::class)) {
+        } elseif (!(new \ReflectionClass($class))->getAttributes(Map::class)) {
             return $this->decorated->process($data, $operation, $uriVariables, $context);
         }
 
