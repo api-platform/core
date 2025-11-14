@@ -49,11 +49,13 @@ final class ObjectMapperProvider implements ProviderInterface
     {
         $data = $this->decorated->provide($operation, $uriVariables, $context);
 
+        $request = $context['request'] ?? null;
+        $request?->attributes->set('entity_data', $data);
+
         if (!$this->objectMapper || !\is_object($data)) {
             return $data;
         }
 
-        $request = $context['request'] ?? null;
         $entityClass = null;
         if (($options = $operation->getStateOptions()) && $options instanceof Options && $options->getEntityClass()) {
             $entityClass = $options->getEntityClass();

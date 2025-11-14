@@ -55,7 +55,7 @@ final class ObjectMapperProcessor implements ProcessorInterface
             if (!$this->objectMapperMetadata->create($data)) {
                 return $this->decorated->process($data, $operation, $uriVariables, $context);
             }
-        } elseif (!(new \ReflectionClass($operation->getClass()))->getAttributes(Map::class)) {
+        } elseif (!(new \ReflectionClass($class))->getAttributes(Map::class)) {
             return $this->decorated->process($data, $operation, $uriVariables, $context);
         }
 
@@ -64,7 +64,7 @@ final class ObjectMapperProcessor implements ProcessorInterface
             // persist the entity
             $this->decorated->process(
                 // maps the Resource to an Entity
-                $this->objectMapper->map($data),
+                $this->objectMapper->map($data, $context['request']?->attributes->get('entity_data')),
                 $operation,
                 $uriVariables,
                 $context,
