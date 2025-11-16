@@ -17,7 +17,7 @@ use ApiPlatform\Metadata\Exception\RuntimeException;
 use Symfony\Component\ObjectMapper\ObjectMapperAwareInterface;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 
-if (class_exists(ObjectMapperAwareInterface::class)) {
+if (false === class_exists(ObjectMapperAwareInterface::class)) {
     final class ObjectMapper implements ObjectMapperInterface
     {
         public function __construct(private ObjectMapperInterface $decorated)
