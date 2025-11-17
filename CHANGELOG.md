@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.2.5
+
+### Bug fixes
+
+* [57fe3d1](https://github.com/api-platform/core/commit/57fe3d127d477911c4f678ff392bcfd91ef79533) fix(state): class existence check for ObjectMapperAwareInterface
+
 ## v4.2.4
 
 ### Bug fixes
