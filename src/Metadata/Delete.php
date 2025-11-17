@@ -101,6 +101,7 @@ final class Delete extends HttpOperation implements DeleteOperationInterface
         protected ?bool $hideHydraOperation = null,
         ?bool $jsonStream = null,
         array $extraProperties = [],
+        ?bool $map = null,
     ) {
         parent::__construct(
             method: 'DELETE',
@@ -183,6 +184,7 @@ final class Delete extends HttpOperation implements DeleteOperationInterface
             strictQueryParameterValidation: $strictQueryParameterValidation,
             hideHydraOperation: $hideHydraOperation,
             stateOptions: $stateOptions,
+            map: $map
         );
     }
 }

@@ -104,6 +104,7 @@ class XmlExtractorTest extends TestCase
                     'headers' => null,
                     'parameters' => null,
                     'jsonStream' => null,
+                    'map' => null,
                 ],
                 [
                     'uriTemplate' => '/users/{author}/comments{._format}',
@@ -280,6 +281,7 @@ class XmlExtractorTest extends TestCase
                             'parameters' => null,
                             'routeName' => 'custom_route_name',
                             'jsonStream' => null,
+                            'map' => null,
                         ],
                         [
                             'name' => null,
@@ -393,6 +395,7 @@ class XmlExtractorTest extends TestCase
                             ],
                             'routeName' => null,
                             'jsonStream' => null,
+                            'map' => null,
                         ],
                     ],
                     'graphQlOperations' => null,
@@ -405,6 +408,7 @@ class XmlExtractorTest extends TestCase
                     'headers' => ['hello' => 'world'],
                     'parameters' => null,
                     'jsonStream' => null,
+                    'map' => null,
                 ],
             ],
         ], $extractor->getResources());

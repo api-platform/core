@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Functional;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\FirstResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResourceNoMap;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResourceOdm;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResourceSourceOnly;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResourceWithInput;
@@ -24,6 +25,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResourceWithRelation
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\SecondResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MappedDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MappedEntity;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MappedEntityNoMap;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MappedEntitySourceOnly;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MappedResourceWithRelationEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MappedResourceWithRelationRelatedEntity;
@@ -52,6 +54,7 @@ final class MappingTest extends ApiTestCase
             MappedResourceWithRelationRelated::class,
             MappedResourceWithInput::class,
             MappedResourceSourceOnly::class,
+            MappedResourceNoMap::class,
         ];
     }
 
@@ -63,15 +66,19 @@ final class MappingTest extends ApiTestCase
 
         $this->recreateSchema([MappedEntity::class]);
         $this->loadFixtures();
-        $r = self::createClient()->request('GET', $this->isMongoDB() ? 'mapped_resource_odms' : 'mapped_resources');
+        $client = self::createClient();
+        $client->request('GET', $this->isMongoDB() ? 'mapped_resource_odms' : 'mapped_resources');
+        $this->assertArrayHasKey('mapped_data', $client->getKernelBrowser()->getRequest()->attributes->all());
         $this->assertJsonContains(['member' => [
             ['username' => 'B0 A0'],
             ['username' => 'B1 A1'],
             ['username' => 'B2 A2'],
         ]]);
 
-        $r = self::createClient()->request('POST', $this->isMongoDB() ? 'mapped_resource_odms' : 'mapped_resources', ['json' => ['username' => 'so yuka']]);
+        $client = self::createClient();
+        $r = $client->request('POST', $this->isMongoDB() ? 'mapped_resource_odms' : 'mapped_resources', ['json' => ['username' => 'so yuka']]);
         $this->assertJsonContains(['username' => 'so yuka']);
+        $this->assertArrayHasKey('persisted_data', $client->getKernelBrowser()->getRequest()->attributes->all());
 
         $manager = $this->getManager();
         $repo = $manager->getRepository($this->isMongoDB() ? MappedDocument::class : MappedEntity::class);
@@ -214,6 +221,47 @@ final class MappingTest extends ApiTestCase
 
         $r = self::createClient()->request('PATCH', $uri, ['json' => ['username' => 'ba zar'], 'headers' => ['content-type' => 'application/merge-patch+json']]);
         $this->assertJsonContains(['username' => 'ba zar']);
+    }
+
+    public function testShouldNotMapWhenCanMapIsFalse(): void
+    {
+        if (!$this->getContainer()->has('api_platform.object_mapper')) {
+            $this->markTestSkipped('ObjectMapper not installed');
+        }
+
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('MongoDB not tested');
+        }
+
+        $this->recreateSchema([MappedEntityNoMap::class]);
+
+        $client = self::createClient();
+        $client->request('POST', '/mapped_resource_no_maps', [
+            'json' => ['name' => 'test name', 'id' => 1],
+            'headers' => ['content-type' => 'application/ld+json'],
+        ]);
+        $this->assertArrayNotHasKey('mapped_data', $client->getKernelBrowser()->getRequest()->attributes->all());
+
+        $this->assertResponseStatusCodeSame(201);
+        $this->assertJsonContains([
+            '@context' => '/contexts/MappedResourceNoMap',
+            '@id' => '/mapped_resource_no_maps/1',
+            '@type' => 'MappedResourceNoMap',
+            'id' => 1,
+            'name' => 'test name',
+        ]);
+
+        $client = self::createClient();
+        $client->request('GET', '/mapped_resource_no_maps/1');
+        $this->assertArrayNotHasKey('persisted_data', $client->getKernelBrowser()->getRequest()->attributes->all());
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertJsonContains([
+            '@context' => '/contexts/MappedResourceNoMap',
+            '@id' => '/mapped_resource_no_maps/1',
+            '@type' => 'MappedResourceNoMap',
+            'id' => 1,
+            'name' => 'test name',
+        ]);
     }
 
     private function loadFixtures(): void

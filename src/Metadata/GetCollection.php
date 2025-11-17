@@ -102,6 +102,7 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
         ?bool $jsonStream = null,
         array $extraProperties = [],
         private ?string $itemUriTemplate = null,
+        ?bool $map = null,
     ) {
         parent::__construct(
             uriTemplate: $uriTemplate,
@@ -183,6 +184,7 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
             strictQueryParameterValidation: $strictQueryParameterValidation,
             hideHydraOperation: $hideHydraOperation,
             stateOptions: $stateOptions,
+            map: $map
         );
     }
 

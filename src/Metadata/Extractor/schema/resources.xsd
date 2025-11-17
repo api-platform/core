@@ -524,6 +524,7 @@
         <xsd:attribute type="xsd:string" name="securityPostValidationMessage"/>
         <xsd:attribute type="xsd:boolean" name="collectDenormalizationErrors"/>
         <xsd:attribute type="xsd:boolean" name="jsonStream"/>
+        <xsd:attribute type="xsd:boolean" name="map"/>
     </xsd:attributeGroup>
 
     <xsd:attributeGroup name="extendedBase">

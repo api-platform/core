@@ -102,6 +102,7 @@ final class Post extends HttpOperation
         private ?string $itemUriTemplate = null,
         ?bool $strictQueryParameterValidation = null,
         ?bool $hideHydraOperation = null,
+        ?bool $map = null,
     ) {
         parent::__construct(
             method: 'POST',
@@ -183,7 +184,8 @@ final class Post extends HttpOperation
             strictQueryParameterValidation: $strictQueryParameterValidation,
             hideHydraOperation: $hideHydraOperation,
             jsonStream: $jsonStream,
-            extraProperties: $extraProperties
+            extraProperties: $extraProperties,
+            map: $map
         );
     }
 

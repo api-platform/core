@@ -221,6 +221,7 @@ class HttpOperation extends Operation
         ?bool $queryParameterValidationEnabled = null,
         ?bool $jsonStream = null,
         array $extraProperties = [],
+        ?bool $map = null,
     ) {
         $this->formats = (null === $formats || \is_array($formats)) ? $formats : [$formats];
         $this->inputFormats = (null === $inputFormats || \is_array($inputFormats)) ? $inputFormats : [$inputFormats];
@@ -279,7 +280,8 @@ class HttpOperation extends Operation
             strictQueryParameterValidation: $strictQueryParameterValidation,
             hideHydraOperation: $hideHydraOperation,
             jsonStream: $jsonStream,
-            extraProperties: $extraProperties
+            extraProperties: $extraProperties,
+            map: $map
         );
     }
 
