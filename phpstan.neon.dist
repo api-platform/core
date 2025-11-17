@@ -183,3 +183,6 @@ parameters:
 			identifier: method.notFound
 			paths:
 				- tests/Functional/JsonStreamerTest.php
+		-
+			paths:
+				- tests/Fixtures/app/config/reference.php
