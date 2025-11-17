@@ -178,3 +178,8 @@ parameters:
 				- src/Symfony/Bundle/Test
 				- tests
 				- src # TODO
+
+		-
+			identifier: method.notFound
+			paths:
+				- tests/Functional/JsonStreamerTest.php

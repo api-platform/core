@@ -110,16 +110,8 @@ class JsonStreamerTest extends ApiTestCase
             $this->markTestSkipped();
         }
 
-        $buffer = '';
-        ob_start(function (string $chunk) use (&$buffer): void {
-            $buffer .= $chunk;
-        });
-
-        self::createClient()->request('GET', '/json_stream_resources/1', ['headers' => ['accept' => 'application/ld+json']]);
-
-        ob_get_clean();
-
-        $res = json_decode($buffer, true);
+        $r = self::createClient()->request('GET', '/json_stream_resources/1', ['headers' => ['accept' => 'application/ld+json']]);
+        $res = json_decode($r->getBrowserKitResponse()->getContent(), true);
         $this->assertIsInt($res['views']);
         $this->assertIsInt($res['rating']);
         $this->assertIsBool($res['isFeatured']);
@@ -144,11 +136,8 @@ class JsonStreamerTest extends ApiTestCase
             $buffer .= $chunk;
         });
 
-        self::createClient()->request('GET', '/json_stream_resources', ['headers' => ['accept' => 'application/ld+json']]);
-
-        ob_get_clean();
-
-        $res = json_decode($buffer, true);
+        $r = self::createClient()->request('GET', '/json_stream_resources', ['headers' => ['accept' => 'application/ld+json']]);
+        $res = json_decode($r->getBrowserKitResponse()->getContent(), true);
 
         $this->assertIsArray($res);
         $this->assertArrayHasKey('@context', $res);
@@ -173,16 +162,8 @@ class JsonStreamerTest extends ApiTestCase
             $this->markTestSkipped();
         }
 
-        $buffer = '';
-        ob_start(function (string $chunk) use (&$buffer): void {
-            $buffer .= $chunk;
-        });
-
-        self::createClient()->request('GET', '/json_stream_resources/1', ['headers' => ['accept' => 'application/json']]);
-
-        ob_get_clean();
-
-        $res = json_decode($buffer, true);
+        $r = self::createClient()->request('GET', '/json_stream_resources/1', ['headers' => ['accept' => 'application/json']]);
+        $res = json_decode($r->getBrowserKitResponse()->getContent(), true);
         $this->assertIsInt($res['views']);
         $this->assertIsInt($res['rating']);
         $this->assertIsBool($res['isFeatured']);
@@ -202,17 +183,8 @@ class JsonStreamerTest extends ApiTestCase
             $this->markTestSkipped();
         }
 
-        $buffer = '';
-        ob_start(function (string $chunk) use (&$buffer): void {
-            $buffer .= $chunk;
-        });
-
-        self::createClient()->request('GET', '/json_stream_resources', ['headers' => ['accept' => 'application/json']]);
-
-        ob_get_clean();
-
-        $res = json_decode($buffer, true);
-
+        $r = self::createClient()->request('GET', '/json_stream_resources', ['headers' => ['accept' => 'application/json']]);
+        $res = json_decode($r->getBrowserKitResponse()->getContent(), true);
         $this->assertIsArray($res);
         $this->assertArrayNotHasKey('@id', $res);
         $this->assertArrayNotHasKey('@type', $res);
@@ -233,12 +205,7 @@ class JsonStreamerTest extends ApiTestCase
             $this->markTestSkipped('PHP version is lower than 8.4');
         }
 
-        $buffer = '';
-        ob_start(function (string $chunk) use (&$buffer): void {
-            $buffer .= $chunk;
-        });
-
-        self::createClient()->request('POST', '/json_stream_resources', [
+        $r = self::createClient()->request('POST', '/json_stream_resources', [
             'json' => [
                 'title' => 'asd',
                 'views' => 0,
@@ -251,10 +218,7 @@ class JsonStreamerTest extends ApiTestCase
             'headers' => ['content-type' => 'application/ld+json'],
         ]);
 
-        ob_get_clean();
-
-        $res = json_decode($buffer, true);
-
+        $res = json_decode($r->getBrowserKitResponse()->getContent(), true);
         $this->assertResponseIsSuccessful();
         $this->assertSame('asd', $res['title']);
         $this->assertSame(0, $res['views']);
@@ -286,12 +250,7 @@ class JsonStreamerTest extends ApiTestCase
             $this->markTestSkipped('PHP version is lower than 8.4');
         }
 
-        $buffer = '';
-        ob_start(function (string $chunk) use (&$buffer): void {
-            $buffer .= $chunk;
-        });
-
-        self::createClient()->request('POST', '/json_stream_resources', [
+        $r = self::createClient()->request('POST', '/json_stream_resources', [
             'json' => [
                 'title' => 'asd',
                 'views' => 0,
@@ -303,11 +262,7 @@ class JsonStreamerTest extends ApiTestCase
             ],
             'headers' => ['content-type' => 'application/json', 'accept' => 'application/json'],
         ]);
-
-        ob_get_clean();
-
-        $res = json_decode($buffer, true);
-
+        $res = json_decode($r->getBrowserKitResponse()->getContent(), true);
         $this->assertResponseIsSuccessful();
         $this->assertSame('asd', $res['title']);
         $this->assertSame(0, $res['views']);
@@ -335,16 +290,8 @@ class JsonStreamerTest extends ApiTestCase
             $this->markTestSkipped();
         }
 
-        $buffer = '';
-        ob_start(function (string $chunk) use (&$buffer): void {
-            $buffer .= $chunk;
-        });
-
-        self::createClient()->request('GET', '/json-stream-products/test', ['headers' => ['accept' => 'application/ld+json']]);
-
-        ob_get_clean();
-
-        $res = json_decode($buffer, true);
+        $r = self::createClient()->request('GET', '/json-stream-products/test', ['headers' => ['accept' => 'application/ld+json']]);
+        $res = json_decode($r->getBrowserKitResponse()->getContent(), true);
         $this->assertArrayNotHasKey('@id', $res['aggregateRating']);
         $this->assertEquals('https://schema.org/AggregateRating', $res['aggregateRating']['@type']);
         $this->assertEquals('https://schema.org/Product', $res['@type']);
