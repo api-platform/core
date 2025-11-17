@@ -1,5 +1,15 @@
 # Changelog
 
+## v4.2.6
+
+### Bug fixes
+
+* [53d3f8481](https://github.com/api-platform/core/commit/53d3f84817212baccb1a27aa8acf537d7ca6ff10) fix(state): object mapper flag (#7541)
+* [f4a1697ca](https://github.com/api-platform/core/commit/f4a1697ca8028395c611648bd0032a8761069e67) Revert "fix: 🐛 make default value of `pagination_maximum_items_per_page` same…" (#7533)
+
+
+### Features
+
 ## v4.2.5
 
 ### Bug fixes
