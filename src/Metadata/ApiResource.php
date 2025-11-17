@@ -969,8 +969,9 @@ class ApiResource extends Metadata
         array|Parameters|null $parameters = null,
         protected ?bool $strictQueryParameterValidation = null,
         protected ?bool $hideHydraOperation = null,
-        ?bool $jsonStream = null,
+        protected ?bool $jsonStream = null,
         protected array $extraProperties = [],
+        ?bool $map = null,
     ) {
         parent::__construct(
             shortName: $shortName,
@@ -1016,7 +1017,8 @@ class ApiResource extends Metadata
             strictQueryParameterValidation: $strictQueryParameterValidation,
             hideHydraOperation: $hideHydraOperation,
             jsonStream: $jsonStream,
-            extraProperties: $extraProperties
+            extraProperties: $extraProperties,
+            map: $map
         );
 
         /* @var Operations<HttpOperation> $operations> */

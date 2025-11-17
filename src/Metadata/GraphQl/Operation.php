@@ -92,6 +92,7 @@ class Operation extends AbstractOperation
         mixed $rules = null,
         ?string $policy = null,
         array $extraProperties = [],
+        ?bool $map = null,
     ) {
         parent::__construct(
             shortName: $shortName,
@@ -141,7 +142,8 @@ class Operation extends AbstractOperation
             queryParameterValidationEnabled: $queryParameterValidationEnabled,
             rules: $rules,
             policy: $policy,
-            extraProperties: $extraProperties
+            extraProperties: $extraProperties,
+            map: $map
         );
     }
 

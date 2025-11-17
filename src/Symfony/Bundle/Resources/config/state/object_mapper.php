@@ -45,4 +45,11 @@ return function (ContainerConfigurator $container) {
             service('api_platform.state_processor.object_mapper.inner'),
             service('api_platform.object_mapper.metadata_factory'),
         ]);
+
+    $services->set('api_platform.metadata.resource.metadata_collection_factory.object_mapper', 'ApiPlatform\Metadata\Resource\Factory\ObjectMapperMetadataCollectionFactory')
+        ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 100)
+        ->args([
+            service('api_platform.metadata.resource.metadata_collection_factory.object_mapper.inner'),
+            service('api_platform.object_mapper.metadata_factory'),
+        ]);
 };

@@ -761,4 +761,9 @@ final class ResourceMetadataCompatibilityTest extends TestCase
     {
         return $value;
     }
+
+    private function withMap(bool $value): bool
+    {
+        return $value;
+    }
 }

@@ -75,6 +75,7 @@ final class Subscription extends Operation
         mixed $rules = null,
         ?string $policy = null,
         array $extraProperties = [],
+        ?bool $map = null,
     ) {
         parent::__construct(
             resolver: $resolver,
@@ -131,6 +132,7 @@ final class Subscription extends Operation
             policy: $policy,
             rules: $rules,
             extraProperties: $extraProperties,
+            map: $map
         );
     }
 }

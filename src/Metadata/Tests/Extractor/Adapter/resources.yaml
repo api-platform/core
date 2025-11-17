@@ -343,3 +343,4 @@ resources:
                 custom_property: 'Lorem ipsum dolor sit amet'
                 another_custom_property:
                     'Lorem ipsum': 'Dolor sit amet'
+            map: null

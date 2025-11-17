@@ -550,6 +550,14 @@ XML_WRAP
         $resource->addAttribute('jsonStream', $this->parse($value));
     }
 
+    private function buildMap(\SimpleXMLElement $resource, ?bool $value): void
+    {
+        if (null === $value) {
+            return;
+        }
+        $resource->addAttribute('map', $this->parse($value));
+    }
+
     private function parse($value): ?string
     {
         if (null === $value) {
