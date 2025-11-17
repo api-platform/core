@@ -7,6 +7,19 @@
 * [21aa2572d](https://github.com/api-platform/core/commit/21aa2572d8fef2b3f05f7307c51348a6c9767e45) feat(elasticsearch): add SSL options for Elasticsearch configuration (#4059)
 * [ba0c76c](https://github.com/api-platform/core/commit/ba0c76c6f5c8afa8622e87a155b8b99f453d6453) feat(doctrine): remove put & path for readonly entity (#7019)
 
+## v4.2.6
+
+### Bug fixes
+
+* [53d3f8481](https://github.com/api-platform/core/commit/53d3f84817212baccb1a27aa8acf537d7ca6ff10) fix(state): object mapper flag (#7541)
+* [f4a1697ca](https://github.com/api-platform/core/commit/f4a1697ca8028395c611648bd0032a8761069e67) Revert "fix: 🐛 make default value of `pagination_maximum_items_per_page` same…" (#7533)
+
+## v4.2.5
+
+### Bug fixes
+
+* [57fe3d1](https://github.com/api-platform/core/commit/57fe3d127d477911c4f678ff392bcfd91ef79533) fix(state): class existence check for ObjectMapperAwareInterface
+
 ## v4.2.4
 
 ### Bug fixes

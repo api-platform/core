@@ -102,6 +102,7 @@ final class Put extends HttpOperation
         ?bool $strictQueryParameterValidation = null,
         ?bool $hideHydraOperation = null,
         private ?bool $allowCreate = null,
+        ?bool $map = null,
     ) {
         parent::__construct(
             method: 'PUT',
@@ -183,7 +184,8 @@ final class Put extends HttpOperation
             strictQueryParameterValidation: $strictQueryParameterValidation,
             hideHydraOperation: $hideHydraOperation,
             jsonStream: $jsonStream,
-            extraProperties: $extraProperties
+            extraProperties: $extraProperties,
+            map: $map
         );
     }
 

@@ -112,6 +112,7 @@ final class MainController
         $context['previous_data'] = $request->attributes->get('previous_data');
         $context['data'] = $request->attributes->get('data');
         $context['read_data'] = $request->attributes->get('read_data');
+        $context['mapped_data'] = $request->attributes->get('mapped_data');
 
         if (null === $operation->canWrite()) {
             $operation = $operation->withWrite(!$request->isMethodSafe());

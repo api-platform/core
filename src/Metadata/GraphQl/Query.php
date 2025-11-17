@@ -77,6 +77,7 @@ class Query extends Operation
         array $extraProperties = [],
 
         protected ?bool $nested = null,
+        ?bool $map = null,
     ) {
         parent::__construct(
             resolver: $resolver,
@@ -132,7 +133,8 @@ class Query extends Operation
             queryParameterValidationEnabled: $queryParameterValidationEnabled,
             policy: $policy,
             rules: $rules,
-            extraProperties: $extraProperties
+            extraProperties: $extraProperties,
+            map: $map
         );
     }
 

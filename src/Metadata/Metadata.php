@@ -81,6 +81,7 @@ abstract class Metadata
         protected ?bool $strictQueryParameterValidation = null,
         protected ?bool $hideHydraOperation = null,
         protected ?bool $jsonStream = null,
+        protected ?bool $map = null,
         protected array $extraProperties = [],
     ) {
         if (\is_array($parameters) && $parameters) {
@@ -88,6 +89,19 @@ abstract class Metadata
         }
 
         $this->parameters = $parameters;
+    }
+
+    public function canMap(): ?bool
+    {
+        return $this->map;
+    }
+
+    public function withMap(bool $map): static
+    {
+        $self = clone $this;
+        $self->map = $map;
+
+        return $self;
     }
 
     public function getShortName(): ?string
