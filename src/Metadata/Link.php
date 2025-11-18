@@ -19,6 +19,10 @@ use Symfony\Component\TypeInfo\Type;
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::TARGET_PARAMETER)]
 final class Link extends Parameter
 {
+    /**
+     * @param class-string|null $fromClass
+     * @param class-string|null $toClass
+     */
     public function __construct(
         private ?string $parameterName = null,
         private ?string $fromProperty = null,
@@ -87,11 +91,17 @@ final class Link extends Parameter
         return $self;
     }
 
+    /**
+     * @return class-string|null
+     */
     public function getFromClass(): ?string
     {
         return $this->fromClass;
     }
 
+    /**
+     * @param class-string $fromClass
+     */
     public function withFromClass(string $fromClass): self
     {
         $self = clone $this;
@@ -100,11 +110,17 @@ final class Link extends Parameter
         return $self;
     }
 
+    /**
+     * @return class-string|null
+     */
     public function getToClass(): ?string
     {
         return $this->toClass;
     }
 
+    /**
+     * @param class-string $toClass
+     */
     public function withToClass(string $toClass): self
     {
         $self = clone $this;
