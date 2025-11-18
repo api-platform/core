@@ -97,6 +97,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Document\SeparatedEntity as SeparatedE
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\SoMany as SoManyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Taxon as TaxonDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\ThirdLevel as ThirdLevelDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\UidBasedId as UidBasedIdDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\UrlEncodedId as UrlEncodedIdDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\User as UserDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\VideoGame as VideoGameDocument;
@@ -200,6 +201,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SymfonyUuidDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Taxon;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ThirdLevel;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\TreeDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\UidBasedId;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\UrlEncodedId;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\UuidIdentifierDummy;
@@ -217,6 +219,7 @@ use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Ramsey\Uuid\Uuid;
+use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid as SymfonyUuid;
 
 /**
@@ -1429,6 +1432,17 @@ final class DoctrineContext implements Context
     {
         $urlEncodedIdResource = ($this->isOrm() ? new UrlEncodedId() : new UrlEncodedIdDocument());
         $this->manager->persist($urlEncodedIdResource);
+        $this->manager->flush();
+        $this->manager->clear();
+    }
+
+    /**
+     * @Given there is a UidBasedId resource with id :id
+     */
+    public function thereIsAUidBasedIdResource(string $id): void
+    {
+        $uidBasedIdResource = ($this->isOrm() ? new UidBasedId(Ulid::fromBase32($id)) : new UidBasedIdDocument(Ulid::fromBase32($id)));
+        $this->manager->persist($uidBasedIdResource);
         $this->manager->flush();
         $this->manager->clear();
     }
