@@ -22,6 +22,7 @@ use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryAwareInterface;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\JsonSchema\SchemaUriPrefixTrait;
+use ApiPlatform\JsonSchema\TypeAwareDefinitionNameFactoryInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 
@@ -137,7 +138,11 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         $collectionKey = $schema->getItemsDefinitionKey();
 
         if (!$collectionKey) {
-            $definitionName = $schema->getRootDefinitionKey() ?? $this->definitionNameFactory->create($className, $format, $inputOrOutputClass, $operation, $serializerContext);
+            if ($this->definitionNameFactory instanceof TypeAwareDefinitionNameFactoryInterface) {
+                $definitionName = $schema->getRootDefinitionKey() ?? $this->definitionNameFactory->create($className, $format, $inputOrOutputClass, $operation, $serializerContext, $type);
+            } else {
+                $definitionName = $schema->getRootDefinitionKey() ?? $this->definitionNameFactory->create($className, $format, $inputOrOutputClass, $operation, $serializerContext);
+            }
             $this->decorateItemDefinition($definitionName, $definitions, $prefix, $type, $serializerContext);
 
             if (isset($definitions[$definitionName])) {
@@ -247,7 +252,11 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             ];
         }
 
-        $definitionName = $this->definitionNameFactory->create($className, $format, $inputOrOutputClass, $operation, $serializerContext);
+        if ($this->definitionNameFactory instanceof TypeAwareDefinitionNameFactoryInterface) {
+            $definitionName = $this->definitionNameFactory->create($className, $format, $inputOrOutputClass, $operation, $serializerContext, $type);
+        } else {
+            $definitionName = $this->definitionNameFactory->create($className, $format, $inputOrOutputClass, $operation, $serializerContext);
+        }
         $schema['type'] = 'object';
         $schema['description'] = "$definitionName collection.";
         $schema['allOf'] = [

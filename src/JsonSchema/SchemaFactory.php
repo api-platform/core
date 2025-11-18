@@ -97,7 +97,11 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             $isJsonMergePatch => 'merge-patch+json',
         };
 
-        $definitionName = $this->definitionNameFactory->create($className, $definitionFormat, $inputOrOutputClass, $operation, $serializerContext);
+        if ($this->definitionNameFactory instanceof TypeAwareDefinitionNameFactoryInterface) {
+            $definitionName = $this->definitionNameFactory->create($className, $definitionFormat, $inputOrOutputClass, $operation, $serializerContext, $type);
+        } else {
+            $definitionName = $this->definitionNameFactory->create($className, $definitionFormat, $inputOrOutputClass, $operation, $serializerContext);
+        }
 
         if (!isset($schema['$ref']) && !isset($schema['type'])) {
             $ref = $this->getSchemaUriPrefix($version).$definitionName;
