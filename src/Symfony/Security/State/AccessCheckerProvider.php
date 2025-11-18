@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\Security\Exception\AccessDeniedException;
+use ApiPlatform\Symfony\Security\ObjectVariableCheckerInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
@@ -59,15 +60,15 @@ final class AccessCheckerProvider implements ProviderInterface
                 $message = $operation->getSecurityMessage();
         }
 
-        $body = $this->decorated->provide($operation, $uriVariables, $context);
-        if (null === $isGranted) {
-            return $body;
+        if (
+            null === $isGranted
+            // On a GraphQl QueryCollection we want to perform security stage only on the top-level query
+            || ($operation instanceof QueryCollection && null !== ($context['source'] ?? null))
+        ) {
+            return $this->decorated->provide($operation, $uriVariables, $context);
         }
 
-        // On a GraphQl QueryCollection we want to perform security stage only on the top-level query
-        if ($operation instanceof QueryCollection && null !== ($context['source'] ?? null)) {
-            return $body;
-        }
+        $body = 'pre_read' === $this->event ? null : $this->decorated->provide($operation, $uriVariables, $context);
 
         if ($operation instanceof HttpOperation) {
             $request = $context['request'] ?? null;
@@ -84,10 +85,14 @@ final class AccessCheckerProvider implements ProviderInterface
             ];
         }
 
+        if ('pre_read' === $this->event && $this->resourceAccessChecker instanceof ObjectVariableCheckerInterface && $this->resourceAccessChecker->usesObjectVariable($isGranted, $resourceAccessCheckerContext)) {
+            return $this->decorated->provide($operation, $uriVariables, $context);
+        }
+
         if (!$this->resourceAccessChecker->isGranted($operation->getClass(), $isGranted, $resourceAccessCheckerContext)) {
             $operation instanceof GraphQlOperation ? throw new AccessDeniedHttpException($message ?? 'Access Denied.') : throw new AccessDeniedException($message ?? 'Access Denied.');
         }
 
-        return $body;
+        return 'pre_read' === $this->event ? $this->decorated->provide($operation, $uriVariables, $context) : $body;
     }
 }
