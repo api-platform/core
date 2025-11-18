@@ -16,6 +16,7 @@ namespace ApiPlatform\State\Processor;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @implements ProcessorInterface<mixed,mixed>
@@ -36,7 +37,8 @@ final class ObjectMapperProcessor implements ProcessorInterface
         $class = $operation->getInput()['class'] ?? $operation->getClass();
 
         if (
-            !$this->objectMapper
+            $data instanceof Response
+            || !$this->objectMapper
             || !$operation->canWrite()
             || null === $data
             || !is_a($data, $class, true)
