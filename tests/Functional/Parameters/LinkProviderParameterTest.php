@@ -183,4 +183,24 @@ final class LinkProviderParameterTest extends ApiTestCase
             'dummy' => '/dummies/1',
         ]);
     }
+
+    public function testCollectionIdIsCorrect(): void
+    {
+        $container = static::getContainer();
+        if ('mongodb' === $container->getParameter('kernel.environment')) {
+            $this->markTestSkipped();
+        }
+
+        $manager = $this->getManager();
+        $dummy = new Dummy();
+        $dummy->setName('hi');
+        $manager->persist($dummy);
+        $manager->flush();
+
+        self::createClient()->request('GET', '/link_parameter_provider_resources/'.$dummy->getId());
+
+        $this->assertJsonContains([
+            '@id' => '/link_parameter_provider_resources/1',
+        ]);
+    }
 }
