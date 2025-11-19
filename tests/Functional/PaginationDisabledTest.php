@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
-use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactory;
+use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\PaginationDisabledEntity;
 use ApiPlatform\Tests\RecreateSchemaTrait;
@@ -27,7 +27,7 @@ final class PaginationDisabledTest extends ApiTestCase
     use SetupClassResourcesTrait;
 
     protected SchemaFactoryInterface $schemaFactory;
-    private OperationMetadataFactory $operationMetadataFactory;
+    private OperationMetadataFactoryInterface $operationMetadataFactory;
 
     protected static ?bool $alwaysBootKernel = false;
 
