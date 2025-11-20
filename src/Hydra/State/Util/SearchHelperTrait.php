@@ -55,18 +55,17 @@ trait SearchHelperTrait
             }
         }
 
-        $params = $operation ? ($operation->getParameters() ?? []) : ($parameters ?? []);
-
-        foreach ($params as $key => $parameter) {
+        foreach ($parameters ?? $operation?->getParameters() ?? [] as $key => $parameter) {
             if (!$parameter instanceof QueryParameterInterface || false === $parameter->getHydra()) {
                 continue;
             }
 
+            // get possible mapping via the parameter's Filter
             if ($getFilter && ($filterId = $parameter->getFilter()) && \is_string($filterId) && ($filter = $getFilter($filterId))) {
                 $filterDescription = $filter->getDescription($resourceClass);
 
                 foreach ($filterDescription as $variable => $description) {
-                    // // This is a practice induced by PHP and is not necessary when implementing URI template
+                    // This is a practice induced by PHP and is not necessary when implementing URI
                     if (str_ends_with((string) $variable, '[]')) {
                         continue;
                     }
@@ -75,38 +74,28 @@ trait SearchHelperTrait
                         continue;
                     }
 
+                    // Ensure the filter description matches the property defined in the QueryParameter
                     if (($prop = $parameter->getProperty()) && $descriptionProperty !== $prop) {
                         continue;
                     }
 
-                    $k = str_replace(':property', $description['property'], $key);
-                    $variable = str_replace($description['property'], $k, $variable);
-                    $keys[] = $variable;
-                    $m = new IriTemplateMapping(variable: $variable, property: $description['property'], required: $description['required']);
-                    if (null !== ($required = $parameter->getRequired())) {
-                        $m->required = $required;
+                    $variableName = $variable;
+
+                    if ($prop && str_starts_with($variable, $prop)) {
+                        $variableName = substr_replace($variable, $key, 0, \strlen($prop));
                     }
-                    $mapping[] = $m;
+
+                    $keys[] = $variableName;
+                    $mapping[] = new IriTemplateMapping(
+                        variable: $variableName,
+                        property: $descriptionProperty,
+                        required: $parameter->getRequired() ?? $description['required'] ?? false
+                    );
                 }
 
                 if ($filterDescription) {
                     continue;
                 }
-            }
-
-            if (str_contains($key, ':property') && $parameter->getProperties()) {
-                $required = $parameter->getRequired();
-                foreach ($parameter->getProperties() as $prop) {
-                    $k = str_replace(':property', $prop, $key);
-                    $m = new IriTemplateMapping(variable: $k, property: $prop);
-                    $keys[] = $k;
-                    if (null !== $required) {
-                        $m->required = $required;
-                    }
-                    $mapping[] = $m;
-                }
-
-                continue;
             }
 
             if (!($property = $parameter->getProperty())) {

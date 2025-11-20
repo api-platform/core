@@ -25,7 +25,7 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/doctrine-common": "^4.2",
+        "api-platform/doctrine-common": "^4.2.9",
         "api-platform/metadata": "^4.2",
         "api-platform/state": "^4.2.4",
         "doctrine/mongodb-odm": "^2.10",

@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class SearchFilterValueTransformer implements FilterInterface
 {
-    public function __construct(#[Autowire('@api_platform.doctrine.orm.search_filter.instance')] private readonly FilterInterface $searchFilter, private ?array $properties = null, private readonly ?string $key = null)
+    public function __construct(#[Autowire('@api_platform.doctrine.orm.search_filter.instance')] private readonly FilterInterface $searchFilter, private ?array $properties = null)
     {
     }
 
@@ -42,6 +42,6 @@ final class SearchFilterValueTransformer implements FilterInterface
             $this->searchFilter->setProperties($this->properties);
         }
 
-        $this->searchFilter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, ['filters' => $context['filters'][$this->key]] + $context);
+        $this->searchFilter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
     }
 }

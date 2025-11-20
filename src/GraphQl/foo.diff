@@ -1,0 +1,289 @@
+diff --git a/src/Doctrine/Common/Filter/ParameterAwareFilterInterface.php b/src/Doctrine/Common/Filter/ParameterAwareFilterInterface.php
+new file mode 100644
+index 00000000000..d1974a32c55
+--- /dev/null
++++ b/src/Doctrine/Common/Filter/ParameterAwareFilterInterface.php
+@@ -0,0 +1,31 @@
++<?php
++
++/*
++ * This file is part of the API Platform project.
++ *
++ * (c) Kévin Dunglas <dunglas@gmail.com>
++ *
++ * For the full copyright and license information, please view the LICENSE
++ * file that was distributed with this source code.
++ */
++
++declare(strict_types=1);
++
++namespace ApiPlatform\Doctrine\Common\Filter;
++
++use ApiPlatform\Metadata\Operation;
++
++/**
++ * Interface for filters that can be applied by a ParameterExtension.
++ *
++ * @author Antoine Bluchet <soyuka@gmail.com>
++ */
++interface ParameterAwareFilterInterface
++{
++    /**
++     * Applies the filter to the query.
++     *
++     * @param array<string, mixed> $context
++     */
++    public function apply(object $queryBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void;
++}
+diff --git a/src/Doctrine/Common/Filter/PropertyAwareFilterInterface.php b/src/Doctrine/Common/Filter/PropertyAwareFilterInterface.php
+index aa0857cef20..1b041f480fb 100644
+--- a/src/Doctrine/Common/Filter/PropertyAwareFilterInterface.php
++++ b/src/Doctrine/Common/Filter/PropertyAwareFilterInterface.php
+@@ -16,6 +16,8 @@
+ /**
+  * @author Antoine Bluchet <soyuka@gmail.com>
+  *
++ * @method ?array getProperties()
++ *
+  * @experimental
+  */
+ interface PropertyAwareFilterInterface
+@@ -24,4 +26,9 @@ interface PropertyAwareFilterInterface
+      * @param string[] $properties
+      */
+     public function setProperties(array $properties): void;
++
++    // /**
++    //  * @return string[]
++    //  */
++    // public function getProperties(): ?array;
+ }
+diff --git a/src/Doctrine/Common/Filter/PropertyPlaceholderOpenApiParameterTrait.php b/src/Doctrine/Common/Filter/PropertyPlaceholderOpenApiParameterTrait.php
+index f2f09e5758c..3acab18a05f 100644
+--- a/src/Doctrine/Common/Filter/PropertyPlaceholderOpenApiParameterTrait.php
++++ b/src/Doctrine/Common/Filter/PropertyPlaceholderOpenApiParameterTrait.php
+@@ -23,16 +23,6 @@ trait PropertyPlaceholderOpenApiParameterTrait
+      */
+     public function getOpenApiParameters(Parameter $parameter): ?array
+     {
+-        if (str_contains($parameter->getKey(), ':property')) {
+-            $parameters = [];
+-            $key = str_replace('[:property]', '', $parameter->getKey());
+-            foreach (array_keys($parameter->getExtraProperties()['_properties'] ?? []) as $property) {
+-                $parameters[] = new OpenApiParameter(name: \sprintf('%s[%s]', $key, $property), in: 'query');
+-            }
+-
+-            return $parameters;
+-        }
+-
+-        return null;
++        return [new OpenApiParameter(name: $parameter->getKey(), in: 'query')];
+     }
+ }
+diff --git a/src/Doctrine/Common/ParameterExtensionTrait.php b/src/Doctrine/Common/ParameterExtensionTrait.php
+new file mode 100644
+index 00000000000..4d865a8730f
+--- /dev/null
++++ b/src/Doctrine/Common/ParameterExtensionTrait.php
+@@ -0,0 +1,63 @@
++<?php
++
++/*
++ * This file is part of the API Platform project.
++ *
++ * (c) Kévin Dunglas <dunglas@gmail.com>
++ *
++ * For the full copyright and license information, please view the LICENSE
++ * file that was distributed with this source code.
++ */
++
++declare(strict_types=1);
++
++namespace ApiPlatform\Doctrine\Common;
++
++use ApiPlatform\Doctrine\Common\Filter\LoggerAwareInterface;
++use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
++use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterInterface;
++use ApiPlatform\Metadata\Parameter;
++use Doctrine\Persistence\ManagerRegistry;
++use Psr\Container\ContainerInterface;
++use Psr\Log\LoggerInterface;
++
++trait ParameterExtensionTrait
++{
++    use ParameterValueExtractorTrait;
++
++    protected ContainerInterface $filterLocator;
++    protected ?ManagerRegistry $managerRegistry = null;
++    protected ?LoggerInterface $logger = null;
++
++    /**
++     * @param object    $filter    the filter instance to configure
++     * @param Parameter $parameter the operation parameter associated with the filter
++     */
++    private function configureFilter(object $filter, Parameter $parameter): void
++    {
++        if ($this->managerRegistry && $filter instanceof ManagerRegistryAwareInterface && !$filter->hasManagerRegistry()) {
++            $filter->setManagerRegistry($this->managerRegistry);
++        }
++
++        if ($this->logger && $filter instanceof LoggerAwareInterface && !$filter->hasLogger()) {
++            $filter->setLogger($this->logger);
++        }
++
++        if ($filter instanceof PropertyAwareFilterInterface) {
++            $properties = [];
++            // Check if the filter has getProperties method (e.g., if it's an AbstractFilter)
++            if (method_exists($filter, 'getProperties')) { // @phpstan-ignore-line todo 5.x remove this check @see interface
++                $properties = $filter->getProperties() ?? [];
++            }
++
++            $propertyKey = $parameter->getProperty() ?? $parameter->getKey();
++            foreach ($parameter->getProperties() ?? [$propertyKey] as $property) {
++                if (!isset($properties[$property])) {
++                    $properties[$property] = $parameter->getFilterContext();
++                }
++            }
++
++            $filter->setProperties($properties);
++        }
++    }
++}
+diff --git a/src/Doctrine/Common/ParameterValueExtractorTrait.php b/src/Doctrine/Common/ParameterValueExtractorTrait.php
+index b50dede8f76..62c18f6483c 100644
+--- a/src/Doctrine/Common/ParameterValueExtractorTrait.php
++++ b/src/Doctrine/Common/ParameterValueExtractorTrait.php
+@@ -23,10 +23,7 @@ trait ParameterValueExtractorTrait
+     private function extractParameterValue(Parameter $parameter, mixed $value): array
+     {
+         $key = $parameter->getProperty() ?? $parameter->getKey();
+-        if (!str_contains($key, ':property')) {
+-            return [$key => $value];
+-        }
+ 
+-        return [str_replace('[:property]', '', $key) => $value];
++        return [$key => $value];
+     }
+ }
+diff --git a/src/Doctrine/Odm/Extension/ParameterExtension.php b/src/Doctrine/Odm/Extension/ParameterExtension.php
+index d68e6e9ed3b..d841fb9240e 100644
+--- a/src/Doctrine/Odm/Extension/ParameterExtension.php
++++ b/src/Doctrine/Odm/Extension/ParameterExtension.php
+@@ -13,11 +13,9 @@
+ 
+ namespace ApiPlatform\Doctrine\Odm\Extension;
+ 
+-use ApiPlatform\Doctrine\Common\Filter\LoggerAwareInterface;
+-use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
+-use ApiPlatform\Doctrine\Common\ParameterValueExtractorTrait;
+-use ApiPlatform\Doctrine\Odm\Filter\AbstractFilter;
+-use ApiPlatform\Doctrine\Odm\Filter\FilterInterface;
++use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterInterface;
++use ApiPlatform\Doctrine\Common\ParameterExtensionTrait;
++use ApiPlatform\Doctrine\Odm\Filter\FilterInterface; // Explicitly import PropertyAwareFilterInterface
+ use ApiPlatform\Metadata\Operation;
+ use ApiPlatform\State\ParameterNotFound;
+ use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
+@@ -32,13 +30,16 @@
+  */
+ final class ParameterExtension implements AggregationCollectionExtensionInterface, AggregationItemExtensionInterface
+ {
+-    use ParameterValueExtractorTrait;
++    use ParameterExtensionTrait;
+ 
+     public function __construct(
+-        private readonly ContainerInterface $filterLocator,
+-        private readonly ?ManagerRegistry $managerRegistry = null,
+-        private readonly ?LoggerInterface $logger = null,
++        ContainerInterface $filterLocator,
++        ?ManagerRegistry $managerRegistry = null,
++        ?LoggerInterface $logger = null,
+     ) {
++        $this->filterLocator = $filterLocator;
++        $this->managerRegistry = $managerRegistry;
++        $this->logger = $logger;
+     }
+ 
+     /**
+@@ -66,28 +67,7 @@ private function applyFilter(Builder $aggregationBuilder, ?string $resourceClass
+                 continue;
+             }
+ 
+-            if ($this->managerRegistry && $filter instanceof ManagerRegistryAwareInterface && !$filter->hasManagerRegistry()) {
+-                $filter->setManagerRegistry($this->managerRegistry);
+-            }
+-
+-            if ($this->logger && $filter instanceof LoggerAwareInterface && !$filter->hasLogger()) {
+-                $filter->setLogger($this->logger);
+-            }
+-
+-            if ($filter instanceof AbstractFilter && !$filter->getProperties()) {
+-                $propertyKey = $parameter->getProperty() ?? $parameter->getKey();
+-
+-                if (str_contains($propertyKey, ':property')) {
+-                    $extraProperties = $parameter->getExtraProperties()['_properties'] ?? [];
+-                    foreach (array_keys($extraProperties) as $property) {
+-                        $properties[$property] = $parameter->getFilterContext();
+-                    }
+-                } else {
+-                    $properties = [$propertyKey => $parameter->getFilterContext()];
+-                }
+-
+-                $filter->setProperties($properties ?? []);
+-            }
++            $this->configureFilter($filter, $parameter);
+ 
+             $context['filters'] = $values;
+             $context['parameter'] = $parameter;
+diff --git a/src/Doctrine/Orm/Extension/ParameterExtension.php b/src/Doctrine/Orm/Extension/ParameterExtension.php
+index b7c8d8938b9..0264567a602 100644
+--- a/src/Doctrine/Orm/Extension/ParameterExtension.php
++++ b/src/Doctrine/Orm/Extension/ParameterExtension.php
+@@ -13,11 +13,8 @@
+ 
+ namespace ApiPlatform\Doctrine\Orm\Extension;
+ 
+-use ApiPlatform\Doctrine\Common\Filter\LoggerAwareInterface;
+-use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
+ use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterInterface;
+-use ApiPlatform\Doctrine\Common\ParameterValueExtractorTrait;
+-use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
++use ApiPlatform\Doctrine\Common\ParameterExtensionTrait; // Explicitly import PropertyAwareFilterInterface
+ use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
+ use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+ use ApiPlatform\Metadata\Operation;
+@@ -34,13 +31,16 @@
+  */
+ final class ParameterExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
+ {
+-    use ParameterValueExtractorTrait;
++    use ParameterExtensionTrait;
+ 
+     public function __construct(
+-        private readonly ContainerInterface $filterLocator,
+-        private readonly ?ManagerRegistry $managerRegistry = null,
+-        private readonly ?LoggerInterface $logger = null,
++        ContainerInterface $filterLocator,
++        ?ManagerRegistry $managerRegistry = null,
++        ?LoggerInterface $logger = null,
+     ) {
++        $this->filterLocator = $filterLocator;
++        $this->managerRegistry = $managerRegistry;
++        $this->logger = $logger;
+     }
+ 
+     /**
+@@ -68,30 +68,7 @@ private function applyFilter(QueryBuilder $queryBuilder, QueryNameGeneratorInter
+                 continue;
+             }
+ 
+-            if ($this->managerRegistry && $filter instanceof ManagerRegistryAwareInterface && !$filter->hasManagerRegistry()) {
+-                $filter->setManagerRegistry($this->managerRegistry);
+-            }
+-
+-            if ($this->logger && $filter instanceof LoggerAwareInterface && !$filter->hasLogger()) {
+-                $filter->setLogger($this->logger);
+-            }
+-
+-            if ($filter instanceof PropertyAwareFilterInterface) {
+-                $properties = [];

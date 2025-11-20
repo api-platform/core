@@ -23,16 +23,6 @@ trait PropertyPlaceholderOpenApiParameterTrait
      */
     public function getOpenApiParameters(Parameter $parameter): ?array
     {
-        if (str_contains($parameter->getKey(), ':property')) {
-            $parameters = [];
-            $key = str_replace('[:property]', '', $parameter->getKey());
-            foreach (array_keys($parameter->getExtraProperties()['_properties'] ?? []) as $property) {
-                $parameters[] = new OpenApiParameter(name: \sprintf('%s[%s]', $key, $property), in: 'query');
-            }
-
-            return $parameters;
-        }
-
-        return null;
+        return [new OpenApiParameter(name: $parameter->getKey(), in: 'query')];
     }
 }
