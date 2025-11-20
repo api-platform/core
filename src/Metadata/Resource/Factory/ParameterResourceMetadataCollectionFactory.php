@@ -129,12 +129,16 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                 $parameters->add($key, $parameter->withProvider($f->getParameterProvider()));
             }
 
-            if (':property' === $key) {
+            if (str_contains($key, ':property')) {
                 foreach ($propertyNames as $property) {
                     $converted = $this->nameConverter?->denormalize($property) ?? $property;
                     $propertyParameter = $this->setDefaults($converted, $parameter, $resourceClass, $properties, $operation);
                     $priority = $propertyParameter->getPriority() ?? $internalPriority--;
-                    $parameters->add($converted, $propertyParameter->withPriority($priority)->withKey($converted));
+                    $finalKey = str_replace(':property', $converted, $key);
+                    $parameters->add(
+                        $finalKey,
+                        $propertyParameter->withProperty($converted)->withPriority($priority)->withKey($finalKey)
+                    );
                 }
 
                 $parameters->remove($key, $parameter::class);
