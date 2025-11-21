@@ -28,6 +28,7 @@ use ApiPlatform\State\ProviderInterface;
 use Negotiation\Negotiator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Generates the API documentation.
@@ -48,6 +49,7 @@ final class DocumentationAction
         private readonly ?ProcessorInterface $processor = null,
         ?Negotiator $negotiator = null,
         private readonly array $documentationFormats = [OpenApiNormalizer::JSON_FORMAT => ['application/vnd.openapi+json'], OpenApiNormalizer::FORMAT => ['application/json']],
+        private readonly bool $swaggerUiEnabled = true,
     ) {
         $this->negotiator = $negotiator ?? new Negotiator();
     }
@@ -83,6 +85,10 @@ final class DocumentationAction
      */
     private function getOpenApiDocumentation(array $context, string $format, Request $request): OpenApi|Response
     {
+        if ('html' === $format && !$this->swaggerUiEnabled) {
+            throw new NotFoundHttpException('Swagger UI is disabled.');
+        }
+
         if ($this->provider && $this->processor) {
             $context['request'] = $request;
             $operation = new Get(
@@ -93,7 +99,7 @@ final class DocumentationAction
                 outputFormats: $this->documentationFormats
             );
 
-            if ('html' === $format) {
+            if ('html' === $format && $this->swaggerUiEnabled) {
                 $operation = $operation->withProcessor('api_platform.swagger_ui.processor')->withWrite(true);
             }
 

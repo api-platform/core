@@ -586,13 +586,13 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('openapi/yaml.php');
         }
 
-        $loader->load('swagger_ui.php');
-
-        if ($config['use_symfony_listeners']) {
-            $loader->load('symfony/swagger_ui.php');
-        }
-
         if ($config['enable_swagger_ui']) {
+            $loader->load('swagger_ui.php');
+
+            if ($config['use_symfony_listeners']) {
+                $loader->load('symfony/swagger_ui.php');
+            }
+
             $loader->load('state/swagger_ui.php');
         }
 
