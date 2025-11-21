@@ -253,6 +253,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.listener.view.write',
             'api_platform.listener.view.serialize',
             'api_platform.listener.view.respond',
+            'api_platform.swagger_ui.documentation.provider',
         ];
 
         foreach ($services as $service) {
@@ -264,11 +265,11 @@ class ApiPlatformExtensionTest extends TestCase
     {
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['enable_swagger'] = true;
-        $config['api_platform']['enable_swagger_ui'] = false; 
+        $config['api_platform']['enable_swagger_ui'] = false;
         $config['api_platform']['use_symfony_listeners'] = true;
 
         (new ApiPlatformExtension())->load($config, $this->container);
-        
+
         $this->assertNotContainerHasService('api_platform.swagger_ui.processor');
 
         $this->assertNotContainerHasService('api_platform.swagger_ui.context');
