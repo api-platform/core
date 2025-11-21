@@ -38,6 +38,7 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\Country;
+use Webmozart\Assert\Assert as Assertion;
 
 #[Get(
     uriTemplate: 'with_parameters/{id}{._format}',
@@ -281,7 +282,21 @@ use Symfony\Component\Validator\Constraints\Country;
     ],
     provider: [self::class, 'collectionProvider'],
 )]
-
+#[GetCollection(
+    uriTemplate: 'parameter_defaults',
+    parameters: [
+        'false_as_default' => new QueryParameter(
+            default: false,
+        ),
+        'true_as_default' => new QueryParameter(
+            default: true,
+        ),
+        'foo_as_default' => new QueryParameter(
+            default: 'foo',
+        ),
+    ],
+    provider: [self::class, 'checkParameterDefaults'],
+)]
 #[QueryParameter(key: 'everywhere')]
 class WithParameter
 {
@@ -371,5 +386,14 @@ class WithParameter
     public static function provideDummyFromParameter(Operation $operation, array $uriVariables = [], array $context = []): object|array
     {
         return $operation->getParameters()->get('dummy')->getValue();
+    }
+
+    public static function checkParameterDefaults(Operation $operation, array $uriVariables = [], array $context = []): JsonResponse
+    {
+        Assertion::false($operation->getParameters()->get('false_as_default')->getValue());
+        Assertion::true($operation->getParameters()->get('true_as_default')->getValue());
+        Assertion::same($operation->getParameters()->get('foo_as_default')->getValue(), 'foo');
+
+        return new JsonResponse([]);
     }
 }
