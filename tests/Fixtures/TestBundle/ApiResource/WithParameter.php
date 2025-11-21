@@ -294,6 +294,10 @@ use Webmozart\Assert\Assert as Assertion;
         'foo_as_default' => new QueryParameter(
             default: 'foo',
         ),
+        'required_with_a_default' => new QueryParameter(
+            required: true,
+            default: 'bar'
+        ),
     ],
     provider: [self::class, 'checkParameterDefaults'],
 )]
@@ -393,6 +397,7 @@ class WithParameter
         Assertion::false($operation->getParameters()->get('false_as_default')->getValue());
         Assertion::true($operation->getParameters()->get('true_as_default')->getValue());
         Assertion::same($operation->getParameters()->get('foo_as_default')->getValue(), 'foo');
+        Assertion::same($operation->getParameters()->get('required_with_a_default')->getValue(), 'bar');
 
         return new JsonResponse([]);
     }
