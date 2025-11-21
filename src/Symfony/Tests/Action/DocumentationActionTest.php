@@ -133,4 +133,25 @@ class DocumentationActionTest extends TestCase
         $entrypoint = new DocumentationAction($resourceNameCollectionFactory, provider: $provider, processor: $processor);
         $entrypoint($request);
     }
+
+    public function testHtmlFormatNotSupportedThrowsException(): void
+    {
+        $this->expectException(NotFoundHttpException::class);
+        $this->expectExceptionMessage('Format "html" is not supported');
+
+        $request = new Request();
+        $request->attributes->set('_format', 'html');
+
+        $openApiFactory = $this->createMock(OpenApiFactoryInterface::class);
+        $resourceNameCollectionFactory = $this->createMock(ResourceNameCollectionFactoryInterface::class);
+
+        $documentation = new DocumentationAction(
+            $resourceNameCollectionFactory,
+            openApiFactory: $openApiFactory,
+            documentationFormats: ['json' => ['application/json']],
+            swaggerUiEnabled: false,
+        );
+
+        $documentation($request);
+    }
 }
