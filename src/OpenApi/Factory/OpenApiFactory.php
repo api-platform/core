@@ -337,6 +337,11 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 }
 
                 $in = $p instanceof HeaderParameterInterface ? 'header' : 'query';
+                $defaultSchema = ['type' => 'string'];
+                if (null !== $p->getDefault()) {
+                    $defaultSchema['default'] = $p->getDefault();
+                }
+
                 $defaultParameter = new Parameter(
                     $key,
                     $in,
@@ -344,7 +349,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     $p->getRequired() ?? false,
                     false,
                     null,
-                    $p->getSchema() ?? ['type' => 'string'],
+                    $p->getSchema() ?? $defaultSchema,
                 );
 
                 $linkParameter = $p->getOpenApi();
