@@ -372,6 +372,11 @@ abstract class Parameter
         return $self;
     }
 
+    public function getDefault(): mixed
+    {
+        return $this->default;
+    }
+
     public function withDefault(mixed $default): self
     {
         $self = clone $this;

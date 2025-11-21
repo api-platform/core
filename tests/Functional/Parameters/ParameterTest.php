@@ -215,4 +215,10 @@ final class ParameterTest extends ApiTestCase
         yield 'valid country' => ['country=FR', 200];
         yield 'array of countries' => ['country[]=FR', 200];
     }
+
+    public function testDefaultValues(): void
+    {
+        self::createClient()->request('GET', 'parameter_defaults');
+        $this->assertResponseIsSuccessful();
+    }
 }
