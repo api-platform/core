@@ -1,0 +1,6 @@
+imports:
+    - { resource: config_test.yml }
+
+api_platform:
+    enable_swagger: true
+    enable_swagger_ui: false
