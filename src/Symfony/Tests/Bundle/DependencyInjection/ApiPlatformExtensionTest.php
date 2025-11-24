@@ -108,6 +108,8 @@ class ApiPlatformExtensionTest extends TestCase
         'asset_package' => null,
         'enable_entrypoint' => true,
         'enable_docs' => true,
+        'enable_swagger' => true,
+        'enable_swagger_ui' => true,
         'use_symfony_listeners' => false,
     ]];
 

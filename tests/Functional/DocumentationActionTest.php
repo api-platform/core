@@ -14,20 +14,59 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use ApiPlatform\Symfony\Bundle\Test\Client;
+use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class DocumentationActionTest extends ApiTestCase
+/**
+ * @author Maxence Castel <maxence.castel59@gmail.com>
+ */
+class DocumentationActionAppKernel extends \AppKernel
+{
+    public static bool $swaggerUiEnabled = true;
+
+    public function getCacheDir(): string
+    {
+        $suffix = self::$swaggerUiEnabled ? 'ui_enabled' : 'ui_disabled';
+
+        return parent::getCacheDir().'/'.$suffix;
+    }
+
+    public function getLogDir(): string
+    {
+        $suffix = self::$swaggerUiEnabled ? 'ui_enabled' : 'ui_disabled';
+
+        return parent::getLogDir().'/'.$suffix;
+    }
+
+    protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
+    {
+        parent::configureContainer($c, $loader);
+
+        $loader->load(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('api_platform', [
+                'enable_swagger_ui' => DocumentationActionAppKernel::$swaggerUiEnabled,
+            ]);
+        });
+    }
+}
+
+final class DocumentationActionTest extends ApiTestCase
 {
     protected static ?bool $alwaysBootKernel = true;
 
-    private function createClientWithEnv(string $env): Client
+    protected static function getKernelClass(): string
     {
-        return self::createClient(['environment' => $env]);
+        return DocumentationActionAppKernel::class;
     }
 
     public function testHtmlDocumentationIsNotAccessibleWhenSwaggerUiIsDisabled(): void
     {
-        $client = $this->createClientWithEnv('swagger_ui_disabled');
+        DocumentationActionAppKernel::$swaggerUiEnabled = false;
+
+        $client = self::createClient();
+
+        $container = static::getContainer();
+        $this->assertFalse($container->getParameter('api_platform.enable_swagger_ui'));
 
         $client->request('GET', '/docs', ['headers' => ['Accept' => 'text/html']]);
         $this->assertResponseStatusCodeSame(404);
@@ -36,7 +75,12 @@ class DocumentationActionTest extends ApiTestCase
 
     public function testJsonDocumentationIsAccessibleWhenSwaggerUiIsDisabled(): void
     {
-        $client = $this->createClientWithEnv('swagger_ui_disabled');
+        DocumentationActionAppKernel::$swaggerUiEnabled = false;
+
+        $client = self::createClient();
+
+        $container = static::getContainer();
+        $this->assertFalse($container->getParameter('api_platform.enable_swagger_ui'));
 
         $client->request('GET', '/docs.jsonopenapi', ['headers' => ['Accept' => 'application/vnd.openapi+json']]);
         $this->assertResponseIsSuccessful();
@@ -46,7 +90,12 @@ class DocumentationActionTest extends ApiTestCase
 
     public function testHtmlDocumentationIsAccessibleWhenSwaggerUiIsEnabled(): void
     {
-        $client = $this->createClientWithEnv('swagger_ui_enabled');
+        DocumentationActionAppKernel::$swaggerUiEnabled = true;
+
+        $client = self::createClient();
+
+        $container = static::getContainer();
+        $this->assertTrue($container->getParameter('api_platform.enable_swagger_ui'));
 
         $client->request('GET', '/docs', ['headers' => ['Accept' => 'text/html']]);
         $this->assertResponseIsSuccessful();
@@ -55,7 +104,12 @@ class DocumentationActionTest extends ApiTestCase
 
     public function testJsonDocumentationIsAccessibleWhenSwaggerUiIsEnabled(): void
     {
-        $client = $this->createClientWithEnv('swagger_ui_enabled');
+        DocumentationActionAppKernel::$swaggerUiEnabled = true;
+
+        $client = self::createClient();
+
+        $container = static::getContainer();
+        $this->assertTrue($container->getParameter('api_platform.enable_swagger_ui'));
 
         $client->request('GET', '/docs.jsonopenapi', ['headers' => ['Accept' => 'application/vnd.openapi+json']]);
         $this->assertResponseIsSuccessful();
