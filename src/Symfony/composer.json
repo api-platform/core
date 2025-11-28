@@ -39,12 +39,12 @@
         "api-platform/state": "^4.2.4",
         "api-platform/validator": "^4.2.3",
         "api-platform/openapi": "^4.2.3",
-        "symfony/asset": "^6.4 || ^7.0",
-        "symfony/finder": "^6.4 || ^7.0",
+        "symfony/asset": "^6.4 || ^7.0 || ^8.0",
+        "symfony/finder": "^6.4 || ^7.0 || ^8.0",
         "symfony/property-info": "^6.4 || ^7.1",
-        "symfony/property-access": "^6.4 || ^7.0",
-        "symfony/serializer": "^6.4 || ^7.0",
-        "symfony/security-core": "^6.4 || ^7.0",
+        "symfony/property-access": "^6.4 || ^7.0 || ^8.0",
+        "symfony/serializer": "^6.4 || ^7.0 || ^8.0",
+        "symfony/security-core": "^6.4 || ^7.0 || ^8.0",
         "willdurand/negotiation": "^3.1"
     },
     "require-dev": {
@@ -55,13 +55,13 @@
         "api-platform/graphql": "^4.2.3",
         "phpspec/prophecy-phpunit": "^2.2",
         "phpunit/phpunit": "11.5.x-dev",
-        "symfony/expression-language": "^6.4 || ^7.0",
-        "symfony/intl": "^6.4 || ^7.0",
+        "symfony/expression-language": "^6.4 || ^7.0 || ^8.0",
+        "symfony/intl": "^6.4 || ^7.0 || ^8.0",
         "symfony/mercure-bundle": "*",
-        "symfony/object-mapper": "^7.0",
-        "symfony/routing": "^6.4 || ^7.0",
-        "symfony/type-info": "^7.3",
-        "symfony/validator": "^6.4.11 || ^7.0",
+        "symfony/object-mapper": "^7.0 || ^8.0",
+        "symfony/routing": "^6.4 || ^7.0 || ^8.0",
+        "symfony/type-info": "^7.3 || ^8.0",
+        "symfony/validator": "^6.4.11 || ^7.0 || ^8.0",
         "webonyx/graphql-php": "^15.0"
     },
     "suggest": {
@@ -108,7 +108,7 @@
             "dev-main": "4.3.x-dev"
         },
         "symfony": {
-            "require": "^6.4 || ^7.0"
+            "require": "^6.4 || ^7.0 || ^8.0"
         },
         "thanks": {
             "name": "api-platform/api-platform",

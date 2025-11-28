@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Serializer\Tests\Fixtures\ApiResource;
 
 use ApiPlatform\Metadata\ApiResource;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource]
 class DummyTableInheritanceChild extends DummyTableInheritance

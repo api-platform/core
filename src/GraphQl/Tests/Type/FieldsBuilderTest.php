@@ -46,7 +46,7 @@ use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\TypeInfo\Type;
 
 /**
@@ -84,7 +84,7 @@ class FieldsBuilderTest extends TestCase
         $this->fieldsBuilder = $this->buildFieldsBuilder();
     }
 
-    private function buildFieldsBuilder(?AdvancedNameConverterInterface $advancedNameConverter = null): FieldsBuilder
+    private function buildFieldsBuilder(?NameConverterInterface $advancedNameConverter = null): FieldsBuilder
     {
         return new FieldsBuilder($this->propertyNameCollectionFactoryProphecy->reveal(), $this->propertyMetadataFactoryProphecy->reveal(), $this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->resourceClassResolverProphecy->reveal(), $this->typesContainerProphecy->reveal(), $this->typeBuilderProphecy->reveal(), $this->typeConverterProphecy->reveal(), $this->itemResolverFactoryProphecy->reveal(), $this->filterLocatorProphecy->reveal(), new Pagination(), $advancedNameConverter ?? new CustomConverter(), '__');
     }
@@ -504,8 +504,8 @@ class FieldsBuilderTest extends TestCase
 
     public static function resourceObjectTypeFieldsProvider(): iterable
     {
-        $advancedNameConverterFactory = function (self $that): AdvancedNameConverterInterface {
-            $advancedNameConverterProphecy = $that->prophesize(AdvancedNameConverterInterface::class);
+        $advancedNameConverterFactory = function (self $that): NameConverterInterface {
+            $advancedNameConverterProphecy = $that->prophesize(NameConverterInterface::class);
             $advancedNameConverterProphecy->normalize('field', \stdClass::class)->willReturn('normalizedField');
 
             return $advancedNameConverterProphecy->reveal();

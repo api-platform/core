@@ -25,7 +25,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     uriTemplate: 'query_parameter_validate_before_read',
     parameters: [
         'search' => new QueryParameter(constraints: [new NotBlank()]),
-        'sort[:property]' => new QueryParameter(constraints: [new NotBlank(), new Collection(['id' => new Choice(['asc', 'desc'])], allowMissingFields: true)]),
+        'sort[:property]' => new QueryParameter(constraints: [new NotBlank(), new Collection(['id' => new Choice(choices: ['asc', 'desc'])], allowMissingFields: true)]),
     ],
     provider: [self::class, 'provide']
 )]

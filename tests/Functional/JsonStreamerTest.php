@@ -136,7 +136,12 @@ class JsonStreamerTest extends ApiTestCase
             $buffer .= $chunk;
         });
 
-        $r = self::createClient()->request('GET', '/json_stream_resources', ['headers' => ['accept' => 'application/ld+json']]);
+        try {
+            $r = self::createClient()->request('GET', '/json_stream_resources', ['headers' => ['accept' => 'application/ld+json']]);
+        } finally {
+            ob_end_clean();
+        }
+
         $res = json_decode($r->getBrowserKitResponse()->getContent(), true);
 
         $this->assertIsArray($res);

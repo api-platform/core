@@ -32,6 +32,9 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
     #[IgnoreDeprecations]
     public function testEnumLegacy(): void
     {
+        if (!class_exists(LegacyType::class)) {
+            $this->markTestSkipped();
+        }
         $this->expectUserDeprecationMessage('Since api_platform/metadata 4.2: The "builtinTypes" argument of "ApiPlatform\Metadata\ApiProperty" is deprecated, use "nativeType" instead.');
         $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
         $apiProperty = new ApiProperty(builtinTypes: [new LegacyType(builtinType: 'object', nullable: true, class: IntEnumAsIdentifier::class)]);
@@ -56,6 +59,9 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
     #[IgnoreDeprecations]
     public function testWithCustomOpenApiContextLegacy(): void
     {
+        if (!class_exists(LegacyType::class)) {
+            $this->markTestSkipped();
+        }
         $this->expectUserDeprecationMessage('Since api_platform/metadata 4.2: The "builtinTypes" argument of "ApiPlatform\Metadata\ApiProperty" is deprecated, use "nativeType" instead.');
         $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
         $apiProperty = new ApiProperty(
@@ -86,6 +92,9 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
     #[IgnoreDeprecations]
     public function testWithCustomOpenApiContextWithoutTypeDefinitionLegacy(): void
     {
+        if (!class_exists(LegacyType::class)) {
+            $this->markTestSkipped();
+        }
         $this->expectUserDeprecationMessage('Since api_platform/metadata 4.2: The "builtinTypes" argument of "ApiPlatform\Metadata\ApiProperty" is deprecated, use "nativeType" instead.');
         $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
         $apiProperty = new ApiProperty(

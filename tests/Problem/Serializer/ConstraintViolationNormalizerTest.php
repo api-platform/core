@@ -17,7 +17,6 @@ use ApiPlatform\Problem\Serializer\ConstraintViolationListNormalizer;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\ConstraintViolation;
@@ -81,17 +80,7 @@ class ConstraintViolationNormalizerTest extends TestCase
 
         $nameConverterFactory = function (self $that): NameConverterInterface {
             $nameConverterProphecy = $that->prophesize(NameConverterInterface::class);
-            $nameConverterProphecy->normalize(Argument::type('string'))->will(fn ($args) => '_'.$args[0]);
-
-            return $nameConverterProphecy->reveal();
-        };
-        yield [$nameConverterFactory, $expected];
-
-        $nameConverterFactory = function (self $that): NameConverterInterface {
-            $nameConverterProphecy = $that->prophesize(AdvancedNameConverterInterface::class);
-            $nameConverterProphecy->normalize(Argument::type('string'), null, Argument::type('string'))->will(
-                fn ($args) => '_'.$args[0]
-            );
+            $nameConverterProphecy->normalize(Argument::cetera())->will(fn ($args) => '_'.$args[0]);
 
             return $nameConverterProphecy->reveal();
         };

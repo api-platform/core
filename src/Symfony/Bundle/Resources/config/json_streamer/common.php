@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\JsonStreamer\StreamerDumper;
+
 return function (ContainerConfigurator $container) {
     $services = $container->services();
 
@@ -21,6 +23,7 @@ return function (ContainerConfigurator $container) {
             tagged_locator('json_streamer.value_transformer'),
             service('api_platform.jsonld.json_streamer.write.property_metadata_loader'),
             '%.json_streamer.stream_writers_dir.jsonld%',
+            service('config_cache_factory')->ignoreOnInvalid(),
         ]);
 
     $services->set('api_platform.jsonld.json_streamer.stream_reader', 'Symfony\Component\JsonStreamer\JsonStreamReader')
@@ -28,7 +31,8 @@ return function (ContainerConfigurator $container) {
             tagged_locator('json_streamer.value_transformer'),
             service('json_streamer.read.property_metadata_loader'),
             '%.json_streamer.stream_readers_dir.jsonld%',
-            '%.json_streamer.lazy_ghosts_dir.jsonld%',
+            class_exists(StreamerDumper::class) ? service('config_cache_factory')->ignoreOnInvalid() : param('.json_streamer.lazy_ghosts_dir'),
+            param('.json_streamer.lazy_ghosts_dir'),
         ]);
 
     $services->set('api_platform.jsonld.json_streamer.write.property_metadata_loader', 'ApiPlatform\JsonLd\JsonStreamer\WritePropertyMetadataLoader')

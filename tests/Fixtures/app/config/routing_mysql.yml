@@ -1,2 +1,2 @@
 _main:
-    resource: routing_test.yml
+    resource: routing_test.php

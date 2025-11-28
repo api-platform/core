@@ -29,7 +29,7 @@ use ApiPlatform\Serializer\Filter\PropertyFilter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute as Serializer;
 
 #[ApiFilter(DateFilter::class, strategy: DateFilter::EXCLUDE_NULL)]
 #[ApiFilter(BooleanFilter::class)]

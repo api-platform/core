@@ -18,7 +18,7 @@ use ApiPlatform\Elasticsearch\State\Options;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(normalizationContext: ['groups' => ['user:read']], stateOptions: new Options(index: 'user'))]
 #[ApiFilter(TermFilter::class, properties: ['id', 'gender', 'age', 'firstName', 'tweets.id', 'tweets.date'])]

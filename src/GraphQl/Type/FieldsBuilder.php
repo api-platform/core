@@ -41,8 +41,6 @@ use GraphQL\Type\Definition\WrappingType;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Type as LegacyType;
-use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
-use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\CollectionType;
@@ -741,10 +739,7 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
         if (null === $this->nameConverter) {
             return $property;
         }
-        if ($this->nameConverter instanceof AdvancedNameConverterInterface || $this->nameConverter instanceof MetadataAwareNameConverter) {
-            return $this->nameConverter->normalize($property, $resourceClass);
-        }
 
-        return $this->nameConverter->normalize($property);
+        return $this->nameConverter->normalize($property, $resourceClass);
     }
 }

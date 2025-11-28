@@ -16,7 +16,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5587;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     shortName: 'issue5584_employee',

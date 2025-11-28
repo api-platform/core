@@ -31,8 +31,8 @@
         "api-platform/jsonld": "^4.2",
         "api-platform/json-schema": "^4.2",
         "api-platform/serializer": "^4.2.4",
-        "symfony/web-link": "^6.4 || ^7.1",
-        "symfony/type-info": "^7.3"
+        "symfony/web-link": "^6.4 || ^7.1 || ^8.0",
+        "symfony/type-info": "^7.3 || ^8.0"
     },
     "require-dev": {
         "api-platform/doctrine-odm": "^4.2",
@@ -68,7 +68,7 @@
             "dev-4.1": "4.1.x-dev"
         },
         "symfony": {
-            "require": "^6.4 || ^7.0"
+            "require": "^6.4 || ^7.0 || ^8.0"
         },
         "thanks": {
             "name": "api-platform/api-platform",

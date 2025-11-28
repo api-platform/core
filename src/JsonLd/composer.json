@@ -57,7 +57,7 @@
             "dev-4.1": "4.1.x-dev"
         },
         "symfony": {
-            "require": "^6.4 || ^7.0"
+            "require": "^6.4 || ^7.0 || ^8.0"
         },
         "thanks": {
             "name": "api-platform/api-platform",
@@ -68,7 +68,7 @@
         "test": "./vendor/bin/phpunit"
     },
     "require-dev": {
-        "symfony/type-info": "^7.3",
+        "symfony/type-info": "^7.3 || ^8.0",
         "phpunit/phpunit": "11.5.x-dev"
     },
     "repositories": [

@@ -21,7 +21,7 @@ use ApiPlatform\Metadata\NotExposed;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Post;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource]
 #[GetCollection]

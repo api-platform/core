@@ -22,6 +22,7 @@ use ApiPlatform\Tests\Behat\DoctrineContext;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\User as UserDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
+use Doctrine\Bundle\DoctrineBundle\Command\Proxy\ValidateSchemaCommand;
 use Doctrine\Bundle\DoctrineBundle\ConnectionFactory;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\Command\TailCursorDoctrineODMCommand;
@@ -41,6 +42,7 @@ use Symfony\Component\HttpClient\Messenger\PingWebhookMessageHandler;
 use Symfony\Component\HttpFoundation\Session\SessionFactory;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
+use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Security\Core\Authorization\Strategy\AccessDecisionStrategyInterface;
 use Symfony\Component\Security\Core\User\User as SymfonyCoreUser;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -158,6 +160,12 @@ class AppKernel extends Kernel
                 'annotations' => false,
                 'set_locale_from_accept_language' => true,
             ];
+        }
+
+        // SF 8.1 removed configuration
+        if (!class_exists(Type::class)) {
+            unset($config['annotations']);
+            $c->setParameter('.json_streamer.lazy_ghosts_dir', __DIR__.'/cache/json_streamer_lazy_ghost');
         }
 
         $c->prependExtensionConfig('framework', $config);
@@ -281,11 +289,19 @@ class AppKernel extends Kernel
         if (defined(ConnectionFactory::class.'::DEFAULT_SCHEME_MAP')) {
             $c->prependExtensionConfig('doctrine', [
                 'orm' => [
-                    'report_fields_where_declared' => true,
                     'controller_resolver' => ['auto_mapping' => false],
-                    'enable_lazy_ghost_objects' => true,
                 ],
             ]);
+
+            if (class_exists(ValidateSchemaCommand::class)) {
+                $c->prependExtensionConfig('doctrine', [
+                    'orm' => [
+                        'auto_generate_proxy_classes' => '%kernel.debug%',
+                        'report_fields_where_declared' => true,
+                        'enable_lazy_ghost_objects' => true,
+                    ],
+                ]);
+            }
         }
 
         $loader->load(__DIR__.'/config/config_swagger.php');
