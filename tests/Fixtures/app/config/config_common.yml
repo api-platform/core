@@ -271,6 +271,10 @@ services:
         tags:
             - name: 'api_platform.state_processor'
 
+    ApiPlatform\Tests\Fixtures\TestBundle\ObjectMapper\IsbnToCustomIsbnTransformer:
+        tags:
+            - name: 'object_mapper.transform_callable'
+
     app.messenger_handler.messenger_with_response:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\MessengerHandler\MessengerWithResponseHandler'
         tags:

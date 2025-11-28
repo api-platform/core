@@ -15,8 +15,8 @@ namespace ApiPlatform\State\Processor;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 
 /**
  * @implements ProcessorInterface<mixed,mixed>
