@@ -16,6 +16,8 @@ namespace ApiPlatform\Metadata\Util;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\State\Util\RequestParser;
+use Uri\InvalidUriException;
+use Uri\Rfc3986\Uri;
 
 /**
  * Parses and creates IRIs.
@@ -30,12 +32,35 @@ final class IriHelper
     {
     }
 
+    public static function parseIri(string $iri, string $pageParameterName): array
+    {
+        if (PHP_VERSION_ID < 80500 || !\class_exists(Uri::class)) {
+            return self::parseLegacyIri($iri, $pageParameterName);
+        }
+
+        try {
+            $uri = new Uri($iri);
+        } catch (InvalidUriException $e) {
+            throw new InvalidArgumentException(\sprintf('The request URI "%s" is malformed.', $iri), previous: $e);
+        }
+
+        $parameters = [];
+        if (null !== $query = $uri->getQuery()) {
+            $parameters = RequestParser::parseRequestParams($query);
+
+            // Remove existing page parameter
+            unset($parameters[$pageParameterName]);
+        }
+
+        return ['uri' => $uri, 'parameters' => $parameters];
+    }
+
     /**
      * Parses and standardizes the request IRI.
      *
      * @throws InvalidArgumentException
      */
-    public static function parseIri(string $iri, string $pageParameterName): array
+    private static function parseLegacyIri(string $iri, string $pageParameterName): array
     {
         $parts = parse_url($iri);
         if (false === $parts) {
@@ -58,14 +83,29 @@ final class IriHelper
      *
      * @param int $urlGenerationStrategy
      */
-    public static function createIri(array $parts, array $parameters, ?string $pageParameterName = null, ?float $page = null, $urlGenerationStrategy = UrlGeneratorInterface::ABS_PATH): string
+    public static function createIri(array|Uri $parts, array $parameters, ?string $pageParameterName = null, ?float $page = null, $urlGenerationStrategy = UrlGeneratorInterface::ABS_PATH): string
     {
         if (null !== $page && null !== $pageParameterName) {
             $parameters[$pageParameterName] = $page;
         }
 
         $query = http_build_query($parameters, '', '&', \PHP_QUERY_RFC3986);
-        $parts['query'] = preg_replace('/%5B\d+%5D/', '%5B%5D', $query);
+        $queryParts = preg_replace('/%5B\d+%5D/', '%5B%5D', $query);
+
+        if ($parts instanceof Uri) {
+            $uri = $parts
+                ->withQuery('' !== $queryParts ? $queryParts : null)
+                ->withScheme(UrlGeneratorInterface::ABS_URL === $urlGenerationStrategy && null === $parts->getScheme() ? ($parts->getPort() === 443 ? 'https' : 'http') : null)
+            ;
+
+            if (null === $urlGenerationStrategy) {
+                $uri = $uri->withScheme(null)->withUserInfo(null)->withPort(null)->withHost(null);
+            }
+
+            return $uri->toString();
+        }
+
+        $parts['query'] = $queryParts;
 
         $url = '';
         if ((UrlGeneratorInterface::ABS_URL === $urlGenerationStrategy || UrlGeneratorInterface::NET_PATH === $urlGenerationStrategy) && isset($parts['host'])) {

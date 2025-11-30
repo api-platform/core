@@ -33,6 +33,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\JsonStreamer\StreamWriterInterface;
 use Symfony\Component\TypeInfo\Type;
+use Uri\Rfc3986\Uri;
 
 /**
  * @implements ProcessorInterface<mixed,mixed>
@@ -83,8 +84,8 @@ final class JsonStreamerProcessor implements ProcessorInterface
             $collection->view = $this->getPartialCollectionView($data, $requestUri, $this->pageParameterName, $this->enabledParameterName, $operation->getUrlGenerationStrategy() ?? $this->urlGenerationStrategy);
 
             if ($operation->getParameters()) {
-                $parts = parse_url($requestUri);
-                $collection->search = $this->getSearch($parts['path'] ?? '', $operation);
+                $path = PHP_VERSION_ID >= 80500 && \class_exists(Uri::class) ? Uri::parse($requestUri)?->getPath() : ($parts['path'] ?? '');
+                $collection->search = $this->getSearch($path, $operation);
             }
 
             if ($data instanceof PaginatorInterface) {
