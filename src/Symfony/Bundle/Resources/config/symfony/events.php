@@ -179,6 +179,7 @@ return function (ContainerConfigurator $container) {
             service('api_platform.state_processor.documentation'),
             service('api_platform.negotiator')->nullOnInvalid(),
             '%api_platform.docs_formats%',
+            '%api_platform.enable_swagger_ui%',
         ]);
 
     $services->set('api_platform.action.placeholder', 'ApiPlatform\Symfony\Action\PlaceholderAction')

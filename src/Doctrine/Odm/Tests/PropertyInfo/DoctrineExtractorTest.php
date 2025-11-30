@@ -84,13 +84,6 @@ class DoctrineExtractorTest extends TestCase
         );
     }
 
-    #[IgnoreDeprecations]
-    #[\PHPUnit\Framework\Attributes\DataProvider('legacyTypesProvider')]
-    public function testExtractLegacy(string $property, ?array $type = null): void
-    {
-        $this->assertEquals($type, $this->createExtractor()->getTypes(DoctrineDummy::class, $property));
-    }
-
     #[\PHPUnit\Framework\Attributes\DataProvider('typesProvider')]
     public function testExtract(string $property, ?Type $type): void
     {
@@ -100,6 +93,10 @@ class DoctrineExtractorTest extends TestCase
     #[IgnoreDeprecations]
     public function testExtractWithEmbedOneLegacy(): void
     {
+        if (!class_exists(LegacyType::class)) {
+            $this->markTestSkipped();
+        }
+
         $expectedTypes = [
             new LegacyType(
                 LegacyType::BUILTIN_TYPE_OBJECT,
@@ -127,6 +124,10 @@ class DoctrineExtractorTest extends TestCase
     #[IgnoreDeprecations]
     public function testExtractWithEmbedManyLegacy(): void
     {
+        if (!class_exists(LegacyType::class)) {
+            $this->markTestSkipped();
+        }
+
         $expectedTypes = [
             new LegacyType(
                 LegacyType::BUILTIN_TYPE_OBJECT,
@@ -157,6 +158,10 @@ class DoctrineExtractorTest extends TestCase
     #[IgnoreDeprecations]
     public function testExtractEnumLegacy(): void
     {
+        if (!class_exists(LegacyType::class)) {
+            $this->markTestSkipped();
+        }
+
         $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, EnumString::class)], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumString'));
         $this->assertEquals([new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, EnumInt::class)], $this->createExtractor()->getTypes(DoctrineEnum::class, 'enumInt'));
         $this->assertNull($this->createExtractor()->getTypes(DoctrineEnum::class, 'enumCustom'));
@@ -170,9 +175,13 @@ class DoctrineExtractorTest extends TestCase
     }
 
     #[IgnoreDeprecations]
-    public static function legacyTypesProvider(): array
+    public function testExtractLegacy(): void
     {
-        return [
+        if (!class_exists(LegacyType::class)) {
+            $this->markTestSkipped();
+        }
+
+        $legacyTypes = [
             ['id', [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]],
             ['bin', [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]],
             ['binByteArray', [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]],
@@ -194,7 +203,8 @@ class DoctrineExtractorTest extends TestCase
             ['objectId', [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]],
             ['raw', null],
             ['foo', [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, DoctrineRelation::class)]],
-            ['bar',
+            [
+                'bar',
                 [
                     new LegacyType(
                         LegacyType::BUILTIN_TYPE_OBJECT,
@@ -206,7 +216,8 @@ class DoctrineExtractorTest extends TestCase
                     ),
                 ],
             ],
-            ['indexedFoo',
+            [
+                'indexedFoo',
                 [
                     new LegacyType(
                         LegacyType::BUILTIN_TYPE_OBJECT,
@@ -221,6 +232,10 @@ class DoctrineExtractorTest extends TestCase
             ['customFoo', null],
             ['notMapped', null],
         ];
+
+        foreach ($legacyTypes as [$property, $t]) {
+            $this->assertEquals($t, $this->createExtractor()->getTypes(DoctrineDummy::class, $property));
+        }
     }
 
     /**
@@ -263,12 +278,16 @@ class DoctrineExtractorTest extends TestCase
     #[IgnoreDeprecations]
     public function testGetTypesCatchExceptionLegacy(): void
     {
+        if (!class_exists(LegacyType::class)) {
+            $this->markTestSkipped();
+        }
+
         $this->assertNull($this->createExtractor()->getTypes('Not\Exist', 'baz'));
     }
 
     public function testGetTypesCatchException(): void
     {
-        $this->assertNull($this->createExtractor()->getType('Not\Exist', 'baz'));
+        $this->assertNull($this->createExtractor()->getType(\Not\Exist::class, 'baz')); // @phpstan-ignore-line
     }
 
     public function testGeneratedValueNotWritable(): void
@@ -283,6 +302,10 @@ class DoctrineExtractorTest extends TestCase
     #[IgnoreDeprecations]
     public function testGetTypesWithEmbedManyOmittingTargetDocumentLegacy(): void
     {
+        if (!class_exists(LegacyType::class)) {
+            $this->markTestSkipped();
+        }
+
         $actualTypes = $this->createExtractor()->getTypes(
             DoctrineWithEmbedded::class,
             'embedManyOmittingTargetDocument'

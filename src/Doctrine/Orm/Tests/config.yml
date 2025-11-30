@@ -7,11 +7,9 @@ doctrine:
             symfony_uuid: Symfony\Bridge\Doctrine\Types\UuidType
 
     orm:
-        auto_generate_proxy_classes: '%kernel.debug%'
         controller_resolver: 
             enabled: false
             auto_mapping: false
-        enable_lazy_ghost_objects: true
         mappings:
             ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity:
                 type: attribute

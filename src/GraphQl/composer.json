@@ -24,9 +24,9 @@
         "api-platform/metadata": "^4.2",
         "api-platform/state": "^4.2.4",
         "api-platform/serializer": "^4.2.4",
-        "symfony/property-info": "^7.1",
-        "symfony/serializer": "^6.4 || ^7.1",
-        "symfony/type-info": "^7.3",
+        "symfony/property-info": "^7.1 || ^8.0",
+        "symfony/serializer": "^6.4 || ^7.1 || ^8.0",
+        "symfony/type-info": "^7.3 || ^8.0",
         "webonyx/graphql-php": "^15.0",
         "willdurand/negotiation": "^3.1"
     },
@@ -35,7 +35,7 @@
         "api-platform/validator": "^4.2.4",
         "twig/twig": "^1.42.3 || ^2.12 || ^3.0",
         "symfony/mercure-bundle": "*",
-        "symfony/routing": "^6.4 || ^7.0",
+        "symfony/routing": "^6.4 || ^7.0 || ^8.0",
         "phpunit/phpunit": "11.5.x-dev"
     },
     "autoload": {
@@ -70,7 +70,7 @@
             "dev-4.1": "4.1.x-dev"
         },
         "symfony": {
-            "require": "^6.4 || ^7.0"
+            "require": "^6.4 || ^7.0 || ^8.0"
         },
         "thanks": {
             "name": "api-platform/api-platform",

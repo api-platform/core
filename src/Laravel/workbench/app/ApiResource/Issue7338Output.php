@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Workbench\App\ApiResource;
 
 use ApiPlatform\Metadata\ApiProperty;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 class Issue7338Output
 {

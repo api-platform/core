@@ -17,8 +17,6 @@ use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use GraphQL\Type\Definition\ResolveInfo;
-use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
-use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 
@@ -112,10 +110,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         if (null === $this->nameConverter) {
             return $property;
         }
-        if ($this->nameConverter instanceof AdvancedNameConverterInterface || $this->nameConverter instanceof MetadataAwareNameConverter) {
-            return $this->nameConverter->denormalize($property, $resourceClass, null, $context);
-        }
 
-        return $this->nameConverter->denormalize($property);
+        return $this->nameConverter->denormalize($property, $resourceClass, null, $context);
     }
 }

@@ -26,11 +26,11 @@
     "require": {
         "php": ">=8.2",
         "api-platform/metadata": "^4.2",
-        "symfony/console": "^6.4 || ^7.0",
-        "symfony/property-info": "^6.4 || ^7.1",
-        "symfony/serializer": "^6.4 || ^7.0",
-        "symfony/type-info": "^7.3",
-        "symfony/uid": "^6.4 || ^7.0"
+        "symfony/console": "^6.4 || ^7.0 || ^8.0",
+        "symfony/property-info": "^6.4 || ^7.1 || ^8.0",
+        "symfony/serializer": "^6.4 || ^7.0 || ^8.0",
+        "symfony/type-info": "^7.3 || ^8.0",
+        "symfony/uid": "^6.4 || ^7.0 || ^8.0"
     },
     "require-dev": {
         "phpspec/prophecy-phpunit": "^2.2",
@@ -62,7 +62,7 @@
             "dev-4.1": "4.1.x-dev"
         },
         "symfony": {
-            "require": "^6.4 || ^7.0"
+            "require": "^6.4 || ^7.0 || ^8.0"
         },
         "thanks": {
             "name": "api-platform/api-platform",

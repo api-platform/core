@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Dto;
 
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\WrappedResponseEntity;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 class CustomOutputEntityWrapperDto
 {

@@ -14,10 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Hydra\Serializer;
 
 use ApiPlatform\JsonLd\ContextBuilder;
-use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
-final readonly class HydraPrefixNameConverter implements NameConverterInterface, AdvancedNameConverterInterface
+final readonly class HydraPrefixNameConverter implements NameConverterInterface
 {
     /**
      * @param array<string,mixed> $defaultContext

@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Hydra;
 
 use Symfony\Component\JsonStreamer\Attribute\StreamedName;
-use Symfony\Component\Serializer\Annotation\SerializedName;
+use Symfony\Component\Serializer\Attribute\SerializedName;
 
 class IriTemplateMapping
 {

@@ -48,6 +48,9 @@ class SchemaFactoryTest extends TestCase
     #[IgnoreDeprecations]
     public function testBuildSchemaForNonResourceClassLegacy(): void
     {
+        if (!class_exists(LegacyType::class)) {
+            $this->markTestSkipped();
+        }
         $this->expectUserDeprecationMessage('Since api-platform/metadata 4.2: The "ApiPlatform\Metadata\ApiProperty::withBuiltinTypes()" method is deprecated, use "ApiPlatform\Metadata\ApiProperty::withNativeType()" instead.');
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
 
@@ -227,6 +230,9 @@ class SchemaFactoryTest extends TestCase
     #[IgnoreDeprecations]
     public function testBuildSchemaForNonResourceClassWithUnionIntersectTypesLegacy(): void
     {
+        if (!class_exists(LegacyType::class)) {
+            $this->markTestSkipped();
+        }
         $this->expectUserDeprecationMessage('Since api-platform/metadata 4.2: The "ApiPlatform\Metadata\ApiProperty::withBuiltinTypes()" method is deprecated, use "ApiPlatform\Metadata\ApiProperty::withNativeType()" instead.');
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
 
@@ -368,6 +374,9 @@ class SchemaFactoryTest extends TestCase
     #[IgnoreDeprecations]
     public function testBuildSchemaWithSerializerGroupsLegacy(): void
     {
+        if (!class_exists(LegacyType::class)) {
+            $this->markTestSkipped();
+        }
         $this->expectUserDeprecationMessage('Since api-platform/metadata 4.2: The "ApiPlatform\Metadata\ApiProperty::withBuiltinTypes()" method is deprecated, use "ApiPlatform\Metadata\ApiProperty::withNativeType()" instead.');
         $shortName = (new \ReflectionClass(OverriddenOperationDummy::class))->getShortName();
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
@@ -525,6 +534,9 @@ class SchemaFactoryTest extends TestCase
     #[IgnoreDeprecations]
     public function testBuildSchemaForAssociativeArrayLegacy(): void
     {
+        if (!class_exists(LegacyType::class)) {
+            $this->markTestSkipped();
+        }
         $this->expectUserDeprecationMessage('Since api-platform/metadata 4.2: The "ApiPlatform\Metadata\ApiProperty::withBuiltinTypes()" method is deprecated, use "ApiPlatform\Metadata\ApiProperty::withNativeType()" instead.');
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
 

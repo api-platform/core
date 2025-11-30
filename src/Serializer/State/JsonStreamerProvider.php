@@ -42,6 +42,13 @@ final class JsonStreamerProvider implements ProviderInterface
         $data = $this->jsonStreamReader->read($request->getContent(true), Type::object($operation->getClass()));
         $context['request']->attributes->set('deserialized', true);
 
+        if (\PHP_VERSION_ID > 80400) {
+            $refl = new \ReflectionClass($data);
+            if ($refl->isUninitializedLazyObject($data)) {
+                $refl->initializeLazyObject($data);
+            }
+        }
+
         return $data;
     }
 }

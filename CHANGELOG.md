@@ -7,6 +7,17 @@
 * [21aa2572d](https://github.com/api-platform/core/commit/21aa2572d8fef2b3f05f7307c51348a6c9767e45) feat(elasticsearch): add SSL options for Elasticsearch configuration (#4059)
 * [ba0c76c](https://github.com/api-platform/core/commit/ba0c76c6f5c8afa8622e87a155b8b99f453d6453) feat(doctrine): remove put & path for readonly entity (#7019)
 
+## v4.2.7
+
+**Symfony 8.0 compatible.**
+
+### Bug fixes
+
+* [44af80c43](https://github.com/api-platform/core/commit/44af80c434083046b57a0272c4f8789151f2d0f8) fix(symfony): disable Swagger UI and keep openapi.json (#7549)
+* [4dfa8da8b](https://github.com/api-platform/core/commit/4dfa8da8b09d2f4226632e7aaaa87110ed28ae3a) fix(metadata): repeatable attribute mutators (#7542)
+* [5e2f729ed](https://github.com/api-platform/core/commit/5e2f729ed2a7cc40811a7c67d4b32f7111834528) fix(state): never map a response (#7543)
+* [e9af8905c](https://github.com/api-platform/core/commit/e9af8905c35484fe97b719d28112483dfa403642) fix(metadata): disable pagination maximum items per page (#7553)
+
 ## v4.2.6
 
 ### Bug fixes

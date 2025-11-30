@@ -1,0 +1,119 @@
+<?php
+
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
+namespace ApiPlatform\Tests\Functional;
+
+use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+
+/**
+ * @author Maxence Castel <maxence.castel59@gmail.com>
+ */
+class DocumentationActionAppKernel extends \AppKernel
+{
+    public static bool $swaggerUiEnabled = true;
+
+    public function getCacheDir(): string
+    {
+        $suffix = self::$swaggerUiEnabled ? 'ui_enabled' : 'ui_disabled';
+
+        return parent::getCacheDir().'/'.$suffix;
+    }
+
+    public function getLogDir(): string
+    {
+        $suffix = self::$swaggerUiEnabled ? 'ui_enabled' : 'ui_disabled';
+
+        return parent::getLogDir().'/'.$suffix;
+    }
+
+    protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
+    {
+        parent::configureContainer($c, $loader);
+
+        $loader->load(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('api_platform', [
+                'enable_swagger_ui' => DocumentationActionAppKernel::$swaggerUiEnabled,
+            ]);
+        });
+    }
+}
+
+final class DocumentationActionTest extends ApiTestCase
+{
+    protected static ?bool $alwaysBootKernel = true;
+
+    protected static function getKernelClass(): string
+    {
+        return DocumentationActionAppKernel::class;
+    }
+
+    public function testHtmlDocumentationIsNotAccessibleWhenSwaggerUiIsDisabled(): void
+    {
+        DocumentationActionAppKernel::$swaggerUiEnabled = false;
+
+        $client = self::createClient();
+
+        $container = static::getContainer();
+        $this->assertFalse($container->getParameter('api_platform.enable_swagger_ui'));
+
+        $client->request('GET', '/docs', ['headers' => ['Accept' => 'text/html']]);
+        $this->assertResponseStatusCodeSame(404);
+        $this->assertStringContainsString('Swagger UI is disabled.', $client->getResponse()->getContent(false));
+    }
+
+    public function testJsonDocumentationIsAccessibleWhenSwaggerUiIsDisabled(): void
+    {
+        DocumentationActionAppKernel::$swaggerUiEnabled = false;
+
+        $client = self::createClient();
+
+        $container = static::getContainer();
+        $this->assertFalse($container->getParameter('api_platform.enable_swagger_ui'));
+
+        $client->request('GET', '/docs.jsonopenapi', ['headers' => ['Accept' => 'application/vnd.openapi+json']]);
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains(['openapi' => '3.1.0']);
+        $this->assertJsonContains(['info' => ['title' => 'My Dummy API']]);
+    }
+
+    public function testHtmlDocumentationIsAccessibleWhenSwaggerUiIsEnabled(): void
+    {
+        DocumentationActionAppKernel::$swaggerUiEnabled = true;
+
+        $client = self::createClient();
+
+        $container = static::getContainer();
+        $this->assertTrue($container->getParameter('api_platform.enable_swagger_ui'));
+
+        $client->request('GET', '/docs', ['headers' => ['Accept' => 'text/html']]);
+        $this->assertResponseIsSuccessful();
+        $this->assertStringNotContainsString('Swagger UI is disabled.', $client->getResponse()->getContent(false));
+    }
+
+    public function testJsonDocumentationIsAccessibleWhenSwaggerUiIsEnabled(): void
+    {
+        DocumentationActionAppKernel::$swaggerUiEnabled = true;
+
+        $client = self::createClient();
+
+        $container = static::getContainer();
+        $this->assertTrue($container->getParameter('api_platform.enable_swagger_ui'));
+
+        $client->request('GET', '/docs.jsonopenapi', ['headers' => ['Accept' => 'application/vnd.openapi+json']]);
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains(['openapi' => '3.1.0']);
+        $this->assertJsonContains(['info' => ['title' => 'My Dummy API']]);
+    }
+}

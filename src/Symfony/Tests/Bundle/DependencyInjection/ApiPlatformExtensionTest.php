@@ -108,6 +108,8 @@ class ApiPlatformExtensionTest extends TestCase
         'asset_package' => null,
         'enable_entrypoint' => true,
         'enable_docs' => true,
+        'enable_swagger' => true,
+        'enable_swagger_ui' => true,
         'use_symfony_listeners' => false,
     ]];
 
@@ -208,6 +210,10 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.state_processor.respond',
             'api_platform.state_processor.add_link_header',
             'api_platform.state_processor.serialize',
+
+            'api_platform.swagger_ui.context',
+            'api_platform.swagger_ui.processor',
+            'api_platform.swagger_ui.provider',
         ];
 
         $aliases = [
@@ -249,11 +255,49 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.listener.view.write',
             'api_platform.listener.view.serialize',
             'api_platform.listener.view.respond',
+            'api_platform.swagger_ui.documentation.provider',
         ];
 
         foreach ($services as $service) {
             $this->assertNotContainerHasService($service);
         }
+    }
+
+    public function testSwaggerUiDisabledConfiguration(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['enable_swagger'] = true;
+        $config['api_platform']['enable_swagger_ui'] = false;
+        $config['api_platform']['use_symfony_listeners'] = true;
+
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertNotContainerHasService('api_platform.swagger_ui.processor');
+
+        $this->assertNotContainerHasService('api_platform.swagger_ui.context');
+
+        $this->assertNotContainerHasService('api_platform.swagger_ui.provider');
+
+        $this->assertNotContainerHasService('api_platform.swagger_ui.documentation.provider');
+    }
+
+    public function testSwaggerUiEnabledConfiguration(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['enable_swagger'] = true;
+        $config['api_platform']['enable_swagger_ui'] = true;
+        $config['api_platform']['use_symfony_listeners'] = true;
+
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $services = [
+            'api_platform.swagger_ui.processor',
+            'api_platform.swagger_ui.context',
+            'api_platform.swagger_ui.provider',
+            'api_platform.swagger_ui.documentation.provider',
+        ];
+
+        $this->assertContainerHas($services);
     }
 
     public function testEventListenersConfiguration(): void
@@ -299,5 +343,42 @@ class ApiPlatformExtensionTest extends TestCase
         $emptyPhpFile = realpath(__DIR__.'/php/empty_file.php');
         $this->assertContainerHasService('api_platform.metadata.resource_extractor.php_file');
         $this->assertSame([$emptyPhpFile], $this->container->getDefinition('api_platform.metadata.resource_extractor.php_file')->getArgument(0));
+    }
+
+    public function testPaginationMaximumItemsPerPageIsNotSet(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertTrue($this->container->hasParameter('api_platform.collection.pagination.maximum_items_per_page'));
+        $this->assertSame(30, $this->container->getParameter('api_platform.collection.pagination.maximum_items_per_page'));
+    }
+
+    public function testPaginationMaximumItemsPerPageIsSetWithNull(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['defaults']['pagination_maximum_items_per_page'] = null;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertTrue($this->container->hasParameter('api_platform.collection.pagination.maximum_items_per_page'));
+        $this->assertNull($this->container->getParameter('api_platform.collection.pagination.maximum_items_per_page'));
+    }
+
+    public function testPaginationMaximumItemsPerPageIsSetWithExplicitValue(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['defaults']['pagination_maximum_items_per_page'] = 22;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertSame(22, $this->container->getParameter('api_platform.collection.pagination.maximum_items_per_page'));
+    }
+
+    public function testPaginationMaximumItemsPerPageIsSetWithZero(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['defaults']['pagination_maximum_items_per_page'] = 0;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertSame(0, $this->container->getParameter('api_platform.collection.pagination.maximum_items_per_page'));
     }
 }

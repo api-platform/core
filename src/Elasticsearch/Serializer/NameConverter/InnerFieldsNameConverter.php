@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\Serializer\NameConverter;
 
-use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -24,7 +23,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-final class InnerFieldsNameConverter implements NameConverterInterface, AdvancedNameConverterInterface
+final class InnerFieldsNameConverter implements NameConverterInterface
 {
     public function __construct(private readonly NameConverterInterface $inner = new CamelCaseToSnakeCaseNameConverter())
     {

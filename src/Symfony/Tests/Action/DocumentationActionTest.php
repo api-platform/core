@@ -27,6 +27,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
@@ -34,6 +35,50 @@ use Symfony\Component\HttpFoundation\Request;
 class DocumentationActionTest extends TestCase
 {
     use ProphecyTrait;
+
+    public function testHtmlFormatWhenSwaggerUiDisabledThrows404(): void
+    {
+        $this->expectException(NotFoundHttpException::class);
+        $this->expectExceptionMessage('Swagger UI is disabled.');
+
+        $request = new Request();
+        $request->attributes->set('_format', 'html');
+
+        $openApiFactory = $this->createMock(OpenApiFactoryInterface::class);
+        $resourceNameCollectionFactory = $this->createMock(ResourceNameCollectionFactoryInterface::class);
+
+        $documentation = new DocumentationAction(
+            $resourceNameCollectionFactory,
+            openApiFactory: $openApiFactory,
+            documentationFormats: [
+                'json' => ['application/json'],
+                'html' => ['text/html'],
+            ],
+            swaggerUiEnabled: false,
+        );
+
+        $documentation($request);
+    }
+
+    public function testJsonFormatWhenSwaggerUiDisabledIsAccessible(): void
+    {
+        $request = new Request();
+        $request->attributes->set('_format', 'json');
+
+        $openApiFactory = $this->createMock(OpenApiFactoryInterface::class);
+        $openApiFactory->expects($this->once())->method('__invoke')->willReturn(new OpenApi(new Info('title', '1.0.0'), [], new Paths()));
+
+        $resourceNameCollectionFactory = $this->createMock(ResourceNameCollectionFactoryInterface::class);
+
+        $documentation = new DocumentationAction(
+            $resourceNameCollectionFactory,
+            openApiFactory: $openApiFactory,
+            swaggerUiEnabled: false
+        );
+
+        $result = $documentation($request);
+        $this->assertInstanceOf(OpenApi::class, $result);
+    }
 
     public function testDocumentationAction(): void
     {
@@ -87,5 +132,26 @@ class DocumentationActionTest extends TestCase
         $processor->expects($this->once())->method('process')->willReturnArgument(0);
         $entrypoint = new DocumentationAction($resourceNameCollectionFactory, provider: $provider, processor: $processor);
         $entrypoint($request);
+    }
+
+    public function testHtmlFormatNotSupportedThrowsException(): void
+    {
+        $this->expectException(NotFoundHttpException::class);
+        $this->expectExceptionMessage('Format "html" is not supported');
+
+        $request = new Request();
+        $request->attributes->set('_format', 'html');
+
+        $openApiFactory = $this->createMock(OpenApiFactoryInterface::class);
+        $resourceNameCollectionFactory = $this->createMock(ResourceNameCollectionFactoryInterface::class);
+
+        $documentation = new DocumentationAction(
+            $resourceNameCollectionFactory,
+            openApiFactory: $openApiFactory,
+            documentationFormats: ['json' => ['application/json']],
+            swaggerUiEnabled: false,
+        );
+
+        $documentation($request);
     }
 }

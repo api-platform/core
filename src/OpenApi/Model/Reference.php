@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\OpenApi\Model;
 
-use Symfony\Component\Serializer\Annotation\SerializedName;
+use Symfony\Component\Serializer\Attribute\SerializedName;
 
 final class Reference
 {

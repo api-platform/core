@@ -29,21 +29,21 @@
         "api-platform/metadata": "^4.2",
         "api-platform/state": "^4.2.4",
         "doctrine/mongodb-odm": "^2.10",
-        "symfony/property-info": "^6.4 || ^7.1",
-        "symfony/type-info": "^7.3"
+        "symfony/property-info": "^6.4 || ^7.1 || ^8.0",
+        "symfony/type-info": "^7.3 || ^8.0"
     },
     "require-dev": {
-        "doctrine/doctrine-bundle": "^2.11",
+        "doctrine/doctrine-bundle": "^2.11 || ^3.1",
         "doctrine/mongodb-odm-bundle": "^5.0",
         "phpspec/prophecy-phpunit": "^2.2",
         "phpunit/phpunit": "11.5.x-dev",
-        "symfony/cache": "^6.4 || ^7.0",
-        "symfony/framework-bundle": "^6.4 || ^7.0",
-        "symfony/property-access": "^6.4 || ^7.0",
-        "symfony/serializer": "^6.4 || ^7.0",
-        "symfony/uid": "^6.4 || ^7.0",
-        "symfony/validator": "^6.4.11 || ^7.0",
-        "symfony/yaml": "^6.4 || ^7.0"
+        "symfony/cache": "^6.4 || ^7.0 || ^8.0",
+        "symfony/framework-bundle": "^6.4 || ^7.0 || ^8.0",
+        "symfony/property-access": "^6.4 || ^7.0 || ^8.0",
+        "symfony/serializer": "^6.4 || ^7.0 || ^8.0",
+        "symfony/uid": "^6.4 || ^7.0 || ^8.0",
+        "symfony/validator": "^6.4.11 || ^7.0 || ^8.0",
+        "symfony/yaml": "^6.4 || ^7.0 || ^8.0"
     },
     "autoload": {
         "psr-4": {
@@ -67,7 +67,7 @@
             "dev-4.1": "4.1.x-dev"
         },
         "symfony": {
-            "require": "^6.4 || ^7.0"
+            "require": "^6.4 || ^7.0 || ^8.0"
         },
         "thanks": {
             "name": "api-platform/api-platform",

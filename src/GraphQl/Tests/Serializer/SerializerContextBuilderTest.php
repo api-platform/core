@@ -23,7 +23,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -42,7 +42,7 @@ class SerializerContextBuilderTest extends TestCase
         $this->serializerContextBuilder = $this->buildSerializerContextBuilder();
     }
 
-    private function buildSerializerContextBuilder(?AdvancedNameConverterInterface $advancedNameConverter = null): SerializerContextBuilder
+    private function buildSerializerContextBuilder(?NameConverterInterface $advancedNameConverter = null): SerializerContextBuilder
     {
         return new SerializerContextBuilder($advancedNameConverter ?? new CustomConverter());
     }
@@ -112,8 +112,8 @@ class SerializerContextBuilderTest extends TestCase
 
     public static function createNormalizationContextProvider(): iterable
     {
-        $advancedNameConverterFactory = function (self $that): AdvancedNameConverterInterface {
-            $advancedNameConverterProphecy = $that->prophesize(AdvancedNameConverterInterface::class);
+        $advancedNameConverterFactory = function (self $that): NameConverterInterface {
+            $advancedNameConverterProphecy = $that->prophesize(NameConverterInterface::class);
             $advancedNameConverterProphecy->denormalize('field', 'myResource', null, Argument::type('array'))->willReturn('denormalizedField');
 
             return $advancedNameConverterProphecy->reveal();

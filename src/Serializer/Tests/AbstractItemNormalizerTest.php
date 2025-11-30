@@ -93,6 +93,7 @@ class AbstractItemNormalizerTest extends TestCase
     public function testNormalize(): void
     {
         $relatedDummy = new RelatedDummy();
+        $relatedDummy->setId(2);
 
         $dummy = new Dummy();
         $dummy->setName('foo');
@@ -146,6 +147,7 @@ class AbstractItemNormalizerTest extends TestCase
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
         $serializerProphecy->normalize('foo', null, Argument::type('array'))->willReturn('foo');
+        $serializerProphecy->normalize('/dummies/2', null, Argument::type('array'))->willReturn('/dummies/2');
         $serializerProphecy->normalize(['/dummies/2'], null, Argument::type('array'))->willReturn(['/dummies/2']);
 
         $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), null, null, [], null, null) extends AbstractItemNormalizer {};
@@ -294,6 +296,11 @@ class AbstractItemNormalizerTest extends TestCase
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
+        // This is the fix: we must ensure normalize returns the IRIs as strings, not null
+        $serializerProphecy->normalize('/property-collection-relations', Argument::cetera())->willReturn('/property-collection-relations');
+        $serializerProphecy->normalize('/parent/42/another-collection-operations', Argument::cetera())->willReturn('/parent/42/another-collection-operations');
+        $serializerProphecy->normalize('/parent/42/another-collection-operations/24', Argument::cetera())->willReturn('/parent/42/another-collection-operations/24');
+
         $normalizer->setSerializer($serializerProphecy->reveal());
 
         $expected = [
@@ -1864,6 +1871,7 @@ class AbstractItemNormalizerTest extends TestCase
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
         $serializerProphecy->willImplement(NormalizerInterface::class);
         $serializerProphecy->normalize('foo', null, Argument::type('array'))->willReturn('foo');
+        $serializerProphecy->normalize('/dummies/2', null, Argument::type('array'))->willReturn('/dummies/2');
         $serializerProphecy->normalize(['/dummies/2'], null, Argument::type('array'))->willReturn(['/dummies/2']);
 
         $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), null, null, [], null, null) extends AbstractItemNormalizer {};

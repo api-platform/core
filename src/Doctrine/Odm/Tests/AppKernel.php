@@ -20,6 +20,7 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\PropertyInfo\Type;
 
 /**
  * AppKernel for tests.
@@ -77,10 +78,13 @@ class AppKernel extends Kernel
             'php_errors' => ['log' => true],
             'router' => ['utf8' => true],
             'http_method_override' => false,
-            'annotations' => false,
             'handle_all_throwables' => true,
             'uid' => ['default_uuid_version' => 7, 'time_based_uuid_version' => 7],
         ];
+
+        if (!class_exists(Type::class)) {
+            $c->setParameter('.json_streamer.lazy_ghosts_dir', __DIR__.'/cache/json_streamer_lazy_ghost');
+        }
 
         $c->prependExtensionConfig('framework', $config);
 

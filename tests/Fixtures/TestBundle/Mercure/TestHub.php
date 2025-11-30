@@ -37,8 +37,13 @@ final class TestHub implements HubInterface
         return $this->updates;
     }
 
+    // @TODO: remove in 4.3
     public function getUrl(): string
     {
+        if (!method_exists($this->hub, 'getUrl')) {
+            throw new \RuntimeException();
+        }
+
         return $this->hub->getUrl();
     }
 
@@ -49,6 +54,10 @@ final class TestHub implements HubInterface
 
     public function getProvider(): TokenProviderInterface
     {
+        if (!method_exists($this->hub, 'getProvider')) {
+            throw new \RuntimeException();
+        }
+
         return $this->hub->getProvider();
     }
 

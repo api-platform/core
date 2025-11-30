@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonApi\Serializer;
 
 use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
-use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
@@ -22,7 +21,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-final class ReservedAttributeNameConverter implements NameConverterInterface, AdvancedNameConverterInterface
+final class ReservedAttributeNameConverter implements NameConverterInterface
 {
     public const JSON_API_RESERVED_ATTRIBUTES = [
         'id' => '_id',
