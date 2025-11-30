@@ -143,22 +143,25 @@ class OpenApiTest extends ApiTestCase
                             'readOnly' => true,
                             'description' => 'A short, human-readable summary of the problem.',
                             'type' => [
-                                0 => 'string',
-                                1 => 'null',
+                                'string',
+                                'null',
                             ],
                         ],
                         'detail' => [
                             'readOnly' => true,
                             'description' => 'A human-readable explanation specific to this occurrence of the problem.',
                             'type' => [
-                                0 => 'string',
-                                1 => 'null',
+                                'string',
+                                'null',
                             ],
                         ],
                         'status' => [
-                            'type' => 'number',
+                            'type' => [
+                                'number',
+                                'null',
+                            ],
                             'examples' => [
-                                0 => 404,
+                                404,
                             ],
                             'default' => 400,
                         ],
@@ -166,8 +169,8 @@ class OpenApiTest extends ApiTestCase
                             'readOnly' => true,
                             'description' => 'A URI reference that identifies the specific occurrence of the problem. It may or may not yield further information if dereferenced.',
                             'type' => [
-                                0 => 'string',
-                                1 => 'null',
+                                'string',
+                                'null',
                             ],
                         ],
                         'type' => [
@@ -178,8 +181,8 @@ class OpenApiTest extends ApiTestCase
                         'description' => [
                             'readOnly' => true,
                             'type' => [
-                                0 => 'string',
-                                1 => 'null',
+                                'string',
+                                'null',
                             ],
                         ],
                     ],

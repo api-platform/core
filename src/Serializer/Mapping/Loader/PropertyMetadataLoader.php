@@ -64,14 +64,14 @@ final class PropertyMetadataLoader implements LoaderInterface
             $attribute = $a->newInstance();
             if ($attribute instanceof DiscriminatorMap) {
                 $classMetadata->setClassDiscriminatorMapping(new ClassDiscriminatorMapping(
-                    $attribute->getTypeProperty(),
-                    $attribute->getMapping()
+                    method_exists($attribute, 'getTypeProperty') ? $attribute->getTypeProperty() : $attribute->typeProperty,
+                    method_exists($attribute, 'getMapping') ? $attribute->getMapping() : $attribute->mapping
                 ));
                 continue;
             }
 
             if ($attribute instanceof Groups) {
-                $classGroups = $attribute->getGroups();
+                $classGroups = method_exists($attribute, 'getGroups') ? $attribute->getGroups() : $attribute->groups;
 
                 continue;
             }
@@ -116,16 +116,17 @@ final class PropertyMetadataLoader implements LoaderInterface
             // This code is adapted from Symfony\Component\Serializer\Mapping\Loader\AttributeLoader
             foreach ($attributes[$propertyName] as $attr) {
                 if ($attr instanceof Groups) {
-                    foreach ($attr->getGroups() as $group) {
+                    $groups = method_exists($attr, 'getGroups') ? $attr->getGroups() : $attr->groups;
+                    foreach ($groups as $group) {
                         $attributeMetadata->addGroup($group);
                     }
                     continue;
                 }
 
                 match (true) {
-                    $attr instanceof MaxDepth => $attributeMetadata->setMaxDepth($attr->getMaxDepth()),
-                    $attr instanceof SerializedName => $attributeMetadata->setSerializedName($attr->getSerializedName()),
-                    $attr instanceof SerializedPath => $attributeMetadata->setSerializedPath($attr->getSerializedPath()),
+                    $attr instanceof MaxDepth => $attributeMetadata->setMaxDepth(method_exists($attr, 'getMaxDepth') ? $attr->getMaxDepth() : $attr->maxDepth),
+                    $attr instanceof SerializedName => $attributeMetadata->setSerializedName(method_exists($attr, 'getSerializedName') ? $attr->getSerializedName() : $attr->serializedName),
+                    $attr instanceof SerializedPath => $attributeMetadata->setSerializedPath(method_exists($attr, 'getSerializedPath') ? $attr->getSerializedPath() : $attr->serializedPath),
                     $attr instanceof Ignore => $attributeMetadata->setIgnore(true),
                     $attr instanceof Context => $this->setAttributeContextsForGroups($attr, $attributeMetadata),
                     default => null,
@@ -148,10 +149,11 @@ final class PropertyMetadataLoader implements LoaderInterface
 
     private function setAttributeContextsForGroups(Context $annotation, AttributeMetadataInterface $attributeMetadata): void
     {
-        $context = $annotation->getContext();
-        $groups = $annotation->getGroups();
-        $normalizationContext = $annotation->getNormalizationContext();
-        $denormalizationContext = $annotation->getDenormalizationContext();
+        $context = method_exists($annotation, 'getContext') ? $annotation->getContext() : $annotation->context;
+        $groups = method_exists($annotation, 'getGroups') ? $annotation->getGroups() : $annotation->groups;
+        $normalizationContext = method_exists($annotation, 'getNormalizationContext') ? $annotation->getNormalizationContext() : $annotation->normalizationContext;
+        $denormalizationContext = method_exists($annotation, 'getDenormalizationContext') ? $annotation->getDenormalizationContext() : $annotation->denormalizationContext;
+
         if ($normalizationContext || $context) {
             $attributeMetadata->setNormalizationContextForGroups($normalizationContext ?: $context, $groups);
         }

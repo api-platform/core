@@ -15,8 +15,8 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue4358;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Get;
-use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Serializer\Annotation\MaxDepth;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\MaxDepth;
 
 #[Get(uriTemplate: 'resource_a',
     formats: ['jsonhal'],

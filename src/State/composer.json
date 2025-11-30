@@ -30,18 +30,19 @@
         "php": ">=8.2",
         "api-platform/metadata": "^4.2.3",
         "psr/container": "^1.0 || ^2.0",
-        "symfony/http-kernel": "^6.4 || ^7.0",
-        "symfony/serializer": "^6.4 || ^7.0",
-        "symfony/translation-contracts": "^3.0"
+        "symfony/http-kernel": "^6.4 || ^7.0 || ^8.0",
+        "symfony/serializer": "^6.4 || ^7.0 || ^8.0",
+        "symfony/translation-contracts": "^3.0",
+        "symfony/deprecation-contracts": "^3.1"
     },
     "require-dev": {
         "api-platform/serializer": "^4.2.4",
         "api-platform/validator": "^4.2.4",
         "phpunit/phpunit": "11.5.x-dev",
-        "symfony/http-foundation": "^6.4.14 || ^7.0",
-        "symfony/object-mapper": "^7.3",
-        "symfony/type-info": "^7.3 || 7.4.x-dev",
-        "symfony/web-link": "^6.4 || ^7.1",
+        "symfony/http-foundation": "^6.4.14 || ^7.0 || ^8.0",
+        "symfony/object-mapper": "^7.4 || ^8.0",
+        "symfony/type-info": "^7.4 || ^8.0",
+        "symfony/web-link": "^6.4 || ^7.1 || ^8.0",
         "willdurand/negotiation": "^3.1"
     },
     "conflicts": {
@@ -73,7 +74,7 @@
             "dev-4.1": "4.1.x-dev"
         },
         "symfony": {
-            "require": "^6.4 || ^7.0"
+            "require": "^6.4 || ^7.0 || ^8.0"
         },
         "thanks": {
             "name": "api-platform/api-platform",

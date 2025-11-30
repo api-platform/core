@@ -20,7 +20,7 @@ use ApiPlatform\Metadata\GraphQl\Query;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * OptionalRequiredDummy. Used to test GraphQL Schema generation for nullable embedded relations.
@@ -32,7 +32,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ],
 )]
 #[ODM\Document]
-class OptionalRequiredDummy
+class OptionalRequiredDummy implements \Stringable
 {
     #[ApiProperty(writable: false)]
     #[ODM\Id(strategy: 'INCREMENT', type: 'int')]

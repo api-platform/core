@@ -26,7 +26,7 @@
         "api-platform/metadata": "^4.2",
         "api-platform/documentation": "^4.2",
         "api-platform/serializer": "^4.2.4",
-        "symfony/type-info": "^7.3"
+        "symfony/type-info": "^7.3 || ^8.0"
     },
     "autoload": {
         "psr-4": {
@@ -54,7 +54,7 @@
             "dev-4.1": "4.1.x-dev"
         },
         "symfony": {
-            "require": "^6.4 || ^7.0"
+            "require": "^6.4 || ^7.0 || ^8.0"
         },
         "thanks": {
             "name": "api-platform/api-platform",

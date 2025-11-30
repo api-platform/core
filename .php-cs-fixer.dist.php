@@ -21,14 +21,16 @@ $finder = PhpCsFixer\Finder::create()
         'docs/guides',
         'docs/var',
         'src/Doctrine/Orm/Tests/var',
-        'src/Doctrine/Odm/Tests/var'
+        'src/Doctrine/Odm/Tests/var',
     ])
+    ->notPath('tests/Fixtures/app/config/reference.php')
     ->notPath('src/Symfony/Bundle/DependencyInjection/Configuration.php')
     ->append([
         'tests/Fixtures/app/console',
     ]);
 
 return (new PhpCsFixer\Config())
+    ->setUnsupportedPhpVersionAllowed(true)
     ->setRiskyAllowed(true)
     ->setRules([
         '@DoctrineAnnotation' => true,

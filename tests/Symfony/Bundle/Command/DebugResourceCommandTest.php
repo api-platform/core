@@ -37,7 +37,7 @@ class DebugResourceCommandTest extends TestCase
         $application->setCatchExceptions(false);
         $application->setAutoExit(false);
 
-        if (method_exists($application, 'addCommand')) {
+        if (method_exists($application, 'addCommand')) { // @phpstan-ignore-line
             $application->addCommand(new DebugResourceCommand(new AttributesResourceMetadataCollectionFactory(), new VarCloner(), $dumper ?? new CliDumper()));
         } else {
             $application->add(new DebugResourceCommand(new AttributesResourceMetadataCollectionFactory(), new VarCloner(), $dumper ?? new CliDumper()));

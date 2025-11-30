@@ -16,7 +16,7 @@ namespace ApiPlatform\Elasticsearch\Tests\Serializer\NameConverter;
 use ApiPlatform\Elasticsearch\Serializer\NameConverter\InnerFieldsNameConverter;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 class InnerFieldsNameConverterTest extends TestCase
 {
@@ -25,14 +25,14 @@ class InnerFieldsNameConverterTest extends TestCase
     public function testConstruct(): void
     {
         self::assertInstanceOf(
-            AdvancedNameConverterInterface::class,
-            new InnerFieldsNameConverter($this->prophesize(AdvancedNameConverterInterface::class)->reveal())
+            NameConverterInterface::class,
+            new InnerFieldsNameConverter($this->prophesize(NameConverterInterface::class)->reveal())
         );
     }
 
     public function testNormalize(): void
     {
-        $innerProphecy = $this->prophesize(AdvancedNameConverterInterface::class);
+        $innerProphecy = $this->prophesize(NameConverterInterface::class);
         $innerProphecy->normalize('fooBar', null, null, [])->willReturn('foo_bar')->shouldBeCalled();
         $innerProphecy->normalize('bazQux', null, null, [])->willReturn('baz_qux')->shouldBeCalled();
 
@@ -43,7 +43,7 @@ class InnerFieldsNameConverterTest extends TestCase
 
     public function testDenormalize(): void
     {
-        $innerProphecy = $this->prophesize(AdvancedNameConverterInterface::class);
+        $innerProphecy = $this->prophesize(NameConverterInterface::class);
         $innerProphecy->denormalize('foo_bar', null, null, [])->willReturn('fooBar')->shouldBeCalled();
         $innerProphecy->denormalize('baz_qux', null, null, [])->willReturn('bazQux')->shouldBeCalled();
 

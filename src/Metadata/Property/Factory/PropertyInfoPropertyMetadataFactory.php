@@ -49,7 +49,7 @@ final class PropertyInfoPropertyMetadataFactory implements PropertyMetadataFacto
         // TODO: remove in 5.x
         if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
             if (!$propertyMetadata->getBuiltinTypes()) {
-                $types = $this->propertyInfo->getTypes($resourceClass, $property, $options) ?? [];
+                $types = $this->propertyInfo->getTypes($resourceClass, $property, $options) ?? []; // @phpstan-ignore-line
 
                 foreach ($types as $i => $type) {
                     // Temp fix for https://github.com/symfony/symfony/pull/52699

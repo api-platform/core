@@ -30,8 +30,14 @@ final class PropertyMetadataLoaderTest extends TestCase
         $loader = new PropertyMetadataLoader($coll);
         $classMetadata = new ClassMetadata(HasRelation::class);
         $loader->loadClassMetadata($classMetadata);
-        $this->assertArrayHasKey('relation', $classMetadata->attributesMetadata);
-        $this->assertEquals(['read'], $classMetadata->attributesMetadata['relation']->getGroups());
+        if (method_exists($classMetadata, 'getAttributesMetadata')) { // @phpstan-ignore-line
+            $attributesMetadata = $classMetadata->getAttributesMetadata();
+        } else {
+            $attributesMetadata = $classMetadata->attributesMetadata; // @phpstan-ignore-line
+        }
+
+        $this->assertArrayHasKey('relation', $attributesMetadata);
+        $this->assertEquals(['read'], $attributesMetadata['relation']->getGroups());
     }
 
     public function testCreateMappingForAClass(): void
@@ -41,7 +47,12 @@ final class PropertyMetadataLoaderTest extends TestCase
         $loader = new PropertyMetadataLoader($coll);
         $classMetadata = new ClassMetadata(Relation::class);
         $loader->loadClassMetadata($classMetadata);
-        $this->assertArrayHasKey('name', $classMetadata->attributesMetadata);
-        $this->assertEquals(['read'], $classMetadata->attributesMetadata['name']->getGroups());
+        if (method_exists($classMetadata, 'getAttributesMetadata')) { // @phpstan-ignore-line
+            $attributesMetadata = $classMetadata->getAttributesMetadata();
+        } else {
+            $attributesMetadata = $classMetadata->attributesMetadata; // @phpstan-ignore-line
+        }
+        $this->assertArrayHasKey('name', $attributesMetadata);
+        $this->assertEquals(['read'], $attributesMetadata['name']->getGroups());
     }
 }

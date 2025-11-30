@@ -18,7 +18,7 @@ use ApiPlatform\Elasticsearch\Filter\OrderFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(normalizationContext: ['groups' => ['tweet:read']])]
 #[ApiFilter(OrderFilter::class, properties: ['id', 'author.id'])]

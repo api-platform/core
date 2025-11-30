@@ -24,14 +24,14 @@
     "require": {
         "php": ">=8.2",
         "api-platform/metadata": "^4.2",
-        "symfony/serializer": "^6.4 || ^7.0"
+        "symfony/serializer": "^6.4 || ^7.0 || ^8.0"
     },
     "require-dev": {
         "phpspec/prophecy-phpunit": "^2.2",
         "ramsey/uuid": "^4.7",
         "ramsey/uuid-doctrine": "^2.0",
         "phpunit/phpunit": "11.5.x-dev",
-        "symfony/type-info": "^7.3"
+        "symfony/type-info": "^7.3 || ^8.0"
     },
     "autoload": {
         "psr-4": {
@@ -56,7 +56,7 @@
             "dev-4.1": "4.1.x-dev"
         },
         "symfony": {
-            "require": "^6.4 || ^7.0"
+            "require": "^6.4 || ^7.0 || ^8.0"
         },
         "thanks": {
             "name": "api-platform/api-platform",

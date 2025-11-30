@@ -17,7 +17,6 @@ use ApiPlatform\Hydra\Serializer\ConstraintViolationListNormalizer;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\ConstraintViolation;
@@ -89,16 +88,9 @@ class ConstraintViolationNormalizerTest extends TestCase
             ],
         ];
 
-        $advancedNameConverterFactory = function (self $that) {
-            $advancedNameConverterProphecy = $that->prophesize(AdvancedNameConverterInterface::class);
-            $advancedNameConverterProphecy->normalize(Argument::type('string'), null, Argument::type('string'))->will(fn ($args): string => '_'.$args[0]);
-
-            return $advancedNameConverterProphecy->reveal();
-        };
-
         $nameConverterFactory = function (self $that) {
             $nameConverterProphecy = $that->prophesize(NameConverterInterface::class);
-            $nameConverterProphecy->normalize(Argument::type('string'))->will(fn ($args): string => '_'.$args[0]);
+            $nameConverterProphecy->normalize(Argument::cetera())->will(fn ($args): string => '_'.$args[0]);
 
             return $nameConverterProphecy->reveal();
         };
@@ -107,7 +99,6 @@ class ConstraintViolationNormalizerTest extends TestCase
 
         $expected = $nameConverterBasedExpectation;
         $expected[0]['payload'] = ['severity' => 'warning'];
-        yield [$advancedNameConverterFactory, ['severity', 'anotherField1'], $expected];
         yield [$nameConverterFactory, ['severity', 'anotherField1'], $expected];
         $expected = $basicExpectation;
         $expected[0]['payload'] = ['severity' => 'warning'];
@@ -115,13 +106,11 @@ class ConstraintViolationNormalizerTest extends TestCase
 
         $expected = $nameConverterBasedExpectation;
         $expected[0]['payload'] = ['severity' => 'warning', 'anotherField2' => 'aValue'];
-        yield [$advancedNameConverterFactory, null, $expected];
         yield [$nameConverterFactory, null, $expected];
         $expected = $basicExpectation;
         $expected[0]['payload'] = ['severity' => 'warning', 'anotherField2' => 'aValue'];
         yield [$nullNameConverterFactory, null, $expected];
 
-        yield [$advancedNameConverterFactory, [], $nameConverterBasedExpectation];
         yield [$nameConverterFactory, [], $nameConverterBasedExpectation];
         yield [$nullNameConverterFactory, [], $basicExpectation];
     }

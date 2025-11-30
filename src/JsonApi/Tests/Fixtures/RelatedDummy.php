@@ -15,7 +15,7 @@ namespace ApiPlatform\JsonApi\Tests\Fixtures;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * Related Dummy.

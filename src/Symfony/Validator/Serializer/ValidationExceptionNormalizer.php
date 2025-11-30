@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Validator\Serializer;
 
 use ApiPlatform\Validator\Exception\ValidationException;
-use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
-use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -31,10 +29,8 @@ class ValidationExceptionNormalizer implements NormalizerInterface
         foreach ($object->getConstraintViolationList() as $violation) {
             $class = \is_object($root = $violation->getRoot()) ? $root::class : null;
 
-            if ($this->nameConverter instanceof AdvancedNameConverterInterface || $this->nameConverter instanceof MetadataAwareNameConverter) {
+            if ($this->nameConverter) {
                 $propertyPath = $this->nameConverter->normalize($violation->getPropertyPath(), $class, $format);
-            } elseif ($this->nameConverter instanceof NameConverterInterface) {
-                $propertyPath = $this->nameConverter->normalize($violation->getPropertyPath());
             } else {
                 $propertyPath = $violation->getPropertyPath();
             }

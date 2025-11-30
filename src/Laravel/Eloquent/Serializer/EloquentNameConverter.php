@@ -28,9 +28,9 @@ final class EloquentNameConverter implements NameConverterInterface
     public function normalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
     {
         try {
-            return $this->nameConverter->normalize($propertyName, $class, $format, $context); // @phpstan-ignore-line
+            return $this->nameConverter->normalize($propertyName, $class, $format, $context);
         } catch (UnexpectedPropertyException $e) {
-            return $this->nameConverter->denormalize($propertyName, $class, $format, $context); // @phpstan-ignore-line
+            return $this->nameConverter->denormalize($propertyName, $class, $format, $context);
         }
     }
 
@@ -40,9 +40,9 @@ final class EloquentNameConverter implements NameConverterInterface
     public function denormalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
     {
         try {
-            return $this->nameConverter->denormalize($propertyName, $class, $format, $context); // @phpstan-ignore-line
+            return $this->nameConverter->denormalize($propertyName, $class, $format, $context);
         } catch (UnexpectedPropertyException $e) {
-            return $this->nameConverter->normalize($propertyName, $class, $format, $context); // @phpstan-ignore-line
+            return $this->nameConverter->normalize($propertyName, $class, $format, $context);
         }
     }
 }

@@ -609,27 +609,23 @@ class TypeBuilderTest extends TestCase
         ]), $this->typeBuilder->getEnumType($operation));
     }
 
-    #[DataProvider('legacyTypesProvider')]
     #[IgnoreDeprecations]
-    public function testIsCollectionLegacy(LegacyType $type, bool $expectedIsCollection): void
+    public function testIsCollectionLegacy(): void
     {
-        $this->expectUserDeprecationMessage('Since api-platform/graphql 4.2: The "ApiPlatform\GraphQl\Type\TypeBuilder::isCollection()" method is deprecated and will be removed.');
-        $this->assertSame($expectedIsCollection, $this->typeBuilder->isCollection($type));
-    }
+        if (!class_exists(LegacyType::class)) {
+            $this->markTestSkipped();
+        }
 
-    public static function legacyTypesProvider(): array
-    {
-        return [
-            [new LegacyType(LegacyType::BUILTIN_TYPE_BOOL), false],
-            [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT), false],
-            [new LegacyType(LegacyType::BUILTIN_TYPE_RESOURCE, false, null, false), false],
-            [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, null, true), false],
-            [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true), false],
-            [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, null, new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT)), false],
-            [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'className', true), false],
-            [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, null, true, null, new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'className')), true],
-            [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, null, new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'className')), true],
-        ];
+        $this->expectUserDeprecationMessage('Since api-platform/graphql 4.2: The "ApiPlatform\GraphQl\Type\TypeBuilder::isCollection()" method is deprecated and will be removed.');
+        $this->assertFalse($this->typeBuilder->isCollection(new LegacyType(LegacyType::BUILTIN_TYPE_BOOL)));
+        $this->assertFalse($this->typeBuilder->isCollection(new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT)));
+        $this->assertFalse($this->typeBuilder->isCollection(new LegacyType(LegacyType::BUILTIN_TYPE_RESOURCE, false, null, false)));
+        $this->assertFalse($this->typeBuilder->isCollection(new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, null, true)));
+        $this->assertFalse($this->typeBuilder->isCollection(new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true)));
+        $this->assertFalse($this->typeBuilder->isCollection(new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, null, new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT))));
+        $this->assertFalse($this->typeBuilder->isCollection(new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'className', true)));
+        $this->assertTrue($this->typeBuilder->isCollection(new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, null, true, null, new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'className'))));
+        $this->assertTrue($this->typeBuilder->isCollection(new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, null, new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'className'))));
     }
 
     public static function typesProvider(): array

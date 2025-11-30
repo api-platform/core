@@ -13,7 +13,6 @@ doctrine:
             symfony_uuid: Symfony\Bridge\Doctrine\Types\UuidType
 
     orm:
-        auto_generate_proxy_classes: '%kernel.debug%'
         mappings:
             TestBundle:
                 type: 'attribute'
