@@ -40,7 +40,11 @@ final class ObjectMapperProvider implements ProviderInterface
     {
         $data = $this->decorated->provide($operation, $uriVariables, $context);
 
-        if (!$this->objectMapper || !\is_object($data) || !$operation->canMap()) {
+        if (!$this->objectMapper || !$operation->canMap()) {
+            return $data;
+        }
+
+        if (!\is_object($data) && !\is_array($data)) {
             return $data;
         }
 
@@ -49,6 +53,12 @@ final class ObjectMapperProvider implements ProviderInterface
 
         if ($data instanceof PaginatorInterface) {
             $data = new ArrayPaginator(array_map(fn ($v) => $this->objectMapper->map($v, $operation->getClass()), iterator_to_array($data)), 0, \count($data));
+        } elseif (\is_array($data)) {
+            foreach ($data as &$v) {
+                if (\is_object($v)) {
+                    $v = $this->objectMapper->map($v, $operation->getClass());
+                }
+            }
         } else {
             $data = $this->objectMapper->map($data, $operation->getClass());
         }
