@@ -300,4 +300,41 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertContainerHasService('api_platform.metadata.resource_extractor.php_file');
         $this->assertSame([$emptyPhpFile], $this->container->getDefinition('api_platform.metadata.resource_extractor.php_file')->getArgument(0));
     }
+
+    public function testPaginationMaximumItemsPerPageIsNotSet(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertTrue($this->container->hasParameter('api_platform.collection.pagination.maximum_items_per_page'));
+        $this->assertSame(30, $this->container->getParameter('api_platform.collection.pagination.maximum_items_per_page'));
+    }
+
+    public function testPaginationMaximumItemsPerPageIsSetWithNull(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['defaults']['pagination_maximum_items_per_page'] = null;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertTrue($this->container->hasParameter('api_platform.collection.pagination.maximum_items_per_page'));
+        $this->assertNull($this->container->getParameter('api_platform.collection.pagination.maximum_items_per_page'));
+    }
+
+    public function testPaginationMaximumItemsPerPageIsSetWithExplicitValue(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['defaults']['pagination_maximum_items_per_page'] = 22;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertSame(22, $this->container->getParameter('api_platform.collection.pagination.maximum_items_per_page'));
+    }
+
+    public function testPaginationMaximumItemsPerPageIsSetWithZero(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['defaults']['pagination_maximum_items_per_page'] = 0;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertSame(0, $this->container->getParameter('api_platform.collection.pagination.maximum_items_per_page'));
+    }
 }
