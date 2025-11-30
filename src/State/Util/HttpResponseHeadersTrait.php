@@ -26,6 +26,7 @@ use ApiPlatform\Metadata\Util\CloneTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface as SymfonyHttpExceptionInterface;
+use Uri\Rfc3986\Uri;
 
 /**
  * Shares the logic to create API Platform's headers.
@@ -97,7 +98,11 @@ trait HttpResponseHeadersTrait
             }
         }
 
-        $requestParts = parse_url($request->getRequestUri());
+        $query = PHP_VERSION_ID >= 80500 && \class_exists(Uri::class)
+            ? Uri::parse($context['request_uri'] ?? '')?->getQuery()
+            : $requestParts['query'] ?? null
+        ;
+
         if ($this->iriConverter && !isset($headers['Content-Location'])) {
             try {
                 $iri = null;
@@ -109,8 +114,8 @@ trait HttpResponseHeadersTrait
 
                 if ($iri && 'GET' !== $method) {
                     $location = \sprintf('%s.%s', $iri, $request->getRequestFormat());
-                    if (isset($requestParts['query'])) {
-                        $location .= '?'.$requestParts['query'];
+                    if (isset($query)) {
+                        $location .= '?'.$query;
                     }
 
                     $headers['Content-Location'] = $location;

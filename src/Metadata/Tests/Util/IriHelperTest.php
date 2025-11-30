@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\IriHelper;
 use PHPUnit\Framework\TestCase;
+use Uri\Rfc3986\Uri;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -25,6 +26,10 @@ class IriHelperTest extends TestCase
 {
     public function testHelpers(): void
     {
+        if (PHP_VERSION_ID >= 80500 && class_exists(Uri::class)) {
+            self::markTestSkipped('Parsing url with former "parse_url()" method is not available after PHP8.5 and ext-uri');
+        }
+
         $parsed = [
             'parts' => [
                 'path' => '/hello.json',
@@ -68,6 +73,56 @@ class IriHelperTest extends TestCase
         $parsed['parts']['port'] = 443;
 
         $this->assertSame('//foo:bar@localhost:443/hello.json?foo=bar&bar=3&page=2#foo', IriHelper::createIri($parsed['parts'], $parsed['parameters'], 'page', 2., UrlGeneratorInterface::NET_PATH));
+    }
+
+    public function testHelpersWithRFC3986(): void
+    {
+        if (PHP_VERSION_ID < 80500 || !class_exists(Uri::class)) {
+            self::markTestSkipped('RFC 3986 URI parser needs PHP 8.5 or higher and php-uri extension.');
+        }
+
+        $parsed = [
+            'uri' => new Uri('/hello.json?foo=bar&page=2&bar=3'),
+            'parameters' => [
+                'foo' => 'bar',
+                'bar' => '3',
+            ],
+        ];
+
+
+        $this->assertEquals($parsed, IriHelper::parseIri('/hello.json?foo=bar&page=2&bar=3', 'page'));
+        $this->assertSame('/hello.json?foo=bar&bar=3&page=2', IriHelper::createIri($parsed['uri'], $parsed['parameters'], 'page', 2.));
+    }
+
+    public function testHelpersWithNetworkPathAndRFC3986(): void
+    {
+        if (PHP_VERSION_ID < 80500 || !class_exists(Uri::class)) {
+            self::markTestSkipped('RFC 3986 URI parser needs PHP 8.5 or higher and php-uri extension.');
+        }
+
+        $parsed = [
+            'uri' => $uri = new Uri('/hello.json')
+                ->withQuery('foo=bar&page=2&bar=3')
+                ->withScheme('http')
+                ->withHost('localhost')
+                ->withUserInfo('foo:bar')
+                ->withPort(8080)
+                ->withFragment('foo'),
+            'parameters' => [
+                'foo' => 'bar',
+                'bar' => '3',
+            ],
+        ];
+
+        $this->assertSame('//foo:bar@localhost:8080/hello.json?foo=bar&bar=3&page=2#foo', IriHelper::createIri($parsed['uri'], $parsed['parameters'], 'page', 2., UrlGeneratorInterface::NET_PATH));
+
+        $parsed['uri'] = $uri->withScheme(null);
+
+        $this->assertSame('//foo:bar@localhost:8080/hello.json?foo=bar&bar=3&page=2#foo', IriHelper::createIri($parsed['uri'], $parsed['parameters'], 'page', 2., UrlGeneratorInterface::NET_PATH));
+
+        $parsed['uri'] = $uri->withPort(443);
+
+        $this->assertSame('//foo:bar@localhost:443/hello.json?foo=bar&bar=3&page=2#foo', IriHelper::createIri($parsed['uri'], $parsed['parameters'], 'page', 2., UrlGeneratorInterface::NET_PATH));
     }
 
     public function testParseIriWithInvalidUrl(): void
