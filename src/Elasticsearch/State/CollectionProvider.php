@@ -87,6 +87,10 @@ final class CollectionProvider implements ProviderInterface
             $documents = $documents->asArray();
         }
 
+        if (\is_string($operation->getOutput()) && class_exists($operation->getOutput())) {
+            $resourceClass = $operation->getOutput();
+        }
+
         return new Paginator(
             $this->denormalizer,
             $documents,
