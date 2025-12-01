@@ -31,19 +31,25 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
     public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         $parameter = $context['parameter'];
-        $value = $parameter->getValue();
-        $property = $parameter->getProperty();
         $alias = $queryBuilder->getRootAliases()[0];
-        $parameterName = $queryNameGenerator->generateParameterName($property);
+        $properties = $parameter->getProperties() ?? [$parameter->getProperty()];
+        foreach ($properties as $property) {
+            $parameterName = $queryNameGenerator->generateParameterName($property);
+            $values = $parameter->getValue();
 
-        if (\is_array($value)) {
-            $queryBuilder
-                ->{$context['whereClause'] ?? 'andWhere'}(\sprintf('%s.%s IN (:%s)', $alias, $property, $parameterName));
-        } else {
-            $queryBuilder
-                ->{$context['whereClause'] ?? 'andWhere'}(\sprintf('%s.%s = :%s', $alias, $property, $parameterName));
+            if (is_iterable($values)) {
+                $queryBuilder
+                    ->{$context['whereClause'] ?? 'andWhere'}(
+                        \sprintf('%s.%s IN (:%s)', $alias, $property, $parameterName)
+                    );
+            } else {
+                $queryBuilder
+                    ->{$context['whereClause'] ?? 'andWhere'}(
+                        \sprintf('%s.%s = :%s', $alias, $property, $parameterName)
+                    );
+            }
+
+            $queryBuilder->setParameter($parameterName, $values);
         }
-
-        $queryBuilder->setParameter($parameterName, $value);
     }
 }

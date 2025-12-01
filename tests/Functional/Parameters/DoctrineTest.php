@@ -49,7 +49,7 @@ final class DoctrineTest extends ApiTestCase
         $this->assertEquals('bar', $a['hydra:member'][1]['foo']);
 
         $this->assertArraySubset(['hydra:search' => [
-            'hydra:template' => \sprintf('/%s{?foo,fooAlias,order[order[id]],order[order[foo]],searchPartial[foo],searchExact[foo],searchOnTextAndDate[foo],searchOnTextAndDate[createdAt][before],searchOnTextAndDate[createdAt][strictly_before],searchOnTextAndDate[createdAt][after],searchOnTextAndDate[createdAt][strictly_after],searchParameter[foo],q,id,createdAt}', $route),
+            'hydra:template' => \sprintf('/%s{?foo,fooAlias,order[order[id]],order[order[foo]],searchPartial[foo],searchExact[foo],searchOnTextAndDate[foo],searchOnTextAndDate[createdAt][before],searchOnTextAndDate[createdAt][strictly_before],searchOnTextAndDate[createdAt][after],searchOnTextAndDate[createdAt][strictly_after],searchPartialProperties[foo],searchExactProperties[foo],q,id,createdAt}', $route),
         ]], $a);
 
         $this->assertArraySubset(['@type' => 'IriTemplateMapping', 'variable' => 'fooAlias', 'property' => 'foo'], $a['hydra:search']['hydra:mapping'][1]);
@@ -118,14 +118,26 @@ final class DoctrineTest extends ApiTestCase
         $this->assertEquals($a['hydra:member'][0]['foo'], 'baz');
     }
 
-    public function testPartialSearchFilter(): void
+    public function testPartialSearchFilterWithProperties(): void
     {
         static::bootKernel();
         $resource = $this->isMongoDB() ? SearchFilterParameterDocument::class : SearchFilterParameter::class;
         $this->recreateSchema([$resource]);
         $this->loadFixtures($resource);
         $route = 'search_filter_parameter';
-        $response = self::createClient()->request('GET', $route.'?searchParameter[foo]=baz');
+        $response = self::createClient()->request('GET', $route.'?searchPartialProperties[foo]=baz');
+        $a = $response->toArray();
+        $this->assertEquals($a['hydra:member'][0]['foo'], 'baz');
+    }
+
+    public function testExactFilterWithProperties(): void
+    {
+        static::bootKernel();
+        $resource = $this->isMongoDB() ? SearchFilterParameterDocument::class : SearchFilterParameter::class;
+        $this->recreateSchema([$resource]);
+        $this->loadFixtures($resource);
+        $route = 'search_filter_parameter';
+        $response = self::createClient()->request('GET', $route.'?searchExactProperties[foo]=baz');
         $a = $response->toArray();
         $this->assertEquals($a['hydra:member'][0]['foo'], 'baz');
     }
