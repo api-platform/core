@@ -1,5 +1,13 @@
 # Changelog
 
+## v4.2.8
+
+### Bug fixes
+
+* [2aa0eb195](https://github.com/api-platform/core/commit/2aa0eb195a437a5fe0dcfd42a1166089c9c5f0a1) fix: configuration without a "defaults" key throw an error
+* [999bb7962](https://github.com/api-platform/core/commit/999bb796215eec5bc7df340146e06b6ed8f529fe) fix(json-schema):  schema type in serializer context for schema factory (#7557)
+* [99c45de80](https://github.com/api-platform/core/commit/99c45de804a39a983f8e0708e3f53560289bc5f3) fix(state): object mapper with list<object> (#7564)
+
 ## v4.2.7
 
 **Symfony 8.0 compatible.**
