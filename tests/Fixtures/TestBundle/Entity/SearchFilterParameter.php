@@ -37,7 +37,7 @@ use Doctrine\ORM\Mapping as ORM;
         'searchOnTextAndDate[:property]' => new QueryParameter(filter: 'app_filter_date_and_search'),
         'searchParameter[:property]' => new QueryParameter(
             filter    : new PartialSearchFilter(),
-            properties: ['foo']
+            properties: ['foo'],
         ),
         'q' => new QueryParameter(property: 'hydra:freetextQuery'),
     ]

@@ -124,11 +124,9 @@ final class DoctrineTest extends ApiTestCase
         $resource = $this->isMongoDB() ? SearchFilterParameterDocument::class : SearchFilterParameter::class;
         $this->recreateSchema([$resource]);
         $this->loadFixtures($resource);
-        $route    = 'search_filter_parameter';
-        $response = self::createClient()
-                        ->request('GET', $route . '?searchParameter[foo]=baz')
-        ;
-        $a        = $response->toArray();
+        $route = 'search_filter_parameter';
+        $response = self::createClient()->request('GET', $route.'?searchParameter[foo]=baz');
+        $a = $response->toArray();
         $this->assertEquals($a['hydra:member'][0]['foo'], 'baz');
     }
 
