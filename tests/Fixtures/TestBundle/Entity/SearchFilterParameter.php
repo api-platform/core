@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\PartialSearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
@@ -34,6 +35,10 @@ use Doctrine\ORM\Mapping as ORM;
         'searchPartial[:property]' => new QueryParameter(filter: 'app_search_filter_partial'),
         'searchExact[:property]' => new QueryParameter(filter: 'app_search_filter_with_exact'),
         'searchOnTextAndDate[:property]' => new QueryParameter(filter: 'app_filter_date_and_search'),
+        'searchParameter[:property]' => new QueryParameter(
+            filter    : new PartialSearchFilter(),
+            properties: ['foo']
+        ),
         'q' => new QueryParameter(property: 'hydra:freetextQuery'),
     ]
 )]
