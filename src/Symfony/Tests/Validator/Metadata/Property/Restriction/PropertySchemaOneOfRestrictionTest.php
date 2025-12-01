@@ -83,7 +83,18 @@ final class PropertySchemaOneOfRestrictionTest extends TestCase
     #[IgnoreDeprecations]
     public function testCreate(): void
     {
-        foreach ($this->createProvider() as [$constraint, $propertyMetadata, $expectedResult]) {
+        if (!class_exists(LegacyType::class)) {
+            $this->markTestSkipped('symfony/property-info is not installed.');
+        }
+
+        $cases = [
+            'not supported constraints' => [new AtLeastOneOf([new Positive(), new Length(min: 3)]), new ApiProperty(), []],
+            'one supported constraint' => [new AtLeastOneOf([new Positive(), new Length(min: 3)]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), [
+                'oneOf' => [['minLength' => 3]],
+            ]],
+        ];
+
+        foreach ($cases as [$constraint, $propertyMetadata, $expectedResult]) {
             self::assertSame($expectedResult, $this->propertySchemaOneOfRestriction->create($constraint, $propertyMetadata));
         }
     }
@@ -92,14 +103,6 @@ final class PropertySchemaOneOfRestrictionTest extends TestCase
     public function testCreateWithNativeType(AtLeastOneOf $constraint, ApiProperty $propertyMetadata, array $expectedResult): void
     {
         self::assertSame($expectedResult, $this->propertySchemaOneOfRestriction->create($constraint, $propertyMetadata));
-    }
-
-    public static function createProvider(): \Generator
-    {
-        yield 'not supported constraints' => [new AtLeastOneOf([new Positive(), new Length(min: 3)]), new ApiProperty(), []];
-        yield 'one supported constraint' => [new AtLeastOneOf([new Positive(), new Length(min: 3)]), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), [
-            'oneOf' => [['minLength' => 3]],
-        ]];
     }
 
     public static function createProviderWithNativeType(): \Generator

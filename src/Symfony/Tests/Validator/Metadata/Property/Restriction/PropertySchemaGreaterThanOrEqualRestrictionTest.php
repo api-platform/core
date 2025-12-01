@@ -43,7 +43,20 @@ final class PropertySchemaGreaterThanOrEqualRestrictionTest extends TestCase
     #[IgnoreDeprecations]
     public function testSupports(): void
     {
-        foreach ($this->supportsProvider() as [$constraint, $propertyMetadata, $expectedResult]) {
+        if (!class_exists(LegacyType::class)) {
+            $this->markTestSkipped('symfony/property-info is not installed.');
+        }
+
+        $cases = [
+            'supported int/float with union types' => [new GreaterThanOrEqual(value: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), true],
+            'supported int' => [new GreaterThanOrEqual(value: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), true],
+            'supported float' => [new GreaterThanOrEqual(value: 10.99), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), true],
+            'supported positive or zero' => [new PositiveOrZero(), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), true],
+            'not supported positive' => [new Positive(), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), false],
+            'not supported property path' => [new GreaterThanOrEqual(propertyPath: 'greaterThanMe'), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), false],
+        ];
+
+        foreach ($cases as [$constraint, $propertyMetadata, $expectedResult]) {
             self::assertSame($expectedResult, $this->propertySchemaGreaterThanOrEqualRestriction->supports($constraint, $propertyMetadata));
         }
     }
@@ -52,16 +65,6 @@ final class PropertySchemaGreaterThanOrEqualRestrictionTest extends TestCase
     public function testSupportsWithNativeType(Constraint $constraint, ApiProperty $propertyMetadata, bool $expectedResult): void
     {
         self::assertSame($expectedResult, $this->propertySchemaGreaterThanOrEqualRestriction->supports($constraint, $propertyMetadata));
-    }
-
-    public static function supportsProvider(): \Generator
-    {
-        yield 'supported int/float with union types' => [new GreaterThanOrEqual(value: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), true];
-        yield 'supported int' => [new GreaterThanOrEqual(value: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), true];
-        yield 'supported float' => [new GreaterThanOrEqual(value: 10.99), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), true];
-        yield 'supported positive or zero' => [new PositiveOrZero(), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), true];
-        yield 'not supported positive' => [new Positive(), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), false];
-        yield 'not supported property path' => [new GreaterThanOrEqual(propertyPath: 'greaterThanMe'), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), false];
     }
 
     public static function supportsProviderWithNativeType(): \Generator
@@ -77,6 +80,10 @@ final class PropertySchemaGreaterThanOrEqualRestrictionTest extends TestCase
     #[IgnoreDeprecations]
     public function testCreate(): void
     {
+        if (!class_exists(LegacyType::class)) {
+            $this->markTestSkipped('symfony/property-info is not installed.');
+        }
+
         self::assertEquals(['minimum' => 10], $this->propertySchemaGreaterThanOrEqualRestriction->create(new GreaterThanOrEqual(value: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)])));
     }
 

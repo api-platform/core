@@ -42,7 +42,20 @@ final class PropertySchemaRangeRestrictionTest extends TestCase
     #[IgnoreDeprecations]
     public function testSupports(): void
     {
-        foreach ($this->supportsProvider() as [$constraint, $propertyMetadata, $expectedResult]) {
+        if (!class_exists(LegacyType::class)) {
+            $this->markTestSkipped('symfony/property-info is not installed.');
+        }
+
+        $cases = [
+            'supported int/float with union types' => [new Range(min: 1, max: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), true],
+            'supported int' => [new Range(min: 1, max: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), true],
+            'supported float' => [new Range(min: 1, max: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), true],
+
+            'not supported constraint' => [new Length(min: 1), new ApiProperty(), false],
+            'not supported type' => [new Range(min: 1), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), false],
+        ];
+
+        foreach ($cases as [$constraint, $propertyMetadata, $expectedResult]) {
             self::assertSame($expectedResult, $this->propertySchemaRangeRestriction->supports($constraint, $propertyMetadata));
         }
     }
@@ -51,16 +64,6 @@ final class PropertySchemaRangeRestrictionTest extends TestCase
     public function testSupportsWithNativeType(Constraint $constraint, ApiProperty $propertyMetadata, bool $expectedResult): void
     {
         self::assertSame($expectedResult, $this->propertySchemaRangeRestriction->supports($constraint, $propertyMetadata));
-    }
-
-    public static function supportsProvider(): \Generator
-    {
-        yield 'supported int/float with union types' => [new Range(min: 1, max: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), true];
-        yield 'supported int' => [new Range(min: 1, max: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), true];
-        yield 'supported float' => [new Range(min: 1, max: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), true];
-
-        yield 'not supported constraint' => [new Length(min: 1), new ApiProperty(), false];
-        yield 'not supported type' => [new Range(min: 1), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), false];
     }
 
     public static function supportsProviderWithNativeType(): \Generator
@@ -76,7 +79,21 @@ final class PropertySchemaRangeRestrictionTest extends TestCase
     #[IgnoreDeprecations]
     public function testCreate(): void
     {
-        foreach ($this->createProvider() as [$constraint, $propertyMetadata, $expectedResult]) {
+        if (!class_exists(LegacyType::class)) {
+            $this->markTestSkipped('symfony/property-info is not installed.');
+        }
+
+        $cases = [
+            'int min' => [new Range(min: 1), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['minimum' => 1]],
+            'int max' => [new Range(max: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['maximum' => 10]],
+            'int min max' => [new Range(min: 1, max: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['minimum' => 1, 'maximum' => 10]],
+
+            'float min' => [new Range(min: 1.5), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['minimum' => 1.5]],
+            'float max' => [new Range(max: 10.5), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['maximum' => 10.5]],
+            'float min max' => [new Range(min: 1.5, max: 10.5), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['minimum' => 1.5, 'maximum' => 10.5]],
+        ];
+
+        foreach ($cases as [$constraint, $propertyMetadata, $expectedResult]) {
             self::assertSame($expectedResult, $this->propertySchemaRangeRestriction->create($constraint, $propertyMetadata));
         }
     }
@@ -85,17 +102,6 @@ final class PropertySchemaRangeRestrictionTest extends TestCase
     public function testCreateWithNativeType(Range $constraint, ApiProperty $propertyMetadata, array $expectedResult): void
     {
         self::assertSame($expectedResult, $this->propertySchemaRangeRestriction->create($constraint, $propertyMetadata));
-    }
-
-    public static function createProvider(): \Generator
-    {
-        yield 'int min' => [new Range(min: 1), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['minimum' => 1]];
-        yield 'int max' => [new Range(max: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['maximum' => 10]];
-        yield 'int min max' => [new Range(min: 1, max: 10), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]), ['minimum' => 1, 'maximum' => 10]];
-
-        yield 'float min' => [new Range(min: 1.5), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['minimum' => 1.5]];
-        yield 'float max' => [new Range(max: 10.5), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['maximum' => 10.5]];
-        yield 'float min max' => [new Range(min: 1.5, max: 10.5), (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]), ['minimum' => 1.5, 'maximum' => 10.5]];
     }
 
     public static function createProviderWithNativeType(): \Generator

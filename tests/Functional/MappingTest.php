@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\FirstResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7563\BookDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResourceNoMap;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResourceOdm;
@@ -24,6 +25,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResourceWithRelation
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResourceWithRelationRelated;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\SecondResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MappedDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Book;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MappedEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MappedEntityNoMap;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MappedEntitySourceOnly;
@@ -55,6 +57,7 @@ final class MappingTest extends ApiTestCase
             MappedResourceWithInput::class,
             MappedResourceSourceOnly::class,
             MappedResourceNoMap::class,
+            BookDto::class,
         ];
     }
 
@@ -276,5 +279,76 @@ final class MappingTest extends ApiTestCase
         }
 
         $manager->flush();
+    }
+
+    private function loadBookFixtures(): void
+    {
+        $manager = $this->getManager();
+
+        for ($i = 1; $i <= 5; ++$i) {
+            $book = new Book();
+            $book->name = 'Book '.$i;
+            $book->isbn = 'ISBN-'.$i;
+            $manager->persist($book);
+        }
+
+        $manager->flush();
+    }
+
+    public function testGetSingleBookDto(): void
+    {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('MongoDB not tested.');
+        }
+
+        $this->recreateSchema([Book::class]);
+        $this->loadBookFixtures();
+
+        self::createClient()->request('GET', '/book_dtos/1');
+        self::assertResponseIsSuccessful();
+        self::assertJsonContains([
+            '@type' => 'BookDto',
+            'id' => 1,
+            'name' => 'Book 1',
+            'customIsbn' => 'customISBN-1',
+        ]);
+    }
+
+    public function testGetCollectionBookDtoPaginated(): void
+    {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('MongoDB not tested.');
+        }
+
+        $this->recreateSchema([Book::class]);
+        $this->loadBookFixtures();
+
+        $response = self::createClient()->request('GET', '/book_dtos');
+        self::assertResponseIsSuccessful();
+
+        $json = $response->toArray();
+        self::assertCount(3, $json['hydra:member']);
+        foreach ($response->toArray()['hydra:member'] as $member) {
+            self::assertStringStartsWith('customISBN-', $member['customIsbn']);
+        }
+    }
+
+    public function testGetCollectionBookDtoUnpaginated(): void
+    {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('MongoDB not tested.');
+        }
+
+        $this->recreateSchema([Book::class]);
+        $this->loadBookFixtures();
+
+        $response = self::createClient()->request('GET', '/book_dtos?pagination=false');
+        self::assertResponseIsSuccessful();
+
+        $json = $response->toArray();
+        self::assertCount(5, $json['hydra:member']);
+        foreach ($json['hydra:member'] as $member) {
+            self::assertStringStartsWith('customISBN-', $member['customIsbn']);
+        }
     }
 }
