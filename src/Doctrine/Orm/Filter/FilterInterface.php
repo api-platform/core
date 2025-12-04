@@ -31,7 +31,7 @@ interface FilterInterface extends BaseFilterInterface
      *
      * @phpstan-param array<string, mixed> $context
      *
-     * @param array{filters?: array<string, mixed>, parameter?: Parameter, ...} $context
+     * @psalm-param array{filters?: array<string, mixed>, parameter?: Parameter, ...} $context
      */
     public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void;
 }
