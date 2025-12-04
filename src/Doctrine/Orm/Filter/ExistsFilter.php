@@ -136,7 +136,7 @@ final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
     {
         $parameter = $context['parameter'] ?? null;
 
-        if (null !== ($value = $context['filters'][$parameter?->getProperty()] ?? null)) {
+        if (null !== ($value = $context['filters'][$parameter?->getProperty() ?? ''] ?? null)) {
             $this->filterProperty($this->denormalizePropertyName($parameter->getProperty()), $value, $queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
 
             return;
