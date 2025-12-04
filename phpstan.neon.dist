@@ -103,13 +103,6 @@ parameters:
 		# Allow extra assertions in tests: https://github.com/phpstan/phpstan-strict-rules/issues/130
 		- '#^Call to (static )?method PHPUnit\\Framework\\Assert::.* will always evaluate to true\.$#'
 
-		# Unsealed array shapes not supported
-		-
-			message: '#^Parameter &\$context by\-ref type of method ApiPlatform\\Doctrine\\Odm\\Extension\\ParameterExtension\:\:applyFilter\(\) expects array\<string, mixed\>, array(.*) given\.$#'
-			identifier: parameterByRef.type
-			count: 5
-			path: src/Doctrine/Odm/Extension/ParameterExtension.php
-
 		# Level 6
 		-
 			identifier: missingType.iterableValue

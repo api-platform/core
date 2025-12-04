@@ -28,7 +28,11 @@ interface FilterInterface extends BaseFilterInterface
     /**
      * Applies the filter.
      *
-     * @param array|array{filters?: array<string, mixed>|array, parameter?: Parameter, mongodb_odm_sort_fields?: array, ...} $context
+     * @phpstan-param array<string, mixed> $context
+     *
+     * @psalm-param array{filters?: array<string, mixed>, parameter?: Parameter, mongodb_odm_sort_fields?: array<mixed>, ...} $context
+     *
+     * @param-out array<string, mixed> $context
      */
     public function apply(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void;
 }
