@@ -25,7 +25,8 @@ interface DefinitionNameFactoryInterface
     /**
      * Creates a resource definition name.
      *
-     * @param class-string $className
+     * @param class-string         $className
+     * @param array<string, mixed> $serializerContext
      *
      * @return string the definition name
      */
