@@ -39,6 +39,6 @@ final class DeprecationHeaderTest extends ApiTestCase
 
         $this->assertContains('@1688169599', $headers['deprecation']);
         $this->assertContains('Sun, 30 Jun 2024 23:59:59 UTC', $headers['sunset']);
-        $this->assertStringContainsString('<https://developer.example.com/deprecation>; rel="deprecation"; type="text/html"', $headers['link'][0]);
+        $this->assertStringContainsString('<https://developer.example.com/deprecation>; rel="deprecation"', $headers['link'][0]);
     }
 }

@@ -16,15 +16,20 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use Symfony\Component\WebLink\Link;
 
 #[ApiResource(
-    operations: [new GetCollection(provider: [self::class, 'provide'])],
-    deprecationReason: 'This API is deprecated ',
-    headers: [
-        'deprecation' => '@1688169599',
-        'sunset' => 'Sun, 30 Jun 2024 23:59:59 UTC',
-        'link' => '<https://developer.example.com/deprecation>; rel="deprecation"; type="text/html"',
-    ],
+    operations: [new GetCollection(
+        headers: [
+            'deprecation' => '@1688169599',
+            'sunset' => 'Sun, 30 Jun 2024 23:59:59 UTC',
+        ],
+        links: [
+            new Link('deprecation', 'https://developer.example.com/deprecation'),
+        ],
+        deprecationReason: 'This API is deprecated',
+        provider: [self::class, 'provide'],
+    )],
 )]
 class DeprecationHeader
 {
