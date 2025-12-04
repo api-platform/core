@@ -39,8 +39,7 @@ final class ODMSearchTextAndDateFilter implements FilterInterface
 
     public function apply(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
-        $filterContext = ['filters' => $context['filters']['searchOnTextAndDate']] + $context;
-        $this->searchFilter->apply($aggregationBuilder, $resourceClass, $operation, $filterContext);
-        $this->dateFilter->apply($aggregationBuilder, $resourceClass, $operation, $filterContext);
+        $this->searchFilter->apply($aggregationBuilder, $resourceClass, $operation, $context);
+        $this->dateFilter->apply($aggregationBuilder, $resourceClass, $operation, $context);
     }
 }

@@ -20,6 +20,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilterWithStateOptionsEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SearchFilterParameter;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class DoctrineTest extends ApiTestCase
 {
@@ -49,7 +50,7 @@ final class DoctrineTest extends ApiTestCase
         $this->assertEquals('bar', $a['hydra:member'][1]['foo']);
 
         $this->assertArraySubset(['hydra:search' => [
-            'hydra:template' => \sprintf('/%s{?foo,fooAlias,order[order[id]],order[order[foo]],searchPartial[foo],searchExact[foo],searchOnTextAndDate[foo],searchOnTextAndDate[createdAt][before],searchOnTextAndDate[createdAt][strictly_before],searchOnTextAndDate[createdAt][after],searchOnTextAndDate[createdAt][strictly_after],q,id,createdAt}', $route),
+            'hydra:template' => \sprintf('/%s{?foo,fooAlias,q,order[id],order[foo],searchPartial[foo],searchExact[foo],searchOnTextAndDate[foo],searchOnTextAndDate[createdAt][before],searchOnTextAndDate[createdAt][strictly_before],searchOnTextAndDate[createdAt][after],searchOnTextAndDate[createdAt][strictly_after],search[foo],search[createdAt],id,createdAt}', $route),
         ]], $a);
 
         $this->assertArraySubset(['@type' => 'IriTemplateMapping', 'variable' => 'fooAlias', 'property' => 'foo'], $a['hydra:search']['hydra:mapping'][1]);
@@ -143,6 +144,55 @@ final class DoctrineTest extends ApiTestCase
         $a = $response->toArray();
         $this->assertCount(1, $a['hydra:member']);
         $this->assertEquals('after', $a['hydra:member'][0]['name']);
+    }
+
+    #[DataProvider('partialFilterParameterProviderForSearchFilterParameter')]
+    public function testPartialSearchFilterWithSearchFilterParameter(string $url, int $expectedCount, array $expectedFoos): void
+    {
+        $resource = $this->isMongoDB() ? SearchFilterParameterDocument::class : SearchFilterParameter::class;
+        $this->recreateSchema([$resource]);
+        $this->loadFixtures($resource);
+
+        $response = self::createClient()->request('GET', $url);
+
+        $this->assertResponseIsSuccessful();
+
+        $responseData = $response->toArray();
+        $filteredItems = $responseData['hydra:member'];
+
+        $this->assertCount($expectedCount, $filteredItems, \sprintf('Expected %d items for URL %s', $expectedCount, $url));
+
+        $foos = array_map(fn ($item) => $item['foo'], $filteredItems);
+        sort($foos);
+        sort($expectedFoos);
+
+        $this->assertSame($expectedFoos, $foos, 'The "foo" values do not match the expected values.');
+    }
+
+    public static function partialFilterParameterProviderForSearchFilterParameter(): \Generator
+    {
+        // Fixtures Recap (from DoctrineTest::loadFixtures with SearchFilterParameter):
+        // 3x foo = 'foo'
+        // 2x foo = 'bar'
+        // 1x foo = 'baz'
+
+        yield 'partial match on foo (fo -> 3x foo)' => [
+            '/search_filter_parameter?searchPartial[foo]=fo',
+            3,
+            ['foo', 'foo', 'foo'],
+        ];
+
+        yield 'partial match on foo (ba -> 2x bar, 1x baz)' => [
+            '/search_filter_parameter?searchPartial[foo]=ba',
+            3,
+            ['bar', 'bar', 'baz'],
+        ];
+
+        yield 'partial match on foo (az -> 1x baz)' => [
+            '/search_filter_parameter?searchPartial[foo]=az',
+            1,
+            ['baz'],
+        ];
     }
 
     public function loadFixtures(string $resourceClass): void

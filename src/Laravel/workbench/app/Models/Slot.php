@@ -36,6 +36,7 @@ use Workbench\App\Http\Requests\StoreSlotRequest;
         new Patch(),
         new Delete(),
     ],
+    graphQlOperations: []
 )]
 class Slot extends Model
 {

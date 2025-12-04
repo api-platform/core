@@ -35,7 +35,10 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
         $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'hydra', 'everywhere']));
         $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
-        $propertyMetadata->method('create')->willReturnOnConsecutiveCalls(new ApiProperty(identifier: true), new ApiProperty(readable: true), new ApiProperty(readable: true));
+        $propertyMetadata->method('create')->willReturnOnConsecutiveCalls(
+            new ApiProperty(identifier: true), new ApiProperty(readable: true), new ApiProperty(readable: true),
+            new ApiProperty(identifier: true), new ApiProperty(readable: true), new ApiProperty(readable: true)
+        );
         $filterLocator = $this->createStub(ContainerInterface::class);
         $filterLocator->method('has')->willReturn(true);
         $filterLocator->method('get')->willReturn(new class implements FilterInterface {
@@ -79,7 +82,10 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
         $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'hydra', 'everywhere']));
         $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
-        $propertyMetadata->method('create')->willReturnOnConsecutiveCalls(new ApiProperty(identifier: true), new ApiProperty(readable: true), new ApiProperty(readable: true));
+        $propertyMetadata->method('create')->willReturnOnConsecutiveCalls(
+            new ApiProperty(identifier: true), new ApiProperty(readable: true), new ApiProperty(readable: true),
+            new ApiProperty(identifier: true), new ApiProperty(readable: true), new ApiProperty(readable: true)
+        );
         $filterLocator = $this->createStub(ContainerInterface::class);
         $filterLocator->method('has')->willReturn(false);
         $parameter = new ParameterResourceMetadataCollectionFactory(

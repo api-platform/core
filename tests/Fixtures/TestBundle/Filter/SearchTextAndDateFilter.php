@@ -48,7 +48,7 @@ final class SearchTextAndDateFilter implements FilterInterface
             $this->dateFilter->setProperties($this->dateFilterProperties);
         }
 
-        $this->searchFilter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, ['filters' => $context['filters']['searchOnTextAndDate']] + $context);
-        $this->dateFilter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, ['filters' => $context['filters']['searchOnTextAndDate']] + $context);
+        $this->searchFilter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
+        $this->dateFilter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
     }
 }

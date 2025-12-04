@@ -23,10 +23,7 @@ trait ParameterValueExtractorTrait
     private function extractParameterValue(Parameter $parameter, mixed $value): array
     {
         $key = $parameter->getProperty() ?? $parameter->getKey();
-        if (!str_contains($key, ':property')) {
-            return [$key => $value];
-        }
 
-        return [str_replace('[:property]', '', $key) => $value];
+        return [$key => $value];
     }
 }

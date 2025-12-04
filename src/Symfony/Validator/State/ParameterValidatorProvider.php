@@ -104,21 +104,13 @@ final class ParameterValidatorProvider implements ProviderInterface
     // There's a `property` inside Parameter but it's used for hydra:search only as here we want the parameter name instead
     private function getProperty(Parameter $parameter, ConstraintViolationInterface $violation): string
     {
-        $key = $parameter->getKey();
-
-        if (str_contains($key, '[:property]')) {
-            return str_replace('[:property]', $violation->getPropertyPath(), $key);
-        }
-
-        if (str_contains($key, ':property')) {
-            return str_replace(':property', $violation->getPropertyPath(), $key);
-        }
-
         $openApi = $parameter->getOpenApi();
+
         if (false === $openApi) {
             $openApi = null;
         }
 
+        $key = $parameter->getKey();
         if (\is_array($openApi)) {
             foreach ($openApi as $oa) {
                 if ('deepObject' === $oa->getStyle() && ($oa->getName() === $key || str_starts_with($oa->getName(), $key.'['))) {

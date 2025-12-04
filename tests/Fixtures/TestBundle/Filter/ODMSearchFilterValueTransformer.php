@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final class ODMSearchFilterValueTransformer implements FilterInterface
 {
-    public function __construct(#[Autowire('@api_platform.doctrine_mongodb.odm.search_filter.instance')] private readonly FilterInterface $searchFilter, private ?array $properties = null, private readonly ?string $key = null)
+    public function __construct(#[Autowire('@api_platform.doctrine_mongodb.odm.search_filter.instance')] private readonly FilterInterface $searchFilter, private ?array $properties = null)
     {
     }
 
@@ -41,7 +41,6 @@ final class ODMSearchFilterValueTransformer implements FilterInterface
             $this->searchFilter->setProperties($this->properties);
         }
 
-        $filterContext = ['filters' => $context['filters'][$this->key]] + $context;
-        $this->searchFilter->apply($aggregationBuilder, $resourceClass, $operation, $filterContext);
+        $this->searchFilter->apply($aggregationBuilder, $resourceClass, $operation, $context);
     }
 }

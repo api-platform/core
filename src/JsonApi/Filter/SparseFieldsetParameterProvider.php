@@ -26,7 +26,7 @@ final readonly class SparseFieldsetParameterProvider implements ParameterProvide
             return null;
         }
 
-        $allowedProperties = $parameter->getExtraProperties()['_properties'] ?? [];
+        $allowedProperties = $parameter->getProperties() ?? [];
         $value = $parameter->getValue();
         $normalizationContext = $operation->getNormalizationContext();
 
@@ -45,7 +45,7 @@ final readonly class SparseFieldsetParameterProvider implements ParameterProvide
             }
 
             foreach (explode(',', $fields) as $f) {
-                if (\array_key_exists($f, $allowedProperties)) {
+                if (\in_array($f, $allowedProperties, true)) {
                     $p[] = $f;
                 }
             }
