@@ -26,6 +26,8 @@ interface PropertyExtractorInterface
      * Parses all metadata files and convert them in an array.
      *
      * @throws InvalidArgumentException
+     *
+     * @return array<string, array<string, array<string, mixed>>>
      */
     public function getProperties(): array;
 }
