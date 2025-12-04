@@ -129,16 +129,16 @@ final class PublishMercureUpdatesListener
         try {
             $creatingObjects = clone $this->createdObjects;
             foreach ($creatingObjects as $object) {
-                if ($this->createdObjects->contains($object)) {
-                    $this->createdObjects->detach($object);
+                if ($this->createdObjects->offsetExists($object)) {
+                    $this->createdObjects->offsetUnset($object);
                 }
                 $this->publishUpdate($object, $creatingObjects[$object], 'create');
             }
 
             $updatingObjects = clone $this->updatedObjects;
             foreach ($updatingObjects as $object) {
-                if ($this->updatedObjects->contains($object)) {
-                    $this->updatedObjects->detach($object);
+                if ($this->updatedObjects->offsetExists($object)) {
+                    $this->updatedObjects->offsetUnset($object);
                 }
                 $this->publishUpdate($object, $updatingObjects[$object], 'update');
             }
@@ -146,8 +146,8 @@ final class PublishMercureUpdatesListener
             $deletingObjects = clone $this->deletedObjects;
             foreach ($deletingObjects as $object) {
                 $options = $this->deletedObjects[$object];
-                if ($this->deletedObjects->contains($object)) {
-                    $this->deletedObjects->detach($object);
+                if ($this->deletedObjects->offsetExists($object)) {
+                    $this->deletedObjects->offsetUnset($object);
                 }
                 $this->publishUpdate($object, $deletingObjects[$object], 'delete');
             }
