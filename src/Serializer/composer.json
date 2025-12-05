@@ -39,6 +39,7 @@
         "doctrine/collections": "^2.1",
         "phpspec/prophecy-phpunit": "^2.2",
         "phpunit/phpunit": "11.5.x-dev",
+        "sebastian/exporter": "^6.3.1",
         "symfony/mercure-bundle": "*",
         "symfony/var-dumper": "^6.4 || ^7.0 || ^8.0",
         "symfony/yaml": "^6.4 || ^7.0 || ^8.0",
