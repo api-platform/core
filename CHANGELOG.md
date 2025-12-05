@@ -1,5 +1,15 @@
 # Changelog
 
+## v4.2.9
+
+### Bug fixes
+
+* [502c0e2de](https://github.com/api-platform/core/commit/502c0e2def2c9021851bce799432429217839c7c) fix(symfony): skip argument resolver when context is not api platform (#7579)
+* [834064fc6](https://github.com/api-platform/core/commit/834064fc6c9dbe5492f5d2667b6cfba4de8e5e1a) fix(metadata): filter interface context php doc (#7560)
+* [85458e0d9](https://github.com/api-platform/core/commit/85458e0d935936b319df6572903dc40a763b6dc0) fix(symfony): use app.request.query.get() directly instead of app.request.get() in swagger (#7578)
+* [ef3127000](https://github.com/api-platform/core/commit/ef3127000ee1a6a3ca7282868dfc132a576827a3) fix(symfony): use current route for footer links (#7580)
+* [49d80c840](https://github.com/api-platform/core/commit/49d80c840524241f0403390cdc47a135cd6a0ec9) fix(serializer): render BCMath\Number (PHP 8.4+) as string instead of object (#7555)
+
 ## v4.2.7
 
 **Symfony 8.0 compatible.**
