@@ -45,7 +45,7 @@ final class ComputedFieldTest extends ApiTestCase
         $this->recreateSchema($this->getResources());
         $this->loadFixtures();
 
-        $res = $this->createClient()->request('GET', '/carts?sort[totalQuantity]=wrong');
+        $this->createClient()->request('GET', '/carts?sort[totalQuantity]=wrong');
         $this->assertResponseStatusCodeSame(422);
     }
 
@@ -60,7 +60,7 @@ final class ComputedFieldTest extends ApiTestCase
 
         $ascReq = $this->createClient()->request('GET', '/carts?sort[totalQuantity]=asc');
 
-        $asc = $ascReq->toArray();
+        $asc = $ascReq->toArray(false);
 
         $this->assertArrayHasKey('view', $asc);
         $this->assertArrayHasKey('first', $asc['view']);

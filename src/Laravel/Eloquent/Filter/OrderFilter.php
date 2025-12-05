@@ -31,7 +31,7 @@ final class OrderFilter implements FilterInterface, JsonSchemaFilterInterface, O
     public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder
     {
         if (!\is_string($values)) {
-            $properties = $parameter->getExtraProperties()['_properties'] ?? [];
+            $properties = $parameter->getProperties() ?? [];
 
             foreach ($values as $key => $value) {
                 if (!isset($properties[$key])) {
@@ -55,20 +55,10 @@ final class OrderFilter implements FilterInterface, JsonSchemaFilterInterface, O
     }
 
     /**
-     * @return OpenApiParameter[]|null
+     * @return OpenApiParameter[]
      */
-    public function getOpenApiParameters(Parameter $parameter): ?array
+    public function getOpenApiParameters(Parameter $parameter): array
     {
-        if (str_contains($parameter->getKey(), ':property')) {
-            $parameters = [];
-            $key = str_replace('[:property]', '', $parameter->getKey());
-            foreach (array_keys($parameter->getExtraProperties()['_properties'] ?? []) as $property) {
-                $parameters[] = new OpenApiParameter(name: \sprintf('%s[%s]', $key, $property), in: 'query');
-            }
-
-            return $parameters;
-        }
-
-        return null;
+        return [new OpenApiParameter(name: $parameter->getKey(), in: 'query')];
     }
 }

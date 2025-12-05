@@ -17,13 +17,12 @@ use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ProviderInterface;
-use ApiPlatform\State\Util\ParameterParserTrait;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Validates parameters using the Symfony validator.
+ * Validates parameters using the Laravel validator.
  *
  * @implements ProviderInterface<object>
  *
@@ -31,7 +30,6 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class ParameterValidatorProvider implements ProviderInterface
 {
-    use ParameterParserTrait;
     use ValidationErrorTrait;
 
     /**
@@ -54,6 +52,7 @@ final class ParameterValidatorProvider implements ProviderInterface
         }
 
         $allConstraints = [];
+
         foreach ($operation->getParameters() ?? [] as $parameter) {
             if (!$constraints = $parameter->getConstraints()) {
                 continue;
@@ -69,17 +68,15 @@ final class ParameterValidatorProvider implements ProviderInterface
                 $value = null;
             }
 
-            // Basically renames our key from order[:property] to order.* to assign the rule properly (see https://laravel.com/docs/11.x/validation#rule-in)
-            if (str_contains($key, '[:property]')) {
-                $k = str_replace('[:property]', '', $key);
-                $allConstraints[$k.'.*'] = $constraints;
-                continue;
-            }
+            // Laravel Validator requires dot notation for nested rules (e.g., "sort.isActive"),
+            // not nested arrays. We convert HTTP bracket syntax "sort[isActive]" to "sort.isActive".
+            $ruleKey = str_replace(['[', ']'], ['.', ''], $key);
 
-            $allConstraints[$key] = $constraints;
+            $allConstraints[$ruleKey] = $constraints;
         }
 
         $validator = Validator::make($request->query->all(), $allConstraints);
+
         if ($validator->fails()) {
             throw $this->getValidationError($validator, new ValidationException($validator));
         }

@@ -13,11 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Extension;
 
-use ApiPlatform\Doctrine\Common\Filter\LoggerAwareInterface;
-use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
-use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterInterface;
-use ApiPlatform\Doctrine\Common\ParameterValueExtractorTrait;
-use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
+use ApiPlatform\Doctrine\Common\ParameterExtensionTrait;
 use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
@@ -34,13 +30,16 @@ use Psr\Log\LoggerInterface;
  */
 final class ParameterExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
-    use ParameterValueExtractorTrait;
+    use ParameterExtensionTrait;
 
     public function __construct(
-        private readonly ContainerInterface $filterLocator,
-        private readonly ?ManagerRegistry $managerRegistry = null,
-        private readonly ?LoggerInterface $logger = null,
+        ContainerInterface $filterLocator,
+        ?ManagerRegistry $managerRegistry = null,
+        ?LoggerInterface $logger = null,
     ) {
+        $this->filterLocator = $filterLocator;
+        $this->managerRegistry = $managerRegistry;
+        $this->logger = $logger;
     }
 
     /**
@@ -68,30 +67,7 @@ final class ParameterExtension implements QueryCollectionExtensionInterface, Que
                 continue;
             }
 
-            if ($this->managerRegistry && $filter instanceof ManagerRegistryAwareInterface && !$filter->hasManagerRegistry()) {
-                $filter->setManagerRegistry($this->managerRegistry);
-            }
-
-            if ($this->logger && $filter instanceof LoggerAwareInterface && !$filter->hasLogger()) {
-                $filter->setLogger($this->logger);
-            }
-
-            if ($filter instanceof PropertyAwareFilterInterface) {
-                $properties = [];
-                $propertyKey = $parameter->getProperty() ?? $parameter->getKey();
-                if ($filter instanceof AbstractFilter) {
-                    $properties = $filter->getProperties() ?? [];
-
-                    if (str_contains($propertyKey, ':property')) {
-                        $extraProperties = $parameter->getExtraProperties()['_properties'] ?? [];
-                        foreach (array_keys($extraProperties) as $property) {
-                            $properties[$property] = $parameter->getFilterContext();
-                        }
-                    }
-                }
-
-                $filter->setProperties($properties + [$propertyKey => $parameter->getFilterContext()]);
-            }
+            $this->configureFilter($filter, $parameter);
 
             $filter->apply($queryBuilder, $queryNameGenerator, $resourceClass, $operation,
                 ['filters' => $values, 'parameter' => $parameter] + $context

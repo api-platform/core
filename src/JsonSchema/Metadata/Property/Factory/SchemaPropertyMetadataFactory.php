@@ -319,6 +319,10 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             return ['type' => 'string', 'format' => 'binary'];
         }
 
+        if (is_a($className, \BcMath\Number::class, true)) {
+            return ['type' => 'string', 'format' => 'string'];
+        }
+
         $isResourceClass = $this->isResourceClass($className);
         if (!$isResourceClass && is_a($className, \BackedEnum::class, true)) {
             $enumCases = array_map(static fn (\BackedEnum $enum): string|int => $enum->value, $className::cases());
@@ -506,6 +510,13 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             return [
                 'type' => 'string',
                 'format' => 'binary',
+            ];
+        }
+
+        if (is_a($className, \BcMath\Number::class, true)) {
+            return [
+                'type' => 'string',
+                'format' => 'string',
             ];
         }
 

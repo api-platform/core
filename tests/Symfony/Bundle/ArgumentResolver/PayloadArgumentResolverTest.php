@@ -166,6 +166,10 @@ class PayloadArgumentResolverTest extends KernelTestCase
 
         yield 'request without attributes' => [self::createRequest('PUT', [])];
 
+        yield 'request without API Platform operation attributes' => [self::createRequest('POST', [
+            'data' => new ResourceImplementation(),
+        ])];
+
         yield 'request on operation with deserialization disabled' => [self::createRequest('PUT', [
             '_api_resource_class' => ResourceImplementation::class,
             '_api_operation_name' => 'update_no_deserialize',

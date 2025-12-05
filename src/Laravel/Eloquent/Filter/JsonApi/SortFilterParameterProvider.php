@@ -26,7 +26,7 @@ final readonly class SortFilterParameterProvider implements ParameterProviderInt
         }
 
         $parameters = $operation->getParameters();
-        $properties = $parameter->getExtraProperties()['_properties'] ?? [];
+        $properties = $parameter->getProperties() ?? [];
         $value = $parameter->getValue();
 
         // most eloquent filters work with only a single value
@@ -47,14 +47,12 @@ final readonly class SortFilterParameterProvider implements ParameterProviderInt
                 $v = substr($v, 1);
             }
 
-            if (\array_key_exists($v, $properties)) {
-                $orderBy[$properties[$v]] = $dir;
+            if (\in_array($v, $properties, true)) {
+                $orderBy[$v] = $dir;
             }
         }
 
-        $parameters->add($parameter->getKey(), $parameter->withExtraProperties(
-            ['_api_values' => $orderBy] + $parameter->getExtraProperties()
-        ));
+        $parameters->add($parameter->getKey(), $parameter->setValue($orderBy));
 
         return $operation->withParameters($parameters);
     }

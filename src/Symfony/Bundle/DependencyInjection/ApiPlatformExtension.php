@@ -66,6 +66,7 @@ use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\JsonStreamer\JsonStreamWriter;
 use Symfony\Component\ObjectMapper\ObjectMapper;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+use Symfony\Component\Serializer\Normalizer\NumberNormalizer;
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Yaml\Yaml;
@@ -265,6 +266,15 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         if (class_exists(AbstractUid::class)) {
             $loader->load('symfony/uid.php');
+        }
+
+        // symfony/serializer:7.3 added the NumberNormalizer
+        // symfony/framework-bundle:7.3 added the serializer.normalizer.number` service
+        // if symfony/serializer >= 7.3 and symfony/framework-bundle < 7.3, the service is registred
+        if (class_exists(NumberNormalizer::class) && !$container->has('serializer.normalizer.number')) {
+            $numberNormalizerDefinition = new Definition(NumberNormalizer::class);
+            $numberNormalizerDefinition->addTag('serializer.normalizer', ['built_in' => true, 'priority' => -915]);
+            $container->setDefinition('serializer.normalizer.number', $numberNormalizerDefinition);
         }
 
         $defaultContext = ['hydra_prefix' => $config['serializer']['hydra_prefix']] + ($container->hasParameter('serializer.default_context') ? $container->getParameter('serializer.default_context') : []);

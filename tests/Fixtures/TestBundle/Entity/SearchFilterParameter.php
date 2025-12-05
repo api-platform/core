@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\PartialSearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
@@ -35,6 +36,10 @@ use Doctrine\ORM\Mapping as ORM;
         'searchExact[:property]' => new QueryParameter(filter: 'app_search_filter_with_exact'),
         'searchOnTextAndDate[:property]' => new QueryParameter(filter: 'app_filter_date_and_search'),
         'q' => new QueryParameter(property: 'hydra:freetextQuery'),
+        'search[:property]' => new QueryParameter(
+            filter: new PartialSearchFilter(),
+            properties: ['foo', 'createdAt']
+        ),
     ]
 )]
 #[QueryCollection(
@@ -48,8 +53,8 @@ use Doctrine\ORM\Mapping as ORM;
         'q' => new QueryParameter(property: 'hydra:freetextQuery'),
     ]
 )]
-#[ApiFilter(SearchFilterValueTransformer::class, alias: 'app_search_filter_partial', properties: ['foo' => 'partial'], arguments: ['key' => 'searchPartial'])]
-#[ApiFilter(SearchFilterValueTransformer::class, alias: 'app_search_filter_with_exact', properties: ['foo' => 'exact'], arguments: ['key' => 'searchExact'])]
+#[ApiFilter(SearchFilterValueTransformer::class, alias: 'app_search_filter_partial', properties: ['foo' => 'partial'])]
+#[ApiFilter(SearchFilterValueTransformer::class, alias: 'app_search_filter_with_exact', properties: ['foo' => 'exact'])]
 #[ApiFilter(SearchTextAndDateFilter::class, alias: 'app_filter_date_and_search', properties: ['foo', 'createdAt'], arguments: ['dateFilterProperties' => ['createdAt' => 'exclude_null'], 'searchFilterProperties' => ['foo' => 'exact']])]
 #[QueryParameter(key: ':property', filter: QueryParameterFilter::class)]
 #[ORM\Entity]

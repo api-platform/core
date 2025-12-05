@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
+use ApiPlatform\Doctrine\Odm\Filter\PartialSearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
@@ -33,6 +34,10 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
         'searchExact[:property]' => new QueryParameter(filter: 'app_odm_search_filter_with_exact'),
         'searchOnTextAndDate[:property]' => new QueryParameter(filter: 'app_odm_filter_date_and_search'),
         'q' => new QueryParameter(property: 'hydra:freetextQuery'),
+        'search[:property]' => new QueryParameter(
+            filter: new PartialSearchFilter(),
+            properties: ['foo', 'createdAt']
+        ),
     ]
 )]
 #[QueryCollection(
@@ -46,8 +51,8 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
         'q' => new QueryParameter(property: 'hydra:freetextQuery'),
     ]
 )]
-#[ApiFilter(ODMSearchFilterValueTransformer::class, alias: 'app_odm_search_filter_partial', properties: ['foo' => 'partial'], arguments: ['key' => 'searchPartial'])]
-#[ApiFilter(ODMSearchFilterValueTransformer::class, alias: 'app_odm_search_filter_with_exact', properties: ['foo' => 'exact'], arguments: ['key' => 'searchExact'])]
+#[ApiFilter(ODMSearchFilterValueTransformer::class, alias: 'app_odm_search_filter_partial', properties: ['foo' => 'partial'])]
+#[ApiFilter(ODMSearchFilterValueTransformer::class, alias: 'app_odm_search_filter_with_exact', properties: ['foo' => 'exact'])]
 #[ApiFilter(ODMSearchTextAndDateFilter::class, alias: 'app_odm_filter_date_and_search', properties: ['foo', 'createdAt'], arguments: ['dateFilterProperties' => ['createdAt' => 'exclude_null'], 'searchFilterProperties' => ['foo' => 'exact']])]
 #[QueryParameter(key: ':property', filter: QueryParameterOdmFilter::class)]
 #[ODM\Document]

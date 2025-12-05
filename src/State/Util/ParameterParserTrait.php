@@ -66,8 +66,25 @@ trait ParameterParserTrait
 
         $value = $values[$key] ?? new ParameterNotFound();
         foreach ($accessors ?? [] as $accessor) {
+            if ($value instanceof ParameterNotFound) {
+                break;
+            }
+
             if (\is_array($value) && isset($value[$accessor])) {
                 $value = $value[$accessor];
+            } elseif (\is_array($value) && array_is_list($value)) {
+                $l = [];
+                foreach ($value as $i) {
+                    if (\is_array($i) && isset($i[$accessor])) {
+                        $l[] = $i[$accessor];
+                    }
+                }
+
+                if (!$l) {
+                    $value = new ParameterNotFound();
+                } else {
+                    $value = $l;
+                }
             } else {
                 $value = new ParameterNotFound();
             }

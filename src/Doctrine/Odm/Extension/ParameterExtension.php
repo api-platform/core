@@ -13,11 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Extension;
 
-use ApiPlatform\Doctrine\Common\Filter\LoggerAwareInterface;
-use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
-use ApiPlatform\Doctrine\Common\ParameterValueExtractorTrait;
-use ApiPlatform\Doctrine\Odm\Filter\AbstractFilter;
-use ApiPlatform\Doctrine\Odm\Filter\FilterInterface;
+use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterInterface;
+use ApiPlatform\Doctrine\Common\ParameterExtensionTrait;
+use ApiPlatform\Doctrine\Odm\Filter\FilterInterface; // Explicitly import PropertyAwareFilterInterface
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ParameterNotFound;
 use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
@@ -32,13 +30,16 @@ use Psr\Log\LoggerInterface;
  */
 final class ParameterExtension implements AggregationCollectionExtensionInterface, AggregationItemExtensionInterface
 {
-    use ParameterValueExtractorTrait;
+    use ParameterExtensionTrait;
 
     public function __construct(
-        private readonly ContainerInterface $filterLocator,
-        private readonly ?ManagerRegistry $managerRegistry = null,
-        private readonly ?LoggerInterface $logger = null,
+        ContainerInterface $filterLocator,
+        ?ManagerRegistry $managerRegistry = null,
+        ?LoggerInterface $logger = null,
     ) {
+        $this->filterLocator = $filterLocator;
+        $this->managerRegistry = $managerRegistry;
+        $this->logger = $logger;
     }
 
     /**
@@ -66,28 +67,7 @@ final class ParameterExtension implements AggregationCollectionExtensionInterfac
                 continue;
             }
 
-            if ($this->managerRegistry && $filter instanceof ManagerRegistryAwareInterface && !$filter->hasManagerRegistry()) {
-                $filter->setManagerRegistry($this->managerRegistry);
-            }
-
-            if ($this->logger && $filter instanceof LoggerAwareInterface && !$filter->hasLogger()) {
-                $filter->setLogger($this->logger);
-            }
-
-            if ($filter instanceof AbstractFilter && !$filter->getProperties()) {
-                $propertyKey = $parameter->getProperty() ?? $parameter->getKey();
-
-                if (str_contains($propertyKey, ':property')) {
-                    $extraProperties = $parameter->getExtraProperties()['_properties'] ?? [];
-                    foreach (array_keys($extraProperties) as $property) {
-                        $properties[$property] = $parameter->getFilterContext();
-                    }
-                } else {
-                    $properties = [$propertyKey => $parameter->getFilterContext()];
-                }
-
-                $filter->setProperties($properties ?? []);
-            }
+            $this->configureFilter($filter, $parameter);
 
             $context['filters'] = $values;
             $context['parameter'] = $parameter;

@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\OpenApi\Model\Parameter;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Collection;
@@ -25,7 +26,13 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     uriTemplate: 'query_parameter_validate_before_read',
     parameters: [
         'search' => new QueryParameter(constraints: [new NotBlank()]),
-        'sort[:property]' => new QueryParameter(constraints: [new NotBlank(), new Collection(['id' => new Choice(choices: ['asc', 'desc'])], allowMissingFields: true)]),
+        'sort' => new QueryParameter(
+            openApi: new Parameter(name: 'sort', in: 'query', style: 'deepObject'),
+            constraints: [
+                new NotBlank(),
+                new Collection(['id' => new Choice(choices: ['asc', 'desc'])], allowMissingFields: true),
+            ]
+        ),
     ],
     provider: [self::class, 'provide']
 )]

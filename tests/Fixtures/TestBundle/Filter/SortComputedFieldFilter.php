@@ -34,7 +34,7 @@ class SortComputedFieldFilter implements FilterInterface, JsonSchemaFilterInterf
             return;
         }
 
-        $queryBuilder->addOrderBy('totalQuantity', $context['parameter']->getValue()['totalQuantity'] ?? 'ASC');
+        $queryBuilder->addOrderBy('totalQuantity', $context['parameter']->getValue() ?? 'ASC');
     }
 
     /**

@@ -34,10 +34,10 @@ class OrderFilterTest extends TestCase
         DB::enableQueryLog();
         $response = $this->get('/api/active_books?sort[isActive]=asc', ['Accept' => ['application/ld+json']]);
         $response->assertStatus(200);
-        $this->assertEquals(\DB::getQueryLog()[1]['query'], 'select * from "active_books" order by "isActive" asc limit 30 offset 0');
+        $this->assertEquals(\DB::getQueryLog()[1]['query'], 'select * from "active_books" order by "is_active" asc limit 30 offset 0');
         DB::flushQueryLog();
         $response = $this->get('/api/active_books?sort[isActive]=desc', ['Accept' => ['application/ld+json']]);
         $response->assertStatus(200);
-        $this->assertEquals(DB::getQueryLog()[1]['query'], 'select * from "active_books" order by "isActive" desc limit 30 offset 0');
+        $this->assertEquals(DB::getQueryLog()[1]['query'], 'select * from "active_books" order by "is_active" desc limit 30 offset 0');
     }
 }

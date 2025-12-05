@@ -36,7 +36,7 @@ namespace App\Filter {
 
             // Extract the desired sort direction ('asc' or 'desc') from the parameter's value.
             // IMPORTANT: 'totalQuantity' here MUST match the alias defined in Cart::handleLinks.
-            $queryBuilder->addOrderBy('totalQuantity', $context['parameter']->getValue()['totalQuantity'] ?? 'ASC');
+            $queryBuilder->addOrderBy('totalQuantity', $context['parameter']->getValue() ?? 'ASC');
         }
 
         /**
