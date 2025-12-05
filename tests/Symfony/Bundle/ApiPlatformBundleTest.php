@@ -24,6 +24,7 @@ use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlResolverPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlTypePass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\MetadataAwareNameConverterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\MutatorPass;
+use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ObjectMapperPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\SerializerMappingLoaderPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\TestClientPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\TestMercureHubPass;
@@ -57,6 +58,7 @@ class ApiPlatformBundleTest extends TestCase
         $containerProphecy->addCompilerPass(Argument::type(AuthenticatorManagerPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(SerializerMappingLoaderPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(MutatorPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
+        $containerProphecy->addCompilerPass(Argument::type(ObjectMapperPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
 
         $bundle = new ApiPlatformBundle();
         $bundle->build($containerProphecy->reveal());
