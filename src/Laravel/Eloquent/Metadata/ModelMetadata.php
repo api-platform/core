@@ -76,8 +76,8 @@ final class ModelMetadata
         $columns = $schema->getColumns($table);
         $indexes = $schema->getIndexes($table);
         $relations = $this->getRelations($model);
-
-        $foreignKeys = array_flip(array_column($relations, 'foreign_key'));
+        
+        $foreignKeys = array_flip(array_filter(array_column($relations, 'foreign_key')));
         $attributes = [];
 
         foreach ($columns as $column) {
