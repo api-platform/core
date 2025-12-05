@@ -79,7 +79,7 @@ final class ParameterProvider implements ProviderInterface, StopwatchAwareInterf
                 unset($parameter->getExtraProperties()['_api_values']);
             }
 
-            if (null !== ($default = $parameter->getSchema()['default'] ?? null) && $value instanceof ParameterNotFound) {
+            if (null !== ($default = $parameter->getDefault() ?? $parameter->getSchema()['default'] ?? null) && $value instanceof ParameterNotFound) {
                 $value = $default;
             }
 
@@ -128,7 +128,7 @@ final class ParameterProvider implements ProviderInterface, StopwatchAwareInterf
                 unset($uriVariable->getExtraProperties()['_api_values']);
             }
 
-            if (($default = $uriVariable->getSchema()['default'] ?? false) && ($value instanceof ParameterNotFound || !$value)) {
+            if (($default = $uriVariable->getDefault() ?? $uriVariable->getSchema()['default'] ?? false) && ($value instanceof ParameterNotFound || !$value)) {
                 $value = $default;
             }
 

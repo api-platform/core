@@ -56,6 +56,7 @@ abstract class Parameter
         protected ?bool $castToArray = null,
         protected ?bool $castToNativeType = null,
         protected mixed $castFn = null,
+        protected mixed $default = null,
     ) {
     }
 
@@ -139,7 +140,7 @@ abstract class Parameter
      */
     public function getValue(mixed $default = new ParameterNotFound()): mixed
     {
-        return $this->extraProperties['_api_values'] ?? $default;
+        return $this->extraProperties['_api_values'] ?? $this->default ?? $default;
     }
 
     /**
@@ -367,6 +368,19 @@ abstract class Parameter
     {
         $self = clone $this;
         $self->castFn = $castFn;
+
+        return $self;
+    }
+
+    public function getDefault(): mixed
+    {
+        return $this->default;
+    }
+
+    public function withDefault(mixed $default): self
+    {
+        $self = clone $this;
+        $self->default = $default;
 
         return $self;
     }

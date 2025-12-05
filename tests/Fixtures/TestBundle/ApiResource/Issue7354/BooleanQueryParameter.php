@@ -31,6 +31,9 @@ use ApiPlatform\Metadata\QueryParameter;
                     ],
                     castToNativeType: true,
                 ),
+                'anotherBooleanParameter' => new QueryParameter(
+                    default: true,
+                ),
             ],
             provider: [self::class, 'provide'],
         ),
@@ -38,12 +41,17 @@ use ApiPlatform\Metadata\QueryParameter;
 )]
 class BooleanQueryParameter
 {
-    public function __construct(public bool $booleanParameter)
-    {
+    public function __construct(
+        public bool $booleanParameter,
+        public bool $anotherBooleanParameter,
+    ) {
     }
 
     public static function provide(Operation $operation): self
     {
-        return new self($operation->getParameters()->get('booleanParameter')->getValue());
+        return new self(
+            $operation->getParameters()->get('booleanParameter')->getValue(),
+            $operation->getParameters()->get('anotherBooleanParameter')->getValue(),
+        );
     }
 }
