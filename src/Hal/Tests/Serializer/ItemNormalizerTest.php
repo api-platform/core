@@ -295,7 +295,6 @@ class ItemNormalizerTest extends TestCase
     {
         $setId = function (MaxDepthDummy $dummy, int $id): void {
             $prop = new \ReflectionProperty($dummy, 'id');
-            $prop->setAccessible(true);
             $prop->setValue($dummy, $id);
         };
 
