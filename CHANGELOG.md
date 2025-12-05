@@ -366,6 +366,12 @@ TypeInfo:
 * [cff61eab8](https://github.com/api-platform/core/commit/cff61eab8643f8ed08d59c0684e77740d0d81b04) fix(metadata): append php file resource extractor (#7193)
 * [f3d4afe03](https://github.com/api-platform/core/commit/f3d4afe032385f3b665131a365e42706930f0730) fix(symfony): validator type-info
 
+## v4.1.28
+
+### Bug fixes
+
+* [dfe42b385](https://github.com/api-platform/core/commit/dfe42b385cd6c14db862423fc75c731c11bfaf44) fix(symfony): skip argument resolver when context is not api platform
+
 ## v4.1.27
 
 ### Bug fixes
