@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.1.28
+
+### Bug fixes
+
+* [dfe42b385](https://github.com/api-platform/core/commit/dfe42b385cd6c14db862423fc75c731c11bfaf44) fix(symfony): skip argument resolver when context is not api platform
+
 ## v4.1.27
 
 ### Bug fixes
