@@ -14,7 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional\Issues;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Issue7349\Foo7349;
 use ApiPlatform\Tests\RecreateSchemaTrait;
+use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
@@ -27,7 +29,16 @@ class Issue7349Test extends ApiTestCase
 {
     use RecreateSchemaTrait;
     use RefreshDatabase;
+    use SetupClassResourcesTrait;
     use WithWorkbench;
+
+    /**
+     * @return class-string[]
+     */
+    public static function getResources(): array
+    {
+        return [Foo7349::class];
+    }
 
     /**
      * When using partial pagination, totalItems should not be present.
@@ -38,7 +49,7 @@ class Issue7349Test extends ApiTestCase
             $this->markTestSkipped();
         }
 
-        $response = self::createClient()->request('GET', '/foo7349s?page=1&itemsPerPage=3', [
+        $response = self::createClient()->request('GET', '/foo7349s?page=1&itemsPerPage=3&partial=true', [
             'headers' => [
                 'Accept' => 'application/ld+json',
             ],
@@ -62,7 +73,7 @@ class Issue7349Test extends ApiTestCase
             $this->markTestSkipped();
         }
 
-        $response = self::createClient()->request('GET', '/foo7349s?page=1&itemsPerPage=3', [
+        $response = self::createClient()->request('GET', '/foo7349s?page=1&itemsPerPage=3&partial=false', [
             'headers' => [
                 'Accept' => 'application/ld+json',
             ],
