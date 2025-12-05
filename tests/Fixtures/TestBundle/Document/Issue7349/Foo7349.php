@@ -21,7 +21,9 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
  *
  * @author Maxime Valin <contact@maximeval.in>
  */
-#[ApiResource]
+#[ApiResource(
+    paginationClientPartial: true,
+)]
 #[ODM\Document]
 class Foo7349
 {
