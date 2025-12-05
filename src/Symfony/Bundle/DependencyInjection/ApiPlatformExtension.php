@@ -587,6 +587,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         if (!$config['enable_swagger']) {
+            $container->setParameter('api_platform.enable_swagger_ui', false);
+            $container->setParameter('api_platform.enable_re_doc', false);
+
             return;
         }
 
