@@ -183,6 +183,15 @@ final class IriConverter implements IriConverterInterface
     {
         $identifiers = $context['uri_variables'] ?? [];
 
+        foreach ($identifiers as $identifier) {
+            if (is_object($identifier)) {
+                $identifiers = [
+                    ...$identifiers,
+                    ...$this->identifiersExtractor->getIdentifiersFromItem($identifier, $identifiersExtractorOperation, $context),
+                ];
+            }
+        }
+
         if (\is_object($resource)) {
             try {
                 $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($resource, $identifiersExtractorOperation, $context);
