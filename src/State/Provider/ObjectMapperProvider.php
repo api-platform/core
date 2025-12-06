@@ -15,7 +15,7 @@ namespace ApiPlatform\State\Provider;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Util\CloneTrait;
-use ApiPlatform\State\Pagination\ArrayPaginator;
+use ApiPlatform\State\Pagination\MappedObjectPaginator;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\ProviderInterface;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
@@ -52,7 +52,15 @@ final class ObjectMapperProvider implements ProviderInterface
         $request?->attributes->set('mapped_data', $data);
 
         if ($data instanceof PaginatorInterface) {
-            $data = new ArrayPaginator(array_map(fn ($v) => $this->objectMapper->map($v, $operation->getClass()), iterator_to_array($data)), 0, \count($data));
+            $data = new MappedObjectPaginator(
+                iterator_to_array($data),
+                $this->objectMapper,
+                $operation->getClass(),
+                $data->getTotalItems(),
+                $data->getCurrentPage(),
+                $data->getLastPage(),
+                $data->getItemsPerPage(),
+            );
         } elseif (\is_array($data)) {
             foreach ($data as &$v) {
                 if (\is_object($v)) {
