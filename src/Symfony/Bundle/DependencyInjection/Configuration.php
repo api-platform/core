@@ -175,6 +175,7 @@ final class Configuration implements ConfigurationInterface
         $this->addElasticsearchSection($rootNode);
         $this->addOpenApiSection($rootNode);
         $this->addMakerSection($rootNode);
+        $this->addMcpSection($rootNode);
 
         $this->addExceptionToStatusSection($rootNode);
 
@@ -665,6 +666,16 @@ final class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('namespace_prefix')->defaultValue('')->info('Add a prefix to all maker generated classes. e.g set it to "Api" to set the maker namespace to "App\\Api\\" (if the maker.root_namespace config is App). e.g. App\\Api\\State\\MyStateProcessor')->end()
                     ->end()
+                ->end()
+            ->end();
+    }
+
+    private function addMcpSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('mcp')
+                    ->canBeDisabled()
                 ->end()
             ->end();
     }

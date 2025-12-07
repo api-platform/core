@@ -441,6 +441,31 @@ XML_WRAP
         }
     }
 
+    private function buildMcp(\SimpleXMLElement $resource, ?array $values): void
+    {
+        if (!$values) {
+            return;
+        }
+
+        $node = $resource->addChild('mcpOperations');
+        foreach ($values as $value) {
+            $child = $node->addChild('mcpOperation');
+            foreach ($value as $index => $data) {
+                if (method_exists($this, 'build'.ucfirst($index))) {
+                    $this->{'build'.ucfirst($index)}($child, $data);
+                    continue;
+                }
+
+                if (\is_string($data) || null === $data || is_numeric($data) || \is_bool($data)) {
+                    $child->addAttribute($index, $this->parse($data));
+                    continue;
+                }
+
+                throw new \LogicException(\sprintf('Cannot adapt mcpOperation attribute or child "%s". Please create a "%s" method in %s.', $index, 'build'.ucfirst($index), self::class));
+            }
+        }
+    }
+
     private function buildOperations(\SimpleXMLElement $resource, array $values): void
     {
         $node = $resource->addChild('operations');

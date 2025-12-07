@@ -18,16 +18,15 @@ return function (RoutingConfigurator $routes) {
     $routes->import('routing_common.yml');
     $routes->import('@TestBundle/Controller/Orm', 'attribute');
 
+    $routes->import('.', 'mcp');
+
     if (class_exists(WebProfilerBundle::class)) {
-        // 2. Resolve the actual directory of the bundle
         $reflection = new ReflectionClass(WebProfilerBundle::class);
         $bundleDir = dirname($reflection->getFileName());
 
-        // 3. Check if the PHP config exists on the filesystem
         $usePhp = file_exists($bundleDir.'/Resources/config/routing/wdt.php');
         $ext = $usePhp ? 'php' : 'xml';
 
-        // 4. Import dynamically based on the extension found
         $routes->import("@WebProfilerBundle/Resources/config/routing/wdt.$ext")
             ->prefix('/_wdt');
 
