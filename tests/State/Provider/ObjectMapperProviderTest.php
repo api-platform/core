@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\State\Provider;
 
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\State\Pagination\ArrayPaginator;
+use ApiPlatform\State\Pagination\MappedObjectPaginator;
 use ApiPlatform\State\Provider\ObjectMapperProvider;
 use ApiPlatform\State\ProviderInterface;
 use PHPUnit\Framework\TestCase;
@@ -160,7 +161,7 @@ class ObjectMapperProviderTest extends TestCase
         $provider = new ObjectMapperProvider($objectMapper, $decorated);
 
         $result = $provider->provide($operation);
-        $this->assertInstanceOf(ArrayPaginator::class, $result);
+        $this->assertInstanceOf(MappedObjectPaginator::class, $result);
         $items = iterator_to_array($result);
         $this->assertCount(2, $items);
         $this->assertSame($targetResource1, $items[0]);
@@ -192,7 +193,7 @@ class ObjectMapperProviderTest extends TestCase
         $provider = new ObjectMapperProvider($objectMapper, $decorated);
 
         $result = $provider->provide($operation);
-        $this->assertInstanceOf(ArrayPaginator::class, $result);
+        $this->assertInstanceOf(MappedObjectPaginator::class, $result);
         $this->assertCount(0, iterator_to_array($result));
     }
 }
