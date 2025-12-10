@@ -39,6 +39,7 @@ final class ObjectMapperProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         $data = $this->decorated->provide($operation, $uriVariables, $context);
+        $class = $operation->getOutput()['class'] ?? $operation->getClass();
 
         if (!$this->objectMapper || !$operation->canMap()) {
             return $data;
@@ -55,7 +56,7 @@ final class ObjectMapperProvider implements ProviderInterface
             $data = new MappedObjectPaginator(
                 iterator_to_array($data),
                 $this->objectMapper,
-                $operation->getClass(),
+                $class,
                 $data->getTotalItems(),
                 $data->getCurrentPage(),
                 $data->getLastPage(),
@@ -64,11 +65,11 @@ final class ObjectMapperProvider implements ProviderInterface
         } elseif (\is_array($data)) {
             foreach ($data as &$v) {
                 if (\is_object($v)) {
-                    $v = $this->objectMapper->map($v, $operation->getClass());
+                    $v = $this->objectMapper->map($v, $class);
                 }
             }
         } else {
-            $data = $this->objectMapper->map($data, $operation->getClass());
+            $data = $this->objectMapper->map($data, $class);
         }
 
         $request?->attributes->set('data', $data);
