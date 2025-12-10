@@ -143,6 +143,10 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                 continue;
             }
 
+            if (!$parameter->getKey()) {
+                $parameter = $parameter->withKey($key);
+            }
+
             ['propertyNames' => $propertyNames, 'properties' => $properties] = $this->getProperties($resourceClass, $parameter);
             $parameter = $parameter->withProperties($propertyNames);
 
@@ -170,7 +174,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                 $parameter = $parameter->withProvider($f->getParameterProvider());
             }
 
-            $key = $parameter->getKey() ?? $key;
+            $key = $parameter->getKey();
 
             ['propertyNames' => $propertyNames, 'properties' => $properties] = $this->getProperties($resourceClass, $parameter);
 

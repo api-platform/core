@@ -14,7 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Tests\Resource\Factory;
 
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\FilterInterface;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -36,8 +38,12 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'hydra', 'everywhere']));
         $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
         $propertyMetadata->method('create')->willReturnOnConsecutiveCalls(
-            new ApiProperty(identifier: true), new ApiProperty(readable: true), new ApiProperty(readable: true),
-            new ApiProperty(identifier: true), new ApiProperty(readable: true), new ApiProperty(readable: true)
+            new ApiProperty(identifier: true),
+            new ApiProperty(readable: true),
+            new ApiProperty(readable: true),
+            new ApiProperty(identifier: true),
+            new ApiProperty(readable: true),
+            new ApiProperty(readable: true)
         );
         $filterLocator = $this->createStub(ContainerInterface::class);
         $filterLocator->method('has')->willReturn(true);
@@ -77,14 +83,71 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertNull($everywhere->getOpenApi());
     }
 
+    public function testQueryParameterWithPropertyPlaceholder(): void
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'name', 'description']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false); // No specific filter logic needed for this test
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+
+        $resourceMetadataCollection = $parameterFactory->create(HasParameterAttribute::class);
+        $operation = $resourceMetadataCollection->getOperation(forceCollection: true);
+        $parameters = $operation->getParameters();
+
+        $this->assertInstanceOf(Parameters::class, $parameters);
+
+        // Assert that the original parameter with ':property' is removed
+        $this->assertFalse($parameters->has('search[:property]'));
+
+        // Assert that the new parameters are created and have the correct properties
+        $this->assertTrue($parameters->has('search[name]'));
+        $this->assertTrue($parameters->has('search[description]'));
+        $this->assertTrue($parameters->has('static_param'));
+
+        $searchNameParam = $parameters->get('search[name]');
+        $this->assertInstanceOf(QueryParameter::class, $searchNameParam);
+        $this->assertSame('Search by property', $searchNameParam->getDescription());
+        $this->assertSame('name', $searchNameParam->getProperty());
+        $this->assertSame('search[name]', $searchNameParam->getKey());
+
+        $searchDescriptionParam = $parameters->get('search[description]');
+        $this->assertInstanceOf(QueryParameter::class, $searchDescriptionParam);
+        $this->assertSame('Search by property', $searchDescriptionParam->getDescription());
+        $this->assertSame('description', $searchDescriptionParam->getProperty());
+        $this->assertSame('search[description]', $searchDescriptionParam->getKey());
+
+        $staticParam = $parameters->get('static_param');
+        $this->assertInstanceOf(QueryParameter::class, $staticParam);
+        $this->assertSame('A static parameter', $staticParam->getDescription());
+        $this->assertNull($staticParam->getProperty());
+        $this->assertSame('static_param', $staticParam->getKey());
+    }
+
     public function testParameterFactoryNoFilter(): void
     {
         $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
         $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'hydra', 'everywhere']));
         $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
         $propertyMetadata->method('create')->willReturnOnConsecutiveCalls(
-            new ApiProperty(identifier: true), new ApiProperty(readable: true), new ApiProperty(readable: true),
-            new ApiProperty(identifier: true), new ApiProperty(readable: true), new ApiProperty(readable: true)
+            new ApiProperty(identifier: true),
+            new ApiProperty(readable: true),
+            new ApiProperty(readable: true),
+            new ApiProperty(identifier: true),
+            new ApiProperty(readable: true),
+            new ApiProperty(readable: true)
         );
         $filterLocator = $this->createStub(ContainerInterface::class);
         $filterLocator->method('has')->willReturn(false);
@@ -134,4 +197,26 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertSame('name', $param->getKey());
         $this->assertSame(['name'], $param->getProperties());
     }
+}
+
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            parameters: [
+                'search[:property]' => new QueryParameter(
+                    description: 'Search by property',
+                    properties: ['name', 'description']
+                ),
+                'static_param' => new QueryParameter(
+                    description: 'A static parameter'
+                ),
+            ]
+        ),
+    ]
+)]
+class HasParameterAttribute
+{
+    public $id;
+    public $name;
+    public $description;
 }
