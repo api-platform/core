@@ -23,6 +23,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\Util\StateOptionsTrait;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Container\ContainerInterface;
 
@@ -65,11 +66,25 @@ final class ItemProvider implements ProviderInterface
         }
 
         $repository = $manager->getRepository($entityClass);
-        if (!method_exists($repository, 'createQueryBuilder')) {
-            throw new RuntimeException('The repository class must have a "createQueryBuilder" method.');
+
+        if ($method = $this->getStateOptionsRepositoryMethod($operation)) {
+            if (!method_exists($repository, $method)) {
+                throw new RuntimeException(\sprintf('The repository method "%s::%s" does not exist.', $repository::class, $method));
+            }
+
+            $queryBuilder = $repository->{$method}();
+
+            if (!$queryBuilder instanceof QueryBuilder) {
+                throw new RuntimeException(\sprintf('The repository method "%s" must return a %s instance.', $method, QueryBuilder::class));
+            }
+        } else {
+            if (!method_exists($repository, 'createQueryBuilder')) {
+                throw new RuntimeException('The repository class must have a "createQueryBuilder" method.');
+            }
+
+            $queryBuilder = $repository->createQueryBuilder('o');
         }
 
-        $queryBuilder = $repository->createQueryBuilder('o');
         $queryNameGenerator = new QueryNameGenerator();
 
         if ($handleLinks = $this->getLinksHandler($operation)) {
