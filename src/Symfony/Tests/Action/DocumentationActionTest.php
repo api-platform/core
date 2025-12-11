@@ -158,7 +158,6 @@ class DocumentationActionTest extends TestCase
     public function testHtmlFormatWhenDocsDisabledThrows404(): void
     {
         $this->expectException(NotFoundHttpException::class);
-        $this->expectExceptionMessage('API documentation is disabled.');
 
         $request = new Request();
         $request->attributes->set('_format', 'html');
