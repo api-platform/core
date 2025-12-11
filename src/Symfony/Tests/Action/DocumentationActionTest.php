@@ -154,4 +154,26 @@ class DocumentationActionTest extends TestCase
 
         $documentation($request);
     }
+
+    public function testHtmlFormatWhenDocsDisabledThrows404(): void
+    {
+        $this->expectException(NotFoundHttpException::class);
+
+        $request = new Request();
+        $request->attributes->set('_format', 'html');
+
+        $openApiFactory = $this->createMock(OpenApiFactoryInterface::class);
+        $resourceNameCollectionFactory = $this->createMock(ResourceNameCollectionFactoryInterface::class);
+
+        $documentation = new DocumentationAction(
+            $resourceNameCollectionFactory,
+            openApiFactory: $openApiFactory,
+            documentationFormats: [
+                'html' => ['text/html'],
+            ],
+            docsEnabled: false,
+        );
+
+        $documentation($request);
+    }
 }

@@ -48,5 +48,6 @@ return function (ContainerConfigurator $container) {
             service('api_platform.negotiator')->nullOnInvalid(),
             '%api_platform.docs_formats%',
             '%api_platform.enable_swagger_ui%',
+            '%api_platform.enable_docs%',
         ]);
 };
