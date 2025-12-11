@@ -65,4 +65,13 @@ final class IsGrantedTest extends ApiTestCase
         $client->request('GET', '/is_granted_test_call_provider/1');
         $this->assertResponseStatusCodeSame(401);
     }
+
+    public function testIsGrantedReturns404WhenNotFoundAndNoAccess(): void
+    {
+        $client = self::createClient();
+        $client->loginUser(new InMemoryUser('user', 'password', ['ROLE_USER']));
+
+        $client->request('GET', '/internal/1');
+        $this->assertResponseStatusCodeSame(403);
+    }
 }
