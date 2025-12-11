@@ -1,5 +1,18 @@
 # Changelog
 
+## v4.2.10
+
+### Bug fixes
+
+* [01fd0b578](https://github.com/api-platform/core/commit/01fd0b578d68f590670caf92b9a02a854a019311) fix(symfony): do not redeclare object_mapper (#7602)
+* [0ef0ba63a](https://github.com/api-platform/core/commit/0ef0ba63a41af000836dd5631b43bcdf10c50c71) fix(metadata): update tests to use MappedObjectPaginator instead of ArrayPaginator (#7591)
+* [6561eb1ec](https://github.com/api-platform/core/commit/6561eb1ec96c296021baa3e36e04843412632c8f) fix(symfony): do not load docs routes if docs disabled (#7448)
+* [8f4bc086f](https://github.com/api-platform/core/commit/8f4bc086fcc811c69a67e29c313b12160c6efa45) fix(symfony): disable Swagger UI and ReDoc when Swagger is off (#7586)
+* [9814f27ee](https://github.com/api-platform/core/commit/9814f27ee4bc11d03dd9cc9ca5c0caa53061ae44) fix(metadata): property placeholder on multiple parameters (#7598)
+* [bc1fd4c10](https://github.com/api-platform/core/commit/bc1fd4c10c04fcd552e7b385efc08a1be0826614) fix(laravel): belongs-to-many relations dont have a get-foreign-key-name method (#7589)
+* [d3bcded9b](https://github.com/api-platform/core/commit/d3bcded9baf5ddc2e52d8ea2d894f328e9dd4a8e) fix(metadata): use operation output class for mapping instead of operation class (#7601)
+* [d7bab4bb3](https://github.com/api-platform/core/commit/d7bab4bb36af636ee11fc2c875dbb1ce687a50d1) fix(serializer): properly handle read link parameters when generating iris (#7520)
+
 ## v4.2.9
 
 ### Bug fixes
