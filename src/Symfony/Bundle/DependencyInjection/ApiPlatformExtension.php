@@ -50,6 +50,7 @@ use ApiPlatform\Validator\Exception\ValidationException;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Ramsey\Uuid\Uuid;
+use Symfony\Bundle\FrameworkBundle\Command\TranslationExtractCommand;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerHelper;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\DirectoryResource;
@@ -177,7 +178,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerLinkSecurityConfiguration($loader, $config);
         $this->registerJsonStreamerConfiguration($container, $loader, $formats, $config);
 
-        if (class_exists(ObjectMapper::class)) {
+        // TranslationExtractCommand was introduced in framework-bundle/7.3 with the object mapper service
+        if (class_exists(ObjectMapper::class) && class_exists(TranslationExtractCommand::class)) {
             $loader->load('state/object_mapper.php');
         }
         $container->registerForAutoconfiguration(FilterInterface::class)
