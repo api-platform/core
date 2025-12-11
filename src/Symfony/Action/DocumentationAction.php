@@ -61,7 +61,7 @@ final class DocumentationAction
     public function __invoke(?Request $request = null)
     {
         if (false === $this->docsEnabled) {
-            throw new NotFoundHttpException('API documentation is disabled.');
+            throw new NotFoundHttpException();
         }
 
         if (null === $request) {
