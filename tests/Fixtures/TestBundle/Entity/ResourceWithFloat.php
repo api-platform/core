@@ -28,20 +28,26 @@ class ResourceWithFloat
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private ?int $id = null;
     #[ORM\Column(type: 'float')]
-    private float $myFloatField = 0.0;
+    private string|float $myFloatField = 0.0;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getMyFloatField(): float
+    public function getMyFloatField(): string|float
     {
-        return $this->myFloatField;
+        // php 8.5 emits warning unexpected NAN value was coerced to string
+        // with symfony serializer
+        // @see https://github.com/symfony/symfony/pull/62740
+        return is_nan($this->myFloatField) ? 'NAN' : $this->myFloatField;
     }
 
     public function setMyFloatField(float $myFloatField): void
     {
-        $this->myFloatField = $myFloatField;
+        // When binding a NAN value to a prepared statement parameter with Doctrine,
+        // PHP 8.5 emits a warning: "unexpected NAN value was coerced to string".
+        // @see https://github.com/doctrine/dbal/pull/7249
+        $this->myFloatField = is_nan($myFloatField) ? 'NAN' : $myFloatField;
     }
 }
