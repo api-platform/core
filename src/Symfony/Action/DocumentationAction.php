@@ -50,6 +50,7 @@ final class DocumentationAction
         ?Negotiator $negotiator = null,
         private readonly array $documentationFormats = [OpenApiNormalizer::JSON_FORMAT => ['application/vnd.openapi+json'], OpenApiNormalizer::FORMAT => ['application/json']],
         private readonly bool $swaggerUiEnabled = true,
+        private readonly bool $docsEnabled = true,
     ) {
         $this->negotiator = $negotiator ?? new Negotiator();
     }
@@ -59,6 +60,10 @@ final class DocumentationAction
      */
     public function __invoke(?Request $request = null)
     {
+        if (false === $this->docsEnabled) {
+            throw new NotFoundHttpException();
+        }
+
         if (null === $request) {
             return new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version);
         }

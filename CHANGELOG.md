@@ -7,6 +7,16 @@
 * [21aa2572d](https://github.com/api-platform/core/commit/21aa2572d8fef2b3f05f7307c51348a6c9767e45) feat(elasticsearch): add SSL options for Elasticsearch configuration (#4059)
 * [ba0c76c](https://github.com/api-platform/core/commit/ba0c76c6f5c8afa8622e87a155b8b99f453d6453) feat(doctrine): remove put & path for readonly entity (#7019)
 
+## v4.2.9
+
+### Bug fixes
+
+* [502c0e2de](https://github.com/api-platform/core/commit/502c0e2def2c9021851bce799432429217839c7c) fix(symfony): skip argument resolver when context is not api platform (#7579)
+* [834064fc6](https://github.com/api-platform/core/commit/834064fc6c9dbe5492f5d2667b6cfba4de8e5e1a) fix(metadata): filter interface context php doc (#7560)
+* [85458e0d9](https://github.com/api-platform/core/commit/85458e0d935936b319df6572903dc40a763b6dc0) fix(symfony): use app.request.query.get() directly instead of app.request.get() in swagger (#7578)
+* [ef3127000](https://github.com/api-platform/core/commit/ef3127000ee1a6a3ca7282868dfc132a576827a3) fix(symfony): use current route for footer links (#7580)
+* [49d80c840](https://github.com/api-platform/core/commit/49d80c840524241f0403390cdc47a135cd6a0ec9) fix(serializer): render BCMath\Number (PHP 8.4+) as string instead of object (#7555)
+
 ## v4.2.7
 
 **Symfony 8.0 compatible.**
@@ -372,6 +382,12 @@ TypeInfo:
 * [79edced67](https://github.com/api-platform/core/commit/79edced67ccca1a7b80455dd94203501d9c4fa89) !fix(json-schema): share invariable sub-schemas
 * [cff61eab8](https://github.com/api-platform/core/commit/cff61eab8643f8ed08d59c0684e77740d0d81b04) fix(metadata): append php file resource extractor (#7193)
 * [f3d4afe03](https://github.com/api-platform/core/commit/f3d4afe032385f3b665131a365e42706930f0730) fix(symfony): validator type-info
+
+## v4.1.28
+
+### Bug fixes
+
+* [dfe42b385](https://github.com/api-platform/core/commit/dfe42b385cd6c14db862423fc75c731c11bfaf44) fix(symfony): skip argument resolver when context is not api platform
 
 ## v4.1.27
 

@@ -17,6 +17,7 @@ use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\FilterWithStateOptions;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\SearchFilterParameter as SearchFilterParameterDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilterWithStateOptionsEntity;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ProductWithQueryParameter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SearchFilterParameter;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
@@ -34,7 +35,7 @@ final class DoctrineTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [SearchFilterParameter::class, FilterWithStateOptions::class];
+        return [SearchFilterParameter::class, FilterWithStateOptions::class, ProductWithQueryParameter::class];
     }
 
     public function testDoctrineEntitySearchFilter(): void
@@ -195,7 +196,50 @@ final class DoctrineTest extends ApiTestCase
         ];
     }
 
-    public function loadFixtures(string $resourceClass): void
+    public function testQueryParameterWithPropertyArgument(): void
+    {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('Not tested with mongodb.');
+        }
+
+        $resource = ProductWithQueryParameter::class;
+        $this->recreateSchema([$resource]);
+        $this->loadProductFixtures($resource);
+
+        // Test search[:property] with 'title'
+        $response = self::createClient()->request('GET', '/product_with_query_parameters?search[title]=Awesome');
+        $this->assertResponseIsSuccessful();
+        $this->assertCount(1, $response->toArray()['hydra:member']);
+        $this->assertEquals('Awesome Widget', $response->toArray()['hydra:member'][0]['title']);
+
+        // Test search[:property] with 'description'
+        $response = self::createClient()->request('GET', '/product_with_query_parameters?search[description]=super');
+        $this->assertResponseIsSuccessful();
+        $this->assertCount(1, $response->toArray()['hydra:member']);
+        $this->assertEquals('Super Gadget', $response->toArray()['hydra:member'][0]['title']);
+
+        // Test filter[:property] with 'category'
+        $response = self::createClient()->request('GET', '/product_with_query_parameters?filter[category]=Electronics');
+        $this->assertResponseIsSuccessful();
+        $this->assertCount(2, $response->toArray()['hydra:member']);
+
+        // Test filter[:property] with 'brand'
+        $response = self::createClient()->request('GET', '/product_with_query_parameters?filter[brand]=BrandY');
+        $this->assertResponseIsSuccessful();
+        $this->assertCount(1, $response->toArray()['hydra:member']);
+        $this->assertEquals('Super Gadget', $response->toArray()['hydra:member'][0]['title']);
+
+        // Test order[:property] with 'rating'
+        $response = self::createClient()->request('GET', '/product_with_query_parameters?order[rating]=desc');
+        $this->assertResponseIsSuccessful();
+        $members = $response->toArray()['hydra:member'];
+        $this->assertCount(3, $members);
+        $this->assertEquals('Awesome Widget', $members[0]['title']);
+        $this->assertEquals('Super Gadget', $members[1]['title']);
+        $this->assertEquals('Mega Device', $members[2]['title']);
+    }
+
+    private function loadFixtures(string $resourceClass): void
     {
         $container = static::$kernel->getContainer();
         $registry = $this->isMongoDB() ? $container->get('doctrine_mongodb') : $container->get('doctrine');
@@ -211,6 +255,48 @@ final class DoctrineTest extends ApiTestCase
 
             $manager->persist($s);
         }
+
+        $manager->flush();
+    }
+
+    private function loadProductFixtures(string $resourceClass): void
+    {
+        $container = static::$kernel->getContainer();
+        $registry = $this->isMongoDB() ? $container->get('doctrine_mongodb') : $container->get('doctrine');
+        $manager = $registry->getManager();
+
+        $product1 = new $resourceClass();
+        $product1->sku = 'SKU001';
+        $product1->title = 'Awesome Widget';
+        $product1->description = 'A really awesome widget.';
+        $product1->category = 'Electronics';
+        $product1->brand = 'BrandX';
+        $product1->rating = 5;
+        $product1->stock = 100;
+        $product1->tags = ['new', 'sale'];
+        $manager->persist($product1);
+
+        $product2 = new $resourceClass();
+        $product2->sku = 'SKU002';
+        $product2->title = 'Super Gadget';
+        $product2->description = 'A super cool gadget.';
+        $product2->category = 'Electronics';
+        $product2->brand = 'BrandY';
+        $product2->rating = 4;
+        $product2->stock = 50;
+        $product2->tags = ['popular'];
+        $manager->persist($product2);
+
+        $product3 = new $resourceClass();
+        $product3->sku = 'SKU003';
+        $product3->title = 'Mega Device';
+        $product3->description = 'A mega useful device.';
+        $product3->category = 'Home';
+        $product3->brand = 'BrandX';
+        $product3->rating = 3;
+        $product3->stock = 200;
+        $product3->tags = ['clearance'];
+        $manager->persist($product3);
 
         $manager->flush();
     }

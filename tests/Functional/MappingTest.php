@@ -301,6 +301,10 @@ final class MappingTest extends ApiTestCase
             $this->markTestSkipped('MongoDB not tested.');
         }
 
+        if (!$this->getContainer()->has('api_platform.object_mapper')) {
+            $this->markTestSkipped('ObjectMapper not installed');
+        }
+
         $this->recreateSchema([Book::class]);
         $this->loadBookFixtures();
 
@@ -320,6 +324,10 @@ final class MappingTest extends ApiTestCase
             $this->markTestSkipped('MongoDB not tested.');
         }
 
+        if (!$this->getContainer()->has('api_platform.object_mapper')) {
+            $this->markTestSkipped('ObjectMapper not installed');
+        }
+
         $this->recreateSchema([Book::class]);
         $this->loadBookFixtures();
 
@@ -337,6 +345,10 @@ final class MappingTest extends ApiTestCase
     {
         if ($this->isMongoDB()) {
             $this->markTestSkipped('MongoDB not tested.');
+        }
+
+        if (!$this->getContainer()->has('api_platform.object_mapper')) {
+            $this->markTestSkipped('ObjectMapper not installed');
         }
 
         $this->recreateSchema([Book::class]);
