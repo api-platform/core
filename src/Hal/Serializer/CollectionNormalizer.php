@@ -47,22 +47,22 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
 
         $data = [
             '_links' => [
-                'self' => ['href' => IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated ? $currentPage : null, $urlGenerationStrategy)],
+                'self' => ['href' => IriHelper::createIri($parsed['uri'] ?? $parsed['parts'], $parsed['parameters'], $this->pageParameterName, $paginated ? $currentPage : null, $urlGenerationStrategy)],
             ],
         ];
 
         if ($paginated) {
             if (null !== $lastPage) {
-                $data['_links']['first']['href'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1., $urlGenerationStrategy);
-                $data['_links']['last']['href'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $lastPage, $urlGenerationStrategy);
+                $data['_links']['first']['href'] = IriHelper::createIri($parsed['uri'] ?? $parsed['parts'], $parsed['parameters'], $this->pageParameterName, 1., $urlGenerationStrategy);
+                $data['_links']['last']['href'] = IriHelper::createIri($parsed['uri'] ?? $parsed['parts'], $parsed['parameters'], $this->pageParameterName, $lastPage, $urlGenerationStrategy);
             }
 
             if (1. !== $currentPage) {
-                $data['_links']['prev']['href'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage - 1., $urlGenerationStrategy);
+                $data['_links']['prev']['href'] = IriHelper::createIri($parsed['uri'] ?? $parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage - 1., $urlGenerationStrategy);
             }
 
             if ((null !== $lastPage && $currentPage !== $lastPage) || (null === $lastPage && $pageTotalItems >= $itemsPerPage)) {
-                $data['_links']['next']['href'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage + 1., $urlGenerationStrategy);
+                $data['_links']['next']['href'] = IriHelper::createIri($parsed['uri'] ?? $parsed['parts'], $parsed['parameters'], $this->pageParameterName, $currentPage + 1., $urlGenerationStrategy);
             }
         }
 

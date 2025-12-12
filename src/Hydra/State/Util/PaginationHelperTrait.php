@@ -26,16 +26,16 @@ trait PaginationHelperTrait
         $first = $last = $previous = $next = null;
 
         if (null !== $lastPage) {
-            $first = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $pageParameterName, 1., $urlGenerationStrategy);
-            $last = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $pageParameterName, $lastPage, $urlGenerationStrategy);
+            $first = IriHelper::createIri($parsed['uri'] ?? $parsed['parts'], $parsed['parameters'], $pageParameterName, 1., $urlGenerationStrategy);
+            $last = IriHelper::createIri($parsed['uri'] ?? $parsed['parts'], $parsed['parameters'], $pageParameterName, $lastPage, $urlGenerationStrategy);
         }
 
         if (1. !== $currentPage) {
-            $previous = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $pageParameterName, $currentPage - 1., $urlGenerationStrategy);
+            $previous = IriHelper::createIri($parsed['uri'] ?? $parsed['parts'], $parsed['parameters'], $pageParameterName, $currentPage - 1., $urlGenerationStrategy);
         }
 
         if ((null !== $lastPage && $currentPage < $lastPage) || (null === $lastPage && $pageTotalItems >= $itemsPerPage)) {
-            $next = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $pageParameterName, $currentPage + 1., $urlGenerationStrategy);
+            $next = IriHelper::createIri($parsed['uri'] ?? $parsed['parts'], $parsed['parameters'], $pageParameterName, $currentPage + 1., $urlGenerationStrategy);
         }
 
         return [
@@ -65,7 +65,7 @@ trait PaginationHelperTrait
         $appliedFilters = $parsed['parameters'];
         unset($appliedFilters[$enabledParameterName]);
 
-        $id = IriHelper::createIri($parsed['parts'], $parsed['parameters'], $pageParameterName, $paginated ? $currentPage : null, $urlGenerationStrategy);
+        $id = IriHelper::createIri($parsed['uri'] ?? $parsed['parts'], $parsed['parameters'], $pageParameterName, $paginated ? $currentPage : null, $urlGenerationStrategy);
 
         if (!$paginated && $appliedFilters) {
             return new PartialCollectionView($id);
