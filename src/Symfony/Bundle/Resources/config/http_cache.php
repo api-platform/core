@@ -25,5 +25,7 @@ return function (ContainerConfigurator $container) {
             '%api_platform.http_cache.shared_max_age%',
             '%api_platform.http_cache.vary%',
             '%api_platform.http_cache.public%',
+            '%api_platform.http_cache.stale_while_revalidate%',
+            '%api_platform.http_cache.stale_if_error%',
         ]);
 };
