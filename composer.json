@@ -92,7 +92,7 @@
         "api-platform/http-cache": "self.version",
         "api-platform/hydra": "self.version",
         "api-platform/json-api": "self.version",
-        "api-platform/json-hal": "self.version",
+        "api-platform/hal": "self.version",
         "api-platform/json-schema": "self.version",
         "api-platform/jsonld": "self.version",
         "api-platform/laravel": "self.version",
