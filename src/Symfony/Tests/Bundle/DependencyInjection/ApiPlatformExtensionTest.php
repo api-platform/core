@@ -385,7 +385,8 @@ class ApiPlatformExtensionTest extends TestCase
     public function testPaginationMaximumItemsPerPageWhenDefaultsKeyIsMissing(): void
     {
         $config = self::DEFAULT_CONFIG;
-        unset($config['api_platform']['defaults']);
+        $apiPlatformConfig = $config['api_platform'];
+        unset($apiPlatformConfig['defaults']);
         (new ApiPlatformExtension())->load($config, $this->container);
 
         $this->assertTrue($this->container->hasParameter('api_platform.collection.pagination.maximum_items_per_page'));
