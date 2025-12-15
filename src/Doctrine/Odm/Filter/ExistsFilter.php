@@ -129,7 +129,7 @@ final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
     public function apply(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
         $parameter = $context['parameter'] ?? null;
-        if (null !== ($value = $context['filters'][$parameter?->getProperty()] ?? null)) {
+        if (null !== ($value = $context['filters'][$parameter?->getProperty() ?? ''] ?? null)) {
             $this->filterProperty($this->denormalizePropertyName($parameter->getProperty()), $value, $aggregationBuilder, $resourceClass, $operation, $context);
 
             return;

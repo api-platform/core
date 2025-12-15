@@ -38,7 +38,6 @@ final class PhpFileResourceExtractor extends AbstractResourceExtractor
         $resourceReflection = new \ReflectionClass($resource);
 
         foreach ($resourceReflection->getProperties() as $property) {
-            $property->setAccessible(true);
             $resolvedValue = $this->resolve($property->getValue($resource));
             $property->setValue($resource, $resolvedValue);
         }

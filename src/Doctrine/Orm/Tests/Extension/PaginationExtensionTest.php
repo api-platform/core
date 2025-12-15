@@ -388,7 +388,6 @@ class PaginationExtensionTest extends TestCase
         $this->assertInstanceOf(PaginatorInterface::class, $result);
 
         $doctrinePaginatorReflectionProperty = new \ReflectionProperty(AbstractPaginator::class, 'paginator');
-        $doctrinePaginatorReflectionProperty->setAccessible(true);
 
         $doctrinePaginator = $doctrinePaginatorReflectionProperty->getValue($result);
         $this->assertSame($expected, $doctrinePaginator->getFetchJoinCollection());
@@ -436,7 +435,6 @@ class PaginationExtensionTest extends TestCase
         $this->assertInstanceOf(PaginatorInterface::class, $result);
 
         $doctrinePaginatorReflectionProperty = new \ReflectionProperty(AbstractPaginator::class, 'paginator');
-        $doctrinePaginatorReflectionProperty->setAccessible(true);
 
         $doctrinePaginator = $doctrinePaginatorReflectionProperty->getValue($result);
         $this->assertSame($expected, $doctrinePaginator->getUseOutputWalkers());
