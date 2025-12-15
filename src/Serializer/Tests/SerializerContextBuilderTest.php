@@ -25,6 +25,7 @@ use ApiPlatform\Serializer\SerializerContextBuilder;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Serializer\Encoder\CsvEncoder;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -36,6 +37,7 @@ class SerializerContextBuilderTest extends TestCase
     private SerializerContextBuilder $builder;
     private HttpOperation $operation;
     private HttpOperation $patchOperation;
+    private HttpOperation $patchCollectionOperation;
 
     protected function setUp(): void
     {
@@ -49,10 +51,14 @@ class SerializerContextBuilderTest extends TestCase
             ]),
         ]);
 
-        $this->patchOperation = new Patch(inputFormats: ['json' => ['application/merge-patch+json']], name: 'patch');
+        $this->patchOperation = new Patch(inputFormats: ['json' => ['application/merge-patch+json'], 'csv' => ['text/csv']], name: 'patch');
+        $this->patchCollectionOperation = $this->patchOperation
+            ->withDenormalizationContext([CsvEncoder::AS_COLLECTION_KEY => true])
+            ->withName('patch_collection');
         $resourceMetadataWithPatch = new ResourceMetadataCollection('Foo', [
             new ApiResource(operations: [
                 'patch' => $this->patchOperation,
+                'patch_collection' => $this->patchCollectionOperation,
             ]),
         ]);
 
@@ -103,6 +109,20 @@ class SerializerContextBuilderTest extends TestCase
         $request = Request::create('/bars/1/foos');
         $request->attributes->replace(['_api_resource_class' => 'Foo', '_api_operation_name' => 'get', '_api_format' => 'xml', '_api_mime_type' => 'text/xml', 'id' => '1']);
         $expected = ['bar' => 'baz', 'operation_name' => 'get', 'resource_class' => 'Foo', 'request_uri' => '/bars/1/foos', 'api_allow_update' => false, 'uri' => 'http://localhost/bars/1/foos', 'output' => null, 'input' => null, 'iri_only' => false, 'operation' => $this->operation, 'skip_null_values' => true, 'exclude_from_cache_key' => ['root_operation', 'operation', 'object', 'data', 'property_metadata', 'circular_reference_limit_counters', 'debug_trace_id'], 'skip_null_to_one_relations' => true];
+        $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
+
+        $request = Request::create('/foowithpatch/1', 'PATCH', server: ['CONTENT_TYPE' => 'text/csv']);
+        $request->setFormat('csv', ['text/csv']);
+        $request->attributes->replace(['_api_resource_class' => 'FooWithPatch', '_api_operation_name' => 'patch', '_api_format' => 'csv', '_api_mime_type' => 'text/csv']);
+        $expected = ['operation_name' => 'patch', 'resource_class' => 'FooWithPatch', 'request_uri' => '/foowithpatch/1', 'api_allow_update' => true, 'uri' => 'http://localhost/foowithpatch/1', 'output' => null, 'input' => null, 'deep_object_to_populate' => true, 'skip_null_values' => true, 'iri_only' => false, 'operation' => $this->patchOperation, 'exclude_from_cache_key' => ['root_operation', 'operation', 'object', 'data', 'property_metadata', 'circular_reference_limit_counters', 'debug_trace_id'], 'skip_null_to_one_relations' => true];
+        $expected[CsvEncoder::AS_COLLECTION_KEY] = false;
+        $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
+
+        $request = Request::create('/foowithpatch/1', 'PATCH', server: ['CONTENT_TYPE' => 'text/csv']);
+        $request->setFormat('csv', ['text/csv']);
+        $request->attributes->replace(['_api_resource_class' => 'FooWithPatch', '_api_operation_name' => 'patch_collection', '_api_format' => 'csv', '_api_mime_type' => 'text/csv']);
+        $expected = ['operation_name' => 'patch_collection', 'resource_class' => 'FooWithPatch', 'request_uri' => '/foowithpatch/1', 'api_allow_update' => true, 'uri' => 'http://localhost/foowithpatch/1', 'output' => null, 'input' => null, 'deep_object_to_populate' => true, 'skip_null_values' => true, 'iri_only' => false, 'operation' => $this->patchCollectionOperation, 'exclude_from_cache_key' => ['root_operation', 'operation', 'object', 'data', 'property_metadata', 'circular_reference_limit_counters', 'debug_trace_id'], 'skip_null_to_one_relations' => true];
+        $expected[CsvEncoder::AS_COLLECTION_KEY] = true;
         $this->assertEquals($expected, $this->builder->createFromRequest($request, false));
     }
 
