@@ -95,6 +95,151 @@ class ObjectMapperProcessorTest extends TestCase
         $processor = new ObjectMapperProcessor($objectMapper, $decorated);
         $this->assertEquals($data, $processor->process($data, $operation));
     }
+
+    public function testProcessWithNoCustomInputAndNoCustomOutput(): void
+    {
+        $this->skipIfMapParameterNotAvailable();
+
+        $entity = new DummyEntity();
+        $persisted = new DummyEntity();
+        $operation = new Post(class: DummyEntity::class, map: true, write: true);
+
+        $objectMapper = $this->createMock(ObjectMapperInterface::class);
+        $objectMapper->expects($this->never())->method('map');
+
+        $decorated = $this->createMock(ProcessorInterface::class);
+        $decorated->expects($this->once())
+            ->method('process')
+            ->with($entity, $operation, [], [])
+            ->willReturn($persisted);
+
+        $processor = new ObjectMapperProcessor($objectMapper, $decorated);
+        $result = $processor->process($entity, $operation);
+
+        $this->assertSame($persisted, $result);
+    }
+
+    public function testProcessWithNoCustomInputAndCustomOutput(): void
+    {
+        $this->skipIfMapParameterNotAvailable();
+
+        $entity = new DummyEntity();
+        $persisted = new DummyEntity();
+        $output = new DummyOutput();
+        $operation = new Post(
+            class: DummyEntity::class,
+            output: ['class' => DummyOutput::class],
+            map: true,
+            write: true
+        );
+
+        $objectMapper = $this->createMock(ObjectMapperInterface::class);
+        $objectMapper->expects($this->once())
+            ->method('map')
+            ->with($persisted, DummyOutput::class)
+            ->willReturn($output);
+
+        $decorated = $this->createMock(ProcessorInterface::class);
+        $decorated->expects($this->once())
+            ->method('process')
+            ->with($entity, $operation, [], [])
+            ->willReturn($persisted);
+
+        $processor = new ObjectMapperProcessor($objectMapper, $decorated);
+        $result = $processor->process($entity, $operation);
+
+        $this->assertSame($output, $result);
+    }
+
+    public function testProcessWithCustomInputAndNoCustomOutput(): void
+    {
+        $this->skipIfMapParameterNotAvailable();
+
+        $input = new DummyInput();
+        $entity = new DummyEntity();
+        $persisted = new DummyEntity();
+        $operation = new Post(
+            class: DummyEntity::class,
+            input: ['class' => DummyInput::class],
+            map: true,
+            write: true
+        );
+
+        $objectMapper = $this->createMock(ObjectMapperInterface::class);
+        $objectMapper->expects($this->once())
+            ->method('map')
+            ->with($input, null)
+            ->willReturn($entity);
+
+        $decorated = $this->createMock(ProcessorInterface::class);
+        $decorated->expects($this->once())
+            ->method('process')
+            ->with($entity, $operation, [], [])
+            ->willReturn($persisted);
+
+        $processor = new ObjectMapperProcessor($objectMapper, $decorated);
+        $result = $processor->process($input, $operation);
+
+        $this->assertSame($persisted, $result);
+    }
+
+    public function testProcessWithCustomInputAndCustomOutput(): void
+    {
+        $this->skipIfMapParameterNotAvailable();
+
+        $input = new DummyInput();
+        $entity = new DummyEntity();
+        $persisted = new DummyEntity();
+        $output = new DummyOutput();
+        $operation = new Post(
+            class: DummyEntity::class,
+            input: ['class' => DummyInput::class],
+            output: ['class' => DummyOutput::class],
+            map: true,
+            write: true
+        );
+
+        $objectMapper = $this->createMock(ObjectMapperInterface::class);
+        $objectMapper->expects($this->exactly(2))
+            ->method('map')
+            ->willReturnCallback(function ($data, $target) use ($input, $entity, $persisted, $output) {
+                if ($data === $input && null === $target) {
+                    return $entity;
+                }
+                if ($data === $persisted && DummyOutput::class === $target) {
+                    return $output;
+                }
+                throw new \Exception('Unexpected map call');
+            });
+
+        $decorated = $this->createMock(ProcessorInterface::class);
+        $decorated->expects($this->once())
+            ->method('process')
+            ->with($entity, $operation, [], [])
+            ->willReturn($persisted);
+
+        $processor = new ObjectMapperProcessor($objectMapper, $decorated);
+        $result = $processor->process($input, $operation);
+
+        $this->assertSame($output, $result);
+    }
+
+    private function skipIfMapParameterNotAvailable(): void
+    {
+        try {
+            $reflection = new \ReflectionClass(Post::class);
+            $constructor = $reflection->getConstructor();
+            $parameters = $constructor->getParameters();
+            foreach ($parameters as $parameter) {
+                if ('map' === $parameter->getName()) {
+                    return;
+                }
+            }
+            $this->markTestSkipped('The "map" parameter is not available in this version');
+        } catch (\ReflectionException $e) {
+            $this->markTestSkipped('Could not check for "map" parameter availability');
+        }
+    }
 }
 
 class DummyResourceWithoutMap
@@ -103,5 +248,20 @@ class DummyResourceWithoutMap
 
 #[Map]
 class DummyResourceWithMap
+{
+}
+
+#[Map]
+class DummyEntity
+{
+}
+
+#[Map]
+class DummyInput
+{
+}
+
+#[Map]
+class DummyOutput
 {
 }
