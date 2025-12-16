@@ -95,6 +95,9 @@ final class MappingTest extends ApiTestCase
 
         $r = self::createClient()->request('PATCH', $uri, ['json' => ['username' => 'ba zar'], 'headers' => ['content-type' => 'application/merge-patch+json']]);
         $this->assertJsonContains(['username' => 'ba zar']);
+
+        $r = self::createClient()->request('DELETE', $uri);
+        $this->assertResponseStatusCodeSame(204);
     }
 
     public function testShouldMapToTheCorrectResource(): void
