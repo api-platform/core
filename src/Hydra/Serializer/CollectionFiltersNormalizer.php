@@ -25,6 +25,7 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Uri\Rfc3986\Uri;
 
 /**
  * Enhances the result of collection by adding the filters applied on collection.
@@ -94,10 +95,22 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
             return $data;
         }
 
-        $requestParts = parse_url($context['request_uri'] ?? '');
-        if (!\is_array($requestParts)) {
-            return $data;
+        $requestUri = $context['request_uri'] ?? '';
+        if (PHP_VERSION_ID >= 80500 && \class_exists(Uri::class)) {
+            if (null === $uri = Uri::parse($requestUri)) {
+                return $data;
+            }
+
+            $path = $uri->getPath();
+        } else {
+            $requestParts = parse_url($requestUri);
+            if (!\is_array($requestParts)) {
+                return $data;
+            }
+
+            $path = $requestParts['path'] ?? null;
         }
+
         $currentFilters = [];
         foreach ($resourceFilters as $filterId) {
             if ($filter = $this->getFilter($filterId)) {
@@ -112,7 +125,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
             ['mapping' => $mapping, 'keys' => $keys] = $this->getSearchMappingAndKeys($operation, $resourceClass, $currentFilters, $parameters, [$this, 'getFilter']);
             $data[$hydraPrefix.'search'] = [
                 '@type' => $hydraPrefix.'IriTemplate',
-                $hydraPrefix.'template' => \sprintf('%s{?%s}', $requestParts['path'], implode(',', $keys)),
+                $hydraPrefix.'template' => \sprintf('%s{?%s}', $path, implode(',', $keys)),
                 $hydraPrefix.'variableRepresentation' => 'BasicRepresentation',
                 $hydraPrefix.'mapping' => $this->convertMappingToArray($mapping),
             ];
