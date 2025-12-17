@@ -56,6 +56,11 @@ final class ObjectMapperProcessor implements ProcessorInterface
             $context,
         );
 
+        // in some cases (delete operation), the decoration may return a null object
+        if (null === $persisted) {
+            return $persisted;
+        }
+
         $request?->attributes->set('persisted_data', $persisted);
 
         // return the Resource representation of the persisted entity
