@@ -82,7 +82,7 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
 
         foreach ($object as $obj) {
             if ($iriOnly) {
-                $data[$hydraPrefix.'member'][] = $this->iriConverter->getIriFromResource($obj);
+                $data[$hydraPrefix.'member'][] = $this->iriConverter->getIriFromResource($obj, UrlGeneratorInterface::ABS_PATH, null, $context);
             } else {
                 $data[$hydraPrefix.'member'][] = $this->normalizer->normalize($obj, $format, $context + ['jsonld_has_context' => true]);
             }

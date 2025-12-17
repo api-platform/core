@@ -50,7 +50,17 @@ trait JsonLdContextTrait
 
     private function createJsonLdContext(AnonymousContextBuilderInterface $contextBuilder, object $object, array &$context): array
     {
-        $anonymousContext = ($context['output'] ?? []) + ['api_resource' => $context['api_resource'] ?? null];
+        $anonymousContext = ($context['output'] ?? []) + [
+            'api_resource' => $context['api_resource'] ?? null,
+        ];
+
+        if (isset($context['item_uri_template'])) {
+            $anonymousContext['item_uri_template'] = $context['item_uri_template'];
+        }
+
+        if (isset($context['types'])) {
+            $anonymousContext['types'] = $context['types'];
+        }
 
         if (isset($context[ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX])) {
             $anonymousContext[ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX] = $context[ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX];

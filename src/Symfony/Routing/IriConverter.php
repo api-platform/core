@@ -127,12 +127,12 @@ final class IriConverter implements IriConverterInterface
             return $this->generateSymfonyRoute($resource, $referenceType, $this->localOperationCache[$localOperationCacheKey], $context, $this->localIdentifiersExtractorOperationCache[$localOperationCacheKey] ?? null);
         }
 
-        if (!$this->resourceClassResolver->isResourceClass($resourceClass)) {
+        if (!isset($context['item_uri_template']) && !$this->resourceClassResolver->isResourceClass($resourceClass)) {
             return $this->generateSkolemIri($resource, $referenceType, $operation, $context, $resourceClass);
         }
 
         // This is only for when a class (that is not a resource) extends another one that is a resource, we should remove this behavior
-        if (!\is_string($resource) && !isset($context['force_resource_class'])) {
+        if (!\is_string($resource) && !isset($context['force_resource_class']) && !isset($context['item_uri_template'])) {
             $resourceClass = $this->getResourceClass($resource, true);
         }
 
