@@ -83,6 +83,7 @@ abstract class Metadata
         protected ?bool $jsonStream = null,
         protected ?bool $map = null,
         protected array $extraProperties = [],
+
     ) {
         if (\is_array($parameters) && $parameters) {
             $parameters = new Parameters($parameters);
@@ -90,6 +91,10 @@ abstract class Metadata
 
         $this->parameters = $parameters;
     }
+
+
+
+
 
     public function canMap(): ?bool
     {

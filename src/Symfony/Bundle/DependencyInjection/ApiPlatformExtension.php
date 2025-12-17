@@ -33,9 +33,25 @@ use ApiPlatform\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\AsOperationMutator;
 use ApiPlatform\Metadata\AsResourceMutator;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\FilterInterface;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\GraphQl\DeleteMutation;
+use ApiPlatform\Metadata\GraphQl\Mutation;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
+use ApiPlatform\Metadata\GraphQl\Subscription;
+use ApiPlatform\Metadata\HeaderParameter;
+use ApiPlatform\Metadata\McpResource;
+use ApiPlatform\Metadata\McpTool;
+use ApiPlatform\Metadata\NotExposed;
 use ApiPlatform\Metadata\OperationMutatorInterface;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\ResourceMutatorInterface;
+use ApiPlatform\Metadata\Tests\Fixtures\Metadata\Get;
 use ApiPlatform\Metadata\UriVariableTransformerInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\OpenApi\Model\Tag;
@@ -71,6 +87,7 @@ use Symfony\Component\Serializer\Normalizer\NumberNormalizer;
 use Symfony\Component\Uid\AbstractUid;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Yaml\Yaml;
+use Symfony\AI\McpBundle\McpBundle;
 use Twig\Environment;
 
 /**
@@ -182,6 +199,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if (class_exists(ObjectMapper::class) && class_exists(TranslationExtractCommand::class)) {
             $loader->load('state/object_mapper.php');
         }
+
+        if (($config['mcp']['enabled'] ?? false) && class_exists(McpBundle::class)) {
+            $loader->load('mcp.php');
+        }
+
         $container->registerForAutoconfiguration(FilterInterface::class)
             ->addTag('api_platform.filter');
         $container->registerForAutoconfiguration(ProviderInterface::class)
@@ -192,11 +214,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.uri_variables.transformer');
         $container->registerForAutoconfiguration(ParameterProviderInterface::class)
             ->addTag('api_platform.parameter_provider');
-        $container->registerAttributeForAutoconfiguration(ApiResource::class, static function (ChildDefinition $definition): void {
-            $definition->setAbstract(true)
-                ->addTag('api_platform.resource')
-                ->addTag('container.excluded', ['source' => 'by #[ApiResource] attribute']);
-        });
+
         $container->registerAttributeForAutoconfiguration(
             AsResourceMutator::class,
             static function (ChildDefinition $definition, AsResourceMutator $attribute, \ReflectionClass $reflector): void { // @phpstan-ignore-line
@@ -222,6 +240,31 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
                 ]);
             },
         );
+
+        foreach ([
+            McpTool::class,
+            McpResource::class,
+            Patch::class,
+            Delete::class,
+            DeleteMutation::class,
+            Subscription::class,
+            Query::class,
+            Get::class,
+            QueryParameter::class,
+            Mutation::class,
+            QueryCollection::class,
+            NotExposed::class,
+            HeaderParameter::class,
+            Post::class,
+            GetCollection::class,
+            Put::class,
+            ApiResource::class,
+        ] as $class) {
+            $container->registerAttributeForAutoconfiguration($class, static function (ChildDefinition $definition): void {
+                $definition
+                    ->addTag('api_platform.resource');
+            });
+        }
 
         if (!$container->has('api_platform.state.item_provider')) {
             $container->setAlias('api_platform.state.item_provider', 'api_platform.state_provider.object');
