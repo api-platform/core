@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\Util\StateOptionsTrait;
+use Doctrine\ODM\MongoDB\Aggregation\Builder as AggregationBuilder;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -57,7 +58,23 @@ final class CollectionProvider implements ProviderInterface
             throw new RuntimeException(\sprintf('The repository for "%s" must be an instance of "%s".', $documentClass, DocumentRepository::class));
         }
 
-        $aggregationBuilder = $repository->createAggregationBuilder();
+        if ($method = $this->getStateOptionsRepositoryMethod($operation)) {
+            if (!method_exists($repository, $method)) {
+                throw new RuntimeException(\sprintf('The repository method "%s::%s" does not exist.', $repository::class, $method));
+            }
+
+            $aggregationBuilder = $repository->{$method}();
+
+            if (!$aggregationBuilder instanceof AggregationBuilder) {
+                throw new RuntimeException(\sprintf('The repository method "%s" must return a %s instance.', $method, AggregationBuilder::class));
+            }
+        } else {
+            if (!method_exists($repository, 'createQueryBuilder')) {
+                throw new RuntimeException('The repository class must have a "createQueryBuilder" method.');
+            }
+
+            $aggregationBuilder = $repository->createAggregationBuilder();
+        }
 
         if ($handleLinks = $this->getLinksHandler($operation)) {
             $handleLinks($aggregationBuilder, $uriVariables, ['documentClass' => $documentClass, 'operation' => $operation] + $context);
