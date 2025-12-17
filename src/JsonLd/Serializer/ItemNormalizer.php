@@ -101,7 +101,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $resourceClass = $this->getObjectClass($object);
         $outputClass = $this->getOutputClass($context);
 
-        if ($outputClass && !$context['item_uri_template']) {
+        if ($outputClass && !($context['item_uri_template'] ?? null)) {
             return parent::normalize($object, $format, $context);
         }
 

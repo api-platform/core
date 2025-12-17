@@ -374,8 +374,6 @@ Feature: JSON-LD DTO input and output
     """
 
   @v3
-  # Cannot generate proper IRI because DTO does not support resource yet
-  # todo Change member IRI to `/dummy_foos/bar` once DTO support resource
   Scenario: Get a collection with a custom output and itemUriTemplate, from a resource without identifier
     When I send a "GET" request to "/dummy_foo_collection_dtos"
     Then the response status code should be 200
@@ -401,7 +399,7 @@ Feature: JSON-LD DTO input and output
             "additionalProperties": false,
             "required": ["@id", "@type", "foo", "bar"],
             "properties": {
-              "@id": {"pattern": "^/.well-known/genid/.+$"},
+              "@id": {"pattern": "/dummy_foos/bar"},
               "@type": {"pattern": "^DummyCollectionDtoOutput$"},
               "foo": {"type": "string"},
               "bar": {"type": "integer"}
