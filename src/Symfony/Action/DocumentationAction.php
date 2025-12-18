@@ -50,8 +50,8 @@ final class DocumentationAction
         ?Negotiator $negotiator = null,
         private readonly array $documentationFormats = [OpenApiNormalizer::JSON_FORMAT => ['application/vnd.openapi+json'], OpenApiNormalizer::FORMAT => ['application/json']],
         private readonly bool $swaggerUiEnabled = true,
-        private readonly bool $reDocEnabled = true,
         private readonly bool $docsEnabled = true,
+        private readonly bool $reDocEnabled = true,
     ) {
         $this->negotiator = $negotiator ?? new Negotiator();
     }
