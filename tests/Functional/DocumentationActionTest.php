@@ -23,17 +23,18 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class DocumentationActionAppKernel extends \AppKernel
 {
     public static bool $swaggerUiEnabled = true;
+    public static bool $reDocEnabled = true;
 
     public function getCacheDir(): string
     {
-        $suffix = self::$swaggerUiEnabled ? 'ui_enabled' : 'ui_disabled';
+        $suffix = (self::$swaggerUiEnabled ? 'ui_' : 'no_ui_').(self::$reDocEnabled ? 'redoc' : 'no_redoc');
 
         return parent::getCacheDir().'/'.$suffix;
     }
 
     public function getLogDir(): string
     {
-        $suffix = self::$swaggerUiEnabled ? 'ui_enabled' : 'ui_disabled';
+        $suffix = (self::$swaggerUiEnabled ? 'ui_' : 'no_ui_').(self::$reDocEnabled ? 'redoc' : 'no_redoc');
 
         return parent::getLogDir().'/'.$suffix;
     }
@@ -45,6 +46,7 @@ class DocumentationActionAppKernel extends \AppKernel
         $loader->load(static function (ContainerBuilder $container) {
             $container->loadFromExtension('api_platform', [
                 'enable_swagger_ui' => DocumentationActionAppKernel::$swaggerUiEnabled,
+                'enable_re_doc' => DocumentationActionAppKernel::$reDocEnabled,
             ]);
         });
     }
@@ -59,28 +61,32 @@ final class DocumentationActionTest extends ApiTestCase
         return DocumentationActionAppKernel::class;
     }
 
-    public function testHtmlDocumentationIsNotAccessibleWhenSwaggerUiIsDisabled(): void
+    public function testHtmlDocumentationIsNotAccessibleWhenSwaggerUiAndReDocAreDisabled(): void
     {
         DocumentationActionAppKernel::$swaggerUiEnabled = false;
+        DocumentationActionAppKernel::$reDocEnabled = false;
 
         $client = self::createClient();
 
         $container = static::getContainer();
         $this->assertFalse($container->getParameter('api_platform.enable_swagger_ui'));
+        $this->assertFalse($container->getParameter('api_platform.enable_re_doc'));
 
         $client->request('GET', '/docs', ['headers' => ['Accept' => 'text/html']]);
         $this->assertResponseStatusCodeSame(404);
-        $this->assertStringContainsString('Swagger UI is disabled.', $client->getResponse()->getContent(false));
+        $this->assertStringContainsString('Swagger UI and ReDoc are disabled.', $client->getResponse()->getContent(false));
     }
 
     public function testJsonDocumentationIsAccessibleWhenSwaggerUiIsDisabled(): void
     {
         DocumentationActionAppKernel::$swaggerUiEnabled = false;
+        DocumentationActionAppKernel::$reDocEnabled = false;
 
         $client = self::createClient();
 
         $container = static::getContainer();
         $this->assertFalse($container->getParameter('api_platform.enable_swagger_ui'));
+        $this->assertFalse($container->getParameter('api_platform.enable_re_doc'));
 
         $client->request('GET', '/docs.jsonopenapi', ['headers' => ['Accept' => 'application/vnd.openapi+json']]);
         $this->assertResponseIsSuccessful();
@@ -88,28 +94,64 @@ final class DocumentationActionTest extends ApiTestCase
         $this->assertJsonContains(['info' => ['title' => 'My Dummy API']]);
     }
 
-    public function testHtmlDocumentationIsAccessibleWhenSwaggerUiIsEnabled(): void
+    public function testHtmlDocumentationIsAccessibleWhenReDocEnabledAndSwaggerUiDisabled(): void
+    {
+        DocumentationActionAppKernel::$swaggerUiEnabled = false;
+        DocumentationActionAppKernel::$reDocEnabled = true;
+
+        $client = self::createClient();
+
+        $container = static::getContainer();
+        $this->assertFalse($container->getParameter('api_platform.enable_swagger_ui'));
+        $this->assertTrue($container->getParameter('api_platform.enable_re_doc'));
+
+        $client->request('GET', '/docs', ['headers' => ['Accept' => 'text/html']]);
+        $this->assertResponseIsSuccessful();
+        $this->assertStringNotContainsString('Swagger UI and ReDoc are disabled.', $client->getResponse()->getContent(false));
+    }
+
+    public function testHtmlDocumentationIsAccessibleWhenSwaggerUiEnabledAndReDocDisabled(): void
     {
         DocumentationActionAppKernel::$swaggerUiEnabled = true;
+        DocumentationActionAppKernel::$reDocEnabled = false;
 
         $client = self::createClient();
 
         $container = static::getContainer();
         $this->assertTrue($container->getParameter('api_platform.enable_swagger_ui'));
+        $this->assertFalse($container->getParameter('api_platform.enable_re_doc'));
 
         $client->request('GET', '/docs', ['headers' => ['Accept' => 'text/html']]);
         $this->assertResponseIsSuccessful();
-        $this->assertStringNotContainsString('Swagger UI is disabled.', $client->getResponse()->getContent(false));
+        $this->assertStringNotContainsString('Swagger UI and ReDoc are disabled.', $client->getResponse()->getContent(false));
+    }
+
+    public function testHtmlDocumentationIsAccessibleWhenSwaggerUiIsEnabled(): void
+    {
+        DocumentationActionAppKernel::$swaggerUiEnabled = true;
+        DocumentationActionAppKernel::$reDocEnabled = true;
+
+        $client = self::createClient();
+
+        $container = static::getContainer();
+        $this->assertTrue($container->getParameter('api_platform.enable_swagger_ui'));
+        $this->assertTrue($container->getParameter('api_platform.enable_re_doc'));
+
+        $client->request('GET', '/docs', ['headers' => ['Accept' => 'text/html']]);
+        $this->assertResponseIsSuccessful();
+        $this->assertStringNotContainsString('Swagger UI and ReDoc are disabled.', $client->getResponse()->getContent(false));
     }
 
     public function testJsonDocumentationIsAccessibleWhenSwaggerUiIsEnabled(): void
     {
         DocumentationActionAppKernel::$swaggerUiEnabled = true;
+        DocumentationActionAppKernel::$reDocEnabled = true;
 
         $client = self::createClient();
 
         $container = static::getContainer();
         $this->assertTrue($container->getParameter('api_platform.enable_swagger_ui'));
+        $this->assertTrue($container->getParameter('api_platform.enable_re_doc'));
 
         $client->request('GET', '/docs.jsonopenapi', ['headers' => ['Accept' => 'application/vnd.openapi+json']]);
         $this->assertResponseIsSuccessful();

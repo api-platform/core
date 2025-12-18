@@ -268,6 +268,7 @@ class ApiPlatformExtensionTest extends TestCase
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['enable_swagger'] = true;
         $config['api_platform']['enable_swagger_ui'] = false;
+        $config['api_platform']['enable_re_doc'] = false;
         $config['api_platform']['use_symfony_listeners'] = true;
 
         (new ApiPlatformExtension())->load($config, $this->container);
@@ -286,6 +287,26 @@ class ApiPlatformExtensionTest extends TestCase
         $config = self::DEFAULT_CONFIG;
         $config['api_platform']['enable_swagger'] = true;
         $config['api_platform']['enable_swagger_ui'] = true;
+        $config['api_platform']['use_symfony_listeners'] = true;
+
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $services = [
+            'api_platform.swagger_ui.processor',
+            'api_platform.swagger_ui.context',
+            'api_platform.swagger_ui.provider',
+            'api_platform.swagger_ui.documentation.provider',
+        ];
+
+        $this->assertContainerHas($services);
+    }
+
+    public function testReDocEnabledWithSwaggerUiDisabledConfiguration(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['enable_swagger'] = true;
+        $config['api_platform']['enable_swagger_ui'] = false;
+        $config['api_platform']['enable_re_doc'] = true;
         $config['api_platform']['use_symfony_listeners'] = true;
 
         (new ApiPlatformExtension())->load($config, $this->container);

@@ -36,10 +36,10 @@ class DocumentationActionTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testHtmlFormatWhenSwaggerUiDisabledThrows404(): void
+    public function testHtmlFormatWhenSwaggerUiAndReDocDisabledThrows404(): void
     {
         $this->expectException(NotFoundHttpException::class);
-        $this->expectExceptionMessage('Swagger UI is disabled.');
+        $this->expectExceptionMessage('Swagger UI and ReDoc are disabled.');
 
         $request = new Request();
         $request->attributes->set('_format', 'html');
@@ -55,9 +55,68 @@ class DocumentationActionTest extends TestCase
                 'html' => ['text/html'],
             ],
             swaggerUiEnabled: false,
+            reDocEnabled: false,
         );
 
         $documentation($request);
+    }
+
+    public function testHtmlFormatWhenReDocEnabledAndSwaggerUiDisabled(): void
+    {
+        $request = new Request();
+        $request->attributes->set('_format', 'html');
+
+        $openApiFactory = $this->createMock(OpenApiFactoryInterface::class);
+        $resourceNameCollectionFactory = $this->createMock(ResourceNameCollectionFactoryInterface::class);
+        $provider = $this->createMock(ProviderInterface::class);
+        $provider->expects($this->once())->method('provide')->willReturn(new OpenApi(new Info('title', '1.0.0'), [], new Paths()));
+        $processor = $this->createMock(ProcessorInterface::class);
+        $processor->expects($this->once())->method('process')->willReturnArgument(0);
+
+        $documentation = new DocumentationAction(
+            $resourceNameCollectionFactory,
+            openApiFactory: $openApiFactory,
+            provider: $provider,
+            processor: $processor,
+            documentationFormats: [
+                'json' => ['application/json'],
+                'html' => ['text/html'],
+            ],
+            swaggerUiEnabled: false,
+            reDocEnabled: true,
+        );
+
+        $result = $documentation($request);
+        $this->assertInstanceOf(OpenApi::class, $result);
+    }
+
+    public function testHtmlFormatWhenSwaggerUiEnabledAndReDocDisabled(): void
+    {
+        $request = new Request();
+        $request->attributes->set('_format', 'html');
+
+        $openApiFactory = $this->createMock(OpenApiFactoryInterface::class);
+        $resourceNameCollectionFactory = $this->createMock(ResourceNameCollectionFactoryInterface::class);
+        $provider = $this->createMock(ProviderInterface::class);
+        $provider->expects($this->once())->method('provide')->willReturn(new OpenApi(new Info('title', '1.0.0'), [], new Paths()));
+        $processor = $this->createMock(ProcessorInterface::class);
+        $processor->expects($this->once())->method('process')->willReturnArgument(0);
+
+        $documentation = new DocumentationAction(
+            $resourceNameCollectionFactory,
+            openApiFactory: $openApiFactory,
+            provider: $provider,
+            processor: $processor,
+            documentationFormats: [
+                'json' => ['application/json'],
+                'html' => ['text/html'],
+            ],
+            swaggerUiEnabled: true,
+            reDocEnabled: false,
+        );
+
+        $result = $documentation($request);
+        $this->assertInstanceOf(OpenApi::class, $result);
     }
 
     public function testJsonFormatWhenSwaggerUiDisabledIsAccessible(): void
