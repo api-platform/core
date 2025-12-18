@@ -127,12 +127,15 @@ final class IriConverter implements IriConverterInterface
             return $this->generateSymfonyRoute($resource, $referenceType, $this->localOperationCache[$localOperationCacheKey], $context, $this->localIdentifiersExtractorOperationCache[$localOperationCacheKey] ?? null);
         }
 
-        if (!$this->resourceClassResolver->isResourceClass($resourceClass)) {
+        if (!($isResourceClass = $this->resourceClassResolver->isResourceClass($resourceClass)) && !isset($context['item_uri_template'])) {
             return $this->generateSkolemIri($resource, $referenceType, $operation, $context, $resourceClass);
         }
 
+        $context['is_resource_class'] = $isResourceClass;
+        $context['current_resource_class'] = $resourceClass;
+
         // This is only for when a class (that is not a resource) extends another one that is a resource, we should remove this behavior
-        if (!\is_string($resource) && !isset($context['force_resource_class'])) {
+        if (!\is_string($resource) && !isset($context['force_resource_class']) && !isset($context['item_uri_template'])) {
             $resourceClass = $this->getResourceClass($resource, true);
         }
 
@@ -188,7 +191,7 @@ final class IriConverter implements IriConverterInterface
                 $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($resource, $identifiersExtractorOperation, $context);
             } catch (InvalidArgumentException|RuntimeException $e) {
                 // We can try using context uri variables if any
-                if (!$identifiers) {
+                if (!$identifiers && ($context['is_resource_class'] ?? false)) {
                     throw new InvalidArgumentException(\sprintf('Unable to generate an IRI for the item of type "%s"', $operation->getClass()), $e->getCode(), $e);
                 }
             }

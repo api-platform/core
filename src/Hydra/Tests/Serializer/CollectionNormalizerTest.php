@@ -224,8 +224,8 @@ class CollectionNormalizerTest extends TestCase
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResource(Foo::class, UrlGeneratorInterface::ABS_PATH, Argument::any(), Argument::any())->willReturn('/foos');
-        $iriConverterProphecy->getIriFromResource($fooOne)->willReturn('/foos/1');
-        $iriConverterProphecy->getIriFromResource($fooThree)->willReturn('/foos/3');
+        $iriConverterProphecy->getIriFromResource($fooOne, UrlGeneratorInterface::ABS_PATH, Argument::any(), Argument::any())->willReturn('/foos/1');
+        $iriConverterProphecy->getIriFromResource($fooThree, UrlGeneratorInterface::ABS_PATH, Argument::any(), Argument::any())->willReturn('/foos/3');
 
         $delegateNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
 
@@ -276,8 +276,8 @@ class CollectionNormalizerTest extends TestCase
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getIriFromResource(Foo::class, UrlGeneratorInterface::ABS_PATH, Argument::any(), Argument::any())->willReturn('/foos');
-        $iriConverterProphecy->getIriFromResource($fooOne)->willReturn('/foos/1');
-        $iriConverterProphecy->getIriFromResource($fooThree)->willReturn('/foos/3');
+        $iriConverterProphecy->getIriFromResource($fooOne, UrlGeneratorInterface::ABS_PATH, Argument::any(), Argument::any())->willReturn('/foos/1');
+        $iriConverterProphecy->getIriFromResource($fooThree, UrlGeneratorInterface::ABS_PATH, Argument::any(), Argument::any())->willReturn('/foos/3');
 
         $delegateNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
 
