@@ -13,24 +13,32 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource;
 
-use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Tests\Fixtures\TestBundle\State\JsonApiErrorTestProvider;
+use ApiPlatform\Metadata\Operation;
 
-#[ApiResource(
-    operations: [
-        new Get(
-            uriTemplate: '/jsonapi_error_test/{id}',
-            provider: JsonApiErrorTestProvider::class,
-        ),
-    ],
+#[Get(
+    uriTemplate: '/jsonapi_error_test/{id}',
+    provider: [self::class, 'provide'],
     formats: ['jsonapi' => ['application/vnd.api+json']],
 )]
 class JsonApiErrorTestResource
 {
-    #[ApiProperty(identifier: true)]
     public string $id;
-
     public string $name;
+
+    public static function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
+    {
+        $id = $uriVariables['id'] ?? null;
+
+        if ('existing' === $id) {
+            $resource = new self();
+            $resource->id = $id;
+            $resource->name = 'Existing Resource';
+
+            return $resource;
+        }
+
+        throw new ItemNotFoundException(\sprintf('Resource "%s" not found.', $id));
+    }
 }

@@ -35,16 +35,7 @@ final class ErrorNormalizer implements NormalizerInterface
     public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
         $jsonApiObject = $this->itemNormalizer->normalize($object, $format, $context);
-
-        if (!isset($jsonApiObject['data']['attributes'])) {
-            return ['errors' => [[
-                'id' => $jsonApiObject['data']['id'] ?? uniqid('error_', true),
-                'status' => (string) (method_exists($object, 'getStatusCode') ? $object->getStatusCode() : 500),
-                'title' => method_exists($object, 'getMessage') ? $object->getMessage() : 'An error occurred',
-            ]]];
-        }
-
-        $error = $jsonApiObject['data']['attributes'];
+        $error = $jsonApiObject['data']['attributes'] ?? [];
         $error['id'] = $jsonApiObject['data']['id'];
         if (isset($error['type'])) {
             $error['links'] = ['type' => $error['type']];
@@ -53,6 +44,11 @@ final class ErrorNormalizer implements NormalizerInterface
         if (!isset($error['code']) && method_exists($object, 'getId')) {
             $error['code'] = $object->getId();
         }
+
+        // TODO: change this 5.x
+        // if (isset($error['status'])) {
+        //     $error['status'] = (string) $error['status'];
+        // }
 
         if (!isset($error['violations'])) {
             return ['errors' => [$error]];

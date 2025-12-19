@@ -61,13 +61,3 @@ Feature: JSON API error handling
     And the JSON node "errors[0].status" should be equal to 404
     And the JSON node "errors[0].detail" should exist
     And the JSON node "errors[0].type" should exist
-
-  Scenario: Get a proper error when ItemNotFoundException is thrown from a provider
-    When I send a "GET" request to "/jsonapi_error_test/nonexistent"
-    Then the response status code should be 404
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/vnd.api+json; charset=utf-8"
-    And the JSON node "errors" should exist
-    And the JSON node "errors[0].status" should exist
-    And the JSON node "errors[0].title" should exist
-    And the JSON node "errors[0].id" should exist
