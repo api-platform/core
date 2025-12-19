@@ -1,5 +1,18 @@
 # Changelog
 
+## v4.2.11
+
+### Bug fixes
+
+* [0d9a44bef](https://github.com/api-platform/core/commit/0d9a44bef81db4db3656b3d83a9fdaa36a229579) fix(laravel): allow custom error handler for non-api operations (#7622)
+* [17415f789](https://github.com/api-platform/core/commit/17415f789e5aba9d833d12b74c0bf64fb8f64b07) fix(serializer): allow CsvEncoder::AS_COLLECTION_KEY in context (#7613)
+* [2a3449818](https://github.com/api-platform/core/commit/2a3449818a542a33e82800a3a1c3e83396e3510c) fix(symfony): check that required package are installed before configuring services (#7607)
+* [40ad56859](https://github.com/api-platform/core/commit/40ad5685960bfc0bd3dede7860f0a1eda31a3c5b) fix(jsonld): allow mapping collection output with itemUriTemplate (#7620)
+* [9f11aed8a](https://github.com/api-platform/core/commit/9f11aed8a44ac52b51b6f9c40f7000968d12823a) fix(state): delete with stateOptions and object mapper (#7615)
+* [a2da50905](https://github.com/api-platform/core/commit/a2da509059f5f63ad9c9dd3adce68ce74b543651) fix(symfony): enable ReDoc when Swagger UI is disabled (#7617)
+* [c0998928e](https://github.com/api-platform/core/commit/c0998928e651dcbffbf765cc7028badea15a3830) fix(symfony): enable to set default values for `stale-while-revalidate` and `stale-if-error` cache headers via config file (#7606)
+* [d847ad629](https://github.com/api-platform/core/commit/d847ad62918d561333ecb8ecb0e246b3c48b3758) fix(jsonapi): handle missing attributes in ErrorNormalizer (#7569)
+
 ## v4.2.10
 
 ### Bug fixes
