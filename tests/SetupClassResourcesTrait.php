@@ -21,7 +21,7 @@ trait SetupClassResourcesTrait
 
     public static function setUpBeforeClass(): void
     {
-        static::writeResources(self::getResources());
+        static::writeResources(static::getResources());
     }
 
     public static function tearDownAfterClass(): void
