@@ -70,6 +70,46 @@ final class DefinitionNameFactoryTest extends TestCase
         yield ['Bar.DtoOutput.jsonapi-read_write', Dummy::class, 'jsonapi', DtoOutput::class, new Get(shortName: 'Bar'), [AbstractNormalizer::GROUPS => ['read', 'write']]];
         yield ['Bar.DtoOutput.jsonhal-read_write', Dummy::class, 'jsonhal', DtoOutput::class, new Get(shortName: 'Bar'), [AbstractNormalizer::GROUPS => ['read', 'write']]];
         yield ['Bar.DtoOutput.jsonld-read_write', Dummy::class, 'jsonld', DtoOutput::class, new Get(shortName: 'Bar'), [AbstractNormalizer::GROUPS => ['read', 'write']]];
+
+        yield ['Dummy-id', Dummy::class, 'json', null, null, [AbstractNormalizer::ATTRIBUTES => ['id']]];
+        yield ['Dummy.jsonapi-id', Dummy::class, 'jsonapi', null, null, [AbstractNormalizer::ATTRIBUTES => ['id']]];
+        yield ['Dummy.jsonhal-id', Dummy::class, 'jsonhal', null, null, [AbstractNormalizer::ATTRIBUTES => ['id']]];
+        yield ['Dummy.jsonld-id', Dummy::class, 'jsonld', null, null, [AbstractNormalizer::ATTRIBUTES => ['id']]];
+
+        yield ['Dummy-id_name', Dummy::class, 'json', null, null, [AbstractNormalizer::ATTRIBUTES => ['id', 'name']]];
+        yield ['Dummy.jsonapi-id_name', Dummy::class, 'jsonapi', null, null, [AbstractNormalizer::ATTRIBUTES => ['id', 'name']]];
+        yield ['Dummy.jsonhal-id_name', Dummy::class, 'jsonhal', null, null, [AbstractNormalizer::ATTRIBUTES => ['id', 'name']]];
+        yield ['Dummy.jsonld-id_name', Dummy::class, 'jsonld', null, null, [AbstractNormalizer::ATTRIBUTES => ['id', 'name']]];
+
+        yield ['Dummy-title_author.name', Dummy::class, 'json', null, null, [AbstractNormalizer::ATTRIBUTES => ['title', 'author' => ['name']]]];
+        yield ['Dummy.jsonapi-title_author.name', Dummy::class, 'jsonapi', null, null, [AbstractNormalizer::ATTRIBUTES => ['title', 'author' => ['name']]]];
+        yield ['Dummy.jsonhal-title_author.name', Dummy::class, 'jsonhal', null, null, [AbstractNormalizer::ATTRIBUTES => ['title', 'author' => ['name']]]];
+        yield ['Dummy.jsonld-title_author.name', Dummy::class, 'jsonld', null, null, [AbstractNormalizer::ATTRIBUTES => ['title', 'author' => ['name']]]];
+
+        yield ['Dummy-title_author', Dummy::class, 'json', null, null, [AbstractNormalizer::ATTRIBUTES => ['title', 'author' => 'name']]];
+        yield ['Dummy.jsonapi-title_author', Dummy::class, 'jsonapi', null, null, [AbstractNormalizer::ATTRIBUTES => ['title', 'author' => 'name']]];
+        yield ['Dummy.jsonhal-title_author', Dummy::class, 'jsonhal', null, null, [AbstractNormalizer::ATTRIBUTES => ['title', 'author' => 'name']]];
+        yield ['Dummy.jsonld-title_author', Dummy::class, 'jsonld', null, null, [AbstractNormalizer::ATTRIBUTES => ['title', 'author' => 'name']]];
+
+        yield ['Dummy-title_author_name', Dummy::class, 'json', null, null, [AbstractNormalizer::ATTRIBUTES => ['title', 'author', 'name']]];
+        yield ['Dummy.jsonapi-title_author_name', Dummy::class, 'jsonapi', null, null, [AbstractNormalizer::ATTRIBUTES => ['title', 'author', 'name']]];
+        yield ['Dummy.jsonhal-title_author_name', Dummy::class, 'jsonhal', null, null, [AbstractNormalizer::ATTRIBUTES => ['title', 'author', 'name']]];
+        yield ['Dummy.jsonld-title_author_name', Dummy::class, 'jsonld', null, null, [AbstractNormalizer::ATTRIBUTES => ['title', 'author', 'name']]];
+
+        yield ['Dummy-title_author.name_name', Dummy::class, 'json', null, null, [AbstractNormalizer::ATTRIBUTES => ['title', 'author' => ['name'], 'name']]];
+        yield ['Dummy.jsonapi-title_author.name_name', Dummy::class, 'jsonapi', null, null, [AbstractNormalizer::ATTRIBUTES => ['title', 'author' => ['name'], 'name']]];
+        yield ['Dummy.jsonhal-title_author.name_name', Dummy::class, 'jsonhal', null, null, [AbstractNormalizer::ATTRIBUTES => ['title', 'author' => ['name'], 'name']]];
+        yield ['Dummy.jsonld-title_author.name_name', Dummy::class, 'jsonld', null, null, [AbstractNormalizer::ATTRIBUTES => ['title', 'author' => ['name'], 'name']]];
+
+        yield ['Dummy-title_author.name_author.id_name', Dummy::class, 'json', null, null, [AbstractNormalizer::ATTRIBUTES => ['title', 'author' => ['name', 'id'], 'name']]];
+        yield ['Dummy.jsonapi-title_author.name_author.id_name', Dummy::class, 'jsonapi', null, null, [AbstractNormalizer::ATTRIBUTES => ['title', 'author' => ['name', 'id'], 'name']]];
+        yield ['Dummy.jsonhal-title_author.name_author.id_name', Dummy::class, 'jsonhal', null, null, [AbstractNormalizer::ATTRIBUTES => ['title', 'author' => ['name', 'id'], 'name']]];
+        yield ['Dummy.jsonld-title_author.name_author.id_name', Dummy::class, 'jsonld', null, null, [AbstractNormalizer::ATTRIBUTES => ['title', 'author' => ['name', 'id'], 'name']]];
+
+        yield ['Bar.DtoOutput-title_author.name_name', Dummy::class, 'json', DtoOutput::class, new Get(shortName: 'Bar'), [AbstractNormalizer::ATTRIBUTES => ['title', 'author' => ['name'], 'name']]];
+        yield ['Bar.DtoOutput.jsonapi-title_author.name_name', Dummy::class, 'jsonapi', DtoOutput::class, new Get(shortName: 'Bar'), [AbstractNormalizer::ATTRIBUTES => ['title', 'author' => ['name'], 'name']]];
+        yield ['Bar.DtoOutput.jsonhal-title_author.name_name', Dummy::class, 'jsonhal', DtoOutput::class, new Get(shortName: 'Bar'), [AbstractNormalizer::ATTRIBUTES => ['title', 'author' => ['name'], 'name']]];
+        yield ['Bar.DtoOutput.jsonld-title_author.name_name', Dummy::class, 'jsonld', DtoOutput::class, new Get(shortName: 'Bar'), [AbstractNormalizer::ATTRIBUTES => ['title', 'author' => ['name'], 'name']]];
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('providerDefinitions')]

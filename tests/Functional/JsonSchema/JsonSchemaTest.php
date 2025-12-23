@@ -19,9 +19,11 @@ use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Symfony\Bundle\Test\Constraint\MatchesJsonSchema;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\AggregateRating;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ChildAttribute;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\Book;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5501\BrokenDocs;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5501\Related;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ParentAttribute;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Product;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ResourceWithEnumProperty;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ResourceWithIterableUnionProperty;
@@ -68,6 +70,8 @@ class JsonSchemaTest extends ApiTestCase
             Product::class,
             AggregateRating::class,
             ResourceWithIterableUnionProperty::class,
+            ParentAttribute::class,
+            ChildAttribute::class,
         ];
     }
 
@@ -260,5 +264,34 @@ class JsonSchemaTest extends ApiTestCase
         $this->assertContains(['$ref' => '#/definitions/NonResourceClass'], $unionSchemas);
         $this->assertContains(['type' => 'string'], $unionSchemas);
         $this->assertContains(['type' => 'integer'], $unionSchemas);
+    }
+
+    public function testSchemaWithAttributes(): void
+    {
+        $operation = $this->operationMetadataFactory->create('_api_/parent_attributes/{id}{._format}_get');
+        $context = $operation->getNormalizationContext() ?? [];
+
+        $schema = $this->schemaFactory->buildSchema(ParentAttribute::class, 'json', Schema::TYPE_OUTPUT, $operation, null, $context);
+
+        $parentDefinitionName = 'ParentAttribute-name_child.label';
+        $this->assertArrayHasKey($parentDefinitionName, $schema['definitions']);
+
+        $parentProperties = $schema['definitions'][$parentDefinitionName]['properties'];
+
+        $this->assertArrayHasKey('name', $parentProperties);
+        $this->assertArrayHasKey('child', $parentProperties);
+
+        $this->assertArrayNotHasKey('id', $parentProperties);
+        $this->assertArrayNotHasKey('description', $parentProperties);
+
+        $childDefinitionName = 'ChildAttribute-label';
+        $this->assertArrayHasKey($childDefinitionName, $schema['definitions']);
+
+        $childProperties = $schema['definitions'][$childDefinitionName]['properties'];
+
+        $this->assertArrayHasKey('label', $childProperties);
+
+        $this->assertArrayNotHasKey('hiddenData', $childProperties);
+        $this->assertArrayNotHasKey('id', $childProperties);
     }
 }

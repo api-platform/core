@@ -41,7 +41,7 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('groupsProvider')]
-    public function testCreate($readGroups, $writeGroups): void
+    public function testCreateWithGroups($readGroups, $writeGroups): void
     {
         $serializerClassMetadataFactoryProphecy = $this->prophesize(SerializerClassMetadataFactoryInterface::class);
         $dummySerializerClassMetadata = new SerializerClassMetadata(Dummy::class);
@@ -104,6 +104,71 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
         $this->assertTrue($actual[1]->isWritable());
         $this->assertTrue($actual[1]->isReadableLink());
         $this->assertFalse($actual[1]->isWritableLink());
+
+        $this->assertInstanceOf(ApiProperty::class, $actual[2]);
+        $this->assertFalse($actual[2]->isReadable());
+        $this->assertFalse($actual[2]->isWritable());
+    }
+
+    public static function attributesProvider(): array
+    {
+        return [
+            [['foo', 'relatedDummy'], ['foo']],
+            [['foo', 'relatedDummy' => ['name']], ['foo' => []]],
+        ];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('attributesProvider')]
+    public function testCreateWithAttributes($readAttributes, $writeAttributes): void
+    {
+        $serializerClassMetadataFactoryProphecy = $this->prophesize(SerializerClassMetadataFactoryInterface::class);
+        $dummySerializerClassMetadata = new SerializerClassMetadata(Dummy::class);
+        $dummySerializerClassMetadata->addAttributeMetadata(new SerializerAttributeMetadata('foo'));
+        $dummySerializerClassMetadata->addAttributeMetadata(new SerializerAttributeMetadata('relatedDummy'));
+        $dummySerializerClassMetadata->addAttributeMetadata(new SerializerAttributeMetadata('notIncluded'));
+        $serializerClassMetadataFactoryProphecy->getMetadataFor(Dummy::class)->willReturn($dummySerializerClassMetadata);
+        $relatedDummySerializerClassMetadata = new SerializerClassMetadata(RelatedDummy::class);
+        $serializerClassMetadataFactoryProphecy->getMetadataFor(RelatedDummy::class)->willReturn($relatedDummySerializerClassMetadata);
+
+        $context = ['normalization_attributes' => $readAttributes, 'denormalization_attributes' => $writeAttributes];
+
+        $decoratedProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $fooPropertyMetadata = (new ApiProperty())
+            ->withNativeType(Type::nullable(Type::array()))
+            ->withReadable(true)
+            ->withWritable(true);
+        $decoratedProphecy->create(Dummy::class, 'foo', $context)->willReturn($fooPropertyMetadata);
+        $relatedDummyPropertyMetadata = (new ApiProperty())
+            ->withNativeType(Type::nullable(Type::object(RelatedDummy::class)))
+            ->withReadable(true)
+            ->withWritable(true);
+        $decoratedProphecy->create(Dummy::class, 'relatedDummy', $context)->willReturn($relatedDummyPropertyMetadata);
+        $notIncludedPropertyMetadata = (new ApiProperty())
+            ->withNativeType(Type::nullable(Type::string()))
+            ->withReadable(true)
+            ->withWritable(true);
+        $decoratedProphecy->create(Dummy::class, 'notIncluded', $context)->willReturn($notIncludedPropertyMetadata);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->getResourceClass(null, RelatedDummy::class)->willReturn(RelatedDummy::class);
+
+        $serializerPropertyMetadataFactory = new SerializerPropertyMetadataFactory($serializerClassMetadataFactoryProphecy->reveal(), $decoratedProphecy->reveal(), $resourceClassResolverProphecy->reveal());
+
+        $actual = [];
+        $actual[] = $serializerPropertyMetadataFactory->create(Dummy::class, 'foo', $context);
+        $actual[] = $serializerPropertyMetadataFactory->create(Dummy::class, 'relatedDummy', $context);
+        $actual[] = $serializerPropertyMetadataFactory->create(Dummy::class, 'notIncluded', $context);
+
+        $this->assertInstanceOf(ApiProperty::class, $actual[0]);
+        $this->assertTrue($actual[0]->isReadable());
+        $this->assertTrue($actual[0]->isWritable());
+
+        $this->assertInstanceOf(ApiProperty::class, $actual[1]);
+        $this->assertTrue($actual[1]->isReadable());
+        $this->assertFalse($actual[1]->isWritable());
+        $this->assertTrue($actual[1]->isReadableLink());
 
         $this->assertInstanceOf(ApiProperty::class, $actual[2]);
         $this->assertFalse($actual[2]->isReadable());
