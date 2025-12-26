@@ -51,10 +51,20 @@ final class DefinitionNameFactoryTest extends TestCase
         yield ['Dummy.jsonhal-read', Dummy::class, 'jsonhal', null, null, [AbstractNormalizer::GROUPS => ['read']]];
         yield ['Dummy.jsonld-read', Dummy::class, 'jsonld', null, null, [AbstractNormalizer::GROUPS => ['read']]];
 
+        yield ['Dummy-user.read', Dummy::class, 'json', null, null, [AbstractNormalizer::GROUPS => ['user:read']]];
+        yield ['Dummy.jsonapi-user.read', Dummy::class, 'jsonapi', null, null, [AbstractNormalizer::GROUPS => ['user:read']]];
+        yield ['Dummy.jsonhal-user.read', Dummy::class, 'jsonhal', null, null, [AbstractNormalizer::GROUPS => ['user:read']]];
+        yield ['Dummy.jsonld-user.read', Dummy::class, 'jsonld', null, null, [AbstractNormalizer::GROUPS => ['user:read']]];
+
         yield ['Dummy-read_write', Dummy::class, 'json', null, null, [AbstractNormalizer::GROUPS => ['read', 'write']]];
         yield ['Dummy.jsonapi-read_write', Dummy::class, 'jsonapi', null, null, [AbstractNormalizer::GROUPS => ['read', 'write']]];
         yield ['Dummy.jsonhal-read_write', Dummy::class, 'jsonhal', null, null, [AbstractNormalizer::GROUPS => ['read', 'write']]];
         yield ['Dummy.jsonld-read_write', Dummy::class, 'jsonld', null, null, [AbstractNormalizer::GROUPS => ['read', 'write']]];
+
+        yield ['Dummy-user.read_user.write', Dummy::class, 'json', null, null, [AbstractNormalizer::GROUPS => ['user:read', 'user:write']]];
+        yield ['Dummy.jsonapi-user.read_user.write', Dummy::class, 'jsonapi', null, null, [AbstractNormalizer::GROUPS => ['user:read', 'user:write']]];
+        yield ['Dummy.jsonhal-user.read_user.write', Dummy::class, 'jsonhal', null, null, [AbstractNormalizer::GROUPS => ['user:read', 'user:write']]];
+        yield ['Dummy.jsonld-user.read_user.write', Dummy::class, 'jsonld', null, null, [AbstractNormalizer::GROUPS => ['user:read', 'user:write']]];
 
         yield ['Bar.DtoOutput-read_write', Dummy::class, 'json', DtoOutput::class, new Get(shortName: 'Bar'), [AbstractNormalizer::GROUPS => ['read', 'write']]];
         yield ['Bar.DtoOutput.jsonapi-read_write', Dummy::class, 'jsonapi', DtoOutput::class, new Get(shortName: 'Bar'), [AbstractNormalizer::GROUPS => ['read', 'write']]];
