@@ -43,7 +43,8 @@ class JsonApiTest extends ApiTestCase
         $this->assertJsonContains([
             'errors' => [
                 [
-                    'status' => '400',
+                    // TODO: change this to '400' in 5.x
+                    'status' => 400,
                     'detail' => 'Resource "nonexistent" not found.',
                 ],
             ],
