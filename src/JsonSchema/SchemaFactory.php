@@ -244,6 +244,16 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 continue;
             }
 
+            $childSerializerContext = $serializerContext + [self::FORCE_SUBSCHEMA => true, 'gen_id' => $propertyMetadata->getGenId() ?? true];
+            if (isset($serializerContext[AbstractNormalizer::ATTRIBUTES])) {
+                $attributes = $serializerContext[AbstractNormalizer::ATTRIBUTES];
+                if (\is_array($attributes) && \array_key_exists($normalizedPropertyName, $attributes) && \is_array($attributes[$normalizedPropertyName])) {
+                    $childSerializerContext[AbstractNormalizer::ATTRIBUTES] = $attributes[$normalizedPropertyName];
+                } else {
+                    unset($childSerializerContext[AbstractNormalizer::ATTRIBUTES]);
+                }
+            }
+
             $subSchemaFactory = $this->schemaFactory ?: $this;
             $subSchema = $subSchemaFactory->buildSchema(
                 $className,
@@ -251,7 +261,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 $parentType,
                 null,
                 $subSchema,
-                $serializerContext + [self::FORCE_SUBSCHEMA => true, 'gen_id' => $propertyMetadata->getGenId() ?? true],
+                $childSerializerContext,
                 false,
             );
 
