@@ -15,6 +15,7 @@ namespace ApiPlatform\Symfony\Bundle\Command;
 
 use ApiPlatform\GraphQl\Type\SchemaBuilderInterface;
 use GraphQL\Utils\SchemaPrinter;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -26,6 +27,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
+#[AsCommand(name: 'api:graphql:export')]
 class GraphQlExportCommand extends Command
 {
     public function __construct(private readonly SchemaBuilderInterface $schemaBuilder)
@@ -73,10 +75,5 @@ class GraphQlExportCommand extends Command
         }
 
         return \defined(Command::class.'::SUCCESS') ? Command::SUCCESS : 0;
-    }
-
-    public static function getDefaultName(): string
-    {
-        return 'api:graphql:export';
     }
 }
