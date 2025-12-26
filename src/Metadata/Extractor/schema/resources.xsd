@@ -27,7 +27,7 @@
 
     <xsd:complexType name="operations">
         <xsd:sequence maxOccurs="unbounded">
-            <xsd:element name="operation" maxOccurs="unbounded" type="operation"/>
+            <xsd:element name="operation" minOccurs="0" maxOccurs="unbounded" type="operation"/>
         </xsd:sequence>
     </xsd:complexType>
 
