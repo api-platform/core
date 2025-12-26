@@ -365,6 +365,16 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                     $className = $valueType->getWrappedType()->getClassName();
                 }
 
+                $childSerializerContext = $serializerContext + [self::FORCE_SUBSCHEMA => true, 'gen_id' => $propertyMetadata->getGenId() ?? true];
+                if (isset($serializerContext[AbstractNormalizer::ATTRIBUTES])) {
+                    $attributes = $serializerContext[AbstractNormalizer::ATTRIBUTES];
+                    if (\is_array($attributes) && \array_key_exists($normalizedPropertyName, $attributes) && \is_array($attributes[$normalizedPropertyName])) {
+                        $childSerializerContext[AbstractNormalizer::ATTRIBUTES] = $attributes[$normalizedPropertyName];
+                    } else {
+                        unset($childSerializerContext[AbstractNormalizer::ATTRIBUTES]);
+                    }
+                }
+
                 $subSchemaInstance = new Schema($version);
                 $subSchemaInstance->setDefinitions($schema->getDefinitions());
                 $subSchemaFactory = $this->schemaFactory ?: $this;
@@ -374,7 +384,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                     $parentType,
                     null,
                     $subSchemaInstance,
-                    $serializerContext + [self::FORCE_SUBSCHEMA => true, 'gen_id' => $propertyMetadata->getGenId() ?? true],
+                    $childSerializerContext,
                     false,
                 );
                 if (!isset($subSchemaResult['$ref'])) {
@@ -446,6 +456,18 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
         if ($operation && ($denormalizationGroups = $operation->getDenormalizationContext()['groups'] ?? null)) {
             $options['denormalization_groups'] = $denormalizationGroups;
+        }
+
+        if (isset($serializerContext[AbstractNormalizer::ATTRIBUTES])) {
+            $options['serializer_attributes'] = (array) $serializerContext[AbstractNormalizer::ATTRIBUTES];
+        }
+
+        if ($operation && ($normalizationAttributes = $operation->getNormalizationContext()['attributes'] ?? null)) {
+            $options['normalization_attributes'] = $normalizationAttributes;
+        }
+
+        if ($operation && ($denormalizationAttributes = $operation->getDenormalizationContext()['attributes'] ?? null)) {
+            $options['denormalization_attributes'] = $denormalizationAttributes;
         }
 
         if ($validationGroups) {
