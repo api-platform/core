@@ -23,7 +23,6 @@ use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
-use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
 
 /**
  * The date filter allows to filter a collection by date intervals.
@@ -127,8 +126,8 @@ final class DateFilter extends AbstractFilter implements DateFilterInterface, Js
     use DateFilterTrait;
 
     public const DOCTRINE_DATE_TYPES = [
-        MongoDbType::DATE => true,
-        MongoDbType::DATE_IMMUTABLE => true,
+        'date' => true,
+        'date_immutable' => true,
     ];
 
     /**

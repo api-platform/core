@@ -61,7 +61,13 @@ final class PropertyMetadataLoader implements LoaderInterface
         $attributesMetadata = $classMetadata->getAttributesMetadata();
 
         foreach ($refl->getAttributes() as $a) {
+            // Skip attributes whose classes don't exist (e.g., optional dependencies like MongoDB ODM)
+            if (!class_exists($a->getName()) && !interface_exists($a->getName())) {
+                continue;
+            }
+
             $attribute = $a->newInstance();
+
             if ($attribute instanceof DiscriminatorMap) {
                 $classMetadata->setClassDiscriminatorMapping(new ClassDiscriminatorMapping(
                     method_exists($attribute, 'getTypeProperty') ? $attribute->getTypeProperty() : $attribute->typeProperty,

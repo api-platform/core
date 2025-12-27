@@ -11,27 +11,27 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResourceOdm;
 
-use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
-use ApiPlatform\Doctrine\Orm\State\Options;
+use ApiPlatform\Doctrine\Odm\Filter\DateFilter as OdmDateFilter;
+use ApiPlatform\Doctrine\Odm\State\Options as OdmOptions;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Agent;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\AgentDocument;
 
-#[ApiFilter(DateFilter::class, properties: ['birthday'], alias: 'app_filter_date')]
+#[ApiFilter(OdmDateFilter::class, properties: ['birthday'], alias: 'app_filter_date_odm')]
 #[ApiResource(
-    shortName: 'Agent',
+    shortName: 'AgentDocument',
     operations: [
         new GetCollection(parameters: [
-            'birthday' => new QueryParameter(filter: 'app_filter_date'),
+            'birthday' => new QueryParameter(filter: 'app_filter_date_odm'),
         ]),
     ],
-    stateOptions: new Options(entityClass: Agent::class)
+    stateOptions: new OdmOptions(documentClass: AgentDocument::class)
 )]
-class AgentApi
+class AgentDocumentApi
 {
     private ?int $id = null;
 

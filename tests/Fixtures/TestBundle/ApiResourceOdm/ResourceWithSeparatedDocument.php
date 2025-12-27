@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResourceOdm;
 
 use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Odm\State\Options as ODMOptions;
