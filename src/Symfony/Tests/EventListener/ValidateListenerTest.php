@@ -137,7 +137,7 @@ class ValidateListenerTest extends TestCase
     }
 
     #[DataProvider('provideNonApiAttributes')]
-    public function testNoCallprovider(...$attributes): void
+    public function testNoCallprovider(array $attributes): void
     {
         $controllerResult = new \stdClass();
         $provider = $this->createMock(ProviderInterface::class);
@@ -159,8 +159,8 @@ class ValidateListenerTest extends TestCase
     public static function provideNonApiAttributes(): array
     {
         return [
-            ['_api_respond' => false, '_api_operation_name' => 'dummy'],
-            [],
+            [['_api_respond' => false, '_api_operation_name' => 'dummy']],
+            [[]],
         ];
     }
 }

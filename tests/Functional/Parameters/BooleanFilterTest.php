@@ -92,9 +92,9 @@ final class BooleanFilterTest extends ApiTestCase
     public static function booleanFilterNullAndEmptyScenariosProvider(): \Generator
     {
         yield 'active_null_value' => ['/filtered_boolean_parameters?active=null'];
-        yield 'active_empty_value' => ['/filtered_boolean_parameters?active=', 3];
+        yield 'active_empty_value' => ['/filtered_boolean_parameters?active='];
         yield 'enabled_alias_null_value' => ['/filtered_boolean_parameters?enabled=null'];
-        yield 'enabled_alias_empty_value' => ['/filtered_boolean_parameters?enabled=', 3];
+        yield 'enabled_alias_empty_value' => ['/filtered_boolean_parameters?enabled='];
     }
 
     /**

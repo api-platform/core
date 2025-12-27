@@ -1,0 +1,39 @@
+# To run this make sure you have php zts installed
+# In the `php.ini` set output_buffering = Off (or else you may not get the same measures)
+# Run `php-fpm -F` (it should default to 127.0.0.1:9000)
+# Run `frankenphp start --config Caddyfile` (do not use `run` or printing in the terminal will slow down the server)
+# You now have 2 servers:
+# - localhost:8080 with PHP FPM
+# - localhost:8081 with FrankenPHP
+#
+# Note that with no worker mode the performances on HTTP Request (sequentially !) will be likely the same.
+{
+	frankenphp
+}
+
+localhost:8080 {
+    header {
+        Access-Control-Allow-Origin *
+        Access-Control-Allow-Credentials true
+        Access-Control-Allow-Methods *
+        Access-Control-Allow-Headers *
+        defer
+    }
+    root * public/
+    php_fastcgi 127.0.0.1:9000
+    file_server
+}
+
+localhost:8081 {
+    header {
+        Access-Control-Allow-Origin *
+        Access-Control-Allow-Credentials true
+        Access-Control-Allow-Methods *
+        Access-Control-Allow-Headers *
+        defer
+    }
+    root * public/
+    file_server
+    log
+	php_server
+}

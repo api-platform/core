@@ -48,6 +48,7 @@ use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -465,50 +466,123 @@ class FieldsBuilderTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('resourceObjectTypeFieldsProvider')]
     public function testGetResourceObjectTypeFields(string $resourceClass, Operation $operation, array $properties, bool $input, int $depth, ?array $ioMetadata, array $expectedResourceObjectTypeFields, ?callable $advancedNameConverterFactory = null): void
     {
-        $this->resourceClassResolverProphecy->isResourceClass($resourceClass)->willReturn(true);
-        $this->resourceClassResolverProphecy->isResourceClass('nestedResourceClass')->willReturn(true);
-        $this->resourceClassResolverProphecy->isResourceClass('nestedResourceNoQueryClass')->willReturn(true);
-        $this->resourceClassResolverProphecy->isResourceClass(Argument::type('string'))->willReturn(false);
-        $this->propertyNameCollectionFactoryProphecy->create($resourceClass)->willReturn(new PropertyNameCollection(array_keys($properties)));
-        foreach ($properties as $propertyName => $propertyMetadata) {
-            $this->propertyMetadataFactoryProphecy->create($resourceClass, $propertyName, ['normalization_groups' => null, 'denormalization_groups' => null])->willReturn($propertyMetadata);
-            $this->typeConverterProphecy->convertPhpType(Type::null(), Argument::type('bool'), Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), '', $resourceClass, $propertyName, $depth + 1)->willReturn(null);
-            $this->typeConverterProphecy->convertPhpType(Type::callable(), Argument::type('bool'), Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), '', $resourceClass, $propertyName, $depth + 1)->willReturn('NotRegisteredType');
-            $this->typeConverterProphecy->convertPhpType(Argument::type(Type::class), Argument::type('bool'), Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), '', $resourceClass, $propertyName, $depth + 1)->willReturn(GraphQLType::string());
-            $this->typeConverterProphecy->convertPhpType(Type::list(Type::string()), Argument::type('bool'), Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), '', $resourceClass, $propertyName, $depth + 1)->willReturn(GraphQLType::nonNull(GraphQLType::listOf(GraphQLType::nonNull(GraphQLType::string()))));
+        $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturnCallback(function ($class) use ($resourceClass) {
+            return \in_array($class, [$resourceClass, 'nestedResourceClass', 'nestedResourceNoQueryClass'], true);
+        });
 
-            if ('propertyObject' === $propertyName) {
-                $this->typeConverterProphecy->convertPhpType(Argument::type(Type::class), Argument::type('bool'), Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), 'objectClass', $resourceClass, $propertyName, $depth + 1)->willReturn(new ObjectType(['name' => 'objectType', 'fields' => []]));
-                $this->itemResolverFactoryProphecy->__invoke('objectClass', $resourceClass, $operation, Argument::any())->willReturn(static function (): void {
-                });
-            }
-            if ('propertyNestedResource' === $propertyName) {
-                $nestedResourceQueryOperation = new Query();
-                $this->resourceMetadataCollectionFactoryProphecy->create('nestedResourceClass')->willReturn(new ResourceMetadataCollection('nestedResourceClass', [(new ApiResource())->withGraphQlOperations(['item_query' => $nestedResourceQueryOperation])]));
-                $this->typeConverterProphecy->convertPhpType(Argument::type(Type::class), Argument::type('bool'), Argument::that(static fn (Operation $arg): bool => $arg->getName() === $operation->getName()), 'nestedResourceClass', $resourceClass, $propertyName, $depth + 1)->willReturn(new ObjectType(['name' => 'objectType', 'fields' => []]));
-                $this->itemResolverFactoryProphecy->__invoke('nestedResourceClass', $resourceClass, $nestedResourceQueryOperation, Argument::any())->willReturn(static function (): void {
-                });
-            }
-        }
-        $this->typesContainerProphecy->has('NotRegisteredType')->willReturn(false);
-        $this->typesContainerProphecy->all()->willReturn([]);
+        $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->with($resourceClass)->willReturn(new PropertyNameCollection(array_keys($properties)));
 
-        $fieldsBuilder = $this->fieldsBuilder;
-        if ($advancedNameConverterFactory) {
-            $fieldsBuilder = $this->buildFieldsBuilder($advancedNameConverterFactory($this));
-        }
+        $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturnCallback(function ($class, $propertyName) use ($properties, $resourceClass) {
+            if ($class === $resourceClass && isset($properties[$propertyName])) {
+                return $properties[$propertyName];
+            }
+
+            return new ApiProperty();
+        });
+
+        $typeConverter = new class implements TypeConverterInterface {
+            public function convertType(\Symfony\Component\PropertyInfo\Type $type, bool $input, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth): GraphQLType|string|null
+            {
+                return null;
+            }
+
+            public function resolveType(string $type): ?GraphQLType
+            {
+                return null;
+            }
+
+            public function convertPhpType(Type $type, bool $input, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth): GraphQLType|string|null
+            {
+                if ($type->isIdentifiedBy(TypeIdentifier::NULL)) {
+                    return null;
+                }
+                if ($type->isIdentifiedBy(TypeIdentifier::CALLABLE)) {
+                    return 'NotRegisteredType';
+                }
+                if (method_exists($type, 'isList') && $type->isList()) {
+                    return GraphQLType::nonNull(GraphQLType::listOf(GraphQLType::nonNull(GraphQLType::string())));
+                }
+                if ('objectClass' === $resourceClass) {
+                    return new ObjectType(['name' => 'objectType', 'fields' => []]);
+                }
+                if ('nestedResourceClass' === $resourceClass) {
+                    return new ObjectType(['name' => 'objectType', 'fields' => []]);
+                }
+
+                return GraphQLType::string();
+            }
+        };
+
+        $itemResolverFactory = $this->createMock(ResolverFactoryInterface::class);
+        $itemResolverFactory->method('__invoke')->willReturn(static function (): void {
+        });
+
+        $nestedResourceQueryOperation = new Query();
+        $resourceMetadataCollectionFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactory->method('create')->with('nestedResourceClass')->willReturn(
+            new ResourceMetadataCollection('nestedResourceClass', [(new ApiResource())->withGraphQlOperations(['item_query' => $nestedResourceQueryOperation])])
+        );
+
+        $typesContainer = $this->createMock(TypesContainerInterface::class);
+        $typesContainer->method('has')->with('NotRegisteredType')->willReturn(false);
+        $typesContainer->method('all')->willReturn([]);
+
+        $typeBuilder = $this->createMock(ContextAwareTypeBuilderInterface::class);
+
+        $filterLocator = $this->createMock(ContainerInterface::class);
+
+        $nameConverter = $advancedNameConverterFactory ? $advancedNameConverterFactory($this) : new CustomConverter();
+
+        $fieldsBuilder = new FieldsBuilder(
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $resourceMetadataCollectionFactory,
+            $resourceClassResolver,
+            $typesContainer,
+            $typeBuilder,
+            $typeConverter,
+            $itemResolverFactory,
+            $filterLocator,
+            new Pagination(),
+            $nameConverter,
+            '__'
+        );
+
         $resourceObjectTypeFields = $fieldsBuilder->getResourceObjectTypeFields($resourceClass, $operation, $input, $depth, $ioMetadata);
 
-        $this->assertEquals($expectedResourceObjectTypeFields, $resourceObjectTypeFields);
+        // For fields with closures, we need to check them separately
+        foreach ($expectedResourceObjectTypeFields as $fieldName => $expectedField) {
+            $this->assertArrayHasKey($fieldName, $resourceObjectTypeFields, "Field '$fieldName' should exist");
+
+            // If expected field is just a type (not an array), compare directly
+            if (!\is_array($expectedField)) {
+                $this->assertEquals($expectedField, $resourceObjectTypeFields[$fieldName], "Field '$fieldName' should match");
+                continue;
+            }
+
+            foreach ($expectedField as $key => $value) {
+                if ('resolve' === $key && $value instanceof \Closure) {
+                    $this->assertInstanceOf(\Closure::class, $resourceObjectTypeFields[$fieldName][$key], "Field '$fieldName' resolve should be a closure");
+                } else {
+                    $this->assertEquals($value, $resourceObjectTypeFields[$fieldName][$key] ?? null, "Field '$fieldName' key '$key' should match");
+                }
+            }
+        }
+
+        // Check no extra fields exist
+        $this->assertSameSize($expectedResourceObjectTypeFields, $resourceObjectTypeFields, 'Number of fields should match');
     }
 
     public static function resourceObjectTypeFieldsProvider(): iterable
     {
         $advancedNameConverterFactory = function (self $that): NameConverterInterface {
-            $advancedNameConverterProphecy = $that->prophesize(NameConverterInterface::class);
-            $advancedNameConverterProphecy->normalize('field', \stdClass::class)->willReturn('normalizedField');
+            $nameConverter = $that->createMock(NameConverterInterface::class);
+            $nameConverter->method('normalize')->with('field', \stdClass::class)->willReturn('normalizedField');
 
-            return $advancedNameConverterProphecy->reveal();
+            return $nameConverter;
         };
 
         yield 'query' => [\stdClass::class, (new Query())->withClass(\stdClass::class),

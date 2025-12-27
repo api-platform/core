@@ -66,7 +66,7 @@ class AddFormatListenerTest extends TestCase
     }
 
     #[DataProvider('provideNonApiAttributes')]
-    public function testNoCallProvider(...$attributes): void
+    public function testNoCallProvider(array $attributes): void
     {
         $provider = $this->createMock(ProviderInterface::class);
         $provider->expects($this->never())->method('provide');
@@ -85,13 +85,13 @@ class AddFormatListenerTest extends TestCase
     public static function provideNonApiAttributes(): array
     {
         return [
-            ['_api_respond' => false, '_api_operation_name' => 'dummy'],
-            [],
+            [['_api_respond' => false, '_api_operation_name' => 'dummy']],
+            [[]],
         ];
     }
 
     #[DataProvider('provideOperationNotFound')]
-    public function testNoOperation(...$attributes): void
+    public function testNoOperation(array $attributes): void
     {
         $this->expectException(OperationNotFoundException::class);
         $provider = $this->createMock(ProviderInterface::class);
@@ -111,8 +111,8 @@ class AddFormatListenerTest extends TestCase
     public static function provideOperationNotFound(): array
     {
         return [
-            ['_api_resource_class' => 'dummy'],
-            ['_api_resource_class' => 'dummy', '_api_operation_name' => 'dummy'],
+            [['_api_resource_class' => 'dummy']],
+            [['_api_resource_class' => 'dummy', '_api_operation_name' => 'dummy']],
         ];
     }
 }
