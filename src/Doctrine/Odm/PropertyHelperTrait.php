@@ -47,11 +47,11 @@ trait PropertyHelperTrait
         $managerRegistry = $this->getManagerRegistry();
         $manager = $managerRegistry?->getManagerForClass($resourceClass);
 
-        if ($manager) {
-            return $manager->getClassMetadata($resourceClass);
+        if (!$manager) {
+            throw new InvalidArgumentException(\sprintf('Unable to get class metadata for resource "%s". No object manager found.', $resourceClass));
         }
 
-        return new MongoDbOdmClassMetadata($resourceClass);
+        return $manager->getClassMetadata($resourceClass);
     }
 
     /**
