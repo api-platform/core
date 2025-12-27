@@ -55,7 +55,6 @@ class QueryBuilderHelperTest extends TestCase
             $queryBuilder->getDQLPart('join')[$originAliasForJoinOnce ?? 'f'][0]->getAlias());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideAddJoinOnce')]
     public function testAddJoinOnceWithSpecifiedNewAlias(): void
     {
         $queryBuilder = new QueryBuilder($this->prophesize(EntityManagerInterface::class)->reveal());

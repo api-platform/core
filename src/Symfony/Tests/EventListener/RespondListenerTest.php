@@ -93,7 +93,7 @@ class RespondListenerTest extends TestCase
     }
 
     #[DataProvider('provideNonApiAttributes')]
-    public function testNoCallProcessor(...$attributes): void
+    public function testNoCallProcessor(array $attributes): void
     {
         $controllerResult = new \stdClass();
         $processor = $this->createMock(ProcessorInterface::class);
@@ -115,8 +115,8 @@ class RespondListenerTest extends TestCase
     public static function provideNonApiAttributes(): array
     {
         return [
-            ['_api_respond' => false, '_api_operation_name' => 'dummy'],
-            [],
+            [['_api_respond' => false, '_api_operation_name' => 'dummy']],
+            [[]],
         ];
     }
 }

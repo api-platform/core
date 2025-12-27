@@ -38,7 +38,7 @@
     "require-dev": {
         "api-platform/serializer": "^4.2.4",
         "api-platform/validator": "^4.2.4",
-        "phpunit/phpunit": "11.5.x-dev",
+        "phpunit/phpunit": "^12.2",
         "symfony/http-foundation": "^6.4.14 || ^7.0 || ^8.0",
         "symfony/object-mapper": "^7.4 || ^8.0",
         "symfony/type-info": "^7.4 || ^8.0",
@@ -90,11 +90,5 @@
     },
     "scripts": {
         "test": "./vendor/bin/phpunit"
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/soyuka/phpunit"
-        }
-    ]
+    }
 }

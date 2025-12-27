@@ -32,7 +32,7 @@
     },
     "require-dev": {
         "phpspec/prophecy-phpunit": "^2.2",
-        "phpunit/phpunit": "11.5.x-dev"
+        "phpunit/phpunit": "^12.2"
     },
     "autoload": {
         "psr-4": {
@@ -66,11 +66,5 @@
     },
     "scripts": {
         "test": "./vendor/bin/phpunit"
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/soyuka/phpunit"
-        }
-    ]
+    }
 }

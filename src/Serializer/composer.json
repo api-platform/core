@@ -38,7 +38,7 @@
         "api-platform/openapi": "^4.2",
         "doctrine/collections": "^2.1",
         "phpspec/prophecy-phpunit": "^2.2",
-        "phpunit/phpunit": "11.5.x-dev",
+        "phpunit/phpunit": "^12.2",
         "symfony/mercure-bundle": "*",
         "symfony/var-dumper": "^6.4 || ^7.0 || ^8.0",
         "symfony/yaml": "^6.4 || ^7.0 || ^8.0",
@@ -83,11 +83,5 @@
     },
     "scripts": {
         "test": "./vendor/bin/phpunit"
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/soyuka/phpunit"
-        }
-    ]
+    }
 }
