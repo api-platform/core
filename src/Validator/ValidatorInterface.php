@@ -25,6 +25,8 @@ interface ValidatorInterface
     /**
      * Validates an item.
      *
+     * @param array<string, mixed> $context
+     *
      * @throws ValidationException
      */
     public function validate(object $data, array $context = []): void;
