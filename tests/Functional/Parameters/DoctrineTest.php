@@ -300,4 +300,73 @@ final class DoctrineTest extends ApiTestCase
 
         $manager->flush();
     }
+
+    #[DataProvider('openApiParameterDocumentationProvider')]
+    public function testOpenApiParameterDocumentation(string $parameterName, bool $shouldHaveArrayNotation, string $expectedStyle, bool $expectedExplode, ?string $expectedSchemaType = null): void
+    {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('Not tested with mongodb.');
+        }
+
+        $resource = ProductWithQueryParameter::class;
+        $this->recreateSchema([$resource]);
+
+        $response = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $openApiDoc = $response->toArray();
+
+        $parameters = $openApiDoc['paths']['/product_with_query_parameters']['get']['parameters'];
+        $foundParameter = null;
+        $expectedName = $shouldHaveArrayNotation ? $parameterName.'[]' : $parameterName;
+        $alternativeName = $shouldHaveArrayNotation ? $parameterName : $parameterName.'[]';
+
+        foreach ($parameters as $parameter) {
+            if ($parameter['name'] === $expectedName || $parameter['name'] === $alternativeName) {
+                $foundParameter = $parameter;
+                break;
+            }
+        }
+
+        $this->assertNotNull($foundParameter, \sprintf('%s parameter should be present in OpenAPI documentation', $parameterName));
+        $this->assertSame($expectedName, $foundParameter['name'], \sprintf('Parameter name should%s have [] suffix', $shouldHaveArrayNotation ? '' : ' NOT'));
+        $this->assertSame('query', $foundParameter['in']);
+        $this->assertFalse($foundParameter['required']);
+
+        if ($expectedSchemaType) {
+            $this->assertSame($expectedSchemaType, $foundParameter['schema']['type'], \sprintf('Parameter schema type should be %s', $expectedSchemaType));
+        }
+
+        $this->assertSame($expectedStyle, $foundParameter['style'] ?? 'form', \sprintf('Style should be %s', $expectedStyle));
+        $this->assertSame($expectedExplode, $foundParameter['explode'] ?? false, \sprintf('Explode should be %s', $expectedExplode ? 'true' : 'false'));
+    }
+
+    public static function openApiParameterDocumentationProvider(): array
+    {
+        return [
+            'default behavior (no castToArray, no schema) should use array notation' => [
+                'parameterName' => 'brand',
+                'shouldHaveArrayNotation' => true,
+                'expectedStyle' => 'deepObject',
+                'expectedExplode' => true,
+                'expectedSchemaType' => 'string',
+            ],
+            'explicit schema type string should not use array notation' => [
+                'parameterName' => 'exactBrand',
+                'shouldHaveArrayNotation' => false,
+                'expectedStyle' => 'form',
+                'expectedExplode' => false,
+                'expectedSchemaType' => 'string',
+            ],
+            'castToArray false should not use array notation' => [
+                'parameterName' => 'exactCategory',
+                'shouldHaveArrayNotation' => false,
+                'expectedStyle' => 'form',
+                'expectedExplode' => false,
+                'expectedSchemaType' => 'string',
+            ],
+        ];
+    }
 }
