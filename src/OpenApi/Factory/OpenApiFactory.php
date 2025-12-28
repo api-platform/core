@@ -726,13 +726,14 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $arrayValueType = method_exists(PropertyInfoExtractor::class, 'getType') ? TypeIdentifier::ARRAY->value : LegacyType::BUILTIN_TYPE_ARRAY;
             $objectValueType = method_exists(PropertyInfoExtractor::class, 'getType') ? TypeIdentifier::OBJECT->value : LegacyType::BUILTIN_TYPE_OBJECT;
 
-            $style = 'array' === ($schema['type'] ?? null) && \in_array(
+            $isArraySchema = 'array' === ($schema['type'] ?? null);
+            $style = $isArraySchema && \in_array(
                 $description['type'],
                 [$arrayValueType, $objectValueType],
                 true
             ) ? 'deepObject' : 'form';
 
-            $parameter = isset($description['openapi']) && $description['openapi'] instanceof Parameter ? $description['openapi'] : new Parameter(in: 'query', name: $name, style: $style, explode: $description['is_collection'] ?? false);
+            $parameter = isset($description['openapi']) && $description['openapi'] instanceof Parameter ? $description['openapi'] : new Parameter(in: 'query', name: $name, style: $style, explode: $isArraySchema ? ($description['is_collection'] ?? false) : false);
 
             if ('' === $parameter->getDescription() && ($str = $description['description'] ?? '')) {
                 $parameter = $parameter->withDescription($str);
@@ -771,6 +772,8 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         $arrayValueType = method_exists(PropertyInfoExtractor::class, 'getType') ? TypeIdentifier::ARRAY->value : LegacyType::BUILTIN_TYPE_ARRAY;
         $objectValueType = method_exists(PropertyInfoExtractor::class, 'getType') ? TypeIdentifier::OBJECT->value : LegacyType::BUILTIN_TYPE_OBJECT;
 
+        $isArraySchema = 'array' === $schema['type'];
+
         return new Parameter(
             $name,
             'query',
@@ -779,12 +782,12 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $description['openapi']['deprecated'] ?? false,
             $description['openapi']['allowEmptyValue'] ?? null,
             $schema,
-            'array' === $schema['type'] && \in_array(
+            $isArraySchema && \in_array(
                 $description['type'],
                 [$arrayValueType, $objectValueType],
                 true
             ) ? 'deepObject' : 'form',
-            $description['openapi']['explode'] ?? ('array' === $schema['type']),
+            $description['openapi']['explode'] ?? $isArraySchema,
             $description['openapi']['allowReserved'] ?? null,
             $description['openapi']['example'] ?? null,
             isset(
