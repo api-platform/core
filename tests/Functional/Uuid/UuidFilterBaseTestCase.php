@@ -68,7 +68,7 @@ abstract class UuidFilterBaseTestCase extends ApiTestCase
 
         $response = self::createClient()->request('GET', '/'.$this->getUrlPrefix().'_devices', [
             'query' => [
-                'id' => $device->id->toString(),
+                'id' => (string) $device->id,
             ],
         ]);
 
@@ -80,9 +80,9 @@ abstract class UuidFilterBaseTestCase extends ApiTestCase
             [
                 'hydra:member' => [
                     [
-                        '@id' => '/'.$this->getUrlPrefix().'_devices/'.$device->id->toString(),
+                        '@id' => '/'.$this->getUrlPrefix().'_devices/'.$device->id,
                         '@type' => $this->geTypePrefix().'Device',
-                        'id' => $device->id->toString(),
+                        'id' => (string) $device->id,
                     ],
                 ],
             ],
@@ -103,8 +103,8 @@ abstract class UuidFilterBaseTestCase extends ApiTestCase
         $response = self::createClient()->request('GET', '/'.$this->getUrlPrefix().'_devices', [
             'query' => [
                 'id' => [
-                    $device->id->toString(),
-                    $otherDevice->id->toString(),
+                    (string) $device->id,
+                    (string) $otherDevice->id,
                 ],
             ],
         ]);
@@ -117,14 +117,14 @@ abstract class UuidFilterBaseTestCase extends ApiTestCase
             [
                 'hydra:member' => [
                     [
-                        '@id' => '/'.$this->getUrlPrefix().'_devices/'.$device->id->toString(),
+                        '@id' => '/'.$this->getUrlPrefix().'_devices/'.$device->id,
                         '@type' => $this->geTypePrefix().'Device',
-                        'id' => $device->id->toString(),
+                        'id' => (string) $device->id,
                     ],
                     [
-                        '@id' => '/'.$this->getUrlPrefix().'_devices/'.$otherDevice->id->toString(),
+                        '@id' => '/'.$this->getUrlPrefix().'_devices/'.$otherDevice->id,
                         '@type' => $this->geTypePrefix().'Device',
-                        'id' => $otherDevice->id->toString(),
+                        'id' => (string) $otherDevice->id,
                     ],
                 ],
             ],
@@ -172,7 +172,7 @@ abstract class UuidFilterBaseTestCase extends ApiTestCase
 
         $response = self::createClient()->request('GET', '/'.$this->getUrlPrefix().'_device_endpoints', [
             'query' => [
-                'myDevice' => $barDevice->id->toString(),
+                'myDevice' => (string) $barDevice->id,
             ],
         ]);
 
@@ -184,9 +184,9 @@ abstract class UuidFilterBaseTestCase extends ApiTestCase
             [
                 'hydra:member' => [
                     [
-                        '@id' => '/'.$this->getUrlPrefix().'_device_endpoints/'.$barDeviceEndpoint->id->toString(),
+                        '@id' => '/'.$this->getUrlPrefix().'_device_endpoints/'.$barDeviceEndpoint->id,
                         '@type' => $this->geTypePrefix().'DeviceEndpoint',
-                        'id' => $barDeviceEndpoint->id->toString(),
+                        'id' => (string) $barDeviceEndpoint->id,
                     ],
                 ],
             ],
@@ -210,8 +210,8 @@ abstract class UuidFilterBaseTestCase extends ApiTestCase
         $response = self::createClient()->request('GET', '/'.$this->getUrlPrefix().'_device_endpoints', [
             'query' => [
                 'myDevice' => [
-                    $fooDevice->id->toString(),
-                    $barDevice->id->toString(),
+                    (string) $fooDevice->id,
+                    (string) $barDevice->id,
                 ],
             ],
         ]);
@@ -224,14 +224,14 @@ abstract class UuidFilterBaseTestCase extends ApiTestCase
             [
                 'hydra:member' => [
                     [
-                        '@id' => '/'.$this->getUrlPrefix().'_device_endpoints/'.$fooDeviceEndpoint->id->toString(),
+                        '@id' => '/'.$this->getUrlPrefix().'_device_endpoints/'.$fooDeviceEndpoint->id,
                         '@type' => $this->geTypePrefix().'DeviceEndpoint',
-                        'id' => $fooDeviceEndpoint->id->toString(),
+                        'id' => (string) $fooDeviceEndpoint->id,
                     ],
                     [
-                        '@id' => '/'.$this->getUrlPrefix().'_device_endpoints/'.$barDeviceEndpoint->id->toString(),
+                        '@id' => '/'.$this->getUrlPrefix().'_device_endpoints/'.$barDeviceEndpoint->id,
                         '@type' => $this->geTypePrefix().'DeviceEndpoint',
-                        'id' => $barDeviceEndpoint->id->toString(),
+                        'id' => (string) $barDeviceEndpoint->id,
                     ],
                 ],
             ],
