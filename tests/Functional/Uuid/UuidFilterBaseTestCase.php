@@ -287,6 +287,10 @@ abstract class UuidFilterBaseTestCase extends ApiTestCase
 
     protected function tearDown(): void
     {
+        if ($this->isMongoDB()) {
+            return;
+        }
+
         $this->recreateSchema(static::getResources());
 
         parent::tearDown();
