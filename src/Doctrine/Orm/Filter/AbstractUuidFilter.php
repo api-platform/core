@@ -13,10 +13,16 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Filter;
 
+use ApiPlatform\Doctrine\Common\Filter\LoggerAwareInterface;
+use ApiPlatform\Doctrine\Common\Filter\LoggerAwareTrait;
+use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
+use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareTrait;
+use ApiPlatform\Doctrine\Common\PropertyHelperTrait;
+use ApiPlatform\Doctrine\Orm\PropertyHelperTrait as OrmPropertyHelperTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
-use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
@@ -32,33 +38,35 @@ use Doctrine\ORM\QueryBuilder;
 /**
  * @internal
  */
-class AbstractUuidFilter extends AbstractFilter implements OpenApiParameterFilterInterface
+class AbstractUuidFilter implements FilterInterface, ManagerRegistryAwareInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface, LoggerAwareInterface
 {
     use BackwardCompatibleFilterDescriptionTrait;
+    use LoggerAwareTrait;
+    use ManagerRegistryAwareTrait;
+    use OrmPropertyHelperTrait;
+    use PropertyHelperTrait;
 
     private const UUID_SCHEMA = [
         'type' => 'string',
         'format' => 'uuid',
     ];
 
-    protected function filterProperty(string $property, mixed $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
+    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
-        if (
-            null === $value
-            || !$this->isPropertyEnabled($property, $resourceClass)
-            || !$this->isPropertyMapped($property, $resourceClass, true)
-        ) {
+        $parameter = $context['parameter'] ?? null;
+        if (!$parameter) {
             return;
         }
 
+        $this->filterProperty($parameter->getProperty(), $parameter->getValue(), $queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
+    }
+
+    protected function filterProperty(string $property, mixed $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
+    {
         $alias = $queryBuilder->getRootAliases()[0];
         $field = $property;
 
-        $values = $this->normalizeValues((array) $value, $property);
-        if (null === $values) {
-            return;
-        }
-
+        $values = (array) $value;
         $associations = [];
         if ($this->isPropertyNested($property, $resourceClass)) {
             [$alias, $field, $associations] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass, Join::INNER_JOIN);
@@ -185,25 +193,8 @@ class AbstractUuidFilter extends AbstractFilter implements OpenApiParameterFilte
         ];
     }
 
-    /**
-     * Normalize the values array.
-     */
-    protected function normalizeValues(array $values, string $property): ?array
+    public function getSchema(Parameter $parameter): array
     {
-        foreach ($values as $key => $value) {
-            if (!\is_string($value)) {
-                unset($values[$key]);
-            }
-        }
-
-        if (0 === \count($values)) {
-            $this->getLogger()->notice('Invalid filter ignored', [
-                'exception' => new InvalidArgumentException(\sprintf('At least one value is required, multiple values should be in "%1$s[]=019b3c90-e265-72e5-a594-17b446a4067f&%1$s[]=019b3c9b-bce6-76dc-a066-9a44f4ec253f" format', $property)),
-            ]);
-
-            return null;
-        }
-
-        return array_values($values);
+        return self::UUID_SCHEMA;
     }
 }

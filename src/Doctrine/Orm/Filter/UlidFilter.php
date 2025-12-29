@@ -50,4 +50,9 @@ final class UlidFilter extends AbstractUuidFilter
             ),
         ];
     }
+
+    public function getSchema(Parameter $parameter): array
+    {
+        return self::ULID_SCHEMA;
+    }
 }
