@@ -15,6 +15,7 @@ namespace ApiPlatform\Metadata;
 
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
+use ApiPlatform\OpenApi\Model\PathItem;
 use ApiPlatform\State\OptionsInterface;
 
 /**
@@ -327,6 +328,7 @@ class ApiResource extends Metadata
         protected ?bool $collectDenormalizationErrors = null,
         protected ?array $hydraContext = null,
         protected bool|OpenApiOperation|null $openapi = null,
+        protected ?PathItem $openApiPathItem = null,
         /**
          * The `validationContext` option configures the context of validation for the current ApiResource.
          * You can, for instance, describe the validation groups that will be used:.
@@ -1362,6 +1364,19 @@ class ApiResource extends Metadata
     {
         $self = clone $this;
         $self->openapi = $openapi;
+
+        return $self;
+    }
+
+    public function getOpenApiPathItem(): ?PathItem
+    {
+        return $this->openApiPathItem;
+    }
+
+    public function withOpenApiPathItem(PathItem $openApiPathItem): static
+    {
+        $self = clone $this;
+        $self->openApiPathItem = $openApiPathItem;
 
         return $self;
     }
