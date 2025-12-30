@@ -50,7 +50,7 @@ final class ErrorProvider implements ProviderInterface
                     foreach ($resource->getOperations() as $name => $operation) {
                         if (isset($operation->getOutputFormats()[$request->getRequestFormat()])) {
                             $request->attributes->set('_api_operation', $operation);
-                            $request->attributes->set('_api_operation_nme', $name);
+                            $request->attributes->set('_api_operation_name', $name);
                             break 2;
                         }
                     }
