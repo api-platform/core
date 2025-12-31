@@ -258,6 +258,54 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $pathItem = $paths->getPath($path) ?? new PathItem();
             }
 
+            if ($openApiPathItem = $operation->getOpenApiPathItem()) {
+                if ($globalPathSummary = $openApiPathItem->getSummary()) {
+                    $pathItem = $pathItem->withSummary($globalPathSummary);
+
+                    foreach (PathItem::$methods as $pathMethod) {
+                        $getMethod = 'get'.ucfirst(strtolower($pathMethod));
+                        $withMethod = 'with'.ucfirst(strtolower($pathMethod));
+
+                        if (($existingOperation = $pathItem->{$getMethod}()) && $existingOperation instanceof Operation) {
+                            $existingOperationSummary = $existingOperation->getSummary();
+
+                            if ($existingOperationSummary === $this->getPathDescription($resourceShortName, $pathMethod, false) || $existingOperationSummary === $this->getPathDescription($resourceShortName, $pathMethod, true)) {
+                                $pathItem = $pathItem->{$withMethod}($existingOperation->withSummary($globalPathSummary));
+                            }
+                        }
+                    }
+                }
+
+                if ($globalPathDescription = $openApiPathItem->getDescription()) {
+                    $pathItem = $pathItem->withDescription($globalPathDescription);
+
+                    foreach (PathItem::$methods as $pathMethod) {
+                        $getMethod = 'get'.ucfirst(strtolower($pathMethod));
+                        $withMethod = 'with'.ucfirst(strtolower($pathMethod));
+
+                        if (($existingOperation = $pathItem->{$getMethod}()) && $existingOperation instanceof Operation) {
+                            $existingOperationDescription = $existingOperation->getDescription();
+
+                            if ($existingOperationDescription === $this->getPathDescription($resourceShortName, $pathMethod, false) || $existingOperationDescription === $this->getPathDescription($resourceShortName, $pathMethod, true)) {
+                                $pathItem = $pathItem->{$withMethod}($existingOperation->withDescription($globalPathDescription));
+                            }
+                        }
+                    }
+                }
+            }
+
+            if ($openapiAttribute instanceof Operation && $openapiSummary = $openapiAttribute->getSummary()) {
+                $openapiOperation = $openapiOperation->withSummary($openapiSummary);
+            } elseif ($parentSummary = $pathItem->getSummary()) {
+                $openapiOperation = $openapiOperation->withSummary($parentSummary);
+            }
+
+            if ($openapiAttribute instanceof Operation && $openapiDescription = $openapiAttribute->getDescription()) {
+                $openapiOperation = $openapiOperation->withDescription($openapiDescription);
+            } elseif ($parentDescription = $pathItem->getDescription()) {
+                $openapiOperation = $openapiOperation->withDescription($parentDescription);
+            }
+
             $forceSchemaCollection = $operation instanceof CollectionOperationInterface && 'GET' === $method;
             $schema = new Schema('openapi');
             $schema->setDefinitions($schemas);
