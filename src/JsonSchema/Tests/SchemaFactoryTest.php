@@ -16,7 +16,9 @@ namespace ApiPlatform\JsonSchema\Tests;
 use ApiPlatform\JsonSchema\DefinitionNameFactory;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactory;
+use ApiPlatform\JsonSchema\Tests\Fixtures\ApiResource\ChildAttributeDummy;
 use ApiPlatform\JsonSchema\Tests\Fixtures\ApiResource\OverriddenOperationDummy;
+use ApiPlatform\JsonSchema\Tests\Fixtures\ApiResource\ParentAttributeDummy;
 use ApiPlatform\JsonSchema\Tests\Fixtures\DummyResourceInterface;
 use ApiPlatform\JsonSchema\Tests\Fixtures\Enum\GenderTypeEnum;
 use ApiPlatform\JsonSchema\Tests\Fixtures\GenericChild;
@@ -25,6 +27,7 @@ use ApiPlatform\JsonSchema\Tests\Fixtures\NotAResourceWithUnionIntersectTypes;
 use ApiPlatform\JsonSchema\Tests\Fixtures\Serializable;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -529,6 +532,95 @@ class SchemaFactoryTest extends TestCase
         $this->assertArrayNotHasKey('default', $definitions[$rootDefinitionKey]['properties']['genderType']);
         $this->assertArrayNotHasKey('example', $definitions[$rootDefinitionKey]['properties']['genderType']);
         $this->assertSame('object', $definitions[$rootDefinitionKey]['properties']['genderType']['type']);
+    }
+
+    public function testBuildSchemaWithSerializerAttributes(): void
+    {
+        $shortName = (new \ReflectionClass(ParentAttributeDummy::class))->getShortName();
+        $childShortName = (new \ReflectionClass(ChildAttributeDummy::class))->getShortName();
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $serializerAttributes = ['title', 'child' => ['name']];
+        $operation = (new Get())->withName('get')->withNormalizationContext([
+            'attributes' => $serializerAttributes,
+            AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false,
+        ])->withShortName($shortName);
+        $resourceMetadataFactoryProphecy->create(ParentAttributeDummy::class)
+            ->willReturn(
+                new ResourceMetadataCollection(ParentAttributeDummy::class, [
+                    (new ApiResource())->withOperations(new Operations(['get' => $operation])),
+                ])
+            );
+        $childOperation = (new Get())->withName('get')->withShortName($childShortName);
+        $resourceMetadataFactoryProphecy->create(ChildAttributeDummy::class)
+            ->willReturn(
+                new ResourceMetadataCollection(ChildAttributeDummy::class, [
+                    (new ApiResource())->withOperations(new Operations(['get' => $childOperation])),
+                ])
+            );
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(ParentAttributeDummy::class, Argument::type('array'))->willReturn(new PropertyNameCollection(['title', 'child']));
+        $propertyNameCollectionFactoryProphecy->create(ChildAttributeDummy::class, Argument::type('array'))->willReturn(new PropertyNameCollection(['name']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(ParentAttributeDummy::class, 'title', Argument::type('array'))->willReturn(
+            (new ApiProperty())
+                ->withNativeType(Type::string())
+                ->withReadable(true)
+                ->withSchema(['type' => 'string'])
+        );
+        $propertyMetadataFactoryProphecy->create(ParentAttributeDummy::class, 'child', Argument::type('array'))->willReturn(
+            (new ApiProperty())
+                ->withNativeType(Type::object(ChildAttributeDummy::class))
+                ->withReadable(true)
+                ->withSchema(['type' => Schema::UNKNOWN_TYPE])
+        );
+        $propertyMetadataFactoryProphecy->create(ChildAttributeDummy::class, 'name', Argument::type('array'))->willReturn(
+            (new ApiProperty())
+                ->withNativeType(Type::string())
+                ->withReadable(true)
+                ->withSchema(['type' => 'string'])
+        );
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(ParentAttributeDummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(ChildAttributeDummy::class)->willReturn(true);
+
+        $definitionNameFactory = new DefinitionNameFactory();
+
+        $schemaFactory = new SchemaFactory(
+            resourceMetadataFactory: $resourceMetadataFactoryProphecy->reveal(),
+            propertyNameCollectionFactory: $propertyNameCollectionFactoryProphecy->reveal(),
+            propertyMetadataFactory: $propertyMetadataFactoryProphecy->reveal(),
+            resourceClassResolver: $resourceClassResolverProphecy->reveal(),
+            definitionNameFactory: $definitionNameFactory,
+        );
+        $resultSchema = $schemaFactory->buildSchema(ParentAttributeDummy::class, 'json', Schema::TYPE_OUTPUT, null, null, ['attributes' => $serializerAttributes, AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false]);
+
+        $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
+        $definitions = $resultSchema->getDefinitions();
+
+        $this->assertSame((new \ReflectionClass(ParentAttributeDummy::class))->getShortName().'-title_child.name', $rootDefinitionKey);
+        $this->assertTrue(isset($definitions[$rootDefinitionKey]));
+        $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]);
+        $this->assertSame('object', $definitions[$rootDefinitionKey]['type']);
+        $this->assertFalse($definitions[$rootDefinitionKey]['additionalProperties']);
+        $this->assertArrayHasKey('properties', $definitions[$rootDefinitionKey]);
+        $this->assertArrayHasKey('title', $definitions[$rootDefinitionKey]['properties']);
+        $this->assertArrayHasKey('type', $definitions[$rootDefinitionKey]['properties']['title']);
+        $this->assertSame('string', $definitions[$rootDefinitionKey]['properties']['title']['type']);
+        $this->assertArrayHasKey('child', $definitions[$rootDefinitionKey]['properties']);
+        $this->assertArrayHasKey('$ref', $definitions[$rootDefinitionKey]['properties']['child']);
+        $this->assertSame('#/definitions/ChildAttributeDummy-name', $definitions[$rootDefinitionKey]['properties']['child']['$ref']);
+
+        $childDefinitionKey = 'ChildAttributeDummy-name';
+        $this->assertTrue(isset($definitions[$childDefinitionKey]));
+        $this->assertArrayHasKey('type', $definitions[$childDefinitionKey]);
+        $this->assertSame('object', $definitions[$childDefinitionKey]['type']);
+        $this->assertFalse($definitions[$childDefinitionKey]['additionalProperties']);
+        $this->assertArrayHasKey('properties', $definitions[$childDefinitionKey]);
+        $this->assertArrayHasKey('name', $definitions[$childDefinitionKey]['properties']);
+        $this->assertArrayHasKey('type', $definitions[$childDefinitionKey]['properties']['name']);
+        $this->assertSame('string', $definitions[$childDefinitionKey]['properties']['name']['type']);
     }
 
     #[IgnoreDeprecations]

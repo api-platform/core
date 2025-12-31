@@ -57,13 +57,23 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
                 $denormalizationGroups = [$denormalizationGroups];
             }
 
+            [$normalizationAttributes, $denormalizationAttributes] = $this->getEffectiveSerializerAttributes($options);
+
+            if ($normalizationAttributes && !\is_array($normalizationAttributes)) {
+                $normalizationAttributes = [$normalizationAttributes];
+            }
+
+            if ($denormalizationAttributes && !\is_array($denormalizationAttributes)) {
+                $denormalizationAttributes = [$denormalizationAttributes];
+            }
+
             $ignoredAttributes = $options['ignored_attributes'] ?? [];
         } catch (ResourceClassNotFoundException) {
             // TODO: for input/output classes, the serializer groups must be read from the actual resource class
             return $propertyMetadata;
         }
 
-        $propertyMetadata = $this->transformReadWrite($propertyMetadata, $resourceClass, $property, $normalizationGroups, $denormalizationGroups, $ignoredAttributes);
+        $propertyMetadata = $this->transformReadWrite($propertyMetadata, $resourceClass, $property, $normalizationGroups, $denormalizationGroups, $normalizationAttributes, $denormalizationAttributes, $ignoredAttributes);
 
         // TODO: remove in 5.x
         if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
@@ -77,18 +87,18 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
                 }
             }
 
-            return $this->transformLinkStatusLegacy($propertyMetadata, $normalizationGroups, $denormalizationGroups, $types);
+            return $this->transformLinkStatusLegacy($propertyMetadata, $property, $normalizationGroups, $denormalizationGroups, $normalizationAttributes, $denormalizationAttributes, $types);
         }
         $type = $propertyMetadata->getNativeType();
         if (null !== $type && !$this->isResourceClass($resourceClass) && $type->isSatisfiedBy(static fn (Type $t): bool => $t instanceof CollectionType)) {
             return $propertyMetadata->withReadableLink(true)->withWritableLink(true);
         }
 
-        return $this->transformLinkStatus($propertyMetadata, $normalizationGroups, $denormalizationGroups, $type);
+        return $this->transformLinkStatus($propertyMetadata, $property, $normalizationGroups, $denormalizationGroups, $normalizationAttributes, $denormalizationAttributes, $type);
     }
 
     /**
-     * Sets readable/writable based on matching normalization/denormalization groups and property's ignorance.
+     * Sets readable/writable based on matching normalization/denormalization groups/attributes and property's ignorance.
      *
      * A false value is never reset as it could be unreadable/unwritable for other reasons.
      * If normalization/denormalization groups are not specified and the property is not ignored, the property is implicitly readable/writable.
@@ -96,7 +106,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
      * @param string[]|null $normalizationGroups
      * @param string[]|null $denormalizationGroups
      */
-    private function transformReadWrite(ApiProperty $propertyMetadata, string $resourceClass, string $propertyName, ?array $normalizationGroups = null, ?array $denormalizationGroups = null, array $ignoredAttributes = []): ApiProperty
+    private function transformReadWrite(ApiProperty $propertyMetadata, string $resourceClass, string $propertyName, ?array $normalizationGroups = null, ?array $denormalizationGroups = null, ?array $normalizationAttributes = null, ?array $denormalizationAttributes = null, array $ignoredAttributes = []): ApiProperty
     {
         if (\in_array($propertyName, $ignoredAttributes, true)) {
             return $propertyMetadata->withWritable(false)->withReadable(false);
@@ -107,26 +117,26 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
         $ignored = $serializerAttributeMetadata?->isIgnored() ?? false;
 
         if (false !== $propertyMetadata->isReadable()) {
-            $propertyMetadata = $propertyMetadata->withReadable(!$ignored && (null === $normalizationGroups || array_intersect($normalizationGroups, $groups)));
+            $propertyMetadata = $propertyMetadata->withReadable(!$ignored && (null === $normalizationGroups || array_intersect($normalizationGroups, $groups)) && (null === $normalizationAttributes || $this->isPropertyInAttributes($propertyName, $normalizationAttributes)));
         }
 
         if (false !== $propertyMetadata->isWritable()) {
-            $propertyMetadata = $propertyMetadata->withWritable(!$ignored && (null === $denormalizationGroups || array_intersect($denormalizationGroups, $groups)));
+            $propertyMetadata = $propertyMetadata->withWritable(!$ignored && (null === $denormalizationGroups || array_intersect($denormalizationGroups, $groups)) && (null === $denormalizationAttributes || $this->isPropertyInAttributes($propertyName, $denormalizationAttributes)));
         }
 
         return $propertyMetadata;
     }
 
     /**
-     * Sets readableLink/writableLink based on matching normalization/denormalization groups.
+     * Sets readableLink/writableLink based on matching normalization/denormalization groups/attributes.
      *
-     * If normalization/denormalization groups are not specified,
+     * If normalization/denormalization groups/attributes are not specified,
      * set link status to false since embedding of resource must be explicitly enabled
      *
      * @param string[]|null $normalizationGroups
      * @param string[]|null $denormalizationGroups
      */
-    private function transformLinkStatusLegacy(ApiProperty $propertyMetadata, ?array $normalizationGroups = null, ?array $denormalizationGroups = null, ?array $types = null): ApiProperty
+    private function transformLinkStatusLegacy(ApiProperty $propertyMetadata, string $propertyName, ?array $normalizationGroups = null, ?array $denormalizationGroups = null, ?array $normalizationAttributes = null, ?array $denormalizationAttributes = null, ?array $types = null): ApiProperty
     {
         // No need to check link status if property is not readable and not writable
         if (false === $propertyMetadata->isReadable() && false === $propertyMetadata->isWritable()) {
@@ -157,11 +167,11 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
             $relatedGroups = $this->getClassSerializerGroups($relatedClass);
 
             if (null === $propertyMetadata->isReadableLink()) {
-                $propertyMetadata = $propertyMetadata->withReadableLink(null !== $normalizationGroups && !empty(array_intersect($normalizationGroups, $relatedGroups)));
+                $propertyMetadata = $propertyMetadata->withReadableLink((null !== $normalizationGroups && !empty(array_intersect($normalizationGroups, $relatedGroups))) || (null !== $normalizationAttributes && $this->isPropertyInAttributes($propertyName, $normalizationAttributes)));
             }
 
             if (null === $propertyMetadata->isWritableLink()) {
-                $propertyMetadata = $propertyMetadata->withWritableLink(null !== $denormalizationGroups && !empty(array_intersect($denormalizationGroups, $relatedGroups)));
+                $propertyMetadata = $propertyMetadata->withWritableLink((null !== $denormalizationGroups && !empty(array_intersect($denormalizationGroups, $relatedGroups))) || (null !== $denormalizationAttributes && $this->isPropertyInAttributes($propertyName, $denormalizationAttributes)));
             }
 
             return $propertyMetadata;
@@ -171,15 +181,15 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
     }
 
     /**
-     * Sets readableLink/writableLink based on matching normalization/denormalization groups.
+     * Sets readableLink/writableLink based on matching normalization/denormalization groups/attributes.
      *
-     * If normalization/denormalization groups are not specified,
+     * If normalization/denormalization groups/attributes are not specified,
      * set link status to false since embedding of resource must be explicitly enabled
      *
      * @param string[]|null $normalizationGroups
      * @param string[]|null $denormalizationGroups
      */
-    private function transformLinkStatus(ApiProperty $propertyMetadata, ?array $normalizationGroups = null, ?array $denormalizationGroups = null, ?Type $type = null): ApiProperty
+    private function transformLinkStatus(ApiProperty $propertyMetadata, string $propertyName, ?array $normalizationGroups = null, ?array $denormalizationGroups = null, ?array $normalizationAttributes = null, ?array $denormalizationAttributes = null, ?Type $type = null): ApiProperty
     {
         // No need to check link status if property is not readable and not writable
         if (false === $propertyMetadata->isReadable() && false === $propertyMetadata->isWritable()) {
@@ -207,11 +217,11 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
         $relatedGroups = $this->getClassSerializerGroups($className);
 
         if (null === $propertyMetadata->isReadableLink()) {
-            $propertyMetadata = $propertyMetadata->withReadableLink(null !== $normalizationGroups && !empty(array_intersect($normalizationGroups, $relatedGroups)));
+            $propertyMetadata = $propertyMetadata->withReadableLink((null !== $normalizationGroups && !empty(array_intersect($normalizationGroups, $relatedGroups))) || (null !== $normalizationAttributes && $this->isPropertyInAttributes($propertyName, $normalizationAttributes)));
         }
 
         if (null === $propertyMetadata->isWritableLink()) {
-            $propertyMetadata = $propertyMetadata->withWritableLink(null !== $denormalizationGroups && !empty(array_intersect($denormalizationGroups, $relatedGroups)));
+            $propertyMetadata = $propertyMetadata->withWritableLink((null !== $denormalizationGroups && !empty(array_intersect($denormalizationGroups, $relatedGroups))) || (null !== $denormalizationAttributes && $this->isPropertyInAttributes($propertyName, $denormalizationAttributes)));
         }
 
         return $propertyMetadata;
@@ -238,6 +248,32 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
 
         if (\array_key_exists('normalization_groups', $options) && \array_key_exists('denormalization_groups', $options)) {
             return [$options['normalization_groups'] ?? null, $options['denormalization_groups'] ?? null];
+        }
+
+        return [null, null];
+    }
+
+    /**
+     * Gets the effective serializer attributes used in normalization/denormalization.
+     *
+     * Attributes are extracted in the following order:
+     *
+     * - From the "serializer_attributes" key of the $options array.
+     * - From metadata of the given operation ("operation_name" key).
+     * - From metadata of the current resource.
+     *
+     * @return (array|null)[]
+     */
+    private function getEffectiveSerializerAttributes(array $options): array
+    {
+        if (isset($options['serializer_attributes'])) {
+            $attributes = (array) $options['serializer_attributes'];
+
+            return [$attributes, $attributes];
+        }
+
+        if (\array_key_exists('normalization_attributes', $options) && \array_key_exists('denormalization_attributes', $options)) {
+            return [$options['normalization_attributes'] ?? null, $options['denormalization_attributes'] ?? null];
         }
 
         return [null, null];
@@ -271,5 +307,10 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
         }
 
         return array_unique(array_merge(...$groups));
+    }
+
+    private function isPropertyInAttributes(string $propertyName, array $attributes): bool
+    {
+        return \in_array($propertyName, $attributes, true) || \array_key_exists($propertyName, $attributes);
     }
 }
