@@ -402,4 +402,14 @@ class ApiPlatformExtensionTest extends TestCase
 
         $this->assertSame(0, $this->container->getParameter('api_platform.collection.pagination.maximum_items_per_page'));
     }
+
+    public function testPaginationMaximumItemsPerPageWhenDefaultsKeyIsMissing(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        unset($config['api_platform']['defaults']);
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertTrue($this->container->hasParameter('api_platform.collection.pagination.maximum_items_per_page'));
+        $this->assertSame(30, $this->container->getParameter('api_platform.collection.pagination.maximum_items_per_page'));
+    }
 }
