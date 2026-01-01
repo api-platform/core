@@ -31,7 +31,7 @@ interface PropertySchemaRestrictionMetadataInterface
      * @param Constraint  $constraint       The validation constraint
      * @param ApiProperty $propertyMetadata The property metadata
      *
-     * @return array The array of restrictions
+     * @return array<string, mixed> The array of restrictions
      */
     public function create(Constraint $constraint, ApiProperty $propertyMetadata): array;
 

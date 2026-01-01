@@ -25,6 +25,11 @@ interface FilterInterface extends BaseFilterInterface
 {
     /**
      * Apply a filter to the serializer context.
+     *
+     * @param array<string, mixed> $attributes
+     * @param array<string, mixed> $context
+     *
+     * @param-out array<string, mixed> $context
      */
     public function apply(Request $request, bool $normalization, array $attributes, array &$context): void;
 }
