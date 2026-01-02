@@ -22,7 +22,7 @@ final class UuidBinaryFilter extends AbstractUuidFilter
 {
     public function __construct()
     {
-        if (!InstalledVersions::satisfies(new VersionParser, 'doctrine/orm', '^3.0.1')) {
+        if (!InstalledVersions::satisfies(new VersionParser(), 'doctrine/orm', '^3.0.1')) {
             // @see https://github.com/doctrine/orm/pull/11287
             throw new \LogicException('The "doctrine/orm" package version 3.0.1 or higher is required to use the UuidBinaryFilter. Please upgrade your dependencies.');
         }

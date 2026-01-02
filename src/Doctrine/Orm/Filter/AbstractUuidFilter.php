@@ -87,7 +87,7 @@ class AbstractUuidFilter implements FilterInterface, ManagerRegistryAwareInterfa
             $this->logger->notice('Tried to filter on a non-existent field or association', [
                 'field' => $field,
                 'resource_class' => $resourceClass,
-                'exception' => new InvalidArgumentException(sprintf('Property "%s" does not exist in resource "%s".', $field, $resourceClass)),
+                'exception' => new InvalidArgumentException(\sprintf('Property "%s" does not exist in resource "%s".', $field, $resourceClass)),
             ]);
 
             return;
@@ -116,11 +116,8 @@ class AbstractUuidFilter implements FilterInterface, ManagerRegistryAwareInterfa
      */
     private function convertValuesToTheDatabaseRepresentationIfNecessary(QueryBuilder $queryBuilder, ?string $doctrineFieldType, array $values): array
     {
-        if ($doctrineFieldType === null || !Type::hasType($doctrineFieldType)) {
-            throw new \LogicException(sprintf(
-                'The Doctrine type "%s" is not valid or not registered.',
-                $doctrineFieldType
-            ));
+        if (null === $doctrineFieldType || !Type::hasType($doctrineFieldType)) {
+            throw new \LogicException(\sprintf('The Doctrine type "%s" is not valid or not registered.', $doctrineFieldType));
         }
 
         $doctrineType = Type::getType($doctrineFieldType);
