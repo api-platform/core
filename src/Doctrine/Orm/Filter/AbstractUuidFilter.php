@@ -134,12 +134,8 @@ class AbstractUuidFilter implements FilterInterface, ManagerRegistryAwareInterfa
     /**
      * Adds where clause.
      */
-    private function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, mixed $values): void
+    private function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, array $values): void
     {
-        if (!\is_array($values)) {
-            $values = [$values];
-        }
-
         $valueParameter = ':'.$queryNameGenerator->generateParameterName($field);
         $aliasedField = \sprintf('%s.%s', $alias, $field);
 
