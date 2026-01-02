@@ -61,7 +61,7 @@ class AbstractUuidFilter implements FilterInterface, ManagerRegistryAwareInterfa
         $this->filterProperty($parameter->getProperty(), $parameter->getValue(), $queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
     }
 
-    protected function filterProperty(string $property, mixed $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
+    private function filterProperty(string $property, mixed $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         $alias = $queryBuilder->getRootAliases()[0];
         $field = $property;
