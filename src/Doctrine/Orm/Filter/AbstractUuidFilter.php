@@ -117,7 +117,10 @@ class AbstractUuidFilter implements FilterInterface, ManagerRegistryAwareInterfa
     private function convertValuesToTheDatabaseRepresentationIfNecessary(QueryBuilder $queryBuilder, ?string $doctrineFieldType, array $values): array
     {
         if ($doctrineFieldType === null || !Type::hasType($doctrineFieldType)) {
-            return $values;
+            throw new \LogicException(sprintf(
+                'The Doctrine type "%s" is not valid or not registered.',
+                $doctrineFieldType
+            ));
         }
 
         $doctrineType = Type::getType($doctrineFieldType);
