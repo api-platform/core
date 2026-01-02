@@ -15,9 +15,20 @@ namespace ApiPlatform\Tests\Functional\Uuid;
 
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Uuid\RamseyUuidBinaryDevice;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Uuid\RamseyUuidBinaryDeviceEndpoint;
+use Composer\InstalledVersions;
+use Composer\Semver\VersionParser;
 
 class UuidFilterWithRamseyUuidBinaryTest extends UuidFilterBaseTestCase
 {
+    protected function setUp(): void
+    {
+        if (!InstalledVersions::satisfies(new VersionParser, 'doctrine/orm', '^3.0.1')) {
+            $this->markTestSkipped('The "doctrine/orm" package version 3.0.1 or higher is required to use the UuidBinaryFilter');
+        }
+
+        parent::setUp();
+    }
+
     /**
      * @return class-string[]
      */
