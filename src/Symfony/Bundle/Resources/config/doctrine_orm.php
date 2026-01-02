@@ -222,6 +222,15 @@ return function (ContainerConfigurator $container) {
         ->parent('api_platform.doctrine.orm.search_filter')
         ->args([[]]);
 
+    $services->set('api_platform.doctrine.orm.uuid_filter', 'ApiPlatform\Doctrine\Orm\Filter\UuidFilter');
+    $services->alias('ApiPlatform\Doctrine\Orm\Filter\UuidFilter', 'api_platform.doctrine.orm.uuid_filter');
+
+    $services->set('api_platform.doctrine.orm.ulid_filter', 'ApiPlatform\Doctrine\Orm\Filter\UlidFilter');
+    $services->alias('ApiPlatform\Doctrine\Orm\Filter\UlidFilter', 'api_platform.doctrine.orm.ulid_filter');
+
+    $services->set('api_platform.doctrine.orm.uuid_binary_filter', 'ApiPlatform\Doctrine\Orm\Filter\UuidBinaryFilter');
+    $services->alias('ApiPlatform\Doctrine\Orm\Filter\UuidBinaryFilter', 'api_platform.doctrine.orm.uuid_binary_filter');
+
     $services->set('api_platform.doctrine.orm.metadata.resource.metadata_collection_factory', 'ApiPlatform\Doctrine\Orm\Metadata\Resource\DoctrineOrmResourceCollectionMetadataFactory')
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 40)
         ->args([
