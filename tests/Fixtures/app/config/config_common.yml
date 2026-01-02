@@ -82,6 +82,7 @@ api_platform:
     http_cache:
         invalidation:
             enabled: true
+    # TODO: remove in 5.0
     enable_link_security: true
     # see also defaults in AppKernel
     doctrine_mongodb_odm: false

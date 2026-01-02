@@ -995,9 +995,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
     private function registerLinkSecurityConfiguration(PhpFileLoader $loader, array $config): void
     {
-        if ($config['enable_link_security']) {
-            $loader->load('link_security.php');
-        }
+        $loader->load('link_security.php');
     }
 
     private function registerJsonStreamerConfiguration(ContainerBuilder $container, PhpFileLoader $loader, array $formats, array $config): void

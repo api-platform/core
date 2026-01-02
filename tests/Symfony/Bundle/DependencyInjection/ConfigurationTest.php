@@ -233,7 +233,8 @@ class ConfigurationTest extends TestCase
             ],
             'use_symfony_listeners' => false,
             'handle_symfony_errors' => false,
-            'enable_link_security' => false,
+            // TODO: remove in 5.0
+            'enable_link_security' => true,
             'serializer' => [
                 'hydra_prefix' => null,
             ],
