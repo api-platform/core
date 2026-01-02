@@ -22,6 +22,7 @@ use ApiPlatform\Doctrine\Orm\PropertyHelperTrait as OrmPropertyHelperTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\JsonSchemaFilterInterface;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
@@ -83,6 +84,12 @@ class AbstractUuidFilter implements FilterInterface, ManagerRegistryAwareInterfa
 
         // metadata doesn't have the field, nor an association on the field
         if (!$metadata->hasAssociation($field)) {
+            $this->logger->notice('Tried to filter on a non-existent field or association', [
+                'field' => $field,
+                'resource_class' => $resourceClass,
+                'exception' => new InvalidArgumentException(sprintf('Property "%s" does not exist in resource "%s".', $field, $resourceClass)),
+            ]);
+
             return;
         }
 
