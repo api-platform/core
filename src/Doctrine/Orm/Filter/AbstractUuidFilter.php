@@ -116,26 +116,26 @@ class AbstractUuidFilter implements FilterInterface, ManagerRegistryAwareInterfa
      */
     private function convertValuesToTheDatabaseRepresentationIfNecessary(QueryBuilder $queryBuilder, ?string $doctrineFieldType, array $values): array
     {
-        if ($doctrineFieldType && Type::hasType($doctrineFieldType)) {
-            $doctrineType = Type::getType($doctrineFieldType);
-            $platform = $queryBuilder->getEntityManager()->getConnection()->getDatabasePlatform();
-            $databaseValues = [];
-
-            foreach ($values as $value) {
-                try {
-                    $databaseValues[] = $doctrineType->convertToDatabaseValue($value, $platform);
-                } catch (ConversionException $e) {
-                    $this->logger->notice('Invalid value conversion value to its database representation', [
-                        'exception' => $e,
-                    ]);
-                    $databaseValues[] = null;
-                }
-            }
-
-            return $databaseValues;
+        if ($doctrineFieldType === null || !Type::hasType($doctrineFieldType)) {
+            return $values;
         }
 
-        return $values;
+        $doctrineType = Type::getType($doctrineFieldType);
+        $platform = $queryBuilder->getEntityManager()->getConnection()->getDatabasePlatform();
+        $databaseValues = [];
+
+        foreach ($values as $value) {
+            try {
+                $databaseValues[] = $doctrineType->convertToDatabaseValue($value, $platform);
+            } catch (ConversionException $e) {
+                $this->logger->notice('Invalid value conversion value to its database representation', [
+                    'exception' => $e,
+                ]);
+                $databaseValues[] = null;
+            }
+        }
+
+        return $databaseValues;
     }
 
     /**
