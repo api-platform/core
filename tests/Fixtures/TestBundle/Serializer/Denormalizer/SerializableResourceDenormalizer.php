@@ -24,9 +24,9 @@ class SerializableResourceDenormalizer implements DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = null, array $context = []): mixed
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
-        $resource = new $class();
+        $resource = new $type();
         $resource->bar = $data['bar'];
         $resource->foo = $data['foo'];
         $resource->id = $data['id'];
@@ -37,12 +37,15 @@ class SerializableResourceDenormalizer implements DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return 'json' === $format && SerializableResource::class === $type && \is_array($data);
     }
 
-    public function getSupportedTypes($format): array
+    /**
+     * {@inheritdoc}
+     */
+    public function getSupportedTypes(?string $format): array
     {
         return 'json' === $format ? ['*' => true] : [];
     }

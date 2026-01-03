@@ -32,17 +32,17 @@ final class ErrorNormalizer implements NormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
-        $jsonApiObject = $this->itemNormalizer->normalize($object, $format, $context);
+        $jsonApiObject = $this->itemNormalizer->normalize($data, $format, $context);
         $error = $jsonApiObject['data']['attributes'] ?? [];
         $error['id'] = $jsonApiObject['data']['id'];
         if (isset($error['type'])) {
             $error['links'] = ['type' => $error['type']];
         }
 
-        if (!isset($error['code']) && method_exists($object, 'getId')) {
-            $error['code'] = $object->getId();
+        if (!isset($error['code']) && method_exists($data, 'getId')) {
+            $error['code'] = $data->getId();
         }
 
         // TODO: change this 5.x
@@ -81,9 +81,9 @@ final class ErrorNormalizer implements NormalizerInterface
     }
 
     /**
-     * @param string|null $format
+     * {@inheritdoc}
      */
-    public function getSupportedTypes($format): array
+    public function getSupportedTypes(?string $format): array
     {
         if (self::FORMAT === $format) {
             return [

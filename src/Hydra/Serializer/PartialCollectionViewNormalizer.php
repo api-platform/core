@@ -50,21 +50,21 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        $data = $this->collectionNormalizer->normalize($object, $format, $context);
+        $normalizedData = $this->collectionNormalizer->normalize($data, $format, $context);
 
         if (isset($context['api_sub_level'])) {
-            return $data;
+            return $normalizedData;
         }
 
-        if (!\is_array($data)) {
+        if (!\is_array($normalizedData)) {
             throw new UnexpectedValueException('Expected data to be an array');
         }
 
-        $paginated = $object instanceof PartialPaginatorInterface;
-        if ($paginated && $object instanceof PaginatorInterface) {
-            $paginated = 1. !== $object->getLastPage();
+        $paginated = $data instanceof PartialPaginatorInterface;
+        if ($paginated && $data instanceof PaginatorInterface) {
+            $paginated = 1. !== $data->getLastPage();
         }
 
         $parsed = IriHelper::parseIri($context['uri'] ?? $context['request_uri'] ?? '/', $this->pageParameterName);
@@ -72,7 +72,7 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         unset($appliedFilters[$this->enabledParameterName]);
 
         if (!$appliedFilters && !$paginated) {
-            return $data;
+            return $normalizedData;
         }
 
         $isPaginatedWithCursor = false;
@@ -88,12 +88,12 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         $hydraPrefix = $this->getHydraPrefix($context + $this->defaultContext);
 
         if ($isPaginatedWithCursor) {
-            $data[$hydraPrefix.'view'] = ['@id' => null, '@type' => $hydraPrefix.'PartialCollectionView'];
+            $normalizedData[$hydraPrefix.'view'] = ['@id' => null, '@type' => $hydraPrefix.'PartialCollectionView'];
 
-            return $this->populateDataWithCursorBasedPagination($data, $parsed, $object, $cursorPaginationAttribute, $operation?->getUrlGenerationStrategy() ?? $this->urlGenerationStrategy, $hydraPrefix);
+            return $this->populateDataWithCursorBasedPagination($normalizedData, $parsed, $data, $cursorPaginationAttribute, $operation?->getUrlGenerationStrategy() ?? $this->urlGenerationStrategy, $hydraPrefix);
         }
 
-        $partialCollectionView = $this->getPartialCollectionView($object, $context['uri'] ?? $context['request_uri'] ?? '/', $this->pageParameterName, $this->enabledParameterName, $operation?->getUrlGenerationStrategy() ?? $this->urlGenerationStrategy);
+        $partialCollectionView = $this->getPartialCollectionView($data, $context['uri'] ?? $context['request_uri'] ?? '/', $this->pageParameterName, $this->enabledParameterName, $operation?->getUrlGenerationStrategy() ?? $this->urlGenerationStrategy);
 
         $view = [
             '@id' => $partialCollectionView->id,
@@ -113,9 +113,9 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
             $view[$hydraPrefix.'next'] = $partialCollectionView->next;
         }
 
-        $data[$hydraPrefix.'view'] = $view;
+        $normalizedData[$hydraPrefix.'view'] = $view;
 
-        return $data;
+        return $normalizedData;
     }
 
     /**
@@ -127,9 +127,9 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
     }
 
     /**
-     * @param string|null $format
+     * {@inheritdoc}
      */
-    public function getSupportedTypes($format): array
+    public function getSupportedTypes(?string $format): array
     {
         return $this->collectionNormalizer->getSupportedTypes($format);
     }

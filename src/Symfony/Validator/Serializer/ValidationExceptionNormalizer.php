@@ -23,10 +23,13 @@ class ValidationExceptionNormalizer implements NormalizerInterface
     {
     }
 
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    /**
+     * {@inheritdoc}
+     */
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         $messages = [];
-        foreach ($object->getConstraintViolationList() as $violation) {
+        foreach ($data->getConstraintViolationList() as $violation) {
             $class = \is_object($root = $violation->getRoot()) ? $root::class : null;
 
             if ($this->nameConverter) {
@@ -39,20 +42,23 @@ class ValidationExceptionNormalizer implements NormalizerInterface
         }
 
         $str = implode("\n", $messages);
-        $object->setDetail($str);
+        $data->setDetail($str);
 
-        return $this->decorated->normalize($object, $format, $context);
+        return $this->decorated->normalize($data, $format, $context);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof ValidationException && $this->decorated->supportsNormalization($data, $format, $context);
     }
 
     /**
-     * @param string|null $format
+     * {@inheritdoc}
      */
-    public function getSupportedTypes($format): array
+    public function getSupportedTypes(?string $format): array
     {
         return [ValidationException::class => false];
     }

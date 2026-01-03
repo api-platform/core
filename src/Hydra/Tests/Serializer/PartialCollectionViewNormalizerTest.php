@@ -193,7 +193,7 @@ class PartialCollectionViewNormalizerTest extends TestCase
 
         // TODO: use prophecy when getSupportedTypes() will be added to the interface
         $normalizer = new PartialCollectionViewNormalizer(new class implements NormalizerInterface {
-            public function normalize(mixed $object, ?string $format = null, array $context = []): \ArrayObject|array|string|int|float|bool|null
+            public function normalize(mixed $data, ?string $format = null, array $context = []): \ArrayObject|array|string|int|float|bool|null
             {
                 return null;
             }

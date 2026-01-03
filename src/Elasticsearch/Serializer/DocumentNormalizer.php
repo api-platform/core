@@ -64,13 +64,13 @@ final class DocumentNormalizer implements NormalizerInterface, DenormalizerInter
     /**
      * {@inheritdoc}
      */
-    public function denormalize(mixed $data, string $class, ?string $format = null, array $context = []): mixed
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         if (\is_string($data['_id'] ?? null) && \is_array($data['_source'] ?? null)) {
-            $data = $this->populateIdentifier($data, $class)['_source'];
+            $data = $this->populateIdentifier($data, $type)['_source'];
         }
 
-        return $this->decoratedNormalizer->denormalize($data, $class, $format, $context);
+        return $this->decoratedNormalizer->denormalize($data, $type, $format, $context);
     }
 
     /**
@@ -87,7 +87,7 @@ final class DocumentNormalizer implements NormalizerInterface, DenormalizerInter
      *
      * @throws LogicException
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         throw new LogicException(\sprintf('%s is a write-only format.', self::FORMAT));
     }

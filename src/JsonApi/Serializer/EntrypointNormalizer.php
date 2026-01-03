@@ -39,11 +39,11 @@ final class EntrypointNormalizer implements NormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
         $entrypoint = ['links' => ['self' => $this->urlGenerator->generate('api_entrypoint', [], UrlGeneratorInterface::ABS_URL)]];
 
-        foreach ($object->getResourceNameCollection() as $resourceClass) {
+        foreach ($data->getResourceNameCollection() as $resourceClass) {
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
             foreach ($resourceMetadata as $resource) {
@@ -74,9 +74,9 @@ final class EntrypointNormalizer implements NormalizerInterface
     }
 
     /**
-     * @param string|null $format
+     * {@inheritdoc}
      */
-    public function getSupportedTypes($format): array
+    public function getSupportedTypes(?string $format): array
     {
         return self::FORMAT === $format ? [Entrypoint::class => true] : [];
     }

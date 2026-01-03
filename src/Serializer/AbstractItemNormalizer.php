@@ -105,6 +105,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         return $this->resourceClassResolver->isResourceClass($class);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getSupportedTypes(?string $format): array
     {
         return [
@@ -117,9 +120,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      *
      * @throws LogicException
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        $resourceClass = $context['force_resource_class'] ?? $this->getObjectClass($object);
+        $resourceClass = $context['force_resource_class'] ?? $this->getObjectClass($data);
         if ($outputClass = $this->getOutputClass($context)) {
             if (!$this->serializer instanceof NormalizerInterface) {
                 throw new LogicException('Cannot normalize the output because the injected serializer is not a normalizer');
@@ -130,7 +133,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $context['api_sub_level'] = true;
             $context[self::ALLOW_EXTRA_ATTRIBUTES] = false;
 
-            return $this->serializer->normalize($object, $format, $context);
+            return $this->serializer->normalize($data, $format, $context);
         }
 
         // Never remove this, with `application/json` we don't use our AbstractCollectionNormalizer and we need
@@ -144,7 +147,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         $context['api_normalize'] = true;
-        $iri = $context['iri'] ??= $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_URL, $context['operation'] ?? null, $context);
+        $iri = $context['iri'] ??= $this->iriConverter->getIriFromResource($data, UrlGeneratorInterface::ABS_URL, $context['operation'] ?? null, $context);
 
         /*
          * When true, converts the normalized data array of a resource into an
@@ -163,10 +166,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $context['resources'][$iri] = $iri;
         }
 
-        $context['object'] = $object;
+        $context['object'] = $data;
         $context['format'] = $format;
 
-        $data = parent::normalize($object, $format, $context);
+        $data = parent::normalize($data, $format, $context);
 
         $context['data'] = $data;
         unset($context['property_metadata'], $context['api_attribute']);
@@ -203,9 +206,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     /**
      * {@inheritdoc}
      */
-    public function denormalize(mixed $data, string $class, ?string $format = null, array $context = []): mixed
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
-        $resourceClass = $class;
+        $resourceClass = $type;
 
         if ($inputClass = $this->getInputClass($context)) {
             if (!$this->serializer instanceof DenormalizerInterface) {
@@ -224,13 +227,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         if (null === $objectToPopulate = $this->extractObjectToPopulate($resourceClass, $context, static::OBJECT_TO_POPULATE)) {
             $normalizedData = \is_scalar($data) ? [$data] : $this->prepareForDenormalization($data);
-            $class = $this->getClassDiscriminatorResolvedClass($normalizedData, $class, $context);
+            $type = $this->getClassDiscriminatorResolvedClass($normalizedData, $type, $context);
         }
 
         $context['api_denormalize'] = true;
 
-        if ($this->resourceClassResolver->isResourceClass($class)) {
-            $resourceClass = $this->resourceClassResolver->getResourceClass($objectToPopulate, $class);
+        if ($this->resourceClassResolver->isResourceClass($type)) {
+            $resourceClass = $this->resourceClassResolver->getResourceClass($objectToPopulate, $type);
             $context['resource_class'] = $resourceClass;
         }
 
@@ -257,9 +260,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         $previousObject = $this->clone($objectToPopulate);
-        $object = parent::denormalize($data, $class, $format, $context);
+        $object = parent::denormalize($data, $type, $format, $context);
 
-        if (!$this->resourceClassResolver->isResourceClass($class)) {
+        if (!$this->resourceClassResolver->isResourceClass($type)) {
             return $object;
         }
 
@@ -428,12 +431,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      *
      * Unused in this context.
      *
-     * @param object      $object
-     * @param string|null $format
-     *
      * @return string[]
      */
-    protected function extractAttributes($object, $format = null, array $context = []): array
+    protected function extractAttributes(object $object, ?string $format = null, array $context = []): array
     {
         return [];
     }

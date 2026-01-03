@@ -64,9 +64,9 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): \ArrayObject|array|string|int|float|bool|null
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        return $this->decorated->normalize($object, $format, $context);
+        return $this->decorated->normalize($data, $format, $context);
     }
 
     /**
@@ -78,9 +78,9 @@ final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface
     }
 
     /**
-     * @param string|null $format
+     * {@inheritdoc}
      */
-    public function getSupportedTypes($format): array
+    public function getSupportedTypes(?string $format): array
     {
         return DocumentNormalizer::FORMAT !== $format ? $this->decorated->getSupportedTypes($format) : [];
     }

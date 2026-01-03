@@ -42,9 +42,9 @@ final class ObjectNormalizer implements NormalizerInterface
     }
 
     /**
-     * @param string|null $format
+     * {@inheritdoc}
      */
-    public function getSupportedTypes($format): array
+    public function getSupportedTypes(?string $format): array
     {
         return self::FORMAT === $format ? $this->decorated->getSupportedTypes($format) : [];
     }
@@ -52,16 +52,16 @@ final class ObjectNormalizer implements NormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         if (isset($context['api_resource'])) {
             $originalResource = $context['api_resource'];
             unset($context['api_resource']);
         }
 
-        $data = $this->decorated->normalize($object, $format, $context);
-        if (!\is_array($data) || isset($context['api_attribute'])) {
-            return $data;
+        $normalizedData = $this->decorated->normalize($data, $format, $context);
+        if (!\is_array($normalizedData) || isset($context['api_attribute'])) {
+            return $normalizedData;
         }
 
         if (isset($originalResource)) {
@@ -72,13 +72,13 @@ final class ObjectNormalizer implements NormalizerInterface
             ];
         } else {
             $resourceData = [
-                'id' => $this->iriConverter->getIriFromResource($object),
-                'type' => (new \ReflectionClass($this->getObjectClass($object)))->getShortName(),
+                'id' => $this->iriConverter->getIriFromResource($data),
+                'type' => (new \ReflectionClass($this->getObjectClass($data)))->getShortName(),
             ];
         }
 
-        if ($data) {
-            $resourceData['attributes'] = $data;
+        if ($normalizedData) {
+            $resourceData['attributes'] = $normalizedData;
         }
 
         return ['data' => $resourceData];

@@ -34,9 +34,9 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
-        [$messages, $violations] = $this->getMessagesAndViolations($object);
+        [$messages, $violations] = $this->getMessagesAndViolations($data);
 
         return $violations;
     }

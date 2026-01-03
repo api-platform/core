@@ -53,6 +53,9 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
         return static::FORMAT === $format && is_iterable($data);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getSupportedTypes(?string $format): array
     {
         /*
@@ -73,27 +76,27 @@ abstract class AbstractCollectionNormalizer implements NormalizerInterface, Norm
     /**
      * {@inheritdoc}
      *
-     * @param iterable $object
+     * @param iterable $data
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         if (!isset($context['resource_class']) || isset($context['api_sub_level'])) {
-            return $this->normalizeRawCollection($object, $format, $context);
+            return $this->normalizeRawCollection($data, $format, $context);
         }
 
-        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class']);
+        $resourceClass = $this->resourceClassResolver->getResourceClass($data, $context['resource_class']);
         $collectionContext = $this->initContext($resourceClass, $context);
-        $data = [];
-        $paginationData = $this->getPaginationData($object, $collectionContext);
+        $normalizedData = [];
+        $paginationData = $this->getPaginationData($data, $collectionContext);
 
         $childContext = $this->createOperationContext($collectionContext, $resourceClass);
         if (isset($collectionContext['force_resource_class'])) {
             $childContext['force_resource_class'] = $collectionContext['force_resource_class'];
         }
 
-        $itemsData = $this->getItemsData($object, $format, $childContext);
+        $itemsData = $this->getItemsData($data, $format, $childContext);
 
-        return array_merge_recursive($data, $paginationData, $itemsData);
+        return array_merge_recursive($normalizedData, $paginationData, $itemsData);
     }
 
     /**

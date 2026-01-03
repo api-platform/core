@@ -29,11 +29,17 @@ class CustomConverter implements NameConverterInterface
         $this->nameConverter = new CamelCaseToSnakeCaseNameConverter();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function normalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
     {
         return 'nameConverted' === $propertyName ? $this->nameConverter->normalize($propertyName) : $propertyName;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function denormalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
     {
         return 'name_converted' === $propertyName ? $this->nameConverter->denormalize($propertyName) : $propertyName;
