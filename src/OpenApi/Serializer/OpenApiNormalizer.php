@@ -36,7 +36,7 @@ final class OpenApiNormalizer implements NormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
         $pathsCallback = $this->getPathsCallBack();
         $context[AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS] = true;
@@ -45,7 +45,7 @@ final class OpenApiNormalizer implements NormalizerInterface
             'paths' => $pathsCallback,
         ];
 
-        return $this->recursiveClean($this->decorated->normalize($object, $format, $context));
+        return $this->recursiveClean($this->decorated->normalize($data, $format, $context));
     }
 
     private function recursiveClean(array $data): array
@@ -77,9 +77,9 @@ final class OpenApiNormalizer implements NormalizerInterface
     }
 
     /**
-     * @param string|null $format
+     * {@inheritdoc}
      */
-    public function getSupportedTypes($format): array
+    public function getSupportedTypes(?string $format): array
     {
         return (self::FORMAT === $format || self::JSON_FORMAT === $format || self::YAML_FORMAT === $format) ? [OpenApi::class => true] : [];
     }

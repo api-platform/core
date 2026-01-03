@@ -41,24 +41,24 @@ class RelatedDummyPlainIdentifierDenormalizer implements DenormalizerAwareInterf
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = null, array $context = []): mixed
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         $iriConverterContext = ['uri_variables' => ['id' => $data['thirdLevel']]] + $context;
 
         $data['thirdLevel'] = $this->iriConverter->getIriFromResource(
-            RelatedDummyEntity::class === $class ? ThirdLevelEntity::class : ThirdLevelDocument::class,
+            RelatedDummyEntity::class === $type ? ThirdLevelEntity::class : ThirdLevelDocument::class,
             UrlGeneratorInterface::ABS_PATH,
             new Get(),
             $iriConverterContext
         );
 
-        return $this->denormalizer->denormalize($data, $class, $format, $context + [self::class => true]);
+        return $this->denormalizer->denormalize($data, $type, $format, $context + [self::class => true]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return 'json' === $format
             && (is_a($type, RelatedDummyEntity::class, true) || is_a($type, RelatedDummyDocument::class, true))
@@ -66,7 +66,10 @@ class RelatedDummyPlainIdentifierDenormalizer implements DenormalizerAwareInterf
             && !isset($context[self::class]);
     }
 
-    public function getSupportedTypes($format): array
+    /**
+     * {@inheritdoc}
+     */
+    public function getSupportedTypes(?string $format): array
     {
         return 'json' === $format ? ['*' => false] : [];
     }

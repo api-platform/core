@@ -35,14 +35,14 @@ final class ValidationExceptionNormalizer implements NormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
-        $validationException = $object->getPrevious();
+        $validationException = $data->getPrevious();
         if (!$validationException instanceof ConstraintViolationListAwareExceptionInterface) {
             throw new RuntimeException(\sprintf('Object is not a "%s".', ConstraintViolationListAwareExceptionInterface::class));
         }
 
-        $error = FormattedError::createFromException($object);
+        $error = FormattedError::createFromException($data);
         $error['message'] = $validationException->getMessage();
 
         $exceptionClass = $validationException::class;
@@ -81,9 +81,9 @@ final class ValidationExceptionNormalizer implements NormalizerInterface
     }
 
     /**
-     * @param string|null $format
+     * {@inheritdoc}
      */
-    public function getSupportedTypes($format): array
+    public function getSupportedTypes(?string $format): array
     {
         return [
             Error::class => false,

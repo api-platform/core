@@ -33,11 +33,17 @@ final class UuidDenormalizer implements DenormalizerInterface
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return \is_string($data) && is_a($type, UuidInterface::class, true);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getSupportedTypes(?string $format): array
     {
         return [

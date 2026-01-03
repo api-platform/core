@@ -27,11 +27,11 @@ final class RuntimeExceptionNormalizer implements NormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
         /** @var \RuntimeException */
-        $runtimeException = $object->getPrevious();
-        $error = FormattedError::createFromException($object);
+        $runtimeException = $data->getPrevious();
+        $error = FormattedError::createFromException($data);
         $error['message'] = $runtimeException->getMessage();
 
         return $error;
@@ -46,9 +46,9 @@ final class RuntimeExceptionNormalizer implements NormalizerInterface
     }
 
     /**
-     * @param string|null $format
+     * {@inheritdoc}
      */
-    public function getSupportedTypes($format): array
+    public function getSupportedTypes(?string $format): array
     {
         return [
             Error::class => false,

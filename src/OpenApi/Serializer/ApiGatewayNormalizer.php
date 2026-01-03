@@ -42,73 +42,73 @@ final class ApiGatewayNormalizer implements NormalizerInterface
      *
      * @throws UnexpectedValueException
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
-        $data = $this->documentationNormalizer->normalize($object, $format, $context);
-        if (!\is_array($data)) {
+        $normalizedData = $this->documentationNormalizer->normalize($data, $format, $context);
+        if (!\is_array($normalizedData)) {
             throw new UnexpectedValueException('Expected data to be an array');
         }
 
         if (!($context[self::API_GATEWAY] ?? $this->defaultContext[self::API_GATEWAY])) {
-            return $data;
+            return $normalizedData;
         }
 
-        if (empty($data['basePath'])) {
-            $data['basePath'] = '/';
+        if (empty($normalizedData['basePath'])) {
+            $normalizedData['basePath'] = '/';
         }
 
-        foreach ($data['paths'] as $path => $operations) {
+        foreach ($normalizedData['paths'] as $path => $operations) {
             foreach ($operations as $operation => $options) {
                 if (isset($options['parameters'])) {
                     foreach ($options['parameters'] as $key => $parameter) {
                         if (!preg_match('/^[a-zA-Z0-9._$-]+$/', (string) $parameter['name'])) {
-                            unset($data['paths'][$path][$operation]['parameters'][$key]);
+                            unset($normalizedData['paths'][$path][$operation]['parameters'][$key]);
                         }
                         if (isset($parameter['schema']['$ref']) && $this->isLocalRef($parameter['schema']['$ref'])) {
-                            $data['paths'][$path][$operation]['parameters'][$key]['schema']['$ref'] = $this->normalizeRef($parameter['schema']['$ref']);
+                            $normalizedData['paths'][$path][$operation]['parameters'][$key]['schema']['$ref'] = $this->normalizeRef($parameter['schema']['$ref']);
                         }
                     }
-                    $data['paths'][$path][$operation]['parameters'] = array_values($data['paths'][$path][$operation]['parameters']);
+                    $normalizedData['paths'][$path][$operation]['parameters'] = array_values($normalizedData['paths'][$path][$operation]['parameters']);
                 }
                 if (isset($options['responses'])) {
                     foreach ($options['responses'] as $statusCode => $response) {
                         if (isset($response['schema']['items']['$ref']) && $this->isLocalRef($response['schema']['items']['$ref'])) {
-                            $data['paths'][$path][$operation]['responses'][$statusCode]['schema']['items']['$ref'] = $this->normalizeRef($response['schema']['items']['$ref']);
+                            $normalizedData['paths'][$path][$operation]['responses'][$statusCode]['schema']['items']['$ref'] = $this->normalizeRef($response['schema']['items']['$ref']);
                         }
                         if (isset($response['schema']['$ref']) && $this->isLocalRef($response['schema']['$ref'])) {
-                            $data['paths'][$path][$operation]['responses'][$statusCode]['schema']['$ref'] = $this->normalizeRef($response['schema']['$ref']);
+                            $normalizedData['paths'][$path][$operation]['responses'][$statusCode]['schema']['$ref'] = $this->normalizeRef($response['schema']['$ref']);
                         }
                     }
                 }
             }
         }
 
-        foreach ($data['components']['schemas'] as $definition => $options) {
+        foreach ($normalizedData['components']['schemas'] as $definition => $options) {
             if (!isset($options['properties'])) {
                 continue;
             }
             foreach ($options['properties'] as $property => $propertyOptions) {
                 if (isset($propertyOptions['readOnly'])) {
-                    unset($data['components']['schemas'][$definition]['properties'][$property]['readOnly']);
+                    unset($normalizedData['components']['schemas'][$definition]['properties'][$property]['readOnly']);
                 }
                 if (isset($propertyOptions['$ref']) && $this->isLocalRef($propertyOptions['$ref'])) {
-                    $data['components']['schemas'][$definition]['properties'][$property]['$ref'] = $this->normalizeRef($propertyOptions['$ref']);
+                    $normalizedData['components']['schemas'][$definition]['properties'][$property]['$ref'] = $this->normalizeRef($propertyOptions['$ref']);
                 }
                 if (isset($propertyOptions['items']['$ref']) && $this->isLocalRef($propertyOptions['items']['$ref'])) {
-                    $data['components']['schemas'][$definition]['properties'][$property]['items']['$ref'] = $this->normalizeRef($propertyOptions['items']['$ref']);
+                    $normalizedData['components']['schemas'][$definition]['properties'][$property]['items']['$ref'] = $this->normalizeRef($propertyOptions['items']['$ref']);
                 }
             }
         }
 
-        // $data['definitions'] is an instance of \ArrayObject
-        foreach (array_keys($data['components']['schemas']) as $definition) {
+        // $normalizedData['definitions'] is an instance of \ArrayObject
+        foreach (array_keys($normalizedData['components']['schemas']) as $definition) {
             if (!preg_match('/^[0-9A-Za-z]+$/', (string) $definition)) {
-                $data['components']['schemas'][preg_replace('/[^0-9A-Za-z]/', '', (string) $definition)] = $data['components']['schemas'][$definition];
-                unset($data['components']['schemas'][$definition]);
+                $normalizedData['components']['schemas'][preg_replace('/[^0-9A-Za-z]/', '', (string) $definition)] = $normalizedData['components']['schemas'][$definition];
+                unset($normalizedData['components']['schemas'][$definition]);
             }
         }
 
-        return $data;
+        return $normalizedData;
     }
 
     /**
@@ -120,9 +120,9 @@ final class ApiGatewayNormalizer implements NormalizerInterface
     }
 
     /**
-     * @param string|null $format
+     * {@inheritdoc}
      */
-    public function getSupportedTypes($format): array
+    public function getSupportedTypes(?string $format): array
     {
         return $this->documentationNormalizer->getSupportedTypes($format);
     }

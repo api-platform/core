@@ -27,9 +27,9 @@ final class ErrorNormalizer implements NormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
-        return FormattedError::createFromException($object);
+        return FormattedError::createFromException($data);
     }
 
     /**
@@ -41,9 +41,9 @@ final class ErrorNormalizer implements NormalizerInterface
     }
 
     /**
-     * @param string|null $format
+     * {@inheritdoc}
      */
-    public function getSupportedTypes($format): array
+    public function getSupportedTypes(?string $format): array
     {
         return [
             Error::class => true,

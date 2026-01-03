@@ -27,34 +27,35 @@ final class OverrideDocumentationNormalizer implements NormalizerInterface
     }
 
     /**
-     * @param mixed|null $format
-     *
      * @throws ExceptionInterface
      */
-    public function normalize($object, $format = null, array $context = []): array
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
-        $data = $this->documentationNormalizer->normalize($object, $format, $context);
-        if (!\is_array($data)) {
+        $normalizedData = $this->documentationNormalizer->normalize($data, $format, $context);
+        if (!\is_array($normalizedData)) {
             throw new UnexpectedValueException('Expected data to be an array');
         }
 
-        if (isset($data['definitions'])) {
-            $data['definitions']['RamseyUuidDummy']['properties']['id']['description'] = 'The dummy id';
+        if (isset($normalizedData['definitions'])) {
+            $normalizedData['definitions']['RamseyUuidDummy']['properties']['id']['description'] = 'The dummy id';
         } else {
-            $data['components']['schemas']['RamseyUuidDummy']['properties']['id']['description'] = 'The dummy id';
+            $normalizedData['components']['schemas']['RamseyUuidDummy']['properties']['id']['description'] = 'The dummy id';
         }
 
-        return $data;
+        return $normalizedData;
     }
 
     /**
-     * @param mixed|null $format
+     * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $this->documentationNormalizer->supportsNormalization($data, $format, $context);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getSupportedTypes(?string $format): array
     {
         return [];

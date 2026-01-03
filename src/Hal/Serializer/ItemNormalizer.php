@@ -82,9 +82,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
     }
 
     /**
-     * @param string|null $format
+     * {@inheritdoc}
      */
-    public function getSupportedTypes($format): array
+    public function getSupportedTypes(?string $format): array
     {
         return self::FORMAT === $format ? parent::getSupportedTypes($format) : [];
     }
@@ -92,22 +92,22 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        $resourceClass = $this->getObjectClass($object);
+        $resourceClass = $this->getObjectClass($data);
         if ($this->getOutputClass($context)) {
-            return parent::normalize($object, $format, $context);
+            return parent::normalize($data, $format, $context);
         }
 
         $previousResourceClass = $context['resource_class'] ?? null;
         if ($this->resourceClassResolver->isResourceClass($resourceClass) && (null === $previousResourceClass || $this->resourceClassResolver->isResourceClass($previousResourceClass))) {
-            $resourceClass = $this->resourceClassResolver->getResourceClass($object, $previousResourceClass);
+            $resourceClass = $this->resourceClassResolver->getResourceClass($data, $previousResourceClass);
         }
 
         $context = $this->initContext($resourceClass, $context);
 
-        $iri = $context['iri'] ??= $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context);
-        $context['object'] = $object;
+        $iri = $context['iri'] ??= $this->iriConverter->getIriFromResource($data, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context);
+        $context['object'] = $data;
         $context['format'] = $format;
         $context['api_normalize'] = true;
 
@@ -115,10 +115,10 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $context['cache_key'] = $this->getCacheKey($format, $context);
         }
 
-        $data = parent::normalize($object, $format, $context);
+        $normalizedData = parent::normalize($data, $format, $context);
 
-        if (!\is_array($data)) {
-            return $data;
+        if (!\is_array($normalizedData)) {
+            return $normalizedData;
         }
 
         $metadata = [
@@ -128,11 +128,11 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 ],
             ],
         ];
-        $components = $this->getComponents($object, $format, $context);
-        $metadata = $this->populateRelation($metadata, $object, $format, $context, $components, 'links');
-        $metadata = $this->populateRelation($metadata, $object, $format, $context, $components, 'embedded');
+        $components = $this->getComponents($data, $format, $context);
+        $metadata = $this->populateRelation($metadata, $data, $format, $context, $components, 'links');
+        $metadata = $this->populateRelation($metadata, $data, $format, $context, $components, 'embedded');
 
-        return $metadata + $data;
+        return $metadata + $normalizedData;
     }
 
     /**
