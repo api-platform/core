@@ -379,6 +379,7 @@ Feature: JSON-LD DTO input and output
     Then the response status code should be 200
     And the response should be in JSON
     And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
+    Then print last JSON response
     And the JSON should be valid according to this schema:
     """
     {
@@ -400,7 +401,7 @@ Feature: JSON-LD DTO input and output
             "required": ["@id", "@type", "foo", "bar"],
             "properties": {
               "@id": {"pattern": "/dummy_foos/bar"},
-              "@type": {"pattern": "^DummyCollectionDtoOutput$"},
+              "@type": {"pattern": "^DummyFooCollectionDto$"},
               "foo": {"type": "string"},
               "bar": {"type": "integer"}
             }
