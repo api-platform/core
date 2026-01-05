@@ -171,14 +171,14 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         $firstObject = current($objects);
         $lastObject = end($objects);
 
-        $data[$hydraPrefix.'view']['@id'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], urlGenerationStrategy: $urlGenerationStrategy);
+        $data[$hydraPrefix.'view']['@id'] = IriHelper::createIri($parsed['uri'] ?? $parsed['parts'], $parsed['parameters'], urlGenerationStrategy: $urlGenerationStrategy);
 
         if (false !== $lastObject && \is_array($cursorPaginationAttribute)) {
-            $data[$hydraPrefix.'view'][$hydraPrefix.'next'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], $this->cursorPaginationFields($cursorPaginationAttribute, 1, $lastObject)), urlGenerationStrategy: $urlGenerationStrategy);
+            $data[$hydraPrefix.'view'][$hydraPrefix.'next'] = IriHelper::createIri($parsed['uri'] ?? $parsed['parts'], array_merge($parsed['parameters'], $this->cursorPaginationFields($cursorPaginationAttribute, 1, $lastObject)), urlGenerationStrategy: $urlGenerationStrategy);
         }
 
         if (false !== $firstObject && \is_array($cursorPaginationAttribute)) {
-            $data[$hydraPrefix.'view'][$hydraPrefix.'previous'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], $this->cursorPaginationFields($cursorPaginationAttribute, -1, $firstObject)), urlGenerationStrategy: $urlGenerationStrategy);
+            $data[$hydraPrefix.'view'][$hydraPrefix.'previous'] = IriHelper::createIri($parsed['uri'] ?? $parsed['parts'], array_merge($parsed['parameters'], $this->cursorPaginationFields($cursorPaginationAttribute, -1, $firstObject)), urlGenerationStrategy: $urlGenerationStrategy);
         }
 
         return $data;
