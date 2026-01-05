@@ -30,7 +30,7 @@
         "phpspec/prophecy-phpunit": "^2.2",
         "ramsey/uuid": "^4.7",
         "ramsey/uuid-doctrine": "^2.0",
-        "phpunit/phpunit": "11.5.x-dev",
+        "phpunit/phpunit": "^12.2",
         "symfony/type-info": "^7.3 || ^8.0"
     },
     "autoload": {
@@ -65,11 +65,5 @@
     },
     "scripts": {
         "test": "./vendor/bin/phpunit"
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/soyuka/phpunit"
-        }
-    ]
+    }
 }

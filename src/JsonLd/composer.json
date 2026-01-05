@@ -69,12 +69,6 @@
     },
     "require-dev": {
         "symfony/type-info": "^7.3 || ^8.0",
-        "phpunit/phpunit": "11.5.x-dev"
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/soyuka/phpunit"
-        }
-    ]
+        "phpunit/phpunit": "^12.2"
+    }
 }

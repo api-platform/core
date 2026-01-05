@@ -125,6 +125,13 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
                 'groups' => [],
             ]
         );
+
+        $types = $context['types'] ?? null;
+
+        if (\is_array($types) && 1 === \count($types)) {
+            $types = $types[0];
+        }
+
         $shortName = $operation->getShortName();
 
         $jsonLdContext = [
@@ -134,12 +141,12 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
                 $shortName,
                 $operation
             ),
-            '@type' => $shortName,
+            '@type' => $types ?? $shortName,
         ];
 
         if (isset($context['iri'])) {
             $jsonLdContext['@id'] = $context['iri'];
-        } elseif (true === ($context['gen_id'] ?? true) && $this->iriConverter) {
+        } elseif (true === ($context['gen_id'] ?? true) && $this->iriConverter && !isset($context['item_uri_template'])) {
             $jsonLdContext['@id'] = $this->iriConverter->getIriFromResource($object);
         }
 

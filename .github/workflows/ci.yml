@@ -48,6 +48,7 @@ jobs:
           composer global require soyuka/pmu
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
+          composer require --dev doctrine/mongodb-odm-bundle
       - run: composer check-dependencies
 
   php-cs-fixer:
@@ -89,7 +90,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
+          extensions: intl, bcmath, curl, openssl, mbstring
           ini-values: memory_limit=-1
           tools: composer
           coverage: none
@@ -149,6 +150,7 @@ jobs:
           composer global require soyuka/pmu
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
+          composer require --dev doctrine/mongodb-odm-bundle
       - name: Cache PHPStan results
         uses: actions/cache@v4
         with:
@@ -202,7 +204,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
           coverage: pcov
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -219,6 +221,9 @@ jobs:
           composer global require soyuka/pmu
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
+      - name: Force PHPUnit 11.5 for PHP 8.2
+        if: matrix.php == '8.2'
+        run: composer require phpunit/phpunit:^11.5 --dev --with-all-dependencies
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
@@ -291,12 +296,17 @@ jobs:
         with:
           php-version: ${{ matrix.php.version }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
           ini-values: memory_limit=-1
       - name: PMU
         run: |
           composer global require soyuka/pmu
           composer global config allow-plugins.soyuka/pmu true --no-interaction
+      - name: Force PHPUnit 11.5 for PHP 8.2
+        if: matrix.php.version == '8.2'
+        run: |
+          cd $(composer ${{matrix.component}} --cwd)
+          composer require phpunit/phpunit:^11.5 --dev --with-all-dependencies
       - name: Linking
         if: ${{ !matrix.php.lowest && !matrix.php.minimal-changes }}
         run: |
@@ -371,7 +381,7 @@ jobs:
         with:
           php-version: ${{ matrix.php.version }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
           ini-values: memory_limit=-1
       - name: Linking
         run: |
@@ -413,7 +423,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
           coverage: pcov
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -430,6 +440,9 @@ jobs:
           composer global require soyuka/pmu
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
+      - name: Force PHPUnit 11.5 for PHP 8.2
+        if: matrix.php == '8.2'
+        run: composer require phpunit/phpunit:^11.5 --dev --with-all-dependencies
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests (PHP ${{ matrix.php }})
@@ -497,7 +510,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_pgsql, mongodb
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_pgsql
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -548,7 +561,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_mysql, mongodb
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_mysql
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -830,7 +843,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
+          extensions: intl, bcmath, curl, openssl, mbstring
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -883,7 +896,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
+          extensions: intl, bcmath, curl, openssl, mbstring
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -923,7 +936,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
+          extensions: intl, bcmath, curl, openssl, mbstring
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -962,7 +975,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
+          extensions: intl, bcmath, curl, openssl, mbstring
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -1005,7 +1018,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
+          extensions: intl, bcmath, curl, openssl, mbstring
           coverage: none
           ini-values: memory_limit=-1
       - name: Install additional packages
@@ -1053,7 +1066,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, fileinfo, mongodb
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, fileinfo
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -1103,7 +1116,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
+          extensions: intl, bcmath, curl, openssl, mbstring
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -1147,7 +1160,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
+          extensions: intl, bcmath, curl, openssl, mbstring
           coverage: none
           ini-values: memory_limit=-1
       - name: Install additional packages
@@ -1319,7 +1332,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
           ini-values: memory_limit=-1
       - name: Setup node
         uses: actions/setup-node@v4
@@ -1376,8 +1389,12 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
           ini-values: memory_limit=-1
+      - name: Force PHPUnit 11.5 for PHP 8.2
+        if: matrix.php == '8.2'
+        working-directory: 'src/Laravel'
+        run: composer require phpunit/phpunit:^11.5 --dev --with-all-dependencies
       - name: Update project dependencies
         run: |
           composer global require soyuka/pmu
@@ -1402,7 +1419,7 @@ jobs:
         with:
           php-version: 8.5
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, mongodb
+          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
           ini-values: memory_limit=-1
       - name: Update project dependencies
         run: |

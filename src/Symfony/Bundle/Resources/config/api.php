@@ -169,6 +169,13 @@ return function (ContainerConfigurator $container) {
     $services->set('api_platform.uri_variables.transformer.date_time', 'ApiPlatform\Metadata\UriVariableTransformer\DateTimeUriVariableTransformer')
         ->tag('api_platform.uri_variables.transformer', ['priority' => -100]);
 
+    $services->set('api_platform.uri_variables.transformer.api_resource', 'ApiPlatform\Metadata\UriVariableTransformer\ApiResourceUriVariableTransformer')
+        ->args([
+            service('api_platform.api.identifiers_extractor'),
+            service('api_platform.resource_class_resolver'),
+        ])
+        ->tag('api_platform.uri_variables.transformer', ['priority' => -100]);
+
     $services->alias('api_platform.iri_converter', 'api_platform.symfony.iri_converter');
 
     $services->set('api_platform.symfony.iri_converter', 'ApiPlatform\Symfony\Routing\IriConverter')

@@ -7,6 +7,32 @@
 * [21aa2572d](https://github.com/api-platform/core/commit/21aa2572d8fef2b3f05f7307c51348a6c9767e45) feat(elasticsearch): add SSL options for Elasticsearch configuration (#4059)
 * [ba0c76c](https://github.com/api-platform/core/commit/ba0c76c6f5c8afa8622e87a155b8b99f453d6453) feat(doctrine): remove put & path for readonly entity (#7019)
 
+## v4.2.11
+
+### Bug fixes
+
+* [0d9a44bef](https://github.com/api-platform/core/commit/0d9a44bef81db4db3656b3d83a9fdaa36a229579) fix(laravel): allow custom error handler for non-api operations (#7622)
+* [17415f789](https://github.com/api-platform/core/commit/17415f789e5aba9d833d12b74c0bf64fb8f64b07) fix(serializer): allow CsvEncoder::AS_COLLECTION_KEY in context (#7613)
+* [2a3449818](https://github.com/api-platform/core/commit/2a3449818a542a33e82800a3a1c3e83396e3510c) fix(symfony): check that required package are installed before configuring services (#7607)
+* [40ad56859](https://github.com/api-platform/core/commit/40ad5685960bfc0bd3dede7860f0a1eda31a3c5b) fix(jsonld): allow mapping collection output with itemUriTemplate (#7620)
+* [9f11aed8a](https://github.com/api-platform/core/commit/9f11aed8a44ac52b51b6f9c40f7000968d12823a) fix(state): delete with stateOptions and object mapper (#7615)
+* [a2da50905](https://github.com/api-platform/core/commit/a2da509059f5f63ad9c9dd3adce68ce74b543651) fix(symfony): enable ReDoc when Swagger UI is disabled (#7617)
+* [c0998928e](https://github.com/api-platform/core/commit/c0998928e651dcbffbf765cc7028badea15a3830) fix(symfony): enable to set default values for `stale-while-revalidate` and `stale-if-error` cache headers via config file (#7606)
+* [d847ad629](https://github.com/api-platform/core/commit/d847ad62918d561333ecb8ecb0e246b3c48b3758) fix(jsonapi): handle missing attributes in ErrorNormalizer (#7569)
+
+## v4.2.10
+
+### Bug fixes
+
+* [01fd0b578](https://github.com/api-platform/core/commit/01fd0b578d68f590670caf92b9a02a854a019311) fix(symfony): do not redeclare object_mapper (#7602)
+* [0ef0ba63a](https://github.com/api-platform/core/commit/0ef0ba63a41af000836dd5631b43bcdf10c50c71) fix(metadata): update tests to use MappedObjectPaginator instead of ArrayPaginator (#7591)
+* [6561eb1ec](https://github.com/api-platform/core/commit/6561eb1ec96c296021baa3e36e04843412632c8f) fix(symfony): do not load docs routes if docs disabled (#7448)
+* [8f4bc086f](https://github.com/api-platform/core/commit/8f4bc086fcc811c69a67e29c313b12160c6efa45) fix(symfony): disable Swagger UI and ReDoc when Swagger is off (#7586)
+* [9814f27ee](https://github.com/api-platform/core/commit/9814f27ee4bc11d03dd9cc9ca5c0caa53061ae44) fix(metadata): property placeholder on multiple parameters (#7598)
+* [bc1fd4c10](https://github.com/api-platform/core/commit/bc1fd4c10c04fcd552e7b385efc08a1be0826614) fix(laravel): belongs-to-many relations dont have a get-foreign-key-name method (#7589)
+* [d3bcded9b](https://github.com/api-platform/core/commit/d3bcded9baf5ddc2e52d8ea2d894f328e9dd4a8e) fix(metadata): use operation output class for mapping instead of operation class (#7601)
+* [d7bab4bb3](https://github.com/api-platform/core/commit/d7bab4bb36af636ee11fc2c875dbb1ce687a50d1) fix(serializer): properly handle read link parameters when generating iris (#7520)
+
 ## v4.2.9
 
 ### Bug fixes

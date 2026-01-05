@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Functional\Parameters;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\AgentApi;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResourceOdm\AgentDocumentApi;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\AgentDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Agent;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
@@ -33,7 +34,13 @@ final class QueryParameterStateOptionsTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [AgentApi::class];
+        $resources = [AgentApi::class];
+
+        if (class_exists(DocumentManager::class)) {
+            $resources[] = AgentDocumentApi::class;
+        }
+
+        return $resources;
     }
 
     public function testQueryParameterStateOptions(): void

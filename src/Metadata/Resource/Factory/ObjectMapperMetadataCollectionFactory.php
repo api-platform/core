@@ -53,10 +53,11 @@ class ObjectMapperMetadataCollectionFactory implements ResourceMetadataCollectio
                 }
 
                 $class = $operation->getInput()['class'] ?? $operation->getClass();
+                $outputClass = $operation->getOutput()['class'] ?? null;
                 $entityMap = null;
 
                 // Look for Mapping metadata
-                if ($this->canBeMapped($class) || ($entityClass && ($entityMap = $this->canBeMapped($entityClass)))) {
+                if ($this->canBeMapped($class) || ($outputClass && $this->canBeMapped($outputClass)) || ($entityClass && ($entityMap = $this->canBeMapped($entityClass)))) {
                     $found = true;
                     if ($entityMap) {
                         foreach ($entityMap as $mapping) {

@@ -444,10 +444,6 @@ services:
         tags:
             - name: 'api_platform.doctrine.orm.links_handler'
 
-    ApiPlatform\Tests\Fixtures\TestBundle\State\ODMLinkHandledDummyLinksHandler:
-        tags:
-            - name: 'api_platform.doctrine.odm.links_handler'
-
     ApiPlatform\Tests\Fixtures\TestBundle\Serializer\ErrorNormalizer:
         arguments: [ '@serializer.normalizer.problem' ]
         tags:

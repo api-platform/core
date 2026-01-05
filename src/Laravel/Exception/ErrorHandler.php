@@ -67,6 +67,16 @@ class ErrorHandler extends ExceptionsHandler
         $apiOperation = $this->initializeOperation($request);
 
         if (!$apiOperation) {
+            // For non-API operations, first check if any renderable callbacks on this
+            // ErrorHandler instance can handle the exception (issue #7466).
+            $response = $this->renderViaCallbacks($request, $exception);
+
+            if ($response) {
+                return $response;
+            }
+
+            // If no callbacks handled it, delegate to the decorated handler if available
+            // to preserve custom exception handler classes (issue #7058).
             return $this->decorated ? $this->decorated->render($request, $exception) : parent::render($request, $exception);
         }
 
@@ -160,7 +170,6 @@ class ErrorHandler extends ExceptionsHandler
 
         try {
             $response = $this->apiPlatformController->__invoke($dup);
-            $this->decorated->render($dup, $exception);
 
             return $response;
         } catch (\Throwable $e) {

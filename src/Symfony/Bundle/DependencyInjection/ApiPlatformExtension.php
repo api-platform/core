@@ -47,6 +47,7 @@ use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRestrictionMetadataInterface;
 use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
+use Composer\InstalledVersions;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Ramsey\Uuid\Uuid;
@@ -333,6 +334,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.http_cache.shared_max_age', $config['defaults']['cache_headers']['shared_max_age'] ?? null);
         $container->setParameter('api_platform.http_cache.vary', $config['defaults']['cache_headers']['vary'] ?? ['Accept']);
         $container->setParameter('api_platform.http_cache.public', $config['defaults']['cache_headers']['public'] ?? $config['http_cache']['public']);
+        $container->setParameter('api_platform.http_cache.stale_while_revalidate', $config['defaults']['cache_headers']['stale_while_revalidate'] ?? null);
+        $container->setParameter('api_platform.http_cache.stale_if_error', $config['defaults']['cache_headers']['stale_if_error'] ?? null);
         $container->setParameter('api_platform.http_cache.invalidation.max_header_length', $config['defaults']['cache_headers']['invalidation']['max_header_length'] ?? $config['http_cache']['invalidation']['max_header_length']);
         $container->setParameter('api_platform.http_cache.invalidation.xkey.glue', $config['defaults']['cache_headers']['invalidation']['xkey']['glue'] ?? $config['http_cache']['invalidation']['xkey']['glue']);
 
@@ -601,7 +604,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('openapi/yaml.php');
         }
 
-        if ($config['enable_swagger_ui']) {
+        if ($config['enable_swagger_ui'] || $config['enable_re_doc']) {
             $loader->load('swagger_ui.php');
 
             if ($config['use_symfony_listeners']) {
@@ -633,6 +636,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             return;
         }
 
+        if (!InstalledVersions::isInstalled('api-platform/json-api')) {
+            throw new \LogicException('JSON-API support cannot be enabled as the JSON-API component is not installed. Try running "composer require api-platform/json-api".');
+        }
+
         $loader->load('jsonapi.php');
         $loader->load('state/jsonapi.php');
     }
@@ -662,6 +669,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         if (!isset($formats['jsonhal'])) {
             return;
+        }
+
+        if (!InstalledVersions::isInstalled('api-platform/hal')) {
+            throw new \LogicException('HAL support cannot be enabled as the HAL component is not installed. Try running "composer require api-platform/hal".');
         }
 
         $loader->load('hal.php');
@@ -736,6 +747,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             return;
         }
 
+        if (!InstalledVersions::isInstalled('api-platform/doctrine-orm')) {
+            throw new \LogicException('Doctrine support cannot be enabled as the doctrine ORM component is not installed. Try running "composer require api-platform/doctrine-orm".');
+        }
+
         // For older versions of doctrine bridge this allows autoconfiguration for filters
         if (!$container->has(ManagerRegistry::class)) {
             $container->setAlias(ManagerRegistry::class, 'doctrine');
@@ -766,6 +781,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         if (!$this->isConfigEnabled($container, $config['doctrine_mongodb_odm'])) {
             return;
+        }
+
+        if (!InstalledVersions::isInstalled('api-platform/doctrine-odm')) {
+            throw new \LogicException('Doctrine MongoDB ODM support cannot be enabled as the doctrine ODM component is not installed. Try running "composer require api-platform/doctrine-odm".');
         }
 
         $container->registerForAutoconfiguration(AggregationItemExtensionInterface::class)
@@ -877,6 +896,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             return;
         }
 
+        if (!InstalledVersions::isInstalled('symfony/mercure-bundle')) {
+            throw new \LogicException('Mercure support cannot be enabled as the Symfony Mercure Bundle is not installed. Try running "composer require symfony/mercure-bundle".');
+        }
+
         $container->setParameter('api_platform.mercure.include_type', $config['mercure']['include_type']);
         $loader->load('state/mercure.php');
 
@@ -898,6 +921,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             return;
         }
 
+        if (!InstalledVersions::isInstalled('symfony/messenger')) {
+            throw new \LogicException('Messenger support cannot be enabled as the Symfony Messenger component is not installed. Try running "composer require symfony/messenger".');
+        }
+
         $loader->load('messenger.php');
     }
 
@@ -909,6 +936,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         if (!$enabled) {
             return;
+        }
+
+        if (!InstalledVersions::isInstalled('api-platform/elasticsearch')) {
+            throw new \LogicException('Elasticsearch support cannot be enabled as the Elasticsearch component is not installed. Try running "composer require api-platform/elasticsearch".');
         }
 
         $clientClass = !class_exists(\Elasticsearch\Client::class)

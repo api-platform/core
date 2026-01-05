@@ -18,14 +18,16 @@
     </testsuites>
     <coverage/>
     <source ignoreSuppressionOfDeprecations="true" ignoreIndirectDeprecations="false">
-    <deprecationTrigger>
-        <function>trigger_deprecation</function>
-    </deprecationTrigger>
+        <deprecationTrigger>
+            <function>trigger_deprecation</function>
+        </deprecationTrigger>
         <include>
             <directory>./</directory>
         </include>
         <exclude>
             <directory>./Tests</directory>
+            <directory>./workbench</directory>
+            <directory>./public</directory>
             <directory>./vendor</directory>
         </exclude>
     </source>

@@ -92,7 +92,7 @@
         "api-platform/http-cache": "self.version",
         "api-platform/hydra": "self.version",
         "api-platform/json-api": "self.version",
-        "api-platform/json-hal": "self.version",
+        "api-platform/hal": "self.version",
         "api-platform/json-schema": "self.version",
         "api-platform/jsonld": "self.version",
         "api-platform/laravel": "self.version",
@@ -123,15 +123,11 @@
         "willdurand/negotiation": "^3.1"
     },
     "require-dev": {
-        "ext-mongodb": "^1.21 || ^2.0",
         "behat/behat": "^3.11",
         "behat/mink": "^1.9",
-        "doctrine/cache": "^1.11 || ^2.1",
         "doctrine/common": "^3.2.2",
         "doctrine/dbal": "^4.0",
         "doctrine/doctrine-bundle": "^2.11 || ^3.1",
-        "doctrine/mongodb-odm": "^2.10",
-        "doctrine/mongodb-odm-bundle": "^5.0",
         "doctrine/orm": "^2.17 || ^3.0",
         "elasticsearch/elasticsearch": "^7.17 || ^8.4 || ^9.0",
         "friends-of-behat/mink-browserkit-driver": "^1.3.1",
@@ -146,7 +142,7 @@
         "illuminate/routing": "^11.0 || ^12.0",
         "illuminate/support": "^11.0 || ^12.0",
         "jangregor/phpstan-prophecy": "^2.1.11",
-        "justinrainbow/json-schema": "^5.2.11",
+        "justinrainbow/json-schema": "^6.5.2",
         "laravel/framework": "^11.0 || ^12.0",
         "orchestra/testbench": "^9.1",
         "phpspec/prophecy-phpunit": "^2.2",
@@ -156,7 +152,7 @@
         "phpstan/phpstan-doctrine": "^2.0",
         "phpstan/phpstan-phpunit": "^2.0",
         "phpstan/phpstan-symfony": "^2.0",
-        "phpunit/phpunit": "11.5.x-dev",
+        "phpunit/phpunit": "^12.2",
         "psr/log": "^1.0 || ^2.0 || ^3.0",
         "ramsey/uuid": "^4.7",
         "ramsey/uuid-doctrine": "^2.0",
@@ -216,8 +212,5 @@
         "symfony/json-streamer": "To use the JSON Streamer component.",
         "webonyx/graphql-php": "To support GraphQL."
     },
-    "type": "library",
-    "repositories": [
-        {"type": "vcs", "url": "https://github.com/soyuka/phpunit"}
-    ]
+    "type": "library"
 }

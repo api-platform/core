@@ -100,8 +100,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
     public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         $resourceClass = $this->getObjectClass($object);
+        $outputClass = $this->getOutputClass($context);
 
-        if ($this->getOutputClass($context)) {
+        if ($outputClass && !($context['item_uri_template'] ?? null)) {
             return parent::normalize($object, $format, $context);
         }
 
@@ -130,7 +131,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
 
         // Special case: non-resource got serialized and contains a resource therefore we need to reset part of the context
-        if ($previousResourceClass !== $resourceClass) {
+        if ($previousResourceClass !== $resourceClass && $resourceClass !== $outputClass) {
             unset($context['operation'], $context['operation_name'], $context['output']);
         }
 

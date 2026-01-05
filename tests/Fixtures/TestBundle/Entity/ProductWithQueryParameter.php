@@ -42,6 +42,16 @@ use Doctrine\ORM\Mapping as ORM;
                     filter: new OrderFilter(),
                     properties: ['rating']
                 ),
+                'exactBrand' => new QueryParameter(
+                    filter: new ExactFilter(),
+                    property: 'brand',
+                    schema: ['type' => 'string']
+                ),
+                'exactCategory' => new QueryParameter(
+                    filter: new ExactFilter(),
+                    property: 'category',
+                    castToArray: false
+                ),
             ]
         ),
     ]

@@ -120,7 +120,7 @@ final class ModelMetadata
     /**
      * Get the virtual (non-column) attributes for the given model.
      *
-     * @param array<string, mixed> $columns
+     * @param list<array<string, mixed>> $columns
      *
      * @return array<string, mixed>
      */

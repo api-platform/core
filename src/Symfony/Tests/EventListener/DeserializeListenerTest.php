@@ -69,7 +69,7 @@ class DeserializeListenerTest extends TestCase
     }
 
     #[DataProvider('provideNonApiAttributes')]
-    public function testNoCallProvider(...$attributes): void
+    public function testNoCallProvider(array $attributes): void
     {
         $provider = $this->createMock(ProviderInterface::class);
         $provider->expects($this->never())->method('provide');
@@ -88,8 +88,8 @@ class DeserializeListenerTest extends TestCase
     public static function provideNonApiAttributes(): array
     {
         return [
-            ['_api_receive' => false, '_api_operation_name' => 'dummy'],
-            [],
+            [['_api_receive' => false, '_api_operation_name' => 'dummy']],
+            [[]],
         ];
     }
 

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\BookStoreResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\FirstResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7563\BookDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResource;
@@ -26,6 +27,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResourceWithRelation
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\SecondResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MappedDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Book;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\BookStore;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MappedEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MappedEntityNoMap;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MappedEntitySourceOnly;
@@ -58,6 +60,7 @@ final class MappingTest extends ApiTestCase
             MappedResourceSourceOnly::class,
             MappedResourceNoMap::class,
             BookDto::class,
+            BookStoreResource::class,
         ];
     }
 
@@ -95,6 +98,9 @@ final class MappingTest extends ApiTestCase
 
         $r = self::createClient()->request('PATCH', $uri, ['json' => ['username' => 'ba zar'], 'headers' => ['content-type' => 'application/merge-patch+json']]);
         $this->assertJsonContains(['username' => 'ba zar']);
+
+        $r = self::createClient()->request('DELETE', $uri);
+        $this->assertResponseStatusCodeSame(204);
     }
 
     public function testShouldMapToTheCorrectResource(): void
@@ -362,5 +368,80 @@ final class MappingTest extends ApiTestCase
         foreach ($json['hydra:member'] as $member) {
             self::assertStringStartsWith('customISBN-', $member['customIsbn']);
         }
+    }
+
+    public function testOutputDtoForCollectionRead(): void
+    {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('MongoDB not tested.');
+        }
+
+        if (!$this->getContainer()->has('api_platform.object_mapper')) {
+            $this->markTestSkipped('ObjectMapper not installed');
+        }
+
+        $this->recreateSchema([BookStore::class]);
+        $manager = $this->getManager();
+
+        $book1 = new BookStore();
+        $book1->title = 'API Platform Guide';
+        $book1->isbn = '978-1234567890';
+        $book1->description = 'A comprehensive guide to API Platform';
+        $book1->author = 'John Doe';
+        $manager->persist($book1);
+
+        $book2 = new BookStore();
+        $book2->title = 'REST APIs Handbook';
+        $book2->isbn = '978-0987654321';
+        $book2->description = 'Everything about REST APIs';
+        $book2->author = 'Jane Smith';
+        $manager->persist($book2);
+
+        $manager->flush();
+
+        // Test GetCollection returns only the lighter DTO fields (id, name, isbn)
+        $response = self::createClient()->request('GET', '/book_store_resources');
+        self::assertResponseIsSuccessful();
+        self::assertJsonContains([
+            '@id' => '/book_store_resources',
+            '@type' => 'Collection',
+            'member' => [
+                [
+                    '@id' => '/book_store_resources/1',
+                    '@type' => 'BookStoreResource',
+                    'id' => 1,
+                    'name' => 'API Platform Guide',
+                    'isbn' => '978-1234567890',
+                ],
+                [
+                    '@id' => '/book_store_resources/2',
+                    '@type' => 'BookStoreResource',
+                    'id' => 2,
+                    'name' => 'REST APIs Handbook',
+                    'isbn' => '978-0987654321',
+                ],
+            ],
+        ]);
+
+        $json = $response->toArray();
+        // Verify that description and author are NOT present in collection output
+        foreach ($json['member'] as $member) {
+            self::assertArrayNotHasKey('description', $member);
+            self::assertArrayNotHasKey('author', $member);
+            self::assertArrayHasKey('id', $member);
+            self::assertArrayHasKey('name', $member);
+            self::assertArrayHasKey('isbn', $member);
+        }
+
+        // Test Get (single item) returns all fields from the full resource
+        $response = self::createClient()->request('GET', '/book_store_resources/1');
+        self::assertResponseIsSuccessful();
+        self::assertJsonContains([
+            'id' => 1,
+            'title' => 'API Platform Guide',
+            'isbn' => '978-1234567890',
+            'description' => 'A comprehensive guide to API Platform',
+            'author' => 'John Doe',
+        ]);
     }
 }

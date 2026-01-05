@@ -51,6 +51,7 @@ final class DocumentationAction
         private readonly array $documentationFormats = [OpenApiNormalizer::JSON_FORMAT => ['application/vnd.openapi+json'], OpenApiNormalizer::FORMAT => ['application/json']],
         private readonly bool $swaggerUiEnabled = true,
         private readonly bool $docsEnabled = true,
+        private readonly bool $reDocEnabled = true,
     ) {
         $this->negotiator = $negotiator ?? new Negotiator();
     }
@@ -90,8 +91,8 @@ final class DocumentationAction
      */
     private function getOpenApiDocumentation(array $context, string $format, Request $request): OpenApi|Response
     {
-        if ('html' === $format && !$this->swaggerUiEnabled) {
-            throw new NotFoundHttpException('Swagger UI is disabled.');
+        if ('html' === $format && !$this->swaggerUiEnabled && !$this->reDocEnabled) {
+            throw new NotFoundHttpException('Swagger UI and ReDoc are disabled.');
         }
 
         if ($this->provider && $this->processor) {
@@ -104,7 +105,7 @@ final class DocumentationAction
                 outputFormats: $this->documentationFormats
             );
 
-            if ('html' === $format && $this->swaggerUiEnabled) {
+            if ('html' === $format && ($this->swaggerUiEnabled || $this->reDocEnabled)) {
                 $operation = $operation->withProcessor('api_platform.swagger_ui.processor')->withWrite(true);
             }
 
