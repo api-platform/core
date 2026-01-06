@@ -23,6 +23,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Query\AST\PartialObjectExpression;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\QueryBuilder;
@@ -70,7 +71,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         $options = [];
 
         $forceEager = $operation?->getForceEager() ?? $this->forceEager;
-        $fetchPartial = $operation?->getFetchPartial() ?? $this->fetchPartial;
+        $fetchPartial = class_exists(PartialObjectExpression::class) && ($operation?->getFetchPartial() ?? $this->fetchPartial);
 
         if (!isset($context['groups']) && !isset($context['attributes'])) {
             $contextType = isset($context['api_denormalize']) ? 'denormalization_context' : 'normalization_context';
@@ -95,7 +96,61 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             $options['denormalization_groups'] = $denormalizationGroups;
         }
 
-        $this->joinRelations($queryBuilder, $queryNameGenerator, $resourceClass, $forceEager, $fetchPartial, $queryBuilder->getRootAliases()[0], $options, $context);
+        $selects = $this->joinRelations($queryBuilder, $queryNameGenerator, $resourceClass, $forceEager, $fetchPartial, $queryBuilder->getRootAliases()[0], $options, $context);
+        $selectsByClass = [];
+        foreach ($selects as [$entity, $alias, $fields]) {
+            if ($entity === $resourceClass) {
+                // We don't perform partial select the root entity
+                $fields = null;
+            }
+
+            if (!isset($selectsByClass[$entity])) {
+                $selectsByClass[$entity] = [
+                    'aliases' => [$alias => true],
+                    'fields' => null === $fields ? null : array_flip($fields),
+                ];
+            } else {
+                $selectsByClass[$entity]['aliases'][$alias] = true;
+                if (null === $selectsByClass[$entity]['fields']) {
+                    continue;
+                }
+
+                if (null === $fields) {
+                    $selectsByClass[$entity]['fields'] = null;
+                    continue;
+                }
+
+                // Merge fields
+                foreach ($fields as $field) {
+                    $selectsByClass[$entity]['fields'][$field] = true;
+                }
+            }
+        }
+
+        $existingSelects = [];
+        foreach ($queryBuilder->getDQLPart('select') ?? [] as $dqlSelect) {
+            if (!$dqlSelect instanceof Select) {
+                continue;
+            }
+            foreach ($dqlSelect->getParts() as $part) {
+                $existingSelects[(string) $part] = true;
+            }
+        }
+
+        foreach ($selectsByClass as $data) {
+            $fields = null === $data['fields'] ? null : array_keys($data['fields']);
+            foreach (array_keys($data['aliases']) as $alias) {
+                if (isset($existingSelects[$alias])) {
+                    continue;
+                }
+
+                if (null === $fields) {
+                    $queryBuilder->addSelect($alias);
+                } else {
+                    $queryBuilder->addSelect(\sprintf('partial %s.{%s}', $alias, implode(',', $fields)));
+                }
+            }
+        }
     }
 
     /**
@@ -107,7 +162,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
      *
      * @throws RuntimeException when the max number of joins has been reached
      */
-    private function joinRelations(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, bool $forceEager, bool $fetchPartial, string $parentAlias, array $options = [], array $normalizationContext = [], bool $wasLeftJoin = false, int &$joinCount = 0, ?int $currentDepth = null, ?string $parentAssociation = null): void
+    private function joinRelations(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, bool $forceEager, bool $fetchPartial, string $parentAlias, array $options = [], array $normalizationContext = [], bool $wasLeftJoin = false, int &$joinCount = 0, ?int $currentDepth = null, ?string $parentAssociation = null): iterable
     {
         if ($joinCount > $this->maxJoins) {
             throw new RuntimeException('The total number of joined relations has exceeded the specified maximum. Raise the limit if necessary with the "api_platform.eager_loading.max_joins" configuration key (https://api-platform.com/docs/core/performance/#eager-loading), or limit the maximum serialization depth using the "enable_max_depth" option of the Symfony serializer (https://symfony.com/doc/current/components/serializer.html#handling-serialization-depth).');
@@ -200,13 +255,13 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             if (true === $fetchPartial) {
                 try {
                     $propertyOptions = $this->getPropertyContext($attributesMetadata[$association] ?? null, $options);
-                    $this->addSelect($queryBuilder, $mapping['targetEntity'], $associationAlias, $propertyOptions);
+                    yield from $this->addSelect($queryBuilder, $mapping['targetEntity'], $associationAlias, $propertyOptions);
                 } catch (ResourceClassNotFoundException) {
                     continue;
                 }
             } else {
                 $propertyOptions = null;
-                $this->addSelectOnce($queryBuilder, $associationAlias);
+                yield [$resourceClass, $associationAlias, null];
             }
 
             // Avoid recursive joins for self-referencing relations
@@ -229,7 +284,7 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             }
 
             $propertyOptions ??= $this->getPropertyContext($attributesMetadata[$association] ?? null, $options);
-            $this->joinRelations($queryBuilder, $queryNameGenerator, $mapping['targetEntity'], $forceEager, $fetchPartial, $associationAlias, $propertyOptions, $childNormalizationContext, $isLeftJoin, $joinCount, $currentDepth, $association);
+            yield from $this->joinRelations($queryBuilder, $queryNameGenerator, $mapping['targetEntity'], $forceEager, $fetchPartial, $associationAlias, $propertyOptions, $childNormalizationContext, $isLeftJoin, $joinCount, $currentDepth, $association);
         }
     }
 
@@ -267,13 +322,13 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
         return $propertyOptions;
     }
 
-    private function addSelect(QueryBuilder $queryBuilder, string $entity, string $associationAlias, array $propertyMetadataOptions): void
+    private function addSelect(QueryBuilder $queryBuilder, string $entity, string $associationAlias, array $propertyMetadataOptions): iterable
     {
         $select = [];
         $entityManager = $queryBuilder->getEntityManager();
         $targetClassMetadata = $entityManager->getClassMetadata($entity);
         if (!empty($targetClassMetadata->subClasses)) {
-            $this->addSelectOnce($queryBuilder, $associationAlias);
+            yield [$entity, $associationAlias, null];
 
             return;
         }
@@ -308,15 +363,6 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
             }
         }
 
-        $queryBuilder->addSelect(\sprintf('partial %s.{%s}', $associationAlias, implode(',', $select)));
-    }
-
-    private function addSelectOnce(QueryBuilder $queryBuilder, string $alias): void
-    {
-        $existingSelects = array_reduce($queryBuilder->getDQLPart('select') ?? [], fn ($existing, $dqlSelect) => ($dqlSelect instanceof Select) ? array_merge($existing, $dqlSelect->getParts()) : $existing, []);
-
-        if (!\in_array($alias, $existingSelects, true)) {
-            $queryBuilder->addSelect($alias);
-        }
+        yield [$entity, $associationAlias, $select];
     }
 }

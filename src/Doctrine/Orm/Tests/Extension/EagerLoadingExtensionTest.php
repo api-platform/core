@@ -117,6 +117,7 @@ class EagerLoadingExtensionTest extends TestCase
         $emProphecy->getClassMetadata(RelatedDummy::class)->shouldBeCalled()->willReturn($relatedClassMetadataProphecy->reveal());
 
         $queryBuilderProphecy->getRootAliases()->willReturn(['o']);
+        $queryBuilderProphecy->getDQLPart('select')->willReturn([]);
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
 
         $queryBuilderProphecy->leftJoin('o.relatedDummy', 'relatedDummy_a1')->shouldBeCalledTimes(1)->willReturn($queryBuilderProphecy);
@@ -224,6 +225,7 @@ class EagerLoadingExtensionTest extends TestCase
         $emProphecy->getClassMetadata(ThirdLevel::class)->shouldBeCalled()->willReturn($thirdLevelMetadataProphecy->reveal());
 
         $queryBuilderProphecy->getRootAliases()->willReturn(['o']);
+        $queryBuilderProphecy->getDQLPart('select')->willReturn([]);
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
         $queryBuilderProphecy->leftJoin('o.relatedDummy', 'relatedDummy_a1')->shouldBeCalledTimes(1)->willReturn($queryBuilderProphecy);
         $queryBuilderProphecy->leftJoin('relatedDummy_a1.relation', 'relation_a2')->shouldBeCalledTimes(1)->willReturn($queryBuilderProphecy);
@@ -269,6 +271,7 @@ class EagerLoadingExtensionTest extends TestCase
         $emProphecy = $this->prophesize(EntityManager::class);
         $emProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
         $queryBuilderProphecy->getRootAliases()->willReturn(['o']);
+        $queryBuilderProphecy->getDQLPart('select')->willReturn([]);
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
 
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), 30, false, true);
@@ -290,6 +293,7 @@ class EagerLoadingExtensionTest extends TestCase
         $emProphecy = $this->prophesize(EntityManager::class);
         $emProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
         $queryBuilderProphecy->getRootAliases()->willReturn(['o']);
+        $queryBuilderProphecy->getDQLPart('select')->willReturn([]);
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
 
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), 30, false, true);
@@ -310,6 +314,7 @@ class EagerLoadingExtensionTest extends TestCase
         $emProphecy->getClassMetadata(RelatedDummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
         $queryBuilderProphecy->getRootAliases()->willReturn(['o']);
+        $queryBuilderProphecy->getDQLPart('select')->willReturn([]);
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
 
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), 30, false, true);
@@ -330,6 +335,7 @@ class EagerLoadingExtensionTest extends TestCase
         $emProphecy->getClassMetadata(RelatedDummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
         $queryBuilderProphecy->getRootAliases()->willReturn(['o']);
+        $queryBuilderProphecy->getDQLPart('select')->willReturn([]);
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
 
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), 30, false, true);
@@ -364,6 +370,7 @@ class EagerLoadingExtensionTest extends TestCase
         $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'name', ['normalization_groups' => ['bar'], 'denormalization_groups' => ['foo']])->willReturn($namePropertyMetadata)->shouldBeCalled();
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+        $queryBuilderProphecy->getDQLPart('select')->willReturn([]);
 
         $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
         $classMetadataProphecy->associationMappings = [
@@ -375,7 +382,7 @@ class EagerLoadingExtensionTest extends TestCase
 
         foreach ($relatedNameCollection as $property) {
             if ('id' !== $property && 'embeddedDummy' !== $property) {
-                $relatedClassMetadataProphecy->hasField($property)->willReturn('notindatabase' !== $property)->shouldBeCalled();
+                $relatedClassMetadataProphecy->hasField($property)->willReturn(true)->shouldBeCalled();
             }
         }
 
@@ -405,6 +412,90 @@ class EagerLoadingExtensionTest extends TestCase
         $queryBuilderProphecy->leftJoin('o.relatedDummy', 'relatedDummy_a2')->shouldBeCalledTimes(1)->willReturn($queryBuilderProphecy);
         $queryBuilderProphecy->addSelect('partial relatedDummies_a1.{id,name}')->shouldBeCalledTimes(1)->willReturn($queryBuilderProphecy);
         $queryBuilderProphecy->addSelect('partial relatedDummy_a2.{id,name}')->shouldBeCalledTimes(1)->willReturn($queryBuilderProphecy);
+        $queryBuilderProphecy->getDQLPart('join')->willReturn([]);
+
+        $queryBuilder = $queryBuilderProphecy->reveal();
+        $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), 30, false, true, $classMetadataFactoryProphecy->reveal());
+        $eagerExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, new GetCollection(normalizationContext: [AbstractNormalizer::GROUPS => 'foo']));
+    }
+
+    public function testSameEntityWithDifferentPartialProperties(): void
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+
+        $relatedNameCollection = new PropertyNameCollection(['id', 'name']);
+        $propertyNameCollectionFactoryProphecy->create(RelatedDummy::class)->willReturn($relatedNameCollection)->shouldBeCalled();
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $relationPropertyMetadata = new ApiProperty();
+        $relationPropertyMetadata = $relationPropertyMetadata->withReadableLink(false);
+
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy1', ['serializer_groups' => ['foo'], 'normalization_groups' => 'foo'])->willReturn($relationPropertyMetadata)->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy2', ['serializer_groups' => ['foo'], 'normalization_groups' => 'foo'])->willReturn($relationPropertyMetadata)->shouldBeCalled();
+
+        $idPropertyMetadata = (new ApiProperty())->withIdentifier(true);
+        $namePropertyMetadataGroupA = (new ApiProperty())->withReadable(true);
+        // the property Name IS NOT readable in group B
+        $namePropertyMetadataGroupB = (new ApiProperty())->withReadable(false);
+
+        // When called via `relatedDummy1`
+        $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'id', ['normalization_groups' => ['A'], 'denormalization_groups' => ['foo']])->willReturn($idPropertyMetadata)->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'name', ['normalization_groups' => ['A'], 'denormalization_groups' => ['foo']])->willReturn($namePropertyMetadataGroupA)->shouldBeCalled();
+
+        // When called via `relatedDummy2`
+        $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'id', ['normalization_groups' => ['B'], 'denormalization_groups' => ['foo']])->willReturn($idPropertyMetadata)->shouldBeCalled();
+        $propertyMetadataFactoryProphecy->create(RelatedDummy::class, 'name', ['normalization_groups' => ['B'], 'denormalization_groups' => ['foo']])->willReturn($namePropertyMetadataGroupB)->shouldBeCalled();
+
+        $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
+        $queryBuilderProphecy->getDQLPart('select')->willReturn([]);
+
+        $classMetadataProphecy = $this->prophesize(ClassMetadata::class);
+        $classMetadataProphecy->associationMappings = [
+            'relatedDummy1' => ['fetch' => ClassMetadata::FETCH_EAGER, 'joinColumns' => [['nullable' => true]], 'targetEntity' => RelatedDummy::class],
+            'relatedDummy2' => ['fetch' => ClassMetadata::FETCH_EAGER, 'joinColumns' => [['nullable' => true]], 'targetEntity' => RelatedDummy::class],
+        ];
+
+        $relatedClassMetadataProphecy = $this->prophesize(ClassMetadata::class);
+
+        foreach ($relatedNameCollection as $property) {
+            if ('id' !== $property && 'embeddedDummy' !== $property) {
+                $relatedClassMetadataProphecy->hasField($property)->willReturn(true)->shouldBeCalled();
+            }
+        }
+
+        $dummyClassMetadataInterfaceProphecy = $this->prophesize(ClassMetadataInterface::class);
+        $relatedClassMetadataInterfaceProphecy = $this->prophesize(ClassMetadataInterface::class);
+        $classMetadataFactoryProphecy = $this->prophesize(ClassMetadataFactoryInterface::class);
+
+        $relatedDummy1AttributeMetadata = new AttributeMetadata('relatedDummy');
+        $relatedDummy1AttributeMetadata->setNormalizationContextForGroups(['groups' => ['A']], ['foo']);
+
+        $relatedDummy2AttributeMetadata = new AttributeMetadata('relatedDummy');
+        $relatedDummy2AttributeMetadata->setNormalizationContextForGroups(['groups' => ['B']], ['foo']);
+
+        $dummyClassMetadataInterfaceProphecy->getAttributesMetadata()->willReturn([
+            'relatedDummy1' => $relatedDummy1AttributeMetadata,
+            'relatedDummy2' => $relatedDummy2AttributeMetadata,
+        ]);
+        $relatedClassMetadataInterfaceProphecy->getAttributesMetadata()->willReturn([]);
+
+        $classMetadataFactoryProphecy->getMetadataFor(RelatedDummy::class)->willReturn($relatedClassMetadataInterfaceProphecy->reveal());
+        $classMetadataFactoryProphecy->getMetadataFor(Dummy::class)->willReturn($dummyClassMetadataInterfaceProphecy->reveal());
+
+        $relatedClassMetadataProphecy->associationMappings = [];
+
+        $emProphecy = $this->prophesize(EntityManager::class);
+        $emProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
+        $emProphecy->getClassMetadata(RelatedDummy::class)->shouldBeCalled()->willReturn($relatedClassMetadataProphecy->reveal());
+
+        $queryBuilderProphecy->getRootAliases()->willReturn(['o']);
+        $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
+
+        $queryBuilderProphecy->leftJoin('o.relatedDummy1', 'relatedDummy1_a1')->shouldBeCalledTimes(1)->willReturn($queryBuilderProphecy);
+        $queryBuilderProphecy->leftJoin('o.relatedDummy2', 'relatedDummy2_a2')->shouldBeCalledTimes(1)->willReturn($queryBuilderProphecy);
+        $queryBuilderProphecy->addSelect('partial relatedDummy1_a1.{id,name}')->shouldBeCalledTimes(1)->willReturn($queryBuilderProphecy);
+        // here is the purpose of this test: name is not readable in group B, BUT it is part of the partial selection because it is readable in group A
+        $queryBuilderProphecy->addSelect('partial relatedDummy2_a2.{id,name}')->shouldBeCalledTimes(1)->willReturn($queryBuilderProphecy);
         $queryBuilderProphecy->getDQLPart('join')->willReturn([]);
 
         $queryBuilder = $queryBuilderProphecy->reveal();
@@ -454,10 +545,11 @@ class EagerLoadingExtensionTest extends TestCase
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
         $queryBuilderProphecy->getRootAliases()->willReturn(['o']);
+        $queryBuilderProphecy->getDQLPart('select')->willReturn([]);
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
 
-        $queryBuilderProphecy->innerJoin(Argument::type('string'), Argument::type('string'))->shouldBeCalled()->willReturn($queryBuilderProphecy);
-        $queryBuilderProphecy->addSelect(Argument::type('string'))->shouldBeCalled()->willReturn($queryBuilderProphecy);
+        $queryBuilderProphecy->innerJoin(Argument::type('string'), Argument::type('string'))->willReturn($queryBuilderProphecy);
+        $queryBuilderProphecy->addSelect(Argument::type('string'))->willReturn($queryBuilderProphecy);
         $queryBuilderProphecy->getDQLPart('join')->willReturn([]);
 
         $eagerExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), 30, false, true);
@@ -519,6 +611,7 @@ class EagerLoadingExtensionTest extends TestCase
 
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
         $queryBuilderProphecy->getRootAliases()->willReturn(['o']);
+        $queryBuilderProphecy->getDQLPart('select')->willReturn([]);
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
 
         $queryBuilderProphecy->innerJoin(Argument::type('string'), Argument::type('string'))->shouldBeCalledTimes(2)->willReturn($queryBuilderProphecy);
@@ -563,6 +656,7 @@ class EagerLoadingExtensionTest extends TestCase
         $queryBuilderProphecy->getDQLPart('join')->willReturn([]);
 
         $queryBuilderProphecy->getRootAliases()->willReturn(['o']);
+        $queryBuilderProphecy->getDQLPart('select')->willReturn([]);
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
 
         $orderExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), 30, true, true);
@@ -593,6 +687,7 @@ class EagerLoadingExtensionTest extends TestCase
         $emProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
 
         $queryBuilderProphecy->getRootAliases()->willReturn(['o']);
+        $queryBuilderProphecy->getDQLPart('select')->willReturn([]);
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
 
         $orderExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), 30, true, true);
@@ -614,6 +709,7 @@ class EagerLoadingExtensionTest extends TestCase
         $emProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
         $queryBuilderProphecy->getRootAliases()->willReturn(['o']);
+        $queryBuilderProphecy->getDQLPart('select')->willReturn([]);
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
 
         $orderExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), 30, true, true);
@@ -635,6 +731,7 @@ class EagerLoadingExtensionTest extends TestCase
         $emProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
         $queryBuilderProphecy->getRootAliases()->willReturn(['o']);
+        $queryBuilderProphecy->getDQLPart('select')->willReturn([]);
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
 
         $orderExtensionTest = new EagerLoadingExtension($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), 30, true, true);
@@ -660,6 +757,7 @@ class EagerLoadingExtensionTest extends TestCase
         $emProphecy->getClassMetadata(UnknownDummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
         $queryBuilderProphecy = $this->prophesize(QueryBuilder::class);
         $queryBuilderProphecy->getRootAliases()->willReturn(['o']);
+        $queryBuilderProphecy->getDQLPart('select')->willReturn([]);
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
         $queryBuilderProphecy->innerJoin('o.relation', 'relation_a1')->shouldBeCalledTimes(1)->willReturn($queryBuilderProphecy);
         $queryBuilderProphecy->getDQLPart('join')->willReturn([]);
@@ -713,6 +811,7 @@ class EagerLoadingExtensionTest extends TestCase
         $emProphecy->getClassMetadata(RelatedDummy::class)->shouldBeCalled()->willReturn($relatedClassMetadataProphecy->reveal());
 
         $queryBuilderProphecy->getRootAliases()->willReturn(['o']);
+        $queryBuilderProphecy->getDQLPart('select')->willReturn([]);
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
 
         $queryBuilderProphecy->leftJoin('o.relatedDummies', 'relatedDummies_a1')->shouldBeCalledTimes(1)->willReturn($queryBuilderProphecy);
@@ -749,6 +848,7 @@ class EagerLoadingExtensionTest extends TestCase
         $emProphecy->getClassMetadata(Dummy::class)->shouldBeCalled()->willReturn($classMetadataProphecy->reveal());
 
         $queryBuilderProphecy->getRootAliases()->willReturn(['o']);
+        $queryBuilderProphecy->getDQLPart('select')->willReturn([]);
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
 
         $queryBuilder = $queryBuilderProphecy->reveal();
@@ -801,6 +901,7 @@ class EagerLoadingExtensionTest extends TestCase
         $emProphecy->getClassMetadata(RelatedDummy::class)->shouldBeCalled()->willReturn($relatedClassMetadataProphecy->reveal());
 
         $queryBuilderProphecy->getRootAliases()->willReturn(['o']);
+        $queryBuilderProphecy->getDQLPart('select')->willReturn([]);
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
 
         $queryBuilderProphecy->leftJoin('o.relatedDummy', 'relatedDummy_a1')->shouldBeCalledTimes(1)->willReturn($queryBuilderProphecy);
@@ -838,6 +939,7 @@ class EagerLoadingExtensionTest extends TestCase
         $emProphecy->getClassMetadata(RelatedDummy::class)->shouldBeCalled()->willReturn($relatedClassMetadataProphecy->reveal());
 
         $queryBuilderProphecy->getRootAliases()->willReturn(['o']);
+        $queryBuilderProphecy->getDQLPart('select')->willReturn([]);
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
 
         $queryBuilderProphecy->leftJoin('o.relatedDummy', 'relatedDummy_a1')->shouldBeCalledTimes(1)->willReturn($queryBuilderProphecy);
@@ -883,6 +985,7 @@ class EagerLoadingExtensionTest extends TestCase
         $emProphecy->getClassMetadata(RelatedDummy::class)->shouldBeCalled()->willReturn($relatedClassMetadataProphecy->reveal());
 
         $queryBuilderProphecy->getRootAliases()->willReturn(['o']);
+        $queryBuilderProphecy->getDQLPart('select')->willReturn([]);
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
 
         $queryBuilderProphecy->leftJoin('o.relatedDummy', 'relatedDummy_a1')->shouldBeCalledTimes(1)->willReturn($queryBuilderProphecy);
@@ -925,6 +1028,7 @@ class EagerLoadingExtensionTest extends TestCase
         $emProphecy->getClassMetadata(RelatedDummy::class)->shouldBeCalled()->willReturn($relatedClassMetadataProphecy->reveal());
 
         $queryBuilderProphecy->getRootAliases()->willReturn(['o']);
+        $queryBuilderProphecy->getDQLPart('select')->willReturn([]);
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
         $queryBuilderProphecy->getDQLPart('join')->willReturn([
             'o' => [
@@ -971,6 +1075,7 @@ class EagerLoadingExtensionTest extends TestCase
         $emProphecy->getClassMetadata(RelatedDummy::class)->shouldNotBecalled();
 
         $queryBuilderProphecy->getRootAliases()->willReturn(['o']);
+        $queryBuilderProphecy->getDQLPart('select')->willReturn([]);
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
 
         $queryBuilderProphecy->leftJoin('o.relatedDummy', 'relatedDummy_a1')->shouldNotBeCalled();
@@ -1008,6 +1113,7 @@ class EagerLoadingExtensionTest extends TestCase
         $emProphecy->getClassMetadata(PropertyCollectionIriOnlyRelation::class)->shouldNotBecalled();
 
         $queryBuilderProphecy->getRootAliases()->willReturn(['o']);
+        $queryBuilderProphecy->getDQLPart('select')->willReturn([]);
         $queryBuilderProphecy->getEntityManager()->willReturn($emProphecy);
 
         $queryBuilderProphecy->leftJoin('o.propertyCollectionIriOnlyRelation', 'propertyCollectionIriOnlyRelation_a1')->shouldNotBeCalled();
