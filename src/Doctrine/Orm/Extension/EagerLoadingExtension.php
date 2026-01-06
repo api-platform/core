@@ -26,6 +26,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\QueryBuilder;
+use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
@@ -198,11 +199,13 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
 
             if (true === $fetchPartial) {
                 try {
-                    $this->addSelect($queryBuilder, $mapping['targetEntity'], $associationAlias, $options);
+                    $propertyOptions = $this->getPropertyContext($attributesMetadata[$association] ?? null, $options);
+                    $this->addSelect($queryBuilder, $mapping['targetEntity'], $associationAlias, $propertyOptions);
                 } catch (ResourceClassNotFoundException) {
                     continue;
                 }
             } else {
+                $propertyOptions = null;
                 $this->addSelectOnce($queryBuilder, $associationAlias);
             }
 
@@ -225,8 +228,43 @@ final class EagerLoadingExtension implements QueryCollectionExtensionInterface, 
                 }
             }
 
-            $this->joinRelations($queryBuilder, $queryNameGenerator, $mapping['targetEntity'], $forceEager, $fetchPartial, $associationAlias, $options, $childNormalizationContext, $isLeftJoin, $joinCount, $currentDepth, $association);
+            $propertyOptions ??= $this->getPropertyContext($attributesMetadata[$association] ?? null, $options);
+            $this->joinRelations($queryBuilder, $queryNameGenerator, $mapping['targetEntity'], $forceEager, $fetchPartial, $associationAlias, $propertyOptions, $childNormalizationContext, $isLeftJoin, $joinCount, $currentDepth, $association);
         }
+    }
+
+    private function getPropertyContext(?AttributeMetadataInterface $attributeMetadata, array $options): array
+    {
+        if (null === $attributeMetadata) {
+            return $options;
+        }
+
+        $hasNormalizationContext = (isset($options['normalization_groups']) || isset($options['serializer_groups'])) && [] !== $attributeMetadata->getNormalizationContexts();
+        $hasDenormalizationContext = (isset($options['denormalization_groups']) || isset($options['serializer_groups'])) && [] !== $attributeMetadata->getDenormalizationContexts();
+
+        if (!$hasNormalizationContext && !$hasDenormalizationContext) {
+            return $options;
+        }
+
+        $propertyOptions = $options;
+        $propertyOptions['normalization_groups'] ??= $options['serializer_groups'];
+        $propertyOptions['denormalization_groups'] ??= $options['serializer_groups'];
+        // we don't rely on 'serializer_groups' anymore because `context` changes normalization and/or denormalization
+        // but does not have options for both at the same time
+        unset($propertyOptions['serializer_groups']);
+
+        if ($hasNormalizationContext) {
+            $originalGroups = $options['normalization_groups'] ?? $options['serializer_groups'];
+            $propertyContext = $attributeMetadata->getNormalizationContextForGroups((array) $originalGroups);
+            $propertyOptions['normalization_groups'] = $propertyContext[AbstractNormalizer::GROUPS] ?? $originalGroups;
+        }
+        if ($hasDenormalizationContext) {
+            $originalGroups = $options['denormalization_groups'] ?? $options['serializer_groups'];
+            $propertyContext = $attributeMetadata->getDenormalizationContextForGroups((array) $originalGroups);
+            $propertyOptions['denormalization_groups'] = $propertyContext[AbstractNormalizer::GROUPS] ?? $originalGroups;
+        }
+
+        return $propertyOptions;
     }
 
     private function addSelect(QueryBuilder $queryBuilder, string $entity, string $associationAlias, array $propertyMetadataOptions): void
