@@ -115,6 +115,18 @@ final class PartialSearchFilterTest extends ApiTestCase
             0,
             [],
         ];
+
+        yield 'filter by partial name "%"' => [
+            '/chickens?namePartial=%',
+            0,
+            [],
+        ];
+
+        yield 'filter by partial name "_"' => [
+            '/chickens?namePartial=_',
+            0,
+            [],
+        ];
     }
 
     /**

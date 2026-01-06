@@ -38,7 +38,7 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
         $values = $parameter->getValue();
 
         if (!is_iterable($values)) {
-            $queryBuilder->setParameter($parameterName, '%'.strtolower($values).'%');
+            $queryBuilder->setParameter($parameterName, $this->formatLikeValue(strtolower($values)));
 
             $queryBuilder->{$context['whereClause'] ?? 'andWhere'}($queryBuilder->expr()->like(
                 'LOWER('.$field.')',
@@ -55,11 +55,16 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
                 'LOWER('.$field.')',
                 ':'.$parameterName
             );
-            $queryBuilder->setParameter($parameterName, '%'.strtolower($val).'%');
+            $queryBuilder->setParameter($parameterName, $this->formatLikeValue(strtolower($val)));
         }
 
         $queryBuilder->{$context['whereClause'] ?? 'andWhere'}(
             $queryBuilder->expr()->orX(...$likeExpressions)
         );
+    }
+
+    private function formatLikeValue(string $value): string
+    {
+        return '%'.addcslashes($value, '%_').'%';
     }
 }
