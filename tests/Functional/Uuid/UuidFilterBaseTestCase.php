@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Functional\Uuid;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
+use Symfony\Component\HttpFoundation\Response;
 
 abstract class UuidFilterBaseTestCase extends ApiTestCase
 {
@@ -147,16 +148,7 @@ abstract class UuidFilterBaseTestCase extends ApiTestCase
             ],
         ]);
 
-        self::assertResponseIsSuccessful();
-        $json = $response->toArray();
-
-        self::assertArraySubset(['hydra:totalItems' => 0], $json);
-        self::assertArraySubset(
-            [
-                'hydra:member' => [],
-            ],
-            $json
-        );
+        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
     }
 
     public function testSearchFilterByManyInvalidUuid(): void
@@ -174,16 +166,7 @@ abstract class UuidFilterBaseTestCase extends ApiTestCase
             ],
         ]);
 
-        self::assertResponseIsSuccessful();
-        $json = $response->toArray();
-
-        self::assertArraySubset(['hydra:totalItems' => 0], $json);
-        self::assertArraySubset(
-            [
-                'hydra:member' => [],
-            ],
-            $json
-        );
+        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
     }
 
     public function testSearchFilterOnManyToOneRelationByUuid(): void
@@ -288,16 +271,7 @@ abstract class UuidFilterBaseTestCase extends ApiTestCase
             ],
         ]);
 
-        self::assertResponseIsSuccessful();
-        $json = $response->toArray();
-
-        self::assertArraySubset(['hydra:totalItems' => 0], $json);
-        self::assertArraySubset(
-            [
-                'hydra:member' => [],
-            ],
-            $json
-        );
+        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
     }
 
     public function testGetOpenApiDescription(): void
