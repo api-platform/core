@@ -172,16 +172,38 @@ class AbstractUuidFilter implements FilterInterface, ManagerRegistryAwareInterfa
     {
         $in = $parameter instanceof QueryParameter ? 'query' : 'header';
         $key = $parameter->getKey();
+        $schema = $parameter->getSchema();
+        $addStringParam = false;
+        $addArrayParam = false;
+        $openApiParameters = [];
 
-        return [
-            new OpenApiParameter(
+        if (null === $schema) {
+            $addStringParam = true;
+            $addArrayParam = true;
+        }
+
+        foreach ($schema['oneOf'] ?? [$schema] as $item) {
+            if (!isset($item['type']) || 'string' === $item['type']) {
+                $addStringParam = true;
+            }
+
+            if (!isset($item['type']) || 'array' === $item['type']) {
+                $addArrayParam = true;
+            }
+        }
+
+        if ($addStringParam) {
+            $openApiParameters[] = new OpenApiParameter(
                 name: $key,
                 in: $in,
                 schema: self::UUID_SCHEMA,
                 style: 'form',
                 explode: false
-            ),
-            new OpenApiParameter(
+            );
+        }
+
+        if ($addArrayParam) {
+            $openApiParameters[] = new OpenApiParameter(
                 name: $key.'[]',
                 in: $in,
                 description: 'One or more Uuids',
@@ -191,12 +213,26 @@ class AbstractUuidFilter implements FilterInterface, ManagerRegistryAwareInterfa
                 ],
                 style: 'deepObject',
                 explode: true
-            ),
-        ];
+            );
+        }
+
+        return $openApiParameters;
     }
 
     public function getSchema(Parameter $parameter): array
     {
-        return self::UUID_SCHEMA;
+        if (null !== $parameter->getSchema()) {
+            return $parameter->getSchema();
+        }
+
+        return [
+            'oneOf' => [
+                self::UUID_SCHEMA,
+                [
+                    'type' => 'array',
+                    'items' => self::UUID_SCHEMA,
+                ],
+            ],
+        ];
     }
 }
