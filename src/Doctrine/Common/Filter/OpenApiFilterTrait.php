@@ -33,9 +33,19 @@ trait OpenApiFilterTrait
         $hasNonArraySchema = null !== $schema && !$isArraySchema;
 
         if ($hasNonArraySchema || false === $castToArray) {
-            return new OpenApiParameter(name: $parameter->getKey(), in: 'query');
+            return new OpenApiParameter(
+                name: $parameter->getKey(),
+                in: 'query',
+                description: $parameter->getDescription() ?? '',
+            );
         }
 
-        return new OpenApiParameter(name: $parameter->getKey().'[]', in: 'query', style: 'deepObject', explode: true);
+        return new OpenApiParameter(
+            name: $parameter->getKey().'[]',
+            in: 'query',
+            description: $parameter->getDescription() ?? '',
+            style: 'deepObject',
+            explode: true,
+        );
     }
 }
