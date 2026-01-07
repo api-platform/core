@@ -119,19 +119,25 @@ final class PartialSearchFilterTest extends ApiTestCase
         yield 'filter by partial name "%"' => [
             '/chickens?namePartial=%25',
             1,
-            ['xx_%_\_%_xx'],
+            ['xx_%_\\_%_xx'],
         ];
 
         yield 'filter by partial name "_"' => [
-            '/chickens?namePartial=_',
+            '/chickens?namePartial=%5F',
             1,
-            ['xx_%_\_%_xx'],
+            ['xx_%_\\_%_xx'],
         ];
 
         yield 'filter by partial name "\"' => [
             '/chickens?namePartial=%5C',
             1,
-            ['xx_%_\_%_xx'],
+            ['xx_%_\\_%_xx'],
+        ];
+
+        yield 'filter by partial name "\_"' => [
+            '/chickens?namePartial=%5C%5F',
+            1,
+            ['xx_%_\\_%_xx'],
         ];
     }
 
@@ -158,7 +164,7 @@ final class PartialSearchFilterTest extends ApiTestCase
         $chicken2->setChickenCoop($chickenCoop2);
 
         $chicken3 = new $chickenClass();
-        $chicken3->setName('xx_%_\_%_xx');
+        $chicken3->setName('xx_%_\\_%_xx');
         $chicken3->setChickenCoop($chickenCoop1);
 
         $chickenCoop1->addChicken($chicken1);
