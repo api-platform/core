@@ -24,18 +24,12 @@ trait OpenApiFilterTrait
     public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array|null
     {
         $schema = $parameter->getSchema();
-        $isArraySchema = 'array' === ($schema['type'] ?? null);
-        $castToArray = $parameter->getCastToArray();
-
-        // Use non-array notation if:
-        // 1. Schema type is explicitly set to a non-array type (string, number, etc.)
-        // 2. OR castToArray is explicitly false
-        $hasNonArraySchema = null !== $schema && !$isArraySchema;
-
-        if ($hasNonArraySchema || false === $castToArray) {
+        if (false === $parameter->getCastToArray() || (isset($schema['type']) && 'array' !== $schema['type'])) {
             return new OpenApiParameter(name: $parameter->getKey(), in: 'query');
         }
 
-        return new OpenApiParameter(name: $parameter->getKey().'[]', in: 'query', style: 'deepObject', explode: true);
+        $arraySchema = ['type' => 'array', 'items' => $schema ?? ['type' => 'string']];
+
+        return new OpenApiParameter(name: $parameter->getKey().'[]', in: 'query', style: 'deepObject', explode: true, schema: $arraySchema);
     }
 }
