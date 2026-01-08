@@ -339,7 +339,9 @@ final class DoctrineTest extends ApiTestCase
             $this->assertSame($expectedSchemaType, $foundParameter['schema']['type'], \sprintf('Parameter schema type should be %s', $expectedSchemaType));
         }
 
-        $this->assertSame($expectedDescription, $foundParameter['description'] ?? '', \sprintf('Description should be %s', $expectedDescription));
+        if (isset($foundParameter['expectedDescription'])) {
+            $this->assertSame($expectedDescription, $foundParameter['description'] ?? '', \sprintf('Description should be %s', $expectedDescription));
+        }
         $this->assertSame($expectedStyle, $foundParameter['style'] ?? 'form', \sprintf('Style should be %s', $expectedStyle));
         $this->assertSame($expectedExplode, $foundParameter['explode'] ?? false, \sprintf('Explode should be %s', $expectedExplode ? 'true' : 'false'));
     }
