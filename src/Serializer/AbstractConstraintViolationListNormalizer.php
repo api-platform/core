@@ -49,9 +49,9 @@ abstract class AbstractConstraintViolationListNormalizer implements NormalizerIn
     }
 
     /**
-     * @param string|null $format
+     * {@inheritdoc}
      */
-    public function getSupportedTypes($format): array
+    public function getSupportedTypes(?string $format): array
     {
         return $format === static::FORMAT ? [ConstraintViolationListInterface::class => true] : [];
     }

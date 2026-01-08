@@ -61,9 +61,9 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
     }
 
     /**
-     * @param string|null $format
+     * {@inheritdoc}
      */
-    public function getSupportedTypes($format): array
+    public function getSupportedTypes(?string $format): array
     {
         return $this->collectionNormalizer->getSupportedTypes($format);
     }
@@ -71,32 +71,32 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        if (($context[AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS] ?? false) && $object instanceof \ArrayObject && !\count($object)) {
-            return $object;
-        }
-
-        $data = $this->collectionNormalizer->normalize($object, $format, $context);
-        if (!isset($context['resource_class']) || isset($context['api_sub_level'])) {
+        if (($context[AbstractObjectNormalizer::PRESERVE_EMPTY_OBJECTS] ?? false) && $data instanceof \ArrayObject && !\count($data)) {
             return $data;
         }
 
-        if (!\is_array($data)) {
+        $normalizedData = $this->collectionNormalizer->normalize($data, $format, $context);
+        if (!isset($context['resource_class']) || isset($context['api_sub_level'])) {
+            return $normalizedData;
+        }
+
+        if (!\is_array($normalizedData)) {
             throw new UnexpectedValueException('Expected data to be an array');
         }
-        $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class']);
+        $resourceClass = $this->resourceClassResolver->getResourceClass($data, $context['resource_class']);
         $operation = $context['operation'] ?? $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation($context['operation_name'] ?? null);
 
         $parameters = $operation->getParameters();
         $resourceFilters = $operation->getFilters();
         if (!$resourceFilters && !$parameters) {
-            return $data;
+            return $normalizedData;
         }
 
         $requestParts = parse_url($context['request_uri'] ?? '');
         if (!\is_array($requestParts)) {
-            return $data;
+            return $normalizedData;
         }
         $currentFilters = [];
         foreach ($resourceFilters as $filterId) {
@@ -110,7 +110,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         if ($currentFilters || ($parameters && \count($parameters))) {
             $hydraPrefix = $this->getHydraPrefix($context + $this->defaultContext);
             ['mapping' => $mapping, 'keys' => $keys] = $this->getSearchMappingAndKeys($operation, $resourceClass, $currentFilters, $parameters, [$this, 'getFilter']);
-            $data[$hydraPrefix.'search'] = [
+            $normalizedData[$hydraPrefix.'search'] = [
                 '@type' => $hydraPrefix.'IriTemplate',
                 $hydraPrefix.'template' => \sprintf('%s{?%s}', $requestParts['path'], implode(',', $keys)),
                 $hydraPrefix.'variableRepresentation' => 'BasicRepresentation',
@@ -118,7 +118,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
             ];
         }
 
-        return $data;
+        return $normalizedData;
     }
 
     /**

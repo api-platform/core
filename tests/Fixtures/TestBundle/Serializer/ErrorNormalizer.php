@@ -22,19 +22,28 @@ final class ErrorNormalizer implements NormalizerInterface
     {
     }
 
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|\ArrayObject
+    /**
+     * {@inheritdoc}
+     */
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|\ArrayObject
     {
-        $a = $this->decorated->normalize($object, $format, $context);
+        $a = $this->decorated->normalize($data, $format, $context);
         $a['hello'] = 'world';
 
         return $a;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return 'json' === $format;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getSupportedTypes(?string $format): array
     {
         if ('json' === $format) {

@@ -25,21 +25,27 @@ final class AddGroupNormalizer implements NormalizerAwareInterface, NormalizerIn
 
     private const ALREADY_CALLED = 'RELATED_GROUP_IMPACT_ON_COLLECTION_NORMALIZER_ALREADY_CALLED';
 
-    public function normalize($object, $format = null, array $context = []): array|string|int|float|bool|\ArrayObject
+    /**
+     * {@inheritdoc}
+     */
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject
     {
         $context[self::ALREADY_CALLED] = true;
         if (!($operation = $context['operation'] ?? null)) {
-            return $this->normalizer->normalize($object, $format, $context);
+            return $this->normalizer->normalize($data, $format, $context);
         }
 
         if ($operation instanceof Get && '/custom_normalizer_relation_group_impact_on_collection' === $operation->getUriTemplate()) {
             $context['groups'] = ['related'];
         }
 
-        return $this->normalizer->normalize($object, $format, $context);
+        return $this->normalizer->normalize($data, $format, $context);
     }
 
-    public function supportsNormalization($data, $format = null, array $context = []): bool
+    /**
+     * {@inheritdoc}
+     */
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         // Make sure we're not called twice
         if (isset($context[self::ALREADY_CALLED])) {
@@ -49,7 +55,10 @@ final class AddGroupNormalizer implements NormalizerAwareInterface, NormalizerIn
         return $data instanceof RelationGroupImpactOnCollection;
     }
 
-    public function getSupportedTypes($format): array
+    /**
+     * {@inheritdoc}
+     */
+    public function getSupportedTypes(?string $format): array
     {
         return [
             RelationGroupImpactOnCollection::class => false,

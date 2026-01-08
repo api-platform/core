@@ -85,9 +85,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
     }
 
     /**
-     * @param string|null $format
+     * {@inheritdoc}
      */
-    public function getSupportedTypes($format): array
+    public function getSupportedTypes(?string $format): array
     {
         return self::FORMAT === $format ? parent::getSupportedTypes($format) : [];
     }
@@ -97,20 +97,20 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * @throws LogicException
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        $resourceClass = $this->getObjectClass($object);
+        $resourceClass = $this->getObjectClass($data);
         $outputClass = $this->getOutputClass($context);
 
         if ($outputClass && !($context['item_uri_template'] ?? null)) {
-            return parent::normalize($object, $format, $context);
+            return parent::normalize($data, $format, $context);
         }
 
         // TODO: we should not remove the resource_class in the normalizeRawCollection as we would find out anyway that it's not the same as the requested one
         $previousResourceClass = $context['resource_class'] ?? null;
         $metadata = [];
         if ($isResourceClass = $this->resourceClassResolver->isResourceClass($resourceClass) && (null === $previousResourceClass || $this->resourceClassResolver->isResourceClass($previousResourceClass))) {
-            $resourceClass = $this->resourceClassResolver->getResourceClass($object, $previousResourceClass);
+            $resourceClass = $this->resourceClassResolver->getResourceClass($data, $previousResourceClass);
             $context = $this->initContext($resourceClass, $context);
             $metadata = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
         } elseif ($this->contextBuilder instanceof AnonymousContextBuilderInterface) {
@@ -127,7 +127,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             }
 
             // We should improve what's behind the context creation, its probably more complicated then it should
-            $metadata = $this->createJsonLdContext($this->contextBuilder, $object, $context);
+            $metadata = $this->createJsonLdContext($this->contextBuilder, $data, $context);
         }
 
         // Special case: non-resource got serialized and contains a resource therefore we need to reset part of the context
@@ -135,16 +135,16 @@ final class ItemNormalizer extends AbstractItemNormalizer
             unset($context['operation'], $context['operation_name'], $context['output']);
         }
 
-        if (true === ($context['output']['gen_id'] ?? true) && true === ($context['force_iri_generation'] ?? true) && $iri = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context)) {
+        if (true === ($context['output']['gen_id'] ?? true) && true === ($context['force_iri_generation'] ?? true) && $iri = $this->iriConverter->getIriFromResource($data, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context)) {
             $context['iri'] = $iri;
             $metadata['@id'] = $iri;
         }
 
         $context['api_normalize'] = true;
 
-        $data = parent::normalize($object, $format, $context);
-        if (!\is_array($data)) {
-            return $data;
+        $normalizedData = parent::normalize($data, $format, $context);
+        if (!\is_array($normalizedData)) {
+            return $normalizedData;
         }
 
         $operation = $context['operation'] ?? null;
@@ -165,7 +165,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $metadata['@type'] = 1 === \count($types) ? $types[0] : $types;
         }
 
-        return $metadata + $data;
+        return $metadata + $normalizedData;
     }
 
     /**
@@ -181,7 +181,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * @throws NotNormalizableValueException
      */
-    public function denormalize(mixed $data, string $class, ?string $format = null, array $context = []): mixed
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         // Avoid issues with proxies if we populated the object
         if (isset($data['@id']) && !isset($context[self::OBJECT_TO_POPULATE])) {
@@ -200,7 +200,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             }
         }
 
-        return parent::denormalize($data, $class, $format, $context);
+        return parent::denormalize($data, $type, $format, $context);
     }
 
     protected function getAllowedAttributes(string|object $classOrObject, array $context, bool $attributesAsString = false): array|bool

@@ -63,9 +63,9 @@ final class ItemNormalizer extends BaseItemNormalizer
     }
 
     /**
-     * @param string|null $format
+     * {@inheritdoc}
      */
-    public function getSupportedTypes($format): array
+    public function getSupportedTypes(?string $format): array
     {
         return self::FORMAT === $format ? parent::getSupportedTypes($format) : [];
     }
@@ -77,17 +77,17 @@ final class ItemNormalizer extends BaseItemNormalizer
      *
      * @throws UnexpectedValueException
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        $resourceClass = $this->getObjectClass($object);
+        $resourceClass = $this->getObjectClass($data);
 
         if ($this->getOutputClass($context)) {
             $context['graphql_identifiers'] = [
                 self::ITEM_RESOURCE_CLASS_KEY => $context['operation']->getClass(),
-                self::ITEM_IDENTIFIERS_KEY => $this->identifiersExtractor->getIdentifiersFromItem($object, $context['operation'] ?? null),
+                self::ITEM_IDENTIFIERS_KEY => $this->identifiersExtractor->getIdentifiersFromItem($data, $context['operation'] ?? null),
             ];
 
-            return parent::normalize($object, $format, $context);
+            return parent::normalize($data, $format, $context);
         }
 
         if ($this->isCacheKeySafe($context)) {
@@ -97,19 +97,19 @@ final class ItemNormalizer extends BaseItemNormalizer
         }
 
         unset($context['operation_name'], $context['operation']); // Remove operation and operation_name only when cache key has been created
-        $data = parent::normalize($object, $format, $context);
-        if (!\is_array($data)) {
+        $normalizedData = parent::normalize($data, $format, $context);
+        if (!\is_array($normalizedData)) {
             throw new UnexpectedValueException('Expected data to be an array.');
         }
 
         if (isset($context['graphql_identifiers'])) {
-            $data += $context['graphql_identifiers'];
+            $normalizedData += $context['graphql_identifiers'];
         } elseif (!($context['no_resolver_data'] ?? false)) {
-            $data[self::ITEM_RESOURCE_CLASS_KEY] = $resourceClass;
-            $data[self::ITEM_IDENTIFIERS_KEY] = $this->identifiersExtractor->getIdentifiersFromItem($object, $context['operation'] ?? null);
+            $normalizedData[self::ITEM_RESOURCE_CLASS_KEY] = $resourceClass;
+            $normalizedData[self::ITEM_IDENTIFIERS_KEY] = $this->identifiersExtractor->getIdentifiersFromItem($data, $context['operation'] ?? null);
         }
 
-        return $data;
+        return $normalizedData;
     }
 
     /**
@@ -152,12 +152,8 @@ final class ItemNormalizer extends BaseItemNormalizer
 
     /**
      * {@inheritdoc}
-     *
-     * @param object      $object
-     * @param string      $attribute
-     * @param string|null $format
      */
-    protected function setAttributeValue($object, $attribute, mixed $value, $format = null, array $context = []): void
+    protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = []): void
     {
         if ('_id' === $attribute) {
             $attribute = 'id';

@@ -41,9 +41,9 @@ final class ObjectNormalizer implements NormalizerInterface
     }
 
     /**
-     * @param string|null $format
+     * {@inheritdoc}
      */
-    public function getSupportedTypes($format): array
+    public function getSupportedTypes(?string $format): array
     {
         return self::FORMAT === $format ? $this->decorated->getSupportedTypes($format) : [];
     }
@@ -51,7 +51,7 @@ final class ObjectNormalizer implements NormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         if (isset($context['api_resource'])) {
             $originalResource = $context['api_resource'];
@@ -70,9 +70,9 @@ final class ObjectNormalizer implements NormalizerInterface
          */
         $context['api_empty_resource_as_iri'] = true;
 
-        $data = $this->decorated->normalize($object, $format, $context);
-        if (!\is_array($data) || !$data) {
-            return $data;
+        $normalizedData = $this->decorated->normalize($data, $format, $context);
+        if (!\is_array($normalizedData) || !$normalizedData) {
+            return $normalizedData;
         }
 
         if (isset($originalResource)) {
@@ -84,8 +84,8 @@ final class ObjectNormalizer implements NormalizerInterface
             $context['api_resource'] = $originalResource;
         }
 
-        $metadata = $this->createJsonLdContext($this->anonymousContextBuilder, $object, $context);
+        $metadata = $this->createJsonLdContext($this->anonymousContextBuilder, $data, $context);
 
-        return $metadata + $data;
+        return $metadata + $normalizedData;
     }
 }

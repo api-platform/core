@@ -41,9 +41,9 @@ class DummyPlainIdentifierDenormalizer implements DenormalizerInterface, Denorma
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = null, array $context = []): mixed
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
-        $relatedDummyClass = DummyEntity::class === $class ? RelatedDummyEntity::class : RelatedDummyDocument::class;
+        $relatedDummyClass = DummyEntity::class === $type ? RelatedDummyEntity::class : RelatedDummyDocument::class;
         if (!empty($data['relatedDummy'])) {
             $data['relatedDummy'] = $this->iriConverter->getIriFromResource($relatedDummyClass, UrlGeneratorInterface::ABS_PATH, new Get(), ['uri_variables' => [
                 'id' => $data['relatedDummy'],
@@ -58,13 +58,13 @@ class DummyPlainIdentifierDenormalizer implements DenormalizerInterface, Denorma
             }
         }
 
-        return $this->denormalizer->denormalize($data, $class, $format, $context + [self::class => true]);
+        return $this->denormalizer->denormalize($data, $type, $format, $context + [self::class => true]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null, array $context = []): bool
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return 'json' === $format
             && (is_a($type, DummyEntity::class, true) || is_a($type, DummyDocument::class, true))
@@ -72,7 +72,10 @@ class DummyPlainIdentifierDenormalizer implements DenormalizerInterface, Denorma
             && !isset($context[self::class]);
     }
 
-    public function getSupportedTypes($format): array
+    /**
+     * {@inheritdoc}
+     */
+    public function getSupportedTypes(?string $format): array
     {
         return 'json' === $format ? ['*' => false] : [];
     }

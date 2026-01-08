@@ -25,10 +25,13 @@ final class ErrorNormalizer implements NormalizerInterface
     {
     }
 
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    /**
+     * {@inheritdoc}
+     */
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         $context += $this->defaultContext;
-        $normalized = $this->inner->normalize($object, $format, $context);
+        $normalized = $this->inner->normalize($data, $format, $context);
         $hydraPrefix = $this->getHydraPrefix($context);
         if (!$hydraPrefix) {
             return $normalized;
@@ -53,12 +56,18 @@ final class ErrorNormalizer implements NormalizerInterface
         return $normalized;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $this->inner->supportsNormalization($data, $format, $context)
             && (is_a($data, Error::class) || is_a($data, ValidationException::class));
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getSupportedTypes(?string $format): array
     {
         if (method_exists($this->inner, 'getSupportedTypes')) {

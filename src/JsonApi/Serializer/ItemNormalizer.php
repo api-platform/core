@@ -73,9 +73,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
     }
 
     /**
-     * @param string|null $format
+     * {@inheritdoc}
      */
-    public function getSupportedTypes($format): array
+    public function getSupportedTypes(?string $format): array
     {
         return self::FORMAT === $format ? parent::getSupportedTypes($format) : [];
     }
@@ -83,16 +83,16 @@ final class ItemNormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        $resourceClass = $this->getObjectClass($object);
+        $resourceClass = $this->getObjectClass($data);
         if ($this->getOutputClass($context)) {
-            return parent::normalize($object, $format, $context);
+            return parent::normalize($data, $format, $context);
         }
 
         $previousResourceClass = $context['resource_class'] ?? null;
         if ($this->resourceClassResolver->isResourceClass($resourceClass) && (null === $previousResourceClass || $this->resourceClassResolver->isResourceClass($previousResourceClass))) {
-            $resourceClass = $this->resourceClassResolver->getResourceClass($object, $previousResourceClass);
+            $resourceClass = $this->resourceClassResolver->getResourceClass($data, $previousResourceClass);
         }
 
         if (($operation = $context['operation'] ?? null) && method_exists($operation, 'getItemUriTemplate')) {
@@ -101,8 +101,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         $context = $this->initContext($resourceClass, $context);
 
-        $iri = $context['iri'] ??= $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context);
-        $context['object'] = $object;
+        $iri = $context['iri'] ??= $this->iriConverter->getIriFromResource($data, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context);
+        $context['object'] = $data;
         $context['format'] = $format;
         $context['api_normalize'] = true;
 
@@ -110,28 +110,28 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $context['cache_key'] = $this->getCacheKey($format, $context);
         }
 
-        $data = parent::normalize($object, $format, $context);
-        if (!\is_array($data)) {
-            return $data;
+        $normalizedData = parent::normalize($data, $format, $context);
+        if (!\is_array($normalizedData)) {
+            return $normalizedData;
         }
 
         // Get and populate relations
-        ['relationships' => $allRelationshipsData, 'links' => $links] = $this->getComponents($object, $format, $context);
+        ['relationships' => $allRelationshipsData, 'links' => $links] = $this->getComponents($data, $format, $context);
         $populatedRelationContext = $context;
-        $relationshipsData = $this->getPopulatedRelations($object, $format, $populatedRelationContext, $allRelationshipsData);
+        $relationshipsData = $this->getPopulatedRelations($data, $format, $populatedRelationContext, $allRelationshipsData);
 
         // Do not include primary resources
         $context['api_included_resources'] = [$context['iri']];
 
-        $includedResourcesData = $this->getRelatedResources($object, $format, $context, $allRelationshipsData);
+        $includedResourcesData = $this->getRelatedResources($data, $format, $context, $allRelationshipsData);
 
         $resourceData = [
             'id' => $context['iri'],
             'type' => $this->getResourceShortName($resourceClass),
         ];
 
-        if ($data) {
-            $resourceData['attributes'] = $data;
+        if ($normalizedData) {
+            $resourceData['attributes'] = $normalizedData;
         }
 
         if ($relationshipsData) {
@@ -166,7 +166,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * @throws NotNormalizableValueException
      */
-    public function denormalize(mixed $data, string $class, ?string $format = null, array $context = []): mixed
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         // Avoid issues with proxies if we populated the object
         if (!isset($context[self::OBJECT_TO_POPULATE]) && isset($data['data']['id'])) {
@@ -188,7 +188,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         return parent::denormalize(
             $dataToDenormalize,
-            $class,
+            $type,
             $format,
             $context
         );

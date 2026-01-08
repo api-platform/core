@@ -67,13 +67,13 @@ final class DocumentationNormalizer implements NormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
         $classes = [];
         $entrypointProperties = [];
         $hydraPrefix = $this->getHydraPrefix($context + $this->defaultContext);
 
-        foreach ($object->getResourceNameCollection() as $resourceClass) {
+        foreach ($data->getResourceNameCollection() as $resourceClass) {
             $resourceMetadataCollection = $this->resourceMetadataFactory->create($resourceClass);
 
             $resourceMetadata = $resourceMetadataCollection[0];
@@ -88,7 +88,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             $classes[] = $this->getClass($resourceClass, $resourceMetadata, $shortName, $prefixedShortName, $context, $hydraPrefix, $resourceMetadataCollection);
         }
 
-        return $this->computeDoc($object, $this->getClasses($entrypointProperties, $classes, $hydraPrefix), $hydraPrefix);
+        return $this->computeDoc($data, $this->getClasses($entrypointProperties, $classes, $hydraPrefix), $hydraPrefix);
     }
 
     /**
@@ -686,9 +686,9 @@ final class DocumentationNormalizer implements NormalizerInterface
     }
 
     /**
-     * @param string|null $format
+     * {@inheritdoc}
      */
-    public function getSupportedTypes($format): array
+    public function getSupportedTypes(?string $format): array
     {
         return self::FORMAT === $format ? [Documentation::class => true] : [];
     }

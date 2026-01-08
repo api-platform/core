@@ -39,9 +39,9 @@ final class ObjectNormalizer implements NormalizerInterface, DenormalizerInterfa
     }
 
     /**
-     * @param string|null $format
+     * {@inheritdoc}
      */
-    public function getSupportedTypes($format): array
+    public function getSupportedTypes(?string $format): array
     {
         return self::FORMAT === $format ? $this->decorated->getSupportedTypes($format) : [];
     }
@@ -49,20 +49,20 @@ final class ObjectNormalizer implements NormalizerInterface, DenormalizerInterfa
     /**
      * {@inheritdoc}
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         if (isset($context['api_resource'])) {
             $originalResource = $context['api_resource'];
             unset($context['api_resource']);
         }
 
-        $data = $this->decorated->normalize($object, $format, $context);
-        if (!\is_array($data)) {
-            return $data;
+        $normalizedData = $this->decorated->normalize($data, $format, $context);
+        if (!\is_array($normalizedData)) {
+            return $normalizedData;
         }
 
         if (!isset($originalResource)) {
-            return $data;
+            return $normalizedData;
         }
 
         $metadata = [
@@ -73,7 +73,7 @@ final class ObjectNormalizer implements NormalizerInterface, DenormalizerInterfa
             ],
         ];
 
-        return $metadata + $data;
+        return $metadata + $normalizedData;
     }
 
     /**
