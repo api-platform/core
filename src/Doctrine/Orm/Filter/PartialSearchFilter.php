@@ -38,12 +38,10 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
         $values = $parameter->getValue();
 
         if (!is_iterable($values)) {
-            $queryBuilder->setParameter($parameterName, '%'.strtolower($values).'%');
+            $queryBuilder->setParameter($parameterName, $this->formatLikeValue(strtolower($values)));
 
-            $queryBuilder->{$context['whereClause'] ?? 'andWhere'}($queryBuilder->expr()->like(
-                'LOWER('.$field.')',
-                ':'.$parameterName
-            ));
+            $likeExpression = 'LOWER('.$field.') LIKE :'.$parameterName.' ESCAPE \'\\\'';
+            $queryBuilder->{$context['whereClause'] ?? 'andWhere'}($likeExpression);
 
             return;
         }
@@ -51,15 +49,17 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
         $likeExpressions = [];
         foreach ($values as $val) {
             $parameterName = $queryNameGenerator->generateParameterName($property);
-            $likeExpressions[] = $queryBuilder->expr()->like(
-                'LOWER('.$field.')',
-                ':'.$parameterName
-            );
-            $queryBuilder->setParameter($parameterName, '%'.strtolower($val).'%');
+            $likeExpressions[] = 'LOWER('.$field.') LIKE :'.$parameterName.' ESCAPE \'\\\'';
+            $queryBuilder->setParameter($parameterName, $this->formatLikeValue(strtolower($val)));
         }
 
         $queryBuilder->{$context['whereClause'] ?? 'andWhere'}(
             $queryBuilder->expr()->orX(...$likeExpressions)
         );
+    }
+
+    private function formatLikeValue(string $value): string
+    {
+        return '%'.addcslashes($value, '\\%_').'%';
     }
 }
