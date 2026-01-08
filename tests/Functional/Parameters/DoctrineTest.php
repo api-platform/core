@@ -302,7 +302,7 @@ final class DoctrineTest extends ApiTestCase
     }
 
     #[DataProvider('openApiParameterDocumentationProvider')]
-    public function testOpenApiParameterDocumentation(string $parameterName, bool $shouldHaveArrayNotation, string $expectedStyle, bool $expectedExplode, ?string $expectedSchemaType = null): void
+    public function testOpenApiParameterDocumentation(string $parameterName, bool $shouldHaveArrayNotation, string $expectedStyle, bool $expectedExplode, ?string $expectedSchemaType = null, string $expectedDescription = ''): void
     {
         if ($this->isMongoDB()) {
             $this->markTestSkipped('Not tested with mongodb.');
@@ -339,6 +339,9 @@ final class DoctrineTest extends ApiTestCase
             $this->assertSame($expectedSchemaType, $foundParameter['schema']['type'], \sprintf('Parameter schema type should be %s', $expectedSchemaType));
         }
 
+        if (isset($foundParameter['expectedDescription'])) {
+            $this->assertSame($expectedDescription, $foundParameter['description'] ?? '', \sprintf('Description should be %s', $expectedDescription));
+        }
         $this->assertSame($expectedStyle, $foundParameter['style'] ?? 'form', \sprintf('Style should be %s', $expectedStyle));
         $this->assertSame($expectedExplode, $foundParameter['explode'] ?? false, \sprintf('Explode should be %s', $expectedExplode ? 'true' : 'false'));
     }
@@ -352,6 +355,14 @@ final class DoctrineTest extends ApiTestCase
                 'expectedStyle' => 'deepObject',
                 'expectedExplode' => true,
                 'expectedSchemaType' => 'string',
+            ],
+            'default behavior with an extra description' => [
+                'parameterName' => 'brandWithDescription',
+                'shouldHaveArrayNotation' => true,
+                'expectedStyle' => 'deepObject',
+                'expectedExplode' => true,
+                'expectedSchemaType' => 'string',
+                'expectedDescription' => 'Extra description about the filter',
             ],
             'explicit schema type string should not use array notation' => [
                 'parameterName' => 'exactBrand',
