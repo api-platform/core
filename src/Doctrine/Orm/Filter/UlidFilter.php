@@ -24,35 +24,65 @@ final class UlidFilter extends AbstractUuidFilter
         'format' => 'ulid',
     ];
 
-    public function getOpenApiParameters(Parameter $parameter): array
+    public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array
     {
         $in = $parameter instanceof QueryParameter ? 'query' : 'header';
-        $key = $parameter->getKey();
+        $schema = $parameter->getSchema();
+        $isArraySchema = 'array' === ($schema['type'] ?? null);
+        $hasNonArrayType = isset($schema['type']) && 'array' !== $schema['type'];
 
+        $baseSchema = self::ULID_SCHEMA;
+        $arraySchema = ['type' => 'array', 'items' => $baseSchema];
+
+        if ($isArraySchema) {
+            return new OpenApiParameter(
+                name: $parameter->getKey().'[]',
+                in: $in,
+                schema: $arraySchema,
+                style: 'deepObject',
+                explode: true,
+            );
+        }
+
+        if ($hasNonArrayType) {
+            return new OpenApiParameter(
+                name: $parameter->getKey(),
+                in: $in,
+                schema: $baseSchema,
+            );
+        }
+
+        // oneOf or no specific type constraint - return both with explicit schemas
         return [
             new OpenApiParameter(
-                name: $key,
+                name: $parameter->getKey(),
                 in: $in,
-                schema: self::ULID_SCHEMA,
-                style: 'form',
-                explode: false
+                schema: $baseSchema,
             ),
             new OpenApiParameter(
-                name: $key.'[]',
+                name: $parameter->getKey().'[]',
                 in: $in,
-                description: 'One or more Ulids',
-                schema: [
-                    'type' => 'array',
-                    'items' => self::ULID_SCHEMA,
-                ],
+                schema: $arraySchema,
                 style: 'deepObject',
-                explode: true
+                explode: true,
             ),
         ];
     }
 
     public function getSchema(Parameter $parameter): array
     {
-        return self::ULID_SCHEMA;
+        if (false === $parameter->getCastToArray()) {
+            return self::ULID_SCHEMA;
+        }
+
+        return [
+            'oneOf' => [
+                self::ULID_SCHEMA,
+                [
+                    'type' => 'array',
+                    'items' => self::ULID_SCHEMA,
+                ],
+            ],
+        ];
     }
 }

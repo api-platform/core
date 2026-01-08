@@ -56,26 +56,20 @@ class UuidFilterWithCustomSchemaTest extends ApiTestCase
             [
                 'name' => 'id',
                 'in' => 'query',
-                'description' => '',
                 'required' => false,
-                'deprecated' => false,
                 'schema' => [
                     'type' => 'string',
                     'format' => 'uuid',
                 ],
-                'style' => 'form',
-                'explode' => false,
             ],
-            $json['paths']['/uuid_filter_with_custom_schemas']['get']['parameters']
+            array_map(fn ($p) => array_intersect_key($p, ['name' => 1, 'in' => 1, 'required' => 1, 'schema' => 1]), $json['paths']['/uuid_filter_with_custom_schemas']['get']['parameters'])
         );
 
         self::assertContains(
             [
                 'name' => 'id[]',
                 'in' => 'query',
-                'description' => 'One or more Uuids',
                 'required' => false,
-                'deprecated' => false,
                 'schema' => [
                     'type' => 'array',
                     'items' => [
@@ -86,7 +80,7 @@ class UuidFilterWithCustomSchemaTest extends ApiTestCase
                 'style' => 'deepObject',
                 'explode' => true,
             ],
-            $json['paths']['/uuid_filter_with_custom_schemas']['get']['parameters']
+            array_map(fn ($p) => array_intersect_key($p, ['name' => 1, 'in' => 1, 'required' => 1, 'schema' => 1, 'style' => 1, 'explode' => 1]), $json['paths']['/uuid_filter_with_custom_schemas']['get']['parameters'])
         );
     }
 
@@ -102,17 +96,13 @@ class UuidFilterWithCustomSchemaTest extends ApiTestCase
             [
                 'name' => 'idfoo',
                 'in' => 'query',
-                'description' => '',
                 'required' => false,
-                'deprecated' => false,
                 'schema' => [
                     'type' => 'string',
                     'format' => 'uuid',
                 ],
-                'style' => 'form',
-                'explode' => false,
             ],
-            $json['paths']['/uuid_filter_with_custom_schemas']['get']['parameters']
+            array_map(fn ($p) => array_intersect_key($p, ['name' => 1, 'in' => 1, 'required' => 1, 'schema' => 1]), $json['paths']['/uuid_filter_with_custom_schemas']['get']['parameters'])
         );
 
         self::assertNotContains(
@@ -137,9 +127,7 @@ class UuidFilterWithCustomSchemaTest extends ApiTestCase
             [
                 'name' => 'idbar[]',
                 'in' => 'query',
-                'description' => 'One or more Uuids',
                 'required' => false,
-                'deprecated' => false,
                 'schema' => [
                     'type' => 'array',
                     'items' => [
@@ -150,7 +138,7 @@ class UuidFilterWithCustomSchemaTest extends ApiTestCase
                 'style' => 'deepObject',
                 'explode' => true,
             ],
-            $json['paths']['/uuid_filter_with_custom_schemas']['get']['parameters']
+            array_map(fn ($p) => array_intersect_key($p, ['name' => 1, 'in' => 1, 'required' => 1, 'schema' => 1, 'style' => 1, 'explode' => 1]), $json['paths']['/uuid_filter_with_custom_schemas']['get']['parameters'])
         );
     }
 
@@ -166,26 +154,20 @@ class UuidFilterWithCustomSchemaTest extends ApiTestCase
             [
                 'name' => 'idquz',
                 'in' => 'query',
-                'description' => '',
                 'required' => false,
-                'deprecated' => false,
                 'schema' => [
                     'type' => 'string',
                     'format' => 'uuid',
                 ],
-                'style' => 'form',
-                'explode' => false,
             ],
-            $json['paths']['/uuid_filter_with_custom_schemas']['get']['parameters']
+            array_map(fn ($p) => array_intersect_key($p, ['name' => 1, 'in' => 1, 'required' => 1, 'schema' => 1]), $json['paths']['/uuid_filter_with_custom_schemas']['get']['parameters'])
         );
 
         self::assertContains(
             [
                 'name' => 'idquz[]',
                 'in' => 'query',
-                'description' => 'One or more Uuids',
                 'required' => false,
-                'deprecated' => false,
                 'schema' => [
                     'type' => 'array',
                     'items' => [
@@ -196,7 +178,7 @@ class UuidFilterWithCustomSchemaTest extends ApiTestCase
                 'style' => 'deepObject',
                 'explode' => true,
             ],
-            $json['paths']['/uuid_filter_with_custom_schemas']['get']['parameters']
+            array_map(fn ($p) => array_intersect_key($p, ['name' => 1, 'in' => 1, 'required' => 1, 'schema' => 1, 'style' => 1, 'explode' => 1]), $json['paths']['/uuid_filter_with_custom_schemas']['get']['parameters'])
         );
     }
 

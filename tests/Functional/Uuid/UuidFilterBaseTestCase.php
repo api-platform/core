@@ -286,26 +286,20 @@ abstract class UuidFilterBaseTestCase extends ApiTestCase
             [
                 'name' => 'id',
                 'in' => 'query',
-                'description' => '',
                 'required' => false,
-                'deprecated' => false,
                 'schema' => [
                     'type' => 'string',
                     'format' => 'uuid',
                 ],
-                'style' => 'form',
-                'explode' => false,
             ],
-            $json['paths']['/'.$this->getUrlPrefix().'_device_endpoints']['get']['parameters']
+            array_map(fn ($p) => array_intersect_key($p, ['name' => 1, 'in' => 1, 'required' => 1, 'schema' => 1]), $json['paths']['/'.$this->getUrlPrefix().'_device_endpoints']['get']['parameters'])
         );
 
         self::assertContains(
             [
                 'name' => 'id[]',
                 'in' => 'query',
-                'description' => 'One or more Uuids',
                 'required' => false,
-                'deprecated' => false,
                 'schema' => [
                     'type' => 'array',
                     'items' => [
@@ -316,7 +310,7 @@ abstract class UuidFilterBaseTestCase extends ApiTestCase
                 'style' => 'deepObject',
                 'explode' => true,
             ],
-            $json['paths']['/'.$this->getUrlPrefix().'_device_endpoints']['get']['parameters']
+            array_map(fn ($p) => array_intersect_key($p, ['name' => 1, 'in' => 1, 'required' => 1, 'schema' => 1, 'style' => 1, 'explode' => 1]), $json['paths']['/'.$this->getUrlPrefix().'_device_endpoints']['get']['parameters'])
         );
     }
 

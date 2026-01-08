@@ -168,61 +168,56 @@ class AbstractUuidFilter implements FilterInterface, ManagerRegistryAwareInterfa
         return null;
     }
 
-    public function getOpenApiParameters(Parameter $parameter): array
+    public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array|null
     {
         $in = $parameter instanceof QueryParameter ? 'query' : 'header';
-        $key = $parameter->getKey();
         $schema = $parameter->getSchema();
-        $addStringParam = false;
-        $addArrayParam = false;
-        $openApiParameters = [];
+        $isArraySchema = 'array' === ($schema['type'] ?? null);
+        $hasNonArrayType = isset($schema['type']) && 'array' !== $schema['type'];
 
-        if (null === $schema) {
-            $addStringParam = true;
-            $addArrayParam = true;
-        }
+        // Get filter's base schema
+        $baseSchema = self::UUID_SCHEMA;
+        $arraySchema = ['type' => 'array', 'items' => $baseSchema];
 
-        foreach ($schema['oneOf'] ?? [$schema] as $item) {
-            if (!isset($item['type']) || 'string' === $item['type']) {
-                $addStringParam = true;
-            }
-
-            if (!isset($item['type']) || 'array' === $item['type']) {
-                $addArrayParam = true;
-            }
-        }
-
-        if ($addStringParam) {
-            $openApiParameters[] = new OpenApiParameter(
-                name: $key,
+        if ($isArraySchema) {
+            return new OpenApiParameter(
+                name: $parameter->getKey().'[]',
                 in: $in,
-                schema: self::UUID_SCHEMA,
-                style: 'form',
-                explode: false
-            );
-        }
-
-        if ($addArrayParam) {
-            $openApiParameters[] = new OpenApiParameter(
-                name: $key.'[]',
-                in: $in,
-                description: 'One or more Uuids',
-                schema: [
-                    'type' => 'array',
-                    'items' => self::UUID_SCHEMA,
-                ],
+                schema: $arraySchema,
                 style: 'deepObject',
-                explode: true
+                explode: true,
             );
         }
 
-        return $openApiParameters;
+        if ($hasNonArrayType) {
+            return new OpenApiParameter(
+                name: $parameter->getKey(),
+                in: $in,
+                schema: $baseSchema,
+            );
+        }
+
+        // oneOf or no specific type constraint - return both with explicit schemas
+        return [
+            new OpenApiParameter(
+                name: $parameter->getKey(),
+                in: $in,
+                schema: $baseSchema,
+            ),
+            new OpenApiParameter(
+                name: $parameter->getKey().'[]',
+                in: $in,
+                schema: $arraySchema,
+                style: 'deepObject',
+                explode: true,
+            ),
+        ];
     }
 
     public function getSchema(Parameter $parameter): array
     {
-        if (null !== $parameter->getSchema()) {
-            return $parameter->getSchema();
+        if (false === $parameter->getCastToArray()) {
+            return self::UUID_SCHEMA;
         }
 
         return [
