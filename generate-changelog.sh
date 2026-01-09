@@ -9,18 +9,18 @@ printf "# Changelog\n\n"
 printf "## %s\n\n" "$2"
 
 fixes=$(echo "$log" | grep 'fix(\|fix:')
-if [[ 0 != $(echo "$fixes" | wc -l) ]];
+if [[ -n "$fixes" ]];
 then
     printf "### Bug fixes\n\n"
-    printf "$fixes" | sort
+    printf "%s" "$fixes" | sort
     printf "\n\n"
 fi
 
 feat=$(echo "$log" | grep 'feat(\|feat:')
-if [[ 0 != $(echo "$feat" | wc -l) ]];
+if [[ -n "$feat" ]];
 then
     printf "### Features\n\n"
-    printf "$feat" | sort
+    printf "%s" "$feat" | sort
 fi
 )
 
