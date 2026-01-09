@@ -68,10 +68,6 @@ class AbstractUuidFilter implements FilterInterface, ManagerRegistryAwareInterfa
         $field = $property;
 
         $associations = [];
-        if ($this->isPropertyNested($property, $resourceClass)) {
-            [$alias, $field, $associations] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass, Join::INNER_JOIN);
-        }
-
         $metadata = $this->getNestedMetadata($resourceClass, $associations);
 
         if ($metadata->hasField($field)) {
