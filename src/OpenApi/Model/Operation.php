@@ -17,15 +17,16 @@ final class Operation
 {
     use ExtensionTrait;
 
+    /**
+     * @param ?string[]   $tags
+     * @param ?Response[] $responses
+     */
     public function __construct(private ?string $operationId = null, private ?array $tags = null, private ?array $responses = null, private ?string $summary = null, private ?string $description = null, private ?ExternalDocumentation $externalDocs = null, private ?array $parameters = null, private ?RequestBody $requestBody = null, private ?\ArrayObject $callbacks = null, private ?bool $deprecated = null, private ?array $security = null, private ?array $servers = null, array $extensionProperties = [])
     {
         $this->extensionProperties = $extensionProperties;
     }
 
-    /**
-     * @param string $status
-     */
-    public function addResponse(Response $response, $status = 'default'): self
+    public function addResponse(Response $response, int|string $status = 'default'): self
     {
         $this->responses[$status] = $response;
 
@@ -62,6 +63,9 @@ final class Operation
         return $this->externalDocs;
     }
 
+    /**
+     * @return ?Parameter[]
+     */
     public function getParameters(): ?array
     {
         return $this->parameters;
@@ -151,6 +155,9 @@ final class Operation
         return $clone;
     }
 
+    /**
+     * @param Parameter[] $parameters
+     */
     public function withParameters(array $parameters): self
     {
         $clone = clone $this;
