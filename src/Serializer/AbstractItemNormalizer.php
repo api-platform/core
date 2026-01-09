@@ -947,7 +947,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
 
                 if (!\is_object($attributeValue) && null !== $attributeValue) {
-                    throw new UnexpectedValueException('Unexpected non-object value for to-one relation.');
+                    throw new UnexpectedValueException('Unexpected non-object value for to-one relation on class `'.$object::class.'` for attribute `'.$attribute.'`.');
                 }
 
                 $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
