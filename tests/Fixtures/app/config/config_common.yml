@@ -10,6 +10,7 @@ doctrine:
         charset: 'UTF8'
         types:
             uuid: Ramsey\Uuid\Doctrine\UuidType
+            uuid_binary: Ramsey\Uuid\Doctrine\UuidBinaryType
             symfony_uuid: Symfony\Bridge\Doctrine\Types\UuidType
 
     orm:
