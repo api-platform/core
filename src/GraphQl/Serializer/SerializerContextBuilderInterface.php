@@ -22,5 +22,10 @@ use ApiPlatform\Metadata\GraphQl\Operation;
  */
 interface SerializerContextBuilderInterface
 {
+    /**
+     * @param array<string, mixed> $resolverContext
+     *
+     * @return array<string, mixed>
+     */
     public function create(string $resourceClass, Operation $operation, array $resolverContext, bool $normalization): array;
 }

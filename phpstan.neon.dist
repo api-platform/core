@@ -112,6 +112,7 @@ parameters:
 				- src/Doctrine/Orm/Tests
 				- src/Elasticsearch/Tests
 				- src/GraphQl/Tests
+				- src/HttpCache/Tests
 				- src/Hydra/Tests
 				- src/JsonApi/Tests
 				- src/JsonSchema/Tests
