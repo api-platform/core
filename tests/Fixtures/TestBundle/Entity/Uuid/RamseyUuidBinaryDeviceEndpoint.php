@@ -33,6 +33,10 @@ use Ramsey\Uuid\UuidInterface;
             'myDevice' => new QueryParameter(
                 filter: new UuidBinaryFilter(),
             ),
+            'myDeviceExternalIdAlias' => new QueryParameter(
+                filter: new UuidBinaryFilter(),
+                property: 'myDevice.externalId',
+            ),
         ]
     ),
     new Post(),

@@ -33,6 +33,10 @@ use Symfony\Component\Uid\Ulid;
             'myDevice' => new QueryParameter(
                 filter: new UlidFilter(),
             ),
+            'myDeviceExternalIdAlias' => new QueryParameter(
+                filter: new UlidFilter(),
+                property: 'myDevice.externalId',
+            ),
         ]
     ),
     new Post(),

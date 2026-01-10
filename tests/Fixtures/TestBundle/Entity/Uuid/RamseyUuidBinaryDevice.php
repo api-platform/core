@@ -41,8 +41,12 @@ class RamseyUuidBinaryDevice
     #[ORM\Column(type: 'uuid_binary', unique: true)]
     public UuidInterface $id;
 
-    public function __construct(?UuidInterface $id = null)
+    #[ORM\Column(type: 'uuid_binary')]
+    public UuidInterface $externalId;
+
+    public function __construct(?UuidInterface $id = null, ?UuidInterface $externalId = null)
     {
         $this->id = $id ?? Uuid::uuid7();
+        $this->externalId = $externalId ?? Uuid::uuid7();
     }
 }

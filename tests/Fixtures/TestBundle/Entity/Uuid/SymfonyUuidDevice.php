@@ -40,8 +40,12 @@ class SymfonyUuidDevice
     #[ORM\Column(type: 'symfony_uuid', unique: true)]
     public Uuid $id;
 
-    public function __construct(?Uuid $id = null)
+    #[ORM\Column(type: 'symfony_uuid')]
+    public Uuid $externalId;
+
+    public function __construct(?Uuid $id = null, ?Uuid $externalId = null)
     {
         $this->id = $id ?? Uuid::v7();
+        $this->externalId = $externalId ?? Uuid::v7();
     }
 }
