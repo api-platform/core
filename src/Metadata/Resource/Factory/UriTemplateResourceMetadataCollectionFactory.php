@@ -52,6 +52,10 @@ final class UriTemplateResourceMetadataCollectionFactory implements ResourceMeta
 
             $operations = new Operations();
             foreach ($resource->getOperations() ?? new Operations() as $key => $operation) {
+                if (!$operation instanceof HttpOperation) {
+                    continue;
+                }
+
                 /** @var HttpOperation */
                 $operation = $this->configureUriVariables($operation);
 

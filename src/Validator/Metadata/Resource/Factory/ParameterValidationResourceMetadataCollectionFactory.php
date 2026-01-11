@@ -47,6 +47,10 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
                 }
 
                 // As we deprecate the parameter validator, we declare a parameter for each filter transfering validation to the new system
+                if (!$operation instanceof HttpOperation) {
+                    continue;
+                }
+
                 if ($operation->getFilters() && 0 === $parameters->count()) {
                     $parameters = $this->addFilterValidation($operation);
                 }

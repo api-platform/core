@@ -228,6 +228,10 @@ final class ErrorListener extends SymfonyErrorListener
             // TODO: move this to ResourceMetadataCollection?
             foreach ($resourceCollection as $resource) {
                 foreach ($resource->getOperations() as $op) {
+                    if (!$op instanceof HttpOperation) {
+                        continue;
+                    }
+
                     foreach ($op->getOutputFormats() ?? [] as $key => $value) {
                         if ($key === $format) {
                             $operation = $op;

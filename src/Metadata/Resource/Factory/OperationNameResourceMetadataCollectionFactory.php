@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource\Factory;
 
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
 /**
@@ -44,6 +45,10 @@ final class OperationNameResourceMetadataCollectionFactory implements ResourceMe
 
             foreach ($operations as $operationName => $operation) {
                 if ($operation->getName()) {
+                    continue;
+                }
+
+                if (!$operation instanceof HttpOperation) {
                     continue;
                 }
 

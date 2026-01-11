@@ -177,6 +177,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         }
 
         foreach ($resource->getOperations() as $operationName => $operation) {
+            if (!$operation instanceof HttpOperation) {
+                continue;
+            }
+
             $resourceShortName = $operation->getShortName() ?? $operation;
             // No path to return
             if (null === $operation->getUriTemplate() && null === $operation->getRouteName()) {

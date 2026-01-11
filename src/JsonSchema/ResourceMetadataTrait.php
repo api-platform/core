@@ -77,6 +77,10 @@ trait ResourceMetadataTrait
         // Find the operation and use the first one that matches criterias
         foreach ($resourceMetadataCollection as $resourceMetadata) {
             foreach ($resourceMetadata->getOperations() ?? [] as $op) {
+                if (!$op instanceof HttpOperation) {
+                    continue;
+                }
+
                 if (!$lookForCollection && $op instanceof CollectionOperationInterface) {
                     continue;
                 }

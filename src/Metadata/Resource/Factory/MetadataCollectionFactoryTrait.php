@@ -189,6 +189,10 @@ trait MetadataCollectionFactoryTrait
     private function hasSameOperation(ApiResource $resource, string $operationClass, HttpOperation $operation): bool
     {
         foreach ($resource->getOperations() ?? [] as $o) {
+            if (!$o instanceof HttpOperation) {
+                continue;
+            }
+
             if ($o instanceof $operationClass && $operation->getUriTemplate() === $o->getUriTemplate() && $operation->getName() === $o->getName() && $operation->getRouteName() === $o->getRouteName()) {
                 return true;
             }

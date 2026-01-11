@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Operation\Factory;
 
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
@@ -28,6 +29,10 @@ final class OperationMetadataFactory implements OperationMetadataFactoryInterfac
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
             foreach ($this->resourceMetadataCollectionFactory->create($resourceClass) as $resource) {
                 foreach ($resource->getOperations() as $operation) {
+                    if (!$operation instanceof HttpOperation) {
+                        continue;
+                    }
+
                     if ($operation->getUriTemplate() === $uriTemplate || $operation->getName() === $uriTemplate) {
                         return $operation;
                     }

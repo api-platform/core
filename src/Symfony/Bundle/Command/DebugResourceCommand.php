@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle\Command;
 
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -73,6 +74,10 @@ final class DebugResourceCommand extends Command
             }
 
             foreach ($resource->getOperations() as $operation) {
+                if (!$operation instanceof HttpOperation) {
+                    continue;
+                }
+
                 if ($operation->getUriTemplate()) {
                     $resources[] = ($resource->getRoutePrefix() ?? '').$operation->getUriTemplate();
                     break;

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Routing;
 
 use ApiPlatform\Metadata\Exception\RuntimeException;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\OpenApi\Attributes\Webhook;
@@ -57,6 +58,10 @@ final class ApiLoader extends Loader
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
             foreach ($this->resourceMetadataFactory->create($resourceClass) as $resourceMetadata) {
                 foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
+                    if (!$operation instanceof HttpOperation) {
+                        continue;
+                    }
+
                     if ($operation->getOpenapi() instanceof Webhook) {
                         continue;
                     }

@@ -257,6 +257,10 @@ final class DocumentationNormalizer implements NormalizerInterface
         $hydraOperations = [];
         foreach ($resourceMetadataCollection as $resourceMetadata) {
             foreach ($resourceMetadata->getOperations() as $operation) {
+                if (!$operation instanceof HttpOperation) {
+                    continue;
+                }
+
                 if (true === $operation->getHideHydraOperation()) {
                     continue;
                 }

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
@@ -42,6 +43,10 @@ final class MainControllerResourceMetadataCollectionFactory implements ResourceM
             /** @var ApiResource $resource */
             $operations = $resource->getOperations() ?? new Operations();
             foreach ($resource->getOperations() as $key => $operation) {
+                if (!$operation instanceof HttpOperation) {
+                    continue;
+                }
+
                 if ($operation->getRouteName() || $operation->getController()) {
                     continue;
                 }

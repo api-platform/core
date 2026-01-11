@@ -16,6 +16,7 @@ namespace ApiPlatform\Metadata\Resource;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\OperationNotFoundException;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 
 /**
@@ -58,6 +59,10 @@ final class ResourceMetadataCollection extends \ArrayObject
 
             if (!$forceGraphQl) {
                 foreach ($metadata->getOperations() ?? [] as $name => $operation) {
+                    if (!$operation instanceof HttpOperation) {
+                        continue;
+                    }
+
                     $isCollection = $operation instanceof CollectionOperationInterface;
                     $method = $operation->getMethod();
                     $isGetOperation = 'GET' === $method || 'OPTIONS' === $method || 'HEAD' === $method;

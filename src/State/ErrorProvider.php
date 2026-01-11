@@ -48,6 +48,10 @@ final class ErrorProvider implements ProviderInterface
                 $resourceCollection = $this->resourceMetadataCollectionFactory->create($operation->getClass());
                 foreach ($resourceCollection as $resource) {
                     foreach ($resource->getOperations() as $name => $operation) {
+                        if (!$operation instanceof HttpOperation) {
+                            continue;
+                        }
+
                         if (isset($operation->getOutputFormats()[$request->getRequestFormat()])) {
                             $request->attributes->set('_api_operation', $operation);
                             $request->attributes->set('_api_operation_nme', $name);
