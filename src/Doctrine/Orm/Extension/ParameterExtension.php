@@ -22,7 +22,6 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Reads operation parameters and execute its filter.
@@ -37,12 +36,10 @@ final class ParameterExtension implements QueryCollectionExtensionInterface, Que
         ContainerInterface $filterLocator,
         ?ManagerRegistry $managerRegistry = null,
         ?LoggerInterface $logger = null,
-        ?NameConverterInterface $nameConverter = null,
     ) {
         $this->filterLocator = $filterLocator;
         $this->managerRegistry = $managerRegistry;
         $this->logger = $logger;
-        $this->nameConverter = $nameConverter;
     }
 
     /**
