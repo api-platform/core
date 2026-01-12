@@ -33,6 +33,10 @@ use Doctrine\ORM\Mapping as ORM;
             filter: new PartialSearchFilter(),
             property: 'name',
         ),
+        'nameConverted' => new QueryParameter(filter: new ExactFilter()),
+        'nameConvertedAlias' => new QueryParameter(filter: new ExactFilter(), property: 'nameConverted'),
+        'nameNotConverted' => new QueryParameter(filter: new ExactFilter()),
+        'nameNotConvertedAlias' => new QueryParameter(filter: new ExactFilter(), property: 'nameNotConverted'),
         'autocomplete' => new QueryParameter(filter: new FreeTextQueryFilter(new OrFilter(new ExactFilter())), properties: ['name', 'ean']),
         'q' => new QueryParameter(filter: new FreeTextQueryFilter(new PartialSearchFilter()), properties: ['name', 'ean']),
     ],
@@ -46,6 +50,12 @@ class Chicken
 
     #[ORM\Column(type: 'string', length: 255)]
     private string $name;
+
+    #[ORM\Column(type: 'string', length: 255)]
+    private string $nameConverted;
+
+    #[ORM\Column(type: 'string', length: 255)]
+    private string $nameNotConverted;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $ean;
@@ -67,8 +77,20 @@ class Chicken
     public function setName(string $name): self
     {
         $this->name = $name;
+        $this->nameConverted = $name;
+        $this->nameNotConverted = $name;
 
         return $this;
+    }
+
+    public function getNameConverted(): ?string
+    {
+        return $this->nameConverted;
+    }
+
+    public function getNameNotConverted(): ?string
+    {
+        return $this->nameNotConverted;
     }
 
     public function getEan(): ?string

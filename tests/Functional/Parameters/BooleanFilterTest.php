@@ -74,6 +74,22 @@ final class BooleanFilterTest extends ApiTestCase
         yield 'enabled_alias_false' => ['/filtered_boolean_parameters?enabled=false', 1, false];
         yield 'enabled_alias_numeric_1' => ['/filtered_boolean_parameters?enabled=1', 2, true];
         yield 'enabled_alias_numeric_0' => ['/filtered_boolean_parameters?enabled=0', 1, false];
+        yield 'name_converted_true' => ['/filtered_boolean_parameters?nameConverted=true', 2, true];
+        yield 'name_converted_false' => ['/filtered_boolean_parameters?nameConverted=false', 1, false];
+        yield 'name_converted_numeric_1' => ['/filtered_boolean_parameters?nameConverted=1', 2, true];
+        yield 'name_converted_numeric_0' => ['/filtered_boolean_parameters?nameConverted=0', 1, false];
+        yield 'name_not_converted_true' => ['/filtered_boolean_parameters?nameNotConverted=true', 2, true];
+        yield 'name_not_converted_false' => ['/filtered_boolean_parameters?nameNotConverted=false', 1, false];
+        yield 'name_not_converted_numeric_1' => ['/filtered_boolean_parameters?nameNotConverted=1', 2, true];
+        yield 'name_not_converted_numeric_0' => ['/filtered_boolean_parameters?nameNotConverted=0', 1, false];
+        yield 'alias_name_converted_true' => ['/filtered_boolean_parameters?aliasWithNameConverter=true', 2, true];
+        yield 'alias_name_converted_false' => ['/filtered_boolean_parameters?aliasWithNameConverter=false', 1, false];
+        yield 'alias_name_converted_numeric_1' => ['/filtered_boolean_parameters?aliasWithNameConverter=1', 2, true];
+        yield 'alias_name_converted_numeric_0' => ['/filtered_boolean_parameters?aliasWithNameConverter=0', 1, false];
+        yield 'alias_name_not_converted_true' => ['/filtered_boolean_parameters?aliasWithoutNameConverter=true', 2, true];
+        yield 'alias_name_not_converted_false' => ['/filtered_boolean_parameters?aliasWithoutNameConverter=false', 1, false];
+        yield 'alias_name_not_converted_numeric_1' => ['/filtered_boolean_parameters?aliasWithoutNameConverter=1', 2, true];
+        yield 'alias_name_not_converted_numeric_0' => ['/filtered_boolean_parameters?aliasWithoutNameConverter=0', 1, false];
     }
 
     #[DataProvider('booleanFilterNullAndEmptyScenariosProvider')]

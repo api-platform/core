@@ -259,10 +259,6 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             $parameter = $parameter->withProperty($key);
         }
 
-        if ($this->nameConverter && $property = $parameter->getProperty()) {
-            $parameter = $parameter->withProperty($this->nameConverter->normalize($property));
-        }
-
         if (isset($properties[$currentKey]) && ($eloquentRelation = ($properties[$currentKey]->getExtraProperties()['eloquent_relation'] ?? null)) && isset($eloquentRelation['foreign_key'])) {
             $parameter = $parameter->withProperty($eloquentRelation['foreign_key']);
         }
