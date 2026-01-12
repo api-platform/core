@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Odm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
+use ApiPlatform\Doctrine\Common\Filter\NameConverterAwareInterface;
 use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterInterface;
 use ApiPlatform\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Doctrine\Odm\PropertyHelperTrait as MongoDbOdmPropertyHelperTrait;
@@ -32,7 +33,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-abstract class AbstractFilter implements FilterInterface, PropertyAwareFilterInterface, ManagerRegistryAwareInterface
+abstract class AbstractFilter implements FilterInterface, PropertyAwareFilterInterface, ManagerRegistryAwareInterface, NameConverterAwareInterface
 {
     use MongoDbOdmPropertyHelperTrait;
     use PropertyHelperTrait;
@@ -135,5 +136,24 @@ abstract class AbstractFilter implements FilterInterface, PropertyAwareFilterInt
         }
 
         return implode('.', array_map($this->nameConverter->normalize(...), explode('.', $property)));
+    }
+
+    public function hasNameConverter(): bool
+    {
+        return $this->nameConverter instanceof NameConverterInterface;
+    }
+
+    public function getNameConverter(): NameConverterInterface
+    {
+        if (!$this->hasNameConverter()) {
+            throw new RuntimeException('NameConverter must be initialized before accessing it.');
+        }
+
+        return $this->nameConverter;
+    }
+
+    public function setNameConverter(NameConverterInterface $nameConverter): void
+    {
+        $this->nameConverter = $nameConverter;
     }
 }

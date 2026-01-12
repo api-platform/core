@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Orm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
+use ApiPlatform\Doctrine\Common\Filter\NameConverterAwareInterface;
 use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterInterface;
 use ApiPlatform\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Doctrine\Orm\PropertyHelperTrait as OrmPropertyHelperTrait;
@@ -26,7 +27,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
-abstract class AbstractFilter implements FilterInterface, PropertyAwareFilterInterface, ManagerRegistryAwareInterface
+abstract class AbstractFilter implements FilterInterface, PropertyAwareFilterInterface, ManagerRegistryAwareInterface, NameConverterAwareInterface
 {
     use OrmPropertyHelperTrait;
     use PropertyHelperTrait;
@@ -111,19 +112,38 @@ abstract class AbstractFilter implements FilterInterface, PropertyAwareFilterInt
 
     protected function denormalizePropertyName(string|int $property): string
     {
-        if (!$this->nameConverter instanceof NameConverterInterface) {
+        if (!$this->hasNameConverter()) {
             return (string) $property;
         }
 
-        return implode('.', array_map($this->nameConverter->denormalize(...), explode('.', (string) $property)));
+        return implode('.', array_map($this->getNameConverter()->denormalize(...), explode('.', (string) $property)));
     }
 
     protected function normalizePropertyName(string $property): string
     {
-        if (!$this->nameConverter instanceof NameConverterInterface) {
+        if (!$this->hasNameConverter()) {
             return $property;
         }
 
-        return implode('.', array_map($this->nameConverter->normalize(...), explode('.', $property)));
+        return implode('.', array_map($this->getNameConverter()->normalize(...), explode('.', $property)));
+    }
+
+    public function hasNameConverter(): bool
+    {
+        return $this->nameConverter instanceof NameConverterInterface;
+    }
+
+    public function getNameConverter(): NameConverterInterface
+    {
+        if (!$this->hasNameConverter()) {
+            throw new RuntimeException('NameConverter must be initialized before accessing it.');
+        }
+
+        return $this->nameConverter;
+    }
+
+    public function setNameConverter(NameConverterInterface $nameConverter): void
+    {
+        $this->nameConverter = $nameConverter;
     }
 }
