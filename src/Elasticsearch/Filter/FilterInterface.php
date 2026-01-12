@@ -25,5 +25,8 @@ use ApiPlatform\Metadata\Operation;
  */
 interface FilterInterface extends BaseFilterInterface
 {
+    /**
+     * @param array<string, mixed> $context
+     */
     public function apply(array $clauseBody, string $resourceClass, ?Operation $operation = null, array $context = []): array;
 }

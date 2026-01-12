@@ -21,7 +21,8 @@ namespace ApiPlatform\GraphQl\Resolver;
 interface QueryCollectionResolverInterface
 {
     /**
-     * @param iterable<object> $collection
+     * @param iterable<object>     $collection
+     * @param array<string, mixed> $context
      *
      * @return iterable<object>
      */

@@ -24,7 +24,13 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
  */
 interface AggregationResultItemExtensionInterface extends AggregationItemExtensionInterface
 {
+    /**
+     * @param array<string, mixed> $context
+     */
     public function supportsResult(string $resourceClass, ?Operation $operation = null, array $context = []): bool;
 
+    /**
+     * @param array<string, mixed> $context
+     */
     public function getResult(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array $context = []): ?object;
 }

@@ -23,5 +23,10 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
  */
 interface AggregationCollectionExtensionInterface
 {
+    /**
+     * @param array<string, mixed> $context
+     *
+     * @param-out array<string, mixed> $context
+     */
     public function applyToCollection(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void;
 }

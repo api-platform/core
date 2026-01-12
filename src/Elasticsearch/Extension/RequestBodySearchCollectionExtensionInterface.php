@@ -26,5 +26,8 @@ use ApiPlatform\Metadata\Operation;
  */
 interface RequestBodySearchCollectionExtensionInterface
 {
+    /**
+     * @param array<string, mixed> $context
+     */
     public function applyToCollection(array $requestBody, string $resourceClass, ?Operation $operation = null, array $context = []): array;
 }

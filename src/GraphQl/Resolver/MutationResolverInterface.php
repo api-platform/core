@@ -20,5 +20,8 @@ namespace ApiPlatform\GraphQl\Resolver;
  */
 interface MutationResolverInterface
 {
+    /**
+     * @param array<string, mixed> $context
+     */
     public function __invoke(?object $item, array $context): ?object;
 }

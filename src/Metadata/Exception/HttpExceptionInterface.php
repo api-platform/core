@@ -22,6 +22,8 @@ interface HttpExceptionInterface
 
     /**
      * Returns response headers.
+     *
+     * @return array<string, string>
      */
     public function getHeaders(): array;
 }
