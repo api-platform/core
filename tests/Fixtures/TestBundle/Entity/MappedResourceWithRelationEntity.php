@@ -22,7 +22,7 @@ use Symfony\Component\ObjectMapper\Attribute\Map;
 class MappedResourceWithRelationEntity
 {
     #[ORM\Id, ORM\Column]
-    #[Map(transform: 'to_string')]
+    #[Map(transform: 'strval')]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: MappedResourceWithRelationRelatedEntity::class)]
