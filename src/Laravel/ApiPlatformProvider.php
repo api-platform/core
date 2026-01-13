@@ -422,12 +422,10 @@ class ApiPlatformProvider extends ServiceProvider
                 );
             }
 
-            return new AddLinkHeaderProcessor($decorated, new HttpHeaderSerializer());
-        });
+            $decorated = new AddLinkHeaderProcessor($decorated, new HttpHeaderSerializer());
 
-        $this->app->singleton(LinkedDataPlatformProcessor::class, function (Application $app) {
             return new LinkedDataPlatformProcessor(
-                $app->make(AddLinkHeaderProcessor::class), // Original service
+                $decorated,
                 $app->make(ResourceClassResolverInterface::class),
                 $app->make(ResourceMetadataCollectionFactoryInterface::class)
             );
