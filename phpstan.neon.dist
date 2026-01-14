@@ -122,7 +122,6 @@ parameters:
 				- src/State/Tests
 				- src/Symfony/Tests
 				- tests
-				- src # TODO
 		-
 			identifier: missingType.generics
 		-
