@@ -314,6 +314,41 @@ abstract class UuidFilterBaseTestCase extends ApiTestCase
         );
     }
 
+    public function testSearchFilterByUuidNested(): void
+    {
+        $this->recreateSchema(static::getResources());
+
+        $manager = $this->getManager();
+        $manager->persist($fooDevice = $this->createDevice());
+        $manager->persist($barDevice = $this->createDevice());
+        $manager->persist($this->createDeviceEndpoint(null, $fooDevice));
+        $manager->persist($expectedDeviceEndpoint = $this->createDeviceEndpoint(null, $barDevice));
+        $manager->flush();
+
+        $response = self::createClient()->request('GET', '/'.$this->getUrlPrefix().'_device_endpoints', [
+            'query' => [
+                'myDeviceExternalIdAlias' => (string) $expectedDeviceEndpoint->myDevice->externalId,
+            ],
+        ]);
+
+        self::assertResponseIsSuccessful();
+        $json = $response->toArray();
+
+        self::assertArraySubset(['hydra:totalItems' => 1], $json);
+        self::assertArraySubset(
+            [
+                'hydra:member' => [
+                    [
+                        '@id' => '/'.$this->getUrlPrefix().'_device_endpoints/'.$expectedDeviceEndpoint->id,
+                        '@type' => $this->geTypePrefix().'DeviceEndpoint',
+                        'id' => (string) $expectedDeviceEndpoint->id,
+                    ],
+                ],
+            ],
+            $json
+        );
+    }
+
     protected function tearDown(): void
     {
         if ($this->isMongoDB()) {
