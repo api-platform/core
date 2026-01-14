@@ -29,6 +29,10 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
     use BackwardCompatibleFilterDescriptionTrait;
     use OpenApiFilterTrait;
 
+    public function __construct(private readonly bool $caseSensitive = false)
+    {
+    }
+
     public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         $parameter = $context['parameter'];
@@ -44,19 +48,26 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
 
         if (!is_iterable($values)) {
             $parameterName = $queryNameGenerator->generateParameterName($property);
-            $queryBuilder->setParameter($parameterName, $this->formatLikeValue(strtolower($values)));
+            $value = $this->caseSensitive ? $values : strtolower($values);
+            $queryBuilder->setParameter($parameterName, $this->formatLikeValue($value));
 
-            $likeExpression = 'LOWER('.$field.') LIKE :'.$parameterName.' ESCAPE \'\\\'';
+            $likeExpression = $this->caseSensitive
+                ? $field.' LIKE :'.$parameterName.' ESCAPE \'\\\''
+                : 'LOWER('.$field.') LIKE :'.$parameterName.' ESCAPE \'\\\'';
             $queryBuilder->{$context['whereClause'] ?? 'andWhere'}($likeExpression);
 
             return;
         }
 
         $likeExpressions = [];
-        foreach ($values as $val) {
+        foreach ($values as $value) {
             $parameterName = $queryNameGenerator->generateParameterName($property);
-            $likeExpressions[] = 'LOWER('.$field.') LIKE :'.$parameterName.' ESCAPE \'\\\'';
-            $queryBuilder->setParameter($parameterName, $this->formatLikeValue(strtolower($val)));
+            $likeExpressions[] = $this->caseSensitive
+                ? $field.' LIKE :'.$parameterName.' ESCAPE \'\\\''
+                : 'LOWER('.$field.') LIKE :'.$parameterName.' ESCAPE \'\\\'';
+
+            $val = $this->caseSensitive ? $value : strtolower($value);
+            $queryBuilder->setParameter($parameterName, $this->formatLikeValue($val));
         }
 
         $queryBuilder->{$context['whereClause'] ?? 'andWhere'}(

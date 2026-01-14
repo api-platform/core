@@ -55,6 +55,7 @@ final class PartialSearchFilterTest extends ApiTestCase
     }
 
     #[DataProvider('partialSearchFilterProvider')]
+    #[DataProvider('partialSearchFilterCaseSensitiveProvider')]
     public function testPartialSearchFilter(string $url, int $expectedCount, array $expectedNames): void
     {
         $response = self::createClient()->request('GET', $url);
@@ -138,6 +139,33 @@ final class PartialSearchFilterTest extends ApiTestCase
             '/chickens?namePartial=%5C%5F',
             1,
             ['xx_%_\\_%_xx'],
+        ];
+    }
+
+    public static function partialSearchFilterCaseSensitiveProvider(): \Generator
+    {
+        yield 'filter by partial name "tru"' => [
+            '/chickens?namePartial=tru',
+            1,
+            ['Gertrude'],
+        ];
+
+        yield 'filter by partial name "TRU"' => [
+            '/chickens?namePartial=TRU',
+            1,
+            ['Gertrude'],
+        ];
+
+        yield 'filter by case sensitive partial name "tru"' => [
+            '/chickens?namePartialSensitive=tru',
+            1,
+            ['Gertrude'],
+        ];
+
+        yield 'filter by case sensitive partial name "TRU"' => [
+            '/chickens?namePartialSensitive=TRU',
+            0,
+            [],
         ];
     }
 
