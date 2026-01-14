@@ -193,6 +193,43 @@ final class PartialSearchFilterTest extends ApiTestCase
         );
     }
 
+    #[DataProvider('partialSearchFilterCaseSensitiveProvider')]
+    public function testPartialSearchCaseSensitiveFilter(string $url, int $expectedCount, array $expectedNames): void
+    {
+        if ($this->isMysql() || $this->isSqlite()) {
+            $this->markTestSkipped('Mysql and sqlite use case insensitive LIKE.');
+        }
+
+        $this->testPartialSearchFilter($url, $expectedCount, $expectedNames);
+    }
+
+    public static function partialSearchFilterCaseSensitiveProvider(): \Generator
+    {
+        yield 'filter by partial name "tru"' => [
+            '/chickens?namePartial=tru',
+            1,
+            ['Gertrude'],
+        ];
+
+        yield 'filter by partial name "TRU"' => [
+            '/chickens?namePartial=TRU',
+            1,
+            ['Gertrude'],
+        ];
+
+        yield 'filter by case sensitive partial name "tru"' => [
+            '/chickens?namePartialSensitive=tru',
+            1,
+            ['Gertrude'],
+        ];
+
+        yield 'filter by case sensitive partial name "TRU"' => [
+            '/chickens?namePartialSensitive=TRU',
+            0,
+            [],
+        ];
+    }
+
     /**
      * @throws \Throwable
      * @throws MongoDBException

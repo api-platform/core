@@ -29,6 +29,10 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
     use BackwardCompatibleFilterDescriptionTrait;
     use OpenApiFilterTrait;
 
+    public function __construct(private readonly bool $caseSensitive = true)
+    {
+    }
+
     public function apply(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
         $parameter = $context['parameter'];
@@ -47,7 +51,7 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
         if (!is_iterable($values)) {
             $escapedValue = preg_quote($values, '/');
             $match->{$operator}(
-                $aggregationBuilder->matchExpr()->field($property)->equals(new Regex($escapedValue, 'i'))
+                $aggregationBuilder->matchExpr()->field($property)->equals(new Regex($escapedValue, $this->caseSensitive ? '' : 'i'))
             );
 
             return;
@@ -60,7 +64,7 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
             $or->addOr(
                 $aggregationBuilder->matchExpr()
                     ->field($property)
-                    ->equals(new Regex($escapedValue, 'i'))
+                    ->equals(new Regex($escapedValue, $this->caseSensitive ? '' : 'i'))
             );
         }
 
