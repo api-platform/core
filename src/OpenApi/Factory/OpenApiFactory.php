@@ -494,9 +494,9 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     /**
      * @param array<Response> $existingResponses
      */
-    private function buildOpenApiResponse(array $existingResponses, int|string $status, string $description, Operation $openapiOperation, ?HttpOperation $operation = null, ?array $responseMimeTypes = null, ?array $operationOutputSchemas = null, ?ResourceMetadataCollection $resourceMetadataCollection = null): Operation
+    private function buildOpenApiResponse(array $existingResponses, int|string $status, string $description, Operation $openapiOperation, ?HttpOperation $operation = null, ?array $responseMimeTypes = null, ?array $operationOutputSchemas = null, ?ResourceMetadataCollection $resourceMetadataCollection = null, bool $isErrorResponse = false): Operation
     {
-        $noOutput = \is_array($operation?->getOutput()) && null === $operation->getOutput()['class'];
+        $noOutput = !$isErrorResponse && \is_array($operation?->getOutput()) && null === $operation->getOutput()['class'];
 
         $response = $existingResponses[$status] ?? new Response($description);
         if (null === $response->getDescription()) {
@@ -1011,7 +1011,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 throw new RuntimeException(\sprintf('The error class "%s" has no status defined, please either implement ProblemExceptionInterface, or make it an ErrorResource with a status', $errorResource->getClass()));
             }
 
-            $operation = $this->buildOpenApiResponse($operation->getResponses() ?: [], $status, $errorResource->getDescription() ?? '', $operation, $originalOperation, $responseMimeTypes, $operationErrorSchemas, $resourceMetadataCollection);
+            $operation = $this->buildOpenApiResponse($operation->getResponses() ?: [], $status, $errorResource->getDescription() ?? '', $operation, $originalOperation, $responseMimeTypes, $operationErrorSchemas, $resourceMetadataCollection, true);
         }
 
         return $operation;
