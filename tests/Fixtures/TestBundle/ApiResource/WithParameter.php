@@ -212,6 +212,30 @@ use Webmozart\Assert\Assert as Assertion;
     provider: [self::class, 'noopProvider']
 )]
 #[GetCollection(
+    uriTemplate: 'header_uuid',
+    parameters: [
+        'uuid' => new HeaderParameter(
+            schema: [
+                'type' => 'string',
+                'format' => 'uuid',
+            ],
+        ),
+    ],
+    provider: [self::class, 'noopProvider']
+)]
+#[GetCollection(
+    uriTemplate: 'header_ulid',
+    parameters: [
+        'ulid' => new HeaderParameter(
+            schema: [
+                'type' => 'string',
+                'format' => 'ulid',
+            ],
+        ),
+    ],
+    provider: [self::class, 'noopProvider']
+)]
+#[GetCollection(
     uriTemplate: 'query_integer',
     parameters: [
         'Foo' => new QueryParameter(
@@ -250,6 +274,30 @@ use Webmozart\Assert\Assert as Assertion;
                 'type' => 'boolean',
             ],
             castToNativeType: true,
+        ),
+    ],
+    provider: [self::class, 'noopProvider']
+)]
+#[GetCollection(
+    uriTemplate: 'query_uuid',
+    parameters: [
+        'uuid' => new QueryParameter(
+            schema: [
+                'type' => 'string',
+                'format' => 'uuid',
+            ],
+        ),
+    ],
+    provider: [self::class, 'noopProvider']
+)]
+#[GetCollection(
+    uriTemplate: 'query_ulid',
+    parameters: [
+        'ulid' => new QueryParameter(
+            schema: [
+                'type' => 'string',
+                'format' => 'ulid',
+            ],
         ),
     ],
     provider: [self::class, 'noopProvider']

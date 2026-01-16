@@ -34,7 +34,9 @@ use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\Sequentially;
 use Symfony\Component\Validator\Constraints\Type;
+use Symfony\Component\Validator\Constraints\Ulid;
 use Symfony\Component\Validator\Constraints\Unique;
+use Symfony\Component\Validator\Constraints\Uuid;
 
 /**
  * Helper to get a set of validation constraints for a given Parameter.
@@ -145,6 +147,37 @@ trait ParameterValidationConstraints
 
             if ($assertion) {
                 $assertions[] = $assertion;
+            }
+        }
+
+        if (isset($schema['type'], $schema['format']) && 'string' === $schema['type'] && 'uuid' === $schema['format']) {
+            $assertions[] = new Uuid();
+        }
+
+        if (isset($schema['type'], $schema['format']) && 'string' === $schema['type'] && 'ulid' === $schema['format']) {
+            $assertions[] = new Ulid();
+        }
+
+        if (isset($schema['oneOf']) && 2 === \count($schema['oneOf'])) {
+            $oneOfIndexByType = array_column($schema['oneOf'], null, 'type');
+            if (
+                'uuid' === ($oneOfIndexByType['string']['format'] ?? '')
+                && 'uuid' === ($oneOfIndexByType['array']['items']['format'] ?? '')
+            ) {
+                $assertions[] = new AtLeastOneOf([
+                    new Uuid(),
+                    new All([new Uuid()]),
+                ]);
+            }
+
+            if (
+                'ulid' === ($oneOfIndexByType['string']['format'] ?? '')
+                && 'ulid' === ($oneOfIndexByType['array']['items']['format'] ?? '')
+            ) {
+                $assertions[] = new AtLeastOneOf([
+                    new Ulid(),
+                    new All([new Ulid()]),
+                ]);
             }
         }
 

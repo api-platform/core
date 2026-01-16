@@ -142,13 +142,13 @@ abstract class UuidFilterBaseTestCase extends ApiTestCase
         $manager->persist($this->createDevice());
         $manager->flush();
 
-        $response = self::createClient()->request('GET', '/'.$this->getUrlPrefix().'_devices', [
+        self::createClient()->request('GET', '/'.$this->getUrlPrefix().'_devices', [
             'query' => [
                 'id' => 'invalid-uuid',
             ],
         ]);
 
-        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+        self::assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
     public function testSearchFilterByManyInvalidUuid(): void
@@ -160,13 +160,13 @@ abstract class UuidFilterBaseTestCase extends ApiTestCase
         $manager->persist($this->createDevice());
         $manager->flush();
 
-        $response = self::createClient()->request('GET', '/'.$this->getUrlPrefix().'_devices', [
+        self::createClient()->request('GET', '/'.$this->getUrlPrefix().'_devices', [
             'query' => [
                 'id' => ['invalid-uuid', 'other-invalid-uuid'],
             ],
         ]);
 
-        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+        self::assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
     public function testSearchFilterOnManyToOneRelationByUuid(): void
@@ -262,7 +262,7 @@ abstract class UuidFilterBaseTestCase extends ApiTestCase
         $manager->persist($this->createDeviceEndpoint(null, $bazDevice));
         $manager->flush();
 
-        $response = self::createClient()->request('GET', '/'.$this->getUrlPrefix().'_device_endpoints', [
+        self::createClient()->request('GET', '/'.$this->getUrlPrefix().'_device_endpoints', [
             'query' => [
                 'myDevice' => [
                     'invalid-uuid',
@@ -271,7 +271,7 @@ abstract class UuidFilterBaseTestCase extends ApiTestCase
             ],
         ]);
 
-        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+        self::assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
     public function testGetOpenApiDescription(): void

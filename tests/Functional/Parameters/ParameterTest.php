@@ -154,6 +154,14 @@ final class ParameterTest extends ApiTestCase
         yield 'valid boolean 1 header_boolean' => ['header_boolean', ['Lorem' => 1], 200];
         yield 'valid boolean 1 string header_boolean' => ['header_boolean', ['Lorem' => '1'], 200];
         yield 'invalid boolean header_boolean' => ['header_boolean', ['Lorem' => 'string'], 422];
+
+        // query_uuid
+        yield 'valid uuid header_uuid' => ['header_uuid', ['uuid' => '216fff40-98d9-11e3-a5e2-0800200c9a66'], 200];
+        yield 'invalid uuid header_uuid' => ['header_uuid', ['uuid' => 'invalid_uuid'], 422];
+
+        // query_ulid
+        yield 'valid ulid header_ulid' => ['header_ulid', ['ulid' => '01ARZ3NDEKTSV4RRFFQ69G5FAV'], 200];
+        yield 'invalid ulid header_ulid' => ['header_ulid', ['ulid' => 'invalid_ulid'], 422];
     }
 
     #[DataProvider('provideQueryValues')]
@@ -188,6 +196,14 @@ final class ParameterTest extends ApiTestCase
         yield 'valid boolean 1 query_boolean' => ['query_boolean', ['Lorem' => 1], 200];
         yield 'valid boolean 1 string query_boolean' => ['query_boolean', ['Lorem' => '1'], 200];
         yield 'invalid boolean query_boolean' => ['query_boolean', ['Lorem' => 'string'], 422];
+
+        // query_uuid
+        yield 'valid uuid query_uuid' => ['query_uuid', ['uuid' => '216fff40-98d9-11e3-a5e2-0800200c9a66'], 200];
+        yield 'invalid uuid query_uuid' => ['query_uuid', ['uuid' => 'invalid_uuid'], 422];
+
+        // query_ulid
+        yield 'valid ulid query_ulid' => ['query_ulid', ['ulid' => '01ARZ3NDEKTSV4RRFFQ69G5FAV'], 200];
+        yield 'invalid ulid query_ulid' => ['query_ulid', ['ulid' => 'invalid_ulid'], 422];
     }
 
     #[DataProvider('provideCountryValues')]
