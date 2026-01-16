@@ -1,5 +1,13 @@
 # Changelog
 
+## v4.2.13
+
+### Bug fixes
+
+* [1e22e4450](https://github.com/api-platform/core/commit/1e22e445042d8ce187c0f26b2000beafcda92874) fix(openapi): phpdoc operation response as array<int|string, OpenApi\Response> (#7660)
+* [2721655d7](https://github.com/api-platform/core/commit/2721655d73c1012c4238bab860a96a972e88c322) fix(metadata): losing content on error reponse with no output (#7674)
+* [bed668c58](https://github.com/api-platform/core/commit/bed668c58a9c01abd30ea66b3f873628e12b098d) fix: 🐛 pass missing arguments to ConcernsResourceMetadataCollectionFactory (#7676)
+
 ## v4.2.12
 
 ### Bug fixes
