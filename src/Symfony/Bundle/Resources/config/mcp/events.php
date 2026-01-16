@@ -38,7 +38,7 @@ return function (ContainerConfigurator $container) {
             service('api_platform.state_provider.locator'),
             service('api_platform.mcp.state_processor'),
             service('request_stack'),
-            service('monolog.logger.mcp'),
+            service('logger')->ignoreOnInvalid(),
         ])
         ->tag('mcp.request_handler');
 };

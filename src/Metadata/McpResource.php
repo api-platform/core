@@ -330,11 +330,17 @@ final class McpResource extends HttpOperation
         return $self;
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getMeta(): ?array
     {
         return $this->meta;
     }
 
+    /**
+     * @param array<string, mixed>|null $meta
+     */
     public function withMeta(?array $meta): static
     {
         $self = clone $this;

@@ -60,7 +60,7 @@ final class Loader implements LoaderInterface
                                 outputSchema: $outputSchema->getDefinitions()[$outputSchema->getRootDefinitionKey()]->getArrayCopy(),
                             ),
                             self::HANDLER,
-                            true
+                            true,
                         );
                     }
 
@@ -77,7 +77,7 @@ final class Loader implements LoaderInterface
                                 meta: $mcp->getMeta()
                             ),
                             self::HANDLER,
-                            true
+                            true,
                         );
                     }
                 }

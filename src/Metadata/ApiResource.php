@@ -40,16 +40,16 @@ class ApiResource extends Metadata
     protected ?Operations $operations;
 
     /**
-     * @param array<int, HttpOperation>|array<string, HttpOperation>|Operations|null $operations   Operations is a list of HttpOperation
-     * @param array<string, Link>|array<string, mixed[]>|string[]|string|null        $uriVariables
-     * @param array<string, string>                                                  $headers
-     * @param string|callable|null                                                   $provider
-     * @param string|callable|null                                                   $processor
-     * @param mixed|null                                                             $mercure
-     * @param mixed|null                                                             $messenger
-     * @param mixed|null                                                             $input
-     * @param mixed|null                                                             $output
-     * @param array<string, McpResource|McpTool>|null                                $mcp          A list of Mcp resources or tools
+     * @param list<HttpOperation>|array<string, HttpOperation>|Operations|null $operations   Operations is a list of HttpOperation
+     * @param array<string, Link>|array<string, mixed[]>|string[]|string|null  $uriVariables
+     * @param array<string, string>                                            $headers
+     * @param string|callable|null                                             $provider
+     * @param string|callable|null                                             $processor
+     * @param mixed|null                                                       $mercure
+     * @param mixed|null                                                       $messenger
+     * @param mixed|null                                                       $input
+     * @param mixed|null                                                       $output
+     * @param array<string, McpResource|McpTool>|null                          $mcp          A list of Mcp resources or tools
      */
     public function __construct(
         /**
@@ -1031,11 +1031,17 @@ class ApiResource extends Metadata
         }
     }
 
+    /**
+     * @return array<string, McpResource|McpTool>|null
+     */
     public function getMcp(): ?array
     {
         return $this->mcp;
     }
 
+    /**
+     * @param array<string, McpResource|McpTool> $mcp
+     */
     public function withMcp(array $mcp): static
     {
         $self = clone $this;

@@ -426,8 +426,13 @@ XML_WRAP
         foreach ($values as $value) {
             $child = $node->addChild('graphQlOperation');
             foreach ($value as $index => $data) {
-                if (method_exists($this, 'build'.ucfirst($index))) {
-                    $this->{'build'.ucfirst($index)}($child, $data);
+                if (!\is_string($index)) {
+                    continue;
+                }
+
+                $method = 'build'.ucfirst($index);
+                if (method_exists($this, $method)) {
+                    $this->{$method}($child, $data);
                     continue;
                 }
 

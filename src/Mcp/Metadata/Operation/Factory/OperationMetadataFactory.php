@@ -17,7 +17,6 @@ use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\McpResource;
 use ApiPlatform\Metadata\McpTool;
-use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
@@ -32,10 +31,8 @@ final class OperationMetadataFactory implements OperationMetadataFactoryInterfac
 
     /**
      * @throws RuntimeException
-     *
-     * @return HttpOperation
      */
-    public function create(string $operationName, array $context = []): Operation
+    public function create(string $operationName, array $context = []): HttpOperation
     {
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
             foreach ($this->resourceMetadataCollectionFactory->create($resourceClass) as $resource) {
@@ -48,11 +45,7 @@ final class OperationMetadataFactory implements OperationMetadataFactoryInterfac
                         continue;
                     }
 
-                    if ($operation->getName() === $operationName) {
-                        return $operation;
-                    }
-
-                    if ($operation instanceof McpResource && $operation->getUri() === $operationName) {
+                    if ($operation->getName() === $operationName || ($operation instanceof McpResource && $operation->getUri() === $operationName)) {
                         return $operation;
                     }
                 }
