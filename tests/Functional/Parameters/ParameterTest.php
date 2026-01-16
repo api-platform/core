@@ -161,7 +161,7 @@ final class ParameterTest extends ApiTestCase
 
         // query_ulid
         yield 'valid ulid header_ulid' => ['header_ulid', ['ulid' => '01ARZ3NDEKTSV4RRFFQ69G5FAV'], 200];
-        yield 'invalid ulid header_ulid' => ['header_ulid', ['ulid' => 'invalid_uuid'], 422];
+        yield 'invalid ulid header_ulid' => ['header_ulid', ['ulid' => 'invalid_ulid'], 422];
     }
 
     #[DataProvider('provideQueryValues')]
@@ -203,7 +203,7 @@ final class ParameterTest extends ApiTestCase
 
         // query_ulid
         yield 'valid ulid query_ulid' => ['query_ulid', ['ulid' => '01ARZ3NDEKTSV4RRFFQ69G5FAV'], 200];
-        yield 'invalid ulid query_ulid' => ['query_ulid', ['ulid' => 'invalid_uuid'], 422];
+        yield 'invalid ulid query_ulid' => ['query_ulid', ['ulid' => 'invalid_ulid'], 422];
     }
 
     #[DataProvider('provideCountryValues')]
