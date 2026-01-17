@@ -229,7 +229,7 @@ class JsonStreamerTest extends ApiTestCase
         $this->assertSame(0, $res['views']);
         $this->assertSame(0, $res['rating']);
         $this->assertFalse($res['isFeatured']);
-        $this->assertSame('0', $res['price']);
+        $this->assertEquals('0.00', $res['price']);
         $this->assertStringStartsWith('/json_stream_resources/', $res['@id']);
         $this->assertSame('/contexts/JsonStreamResource', $res['@context']);
 
@@ -273,7 +273,7 @@ class JsonStreamerTest extends ApiTestCase
         $this->assertSame(0, $res['views']);
         $this->assertSame(0, $res['rating']);
         $this->assertFalse($res['isFeatured']);
-        $this->assertSame('0', $res['price']);
+        $this->assertEquals('0.00', $res['price']);
         $this->assertArrayNotHasKey('@id', $res);
         $this->assertArrayNotHasKey('@type', $res);
         $this->assertArrayNotHasKey('@context', $res);
