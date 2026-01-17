@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\Util;
 
+use ApiPlatform\Metadata\Error;
 use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
@@ -20,6 +21,8 @@ use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\Util\CloneTrait;
@@ -38,6 +41,8 @@ trait HttpResponseHeadersTrait
     use CloneTrait;
     private ?IriConverterInterface $iriConverter;
     private ?OperationMetadataFactoryInterface $operationMetadataFactory;
+    private ?ResourceClassResolverInterface $resourceClassResolver;
+    private ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory;
 
     /**
      * @param array<string, mixed> $context
@@ -122,6 +127,41 @@ trait HttpResponseHeadersTrait
             }
         }
 
+        if (
+            !$operation instanceof Error
+            && $operation->getUriTemplate()
+            && $this->resourceClassResolver?->isResourceClass($operation->getClass())
+        ) {
+            $this->addLinkedDataPlatformHeaders($headers, $operation);
+        }
+
         return $headers;
+    }
+
+    private function addLinkedDataPlatformHeaders(array &$headers, HttpOperation $operation): void
+    {
+        if (!$this->resourceMetadataCollectionFactory) {
+            return;
+        }
+
+        $acceptPost = null;
+        $allowedMethods = ['OPTIONS', 'HEAD'];
+        $resourceCollection = $this->resourceMetadataCollectionFactory->create($operation->getClass());
+        foreach ($resourceCollection as $resource) {
+            foreach ($resource->getOperations() as $op) {
+                if ($op->getUriTemplate() === $operation->getUriTemplate()) {
+                    $allowedMethods[] = $method = $op->getMethod();
+                    if ('POST' === $method && \is_array($outputFormats = $op->getOutputFormats())) {
+                        $acceptPost = implode(', ', array_merge(...array_values($outputFormats)));
+                    }
+                }
+            }
+        }
+
+        if ($acceptPost) {
+            $headers['Accept-Post'] = $acceptPost;
+        }
+
+        $headers['Allow'] = implode(', ', $allowedMethods);
     }
 }

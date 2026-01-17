@@ -148,7 +148,6 @@ use ApiPlatform\State\ErrorProvider;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginationOptions;
 use ApiPlatform\State\Processor\AddLinkHeaderProcessor;
-use ApiPlatform\State\Processor\LinkedDataPlatformProcessor;
 use ApiPlatform\State\Processor\RespondProcessor;
 use ApiPlatform\State\Processor\SerializeProcessor;
 use ApiPlatform\State\Processor\WriteProcessor;
@@ -405,7 +404,13 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->bind(ProviderInterface::class, ContentNegotiationProvider::class);
 
         $this->app->singleton(RespondProcessor::class, function (Application $app) {
-            $decorated = new RespondProcessor();
+            $decorated = new RespondProcessor(
+                $app->make(IriConverterInterface::class),
+                $app->make(ResourceClassResolverInterface::class),
+                $app->make(OperationMetadataFactoryInterface::class),
+                $app->make(ResourceMetadataCollectionFactoryInterface::class)
+            );
+
             if (class_exists(AddHeadersProcessor::class)) {
                 /** @var ConfigRepository */
                 $config = $app['config']->get('api-platform.http_cache') ?? [];
@@ -422,13 +427,7 @@ class ApiPlatformProvider extends ServiceProvider
                 );
             }
 
-            $decorated = new AddLinkHeaderProcessor($decorated, new HttpHeaderSerializer());
-
-            return new LinkedDataPlatformProcessor(
-                $decorated,
-                $app->make(ResourceClassResolverInterface::class),
-                $app->make(ResourceMetadataCollectionFactoryInterface::class)
-            );
+            return new AddLinkHeaderProcessor($decorated, new HttpHeaderSerializer());
         });
 
         $this->app->singleton(SerializeProcessor::class, function (Application $app) {

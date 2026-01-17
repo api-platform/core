@@ -17,7 +17,7 @@ use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DummyGetPostDeleteOperation;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
-class LinkDataPlatformTest extends ApiTestCase
+class LinkedDataPlatformTest extends ApiTestCase
 {
     use SetupClassResourcesTrait;
 
