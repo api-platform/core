@@ -37,15 +37,42 @@ trait RecreateSchemaTrait
             return;
         }
 
-        /** @var ClassMetadata[] $cl */
-        $cl = [];
-        foreach ($classes as $c) {
-            $cl[] = $manager->getMetadataFactory()->getMetadataFor($c);
+        /** @var ClassMetadata[] $metadataCollection */
+        $metadataCollection = [];
+        $processedClasses = [];
+
+        foreach ($classes as $class) {
+            $this->addMetadataWithDependencies($manager, $class, $metadataCollection, $processedClasses);
         }
 
         $schemaTool = new SchemaTool($manager);
-        @$schemaTool->dropSchema($cl);
-        @$schemaTool->createSchema($cl);
+
+        $manager->getConnection()->executeStatement('SET FOREIGN_KEY_CHECKS = 0');
+        @$schemaTool->dropSchema($metadataCollection);
+        @$schemaTool->createSchema($metadataCollection);
+        $manager->getConnection()->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
+    }
+
+    /**
+     * @param array<ClassMetadata> $metadataCollection
+     * @param array<string>        $processedClasses
+     *
+     * @param-out array<ClassMetadata> $metadataCollection
+     * @param-out array<string>        $processedClasses
+     */
+    private function addMetadataWithDependencies(EntityManagerInterface $manager, string $class, array &$metadataCollection, array &$processedClasses): void
+    {
+        if (isset($processedClasses[$class])) {
+            return;
+        }
+
+        $metadata = $manager->getMetadataFactory()->getMetadataFor($class);
+        $metadataCollection[] = $metadata;
+        $processedClasses[$class] = true;
+
+        foreach ($metadata->getAssociationMappings() as $associationMapping) {
+            $this->addMetadataWithDependencies($manager, $associationMapping->targetEntity, $metadataCollection, $processedClasses);
+        }
     }
 
     private function isMongoDB(): bool
