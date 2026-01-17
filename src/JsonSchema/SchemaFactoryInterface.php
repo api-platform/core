@@ -26,6 +26,8 @@ interface SchemaFactoryInterface
 
     /**
      * Builds the JSON Schema document corresponding to the given PHP class.
+     *
+     * @param array<string, mixed>|null $serializerContext
      */
     public function buildSchema(string $className, string $format = 'json', string $type = Schema::TYPE_OUTPUT, ?Operation $operation = null, ?Schema $schema = null, ?array $serializerContext = null, bool $forceCollection = false): Schema;
 }

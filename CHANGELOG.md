@@ -11,6 +11,31 @@
 
 * When using `output` with `itemUriTemplate` on a collection operation, the JSON-LD `@type` will now use the resource class name instead of the output DTO class name for semantic consistency with `itemUriTemplate` behavior.
 
+## v4.2.13
+
+### Bug fixes
+
+* [1e22e4450](https://github.com/api-platform/core/commit/1e22e445042d8ce187c0f26b2000beafcda92874) fix(openapi): phpdoc operation response as array<int|string, OpenApi\Response> (#7660)
+* [2721655d7](https://github.com/api-platform/core/commit/2721655d73c1012c4238bab860a96a972e88c322) fix(metadata): losing content on error reponse with no output (#7674)
+* [bed668c58](https://github.com/api-platform/core/commit/bed668c58a9c01abd30ea66b3f873628e12b098d) fix: 🐛 pass missing arguments to ConcernsResourceMetadataCollectionFactory (#7676)
+
+## v4.2.12
+
+### Bug fixes
+
+* [39c55837e](https://github.com/api-platform/core/commit/39c55837e258421f83797188667b0b92af555f9d) fix(doctrine): Handling of parameter description (#7656)
+* [550b7621d](https://github.com/api-platform/core/commit/550b7621d644db0ec6dc09b96932dfbc6180f18d) fix(doctrine): escape values with `%` or `_` in search filter (#7653)
+* [582508eee](https://github.com/api-platform/core/commit/582508eee6b01227bfbd142718913d46723570aa) fix(doctrine): fix partial fetch with same entity included multiple time with different fields (#7647)
+* [6a3b02465](https://github.com/api-platform/core/commit/6a3b024654ffdab22f191dd27cb735f54e0e0033) fix(metadata): optional operation element  in XML (#7632)
+* [71578088a](https://github.com/api-platform/core/commit/71578088a218623a8f8492f88c6ab3087f856395) fix(symfony): replace getDefaultName() with AsCommand attribute (#7633)
+* [7d4b5e9c5](https://github.com/api-platform/core/commit/7d4b5e9c520c6191b7d407cfa701386d6eada2e9) fix(serializer): keep object normalization exception messages (#7644)
+* [b5a0ae068](https://github.com/api-platform/core/commit/b5a0ae0684a78b7780fa1c9a5a328cab8e7d815d) fix(openapi): properly document list parameters (#7658)
+* [c136918e0](https://github.com/api-platform/core/commit/c136918e08b93be84e4a275fda05bea3772f16fc) fix(laravel): deprecation in definition name factory (#7661)
+* [d0dffea9b](https://github.com/api-platform/core/commit/d0dffea9b81f1136786a1fcdfd1b59825a1d25f4) fix(openapi): respect schema type for non-collection parameter documentation (#7634)
+* [d23ab4301](https://github.com/api-platform/core/commit/d23ab43011549a26e3ca5a6fd4fbaac38dfb1d3b) fix(doctrine): partial fetch when relation switches context (#7645)
+* [d5f60e2e1](https://github.com/api-platform/core/commit/d5f60e2e1104cab62bde0a43cb694a79cf024f77) fix(test): change string to int for status in JsonApiTest::testError (#7631)
+* [dd457fbd3](https://github.com/api-platform/core/commit/dd457fbd3e6bd70aa1046c03b44edb292882fe05) fix(serializer): enhance exception message for non-object relation (#7646)
+
 ## v4.2.11
 
 ### Bug fixes

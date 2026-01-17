@@ -947,7 +947,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
 
                 if (!\is_object($attributeValue) && null !== $attributeValue) {
-                    throw new UnexpectedValueException('Unexpected non-object value for to-one relation.');
+                    throw new UnexpectedValueException('Unexpected non-object value for to-one relation on class `'.$object::class.'` for attribute `'.$attribute.'`.');
                 }
 
                 $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
@@ -1319,7 +1319,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         if ($denormalizationException) {
             if ($type instanceof Type && $type->isSatisfiedBy(static fn ($type) => $type instanceof BuiltinType) && !$type->isSatisfiedBy($typeIsResourceClass)) {
-                throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the "%s" attribute must be "%s", "%s" given.', $attribute, $type, \gettype($value)), $value, array_map(strval(...), $types), $context['deserialization_path'] ?? null);
+                // If the exception came from object denormalization, preserve its message as it's more specific
+                $message = $type->isSatisfiedBy(static fn ($type) => $type instanceof ObjectType)
+                    ? $denormalizationException->getMessage()
+                    : \sprintf('The type of the "%s" attribute must be "%s", "%s" given.', $attribute, $type, \gettype($value));
+
+                throw NotNormalizableValueException::createForUnexpectedDataType($message, $value, array_map(strval(...), $types), $context['deserialization_path'] ?? null, false, 0, $denormalizationException);
             }
 
             throw $denormalizationException;

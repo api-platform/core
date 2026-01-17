@@ -275,6 +275,7 @@ class OpenApiFactoryTest extends TestCase
                     requestBody: new RequestBody(''),
                 )),
                 'postDummyItemWithoutInput' => (new Post())->withUriTemplate('/dummyitem/noinput')->withOperation($baseOperation)->withInput(false),
+                'postDummyItemWithoutOutput' => (new Post())->withUriTemplate('/dummyitem/nooutput')->withOperation($baseOperation)->withOutput(false),
                 'getDummyCollectionWithErrors' => (new GetCollection())->withUriTemplate('erroredDummies')->withErrors([DummyErrorResource::class])->withOperation($baseOperation),
             ])
         );
@@ -1287,6 +1288,43 @@ class OpenApiFactoryTest extends TestCase
             [],
             null
         ), $emptyRequestBodyPath->getPost());
+
+        $emptyResponsePath = $paths->getPath('/dummyitem/nooutput');
+        $this->assertEquals(new Operation(
+            'postDummyItemWithoutOutput',
+            ['Dummy'],
+            [
+                '201' => new Response(
+                    'Dummy resource created',
+                    new \ArrayObject([
+                        'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject([]))),
+                    ]),
+                    null,
+                    new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
+                ),
+                '400' => new Response(
+                    'Invalid input',
+                    content: new \ArrayObject(['application/problem+json' => new MediaType(schema: new \ArrayObject(['$ref' => '#/components/schemas/Error']))]),
+                    links: new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
+                ),
+                '422' => new Response(
+                    'Unprocessable entity',
+                    content: new \ArrayObject(['application/problem+json' => new MediaType(schema: new \ArrayObject(['$ref' => '#/components/schemas/Error']))]),
+                    links: new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
+                ),
+            ],
+            'Creates a Dummy resource.',
+            'Creates a Dummy resource.',
+            null,
+            [],
+            new RequestBody(
+                'The new Dummy resource',
+                content: new \ArrayObject([
+                    'application/ld+json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.jsonld'])),
+                ]),
+                required: true
+            )
+        ), $emptyResponsePath->getPost());
 
         $parameter = $paths->getPath('/uri_variable_uuid')->getGet()->getParameters()[0];
         $this->assertEquals(['type' => 'string', 'format' => 'uuid'], $parameter->getSchema());

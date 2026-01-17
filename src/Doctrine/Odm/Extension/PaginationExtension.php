@@ -125,6 +125,11 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
         return new Paginator($iterator, $manager->getUnitOfWork(), $resourceClass);
     }
 
+    /**
+     * @param array<string, mixed> $context
+     *
+     * @return array<string, mixed>
+     */
     private function addCountToContext(Builder $aggregationBuilder, array $context): array
     {
         if (!($context['graphql_operation_name'] ?? false)) {

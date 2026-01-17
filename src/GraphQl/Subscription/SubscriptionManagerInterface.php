@@ -20,6 +20,9 @@ namespace ApiPlatform\GraphQl\Subscription;
  */
 interface SubscriptionManagerInterface
 {
+    /**
+     * @param array<string, mixed> $context
+     */
     public function retrieveSubscriptionId(array $context, ?array $result): ?string;
 
     public function getPushPayloads(object $object): array;

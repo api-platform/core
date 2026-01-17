@@ -302,7 +302,7 @@ final class DoctrineTest extends ApiTestCase
     }
 
     #[DataProvider('openApiParameterDocumentationProvider')]
-    public function testOpenApiParameterDocumentation(string $parameterName, bool $shouldHaveArrayNotation, string $expectedStyle, bool $expectedExplode, ?string $expectedSchemaType = null): void
+    public function testOpenApiParameterDocumentation(string $parameterName, bool $shouldHaveArrayNotation, string $expectedStyle, bool $expectedExplode, string $expectedDescription = '', ?array $expectedSchema = null): void
     {
         if ($this->isMongoDB()) {
             $this->markTestSkipped('Not tested with mongodb.');
@@ -335,8 +335,12 @@ final class DoctrineTest extends ApiTestCase
         $this->assertSame('query', $foundParameter['in']);
         $this->assertFalse($foundParameter['required']);
 
-        if ($expectedSchemaType) {
-            $this->assertSame($expectedSchemaType, $foundParameter['schema']['type'], \sprintf('Parameter schema type should be %s', $expectedSchemaType));
+        if (isset($foundParameter['expectedDescription'])) {
+            $this->assertSame($expectedDescription, $foundParameter['description'] ?? '', \sprintf('Description should be %s', $expectedDescription));
+        }
+
+        if ($expectedSchema) {
+            $this->assertSame($expectedSchema, $foundParameter['schema'], 'Parameter schema should match expected schema');
         }
 
         $this->assertSame($expectedStyle, $foundParameter['style'] ?? 'form', \sprintf('Style should be %s', $expectedStyle));
@@ -351,21 +355,40 @@ final class DoctrineTest extends ApiTestCase
                 'shouldHaveArrayNotation' => true,
                 'expectedStyle' => 'deepObject',
                 'expectedExplode' => true,
-                'expectedSchemaType' => 'string',
+                'expectedDescription' => '',
+                'expectedSchema' => ['type' => 'array', 'items' => ['type' => 'string']],
+            ],
+            'default behavior with an extra description' => [
+                'parameterName' => 'brandWithDescription',
+                'shouldHaveArrayNotation' => true,
+                'expectedStyle' => 'deepObject',
+                'expectedExplode' => true,
+                'expectedDescription' => 'Extra description about the filter',
+                'expectedSchema' => ['type' => 'array', 'items' => ['type' => 'string']],
             ],
             'explicit schema type string should not use array notation' => [
                 'parameterName' => 'exactBrand',
                 'shouldHaveArrayNotation' => false,
                 'expectedStyle' => 'form',
                 'expectedExplode' => false,
-                'expectedSchemaType' => 'string',
+                'expectedDescription' => '',
+                'expectedSchema' => ['type' => 'string'],
             ],
             'castToArray false should not use array notation' => [
                 'parameterName' => 'exactCategory',
                 'shouldHaveArrayNotation' => false,
                 'expectedStyle' => 'form',
                 'expectedExplode' => false,
-                'expectedSchemaType' => 'string',
+                'expectedDescription' => '',
+                'expectedSchema' => ['type' => 'string'],
+            ],
+            'with schema and default castToArray should wrap schema in array type' => [
+                'parameterName' => 'tags',
+                'shouldHaveArrayNotation' => true,
+                'expectedStyle' => 'deepObject',
+                'expectedExplode' => true,
+                'expectedDescription' => '',
+                'expectedSchema' => ['type' => 'array', 'items' => ['anyOf' => [['type' => 'array', 'items' => ['type' => 'string']], ['type' => 'string']]]],
             ],
         ];
     }

@@ -30,6 +30,10 @@ use Doctrine\ORM\Mapping as ORM;
                 'brand' => new QueryParameter(
                     filter: new ExactFilter(),
                 ),
+                'brandWithDescription' => new QueryParameter(
+                    filter: new ExactFilter(),
+                    description: 'Extra description about the filter',
+                ),
                 'search[:property]' => new QueryParameter(
                     filter: new PartialSearchFilter(),
                     properties: ['title', 'description']
@@ -51,6 +55,11 @@ use Doctrine\ORM\Mapping as ORM;
                     filter: new ExactFilter(),
                     property: 'category',
                     castToArray: false
+                ),
+                'tags' => new QueryParameter(
+                    filter: new ExactFilter(),
+                    property: 'tags',
+                    schema: ['anyOf' => [['type' => 'array', 'items' => ['type' => 'string']], ['type' => 'string']]]
                 ),
             ]
         ),

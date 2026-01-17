@@ -57,7 +57,12 @@ return function (ContainerConfigurator $container) {
 
     $services->set('api_platform.metadata.resource.metadata_collection_factory.concerns', 'ApiPlatform\Metadata\Resource\Factory\ConcernsResourceMetadataCollectionFactory')
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 800)
-        ->args([service('api_platform.metadata.resource.metadata_collection_factory.concerns.inner')]);
+        ->args([
+            service('api_platform.metadata.resource.metadata_collection_factory.concerns.inner'),
+            service('logger')->nullOnInvalid(),
+            '%api_platform.defaults%',
+            '%api_platform.graphql.enabled%',
+        ]);
 
     $services->set('api_platform.metadata.resource.metadata_collection_factory.not_exposed_operation', 'ApiPlatform\Metadata\Resource\Factory\NotExposedOperationResourceMetadataCollectionFactory')
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 700)

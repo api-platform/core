@@ -18,7 +18,7 @@ namespace ApiPlatform\Doctrine\Common\Filter;
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  *
- * @method ?array getProperties()
+ * @method array<string>|null getProperties()
  *
  * @experimental
  */

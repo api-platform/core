@@ -737,10 +737,7 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->bind(DefinitionNameFactoryInterface::class, DefinitionNameFactory::class);
         $this->app->singleton(DefinitionNameFactory::class, function (Application $app) {
-            /** @var ConfigRepository */
-            $config = $app['config'];
-
-            return new DefinitionNameFactory($config->get('api-platform.formats'));
+            return new DefinitionNameFactory();
         });
 
         $this->app->singleton(SchemaFactory::class, function (Application $app) {

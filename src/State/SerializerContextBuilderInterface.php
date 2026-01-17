@@ -30,6 +30,8 @@ interface SerializerContextBuilderInterface
     /**
      * Creates a serialization context from a Request.
      *
+     * @param array<string, mixed>|null $extractedAttributes
+     *
      * @throws RuntimeException
      *
      * @return array<string, mixed>
