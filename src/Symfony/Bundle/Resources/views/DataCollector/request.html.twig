@@ -193,7 +193,7 @@
                                                     </td>
                                                     <td>
                                                         {% if parameter.extraProperties['_api_values'] is defined %}
-                                                            {{ dump(parameter.extraProperties['_api_values']) }}
+                                                            {{ profiler_dump(parameter.extraProperties['_api_values']) }}
                                                         {% else %}
                                                             ∅
                                                         {% endif %}
