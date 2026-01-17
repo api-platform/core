@@ -177,6 +177,7 @@ The event listeners mode (`USE_SYMFONY_LISTENERS=1`) changes how API Platform ho
 **Setup:**
 ```bash
 cd src/Laravel
+composer link ../../
 composer run-script build
 ```
 
