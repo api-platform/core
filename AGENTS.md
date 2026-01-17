@@ -30,6 +30,8 @@ Unless explicitly asked otherwise:
 **Prerequisites:**
 - Clear cache when changing branches, dependencies, or `USE_SYMFONY_LISTENERS`: `rm -rf tests/Fixtures/app/var/cache/test`
 - Optionally warm cache: `tests/Fixtures/app/console cache:warmup`
+- For MongoDB tests: Set `APP_ENV=mongodb` and install MongoDB ODM: `composer require --dev doctrine/mongodb-odm-bundle`
+- MongoDB extension required: Ensure `mongodb` PHP extension is installed
 
 **PHPUnit (Main Suite):**
 ```bash
@@ -83,11 +85,57 @@ vendor/bin/behat --profile=default --tags '~@!mysql' --format=progress
 vendor/bin/behat --format=progress
 ```
 
+**MongoDB Tests:**
+```bash
+# Set MongoDB environment
+export APP_ENV=mongodb
+export MONGODB_URL=mongodb://localhost:27017
+
+# Install MongoDB ODM
+composer require --dev doctrine/mongodb-odm-bundle
+
+# Clear cache (always required when changing APP_ENV)
+rm -rf tests/Fixtures/app/var/cache/test
+
+# Run PHPUnit tests (exclude ORM tests)
+vendor/bin/phpunit --exclude-group=orm
+
+# Run Behat tests with MongoDB profile
+vendor/bin/behat --profile=mongodb-coverage --format=progress
+```
+
 **Static Analysis:**
 ```bash
 # Always run PHPStan to prevent trivial bugs
+# CRITICAL: PHPStan requires MongoDB extension AND MongoDB ODM bundle
+# Install MongoDB PHP extension first (e.g., pecl install mongodb)
+# Then install MongoDB ODM:
+composer require --dev doctrine/mongodb-odm-bundle
 vendor/bin/phpstan analyse --no-interaction --no-progress
+
+# PHPStan will fail without both:
+# - mongodb PHP extension (for analyzing Document fixtures)
+# - doctrine/mongodb-odm-bundle package (for ODM classes)
 ```
+
+**Testing Event Listeners (vs Default Event System):**
+
+API Platform has two modes for handling Symfony events:
+
+1. **Default Mode (Event System):** Uses Symfony's event system with event subscribers
+2. **Event Listeners Mode:** Uses traditional Symfony event listeners (enabled with `USE_SYMFONY_LISTENERS=1`)
+
+**When to test with event listeners:**
+- Set `USE_SYMFONY_LISTENERS=1` environment variable
+- Always clear cache after switching modes: `rm -rf tests/Fixtures/app/var/cache/test`
+- CI runs separate jobs for both modes to ensure compatibility
+
+**Special Note - Events vs Non-Events:**
+The event listeners mode (`USE_SYMFONY_LISTENERS=1`) changes how API Platform hooks into Symfony's lifecycle:
+- **Non-events (default):** Uses event subscribers for better performance and flexibility
+- **Events (listeners):** Uses traditional event listeners for backward compatibility
+- Both modes must be tested to ensure feature compatibility
+- When debugging event-related issues, test both modes
 
 ### Laravel Tests
 
