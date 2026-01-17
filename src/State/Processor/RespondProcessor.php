@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\StopwatchAwareInterface;
@@ -40,10 +41,12 @@ final class RespondProcessor implements ProcessorInterface, StopwatchAwareInterf
         ?IriConverterInterface $iriConverter = null,
         ?ResourceClassResolverInterface $resourceClassResolver = null,
         ?OperationMetadataFactoryInterface $operationMetadataFactory = null,
+        ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
     ) {
         $this->iriConverter = $iriConverter;
         $this->resourceClassResolver = $resourceClassResolver;
         $this->operationMetadataFactory = $operationMetadataFactory;
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])

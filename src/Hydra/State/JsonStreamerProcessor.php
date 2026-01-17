@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\State\Pagination\PaginatorInterface;
@@ -57,10 +58,12 @@ final class JsonStreamerProcessor implements ProcessorInterface
         private readonly string $pageParameterName = 'page',
         private readonly string $enabledParameterName = 'pagination',
         private readonly int $urlGenerationStrategy = UrlGeneratorInterface::ABS_PATH,
+        ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
     ) {
         $this->resourceClassResolver = $resourceClassResolver;
         $this->iriConverter = $iriConverter;
         $this->operationMetadataFactory = $operationMetadataFactory;
+        $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])

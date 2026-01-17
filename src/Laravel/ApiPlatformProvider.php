@@ -404,7 +404,13 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->bind(ProviderInterface::class, ContentNegotiationProvider::class);
 
         $this->app->singleton(RespondProcessor::class, function (Application $app) {
-            $decorated = new RespondProcessor();
+            $decorated = new RespondProcessor(
+                $app->make(IriConverterInterface::class),
+                $app->make(ResourceClassResolverInterface::class),
+                $app->make(OperationMetadataFactoryInterface::class),
+                $app->make(ResourceMetadataCollectionFactoryInterface::class)
+            );
+
             if (class_exists(AddHeadersProcessor::class)) {
                 /** @var ConfigRepository */
                 $config = $app['config']->get('api-platform.http_cache') ?? [];
