@@ -49,14 +49,30 @@ vendor/bin/phpunit
 ```
 
 **PHPUnit (Component-Specific):**
+
+First go to the component's directory then run dependency linking:
+
+```bash
+cd src/Metadata
+composer link ../../
+```
+
+Then you can run the component's test:
+```bash
+cd src/Metadata
+./vendor/bin/phpunit
+```
+
+Or from the main directory:
+
 ```bash
 # Run tests for a specific component
 composer {component-name} test
 
 # Examples:
-composer doctrine-orm test
-composer graphql test
-composer metadata test
+composer api-platform/doctrine-orm test
+composer api-platform/graphql test
+composer api-platform/metadata test
 ```
 
 **Behat (Functional Tests):**
@@ -106,6 +122,9 @@ vendor/bin/behat --profile=mongodb-coverage --format=progress
 
 **Static Analysis:**
 ```bash
+# Clean up components dependencies (or else it'll try to load vendor directories and run endlessly)
+find src -name vendor -exec rm -r {} \;
+
 # Always run PHPStan to prevent trivial bugs
 # CRITICAL: PHPStan requires MongoDB extension AND MongoDB ODM bundle
 # Install MongoDB PHP extension first (e.g., pecl install mongodb)
@@ -387,3 +406,4 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 - [ ] Documentation PR submitted (if feature)
 - [ ] Conventional commit format used
 - [ ] Code style passes (`php-cs-fixer`, `phpstan`)
+
