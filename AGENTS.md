@@ -11,6 +11,7 @@ Unless explicitly asked otherwise:
 *   **Project Context:** API Platform is a PHP framework supporting both Symfony and Laravel. The user will specify which framework (defaults to Symfony).
 *   **Fixture Handling:** Avoid altering existing fixtures to prevent unintended side effects on other tests. Create new entities/DTOs/models with unique names. Business logic is secondary; focus on framework testing.
 *   **No Test Execution by Default:** Do not run tests unless explicitly asked (to save context, as tests produce verbose output).
+*   **No Git commit by default:** Do not commit unless explicitly asked 
 
 ## Components
 
