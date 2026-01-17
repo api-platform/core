@@ -53,10 +53,10 @@ trait RecreateSchemaTrait
 
     /**
      * @param array<ClassMetadata> $metadataCollection
-     * @param array<string>        $processedClasses
+     * @param array<string, bool>  $processedClasses
      *
      * @param-out array<ClassMetadata> $metadataCollection
-     * @param-out array<string>        $processedClasses
+     * @param-out array<string, bool>  $processedClasses
      */
     private function addMetadataWithDependencies(EntityManagerInterface $manager, string $class, array &$metadataCollection, array &$processedClasses): void
     {
