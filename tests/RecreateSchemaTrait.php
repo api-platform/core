@@ -78,6 +78,11 @@ trait RecreateSchemaTrait
         return 'mongodb' === static::getContainer()->getParameter('kernel.environment');
     }
 
+    private function isPostgres(): bool
+    {
+        return 'postgres' === static::getContainer()->getParameter('kernel.environment');
+    }
+
     private function getManager(): EntityManagerInterface|DocumentManager
     {
         return static::getContainer()->get($this->isMongoDB() ? 'doctrine_mongodb' : 'doctrine')->getManager();

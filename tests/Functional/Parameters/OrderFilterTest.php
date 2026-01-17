@@ -59,6 +59,12 @@ final class OrderFilterTest extends ApiTestCase
 
         $actualOrder = array_map(fn ($item) => $item['createdAt'] ?? null, $orderedItems);
 
+        // Default NULL order is different in PostgreSQL.
+        if ($this->isPostgres()) {
+            $actualOrder = array_values(array_filter($actualOrder));
+            $expectedOrder = array_values(array_filter($expectedOrder));
+        }
+
         $this->assertSame($expectedOrder, $actualOrder, \sprintf('Expected order does not match for URL %s', $url));
     }
 
@@ -86,7 +92,7 @@ final class OrderFilterTest extends ApiTestCase
     public function testOrderFilterNullsComparisonResponses(string $url, array $expectedOrder): void
     {
         if ($this->isMongoDB()) {
-            $this->markTestSkipped(sprintf('Not implemented in %s', OrderFilter::class));
+            $this->markTestSkipped(\sprintf('Not implemented in %s', OrderFilter::class));
         }
 
         $response = self::createClient()->request('GET', $url);
