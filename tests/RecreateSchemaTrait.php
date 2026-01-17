@@ -47,10 +47,8 @@ trait RecreateSchemaTrait
 
         $schemaTool = new SchemaTool($manager);
 
-        $manager->getConnection()->executeStatement('SET FOREIGN_KEY_CHECKS = 0');
-        @$schemaTool->dropSchema($metadataCollection);
+        @$schemaTool->dropDatabase();
         @$schemaTool->createSchema($metadataCollection);
-        $manager->getConnection()->executeStatement('SET FOREIGN_KEY_CHECKS = 1');
     }
 
     /**
