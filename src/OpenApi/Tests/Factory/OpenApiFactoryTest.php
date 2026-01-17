@@ -696,10 +696,10 @@ class OpenApiFactoryTest extends TestCase
             ['Dummy'],
             [
                 '200' => new Response('Dummy collection', new \ArrayObject([
-                    'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject([
+                    'application/ld+json' => new MediaType(new \ArrayObject([
                         'type' => 'array',
                         'items' => ['$ref' => '#/components/schemas/Dummy.OutputDto.jsonld'],
-                    ]))),
+                    ])),
                 ])),
             ],
             'Retrieves the collection of Dummy resources.',
@@ -728,7 +728,7 @@ class OpenApiFactoryTest extends TestCase
                 '201' => new Response(
                     'Dummy resource created',
                     new \ArrayObject([
-                        'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto.jsonld']))),
+                        'application/ld+json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto.jsonld'])),
                     ]),
                     null,
                     new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
@@ -751,7 +751,7 @@ class OpenApiFactoryTest extends TestCase
             new RequestBody(
                 'The new Dummy resource',
                 new \ArrayObject([
-                    'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.jsonld']))),
+                    'application/ld+json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.jsonld'])),
                 ]),
                 true
             )
@@ -770,7 +770,7 @@ class OpenApiFactoryTest extends TestCase
                 '200' => new Response(
                     'Dummy resource',
                     new \ArrayObject([
-                        'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto.jsonld']))),
+                        'application/ld+json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto.jsonld'])),
                     ])
                 ),
                 '404' => new Response(
@@ -1023,7 +1023,7 @@ class OpenApiFactoryTest extends TestCase
                 '201' => new Response(
                     'Dummy resource created',
                     new \ArrayObject([
-                        'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto.jsonld']))),
+                        'application/ld+json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto.jsonld'])),
                     ]),
                     null,
                     new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
@@ -1074,7 +1074,7 @@ class OpenApiFactoryTest extends TestCase
                 '201' => new Response(
                     'Dummy resource created',
                     new \ArrayObject([
-                        'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto.jsonld']))),
+                        'application/ld+json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto.jsonld'])),
                     ]),
                     null,
                     new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
@@ -1097,7 +1097,7 @@ class OpenApiFactoryTest extends TestCase
             new RequestBody(
                 'Extended description for the new Dummy resource',
                 new \ArrayObject([
-                    'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.jsonld']))),
+                    'application/ld+json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.jsonld'])),
                 ]),
                 false
             ),
@@ -1266,7 +1266,7 @@ class OpenApiFactoryTest extends TestCase
                 '201' => new Response(
                     'Dummy resource created',
                     new \ArrayObject([
-                        'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto.jsonld']))),
+                        'application/ld+json' => new MediaType(new \ArrayObject(['$ref' => '#/components/schemas/Dummy.OutputDto.jsonld'])),
                     ]),
                     null,
                     new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
@@ -1297,7 +1297,7 @@ class OpenApiFactoryTest extends TestCase
                 '201' => new Response(
                     'Dummy resource created',
                     new \ArrayObject([
-                        'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject([]))),
+                        'application/ld+json' => new MediaType(new \ArrayObject([])),
                     ]),
                     null,
                     new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
@@ -1339,17 +1339,17 @@ class OpenApiFactoryTest extends TestCase
             ['Dummy'],
             [
                 '200' => new Response('Dummy collection', new \ArrayObject([
-                    'application/ld+json' => new MediaType(new \ArrayObject(new \ArrayObject([
+                    'application/ld+json' => new MediaType(new \ArrayObject([
                         'type' => 'array',
                         'items' => ['$ref' => '#/components/schemas/Dummy.OutputDto.jsonld'],
-                    ]))),
+                    ])),
                 ])),
                 '418' => new Response(
                     'A Teapot Exception',
                     new \ArrayObject([
-                        'application/problem+json' => new MediaType(new \ArrayObject(new \ArrayObject([
+                        'application/problem+json' => new MediaType(new \ArrayObject([
                             '$ref' => '#/components/schemas/DummyErrorResource',
-                        ]))),
+                        ])),
                     ]),
                     links: new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
                 ),
