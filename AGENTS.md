@@ -12,6 +12,22 @@ Unless explicitly asked otherwise:
 *   **Fixture Handling:** Avoid altering existing fixtures to prevent unintended side effects on other tests. Create new entities/DTOs/models with unique names. Business logic is secondary; focus on framework testing.
 *   **No Test Execution by Default:** Do not run tests unless explicitly asked (to save context, as tests produce verbose output).
 
+## Components
+
+This code is organized through components, when you need to run a component's specific test you need to link it using:
+
+```bash
+cd src/Laravel && composer link ../../
+```
+
+Before running php-cs-fixer or phpstan it may be a good idea to remove the components deps:
+
+```bash
+find src -name vendor -exec rm -r {} \;
+```
+
+Laravel's phpstan must run from `src/Laravel` directory.
+
 ## Running Tests (When Asked)
 
 **⚠️ CRITICAL: Almost NEVER run the full test suite!**
