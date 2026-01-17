@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Parameters;
 
+use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\FilteredOrderParameter as FilteredOrderParameterDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilteredOrderParameter;
@@ -79,6 +80,28 @@ final class OrderFilterTest extends ApiTestCase
             '/filtered_order_parameters?date=desc',
             ['2024-12-25T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-01-01T00:00:00+00:00', null],
         ];
+    }
+
+    #[DataProvider('orderFilterNullsComparisonScenariosProvider')]
+    public function testOrderFilterNullsComparisonResponses(string $url, array $expectedOrder): void
+    {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped(sprintf('Not implemented in %s', OrderFilter::class));
+        }
+
+        $response = self::createClient()->request('GET', $url);
+        $this->assertResponseIsSuccessful();
+
+        $responseData = $response->toArray();
+        $orderedItems = $responseData['hydra:member'];
+
+        $actualOrder = array_map(fn ($item) => $item['createdAt'] ?? null, $orderedItems);
+
+        $this->assertSame($expectedOrder, $actualOrder, \sprintf('Expected order does not match for URL %s', $url));
+    }
+
+    public static function orderFilterNullsComparisonScenariosProvider(): \Generator
+    {
         yield 'date_null_always_first_alias_asc' => [
             '/filtered_order_parameters?date_null_always_first=asc',
             [null, '2024-01-01T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-12-25T00:00:00+00:00'],
