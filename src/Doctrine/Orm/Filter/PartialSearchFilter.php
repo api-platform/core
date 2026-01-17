@@ -34,10 +34,10 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
         $property = $parameter->getProperty();
         $alias = $queryBuilder->getRootAliases()[0];
         $field = $alias.'.'.$property;
-        $parameterName = $queryNameGenerator->generateParameterName($property);
         $values = $parameter->getValue();
 
         if (!is_iterable($values)) {
+            $parameterName = $queryNameGenerator->generateParameterName($property);
             $queryBuilder->setParameter($parameterName, $this->formatLikeValue(strtolower($values)));
 
             $likeExpression = 'LOWER('.$field.') LIKE :'.$parameterName.' ESCAPE \'\\\'';
