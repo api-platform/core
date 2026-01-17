@@ -40,9 +40,15 @@ final class IriFilterTest extends ApiTestCase
     public function testIriFilter(): void
     {
         $client = $this->createClient();
+
         $res = $client->request('GET', '/chickens?chickenCoop=/chicken_coops/2')->toArray();
+
         $this->assertCount(1, $res['member']);
         $this->assertEquals('/chicken_coops/2', $res['member'][0]['chickenCoop']);
+
+        $res = $client->request('GET', '/chickens?chickenCoop=/chicken_coops/595')->toArray();
+
+        $this->assertCount(0, $res['member']);
     }
 
     public function testIriFilterMultiple(): void
