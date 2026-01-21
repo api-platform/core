@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\JsonStreamer\CacheWarmer\LazyGhostCacheWarmer;
 use Symfony\Component\JsonStreamer\StreamerDumper;
 
 return function (ContainerConfigurator $container) {
@@ -26,14 +27,25 @@ return function (ContainerConfigurator $container) {
             service('config_cache_factory')->ignoreOnInvalid(),
         ]);
 
+    $jsonStreamReaderArgs = [
+        tagged_locator('json_streamer.value_transformer'),
+        service('json_streamer.read.property_metadata_loader'),
+        '%.json_streamer.stream_readers_dir.jsonld%',
+    ];
+    $isJsonStreamer74OrHigher = class_exists(StreamerDumper::class);
+    $isJsonStreamer80OrHigher = !class_exists(LazyGhostCacheWarmer::class);
+
+    if ($isJsonStreamer80OrHigher) {
+        $jsonStreamReaderArgs[] = service('config_cache_factory')->ignoreOnInvalid();
+    } elseif ($isJsonStreamer74OrHigher) {
+        $jsonStreamReaderArgs[] = service('config_cache_factory')->ignoreOnInvalid();
+        $jsonStreamReaderArgs[] = param('.json_streamer.lazy_ghosts_dir');
+    } else {
+        $jsonStreamReaderArgs[] = param('.json_streamer.lazy_ghosts_dir');
+    }
+
     $services->set('api_platform.jsonld.json_streamer.stream_reader', 'Symfony\Component\JsonStreamer\JsonStreamReader')
-        ->args([
-            tagged_locator('json_streamer.value_transformer'),
-            service('json_streamer.read.property_metadata_loader'),
-            '%.json_streamer.stream_readers_dir.jsonld%',
-            class_exists(StreamerDumper::class) ? service('config_cache_factory')->ignoreOnInvalid() : param('.json_streamer.lazy_ghosts_dir'),
-            param('.json_streamer.lazy_ghosts_dir'),
-        ]);
+        ->args($jsonStreamReaderArgs);
 
     $services->set('api_platform.jsonld.json_streamer.write.property_metadata_loader', 'ApiPlatform\JsonLd\JsonStreamer\WritePropertyMetadataLoader')
         ->args([
