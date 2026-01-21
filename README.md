@@ -9,7 +9,7 @@ It natively supports popular open formats including [JSON for Linked Data (JSON-
 Build a working and fully-featured web API in minutes. Leverage the awesome features of the tool to develop complex and
 high-performance API-first projects. Extend or override everything you want.
 
-[![GitHub Actions](https://github.com/api-platform/core/workflows/CI/badge.svg?branch=main)](https://github.com/api-platform/core/actions?query=workflow%3ACI+branch%3Amain)
+[![GitHub Actions](https://github.com/api-platform/core/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/api-platform/core/actions?query=workflow%3ACI+branch%3Amain)
 
 ## Documentation
 
