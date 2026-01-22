@@ -139,7 +139,20 @@ final class PartialSearchFilterTest extends ApiTestCase
             1,
             ['xx_%_\\_%_xx'],
         ];
+    }
 
+    #[DataProvider('partialSearchMultiByteFilterProvider')]
+    public function testPartialSearchMultiByteFilter(string $url, int $expectedCount, array $expectedNames): void
+    {
+        if ($this->isSqlite()) {
+            $this->markTestSkipped('Multibyte LIKE are not properly handled with sqlite.');
+        }
+
+        $this->testPartialSearchFilter($url, $expectedCount, $expectedNames);
+    }
+
+    public static function partialSearchMultiByteFilterProvider(): \Generator
+    {
         yield 'filter by partial name "gà"' => [
             '/chickens?namePartial[]=gà',
             1,
