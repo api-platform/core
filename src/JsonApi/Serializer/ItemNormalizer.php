@@ -461,7 +461,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             }
 
             $data[$relationshipName] = [
-                'data' => [],
+                'data' => null,
             ];
 
             if (!$attributeValue) {
@@ -476,6 +476,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 continue;
             }
 
+            $data[$relationshipName] = [
+                'data' => [],
+            ];
             // Many to many relationship
             foreach ($attributeValue as $attributeValueElement) {
                 if (!isset($attributeValueElement['data'])) {
