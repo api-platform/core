@@ -165,7 +165,6 @@ class AppKernel extends Kernel
         // SF 8.1 removed configuration
         if (!class_exists(Type::class)) {
             unset($config['annotations']);
-            $c->setParameter('.json_streamer.lazy_ghosts_dir', __DIR__.'/cache/json_streamer_lazy_ghost');
         }
 
         $c->prependExtensionConfig('framework', $config);
