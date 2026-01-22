@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Parameters;
 
+use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\FilteredOrderParameter as FilteredOrderParameterDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilteredOrderParameter;
@@ -58,6 +59,12 @@ final class OrderFilterTest extends ApiTestCase
 
         $actualOrder = array_map(fn ($item) => $item['createdAt'] ?? null, $orderedItems);
 
+        // Default NULL order is different in PostgreSQL.
+        if ($this->isPostgres()) {
+            $actualOrder = array_values(array_filter($actualOrder));
+            $expectedOrder = array_values(array_filter($expectedOrder));
+        }
+
         $this->assertSame($expectedOrder, $actualOrder, \sprintf('Expected order does not match for URL %s', $url));
     }
 
@@ -79,29 +86,51 @@ final class OrderFilterTest extends ApiTestCase
             '/filtered_order_parameters?date=desc',
             ['2024-12-25T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-01-01T00:00:00+00:00', null],
         ];
-        yield 'date_null_always_first_alias_nulls_first' => [
+    }
+
+    #[DataProvider('orderFilterNullsComparisonScenariosProvider')]
+    public function testOrderFilterNullsComparisonResponses(string $url, array $expectedOrder): void
+    {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped(\sprintf('Not implemented in %s', OrderFilter::class));
+        }
+
+        $response = self::createClient()->request('GET', $url);
+        $this->assertResponseIsSuccessful();
+
+        $responseData = $response->toArray();
+        $orderedItems = $responseData['hydra:member'];
+
+        $actualOrder = array_map(fn ($item) => $item['createdAt'] ?? null, $orderedItems);
+
+        $this->assertSame($expectedOrder, $actualOrder, \sprintf('Expected order does not match for URL %s', $url));
+    }
+
+    public static function orderFilterNullsComparisonScenariosProvider(): \Generator
+    {
+        yield 'date_null_always_first_alias_asc' => [
             '/filtered_order_parameters?date_null_always_first=asc',
             [null, '2024-01-01T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-12-25T00:00:00+00:00'],
         ];
-        yield 'date_null_always_first_alias_nulls_last' => [
+        yield 'date_null_always_first_alias_desc' => [
             '/filtered_order_parameters?date_null_always_first=desc',
-            ['2024-12-25T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-01-01T00:00:00+00:00', null],
+            [null, '2024-12-25T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-01-01T00:00:00+00:00'],
         ];
-        yield 'date_null_always_first_old_way_alias_nulls_first' => [
+        yield 'date_null_always_first_old_way_alias_asc' => [
             '/filtered_order_parameters?date_null_always_first_old_way=asc',
             [null, '2024-01-01T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-12-25T00:00:00+00:00'],
         ];
-        yield 'date_null_always_first_old_way_alias_nulls_last' => [
+        yield 'date_null_always_first_old_way_alias_desc' => [
             '/filtered_order_parameters?date_null_always_first_old_way=desc',
-            ['2024-12-25T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-01-01T00:00:00+00:00', null],
+            [null, '2024-12-25T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-01-01T00:00:00+00:00'],
         ];
-        yield 'order_property_created_at_nulls_first' => [
+        yield 'order_property_created_at_null_first_asc' => [
             '/filtered_order_parameters?order[createdAt]=asc',
             [null, '2024-01-01T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-12-25T00:00:00+00:00'],
         ];
-        yield 'order_property_created_at_nulls_last' => [
+        yield 'order_property_created_at_null_first_desc' => [
             '/filtered_order_parameters?order[createdAt]=desc',
-            ['2024-12-25T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-01-01T00:00:00+00:00', null],
+            [null, '2024-12-25T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-01-01T00:00:00+00:00'],
         ];
     }
 

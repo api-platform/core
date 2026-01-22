@@ -38,17 +38,17 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
         'date_null_always_first' => new QueryParameter(
             filter: new OrderFilter(),
             property: 'createdAt',
-            filterContext: OrderFilterInterface::NULLS_ALWAYS_FIRST,
+            filterContext: ['nulls_comparison' => OrderFilterInterface::NULLS_ALWAYS_FIRST],
             nativeType: new BuiltinType(TypeIdentifier::STRING)
         ),
         'date_null_always_first_old_way' => new QueryParameter(
-            filter: new OrderFilter(properties: ['createdAt' => OrderFilterInterface::NULLS_ALWAYS_FIRST]),
+            filter: new OrderFilter(properties: ['createdAt' => ['nulls_comparison' => OrderFilterInterface::NULLS_ALWAYS_FIRST]]),
             property: 'createdAt',
             nativeType: new BuiltinType(TypeIdentifier::STRING)
         ),
         'order[:property]' => new QueryParameter(
             filter: new OrderFilter(),
-            filterContext: OrderFilterInterface::NULLS_ALWAYS_FIRST,
+            filterContext: ['nulls_comparison' => OrderFilterInterface::NULLS_ALWAYS_FIRST],
         ),
     ],
 )]

@@ -62,7 +62,7 @@ class Cart
             ->addGroupBy(\sprintf('%s.id', $rootAlias));
     }
 
-    public ?int $totalQuantity;
+    public int|string|null $totalQuantity;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
