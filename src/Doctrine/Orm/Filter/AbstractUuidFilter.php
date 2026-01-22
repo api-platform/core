@@ -59,6 +59,10 @@ class AbstractUuidFilter implements FilterInterface, ManagerRegistryAwareInterfa
             return;
         }
 
+        if (null === $parameter->getProperty()) {
+            throw new InvalidArgumentException(\sprintf('The filter parameter with key "%s" must specify a property. Nested properties are not automatically resolved. Please provide the property explicitly.', $parameter->getKey()));
+        }
+
         $this->filterProperty($parameter->getProperty(), $parameter->getValue(), $queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
     }
 
