@@ -139,6 +139,30 @@ final class PartialSearchFilterTest extends ApiTestCase
             1,
             ['xx_%_\\_%_xx'],
         ];
+
+        yield 'filter by partial name "é"' => [
+            '/chickens?namePartial[]=é',
+            1,
+            ['GÉgè'],
+        ];
+
+        yield 'filter by partial name "è"' => [
+            '/chickens?namePartial[]=è',
+            1,
+            ['GÉgè'],
+        ];
+
+        yield 'filter by partial name "É"' => [
+            '/chickens?namePartial[]=%C3%89',
+            1,
+            ['GÉgè'],
+        ];
+
+        yield 'filter by partial name "È"' => [
+            '/chickens?namePartial[]=%C3%88',
+            1,
+            ['GÉgè'],
+        ];
     }
 
     /**
@@ -167,8 +191,13 @@ final class PartialSearchFilterTest extends ApiTestCase
         $chicken3->setName('xx_%_\\_%_xx');
         $chicken3->setChickenCoop($chickenCoop1);
 
+        $chicken4 = new $chickenClass();
+        $chicken4->setName('GÉgè');
+        $chicken4->setChickenCoop($chickenCoop1);
+
         $chickenCoop1->addChicken($chicken1);
         $chickenCoop1->addChicken($chicken3);
+        $chickenCoop1->addChicken($chicken4);
         $chickenCoop2->addChicken($chicken2);
 
         $manager->persist($chickenCoop1);
@@ -176,6 +205,7 @@ final class PartialSearchFilterTest extends ApiTestCase
         $manager->persist($chicken1);
         $manager->persist($chicken2);
         $manager->persist($chicken3);
+        $manager->persist($chicken4);
 
         $manager->flush();
     }
