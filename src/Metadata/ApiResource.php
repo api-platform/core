@@ -40,16 +40,16 @@ class ApiResource extends Metadata
     protected ?Operations $operations;
 
     /**
-     * @param list<HttpOperation>|array<string, HttpOperation>|Operations<HttpOperation>|null $operations   Operations is a list of HttpOperation
-     * @param array<string, Link>|array<string, mixed[]>|string[]|string|null                 $uriVariables
-     * @param class-string                                                                    $class
-     * @param array<string, string>                                                           $headers
-     * @param string|callable|null                                                            $provider
-     * @param string|callable|null                                                            $processor
-     * @param mixed|null                                                                      $mercure
-     * @param mixed|null                                                                      $messenger
-     * @param mixed|null                                                                      $input
-     * @param mixed|null                                                                      $output
+     * @param list<HttpOperation>|array<string, HttpOperation>|Operations|null $operations   Operations is a list of HttpOperation
+     * @param array<string, Link>|array<string, mixed[]>|string[]|string|null  $uriVariables
+     * @param array<string, string>                                            $headers
+     * @param string|callable|null                                             $provider
+     * @param string|callable|null                                             $processor
+     * @param mixed|null                                                       $mercure
+     * @param mixed|null                                                       $messenger
+     * @param mixed|null                                                       $input
+     * @param mixed|null                                                       $output
+     * @param array<string, McpResource|McpTool>|null                          $mcp          A list of Mcp resources or tools
      */
     public function __construct(
         /**
@@ -972,6 +972,7 @@ class ApiResource extends Metadata
         protected ?bool $jsonStream = null,
         protected array $extraProperties = [],
         ?bool $map = null,
+        protected ?array $mcp = null,
     ) {
         parent::__construct(
             shortName: $shortName,
@@ -1018,7 +1019,7 @@ class ApiResource extends Metadata
             hideHydraOperation: $hideHydraOperation,
             jsonStream: $jsonStream,
             extraProperties: $extraProperties,
-            map: $map
+            map: $map,
         );
 
         /* @var Operations<HttpOperation> $operations> */
@@ -1028,6 +1029,25 @@ class ApiResource extends Metadata
         if (\is_string($types)) {
             $this->types = (array) $types;
         }
+    }
+
+    /**
+     * @return array<string, McpResource|McpTool>|null
+     */
+    public function getMcp(): ?array
+    {
+        return $this->mcp;
+    }
+
+    /**
+     * @param array<string, McpResource|McpTool> $mcp
+     */
+    public function withMcp(array $mcp): static
+    {
+        $self = clone $this;
+        $self->mcp = $mcp;
+
+        return $self;
     }
 
     /**

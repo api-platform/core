@@ -94,6 +94,17 @@ api_platform:
     mercure:
         include_type: true
 
+mcp:
+    client_transports:
+        http: true
+        stdio: false
+    http:
+        path: '/mcp'
+        session:
+            store: 'file'
+            directory: '%kernel.cache_dir%/mcp'
+            ttl: 3600
+
 services:
     test.client:
         class: ApiPlatform\Tests\Fixtures\TestBundle\BrowserKit\Client

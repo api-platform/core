@@ -28,6 +28,7 @@ use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\Command\TailCursorDoctrineODMCommand;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use FriendsOfBehat\SymfonyExtension\Bundle\FriendsOfBehatSymfonyExtensionBundle;
+use Symfony\AI\McpBundle\McpBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Bundle\MakerBundle\MakerBundle;
@@ -83,6 +84,10 @@ class AppKernel extends Kernel
 
         if (extension_loaded('mongodb') && class_exists(DoctrineMongoDBBundle::class)) {
             $bundles[] = new DoctrineMongoDBBundle();
+        }
+
+        if (class_exists(McpBundle::class)) {
+            $bundles[] = new McpBundle();
         }
 
         $bundles[] = new TestBundle();

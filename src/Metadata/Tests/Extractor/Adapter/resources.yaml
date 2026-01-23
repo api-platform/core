@@ -344,3 +344,4 @@ resources:
                 another_custom_property:
                     'Lorem ipsum': 'Dolor sit amet'
             map: null
+            mcp: null

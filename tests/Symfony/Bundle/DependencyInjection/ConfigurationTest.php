@@ -239,6 +239,9 @@ class ConfigurationTest extends TestCase
                 'hydra_prefix' => null,
             ],
             'enable_phpdoc_parser' => true,
+            'mcp' => [
+                'enabled' => true,
+            ],
         ], $config);
     }
 

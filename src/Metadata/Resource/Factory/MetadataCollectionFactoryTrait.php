@@ -17,6 +17,8 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\McpResource;
+use ApiPlatform\Metadata\McpTool;
 use ApiPlatform\Metadata\Metadata;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Parameter;
@@ -46,7 +48,7 @@ trait MetadataCollectionFactoryTrait
 
     private function isResourceMetadata(string $name): bool
     {
-        return is_a($name, ApiResource::class, true) || is_subclass_of($name, HttpOperation::class) || is_subclass_of($name, GraphQlOperation::class) || is_a($name, Parameter::class, true);
+        return is_a($name, ApiResource::class, true) || is_subclass_of($name, HttpOperation::class) || is_subclass_of($name, GraphQlOperation::class) || is_a($name, Parameter::class, true) || is_a($name, McpTool::class, true) || is_a($name, McpResource::class, true);
     }
 
     /**
@@ -90,11 +92,21 @@ trait MetadataCollectionFactoryTrait
                 if ($operations) {
                     $resource = $resource->withOperations(new Operations($operations));
                 }
-                $resources[++$index] = $resource;
-                continue;
-            }
 
-            if (!is_subclass_of($metadata, HttpOperation::class) && !is_subclass_of($metadata, GraphQlOperation::class)) {
+                if ($mcp = $resource->getMcp()) {
+                    $processedMcp = [];
+                    foreach ($mcp as $key => $mcpOperation) {
+                        if (null === $mcpOperation->getName()) {
+                            $mcpOperation = $mcpOperation->withName($key);
+                        }
+
+                        [, $mcpOperation] = $this->getOperationWithDefaults($resource, $mcpOperation);
+                        $processedMcp[$key] = $mcpOperation;
+                    }
+                    $resource = $resource->withMcp($processedMcp);
+                }
+
+                $resources[++$index] = $resource;
                 continue;
             }
 
@@ -103,6 +115,21 @@ trait MetadataCollectionFactoryTrait
                 $graphQlOperations = $resources[$index]->getGraphQlOperations();
                 $graphQlOperations[$key] = $operation;
                 $resources[$index] = $resources[$index]->withGraphQlOperations($graphQlOperations);
+                continue;
+            }
+
+            if ($metadata instanceof McpTool || $metadata instanceof McpResource) {
+                if (-1 === $index) {
+                    $resources[++$index] = $this->getResourceWithDefaults($resourceClass, $shortName, new ApiResource());
+                }
+                [$key, $operation] = $this->getOperationWithDefaults($resources[$index], $metadata);
+                $mcp = $resources[$index]->getMcp() ?? [];
+                $mcp[$key] = $operation;
+                $resources[$index] = $resources[$index]->withMcp($mcp);
+                continue;
+            }
+
+            if (!is_subclass_of($metadata, HttpOperation::class) && !is_subclass_of($metadata, GraphQlOperation::class)) {
                 continue;
             }
 
