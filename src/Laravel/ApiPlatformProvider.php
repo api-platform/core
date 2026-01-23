@@ -79,6 +79,7 @@ use ApiPlatform\Laravel\ApiResource\Error;
 use ApiPlatform\Laravel\ApiResource\ValidationError;
 use ApiPlatform\Laravel\Controller\DocumentationController;
 use ApiPlatform\Laravel\Controller\EntrypointController;
+use ApiPlatform\Laravel\Controller\NotExposedController;
 use ApiPlatform\Laravel\Eloquent\Filter\JsonApi\SortFilterParameterProvider;
 use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentAttributePropertyMetadataFactory;
 use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentPropertyMetadataFactory;
@@ -666,6 +667,12 @@ class ApiPlatformProvider extends ServiceProvider
                 oauthClientSecret: $config->get('api-platform.swagger_ui.oauth.clientSecret'),
                 oauthPkce: $config->get('api-platform.swagger_ui.oauth.pkce', false),
             );
+        });
+
+        // Note: this class is not included it is used as a string alias as Errors declare this controller
+        $this->app->alias(\ApiPlatform\Symfony\Action\NotExposedAction::class, 'api_platform.action.not_exposed');
+        $this->app->singleton('api_platform.action.not_exposed', function () {
+            return new NotExposedController();
         });
 
         $this->app->singleton(DocumentationController::class, function (Application $app) {

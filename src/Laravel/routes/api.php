@@ -29,8 +29,9 @@ $globalMiddlewares = config()->get('api-platform.routes.middleware', []);
 $domain = config()->get('api-platform.routes.domain', '');
 
 Route::domain($domain)->middleware($globalMiddlewares)->group(function (): void {
-    $resourceNameCollectionFactory = app()->make(ResourceNameCollectionFactoryInterface::class);
-    $resourceMetadataFactory = app()->make(ResourceMetadataCollectionFactoryInterface::class);
+    $app = app();
+    $resourceNameCollectionFactory = $app->make(ResourceNameCollectionFactoryInterface::class);
+    $resourceMetadataFactory = $app->make(ResourceMetadataCollectionFactoryInterface::class);
 
     foreach ($resourceNameCollectionFactory->create() as $resourceClass) {
         foreach ($resourceMetadataFactory->create($resourceClass) as $resourceMetadata) {
@@ -46,7 +47,13 @@ Route::domain($domain)->middleware($globalMiddlewares)->group(function (): void 
                 $uriTemplate = str_replace('{._format}', '{_format?}', $operation->getUriTemplate());
 
                 /* @var HttpOperation $operation */
-                $route = Route::addRoute($operation->getMethod(), $uriTemplate, ['uses' => ApiPlatformController::class, 'prefix' => $operation->getRoutePrefix() ?? ''])
+                $controller = $operation->getController() ?? ApiPlatformController::class;
+
+                if (!class_exists($controller)) {
+                    $controller = $app->make($controller);
+                }
+
+                $route = Route::addRoute($operation->getMethod(), $uriTemplate, ['uses' => $controller, 'prefix' => $operation->getRoutePrefix() ?? ''])
                     ->where([
                         '_format' => '^\.[a-zA-Z]+',
                     ] + ($operation->getRequirements() ?? []))
