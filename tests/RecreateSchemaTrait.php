@@ -78,9 +78,19 @@ trait RecreateSchemaTrait
         return 'mongodb' === static::getContainer()->getParameter('kernel.environment');
     }
 
+    private function isMysql(): bool
+    {
+        return 'mysql' === static::getContainer()->getParameter('kernel.environment');
+    }
+
     private function isPostgres(): bool
     {
         return 'postgres' === static::getContainer()->getParameter('kernel.environment');
+    }
+
+    private function isSqlite(): bool
+    {
+        return \in_array(static::getContainer()->getParameter('kernel.environment'), ['sqlite', 'test'], true);
     }
 
     private function getManager(): EntityManagerInterface|DocumentManager

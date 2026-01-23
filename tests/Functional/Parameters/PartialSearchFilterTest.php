@@ -55,7 +55,6 @@ final class PartialSearchFilterTest extends ApiTestCase
     }
 
     #[DataProvider('partialSearchFilterProvider')]
-    #[DataProvider('partialSearchFilterCaseSensitiveProvider')]
     public function testPartialSearchFilter(string $url, int $expectedCount, array $expectedNames): void
     {
         $response = self::createClient()->request('GET', $url);
@@ -140,6 +139,17 @@ final class PartialSearchFilterTest extends ApiTestCase
             1,
             ['xx_%_\\_%_xx'],
         ];
+    }
+
+
+    #[DataProvider('partialSearchFilterCaseSensitiveProvider')]
+    public function testPartialSearchCaseSensitiveFilter(string $url, int $expectedCount, array $expectedNames): void
+    {
+        if ($this->isMysql() || $this->isSqlite()) {
+            $this->markTestSkipped('Mysql and sqlite use case insensitive LIKE.');
+        }
+
+        $this->testPartialSearchFilter($url, $expectedCount, $expectedNames);
     }
 
     public static function partialSearchFilterCaseSensitiveProvider(): \Generator
