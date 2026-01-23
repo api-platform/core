@@ -16,11 +16,13 @@ namespace ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 
 /**
- * Injects the metadata aware name converter if available.
+ * Creates API Platform's own metadata-aware name converter to avoid polluting Symfony's global serializer.
  *
  * @internal
  *
@@ -36,17 +38,24 @@ final class MetadataAwareNameConverterPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container): void
     {
-        if (!$container->hasDefinition('serializer.name_converter.metadata_aware')) {
+        if (!$container->hasDefinition('serializer.mapping.class_metadata_factory')) {
             return;
         }
 
-        if ($container->hasAlias('api_platform.name_converter')) {
-            $nameConverter = (string) $container->getAlias('api_platform.name_converter');
+        $fallbackConverter = null;
 
-            $container->setParameter('.serializer.name_converter', $nameConverter);
-            $container->getDefinition('serializer.name_converter.metadata_aware')->setArgument(1, new Reference($nameConverter));
+        // Check if user explicitly configured a name converter for API Platform
+        if ($container->hasAlias('api_platform.name_converter')) {
+            $fallbackConverter = new Reference((string) $container->getAlias('api_platform.name_converter'));
         }
 
-        $container->setAlias('api_platform.name_converter', 'serializer.name_converter.metadata_aware');
+        // Create API Platform's own metadata-aware name converter (isolated from Symfony's)
+        $definition = new Definition(MetadataAwareNameConverter::class, [
+            new Reference('serializer.mapping.class_metadata_factory'),
+            $fallbackConverter,
+        ]);
+
+        $container->setDefinition('api_platform.name_converter.metadata_aware', $definition);
+        $container->setAlias('api_platform.name_converter', 'api_platform.name_converter.metadata_aware');
     }
 }
