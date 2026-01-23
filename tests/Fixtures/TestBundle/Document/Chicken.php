@@ -33,6 +33,10 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
             filter: new PartialSearchFilter(),
             property: 'name',
         ),
+        'namePartialSensitive' => new QueryParameter(
+            filter: new PartialSearchFilter(true),
+            property: 'name',
+        ),
         'autocomplete' => new QueryParameter(filter: new FreeTextQueryFilter(new OrFilter(new ExactFilter())), properties: ['name', 'ean']),
         'q' => new QueryParameter(filter: new FreeTextQueryFilter(new PartialSearchFilter()), properties: ['name', 'ean']),
     ],
