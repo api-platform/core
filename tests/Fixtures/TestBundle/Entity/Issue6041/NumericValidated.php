@@ -32,7 +32,7 @@ class NumericValidated
     private ?int $id = null;
 
     #[Assert\Range(min: 1, max: 10)]
-    #[ORM\Column]
+    #[ORM\Column(name: '_range')]
     public int $range;
 
     #[Assert\GreaterThan(value: 10)]

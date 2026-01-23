@@ -484,7 +484,7 @@ jobs:
         continue-on-error: true
 
   postgresql:
-    name: Behat (PHP ${{ matrix.php }}) (PostgreSQL)
+    name: PHPUnit + Behat (PHP ${{ matrix.php }}) (PostgreSQL)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -529,12 +529,16 @@ jobs:
           composer global link .
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
+      - name: Run PHPUnit tests
+        run: vendor/bin/phpunit
+      - name: Clear test app cache
+        run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
         run: |
           vendor/bin/behat --out=std --format=progress --profile=postgres --no-interaction -vv
 
   mysql:
-    name: Behat (PHP ${{ matrix.php }}) (MySQL)
+    name: PHPUnit + Behat (PHP ${{ matrix.php }}) (MySQL)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -578,6 +582,10 @@ jobs:
           composer global require soyuka/pmu
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
+      - name: Clear test app cache
+        run: tests/Fixtures/app/console cache:clear --ansi
+      - name: Run PHPUnit tests
+        run: vendor/bin/phpunit
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
