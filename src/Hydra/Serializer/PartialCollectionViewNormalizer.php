@@ -90,7 +90,7 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         if ($isPaginatedWithCursor) {
             $data[$hydraPrefix.'view'] = ['@id' => null, '@type' => $hydraPrefix.'PartialCollectionView'];
 
-            return $this->populateDataWithCursorBasedPagination($data, $parsed, $object, $cursorPaginationAttribute, $operation?->getUrlGenerationStrategy() ?? $this->urlGenerationStrategy, $hydraPrefix);
+            return $this->populateDataWithCursorBasedPagination($data, $parsed, $object, $cursorPaginationAttribute, $operation?->getUrlGenerationStrategy() ?? $this->urlGenerationStrategy, $hydraPrefix, $itemsPerPage, $pageTotalItems);
         }
 
         $partialCollectionView = $this->getPartialCollectionView($object, $context['uri'] ?? $context['request_uri'] ?? '/', $this->pageParameterName, $this->enabledParameterName, $operation?->getUrlGenerationStrategy() ?? $this->urlGenerationStrategy);
@@ -165,7 +165,7 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         return $paginationFilters;
     }
 
-    private function populateDataWithCursorBasedPagination(array $data, array $parsed, \Traversable $object, ?array $cursorPaginationAttribute, ?int $urlGenerationStrategy, string $hydraPrefix): array
+    private function populateDataWithCursorBasedPagination(array $data, array $parsed, \Traversable $object, ?array $cursorPaginationAttribute, ?int $urlGenerationStrategy, string $hydraPrefix, ?float $itemsPerPage, ?float $pageTotalItems): array
     {
         $objects = iterator_to_array($object);
         $firstObject = current($objects);
@@ -173,7 +173,7 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
 
         $data[$hydraPrefix.'view']['@id'] = IriHelper::createIri($parsed['parts'], $parsed['parameters'], urlGenerationStrategy: $urlGenerationStrategy);
 
-        if (false !== $lastObject && \is_array($cursorPaginationAttribute)) {
+        if (false !== $lastObject && \is_array($cursorPaginationAttribute) && $pageTotalItems >= $itemsPerPage) {
             $data[$hydraPrefix.'view'][$hydraPrefix.'next'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], $this->cursorPaginationFields($cursorPaginationAttribute, 1, $lastObject)), urlGenerationStrategy: $urlGenerationStrategy);
         }
 
