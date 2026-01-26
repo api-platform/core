@@ -321,7 +321,12 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 }
                 $relatedDefinitions[$propertyName] = array_flip($refs);
                 if ($isOne) {
-                    $relationships[$propertyName]['properties']['data'] = self::RELATION_PROPS;
+                    $relationships[$propertyName]['properties']['data'] = [
+                        'oneOf' => [
+                            ['type' => 'null'],
+                            self::RELATION_PROPS,
+                        ],
+                    ];
                     continue;
                 }
                 $relationships[$propertyName]['properties']['data'] = [

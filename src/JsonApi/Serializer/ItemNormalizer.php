@@ -460,26 +460,31 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 $relationshipName = $this->nameConverter->normalize($relationshipName, $context['resource_class'], self::FORMAT, $context);
             }
 
-            $data[$relationshipName] = [
-                'data' => null,
-            ];
-
-            if (!$attributeValue) {
-                continue;
-            }
-
             // Many to one relationship
             if ('one' === $relationshipDataArray['cardinality']) {
+                $data[$relationshipName] = [
+                    'data' => null,
+                ];
+
+                if (!$attributeValue) {
+                    continue;
+                }
+
                 unset($attributeValue['data']['attributes']);
                 $data[$relationshipName] = $attributeValue;
 
                 continue;
             }
 
+            // Many to many relationship
             $data[$relationshipName] = [
                 'data' => [],
             ];
-            // Many to many relationship
+
+            if (!$attributeValue) {
+                continue;
+            }
+
             foreach ($attributeValue as $attributeValueElement) {
                 if (!isset($attributeValueElement['data'])) {
                     throw new UnexpectedValueException(\sprintf('The JSON API attribute \'%s\' must contain a "data" key.', $relationshipName));
