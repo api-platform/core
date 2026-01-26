@@ -488,4 +488,93 @@ class ItemNormalizerTest extends TestCase
 
         $normalizer->denormalize($data, Dummy::class, ItemNormalizer::FORMAT);
     }
+
+    public function testNormalizeWithNullToOneAndEmptyToManyRelationships(): void
+    {
+        $dummy = new Dummy();
+        $dummy->setId(1);
+        $dummy->setName('Dummy with relationships');
+
+        $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->willReturn(
+            new PropertyNameCollection(['id', 'name', 'relatedDummy', 'relatedDummies'])
+        );
+
+        $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturnCallback(function ($class, $property) {
+            return match ($property) {
+                'id' => (new ApiProperty())->withReadable(true)->withIdentifier(true),
+                'name' => (new ApiProperty())->withReadable(true),
+                'relatedDummy' => (new ApiProperty())
+                    ->withReadable(true)
+                    ->withReadableLink(true)
+                    ->withNativeType(Type::nullable(Type::object(RelatedDummy::class))),
+                'relatedDummies' => (new ApiProperty())
+                    ->withReadable(true)
+                    ->withReadableLink(true)
+                    ->withNativeType(Type::collection(Type::object(ArrayCollection::class), Type::object(RelatedDummy::class))),
+                default => new ApiProperty(),
+            };
+        });
+
+        $iriConverter = $this->createMock(IriConverterInterface::class);
+        $iriConverter->method('getIriFromResource')->willReturn('/dummies/1');
+
+        $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('getResourceClass')->willReturn(Dummy::class);
+        $resourceClassResolver->method('isResourceClass')->willReturnCallback(fn ($class) => \in_array($class, [Dummy::class, RelatedDummy::class], true));
+
+        $propertyAccessor = $this->createMock(PropertyAccessorInterface::class);
+        $propertyAccessor->method('getValue')->willReturnCallback(function ($object, $property) {
+            return match ($property) {
+                'id' => 1,
+                'name' => 'Dummy with relationships',
+                'relatedDummy' => null,
+                'relatedDummies' => [],
+                default => null,
+            };
+        });
+
+        $resourceMetadataCollectionFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactory->method('create')->willReturn(
+            new ResourceMetadataCollection('Dummy', [
+                (new ApiResource())
+                    ->withShortName('Dummy')
+                    ->withOperations(new Operations(['get' => (new Get())->withShortName('Dummy')])),
+            ])
+        );
+
+        $serializer = $this->createStub(Serializer::class);
+
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $iriConverter,
+            $resourceClassResolver,
+            $propertyAccessor,
+            null,
+            null,
+            [],
+            $resourceMetadataCollectionFactory,
+        );
+
+        $normalizer->setSerializer($serializer);
+
+        $result = $normalizer->normalize($dummy, ItemNormalizer::FORMAT, [
+            'resources' => [],
+            'resource_class' => Dummy::class,
+        ]);
+
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('data', $result);
+        $this->assertArrayHasKey('relationships', $result['data']);
+
+        // Verify to-one relationship with null value returns {"data": null}
+        $this->assertArrayHasKey('relatedDummy', $result['data']['relationships']);
+        $this->assertSame(['data' => null], $result['data']['relationships']['relatedDummy']);
+
+        // Verify to-many relationship with empty array returns {"data": []}
+        $this->assertArrayHasKey('relatedDummies', $result['data']['relationships']);
+        $this->assertSame(['data' => []], $result['data']['relationships']['relatedDummies']);
+    }
 }
