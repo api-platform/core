@@ -72,7 +72,7 @@ jobs:
           tools: php-cs-fixer
           coverage: none
       - name: Run PHP-CS-Fixer fix
-        run: php-cs-fixer fix --dry-run --diff --ansi
+        run: php-cs-fixer fix --dry-run --diff --ansi --show-progress=none
 
   lint-container:
     name: Lint Container
