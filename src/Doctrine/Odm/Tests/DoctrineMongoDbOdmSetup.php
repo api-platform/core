@@ -16,7 +16,6 @@ namespace ApiPlatform\Doctrine\Odm\Tests;
 use Doctrine\ODM\MongoDB\Configuration;
 use Doctrine\ODM\MongoDB\Mapping\Driver\AttributeDriver;
 use Doctrine\ODM\MongoDB\Mapping\Driver\XmlDriver;
-use RuntimeException;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
