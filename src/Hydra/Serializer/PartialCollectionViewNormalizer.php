@@ -90,6 +90,12 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         if ($isPaginatedWithCursor) {
             $data[$hydraPrefix.'view'] = ['@id' => null, '@type' => $hydraPrefix.'PartialCollectionView'];
 
+            $itemsPerPage = $pageTotalItems = null;
+            if ($object instanceof PartialPaginatorInterface) {
+                $itemsPerPage = $object->getItemsPerPage();
+                $pageTotalItems = (float) \count($object);
+            }
+
             return $this->populateDataWithCursorBasedPagination($data, $parsed, $object, $cursorPaginationAttribute, $operation?->getUrlGenerationStrategy() ?? $this->urlGenerationStrategy, $hydraPrefix, $itemsPerPage, $pageTotalItems);
         }
 
