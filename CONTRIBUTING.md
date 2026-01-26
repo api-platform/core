@@ -265,3 +265,10 @@ This will update all the sub-components `composer.json`.
 6. `gh release create --generate-notes vX.Y.Z`
 7. Create a new release of `api-platform/api-platform`
 
+## PHPStan MongoDB issue
+
+When running PHPStan locally you'll need to require mongodb: 
+
+```bash
+composer require --dev doctrine/mongodb-odm-bundle doctrine/mongodb-odm
+```
