@@ -42,8 +42,8 @@ final class PurgeHttpCacheListener
     use ClassInfoTrait;
     private readonly PropertyAccessorInterface $propertyAccessor;
     private array $tags = [];
-
     private array $scheduledInsertions = [];
+    private ?EntityManagerInterface $em = null;
 
     public function __construct(private readonly PurgerInterface $purger,
         private readonly IriConverterInterface $iriConverter,
@@ -84,22 +84,22 @@ final class PurgeHttpCacheListener
     public function onFlush(OnFlushEventArgs $eventArgs): void
     {
         // @phpstan-ignore-next-line
-        $em = method_exists($eventArgs, 'getObjectManager') ? $eventArgs->getObjectManager() : $eventArgs->getEntityManager();
-        $uow = $em->getUnitOfWork();
+        $this->em = method_exists($eventArgs, 'getObjectManager') ? $eventArgs->getObjectManager() : $eventArgs->getEntityManager();
+        $uow = $this->em->getUnitOfWork();
 
         foreach ($this->scheduledInsertions = $uow->getScheduledEntityInsertions() as $entity) {
             // inserts shouldn't add new related entities, we should be able to gather related tags already
-            $this->gatherRelationTags($em, $entity);
+            $this->gatherRelationTags($this->em, $entity);
         }
 
         foreach ($uow->getScheduledEntityUpdates() as $entity) {
             $this->gatherResourceAndItemTags($entity, true);
-            $this->gatherRelationTags($em, $entity);
+            $this->gatherRelationTags($this->em, $entity);
         }
 
         foreach ($uow->getScheduledEntityDeletions() as $entity) {
             $this->gatherResourceAndItemTags($entity, true);
-            $this->gatherRelationTags($em, $entity);
+            $this->gatherRelationTags($this->em, $entity);
         }
     }
 
@@ -111,6 +111,9 @@ final class PurgeHttpCacheListener
         // since IRIs can't always be generated for new entities (missing auto-generated IDs), we need to gather the related IRIs after flush()
         foreach ($this->scheduledInsertions as $entity) {
             $this->gatherResourceAndItemTags($entity, false);
+            if ($this->em) {
+                $this->gatherParentResourceTags($this->em, $entity);
+            }
         }
 
         if (empty($this->tags)) {
@@ -120,6 +123,7 @@ final class PurgeHttpCacheListener
         $this->purger->purge(array_values($this->tags));
 
         $this->tags = [];
+        $this->em = null;
     }
 
     private function gatherResourceAndItemTags(object $entity, bool $purgeItem): void
@@ -135,6 +139,25 @@ final class PurgeHttpCacheListener
                     $this->addTagForItem($entity);
                 }
             } catch (OperationNotFoundException|InvalidArgumentException) {
+            }
+        }
+    }
+
+    private function gatherParentResourceTags(EntityManagerInterface $em, object $entity): void
+    {
+        $classMetadata = $em->getClassMetadata($entity::class);
+
+        if ($classMetadata->isInheritanceTypeNone()) {
+            return;
+        }
+
+        foreach ($classMetadata->parentClasses as $parentClass) {
+            if ($this->resourceClassResolver->isResourceClass($parentClass)) {
+                try {
+                    $iri = $this->iriConverter->getIriFromResource($parentClass, UrlGeneratorInterface::ABS_PATH, new GetCollection());
+                    $this->tags[$iri] = $iri;
+                } catch (OperationNotFoundException|InvalidArgumentException) {
+                }
             }
         }
     }

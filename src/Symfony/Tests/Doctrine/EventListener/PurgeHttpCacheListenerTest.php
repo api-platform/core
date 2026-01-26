@@ -319,4 +319,79 @@ class PurgeHttpCacheListenerTest extends TestCase
         $listener->onFlush($eventArgs);
         $listener->postFlush();
     }
+
+    public function testOnFlushPurgesParentCollectionsInInheritanceHierarchy(): void
+    {
+        $toInsertChild = new Dummy();
+
+        $purgerProphecy = $this->prophesize(PurgerInterface::class);
+        $purgerProphecy->purge(['/child_dummies', '/parent_dummies'])->shouldBeCalled();
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource(Argument::type(Dummy::class), UrlGeneratorInterface::ABS_PATH, new GetCollection())->willReturn('/child_dummies')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource(RelatedDummy::class, UrlGeneratorInterface::ABS_PATH, new GetCollection())->willReturn('/parent_dummies')->shouldBeCalled();
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Argument::type('string'))->willReturn(true);
+
+        $uowProphecy = $this->prophesize(UnitOfWork::class);
+        $uowProphecy->getScheduledEntityInsertions()->willReturn([$toInsertChild])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityUpdates()->willReturn([])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityDeletions()->willReturn([])->shouldBeCalled();
+
+        $emProphecy = $this->prophesize(EntityManagerInterface::class);
+        $emProphecy->getUnitOfWork()->willReturn($uowProphecy->reveal())->shouldBeCalled();
+
+        $childClassMetadata = new ClassMetadata(Dummy::class);
+        $childClassMetadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_JOINED;
+        $childClassMetadata->parentClasses = [RelatedDummy::class];
+        // @phpstan-ignore-next-line
+        $childClassMetadata->associationMappings = [];
+        $emProphecy->getClassMetadata(Dummy::class)->willReturn($childClassMetadata)->shouldBeCalled();
+
+        $eventArgs = new OnFlushEventArgs($emProphecy->reveal());
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+
+        $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal());
+        $listener->onFlush($eventArgs);
+        $listener->postFlush();
+    }
+
+    public function testOnFlushDoesNotPurgeParentCollectionsWhenNoInheritance(): void
+    {
+        $toInsert = new Dummy();
+
+        $purgerProphecy = $this->prophesize(PurgerInterface::class);
+        $purgerProphecy->purge(['/dummies'])->shouldBeCalled();
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource(Argument::type(Dummy::class), UrlGeneratorInterface::ABS_PATH, new GetCollection())->willReturn('/dummies')->shouldBeCalled();
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Argument::type('string'))->willReturn(true);
+
+        $uowProphecy = $this->prophesize(UnitOfWork::class);
+        $uowProphecy->getScheduledEntityInsertions()->willReturn([$toInsert])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityUpdates()->willReturn([])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityDeletions()->willReturn([])->shouldBeCalled();
+
+        $emProphecy = $this->prophesize(EntityManagerInterface::class);
+        $emProphecy->getUnitOfWork()->willReturn($uowProphecy->reveal())->shouldBeCalled();
+
+        $classMetadata = new ClassMetadata(Dummy::class);
+        $classMetadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_NONE;
+        $classMetadata->parentClasses = [];
+        // @phpstan-ignore-next-line
+        $classMetadata->associationMappings = [];
+        $emProphecy->getClassMetadata(Dummy::class)->willReturn($classMetadata)->shouldBeCalled();
+
+        $eventArgs = new OnFlushEventArgs($emProphecy->reveal());
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+
+        $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal());
+        $listener->onFlush($eventArgs);
+        $listener->postFlush();
+    }
 }
