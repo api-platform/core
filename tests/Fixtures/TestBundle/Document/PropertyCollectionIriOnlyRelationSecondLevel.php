@@ -18,16 +18,14 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-#[
-    Post,
+#[Post,
     GetCollection(uriTemplate: '/property-collection-relation-second-levels'),
     GetCollection(
         uriTemplate: '/property_collection_iri_only_relations/{parentId}/children',
         uriVariables: [
             'parentId' => new Link(toProperty: 'parent', fromClass: PropertyCollectionIriOnlyRelation::class),
         ]
-    )
-]
+    )]
 #[ODM\Document]
 class PropertyCollectionIriOnlyRelationSecondLevel
 {

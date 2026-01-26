@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('issue6932', function (Blueprint $table): void {
+        Schema::create('issue6932', static function (Blueprint $table): void {
             $table->id();
             $table->string('sur_name');
             $table->timestamps();

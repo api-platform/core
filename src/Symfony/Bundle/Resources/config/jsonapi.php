@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-return function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
     $services->set('api_platform.jsonapi.json_schema.schema_factory', 'ApiPlatform\JsonApi\JsonSchema\SchemaFactory')

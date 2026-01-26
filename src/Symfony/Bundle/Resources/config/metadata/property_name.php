@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-return function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
     $services->alias('api_platform.metadata.property.name_collection_factory', 'api_platform.metadata.property.name_collection_factory.property_info');

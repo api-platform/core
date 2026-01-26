@@ -20,8 +20,7 @@ use ApiPlatform\Metadata\Post;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-#[
-    Post,
+#[Post,
     GetCollection(uriTemplate: '/property-uri-template/one-to-ones'),
     Get(
         uriTemplate: '/parent/{parentId}/property-uri-template/one-to-ones/{id}',
@@ -29,8 +28,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
             'parentId' => new Link(toProperty: 'propertyToOneIriOnly', fromClass: PropertyCollectionIriOnly::class),
             'id' => new Link(fromClass: PropertyUriTemplateOneToOneRelation::class),
         ]
-    )
-]
+    )]
 #[ODM\Document]
 class PropertyUriTemplateOneToOneRelation
 {

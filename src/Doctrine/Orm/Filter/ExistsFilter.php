@@ -216,7 +216,7 @@ final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
 
         if ($metadata->hasAssociation($field)) {
             if ($metadata->isSingleValuedAssociation($field)) {
-                if (!($metadata instanceof ClassMetadata)) {
+                if (!$metadata instanceof ClassMetadata) {
                     return false;
                 }
 

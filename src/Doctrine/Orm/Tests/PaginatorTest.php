@@ -75,7 +75,7 @@ class PaginatorTest extends TestCase
         $doctrinePaginator->getQuery()->willReturn($query->reveal())->shouldBeCalled();
         $doctrinePaginator->count()->willReturn($totalItems);
 
-        $doctrinePaginator->getIterator()->will(fn (): \ArrayIterator => new \ArrayIterator());
+        $doctrinePaginator->getIterator()->will(static fn (): \ArrayIterator => new \ArrayIterator());
 
         return new Paginator($doctrinePaginator->reveal());
     }
@@ -107,7 +107,7 @@ class PaginatorTest extends TestCase
         $doctrinePaginator->getQuery()->willReturn($query->reveal())->shouldBeCalled();
         $doctrinePaginator->count()->willReturn(42);
 
-        $doctrinePaginator->getIterator()->will(fn (): \ArrayIterator => new \ArrayIterator());
+        $doctrinePaginator->getIterator()->will(static fn (): \ArrayIterator => new \ArrayIterator());
 
         $paginator = new Paginator($doctrinePaginator->reveal());
         $paginator->getTotalItems();
@@ -129,10 +129,10 @@ class PaginatorTest extends TestCase
         $doctrinePaginator->count()->willReturn(42);
         $doctrinePaginator->getFetchJoinCollection()->willReturn(false);
 
-        $doctrinePaginator->getIterator()->will(fn (): \ArrayIterator => new \ArrayIterator());
+        $doctrinePaginator->getIterator()->will(static fn (): \ArrayIterator => new \ArrayIterator());
 
         $secondDoctrinePaginator = $this->prophesize(DoctrinePaginator::class);
-        $secondDoctrinePaginator->getIterator()->will(fn (): \ArrayIterator => new \ArrayIterator());
+        $secondDoctrinePaginator->getIterator()->will(static fn (): \ArrayIterator => new \ArrayIterator());
         $doctrinePaginatorFactory = $this->prophesize(DoctrinePaginatorFactory::class);
         $doctrinePaginatorFactory->getPaginator(Argument::any(), Argument::any())->willReturn($secondDoctrinePaginator->reveal());
 

@@ -40,7 +40,7 @@ class ApiPlatformEventProvider extends ServiceProvider
             return;
         }
 
-        $this->app->singleton('api_platform.http_cache.clients_array', function (Application $app) {
+        $this->app->singleton('api_platform.http_cache.clients_array', static function (Application $app) {
             $purgerUrls = Config::get('api-platform.http_cache.invalidation.urls', []);
             $requestOptions = Config::get('api-platform.http_cache.invalidation.request_options', []);
 
@@ -52,13 +52,13 @@ class ApiPlatformEventProvider extends ServiceProvider
             return $clients;
         });
 
-        $httpClients = fn (Application $app) => $app->make('api_platform.http_cache.clients_array');
+        $httpClients = static fn (Application $app) => $app->make('api_platform.http_cache.clients_array');
 
-        $this->app->singleton(VarnishPurger::class, function (Application $app) use ($httpClients) {
+        $this->app->singleton(VarnishPurger::class, static function (Application $app) use ($httpClients) {
             return new VarnishPurger($httpClients($app));
         });
 
-        $this->app->singleton(VarnishXKeyPurger::class, function (Application $app) use ($httpClients) {
+        $this->app->singleton(VarnishXKeyPurger::class, static function (Application $app) use ($httpClients) {
             return new VarnishXKeyPurger(
                 $httpClients($app),
                 Config::get('api-platform.http_cache.invalidation.max_header_length', 7500),
@@ -66,14 +66,14 @@ class ApiPlatformEventProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(SouinPurger::class, function (Application $app) use ($httpClients) {
+        $this->app->singleton(SouinPurger::class, static function (Application $app) use ($httpClients) {
             return new SouinPurger(
                 $httpClients($app),
                 Config::get('api-platform.http_cache.invalidation.max_header_length', 7500)
             );
         });
 
-        $this->app->singleton(PurgerInterface::class, function (Application $app) {
+        $this->app->singleton(PurgerInterface::class, static function (Application $app) {
             $purgerClass = Config::get(
                 'api-platform.http_cache.invalidation.purger',
                 SouinPurger::class
@@ -86,7 +86,7 @@ class ApiPlatformEventProvider extends ServiceProvider
             return $app->make($purgerClass);
         });
 
-        $this->app->singleton(PurgeHttpCacheListener::class, function (Application $app) {
+        $this->app->singleton(PurgeHttpCacheListener::class, static function (Application $app) {
             return new PurgeHttpCacheListener(
                 $app->make(PurgerInterface::class),
                 $app->make(IriConverterInterface::class),

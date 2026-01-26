@@ -41,7 +41,7 @@ class GraphQlAuthTest extends TestCase
      */
     protected function defineEnvironment($app): void
     {
-        tap($app['config'], function (Repository $config): void {
+        tap($app['config'], static function (Repository $config): void {
             $config->set('api-platform.routes.middleware', ['auth:sanctum']);
             $config->set('app.key', 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF');
             $config->set('api-platform.graphql.enabled', true);
@@ -95,7 +95,7 @@ class GraphQlAuthTest extends TestCase
      */
     protected function useProductionMode($app): void
     {
-        tap($app['config'], function (Repository $config): void {
+        tap($app['config'], static function (Repository $config): void {
             $config->set('api-platform.routes.middleware', ['auth:sanctum']);
             $config->set('api-platform.graphql.enabled', true);
             $config->set('app.key', 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF');

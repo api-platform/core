@@ -21,7 +21,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('book_with_relations', function (Blueprint $table): void {
+        Schema::create('book_with_relations', static function (Blueprint $table): void {
             $table->id();
             $table->string('title');
             $table->foreignId('author_with_group_id')->constrained();

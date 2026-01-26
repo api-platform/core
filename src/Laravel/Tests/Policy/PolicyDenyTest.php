@@ -36,13 +36,13 @@ class PolicyDenyTest extends TestCase
      */
     protected function defineEnvironment($app): void
     {
-        Gate::guessPolicyNamesUsing(function (string $modelClass) {
+        Gate::guessPolicyNamesUsing(static function (string $modelClass) {
             return Book::class === $modelClass ?
                 BookDenyPolicy::class :
                 null;
         });
 
-        tap($app['config'], function (Repository $config): void {
+        tap($app['config'], static function (Repository $config): void {
             $config->set('api-platform.formats', ['jsonapi' => ['application/vnd.api+json']]);
             $config->set('api-platform.docs_formats', ['jsonapi' => ['application/vnd.api+json']]);
             $config->set('app.debug', true);

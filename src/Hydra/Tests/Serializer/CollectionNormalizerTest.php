@@ -171,10 +171,10 @@ class CollectionNormalizerTest extends TestCase
             $paginatorProphecy->getTotalItems()->willReturn(1312);
         }
 
-        $paginatorProphecy->rewind()->will(function (): void {});
+        $paginatorProphecy->rewind()->will(static function (): void {});
         $paginatorProphecy->valid()->willReturn(true, false);
         $paginatorProphecy->current()->willReturn('foo');
-        $paginatorProphecy->next()->will(function (): void {});
+        $paginatorProphecy->next()->will(static function (): void {});
 
         $serializer = $this->prophesize(SerializerInterface::class);
         $serializer->willImplement(NormalizerInterface::class);

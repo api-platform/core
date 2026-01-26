@@ -114,7 +114,7 @@ class ObjectMapperProviderTest extends TestCase
         $objectMapper = $this->createMock(ObjectMapperInterface::class);
         $objectMapper->expects($this->exactly(2))
             ->method('map')
-            ->willReturnCallback(function ($source, $target) use ($sourceEntity1, $sourceEntity2, $targetResource1, $targetResource2) {
+            ->willReturnCallback(static function ($source, $target) use ($sourceEntity1, $sourceEntity2, $targetResource1, $targetResource2) {
                 if ($source === $sourceEntity1) {
                     return $targetResource1;
                 }
@@ -146,7 +146,7 @@ class ObjectMapperProviderTest extends TestCase
         $objectMapper = $this->createMock(ObjectMapperInterface::class);
         $objectMapper->expects($this->exactly(2))
             ->method('map')
-            ->willReturnCallback(function ($source, $target) use ($sourceEntity1, $sourceEntity2, $targetResource1, $targetResource2) {
+            ->willReturnCallback(static function ($source, $target) use ($sourceEntity1, $sourceEntity2, $targetResource1, $targetResource2) {
                 if ($source === $sourceEntity1) {
                     return $targetResource1;
                 }

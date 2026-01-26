@@ -32,7 +32,7 @@ class AuthTest extends TestCase
      */
     protected function defineEnvironment($app): void
     {
-        tap($app['config'], function (Repository $config): void {
+        tap($app['config'], static function (Repository $config): void {
             $config->set('api-platform.graphql.enabled', true);
             $config->set('app.key', 'AckfSECXIvnK5r28GVIWUAxmbBSjTsmF');
         });

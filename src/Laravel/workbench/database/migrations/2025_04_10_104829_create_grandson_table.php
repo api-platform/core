@@ -18,13 +18,13 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('grand_fathers', function (Blueprint $table): void {
+        Schema::create('grand_fathers', static function (Blueprint $table): void {
             $table->increments('id_grand_father');
             $table->string('name');
             $table->timestamps();
         });
 
-        Schema::create('grand_sons', function (Blueprint $table): void {
+        Schema::create('grand_sons', static function (Blueprint $table): void {
             $table->increments('id_grand_son');
             $table->string('name');
             $table->unsignedInteger('grand_father_id')->nullable();

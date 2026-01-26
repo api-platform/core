@@ -248,8 +248,8 @@ class OrderFilterTest extends DoctrineMongoDbOdmFilterTestCase
 
     public static function provideApplyTestData(): array
     {
-        $orderFilterFactory = fn (self $that, ManagerRegistry $managerRegistry, ?array $properties = null): OrderFilter => new OrderFilter($managerRegistry, 'order', null, $properties);
-        $customOrderFilterFactory = fn (self $that, ManagerRegistry $managerRegistry, ?array $properties = null): OrderFilter => new OrderFilter($managerRegistry, 'customOrder', null, $properties);
+        $orderFilterFactory = static fn (self $that, ManagerRegistry $managerRegistry, ?array $properties = null): OrderFilter => new OrderFilter($managerRegistry, 'order', null, $properties);
+        $customOrderFilterFactory = static fn (self $that, ManagerRegistry $managerRegistry, ?array $properties = null): OrderFilter => new OrderFilter($managerRegistry, 'customOrder', null, $properties);
 
         return array_merge_recursive(
             self::provideApplyTestArguments(),

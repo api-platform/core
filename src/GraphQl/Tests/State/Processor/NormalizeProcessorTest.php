@@ -90,7 +90,7 @@ class NormalizeProcessorTest extends TestCase
 
     public static function processCollection(): iterable
     {
-        $partialPaginatorFactory = function (self $that): PartialPaginatorInterface {
+        $partialPaginatorFactory = static function (self $that): PartialPaginatorInterface {
             $partialPaginatorProphecy = $that->prophesize(PartialPaginatorInterface::class);
             $partialPaginatorProphecy->count()->willReturn(2);
             $partialPaginatorProphecy->valid()->willReturn(false);

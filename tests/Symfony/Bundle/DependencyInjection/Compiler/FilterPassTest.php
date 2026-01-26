@@ -36,7 +36,7 @@ class FilterPassTest extends TestCase
         $this->assertInstanceOf(CompilerPassInterface::class, $filterPass);
 
         $filterLocatorDefinitionProphecy = $this->prophesize(Definition::class);
-        $filterLocatorDefinitionProphecy->addArgument(Argument::that(fn (array $arg) => !isset($arg['foo']) && isset($arg['my_id']) && $arg['my_id'] instanceof Reference))->willReturn($filterLocatorDefinitionProphecy->reveal())->shouldBeCalled();
+        $filterLocatorDefinitionProphecy->addArgument(Argument::that(static fn (array $arg) => !isset($arg['foo']) && isset($arg['my_id']) && $arg['my_id'] instanceof Reference))->willReturn($filterLocatorDefinitionProphecy->reveal())->shouldBeCalled();
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->findTaggedServiceIds('api_platform.filter', true)->willReturn(['foo' => [], 'bar' => [['id' => 'my_id']]])->shouldBeCalled();
@@ -52,7 +52,7 @@ class FilterPassTest extends TestCase
         $this->assertInstanceOf(CompilerPassInterface::class, $filterPass);
 
         $filterLocatorDefinitionProphecy = $this->prophesize(Definition::class);
-        $filterLocatorDefinitionProphecy->addArgument(Argument::that(fn (array $arg) => !isset($arg['foo']) && isset($arg['bar']) && $arg['bar'] instanceof Reference))->willReturn($filterLocatorDefinitionProphecy->reveal())->shouldBeCalled();
+        $filterLocatorDefinitionProphecy->addArgument(Argument::that(static fn (array $arg) => !isset($arg['foo']) && isset($arg['bar']) && $arg['bar'] instanceof Reference))->willReturn($filterLocatorDefinitionProphecy->reveal())->shouldBeCalled();
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->findTaggedServiceIds('api_platform.filter', true)->willReturn(['foo' => [], 'bar' => [['hi' => 'hello']]])->shouldBeCalled();

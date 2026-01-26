@@ -21,13 +21,13 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('authors', function (Blueprint $table): void {
+        Schema::create('authors', static function (Blueprint $table): void {
             $table->id();
             $table->string('name');
             $table->timestamps();
         });
 
-        Schema::create('books', function (Blueprint $table): void {
+        Schema::create('books', static function (Blueprint $table): void {
             $table->ulid('id')->primary();
             $table->string('name');
             $table->string('isbn');
@@ -41,20 +41,20 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('posts', function (Blueprint $table): void {
+        Schema::create('posts', static function (Blueprint $table): void {
             $table->id();
             $table->string('title');
             $table->timestamps();
         });
 
-        Schema::create('sluggables', function (Blueprint $table): void {
+        Schema::create('sluggables', static function (Blueprint $table): void {
             $table->id();
             $table->string('title');
             $table->string('slug')->unique();
             $table->timestamps();
         });
 
-        Schema::create('comments', function (Blueprint $table): void {
+        Schema::create('comments', static function (Blueprint $table): void {
             $table->id();
             $table->text('text');
             $table->text('internal_note')->nullable();
@@ -63,7 +63,7 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        Schema::create('users', function (Blueprint $table): void {
+        Schema::create('users', static function (Blueprint $table): void {
             $table->id();
             $table->string('name');
             $table->string('email')->unique();

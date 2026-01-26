@@ -21,7 +21,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('author_with_groups', function (Blueprint $table): void {
+        Schema::create('author_with_groups', static function (Blueprint $table): void {
             $table->id();
             $table->string('name');
             $table->timestamps();

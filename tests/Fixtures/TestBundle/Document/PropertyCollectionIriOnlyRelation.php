@@ -22,16 +22,14 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-#[
-    Post,
+#[Post,
     GetCollection(uriTemplate: '/property-collection-relations'),
     GetCollection(
         uriTemplate: '/parent/{parentId}/another-collection-operations',
         uriVariables: [
             'parentId' => new Link(toProperty: 'propertyCollectionIriOnly', fromClass: PropertyCollectionIriOnly::class),
         ]
-    )
-]
+    )]
 #[ODM\Document]
 class PropertyCollectionIriOnlyRelation
 {

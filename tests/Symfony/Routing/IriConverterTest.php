@@ -316,9 +316,9 @@ class IriConverterTest extends TestCase
     private function getResourceClassResolver()
     {
         $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolver->isResourceClass(Argument::type('string'))->will(fn ($args) => true);
+        $resourceClassResolver->isResourceClass(Argument::type('string'))->will(static fn ($args) => true);
 
-        $resourceClassResolver->getResourceClass(Argument::cetera())->will(fn ($args) => $args[0]::class);
+        $resourceClassResolver->getResourceClass(Argument::cetera())->will(static fn ($args) => $args[0]::class);
 
         return $resourceClassResolver->reveal();
     }

@@ -112,7 +112,7 @@ class SerializerContextBuilderTest extends TestCase
 
     public static function createNormalizationContextProvider(): iterable
     {
-        $advancedNameConverterFactory = function (self $that): NameConverterInterface {
+        $advancedNameConverterFactory = static function (self $that): NameConverterInterface {
             $advancedNameConverterProphecy = $that->prophesize(NameConverterInterface::class);
             $advancedNameConverterProphecy->denormalize('field', 'myResource', null, Argument::type('array'))->willReturn('denormalizedField');
 

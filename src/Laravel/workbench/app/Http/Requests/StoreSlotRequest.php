@@ -36,7 +36,7 @@ class StoreSlotRequest extends FormRequest
             'area' => [
                 'required',
                 'string',
-                function (string $attribute, mixed $value, \Closure $fail) use ($iriConverter): void {
+                static function (string $attribute, mixed $value, \Closure $fail) use ($iriConverter): void {
                     if (!(self::$receivedArea = $iriConverter->getResourceFromIri($value))) {
                         $fail("The {$attribute} is invalid.");
                     }

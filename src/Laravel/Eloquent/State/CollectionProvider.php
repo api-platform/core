@@ -78,7 +78,7 @@ final class CollectionProvider implements ProviderInterface
 
                     // Relation Order by, we need to do laravel eager loading
                     $query->with([
-                        $table => fn ($query) => $query->orderBy($property, $direction),
+                        $table => static fn ($query) => $query->orderBy($property, $direction),
                     ]);
 
                     continue;

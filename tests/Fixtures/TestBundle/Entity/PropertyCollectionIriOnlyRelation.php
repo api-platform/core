@@ -23,16 +23,14 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-#[
-    Post,
+#[Post,
     GetCollection(uriTemplate: '/property-collection-relations'),
     GetCollection(
         uriTemplate: '/parent/{parentId}/another-collection-operations',
         uriVariables: [
             'parentId' => new Link(toProperty: 'propertyCollectionIriOnly', fromClass: PropertyCollectionIriOnly::class),
         ]
-    )
-]
+    )]
 #[ORM\Entity]
 class PropertyCollectionIriOnlyRelation
 {
