@@ -203,7 +203,7 @@ class ValidationException extends RuntimeException implements ConstraintViolatio
                     'message' => ['type' => 'string', 'description' => 'The message associated with the violation'],
                     'code' => ['type' => 'string', 'description' => 'The code of the violation'],
                     'hint' => ['type' => 'string', 'description' => 'An extra hint to understand the violation'],
-                    'payload' => ['type' => 'array', 'description' => 'The serialized payload of the violation'],
+                    'payload' => ['type' => 'object', 'description' => 'The serialized payload of the violation'],
                 ],
                 'required' => ['propertyPath', 'message'],
             ],
