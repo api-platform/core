@@ -240,7 +240,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
                 false,
                 Argument::type('array')
             )
-            ->will(function (array $arguments): array {
+            ->will(static function (array $arguments): array {
                 /** @var Request $request */
                 $request = $arguments[0];
 

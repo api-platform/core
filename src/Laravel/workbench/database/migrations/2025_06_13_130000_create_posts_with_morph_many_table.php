@@ -18,14 +18,14 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('posts_with_morph_many', function (Blueprint $table): void {
+        Schema::create('posts_with_morph_many', static function (Blueprint $table): void {
             $table->id();
             $table->string('title');
             $table->text('content');
             $table->timestamps();
         });
 
-        Schema::create('comments_morph', function (Blueprint $table): void {
+        Schema::create('comments_morph', static function (Blueprint $table): void {
             $table->id();
             $table->text('content');
             $table->morphs('commentable');

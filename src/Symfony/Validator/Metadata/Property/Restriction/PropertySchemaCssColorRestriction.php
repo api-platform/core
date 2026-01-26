@@ -62,7 +62,7 @@ class PropertySchemaCssColorRestriction implements PropertySchemaRestrictionMeta
     {
         return [
             'pattern' => '^('.implode('|', array_map(
-                fn ($format) => trim(self::COLOR_PATTERNS[$format], '/iD^$'),
+                static fn ($format) => trim(self::COLOR_PATTERNS[$format], '/iD^$'),
                 (array) $constraint->formats
             )).')$',
         ];

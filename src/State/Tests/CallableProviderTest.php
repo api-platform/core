@@ -32,7 +32,7 @@ class CallableProviderTest extends TestCase
 
     public function testCallable(): void
     {
-        $operation = new Get(name: 'hello', provider: fn () => ['ok']);
+        $operation = new Get(name: 'hello', provider: static fn () => ['ok']);
         $this->assertEquals((new CallableProvider())->provide($operation), ['ok']);
     }
 

@@ -51,7 +51,7 @@ class GetDropOffSlotsRequest extends FormRequest
     protected function failedValidation(Validator $validator): void
     {
         $violations = collect($validator->errors())
-            ->map(fn ($m, $f) => ['propertyPath' => $f, 'message' => $m[0]]) // ** @phpstan-ignore-line */
+            ->map(static fn ($m, $f) => ['propertyPath' => $f, 'message' => $m[0]]) // ** @phpstan-ignore-line */
             ->values()->all();
 
         throw new \ApiPlatform\Laravel\ApiResource\ValidationError($violations[0]['message'] ?? 'Validation failed.', hash('xxh3', implode(',', array_column($violations, 'propertyPath'))), new \Illuminate\Validation\ValidationException($validator), $violations);

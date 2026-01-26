@@ -160,7 +160,7 @@ class ItemNormalizerTest extends TestCase
         $context = [
             'circular_reference_limit' => 2,
             'circular_reference_limit_counters' => [$splObject => 2],
-            'cache_error' => function (): void {},
+            'cache_error' => static function (): void {},
         ];
 
         $this->assertSame('/circular_references/1', $normalizer->normalize($circularReferenceEntity, ItemNormalizer::FORMAT, $context));
@@ -262,17 +262,17 @@ class ItemNormalizerTest extends TestCase
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', Argument::any())->willReturn((new ApiProperty())->withNativeType($relatedDummyType)->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(false));
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummies', Argument::any())->willReturn((new ApiProperty())->withNativeType($relatedDummiesType)->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(false));
 
-        $getItemFromIriSecondArgCallback = fn ($arg): bool => \is_array($arg) && isset($arg['fetch_data']) && true === $arg['fetch_data'];
+        $getItemFromIriSecondArgCallback = static fn ($arg): bool => \is_array($arg) && isset($arg['fetch_data']) && true === $arg['fetch_data'];
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
         $iriConverterProphecy->getResourceFromIri('/related_dummies/1', Argument::that($getItemFromIriSecondArgCallback))->willReturn($relatedDummy1);
         $iriConverterProphecy->getResourceFromIri('/related_dummies/2', Argument::that($getItemFromIriSecondArgCallback))->willReturn($relatedDummy2);
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
-        $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'name', 'foo')->will(function (): void {});
+        $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'name', 'foo')->will(static function (): void {});
         $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'ghost', 'invisible')->willThrow(new NoSuchPropertyException());
-        $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'relatedDummy', $relatedDummy1)->will(function (): void {});
-        $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'relatedDummies', [$relatedDummy2])->will(function (): void {});
+        $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'relatedDummy', $relatedDummy1)->will(static function (): void {});
+        $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'relatedDummies', [$relatedDummy2])->will(static function (): void {});
 
         $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
         $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
@@ -501,7 +501,7 @@ class ItemNormalizerTest extends TestCase
         );
 
         $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactory->method('create')->willReturnCallback(function ($class, $property) {
+        $propertyMetadataFactory->method('create')->willReturnCallback(static function ($class, $property) {
             return match ($property) {
                 'id' => (new ApiProperty())->withReadable(true)->withIdentifier(true),
                 'name' => (new ApiProperty())->withReadable(true),
@@ -522,10 +522,10 @@ class ItemNormalizerTest extends TestCase
 
         $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
         $resourceClassResolver->method('getResourceClass')->willReturn(Dummy::class);
-        $resourceClassResolver->method('isResourceClass')->willReturnCallback(fn ($class) => \in_array($class, [Dummy::class, RelatedDummy::class], true));
+        $resourceClassResolver->method('isResourceClass')->willReturnCallback(static fn ($class) => \in_array($class, [Dummy::class, RelatedDummy::class], true));
 
         $propertyAccessor = $this->createMock(PropertyAccessorInterface::class);
-        $propertyAccessor->method('getValue')->willReturnCallback(function ($object, $property) {
+        $propertyAccessor->method('getValue')->willReturnCallback(static function ($object, $property) {
             return match ($property) {
                 'id' => 1,
                 'name' => 'Dummy with relationships',

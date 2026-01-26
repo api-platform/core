@@ -1042,7 +1042,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
         try {
             $errorResource = $this->resourceMetadataFactory->create($error)[0] ?? new ErrorResource(status: $status, description: $description, class: $defaultErrorResourceClass);
-            if (!($errorResource instanceof ErrorResource)) {
+            if (!$errorResource instanceof ErrorResource) {
                 throw new RuntimeException(\sprintf('The error class %s is not an ErrorResource', $error));
             }
 

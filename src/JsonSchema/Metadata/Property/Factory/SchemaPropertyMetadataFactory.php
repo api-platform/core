@@ -201,7 +201,7 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
         $isNullable = $type->isNullable();
 
         if ($type instanceof UnionType) {
-            $subTypes = array_filter($type->getTypes(), fn ($t) => !($t instanceof BuiltinType && $t->isIdentifiedBy(TypeIdentifier::NULL)));
+            $subTypes = array_filter($type->getTypes(), static fn ($t) => !($t instanceof BuiltinType && $t->isIdentifiedBy(TypeIdentifier::NULL)));
 
             foreach ($subTypes as $t) {
                 $s = $this->getJsonSchemaFromType($t, $readableLink);
@@ -246,7 +246,7 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             $keyType = $type->getCollectionKeyType();
 
             // Associative array (string keys)
-            if ($keyType->isSatisfiedBy(fn (Type $t) => $t instanceof BuiltinType && $t->isIdentifiedBy(TypeIdentifier::INT))) {
+            if ($keyType->isSatisfiedBy(static fn (Type $t) => $t instanceof BuiltinType && $t->isIdentifiedBy(TypeIdentifier::INT))) {
                 $schema = [
                     'type' => 'array',
                     'items' => $valueSchema,

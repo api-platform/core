@@ -17,5 +17,5 @@ use Tests\TestCase;
 
 pest()->extend(TestCase::class);
 
-it('does nothing', function (): void {
+it('does nothing', static function (): void {
 });

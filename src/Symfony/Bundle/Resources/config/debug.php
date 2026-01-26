@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-return function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
     $services->set('debug.var_dumper.cloner', 'Symfony\Component\VarDumper\Cloner\VarCloner');

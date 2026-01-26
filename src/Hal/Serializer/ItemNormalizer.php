@@ -215,7 +215,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
                         $isOne = $className && $this->resourceClassResolver->isResourceClass($className);
                     }
                 } elseif ($type instanceof Type) {
-                    if ($type->isSatisfiedBy(fn ($t) => $t instanceof CollectionType)) {
+                    if ($type->isSatisfiedBy(static fn ($t) => $t instanceof CollectionType)) {
                         $isMany = TypeHelper::getCollectionValueType($type)?->isSatisfiedBy($typeIsResourceClass);
                     } else {
                         $isOne = $type->isSatisfiedBy($typeIsResourceClass);

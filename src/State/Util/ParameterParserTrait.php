@@ -94,7 +94,7 @@ trait ParameterParserTrait
             return $value;
         }
 
-        $isCollectionType = fn ($t) => $t instanceof CollectionType;
+        $isCollectionType = static fn ($t) => $t instanceof CollectionType;
         $isCollection = $parameter->getNativeType()?->isSatisfiedBy($isCollectionType) ?? false;
 
         // type-info 7.2
@@ -116,7 +116,7 @@ trait ParameterParserTrait
 
         if (true === $parameter->getCastToNativeType() && ($castFn = $parameter->getCastFn())) {
             if (\is_array($value)) {
-                $value = array_map(fn ($v) => $castFn($v, $parameter), $value);
+                $value = array_map(static fn ($v) => $castFn($v, $parameter), $value);
             } else {
                 $value = $castFn($value, $parameter);
             }

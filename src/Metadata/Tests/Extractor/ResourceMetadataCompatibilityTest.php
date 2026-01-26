@@ -595,7 +595,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
             return $values;
         }
 
-        $allowedProperties = array_map(fn (\ReflectionProperty $reflProperty): string => $reflProperty->getName(), (new \ReflectionClass(OpenApiOperation::class))->getProperties());
+        $allowedProperties = array_map(static fn (\ReflectionProperty $reflProperty): string => $reflProperty->getName(), (new \ReflectionClass(OpenApiOperation::class))->getProperties());
         foreach ($values as $key => $value) {
             $values[$key] = match ($key) {
                 'externalDocs' => new ExternalDocumentation(description: $value['description'] ?? '', url: $value['url'] ?? ''),

@@ -18,26 +18,24 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 
-#[
-    ApiResource(
-        shortName: 'PasswordResource',
-        operations: [
-            new Post(
-                uriTemplate: '/password/reset',
-                name: 'password_reset',
-            ),
-            new Post(
-                uriTemplate: '/password/set',
-                name: 'password_set',
-            ),
-            new Get(
-                uriTemplate: '/password/reset/{token}',
-                name: 'password_reset_token',
-            ),
-        ],
-        routePrefix: '/users'
-    )
-]
+#[ApiResource(
+    shortName: 'PasswordResource',
+    operations: [
+        new Post(
+            uriTemplate: '/password/reset',
+            name: 'password_reset',
+        ),
+        new Post(
+            uriTemplate: '/password/set',
+            name: 'password_set',
+        ),
+        new Get(
+            uriTemplate: '/password/reset/{token}',
+            name: 'password_reset_token',
+        ),
+    ],
+    routePrefix: '/users'
+)]
 /**
  * Test for issue #5235.
  */

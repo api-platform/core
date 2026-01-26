@@ -34,7 +34,7 @@ class GraphQlTest extends TestCase
      */
     protected function defineEnvironment($app): void
     {
-        tap($app['config'], function (Repository $config): void {
+        tap($app['config'], static function (Repository $config): void {
             $config->set('api-platform.graphql.enabled', true);
         });
     }
@@ -83,7 +83,7 @@ class GraphQlTest extends TestCase
         // Create books in reverse alphabetical order to test the 'asc' order
         BookFactory::new()
             ->count(10)
-            ->sequence(fn ($sequence) => ['name' => \chr(122 - $sequence->index)]) // ASCII codes starting from 'z'
+            ->sequence(static fn ($sequence) => ['name' => \chr(122 - $sequence->index)]) // ASCII codes starting from 'z'
             ->has(AuthorFactory::new())
             ->create();
 

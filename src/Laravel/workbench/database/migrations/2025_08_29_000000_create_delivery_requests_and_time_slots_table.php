@@ -21,14 +21,14 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('time_slots', function (Blueprint $table): void {
+        Schema::create('time_slots', static function (Blueprint $table): void {
             $table->id();
             $table->string('name');
             $table->string('note')->nullable();
             $table->timestamps();
         });
 
-        Schema::create('delivery_requests', function (Blueprint $table): void {
+        Schema::create('delivery_requests', static function (Blueprint $table): void {
             $table->id();
             $table->foreignId('pickup_time_slot_id')->nullable()->constrained('time_slots');
             $table->string('note')->nullable();

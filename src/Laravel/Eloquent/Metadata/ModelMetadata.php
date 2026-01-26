@@ -323,7 +323,7 @@ final class ModelMetadata
     private function columnIsUnique(string $column, array $indexes): bool
     {
         return collect($indexes)->contains(
-            fn ($index) => 1 === \count($index['columns']) && $index['columns'][0] === $column && $index['unique']
+            static fn ($index) => 1 === \count($index['columns']) && $index['columns'][0] === $column && $index['unique']
         );
     }
 }

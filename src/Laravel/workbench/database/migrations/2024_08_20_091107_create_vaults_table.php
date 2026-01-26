@@ -21,7 +21,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('vaults', function (Blueprint $table): void {
+        Schema::create('vaults', static function (Blueprint $table): void {
             $table->id();
             $table->string('secret');
             $table->timestamps();

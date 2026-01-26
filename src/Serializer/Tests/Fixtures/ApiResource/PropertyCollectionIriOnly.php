@@ -24,11 +24,9 @@ use Symfony\Component\Serializer\Attribute\Groups;
 /**
  * Assert that a property being a collection set with ApiProperty::UriTemplate to true returns only the IRI of the collection.
  */
-#[
-    Post,
+#[Post,
     Get(normalizationContext: ['groups' => ['read']]),
-    GetCollection(normalizationContext: ['groups' => ['read']]),
-]
+    GetCollection(normalizationContext: ['groups' => ['read']]),]
 class PropertyCollectionIriOnly
 {
     private ?int $id = null;

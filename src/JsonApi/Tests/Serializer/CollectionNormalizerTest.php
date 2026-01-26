@@ -61,8 +61,8 @@ class CollectionNormalizerTest extends TestCase
         $paginatorProphecy->getLastPage()->willReturn(7.);
         $paginatorProphecy->getItemsPerPage()->willReturn(12.);
         $paginatorProphecy->getTotalItems()->willReturn(1312.);
-        $paginatorProphecy->rewind()->will(function (): void {});
-        $paginatorProphecy->next()->will(function (): void {});
+        $paginatorProphecy->rewind()->will(static function (): void {});
+        $paginatorProphecy->next()->will(static function (): void {});
         $paginatorProphecy->current()->willReturn('foo');
         $paginatorProphecy->valid()->willReturn(true, false);
 
@@ -137,8 +137,8 @@ class CollectionNormalizerTest extends TestCase
         $paginatorProphecy = $this->prophesize(PartialPaginatorInterface::class);
         $paginatorProphecy->getCurrentPage()->willReturn(3.);
         $paginatorProphecy->getItemsPerPage()->willReturn(12.);
-        $paginatorProphecy->rewind()->will(function (): void {});
-        $paginatorProphecy->next()->will(function (): void {});
+        $paginatorProphecy->rewind()->will(static function (): void {});
+        $paginatorProphecy->next()->will(static function (): void {});
         $paginatorProphecy->current()->willReturn('foo');
         $paginatorProphecy->valid()->willReturn(true, false);
         $paginatorProphecy->count()->willReturn(1312);

@@ -58,7 +58,7 @@ trait LinksHandlerLocatorTrait
     {
         $methods = get_class_methods($className);
 
-        $similarMethods = array_filter($methods, function ($method) use ($methodName) {
+        $similarMethods = array_filter($methods, static function ($method) use ($methodName) {
             return levenshtein($methodName, $method) <= 3;
         });
 

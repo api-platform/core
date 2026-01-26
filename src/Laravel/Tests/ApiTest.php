@@ -29,7 +29,7 @@ class ApiTest extends TestCase
      */
     protected function defineEnvironment($app): void
     {
-        tap($app['config'], function (Repository $config): void {
+        tap($app['config'], static function (Repository $config): void {
             $config->set('api-platform.routes.domain', 'http://test.com');
             $config->set('app.debug', true);
             $config->set('api-platform.formats', ['jsonld' => ['application/ld+json']]);

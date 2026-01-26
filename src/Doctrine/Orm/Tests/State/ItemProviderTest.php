@@ -236,7 +236,7 @@ class ItemProviderTest extends TestCase
 
         $classMetadataMock->method('getTypeOfField')
             ->with($this->logicalOr(...array_keys($identifierFields)))
-            ->willReturnCallback(function ($name) use ($getTypeOfFieldExpectations) {
+            ->willReturnCallback(static function ($name) use ($getTypeOfFieldExpectations) {
                 return $getTypeOfFieldExpectations[$name];
             });
 
@@ -260,7 +260,7 @@ class ItemProviderTest extends TestCase
 
         $managerMock->method('getClassMetadata')
             ->with($this->logicalOr(...array_keys($classMetadataExpectations)))
-            ->willReturnCallback(function ($name) use ($classMetadataExpectations) {
+            ->willReturnCallback(static function ($name) use ($classMetadataExpectations) {
                 return $classMetadataExpectations[$name];
             });
 

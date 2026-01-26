@@ -31,7 +31,7 @@ class GraphQlResolverPassTest extends TestCase
         $this->assertInstanceOf(CompilerPassInterface::class, $filterPass);
 
         $typeLocatorDefinition = $this->createMock(Definition::class);
-        $typeLocatorDefinition->expects($this->once())->method('addArgument')->with($this->callback(function () {
+        $typeLocatorDefinition->expects($this->once())->method('addArgument')->with($this->callback(static function () {
             return true;
         }));
 

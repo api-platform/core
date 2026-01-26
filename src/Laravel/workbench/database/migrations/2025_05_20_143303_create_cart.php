@@ -18,14 +18,14 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('shopping_carts', function (Blueprint $table): void {
+        Schema::create('shopping_carts', static function (Blueprint $table): void {
             $table->id();
             $table->string('user_identifier')->index();
             $table->string('status')->default('active');
             $table->timestamps();
         });
 
-        Schema::create('cart_items', function (Blueprint $table): void {
+        Schema::create('cart_items', static function (Blueprint $table): void {
             $table->id();
             $table->string('product_sku');
             $table->integer('quantity')->unsigned();

@@ -16,7 +16,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Component\JsonStreamer\CacheWarmer\LazyGhostCacheWarmer;
 use Symfony\Component\JsonStreamer\StreamerDumper;
 
-return function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
     $services->set('api_platform.jsonld.json_streamer.stream_writer', 'Symfony\Component\JsonStreamer\JsonStreamWriter')
