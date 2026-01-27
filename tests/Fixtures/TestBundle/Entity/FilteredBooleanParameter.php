@@ -33,11 +33,35 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
             property: 'active',
             nativeType: new BuiltinType(TypeIdentifier::BOOL),
         ),
+        'nameConverted' => new QueryParameter(
+            filter: new BooleanFilter(),
+            nativeType: new BuiltinType(TypeIdentifier::BOOL),
+        ),
+        'nameNotConverted' => new QueryParameter(
+            filter: new BooleanFilter(),
+            nativeType: new BuiltinType(TypeIdentifier::BOOL),
+        ),
+        'aliasWithNameConverter' => new QueryParameter(
+            filter: new BooleanFilter(),
+            property: 'nameConverted',
+            nativeType: new BuiltinType(TypeIdentifier::BOOL),
+        ),
+        'aliasWithoutNameConverter' => new QueryParameter(
+            filter: new BooleanFilter(),
+            property: 'nameNotConverted',
+            nativeType: new BuiltinType(TypeIdentifier::BOOL),
+        ),
     ],
 )]
 #[ORM\Entity]
 class FilteredBooleanParameter
 {
+    #[ORM\Column(nullable: true)]
+    private ?bool $nameConverted;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $nameNotConverted;
+
     public function __construct(
         #[ORM\Column]
         #[ORM\Id]
@@ -47,6 +71,8 @@ class FilteredBooleanParameter
         #[ORM\Column(nullable: true)]
         public ?bool $active = null,
     ) {
+        $this->nameConverted = $this->active;
+        $this->nameNotConverted = $this->active;
     }
 
     public function getId(): ?int
@@ -62,5 +88,7 @@ class FilteredBooleanParameter
     public function setActive(?bool $isActive): void
     {
         $this->active = $isActive;
+        $this->nameConverted = $isActive;
+        $this->nameNotConverted = $isActive;
     }
 }

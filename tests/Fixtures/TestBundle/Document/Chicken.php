@@ -33,6 +33,10 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
             filter: new PartialSearchFilter(),
             property: 'name',
         ),
+        'nameConverted' => new QueryParameter(filter: new ExactFilter()),
+        'nameConvertedAlias' => new QueryParameter(filter: new ExactFilter(), property: 'nameConverted'),
+        'nameNotConverted' => new QueryParameter(filter: new ExactFilter()),
+        'nameNotConvertedAlias' => new QueryParameter(filter: new ExactFilter(), property: 'nameNotConverted'),
         'autocomplete' => new QueryParameter(filter: new FreeTextQueryFilter(new OrFilter(new ExactFilter())), properties: ['name', 'ean']),
         'q' => new QueryParameter(filter: new FreeTextQueryFilter(new PartialSearchFilter()), properties: ['name', 'ean']),
     ],
@@ -44,6 +48,12 @@ class Chicken
 
     #[ODM\Field(type: 'string')]
     private string $name;
+
+    #[ODM\Field(type: 'string')]
+    private string $nameConverted;
+
+    #[ODM\Field(type: 'string')]
+    private string $nameNotConverted;
 
     #[ODM\Field(type: 'string', nullable: true)]
     private ?string $ean;
@@ -64,8 +74,20 @@ class Chicken
     public function setName(string $name): self
     {
         $this->name = $name;
+        $this->nameConverted = $name;
+        $this->nameNotConverted = $name;
 
         return $this;
+    }
+
+    public function getNameConverted(): ?string
+    {
+        return $this->nameConverted;
+    }
+
+    public function getNameNotConverted(): ?string
+    {
+        return $this->nameNotConverted;
     }
 
     public function getEan(): ?string

@@ -103,6 +103,30 @@ final class ExactFilterTest extends ApiTestCase
             0,
             [],
         ];
+
+        yield 'filter by nameConverted' => [
+            '/chickens?nameConverted=Gertrude',
+            1,
+            ['Gertrude'],
+        ];
+
+        yield 'filter by nameConvertedAlias' => [
+            '/chickens?nameConvertedAlias=Gertrude',
+            1,
+            ['Gertrude'],
+        ];
+
+        yield 'filter by nameNotConverted' => [
+            '/chickens?nameNotConverted=Gertrude',
+            1,
+            ['Gertrude'],
+        ];
+
+        yield 'filter by nameNotConvertedAlias' => [
+            '/chickens?nameNotConvertedAlias=Gertrude',
+            1,
+            ['Gertrude'],
+        ];
     }
 
     /**
