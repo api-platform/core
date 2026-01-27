@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\Serializer\YamlEncoder;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.yamlopenapi.encoder', 'ApiPlatform\Serializer\YamlEncoder')
+    $services->set('api_platform.yamlopenapi.encoder', YamlEncoder::class)
         ->args([
             'yamlopenapi',
             service('serializer.encoder.yaml')->nullOnInvalid(),

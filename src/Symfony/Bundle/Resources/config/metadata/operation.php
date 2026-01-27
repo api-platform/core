@@ -13,18 +13,22 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\Metadata\Operation\Factory\CacheOperationMetadataFactory;
+use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactory;
+use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.metadata.operation.metadata_factory', 'ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactory')
+    $services->set('api_platform.metadata.operation.metadata_factory', OperationMetadataFactory::class)
         ->args([
             service('api_platform.metadata.resource.name_collection_factory'),
             service('api_platform.metadata.resource.metadata_collection_factory'),
         ]);
 
-    $services->alias('ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface', 'api_platform.metadata.operation.metadata_factory');
+    $services->alias(OperationMetadataFactoryInterface::class, 'api_platform.metadata.operation.metadata_factory');
 
-    $services->set('api_platform.metadata.operation.metadata_factory.cached', 'ApiPlatform\Metadata\Operation\Factory\CacheOperationMetadataFactory')
+    $services->set('api_platform.metadata.operation.metadata_factory.cached', CacheOperationMetadataFactory::class)
         ->decorate('api_platform.metadata.operation.metadata_factory', null, -10)
         ->args([
             service('api_platform.cache.metadata.operation'),

@@ -13,12 +13,17 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\State\Processor\AddLinkHeaderProcessor;
+use ApiPlatform\State\Processor\RespondProcessor;
+use ApiPlatform\State\Processor\SerializeProcessor;
+use ApiPlatform\State\Processor\WriteProcessor;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
     $services->alias('api_platform.state_processor.main', 'api_platform.state_processor.respond');
 
-    $services->set('api_platform.state_processor.serialize', 'ApiPlatform\State\Processor\SerializeProcessor')
+    $services->set('api_platform.state_processor.serialize', SerializeProcessor::class)
         ->decorate('api_platform.state_processor.main', null, 200)
         ->args([
             service('api_platform.state_processor.serialize.inner'),
@@ -26,14 +31,14 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.serializer.context_builder'),
         ]);
 
-    $services->set('api_platform.state_processor.write', 'ApiPlatform\State\Processor\WriteProcessor')
+    $services->set('api_platform.state_processor.write', WriteProcessor::class)
         ->decorate('api_platform.state_processor.main', null, 100)
         ->args([
             service('api_platform.state_processor.write.inner'),
             service('api_platform.state_processor.locator'),
         ]);
 
-    $services->set('api_platform.state_processor.respond', 'ApiPlatform\State\Processor\RespondProcessor')
+    $services->set('api_platform.state_processor.respond', RespondProcessor::class)
         ->args([
             service('api_platform.iri_converter'),
             service('api_platform.resource_class_resolver'),
@@ -41,7 +46,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.metadata.resource.metadata_collection_factory'),
         ]);
 
-    $services->set('api_platform.state_processor.add_link_header', 'ApiPlatform\State\Processor\AddLinkHeaderProcessor')
+    $services->set('api_platform.state_processor.add_link_header', AddLinkHeaderProcessor::class)
         ->decorate('api_platform.state_processor.respond', null, 0)
         ->args([service('api_platform.state_processor.add_link_header.inner')]);
 };

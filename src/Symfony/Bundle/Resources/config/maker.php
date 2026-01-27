@@ -13,18 +13,22 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\Symfony\Maker\MakeFilter;
+use ApiPlatform\Symfony\Maker\MakeStateProcessor;
+use ApiPlatform\Symfony\Maker\MakeStateProvider;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.maker.command.state_processor', 'ApiPlatform\Symfony\Maker\MakeStateProcessor')
+    $services->set('api_platform.maker.command.state_processor', MakeStateProcessor::class)
         ->args([param('api_platform.maker.namespace_prefix')])
         ->tag('maker.command');
 
-    $services->set('api_platform.maker.command.state_provider', 'ApiPlatform\Symfony\Maker\MakeStateProvider')
+    $services->set('api_platform.maker.command.state_provider', MakeStateProvider::class)
         ->args([param('api_platform.maker.namespace_prefix')])
         ->tag('maker.command');
 
-    $services->set('api_platform.maker.command.filter', 'ApiPlatform\Symfony\Maker\MakeFilter')
+    $services->set('api_platform.maker.command.filter', MakeFilter::class)
         ->args([param('api_platform.maker.namespace_prefix')])
         ->tag('maker.command');
 };

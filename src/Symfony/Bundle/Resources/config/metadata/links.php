@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\Metadata\Resource\Factory\LinkFactory;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.metadata.resource.link_factory', 'ApiPlatform\Metadata\Resource\Factory\LinkFactory')
+    $services->set('api_platform.metadata.resource.link_factory', LinkFactory::class)
         ->args([
             service('api_platform.metadata.property.name_collection_factory'),
             service('api_platform.metadata.property.metadata_factory'),

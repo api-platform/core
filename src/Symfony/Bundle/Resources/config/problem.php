@@ -13,14 +13,17 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\Serializer\JsonEncoder;
+use ApiPlatform\Symfony\Validator\Serializer\ValidationExceptionNormalizer;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.problem.encoder', 'ApiPlatform\Serializer\JsonEncoder')
+    $services->set('api_platform.problem.encoder', JsonEncoder::class)
         ->args(['jsonproblem'])
         ->tag('serializer.encoder');
 
-    $services->set('api_platform.problem.normalizer.validation_exception', 'ApiPlatform\Symfony\Validator\Serializer\ValidationExceptionNormalizer')
+    $services->set('api_platform.problem.normalizer.validation_exception', ValidationExceptionNormalizer::class)
         ->args([
             service('api_platform.serializer.normalizer.item'),
             service('api_platform.name_converter')->ignoreOnInvalid(),

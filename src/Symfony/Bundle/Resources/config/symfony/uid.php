@@ -13,12 +13,15 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\Symfony\UriVariableTransformer\UlidUriVariableTransformer;
+use ApiPlatform\Symfony\UriVariableTransformer\UuidUriVariableTransformer;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.symfony.uri_variables.transformer.ulid', 'ApiPlatform\Symfony\UriVariableTransformer\UlidUriVariableTransformer')
+    $services->set('api_platform.symfony.uri_variables.transformer.ulid', UlidUriVariableTransformer::class)
         ->tag('api_platform.uri_variables.transformer');
 
-    $services->set('api_platform.symfony.uri_variables.transformer.uuid', 'ApiPlatform\Symfony\UriVariableTransformer\UuidUriVariableTransformer')
+    $services->set('api_platform.symfony.uri_variables.transformer.uuid', UuidUriVariableTransformer::class)
         ->tag('api_platform.uri_variables.transformer');
 };

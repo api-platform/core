@@ -13,32 +13,53 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\Doctrine\Common\State\PersistProcessor;
+use ApiPlatform\Doctrine\Common\State\RemoveProcessor;
+use ApiPlatform\Doctrine\Odm\Extension\FilterExtension;
+use ApiPlatform\Doctrine\Odm\Extension\OrderExtension;
+use ApiPlatform\Doctrine\Odm\Extension\PaginationExtension;
+use ApiPlatform\Doctrine\Odm\Extension\ParameterExtension;
+use ApiPlatform\Doctrine\Odm\Filter\BooleanFilter;
+use ApiPlatform\Doctrine\Odm\Filter\DateFilter;
+use ApiPlatform\Doctrine\Odm\Filter\ExistsFilter;
+use ApiPlatform\Doctrine\Odm\Filter\NumericFilter;
+use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Odm\Filter\RangeFilter;
+use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Odm\Metadata\Property\DoctrineMongoDbOdmPropertyMetadataFactory;
+use ApiPlatform\Doctrine\Odm\Metadata\Resource\DoctrineMongoDbOdmResourceCollectionMetadataFactory;
+use ApiPlatform\Doctrine\Odm\PropertyInfo\DoctrineExtractor;
+use ApiPlatform\Doctrine\Odm\State\CollectionProvider;
+use ApiPlatform\Doctrine\Odm\State\ItemProvider;
+use ApiPlatform\Doctrine\Odm\State\LinksHandler;
+use Doctrine\Persistence\Mapping\ClassMetadataFactory;
+
 return function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.doctrine_mongodb.odm.default_document_manager.property_info_extractor', 'ApiPlatform\Doctrine\Odm\PropertyInfo\DoctrineExtractor')
+    $services->set('api_platform.doctrine_mongodb.odm.default_document_manager.property_info_extractor', DoctrineExtractor::class)
         ->args([service('doctrine_mongodb.odm.default_document_manager')])
         ->tag('property_info.list_extractor', ['priority' => -1001])
         ->tag('property_info.type_extractor', ['priority' => -999])
         ->tag('property_info.access_extractor', ['priority' => -999]);
 
-    $services->set('api_platform.doctrine.metadata_factory', 'Doctrine\Persistence\Mapping\ClassMetadataFactory')->factory([service('doctrine_mongodb.odm.default_document_manager'), 'getMetadataFactory']);
+    $services->set('api_platform.doctrine.metadata_factory', ClassMetadataFactory::class)->factory([service('doctrine_mongodb.odm.default_document_manager'), 'getMetadataFactory']);
 
-    $services->set('api_platform.doctrine_mongodb.odm.state.remove_processor', 'ApiPlatform\Doctrine\Common\State\RemoveProcessor')
+    $services->set('api_platform.doctrine_mongodb.odm.state.remove_processor', RemoveProcessor::class)
         ->args([service('doctrine_mongodb')])
         ->tag('api_platform.state_processor', ['priority' => -100, 'key' => 'api_platform.doctrine_mongodb.odm.state.remove_processor'])
         ->tag('api_platform.state_processor', ['priority' => -100, 'key' => 'ApiPlatform\Doctrine\Common\State\RemoveProcessor']);
 
-    $services->alias('ApiPlatform\Doctrine\Common\State\RemoveProcessor', 'api_platform.doctrine_mongodb.odm.state.remove_processor');
+    $services->alias(RemoveProcessor::class, 'api_platform.doctrine_mongodb.odm.state.remove_processor');
 
-    $services->set('api_platform.doctrine_mongodb.odm.state.persist_processor', 'ApiPlatform\Doctrine\Common\State\PersistProcessor')
+    $services->set('api_platform.doctrine_mongodb.odm.state.persist_processor', PersistProcessor::class)
         ->args([service('doctrine_mongodb')])
         ->tag('api_platform.state_processor', ['priority' => -100, 'key' => 'api_platform.doctrine_mongodb.odm.state.persist_processor'])
         ->tag('api_platform.state_processor', ['priority' => -100, 'key' => 'ApiPlatform\Doctrine\Common\State\PersistProcessor']);
 
-    $services->alias('ApiPlatform\Doctrine\Common\State\PersistProcessor', 'api_platform.doctrine_mongodb.odm.state.persist_processor');
+    $services->alias(PersistProcessor::class, 'api_platform.doctrine_mongodb.odm.state.persist_processor');
 
-    $services->set('api_platform.doctrine_mongodb.odm.search_filter', 'ApiPlatform\Doctrine\Odm\Filter\SearchFilter')
+    $services->set('api_platform.doctrine_mongodb.odm.search_filter', SearchFilter::class)
         ->abstract()
         ->arg(0, service('doctrine_mongodb'))
         ->arg(1, service('api_platform.iri_converter'))
@@ -47,111 +68,111 @@ return function (ContainerConfigurator $container) {
         ->arg(4, service('logger')->ignoreOnInvalid())
         ->arg('$nameConverter', service('api_platform.name_converter')->ignoreOnInvalid());
 
-    $services->alias('ApiPlatform\Doctrine\Odm\Filter\SearchFilter', 'api_platform.doctrine_mongodb.odm.search_filter');
+    $services->alias(SearchFilter::class, 'api_platform.doctrine_mongodb.odm.search_filter');
 
     $services->set('api_platform.doctrine_mongodb.odm.search_filter.instance')
         ->parent('api_platform.doctrine_mongodb.odm.search_filter')
         ->args([[]]);
 
-    $services->set('api_platform.doctrine_mongodb.odm.boolean_filter', 'ApiPlatform\Doctrine\Odm\Filter\BooleanFilter')
+    $services->set('api_platform.doctrine_mongodb.odm.boolean_filter', BooleanFilter::class)
         ->abstract()
         ->arg(0, service('doctrine_mongodb'))
         ->arg(1, service('logger')->ignoreOnInvalid())
         ->arg('$nameConverter', service('api_platform.name_converter')->ignoreOnInvalid());
 
-    $services->alias('ApiPlatform\Doctrine\Odm\Filter\BooleanFilter', 'api_platform.doctrine_mongodb.odm.boolean_filter');
+    $services->alias(BooleanFilter::class, 'api_platform.doctrine_mongodb.odm.boolean_filter');
 
     $services->set('api_platform.doctrine_mongodb.odm.boolean_filter.instance')
         ->parent('api_platform.doctrine_mongodb.odm.boolean_filter')
         ->args([[]]);
 
-    $services->set('api_platform.doctrine_mongodb.odm.date_filter', 'ApiPlatform\Doctrine\Odm\Filter\DateFilter')
+    $services->set('api_platform.doctrine_mongodb.odm.date_filter', DateFilter::class)
         ->abstract()
         ->arg(0, service('doctrine_mongodb'))
         ->arg(1, service('logger')->ignoreOnInvalid())
         ->arg('$nameConverter', service('api_platform.name_converter')->ignoreOnInvalid());
 
-    $services->alias('ApiPlatform\Doctrine\Odm\Filter\DateFilter', 'api_platform.doctrine_mongodb.odm.date_filter');
+    $services->alias(DateFilter::class, 'api_platform.doctrine_mongodb.odm.date_filter');
 
     $services->set('api_platform.doctrine_mongodb.odm.date_filter.instance')
         ->parent('api_platform.doctrine_mongodb.odm.date_filter')
         ->args([[]]);
 
-    $services->set('api_platform.doctrine_mongodb.odm.exists_filter', 'ApiPlatform\Doctrine\Odm\Filter\ExistsFilter')
+    $services->set('api_platform.doctrine_mongodb.odm.exists_filter', ExistsFilter::class)
         ->abstract()
         ->arg(0, service('doctrine_mongodb'))
         ->arg(1, service('logger')->ignoreOnInvalid())
         ->arg('$existsParameterName', '%api_platform.collection.exists_parameter_name%')
         ->arg('$nameConverter', service('api_platform.name_converter')->ignoreOnInvalid());
 
-    $services->alias('ApiPlatform\Doctrine\Odm\Filter\ExistsFilter', 'api_platform.doctrine_mongodb.odm.exists_filter');
+    $services->alias(ExistsFilter::class, 'api_platform.doctrine_mongodb.odm.exists_filter');
 
     $services->set('api_platform.doctrine_mongodb.odm.exists_filter.instance')
         ->parent('api_platform.doctrine_mongodb.odm.exists_filter')
         ->args([[]]);
 
-    $services->set('api_platform.doctrine_mongodb.odm.numeric_filter', 'ApiPlatform\Doctrine\Odm\Filter\NumericFilter')
+    $services->set('api_platform.doctrine_mongodb.odm.numeric_filter', NumericFilter::class)
         ->abstract()
         ->arg(0, service('doctrine_mongodb'))
         ->arg(1, service('logger')->ignoreOnInvalid())
         ->arg('$nameConverter', service('api_platform.name_converter')->ignoreOnInvalid());
 
-    $services->alias('ApiPlatform\Doctrine\Odm\Filter\NumericFilter', 'api_platform.doctrine_mongodb.odm.numeric_filter');
+    $services->alias(NumericFilter::class, 'api_platform.doctrine_mongodb.odm.numeric_filter');
 
     $services->set('api_platform.doctrine_mongodb.odm.numeric_filter.instance')
         ->parent('api_platform.doctrine_mongodb.odm.numeric_filter')
         ->args([[]]);
 
-    $services->set('api_platform.doctrine_mongodb.odm.order_filter', 'ApiPlatform\Doctrine\Odm\Filter\OrderFilter')
+    $services->set('api_platform.doctrine_mongodb.odm.order_filter', OrderFilter::class)
         ->abstract()
         ->arg(0, service('doctrine_mongodb'))
         ->arg(1, '%api_platform.collection.order_parameter_name%')
         ->arg(2, service('logger')->ignoreOnInvalid())
         ->arg('$nameConverter', service('api_platform.name_converter')->ignoreOnInvalid());
 
-    $services->alias('ApiPlatform\Doctrine\Odm\Filter\OrderFilter', 'api_platform.doctrine_mongodb.odm.order_filter');
+    $services->alias(OrderFilter::class, 'api_platform.doctrine_mongodb.odm.order_filter');
 
     $services->set('api_platform.doctrine_mongodb.odm.order_filter.instance')
         ->parent('api_platform.doctrine_mongodb.odm.order_filter')
         ->args([[]]);
 
-    $services->set('api_platform.doctrine_mongodb.odm.range_filter', 'ApiPlatform\Doctrine\Odm\Filter\RangeFilter')
+    $services->set('api_platform.doctrine_mongodb.odm.range_filter', RangeFilter::class)
         ->abstract()
         ->arg(0, service('doctrine_mongodb'))
         ->arg(1, service('logger')->ignoreOnInvalid())
         ->arg('$nameConverter', service('api_platform.name_converter')->ignoreOnInvalid());
 
-    $services->alias('ApiPlatform\Doctrine\Odm\Filter\RangeFilter', 'api_platform.doctrine_mongodb.odm.range_filter');
+    $services->alias(RangeFilter::class, 'api_platform.doctrine_mongodb.odm.range_filter');
 
     $services->set('api_platform.doctrine_mongodb.odm.range_filter.instance')
         ->parent('api_platform.doctrine_mongodb.odm.range_filter')
         ->args([[]]);
 
-    $services->set('api_platform.doctrine_mongodb.odm.aggregation_extension.filter', 'ApiPlatform\Doctrine\Odm\Extension\FilterExtension')
+    $services->set('api_platform.doctrine_mongodb.odm.aggregation_extension.filter', FilterExtension::class)
         ->args([service('api_platform.filter_locator')])
         ->tag('api_platform.doctrine_mongodb.odm.aggregation_extension.collection', ['priority' => 32]);
 
-    $services->alias('ApiPlatform\Doctrine\Odm\Extension\FilterExtension', 'api_platform.doctrine_mongodb.odm.aggregation_extension.filter');
+    $services->alias(FilterExtension::class, 'api_platform.doctrine_mongodb.odm.aggregation_extension.filter');
 
-    $services->set('api_platform.doctrine_mongodb.odm.aggregation_extension.pagination', 'ApiPlatform\Doctrine\Odm\Extension\PaginationExtension')
+    $services->set('api_platform.doctrine_mongodb.odm.aggregation_extension.pagination', PaginationExtension::class)
         ->args([
             service('doctrine_mongodb'),
             service('api_platform.pagination'),
         ])
         ->tag('api_platform.doctrine_mongodb.odm.aggregation_extension.collection');
 
-    $services->alias('ApiPlatform\Doctrine\Odm\Extension\PaginationExtension', 'api_platform.doctrine_mongodb.odm.aggregation_extension.pagination');
+    $services->alias(PaginationExtension::class, 'api_platform.doctrine_mongodb.odm.aggregation_extension.pagination');
 
-    $services->set('api_platform.doctrine_mongodb.odm.aggregation_extension.order', 'ApiPlatform\Doctrine\Odm\Extension\OrderExtension')
+    $services->set('api_platform.doctrine_mongodb.odm.aggregation_extension.order', OrderExtension::class)
         ->args([
             '%api_platform.collection.order%',
             service('doctrine_mongodb'),
         ])
         ->tag('api_platform.doctrine_mongodb.odm.aggregation_extension.collection', ['priority' => 16]);
 
-    $services->alias('ApiPlatform\Doctrine\Odm\Extension\OrderExtension', 'api_platform.doctrine_mongodb.odm.aggregation_extension.order');
+    $services->alias(OrderExtension::class, 'api_platform.doctrine_mongodb.odm.aggregation_extension.order');
 
-    $services->set('api_platform.doctrine_mongodb.odm.extension.parameter_extension', 'ApiPlatform\Doctrine\Odm\Extension\ParameterExtension')
+    $services->set('api_platform.doctrine_mongodb.odm.extension.parameter_extension', ParameterExtension::class)
         ->args([
             service('api_platform.filter_locator'),
             service('doctrine_mongodb')->nullOnInvalid(),
@@ -160,16 +181,16 @@ return function (ContainerConfigurator $container) {
         ->tag('api_platform.doctrine_mongodb.odm.aggregation_extension.collection', ['priority' => 32])
         ->tag('api_platform.doctrine_mongodb.odm.aggregation_extension.item');
 
-    $services->alias('ApiPlatform\Doctrine\Odm\Extension\ParameterExtension', 'api_platform.doctrine_mongodb.odm.extension.parameter_extension');
+    $services->alias(ParameterExtension::class, 'api_platform.doctrine_mongodb.odm.extension.parameter_extension');
 
-    $services->set('api_platform.doctrine_mongodb.odm.metadata.property.metadata_factory', 'ApiPlatform\Doctrine\Odm\Metadata\Property\DoctrineMongoDbOdmPropertyMetadataFactory')
+    $services->set('api_platform.doctrine_mongodb.odm.metadata.property.metadata_factory', DoctrineMongoDbOdmPropertyMetadataFactory::class)
         ->decorate('api_platform.metadata.property.metadata_factory', null, 40)
         ->args([
             service('doctrine_mongodb'),
             service('api_platform.doctrine_mongodb.odm.metadata.property.metadata_factory.inner'),
         ]);
 
-    $services->set('api_platform.doctrine_mongodb.odm.state.collection_provider', 'ApiPlatform\Doctrine\Odm\State\CollectionProvider')
+    $services->set('api_platform.doctrine_mongodb.odm.state.collection_provider', CollectionProvider::class)
         ->args([
             service('api_platform.metadata.resource.metadata_collection_factory'),
             service('doctrine_mongodb'),
@@ -179,9 +200,9 @@ return function (ContainerConfigurator $container) {
         ->tag('api_platform.state_provider', ['priority' => -100, 'key' => 'ApiPlatform\Doctrine\Odm\State\CollectionProvider'])
         ->tag('api_platform.state_provider', ['priority' => -100, 'key' => 'api_platform.doctrine_mongodb.odm.state.collection_provider']);
 
-    $services->alias('ApiPlatform\Doctrine\Odm\State\CollectionProvider', 'api_platform.doctrine_mongodb.odm.state.collection_provider');
+    $services->alias(CollectionProvider::class, 'api_platform.doctrine_mongodb.odm.state.collection_provider');
 
-    $services->set('api_platform.doctrine_mongodb.odm.state.item_provider', 'ApiPlatform\Doctrine\Odm\State\ItemProvider')
+    $services->set('api_platform.doctrine_mongodb.odm.state.item_provider', ItemProvider::class)
         ->args([
             service('api_platform.metadata.resource.metadata_collection_factory'),
             service('doctrine_mongodb'),
@@ -191,18 +212,18 @@ return function (ContainerConfigurator $container) {
         ->tag('api_platform.state_provider', ['priority' => -100, 'key' => 'ApiPlatform\Doctrine\Odm\State\ItemProvider'])
         ->tag('api_platform.state_provider', ['priority' => -100, 'key' => 'api_platform.doctrine_mongodb.odm.state.item_provider']);
 
-    $services->alias('ApiPlatform\Doctrine\Odm\State\ItemProvider', 'api_platform.doctrine_mongodb.odm.state.item_provider');
+    $services->alias(ItemProvider::class, 'api_platform.doctrine_mongodb.odm.state.item_provider');
 
     $services->alias('api_platform.state.item_provider', 'ApiPlatform\Doctrine\Odm\State\ItemProvider');
 
-    $services->set('api_platform.doctrine.odm.metadata.resource.metadata_collection_factory', 'ApiPlatform\Doctrine\Odm\Metadata\Resource\DoctrineMongoDbOdmResourceCollectionMetadataFactory')
+    $services->set('api_platform.doctrine.odm.metadata.resource.metadata_collection_factory', DoctrineMongoDbOdmResourceCollectionMetadataFactory::class)
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 40)
         ->args([
             service('doctrine_mongodb'),
             service('api_platform.doctrine.odm.metadata.resource.metadata_collection_factory.inner'),
         ]);
 
-    $services->set('api_platform.doctrine.odm.links_handler', 'ApiPlatform\Doctrine\Odm\State\LinksHandler')
+    $services->set('api_platform.doctrine.odm.links_handler', LinksHandler::class)
         ->args([
             service('api_platform.metadata.resource.metadata_collection_factory'),
             service('doctrine_mongodb'),

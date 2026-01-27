@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\JsonApi\State\JsonApiProvider;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.jsonapi.state_provider', 'ApiPlatform\JsonApi\State\JsonApiProvider')
+    $services->set('api_platform.jsonapi.state_provider', JsonApiProvider::class)
         ->decorate('api_platform.state_provider.read', null, 0)
         ->args([
             service('api_platform.jsonapi.state_provider.inner'),
