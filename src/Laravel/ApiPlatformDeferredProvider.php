@@ -49,6 +49,7 @@ use ApiPlatform\Laravel\Metadata\ParameterValidationResourceMetadataCollectionFa
 use ApiPlatform\Laravel\State\ParameterValidatorProvider;
 use ApiPlatform\Laravel\State\SwaggerUiProcessor;
 use ApiPlatform\Laravel\State\ValidateProvider;
+use ApiPlatform\Mcp\State\ToolProvider;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\InflectorInterface;
 use ApiPlatform\Metadata\Laravel\SkipAutoconfigure;
@@ -90,6 +91,7 @@ use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 use Negotiation\Negotiator;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\ObjectMapper\ObjectMapper;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -198,7 +200,15 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
             return new CallableProvider(new ServiceLocator($tagged));
         });
 
-        $this->autoconfigure($classes, ProviderInterface::class, [ItemProvider::class, CollectionProvider::class, ErrorProvider::class]);
+        if (class_exists(ToolProvider::class)) {
+            $this->app->singleton(ToolProvider::class, static function (Application $app) {
+                return new ToolProvider(
+                    $app->make(ObjectMapper::class)
+                );
+            });
+        }
+
+        $this->autoconfigure($classes, ProviderInterface::class, [ItemProvider::class, CollectionProvider::class, ErrorProvider::class, ToolProvider::class]);
 
         $this->app->singleton(ResourceMetadataCollectionFactoryInterface::class, function (Application $app) {
             /** @var ConfigRepository $config */
@@ -366,6 +376,7 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
             'api_platform.graphql.state_provider.parameter',
             FieldsBuilderEnumInterface::class,
             ExceptionHandlerInterface::class,
+            ToolProvider::class,
         ];
     }
 }

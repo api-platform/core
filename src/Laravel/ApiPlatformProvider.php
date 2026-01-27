@@ -106,6 +106,11 @@ use ApiPlatform\Laravel\State\AccessCheckerProvider;
 use ApiPlatform\Laravel\State\SwaggerUiProcessor;
 use ApiPlatform\Laravel\State\SwaggerUiProvider;
 use ApiPlatform\Laravel\State\ValidateProvider;
+use ApiPlatform\Mcp\Capability\Registry\Loader as McpLoader;
+use ApiPlatform\Mcp\Metadata\Operation\Factory\OperationMetadataFactory as McpOperationMetadataFactory;
+use ApiPlatform\Mcp\Routing\IriConverter as McpIriConverter;
+use ApiPlatform\Mcp\Server\Handler;
+use ApiPlatform\Mcp\State\StructuredContentProcessor;
 use ApiPlatform\Metadata\IdentifiersExtractor;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\InflectorInterface;
@@ -147,7 +152,6 @@ use ApiPlatform\Serializer\SerializerContextBuilder;
 use ApiPlatform\State\CallableProcessor;
 use ApiPlatform\State\CallableProvider;
 use ApiPlatform\State\ErrorProvider;
-use ApiPlatform\State\ObjectMapper\ObjectMapper;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginationOptions;
 use ApiPlatform\State\Processor\AddLinkHeaderProcessor;
@@ -163,15 +167,25 @@ use ApiPlatform\State\Provider\ParameterProvider;
 use ApiPlatform\State\Provider\ReadProvider;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\SerializerContextBuilderInterface;
+use Http\Discovery\Psr17Factory;
 use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
+use Mcp\Capability\Registry;
+use Mcp\Server;
+use Mcp\Server\Builder;
+use Mcp\Server\Session\InMemorySessionStore;
 use Negotiation\Negotiator;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Psr\Log\LoggerInterface;
+use Symfony\AI\McpBundle\Controller\McpController;
+use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
+use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\ObjectMapper\Metadata\ObjectMapperMetadataFactoryInterface;
 use Symfony\Component\ObjectMapper\Metadata\ReflectionObjectMapperMetadataFactory;
+use Symfony\Component\ObjectMapper\ObjectMapper;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
@@ -426,11 +440,9 @@ class ApiPlatformProvider extends ServiceProvider
             $this->app->singleton(ObjectMapperMetadataFactoryInterface::class, ReflectionObjectMapperMetadataFactory::class);
 
             $this->app->singleton(ObjectMapper::class, static function (Application $app) {
-                if (!$app->bound('api_platform.object_mapper')) {
-                    return null;
-                }
-
-                return new ObjectMapper($app->make('api_platform.object_mapper'));
+                return new ObjectMapper(
+                    $app->make(ObjectMapperMetadataFactoryInterface::class)
+                );
             });
 
             $this->app->extend(ProviderInterface::class, static function (ProviderInterface $inner, Application $app) {
@@ -884,6 +896,8 @@ class ApiPlatformProvider extends ServiceProvider
             $this->registerGraphQl();
         }
 
+        $this->registerMcp();
+
         $this->app->singleton(JsonApiEntrypointNormalizer::class, static function (Application $app) {
             return new JsonApiEntrypointNormalizer(
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
@@ -1030,6 +1044,126 @@ class ApiPlatformProvider extends ServiceProvider
                 OpenApiCommand::class,
             ]);
         }
+    }
+
+    private function registerMcp(): void
+    {
+        if (!class_exists(McpController::class)) {
+            return;
+        }
+
+        $this->app->singleton(Registry::class, static function (Application $app) {
+            return new Registry(
+                null, // event dispatcher (todo)
+                $app->make(LoggerInterface::class)
+            );
+        });
+
+        $this->app->singleton(McpLoader::class, static function (Application $app) {
+            return new McpLoader(
+                $app->make(ResourceNameCollectionFactoryInterface::class),
+                $app->make(ResourceMetadataCollectionFactoryInterface::class),
+                $app->make(SchemaFactoryInterface::class)
+            );
+        });
+        $this->app->tag(McpLoader::class, 'mcp.loader');
+
+        // TODO: add more stores?
+        $this->app->singleton('mcp.session.store', static function () {
+            return new InMemorySessionStore(3600);
+        });
+
+        $this->app->singleton(Builder::class, static function (Application $app) {
+            $config = $app['config'];
+
+            $builder = Server::builder()
+                ->setServerInfo(
+                    $config->get('api-platform.title', 'API Platform'),
+                    $config->get('api-platform.version', '1.0.0'),
+                    $config->get('api-platform.description', 'My awesome API'),
+                    [], // icons
+                    null // website_url todo
+                )
+                ->setPaginationLimit(100)
+                ->setRegistry($app->make(Registry::class))
+                ->setSession($app->make('mcp.session.store'));
+
+            foreach ($app->tagged('mcp.loader') as $loader) {
+                $builder->addLoader($loader);
+            }
+
+            $builder->addRequestHandler($app->make(Handler::class));
+
+            return $builder;
+        });
+
+        $this->app->singleton(Server::class, static function (Application $app) {
+            return $app->make(Builder::class)->build();
+        });
+
+        $this->app->singleton(McpOperationMetadataFactory::class, static function (Application $app) {
+            return new McpOperationMetadataFactory(
+                $app->make(ResourceNameCollectionFactoryInterface::class),
+                $app->make(ResourceMetadataCollectionFactoryInterface::class)
+            );
+        });
+
+        $this->app->singleton('api_platform.mcp.state_processor.write', static function (Application $app) {
+            return new WriteProcessor(
+                null,
+                $app->make(CallableProcessor::class)
+            );
+        });
+
+        $this->app->singleton(StructuredContentProcessor::class, static function (Application $app) {
+            return new StructuredContentProcessor(
+                $app->make(SerializerInterface::class),
+                $app->make(SerializerContextBuilderInterface::class),
+                $app->make('api_platform.mcp.state_processor.write')
+            );
+        });
+
+        $this->app->singleton(RequestStack::class, static function (Application $app) {
+            return new RequestStack();
+        });
+
+        $this->app->singleton(Handler::class, static function (Application $app) {
+            return new Handler(
+                $app->make(McpOperationMetadataFactory::class),
+                $app->make(ProviderInterface::class),
+                $app->make(StructuredContentProcessor::class),
+                $app->make(RequestStack::class),
+                $app->make(LoggerInterface::class)
+            );
+        });
+
+        $this->app->extend(IriConverterInterface::class, static function (IriConverterInterface $iriConverter) {
+            return new McpIriConverter($iriConverter);
+        });
+
+        // Register Symfony MCP controller
+        $this->app->singleton(McpController::class, static function (Application $app) {
+            if (!class_exists('Http\Discovery\Psr17Factory')) {
+                throw new \RuntimeException('PSR-17 HTTP factory implementation not available. Please install php-http/discovery.');
+            }
+
+            $psr17Factory = new Psr17Factory();
+            $psrHttpFactory = new PsrHttpFactory(
+                $psr17Factory,
+                $psr17Factory,
+                $psr17Factory,
+                $psr17Factory
+            );
+            $httpFoundationFactory = new HttpFoundationFactory();
+
+            return new McpController(
+                $app->make(Server::class),
+                $psrHttpFactory,
+                $httpFoundationFactory,
+                $psr17Factory,
+                $psr17Factory
+            );
+        });
     }
 
     private function registerGraphQl(): void

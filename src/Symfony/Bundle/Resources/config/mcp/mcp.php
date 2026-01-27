@@ -35,11 +35,13 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.mcp.iri_converter.inner'),
         ]);
 
-    $services->set('api_platform.mcp.state.tool_provider', ToolProvider::class)
+    $services->set(ToolProvider::class, ToolProvider::class)
         ->args([
             service('object_mapper'),
         ])
         ->tag('api_platform.state_provider');
+
+    $services->alias('api_platform.mcp.state.tool_provider', ToolProvider::class);
 
     $services->set('api_platform.mcp.metadata.operation.mcp_factory', OperationMetadataFactory::class)
         ->args([

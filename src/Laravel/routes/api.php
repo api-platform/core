@@ -23,7 +23,10 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\OpenApi\Attributes\Webhook;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Symfony\AI\McpBundle\Controller\McpController;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 $globalMiddlewares = config()->get('api-platform.routes.middleware', []);
 $domain = config()->get('api-platform.routes.domain', '');
@@ -111,3 +114,20 @@ Route::domain($domain)->middleware($globalMiddlewares)->group(static function ()
         }
     });
 });
+
+// MCP endpoint (outside the API prefix)
+if (class_exists(McpController::class)) {
+    Route::match(['GET', 'POST', 'DELETE', 'OPTIONS'], '/mcp', static function (Request $request) {
+        $requestStack = app(RequestStack::class);
+        $mcpController = app(McpController::class);
+
+        // Push Laravel request onto Symfony RequestStack
+        $requestStack->push($request);
+
+        try {
+            return $mcpController->handle($request);
+        } finally {
+            $requestStack->pop();
+        }
+    })->name('api_mcp');
+}
