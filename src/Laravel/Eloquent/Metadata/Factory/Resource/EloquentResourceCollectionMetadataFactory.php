@@ -15,6 +15,7 @@ namespace ApiPlatform\Laravel\Eloquent\Metadata\Factory\Resource;
 
 use ApiPlatform\Laravel\Eloquent\State\CollectionProvider;
 use ApiPlatform\Laravel\Eloquent\State\ItemProvider;
+use ApiPlatform\Laravel\Eloquent\State\Options;
 use ApiPlatform\Laravel\Eloquent\State\PersistProcessor;
 use ApiPlatform\Laravel\Eloquent\State\RemoveProcessor;
 use ApiPlatform\Metadata\CollectionOperationInterface;
@@ -32,11 +33,14 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\State\Util\StateOptionsTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Gate;
 
 final class EloquentResourceCollectionMetadataFactory implements ResourceMetadataCollectionFactoryInterface
 {
+    use StateOptionsTrait;
+
     private const POLICY_METHODS = [
         Put::class => 'update',
         Post::class => 'create',
@@ -71,18 +75,24 @@ final class EloquentResourceCollectionMetadataFactory implements ResourceMetadat
             return $this->decorated->create($resourceClass);
         }
 
-        if (!$model instanceof Model) {
-            return $resourceMetadataCollection;
-        }
+        $isModel = $model instanceof Model;
 
         foreach ($resourceMetadataCollection as $i => $resourceMetadata) {
             $operations = $resourceMetadata->getOperations();
             foreach ($operations ?? [] as $operationName => $operation) {
+                // Check if this operation uses Eloquent via stateOptions
+                $modelClass = $this->getStateOptionsClass($operation, $resourceClass, Options::class);
+                $usesEloquent = $isModel || ($modelClass !== $resourceClass);
+
+                if (!$usesEloquent) {
+                    continue;
+                }
+
                 if (!$operation->getProvider()) {
                     $operation = $operation->withProvider($operation instanceof CollectionOperationInterface ? CollectionProvider::class : ItemProvider::class);
                 }
 
-                if (!$operation->getPolicy() && ($policy = Gate::getPolicyFor($model))) {
+                if ($isModel && !$operation->getPolicy() && ($policy = Gate::getPolicyFor($model))) {
                     $policyMethod = self::POLICY_METHODS[$operation::class] ?? null;
                     if ($operation instanceof Put && $operation->getAllowCreate()) {
                         $policyMethod = self::POLICY_METHODS[Post::class];
@@ -104,7 +114,15 @@ final class EloquentResourceCollectionMetadataFactory implements ResourceMetadat
 
             $graphQlOperations = $resourceMetadata->getGraphQlOperations();
             foreach ($graphQlOperations ?? [] as $operationName => $graphQlOperation) {
-                if (!$graphQlOperation->getPolicy() && ($policy = Gate::getPolicyFor($model))) {
+                // Check if this operation uses Eloquent via stateOptions
+                $modelClass = $this->getStateOptionsClass($graphQlOperation, $resourceClass, Options::class);
+                $usesEloquent = $isModel || ($modelClass !== $resourceClass);
+
+                if (!$usesEloquent) {
+                    continue;
+                }
+
+                if ($isModel && !$graphQlOperation->getPolicy() && ($policy = Gate::getPolicyFor($model))) {
                     if (($policyMethod = self::POLICY_METHODS[$graphQlOperation::class] ?? null) && method_exists($policy, $policyMethod)) {
                         $graphQlOperation = $graphQlOperation->withPolicy($policyMethod);
                     }
