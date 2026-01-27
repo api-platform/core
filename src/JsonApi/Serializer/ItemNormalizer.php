@@ -15,6 +15,7 @@ namespace ApiPlatform\JsonApi\Serializer;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
+use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -29,6 +30,7 @@ use ApiPlatform\Serializer\CacheKeyTrait;
 use ApiPlatform\Serializer\ContextTrait;
 use ApiPlatform\Serializer\OperationResourceClassResolverInterface;
 use ApiPlatform\Serializer\TagCollectorInterface;
+use ApiPlatform\State\ProviderInterface;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
@@ -59,6 +61,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     public const FORMAT = 'jsonapi';
 
     private array $componentsCache = [];
+    private string $resourceIdStrategy;
 
     public function __construct(
         PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
@@ -72,10 +75,14 @@ final class ItemNormalizer extends AbstractItemNormalizer
         ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
         ?ResourceAccessCheckerInterface $resourceAccessChecker = null,
         protected ?TagCollectorInterface $tagCollector = null,
-        ?OperationResourceClassResolverInterface $operationResourceResolver = null
+        ?OperationResourceClassResolverInterface $operationResourceResolver = null,
+        private readonly ?IdentifiersExtractorInterface $identifiersExtractor = null,
+        private readonly ?ProviderInterface $provider = null,
+        string $resourceIdStrategy = 'iri'
     )
     {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $defaultContext, $resourceMetadataCollectionFactory, $resourceAccessChecker, $tagCollector, $operationResourceResolver);
+        $this->resourceIdStrategy = $resourceIdStrategy;
     }
 
     /**
@@ -139,8 +146,14 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         $includedResourcesData = $this->getRelatedResources($data, $format, $context, $allRelationshipsData);
 
+        $id = $context['iri'];
+        if ($this->resourceIdStrategy === 'identifiers') {
+            $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($object);
+            $id = (string) array_values($identifiers)[0];
+        }
+
         $resourceData = [
-            'id' => $context['iri'],
+            'id' => $id,
             'type' => $this->getResourceShortName($resourceClass),
         ];
 
@@ -188,10 +201,21 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 throw new NotNormalizableValueException('Update is not allowed for this operation.');
             }
 
-            $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri(
-                $data['data']['id'],
-                $context + ['fetch_data' => false]
-            );
+            $context += ['fetch_data' => false];
+            if ($this->resourceIdStrategy === 'iri') {
+                $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri(
+                    $data['data']['id'],
+                    $context
+                );
+            } else if ($this->resourceIdStrategy === 'identifiers') {
+                $operation = $context['operation'] ?? $context['api_platform_operation'] ?? null;
+                $uriVariables = $context['uriVariables'] ?? [];
+                $context[self::OBJECT_TO_POPULATE] = $this->provider->provide(
+                    $operation,
+                    $uriVariables,
+                    $context
+                );
+            }
         }
 
         // Merge attributes and relationships, into format expected by the parent normalizer
@@ -239,7 +263,41 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
 
         try {
-            return $this->iriConverter->getResourceFromIri($value['id'], $context + ['fetch_data' => true]);
+            $context += ['fetch_data' => true];
+            if ($this->resourceIdStrategy === 'iri') {
+                return $this->iriConverter->getResourceFromIri($value['id'], $context);
+            } else if ($this->resourceIdStrategy === 'identifiers') {
+                $targetClass = $propertyMetadata->getBuiltinTypes()[0]->getClassName();
+                $resourceMetadata = $this->resourceMetadataCollectionFactory
+                                         ->create($targetClass);
+
+                $getOperation = null;
+                foreach ($resourceMetadata as $resource) {
+                    foreach ($resource->getOperations() as $operation) {
+                        if ($operation instanceof Get) {
+                            $getOperation = $operation;
+                            break 2;
+                        }
+                    }
+                }
+                if (null === $getOperation) {
+                    throw new ItemNotFoundException(sprintf(
+                        'No GET operation found for resource "%s".',
+                        $targetClass
+                    ));
+                }
+
+                $uriVariablesDefinition = $getOperation->getUriVariables();
+
+                $uriVariables = [];
+                foreach ($uriVariablesDefinition as $varName => $link) {
+                    foreach ($link->getIdentifiers() as $identifier) {
+                        $uriVariables[$identifier] = (string) $value['data']['id'];
+                    }
+                }
+                return $this->provider->provide($getOperation, $uriVariables, $context);
+            }
+
         } catch (ItemNotFoundException $e) {
             if (!isset($context['not_normalizable_value_exceptions'])) {
                 throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
@@ -287,10 +345,15 @@ final class ItemNormalizer extends AbstractItemNormalizer
             return $normalizedRelatedObject;
         }
 
+        $id = $iri;
+        if ($this->resourceIdStrategy === 'identifiers') {
+            $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($relatedObject);
+            $id = (string) array_values($identifiers)[0];
+        }
         $context['data'] = [
             'data' => [
+                'id' => $id,
                 'type' => $this->getResourceShortName($resourceClass),
-                'id' => $iri,
             ],
         ];
 
