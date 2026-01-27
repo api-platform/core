@@ -56,7 +56,7 @@ final class PropertySchemaGreaterThanRestriction implements PropertySchemaRestri
             return $type->isIdentifiedBy(TypeIdentifier::INT, TypeIdentifier::FLOAT);
         }
 
-        $types = array_map(fn (LegacyType $type) => $type->getBuiltinType(), $propertyMetadata->getBuiltinTypes() ?? []);
+        $types = array_map(static fn (LegacyType $type) => $type->getBuiltinType(), $propertyMetadata->getBuiltinTypes() ?? []);
         if ($propertyMetadata->getExtraProperties()['nested_schema'] ?? false) {
             $types = [LegacyType::BUILTIN_TYPE_INT];
         }

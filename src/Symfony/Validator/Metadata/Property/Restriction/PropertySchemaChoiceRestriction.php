@@ -57,7 +57,7 @@ final class PropertySchemaChoiceRestriction implements PropertySchemaRestriction
 
         $restriction['type'] = 'array';
 
-        $types = array_values(array_unique(array_map(fn (mixed $choice) => \is_string($choice) ? 'string' : 'number', $choices)));
+        $types = array_values(array_unique(array_map(static fn (mixed $choice) => \is_string($choice) ? 'string' : 'number', $choices)));
 
         if ($count = \count($types)) {
             if (1 === $count) {
@@ -89,15 +89,15 @@ final class PropertySchemaChoiceRestriction implements PropertySchemaRestriction
                 ? Type::string()
                 : $propertyMetadata->getNativeType();
 
-            $isValidScalarType = fn (Type $t): bool => $t->isSatisfiedBy(
-                fn (Type $subType): bool => $subType->isIdentifiedBy(TypeIdentifier::STRING, TypeIdentifier::INT, TypeIdentifier::FLOAT)
+            $isValidScalarType = static fn (Type $t): bool => $t->isSatisfiedBy(
+                static fn (Type $subType): bool => $subType->isIdentifiedBy(TypeIdentifier::STRING, TypeIdentifier::INT, TypeIdentifier::FLOAT)
             );
 
             if ($isValidScalarType($nativeType)) {
                 return true;
             }
 
-            if ($nativeType->isSatisfiedBy(fn ($t) => $t instanceof CollectionType)) {
+            if ($nativeType->isSatisfiedBy(static fn ($t) => $t instanceof CollectionType)) {
                 if (null !== ($collectionValueType = TypeHelper::getCollectionValueType($nativeType)) && $isValidScalarType($collectionValueType)) {
                     return true;
                 }

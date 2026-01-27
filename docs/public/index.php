@@ -22,7 +22,7 @@ if (!($guide = $_SERVER['APP_GUIDE'] ?? $_ENV['APP_GUIDE'] ?? null)) {
     throw new RuntimeException('No guide.');
 }
 
-$app = function (array $context) use ($guide) {
+$app = static function (array $context) use ($guide) {
     return new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG'], $guide);
 };
 

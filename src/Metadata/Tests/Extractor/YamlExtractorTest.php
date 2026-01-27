@@ -551,6 +551,29 @@ class YamlExtractorTest extends TestCase
         $this->assertSame(Program::class.'Output', $resources[Program::class][0]['operations'][0]['output']);
     }
 
+    public function testExtendingYamlResourcesByMultipleYamlFiles(): void
+    {
+        $extractor = new YamlResourceExtractor([
+            __DIR__.'/yaml/extending-base.yaml',
+            __DIR__.'/yaml/extending-additional.yaml',
+        ]);
+        $resources = $extractor->getResources();
+
+        $this->assertArrayHasKey(User::class, $resources);
+        $this->assertCount(2, $resources[User::class], 'Expected two resource definitions for User class');
+
+        $this->assertSame('/users{._format}', $resources[User::class][0]['uriTemplate']);
+        $this->assertSame('Base user resource', $resources[User::class][0]['description']);
+        $this->assertArrayHasKey('operations', $resources[User::class][0]);
+        $this->assertCount(2, $resources[User::class][0]['operations']);
+
+        $this->assertSame('/admin/users{._format}', $resources[User::class][1]['uriTemplate']);
+        $this->assertSame('Admin user resource', $resources[User::class][1]['description']);
+        $this->assertSame('is_granted("ROLE_ADMIN")', $resources[User::class][1]['security']);
+        $this->assertArrayHasKey('operations', $resources[User::class][1]);
+        $this->assertCount(1, $resources[User::class][1]['operations']);
+    }
+
     #[\PHPUnit\Framework\Attributes\DataProvider('getInvalidPaths')]
     public function testInvalidYaml(string $path, string $error): void
     {

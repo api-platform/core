@@ -288,12 +288,12 @@ class ItemNormalizerTest extends TestCase
             ],
             'name' => 'hello',
         ];
-        $this->assertEquals($expected, $normalizer->normalize($dummy, null, ['not_serializable' => function (): void {}]));
+        $this->assertEquals($expected, $normalizer->normalize($dummy, null, ['not_serializable' => static function (): void {}]));
     }
 
     public function testMaxDepth(): void
     {
-        $setId = function (MaxDepthDummy $dummy, int $id): void {
+        $setId = static function (MaxDepthDummy $dummy, int $id): void {
             $prop = new \ReflectionProperty($dummy, 'id');
             $prop->setValue($dummy, $id);
         };
@@ -436,7 +436,7 @@ class ItemNormalizerTest extends TestCase
         $propertyNameCollectionFactory->method('create')->willReturn($propertyNameCollection);
 
         $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactory->method('create')->willReturnCallback(function ($resourceClass, $propertyName, $groups) {
+        $propertyMetadataFactory->method('create')->willReturnCallback(static function ($resourceClass, $propertyName, $groups) {
             if ('alias' == $propertyName) {
                 return (new ApiProperty())->withNativeType(Type::string())->withDescription('')->withReadable(true);
             }
@@ -449,7 +449,7 @@ class ItemNormalizerTest extends TestCase
         $iriConverter->method('getIriFromResource')->willReturn('/dummies/1');
 
         $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
-        $resourceClassResolver->method('getResourceClass')->willReturnCallback(function ($resource) {
+        $resourceClassResolver->method('getResourceClass')->willReturnCallback(static function ($resource) {
             if ($resource instanceof Dummy) {
                 return Dummy::class;
             }
@@ -463,7 +463,7 @@ class ItemNormalizerTest extends TestCase
         $serializer->method('normalize')->with(null, null, self::anything())->willReturn(null);
 
         $nameConverter = self::createMock(NameConverterInterface::class);
-        $nameConverter->method('normalize')->willReturnCallback(function ($propertyName) {
+        $nameConverter->method('normalize')->willReturnCallback(static function ($propertyName) {
             if ('alias' == $propertyName) {
                 return 'alias';
             }

@@ -59,7 +59,7 @@ class PropertySchemaLengthRestriction implements PropertySchemaRestrictionMetada
             return $constraint instanceof Length && $type?->isIdentifiedBy(TypeIdentifier::STRING);
         }
 
-        $types = array_map(fn (LegacyType $type) => $type->getBuiltinType(), $propertyMetadata->getBuiltinTypes() ?? []);
+        $types = array_map(static fn (LegacyType $type) => $type->getBuiltinType(), $propertyMetadata->getBuiltinTypes() ?? []);
         if ($propertyMetadata->getExtraProperties()['nested_schema'] ?? false) {
             $types = [LegacyType::BUILTIN_TYPE_STRING];
         }

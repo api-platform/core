@@ -48,7 +48,7 @@ class CustomExceptionHandlerTest extends TestCase
      */
     protected function defineEnvironment($app): void
     {
-        tap($app['config'], function (Repository $config): void {
+        tap($app['config'], static function (Repository $config): void {
             $config->set('app.debug', false);
             $config->set('api-platform.resources', [app_path('Models'), app_path('ApiResource')]);
         });
@@ -66,7 +66,7 @@ class CustomExceptionHandlerTest extends TestCase
         self::$customHandlerCalled = false;
 
         if (!self::$useCustomHandlerClass) {
-            $this->app->make(ExceptionHandler::class)->renderable(function (\Throwable $exception, Request $request) {
+            $this->app->make(ExceptionHandler::class)->renderable(static function (\Throwable $exception, Request $request) {
                 if ($exception instanceof CustomTestException) {
                     self::$customHandlerCalled = true;
 
@@ -75,15 +75,15 @@ class CustomExceptionHandlerTest extends TestCase
             });
         }
 
-        Route::get('/non-api-route', function () {
+        Route::get('/non-api-route', static function () {
             throw new CustomTestException('This should be handled by custom handler');
         });
 
-        Route::get('/non-api-route-regular', function () {
+        Route::get('/non-api-route-regular', static function () {
             throw new \RuntimeException('Regular exception on non-API route');
         });
 
-        Route::get('/non-api-custom-handler', function () {
+        Route::get('/non-api-custom-handler', static function () {
             throw new CustomHandlerException('Should use custom handler class');
         });
     }
@@ -129,7 +129,7 @@ class CustomExceptionHandlerTest extends TestCase
         $this->setUpTraits();
         CustomHandler::$customRenderCalled = false;
 
-        Route::get('/non-api-custom-handler-test', function () {
+        Route::get('/non-api-custom-handler-test', static function () {
             throw new CustomHandlerException('Should use custom handler class');
         });
 

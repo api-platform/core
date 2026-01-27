@@ -18,13 +18,13 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('slots', function (Blueprint $table): void {
+        Schema::create('slots', static function (Blueprint $table): void {
             $table->id();
             $table->string('name');
             $table->foreignId('area_id')->constrained('areas')->onDelete('cascade');
             $table->timestamps();
         });
-        Schema::create('areas', function (Blueprint $table): void {
+        Schema::create('areas', static function (Blueprint $table): void {
             $table->id();
             $table->string('name');
             $table->timestamps();

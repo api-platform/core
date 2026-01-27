@@ -65,7 +65,7 @@ final class PartialSearchFilterTest extends ApiTestCase
 
         $this->assertCount($expectedCount, $filteredItems, \sprintf('Expected %d items for URL %s', $expectedCount, $url));
 
-        $names = array_map(fn ($chicken) => $chicken['name'], $filteredItems);
+        $names = array_map(static fn ($chicken) => $chicken['name'], $filteredItems);
         sort($names);
         sort($expectedNames);
 
@@ -141,6 +141,43 @@ final class PartialSearchFilterTest extends ApiTestCase
         ];
     }
 
+    #[DataProvider('partialSearchMultiByteFilterProvider')]
+    public function testPartialSearchMultiByteFilter(string $url, int $expectedCount, array $expectedNames): void
+    {
+        if ($this->isSqlite()) {
+            $this->markTestSkipped('Multibyte LIKE are not properly handled with sqlite.');
+        }
+
+        $this->testPartialSearchFilter($url, $expectedCount, $expectedNames);
+    }
+
+    public static function partialSearchMultiByteFilterProvider(): \Generator
+    {
+        yield 'filter by partial name "gà"' => [
+            '/chickens?namePartial[]=gà',
+            1,
+            ['GÀgù'],
+        ];
+
+        yield 'filter by partial name "gù"' => [
+            '/chickens?namePartial[]=gù',
+            1,
+            ['GÀgù'],
+        ];
+
+        yield 'filter by partial name "gÀ"' => [
+            '/chickens?namePartial[]=g%C3%80',
+            1,
+            ['GÀgù'],
+        ];
+
+        yield 'filter by partial name "gÙ"' => [
+            '/chickens?namePartial[]=g%C3%99',
+            1,
+            ['GÀgù'],
+        ];
+    }
+
     /**
      * @throws \Throwable
      * @throws MongoDBException
@@ -167,8 +204,13 @@ final class PartialSearchFilterTest extends ApiTestCase
         $chicken3->setName('xx_%_\\_%_xx');
         $chicken3->setChickenCoop($chickenCoop1);
 
+        $chicken4 = new $chickenClass();
+        $chicken4->setName('GÀgù');
+        $chicken4->setChickenCoop($chickenCoop1);
+
         $chickenCoop1->addChicken($chicken1);
         $chickenCoop1->addChicken($chicken3);
+        $chickenCoop1->addChicken($chicken4);
         $chickenCoop2->addChicken($chicken2);
 
         $manager->persist($chickenCoop1);
@@ -176,6 +218,7 @@ final class PartialSearchFilterTest extends ApiTestCase
         $manager->persist($chicken1);
         $manager->persist($chicken2);
         $manager->persist($chicken3);
+        $manager->persist($chicken4);
 
         $manager->flush();
     }

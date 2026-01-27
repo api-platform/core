@@ -11,6 +11,17 @@
 
 * When using `output` with `itemUriTemplate` on a collection operation, the JSON-LD `@type` will now use the resource class name instead of the output DTO class name for semantic consistency with `itemUriTemplate` behavior.
 
+## v4.2.14
+
+### Bug fixes
+
+* [0dc7ec348](https://github.com/api-platform/core/commit/0dc7ec348d48025f953820101609b1aa9fd5af59) fix(doctrine): useless generateParameterName call (#7679)
+* [1c6fae536](https://github.com/api-platform/core/commit/1c6fae536d8d4b51544cee295883cd8726ec5944) fix(symfony): fix for symfony/json_streamer 8.0 with enable_json_streamer (#7684)
+* [83a3cacfb](https://github.com/api-platform/core/commit/83a3cacfb49968b80e2f5d352c1b0930c923209d) fix(laravel): use controller if declared (#7687)
+* [9f46eef05](https://github.com/api-platform/core/commit/9f46eef057240f346437590a3dade7dd200bc7f3) fix(jsonschema): call to an undefined method Symfony\Component\TypeInfo\Type::getClassName() (#7685)
+* [f5ba97460](https://github.com/api-platform/core/commit/f5ba9746069514c579343624af075e5b4eda6404) fix(doctrine): PartialSearchFilter on multibyte characters (#7688)
+* [1706c3c58](https://github.com/api-platform/core/commit/1706c3c5824fe78a1c00c1988faf0dde94a93f8c) fix(doctrine): throw exception if parameter property is not provided
+
 ## v4.2.13
 
 ### Bug fixes

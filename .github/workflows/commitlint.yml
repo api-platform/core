@@ -9,7 +9,7 @@ jobs:
     if: github.event_name == 'pull_request_target'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Fetch PR head
@@ -29,4 +29,3 @@ jobs:
             echo '{}' > package.json
             npm install --no-fund --no-audit @commitlint/config-conventional @commitlint/cli
             echo "$commit_message" | ./node_modules/.bin/commitlint -g .commitlintrc
-

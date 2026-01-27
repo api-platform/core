@@ -14,7 +14,7 @@ declare(strict_types=1);
 use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
-return function (RoutingConfigurator $routes) {
+return static function (RoutingConfigurator $routes) {
     $routes->import('routing_common.yml');
     $routes->import('@TestBundle/Controller/Orm', 'attribute');
 

@@ -164,7 +164,7 @@ class ItemNormalizerTest extends TestCase
             SecuredDummy::class,
             'object == null or object.getOwner() == user',
             Argument::type('array')
-        )->will(function (array $args) {
+        )->will(static function (array $args) {
             return 'hello' === $args[2]['object']->getTitle(); // Allow access only for securedDummyWithOwnerOnlyPropertyAllowed
         });
 

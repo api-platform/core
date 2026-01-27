@@ -80,6 +80,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                 $resourceYaml = [$resourceYaml];
             }
 
+            $resourcesCount = isset($this->resources[$resourceName]) ? \count($this->resources[$resourceName]) : 0;
             foreach ($resourceYaml as $key => $resourceYamlDatum) {
                 if (null === $resourceYamlDatum) {
                     $resourceYamlDatum = [];
@@ -87,7 +88,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
 
                 try {
                     $base = $this->buildExtendedBase($resourceYamlDatum);
-                    $this->resources[$resourceName][$key] = array_merge($base, [
+                    $this->resources[$resourceName][$resourcesCount + $key] = array_merge($base, [
                         'operations' => $this->buildOperations($resourceYamlDatum, $base),
                         'graphQlOperations' => $this->buildGraphQlOperations($resourceYamlDatum, $base),
                     ]);
@@ -231,13 +232,13 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
             return $this->phpize($resource, 'openapi', 'bool');
         }
 
-        $allowedProperties = array_map(fn (\ReflectionProperty $reflProperty): string => $reflProperty->getName(), (new \ReflectionClass(OpenApiOperation::class))->getProperties());
+        $allowedProperties = array_map(static fn (\ReflectionProperty $reflProperty): string => $reflProperty->getName(), (new \ReflectionClass(OpenApiOperation::class))->getProperties());
         foreach ($resource['openapi'] as $key => $value) {
             $resource['openapi'][$key] = match ($key) {
                 'externalDocs' => new ExternalDocumentation(description: $value['description'] ?? '', url: $value['url'] ?? ''),
                 'requestBody' => new RequestBody(description: $value['description'] ?? '', content: isset($value['content']) ? new \ArrayObject($value['content'] ?? []) : null, required: $value['required'] ?? false),
                 'callbacks' => new \ArrayObject($value ?? []),
-                'responses' => array_map(fn (array $response): Response => new Response(
+                'responses' => array_map(static fn (array $response): Response => new Response(
                     description: $response['description'] ?? '',
                     headers: isset($response['headers']) ? new \ArrayObject($response['headers']) : null,
                     content: isset($response['content']) ? new \ArrayObject($response['content']) : null,

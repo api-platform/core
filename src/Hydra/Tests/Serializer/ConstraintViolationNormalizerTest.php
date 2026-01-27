@@ -88,14 +88,14 @@ class ConstraintViolationNormalizerTest extends TestCase
             ],
         ];
 
-        $nameConverterFactory = function (self $that) {
+        $nameConverterFactory = static function (self $that) {
             $nameConverterProphecy = $that->prophesize(NameConverterInterface::class);
-            $nameConverterProphecy->normalize(Argument::cetera())->will(fn ($args): string => '_'.$args[0]);
+            $nameConverterProphecy->normalize(Argument::cetera())->will(static fn ($args): string => '_'.$args[0]);
 
             return $nameConverterProphecy->reveal();
         };
 
-        $nullNameConverterFactory = fn () => null;
+        $nullNameConverterFactory = static fn () => null;
 
         $expected = $nameConverterBasedExpectation;
         $expected[0]['payload'] = ['severity' => 'warning'];

@@ -15,20 +15,18 @@ namespace ApiPlatform\Tests\Symfony\Bundle\DependencyInjection\Compiler;
 
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\MetadataAwareNameConverterPass;
 use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 
 /**
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
 class MetadataAwareNameConverterPassTest extends TestCase
 {
-    use ProphecyTrait;
-
     public function testConstruct(): void
     {
         $this->assertInstanceOf(CompilerPassInterface::class, new MetadataAwareNameConverterPass());
@@ -38,42 +36,66 @@ class MetadataAwareNameConverterPassTest extends TestCase
     {
         $pass = new MetadataAwareNameConverterPass();
 
-        $reference = new Reference('app.name_converter');
+        $container = new ContainerBuilder();
+        $container->setDefinition('serializer.mapping.class_metadata_factory', new Definition());
+        $container->setAlias('api_platform.name_converter', 'app.name_converter');
 
-        $definition = $this->prophesize(Definition::class);
-        $definition->setArgument(1, $reference)->shouldBeCalled()->willReturn($definition);
+        $pass->process($container);
 
-        $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
-        $containerBuilderProphecy->hasAlias('api_platform.name_converter')->willReturn(true)->shouldBeCalled();
-        $containerBuilderProphecy->getAlias('api_platform.name_converter')->shouldBeCalled()->willReturn(new Alias('app.name_converter'));
-        $containerBuilderProphecy->hasDefinition('serializer.name_converter.metadata_aware')->shouldBeCalled()->willReturn(true);
-        $containerBuilderProphecy->getDefinition('serializer.name_converter.metadata_aware')->shouldBeCalled()->willReturn($definition);
-        $containerBuilderProphecy->setAlias('api_platform.name_converter', 'serializer.name_converter.metadata_aware')->shouldBeCalled();
-        $containerBuilderProphecy->setParameter('.serializer.name_converter', 'app.name_converter')->shouldBeCalled();
+        // Should create API Platform's own metadata-aware converter
+        $this->assertTrue($container->hasDefinition('api_platform.name_converter.metadata_aware'));
+        $definition = $container->getDefinition('api_platform.name_converter.metadata_aware');
+        $this->assertSame(MetadataAwareNameConverter::class, $definition->getClass());
 
-        $pass->process($containerBuilderProphecy->reveal());
+        // Should have class metadata factory as first argument
+        $args = $definition->getArguments();
+        $this->assertInstanceOf(Reference::class, $args[0]);
+        $this->assertSame('serializer.mapping.class_metadata_factory', (string) $args[0]);
+
+        // Should have the user's converter as fallback (second argument)
+        $this->assertInstanceOf(Reference::class, $args[1]);
+        $this->assertSame('app.name_converter', (string) $args[1]);
+
+        // Should alias api_platform.name_converter to the new service
+        $this->assertTrue($container->hasAlias('api_platform.name_converter'));
+        $alias = $container->getAlias('api_platform.name_converter');
+        $this->assertSame('api_platform.name_converter.metadata_aware', (string) $alias);
     }
 
     public function testProcessWithoutNameConverter(): void
     {
         $pass = new MetadataAwareNameConverterPass();
 
-        $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
-        $containerBuilderProphecy->hasAlias('api_platform.name_converter')->willReturn(false)->shouldBeCalled();
-        $containerBuilderProphecy->hasDefinition('serializer.name_converter.metadata_aware')->shouldBeCalled()->willReturn(true);
-        $containerBuilderProphecy->setAlias('api_platform.name_converter', 'serializer.name_converter.metadata_aware')->shouldBeCalled();
+        $container = new ContainerBuilder();
+        $container->setDefinition('serializer.mapping.class_metadata_factory', new Definition());
 
-        $pass->process($containerBuilderProphecy->reveal());
+        $pass->process($container);
+
+        // Should still create API Platform's own metadata-aware converter (without fallback)
+        $this->assertTrue($container->hasDefinition('api_platform.name_converter.metadata_aware'));
+        $definition = $container->getDefinition('api_platform.name_converter.metadata_aware');
+        $this->assertSame(MetadataAwareNameConverter::class, $definition->getClass());
+
+        $args = $definition->getArguments();
+        $this->assertInstanceOf(Reference::class, $args[0]);
+        $this->assertSame('serializer.mapping.class_metadata_factory', (string) $args[0]);
+        $this->assertNull($args[1]); // No fallback converter
+
+        // Should alias api_platform.name_converter to the new service
+        $this->assertTrue($container->hasAlias('api_platform.name_converter'));
     }
 
-    public function testProcessWithoutMetadataAwareDefinition(): void
+    public function testProcessWithoutClassMetadataFactory(): void
     {
         $pass = new MetadataAwareNameConverterPass();
 
-        $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
-        $containerBuilderProphecy->hasDefinition('serializer.name_converter.metadata_aware')->willReturn(false)->shouldBeCalled();
-        $containerBuilderProphecy->setAlias('api_platform.name_converter', 'serializer.name_converter.metadata_aware')->shouldNotBeCalled();
+        $container = new ContainerBuilder();
+        // No serializer.mapping.class_metadata_factory defined
 
-        $pass->process($containerBuilderProphecy->reveal());
+        $pass->process($container);
+
+        // Should not create anything if class metadata factory is missing
+        $this->assertFalse($container->hasDefinition('api_platform.name_converter.metadata_aware'));
+        $this->assertFalse($container->hasAlias('api_platform.name_converter'));
     }
 }

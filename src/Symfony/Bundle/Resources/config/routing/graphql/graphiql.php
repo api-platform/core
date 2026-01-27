@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Symfony\Component\Routing\Loader\Configurator;
 
-return function (RoutingConfigurator $routes) {
+return static function (RoutingConfigurator $routes) {
     $routes->add('api_graphql_graphiql', '/graphql/graphiql')
         ->controller('api_platform.graphql.action.graphiql')
         ->methods(['GET', 'HEAD']);

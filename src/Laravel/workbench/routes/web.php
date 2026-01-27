@@ -14,7 +14,7 @@ declare(strict_types=1);
 use Illuminate\Http\Request;
 use Workbench\App\Models\User;
 
-Route::post('/tokens/create', function (Request $request) {
+Route::post('/tokens/create', static function (Request $request) {
     $user = User::first();
     $token = $user->createToken('foo');
 

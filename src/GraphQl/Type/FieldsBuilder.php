@@ -406,7 +406,7 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
         }
 
         try {
-            $isCollectionType = $type->isSatisfiedBy(fn ($t) => $t instanceof CollectionType) && ($v = TypeHelper::getCollectionValueType($type)) && TypeHelper::getClassName($v);
+            $isCollectionType = $type->isSatisfiedBy(static fn ($t) => $t instanceof CollectionType) && ($v = TypeHelper::getCollectionValueType($type)) && TypeHelper::getClassName($v);
 
             $valueType = $type;
             if ($isCollectionType) {
@@ -730,7 +730,7 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
             $graphqlType = $this->typesContainer->get($graphqlType);
         }
 
-        if ($type->isSatisfiedBy(fn ($t) => $t instanceof CollectionType) && ($collectionValueType = TypeHelper::getCollectionValueType($type)) && TypeHelper::getClassName($collectionValueType)) {
+        if ($type->isSatisfiedBy(static fn ($t) => $t instanceof CollectionType) && ($collectionValueType = TypeHelper::getCollectionValueType($type)) && TypeHelper::getClassName($collectionValueType)) {
             if (!$input && !$this->isEnumClass($resourceClass) && $this->pagination->isGraphQlEnabled($resourceOperation)) {
                 return $this->typeBuilder->getPaginatedCollectionType($graphqlType, $resourceOperation);
             }

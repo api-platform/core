@@ -65,7 +65,7 @@ class ResolverFactory implements ResolverFactoryInterface
                     $type = $propertyMetadata?->getNativeType();
 
                     // Data already fetched and normalized (field or nested resource)
-                    if ($body || null === $resourceClass || ($type && !$type->isSatisfiedBy(fn ($t) => $t instanceof CollectionType))) {
+                    if ($body || null === $resourceClass || ($type && !$type->isSatisfiedBy(static fn ($t) => $t instanceof CollectionType))) {
                         return $body;
                     }
                 } else {

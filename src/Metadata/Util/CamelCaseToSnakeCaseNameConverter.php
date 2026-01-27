@@ -54,7 +54,7 @@ class CamelCaseToSnakeCaseNameConverter
     {
         $camelCasedName = preg_replace_callback(
             '/(^|_|\.)+(.)/',
-            fn ($match) => ('.' === $match[1] ? '_' : '').strtoupper($match[2]),
+            static fn ($match) => ('.' === $match[1] ? '_' : '').strtoupper($match[2]),
             $propertyName
         );
 

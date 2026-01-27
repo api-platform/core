@@ -137,7 +137,7 @@ final class TypeConverter implements TypeConverterInterface
     private function getResourceType(Type|LegacyType $type, bool $input, Operation $rootOperation, string $rootResource, ?string $property, int $depth): ?GraphQLType
     {
         if ($type instanceof Type) {
-            $isCollection = $type->isSatisfiedBy(fn ($t) => $t instanceof CollectionType);
+            $isCollection = $type->isSatisfiedBy(static fn ($t) => $t instanceof CollectionType);
 
             if ($isCollection) {
                 $type = TypeHelper::getCollectionValueType($type);
@@ -145,7 +145,7 @@ final class TypeConverter implements TypeConverterInterface
 
             /** @var class-string|null $resourceClass */
             $resourceClass = null;
-            $typeIsResourceClass = function (Type $type) use (&$resourceClass): bool {
+            $typeIsResourceClass = static function (Type $type) use (&$resourceClass): bool {
                 return $type instanceof ObjectType && $resourceClass = $type->getClassName();
             };
 

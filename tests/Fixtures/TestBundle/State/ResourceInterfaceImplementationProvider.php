@@ -26,7 +26,7 @@ final class ResourceInterfaceImplementationProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ResourceInterfaceImplementation|\Generator|null
     {
         if ($operation instanceof CollectionOperationInterface) {
-            return (function (): \Generator {
+            return (static function (): \Generator {
                 yield (new ResourceInterfaceImplementation())->setFoo('item1');
                 yield (new ResourceInterfaceImplementation())->setFoo('item2');
             })();

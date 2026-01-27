@@ -78,9 +78,9 @@ class ConstraintViolationNormalizerTest extends TestCase
             ],
         ];
 
-        $nameConverterFactory = function (self $that): NameConverterInterface {
+        $nameConverterFactory = static function (self $that): NameConverterInterface {
             $nameConverterProphecy = $that->prophesize(NameConverterInterface::class);
-            $nameConverterProphecy->normalize(Argument::cetera())->will(fn ($args) => '_'.$args[0]);
+            $nameConverterProphecy->normalize(Argument::cetera())->will(static fn ($args) => '_'.$args[0]);
 
             return $nameConverterProphecy->reveal();
         };
@@ -101,6 +101,6 @@ class ConstraintViolationNormalizerTest extends TestCase
                 'code' => null,
             ],
         ];
-        yield [fn () => null, $expected];
+        yield [static fn () => null, $expected];
     }
 }

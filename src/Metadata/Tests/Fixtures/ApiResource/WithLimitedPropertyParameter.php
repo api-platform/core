@@ -17,11 +17,9 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
 
-#[
-    ApiResource(operations: [
-        new GetCollection(name: 'collection', parameters: [':property' => new QueryParameter(properties: ['name'])]),
-    ])
-]
+#[ApiResource(operations: [
+    new GetCollection(name: 'collection', parameters: [':property' => new QueryParameter(properties: ['name'])]),
+])]
 class WithLimitedPropertyParameter
 {
     public $id;

@@ -36,7 +36,7 @@ class GraphQlTypePassTest extends TestCase
         $this->assertInstanceOf(CompilerPassInterface::class, $filterPass);
 
         $typeLocatorDefinitionProphecy = $this->prophesize(Definition::class);
-        $typeLocatorDefinitionProphecy->addArgument(Argument::that(fn (array $arg) => !isset($arg['foo']) && isset($arg['my_id']) && $arg['my_id'] instanceof Reference))->willReturn($typeLocatorDefinitionProphecy->reveal())->shouldBeCalled();
+        $typeLocatorDefinitionProphecy->addArgument(Argument::that(static fn (array $arg) => !isset($arg['foo']) && isset($arg['my_id']) && $arg['my_id'] instanceof Reference))->willReturn($typeLocatorDefinitionProphecy->reveal())->shouldBeCalled();
 
         $typesFactoryDefinitionProphecy = $this->prophesize(Definition::class);
         $typesFactoryDefinitionProphecy->addArgument(['my_id'])->willReturn($typesFactoryDefinitionProphecy->reveal())->shouldBeCalled();
@@ -57,7 +57,7 @@ class GraphQlTypePassTest extends TestCase
         $this->assertInstanceOf(CompilerPassInterface::class, $filterPass);
 
         $typeLocatorDefinitionProphecy = $this->prophesize(Definition::class);
-        $typeLocatorDefinitionProphecy->addArgument(Argument::that(fn (array $arg) => !isset($arg['foo']) && isset($arg['bar']) && $arg['bar'] instanceof Reference))->willReturn($typeLocatorDefinitionProphecy->reveal())->shouldBeCalled();
+        $typeLocatorDefinitionProphecy->addArgument(Argument::that(static fn (array $arg) => !isset($arg['foo']) && isset($arg['bar']) && $arg['bar'] instanceof Reference))->willReturn($typeLocatorDefinitionProphecy->reveal())->shouldBeCalled();
 
         $typesFactoryDefinitionProphecy = $this->prophesize(Definition::class);
         $typesFactoryDefinitionProphecy->addArgument(['bar'])->willReturn($typesFactoryDefinitionProphecy->reveal())->shouldBeCalled();

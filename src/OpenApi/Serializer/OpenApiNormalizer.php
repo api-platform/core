@@ -91,7 +91,7 @@ final class OpenApiNormalizer implements NormalizerInterface
                 $paths = $decoratedObject->getPaths();
 
                 // sort paths by tags, then by path for each tag
-                uksort($paths, function ($keyA, $keyB) use ($paths) {
+                uksort($paths, static function ($keyA, $keyB) use ($paths) {
                     $a = $paths[$keyA];
                     $b = $paths[$keyB];
 

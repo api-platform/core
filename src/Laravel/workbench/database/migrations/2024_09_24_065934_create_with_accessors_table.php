@@ -21,13 +21,13 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('with_accessor_relations', function (Blueprint $table): void {
+        Schema::create('with_accessor_relations', static function (Blueprint $table): void {
             $table->id();
             $table->string('name');
             $table->timestamps();
         });
 
-        Schema::create('with_accessors', function (Blueprint $table): void {
+        Schema::create('with_accessors', static function (Blueprint $table): void {
             $table->id();
             $table->string('name');
             $table->integer('relation_id')->unsigned();

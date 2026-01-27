@@ -128,7 +128,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $retry = [];
         $data = [];
 
-        $managedHub = $this->createMockHub(function (Update $update) use (&$topics, &$private, &$retry, &$data): string {
+        $managedHub = $this->createMockHub(static function (Update $update) use (&$topics, &$private, &$retry, &$data): string {
             $topics = array_merge($topics, $update->getTopics());
             $private[] = $update->isPrivate();
             $retry[] = $update->getRetry();
@@ -241,7 +241,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $retry = [];
         $data = [];
 
-        $defaultHub = $this->createMockHub(function (Update $update) use (&$topics, &$private, &$retry, &$data): string {
+        $defaultHub = $this->createMockHub(static function (Update $update) use (&$topics, &$private, &$retry, &$data): string {
             $topics = array_merge($topics, $update->getTopics());
             $private[] = $update->isPrivate();
             $retry[] = $update->getRetry();
@@ -315,7 +315,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $retry = [];
         $data = [];
 
-        $defaultHub = $this->createMockHub(function (Update $update) use (&$topics, &$private, &$retry, &$data): string {
+        $defaultHub = $this->createMockHub(static function (Update $update) use (&$topics, &$private, &$retry, &$data): string {
             $topics = array_merge($topics, $update->getTopics());
             $private[] = $update->isPrivate();
             $retry[] = $update->getRetry();

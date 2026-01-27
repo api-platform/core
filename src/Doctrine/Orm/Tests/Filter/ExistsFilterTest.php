@@ -98,8 +98,8 @@ class ExistsFilterTest extends DoctrineOrmFilterTestCase
 
     public static function provideApplyTestData(): array
     {
-        $existsFilterFactory = fn (self $that, ManagerRegistry $managerRegistry, ?array $properties = null): ExistsFilter => new ExistsFilter($managerRegistry, null, $properties, 'exists');
-        $customExistsFilterFactory = fn (self $that, ManagerRegistry $managerRegistry, ?array $properties = null): ExistsFilter => new ExistsFilter($managerRegistry, null, $properties, 'customExists');
+        $existsFilterFactory = static fn (self $that, ManagerRegistry $managerRegistry, ?array $properties = null): ExistsFilter => new ExistsFilter($managerRegistry, null, $properties, 'exists');
+        $customExistsFilterFactory = static fn (self $that, ManagerRegistry $managerRegistry, ?array $properties = null): ExistsFilter => new ExistsFilter($managerRegistry, null, $properties, 'customExists');
 
         return array_merge_recursive(
             self::provideApplyTestArguments(),

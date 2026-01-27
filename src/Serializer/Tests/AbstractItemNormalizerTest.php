@@ -349,7 +349,7 @@ class AbstractItemNormalizerTest extends TestCase
         $resourceAccessChecker->isGranted(
             SecuredDummy::class,
             'is_granted(\'ROLE_ADMIN\')',
-            Argument::that(function (array $context) {
+            Argument::that(static function (array $context) {
                 return \array_key_exists('property', $context)
                     && \array_key_exists('object', $context)
                     && \array_key_exists('previous_object', $context)
@@ -402,7 +402,7 @@ class AbstractItemNormalizerTest extends TestCase
         $resourceAccessChecker->isGranted(
             SecuredDummy::class,
             'is_granted(\'ROLE_ADMIN\')',
-            Argument::that(function (array $context) {
+            Argument::that(static function (array $context) {
                 return \array_key_exists('property', $context)
                     && \array_key_exists('object', $context)
                     && \array_key_exists('previous_object', $context)
@@ -459,7 +459,7 @@ class AbstractItemNormalizerTest extends TestCase
         $resourceAccessChecker->isGranted(
             SecuredDummy::class,
             'is_granted(\'ROLE_ADMIN\')',
-            Argument::that(function (array $context) {
+            Argument::that(static function (array $context) {
                 return \array_key_exists('property', $context)
                     && \array_key_exists('object', $context)
                     && \array_key_exists('previous_object', $context)

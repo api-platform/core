@@ -59,7 +59,7 @@ trait BackedEnumFilterTrait
             foreach ($filterParameterNames as $filterParameterName) {
                 $isCollection = str_ends_with($filterParameterName, '[]');
 
-                $enumValues = array_map(fn (\BackedEnum $case) => $case->value, $this->enumTypes[$property]::cases());
+                $enumValues = array_map(static fn (\BackedEnum $case) => $case->value, $this->enumTypes[$property]::cases());
 
                 $schema = $isCollection
                     ? ['type' => 'array', 'items' => ['type' => 'string', 'enum' => $enumValues]]
@@ -99,7 +99,7 @@ trait BackedEnumFilterTrait
             $value = (int) $value;
         }
 
-        $values = array_map(fn (\BackedEnum $case) => $case->value, $this->enumTypes[$property]::cases());
+        $values = array_map(static fn (\BackedEnum $case) => $case->value, $this->enumTypes[$property]::cases());
 
         if (\in_array($value, $values, true)) {
             return $value;

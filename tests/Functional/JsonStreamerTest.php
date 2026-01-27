@@ -132,7 +132,7 @@ class JsonStreamerTest extends ApiTestCase
         }
 
         $buffer = '';
-        ob_start(function (string $chunk) use (&$buffer): void {
+        ob_start(static function (string $chunk) use (&$buffer): void {
             $buffer .= $chunk;
         });
 

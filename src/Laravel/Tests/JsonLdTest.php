@@ -39,7 +39,7 @@ class JsonLdTest extends TestCase
      */
     protected function defineEnvironment($app): void
     {
-        tap($app['config'], function (Repository $config): void {
+        tap($app['config'], static function (Repository $config): void {
             $config->set('app.debug', true);
             $config->set('api-platform.resources', [app_path('Models'), app_path('ApiResource')]);
         });

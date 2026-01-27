@@ -522,7 +522,7 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
         $relatedDummyProphecy = $that->prophesize(RelatedDummy::class);
         $iriConverterProphecy = $that->prophesize(IriConverterInterface::class);
 
-        $iriConverterProphecy->getResourceFromIri(Argument::type('string'), ['fetch_data' => false])->will(function ($args) use ($relatedDummyProphecy) {
+        $iriConverterProphecy->getResourceFromIri(Argument::type('string'), ['fetch_data' => false])->will(static function ($args) use ($relatedDummyProphecy) {
             if (str_contains((string) $args[0], '/related_dummies')) {
                 $relatedDummyProphecy->getId()->shouldBeCalled()->willReturn(1);
 

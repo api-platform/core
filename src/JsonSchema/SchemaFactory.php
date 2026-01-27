@@ -360,9 +360,11 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
                 if ($valueType instanceof ObjectType) {
                     $className = $valueType->getClassName();
-                } else {
+                } elseif (($wrappedType = $valueType->getWrappedType()) instanceof ObjectType) {
                     // GenericType
-                    $className = $valueType->getWrappedType()->getClassName();
+                    $className = $wrappedType->getClassName();
+                } else {
+                    continue;
                 }
 
                 $subSchemaInstance = new Schema($version);

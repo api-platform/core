@@ -19,8 +19,7 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-#[
-    Post,
+#[Post,
     GetCollection(uriTemplate: '/property-collection-relations'),
     GetCollection(
         uriTemplate: '/parent/{parentId}/another-collection-operations',
@@ -34,8 +33,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
             'parentId' => new Link(fromProperty: 'propertyCollectionIriOnly', fromClass: PropertyCollectionIriOnly::class),
             'id' => new Link(fromProperty: 'id', toClass: PropertyCollectionIriOnlyRelation::class),
         ]
-    )
-]
+    )]
 class PropertyCollectionIriOnlyRelation
 {
     /**

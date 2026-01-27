@@ -38,7 +38,7 @@ class WithAccessor extends Model
     protected function name(): Attribute
     {
         return Attribute::make(
-            get: fn (string $value) => 'test',
+            get: static fn (string $value) => 'test',
         );
     }
 }

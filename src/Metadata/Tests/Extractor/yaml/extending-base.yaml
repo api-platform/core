@@ -1,0 +1,9 @@
+resources:
+    ApiPlatform\Metadata\Tests\Fixtures\ApiResource\User:
+        -   uriTemplate: /users{._format}
+            description: Base user resource
+            operations:
+                ApiPlatform\Metadata\GetCollection:
+                    uriTemplate: /users{._format}
+                ApiPlatform\Metadata\Get:
+                    uriTemplate: /users/{id}{._format}

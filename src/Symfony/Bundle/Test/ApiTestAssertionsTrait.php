@@ -152,7 +152,7 @@ trait ApiTestAssertionsTrait
      */
     public static function getMercureMessages(?string $hubName = null): array
     {
-        return array_map(fn (array $update) => $update['object'], self::getMercureHub($hubName)->getMessages());
+        return array_map(static fn (array $update) => $update['object'], self::getMercureHub($hubName)->getMessages());
     }
 
     public static function getMercureMessage(int $index = 0, ?string $hubName = null): ?Update

@@ -1403,7 +1403,7 @@ class OpenApiFactoryTest extends TestCase
 
         $resourceCollectionMetadataFactory
             ->method('create')
-            ->willReturnCallback(fn (string $resourceClass): ResourceMetadataCollection => match ($resourceClass) {
+            ->willReturnCallback(static fn (string $resourceClass): ResourceMetadataCollection => match ($resourceClass) {
                 default => new ResourceMetadataCollection($resourceClass, []),
                 Dummy::class => $resourceCollectionMetadata,
             });

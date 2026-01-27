@@ -76,7 +76,7 @@ class ValidatorTest extends TestCase
         $symfonyValidator = $symfonyValidatorProphecy->reveal();
 
         $validator = new Validator($symfonyValidator);
-        $validator->validate(new DummyEntity(), ['groups' => fn ($data): array => $data instanceof DummyEntity ? $expectedValidationGroups : []]);
+        $validator->validate(new DummyEntity(), ['groups' => static fn ($data): array => $data instanceof DummyEntity ? $expectedValidationGroups : []]);
     }
 
     public function testValidateGetGroupsFromService(): void

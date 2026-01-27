@@ -1,0 +1,8 @@
+resources:
+    ApiPlatform\Metadata\Tests\Fixtures\ApiResource\User:
+        -   uriTemplate: /admin/users{._format}
+            description: Admin user resource
+            security: 'is_granted("ROLE_ADMIN")'
+            operations:
+                ApiPlatform\Metadata\GetCollection:
+                    uriTemplate: /admin/users{._format}
