@@ -14,7 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonApiDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonApiErrorTestResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonApiRelatedDummy;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
 class JsonApiTest extends ApiTestCase
@@ -29,6 +31,8 @@ class JsonApiTest extends ApiTestCase
     {
         return [
             JsonApiErrorTestResource::class,
+            JsonApiDummy::class,
+            JsonApiRelatedDummy::class,
         ];
     }
 
@@ -49,5 +53,93 @@ class JsonApiTest extends ApiTestCase
                 ],
             ],
         ]);
+    }
+
+    public function testGetSingleResourceIdentifierMode(): void
+    {
+        $this->bootJsonApiKernel();
+        self::createClient()->request('GET', '/jsonapi_dummies/10', [
+            'headers' => ['accept' => 'application/vnd.api+json'],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json; charset=utf-8');
+        $this->assertJsonContains([
+            'data' => [
+                'id' => '10',
+                'type' => 'JsonApiDummy',
+                'links' => [
+                    'self' => '/jsonapi_dummies/10',
+                ],
+                'attributes' => [
+                    'name' => 'Dummy #10',
+                ],
+            ],
+        ]);
+    }
+
+    public function testGetCollectionIdentifierMode(): void
+    {
+        $this->bootJsonApiKernel();
+        self::createClient()->request('GET', '/jsonapi_dummies', [
+            'headers' => ['accept' => 'application/vnd.api+json'],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json; charset=utf-8');
+        $this->assertJsonContains([
+            'data' => [
+                [
+                    'id' => '1',
+                    'type' => 'JsonApiDummy',
+                    'links' => [
+                        'self' => '/jsonapi_dummies/1',
+                    ],
+                ],
+                [
+                    'id' => '2',
+                    'type' => 'JsonApiDummy',
+                    'links' => [
+                        'self' => '/jsonapi_dummies/2',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testGetSingleResourceDefaultIriMode(): void
+    {
+        // Default mode (use_iri_as_id: true) — id should be the IRI, no links.self
+        self::createClient()->request('GET', '/jsonapi_dummies/10', [
+            'headers' => ['accept' => 'application/vnd.api+json'],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains([
+            'data' => [
+                'id' => '/jsonapi_dummies/10',
+                'type' => 'JsonApiDummy',
+            ],
+        ]);
+
+        // Verify no links.self is present on the data object
+        $json = json_decode(self::getClient()->getResponse()->getContent(), true);
+        $this->assertArrayNotHasKey('links', $json['data']);
+    }
+
+    private function bootJsonApiKernel(): void
+    {
+        $baseEnv = $_SERVER['APP_ENV'] ?? 'test';
+        $jsonApiEnv = 'mongodb' === $baseEnv ? 'jsonapi_mongodb' : 'jsonapi';
+
+        // AppKernel overrides environment with $_SERVER['APP_ENV'] (behat compat),
+        // so we must temporarily set it to our target environment.
+        $_SERVER['APP_ENV'] = $jsonApiEnv;
+
+        try {
+            self::bootKernel(['environment' => $jsonApiEnv]);
+        } finally {
+            $_SERVER['APP_ENV'] = $baseEnv;
+        }
     }
 }

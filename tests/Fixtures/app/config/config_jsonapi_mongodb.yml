@@ -1,0 +1,6 @@
+imports:
+    - { resource: config_mongodb.yml }
+
+api_platform:
+    jsonapi:
+        use_iri_as_id: false

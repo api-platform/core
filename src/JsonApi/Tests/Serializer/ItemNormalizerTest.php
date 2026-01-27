@@ -21,7 +21,9 @@ use ApiPlatform\JsonApi\Tests\Fixtures\RelatedDummy;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -29,6 +31,7 @@ use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
@@ -576,5 +579,329 @@ class ItemNormalizerTest extends TestCase
         // Verify to-many relationship with empty array returns {"data": []}
         $this->assertArrayHasKey('relatedDummies', $result['data']['relationships']);
         $this->assertSame(['data' => []], $result['data']['relationships']['relatedDummies']);
+    }
+
+    public function testNormalizeWithEntityIdentifier(): void
+    {
+        $dummy = new Dummy();
+        $dummy->setId(10);
+        $dummy->setName('hello');
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::any())->willReturn(new PropertyNameCollection(['id', 'name']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::any())->willReturn((new ApiProperty())->withReadable(true));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id', Argument::type('array'))->willReturn((new ApiProperty())->withReadable(true)->withIdentifier(true));
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource($dummy, Argument::cetera())->willReturn('/dummies/10');
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->getValue($dummy, 'id')->willReturn(10);
+        $propertyAccessorProphecy->getValue($dummy, 'name')->willReturn('hello');
+
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection('Dummy', [
+            (new ApiResource())
+                ->withShortName('Dummy')
+                ->withOperations(new Operations(['get' => (new Get())->withShortName('Dummy')])),
+        ]));
+
+        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+        $identifiersExtractorProphecy->getIdentifiersFromItem($dummy, Argument::any(), Argument::type('array'))->willReturn(['id' => 10]);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+        $serializerProphecy->normalize('hello', ItemNormalizer::FORMAT, Argument::type('array'))->willReturn('hello');
+        $serializerProphecy->normalize(10, ItemNormalizer::FORMAT, Argument::type('array'))->willReturn(10);
+        $serializerProphecy->normalize(null, ItemNormalizer::FORMAT, Argument::type('array'))->willReturn(null);
+
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $propertyAccessorProphecy->reveal(),
+            new ReservedAttributeNameConverter(),
+            null,
+            [],
+            $resourceMetadataCollectionFactoryProphecy->reveal(),
+            null,
+            null,
+            null,
+            $identifiersExtractorProphecy->reveal(),
+            false,
+        );
+
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $expected = [
+            'data' => [
+                'id' => '10',
+                'type' => 'Dummy',
+                'links' => ['self' => '/dummies/10'],
+                'attributes' => [
+                    '_id' => 10,
+                    'name' => 'hello',
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expected, $normalizer->normalize($dummy, ItemNormalizer::FORMAT));
+    }
+
+    public function testNormalizeRelationWithEntityIdentifier(): void
+    {
+        $dummy = new Dummy();
+        $dummy->setId(10);
+        $dummy->setName('hello');
+
+        $relatedDummy = new RelatedDummy();
+        $relatedDummy->setId(1);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::any())->willReturn(new PropertyNameCollection(['id', 'name', 'relatedDummy']));
+
+        $relatedDummyType = Type::object(RelatedDummy::class);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::any())->willReturn((new ApiProperty())->withReadable(true));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id', Argument::type('array'))->willReturn((new ApiProperty())->withReadable(true)->withIdentifier(true));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', Argument::any())->willReturn(
+            (new ApiProperty())->withNativeType($relatedDummyType)->withReadable(true)->withReadableLink(false)->withWritableLink(false)
+        );
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource($dummy, Argument::cetera())->willReturn('/dummies/10');
+        $iriConverterProphecy->getIriFromResource($relatedDummy)->willReturn('/related_dummies/1');
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($relatedDummy, RelatedDummy::class)->willReturn(RelatedDummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->getValue($dummy, 'id')->willReturn(10);
+        $propertyAccessorProphecy->getValue($dummy, 'name')->willReturn('hello');
+        $propertyAccessorProphecy->getValue($dummy, 'relatedDummy')->willReturn($relatedDummy);
+
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection('Dummy', [
+            (new ApiResource())
+                ->withShortName('Dummy')
+                ->withOperations(new Operations(['get' => (new Get())->withShortName('Dummy')])),
+        ]));
+        $resourceMetadataCollectionFactoryProphecy->create(RelatedDummy::class)->willReturn(new ResourceMetadataCollection('RelatedDummy', [
+            (new ApiResource())
+                ->withShortName('RelatedDummy')
+                ->withOperations(new Operations(['get' => (new Get())->withShortName('RelatedDummy')])),
+        ]));
+
+        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+        $identifiersExtractorProphecy->getIdentifiersFromItem($dummy, Argument::any(), Argument::type('array'))->willReturn(['id' => 10]);
+        $identifiersExtractorProphecy->getIdentifiersFromItem($relatedDummy)->willReturn(['id' => 1]);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+        $serializerProphecy->normalize('hello', ItemNormalizer::FORMAT, Argument::type('array'))->willReturn('hello');
+        $serializerProphecy->normalize(10, ItemNormalizer::FORMAT, Argument::type('array'))->willReturn(10);
+        $serializerProphecy->normalize(null, ItemNormalizer::FORMAT, Argument::type('array'))->willReturn(null);
+
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $propertyAccessorProphecy->reveal(),
+            new ReservedAttributeNameConverter(),
+            null,
+            [],
+            $resourceMetadataCollectionFactoryProphecy->reveal(),
+            null,
+            null,
+            null,
+            $identifiersExtractorProphecy->reveal(),
+            false,
+        );
+
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $result = $normalizer->normalize($dummy, ItemNormalizer::FORMAT, [
+            'resources' => [],
+            'resource_class' => Dummy::class,
+        ]);
+
+        $this->assertIsArray($result);
+        $this->assertSame('10', $result['data']['id']);
+        $this->assertSame('Dummy', $result['data']['type']);
+        $this->assertSame('/dummies/10', $result['data']['links']['self']);
+
+        // Verify relationship uses entity identifier with links.self
+        $this->assertArrayHasKey('relationships', $result['data']);
+        $this->assertArrayHasKey('relatedDummy', $result['data']['relationships']);
+        $relationData = $result['data']['relationships']['relatedDummy']['data'];
+        $this->assertSame('1', $relationData['id']);
+        $this->assertSame('RelatedDummy', $relationData['type']);
+        $this->assertSame('/related_dummies/1', $relationData['links']['self']);
+    }
+
+    public function testDenormalizeWithEntityIdentifier(): void
+    {
+        $data = [
+            'data' => [
+                'type' => 'dummy',
+                'id' => '10',
+                'attributes' => [
+                    'name' => 'foo',
+                ],
+            ],
+        ];
+
+        $dummy = new Dummy();
+        $dummy->setId(10);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::any())->willReturn(new PropertyNameCollection(['name']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::any())->willReturn((new ApiProperty())->withNativeType(Type::string())->withReadable(false)->withWritable(true));
+
+        $getOperation = (new Get(uriVariables: ['id' => new Link(parameterName: 'id', identifiers: ['id'], fromClass: Dummy::class)]))->withClass(Dummy::class);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, $getOperation, Argument::that(static fn ($ctx) => ($ctx['uri_variables'] ?? null) === ['id' => '10']))->willReturn('/dummies/10');
+        $iriConverterProphecy->getResourceFromIri('/dummies/10', Argument::type('array'))->willReturn($dummy);
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'name', 'foo')->will(static function (): void {});
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $resourceMetadataCollectionFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactory->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource())->withOperations(new Operations(['get' => $getOperation])),
+        ]));
+
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $propertyAccessorProphecy->reveal(),
+            new ReservedAttributeNameConverter(),
+            null,
+            [],
+            $resourceMetadataCollectionFactory->reveal(),
+            null,
+            null,
+            null,
+            null,
+            false,
+        );
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $result = $normalizer->denormalize($data, Dummy::class, ItemNormalizer::FORMAT, [
+            'operation' => $getOperation,
+        ]);
+
+        $this->assertInstanceOf(Dummy::class, $result);
+    }
+
+    public function testDenormalizeRelationWithEntityIdentifier(): void
+    {
+        $data = [
+            'data' => [
+                'type' => 'dummy',
+                'attributes' => [
+                    'name' => 'foo',
+                ],
+                'relationships' => [
+                    'relatedDummy' => [
+                        'data' => [
+                            'type' => 'related-dummy',
+                            'id' => '1',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $relatedDummy = new RelatedDummy();
+        $relatedDummy->setId(1);
+
+        $relatedDummyType = Type::object(RelatedDummy::class);
+        $getRelatedOperation = (new Get(uriVariables: ['id' => new Link(parameterName: 'id', identifiers: ['id'], fromClass: RelatedDummy::class)]))->withClass(RelatedDummy::class);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::any())->willReturn(new PropertyNameCollection(['name', 'relatedDummy']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::any())->willReturn((new ApiProperty())->withNativeType(Type::string())->withReadable(false)->withWritable(true));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummy', Argument::any())->willReturn(
+            (new ApiProperty())->withNativeType($relatedDummyType)->withReadable(false)->withWritable(true)->withReadableLink(false)->withWritableLink(false)
+        );
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource(RelatedDummy::class, UrlGeneratorInterface::ABS_PATH, $getRelatedOperation, Argument::that(static fn ($ctx) => ($ctx['uri_variables'] ?? null) === ['id' => '1']))->willReturn('/related_dummies/1');
+        $iriConverterProphecy->getResourceFromIri('/related_dummies/1', Argument::type('array'))->willReturn($relatedDummy);
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'name', 'foo')->will(static function (): void {});
+        $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'relatedDummy', $relatedDummy)->will(static function (): void {});
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass(null, RelatedDummy::class)->willReturn(RelatedDummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
+
+        $resourceMetadataCollectionFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactory->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource())->withOperations(new Operations([new Get(name: 'get')])),
+        ]));
+        $resourceMetadataCollectionFactory->create(RelatedDummy::class)->willReturn(new ResourceMetadataCollection(RelatedDummy::class, [
+            (new ApiResource())->withOperations(new Operations(['get' => $getRelatedOperation])),
+        ]));
+
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $propertyAccessorProphecy->reveal(),
+            new ReservedAttributeNameConverter(),
+            null,
+            [],
+            $resourceMetadataCollectionFactory->reveal(),
+            null,
+            null,
+            null,
+            null,
+            false,
+        );
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $result = $normalizer->denormalize($data, Dummy::class, ItemNormalizer::FORMAT);
+
+        $this->assertInstanceOf(Dummy::class, $result);
     }
 }

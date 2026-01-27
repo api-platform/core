@@ -15,6 +15,7 @@ namespace ApiPlatform\JsonApi\Serializer;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -24,13 +25,13 @@ use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
+use ApiPlatform\Metadata\Util\CompositeIdentifierParser;
 use ApiPlatform\Metadata\Util\TypeHelper;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Serializer\CacheKeyTrait;
 use ApiPlatform\Serializer\ContextTrait;
 use ApiPlatform\Serializer\OperationResourceClassResolverInterface;
 use ApiPlatform\Serializer\TagCollectorInterface;
-use ApiPlatform\State\ProviderInterface;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
@@ -61,7 +62,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
     public const FORMAT = 'jsonapi';
 
     private array $componentsCache = [];
-    private string $resourceIdStrategy;
+    private bool $useIriAsId;
 
     public function __construct(
         PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
@@ -77,12 +78,10 @@ final class ItemNormalizer extends AbstractItemNormalizer
         protected ?TagCollectorInterface $tagCollector = null,
         ?OperationResourceClassResolverInterface $operationResourceResolver = null,
         private readonly ?IdentifiersExtractorInterface $identifiersExtractor = null,
-        private readonly ?ProviderInterface $provider = null,
-        string $resourceIdStrategy = 'iri'
-    )
-    {
+        bool $useIriAsId = true,
+    ) {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $defaultContext, $resourceMetadataCollectionFactory, $resourceAccessChecker, $tagCollector, $operationResourceResolver);
-        $this->resourceIdStrategy = $resourceIdStrategy;
+        $this->useIriAsId = $useIriAsId;
     }
 
     /**
@@ -141,21 +140,28 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $populatedRelationContext = $context;
         $relationshipsData = $this->getPopulatedRelations($data, $format, $populatedRelationContext, $allRelationshipsData);
 
-        // Do not include primary resources
-        $context['api_included_resources'] = [$context['iri']];
+        $id = $iri;
+        if (!$this->useIriAsId) {
+            $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($data, $context['operation'] ?? null, $context);
+            $id = $this->getIdStringFromIdentifiers($identifiers);
+        }
+
+        $resourceShortName = $this->getResourceShortName($resourceClass);
+
+        // Do not include primary resources — use type:id composite key to avoid cross-type collisions
+        $context['api_included_resources'] = [$resourceShortName.':'.$id => true];
 
         $includedResourcesData = $this->getRelatedResources($data, $format, $context, $allRelationshipsData);
 
-        $id = $context['iri'];
-        if ($this->resourceIdStrategy === 'identifiers') {
-            $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($object);
-            $id = (string) array_values($identifiers)[0];
-        }
-
         $resourceData = [
             'id' => $id,
-            'type' => $this->getResourceShortName($resourceClass),
+            'type' => $resourceShortName,
         ];
+
+        // TODO: consider always adding links.self — it's valid per the JSON:API spec even when id is the IRI
+        if (!$this->useIriAsId) {
+            $resourceData['links'] = ['self' => $iri];
+        }
 
         if ($normalizedData) {
             $resourceData['attributes'] = $normalizedData;
@@ -202,19 +208,17 @@ final class ItemNormalizer extends AbstractItemNormalizer
             }
 
             $context += ['fetch_data' => false];
-            if ($this->resourceIdStrategy === 'iri') {
+            if ($this->useIriAsId) {
                 $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri(
                     $data['data']['id'],
                     $context
                 );
-            } else if ($this->resourceIdStrategy === 'identifiers') {
-                $operation = $context['operation'] ?? $context['api_platform_operation'] ?? null;
-                $uriVariables = $context['uriVariables'] ?? [];
-                $context[self::OBJECT_TO_POPULATE] = $this->provider->provide(
-                    $operation,
-                    $uriVariables,
-                    $context
-                );
+            } else {
+                $operation = $context['operation'] ?? null;
+                if ($operation instanceof HttpOperation) {
+                    $iri = $this->reconstructIri($type, (string) $data['data']['id'], $operation);
+                    $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri($iri, $context);
+                }
             }
         }
 
@@ -264,40 +268,28 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         try {
             $context += ['fetch_data' => true];
-            if ($this->resourceIdStrategy === 'iri') {
+            if ($this->useIriAsId) {
                 return $this->iriConverter->getResourceFromIri($value['id'], $context);
-            } else if ($this->resourceIdStrategy === 'identifiers') {
-                $targetClass = $propertyMetadata->getBuiltinTypes()[0]->getClassName();
-                $resourceMetadata = $this->resourceMetadataCollectionFactory
-                                         ->create($targetClass);
-
-                $getOperation = null;
-                foreach ($resourceMetadata as $resource) {
-                    foreach ($resource->getOperations() as $operation) {
-                        if ($operation instanceof Get) {
-                            $getOperation = $operation;
-                            break 2;
-                        }
-                    }
-                }
-                if (null === $getOperation) {
-                    throw new ItemNotFoundException(sprintf(
-                        'No GET operation found for resource "%s".',
-                        $targetClass
-                    ));
-                }
-
-                $uriVariablesDefinition = $getOperation->getUriVariables();
-
-                $uriVariables = [];
-                foreach ($uriVariablesDefinition as $varName => $link) {
-                    foreach ($link->getIdentifiers() as $identifier) {
-                        $uriVariables[$identifier] = (string) $value['data']['id'];
-                    }
-                }
-                return $this->provider->provide($getOperation, $uriVariables, $context);
             }
 
+            $targetClass = null;
+            $nativeType = $propertyMetadata->getNativeType();
+
+            if ($nativeType) {
+                $nativeType->isSatisfiedBy(function (Type $type) use (&$targetClass): bool {
+                    return $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($targetClass = $type->getClassName());
+                });
+            }
+
+            if (null === $targetClass) {
+                throw new ItemNotFoundException(\sprintf('Cannot determine target class for property "%s".', $attributeName));
+            }
+
+            /** @var HttpOperation $getOperation */
+            $getOperation = $this->resourceMetadataCollectionFactory->create($targetClass)->getOperation(httpOperation: true);
+            $iri = $this->reconstructIri($targetClass, (string) $value['id'], $getOperation);
+
+            return $this->iriConverter->getResourceFromIri($iri, $context);
         } catch (ItemNotFoundException $e) {
             if (!isset($context['not_normalizable_value_exceptions'])) {
                 throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
@@ -346,15 +338,22 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
 
         $id = $iri;
-        if ($this->resourceIdStrategy === 'identifiers') {
+        if (!$this->useIriAsId) {
             $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($relatedObject);
-            $id = (string) array_values($identifiers)[0];
+            $id = $this->getIdStringFromIdentifiers($identifiers);
         }
+
+        $relationData = [
+            'type' => $this->getResourceShortName($resourceClass),
+            'id' => $id,
+        ];
+
+        if (!$this->useIriAsId) {
+            $relationData['links'] = ['self' => $iri];
+        }
+
         $context['data'] = [
-            'data' => [
-                'id' => $id,
-                'type' => $this->getResourceShortName($resourceClass),
-            ],
+            'data' => $relationData,
         ];
 
         $context['iri'] = $iri;
@@ -627,10 +626,10 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     private function addIncluded(array $data, array &$included, array &$context): void
     {
-        if (isset($data['id']) && !\in_array($data['id'], $context['api_included_resources'], true)) {
+        $trackingKey = ($data['type'] ?? '').':'.($data['id'] ?? '');
+        if (isset($data['id']) && !isset($context['api_included_resources'][$trackingKey])) {
             $included[] = $data;
-            // Track already included resources
-            $context['api_included_resources'][] = $data['id'];
+            $context['api_included_resources'][$trackingKey] = true;
         }
     }
 
@@ -654,6 +653,35 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $filtered = array_filter($context['api_included'] ?? [], static fn (string $included): bool => str_starts_with($included, $normalizedName.'.'));
 
         return array_map(static fn (string $nested): string => substr($nested, strpos($nested, '.') + 1), $filtered);
+    }
+
+    private function getIdStringFromIdentifiers(array $identifiers): string
+    {
+        if (1 === \count($identifiers)) {
+            return (string) array_values($identifiers)[0];
+        }
+
+        return CompositeIdentifierParser::stringify($identifiers);
+    }
+
+    /**
+     * Reconstructs an IRI from a resource class and a raw JSON:API id string.
+     *
+     * Maps the id to the operation's single URI variable parameter name and generates
+     * the IRI via IriConverter. Composite identifiers on a single Link work naturally
+     * since the composite string (e.g. "field1=val1;field2=val2") is passed as-is.
+     */
+    private function reconstructIri(string $resourceClass, string $id, HttpOperation $operation): string
+    {
+        $uriVariables = $operation->getUriVariables() ?? [];
+
+        if (\count($uriVariables) > 1) {
+            throw new UnexpectedValueException('JSON:API entity identifier mode requires operations with a single URI variable. Subresource operations with multiple URI variables are not supported — use IRI identifiers instead.');
+        }
+
+        $parameterName = array_key_first($uriVariables) ?? 'id';
+
+        return $this->iriConverter->getIriFromResource($resourceClass, UrlGeneratorInterface::ABS_PATH, $operation, ['uri_variables' => [$parameterName => $id]]);
     }
 
     // TODO: this code is similar to the one used in JsonLd
