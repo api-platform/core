@@ -1,0 +1,58 @@
+{
+    "name": "api-platform/mcp",
+    "description": "Model Context Protocol (MCP) integration for API Platform",
+    "type": "library",
+    "keywords": [
+        "REST",
+        "API",
+        "MCP",
+        "Model Context Protocol"
+    ],
+    "homepage": "https://api-platform.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kévin Dunglas",
+            "email": "kevin@dunglas.fr",
+            "homepage": "https://dunglas.fr"
+        },
+        {
+            "name": "Antoine Bluchet",
+            "email": "soyuka@gmail.com",
+            "homepage": "https://soyuka.me"
+        },
+        {
+            "name": "API Platform Community",
+            "homepage": "https://api-platform.com/community/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "api-platform/metadata": "^4.2",
+        "api-platform/json-schema": "^4.2",
+        "mcp/sdk": "^0.3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "ApiPlatform\\Mcp\\": ""
+        }
+    },
+    "config": {
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "4.3.x-dev"
+        },
+        "symfony": {
+            "require": "^6.4 || ^7.0 || ^8.0"
+        },
+        "thanks": {
+            "name": "api-platform/api-platform",
+            "url": "https://github.com/api-platform/api-platform"
+        }
+    }
+}
