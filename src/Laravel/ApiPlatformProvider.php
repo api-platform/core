@@ -404,7 +404,7 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->bind(ProviderInterface::class, ContentNegotiationProvider::class);
 
-        $this->app->singleton(RespondProcessor::class, function (Application $app) {
+        $this->app->singleton(RespondProcessor::class, static function (Application $app) {
             $decorated = new RespondProcessor(
                 $app->make(IriConverterInterface::class),
                 $app->make(ResourceClassResolverInterface::class),

@@ -16,7 +16,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use ApiPlatform\Mcp\Server\Handler;
 use ApiPlatform\Mcp\State\StructuredContentProcessor;
 
-return function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
     $services->set('api_platform.mcp.state_processor.write', 'ApiPlatform\State\Processor\WriteProcessor')

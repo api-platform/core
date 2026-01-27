@@ -123,7 +123,7 @@ class ElasticsearchClientPassTest extends TestCase
 
         $clientDefinition->expects($this->once())
             ->method('setArguments')
-            ->with($this->callback(function ($arguments) {
+            ->with($this->callback(static function ($arguments) {
                 $config = $arguments[0];
 
                 return isset($config['hosts'])
@@ -171,7 +171,7 @@ class ElasticsearchClientPassTest extends TestCase
 
         $clientDefinition->expects($this->once())
             ->method('setArguments')
-            ->with($this->callback(function ($arguments) {
+            ->with($this->callback(static function ($arguments) {
                 $config = $arguments[0];
 
                 return isset($config['hosts'])

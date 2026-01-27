@@ -18,7 +18,7 @@ use ApiPlatform\Mcp\Metadata\Operation\Factory\OperationMetadataFactory;
 use ApiPlatform\Mcp\Routing\IriConverter;
 use ApiPlatform\Mcp\State\ToolProvider;
 
-return function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
     $services->set('api_platform.mcp.loader', Loader::class)
