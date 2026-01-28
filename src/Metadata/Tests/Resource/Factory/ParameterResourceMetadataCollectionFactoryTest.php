@@ -136,6 +136,49 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertSame('static_param', $staticParam->getKey());
     }
 
+    public function testQueryParameterWithNestedPropertyPlaceholder(): void
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'name', 'related']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+
+        $resourceMetadataCollection = $parameterFactory->create(HasNestedParameterAttribute::class);
+        $operation = $resourceMetadataCollection->getOperation(forceCollection: true);
+        $parameters = $operation->getParameters();
+
+        $this->assertInstanceOf(Parameters::class, $parameters);
+
+        $this->assertFalse($parameters->has('search[:property]'));
+        $this->assertTrue($parameters->has('search[name]'));
+        $this->assertTrue($parameters->has('search[related.nested]'));
+
+        $searchNameParam = $parameters->get('search[name]');
+        $this->assertInstanceOf(QueryParameter::class, $searchNameParam);
+        $this->assertNull($searchNameParam->getDescription());
+        $this->assertSame('name', $searchNameParam->getProperty());
+        $this->assertSame('search[name]', $searchNameParam->getKey());
+
+        $searchRelatedNestedParam = $parameters->get('search[related.nested]');
+        $this->assertInstanceOf(QueryParameter::class, $searchRelatedNestedParam);
+        $this->assertNull($searchRelatedNestedParam->getDescription());
+        $this->assertSame('related.nested', $searchRelatedNestedParam->getProperty());
+        $this->assertSame('search[related.nested]', $searchRelatedNestedParam->getKey());
+    }
+
     public function testParameterFactoryNoFilter(): void
     {
         $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
@@ -219,4 +262,22 @@ class HasParameterAttribute
     public $id;
     public $name;
     public $description;
+}
+
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            parameters: [
+                'search[:property]' => new QueryParameter(
+                    properties: ['name', 'related.nested']
+                ),
+            ]
+        ),
+    ]
+)]
+class HasNestedParameterAttribute
+{
+    public $id;
+    public $name;
+    public $related;
 }
