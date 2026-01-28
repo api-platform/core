@@ -25,7 +25,7 @@
         "serializer",
         "state",
         "symfony",
-        "test"
+        "test",
         "validator",
       ]
     ],
