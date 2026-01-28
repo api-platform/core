@@ -27,4 +27,8 @@ return function (ContainerConfigurator $container) {
     $services->set('api_platform.maker.command.filter', 'ApiPlatform\Symfony\Maker\MakeFilter')
         ->args([param('api_platform.maker.namespace_prefix')])
         ->tag('maker.command');
+
+    $services->set('api_platform.maker.command.api_resource', 'ApiPlatform\Symfony\Maker\MakeApiResource')
+        ->args([param('api_platform.maker.namespace_prefix')])
+        ->tag('maker.command');
 };
