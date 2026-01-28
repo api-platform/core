@@ -52,6 +52,11 @@ class ObjectMapperMetadataCollectionFactory implements ResourceMetadataCollectio
                     $entityClass = $options->getDocumentClass();
                 }
 
+                // Laravel Eloquent State Options
+                if (($options = $operation->getStateOptions()) && method_exists($options, 'getModelClass') && $options->getModelClass()) {
+                    $entityClass = $options->getModelClass();
+                }
+
                 $class = $operation->getInput()['class'] ?? $operation->getClass();
                 $outputClass = $operation->getOutput()['class'] ?? null;
                 $entityMap = null;

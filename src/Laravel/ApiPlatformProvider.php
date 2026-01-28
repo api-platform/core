@@ -126,6 +126,7 @@ use ApiPlatform\Metadata\Resource\Factory\AttributesResourceNameCollectionFactor
 use ApiPlatform\Metadata\Resource\Factory\ConcernsResourceNameCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\LinkFactory;
 use ApiPlatform\Metadata\Resource\Factory\LinkFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\ObjectMapperMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
@@ -146,15 +147,18 @@ use ApiPlatform\Serializer\SerializerContextBuilder;
 use ApiPlatform\State\CallableProcessor;
 use ApiPlatform\State\CallableProvider;
 use ApiPlatform\State\ErrorProvider;
+use ApiPlatform\State\ObjectMapper\ObjectMapper;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginationOptions;
 use ApiPlatform\State\Processor\AddLinkHeaderProcessor;
+use ApiPlatform\State\Processor\ObjectMapperProcessor;
 use ApiPlatform\State\Processor\RespondProcessor;
 use ApiPlatform\State\Processor\SerializeProcessor;
 use ApiPlatform\State\Processor\WriteProcessor;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\Provider\ContentNegotiationProvider;
 use ApiPlatform\State\Provider\DeserializeProvider;
+use ApiPlatform\State\Provider\ObjectMapperProvider;
 use ApiPlatform\State\Provider\ParameterProvider;
 use ApiPlatform\State\Provider\ReadProvider;
 use ApiPlatform\State\ProviderInterface;
@@ -166,6 +170,9 @@ use Illuminate\Support\ServiceProvider;
 use Negotiation\Negotiator;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\ObjectMapper\Metadata\ObjectMapperMetadataFactoryInterface;
+use Symfony\Component\ObjectMapper\Metadata\ReflectionObjectMapperMetadataFactory;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
@@ -347,6 +354,16 @@ class ApiPlatformProvider extends ServiceProvider
             return new HydraPrefixNameConverter(new MetadataAwareNameConverter($app->make(ClassMetadataFactoryInterface::class), $nameConverter), $defaultContext);
         });
 
+        // ObjectMapper metadata factory support
+        if (interface_exists(ObjectMapperInterface::class)) {
+            $this->app->extend(ResourceMetadataCollectionFactoryInterface::class, static function (ResourceMetadataCollectionFactoryInterface $inner, Application $app) {
+                return new ObjectMapperMetadataCollectionFactory(
+                    $inner,
+                    $app->make(ObjectMapperMetadataFactoryInterface::class)
+                );
+            });
+        }
+
         $this->app->singleton(OperationMetadataFactory::class, static function (Application $app) {
             return new OperationMetadataFactory($app->make(ResourceNameCollectionFactoryInterface::class), $app->make(ResourceMetadataCollectionFactoryInterface::class));
         });
@@ -403,6 +420,23 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->bind(ProviderInterface::class, ContentNegotiationProvider::class);
+
+        // ObjectMapper support
+        if (interface_exists(ObjectMapperInterface::class)) {
+            $this->app->singleton(ObjectMapperMetadataFactoryInterface::class, ReflectionObjectMapperMetadataFactory::class);
+
+            $this->app->singleton(ObjectMapper::class, static function (Application $app) {
+                if (!$app->bound('api_platform.object_mapper')) {
+                    return null;
+                }
+
+                return new ObjectMapper($app->make('api_platform.object_mapper'));
+            });
+
+            $this->app->extend(ProviderInterface::class, static function (ProviderInterface $inner, Application $app) {
+                return new ObjectMapperProvider($app->make(ObjectMapper::class), $inner);
+            });
+        }
 
         $this->app->singleton(RespondProcessor::class, static function (Application $app) {
             $decorated = new RespondProcessor(
@@ -469,6 +503,13 @@ class ApiPlatformProvider extends ServiceProvider
 
             return $app->make(WriteProcessor::class);
         });
+
+        // ObjectMapperProcessor wraps the base processor if available
+        if (interface_exists(ObjectMapperInterface::class)) {
+            $this->app->extend(ProcessorInterface::class, static function (ProcessorInterface $inner, Application $app) {
+                return new ObjectMapperProcessor($app->make(ObjectMapper::class), $inner);
+            });
+        }
 
         $this->app->singleton(ObjectNormalizer::class, static function (Application $app) {
             $config = $app['config'];
