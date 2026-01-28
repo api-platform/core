@@ -98,9 +98,4 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
 
         return $context;
     }
-
-    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
-    {
-        return self::FORMAT === $format && \is_iterable($data);
-    }
 }
