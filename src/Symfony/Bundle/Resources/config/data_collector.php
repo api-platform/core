@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\Symfony\Bundle\DataCollector\RequestDataCollector;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.data_collector.request', 'ApiPlatform\Symfony\Bundle\DataCollector\RequestDataCollector')
+    $services->set('api_platform.data_collector.request', RequestDataCollector::class)
         ->args([
             service('api_platform.metadata.resource.metadata_collection_factory'),
             service('api_platform.filter_locator'),

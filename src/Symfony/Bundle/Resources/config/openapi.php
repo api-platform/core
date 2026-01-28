@@ -13,25 +13,38 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\OpenApi\Command\OpenApiCommand;
+use ApiPlatform\OpenApi\Factory\OpenApiFactory;
+use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
+use ApiPlatform\OpenApi\Options;
+use ApiPlatform\OpenApi\Serializer\ApiGatewayNormalizer;
+use ApiPlatform\OpenApi\Serializer\LegacyOpenApiNormalizer;
+use ApiPlatform\OpenApi\Serializer\OpenApiNormalizer;
+use ApiPlatform\OpenApi\Serializer\SerializerContextBuilder;
+use ApiPlatform\OpenApi\State\OpenApiProvider;
+use ApiPlatform\Serializer\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
+
 return function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.openapi.normalizer', 'ApiPlatform\OpenApi\Serializer\OpenApiNormalizer')
-        ->args([inline_service('Symfony\Component\Serializer\Serializer')->arg(0, [inline_service('Symfony\Component\Serializer\Normalizer\ObjectNormalizer')->arg(0, null)->arg(1, null)->arg(2, service('api_platform.property_accessor'))->arg(3, service('api_platform.property_info'))])->arg(1, [service('serializer.encoder.json')])])
+    $services->set('api_platform.openapi.normalizer', OpenApiNormalizer::class)
+        ->args([inline_service(Serializer::class)->arg(0, [inline_service(ObjectNormalizer::class)->arg(0, null)->arg(1, null)->arg(2, service('api_platform.property_accessor'))->arg(3, service('api_platform.property_info'))])->arg(1, [service('serializer.encoder.json')])])
         ->tag('serializer.normalizer', ['priority' => -795]);
 
-    $services->alias('ApiPlatform\OpenApi\Serializer\OpenApiNormalizer', 'api_platform.openapi.normalizer');
+    $services->alias(OpenApiNormalizer::class, 'api_platform.openapi.normalizer');
 
-    $services->set('api_platform.openapi.provider', 'ApiPlatform\OpenApi\State\OpenApiProvider')
+    $services->set('api_platform.openapi.provider', OpenApiProvider::class)
         ->args([service('api_platform.openapi.factory')])
         ->tag('api_platform.state_provider', ['priority' => -100, 'key' => 'ApiPlatform\OpenApi\State\OpenApiProvider'])
         ->tag('api_platform.state_provider', ['priority' => -100, 'key' => 'api_platform.openapi.provider']);
 
-    $services->set('api_platform.openapi.serializer_context_builder', 'ApiPlatform\OpenApi\Serializer\SerializerContextBuilder')
+    $services->set('api_platform.openapi.serializer_context_builder', SerializerContextBuilder::class)
         ->decorate('api_platform.serializer.context_builder', null, 0)
         ->args([service('api_platform.openapi.serializer_context_builder.inner')]);
 
-    $services->set('api_platform.openapi.options', 'ApiPlatform\OpenApi\Options')
+    $services->set('api_platform.openapi.options', Options::class)
         ->args([
             '%api_platform.title%',
             '%api_platform.description%',
@@ -59,28 +72,28 @@ return function (ContainerConfigurator $container) {
             '%api_platform.openapi.license.identifier%',
         ]);
 
-    $services->alias('ApiPlatform\OpenApi\Options', 'api_platform.openapi.options');
+    $services->alias(Options::class, 'api_platform.openapi.options');
 
-    $services->set('api_platform.openapi.command', 'ApiPlatform\OpenApi\Command\OpenApiCommand')
+    $services->set('api_platform.openapi.command', OpenApiCommand::class)
         ->args([
             service('api_platform.openapi.factory'),
             service('api_platform.serializer'),
         ])
         ->tag('console.command');
 
-    $services->set('api_platform.openapi.normalizer.api_gateway', 'ApiPlatform\OpenApi\Serializer\ApiGatewayNormalizer')
+    $services->set('api_platform.openapi.normalizer.api_gateway', ApiGatewayNormalizer::class)
         ->decorate('api_platform.openapi.normalizer', null, -1)
         ->args([service('api_platform.openapi.normalizer.api_gateway.inner')])
         ->tag('serializer.normalizer');
 
-    $services->set('api_platform.openapi.normalizer.legacy', 'ApiPlatform\OpenApi\Serializer\LegacyOpenApiNormalizer')
+    $services->set('api_platform.openapi.normalizer.legacy', LegacyOpenApiNormalizer::class)
         ->decorate('api_platform.openapi.normalizer.api_gateway', null, -2)
         ->args([service('api_platform.openapi.normalizer.legacy.inner')])
         ->tag('serializer.normalizer');
 
-    $services->alias('ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface', 'api_platform.openapi.factory');
+    $services->alias(OpenApiFactoryInterface::class, 'api_platform.openapi.factory');
 
-    $services->set('api_platform.openapi.factory', 'ApiPlatform\OpenApi\Factory\OpenApiFactory')
+    $services->set('api_platform.openapi.factory', OpenApiFactory::class)
         ->args([
             service('api_platform.metadata.resource.name_collection_factory'),
             service('api_platform.metadata.resource.metadata_collection_factory'),
@@ -99,7 +112,7 @@ return function (ContainerConfigurator $container) {
         ->parent('cache.system')
         ->tag('cache.pool');
 
-    $services->set('api_platform.jsonopenapi.encoder', 'ApiPlatform\Serializer\JsonEncoder')
+    $services->set('api_platform.jsonopenapi.encoder', JsonEncoder::class)
         ->args([
             'jsonopenapi',
             service('serializer.json.encoder')->nullOnInvalid(),

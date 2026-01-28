@@ -13,10 +13,17 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\JsonSchema\BackwardCompatibleSchemaFactory;
+use ApiPlatform\JsonSchema\Command\JsonSchemaGenerateCommand;
+use ApiPlatform\JsonSchema\DefinitionNameFactory;
+use ApiPlatform\JsonSchema\Metadata\Property\Factory\SchemaPropertyMetadataFactory;
+use ApiPlatform\JsonSchema\SchemaFactory;
+use ApiPlatform\JsonSchema\SchemaFactoryInterface;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.json_schema.schema_factory', 'ApiPlatform\JsonSchema\SchemaFactory')
+    $services->set('api_platform.json_schema.schema_factory', SchemaFactory::class)
         ->args([
             service('api_platform.metadata.resource.metadata_collection_factory'),
             service('api_platform.metadata.property.name_collection_factory'),
@@ -27,25 +34,25 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.json_schema.definition_name_factory')->ignoreOnInvalid(),
         ]);
 
-    $services->alias('ApiPlatform\JsonSchema\SchemaFactoryInterface', 'api_platform.json_schema.schema_factory');
+    $services->alias(SchemaFactoryInterface::class, 'api_platform.json_schema.schema_factory');
 
-    $services->set('api_platform.json_schema.json_schema_generate_command', 'ApiPlatform\JsonSchema\Command\JsonSchemaGenerateCommand')
+    $services->set('api_platform.json_schema.json_schema_generate_command', JsonSchemaGenerateCommand::class)
         ->args([
             service('api_platform.json_schema.schema_factory'),
             '%api_platform.formats%',
         ])
         ->tag('console.command');
 
-    $services->set('api_platform.json_schema.metadata.property.metadata_factory.schema', 'ApiPlatform\JsonSchema\Metadata\Property\Factory\SchemaPropertyMetadataFactory')
+    $services->set('api_platform.json_schema.metadata.property.metadata_factory.schema', SchemaPropertyMetadataFactory::class)
         ->decorate('api_platform.metadata.property.metadata_factory', null, 10)
         ->args([
             service('api_platform.resource_class_resolver'),
             service('api_platform.json_schema.metadata.property.metadata_factory.schema.inner'),
         ]);
 
-    $services->set('api_platform.json_schema.backward_compatible_schema_factory', 'ApiPlatform\JsonSchema\BackwardCompatibleSchemaFactory')
+    $services->set('api_platform.json_schema.backward_compatible_schema_factory', BackwardCompatibleSchemaFactory::class)
         ->decorate('api_platform.json_schema.schema_factory', null, -2)
         ->args([service('api_platform.json_schema.backward_compatible_schema_factory.inner')]);
 
-    $services->set('api_platform.json_schema.definition_name_factory', 'ApiPlatform\JsonSchema\DefinitionNameFactory');
+    $services->set('api_platform.json_schema.definition_name_factory', DefinitionNameFactory::class);
 };

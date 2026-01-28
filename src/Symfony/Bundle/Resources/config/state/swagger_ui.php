@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\Symfony\Bundle\SwaggerUi\SwaggerUiProvider;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.swagger_ui.provider', 'ApiPlatform\Symfony\Bundle\SwaggerUi\SwaggerUiProvider')
+    $services->set('api_platform.swagger_ui.provider', SwaggerUiProvider::class)
         ->decorate('api_platform.state_provider.read', null, 0)
         ->args([
             service('api_platform.swagger_ui.provider.inner'),

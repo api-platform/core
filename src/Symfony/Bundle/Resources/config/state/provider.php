@@ -13,12 +13,18 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\State\Provider\ContentNegotiationProvider;
+use ApiPlatform\State\Provider\DeserializeProvider;
+use ApiPlatform\State\Provider\ParameterProvider;
+use ApiPlatform\State\Provider\ReadProvider;
+use ApiPlatform\Symfony\EventListener\ErrorListener;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
     $services->alias('api_platform.state_provider.main', 'api_platform.state_provider.locator');
 
-    $services->set('api_platform.state_provider.content_negotiation', 'ApiPlatform\State\Provider\ContentNegotiationProvider')
+    $services->set('api_platform.state_provider.content_negotiation', ContentNegotiationProvider::class)
         ->decorate('api_platform.state_provider.main', null, 100)
         ->args([
             service('api_platform.state_provider.content_negotiation.inner'),
@@ -27,14 +33,14 @@ return static function (ContainerConfigurator $container) {
             '%api_platform.error_formats%',
         ]);
 
-    $services->set('api_platform.state_provider.read', 'ApiPlatform\State\Provider\ReadProvider')
+    $services->set('api_platform.state_provider.read', ReadProvider::class)
         ->decorate('api_platform.state_provider.main', null, 500)
         ->args([
             service('api_platform.state_provider.read.inner'),
             service('api_platform.serializer.context_builder'),
         ]);
 
-    $services->set('api_platform.state_provider.deserialize', 'ApiPlatform\State\Provider\DeserializeProvider')
+    $services->set('api_platform.state_provider.deserialize', DeserializeProvider::class)
         ->decorate('api_platform.state_provider.main', null, 300)
         ->args([
             service('api_platform.state_provider.deserialize.inner'),
@@ -43,7 +49,7 @@ return static function (ContainerConfigurator $container) {
             service('translator')->nullOnInvalid(),
         ]);
 
-    $services->set('api_platform.error_listener', 'ApiPlatform\Symfony\EventListener\ErrorListener')
+    $services->set('api_platform.error_listener', ErrorListener::class)
         ->arg('$controller', 'api_platform.symfony.main_controller')
         ->arg('$logger', service('logger')->nullOnInvalid())
         ->arg('$debug', '%kernel.debug%')
@@ -55,7 +61,7 @@ return static function (ContainerConfigurator $container) {
         ->arg('$resourceClassResolver', service('api_platform.resource_class_resolver'))
         ->arg('$negotiator', service('api_platform.negotiator'));
 
-    $services->set('api_platform.state_provider.parameter', 'ApiPlatform\State\Provider\ParameterProvider')
+    $services->set('api_platform.state_provider.parameter', ParameterProvider::class)
         ->decorate('api_platform.state_provider.main', null, 180)
         ->args([
             service('api_platform.state_provider.parameter.inner'),

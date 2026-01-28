@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\JsonLd\Action\ContextAction;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.jsonld.action.context', 'ApiPlatform\JsonLd\Action\ContextAction')
+    $services->set('api_platform.jsonld.action.context', ContextAction::class)
         ->public()
         ->args([
             service('api_platform.jsonld.context_builder'),

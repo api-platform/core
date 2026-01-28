@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\Symfony\Doctrine\EventListener\PurgeHttpCacheListener;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.doctrine.listener.http_cache.purge', 'ApiPlatform\Symfony\Doctrine\EventListener\PurgeHttpCacheListener')
+    $services->set('api_platform.doctrine.listener.http_cache.purge', PurgeHttpCacheListener::class)
         ->args([
             service('api_platform.http_cache.purger'),
             service('api_platform.iri_converter'),

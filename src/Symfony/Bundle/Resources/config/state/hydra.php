@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\Hydra\State\HydraLinkProcessor;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.hydra.processor.link', 'ApiPlatform\Hydra\State\HydraLinkProcessor')
+    $services->set('api_platform.hydra.processor.link', HydraLinkProcessor::class)
         ->decorate('api_platform.state_processor.respond', null, 410)
         ->args([
             service('api_platform.hydra.processor.link.inner'),

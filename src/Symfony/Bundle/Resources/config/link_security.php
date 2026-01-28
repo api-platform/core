@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\State\ParameterProvider\ReadLinkParameterProvider;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.state_provider.read_link', 'ApiPlatform\State\ParameterProvider\ReadLinkParameterProvider')
+    $services->set('api_platform.state_provider.read_link', ReadLinkParameterProvider::class)
         ->args([
             service('api_platform.state_provider.locator'),
             service('api_platform.metadata.resource.metadata_collection_factory'),

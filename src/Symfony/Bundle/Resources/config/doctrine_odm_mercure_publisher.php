@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\Symfony\Doctrine\EventListener\PublishMercureUpdatesListener;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.doctrine_mongodb.odm.listener.mercure.publish', 'ApiPlatform\Symfony\Doctrine\EventListener\PublishMercureUpdatesListener')
+    $services->set('api_platform.doctrine_mongodb.odm.listener.mercure.publish', PublishMercureUpdatesListener::class)
         ->args([
             service('api_platform.resource_class_resolver'),
             service('api_platform.symfony.iri_converter'),

@@ -13,10 +13,13 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\Serializer\State\JsonStreamerProcessor;
+use ApiPlatform\Serializer\State\JsonStreamerProvider;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.state_processor.json_streamer', 'ApiPlatform\Serializer\State\JsonStreamerProcessor')
+    $services->set('api_platform.state_processor.json_streamer', JsonStreamerProcessor::class)
         ->decorate('api_platform.state_processor.main', null, 190)
         ->args([
             service('api_platform.state_processor.json_streamer.inner'),
@@ -26,7 +29,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.metadata.operation.metadata_factory'),
         ]);
 
-    $services->set('api_platform.state_provider.json_streamer', 'ApiPlatform\Serializer\State\JsonStreamerProvider')
+    $services->set('api_platform.state_provider.json_streamer', JsonStreamerProvider::class)
         ->decorate('api_platform.state_provider.main', null, 310)
         ->args([
             service('api_platform.state_provider.json_streamer.inner'),

@@ -13,19 +13,52 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\Metadata\IdentifiersExtractor;
+use ApiPlatform\Metadata\IdentifiersExtractorInterface;
+use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\Operation\DashPathSegmentNameGenerator;
+use ApiPlatform\Metadata\Operation\UnderscorePathSegmentNameGenerator;
+use ApiPlatform\Metadata\ResourceClassResolver;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\UriVariablesConverter;
+use ApiPlatform\Metadata\UriVariableTransformer\ApiResourceUriVariableTransformer;
+use ApiPlatform\Metadata\UriVariableTransformer\DateTimeUriVariableTransformer;
+use ApiPlatform\Metadata\UriVariableTransformer\IntegerUriVariableTransformer;
+use ApiPlatform\Metadata\UrlGeneratorInterface;
+use ApiPlatform\Metadata\Util\Inflector;
+use ApiPlatform\Serializer\ConstraintViolationListNormalizer;
+use ApiPlatform\Serializer\Filter\GroupFilter;
+use ApiPlatform\Serializer\Filter\PropertyFilter;
+use ApiPlatform\Serializer\ItemNormalizer;
+use ApiPlatform\Serializer\Mapping\Factory\ClassMetadataFactory;
+use ApiPlatform\Serializer\Mapping\Loader\PropertyMetadataLoader;
+use ApiPlatform\Serializer\Parameter\SerializerFilterParameterProvider;
+use ApiPlatform\Serializer\SerializerContextBuilder;
+use ApiPlatform\Serializer\SerializerFilterContextBuilder;
+use ApiPlatform\State\ErrorProvider;
+use ApiPlatform\State\SerializerContextBuilderInterface;
+use ApiPlatform\Symfony\Action\NotExposedAction;
+use ApiPlatform\Symfony\Action\NotFoundAction;
+use ApiPlatform\Symfony\Routing\ApiLoader;
+use ApiPlatform\Symfony\Routing\IriConverter;
+use ApiPlatform\Symfony\Routing\Router;
+use ApiPlatform\Symfony\Routing\SkolemIriConverter;
+use Negotiation\Negotiator;
+use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
+
 return function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.action.not_found', 'ApiPlatform\Symfony\Action\NotFoundAction')
+    $services->set('api_platform.action.not_found', NotFoundAction::class)
         ->public();
 
-    $services->alias('ApiPlatform\Symfony\Action\NotFoundAction', 'api_platform.action.not_found')
+    $services->alias(NotFoundAction::class, 'api_platform.action.not_found')
         ->public();
 
-    $services->set('api_platform.action.not_exposed', 'ApiPlatform\Symfony\Action\NotExposedAction')
+    $services->set('api_platform.action.not_exposed', NotExposedAction::class)
         ->public();
 
-    $services->alias('ApiPlatform\Symfony\Action\NotExposedAction', 'api_platform.action.not_exposed')
+    $services->alias(NotExposedAction::class, 'api_platform.action.not_exposed')
         ->public();
 
     $services->alias('api_platform.serializer', 'serializer');
@@ -34,32 +67,32 @@ return function (ContainerConfigurator $container) {
 
     $services->alias('api_platform.property_info', 'property_info');
 
-    $services->set('api_platform.negotiator', 'Negotiation\Negotiator');
+    $services->set('api_platform.negotiator', Negotiator::class);
 
-    $services->set('api_platform.resource_class_resolver', 'ApiPlatform\Metadata\ResourceClassResolver')
+    $services->set('api_platform.resource_class_resolver', ResourceClassResolver::class)
         ->args([service('api_platform.metadata.resource.name_collection_factory')]);
 
-    $services->alias('ApiPlatform\Metadata\ResourceClassResolverInterface', 'api_platform.resource_class_resolver');
+    $services->alias(ResourceClassResolverInterface::class, 'api_platform.resource_class_resolver');
 
-    $services->alias('ApiPlatform\Metadata\UrlGeneratorInterface', 'api_platform.router');
+    $services->alias(UrlGeneratorInterface::class, 'api_platform.router');
 
-    $services->set('api_platform.router', 'ApiPlatform\Symfony\Routing\Router')
+    $services->set('api_platform.router', Router::class)
         ->args([
             service('router'),
             '%api_platform.url_generation_strategy%',
         ]);
 
-    $services->set('api_platform.serializer.context_builder', 'ApiPlatform\Serializer\SerializerContextBuilder')
+    $services->set('api_platform.serializer.context_builder', SerializerContextBuilder::class)
         ->arg(0, service('api_platform.metadata.resource.metadata_collection_factory'))
         ->arg('$debug', '%kernel.debug%');
 
-    $services->set('api_platform.serializer.filter_parameter_provider', 'ApiPlatform\Serializer\Parameter\SerializerFilterParameterProvider')
+    $services->set('api_platform.serializer.filter_parameter_provider', SerializerFilterParameterProvider::class)
         ->args([service('api_platform.filter_locator')])
         ->tag('api_platform.parameter_provider', ['key' => 'api_platform.serializer.filter_parameter_provider', 'priority' => -895]);
 
-    $services->alias('ApiPlatform\State\SerializerContextBuilderInterface', 'api_platform.serializer.context_builder');
+    $services->alias(SerializerContextBuilderInterface::class, 'api_platform.serializer.context_builder');
 
-    $services->set('api_platform.serializer.context_builder.filter', 'ApiPlatform\Serializer\SerializerFilterContextBuilder')
+    $services->set('api_platform.serializer.context_builder.filter', SerializerFilterContextBuilder::class)
         ->decorate('api_platform.serializer.context_builder', null, 0)
         ->args([
             service('api_platform.metadata.resource.metadata_collection_factory'),
@@ -67,21 +100,21 @@ return function (ContainerConfigurator $container) {
             service('api_platform.serializer.context_builder.filter.inner'),
         ]);
 
-    $services->set('api_platform.serializer.property_filter', 'ApiPlatform\Serializer\Filter\PropertyFilter')
+    $services->set('api_platform.serializer.property_filter', PropertyFilter::class)
         ->abstract()
         ->arg('$parameterName', 'properties')
         ->arg('$overrideDefaultProperties', false)
         ->arg('$whitelist', null)
         ->arg('$nameConverter', service('api_platform.name_converter')->ignoreOnInvalid());
 
-    $services->alias('ApiPlatform\Serializer\Filter\PropertyFilter', 'api_platform.serializer.property_filter');
+    $services->alias(PropertyFilter::class, 'api_platform.serializer.property_filter');
 
-    $services->set('api_platform.serializer.group_filter', 'ApiPlatform\Serializer\Filter\GroupFilter')
+    $services->set('api_platform.serializer.group_filter', GroupFilter::class)
         ->abstract();
 
-    $services->alias('ApiPlatform\Serializer\Filter\GroupFilter', 'api_platform.serializer.group_filter');
+    $services->alias(GroupFilter::class, 'api_platform.serializer.group_filter');
 
-    $services->set('api_platform.serializer.normalizer.item', 'ApiPlatform\Serializer\ItemNormalizer')
+    $services->set('api_platform.serializer.normalizer.item', ItemNormalizer::class)
         ->args([
             service('api_platform.metadata.property.name_collection_factory'),
             service('api_platform.metadata.property.metadata_factory'),
@@ -98,34 +131,34 @@ return function (ContainerConfigurator $container) {
         ])
         ->tag('serializer.normalizer', ['priority' => -895]);
 
-    $services->set('api_platform.serializer.mapping.class_metadata_factory', 'ApiPlatform\Serializer\Mapping\Factory\ClassMetadataFactory')
+    $services->set('api_platform.serializer.mapping.class_metadata_factory', ClassMetadataFactory::class)
         ->decorate('serializer.mapping.class_metadata_factory', null, -1)
         ->args([service('api_platform.serializer.mapping.class_metadata_factory.inner')]);
 
-    $services->set('api_platform.serializer.mapping.cache_class_metadata_factory', 'Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory')
+    $services->set('api_platform.serializer.mapping.cache_class_metadata_factory', CacheClassMetadataFactory::class)
         ->decorate('api_platform.serializer.mapping.class_metadata_factory', null, -2)
         ->args([
             service('api_platform.serializer.mapping.cache_class_metadata_factory.inner'),
             service('serializer.mapping.cache.symfony'),
         ]);
 
-    $services->set('api_platform.path_segment_name_generator.underscore', 'ApiPlatform\Metadata\Operation\UnderscorePathSegmentNameGenerator');
+    $services->set('api_platform.path_segment_name_generator.underscore', UnderscorePathSegmentNameGenerator::class);
 
-    $services->set('api_platform.path_segment_name_generator.dash', 'ApiPlatform\Metadata\Operation\DashPathSegmentNameGenerator');
+    $services->set('api_platform.path_segment_name_generator.dash', DashPathSegmentNameGenerator::class);
 
-    $services->set('api_platform.metadata.path_segment_name_generator.underscore', 'ApiPlatform\Metadata\Operation\UnderscorePathSegmentNameGenerator')
+    $services->set('api_platform.metadata.path_segment_name_generator.underscore', UnderscorePathSegmentNameGenerator::class)
         ->args([service('api_platform.inflector')->nullOnInvalid()]);
 
-    $services->set('api_platform.metadata.path_segment_name_generator.dash', 'ApiPlatform\Metadata\Operation\DashPathSegmentNameGenerator')
+    $services->set('api_platform.metadata.path_segment_name_generator.dash', DashPathSegmentNameGenerator::class)
         ->args([service('api_platform.inflector')->nullOnInvalid()]);
 
-    $services->set('api_platform.metadata.inflector', 'ApiPlatform\Metadata\Util\Inflector');
+    $services->set('api_platform.metadata.inflector', Inflector::class);
 
     $services->set('api_platform.cache.route_name_resolver')
         ->parent('cache.system')
         ->tag('cache.pool');
 
-    $services->set('api_platform.route_loader', 'ApiPlatform\Symfony\Routing\ApiLoader')
+    $services->set('api_platform.route_loader', ApiLoader::class)
         ->args([
             service('kernel'),
             service('api_platform.metadata.resource.name_collection_factory'),
@@ -140,10 +173,10 @@ return function (ContainerConfigurator $container) {
         ])
         ->tag('routing.loader');
 
-    $services->set('api_platform.symfony.iri_converter.skolem', 'ApiPlatform\Symfony\Routing\SkolemIriConverter')
+    $services->set('api_platform.symfony.iri_converter.skolem', SkolemIriConverter::class)
         ->args([service('api_platform.router')]);
 
-    $services->set('api_platform.api.identifiers_extractor', 'ApiPlatform\Metadata\IdentifiersExtractor')
+    $services->set('api_platform.api.identifiers_extractor', IdentifiersExtractor::class)
         ->args([
             service('api_platform.metadata.resource.metadata_collection_factory'),
             service('api_platform.resource_class_resolver'),
@@ -154,22 +187,22 @@ return function (ContainerConfigurator $container) {
 
     $services->alias('api_platform.identifiers_extractor', 'api_platform.api.identifiers_extractor');
 
-    $services->alias('ApiPlatform\Metadata\IdentifiersExtractorInterface', 'api_platform.api.identifiers_extractor');
+    $services->alias(IdentifiersExtractorInterface::class, 'api_platform.api.identifiers_extractor');
 
-    $services->set('api_platform.uri_variables.converter', 'ApiPlatform\Metadata\UriVariablesConverter')
+    $services->set('api_platform.uri_variables.converter', UriVariablesConverter::class)
         ->args([
             service('api_platform.metadata.property.metadata_factory'),
             service('api_platform.metadata.resource.metadata_collection_factory'),
             tagged_iterator('api_platform.uri_variables.transformer'),
         ]);
 
-    $services->set('api_platform.uri_variables.transformer.integer', 'ApiPlatform\Metadata\UriVariableTransformer\IntegerUriVariableTransformer')
+    $services->set('api_platform.uri_variables.transformer.integer', IntegerUriVariableTransformer::class)
         ->tag('api_platform.uri_variables.transformer', ['priority' => -100]);
 
-    $services->set('api_platform.uri_variables.transformer.date_time', 'ApiPlatform\Metadata\UriVariableTransformer\DateTimeUriVariableTransformer')
+    $services->set('api_platform.uri_variables.transformer.date_time', DateTimeUriVariableTransformer::class)
         ->tag('api_platform.uri_variables.transformer', ['priority' => -100]);
 
-    $services->set('api_platform.uri_variables.transformer.api_resource', 'ApiPlatform\Metadata\UriVariableTransformer\ApiResourceUriVariableTransformer')
+    $services->set('api_platform.uri_variables.transformer.api_resource', ApiResourceUriVariableTransformer::class)
         ->args([
             service('api_platform.api.identifiers_extractor'),
             service('api_platform.resource_class_resolver'),
@@ -178,7 +211,7 @@ return function (ContainerConfigurator $container) {
 
     $services->alias('api_platform.iri_converter', 'api_platform.symfony.iri_converter');
 
-    $services->set('api_platform.symfony.iri_converter', 'ApiPlatform\Symfony\Routing\IriConverter')
+    $services->set('api_platform.symfony.iri_converter', IriConverter::class)
         ->args([
             service('api_platform.state_provider.locator'),
             service('api_platform.router'),
@@ -190,21 +223,21 @@ return function (ContainerConfigurator $container) {
             service('api_platform.metadata.operation.metadata_factory'),
         ]);
 
-    $services->alias('ApiPlatform\Metadata\IriConverterInterface', 'api_platform.symfony.iri_converter');
+    $services->alias(IriConverterInterface::class, 'api_platform.symfony.iri_converter');
 
-    $services->set('api_platform.state.error_provider', 'ApiPlatform\State\ErrorProvider')
+    $services->set('api_platform.state.error_provider', ErrorProvider::class)
         ->arg('$debug', '%kernel.debug%')
         ->arg('$resourceClassResolver', service('api_platform.resource_class_resolver'))
         ->arg('$resourceMetadataCollectionFactory', service('api_platform.metadata.resource.metadata_collection_factory'))
         ->tag('api_platform.state_provider', ['key' => 'api_platform.state.error_provider']);
 
-    $services->set('api_platform.normalizer.constraint_violation_list', 'ApiPlatform\Serializer\ConstraintViolationListNormalizer')
+    $services->set('api_platform.normalizer.constraint_violation_list', ConstraintViolationListNormalizer::class)
         ->args([
             '%api_platform.validator.serialize_payload_fields%',
             service('api_platform.name_converter')->ignoreOnInvalid(),
         ])
         ->tag('serializer.normalizer', ['priority' => -780]);
 
-    $services->set('api_platform.serializer.property_metadata_loader', 'ApiPlatform\Serializer\Mapping\Loader\PropertyMetadataLoader')
+    $services->set('api_platform.serializer.property_metadata_loader', PropertyMetadataLoader::class)
         ->args([service('api_platform.metadata.property.name_collection_factory')]);
 };

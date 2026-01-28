@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\HttpCache\State\AddTagsProcessor;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.http_cache_purger.processor.add_tags', 'ApiPlatform\HttpCache\State\AddTagsProcessor')
+    $services->set('api_platform.http_cache_purger.processor.add_tags', AddTagsProcessor::class)
         ->decorate('api_platform.state_processor.respond', null, 0)
         ->args([
             service('api_platform.http_cache_purger.processor.add_tags.inner'),
