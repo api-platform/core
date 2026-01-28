@@ -29,6 +29,7 @@ use ApiPlatform\Metadata\Util\Inflector;
 use ApiPlatform\Serializer\ConstraintViolationListNormalizer;
 use ApiPlatform\Serializer\Filter\GroupFilter;
 use ApiPlatform\Serializer\Filter\PropertyFilter;
+use ApiPlatform\Serializer\ItemDenormalizer;
 use ApiPlatform\Serializer\ItemNormalizer;
 use ApiPlatform\Serializer\Mapping\Factory\ClassMetadataFactory;
 use ApiPlatform\Serializer\Mapping\Loader\PropertyMetadataLoader;
@@ -144,6 +145,23 @@ return function (ContainerConfigurator $container) {
             service('property_info')->ignoreOnInvalid(),
         ])
         ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -1000]);
+
+    $services->set('api_platform.serializer.normalizer.item_denormalizer', ItemDenormalizer::class)
+        ->args([
+            service('api_platform.metadata.property.name_collection_factory'),
+            service('api_platform.metadata.property.metadata_factory'),
+            service('api_platform.iri_converter'),
+            service('api_platform.resource_class_resolver'),
+            service('api_platform.property_accessor'),
+            service('api_platform.name_converter')->ignoreOnInvalid(),
+            service('serializer.mapping.class_metadata_factory')->ignoreOnInvalid(),
+            null,
+            service('api_platform.metadata.resource.metadata_collection_factory')->ignoreOnInvalid(),
+            service('api_platform.security.resource_access_checker')->ignoreOnInvalid(),
+            [],
+            service('api_platform.http_cache.tag_collector')->ignoreOnInvalid(),
+        ])
+        ->tag('serializer.normalizer', ['priority' => -900]);
 
     $services->set('api_platform.serializer.mapping.class_metadata_factory', ClassMetadataFactory::class)
         ->decorate('serializer.mapping.class_metadata_factory', null, -1)

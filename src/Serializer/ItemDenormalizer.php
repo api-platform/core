@@ -26,15 +26,11 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
- * Generic item normalizer.
- *
- * TODO: do not hardcode "id"
+ * Converts data to objects (denormalization only).
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @todo Denormalization methods should be deprecated in 5.x, use ItemDenormalizer instead
  */
-class ItemNormalizer extends AbstractItemNormalizer
+class ItemDenormalizer extends AbstractItemNormalizer
 {
     use ItemNormalizerTrait;
     private readonly LoggerInterface $logger;

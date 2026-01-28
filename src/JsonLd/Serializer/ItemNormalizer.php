@@ -25,9 +25,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
-use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
-use ApiPlatform\Serializer\ContextTrait;
 use ApiPlatform\Serializer\TagCollectorInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Exception\LogicException;
@@ -39,57 +37,16 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * Converts between objects and array including JSON-LD and Hydra metadata.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @todo Denormalization methods should be deprecated in 5.x, use ItemDenormalizer instead
  */
 final class ItemNormalizer extends AbstractItemNormalizer
 {
-    use ClassInfoTrait;
-    use ContextTrait;
-    use JsonLdContextTrait;
-
-    public const FORMAT = 'jsonld';
-    private const JSONLD_KEYWORDS = [
-        '@context',
-        '@direction',
-        '@graph',
-        '@id',
-        '@import',
-        '@included',
-        '@index',
-        '@json',
-        '@language',
-        '@list',
-        '@nest',
-        '@none',
-        '@prefix',
-        '@propagate',
-        '@protected',
-        '@reverse',
-        '@set',
-        '@type',
-        '@value',
-        '@version',
-        '@vocab',
-    ];
+    use ItemNormalizerTrait;
 
     public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, private readonly ContextBuilderInterface $contextBuilder, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ?ResourceAccessCheckerInterface $resourceAccessChecker = null, protected ?TagCollectorInterface $tagCollector = null, private ?OperationMetadataFactoryInterface $operationMetadataFactory = null)
     {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $defaultContext, $resourceMetadataCollectionFactory, $resourceAccessChecker, $tagCollector);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
-    {
-        return self::FORMAT === $format && parent::supportsNormalization($data, $format, $context);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSupportedTypes(?string $format): array
-    {
-        return self::FORMAT === $format ? parent::getSupportedTypes($format) : [];
     }
 
     /**
@@ -170,16 +127,10 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     /**
      * {@inheritdoc}
-     */
-    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
-    {
-        return self::FORMAT === $format && parent::supportsDenormalization($data, $type, $format, $context);
-    }
-
-    /**
-     * {@inheritdoc}
      *
      * @throws NotNormalizableValueException
+     *
+     * @todo This method should be deprecated in 5.x, use ItemDenormalizer instead
      */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
@@ -201,15 +152,5 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
 
         return parent::denormalize($data, $type, $format, $context);
-    }
-
-    protected function getAllowedAttributes(string|object $classOrObject, array $context, bool $attributesAsString = false): array|bool
-    {
-        $allowedAttributes = parent::getAllowedAttributes($classOrObject, $context, $attributesAsString);
-        if (\is_array($allowedAttributes) && ($context['api_denormalize'] ?? false)) {
-            $allowedAttributes = array_merge($allowedAttributes, self::JSONLD_KEYWORDS);
-        }
-
-        return $allowedAttributes;
     }
 }
