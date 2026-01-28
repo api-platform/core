@@ -104,6 +104,12 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         $propertyNames = [];
         $properties = [];
         foreach ($parameter?->getProperties() ?? $this->propertyNameCollectionFactory->create($resourceClass) as $property) {
+            if (str_contains($property, '.')) {
+                $propertyNames[] = $property;
+                $properties[$property] = new ApiProperty();
+                continue;
+            }
+
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
             if ($propertyMetadata->isReadable()) {
                 $propertyNames[] = $property;
@@ -151,7 +157,11 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             $parameter = $parameter->withProperties($propertyNames);
 
             foreach ($propertyNames as $property) {
-                $converted = $this->nameConverter?->denormalize($property) ?? $property;
+                if (str_contains($property, '.')) {
+                    $converted = $property;
+                } else {
+                    $converted = $this->nameConverter?->denormalize($property) ?? $property;
+                }
                 $finalKey = str_replace(':property', $converted, $key);
                 $parameters->add(
                     $finalKey,
