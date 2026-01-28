@@ -13,13 +13,19 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\JsonLd\JsonStreamer\ValueTransformer\ContextValueTransformer;
+use ApiPlatform\JsonLd\JsonStreamer\ValueTransformer\IriValueTransformer;
+use ApiPlatform\JsonLd\JsonStreamer\ValueTransformer\TypeValueTransformer;
+use ApiPlatform\JsonLd\JsonStreamer\WritePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\CacheWarmer\LazyGhostCacheWarmer;
+use Symfony\Component\JsonStreamer\JsonStreamReader;
+use Symfony\Component\JsonStreamer\JsonStreamWriter;
 use Symfony\Component\JsonStreamer\StreamerDumper;
 
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.jsonld.json_streamer.stream_writer', 'Symfony\Component\JsonStreamer\JsonStreamWriter')
+    $services->set('api_platform.jsonld.json_streamer.stream_writer', JsonStreamWriter::class)
         ->args([
             tagged_locator('json_streamer.value_transformer'),
             service('api_platform.jsonld.json_streamer.write.property_metadata_loader'),
@@ -44,10 +50,10 @@ return static function (ContainerConfigurator $container) {
         $jsonStreamReaderArgs[] = param('.json_streamer.lazy_ghosts_dir');
     }
 
-    $services->set('api_platform.jsonld.json_streamer.stream_reader', 'Symfony\Component\JsonStreamer\JsonStreamReader')
+    $services->set('api_platform.jsonld.json_streamer.stream_reader', JsonStreamReader::class)
         ->args($jsonStreamReaderArgs);
 
-    $services->set('api_platform.jsonld.json_streamer.write.property_metadata_loader', 'ApiPlatform\JsonLd\JsonStreamer\WritePropertyMetadataLoader')
+    $services->set('api_platform.jsonld.json_streamer.write.property_metadata_loader', WritePropertyMetadataLoader::class)
         ->args([
             service('json_streamer.write.property_metadata_loader'),
             service('api_platform.resource_class_resolver'),
@@ -55,18 +61,18 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.metadata.property.metadata_factory'),
         ]);
 
-    $services->set('api_platform.jsonld.json_streamer.write.value_transformer.iri', 'ApiPlatform\JsonLd\JsonStreamer\ValueTransformer\IriValueTransformer')
+    $services->set('api_platform.jsonld.json_streamer.write.value_transformer.iri', IriValueTransformer::class)
         ->args([service('api_platform.iri_converter')])
         ->tag('json_streamer.value_transformer');
 
-    $services->set('api_platform.jsonld.json_streamer.write.value_transformer.type', 'ApiPlatform\JsonLd\JsonStreamer\ValueTransformer\TypeValueTransformer')
+    $services->set('api_platform.jsonld.json_streamer.write.value_transformer.type', TypeValueTransformer::class)
         ->args([
             service('api_platform.resource_class_resolver'),
             service('api_platform.metadata.resource.metadata_collection_factory'),
         ])
         ->tag('json_streamer.value_transformer');
 
-    $services->set('api_platform.jsonld.json_streamer.write.value_transformer.context', 'ApiPlatform\JsonLd\JsonStreamer\ValueTransformer\ContextValueTransformer')
+    $services->set('api_platform.jsonld.json_streamer.write.value_transformer.context', ContextValueTransformer::class)
         ->args([service('api_platform.router')])
         ->tag('json_streamer.value_transformer');
 };

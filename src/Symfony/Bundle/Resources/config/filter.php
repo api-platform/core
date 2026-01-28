@@ -13,9 +13,11 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\DependencyInjection\ServiceLocator;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.filter_locator', 'Symfony\Component\DependencyInjection\ServiceLocator')
+    $services->set('api_platform.filter_locator', ServiceLocator::class)
         ->tag('container.service_locator');
 };

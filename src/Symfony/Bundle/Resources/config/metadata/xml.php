@@ -13,16 +13,19 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\Metadata\Extractor\XmlPropertyExtractor;
+use ApiPlatform\Metadata\Extractor\XmlResourceExtractor;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.metadata.resource_extractor.xml', 'ApiPlatform\Metadata\Extractor\XmlResourceExtractor')
+    $services->set('api_platform.metadata.resource_extractor.xml', XmlResourceExtractor::class)
         ->args([
             [],
             service('service_container'),
         ]);
 
-    $services->set('api_platform.metadata.property_extractor.xml', 'ApiPlatform\Metadata\Extractor\XmlPropertyExtractor')
+    $services->set('api_platform.metadata.property_extractor.xml', XmlPropertyExtractor::class)
         ->args([
             [],
             service('service_container'),

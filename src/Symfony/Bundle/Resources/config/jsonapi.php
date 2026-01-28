@@ -13,10 +13,20 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\JsonApi\JsonSchema\SchemaFactory;
+use ApiPlatform\JsonApi\Serializer\CollectionNormalizer;
+use ApiPlatform\JsonApi\Serializer\ConstraintViolationListNormalizer;
+use ApiPlatform\JsonApi\Serializer\EntrypointNormalizer;
+use ApiPlatform\JsonApi\Serializer\ErrorNormalizer;
+use ApiPlatform\JsonApi\Serializer\ItemNormalizer;
+use ApiPlatform\JsonApi\Serializer\ObjectNormalizer;
+use ApiPlatform\JsonApi\Serializer\ReservedAttributeNameConverter;
+use ApiPlatform\Serializer\JsonEncoder;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.jsonapi.json_schema.schema_factory', 'ApiPlatform\JsonApi\JsonSchema\SchemaFactory')
+    $services->set('api_platform.jsonapi.json_schema.schema_factory', SchemaFactory::class)
         ->decorate('api_platform.json_schema.schema_factory', null, 0)
         ->args([
             service('api_platform.jsonapi.json_schema.schema_factory.inner'),
@@ -26,14 +36,14 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.json_schema.definition_name_factory')->ignoreOnInvalid(),
         ]);
 
-    $services->set('api_platform.jsonapi.encoder', 'ApiPlatform\Serializer\JsonEncoder')
+    $services->set('api_platform.jsonapi.encoder', JsonEncoder::class)
         ->args(['jsonapi'])
         ->tag('serializer.encoder');
 
-    $services->set('api_platform.jsonapi.name_converter.reserved_attribute_name', 'ApiPlatform\JsonApi\Serializer\ReservedAttributeNameConverter')
+    $services->set('api_platform.jsonapi.name_converter.reserved_attribute_name', ReservedAttributeNameConverter::class)
         ->args([service('api_platform.name_converter')->ignoreOnInvalid()]);
 
-    $services->set('api_platform.jsonapi.normalizer.entrypoint', 'ApiPlatform\JsonApi\Serializer\EntrypointNormalizer')
+    $services->set('api_platform.jsonapi.normalizer.entrypoint', EntrypointNormalizer::class)
         ->args([
             service('api_platform.metadata.resource.metadata_collection_factory'),
             service('api_platform.iri_converter'),
@@ -41,7 +51,7 @@ return static function (ContainerConfigurator $container) {
         ])
         ->tag('serializer.normalizer', ['priority' => -800]);
 
-    $services->set('api_platform.jsonapi.normalizer.collection', 'ApiPlatform\JsonApi\Serializer\CollectionNormalizer')
+    $services->set('api_platform.jsonapi.normalizer.collection', CollectionNormalizer::class)
         ->args([
             service('api_platform.resource_class_resolver'),
             '%api_platform.collection.pagination.page_parameter_name%',
@@ -49,7 +59,7 @@ return static function (ContainerConfigurator $container) {
         ])
         ->tag('serializer.normalizer', ['priority' => -985]);
 
-    $services->set('api_platform.jsonapi.normalizer.item', 'ApiPlatform\JsonApi\Serializer\ItemNormalizer')
+    $services->set('api_platform.jsonapi.normalizer.item', ItemNormalizer::class)
         ->args([
             service('api_platform.metadata.property.name_collection_factory'),
             service('api_platform.metadata.property.metadata_factory'),
@@ -65,7 +75,7 @@ return static function (ContainerConfigurator $container) {
         ])
         ->tag('serializer.normalizer', ['priority' => -890]);
 
-    $services->set('api_platform.jsonapi.normalizer.object', 'ApiPlatform\JsonApi\Serializer\ObjectNormalizer')
+    $services->set('api_platform.jsonapi.normalizer.object', ObjectNormalizer::class)
         ->args([
             service('serializer.normalizer.object'),
             service('api_platform.iri_converter'),
@@ -74,14 +84,14 @@ return static function (ContainerConfigurator $container) {
         ])
         ->tag('serializer.normalizer', ['priority' => -995]);
 
-    $services->set('api_platform.jsonapi.normalizer.constraint_violation_list', 'ApiPlatform\JsonApi\Serializer\ConstraintViolationListNormalizer')
+    $services->set('api_platform.jsonapi.normalizer.constraint_violation_list', ConstraintViolationListNormalizer::class)
         ->args([
             service('api_platform.metadata.property.metadata_factory'),
             service('api_platform.jsonapi.name_converter.reserved_attribute_name'),
         ])
         ->tag('serializer.normalizer', ['priority' => -780]);
 
-    $services->set('api_platform.jsonapi.normalizer.error', 'ApiPlatform\JsonApi\Serializer\ErrorNormalizer')
+    $services->set('api_platform.jsonapi.normalizer.error', ErrorNormalizer::class)
         ->args([service('api_platform.jsonapi.normalizer.item')])
         ->tag('serializer.normalizer', ['priority' => -790]);
 };

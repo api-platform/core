@@ -13,10 +13,14 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\Symfony\Action\DocumentationAction;
+use ApiPlatform\Symfony\Action\EntrypointAction;
+use ApiPlatform\Symfony\Controller\MainController;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.symfony.main_controller', 'ApiPlatform\Symfony\Controller\MainController')
+    $services->set('api_platform.symfony.main_controller', MainController::class)
         ->public()
         ->args([
             service('api_platform.metadata.resource.metadata_collection_factory'),
@@ -26,7 +30,7 @@ return static function (ContainerConfigurator $container) {
             service('logger')->ignoreOnInvalid(),
         ]);
 
-    $services->set('api_platform.action.entrypoint', 'ApiPlatform\Symfony\Action\EntrypointAction')
+    $services->set('api_platform.action.entrypoint', EntrypointAction::class)
         ->public()
         ->args([
             service('api_platform.metadata.resource.name_collection_factory'),
@@ -35,7 +39,7 @@ return static function (ContainerConfigurator $container) {
             '%api_platform.docs_formats%',
         ]);
 
-    $services->set('api_platform.action.documentation', 'ApiPlatform\Symfony\Action\DocumentationAction')
+    $services->set('api_platform.action.documentation', DocumentationAction::class)
         ->public()
         ->args([
             service('api_platform.metadata.resource.name_collection_factory'),

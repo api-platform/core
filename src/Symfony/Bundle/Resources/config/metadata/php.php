@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\Metadata\Extractor\PhpFileResourceExtractor;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.metadata.resource_extractor.php_file', 'ApiPlatform\Metadata\Extractor\PhpFileResourceExtractor')
+    $services->set('api_platform.metadata.resource_extractor.php_file', PhpFileResourceExtractor::class)
         ->args([
             [],
             service('service_container'),

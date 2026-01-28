@@ -13,10 +13,17 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\Hal\JsonSchema\SchemaFactory;
+use ApiPlatform\Hal\Serializer\CollectionNormalizer;
+use ApiPlatform\Hal\Serializer\EntrypointNormalizer;
+use ApiPlatform\Hal\Serializer\ItemNormalizer;
+use ApiPlatform\Hal\Serializer\ObjectNormalizer;
+use ApiPlatform\Serializer\JsonEncoder;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.hal.json_schema.schema_factory', 'ApiPlatform\Hal\JsonSchema\SchemaFactory')
+    $services->set('api_platform.hal.json_schema.schema_factory', SchemaFactory::class)
         ->decorate('api_platform.json_schema.schema_factory', null, 0)
         ->args([
             service('api_platform.hal.json_schema.schema_factory.inner'),
@@ -24,11 +31,11 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.metadata.resource.metadata_collection_factory')->ignoreOnInvalid(),
         ]);
 
-    $services->set('api_platform.hal.encoder', 'ApiPlatform\Serializer\JsonEncoder')
+    $services->set('api_platform.hal.encoder', JsonEncoder::class)
         ->args(['jsonhal'])
         ->tag('serializer.encoder');
 
-    $services->set('api_platform.hal.normalizer.entrypoint', 'ApiPlatform\Hal\Serializer\EntrypointNormalizer')
+    $services->set('api_platform.hal.normalizer.entrypoint', EntrypointNormalizer::class)
         ->args([
             service('api_platform.metadata.resource.metadata_collection_factory'),
             service('api_platform.iri_converter'),
@@ -36,7 +43,7 @@ return static function (ContainerConfigurator $container) {
         ])
         ->tag('serializer.normalizer', ['priority' => -800]);
 
-    $services->set('api_platform.hal.normalizer.collection', 'ApiPlatform\Hal\Serializer\CollectionNormalizer')
+    $services->set('api_platform.hal.normalizer.collection', CollectionNormalizer::class)
         ->args([
             service('api_platform.resource_class_resolver'),
             '%api_platform.collection.pagination.page_parameter_name%',
@@ -44,7 +51,7 @@ return static function (ContainerConfigurator $container) {
         ])
         ->tag('serializer.normalizer', ['priority' => -985]);
 
-    $services->set('api_platform.hal.normalizer.item', 'ApiPlatform\Hal\Serializer\ItemNormalizer')
+    $services->set('api_platform.hal.normalizer.item', ItemNormalizer::class)
         ->args([
             service('api_platform.metadata.property.name_collection_factory'),
             service('api_platform.metadata.property.metadata_factory'),
@@ -60,7 +67,7 @@ return static function (ContainerConfigurator $container) {
         ])
         ->tag('serializer.normalizer', ['priority' => -890]);
 
-    $services->set('api_platform.hal.normalizer.object', 'ApiPlatform\Hal\Serializer\ObjectNormalizer')
+    $services->set('api_platform.hal.normalizer.object', ObjectNormalizer::class)
         ->args([
             service('serializer.normalizer.object'),
             service('api_platform.iri_converter'),

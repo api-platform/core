@@ -13,23 +13,27 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\Symfony\EventListener\ValidateListener;
+use ApiPlatform\Symfony\Validator\State\ParameterValidatorProvider;
+use ApiPlatform\Symfony\Validator\State\ValidateProvider;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.state_provider.validate', 'ApiPlatform\Symfony\Validator\State\ValidateProvider')
+    $services->set('api_platform.state_provider.validate', ValidateProvider::class)
         ->args([
             null,
             service('api_platform.validator'),
         ]);
 
-    $services->set('api_platform.listener.view.validate', 'ApiPlatform\Symfony\EventListener\ValidateListener')
+    $services->set('api_platform.listener.view.validate', ValidateListener::class)
         ->args([
             service('api_platform.state_provider.validate'),
             service('api_platform.metadata.resource.metadata_collection_factory'),
         ])
         ->tag('kernel.event_listener', ['event' => 'kernel.view', 'method' => 'onKernelView', 'priority' => 64]);
 
-    $services->set('api_platform.state_provider.parameter_validator', 'ApiPlatform\Symfony\Validator\State\ParameterValidatorProvider')
+    $services->set('api_platform.state_provider.parameter_validator', ParameterValidatorProvider::class)
         ->public()
         ->decorate('api_platform.state_provider.read', null, 110)
         ->args([

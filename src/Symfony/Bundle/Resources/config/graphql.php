@@ -13,38 +13,73 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\GraphQl\Action\EntrypointAction;
+use ApiPlatform\GraphQl\Action\GraphiQlAction;
+use ApiPlatform\GraphQl\Error\ErrorHandler;
+use ApiPlatform\GraphQl\Executor;
+use ApiPlatform\GraphQl\Metadata\RuntimeOperationMetadataFactory;
+use ApiPlatform\GraphQl\Resolver\Factory\ResolverFactory;
+use ApiPlatform\GraphQl\Resolver\ResourceFieldResolver;
+use ApiPlatform\GraphQl\Serializer\Exception\ErrorNormalizer;
+use ApiPlatform\GraphQl\Serializer\Exception\HttpExceptionNormalizer;
+use ApiPlatform\GraphQl\Serializer\Exception\RuntimeExceptionNormalizer;
+use ApiPlatform\GraphQl\Serializer\Exception\ValidationExceptionNormalizer;
+use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
+use ApiPlatform\GraphQl\Serializer\ObjectNormalizer;
+use ApiPlatform\GraphQl\Serializer\SerializerContextBuilder;
+use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
+use ApiPlatform\GraphQl\State\Processor\NormalizeProcessor;
+use ApiPlatform\GraphQl\State\Processor\SubscriptionProcessor;
+use ApiPlatform\GraphQl\State\Provider\DenormalizeProvider;
+use ApiPlatform\GraphQl\State\Provider\ReadProvider;
+use ApiPlatform\GraphQl\State\Provider\ResolverProvider;
+use ApiPlatform\GraphQl\Subscription\SubscriptionIdentifierGenerator;
+use ApiPlatform\GraphQl\Subscription\SubscriptionManager;
+use ApiPlatform\GraphQl\Type\Definition\IterableType;
+use ApiPlatform\GraphQl\Type\Definition\UploadType;
+use ApiPlatform\GraphQl\Type\FieldsBuilder;
+use ApiPlatform\GraphQl\Type\SchemaBuilder;
+use ApiPlatform\GraphQl\Type\TypeBuilder;
+use ApiPlatform\GraphQl\Type\TypeConverter;
+use ApiPlatform\GraphQl\Type\TypesContainer;
+use ApiPlatform\GraphQl\Type\TypesFactory;
+use ApiPlatform\State\Processor\WriteProcessor;
+use ApiPlatform\State\Provider\ParameterProvider;
+use ApiPlatform\Symfony\Bundle\Command\GraphQlExportCommand;
+use Symfony\Component\DependencyInjection\ServiceLocator;
+
 return function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.graphql.executor', 'ApiPlatform\GraphQl\Executor')
+    $services->set('api_platform.graphql.executor', Executor::class)
         ->args([
             '%api_platform.graphql.introspection.enabled%',
             '%api_platform.graphql.max_query_complexity%',
             '%api_platform.graphql.max_query_depth%',
         ]);
 
-    $services->set('api_platform.graphql.resolver_locator', 'Symfony\Component\DependencyInjection\ServiceLocator')
+    $services->set('api_platform.graphql.resolver_locator', ServiceLocator::class)
         ->tag('container.service_locator');
 
-    $services->set('api_platform.graphql.iterable_type', 'ApiPlatform\GraphQl\Type\Definition\IterableType')
+    $services->set('api_platform.graphql.iterable_type', IterableType::class)
         ->tag('api_platform.graphql.type');
 
-    $services->set('api_platform.graphql.upload_type', 'ApiPlatform\GraphQl\Type\Definition\UploadType')
+    $services->set('api_platform.graphql.upload_type', UploadType::class)
         ->tag('api_platform.graphql.type');
 
-    $services->set('api_platform.graphql.type_locator', 'Symfony\Component\DependencyInjection\ServiceLocator')
+    $services->set('api_platform.graphql.type_locator', ServiceLocator::class)
         ->tag('container.service_locator');
 
-    $services->set('api_platform.graphql.types_container', 'ApiPlatform\GraphQl\Type\TypesContainer');
+    $services->set('api_platform.graphql.types_container', TypesContainer::class);
 
-    $services->set('api_platform.graphql.types_factory', 'ApiPlatform\GraphQl\Type\TypesFactory')
+    $services->set('api_platform.graphql.types_factory', TypesFactory::class)
         ->args([service('api_platform.graphql.type_locator')]);
 
-    $services->set('api_platform.graphql.fields_builder_locator', 'Symfony\Component\DependencyInjection\ServiceLocator')
+    $services->set('api_platform.graphql.fields_builder_locator', ServiceLocator::class)
         ->args([[service('api_platform.graphql.fields_builder')]])
         ->tag('container.service_locator');
 
-    $services->set('api_platform.graphql.action.entrypoint', 'ApiPlatform\GraphQl\Action\EntrypointAction')
+    $services->set('api_platform.graphql.action.entrypoint', EntrypointAction::class)
         ->public()
         ->args([
             service('api_platform.graphql.schema_builder'),
@@ -57,7 +92,7 @@ return function (ContainerConfigurator $container) {
             '%api_platform.graphql.default_ide%',
         ]);
 
-    $services->set('api_platform.graphql.action.graphiql', 'ApiPlatform\GraphQl\Action\GraphiQlAction')
+    $services->set('api_platform.graphql.action.graphiql', GraphiQlAction::class)
         ->public()
         ->args([
             service('twig'),
@@ -67,19 +102,19 @@ return function (ContainerConfigurator $container) {
             '%api_platform.asset_package%',
         ]);
 
-    $services->set('api_platform.graphql.error_handler', 'ApiPlatform\GraphQl\Error\ErrorHandler');
+    $services->set('api_platform.graphql.error_handler', ErrorHandler::class);
 
-    $services->set('api_platform.graphql.subscription.subscription_identifier_generator', 'ApiPlatform\GraphQl\Subscription\SubscriptionIdentifierGenerator');
+    $services->set('api_platform.graphql.subscription.subscription_identifier_generator', SubscriptionIdentifierGenerator::class);
 
     $services->set('api_platform.graphql.cache.subscription')
         ->parent('cache.system')
         ->tag('cache.pool');
 
-    $services->set('api_platform.graphql.command.export_command', 'ApiPlatform\Symfony\Bundle\Command\GraphQlExportCommand')
+    $services->set('api_platform.graphql.command.export_command', GraphQlExportCommand::class)
         ->args([service('api_platform.graphql.schema_builder')])
         ->tag('console.command');
 
-    $services->set('api_platform.graphql.type_converter', 'ApiPlatform\GraphQl\Type\TypeConverter')
+    $services->set('api_platform.graphql.type_converter', TypeConverter::class)
         ->args([
             service('api_platform.graphql.type_builder'),
             service('api_platform.graphql.types_container'),
@@ -87,7 +122,7 @@ return function (ContainerConfigurator $container) {
             service('api_platform.metadata.property.metadata_factory'),
         ]);
 
-    $services->set('api_platform.graphql.type_builder', 'ApiPlatform\GraphQl\Type\TypeBuilder')
+    $services->set('api_platform.graphql.type_builder', TypeBuilder::class)
         ->args([
             service('api_platform.graphql.types_container'),
             service('api_platform.graphql.resolver.resource_field'),
@@ -95,7 +130,7 @@ return function (ContainerConfigurator $container) {
             service('api_platform.pagination'),
         ]);
 
-    $services->set('api_platform.graphql.fields_builder', 'ApiPlatform\GraphQl\Type\FieldsBuilder')
+    $services->set('api_platform.graphql.fields_builder', FieldsBuilder::class)
         ->args([
             service('api_platform.metadata.property.name_collection_factory'),
             service('api_platform.metadata.property.metadata_factory'),
@@ -112,7 +147,7 @@ return function (ContainerConfigurator $container) {
             service('api_platform.inflector')->nullOnInvalid(),
         ]);
 
-    $services->set('api_platform.graphql.schema_builder', 'ApiPlatform\GraphQl\Type\SchemaBuilder')
+    $services->set('api_platform.graphql.schema_builder', SchemaBuilder::class)
         ->args([
             service('api_platform.metadata.resource.name_collection_factory'),
             service('api_platform.metadata.resource.metadata_collection_factory'),
@@ -121,16 +156,16 @@ return function (ContainerConfigurator $container) {
             service('api_platform.graphql.fields_builder'),
         ]);
 
-    $services->set('api_platform.graphql.serializer.context_builder', 'ApiPlatform\GraphQl\Serializer\SerializerContextBuilder')
+    $services->set('api_platform.graphql.serializer.context_builder', SerializerContextBuilder::class)
         ->args([service('api_platform.name_converter')->ignoreOnInvalid()]);
 
-    $services->alias('ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface', 'api_platform.graphql.serializer.context_builder');
+    $services->alias(SerializerContextBuilderInterface::class, 'api_platform.graphql.serializer.context_builder');
 
     $services->alias('api_platform.graphql.state_provider', 'api_platform.state_provider.locator');
 
     $services->alias('api_platform.graphql.state_processor', 'api_platform.graphql.state_processor.normalize');
 
-    $services->set('api_platform.graphql.state_provider.read', 'ApiPlatform\GraphQl\State\Provider\ReadProvider')
+    $services->set('api_platform.graphql.state_provider.read', ReadProvider::class)
         ->decorate('api_platform.graphql.state_provider', null, 500)
         ->args([
             service('api_platform.graphql.state_provider.read.inner'),
@@ -139,21 +174,21 @@ return function (ContainerConfigurator $container) {
             '%api_platform.graphql.nesting_separator%',
         ]);
 
-    $services->set('api_platform.graphql.state_provider.parameter', 'ApiPlatform\State\Provider\ParameterProvider')
+    $services->set('api_platform.graphql.state_provider.parameter', ParameterProvider::class)
         ->decorate('api_platform.graphql.state_provider', null, 300)
         ->args([
             service('api_platform.graphql.state_provider.parameter.inner'),
             tagged_locator('api_platform.parameter_provider', 'key'),
         ]);
 
-    $services->set('api_platform.graphql.state_provider.resolver', 'ApiPlatform\GraphQl\State\Provider\ResolverProvider')
+    $services->set('api_platform.graphql.state_provider.resolver', ResolverProvider::class)
         ->decorate('api_platform.graphql.state_provider', null, 190)
         ->args([
             service('api_platform.graphql.state_provider.resolver.inner'),
             service('api_platform.graphql.resolver_locator'),
         ]);
 
-    $services->set('api_platform.graphql.state_provider.denormalizer', 'ApiPlatform\GraphQl\State\Provider\DenormalizeProvider')
+    $services->set('api_platform.graphql.state_provider.denormalizer', DenormalizeProvider::class)
         ->decorate('api_platform.graphql.state_provider', null, 300)
         ->args([
             service('api_platform.graphql.state_provider.denormalizer.inner'),
@@ -161,7 +196,7 @@ return function (ContainerConfigurator $container) {
             service('api_platform.graphql.serializer.context_builder'),
         ]);
 
-    $services->set('api_platform.graphql.state_processor.subscription', 'ApiPlatform\GraphQl\State\Processor\SubscriptionProcessor')
+    $services->set('api_platform.graphql.state_processor.subscription', SubscriptionProcessor::class)
         ->decorate('api_platform.graphql.state_processor', null, 200)
         ->args([
             service('api_platform.graphql.state_processor.subscription.inner'),
@@ -169,37 +204,37 @@ return function (ContainerConfigurator $container) {
             service('api_platform.graphql.subscription.mercure_iri_generator')->ignoreOnInvalid(),
         ]);
 
-    $services->set('api_platform.graphql.state_processor.write', 'ApiPlatform\State\Processor\WriteProcessor')
+    $services->set('api_platform.graphql.state_processor.write', WriteProcessor::class)
         ->decorate('api_platform.graphql.state_processor', null, 100)
         ->args([
             service('api_platform.graphql.state_processor.write.inner'),
             service('api_platform.state_processor.locator'),
         ]);
 
-    $services->set('api_platform.graphql.state_processor.normalize', 'ApiPlatform\GraphQl\State\Processor\NormalizeProcessor')
+    $services->set('api_platform.graphql.state_processor.normalize', NormalizeProcessor::class)
         ->args([
             service('serializer'),
             service('api_platform.graphql.serializer.context_builder'),
             service('api_platform.pagination'),
         ]);
 
-    $services->set('api_platform.graphql.resolver.factory', 'ApiPlatform\GraphQl\Resolver\Factory\ResolverFactory')
+    $services->set('api_platform.graphql.resolver.factory', ResolverFactory::class)
         ->args([
             service('api_platform.graphql.state_provider'),
             service('api_platform.graphql.state_processor'),
             service('api_platform.graphql.runtime_operation_metadata_factory'),
         ]);
 
-    $services->set('api_platform.graphql.runtime_operation_metadata_factory', 'ApiPlatform\GraphQl\Metadata\RuntimeOperationMetadataFactory')
+    $services->set('api_platform.graphql.runtime_operation_metadata_factory', RuntimeOperationMetadataFactory::class)
         ->args([
             service('api_platform.metadata.resource.metadata_collection_factory'),
             service('api_platform.router'),
         ]);
 
-    $services->set('api_platform.graphql.resolver.resource_field', 'ApiPlatform\GraphQl\Resolver\ResourceFieldResolver')
+    $services->set('api_platform.graphql.resolver.resource_field', ResourceFieldResolver::class)
         ->args([service('api_platform.symfony.iri_converter')]);
 
-    $services->set('api_platform.graphql.normalizer.item', 'ApiPlatform\GraphQl\Serializer\ItemNormalizer')
+    $services->set('api_platform.graphql.normalizer.item', ItemNormalizer::class)
         ->args([
             service('api_platform.metadata.property.name_collection_factory'),
             service('api_platform.metadata.property.metadata_factory'),
@@ -215,7 +250,7 @@ return function (ContainerConfigurator $container) {
         ])
         ->tag('serializer.normalizer', ['priority' => -890]);
 
-    $services->set('api_platform.graphql.normalizer.object', 'ApiPlatform\GraphQl\Serializer\ObjectNormalizer')
+    $services->set('api_platform.graphql.normalizer.object', ObjectNormalizer::class)
         ->args([
             service('serializer.normalizer.object'),
             service('api_platform.symfony.iri_converter'),
@@ -223,7 +258,7 @@ return function (ContainerConfigurator $container) {
         ])
         ->tag('serializer.normalizer', ['priority' => -995]);
 
-    $services->set('api_platform.graphql.subscription.subscription_manager', 'ApiPlatform\GraphQl\Subscription\SubscriptionManager')
+    $services->set('api_platform.graphql.subscription.subscription_manager', SubscriptionManager::class)
         ->args([
             service('api_platform.graphql.cache.subscription'),
             service('api_platform.graphql.subscription.subscription_identifier_generator'),
@@ -232,16 +267,16 @@ return function (ContainerConfigurator $container) {
             service('api_platform.metadata.resource.metadata_collection_factory'),
         ]);
 
-    $services->set('api_platform.graphql.normalizer.error', 'ApiPlatform\GraphQl\Serializer\Exception\ErrorNormalizer')
+    $services->set('api_platform.graphql.normalizer.error', ErrorNormalizer::class)
         ->tag('serializer.normalizer', ['priority' => -790]);
 
-    $services->set('api_platform.graphql.normalizer.validation_exception', 'ApiPlatform\GraphQl\Serializer\Exception\ValidationExceptionNormalizer')
+    $services->set('api_platform.graphql.normalizer.validation_exception', ValidationExceptionNormalizer::class)
         ->args(['%api_platform.exception_to_status%'])
         ->tag('serializer.normalizer', ['priority' => -780]);
 
-    $services->set('api_platform.graphql.normalizer.http_exception', 'ApiPlatform\GraphQl\Serializer\Exception\HttpExceptionNormalizer')
+    $services->set('api_platform.graphql.normalizer.http_exception', HttpExceptionNormalizer::class)
         ->tag('serializer.normalizer', ['priority' => -780]);
 
-    $services->set('api_platform.graphql.normalizer.runtime_exception', 'ApiPlatform\GraphQl\Serializer\Exception\RuntimeExceptionNormalizer')
+    $services->set('api_platform.graphql.normalizer.runtime_exception', RuntimeExceptionNormalizer::class)
         ->tag('serializer.normalizer', ['priority' => -780]);
 };
