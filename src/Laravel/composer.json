@@ -29,12 +29,13 @@
     "require": {
         "php": ">=8.2",
         "api-platform/documentation": "^4.2",
+        "api-platform/hal": "^4.2.0-beta.1",
         "api-platform/hydra": "^4.2",
         "api-platform/json-api": "^4.2",
-        "api-platform/hal": "^4.2.0-beta.1",
         "api-platform/json-schema": "^4.2",
         "api-platform/jsonld": "^4.2",
         "api-platform/metadata": "^4.2",
+        "api-platform/mcp": "dev-main",
         "api-platform/openapi": "^4.2",
         "api-platform/serializer": "^4.2.4",
         "api-platform/state": "^4.2.4",
@@ -58,11 +59,14 @@
         "doctrine/dbal": "^4.0",
         "larastan/larastan": "^2.0 || ^3.0",
         "laravel/sanctum": "^4.0",
+        "mcp/sdk": "^0.3.0",
         "orchestra/testbench": "^10.1",
         "phpdocumentor/type-resolver": "^1.7",
         "phpstan/phpdoc-parser": "^1.29 || ^2.0",
         "phpunit/phpunit": "^12.2",
-        "symfony/http-client": "^7.4 || ^8.0"
+        "symfony/http-client": "^7.4 || ^8.0",
+        "symfony/mcp-bundle": "dev-main",
+        "symfony/object-mapper": "8.1.x-dev"
     },
     "autoload": {
         "psr-4": {
@@ -74,7 +78,10 @@
         ]
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
     },
     "suggest": {
         "api-platform/graphql": "Enable GraphQl support.",
@@ -127,5 +134,6 @@
         "lint": [
             "@php vendor/bin/phpstan analyse --verbose --ansi"
         ]
-    }
+    },
+    "minimum-stability": "dev"
 }
