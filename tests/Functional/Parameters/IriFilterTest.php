@@ -56,6 +56,21 @@ final class IriFilterTest extends ApiTestCase
         $this->assertCount(2, $res['member']);
     }
 
+    public function testIriFilterThrowsExceptionWhenPropertyIsMissing(): void
+    {
+        $response = self::createClient()->request('GET', '/chickens?chickenCoopNoProperty=/chicken_coops/1');
+        $this->assertResponseStatusCodeSame(400);
+
+        $responseData = $response->toArray(false);
+
+        $this->assertSame('An error occurred', $responseData['hydra:title']);
+        $this->assertSame($responseData['hydra:description'], $responseData['detail']);
+        $this->assertStringContainsString(
+            'The filter parameter with key "chickenCoopNoProperty" must specify a property',
+            $responseData['detail']
+        );
+    }
+
     /**
      * @throws \Throwable
      */

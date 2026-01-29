@@ -105,6 +105,21 @@ final class ExactFilterTest extends ApiTestCase
         ];
     }
 
+    public function testExactSearchFilterThrowsExceptionWhenPropertyIsMissing(): void
+    {
+        $response = self::createClient()->request('GET', '/chickens?nameExactNoProperty=Gertrude');
+        $this->assertResponseStatusCodeSame(400);
+
+        $responseData = $response->toArray(false);
+
+        $this->assertSame('An error occurred', $responseData['hydra:title']);
+        $this->assertSame($responseData['hydra:description'], $responseData['detail']);
+        $this->assertStringContainsString(
+            'The filter parameter with key "nameExactNoProperty" must specify a property',
+            $responseData['detail']
+        );
+    }
+
     /**
      * @throws \Throwable
      * @throws MongoDBException
