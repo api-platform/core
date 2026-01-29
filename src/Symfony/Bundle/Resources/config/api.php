@@ -45,6 +45,7 @@ use ApiPlatform\Symfony\Routing\Router;
 use ApiPlatform\Symfony\Routing\SkolemIriConverter;
 use Negotiation\Negotiator;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 return function (ContainerConfigurator $container) {
     $services = $container->services();
@@ -130,6 +131,19 @@ return function (ContainerConfigurator $container) {
             service('api_platform.http_cache.tag_collector')->ignoreOnInvalid(),
         ])
         ->tag('serializer.normalizer', ['priority' => -895]);
+
+    $services->set('api_platform.normalizer.object', ObjectNormalizer::class)
+        ->args([
+            service('serializer.mapping.class_metadata_factory'),
+            service('api_platform.name_converter')->ignoreOnInvalid(),
+            service('serializer.property_accessor'),
+            service('property_info')->ignoreOnInvalid(),
+            service('serializer.mapping.class_discriminator_resolver')->ignoreOnInvalid(),
+            null,
+            [],
+            service('property_info')->ignoreOnInvalid(),
+        ])
+        ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -1000]);
 
     $services->set('api_platform.serializer.mapping.class_metadata_factory', ClassMetadataFactory::class)
         ->decorate('serializer.mapping.class_metadata_factory', null, -1)
