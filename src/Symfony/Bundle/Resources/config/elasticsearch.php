@@ -20,6 +20,7 @@ use ApiPlatform\Elasticsearch\Filter\MatchFilter;
 use ApiPlatform\Elasticsearch\Filter\OrderFilter;
 use ApiPlatform\Elasticsearch\Filter\TermFilter;
 use ApiPlatform\Elasticsearch\Metadata\Resource\Factory\ElasticsearchProviderResourceMetadataCollectionFactory;
+use ApiPlatform\Elasticsearch\Serializer\DocumentDenormalizer;
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
 use ApiPlatform\Elasticsearch\Serializer\ItemNormalizer;
 use ApiPlatform\Elasticsearch\Serializer\NameConverter\InnerFieldsNameConverter;
@@ -36,9 +37,21 @@ return function (ContainerConfigurator $container) {
         ->decorate('api_platform.serializer.normalizer.item', null, 0)
         ->args([service('api_platform.elasticsearch.normalizer.item.inner')]);
 
-    $services->set('api_platform.elasticsearch.normalizer.document', DocumentNormalizer::class)
+    $services->set('api_platform.elasticsearch.denormalizer.document', DocumentDenormalizer::class)
         ->args([
             service('api_platform.metadata.resource.metadata_collection_factory'),
+            service('serializer.mapping.class_metadata_factory'),
+            service('api_platform.elasticsearch.name_converter.inner_fields'),
+            service('serializer.property_accessor'),
+            service('property_info')->ignoreOnInvalid(),
+            service('serializer.mapping.class_discriminator_resolver')->ignoreOnInvalid(),
+            null,
+            '%api_platform.serializer.default_context%',
+        ])
+        ->tag('serializer.normalizer', ['priority' => -895]);
+
+    $services->set('api_platform.elasticsearch.normalizer.document', DocumentNormalizer::class)
+        ->args([
             service('serializer.mapping.class_metadata_factory'),
             service('api_platform.elasticsearch.name_converter.inner_fields'),
             service('serializer.property_accessor'),
