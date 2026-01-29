@@ -13,14 +13,33 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
+use ApiPlatform\Doctrine\Odm\Filter\PartialSearchFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 #[ODM\Document]
-#[GetCollection(
-    normalizationContext: ['hydra_prefix' => false]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            normalizationContext: ['hydra_prefix' => false],
+            parameters: [
+                'chickenNamePartial' => new QueryParameter(
+                    filter: new PartialSearchFilter(),
+                    property: 'chickens.name',
+                ),
+                'search[:property]' => new QueryParameter(
+                    filter: new PartialSearchFilter(),
+                    properties: ['chickens.name'],
+                ),
+            ],
+        ),
+        new Get(),
+    ]
 )]
 class ChickenCoop
 {

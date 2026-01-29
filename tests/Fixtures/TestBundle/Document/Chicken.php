@@ -18,27 +18,34 @@ use ApiPlatform\Doctrine\Odm\Filter\FreeTextQueryFilter;
 use ApiPlatform\Doctrine\Odm\Filter\IriFilter;
 use ApiPlatform\Doctrine\Odm\Filter\OrFilter;
 use ApiPlatform\Doctrine\Odm\Filter\PartialSearchFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 #[ODM\Document]
-#[GetCollection(
-    normalizationContext: ['hydra_prefix' => false],
-    parameters: [
-        'chickenCoop' => new QueryParameter(filter: new IriFilter()),
-        'chickenCoopNoProperty' => new QueryParameter(filter: new IriFilter()),
-        'chickenCoopId' => new QueryParameter(filter: new ExactFilter(), property: 'chickenCoop'),
-        'name' => new QueryParameter(filter: new ExactFilter()),
-        'nameExactNoProperty' => new QueryParameter(filter: new ExactFilter()),
-        'namePartial' => new QueryParameter(
-            filter: new PartialSearchFilter(),
-            property: 'name',
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            normalizationContext: ['hydra_prefix' => false],
+            parameters: [
+                'chickenCoop' => new QueryParameter(filter: new IriFilter()),
+                'chickenCoopNoProperty' => new QueryParameter(filter: new IriFilter()),
+                'chickenCoopId' => new QueryParameter(filter: new ExactFilter(), property: 'chickenCoop'),
+                'name' => new QueryParameter(filter: new ExactFilter()),
+                'nameExactNoProperty' => new QueryParameter(filter: new ExactFilter()),
+                'namePartial' => new QueryParameter(
+                    filter: new PartialSearchFilter(),
+                    property: 'name',
+                ),
+                'namePartialNoProperty' => new QueryParameter(filter: new PartialSearchFilter()),
+                'autocomplete' => new QueryParameter(filter: new FreeTextQueryFilter(new OrFilter(new ExactFilter())), properties: ['name', 'ean']),
+                'q' => new QueryParameter(filter: new FreeTextQueryFilter(new PartialSearchFilter()), properties: ['name', 'ean']),
+            ],
         ),
-        'namePartialNoProperty' => new QueryParameter(filter: new PartialSearchFilter()),
-        'autocomplete' => new QueryParameter(filter: new FreeTextQueryFilter(new OrFilter(new ExactFilter())), properties: ['name', 'ean']),
-        'q' => new QueryParameter(filter: new FreeTextQueryFilter(new PartialSearchFilter()), properties: ['name', 'ean']),
-    ],
+        new Get(),
+    ]
 )]
 class Chicken
 {
