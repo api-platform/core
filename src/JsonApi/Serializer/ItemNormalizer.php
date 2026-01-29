@@ -75,11 +75,11 @@ final class ItemNormalizer extends AbstractItemNormalizer
         protected ?TagCollectorInterface $tagCollector = null,
         private readonly IdentifiersExtractorInterface $identifiersExtractor,
         private readonly ProviderInterface $provider,
-        string $resourceIdStrategy = 'iri'
+        bool $useIriAsId = true
     )
     {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $defaultContext, $resourceMetadataCollectionFactory, $resourceAccessChecker, $tagCollector);
-        $this->resourceIdStrategy = $resourceIdStrategy;
+        $this->useIriAsId = $useIriAsId;
     }
 
     /**
@@ -144,7 +144,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $includedResourcesData = $this->getRelatedResources($object, $format, $context, $allRelationshipsData);
 
         $id = $context['iri'];
-        if ($this->resourceIdStrategy === 'identifiers') {
+        if (!$this->useIriAsId) {
             $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($object);
             $id = (string) array_values($identifiers)[0];
         }
@@ -199,12 +199,12 @@ final class ItemNormalizer extends AbstractItemNormalizer
             }
 
             $context += ['fetch_data' => false];
-            if ($this->resourceIdStrategy === 'iri') {
+            if ($this->useIriAsId) {
                 $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri(
                     $data['data']['id'],
                     $context
                 );
-            } else if ($this->resourceIdStrategy === 'identifiers') {
+            } else {
                 $operation = $context['operation'] ?? $context['api_platform_operation'] ?? null;
                 $uriVariables = $context['uriVariables'] ?? [];
                 $context[self::OBJECT_TO_POPULATE] = $this->provider->provide(
@@ -261,9 +261,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         try {
             $context += ['fetch_data' => true];
-            if ($this->resourceIdStrategy === 'iri') {
+            if ($this->useIriAsId) {
                 return $this->iriConverter->getResourceFromIri($value['id'], $context);
-            } else if ($this->resourceIdStrategy === 'identifiers') {
+            } else {
                 $targetClass = $propertyMetadata->getBuiltinTypes()[0]->getClassName();
                 $resourceMetadata = $this->resourceMetadataCollectionFactory
                                          ->create($targetClass);
@@ -343,7 +343,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
 
         $id = $iri;
-        if ($this->resourceIdStrategy === 'identifiers') {
+        if (!$this->useIriAsId) {
             $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($relatedObject);
             $id = (string) array_values($identifiers)[0];
         }

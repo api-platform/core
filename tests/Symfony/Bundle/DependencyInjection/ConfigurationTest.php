@@ -236,7 +236,7 @@ class ConfigurationTest extends TestCase
             ],
             'enable_phpdoc_parser' => true,
             'jsonapi' => [
-                'resource_id_strategy' => 'iri'
+                'use_iri_as_id' => true
             ],
         ], $config);
     }

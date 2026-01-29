@@ -644,7 +644,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('state/jsonapi.php');
 
         $container->getDefinition('api_platform.jsonapi.normalizer.item')
-            ->addArgument($config['jsonapi']['resource_id_strategy']);
+            ->addArgument($config['jsonapi']['use_iri_as_id']);
     }
 
     private function registerJsonLdHydraConfiguration(ContainerBuilder $container, array $formats, PhpFileLoader $loader, array $config): void
