@@ -13,10 +13,17 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\JsonLd\ContextBuilder;
+use ApiPlatform\JsonLd\Serializer\ErrorNormalizer;
+use ApiPlatform\JsonLd\Serializer\ItemNormalizer;
+use ApiPlatform\JsonLd\Serializer\ObjectNormalizer;
+use ApiPlatform\Serializer\JsonEncoder;
+use ApiPlatform\Symfony\Validator\Serializer\ValidationExceptionNormalizer;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.jsonld.context_builder', 'ApiPlatform\JsonLd\ContextBuilder')
+    $services->set('api_platform.jsonld.context_builder', ContextBuilder::class)
         ->args([
             service('api_platform.metadata.resource.name_collection_factory'),
             service('api_platform.metadata.resource.metadata_collection_factory'),
@@ -28,7 +35,7 @@ return static function (ContainerConfigurator $container) {
             '%api_platform.serializer.default_context%',
         ]);
 
-    $services->set('api_platform.jsonld.normalizer.item', 'ApiPlatform\JsonLd\Serializer\ItemNormalizer')
+    $services->set('api_platform.jsonld.normalizer.item', ItemNormalizer::class)
         ->args([
             service('api_platform.metadata.resource.metadata_collection_factory'),
             service('api_platform.metadata.property.name_collection_factory'),
@@ -45,14 +52,14 @@ return static function (ContainerConfigurator $container) {
         ])
         ->tag('serializer.normalizer', ['priority' => -890]);
 
-    $services->set('api_platform.jsonld.normalizer.error', 'ApiPlatform\JsonLd\Serializer\ErrorNormalizer')
+    $services->set('api_platform.jsonld.normalizer.error', ErrorNormalizer::class)
         ->args([
             service('api_platform.jsonld.normalizer.item'),
             '%api_platform.serializer.default_context%',
         ])
         ->tag('serializer.normalizer', ['priority' => -880]);
 
-    $services->set('api_platform.jsonld.normalizer.object', 'ApiPlatform\JsonLd\Serializer\ObjectNormalizer')
+    $services->set('api_platform.jsonld.normalizer.object', ObjectNormalizer::class)
         ->args([
             service('serializer.normalizer.object'),
             service('api_platform.iri_converter'),
@@ -60,14 +67,14 @@ return static function (ContainerConfigurator $container) {
         ])
         ->tag('serializer.normalizer', ['priority' => -995]);
 
-    $services->set('api_platform.jsonld.normalizer.validation_exception', 'ApiPlatform\Symfony\Validator\Serializer\ValidationExceptionNormalizer')
+    $services->set('api_platform.jsonld.normalizer.validation_exception', ValidationExceptionNormalizer::class)
         ->args([
             service('api_platform.jsonld.normalizer.error'),
             service('api_platform.name_converter')->ignoreOnInvalid(),
         ])
         ->tag('serializer.normalizer', ['priority' => -800]);
 
-    $services->set('api_platform.jsonld.encoder', 'ApiPlatform\Serializer\JsonEncoder')
+    $services->set('api_platform.jsonld.encoder', JsonEncoder::class)
         ->args([
             'jsonld',
             service('serializer.json.encoder')->nullOnInvalid(),

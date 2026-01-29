@@ -13,18 +13,22 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\Symfony\Maker\MakeFilter;
+use ApiPlatform\Symfony\Maker\MakeStateProcessor;
+use ApiPlatform\Symfony\Maker\MakeStateProvider;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.maker.command.state_processor', 'ApiPlatform\Symfony\Maker\MakeStateProcessor')
+    $services->set('api_platform.maker.command.state_processor', MakeStateProcessor::class)
         ->args([service('api_platform.metadata.resource.name_collection_factory')])
         ->tag('maker.command');
 
-    $services->set('api_platform.maker.command.state_provider', 'ApiPlatform\Symfony\Maker\MakeStateProvider')
+    $services->set('api_platform.maker.command.state_provider', MakeStateProvider::class)
         ->args([service('api_platform.metadata.resource.name_collection_factory')])
         ->tag('maker.command');
 
-    $services->set('api_platform.maker.command.filter', 'ApiPlatform\Symfony\Maker\MakeFilter')
+    $services->set('api_platform.maker.command.filter', MakeFilter::class)
         ->args([service('api_platform.metadata.resource.name_collection_factory')])
         ->tag('maker.command');
 };

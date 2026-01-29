@@ -13,17 +13,20 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\State\Provider\SecurityParameterProvider;
+use ApiPlatform\Symfony\Security\State\AccessCheckerProvider;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.state_provider.access_checker', 'ApiPlatform\Symfony\Security\State\AccessCheckerProvider')
+    $services->set('api_platform.state_provider.access_checker', AccessCheckerProvider::class)
         ->decorate('api_platform.state_provider.read', null, 0)
         ->args([
             service('api_platform.state_provider.access_checker.inner'),
             service('api_platform.security.resource_access_checker'),
         ]);
 
-    $services->set('api_platform.state_provider.access_checker.post_deserialize', 'ApiPlatform\Symfony\Security\State\AccessCheckerProvider')
+    $services->set('api_platform.state_provider.access_checker.post_deserialize', AccessCheckerProvider::class)
         ->decorate('api_platform.state_provider.deserialize', null, 0)
         ->args([
             service('api_platform.state_provider.access_checker.post_deserialize.inner'),
@@ -31,7 +34,7 @@ return static function (ContainerConfigurator $container) {
             'post_denormalize',
         ]);
 
-    $services->set('api_platform.state_provider.security_parameter', 'ApiPlatform\State\Provider\SecurityParameterProvider')
+    $services->set('api_platform.state_provider.security_parameter', SecurityParameterProvider::class)
         ->decorate('api_platform.state_provider.access_checker', null, 0)
         ->args([
             service('api_platform.state_provider.security_parameter.inner'),

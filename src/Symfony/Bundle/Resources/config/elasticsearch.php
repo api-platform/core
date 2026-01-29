@@ -13,17 +13,30 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\Elasticsearch\Extension\ConstantScoreFilterExtension;
+use ApiPlatform\Elasticsearch\Extension\SortExtension;
+use ApiPlatform\Elasticsearch\Extension\SortFilterExtension;
+use ApiPlatform\Elasticsearch\Filter\MatchFilter;
+use ApiPlatform\Elasticsearch\Filter\OrderFilter;
+use ApiPlatform\Elasticsearch\Filter\TermFilter;
+use ApiPlatform\Elasticsearch\Metadata\Resource\Factory\ElasticsearchProviderResourceMetadataCollectionFactory;
+use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
+use ApiPlatform\Elasticsearch\Serializer\ItemNormalizer;
+use ApiPlatform\Elasticsearch\Serializer\NameConverter\InnerFieldsNameConverter;
+use ApiPlatform\Elasticsearch\State\CollectionProvider;
+use ApiPlatform\Elasticsearch\State\ItemProvider;
+
 return function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.elasticsearch.name_converter.inner_fields', 'ApiPlatform\Elasticsearch\Serializer\NameConverter\InnerFieldsNameConverter')
+    $services->set('api_platform.elasticsearch.name_converter.inner_fields', InnerFieldsNameConverter::class)
         ->args([service('api_platform.name_converter')->ignoreOnInvalid()]);
 
-    $services->set('api_platform.elasticsearch.normalizer.item', 'ApiPlatform\Elasticsearch\Serializer\ItemNormalizer')
+    $services->set('api_platform.elasticsearch.normalizer.item', ItemNormalizer::class)
         ->decorate('api_platform.serializer.normalizer.item', null, 0)
         ->args([service('api_platform.elasticsearch.normalizer.item.inner')]);
 
-    $services->set('api_platform.elasticsearch.normalizer.document', 'ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer')
+    $services->set('api_platform.elasticsearch.normalizer.document', DocumentNormalizer::class)
         ->args([
             service('api_platform.metadata.resource.metadata_collection_factory'),
             service('serializer.mapping.class_metadata_factory'),
@@ -40,15 +53,15 @@ return function (ContainerConfigurator $container) {
         ->abstract()
         ->args([service('api_platform.filter_locator')]);
 
-    $services->set('api_platform.elasticsearch.request_body_search_extension.constant_score_filter', 'ApiPlatform\Elasticsearch\Extension\ConstantScoreFilterExtension')
+    $services->set('api_platform.elasticsearch.request_body_search_extension.constant_score_filter', ConstantScoreFilterExtension::class)
         ->parent('api_platform.elasticsearch.request_body_search_extension.filter')
         ->tag('api_platform.elasticsearch.request_body_search_extension.collection', ['priority' => 30]);
 
-    $services->set('api_platform.elasticsearch.request_body_search_extension.sort_filter', 'ApiPlatform\Elasticsearch\Extension\SortFilterExtension')
+    $services->set('api_platform.elasticsearch.request_body_search_extension.sort_filter', SortFilterExtension::class)
         ->parent('api_platform.elasticsearch.request_body_search_extension.filter')
         ->tag('api_platform.elasticsearch.request_body_search_extension.collection', ['priority' => 20]);
 
-    $services->set('api_platform.elasticsearch.request_body_search_extension.sort', 'ApiPlatform\Elasticsearch\Extension\SortExtension')
+    $services->set('api_platform.elasticsearch.request_body_search_extension.sort', SortExtension::class)
         ->args([
             service('api_platform.metadata.property.metadata_factory'),
             service('api_platform.resource_class_resolver'),
@@ -68,19 +81,19 @@ return function (ContainerConfigurator $container) {
             service('api_platform.elasticsearch.name_converter.inner_fields'),
         ]);
 
-    $services->set('api_platform.elasticsearch.term_filter', 'ApiPlatform\Elasticsearch\Filter\TermFilter')
+    $services->set('api_platform.elasticsearch.term_filter', TermFilter::class)
         ->abstract()
         ->parent('api_platform.elasticsearch.search_filter');
 
-    $services->alias('ApiPlatform\Elasticsearch\Filter\TermFilter', 'api_platform.elasticsearch.term_filter');
+    $services->alias(TermFilter::class, 'api_platform.elasticsearch.term_filter');
 
-    $services->set('api_platform.elasticsearch.match_filter', 'ApiPlatform\Elasticsearch\Filter\MatchFilter')
+    $services->set('api_platform.elasticsearch.match_filter', MatchFilter::class)
         ->abstract()
         ->parent('api_platform.elasticsearch.search_filter');
 
-    $services->alias('ApiPlatform\Elasticsearch\Filter\MatchFilter', 'api_platform.elasticsearch.match_filter');
+    $services->alias(MatchFilter::class, 'api_platform.elasticsearch.match_filter');
 
-    $services->set('api_platform.elasticsearch.order_filter', 'ApiPlatform\Elasticsearch\Filter\OrderFilter')
+    $services->set('api_platform.elasticsearch.order_filter', OrderFilter::class)
         ->abstract()
         ->args([
             service('api_platform.metadata.property.name_collection_factory'),
@@ -90,9 +103,9 @@ return function (ContainerConfigurator $container) {
             '%api_platform.collection.order_parameter_name%',
         ]);
 
-    $services->alias('ApiPlatform\Elasticsearch\Filter\OrderFilter', 'api_platform.elasticsearch.order_filter');
+    $services->alias(OrderFilter::class, 'api_platform.elasticsearch.order_filter');
 
-    $services->set('api_platform.elasticsearch.state.item_provider', 'ApiPlatform\Elasticsearch\State\ItemProvider')
+    $services->set('api_platform.elasticsearch.state.item_provider', ItemProvider::class)
         ->args([
             service('api_platform.elasticsearch.client'),
             service('serializer'),
@@ -101,9 +114,9 @@ return function (ContainerConfigurator $container) {
         ->tag('api_platform.state_provider', ['priority' => -100, 'key' => 'ApiPlatform\Elasticsearch\State\ItemProvider'])
         ->tag('api_platform.state_provider', ['priority' => -100]);
 
-    $services->alias('ApiPlatform\Elasticsearch\State\ItemProvider', 'api_platform.elasticsearch.state.item_provider');
+    $services->alias(ItemProvider::class, 'api_platform.elasticsearch.state.item_provider');
 
-    $services->set('api_platform.elasticsearch.state.collection_provider', 'ApiPlatform\Elasticsearch\State\CollectionProvider')
+    $services->set('api_platform.elasticsearch.state.collection_provider', CollectionProvider::class)
         ->args([
             service('api_platform.elasticsearch.client'),
             service('serializer'),
@@ -114,9 +127,9 @@ return function (ContainerConfigurator $container) {
         ->tag('api_platform.state_provider', ['priority' => -100, 'key' => 'ApiPlatform\Elasticsearch\State\CollectionProvider'])
         ->tag('api_platform.state_provider', ['priority' => -100]);
 
-    $services->alias('ApiPlatform\Elasticsearch\State\CollectionProvider', 'api_platform.elasticsearch.state.collection_provider');
+    $services->alias(CollectionProvider::class, 'api_platform.elasticsearch.state.collection_provider');
 
-    $services->set('api_platform.elasticsearch.metadata.resource.metadata_collection_factory', 'ApiPlatform\Elasticsearch\Metadata\Resource\Factory\ElasticsearchProviderResourceMetadataCollectionFactory')
+    $services->set('api_platform.elasticsearch.metadata.resource.metadata_collection_factory', ElasticsearchProviderResourceMetadataCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 40)
         ->args([service('api_platform.elasticsearch.metadata.resource.metadata_collection_factory.inner')]);
 };

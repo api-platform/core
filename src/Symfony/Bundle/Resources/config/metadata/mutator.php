@@ -13,10 +13,13 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\Metadata\Mutator\OperationMutatorCollection;
+use ApiPlatform\Metadata\Mutator\ResourceMutatorCollection;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('api_platform.metadata.mutator_collection.resource', 'ApiPlatform\Metadata\Mutator\ResourceMutatorCollection');
+    $services->set('api_platform.metadata.mutator_collection.resource', ResourceMutatorCollection::class);
 
-    $services->set('api_platform.metadata.mutator_collection.operation', 'ApiPlatform\Metadata\Mutator\OperationMutatorCollection');
+    $services->set('api_platform.metadata.mutator_collection.operation', OperationMutatorCollection::class);
 };

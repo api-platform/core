@@ -13,6 +13,14 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\Metadata\Resource\Factory\AttributesResourceNameCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\CachedResourceNameCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\ClassNameResourceNameCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\ConcernsResourceNameCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\ExtractorResourceNameCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\PhpFileResourceNameCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
+
 return function (ContainerConfigurator $container) {
     $services = $container->services();
 
@@ -20,7 +28,7 @@ return function (ContainerConfigurator $container) {
         ->parent('cache.system')
         ->tag('cache.pool');
 
-    $services->set('api_platform.metadata.resource.name_collection_factory.cached', 'ApiPlatform\Metadata\Resource\Factory\CachedResourceNameCollectionFactory')
+    $services->set('api_platform.metadata.resource.name_collection_factory.cached', CachedResourceNameCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.name_collection_factory', null, -10)
         ->args([
             service('api_platform.cache.metadata.resource'),
@@ -29,33 +37,33 @@ return function (ContainerConfigurator $container) {
 
     $services->alias('api_platform.metadata.resource.name_collection_factory', 'api_platform.metadata.resource.name_collection_factory.xml');
 
-    $services->set('api_platform.metadata.resource.name_collection_factory.xml', 'ApiPlatform\Metadata\Resource\Factory\ExtractorResourceNameCollectionFactory')
+    $services->set('api_platform.metadata.resource.name_collection_factory.xml', ExtractorResourceNameCollectionFactory::class)
         ->args([service('api_platform.metadata.resource_extractor.xml')]);
 
-    $services->set('api_platform.metadata.resource.name_collection_factory.php_file', 'ApiPlatform\Metadata\Resource\Factory\PhpFileResourceNameCollectionFactory')
+    $services->set('api_platform.metadata.resource.name_collection_factory.php_file', PhpFileResourceNameCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.name_collection_factory', null, 900)
         ->args([
             service('api_platform.metadata.resource_extractor.php_file'),
             service('api_platform.metadata.resource.name_collection_factory.php_file.inner'),
         ]);
 
-    $services->set('api_platform.metadata.resource.name_collection_factory.concerns', 'ApiPlatform\Metadata\Resource\Factory\ConcernsResourceNameCollectionFactory')
+    $services->set('api_platform.metadata.resource.name_collection_factory.concerns', ConcernsResourceNameCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.name_collection_factory', null, 800)
         ->args([
             '%api_platform.resource_class_directories%',
             service('api_platform.metadata.resource.name_collection_factory.concerns.inner'),
         ]);
 
-    $services->alias('ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface', 'api_platform.metadata.resource.name_collection_factory');
+    $services->alias(ResourceNameCollectionFactoryInterface::class, 'api_platform.metadata.resource.name_collection_factory');
 
-    $services->set('api_platform.metadata.resource.name_collection_factory.attributes', 'ApiPlatform\Metadata\Resource\Factory\AttributesResourceNameCollectionFactory')
+    $services->set('api_platform.metadata.resource.name_collection_factory.attributes', AttributesResourceNameCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.name_collection_factory', null, 0)
         ->args([
             '%api_platform.resource_class_directories%',
             service('api_platform.metadata.resource.name_collection_factory.attributes.inner'),
         ]);
 
-    $services->set('api_platform.metadata.resource.name_collection_factory.class_name', 'ApiPlatform\Metadata\Resource\Factory\ClassNameResourceNameCollectionFactory')
+    $services->set('api_platform.metadata.resource.name_collection_factory.class_name', ClassNameResourceNameCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.name_collection_factory', null, 0)
         ->args([
             '%api_platform.class_name_resources%',

@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/tests/Fixer/SymfonyServiceClassConstantFixer.php';
+
+use ApiPlatform\Tests\Fixer\SymfonyServiceClassConstantFixer;
+
 $header = <<<'HEADER'
 This file is part of the API Platform project.
 
@@ -113,5 +117,10 @@ return (new PhpCsFixer\Config())
                 'property',
             ],
         ],
+        'ApiPlatform/symfony_service_class_constant' => true,
+    ])
+    ->registerCustomFixers([
+        new SymfonyServiceClassConstantFixer(),
     ])
     ->setFinder($finder);
+

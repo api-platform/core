@@ -13,14 +13,18 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\Symfony\Bundle\Command\DebugResourceCommand;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
+use Symfony\Component\VarDumper\Dumper\CliDumper;
+
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    $services->set('debug.var_dumper.cloner', 'Symfony\Component\VarDumper\Cloner\VarCloner');
+    $services->set('debug.var_dumper.cloner', VarCloner::class);
 
-    $services->set('debug.var_dumper.cli_dumper', 'Symfony\Component\VarDumper\Dumper\CliDumper');
+    $services->set('debug.var_dumper.cli_dumper', CliDumper::class);
 
-    $services->set('debug.api_platform.debug_resource.command', 'ApiPlatform\Symfony\Bundle\Command\DebugResourceCommand')
+    $services->set('debug.api_platform.debug_resource.command', DebugResourceCommand::class)
         ->args([
             service('api_platform.metadata.resource.metadata_collection_factory'),
             service('debug.var_dumper.cloner'),

@@ -13,14 +13,33 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\Metadata\Resource\Factory\AlternateUriResourceMetadataCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\AttributesResourceMetadataCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\BackedEnumResourceMetadataCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\CachedResourceMetadataCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\ConcernsResourceMetadataCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\ExtractorResourceMetadataCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\FiltersResourceMetadataCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\FormatsResourceMetadataCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\InputOutputResourceMetadataCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\LinkResourceMetadataCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\MainControllerResourceMetadataCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\MutatorResourceMetadataCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\NotExposedOperationResourceMetadataCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\OperationNameResourceMetadataCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\ParameterResourceMetadataCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\PhpFileResourceMetadataCollectionFactory;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\Factory\UriTemplateResourceMetadataCollectionFactory;
+
 return function (ContainerConfigurator $container) {
     $services = $container->services();
 
     $services->alias('api_platform.metadata.resource.metadata_collection_factory', 'api_platform.metadata.resource.metadata_collection_factory.attributes');
 
-    $services->alias('ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface', 'api_platform.metadata.resource.metadata_collection_factory');
+    $services->alias(ResourceMetadataCollectionFactoryInterface::class, 'api_platform.metadata.resource.metadata_collection_factory');
 
-    $services->set('api_platform.metadata.resource.metadata_collection_factory.attributes', 'ApiPlatform\Metadata\Resource\Factory\AttributesResourceMetadataCollectionFactory')
+    $services->set('api_platform.metadata.resource.metadata_collection_factory.attributes', AttributesResourceMetadataCollectionFactory::class)
         ->args([
             null,
             service('logger')->nullOnInvalid(),
@@ -28,7 +47,7 @@ return function (ContainerConfigurator $container) {
             '%api_platform.graphql.enabled%',
         ]);
 
-    $services->set('api_platform.metadata.resource.metadata_collection_factory.xml', 'ApiPlatform\Metadata\Resource\Factory\ExtractorResourceMetadataCollectionFactory')
+    $services->set('api_platform.metadata.resource.metadata_collection_factory.xml', ExtractorResourceMetadataCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 800)
         ->args([
             service('api_platform.metadata.resource_extractor.xml'),
@@ -38,7 +57,7 @@ return function (ContainerConfigurator $container) {
             '%api_platform.graphql.enabled%',
         ]);
 
-    $services->set('api_platform.metadata.resource.metadata_collection_factory.php_file', 'ApiPlatform\Metadata\Resource\Factory\PhpFileResourceMetadataCollectionFactory')
+    $services->set('api_platform.metadata.resource.metadata_collection_factory.php_file', PhpFileResourceMetadataCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 800)
         ->args([
             service('api_platform.metadata.resource_extractor.php_file'),
@@ -47,7 +66,7 @@ return function (ContainerConfigurator $container) {
             '%api_platform.defaults%',
         ]);
 
-    $services->set('api_platform.metadata.resource.metadata_collection_factory.mutator', 'ApiPlatform\Metadata\Resource\Factory\MutatorResourceMetadataCollectionFactory')
+    $services->set('api_platform.metadata.resource.metadata_collection_factory.mutator', MutatorResourceMetadataCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 800)
         ->args([
             service('api_platform.metadata.mutator_collection.resource'),
@@ -55,7 +74,7 @@ return function (ContainerConfigurator $container) {
             service('api_platform.metadata.resource.metadata_collection_factory.mutator.inner'),
         ]);
 
-    $services->set('api_platform.metadata.resource.metadata_collection_factory.concerns', 'ApiPlatform\Metadata\Resource\Factory\ConcernsResourceMetadataCollectionFactory')
+    $services->set('api_platform.metadata.resource.metadata_collection_factory.concerns', ConcernsResourceMetadataCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 800)
         ->args([
             service('api_platform.metadata.resource.metadata_collection_factory.concerns.inner'),
@@ -64,18 +83,18 @@ return function (ContainerConfigurator $container) {
             '%api_platform.graphql.enabled%',
         ]);
 
-    $services->set('api_platform.metadata.resource.metadata_collection_factory.not_exposed_operation', 'ApiPlatform\Metadata\Resource\Factory\NotExposedOperationResourceMetadataCollectionFactory')
+    $services->set('api_platform.metadata.resource.metadata_collection_factory.not_exposed_operation', NotExposedOperationResourceMetadataCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 700)
         ->args([
             service('api_platform.metadata.resource.link_factory'),
             service('api_platform.metadata.resource.metadata_collection_factory.not_exposed_operation.inner'),
         ]);
 
-    $services->set('api_platform.metadata.resource.metadata_collection_factory.backed_enum', 'ApiPlatform\Metadata\Resource\Factory\BackedEnumResourceMetadataCollectionFactory')
+    $services->set('api_platform.metadata.resource.metadata_collection_factory.backed_enum', BackedEnumResourceMetadataCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 500)
         ->args([service('api_platform.metadata.resource.metadata_collection_factory.backed_enum.inner')]);
 
-    $services->set('api_platform.metadata.resource.metadata_collection_factory.uri_template', 'ApiPlatform\Metadata\Resource\Factory\UriTemplateResourceMetadataCollectionFactory')
+    $services->set('api_platform.metadata.resource.metadata_collection_factory.uri_template', UriTemplateResourceMetadataCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 500)
         ->args([
             service('api_platform.metadata.resource.link_factory'),
@@ -83,14 +102,14 @@ return function (ContainerConfigurator $container) {
             service('api_platform.metadata.resource.metadata_collection_factory.uri_template.inner'),
         ]);
 
-    $services->set('api_platform.metadata.resource.metadata_collection_factory.main_controller', 'ApiPlatform\Metadata\Resource\Factory\MainControllerResourceMetadataCollectionFactory')
+    $services->set('api_platform.metadata.resource.metadata_collection_factory.main_controller', MainControllerResourceMetadataCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 500)
         ->args([
             service('api_platform.metadata.resource.metadata_collection_factory.main_controller.inner'),
             '%api_platform.use_symfony_listeners%',
         ]);
 
-    $services->set('api_platform.metadata.resource.metadata_collection_factory.link', 'ApiPlatform\Metadata\Resource\Factory\LinkResourceMetadataCollectionFactory')
+    $services->set('api_platform.metadata.resource.metadata_collection_factory.link', LinkResourceMetadataCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 500)
         ->args([
             service('api_platform.metadata.resource.link_factory'),
@@ -98,15 +117,15 @@ return function (ContainerConfigurator $container) {
             '%api_platform.graphql.enabled%',
         ]);
 
-    $services->set('api_platform.metadata.resource.metadata_collection_factory.operation_name', 'ApiPlatform\Metadata\Resource\Factory\OperationNameResourceMetadataCollectionFactory')
+    $services->set('api_platform.metadata.resource.metadata_collection_factory.operation_name', OperationNameResourceMetadataCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 200)
         ->args([service('api_platform.metadata.resource.metadata_collection_factory.operation_name.inner')]);
 
-    $services->set('api_platform.metadata.resource.metadata_collection_factory.input_output', 'ApiPlatform\Metadata\Resource\Factory\InputOutputResourceMetadataCollectionFactory')
+    $services->set('api_platform.metadata.resource.metadata_collection_factory.input_output', InputOutputResourceMetadataCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 200)
         ->args([service('api_platform.metadata.resource.metadata_collection_factory.input_output.inner')]);
 
-    $services->set('api_platform.metadata.resource.metadata_collection_factory.formats', 'ApiPlatform\Metadata\Resource\Factory\FormatsResourceMetadataCollectionFactory')
+    $services->set('api_platform.metadata.resource.metadata_collection_factory.formats', FormatsResourceMetadataCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 200)
         ->args([
             service('api_platform.metadata.resource.metadata_collection_factory.formats.inner'),
@@ -115,15 +134,15 @@ return function (ContainerConfigurator $container) {
             '%api_platform.error_formats%',
         ]);
 
-    $services->set('api_platform.metadata.resource.metadata_collection_factory.filters', 'ApiPlatform\Metadata\Resource\Factory\FiltersResourceMetadataCollectionFactory')
+    $services->set('api_platform.metadata.resource.metadata_collection_factory.filters', FiltersResourceMetadataCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 200)
         ->args([service('api_platform.metadata.resource.metadata_collection_factory.filters.inner')]);
 
-    $services->set('api_platform.metadata.resource.metadata_collection_factory.alternate_uri', 'ApiPlatform\Metadata\Resource\Factory\AlternateUriResourceMetadataCollectionFactory')
+    $services->set('api_platform.metadata.resource.metadata_collection_factory.alternate_uri', AlternateUriResourceMetadataCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 200)
         ->args([service('api_platform.metadata.resource.metadata_collection_factory.alternate_uri.inner')]);
 
-    $services->set('api_platform.metadata.resource.metadata_collection_factory.parameter', 'ApiPlatform\Metadata\Resource\Factory\ParameterResourceMetadataCollectionFactory')
+    $services->set('api_platform.metadata.resource.metadata_collection_factory.parameter', ParameterResourceMetadataCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 1000)
         ->args([
             service('api_platform.metadata.property.name_collection_factory'),
@@ -134,7 +153,7 @@ return function (ContainerConfigurator $container) {
             service('logger')->ignoreOnInvalid(),
         ]);
 
-    $services->set('api_platform.metadata.resource.metadata_collection_factory.cached', 'ApiPlatform\Metadata\Resource\Factory\CachedResourceMetadataCollectionFactory')
+    $services->set('api_platform.metadata.resource.metadata_collection_factory.cached', CachedResourceMetadataCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, -10)
         ->args([
             service('api_platform.cache.metadata.resource_collection'),
