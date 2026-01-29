@@ -235,6 +235,9 @@ class ConfigurationTest extends TestCase
                 'hydra_prefix' => null,
             ],
             'enable_phpdoc_parser' => true,
+            'jsonapi' => [
+                'resource_id_strategy' => 'iri'
+            ],
         ], $config);
     }
 
