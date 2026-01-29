@@ -144,10 +144,6 @@ final class PartialSearchFilterTest extends ApiTestCase
     #[DataProvider('partialSearchFilterOneToManyRelationProvider')]
     public function testPartialSearchFilterOneToManyRelation(string $url, int $expectedCount, array $expectedChickenNames): void
     {
-        if ($this->isMongoDB()) {
-            $this->markTestSkipped('MongoDB ODM does not support $lookup on DBRef references (ReferenceMany relations)');
-        }
-
         $response = self::createClient()->request('GET', $url);
         $this->assertResponseIsSuccessful();
 
@@ -249,10 +245,6 @@ final class PartialSearchFilterTest extends ApiTestCase
     #[DataProvider('partialSearchFilterOneToManyRelationWithPropertyPlaceholderProvider')]
     public function testPartialSearchFilterOneToManyRelationWithPropertyPlaceholder(string $url, int $expectedCount, array $expectedChickenNames): void
     {
-        if ($this->isMongoDB()) {
-            $this->markTestSkipped('MongoDB ODM does not support $lookup on DBRef references (ReferenceMany relations)');
-        }
-
         $response = self::createClient()->request('GET', $url);
         $this->assertResponseIsSuccessful();
 

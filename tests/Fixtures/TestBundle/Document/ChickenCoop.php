@@ -46,7 +46,7 @@ class ChickenCoop
     #[ODM\Id(type: 'int', strategy: 'INCREMENT')]
     private ?int $id = null;
 
-    #[ODM\ReferenceMany(targetDocument: Chicken::class, mappedBy: 'chickenCoop')]
+    #[ODM\EmbedMany(targetDocument: Chicken::class)]
     private Collection $chickens;
 
     public function __construct()
