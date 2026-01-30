@@ -17,6 +17,7 @@ use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ParameterNotFound;
@@ -33,14 +34,14 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
     public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
         $parameter = $context['parameter'];
-        if (!isset($parameter)) {
-            return;
+
+        if (null === $property = $parameter->getProperty()) {
+            throw new InvalidArgumentException(\sprintf('The filter parameter with key "%s" must specify a property. Please provide the property explicitly.', $parameter->getKey()));
         }
 
         $values = $parameter->getValue();
-        $property = $parameter->getProperty();
 
-        if (null === $values || $values instanceof ParameterNotFound || null === $property) {
+        if (null === $values || $values instanceof ParameterNotFound) {
             return;
         }
 
