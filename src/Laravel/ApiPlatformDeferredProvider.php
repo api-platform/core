@@ -49,6 +49,7 @@ use ApiPlatform\Laravel\Metadata\ParameterValidationResourceMetadataCollectionFa
 use ApiPlatform\Laravel\State\ParameterValidatorProvider;
 use ApiPlatform\Laravel\State\SwaggerUiProcessor;
 use ApiPlatform\Laravel\State\ValidateProvider;
+use ApiPlatform\Mcp\State\ToolProvider;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\InflectorInterface;
 use ApiPlatform\Metadata\Laravel\SkipAutoconfigure;
@@ -198,7 +199,15 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
             return new CallableProvider(new ServiceLocator($tagged));
         });
 
-        $this->autoconfigure($classes, ProviderInterface::class, [ItemProvider::class, CollectionProvider::class, ErrorProvider::class]);
+        if (class_exists(ToolProvider::class)) {
+            $this->app->singleton(ToolProvider::class, static function (Application $app) {
+                return new ToolProvider(
+                    $app->make('api_platform.object_mapper')
+                );
+            });
+        }
+
+        $this->autoconfigure($classes, ProviderInterface::class, [ItemProvider::class, CollectionProvider::class, ErrorProvider::class, ToolProvider::class]);
 
         $this->app->singleton(ResourceMetadataCollectionFactoryInterface::class, function (Application $app) {
             /** @var ConfigRepository $config */
@@ -366,6 +375,7 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
             'api_platform.graphql.state_provider.parameter',
             FieldsBuilderEnumInterface::class,
             ExceptionHandlerInterface::class,
+            ToolProvider::class,
         ];
     }
 }
