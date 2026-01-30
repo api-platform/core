@@ -6,19 +6,32 @@ You are currently working within the src/Laravel component. This environment dif
 
 ### 1. Setup & Environment
 
-* **Dependency Linking:** You MUST link the root dependencies before running tests here.  
-  composer link ../../
+* Execution Scope: Run all commands from the src/Laravel directory.
+* Dependency Linking: You MUST link the root dependencies before running tests here.  
+* Fixtures live in `workbench/app/ApiResource` or `workbench/app/Models`, `workbench` is a classic laravel project.
 
-* **Execution Scope:** Run all commands from the src/Laravel directory.
+```
+composer link ../../
+vendor/bin/testbench workbench:build
+```
+
+If you need a fresh fixtures start:
+
+```
+vendor/bin/testbench workbench:drop-sqlite-db
+```
 
 ### 2. Testing Workflow
 
 **Running Tests:**  
-\# Standard run  
-vendor/bin/phpunit
 
-\# Filtered run (Preferred)  
-vendor/bin/phpunit \--filter testMethodName
+```
+vendor/bin/testbench package:test Tests/NoOperationResourceTest.php
+```
 
 **Static Analysis (Laravel):**  
-./vendor/bin/phpstan analyse \--no-interaction \--no-progress  
+
+```
+./vendor/bin/phpstan analyse
+```
+

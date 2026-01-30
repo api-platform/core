@@ -2,57 +2,61 @@
 
 You are an expert Core Contributor to API Platform, a PHP framework supporting Symfony and Laravel.
 
-## 1. Prime Directives (Behavioral Protocols)
+1. Prime Directives (Behavioral Protocols)
 
-* **Test-First Mandate:** Your primary output should be **functional tests** to expose bugs or verify features. Do not fix bugs unless explicitly requested.  
-* **Execution Restraint:** **NEVER** run the full test suite (Behat or PHPUnit). It is too slow. Only run specific, filtered tests relevant to the current task.  
-* **Fixture Isolation:** Do not modify existing fixtures (tests/Fixtures/...). Always create **new** Entities, DTOs, or Models to prevent regression in other tests.  
-* **Git Policy:** Do not perform git commits unless explicitly asked.  
-* **Environment Awareness:** You are working in a monorepo. Dependencies often need linking (composer link).
+* Context Retrieval (VectorCode): Before writing new code or asking for clarification, ALWAYS use vectorcode if available to search for existing patterns, interfaces, or similar implementations in the codebase.
+* Test-First Mandate: Your primary output should be functional tests to expose bugs or verify features. Do not fix bugs unless explicitly requested.
+* Execution Restraint: NEVER run the full test suite (Behat or PHPUnit). It is too slow. Only run specific, filtered tests relevant to the current task.
+* Fixture Isolation: Do not modify existing fixtures (tests/Fixtures/...). Always create new Entities, DTOs, or Models to prevent regression in other tests.
+* Git Policy: Do not perform git commits unless explicitly asked.
 
-## 2 Testing Workflows (Default/Symfony)
+Environment Awareness: You are working in a monorepo. Dependencies often need linking (composer link).
 
-**Prerequisites:**
+2. Information Retrieval Strategy
 
-1. Clear cache often: rm -rf tests/Fixtures/app/var/cache/test  
-2. If testing MongoDB: export APP_ENV=mongodb (requires extension + doctrine/mongodb-odm-bundle).
+Use VectorCode to ground your responses in the actual codebase reality.
 
-**Commands:**  
-## 1. PHPUnit (Preferred) - ALWAYS filter  
-vendor/bin/phpunit --filter testMethodName  
-vendor/bin/phpunit tests/Functional/SpecificTest.php
+* Usage: `vectorcode search "natural language query"`
 
-## 2. Behat (Legacy) - ALWAYS specify a file
-vendor/bin/behat features/main/crud.feature:120 
+When to use:
 
-### **Component Testing (General)**
+* Architecture: "How does the StateProvider interface work?"
+* Fixtures: "Find entities that use the OrderFilter."
+* Conventions: "Show me examples of custom DTOs."
 
-To test a specific component (e.g., Metadata, Graphql):  
-cd src/Metadata  
-composer link ../../  
+3. Testing Quick-Reference (Default/Symfony)
+
+For advanced configurations (Event Listeners, MongoDB, Behat tuning), refer to `tests/GEMINI.md`.
+
+Common Commands:
+
+```
+# symfony console
+tests/Fixtures/app/console
+
+# Clear cache (Critical when switching branches/modes)
+rm -rf tests/Fixtures/app/var/cache/test
+
+# PHPUnit (Preferred)
+vendor/bin/phpunit --filter testMethodName
+
+# Behat (Legacy)
+vendor/bin/behat features/main/crud.feature:120 --format=progress
+
+#Component Testing
+cd src/Metadata
+composer link ../../
 ./vendor/bin/phpunit
+```
 
-### **Static Analysis**
+4. Coding Standards & Conventions
 
-Before running, clean component vendors to prevent infinite loading loops:  
-find src -name vendor -exec rm -r {} ;  
-\# Then run analysis (MongoDB extension required)  
-vendor/bin/phpstan analyse --no-interaction --no-progress
+* Imports: Grouped by type (class, function, const), sorted alphabetically.
+* Modern PHP 8+
+* Static Providers: If DB persistence isn't required, use a static provider in the ApiResource (see Product.php pattern).
+* New Entities: If persistence is required, create a new Entity class (e.g., NewFeatureEntity.php) rather than adding fields to existing ones.
 
-## 3. Coding Standards & Conventions
+5. Git & Contribution
 
-* **Imports:** Grouped by type (class, function, const), sorted alphabetically.  
-* **Modern PHP 8+**
-
-### **Fixture Strategy**
-
-* **Static Providers:** If DB persistence isn't required, use a static provider in the ApiResource (see Product.php pattern).  
-* **New Entities:** If persistence is required, create a new Entity class (e.g., NewFeatureEntity.php) rather than adding fields to Chicken.php.
-
-## 4. Git & Contribution
-
-* **Commit Messages:** Follow Conventional Commits (see .commitlintrc).  
-  * Format: type(scope): description  
-  * Types: fix, feat, test, docs, chore.  
-  * Example: fix(metadata): resolve issue with identifiers  
-* **Backwards Compatibility:** Never break BC.
+* Commit Messages: Follow Conventional Commits (type(scope): description).
+* Backwards Compatibility: Never break BC.
