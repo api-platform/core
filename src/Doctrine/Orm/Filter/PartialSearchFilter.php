@@ -20,7 +20,6 @@ use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\State\ParameterNotFound;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -39,20 +38,15 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
             throw new InvalidArgumentException(\sprintf('The filter parameter with key "%s" must specify a property. Please provide the property explicitly.', $parameter->getKey()));
         }
 
-        $values = $parameter->getValue();
-
-        if (null === $values || $values instanceof ParameterNotFound) {
-            return;
-        }
-
         $alias = $queryBuilder->getRootAliases()[0];
-        $field = $property;
+        $field = $alias.'.'.$property;
+        $values = $parameter->getValue();
 
         if (str_contains($property, '.')) {
             $associations = explode('.', $property);
             $field = array_pop($associations);
             $currentAlias = $alias;
-
+            
             foreach ($associations as $association) {
                 $currentAlias = QueryBuilderHelper::addJoinOnce(
                     $queryBuilder,
@@ -64,10 +58,8 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
             $alias = $currentAlias;
         }
 
-        $field = $alias.'.'.$field;
-        $parameterName = $queryNameGenerator->generateParameterName($field);
-
         if (!is_iterable($values)) {
+            $parameterName = $queryNameGenerator->generateParameterName($property);
             $queryBuilder->setParameter($parameterName, $this->formatLikeValue($values));
 
             $likeExpression = 'LOWER('.$field.') LIKE LOWER(:'.$parameterName.') ESCAPE \'\\\'';
