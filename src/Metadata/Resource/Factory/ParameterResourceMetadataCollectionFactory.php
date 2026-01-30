@@ -27,6 +27,7 @@ use ApiPlatform\Metadata\PropertiesAwareInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use ApiPlatform\Serializer\Filter\FilterInterface as SerializerFilterInterface;
 use ApiPlatform\State\Parameter\ValueCaster;
@@ -35,6 +36,8 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\CollectionType;
+use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
@@ -53,6 +56,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         private readonly ?ContainerInterface $filterLocator = null,
         private readonly ?NameConverterInterface $nameConverter = null,
         private readonly ?LoggerInterface $logger = null,
+        private readonly ?ResourceClassResolverInterface $resourceClassResolver = null,
     ) {
     }
 
@@ -105,9 +109,38 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         $properties = [];
         foreach ($parameter?->getProperties() ?? $this->propertyNameCollectionFactory->create($resourceClass) as $property) {
             if (str_contains($property, '.')) {
-                $propertyNames[] = $property;
-                $properties[$property] = new ApiProperty();
-                continue;
+                $parts = explode('.', $property);
+                $currentClass = $resourceClass;
+                $validPath = true;
+
+                foreach ($parts as $i => $part) {
+                    $isLastPart = ($i === \count($parts) - 1);
+
+                    try {
+                        $propertyMetadata = $this->propertyMetadataFactory->create($currentClass, $part);
+                    } catch (\Exception $e) {
+                        $validPath = false;
+                        break;
+                    }
+
+                    if (!$isLastPart) {
+                        $nextClass = $this->getClassFromProperty($propertyMetadata);
+
+                        if (!$nextClass) {
+                            $validPath = false;
+                            break;
+                        }
+
+                        $currentClass = $nextClass;
+                    }
+
+                    if ($validPath && $propertyMetadata->isReadable()) {
+                        $propertyNames[] = $property;
+                        $properties[$property] = $propertyMetadata;
+                    }
+
+                    continue;
+                }
             }
 
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
@@ -136,6 +169,28 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         $this->localPropertyCache[$k] = ['propertyNames' => $propertyNames, 'properties' => $properties];
 
         return $this->localPropertyCache[$k];
+    }
+
+    private function getClassFromProperty(ApiProperty $propertyMetadata): ?string
+    {
+        if (!($type = $propertyMetadata->getNativeType())) {
+            return null;
+        }
+
+        return $this->extractClassNameFromType($type);
+    }
+
+    private function extractClassNameFromType(Type $type): ?string
+    {
+        if ($type instanceof CollectionType) {
+            return $this->extractClassNameFromType($type->getCollectionValueType());
+        }
+
+        if ($type instanceof ObjectType) {
+            return $type->getClassName();
+        }
+
+        return null;
     }
 
     private function getDefaultParameters(Operation $operation, string $resourceClass, int &$internalPriority): Parameters
