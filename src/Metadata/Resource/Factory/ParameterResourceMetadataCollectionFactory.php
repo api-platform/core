@@ -173,7 +173,13 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             return null;
         }
 
-        return $this->extractClassNameFromType($type);
+        $className = $this->extractClassNameFromType($type);
+
+        if ($className && $this->resourceClassResolver?->isResourceClass($className)) {
+            return $className;
+        }
+
+        return null;
     }
 
     private function extractClassNameFromType(Type $type): ?string
