@@ -41,11 +41,11 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
 
         $property = $parameter->getProperty();
         $alias = $queryBuilder->getRootAliases()[0];
-        $field = $property;
+        $parameterName = $queryNameGenerator->generateParameterName($property);
 
         if (str_contains($property, '.')) {
             $associations = explode('.', $property);
-            $field = array_pop($associations);
+            $property = array_pop($associations);
             $currentAlias = $alias;
 
             foreach ($associations as $association) {
@@ -59,15 +59,12 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
             $alias = $currentAlias;
         }
 
-        $field = $alias.'.'.$field;
-        $parameterName = $queryNameGenerator->generateParameterName($field);
-
         if (\is_array($value)) {
             $queryBuilder
-                ->{$context['whereClause'] ?? 'andWhere'}(\sprintf('%s IN (:%s)', $field, $parameterName));
+                ->{$context['whereClause'] ?? 'andWhere'}(\sprintf('%s.%s IN (:%s)', $alias, $property, $parameterName));
         } else {
             $queryBuilder
-                ->{$context['whereClause'] ?? 'andWhere'}(\sprintf('%s = :%s', $field, $parameterName));
+                ->{$context['whereClause'] ?? 'andWhere'}(\sprintf('%s.%s = :%s', $alias, $property, $parameterName));
         }
 
         $queryBuilder->setParameter($parameterName, $value);
