@@ -253,7 +253,8 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
                             ),
                             $app->make('filters'),
                             $app->make(CamelCaseToSnakeCaseNameConverter::class),
-                            $this->app->make(LoggerInterface::class)
+                            $this->app->make(LoggerInterface::class),
+                            $app->make(ResourceClassResolverInterface::class)
                         ),
                         $app->make('filters')
                     )
