@@ -28,6 +28,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\Util\TypeHelper;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use ApiPlatform\Serializer\Filter\FilterInterface as SerializerFilterInterface;
 use ApiPlatform\State\Parameter\ValueCaster;
@@ -179,15 +180,11 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
 
     private function extractClassNameFromType(Type $type): ?string
     {
-        if ($type instanceof CollectionType) {
-            return $this->extractClassNameFromType($type->getCollectionValueType());
+        if ($collectionValueType = TypeHelper::getCollectionValueType($type)) {
+            return TypeHelper::getClassName($collectionValueType);
         }
 
-        if ($type instanceof ObjectType) {
-            return $type->getClassName();
-        }
-
-        return null;
+        return TypeHelper::getClassName($type);
     }
 
     private function getDefaultParameters(Operation $operation, string $resourceClass, int &$internalPriority): Parameters
