@@ -82,11 +82,6 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     ];
 
     /**
-     * @var array<string, true>
-     */
-    private array $transformed = [];
-
-    /**
      * @param array<string, mixed> $defaultContext
      */
     public function __construct(
@@ -284,7 +279,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
     private function decorateItemDefinition(string $definitionName, \ArrayObject $definitions, string $prefix, string $type, ?array $serializerContext): void
     {
-        if (!isset($definitions[$definitionName]) || ($this->transformed[$definitionName] ?? false)) {
+        if (!isset($definitions[$definitionName])) {
             return;
         }
 
@@ -292,6 +287,12 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         $baseName = self::ITEM_BASE_SCHEMA_NAME;
         if ($hasNoId) {
             $baseName = self::ITEM_WITHOUT_ID_BASE_SCHEMA_NAME;
+        }
+
+        // Check if the definition is already decorated to prevent double wrapping (recursion or cache)
+        $currentDef = $definitions[$definitionName];
+        if (($currentDef['allOf'][0]['$ref'] ?? null) === $prefix.$baseName) {
+            return;
         }
 
         if (!isset($definitions[$baseName])) {
@@ -309,7 +310,5 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
         $definitions[$definitionName] = $allOf;
         unset($definitions[$definitionName]['allOf'][1]['description']);
-
-        $this->transformed[$definitionName] = true;
     }
 }

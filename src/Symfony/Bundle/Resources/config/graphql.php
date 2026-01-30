@@ -252,7 +252,7 @@ return function (ContainerConfigurator $container) {
 
     $services->set('api_platform.graphql.normalizer.object', ObjectNormalizer::class)
         ->args([
-            service('serializer.normalizer.object'),
+            service('api_platform.normalizer.object'),
             service('api_platform.symfony.iri_converter'),
             service('api_platform.api.identifiers_extractor'),
         ])

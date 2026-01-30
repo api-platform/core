@@ -51,6 +51,10 @@ Route::domain($domain)->middleware($globalMiddlewares)->group(static function ()
 
                 if (!class_exists($controller)) {
                     $controller = $app->make($controller);
+
+                    if (is_callable([$controller, '__invoke'])) {
+                        $controller = '\\'.$controller::class.'@__invoke'; // see Illuminate\Routing\RouteAction
+                    }
                 }
 
                 $route = Route::addRoute($operation->getMethod(), $uriTemplate, ['uses' => $controller, 'prefix' => $operation->getRoutePrefix() ?? ''])

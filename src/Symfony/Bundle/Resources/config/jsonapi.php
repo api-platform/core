@@ -77,7 +77,7 @@ return static function (ContainerConfigurator $container) {
 
     $services->set('api_platform.jsonapi.normalizer.object', ObjectNormalizer::class)
         ->args([
-            service('serializer.normalizer.object'),
+            service('api_platform.normalizer.object'),
             service('api_platform.iri_converter'),
             service('api_platform.resource_class_resolver'),
             service('api_platform.metadata.resource.metadata_collection_factory'),
