@@ -61,7 +61,7 @@ return static function (ContainerConfigurator $container) {
 
     $services->set('api_platform.jsonld.normalizer.object', ObjectNormalizer::class)
         ->args([
-            service('serializer.normalizer.object'),
+            service('api_platform.normalizer.object'),
             service('api_platform.iri_converter'),
             service('api_platform.jsonld.context_builder'),
         ])
