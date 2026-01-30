@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
+use ApiPlatform\Doctrine\Odm\Filter\ExactFilter;
 use ApiPlatform\Doctrine\Odm\Filter\PartialSearchFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
@@ -32,8 +33,16 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
                     filter: new PartialSearchFilter(),
                     property: 'chickens.name',
                 ),
-                'search[:property]' => new QueryParameter(
+                'searchChickenNamePartial[:property]' => new QueryParameter(
                     filter: new PartialSearchFilter(),
+                    properties: ['chickens.name'],
+                ),
+                'chickenNameExact' => new QueryParameter(
+                    filter: new ExactFilter(),
+                    property: 'chickens.name',
+                ),
+                'searchChickenNameExact[:property]' => new QueryParameter(
+                    filter: new ExactFilter(),
                     properties: ['chickens.name'],
                 ),
             ],

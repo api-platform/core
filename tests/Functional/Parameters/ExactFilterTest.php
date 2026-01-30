@@ -105,6 +105,88 @@ final class ExactFilterTest extends ApiTestCase
         ];
     }
 
+    #[DataProvider('exactSearchFilterOneToManyRelationProvider')]
+    public function testExactSearchFilterOneToManyRelation(string $url, int $expectedCount, array $expectedChickenNames): void
+    {
+        $response = self::createClient()->request('GET', $url);
+        $this->assertResponseIsSuccessful();
+
+        $responseData = $response->toArray();
+        $filteredCoops = $responseData['member'];
+
+        $this->assertCount($expectedCount, $filteredCoops, \sprintf('Expected %d coops for URL %s', $expectedCount, $url));
+
+        $allChickenNames = [];
+        foreach ($filteredCoops as $coop) {
+            foreach ($coop['chickens'] as $chickenIri) {
+                $chickenResponse = self::createClient()->request('GET', $chickenIri);
+                $chickenData = $chickenResponse->toArray();
+                $allChickenNames[] = $chickenData['name'];
+            }
+        }
+
+        sort($allChickenNames);
+        sort($expectedChickenNames);
+
+        $this->assertSame($expectedChickenNames, $allChickenNames, 'The chicken names in coops do not match the expected values.');
+    }
+
+    public static function exactSearchFilterOneToManyRelationProvider(): \Generator
+    {
+        yield 'filter coops by exact chicken name (chickens.name) "Gertrude"' => [
+            '/chicken_coops?chickenNameExact=Gertrude',
+            1,
+            ['Gertrude'],
+        ];
+
+        yield 'filter coops by a non-existent chicken name (chickens.name)' => [
+            '/chicken_coops?chickenNameExact=Kevin',
+            0,
+            [],
+        ];
+    }
+
+    #[DataProvider('exactSearchFilterOneToManyRelationWithPropertyPlaceholderProvider')]
+    public function testExactSearchFilterOneToManyRelationWithPropertyPlaceholder(string $url, int $expectedCount, array $expectedChickenNames): void
+    {
+        $response = self::createClient()->request('GET', $url);
+        $this->assertResponseIsSuccessful();
+
+        $responseData = $response->toArray();
+        $filteredCoops = $responseData['member'];
+
+        $this->assertCount($expectedCount, $filteredCoops, \sprintf('Expected %d coops for URL %s', $expectedCount, $url));
+
+        $allChickenNames = [];
+        foreach ($filteredCoops as $coop) {
+            foreach ($coop['chickens'] as $chickenIri) {
+                $chickenResponse = self::createClient()->request('GET', $chickenIri);
+                $chickenData = $chickenResponse->toArray();
+                $allChickenNames[] = $chickenData['name'];
+            }
+        }
+
+        sort($allChickenNames);
+        sort($expectedChickenNames);
+
+        $this->assertSame($expectedChickenNames, $allChickenNames, 'The chicken names in coops do not match the expected values.');
+    }
+
+    public static function exactSearchFilterOneToManyRelationWithPropertyPlaceholderProvider(): \Generator
+    {
+        yield 'filter coops by exact chicken name (chickens.name) "Gertrude" using :property placeholder' => [
+            '/chicken_coops?searchChickenNameExact[chickens.name]=Gertrude',
+            1,
+            ['Gertrude'],
+        ];
+
+        yield 'filter coops by a non-existent chicken name (chickens.name) using :property placeholder' => [
+            '/chicken_coops?searchChickenNameExact[chickens.name]=Kevin',
+            0,
+            [],
+        ];
+    }
+
     public function testExactSearchFilterThrowsExceptionWhenPropertyIsMissing(): void
     {
         $response = self::createClient()->request('GET', '/chickens?nameExactNoProperty=Gertrude');

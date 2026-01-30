@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Orm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
+use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
@@ -40,14 +41,33 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
 
         $property = $parameter->getProperty();
         $alias = $queryBuilder->getRootAliases()[0];
-        $parameterName = $queryNameGenerator->generateParameterName($property);
+        $field = $property;
+
+        if (str_contains($property, '.')) {
+            $associations = explode('.', $property);
+            $field = array_pop($associations);
+            $currentAlias = $alias;
+
+            foreach ($associations as $association) {
+                $currentAlias = QueryBuilderHelper::addJoinOnce(
+                    $queryBuilder,
+                    $queryNameGenerator,
+                    $currentAlias,
+                    $association
+                );
+            }
+            $alias = $currentAlias;
+        }
+
+        $field = $alias.'.'.$field;
+        $parameterName = $queryNameGenerator->generateParameterName($field);
 
         if (\is_array($value)) {
             $queryBuilder
-                ->{$context['whereClause'] ?? 'andWhere'}(\sprintf('%s.%s IN (:%s)', $alias, $property, $parameterName));
+                ->{$context['whereClause'] ?? 'andWhere'}(\sprintf('%s IN (:%s)', $field, $parameterName));
         } else {
             $queryBuilder
-                ->{$context['whereClause'] ?? 'andWhere'}(\sprintf('%s.%s = :%s', $alias, $property, $parameterName));
+                ->{$context['whereClause'] ?? 'andWhere'}(\sprintf('%s = :%s', $field, $parameterName));
         }
 
         $queryBuilder->setParameter($parameterName, $value);
