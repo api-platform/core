@@ -159,7 +159,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerOAuthConfiguration($container, $config);
         $this->registerOpenApiConfiguration($container, $config, $loader);
         $this->registerSwaggerConfiguration($container, $config, $loader);
-        $this->registerJsonApiConfiguration($formats, $loader, $config);
+        $this->registerJsonApiConfiguration($container, $formats, $loader, $config);
         $this->registerJsonLdHydraConfiguration($container, $formats, $loader, $config);
         $this->registerJsonHalConfiguration($formats, $loader);
         $this->registerJsonProblemConfiguration($errorFormats, $loader);
@@ -630,7 +630,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.swagger_ui.extra_configuration', $config['openapi']['swagger_ui_extra_configuration'] ?: $config['swagger']['swagger_ui_extra_configuration']);
     }
 
-    private function registerJsonApiConfiguration(array $formats, PhpFileLoader $loader, array $config): void
+    private function registerJsonApiConfiguration(ContainerBuilder $container, array $formats, PhpFileLoader $loader, array $config): void
     {
         if (!isset($formats['jsonapi'])) {
             return;
@@ -642,6 +642,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $loader->load('jsonapi.php');
         $loader->load('state/jsonapi.php');
+
+        $container->getDefinition('api_platform.jsonapi.normalizer.item')
+            ->addArgument($config['jsonapi']['use_iri_as_id']);
     }
 
     private function registerJsonLdHydraConfiguration(ContainerBuilder $container, array $formats, PhpFileLoader $loader, array $config): void
