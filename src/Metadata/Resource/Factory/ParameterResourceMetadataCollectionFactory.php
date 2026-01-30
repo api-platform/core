@@ -111,7 +111,6 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             if (str_contains($property, '.')) {
                 $parts = explode('.', $property);
                 $currentClass = $resourceClass;
-                $validPath = true;
 
                 foreach ($parts as $i => $part) {
                     $isLastPart = ($i === \count($parts) - 1);
@@ -119,7 +118,6 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                     try {
                         $propertyMetadata = $this->propertyMetadataFactory->create($currentClass, $part);
                     } catch (\Exception $e) {
-                        $validPath = false;
                         break;
                     }
 
@@ -127,14 +125,13 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                         $nextClass = $this->getClassFromProperty($propertyMetadata);
 
                         if (!$nextClass) {
-                            $validPath = false;
                             break;
                         }
 
                         $currentClass = $nextClass;
                     }
 
-                    if ($validPath && $propertyMetadata->isReadable()) {
+                    if ($propertyMetadata->isReadable()) {
                         $propertyNames[] = $property;
                         $properties[$property] = $propertyMetadata;
                     }
