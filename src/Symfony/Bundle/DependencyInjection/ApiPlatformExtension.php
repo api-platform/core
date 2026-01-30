@@ -179,6 +179,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerJsonApiConfiguration($formats, $loader, $config);
         $this->registerJsonLdHydraConfiguration($container, $formats, $loader, $config);
         $this->registerJsonHalConfiguration($formats, $loader);
+        $this->registerToonConfiguration($formats, $loader);
         $this->registerJsonProblemConfiguration($errorFormats, $loader);
         $this->registerGraphQlConfiguration($container, $config, $loader);
         $this->registerCacheConfiguration($container);
@@ -721,6 +722,19 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $loader->load('hal.php');
+    }
+
+    private function registerToonConfiguration(array $formats, PhpFileLoader $loader): void
+    {
+        if (!isset($formats['toon'])) {
+            return;
+        }
+
+        if (!InstalledVersions::isInstalled('api-platform/toon')) {
+            throw new \LogicException('Toon support cannot be enabled as the Toon component is not installed. Try running "composer require api-platform/toon".');
+        }
+
+        $loader->load('toon.php');
     }
 
     private function registerJsonProblemConfiguration(array $errorFormats, PhpFileLoader $loader): void

@@ -104,6 +104,7 @@
         "api-platform/serializer": "self.version",
         "api-platform/state": "self.version",
         "api-platform/symfony": "self.version",
+        "api-platform/toon": "self.version",
         "api-platform/validator": "self.version"
     },
     "require": {
@@ -137,6 +138,7 @@
         "friends-of-behat/symfony-extension": "^2.1",
         "friendsofphp/php-cs-fixer": "^3.93",
         "guzzlehttp/guzzle": "^6.0 || ^7.0",
+        "helgesverre/toon": "^3.1",
         "illuminate/config": "^11.0 || ^12.0",
         "illuminate/contracts": "^11.0 || ^12.0",
         "illuminate/database": "^11.0 || ^12.0",
@@ -202,6 +204,7 @@
     "suggest": {
         "doctrine/mongodb-odm-bundle": "To support MongoDB. Only versions 4.0 and later are supported.",
         "elasticsearch/elasticsearch": "To support Elasticsearch.",
+        "helgesverre/toon": "To support Toon format serialization.",
         "phpstan/phpdoc-parser": "To support extracting metadata from PHPDoc.",
         "psr/cache-implementation": "To use metadata caching.",
         "ramsey/uuid": "To support Ramsey's UUID identifiers.",
