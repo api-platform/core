@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Orm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
+use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
@@ -33,14 +34,30 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
     {
         $parameter = $context['parameter'];
 
-        if (null === $parameter->getProperty()) {
+        if (null === $property = $parameter->getProperty()) {
             throw new InvalidArgumentException(\sprintf('The filter parameter with key "%s" must specify a property. Please provide the property explicitly.', $parameter->getKey()));
         }
 
-        $property = $parameter->getProperty();
         $alias = $queryBuilder->getRootAliases()[0];
-        $field = $alias.'.'.$property;
         $values = $parameter->getValue();
+
+        if (str_contains($property, '.')) {
+            $associations = explode('.', $property);
+            $property = array_pop($associations);
+            $currentAlias = $alias;
+
+            foreach ($associations as $association) {
+                $currentAlias = QueryBuilderHelper::addJoinOnce(
+                    $queryBuilder,
+                    $queryNameGenerator,
+                    $currentAlias,
+                    $association
+                );
+            }
+            $alias = $currentAlias;
+        }
+
+        $field = $alias.'.'.$property;
 
         if (!is_iterable($values)) {
             $parameterName = $queryNameGenerator->generateParameterName($property);

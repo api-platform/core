@@ -13,14 +13,42 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
+use ApiPlatform\Doctrine\Orm\Filter\PartialSearchFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-#[GetCollection(
-    normalizationContext: ['hydra_prefix' => false],
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            normalizationContext: ['hydra_prefix' => false],
+            parameters: [
+                'chickenNamePartial' => new QueryParameter(
+                    filter: new PartialSearchFilter(),
+                    property: 'chickens.name',
+                ),
+                'searchChickenNamePartial[:property]' => new QueryParameter(
+                    filter: new PartialSearchFilter(),
+                    properties: ['chickens.name'],
+                ),
+                'chickenNameExact' => new QueryParameter(
+                    filter: new ExactFilter(),
+                    property: 'chickens.name',
+                ),
+                'searchChickenNameExact[:property]' => new QueryParameter(
+                    filter: new ExactFilter(),
+                    properties: ['chickens.name'],
+                ),
+            ],
+        ),
+        new Get(),
+    ]
 )]
 class ChickenCoop
 {

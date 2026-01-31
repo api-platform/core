@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Orm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
+use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
@@ -41,6 +42,22 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
         $property = $parameter->getProperty();
         $alias = $queryBuilder->getRootAliases()[0];
         $parameterName = $queryNameGenerator->generateParameterName($property);
+
+        if (str_contains($property, '.')) {
+            $associations = explode('.', $property);
+            $property = array_pop($associations);
+            $currentAlias = $alias;
+
+            foreach ($associations as $association) {
+                $currentAlias = QueryBuilderHelper::addJoinOnce(
+                    $queryBuilder,
+                    $queryNameGenerator,
+                    $currentAlias,
+                    $association
+                );
+            }
+            $alias = $currentAlias;
+        }
 
         if (\is_array($value)) {
             $queryBuilder

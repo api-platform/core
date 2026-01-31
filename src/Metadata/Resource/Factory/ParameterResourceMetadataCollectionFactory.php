@@ -27,6 +27,8 @@ use ApiPlatform\Metadata\PropertiesAwareInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\Util\TypeHelper;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use ApiPlatform\Serializer\Filter\FilterInterface as SerializerFilterInterface;
 use ApiPlatform\State\Parameter\ValueCaster;
@@ -53,6 +55,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         private readonly ?ContainerInterface $filterLocator = null,
         private readonly ?NameConverterInterface $nameConverter = null,
         private readonly ?LoggerInterface $logger = null,
+        private readonly ?ResourceClassResolverInterface $resourceClassResolver = null,
     ) {
     }
 
@@ -104,6 +107,38 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         $propertyNames = [];
         $properties = [];
         foreach ($parameter?->getProperties() ?? $this->propertyNameCollectionFactory->create($resourceClass) as $property) {
+            if (str_contains($property, '.')) {
+                $parts = explode('.', $property);
+                $currentClass = $resourceClass;
+
+                foreach ($parts as $i => $part) {
+                    $isLastPart = ($i === \count($parts) - 1);
+
+                    try {
+                        $propertyMetadata = $this->propertyMetadataFactory->create($currentClass, $part);
+                    } catch (\Exception $e) {
+                        break;
+                    }
+
+                    if (!$isLastPart) {
+                        $nextClass = $this->getClassFromProperty($propertyMetadata);
+
+                        if (!$nextClass) {
+                            break;
+                        }
+
+                        $currentClass = $nextClass;
+                    }
+
+                    if ($propertyMetadata->isReadable()) {
+                        $propertyNames[] = $property;
+                        $properties[$property] = $propertyMetadata;
+                    }
+
+                    continue;
+                }
+            }
+
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
             if ($propertyMetadata->isReadable()) {
                 $propertyNames[] = $property;
@@ -132,6 +167,30 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         return $this->localPropertyCache[$k];
     }
 
+    private function getClassFromProperty(ApiProperty $propertyMetadata): ?string
+    {
+        if (!($type = $propertyMetadata->getNativeType())) {
+            return null;
+        }
+
+        $className = $this->extractClassNameFromType($type);
+
+        if ($className && $this->resourceClassResolver?->isResourceClass($className)) {
+            return $className;
+        }
+
+        return null;
+    }
+
+    private function extractClassNameFromType(Type $type): ?string
+    {
+        if ($collectionValueType = TypeHelper::getCollectionValueType($type)) {
+            return TypeHelper::getClassName($collectionValueType);
+        }
+
+        return TypeHelper::getClassName($type);
+    }
+
     private function getDefaultParameters(Operation $operation, string $resourceClass, int &$internalPriority): Parameters
     {
         $propertyNames = $properties = [];
@@ -151,7 +210,11 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             $parameter = $parameter->withProperties($propertyNames);
 
             foreach ($propertyNames as $property) {
-                $converted = $this->nameConverter?->denormalize($property) ?? $property;
+                if (str_contains($property, '.')) {
+                    $converted = $property;
+                } else {
+                    $converted = $this->nameConverter?->denormalize($property) ?? $property;
+                }
                 $finalKey = str_replace(':property', $converted, $key);
                 $parameters->add(
                     $finalKey,

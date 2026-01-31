@@ -141,6 +141,208 @@ final class PartialSearchFilterTest extends ApiTestCase
         ];
     }
 
+    #[DataProvider('partialSearchFilterOneToManyRelationProvider')]
+    public function testPartialSearchFilterOneToManyRelation(string $url, int $expectedCount, array $expectedChickenNames): void
+    {
+        $response = self::createClient()->request('GET', $url);
+        $this->assertResponseIsSuccessful();
+
+        $responseData = $response->toArray();
+        $filteredCoops = $responseData['member'];
+
+        $this->assertCount($expectedCount, $filteredCoops, \sprintf('Expected %d coops for URL %s', $expectedCount, $url));
+
+        $allChickenNames = [];
+        foreach ($filteredCoops as $coop) {
+            foreach ($coop['chickens'] as $chickenIri) {
+                $chickenResponse = self::createClient()->request('GET', $chickenIri);
+                $chickenData = $chickenResponse->toArray();
+                $allChickenNames[] = $chickenData['name'];
+            }
+        }
+
+        sort($allChickenNames);
+        sort($expectedChickenNames);
+
+        $this->assertSame($expectedChickenNames, $allChickenNames, 'The chicken names in coops do not match the expected values.');
+    }
+
+    public static function partialSearchFilterOneToManyRelationProvider(): \Generator
+    {
+        yield 'filter coops by chicken name (chickens.name) containing "ertrude"' => [
+            '/chicken_coops?chickenNamePartial=ertrude',
+            1,
+            ['Gertrude', 'xx_%_\\_%_xx', 'GÀgù'],
+        ];
+
+        yield 'filter coops by chicken name (chickens.name) containing "riette"' => [
+            '/chicken_coops?chickenNamePartial=riette',
+            1,
+            ['Henriette'],
+        ];
+
+        yield 'filter coops by chicken name (chickens.name) containing "e" (should match both coops)' => [
+            '/chicken_coops?chickenNamePartial=e',
+            2,
+            ['Gertrude', 'xx_%_\\_%_xx', 'GÀgù', 'Henriette'],
+        ];
+
+        yield 'filter coops by chicken name (chickens.name) with no matching entities' => [
+            '/chicken_coops?chickenNamePartial=Zebra',
+            0,
+            [],
+        ];
+
+        yield 'filter coops by chicken name (chickens.name) "xx"' => [
+            '/chicken_coops?chickenNamePartial=xx',
+            1,
+            ['Gertrude', 'xx_%_\\_%_xx', 'GÀgù'],
+        ];
+
+        yield 'filter coops by chicken name (chickens.name) with multiple partial names "rude" OR "iette"' => [
+            '/chicken_coops?chickenNamePartial[]=rude&chickenNamePartial[]=iette',
+            2,
+            ['Gertrude', 'xx_%_\\_%_xx', 'GÀgù', 'Henriette'],
+        ];
+
+        yield 'filter coops by chicken name (chickens.name) with multiple partial names, one matching "Gert," the other not matching "Zebra"' => [
+            '/chicken_coops?chickenNamePartial[]=Gert&chickenNamePartial[]=Zebra',
+            1,
+            ['Gertrude', 'xx_%_\\_%_xx', 'GÀgù'],
+        ];
+
+        yield 'filter coops by chicken name (chickens.name) with multiple partial names without matches' => [
+            '/chicken_coops?chickenNamePartial[]=Toto&chickenNamePartial[]=Match',
+            0,
+            [],
+        ];
+
+        yield 'filter coops by chicken name (chickens.name) "%"' => [
+            '/chicken_coops?chickenNamePartial=%25',
+            1,
+            ['Gertrude', 'xx_%_\\_%_xx', 'GÀgù'],
+        ];
+
+        yield 'filter coops by chicken name (chickens.name) "_"' => [
+            '/chicken_coops?chickenNamePartial=%5F',
+            1,
+            ['Gertrude', 'xx_%_\\_%_xx', 'GÀgù'],
+        ];
+
+        yield 'filter coops by chicken name (chickens.name) "\\"' => [
+            '/chicken_coops?chickenNamePartial=%5C',
+            1,
+            ['Gertrude', 'xx_%_\\_%_xx', 'GÀgù'],
+        ];
+
+        yield 'filter coops by chicken name (chickens.name) "\\_"' => [
+            '/chicken_coops?chickenNamePartial=%5C%5F',
+            1,
+            ['Gertrude', 'xx_%_\\_%_xx', 'GÀgù'],
+        ];
+    }
+
+    #[DataProvider('partialSearchFilterOneToManyRelationWithPropertyPlaceholderProvider')]
+    public function testPartialSearchFilterOneToManyRelationWithPropertyPlaceholder(string $url, int $expectedCount, array $expectedChickenNames): void
+    {
+        $response = self::createClient()->request('GET', $url);
+        $this->assertResponseIsSuccessful();
+
+        $responseData = $response->toArray();
+        $filteredCoops = $responseData['member'];
+
+        $this->assertCount($expectedCount, $filteredCoops, \sprintf('Expected %d coops for URL %s', $expectedCount, $url));
+
+        $allChickenNames = [];
+        foreach ($filteredCoops as $coop) {
+            foreach ($coop['chickens'] as $chickenIri) {
+                $chickenResponse = self::createClient()->request('GET', $chickenIri);
+                $chickenData = $chickenResponse->toArray();
+                $allChickenNames[] = $chickenData['name'];
+            }
+        }
+
+        sort($allChickenNames);
+        sort($expectedChickenNames);
+
+        $this->assertSame($expectedChickenNames, $allChickenNames, 'The chicken names in coops do not match the expected values.');
+    }
+
+    public static function partialSearchFilterOneToManyRelationWithPropertyPlaceholderProvider(): \Generator
+    {
+        yield 'filter coops by chicken name (chickens.name) containing "ertrude" using :property placeholder' => [
+            '/chicken_coops?searchChickenNamePartial[chickens.name]=ertrude',
+            1,
+            ['Gertrude', 'xx_%_\\_%_xx', 'GÀgù'],
+        ];
+
+        yield 'filter coops by chicken name (chickens.name) containing "riette" using :property placeholder' => [
+            '/chicken_coops?searchChickenNamePartial[chickens.name]=riette',
+            1,
+            ['Henriette'],
+        ];
+
+        yield 'filter coops by chicken name (chickens.name) containing "e" (should match both coops) using :property placeholder' => [
+            '/chicken_coops?searchChickenNamePartial[chickens.name]=e',
+            2,
+            ['Gertrude', 'xx_%_\\_%_xx', 'GÀgù', 'Henriette'],
+        ];
+
+        yield 'filter coops by chicken name (chickens.name) with no matching entities using :property placeholder' => [
+            '/chicken_coops?searchChickenNamePartial[chickens.name]=Zebra',
+            0,
+            [],
+        ];
+
+        yield 'filter coops by chicken name (chickens.name) "xx" using :property placeholder' => [
+            '/chicken_coops?searchChickenNamePartial[chickens.name]=xx',
+            1,
+            ['Gertrude', 'xx_%_\\_%_xx', 'GÀgù'],
+        ];
+
+        yield 'filter coops by chicken name (chickens.name) with multiple partial names "rude" OR "iette" using :property placeholder' => [
+            '/chicken_coops?searchChickenNamePartial[chickens.name][]=rude&searchChickenNamePartial[chickens.name][]=iette',
+            2,
+            ['Gertrude', 'xx_%_\\_%_xx', 'GÀgù', 'Henriette'],
+        ];
+
+        yield 'filter coops by chicken name (chickens.name) with multiple partial names, one matching "Gert," the other not matching "Zebra" using :property placeholder' => [
+            '/chicken_coops?searchChickenNamePartial[chickens.name][]=Gert&searchChickenNamePartial[chickens.name][]=Zebra',
+            1,
+            ['Gertrude', 'xx_%_\\_%_xx', 'GÀgù'],
+        ];
+
+        yield 'filter coops by chicken name (chickens.name) with multiple partial names without matches using :property placeholder' => [
+            '/chicken_coops?searchChickenNamePartial[chickens.name][]=Toto&searchChickenNamePartial[chickens.name][]=Match',
+            0,
+            [],
+        ];
+
+        yield 'filter coops by chicken name (chickens.name) "%" using :property placeholder' => [
+            '/chicken_coops?searchChickenNamePartial[chickens.name]=%25',
+            1,
+            ['Gertrude', 'xx_%_\\_%_xx', 'GÀgù'],
+        ];
+
+        yield 'filter coops by chicken name (chickens.name) "_" using :property placeholder' => [
+            '/chicken_coops?searchChickenNamePartial[chickens.name]=%5F',
+            1,
+            ['Gertrude', 'xx_%_\\_%_xx', 'GÀgù'],
+        ];
+
+        yield 'filter coops by chicken name (chickens.name) "\\" using :property placeholder' => [
+            '/chicken_coops?searchChickenNamePartial[chickens.name]=%5C',
+            1,
+            ['Gertrude', 'xx_%_\\_%_xx', 'GÀgù'],
+        ];
+
+        yield 'filter coops by chicken name (chickens.name) "\\_" using :property placeholder' => [
+            '/chicken_coops?searchChickenNamePartial[chickens.name]=%5C%5F',
+            1,
+            ['Gertrude', 'xx_%_\\_%_xx', 'GÀgù'],
+        ];
+    }
+
     #[DataProvider('partialSearchMultiByteFilterProvider')]
     public function testPartialSearchMultiByteFilter(string $url, int $expectedCount, array $expectedNames): void
     {
