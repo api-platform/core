@@ -39,14 +39,13 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
         }
 
         $alias = $queryBuilder->getRootAliases()[0];
-        $field = $alias.'.'.$property;
         $values = $parameter->getValue();
 
         if (str_contains($property, '.')) {
             $associations = explode('.', $property);
-            $field = array_pop($associations);
+            $property = array_pop($associations);
             $currentAlias = $alias;
-            
+
             foreach ($associations as $association) {
                 $currentAlias = QueryBuilderHelper::addJoinOnce(
                     $queryBuilder,
@@ -57,6 +56,8 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
             }
             $alias = $currentAlias;
         }
+
+        $field = $alias.'.'.$property;
 
         if (!is_iterable($values)) {
             $parameterName = $queryNameGenerator->generateParameterName($property);
