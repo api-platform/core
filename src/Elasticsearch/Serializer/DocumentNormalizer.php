@@ -38,7 +38,7 @@ final class DocumentNormalizer implements NormalizerInterface, SerializerAwareIn
 
     public function __construct(
         ?ClassMetadataFactoryInterface $classMetadataFactory = null,
-        private readonly ?NameConverterInterface $nameConverter = null,
+        ?NameConverterInterface $nameConverter = null,
         ?PropertyAccessorInterface $propertyAccessor = null,
         ?PropertyTypeExtractorInterface $propertyTypeExtractor = null,
         ?ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null,
