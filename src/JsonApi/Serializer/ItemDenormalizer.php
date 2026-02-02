@@ -68,6 +68,16 @@ final class ItemDenormalizer extends AbstractItemNormalizer
     /**
      * {@inheritdoc}
      *
+     * This denormalizer only handles denormalization. Use ItemNormalizer for normalization.
+     */
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
      * @throws NotNormalizableValueException
      */
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed

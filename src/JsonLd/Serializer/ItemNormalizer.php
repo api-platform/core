@@ -15,7 +15,6 @@ namespace ApiPlatform\JsonLd\Serializer;
 
 use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
-use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
@@ -29,16 +28,13 @@ use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Serializer\TagCollectorInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Exception\LogicException;
-use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
- * Converts between objects and array including JSON-LD and Hydra metadata.
+ * Converts between objects and array including JSON-LD and Hydra metadata (normalization only).
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
- *
- * @todo Denormalization methods should be deprecated in 5.x, use ItemDenormalizer instead
  */
 final class ItemNormalizer extends AbstractItemNormalizer
 {
@@ -47,6 +43,40 @@ final class ItemNormalizer extends AbstractItemNormalizer
     public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, private readonly ContextBuilderInterface $contextBuilder, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ?ResourceAccessCheckerInterface $resourceAccessChecker = null, protected ?TagCollectorInterface $tagCollector = null, private ?OperationMetadataFactoryInterface $operationMetadataFactory = null)
     {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $defaultContext, $resourceMetadataCollectionFactory, $resourceAccessChecker, $tagCollector);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
+    {
+        return self::FORMAT === $format && parent::supportsNormalization($data, $format, $context);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSupportedTypes(?string $format): array
+    {
+        return self::FORMAT === $format ? parent::getSupportedTypes($format) : [];
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @deprecated since API Platform 4.2, use {@see ItemDenormalizer} instead
+     */
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
+    {
+        trigger_deprecation(
+            'api-platform/core',
+            '4.2',
+            'Using "%s" for denormalization is deprecated, use "%s" instead.',
+            self::class,
+            ItemDenormalizer::class
+        );
+
+        return self::FORMAT === $format && parent::supportsDenormalization($data, $type, $format, $context);
     }
 
     /**
@@ -123,34 +153,5 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
 
         return $metadata + $normalizedData;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @throws NotNormalizableValueException
-     *
-     * @todo This method should be deprecated in 5.x, use ItemDenormalizer instead
-     */
-    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
-    {
-        // Avoid issues with proxies if we populated the object
-        if (isset($data['@id']) && !isset($context[self::OBJECT_TO_POPULATE])) {
-            if (true !== ($context['api_allow_update'] ?? true)) {
-                throw new NotNormalizableValueException('Update is not allowed for this operation.');
-            }
-
-            try {
-                $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri($data['@id'], $context + ['fetch_data' => true], $context['operation'] ?? null);
-            } catch (ItemNotFoundException $e) {
-                $operation = $context['operation'] ?? null;
-
-                if (!('PUT' === $operation?->getMethod() && ($operation->getExtraProperties()['standard_put'] ?? true))) {
-                    throw $e;
-                }
-            }
-        }
-
-        return parent::denormalize($data, $type, $format, $context);
     }
 }
