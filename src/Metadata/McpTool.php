@@ -20,7 +20,7 @@ use ApiPlatform\State\OptionsInterface;
 use Symfony\Component\WebLink\Link as WebLink;
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
-final class McpTool extends HttpOperation
+class McpTool extends HttpOperation
 {
     /**
      * @param string|null                                    $name              The name of the tool (defaults to the method name)

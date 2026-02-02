@@ -47,17 +47,23 @@ final class Loader implements LoaderInterface
                 foreach ($resource->getMcp() ?? [] as $mcp) {
                     if ($mcp instanceof McpTool) {
                         $inputClass = $mcp->getInput()['class'] ?? $mcp->getClass();
-                        $schema = $this->schemaFactory->buildSchema($inputClass, 'json', Schema::TYPE_INPUT, $mcp, null, [SchemaFactory::FORCE_SUBSCHEMA => true]);
-                        $outputSchema = $this->schemaFactory->buildSchema($inputClass, 'json', Schema::TYPE_OUTPUT, $mcp, null, [SchemaFactory::FORCE_SUBSCHEMA => true]);
+                        $inputFormat = array_first($mcp->getInputFormats() ?? ['json']);
+                        $inputSchema = $this->schemaFactory->buildSchema($inputClass, $inputFormat, Schema::TYPE_INPUT, $mcp, null, [SchemaFactory::FORCE_SUBSCHEMA => true]);
+
+                        $outputClass = $mcp->getOutput()['class'] ?? $mcp->getClass();
+                        $outputFormat = array_first($mcp->getOutputFormats() ?? ['jsonld']);
+                        $outputSchema = $this->schemaFactory->buildSchema($outputClass, $outputFormat, Schema::TYPE_OUTPUT, $mcp, null, [SchemaFactory::FORCE_SUBSCHEMA => true]);
+
                         $registry->registerTool(
                             new Tool(
                                 name: $mcp->getName(),
-                                inputSchema: $schema->getDefinitions()[$schema->getRootDefinitionKey()]->getArrayCopy(),
+                                inputSchema: $inputSchema->getDefinitions()[$inputSchema->getRootDefinitionKey()]->getArrayCopy(),
                                 description: $mcp->getDescription(),
                                 annotations: $mcp->getAnnotations() ? ToolAnnotations::fromArray($mcp->getAnnotations()) : null,
                                 icons: $mcp->getIcons(),
                                 meta: $mcp->getMeta(),
                                 outputSchema: $outputSchema->getDefinitions()[$outputSchema->getRootDefinitionKey()]->getArrayCopy(),
+                                // outputSchema: $outputSchema->getArrayCopy(),
                             ),
                             self::HANDLER,
                             true,

@@ -48,6 +48,10 @@ final class InputOutputResourceMetadataCollectionFactory implements ResourceMeta
                 $resourceMetadata = $resourceMetadata->withGraphQlOperations($this->getTransformedOperations($resourceMetadata->getGraphQlOperations(), $resourceMetadata));
             }
 
+            if ($resourceMetadata->getMcp()) {
+                $resourceMetadata = $resourceMetadata->withMcp($this->getTransformedOperations($resourceMetadata->getMcp(), $resourceMetadata));
+            }
+
             $resourceMetadataCollection[$key] = $resourceMetadata;
         }
 

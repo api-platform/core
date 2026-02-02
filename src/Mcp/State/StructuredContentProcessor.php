@@ -63,7 +63,7 @@ final class StructuredContentProcessor implements ProcessorInterface
                 'operation' => $operation,
             ]);
             $serializerContext['uri_variables'] = $uriVariables;
-            $format = $request->getRequestFormat('') ?: 'json';
+            $format = $request->getRequestFormat('') ?: 'jsonld';
             $structuredContent = $this->serializer->normalize($result, $format, $serializerContext);
             $result = $this->serializer->encode($structuredContent, $format, $serializerContext);
         }
