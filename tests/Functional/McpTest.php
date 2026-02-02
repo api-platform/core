@@ -405,6 +405,7 @@ class McpTest extends ApiTestCase
             ],
         ]);
 
+        self::assertResponseIsSuccessful();
         $data = $res->toArray();
         self::assertArrayHasKey('result', $data);
         self::assertArrayHasKey('tools', $data['result']);
@@ -418,6 +419,7 @@ class McpTest extends ApiTestCase
         self::assertContains('validate_input', $toolNames);
         self::assertContains('generate_markdown', $toolNames);
         self::assertContains('process_message', $toolNames);
+        self::assertContains('list_books', $toolNames);
 
         foreach ($tools as $tool) {
             self::assertArrayHasKey('name', $tool);
@@ -425,7 +427,60 @@ class McpTest extends ApiTestCase
             self::assertEquals('object', $tool['inputSchema']['type']);
         }
 
-        self::assertResponseIsSuccessful();
+        $listBooks = array_filter($tools, static function (array $input) {
+            return 'list_books' === $input['name'];
+        });
+
+        self::assertCount(1, $listBooks);
+
+        $listBooks = array_first($listBooks);
+
+        self::assertArrayHasKeyAndValue('inputSchema', [
+            'type' => 'object',
+            'properties' => [
+                'search' => ['type' => 'string'],
+            ],
+        ], $listBooks);
+        self::assertArrayHasKeyAndValue('description', 'List Books', $listBooks);
+
+        $outputSchema = $listBooks['outputSchema'];
+        self::assertArrayHasKeyAndValue('$schema', 'http://json-schema.org/draft-07/schema#', $outputSchema);
+        self::assertArrayHasKeyAndValue('type', 'object', $outputSchema);
+
+        self::assertArrayHasKey('definitions', $outputSchema);
+        $definitions = $outputSchema['definitions'];
+        self::assertArrayHasKey('McpBook.jsonld', $definitions);
+        $McpBookJsonLd = $definitions['McpBook.jsonld'];
+        self::assertArrayHasKeyAndValue('allOf', [
+            [
+                '$ref' => '#/definitions/HydraItemBaseSchema',
+            ],
+            [
+                'type' => 'object',
+                'properties' => [
+                    'id' => ['readOnly' => true, 'type' => 'integer'],
+                    'title' => ['type' => 'string'],
+                    'isbn' => ['type' => 'string'],
+                    'status' => ['type' => ['string', 'null']],
+                ],
+            ],
+        ], $McpBookJsonLd);
+
+        self::assertArrayHasKeyAndValue('allOf', [
+            ['$ref' => '#/definitions/HydraCollectionBaseSchema'],
+            [
+                'type' => 'object',
+                'required' => ['hydra:member'],
+                'properties' => [
+                    'hydra:member' => [
+                        'type' => 'array',
+                        'items' => [
+                            '$ref' => '#/definitions/McpBook.jsonld',
+                        ],
+                    ],
+                ],
+            ],
+        ], $outputSchema);
     }
 
     public function testMcpToolAttribute(): void
@@ -650,5 +705,89 @@ class McpTest extends ApiTestCase
         self::assertStringContainsString('```php', $content);
         self::assertStringContainsString("echo 'Hello, World!';", $content);
         self::assertStringContainsString('```', $content);
+    }
+
+    public function testMcpListBooks(): void
+    {
+        if (!class_exists(McpBundle::class)) {
+            $this->markTestSkipped('MCP bundle is not installed');
+        }
+
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('MCP is not supported with MongoDB');
+        }
+
+        if (!$this->isPsr17FactoryAvailable()) {
+            $this->markTestSkipped('PSR-17 HTTP factory implementation not available (required for MCP)');
+        }
+
+        $this->recreateSchema([
+            McpBook::class,
+        ]);
+
+        $book = new McpBook();
+        $book->setTitle('API Platform Guide for MCP');
+        $book->setIsbn('1-528491');
+        $book->setStatus('available');
+        $manager = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $manager->persist($book);
+        $manager->flush();
+
+        $client = self::createClient();
+        $sessionId = $this->initializeMcpSession($client);
+
+        $res = $client->request('POST', '/mcp', [
+            'headers' => [
+                'Accept' => 'application/json, text/event-stream',
+                'Content-Type' => 'application/json',
+                'mcp-session-id' => $sessionId,
+            ],
+            'json' => [
+                'jsonrpc' => '2.0',
+                'id' => 2,
+                'method' => 'tools/call',
+                'params' => [
+                    'name' => 'list_books',
+                    'arguments' => [
+                        'search' => '',
+                    ],
+                ],
+            ],
+        ]);
+
+        self::assertResponseIsSuccessful();
+        $result = $res->toArray()['result'] ?? null;
+        self::assertIsArray($result);
+        self::assertArrayHasKey('content', $result);
+        $content = $result['content'][0]['text'] ?? null;
+        self::assertNotNull($content, 'No text content in result');
+        self::assertStringContainsString('API Platform Guide for MCP', $content);
+        self::assertStringContainsString('1-528491', $content);
+
+        $structuredContent = $result['structuredContent'] ?? null;
+        $this->assertIsArray($structuredContent);
+
+        // when api_platform.use_symfony_listeners is true, the result is formatted as JSON-LD
+        if (true === $this->getContainer()->getParameter('api_platform.use_symfony_listeners')) {
+            self::assertArrayHasKeyAndValue('@context', '/contexts/McpBook', $structuredContent);
+            self::assertArrayHasKeyAndValue('hydra:totalItems', 1, $structuredContent);
+            $members = $structuredContent['hydra:member'];
+        } else {
+            $members = $structuredContent;
+        }
+
+        $this->assertCount(1, $members, json_encode($members, \JSON_PRETTY_PRINT));
+        $actualBook = array_first($members);
+
+        self::assertArrayHasKeyAndValue('id', 1, $actualBook);
+        self::assertArrayHasKeyAndValue('title', 'API Platform Guide for MCP', $actualBook);
+        self::assertArrayHasKeyAndValue('isbn', '1-528491', $actualBook);
+        self::assertArrayHasKeyAndValue('status', 'available', $actualBook);
+    }
+
+    private static function assertArrayHasKeyAndValue(string $key, mixed $value, array $data): void
+    {
+        self::assertArrayHasKey($key, $data);
+        self::assertSame($value, $data[$key]);
     }
 }
