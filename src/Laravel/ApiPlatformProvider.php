@@ -989,7 +989,7 @@ class ApiPlatformProvider extends ServiceProvider
             $list->insert($app->make(HalObjectNormalizer::class), -995);
             $list->insert($app->make(HalItemNormalizer::class), -890);
             $list->insert($app->make(JsonLdItemNormalizer::class), -890);
-            $list->insert($app->make(JsonLdItemDenormalizer::class), -895);
+            $list->insert($app->make(JsonLdItemDenormalizer::class), -885);
             $list->insert($app->make(JsonLdObjectNormalizer::class), -995);
             $list->insert($app->make(ArrayDenormalizer::class), -990);
             $list->insert($app->make(DateTimeZoneNormalizer::class), -915);
@@ -1005,7 +1005,7 @@ class ApiPlatformProvider extends ServiceProvider
             $list->insert($app->make(JsonApiEntrypointNormalizer::class), -800);
             $list->insert($app->make(JsonApiCollectionNormalizer::class), -985);
             $list->insert($app->make(JsonApiItemNormalizer::class), -890);
-            $list->insert($app->make(JsonApiItemDenormalizer::class), -895);
+            $list->insert($app->make(JsonApiItemDenormalizer::class), -885);
             $list->insert($app->make(JsonApiErrorNormalizer::class), -790);
             $list->insert($app->make(JsonApiObjectNormalizer::class), -995);
 
