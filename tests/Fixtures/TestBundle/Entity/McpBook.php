@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\McpTool;
 use ApiPlatform\Metadata\McpToolCollection;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\McpBookOutputDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\SearchDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\State\McpBookListProcessor;
 use Doctrine\ORM\Mapping as ORM;
@@ -34,6 +35,13 @@ use Doctrine\ORM\Mapping as ORM;
             description: 'List Books',
             input: SearchDto::class,
             processor: McpBookListProcessor::class,
+            structuredContent: true,
+        ),
+        'list_books_dto' => new McpToolCollection(
+            description: 'List Books and return a DTO',
+            input: SearchDto::class,
+            output: McpBookOutputDto::class,
+            processor: [self::class, 'processDto'],
             structuredContent: true,
         ),
     ]
@@ -105,5 +113,15 @@ class McpBook
         $data->setStatus('updated');
 
         return $data;
+    }
+
+    public static function processDto(): McpBookOutputDto
+    {
+        $book = new McpBookOutputDto();
+        $book->id = 528491;
+        $book->name = 'Raiders of the Lost Ark';
+        $book->isbn = '1-528491';
+
+        return $book;
     }
 }

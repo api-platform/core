@@ -420,6 +420,7 @@ class McpTest extends ApiTestCase
         self::assertContains('generate_markdown', $toolNames);
         self::assertContains('process_message', $toolNames);
         self::assertContains('list_books', $toolNames);
+        self::assertContains('list_books_dto', $toolNames);
 
         foreach ($tools as $tool) {
             self::assertArrayHasKey('name', $tool);
@@ -783,6 +784,82 @@ class McpTest extends ApiTestCase
         self::assertArrayHasKeyAndValue('title', 'API Platform Guide for MCP', $actualBook);
         self::assertArrayHasKeyAndValue('isbn', '1-528491', $actualBook);
         self::assertArrayHasKeyAndValue('status', 'available', $actualBook);
+    }
+
+    public function testMcpListBooksDto(): void
+    {
+        if (!class_exists(McpBundle::class)) {
+            $this->markTestSkipped('MCP bundle is not installed');
+        }
+
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('MCP is not supported with MongoDB');
+        }
+
+        if (!$this->isPsr17FactoryAvailable()) {
+            $this->markTestSkipped('PSR-17 HTTP factory implementation not available (required for MCP)');
+        }
+
+        $this->recreateSchema([
+            McpBook::class,
+        ]);
+
+        $book = new McpBook();
+        $book->setTitle('API Platform Guide for MCP');
+        $book->setIsbn('1-528491');
+        $book->setStatus('available');
+        $manager = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $manager->persist($book);
+        $manager->flush();
+
+        $client = self::createClient();
+        $sessionId = $this->initializeMcpSession($client);
+
+        $res = $client->request('POST', '/mcp', [
+            'headers' => [
+                'Accept' => 'application/json, text/event-stream',
+                'Content-Type' => 'application/json',
+                'mcp-session-id' => $sessionId,
+            ],
+            'json' => [
+                'jsonrpc' => '2.0',
+                'id' => 2,
+                'method' => 'tools/call',
+                'params' => [
+                    'name' => 'list_books_dto',
+                    'arguments' => [
+                        'search' => '',
+                    ],
+                ],
+            ],
+        ]);
+
+        self::assertResponseIsSuccessful();
+        $result = $res->toArray()['result'] ?? null;
+        self::assertIsArray($result);
+        self::assertArrayHasKey('content', $result);
+        $content = $result['content'][0]['text'] ?? null;
+        self::assertNotNull($content, 'No text content in result');
+        self::assertStringContainsString('Raiders of the Lost Ark', $content);
+        self::assertStringContainsString('1-528491', $content);
+
+        $structuredContent = $result['structuredContent'] ?? null;
+        $this->assertIsArray($structuredContent);
+
+        $actualBook = $structuredContent;
+
+        // when api_platform.use_symfony_listeners is true, the result is formatted as JSON-LD
+        if (true === $this->getContainer()->getParameter('api_platform.use_symfony_listeners')) {
+            self::assertArrayHasKey('@context', $structuredContent);
+            $context = $structuredContent['@context'];
+            self::assertArrayHasKeyAndValue('@vocab', 'http://localhost/docs.jsonld#', $context);
+            self::assertArrayHasKeyAndValue('hydra', 'http://www.w3.org/ns/hydra/core#', $context);
+        }
+
+        self::assertArrayHasKeyAndValue('id', 528491, $actualBook);
+        self::assertArrayHasKeyAndValue('name', 'Raiders of the Lost Ark', $actualBook);
+        self::assertArrayHasKeyAndValue('isbn', '1-528491', $actualBook);
+        self::assertArrayNotHasKey('status', $actualBook);
     }
 
     private static function assertArrayHasKeyAndValue(string $key, mixed $value, array $data): void
