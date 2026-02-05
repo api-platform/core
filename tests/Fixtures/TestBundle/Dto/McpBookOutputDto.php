@@ -21,8 +21,17 @@ final class McpBookOutputDto
 {
     public int $id;
 
-    #[Map(source: 'title')]
     public string $name;
 
     public string $isbn;
+
+    public static function fromMcpBook(McpBookEntity $mcpBook): self
+    {
+        $mcpBookOutputDto = new self();
+        $mcpBookOutputDto->id = $mcpBook->getId();
+        $mcpBookOutputDto->name = $mcpBook->getTitle();
+        $mcpBookOutputDto->isbn = $mcpBook->getIsbn();
+
+        return $mcpBookOutputDto;
+    }
 }

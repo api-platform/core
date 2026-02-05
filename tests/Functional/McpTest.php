@@ -482,6 +482,37 @@ class McpTest extends ApiTestCase
                 ],
             ],
         ], $outputSchema);
+
+        $listBooksDto = array_filter($tools, static function (array $input) {
+            return 'list_books_dto' === $input['name'];
+        });
+
+        self::assertCount(1, $listBooksDto);
+
+        $listBooksDto = array_first($listBooksDto);
+
+        self::assertArrayHasKeyAndValue('inputSchema', [
+            'type' => 'object',
+            'properties' => [
+                'search' => ['type' => 'string'],
+            ],
+        ], $listBooksDto);
+        self::assertArrayHasKeyAndValue('description', 'List Books and return a DTO', $listBooksDto);
+
+        $outputSchema = $listBooksDto['outputSchema'];
+        self::assertArrayHasKeyAndValue('$schema', 'http://json-schema.org/draft-07/schema#', $outputSchema);
+        self::assertArrayNotHasKey('type', $outputSchema);
+
+        self::assertArrayHasKey('definitions', $outputSchema);
+        $definitions = $outputSchema['definitions'];
+        self::assertArrayHasKeyAndValue('McpBookOutputDto.jsonld', [
+            'type' => 'object',
+            'properties' => [
+                'id' => ['type' => 'integer'],
+                'name' => ['type' => 'string'],
+                'isbn' => ['type' => 'string'],
+            ],
+        ], $definitions);
     }
 
     public function testMcpToolAttribute(): void
@@ -828,7 +859,7 @@ class McpTest extends ApiTestCase
                 'params' => [
                     'name' => 'list_books_dto',
                     'arguments' => [
-                        'search' => '',
+                        'search' => 'Guide',
                     ],
                 ],
             ],
@@ -840,31 +871,34 @@ class McpTest extends ApiTestCase
         self::assertArrayHasKey('content', $result);
         $content = $result['content'][0]['text'] ?? null;
         self::assertNotNull($content, 'No text content in result');
-        self::assertStringContainsString('Raiders of the Lost Ark', $content);
+        self::assertStringContainsString('API Platform Guide for MCP', $content);
         self::assertStringContainsString('1-528491', $content);
 
         $structuredContent = $result['structuredContent'] ?? null;
         $this->assertIsArray($structuredContent);
 
-        $actualBook = $structuredContent;
-
         // when api_platform.use_symfony_listeners is true, the result is formatted as JSON-LD
         if (true === $this->getContainer()->getParameter('api_platform.use_symfony_listeners')) {
-            self::assertArrayHasKey('@context', $structuredContent);
-            $context = $structuredContent['@context'];
-            self::assertArrayHasKeyAndValue('@vocab', 'http://localhost/docs.jsonld#', $context);
-            self::assertArrayHasKeyAndValue('hydra', 'http://www.w3.org/ns/hydra/core#', $context);
+            self::assertArrayHasKeyAndValue('@context', [
+                '@vocab' => 'http://localhost/docs.jsonld#',
+                'hydra' => 'http://www.w3.org/ns/hydra/core#',
+                'id' => 'McpBookOutputDto/id',
+                'name' => 'McpBookOutputDto/name',
+                'isbn' => 'McpBookOutputDto/isbn',
+            ], $structuredContent);
+            self::assertArrayHasKey('@id', $structuredContent);
+            self::assertArrayHasKeyAndValue('@type', 'McpBookOutputDto', $structuredContent);
         }
 
-        self::assertArrayHasKeyAndValue('id', 528491, $actualBook);
-        self::assertArrayHasKeyAndValue('name', 'Raiders of the Lost Ark', $actualBook);
-        self::assertArrayHasKeyAndValue('isbn', '1-528491', $actualBook);
-        self::assertArrayNotHasKey('status', $actualBook);
+        self::assertArrayHasKeyAndValue('id', 1, $structuredContent);
+        self::assertArrayHasKeyAndValue('name', 'API Platform Guide for MCP', $structuredContent);
+        self::assertArrayHasKeyAndValue('isbn', '1-528491', $structuredContent);
+        self::assertArrayNotHasKey('status', $structuredContent);
     }
 
     private static function assertArrayHasKeyAndValue(string $key, mixed $value, array $data): void
     {
-        self::assertArrayHasKey($key, $data);
+        self::assertArrayHasKey($key, $data, json_encode($data, \JSON_PRETTY_PRINT));
         self::assertSame($value, $data[$key]);
     }
 }
