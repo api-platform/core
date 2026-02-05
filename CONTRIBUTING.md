@@ -235,7 +235,7 @@ exit 0
 
 ## Changing a version constraint
 
-Preferably change the version inside the root `composer.json`, then use `composer blend --all` to re-map the depedency accross each sub-project automatically. 
+Preferably change the version inside the root `composer.json`, then use `composer blend --all` to re-map the dependency across each sub-project automatically. 
 
 # License and Copyright Attribution
 
