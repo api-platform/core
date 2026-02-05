@@ -57,7 +57,12 @@ APP_DEBUG=1 tests/Fixtures/app/console debug:config
 The API Platform project follows [Symfony coding standards](https://symfony.com/doc/current/contributing/code/standards.html).
 But don't worry, you can fix CS issues automatically using the [PHP CS Fixer](https://cs.symfony.com) tool:
 
-    php-cs-fixer.phar fix
+```shell
+    vendor/bin/php-cs-fixer fix --diff
+```
+
+> [!NOTE]
+> The first run may take some time, then the following runs will be faster because the cache will be used.
 
 And then, add the fixed file to your commit before pushing.
 Be sure to add only **your modified files**. If any other file is fixed by cs tools, just revert it before committing.
