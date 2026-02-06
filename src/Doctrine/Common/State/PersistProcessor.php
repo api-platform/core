@@ -168,6 +168,10 @@ final class PersistProcessor implements ProcessorInterface
                 continue;
             }
 
+            if (!$reflectionProperty->isInitialized($data)) {
+                continue;
+            }
+
             $value = $reflectionProperty->getValue($data);
 
             if (!\is_object($value)) {
