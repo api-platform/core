@@ -15,7 +15,9 @@ namespace ApiPlatform\Doctrine\Common\Tests\State;
 
 use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 use ApiPlatform\Doctrine\Common\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Doctrine\Common\Tests\Fixtures\TestBundle\Entity\DummyWithUninitializedProperties;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\State\ProcessorInterface;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
@@ -114,6 +116,28 @@ class PersistProcessorTest extends TestCase
         $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($objectManagerProphecy)->shouldBeCalled();
 
         $result = (new PersistProcessor($managerRegistryProphecy->reveal()))->process($dummy, new Get());
+        $this->assertSame($dummy, $result);
+    }
+
+    public function testHandleLazyObjectRelationsSkipsUninitializedProperties(): void
+    {
+        $dummy = new DummyWithUninitializedProperties();
+        $dummy->title = 'My Book';
+
+        $classMetadata = new ORMClassMetadata(DummyWithUninitializedProperties::class);
+        $classMetadata->identifier = ['id'];
+
+        $objectManagerProphecy = $this->prophesize(ObjectManager::class);
+        $objectManagerProphecy->getClassMetadata(DummyWithUninitializedProperties::class)->willReturn($classMetadata);
+        $objectManagerProphecy->contains($dummy)->willReturn(false);
+        $objectManagerProphecy->persist($dummy)->shouldBeCalled();
+        $objectManagerProphecy->flush()->shouldBeCalled();
+        $objectManagerProphecy->refresh($dummy)->shouldBeCalled();
+
+        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
+        $managerRegistryProphecy->getManagerForClass(DummyWithUninitializedProperties::class)->willReturn($objectManagerProphecy->reveal());
+
+        $result = (new PersistProcessor($managerRegistryProphecy->reveal()))->process($dummy, new Post(map: true));
         $this->assertSame($dummy, $result);
     }
 }
