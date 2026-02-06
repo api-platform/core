@@ -26,6 +26,9 @@ use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
+/**
+ * @experimental
+ */
 final class StructuredContentProcessor implements ProcessorInterface
 {
     public function __construct(

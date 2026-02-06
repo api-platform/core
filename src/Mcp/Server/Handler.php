@@ -31,6 +31,8 @@ use Psr\Log\NullLogger;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
+ * @experimental
+ *
  * @implements RequestHandlerInterface<CallToolResult|ReadResourceResult>
  */
 final class Handler implements RequestHandlerInterface

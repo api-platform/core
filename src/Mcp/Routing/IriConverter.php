@@ -19,6 +19,9 @@ use ApiPlatform\Metadata\McpTool;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 
+/**
+ * @experimental
+ */
 final class IriConverter implements IriConverterInterface
 {
     public function __construct(private readonly IriConverterInterface $inner)

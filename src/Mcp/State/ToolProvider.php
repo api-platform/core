@@ -18,6 +18,8 @@ use ApiPlatform\State\ProviderInterface;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 
 /**
+ * @experimental
+ *
  * @implements ProviderInterface<object>
  */
 final class ToolProvider implements ProviderInterface

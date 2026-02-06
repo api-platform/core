@@ -21,6 +21,9 @@ use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 
+/**
+ * @experimental
+ */
 final class OperationMetadataFactory implements OperationMetadataFactoryInterface
 {
     public function __construct(

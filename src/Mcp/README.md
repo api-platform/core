@@ -1,5 +1,8 @@
 # API Platform - MCP
 
+> [!WARNING]
+> This component is **experimental**.
+
 The [MCP](https://modelcontextprotocol.io/) component of the [API Platform](https://api-platform.com) framework.
 
 Integrates the MCP php-sdk with API Platform in addition to the MCP Bundle of Symfony.

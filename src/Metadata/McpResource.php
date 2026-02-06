@@ -19,6 +19,9 @@ use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\State\OptionsInterface;
 use Symfony\Component\WebLink\Link as WebLink;
 
+/**
+ * @experimental
+ */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 final class McpResource extends HttpOperation
 {
