@@ -50,7 +50,9 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactory implements Resou
                         continue;
                     }
 
-                    $operations->add($operationName, $this->addDefaults($operation));
+                    $operation = $this->addDefaults($operation);
+                    $operation = $this->setParametersFilterClass($operation, $documentClass);
+                    $operations->add($operationName, $operation);
                 }
 
                 $resourceMetadata = $resourceMetadata->withOperations($operations);
@@ -60,11 +62,14 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactory implements Resou
 
             if ($graphQlOperations) {
                 foreach ($graphQlOperations as $operationName => $graphQlOperation) {
-                    if (!$this->managerRegistry->getManagerForClass($graphQlOperation->getClass()) instanceof DocumentManager) {
+                    $documentClass = $this->getStateOptionsClass($graphQlOperation, $graphQlOperation->getClass(), Options::class);
+                    if (!$this->managerRegistry->getManagerForClass($documentClass) instanceof DocumentManager) {
                         continue;
                     }
 
-                    $graphQlOperations[$operationName] = $this->addDefaults($graphQlOperation);
+                    $graphQlOperation = $this->addDefaults($graphQlOperation);
+                    $graphQlOperation = $this->setParametersFilterClass($graphQlOperation, $documentClass);
+                    $graphQlOperations[$operationName] = $graphQlOperation;
                 }
 
                 $resourceMetadata = $resourceMetadata->withGraphQlOperations($graphQlOperations);
@@ -111,5 +116,21 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactory implements Resou
         }
 
         return 'api_platform.doctrine_mongodb.odm.state.persist_processor';
+    }
+
+    private function setParametersFilterClass(Operation $operation, string $documentClass): Operation
+    {
+        $parameters = $operation->getParameters();
+        if (!$parameters) {
+            return $operation;
+        }
+
+        foreach ($parameters as $key => $parameter) {
+            if (null === $parameter->getFilterClass()) {
+                $parameters->add($key, $parameter->withFilterClass($documentClass));
+            }
+        }
+
+        return $operation->withParameters($parameters);
     }
 }
