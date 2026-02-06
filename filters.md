@@ -241,7 +241,7 @@ public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $q
 
 ### Restricting Properties with `:property` Placeholders
 
-Filters that work on a per-parameter basis can also use the `:property` placeholde and use the
+Filters that work on a per-parameter basis can also use the `:property` placeholder and use the
 parameter's `properties` configuration:
 
 ```php
