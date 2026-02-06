@@ -27,6 +27,9 @@ use Mcp\Schema\Resource;
 use Mcp\Schema\Tool;
 use Mcp\Schema\ToolAnnotations;
 
+/**
+ * @experimental
+ */
 final class Loader implements LoaderInterface
 {
     public const HANDLER = 'api_platform.mcp.handler';

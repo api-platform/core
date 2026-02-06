@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
+/**
+ * @experimental
+ */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 final class McpToolCollection extends McpTool implements CollectionOperationInterface
 {
