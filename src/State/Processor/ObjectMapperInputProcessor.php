@@ -19,9 +19,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 
 /**
+ * Maps the API resource (DTO) to the entity before persistence.
+ *
  * @implements ProcessorInterface<mixed,mixed>
  */
-final class ObjectMapperProcessor implements ProcessorInterface
+final class ObjectMapperInputProcessor implements ProcessorInterface
 {
     /**
      * @param ProcessorInterface<mixed,mixed> $decorated
@@ -39,8 +41,9 @@ final class ObjectMapperProcessor implements ProcessorInterface
         if (
             $data instanceof Response
             || !$this->objectMapper
-            || !$operation->canWrite()
+            || !($operation->canWrite() ?? true)
             || null === $data
+            || null === $class
             || !is_a($data, $class, true)
             || !$operation->canMap()
         ) {
@@ -48,26 +51,8 @@ final class ObjectMapperProcessor implements ProcessorInterface
         }
 
         $request = $context['request'] ?? null;
-        $persisted = $this->decorated->process(
-            // maps the Resource to an Entity
-            $this->objectMapper->map($data, $request?->attributes->get('mapped_data')),
-            $operation,
-            $uriVariables,
-            $context,
-        );
+        $mapped = $this->objectMapper->map($data, $request?->attributes->get('mapped_data'));
 
-        // in some cases (delete operation), the decoration may return a null object
-        if (null === $persisted) {
-            return $persisted;
-        }
-
-        $request?->attributes->set('persisted_data', $persisted);
-
-        // return the Resource representation of the persisted entity
-        return $this->objectMapper->map(
-            // persist the entity
-            $persisted,
-            $operation->getClass()
-        );
+        return $this->decorated->process($mapped, $operation, $uriVariables, $context);
     }
 }

@@ -151,7 +151,8 @@ use ApiPlatform\State\ObjectMapper\ObjectMapper;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginationOptions;
 use ApiPlatform\State\Processor\AddLinkHeaderProcessor;
-use ApiPlatform\State\Processor\ObjectMapperProcessor;
+use ApiPlatform\State\Processor\ObjectMapperInputProcessor;
+use ApiPlatform\State\Processor\ObjectMapperOutputProcessor;
 use ApiPlatform\State\Processor\RespondProcessor;
 use ApiPlatform\State\Processor\SerializeProcessor;
 use ApiPlatform\State\Processor\WriteProcessor;
@@ -470,7 +471,13 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->singleton(WriteProcessor::class, static function (Application $app) {
-            return new WriteProcessor($app->make(SerializeProcessor::class), $app->make(CallableProcessor::class));
+            $inner = $app->make(SerializeProcessor::class);
+
+            if (interface_exists(ObjectMapperInterface::class)) {
+                $inner = new ObjectMapperOutputProcessor($app->make(ObjectMapper::class), $inner);
+            }
+
+            return new WriteProcessor($inner, $app->make(CallableProcessor::class));
         });
 
         $this->app->singleton(SerializerContextBuilder::class, static function (Application $app) {
@@ -504,10 +511,10 @@ class ApiPlatformProvider extends ServiceProvider
             return $app->make(WriteProcessor::class);
         });
 
-        // ObjectMapperProcessor wraps the base processor if available
+        // ObjectMapperInputProcessor wraps the base processor if available
         if (interface_exists(ObjectMapperInterface::class)) {
             $this->app->extend(ProcessorInterface::class, static function (ProcessorInterface $inner, Application $app) {
-                return new ObjectMapperProcessor($app->make(ObjectMapper::class), $inner);
+                return new ObjectMapperInputProcessor($app->make(ObjectMapper::class), $inner);
             });
         }
 

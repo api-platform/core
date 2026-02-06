@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use ApiPlatform\Symfony\Validator\State\ParameterValidatorProvider;
+use ApiPlatform\Symfony\Validator\State\ValidateProcessor;
 use ApiPlatform\Symfony\Validator\State\ValidateProvider;
 
 return static function (ContainerConfigurator $container) {
@@ -32,5 +33,12 @@ return static function (ContainerConfigurator $container) {
         ->args([
             service('validator'),
             service('api_platform.state_provider.parameter_validator.inner'),
+        ]);
+
+    $services->set('api_platform.state_processor.validate', ValidateProcessor::class)
+        ->decorate('api_platform.state_processor.main', null, 80)
+        ->args([
+            service('api_platform.state_processor.validate.inner'),
+            service('api_platform.validator'),
         ]);
 };
