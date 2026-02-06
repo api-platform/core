@@ -168,6 +168,11 @@ final class PersistProcessor implements ProcessorInterface
                 continue;
             }
 
+            // Skip uninitialized typed properties (e.g., those initialized in @PrePersist)
+            if (!$reflectionProperty->isInitialized($data)) {
+                continue;
+            }
+
             $value = $reflectionProperty->getValue($data);
 
             if (!\is_object($value)) {
