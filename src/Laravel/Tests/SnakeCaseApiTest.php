@@ -42,7 +42,7 @@ class SnakeCaseApiTest extends TestCase
         $cartData = [
             'product_sku' => 'SKU_TEST_001',
             'quantity' => 2,
-            'price_at_addition' => '19.99',
+            'price_at_addition' => 19.99,
             'shopping_cart' => [
                 'user_identifier' => 'user-'.Str::uuid()->toString(),
                 'status' => 'active',
@@ -75,7 +75,7 @@ class SnakeCaseApiTest extends TestCase
         $cartData = [
             'productSku' => 'SKU_TEST_001',
             'quantity' => 2,
-            'priceAtAddition' => '19.99',
+            'priceAtAddition' => 19.99,
             'shoppingCart' => [
                 'userIdentifier' => 'user-'.Str::uuid()->toString(),
                 'status' => 'active',
