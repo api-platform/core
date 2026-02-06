@@ -31,6 +31,11 @@ final class Issue7735Test extends ApiTestCase
         return [Issue7735Resource::class];
     }
 
+    /**
+     * Test that POST requests work with entities having typed properties initialized in @PrePersist.
+     * This verifies the fix for issue #7735 where handleLazyObjectRelations() would fatal
+     * when accessing uninitialized typed properties.
+     */
     public function testPostWithUninitializedTypedPropertyInPrePersist(): void
     {
         $response = self::createClient()->request('POST', '/issue7735_resources', [
