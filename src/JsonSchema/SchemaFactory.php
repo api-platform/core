@@ -31,6 +31,7 @@ use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
 use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
+use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 /**
@@ -352,6 +353,65 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
                 if ($isCollection) {
                     $valueType = TypeHelper::getCollectionValueType($t);
+                }
+
+                if ($valueType instanceof UnionType) {
+                    $unionRefs = [];
+
+                    foreach ($valueType->getTypes() as $subtype) {
+                        if ($subtype instanceof BuiltinType && TypeIdentifier::NULL === $subtype->getTypeIdentifier()) {
+                            continue;
+                        }
+
+                        if ($subtype instanceof ObjectType) {
+                            $className = $subtype->getClassName();
+                        } elseif ($subtype instanceof BuiltinType && $subtype->getTypeIdentifier()->isScalar()) {
+                            $unionRefs[] = match ($subtype->getTypeIdentifier()) {
+                                TypeIdentifier::INT => ['type' => 'integer'],
+                                TypeIdentifier::FLOAT => ['type' => 'number'],
+                                TypeIdentifier::BOOL => ['type' => 'boolean'],
+                                TypeIdentifier::TRUE => ['type' => 'boolean', 'const' => true],
+                                TypeIdentifier::FALSE => ['type' => 'boolean', 'const' => false],
+                                TypeIdentifier::STRING => ['type' => 'string'],
+                                default => ['type' => 'null'],
+                            };
+
+                            continue;
+                        } else {
+                            continue;
+                        }
+
+                        $subSchema = new Schema($version);
+                        $subSchema->setDefinitions($schema->getDefinitions());
+
+                        $result = ($this->schemaFactory ?: $this)->buildSchema(
+                            $className,
+                            $format,
+                            $parentType,
+                            null,
+                            $subSchema,
+                            $serializerContext + [self::FORCE_SUBSCHEMA => true],
+                        );
+
+                        if (isset($result['$ref'])) {
+                            $unionRefs[] = ['$ref' => $result['$ref']];
+                        }
+                    }
+
+                    if ($unionRefs) {
+                        if ($isCollection) {
+                            $propertySchema['type'] = 'array';
+                            $propertySchema['items'] = 1 === \count($unionRefs)
+                                ? $unionRefs[0]
+                                : ['anyOf' => $unionRefs];
+                        } else {
+                            $refs = 1 === \count($unionRefs)
+                                ? [$unionRefs[0]]
+                                : $unionRefs;
+                        }
+                    }
+
+                    continue;
                 }
 
                 if (!$valueType instanceof ObjectType && !$valueType instanceof GenericType) {

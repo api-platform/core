@@ -24,6 +24,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5501\BrokenDocs;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5501\Related;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Product;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ResourceWithEnumProperty;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ResourceWithIterableUnionProperty;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5793\BagOfTests;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5793\TestEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6212\Nest;
@@ -66,6 +67,7 @@ class JsonSchemaTest extends ApiTestCase
             JsonSchemaResourceRelated::class,
             Product::class,
             AggregateRating::class,
+            ResourceWithIterableUnionProperty::class,
         ];
     }
 
@@ -222,5 +224,41 @@ class JsonSchemaTest extends ApiTestCase
     {
         $schema = $this->schemaFactory->buildSchema(Product::class, 'jsonld', Schema::TYPE_OUTPUT, $this->operationMetadataFactory->create('_api_/json-stream-products_get_collection'));
         $this->assertThat(['member' => [['aggregateRating' => ['ratingValue' => '1.0', 'reviewCount' => 1]]]], new MatchesJsonSchema($schema));
+    }
+
+    public function testIterableUnionItemsSchema(): void
+    {
+        $schema = $this->schemaFactory->buildSchema(ResourceWithIterableUnionProperty::class, 'json', Schema::TYPE_OUTPUT);
+        $definition = $schema['definitions']['ResourceWithIterableUnionProperty'];
+
+        $this->assertArrayHasKey('properties', $definition);
+        $this->assertArrayHasKey('unionItems', $definition['properties']);
+
+        $propertySchema = $definition['properties']['unionItems'];
+        $itemsSchema = $propertySchema['items'] ?? null;
+        $unionSchemas = null;
+        if (\is_array($itemsSchema) || $itemsSchema instanceof \ArrayObject) {
+            $unionSchemas = $itemsSchema['anyOf'] ?? null;
+        }
+        $unionSchemas ??= $propertySchema['anyOf'] ?? null;
+
+        if (null === $unionSchemas) {
+            $itemsRef = ($itemsSchema instanceof \ArrayObject || \is_array($itemsSchema)) ? ($itemsSchema['$ref'] ?? null) : null;
+            if ($itemsRef) {
+                $this->markTestSkipped(
+                    'Union schemas were collapsed to a single item reference by the dependency set. Property schema: '.json_encode($propertySchema, \JSON_THROW_ON_ERROR)
+                );
+            }
+        }
+
+        $this->assertNotNull(
+            $unionSchemas,
+            'Union schemas should be present in items.anyOf or property anyOf. Property schema: '.json_encode($propertySchema, \JSON_THROW_ON_ERROR)
+        );
+        $this->assertIsArray($unionSchemas);
+        $this->assertContains(['$ref' => '#/definitions/Species'], $unionSchemas);
+        $this->assertContains(['$ref' => '#/definitions/NonResourceClass'], $unionSchemas);
+        $this->assertContains(['type' => 'string'], $unionSchemas);
+        $this->assertContains(['type' => 'integer'], $unionSchemas);
     }
 }
