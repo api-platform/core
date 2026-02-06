@@ -15,6 +15,11 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\McpTool;
+use ApiPlatform\Metadata\McpToolCollection;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\McpBookOutputDto;
+use ApiPlatform\Tests\Fixtures\TestBundle\Dto\SearchDto;
+use ApiPlatform\Tests\Fixtures\TestBundle\State\McpBookListDtoProcessor;
+use ApiPlatform\Tests\Fixtures\TestBundle\State\McpBookListProcessor;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ApiResource(
@@ -26,6 +31,19 @@ use Doctrine\ORM\Mapping as ORM;
         ),
         'update_book_status' => new McpTool(
             processor: [self::class, 'process']
+        ),
+        'list_books' => new McpToolCollection(
+            description: 'List Books',
+            input: SearchDto::class,
+            processor: McpBookListProcessor::class,
+            structuredContent: true,
+        ),
+        'list_books_dto' => new McpTool(
+            description: 'List Books and return a DTO',
+            input: SearchDto::class,
+            output: McpBookOutputDto::class,
+            processor: McpBookListDtoProcessor::class,
+            structuredContent: true,
         ),
     ]
 )]
