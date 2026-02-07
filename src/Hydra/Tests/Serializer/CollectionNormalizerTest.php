@@ -243,6 +243,7 @@ class CollectionNormalizerTest extends TestCase
             $paginatorProphecy->getTotalItems()->willReturn(1312);
         }
 
+        $paginatorProphecy->key()->willReturn(0);
         $paginatorProphecy->rewind()->will(static function (): void {});
         $paginatorProphecy->valid()->willReturn(true, false);
         $paginatorProphecy->current()->willReturn('foo');
