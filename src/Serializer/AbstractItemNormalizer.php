@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\AccessDeniedException;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -97,7 +98,27 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return false;
         }
 
-        $class = $context['force_resource_class'] ?? $this->getObjectClass($data);
+        if (isset($context['force_resource_class'])) {
+            if (is_a($data, $context['force_resource_class'], true)) {
+                $class = $context['force_resource_class'];
+            } else {
+                // force_resource_class is used for the stateOptions pattern (entity/model backing a DTO resource).
+                // Verify the object class matches the expected entity/model class from stateOptions
+                // to prevent context leakage from intercepting unrelated types (e.g., DateTimeImmutable).
+                $objectClass = $this->getObjectClass($data);
+                $operation = $context['operation'] ?? $context['root_operation'] ?? null;
+                $stateOptions = $operation instanceof HttpOperation ? $operation->getStateOptions() : null;
+                $expectedClass = $stateOptions && method_exists($stateOptions, 'getEntityClass')
+                    ? $stateOptions->getEntityClass()
+                    : ($stateOptions && method_exists($stateOptions, 'getModelClass') ? $stateOptions->getModelClass() : null);
+                $class = $expectedClass === $objectClass
+                    ? $context['force_resource_class']
+                    : $objectClass;
+            }
+        } else {
+            $class = $this->getObjectClass($data);
+        }
+
         if (($context['output']['class'] ?? null) === $class) {
             return true;
         }
