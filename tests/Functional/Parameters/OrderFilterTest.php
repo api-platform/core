@@ -78,6 +78,14 @@ final class OrderFilterTest extends ApiTestCase
             '/filtered_order_parameters?createdAt=desc',
             ['2024-12-25T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-01-01T00:00:00+00:00', null],
         ];
+        yield 'created_at_ordered_asc_uppercase' => [
+            '/filtered_order_parameters?createdAt=ASC',
+            [null, '2024-01-01T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-12-25T00:00:00+00:00'],
+        ];
+        yield 'created_at_ordered_desc_uppercase' => [
+            '/filtered_order_parameters?createdAt=DESC',
+            ['2024-12-25T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-01-01T00:00:00+00:00', null],
+        ];
         yield 'date_alias_ordered_asc' => [
             '/filtered_order_parameters?date=asc',
             [null, '2024-01-01T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-12-25T00:00:00+00:00'],
@@ -130,6 +138,14 @@ final class OrderFilterTest extends ApiTestCase
         ];
         yield 'order_property_created_at_null_first_desc' => [
             '/filtered_order_parameters?order[createdAt]=desc',
+            [null, '2024-12-25T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-01-01T00:00:00+00:00'],
+        ];
+        yield 'order_property_created_at_null_first_asc_uppercase' => [
+            '/filtered_order_parameters?order[createdAt]=ASC',
+            [null, '2024-01-01T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-12-25T00:00:00+00:00'],
+        ];
+        yield 'order_property_created_at_null_first_desc_uppercase' => [
+            '/filtered_order_parameters?order[createdAt]=DESC',
             [null, '2024-12-25T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-01-01T00:00:00+00:00'],
         ];
     }
