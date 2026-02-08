@@ -14,11 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\EventListener;
 
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
 use ApiPlatform\State\Util\RequestAttributesExtractor;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
-use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 
 /**
  * Maps the API resource (DTO) to the entity before persistence.
@@ -27,8 +26,11 @@ final class ObjectMapperInputListener
 {
     use OperationRequestInitiatorTrait;
 
+    /**
+     * @param ProcessorInterface<mixed, mixed> $processor
+     */
     public function __construct(
-        private readonly ObjectMapperInterface $objectMapper,
+        private readonly ProcessorInterface $processor,
         ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
     ) {
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
@@ -36,7 +38,6 @@ final class ObjectMapperInputListener
 
     public function onKernelView(ViewEvent $event): void
     {
-        $data = $event->getControllerResult();
         $request = $event->getRequest();
         $operation = $this->initializeOperation($request);
 
@@ -44,20 +45,14 @@ final class ObjectMapperInputListener
             return;
         }
 
-        $class = $operation->getInput()['class'] ?? $operation->getClass();
-
-        if (
-            $data instanceof Response
-            || !($operation->canWrite() ?? !$request->isMethodSafe())
-            || null === $data
-            || !is_a($data, $class, true)
-            || !$operation->canMap()
-        ) {
-            return;
+        if (null === $operation->canWrite()) {
+            $operation = $operation->withWrite(!$request->isMethodSafe());
         }
 
-        $mapped = $this->objectMapper->map($data, $request->attributes->get('mapped_data'));
+        $data = $this->processor->process($event->getControllerResult(), $operation, $request->attributes->get('_api_uri_variables') ?? [], [
+            'request' => $request,
+        ]);
 
-        $event->setControllerResult($mapped);
+        $event->setControllerResult($data);
     }
 }

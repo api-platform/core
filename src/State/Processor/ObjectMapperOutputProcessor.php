@@ -26,11 +26,11 @@ use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 final class ObjectMapperOutputProcessor implements ProcessorInterface
 {
     /**
-     * @param ProcessorInterface<mixed,mixed> $decorated
+     * @param ProcessorInterface<mixed,mixed>|null $decorated
      */
     public function __construct(
         private readonly ?ObjectMapperInterface $objectMapper,
-        private readonly ProcessorInterface $decorated,
+        private readonly ?ProcessorInterface $decorated = null,
     ) {
     }
 
@@ -43,13 +43,13 @@ final class ObjectMapperOutputProcessor implements ProcessorInterface
             || null === $data
             || !$operation->canMap()
         ) {
-            return $this->decorated->process($data, $operation, $uriVariables, $context);
+            return $this->decorated ? $this->decorated->process($data, $operation, $uriVariables, $context) : $data;
         }
 
         $request = $context['request'] ?? null;
         $request?->attributes->set('persisted_data', $data);
         $dto = $this->objectMapper->map($data, $operation->getClass());
 
-        return $this->decorated->process($dto, $operation, $uriVariables, $context);
+        return $this->decorated ? $this->decorated->process($dto, $operation, $uriVariables, $context) : $dto;
     }
 }
