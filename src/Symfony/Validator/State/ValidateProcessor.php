@@ -25,8 +25,11 @@ use Symfony\Component\HttpFoundation\Response;
  */
 final class ValidateProcessor implements ProcessorInterface
 {
+    /**
+     * @param ProcessorInterface<mixed,mixed>|null $decorated
+     */
     public function __construct(
-        private readonly ProcessorInterface $decorated,
+        private readonly ?ProcessorInterface $decorated,
         private readonly ValidatorInterface $validator,
     ) {
     }
@@ -34,15 +37,15 @@ final class ValidateProcessor implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
         if ($data instanceof Response || !$data || false === ($operation->canWrite() ?? true)) {
-            return $this->decorated->process($data, $operation, $uriVariables, $context);
+            return $this->decorated ? $this->decorated->process($data, $operation, $uriVariables, $context) : $data;
         }
 
         if (false === ($operation->canValidate() ?? true)) {
-            return $this->decorated->process($data, $operation, $uriVariables, $context);
+            return $this->decorated ? $this->decorated->process($data, $operation, $uriVariables, $context) : $data;
         }
 
         $this->validator->validate($data, $operation->getValidationContext() ?? []);
 
-        return $this->decorated->process($data, $operation, $uriVariables, $context);
+        return $this->decorated ? $this->decorated->process($data, $operation, $uriVariables, $context) : $data;
     }
 }
