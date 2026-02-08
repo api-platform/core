@@ -51,7 +51,7 @@ final class OrderFilter implements FilterInterface, JsonSchemaFilterInterface, O
      */
     public function getSchema(Parameter $parameter): array
     {
-        return ['type' => 'string', 'enum' => ['asc', 'desc']];
+        return ['type' => 'string', 'enum' => ['asc', 'desc', 'ASC', 'DESC']];
     }
 
     /**
