@@ -45,6 +45,10 @@ class ObjectMapperValidationTest extends ApiTestCase
      */
     public function testUniqueEntityValidationOnCreate(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('UniqueEntity validation is not supported with MongoDB.');
+        }
+
         if (!$this->getContainer()->has('api_platform.object_mapper')) {
             $this->markTestSkipped('ObjectMapper not installed');
         }
@@ -100,6 +104,10 @@ class ObjectMapperValidationTest extends ApiTestCase
      */
     public function testDtoValidationStillWorks(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('UniqueEntity validation is not supported with MongoDB.');
+        }
+
         if (!$this->getContainer()->has('api_platform.object_mapper')) {
             $this->markTestSkipped('ObjectMapper not installed');
         }
@@ -129,6 +137,10 @@ class ObjectMapperValidationTest extends ApiTestCase
      */
     public function testEntityConstraintsValidated(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('UniqueEntity validation is not supported with MongoDB.');
+        }
+
         if (!$this->getContainer()->has('api_platform.object_mapper')) {
             $this->markTestSkipped('ObjectMapper not installed');
         }
