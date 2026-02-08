@@ -287,6 +287,6 @@ final class OrderFilter extends AbstractFilter implements OrderFilterInterface, 
      */
     public function getSchema(Parameter $parameter): array
     {
-        return ['type' => 'string', 'enum' => ['asc', 'desc']];
+        return ['type' => 'string', 'enum' => ['asc', 'desc', 'ASC', 'DESC']];
     }
 }
