@@ -199,6 +199,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         // TranslationExtractCommand was introduced in framework-bundle/7.3 with the object mapper service
         if (class_exists(ObjectMapper::class) && class_exists(TranslationExtractCommand::class)) {
             $loader->load('state/object_mapper.php');
+            $loader->load($config['use_symfony_listeners'] ? 'symfony/object_mapper.php' : 'state/object_mapper_processor.php');
         }
 
         if (($config['mcp']['enabled'] ?? false) && class_exists(McpBundle::class)) {

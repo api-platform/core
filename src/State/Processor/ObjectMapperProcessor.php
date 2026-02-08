@@ -19,6 +19,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 
 /**
+ * @deprecated since API Platform 4.2, use {@see ObjectMapperInputProcessor} and {@see ObjectMapperOutputProcessor} instead
+ *
  * @implements ProcessorInterface<mixed,mixed>
  */
 final class ObjectMapperProcessor implements ProcessorInterface
@@ -30,6 +32,7 @@ final class ObjectMapperProcessor implements ProcessorInterface
         private readonly ?ObjectMapperInterface $objectMapper,
         private readonly ProcessorInterface $decorated,
     ) {
+        trigger_deprecation('api-platform/core', '4.2', 'The "%s" class is deprecated, use "%s" and "%s" instead.', self::class, ObjectMapperInputProcessor::class, ObjectMapperOutputProcessor::class);
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): object|array|null

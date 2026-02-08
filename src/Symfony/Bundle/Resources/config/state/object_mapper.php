@@ -15,7 +15,6 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use ApiPlatform\Metadata\Resource\Factory\ObjectMapperMetadataCollectionFactory;
 use ApiPlatform\State\ObjectMapper\ObjectMapper;
-use ApiPlatform\State\Processor\ObjectMapperProcessor;
 use ApiPlatform\State\Provider\ObjectMapperProvider;
 use Symfony\Component\ObjectMapper\Metadata\ReflectionObjectMapperMetadataFactory;
 
@@ -35,14 +34,6 @@ return static function (ContainerConfigurator $container) {
         ->args([
             service('api_platform.object_mapper')->nullOnInvalid(),
             service('api_platform.state_provider.object_mapper.inner'),
-            service('api_platform.object_mapper.metadata_factory'),
-        ]);
-
-    $services->set('api_platform.state_processor.object_mapper', ObjectMapperProcessor::class)
-        ->decorate('api_platform.state_processor.locator', null, 0)
-        ->args([
-            service('api_platform.object_mapper')->nullOnInvalid(),
-            service('api_platform.state_processor.object_mapper.inner'),
             service('api_platform.object_mapper.metadata_factory'),
         ]);
 
