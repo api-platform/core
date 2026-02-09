@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -31,8 +32,12 @@ final class EntrypointNormalizer implements NormalizerInterface
 {
     public const FORMAT = 'jsonld';
 
-    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory, private readonly IriConverterInterface $iriConverter, private readonly UrlGeneratorInterface $urlGenerator)
-    {
+    public function __construct(
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory,
+        private readonly IriConverterInterface $iriConverter,
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly ?LoggerInterface $logger = null,
+    ) {
     }
 
     /**
@@ -50,13 +55,29 @@ final class EntrypointNormalizer implements NormalizerInterface
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
             foreach ($resourceMetadata as $resource) {
-                if ($resource->getExtraProperties()['is_alternate_resource_metadata'] ?? false) {
-                    continue;
-                }
+                $isAlternate = $resource->getExtraProperties()['is_alternate_resource_metadata'] ?? false;
 
                 foreach ($resource->getOperations() as $operation) {
-                    $key = lcfirst($resource->getShortName());
-                    if (true === $operation->getHideHydraOperation() || !$operation instanceof CollectionOperationInterface || isset($entrypoint[$key])) {
+                    $baseKey = lcfirst($resource->getShortName());
+                    $key = $baseKey;
+
+                    if (true === $operation->getHideHydraOperation() || !$operation instanceof CollectionOperationInterface) {
+                        continue;
+                    }
+
+                    // If this is an alternate and the key already exists, generate an indexed key
+                    if ($isAlternate && isset($entrypoint[$key])) {
+                        // Find the next available index
+                        $index = 1;
+                        while (isset($entrypoint[$baseKey.'_'.$index])) {
+                            ++$index;
+                        }
+                        $key = $baseKey.'_'.$index;
+
+                        if ($this->logger) {
+                            $this->logger->warning('Multiple ApiResource declarations with the same shortName "{shortName}" for class "{class}"; consider using distinct shortNames.', ['shortName' => $resource->getShortName(), 'class' => $resourceClass]);
+                        }
+                    } elseif (isset($entrypoint[$key])) {
                         continue;
                     }
 
