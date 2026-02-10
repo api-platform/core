@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7735;
 
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue7735\Issue7735Entity;
 use Symfony\Component\ObjectMapper\Attribute\Map;
@@ -22,9 +23,8 @@ use Symfony\Component\ObjectMapper\Attribute\Map;
 #[ApiResource(
     stateOptions: new Options(entityClass: Issue7735Entity::class),
     operations: [
-        new Post(
-            uriTemplate: '/issue7735_resources',
-        ),
+        new Post(),
+        new Get(),
     ]
 )]
 #[Map(target: Issue7735Entity::class)]

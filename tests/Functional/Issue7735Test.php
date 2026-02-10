@@ -41,6 +41,10 @@ final class Issue7735Test extends ApiTestCase
      */
     public function testPostWithUninitializedTypedPropertyInPrePersist(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('This test is only for Doctrine ORM.');
+        }
+
         $this->recreateSchema([Issue7735Entity::class]);
 
         $response = self::createClient()->request('POST', '/issue7735_resources', [

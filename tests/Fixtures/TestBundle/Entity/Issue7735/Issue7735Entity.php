@@ -40,7 +40,7 @@ class Issue7735Entity
     public function prePersist(): void
     {
         // Initialize the typed property in PrePersist
-        $this->generatedValue = 'generated_' . uniqid();
+        $this->generatedValue = 'generated_'.uniqid();
     }
 
     public function getId(): ?int
