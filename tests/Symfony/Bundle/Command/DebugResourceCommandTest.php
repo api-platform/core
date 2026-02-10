@@ -48,6 +48,7 @@ class DebugResourceCommandTest extends TestCase
         return new CommandTester($command);
     }
 
+    /** @group legacy */
     public function testDebugResource(): void
     {
         $varDumper = $this->prophesize(DataDumperInterface::class);
@@ -61,6 +62,7 @@ class DebugResourceCommandTest extends TestCase
         $this->assertStringContainsString('Successfully dumped the selected resource', $commandTester->getDisplay());
     }
 
+    /** @group legacy */
     public function testDebugOperation(): void
     {
         $varDumper = $this->prophesize(DataDumperInterface::class);

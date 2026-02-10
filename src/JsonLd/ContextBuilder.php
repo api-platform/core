@@ -62,13 +62,14 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         $context = $this->getBaseContext($referenceType);
 
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
-            $shortName = $this->resourceMetadataFactory->create($resourceClass)[0]->getShortName();
-            $resourceName = lcfirst($shortName);
+            foreach ($this->resourceMetadataFactory->create($resourceClass) as $resource) {
+                $resourceName = lcfirst($resource->getShortName());
 
-            $context[$resourceName] = [
-                '@id' => 'Entrypoint/'.$resourceName,
-                '@type' => '@id',
-            ];
+                $context[$resourceName] = [
+                    '@id' => 'Entrypoint/'.$resourceName,
+                    '@type' => '@id',
+                ];
+            }
         }
 
         return $context;

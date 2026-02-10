@@ -202,7 +202,7 @@ trait MetadataCollectionFactoryTrait
             $resources[$index] = $resources[$index]->withGraphQlOperations($graphQlOperationsWithDefaults);
         }
 
-        return $resources;
+        return $this->deduplicateShortNames($resources);
     }
 
     /**
@@ -222,6 +222,52 @@ trait MetadataCollectionFactoryTrait
         }
 
         return false;
+    }
+
+    /**
+     * When multiple ApiResource declarations on the same class share the same shortName,
+     * suffix duplicates with an incrementing number (e.g. Book, Book2, Book3).
+     *
+     * @param ApiResource[] $resources
+     *
+     * @return ApiResource[]
+     */
+    private function deduplicateShortNames(array $resources): array
+    {
+        $enabled = $this->defaults['extra_properties']['deduplicate_resource_short_names'] ?? false;
+        $shortNameCounts = [];
+
+        foreach ($resources as $index => $resource) {
+            $shortName = $resource->getShortName();
+            if (!isset($shortNameCounts[$shortName])) {
+                $shortNameCounts[$shortName] = 1;
+                continue;
+            }
+
+            if (!$enabled) {
+                if (1 === $shortNameCounts[$shortName]) {
+                    trigger_deprecation('api-platform/core', '4.2', 'Having multiple "#[ApiResource]" attributes with the same "shortName" "%s" on class "%s" is deprecated and will result in automatic short name deduplication in API Platform 5.x. Set "defaults.extra_properties.deduplicate_resource_short_names" to "true" in the API Platform configuration to enable it now.', $shortName, $resource->getClass());
+                }
+                ++$shortNameCounts[$shortName];
+                continue;
+            }
+
+            $newShortName = $shortName.(++$shortNameCounts[$shortName]);
+            $resource = $resource->withShortName($newShortName);
+
+            // Update operations to reflect the new shortName
+            if ($operations = $resource->getOperations()) {
+                $updatedOperations = [];
+                foreach ($operations as $key => $operation) {
+                    $updatedOperations[$key] = $operation->withShortName($newShortName);
+                }
+                $resource = $resource->withOperations(new Operations($updatedOperations));
+            }
+
+            $resources[$index] = $resource;
+        }
+
+        return $resources;
     }
 
     /**
