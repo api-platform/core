@@ -36,6 +36,10 @@ use Doctrine\ORM\Mapping as ORM;
             property: 'name',
         ),
         'namePartialNoProperty' => new QueryParameter(filter: new PartialSearchFilter()),
+        'namePartialSensitive' => new QueryParameter(
+            filter: new PartialSearchFilter(true),
+            property: 'name',
+        ),
         'autocomplete' => new QueryParameter(filter: new FreeTextQueryFilter(new OrFilter(new ExactFilter())), properties: ['name', 'ean']),
         'q' => new QueryParameter(filter: new FreeTextQueryFilter(new PartialSearchFilter()), properties: ['name', 'ean']),
     ],
