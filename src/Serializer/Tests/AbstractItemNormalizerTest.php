@@ -826,7 +826,6 @@ class AbstractItemNormalizerTest extends TestCase
         ];
         $this->assertSame($expected, $normalizer->normalize($dummy, null, [
             'resources' => [],
-            'force_resource_class' => Dummy::class,
         ]));
     }
 

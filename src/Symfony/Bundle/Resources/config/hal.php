@@ -64,6 +64,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.metadata.resource.metadata_collection_factory')->ignoreOnInvalid(),
             service('api_platform.security.resource_access_checker')->ignoreOnInvalid(),
             service('api_platform.http_cache.tag_collector')->ignoreOnInvalid(),
+            service('api_platform.serializer.operation_resource_resolver'),
         ])
         ->tag('serializer.normalizer', ['priority' => -890]);
 

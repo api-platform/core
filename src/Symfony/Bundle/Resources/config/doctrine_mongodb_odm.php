@@ -32,6 +32,7 @@ use ApiPlatform\Doctrine\Odm\PropertyInfo\DoctrineExtractor;
 use ApiPlatform\Doctrine\Odm\State\CollectionProvider;
 use ApiPlatform\Doctrine\Odm\State\ItemProvider;
 use ApiPlatform\Doctrine\Odm\State\LinksHandler;
+use ApiPlatform\Doctrine\Orm\Serializer\DoctrineOperationResourceResolver;
 use Doctrine\Persistence\Mapping\ClassMetadataFactory;
 
 return function (ContainerConfigurator $container) {
@@ -44,6 +45,8 @@ return function (ContainerConfigurator $container) {
         ->tag('property_info.access_extractor', ['priority' => -999]);
 
     $services->set('api_platform.doctrine.metadata_factory', ClassMetadataFactory::class)->factory([service('doctrine_mongodb.odm.default_document_manager'), 'getMetadataFactory']);
+
+    $services->set('api_platform.serializer.operation_resource_resolver', DoctrineOperationResourceResolver::class);
 
     $services->set('api_platform.doctrine_mongodb.odm.state.remove_processor', RemoveProcessor::class)
         ->args([service('doctrine_mongodb')])

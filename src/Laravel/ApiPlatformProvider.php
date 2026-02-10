@@ -102,6 +102,7 @@ use ApiPlatform\Laravel\Routing\IriConverter;
 use ApiPlatform\Laravel\Routing\Router as UrlGeneratorRouter;
 use ApiPlatform\Laravel\Routing\SkolemIriConverter;
 use ApiPlatform\Laravel\Security\ResourceAccessChecker;
+use ApiPlatform\Laravel\Serializer\EloquentOperationResourceResolver;
 use ApiPlatform\Laravel\State\AccessCheckerProvider;
 use ApiPlatform\Laravel\State\SwaggerUiProcessor;
 use ApiPlatform\Laravel\State\SwaggerUiProvider;
@@ -142,6 +143,7 @@ use ApiPlatform\Serializer\ItemNormalizer;
 use ApiPlatform\Serializer\JsonEncoder;
 use ApiPlatform\Serializer\Mapping\Factory\ClassMetadataFactory as SerializerClassMetadataFactory;
 use ApiPlatform\Serializer\Mapping\Loader\PropertyMetadataLoader;
+use ApiPlatform\Serializer\OperationResourceResolverInterface;
 use ApiPlatform\Serializer\SerializerContextBuilder;
 use ApiPlatform\State\CallableProcessor;
 use ApiPlatform\State\CallableProvider;
@@ -267,6 +269,11 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->bind(ResourceClassResolverInterface::class, ResourceClassResolver::class);
         $this->app->singleton(ResourceClassResolver::class, static function (Application $app) {
             return new EloquentResourceClassResolver(new ResourceClassResolver($app->make(ResourceNameCollectionFactoryInterface::class)));
+        });
+
+        $this->app->bind(OperationResourceResolverInterface::class, EloquentOperationResourceResolver::class);
+        $this->app->singleton(EloquentOperationResourceResolver::class, static function (Application $app) {
+            return new EloquentOperationResourceResolver();
         });
 
         $this->app->singleton(PropertyMetadataFactoryInterface::class, static function (Application $app) {
@@ -495,7 +502,7 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->bind(IriConverterInterface::class, IriConverter::class);
         $this->app->singleton(IriConverter::class, static function (Application $app) {
-            return new IriConverter($app->make(CallableProvider::class), $app->make(OperationMetadataFactoryInterface::class), $app->make(UrlGeneratorRouter::class), $app->make(IdentifiersExtractorInterface::class), $app->make(ResourceClassResolverInterface::class), $app->make(ResourceMetadataCollectionFactoryInterface::class), $app->make(SkolemIriConverter::class));
+            return new IriConverter($app->make(CallableProvider::class), $app->make(OperationMetadataFactoryInterface::class), $app->make(UrlGeneratorRouter::class), $app->make(IdentifiersExtractorInterface::class), $app->make(ResourceClassResolverInterface::class), $app->make(ResourceMetadataCollectionFactoryInterface::class), $app->make(SkolemIriConverter::class), null, $app->make(OperationResourceResolverInterface::class));
         });
 
         $this->app->singleton(SkolemIriConverter::class, static function (Application $app) {
@@ -575,6 +582,8 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ResourceAccessCheckerInterface::class),
                 $defaultContext,
                 // $app->make(TagCollectorInterface::class)
+                null,
+                $app->make(OperationResourceResolverInterface::class),
             );
         });
 
@@ -967,6 +976,9 @@ class ApiPlatformProvider extends ServiceProvider
                 $defaultContext,
                 $app->make(ResourceAccessCheckerInterface::class),
                 // $app->make(TagCollectorInterface::class)
+                null,
+                null,
+                $app->make(OperationResourceResolverInterface::class),
             );
         });
 
