@@ -26,7 +26,7 @@ When to use:
 
 3. Testing Quick-Reference (Default/Symfony)
 
-For advanced configurations (Event Listeners, MongoDB, Behat tuning), refer to `tests/GEMINI.md`.
+For advanced configurations (Event Listeners, MongoDB, Behat tuning), refer to `tests/AGENTS.md`.
 
 Common Commands:
 
