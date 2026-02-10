@@ -486,7 +486,7 @@ class ItemNormalizerTest extends TestCase
             tagCollector: null,
         );
 
-        $normalizer->setSerializer($serializer); // @phpstan-ignore-line
+        $normalizer->setSerializer($serializer);
 
         self::assertThat($expected, self::equalTo($normalizer->normalize($dummy, null, $context)));
     }
