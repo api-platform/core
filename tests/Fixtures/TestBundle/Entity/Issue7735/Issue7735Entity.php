@@ -30,11 +30,11 @@ class Issue7735Entity
     private string $name;
 
     /**
-     * This typed property is intentionally not initialized.
-     * It will be set in the PrePersist callback.
+     * This property is nullable to allow ObjectMapper to set null during initial mapping.
+     * It will be set to a non-null value in the PrePersist callback.
      */
     #[ORM\Column]
-    private string $generatedValue;
+    private ?string $generatedValue = null;
 
     #[ORM\PrePersist]
     public function prePersist(): void
@@ -60,12 +60,12 @@ class Issue7735Entity
         return $this;
     }
 
-    public function getGeneratedValue(): string
+    public function getGeneratedValue(): ?string
     {
         return $this->generatedValue;
     }
 
-    public function setGeneratedValue(string $generatedValue): self
+    public function setGeneratedValue(?string $generatedValue): self
     {
         $this->generatedValue = $generatedValue;
 

@@ -15,10 +15,13 @@ namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7735\Issue7735Resource;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue7735\Issue7735Entity;
+use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
 final class Issue7735Test extends ApiTestCase
 {
+    use RecreateSchemaTrait;
     use SetupClassResourcesTrait;
 
     protected static ?bool $alwaysBootKernel = false;
@@ -38,6 +41,8 @@ final class Issue7735Test extends ApiTestCase
      */
     public function testPostWithUninitializedTypedPropertyInPrePersist(): void
     {
+        $this->recreateSchema([Issue7735Entity::class]);
+
         $response = self::createClient()->request('POST', '/issue7735_resources', [
             'json' => [
                 'name' => 'Test Resource',
