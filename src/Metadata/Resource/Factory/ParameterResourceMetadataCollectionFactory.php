@@ -53,6 +53,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         private readonly ?ContainerInterface $filterLocator = null,
         private readonly ?NameConverterInterface $nameConverter = null,
         private readonly ?LoggerInterface $logger = null,
+        private readonly bool $withLegacyFilterMetadata = true,
     ) {
     }
 
@@ -269,7 +270,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
 
         $parameter = $this->addFilterMetadata($parameter);
 
-        if ($filter instanceof FilterInterface) {
+        if ($filter instanceof FilterInterface && $this->withLegacyFilterMetadata) {
             try {
                 return $this->getLegacyFilterMetadata($parameter, $operation, $filter);
             } catch (RuntimeException $exception) {

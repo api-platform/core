@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
 use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -79,6 +80,65 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         $hydraParameter = $parameters->get('hydra', QueryParameter::class);
         $this->assertEquals(['type' => 'foo'], $hydraParameter->getSchema());
         $this->assertEquals(new Parameter('test', 'query'), $hydraParameter->getOpenApi());
+        $everywhere = $parameters->get('everywhere', QueryParameter::class);
+        $this->assertNull($everywhere->getOpenApi());
+    }
+
+    public function testParameterFactoryWithoutLegacyDescription(): void
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'hydra', 'everywhere']));
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturnOnConsecutiveCalls(
+            new ApiProperty(identifier: true),
+            new ApiProperty(readable: true),
+            new ApiProperty(readable: true),
+            new ApiProperty(identifier: true),
+            new ApiProperty(readable: true),
+            new ApiProperty(readable: true)
+        );
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(true);
+        $filterLocator->method('get')->willReturn(new class implements FilterInterface, JsonSchemaFilterInterface {
+            public function getDescription(string $resourceClass): array
+            {
+                // @phpstan-ignore-next-line return.type
+                return [
+                    'hydra' => [
+                        'property' => 'hydra',
+                        'type' => 'string',
+                        'required' => false,
+                        'schema' => ['type' => 'foo'],
+                        'openapi' => new Parameter('test', 'query'),
+                    ],
+                    'everywhere' => [
+                        'property' => 'everywhere',
+                        'type' => 'string',
+                        'required' => false,
+                        'openapi' => ['allowEmptyValue' => true],
+                    ],
+                ];
+            }
+
+            public function getSchema(\ApiPlatform\Metadata\Parameter $parameter): array
+            {
+                return ['type' => 'string'];
+            }
+        });
+        $parameter = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator,
+            null,
+            null,
+            false,
+        );
+        $operation = $parameter->create(WithParameter::class)->getOperation('collection');
+        $this->assertInstanceOf(Parameters::class, $parameters = $operation->getParameters());
+        $hydraParameter = $parameters->get('hydra', QueryParameter::class);
+        $this->assertSame(['type' => 'string'], $hydraParameter->getSchema());
+        $this->assertNull($hydraParameter->getOpenApi());
         $everywhere = $parameters->get('everywhere', QueryParameter::class);
         $this->assertNull($everywhere->getOpenApi());
     }
