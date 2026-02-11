@@ -204,6 +204,9 @@ Feature: HAL support
             },
             "thirdLevel": {
               "href": "/third_levels/1"
+            },
+            "parent": {
+               "href": "\/relation_embedders\/1"
             }
           },
           "_embedded": {
@@ -211,6 +214,9 @@ Feature: HAL support
               "_links": {
                 "self": {
                   "href": "/third_levels/1"
+                },
+                "parent": {
+                   "href": "\/related_dummies\/1"
                 }
               },
               "level": 3
