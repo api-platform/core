@@ -83,7 +83,7 @@ class GraphQlTest extends TestCase
         // Create books in reverse alphabetical order to test the 'asc' order
         BookFactory::new()
             ->count(10)
-            ->sequence(static fn ($sequence) => ['name' => \chr(\ord('z') - ($sequence->index % 26))]) // ASCII codes starting from 'z'
+            ->sequence(static fn ($sequence) => ['name' => \chr(\ord('z') - ((($sequence->index % 26) + 26) % 26))]) // ASCII codes starting from 'z'
             ->has(AuthorFactory::new())
             ->create();
 
