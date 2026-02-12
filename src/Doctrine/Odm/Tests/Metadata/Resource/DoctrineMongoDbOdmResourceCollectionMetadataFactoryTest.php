@@ -27,6 +27,7 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\Persistence\ManagerRegistry;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 
@@ -70,7 +71,7 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactoryTest extends Test
         $this->assertNull($resourceMetadataCollection->getOperation('graphql_get')->getProvider());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('operationProvider')]
+    #[DataProvider('operationProvider')]
     public function testWithProvider(HttpOperation $operation, ?string $expectedProvider = null, ?string $expectedProcessor = null): void
     {
         if (!class_exists(DocumentManager::class)) {

@@ -15,6 +15,7 @@ namespace ApiPlatform\GraphQl\Tests\Serializer\Exception;
 
 use ApiPlatform\GraphQl\Serializer\Exception\HttpExceptionNormalizer;
 use GraphQL\Error\Error;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -35,7 +36,7 @@ class HttpExceptionNormalizerTest extends TestCase
         $this->httpExceptionNormalizer = new HttpExceptionNormalizer();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('exceptionProvider')]
+    #[DataProvider('exceptionProvider')]
     public function testNormalize(HttpException $exception, string $expectedExceptionMessage, int $expectedStatus, string $expectedCategory): void
     {
         $error = new Error('test message', null, null, [], null, $exception);

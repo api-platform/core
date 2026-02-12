@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use GraphQL\Type\Definition\ResolveInfo;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -80,7 +81,7 @@ class SerializerContextBuilderTest extends TestCase
         return $operation;
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('createNormalizationContextProvider')]
+    #[DataProvider('createNormalizationContextProvider')]
     public function testCreateNormalizationContext(?string $resourceClass, string $operationName, array $fields, bool $isMutation, bool $isSubscription, bool $noInfo, array $expectedContext, ?callable $advancedNameConverter = null, ?string $expectedExceptionClass = null, ?string $expectedExceptionMessage = null): void
     {
         $resolverContext = [];
@@ -292,7 +293,7 @@ class SerializerContextBuilderTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('createDenormalizationContextProvider')]
+    #[DataProvider('createDenormalizationContextProvider')]
     public function testCreateDenormalizationContext(?string $resourceClass, string $operationName, array $expectedContext): void
     {
         $operation = $this->buildOperationFromContext(true, false, $expectedContext, false, $resourceClass);

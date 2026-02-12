@@ -21,6 +21,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SecuredDummy;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 
@@ -99,7 +100,7 @@ class ClientTest extends ApiTestCase
         $this->assertStringContainsString('<name>Kevin</name>', $response->getContent());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('authBasicProvider')]
+    #[DataProvider('authBasicProvider')]
     public function testAuthBasic($basic): void
     {
         $this->recreateSchema([SecuredDummy::class, RelatedDummy::class]);

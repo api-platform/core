@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Problem\Serializer;
 
 use ApiPlatform\Problem\Serializer\ConstraintViolationListNormalizer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -44,7 +45,7 @@ class ConstraintViolationNormalizerTest extends TestCase
         $this->assertSame([ConstraintViolationListInterface::class => true], $normalizer->getSupportedTypes($normalizer::FORMAT));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('nameConverterProvider')]
+    #[DataProvider('nameConverterProvider')]
     public function testNormalize(callable $nameConverterFactory, array $expected): void
     {
         $normalizer = new ConstraintViolationListNormalizer(['severity', 'anotherField1'], $nameConverterFactory($this));

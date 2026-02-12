@@ -14,11 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonSchema\Tests;
 
 use ApiPlatform\JsonSchema\Schema;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class SchemaTest extends TestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('versionProvider')]
+    #[DataProvider('versionProvider')]
     public function testJsonSchemaVersion(string $version, string $ref): void
     {
         $schema = new Schema($version);
@@ -29,7 +30,7 @@ class SchemaTest extends TestCase
         $this->assertSame('Foo', $schema->getRootDefinitionKey());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('versionProvider')]
+    #[DataProvider('versionProvider')]
     public function testCollectionJsonSchemaVersion(string $version, string $ref): void
     {
         $schema = new Schema($version);
@@ -58,7 +59,7 @@ class SchemaTest extends TestCase
         $this->assertSame('http://json-schema.org/draft-07/schema#', $schema['$schema']);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('definitionsDataProvider')]
+    #[DataProvider('definitionsDataProvider')]
     public function testDefinitions(string $version, array $baseDefinitions): void
     {
         $schema = new Schema($version);

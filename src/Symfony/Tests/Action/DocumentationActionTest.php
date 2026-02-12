@@ -23,6 +23,7 @@ use ApiPlatform\OpenApi\OpenApi;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\Action\DocumentationAction;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -166,7 +167,7 @@ class DocumentationActionTest extends TestCase
         return [['application/json'], ['application/html']];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('getOpenApiContentTypes')]
+    #[DataProvider('getOpenApiContentTypes')]
     public function testGetOpenApi($contentType): void
     {
         $request = new Request(server: ['CONTENT_TYPE' => $contentType]);

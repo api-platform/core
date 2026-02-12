@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\Resource\Factory\InputOutputResourceMetadataCollectionF
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\Tests\Fixtures\DummyEntity;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 
@@ -25,7 +26,7 @@ class InputOutputResourceMetadataCollectionFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('getAttributes')]
+    #[DataProvider('getAttributes')]
     public function testInputOutputMetadata(mixed $input, ?array $expected): void
     {
         $resourceCollection = new ResourceMetadataCollection('Foo', [new ApiResource(input: $input)]);

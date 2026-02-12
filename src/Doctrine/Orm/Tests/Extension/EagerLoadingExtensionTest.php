@@ -38,6 +38,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -1000,7 +1001,7 @@ class EagerLoadingExtensionTest extends TestCase
         $eagerExtensionTest->applyToCollection($queryBuilder, new QueryNameGenerator(), Dummy::class, new GetCollection(normalizationContext: [AbstractNormalizer::GROUPS => 'foo']));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideExistingJoinCases')]
+    #[DataProvider('provideExistingJoinCases')]
     public function testApplyToCollectionWithExistingJoin(string $joinType): void
     {
         $context = ['groups' => ['foo']];

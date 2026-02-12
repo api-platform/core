@@ -41,6 +41,7 @@ use GraphQL\Type\Definition\ListOfType;
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type as GraphQLType;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -114,7 +115,7 @@ class FieldsBuilderTest extends TestCase
         $this->assertSame($itemResolver, $nodeQueryFields['resolve']);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('itemQueryFieldsProvider')]
+    #[DataProvider('itemQueryFieldsProvider')]
     public function testGetItemQueryFields(string $resourceClass, Operation $operation, array $configuration, ?GraphQLType $graphqlType, ?callable $resolver, array $expectedQueryFields): void
     {
         $this->resourceClassResolverProphecy->isResourceClass($resourceClass)->willReturn(true);
@@ -192,7 +193,7 @@ class FieldsBuilderTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('collectionQueryFieldsProvider')]
+    #[DataProvider('collectionQueryFieldsProvider')]
     public function testGetCollectionQueryFields(string $resourceClass, Operation $operation, array $configuration, ?GraphQLType $graphqlType, ?callable $resolver, array $expectedQueryFields): void
     {
         $this->resourceClassResolverProphecy->isResourceClass($resourceClass)->willReturn(true);
@@ -342,7 +343,7 @@ class FieldsBuilderTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('mutationFieldsProvider')]
+    #[DataProvider('mutationFieldsProvider')]
     public function testGetMutationFields(string $resourceClass, Operation $operation, GraphQLType $graphqlType, GraphQLType $inputGraphqlType, ?callable $mutationResolver, array $expectedMutationFields): void
     {
         $this->resourceClassResolverProphecy->isResourceClass($resourceClass)->willReturn(true);
@@ -401,7 +402,7 @@ class FieldsBuilderTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('subscriptionFieldsProvider')]
+    #[DataProvider('subscriptionFieldsProvider')]
     public function testGetSubscriptionFields(string $resourceClass, Operation $operation, GraphQLType $graphqlType, GraphQLType $inputGraphqlType, ?callable $subscriptionResolver, array $expectedSubscriptionFields): void
     {
         $this->resourceClassResolverProphecy->isResourceClass($resourceClass)->willReturn(true);
@@ -463,7 +464,7 @@ class FieldsBuilderTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('resourceObjectTypeFieldsProvider')]
+    #[DataProvider('resourceObjectTypeFieldsProvider')]
     public function testGetResourceObjectTypeFields(string $resourceClass, Operation $operation, array $properties, bool $input, int $depth, ?array $ioMetadata, array $expectedResourceObjectTypeFields, ?callable $advancedNameConverterFactory = null): void
     {
         $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
@@ -920,7 +921,7 @@ class FieldsBuilderTest extends TestCase
         ], $enumFields);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('resolveResourceArgsProvider')]
+    #[DataProvider('resolveResourceArgsProvider')]
     public function testResolveResourceArgs(array $args, array $expectedResolvedArgs, ?string $expectedExceptionMessage = null): void
     {
         if (null !== $expectedExceptionMessage) {

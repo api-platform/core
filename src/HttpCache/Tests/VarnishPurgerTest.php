@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\HttpCache\Tests;
 
 use ApiPlatform\HttpCache\VarnishPurger;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
@@ -65,7 +66,7 @@ class VarnishPurgerTest extends TestCase
         $purger->purge([]);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideChunkHeaderCases')]
+    #[DataProvider('provideChunkHeaderCases')]
     public function testItChunksHeaderToAvoidHittingVarnishLimit(int $maxHeaderLength, array $iris, array $regexesToSend): void
     {
         $client = new class implements HttpClientInterface {

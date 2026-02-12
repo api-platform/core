@@ -23,6 +23,7 @@ use ApiPlatform\State\Pagination\ArrayPaginator;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
 use GraphQL\Type\Definition\ResolveInfo;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -42,7 +43,7 @@ class NormalizeProcessorTest extends TestCase
         $this->resolveInfoProphecy = $this->prophesize(ResolveInfo::class);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('processItems')]
+    #[DataProvider('processItems')]
     public function testProcess($body, $operation): void
     {
         $context = ['args' => []];
@@ -64,7 +65,7 @@ class NormalizeProcessorTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('processCollection')]
+    #[DataProvider('processCollection')]
     public function testProcessCollection($collection, $operation, $args, ?array $expectedResult, array $getFieldSelection, ?string $expectedExceptionClass = null, ?string $expectedExceptionMessage = null): void
     {
         $this->resolveInfoProphecy->getFieldSelection(1)->willReturn($getFieldSelection);

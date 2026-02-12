@@ -23,6 +23,7 @@ use ApiPlatform\Metadata\Tests\Extractor\Adapter\XmlPropertyAdapter;
 use ApiPlatform\Metadata\Tests\Extractor\Adapter\YamlPropertyAdapter;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Comment;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\TypeInfo\Type;
 
@@ -79,7 +80,7 @@ final class PropertyMetadataCompatibilityTest extends TestCase
         'nativeType' => 'string',
     ];
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('getExtractors')]
+    #[DataProvider('getExtractors')]
     public function testValidMetadata(string $extractorClass, PropertyAdapterInterface $adapter): void
     {
         $reflClass = new \ReflectionClass(ApiProperty::class);

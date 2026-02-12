@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Resource\Factory\OperationNameResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 
@@ -26,7 +27,7 @@ class OperationNameResourceMetadataFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('operationProvider')]
+    #[DataProvider('operationProvider')]
     public function testGeneratesName(HttpOperation $operation, string $expectedOperationName): void
     {
         $decorated = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);

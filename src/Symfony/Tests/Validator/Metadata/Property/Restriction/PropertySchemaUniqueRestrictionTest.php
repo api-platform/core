@@ -15,6 +15,7 @@ namespace ApiPlatform\Symfony\Tests\Validator\Metadata\Property\Restriction;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaUniqueRestriction;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Validator\Constraint;
@@ -35,7 +36,7 @@ final class PropertySchemaUniqueRestrictionTest extends TestCase
         $this->propertySchemaUniqueRestriction = new PropertySchemaUniqueRestriction();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('supportsProvider')]
+    #[DataProvider('supportsProvider')]
     public function testSupports(Constraint $constraint, ApiProperty $propertyMetadata, bool $expectedResult): void
     {
         self::assertSame($expectedResult, $this->propertySchemaUniqueRestriction->supports($constraint, $propertyMetadata));

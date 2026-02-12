@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Dummy;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\DummyCar;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\RelatedDummy;
 use ApiPlatform\Metadata\Tests\Fixtures\DummyIgnoreProperty;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata as SerializerAttributeMetadata;
@@ -40,7 +41,7 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('groupsProvider')]
+    #[DataProvider('groupsProvider')]
     public function testCreate($readGroups, $writeGroups): void
     {
         $serializerClassMetadataFactoryProphecy = $this->prophesize(SerializerClassMetadataFactoryInterface::class);

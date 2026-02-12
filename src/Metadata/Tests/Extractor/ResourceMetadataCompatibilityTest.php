@@ -41,6 +41,7 @@ use ApiPlatform\OpenApi\Model\ExternalDocumentation;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\OpenApi\Model\RequestBody;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\WebLink\Link;
 
@@ -509,7 +510,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         'parameters',
     ];
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('getExtractors')]
+    #[DataProvider('getExtractors')]
     public function testValidMetadata(string $extractorClass, ResourceAdapterInterface $adapter): void
     {
         $reflClass = new \ReflectionClass(ApiResource::class);

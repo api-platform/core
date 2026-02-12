@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Comment;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\User;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
@@ -414,7 +415,7 @@ class XmlExtractorTest extends TestCase
         ], $extractor->getResources());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('getInvalidPaths')]
+    #[DataProvider('getInvalidPaths')]
     public function testInvalidXML(string $path, string $error): void
     {
         $this->expectException(InvalidArgumentException::class);

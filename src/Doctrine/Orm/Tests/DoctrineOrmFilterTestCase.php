@@ -18,6 +18,7 @@ use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity\Dummy;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGenerator;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**
@@ -45,7 +46,7 @@ abstract class DoctrineOrmFilterTestCase extends KernelTestCase
         $this->repository = $this->managerRegistry->getManagerForClass(Dummy::class)->getRepository(Dummy::class);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideApplyTestData')]
+    #[DataProvider('provideApplyTestData')]
     public function testApply(?array $properties, array $filterParameters, string $expectedDql, ?array $expectedParameters = null, ?callable $factory = null, ?string $resourceClass = null): void
     {
         $this->doTestApply($properties, $filterParameters, $expectedDql, $expectedParameters, $factory, $resourceClass);

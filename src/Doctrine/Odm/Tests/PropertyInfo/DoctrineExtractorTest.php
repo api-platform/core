@@ -27,6 +27,7 @@ use ApiPlatform\Doctrine\Odm\Tests\PropertyInfo\Fixtures\EnumString;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Types\Type as MongoDbType;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Type as LegacyType;
@@ -84,7 +85,7 @@ class DoctrineExtractorTest extends TestCase
         );
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('typesProvider')]
+    #[DataProvider('typesProvider')]
     public function testExtract(string $property, ?Type $type): void
     {
         $this->assertEquals($type, $this->createExtractor()->getType(DoctrineDummy::class, $property));

@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\FlexConfig;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Program;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\SingleFileConfigDummy;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\User;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -574,7 +575,7 @@ class YamlExtractorTest extends TestCase
         $this->assertCount(1, $resources[User::class][1]['operations']);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('getInvalidPaths')]
+    #[DataProvider('getInvalidPaths')]
     public function testInvalidYaml(string $path, string $error): void
     {
         $this->expectException(InvalidArgumentException::class);

@@ -23,11 +23,12 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use GraphQL\Type\Definition\ResolveInfo;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ResolverFactoryTest extends TestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('graphQlQueries')]
+    #[DataProvider('graphQlQueries')]
     public function testGraphQlResolver(?string $resourceClass = null, ?string $rootClass = null, ?Operation $operation = null, ?Operation $providedOperation = null, ?Operation $processedOperation = null): void
     {
         $returnValue = new \stdClass();

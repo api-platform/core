@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\State\Tests\Util;
 
 use ApiPlatform\State\Util\RequestParser;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -21,7 +22,7 @@ use PHPUnit\Framework\TestCase;
  */
 class RequestParserTest extends TestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('parseRequestParamsProvider')]
+    #[DataProvider('parseRequestParamsProvider')]
     public function testParseRequestParams(string $source, array $expected): void
     {
         $actual = RequestParser::parseRequestParams($source);
