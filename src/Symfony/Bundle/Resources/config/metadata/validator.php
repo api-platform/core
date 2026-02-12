@@ -29,7 +29,7 @@ use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRe
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaUniqueRestriction;
 use ApiPlatform\Symfony\Validator\Metadata\Property\ValidatorPropertyMetadataFactory;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.metadata.property.metadata_factory.validator', ValidatorPropertyMetadataFactory::class)

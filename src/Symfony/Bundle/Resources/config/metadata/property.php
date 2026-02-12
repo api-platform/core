@@ -22,7 +22,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyInfoPropertyMetadataFactory;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\SerializerPropertyMetadataFactory;
 
-return function (ContainerConfigurator $container) {
+return function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->alias('api_platform.metadata.property.metadata_factory', 'api_platform.metadata.property.metadata_factory.xml');

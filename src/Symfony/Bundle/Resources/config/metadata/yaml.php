@@ -20,7 +20,7 @@ use ApiPlatform\Metadata\Property\Factory\ExtractorPropertyNameCollectionFactory
 use ApiPlatform\Metadata\Resource\Factory\ExtractorResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\ExtractorResourceNameCollectionFactory;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.metadata.resource_extractor.yaml', YamlResourceExtractor::class)

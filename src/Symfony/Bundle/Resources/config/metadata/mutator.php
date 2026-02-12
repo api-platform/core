@@ -16,7 +16,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use ApiPlatform\Metadata\Mutator\OperationMutatorCollection;
 use ApiPlatform\Metadata\Mutator\ResourceMutatorCollection;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.metadata.mutator_collection.resource', ResourceMutatorCollection::class);

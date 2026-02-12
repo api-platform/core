@@ -26,7 +26,7 @@ use ApiPlatform\Elasticsearch\Serializer\NameConverter\InnerFieldsNameConverter;
 use ApiPlatform\Elasticsearch\State\CollectionProvider;
 use ApiPlatform\Elasticsearch\State\ItemProvider;
 
-return function (ContainerConfigurator $container) {
+return function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.elasticsearch.name_converter.inner_fields', InnerFieldsNameConverter::class)

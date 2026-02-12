@@ -16,7 +16,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use ApiPlatform\Hydra\State\JsonStreamerProcessor;
 use ApiPlatform\Hydra\State\JsonStreamerProvider;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.jsonld.state_processor.json_streamer', JsonStreamerProcessor::class)

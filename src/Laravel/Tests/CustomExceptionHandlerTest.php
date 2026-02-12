@@ -75,15 +75,15 @@ class CustomExceptionHandlerTest extends TestCase
             });
         }
 
-        Route::get('/non-api-route', static function () {
+        Route::get('/non-api-route', static function (): void {
             throw new CustomTestException('This should be handled by custom handler');
         });
 
-        Route::get('/non-api-route-regular', static function () {
+        Route::get('/non-api-route-regular', static function (): void {
             throw new \RuntimeException('Regular exception on non-API route');
         });
 
-        Route::get('/non-api-custom-handler', static function () {
+        Route::get('/non-api-custom-handler', static function (): void {
             throw new CustomHandlerException('Should use custom handler class');
         });
     }
@@ -129,7 +129,7 @@ class CustomExceptionHandlerTest extends TestCase
         $this->setUpTraits();
         CustomHandler::$customRenderCalled = false;
 
-        Route::get('/non-api-custom-handler-test', static function () {
+        Route::get('/non-api-custom-handler-test', static function (): void {
             throw new CustomHandlerException('Should use custom handler class');
         });
 

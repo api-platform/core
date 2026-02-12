@@ -16,7 +16,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use ApiPlatform\Symfony\Bundle\SwaggerUi\SwaggerUiContext;
 use ApiPlatform\Symfony\Bundle\SwaggerUi\SwaggerUiProcessor;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.swagger_ui.context', SwaggerUiContext::class)
