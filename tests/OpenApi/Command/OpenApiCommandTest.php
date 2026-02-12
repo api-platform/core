@@ -19,6 +19,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Crud;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6317\Issue6317;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5625\Currency;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\ApplicationTester;
@@ -64,7 +65,7 @@ class OpenApiCommandTest extends KernelTestCase
         $this->assertJson($this->tester->getDisplay());
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('orm')]
+    #[Group('orm')]
     public function testExecuteWithYaml(): void
     {
         $this->tester->run(['command' => 'api:openapi:export', '--yaml' => true]);

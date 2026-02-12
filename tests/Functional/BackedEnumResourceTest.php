@@ -22,6 +22,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\BackedEnumStringResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6264\Availability;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6264\AvailabilityStatus;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpClient\HttpOptions;
 
 final class BackedEnumResourceTest extends ApiTestCase
@@ -512,7 +513,7 @@ GRAPHQL;
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('providerEnumItemsGraphQl')]
-    #[\PHPUnit\Framework\Attributes\Group('legacy')]
+    #[Group('legacy')]
     public function testItemGraphql(string $query, array $variables, array $expected): void
     {
         $options = (new HttpOptions())
@@ -524,7 +525,7 @@ GRAPHQL;
         $this->assertJsonEquals($expected);
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('legacy')]
+    #[Group('legacy')]
     public function testCollectionGraphQl(): void
     {
         $query = <<<'GRAPHQL'
@@ -551,7 +552,7 @@ GRAPHQL;
         ]);
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('legacy')]
+    #[Group('legacy')]
     public function testItemGraphQlInteger(): void
     {
         $query = <<<'GRAPHQL'

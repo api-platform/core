@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -30,7 +31,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class CollectionNormalizerTest extends TestCase
 {
-    #[\PHPUnit\Framework\Attributes\Group('legacy')]
+    #[Group('legacy')]
     public function testSupportsNormalize(): void
     {
         $resourceClassResolverMock = $this->createMock(ResourceClassResolverInterface::class);
