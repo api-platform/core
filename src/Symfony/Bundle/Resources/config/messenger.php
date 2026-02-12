@@ -16,7 +16,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use ApiPlatform\Symfony\Messenger\Metadata\MessengerResourceMetadataCollectionFactory;
 use ApiPlatform\Symfony\Messenger\Processor;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->alias('api_platform.message_bus', 'messenger.default_bus');

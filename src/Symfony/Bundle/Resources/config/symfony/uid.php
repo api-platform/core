@@ -16,7 +16,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use ApiPlatform\Symfony\UriVariableTransformer\UlidUriVariableTransformer;
 use ApiPlatform\Symfony\UriVariableTransformer\UuidUriVariableTransformer;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.symfony.uri_variables.transformer.ulid', UlidUriVariableTransformer::class)

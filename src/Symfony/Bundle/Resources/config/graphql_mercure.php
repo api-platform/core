@@ -15,7 +15,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGenerator;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.graphql.subscription.mercure_iri_generator', MercureSubscriptionIriGenerator::class)

@@ -17,7 +17,7 @@ use ApiPlatform\Symfony\Action\DocumentationAction;
 use ApiPlatform\Symfony\Action\EntrypointAction;
 use ApiPlatform\Symfony\Controller\MainController;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.symfony.main_controller', MainController::class)

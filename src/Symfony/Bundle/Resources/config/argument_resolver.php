@@ -15,7 +15,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use ApiPlatform\Symfony\Bundle\ArgumentResolver\PayloadArgumentResolver;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.argument_resolver.payload', PayloadArgumentResolver::class)

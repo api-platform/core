@@ -17,7 +17,7 @@ use ApiPlatform\Symfony\Validator\State\ParameterValidatorProvider;
 use ApiPlatform\Symfony\Validator\State\ValidateProcessor;
 use ApiPlatform\Symfony\Validator\State\ValidateProvider;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.state_provider.validate', ValidateProvider::class)

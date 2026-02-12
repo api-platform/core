@@ -89,7 +89,7 @@ final class Operations implements \IteratorAggregate, \Countable
 
     public function has(string $key): bool
     {
-        foreach ($this->operations as $i => [$operationName, $operation]) {
+        foreach ($this->operations as [$operationName, $operation]) {
             if ($operationName === $key) {
                 return true;
             }
