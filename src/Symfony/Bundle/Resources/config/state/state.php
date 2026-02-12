@@ -23,7 +23,7 @@ use ApiPlatform\State\Provider\BackedEnumProvider;
 use ApiPlatform\State\SerializerContextBuilderInterface;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.state_provider.locator', CallableProvider::class)

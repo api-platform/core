@@ -19,7 +19,7 @@ use ApiPlatform\Metadata\Property\Factory\ExtractorPropertyNameCollectionFactory
 use ApiPlatform\Metadata\Property\Factory\PropertyInfoPropertyNameCollectionFactory;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->alias('api_platform.metadata.property.name_collection_factory', 'api_platform.metadata.property.name_collection_factory.property_info');

@@ -49,7 +49,7 @@ use Negotiation\Negotiator;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
-return function (ContainerConfigurator $container) {
+return function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.action.not_found', NotFoundAction::class)

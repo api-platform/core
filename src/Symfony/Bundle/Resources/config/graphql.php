@@ -48,7 +48,7 @@ use ApiPlatform\State\Provider\ParameterProvider;
 use ApiPlatform\Symfony\Bundle\Command\GraphQlExportCommand;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-return function (ContainerConfigurator $container) {
+return function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.graphql.executor', Executor::class)

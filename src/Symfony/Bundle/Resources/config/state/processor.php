@@ -18,7 +18,7 @@ use ApiPlatform\State\Processor\RespondProcessor;
 use ApiPlatform\State\Processor\SerializeProcessor;
 use ApiPlatform\State\Processor\WriteProcessor;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->alias('api_platform.state_processor.main', 'api_platform.state_processor.respond');

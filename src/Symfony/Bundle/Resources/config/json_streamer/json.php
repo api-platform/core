@@ -16,7 +16,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use ApiPlatform\Serializer\State\JsonStreamerProcessor;
 use ApiPlatform\Serializer\State\JsonStreamerProvider;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.state_processor.json_streamer', JsonStreamerProcessor::class)

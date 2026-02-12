@@ -16,7 +16,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use ApiPlatform\Symfony\Bundle\CacheWarmer\CachePoolClearerCacheWarmer;
 use ApiPlatform\Symfony\EventListener\ExceptionListener;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.listener.exception', ExceptionListener::class)

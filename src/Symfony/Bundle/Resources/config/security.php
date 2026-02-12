@@ -17,7 +17,7 @@ use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\Symfony\Security\Core\Authorization\ExpressionLanguageProvider;
 use ApiPlatform\Symfony\Security\ResourceAccessChecker;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->alias('api_platform.security.expression_language', 'security.expression_language');

@@ -20,7 +20,7 @@ use ApiPlatform\Hal\Serializer\ItemNormalizer;
 use ApiPlatform\Hal\Serializer\ObjectNormalizer;
 use ApiPlatform\Serializer\JsonEncoder;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.hal.json_schema.schema_factory', SchemaFactory::class)

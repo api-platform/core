@@ -15,7 +15,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use ApiPlatform\Symfony\Validator\State\ValidateProvider;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.graphql.state_provider.validate', ValidateProvider::class)

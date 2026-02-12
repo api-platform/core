@@ -22,7 +22,7 @@ use ApiPlatform\Hydra\Serializer\EntrypointNormalizer;
 use ApiPlatform\Hydra\Serializer\HydraPrefixNameConverter;
 use ApiPlatform\Hydra\Serializer\PartialCollectionViewNormalizer;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.hydra.json_schema.schema_factory', SchemaFactory::class)

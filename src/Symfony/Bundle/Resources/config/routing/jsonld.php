@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Symfony\Component\Routing\Loader\Configurator;
 
-return static function (RoutingConfigurator $routes) {
+return static function (RoutingConfigurator $routes): void {
     $routes->add('api_jsonld_context', '/contexts/{shortName}.{_format}')
         ->controller('api_platform.jsonld.action.context')
         ->methods(['GET', 'HEAD'])

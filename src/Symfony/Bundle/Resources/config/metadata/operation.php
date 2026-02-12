@@ -17,7 +17,7 @@ use ApiPlatform\Metadata\Operation\Factory\CacheOperationMetadataFactory;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactory;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.metadata.operation.metadata_factory', OperationMetadataFactory::class)
