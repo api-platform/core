@@ -63,7 +63,19 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
             $name = \sprintf('%s%s', $prefix, $definitionName ? '-'.$definitionName : $definitionName);
         } else {
             $groups = (array) ($serializerContext[AbstractNormalizer::GROUPS] ?? []);
-            $name = $groups ? \sprintf('%s-%s', $prefix, implode('_', $groups)) : $prefix;
+            $attributes = (array) ($serializerContext[AbstractNormalizer::ATTRIBUTES] ?? []);
+
+            $parts = [];
+
+            if ($groups) {
+                $parts[] = implode('_', $groups);
+            }
+
+            if ($attributes) {
+                $parts[] = $this->getAttributesAsString($attributes);
+            }
+
+            $name = $parts ? \sprintf('%s-%s', $prefix, implode('_', $parts)) : $prefix;
         }
 
         if (false === ($serializerContext['gen_id'] ?? true)) {
@@ -98,5 +110,27 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
         }
 
         return $name;
+    }
+
+    private function getAttributesAsString(array $attributes): string
+    {
+        $parts = [];
+
+        foreach ($attributes as $key => $value) {
+            if (\is_array($value)) {
+                $childString = $this->getAttributesAsString($value);
+                $children = explode('_', $childString);
+
+                foreach ($children as $child) {
+                    $parts[] = $key.'.'.$child;
+                }
+            } elseif (\is_string($key)) {
+                $parts[] = $key;
+            } else {
+                $parts[] = $value;
+            }
+        }
+
+        return implode('_', $parts);
     }
 }
