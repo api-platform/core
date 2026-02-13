@@ -18,6 +18,7 @@ use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -27,6 +28,7 @@ use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Serializer\ContextTrait;
+use ApiPlatform\Serializer\OperationResourceClassResolverInterface;
 use ApiPlatform\Serializer\TagCollectorInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Exception\LogicException;
@@ -70,9 +72,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
         '@vocab',
     ];
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, private readonly ContextBuilderInterface $contextBuilder, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ?ResourceAccessCheckerInterface $resourceAccessChecker = null, protected ?TagCollectorInterface $tagCollector = null)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, private readonly ContextBuilderInterface $contextBuilder, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ?ResourceAccessCheckerInterface $resourceAccessChecker = null, protected ?TagCollectorInterface $tagCollector = null, private ?OperationMetadataFactoryInterface $operationMetadataFactory = null, ?OperationResourceClassResolverInterface $operationResourceResolver = null)
     {
-        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $defaultContext, $resourceMetadataCollectionFactory, $resourceAccessChecker, $tagCollector);
+        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $defaultContext, $resourceMetadataCollectionFactory, $resourceAccessChecker, $tagCollector, $operationResourceResolver);
     }
 
     /**
@@ -84,9 +86,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
     }
 
     /**
-     * @param string|null $format
+     * {@inheritdoc}
      */
-    public function getSupportedTypes($format): array
+    public function getSupportedTypes(?string $format): array
     {
         return self::FORMAT === $format ? parent::getSupportedTypes($format) : [];
     }
@@ -96,20 +98,39 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * @throws LogicException
      */
-    public function normalize(mixed $object, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        $resourceClass = $this->getObjectClass($object);
+        $resourceClass = $this->getObjectClass($data);
         $outputClass = $this->getOutputClass($context);
 
-        if ($outputClass && !($context['item_uri_template'] ?? null)) {
-            return parent::normalize($object, $format, $context);
+        if ($outputClass) {
+            if ($context['item_uri_template'] ?? null) {
+                // When both output and item_uri_template are present, temporarily remove
+                // item_uri_template so the output re-dispatch produces the correct @type
+                // from the output class (not from the item_uri_template operation).
+                $itemUriTemplate = $context['item_uri_template'];
+                unset($context['item_uri_template']);
+                $originalData = $data;
+                $data = parent::normalize($data, $format, $context);
+                if (\is_array($data)) {
+                    try {
+                        $context['item_uri_template'] = $itemUriTemplate;
+                        $data['@id'] = $this->iriConverter->getIriFromResource($originalData, UrlGeneratorInterface::ABS_PATH, null, $context);
+                    } catch (\Exception) {
+                    }
+                }
+
+                return $data;
+            }
+
+            return parent::normalize($data, $format, $context);
         }
 
         // TODO: we should not remove the resource_class in the normalizeRawCollection as we would find out anyway that it's not the same as the requested one
         $previousResourceClass = $context['resource_class'] ?? null;
         $metadata = [];
         if ($isResourceClass = $this->resourceClassResolver->isResourceClass($resourceClass) && (null === $previousResourceClass || $this->resourceClassResolver->isResourceClass($previousResourceClass))) {
-            $resourceClass = $this->resourceClassResolver->getResourceClass($object, $previousResourceClass);
+            $resourceClass = $this->resourceClassResolver->getResourceClass($data, $previousResourceClass);
             $context = $this->initContext($resourceClass, $context);
             $metadata = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
         } elseif ($this->contextBuilder instanceof AnonymousContextBuilderInterface) {
@@ -119,12 +140,21 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 $context['output']['iri'] = null;
             }
 
-            if ($this->resourceClassResolver->isResourceClass($resourceClass)) {
+            if (isset($context['item_uri_template']) && $this->operationMetadataFactory) {
+                $itemOp = $this->operationMetadataFactory->create($context['item_uri_template']);
+                // Use resource-level shortName for @type, not operation-specific shortName
+                try {
+                    $itemResourceShortName = $this->resourceMetadataCollectionFactory->create($itemOp->getClass())[0]->getShortName();
+                    $context['output']['operation'] = $itemOp->withShortName($itemResourceShortName);
+                } catch (\Exception) {
+                    $context['output']['operation'] = $itemOp;
+                }
+            } elseif ($this->resourceClassResolver->isResourceClass($resourceClass)) {
                 $context['output']['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
             }
 
             // We should improve what's behind the context creation, its probably more complicated then it should
-            $metadata = $this->createJsonLdContext($this->contextBuilder, $object, $context);
+            $metadata = $this->createJsonLdContext($this->contextBuilder, $data, $context);
         }
 
         // Special case: non-resource got serialized and contains a resource therefore we need to reset part of the context
@@ -132,19 +162,24 @@ final class ItemNormalizer extends AbstractItemNormalizer
             unset($context['operation'], $context['operation_name'], $context['output']);
         }
 
-        if (true === ($context['output']['gen_id'] ?? true) && true === ($context['force_iri_generation'] ?? true) && $iri = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context)) {
+        if (true === ($context['output']['gen_id'] ?? true) && true === ($context['force_iri_generation'] ?? true) && $iri = $this->iriConverter->getIriFromResource($data, UrlGeneratorInterface::ABS_PATH, $context['operation'] ?? null, $context)) {
             $context['iri'] = $iri;
             $metadata['@id'] = $iri;
         }
 
         $context['api_normalize'] = true;
 
-        $data = parent::normalize($object, $format, $context);
-        if (!\is_array($data)) {
-            return $data;
+        $normalizedData = parent::normalize($data, $format, $context);
+        if (!\is_array($normalizedData)) {
+            return $normalizedData;
         }
 
         $operation = $context['operation'] ?? null;
+
+        if ($this->operationMetadataFactory && isset($context['item_uri_template']) && !$operation) {
+            $operation = $this->operationMetadataFactory->create($context['item_uri_template']);
+        }
+
         if ($isResourceClass && !$operation) {
             $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
         }
@@ -152,12 +187,21 @@ final class ItemNormalizer extends AbstractItemNormalizer
         if (!isset($metadata['@type']) && $operation) {
             $types = $operation instanceof HttpOperation ? $operation->getTypes() : null;
             if (null === $types) {
-                $types = [$operation->getShortName()];
+                // TODO: 5.x break on this as this looks wrong, CollectionReferencingItem returns an IRI that point through
+                // ItemReferencedInCollection but it returns a CollectionReferencingItem therefore we should use the current
+                // object's class Type and not rely on operation ?
+                // Use resource-level shortName to avoid operation-specific overrides
+                $typeClass = $isResourceClass ? $resourceClass : ($operation->getClass() ?? $resourceClass);
+                try {
+                    $types = [$this->resourceMetadataCollectionFactory->create($typeClass)[0]->getShortName()];
+                } catch (\Exception) {
+                    $types = [$operation->getShortName()];
+                }
             }
             $metadata['@type'] = 1 === \count($types) ? $types[0] : $types;
         }
 
-        return $metadata + $data;
+        return $metadata + $normalizedData;
     }
 
     /**
@@ -173,7 +217,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      *
      * @throws NotNormalizableValueException
      */
-    public function denormalize(mixed $data, string $class, ?string $format = null, array $context = []): mixed
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         // Avoid issues with proxies if we populated the object
         if (isset($data['@id']) && !isset($context[self::OBJECT_TO_POPULATE])) {
@@ -192,7 +236,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             }
         }
 
-        return parent::denormalize($data, $class, $format, $context);
+        return parent::denormalize($data, $type, $format, $context);
     }
 
     protected function getAllowedAttributes(string|object $classOrObject, array $context, bool $attributesAsString = false): array|bool

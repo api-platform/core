@@ -30,6 +30,7 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
+use ApiPlatform\Serializer\OperationResourceClassResolverInterface;
 use ApiPlatform\State\ProviderInterface;
 use Illuminate\Database\Eloquent\Relations\Relation;
 // use Illuminate\Routing\Router;
@@ -56,7 +57,7 @@ class IriConverter implements IriConverterInterface
     /**
      * @param ProviderInterface<object> $provider
      */
-    public function __construct(private readonly ProviderInterface $provider, private readonly OperationMetadataFactoryInterface $operationMetadataFactory, private readonly RouterInterface $router, private readonly IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ?IriConverterInterface $decorated = null)
+    public function __construct(private readonly ProviderInterface $provider, private readonly OperationMetadataFactoryInterface $operationMetadataFactory, private readonly RouterInterface $router, private readonly IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ?IriConverterInterface $decorated = null, private readonly ?OperationResourceClassResolverInterface $operationResourceResolver = null)
     {
         $this->resourceClassResolver = $resourceClassResolver;
     }
@@ -93,7 +94,7 @@ class IriConverter implements IriConverterInterface
      */
     public function getIriFromResource(object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, ?Operation $operation = null, array $context = []): ?string
     {
-        $resourceClass = $context['force_resource_class'] ?? (\is_string($resource) ? $resource : $this->getObjectClass($resource));
+        $resourceClass = $this->getResourceClassForIri($resource, $context);
         if ($resource instanceof Relation) {
             $resourceClass = $this->getObjectClass($resource->getRelated());
         }
@@ -112,12 +113,13 @@ class IriConverter implements IriConverterInterface
         }
 
         // This is only for when a class (that is not a resource) extends another one that is a resource, we should remove this behavior
-        if (!\is_string($resource) && !isset($context['force_resource_class'])) {
-            $resourceClass = $this->getResourceClass($resource, true);
+        // Skip this if getResourceClassForIri already determined the class via operation stateOptions
+        if (!\is_string($resource) && $resourceClass === $this->getObjectClass($resource)) {
+            $resourceClass = $this->getResourceClass($resource, true) ?? $resourceClass;
         }
 
         if (!$operation) {
-            $operation = (new Get())->withClass($resourceClass);
+            $operation = (new Get())->withClass($resourceClass); // @phpstan-ignore-line
         }
 
         if ($operation instanceof HttpOperation && 301 === $operation->getStatus()) {
@@ -188,5 +190,50 @@ class IriConverter implements IriConverterInterface
 
         // Use a skolem iri, the route is defined in genid.xml
         return $this->decorated->getIriFromResource($resource, $referenceType, $operation, $context);
+    }
+
+    /**
+     * Determines which resource class to use for IRI generation.
+     *
+     * When an operation has stateOptions (entity/model class), this validates
+     * that the object being normalized matches the expected backing class before
+     * treating it as the resource class.
+     *
+     * This prevents context leakage where unrelated objects are incorrectly
+     * treated as resources for IRI generation.
+     *
+     * @param array<string, mixed> $context
+     */
+    private function getResourceClassForIri(object|string $resource, array $context): string
+    {
+        if (\is_string($resource)) {
+            return $resource;
+        }
+
+        // force_resource_class is set when operation has stateOptions with entity/model class
+        if (isset($context['force_resource_class'])) {
+            return $context['force_resource_class'];
+        }
+
+        // Explicit resource_class in context takes precedence
+        if (isset($context['resource_class'])) {
+            return $context['resource_class'];
+        }
+
+        // When item_uri_template is present, operation will be created from it in getIriFromResource,
+        // so we can't use operationResourceResolver here. Return object class and let the operation
+        // resolution happen after the operation is created from the template.
+        if (isset($context['item_uri_template'])) {
+            return $this->getObjectClass($resource);
+        }
+
+        // Use the service to resolve resource class when operation is available
+        $operation = $context['operation'] ?? $context['root_operation'] ?? null;
+        if ($operation && $this->operationResourceResolver) {
+            return $this->operationResourceResolver->resolve($resource, $operation);
+        }
+
+        // Fallback to object's actual class
+        return $this->getObjectClass($resource);
     }
 }
