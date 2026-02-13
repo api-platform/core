@@ -17,6 +17,7 @@ use ApiPlatform\Doctrine\Odm\Filter\FilterInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Repository\DocumentRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**
@@ -45,7 +46,7 @@ abstract class DoctrineMongoDbOdmFilterTestCase extends KernelTestCase
         $this->repository = $this->manager->getRepository($this->resourceClass);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideApplyTestData')]
+    #[DataProvider('provideApplyTestData')]
     public function testApply(?array $properties, array $filterParameters, array $expectedPipeline, ?callable $factory = null, ?string $resourceClass = null): void
     {
         $this->doTestApply($properties, $filterParameters, $expectedPipeline, $factory, $resourceClass);

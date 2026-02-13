@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DtoOutput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
@@ -112,7 +113,7 @@ final class DefinitionNameFactoryTest extends TestCase
         yield ['Bar.DtoOutput.jsonld-title_author.name_name', Dummy::class, 'jsonld', DtoOutput::class, new Get(shortName: 'Bar'), [AbstractNormalizer::ATTRIBUTES => ['title', 'author' => ['name'], 'name']]];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('providerDefinitions')]
+    #[DataProvider('providerDefinitions')]
     public function testCreate(string $expected, string $className, string $format = 'json', ?string $inputOrOutputClass = null, ?Operation $operation = null, array $serializerContext = []): void
     {
         $definitionNameFactory = new DefinitionNameFactory();

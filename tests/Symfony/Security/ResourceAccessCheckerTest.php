@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Symfony\Security;
 use ApiPlatform\Symfony\Security\ResourceAccessChecker;
 use ApiPlatform\Tests\Fixtures\Serializable;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -32,7 +33,7 @@ class ResourceAccessCheckerTest extends TestCase
 {
     use ProphecyTrait;
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('getGranted')]
+    #[DataProvider('getGranted')]
     public function testIsGranted(bool $granted): void
     {
         $expressionLanguageProphecy = $this->prophesize(ExpressionLanguage::class);

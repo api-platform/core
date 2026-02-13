@@ -76,7 +76,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected array $localFactoryOptionsCache = [];
     protected ?ResourceAccessCheckerInterface $resourceAccessChecker;
 
-    public function __construct(protected PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, protected PropertyMetadataFactoryInterface $propertyMetadataFactory, protected IriConverterInterface $iriConverter, protected ResourceClassResolverInterface $resourceClassResolver, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ?ResourceAccessCheckerInterface $resourceAccessChecker = null, protected ?TagCollectorInterface $tagCollector = null)
+    public function __construct(protected PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, protected PropertyMetadataFactoryInterface $propertyMetadataFactory, protected IriConverterInterface $iriConverter, protected ResourceClassResolverInterface $resourceClassResolver, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ?ResourceAccessCheckerInterface $resourceAccessChecker = null, protected ?TagCollectorInterface $tagCollector = null, protected ?OperationResourceClassResolverInterface $operationResourceResolver = null)
     {
         if (!isset($defaultContext['circular_reference_handler'])) {
             $defaultContext['circular_reference_handler'] = fn ($object): ?string => $this->iriConverter->getIriFromResource($object);
@@ -97,7 +97,21 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return false;
         }
 
-        $class = $context['force_resource_class'] ?? $this->getObjectClass($data);
+        $class = $this->getObjectClass($data);
+
+        // Only honor force_resource_class if the resolver confirms this object
+        // maps to the operation's resource class (prevents context leakage to
+        // unrelated objects like DateTimeImmutable)
+        if (isset($context['force_resource_class']) && $context['force_resource_class'] !== $class) {
+            $operation = $context['operation'] ?? $context['root_operation'] ?? null;
+            if ($operation && $this->operationResourceResolver) {
+                $resolvedClass = $this->operationResourceResolver->resolve($data, $operation);
+                if ($resolvedClass !== $class) {
+                    $class = $context['force_resource_class'];
+                }
+            }
+        }
+
         if (($context['output']['class'] ?? null) === $class) {
             return true;
         }
@@ -123,6 +137,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
         $resourceClass = $context['force_resource_class'] ?? $this->getObjectClass($data);
+        // Prevent force_resource_class from leaking to child property normalizations
+        unset($context['force_resource_class']);
         if ($outputClass = $this->getOutputClass($context)) {
             if (!$this->serializer instanceof NormalizerInterface) {
                 throw new LogicException('Cannot normalize the output because the injected serializer is not a normalizer');

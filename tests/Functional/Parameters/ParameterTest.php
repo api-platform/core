@@ -18,6 +18,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\TranslateValidationError;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\WithParameter;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 final class ParameterTest extends ApiTestCase
 {
@@ -82,7 +83,7 @@ final class ParameterTest extends ApiTestCase
      * Because of the openapiContext deprecation.
      * TODO: only select a few classes to generate the docs for a faster test.
      */
-    #[\PHPUnit\Framework\Attributes\Group('legacy')]
+    #[Group('legacy')]
     public function testDisableOpenApi(): void
     {
         $response = self::createClient()->request('GET', 'docs', ['headers' => ['accept' => 'application/vnd.openapi+json']]);

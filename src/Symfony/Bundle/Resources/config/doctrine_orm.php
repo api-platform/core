@@ -35,6 +35,7 @@ use ApiPlatform\Doctrine\Orm\Filter\UuidFilter;
 use ApiPlatform\Doctrine\Orm\Metadata\Property\DoctrineOrmPropertyMetadataFactory;
 use ApiPlatform\Doctrine\Orm\Metadata\Resource\DoctrineOrmLinkFactory;
 use ApiPlatform\Doctrine\Orm\Metadata\Resource\DoctrineOrmResourceCollectionMetadataFactory;
+use ApiPlatform\Doctrine\Orm\Serializer\DoctrineOrmOperationResourceClassResolver;
 use ApiPlatform\Doctrine\Orm\State\CollectionProvider;
 use ApiPlatform\Doctrine\Orm\State\ItemProvider;
 use ApiPlatform\Doctrine\Orm\State\LinksHandler;
@@ -44,6 +45,8 @@ return function (ContainerConfigurator $container) {
     $services = $container->services();
 
     $services->set('api_platform.doctrine.metadata_factory', ClassMetadataFactory::class)->factory([service('doctrine.orm.default_entity_manager'), 'getMetadataFactory']);
+
+    $services->set('api_platform.serializer.operation_resource_resolver', DoctrineOrmOperationResourceClassResolver::class);
 
     $services->set('api_platform.doctrine.orm.state.remove_processor', RemoveProcessor::class)
         ->args([service('doctrine')])

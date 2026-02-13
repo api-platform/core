@@ -23,6 +23,7 @@ use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prediction\CallPrediction;
@@ -93,7 +94,7 @@ class PersistProcessorTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('getTrackingPolicyParameters')]
+    #[DataProvider('getTrackingPolicyParameters')]
     public function testTrackingPolicy(string $metadataClass, bool $deferredExplicit, bool $persisted): void
     {
         $dummy = new Dummy();

@@ -24,6 +24,7 @@ use GraphQL\Error\DebugFlag;
 use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Type\Schema;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -91,7 +92,7 @@ class EntrypointActionTest extends TestCase
         $this->assertEqualsWithoutDateHeader(new JsonResponse(['GraphQL']), $mockedEntrypoint($request));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('multipartRequestProvider')]
+    #[DataProvider('multipartRequestProvider')]
     public function testMultipartRequestAction(?string $operations, ?string $map, array $files, array $variables, Response $expectedResponse): void
     {
         $requestParams = [];

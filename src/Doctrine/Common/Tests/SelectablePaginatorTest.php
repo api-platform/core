@@ -15,11 +15,12 @@ namespace ApiPlatform\Doctrine\Common\Tests;
 
 use ApiPlatform\Doctrine\Common\SelectablePaginator;
 use Doctrine\Common\Collections\ArrayCollection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class SelectablePaginatorTest extends TestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('initializeProvider')]
+    #[DataProvider('initializeProvider')]
     public function testInitialize($results, $currentPage, $itemsPerPage, $totalItems, $lastPage, $currentItems): void
     {
         $results = new ArrayCollection($results);

@@ -43,6 +43,7 @@ use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\PropertyCollectionIriOnlyR
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\RelatedDummy;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\SecuredDummy;
 use Doctrine\Common\Collections\ArrayCollection;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -65,7 +66,7 @@ class AbstractItemNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
-    #[\PHPUnit\Framework\Attributes\Group('legacy')]
+    #[Group('legacy')]
     public function testSupportNormalizationAndSupportDenormalization(): void
     {
         $std = new \stdClass();
@@ -825,7 +826,6 @@ class AbstractItemNormalizerTest extends TestCase
         ];
         $this->assertSame($expected, $normalizer->normalize($dummy, null, [
             'resources' => [],
-            'force_resource_class' => Dummy::class,
         ]));
     }
 

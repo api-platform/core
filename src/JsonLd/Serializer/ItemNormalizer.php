@@ -28,6 +28,7 @@ use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Serializer\ContextTrait;
+use ApiPlatform\Serializer\OperationResourceClassResolverInterface;
 use ApiPlatform\Serializer\TagCollectorInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Exception\LogicException;
@@ -71,9 +72,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
         '@vocab',
     ];
 
-    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, private readonly ContextBuilderInterface $contextBuilder, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ?ResourceAccessCheckerInterface $resourceAccessChecker = null, protected ?TagCollectorInterface $tagCollector = null, private ?OperationMetadataFactoryInterface $operationMetadataFactory = null)
+    public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, private readonly ContextBuilderInterface $contextBuilder, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ?ResourceAccessCheckerInterface $resourceAccessChecker = null, protected ?TagCollectorInterface $tagCollector = null, private ?OperationMetadataFactoryInterface $operationMetadataFactory = null, ?OperationResourceClassResolverInterface $operationResourceResolver = null)
     {
-        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $defaultContext, $resourceMetadataCollectionFactory, $resourceAccessChecker, $tagCollector);
+        parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $defaultContext, $resourceMetadataCollectionFactory, $resourceAccessChecker, $tagCollector, $operationResourceResolver);
     }
 
     /**
@@ -102,7 +103,26 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $resourceClass = $this->getObjectClass($data);
         $outputClass = $this->getOutputClass($context);
 
-        if ($outputClass && !($context['item_uri_template'] ?? null)) {
+        if ($outputClass) {
+            if ($context['item_uri_template'] ?? null) {
+                // When both output and item_uri_template are present, temporarily remove
+                // item_uri_template so the output re-dispatch produces the correct @type
+                // from the output class (not from the item_uri_template operation).
+                $itemUriTemplate = $context['item_uri_template'];
+                unset($context['item_uri_template']);
+                $originalData = $data;
+                $data = parent::normalize($data, $format, $context);
+                if (\is_array($data)) {
+                    try {
+                        $context['item_uri_template'] = $itemUriTemplate;
+                        $data['@id'] = $this->iriConverter->getIriFromResource($originalData, UrlGeneratorInterface::ABS_PATH, null, $context);
+                    } catch (\Exception) {
+                    }
+                }
+
+                return $data;
+            }
+
             return parent::normalize($data, $format, $context);
         }
 
@@ -121,7 +141,14 @@ final class ItemNormalizer extends AbstractItemNormalizer
             }
 
             if (isset($context['item_uri_template']) && $this->operationMetadataFactory) {
-                $context['output']['operation'] = $this->operationMetadataFactory->create($context['item_uri_template']);
+                $itemOp = $this->operationMetadataFactory->create($context['item_uri_template']);
+                // Use resource-level shortName for @type, not operation-specific shortName
+                try {
+                    $itemResourceShortName = $this->resourceMetadataCollectionFactory->create($itemOp->getClass())[0]->getShortName();
+                    $context['output']['operation'] = $itemOp->withShortName($itemResourceShortName);
+                } catch (\Exception) {
+                    $context['output']['operation'] = $itemOp;
+                }
             } elseif ($this->resourceClassResolver->isResourceClass($resourceClass)) {
                 $context['output']['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
             }
@@ -160,7 +187,16 @@ final class ItemNormalizer extends AbstractItemNormalizer
         if (!isset($metadata['@type']) && $operation) {
             $types = $operation instanceof HttpOperation ? $operation->getTypes() : null;
             if (null === $types) {
-                $types = [$operation->getShortName()];
+                // TODO: 5.x break on this as this looks wrong, CollectionReferencingItem returns an IRI that point through
+                // ItemReferencedInCollection but it returns a CollectionReferencingItem therefore we should use the current
+                // object's class Type and not rely on operation ?
+                // Use resource-level shortName to avoid operation-specific overrides
+                $typeClass = $isResourceClass ? $resourceClass : ($operation->getClass() ?? $resourceClass);
+                try {
+                    $types = [$this->resourceMetadataCollectionFactory->create($typeClass)[0]->getShortName()];
+                } catch (\Exception) {
+                    $types = [$operation->getShortName()];
+                }
             }
             $metadata['@type'] = 1 === \count($types) ? $types[0] : $types;
         }

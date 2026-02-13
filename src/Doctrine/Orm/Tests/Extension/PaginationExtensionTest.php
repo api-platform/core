@@ -30,6 +30,7 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\CountWalker;
 use Doctrine\Persistence\ManagerRegistry;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -355,7 +356,7 @@ class PaginationExtensionTest extends TestCase
         $this->assertFalse($query->getHint(CountWalker::HINT_DISTINCT));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('fetchJoinCollectionProvider')]
+    #[DataProvider('fetchJoinCollectionProvider')]
     public function testGetResultWithFetchJoinCollection(bool $paginationFetchJoinCollection, array $context, bool $expected): void
     {
         $dummyMetadata = new ClassMetadata(Dummy::class);
@@ -402,7 +403,7 @@ class PaginationExtensionTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('fetchUseOutputWalkersProvider')]
+    #[DataProvider('fetchUseOutputWalkersProvider')]
     public function testGetResultWithUseOutputWalkers(bool $paginationUseOutputWalkers, array $context, bool $expected): void
     {
         $dummyMetadata = new ClassMetadata(Dummy::class);

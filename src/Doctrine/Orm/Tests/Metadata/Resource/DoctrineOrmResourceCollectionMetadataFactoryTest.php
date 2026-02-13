@@ -32,6 +32,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 
@@ -67,7 +68,7 @@ class DoctrineOrmResourceCollectionMetadataFactoryTest extends TestCase
         $this->assertNull($resourceMetadataCollection->getOperation('graphql_get')->getProvider());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('operationProvider')]
+    #[DataProvider('operationProvider')]
     public function testWithProvider(HttpOperation $operation, ?string $expectedProvider = null, ?string $expectedProcessor = null): void
     {
         $objectManager = $this->prophesize(EntityManagerInterface::class);

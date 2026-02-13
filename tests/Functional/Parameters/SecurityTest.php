@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Functional\Parameters;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\WithSecurityParameter;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 
@@ -39,7 +40,7 @@ final class SecurityTest extends ApiTestCase
         yield [['ROLE_USER'], Response::HTTP_FORBIDDEN];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataUserAuthorization')]
+    #[DataProvider('dataUserAuthorization')]
     public function testUserAuthorization(array $roles, int $expectedStatusCode): void
     {
         $client = self::createClient();
@@ -64,7 +65,7 @@ final class SecurityTest extends ApiTestCase
         yield ['not_the_expected_parameter_value', Response::HTTP_FORBIDDEN];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataSecurityValues')]
+    #[DataProvider('dataSecurityValues')]
     public function testSecurityHeaderValues(string $parameterValue, int $expectedStatusCode): void
     {
         self::createClient()->request('GET', 'with_security_parameters_collection', [
@@ -75,7 +76,7 @@ final class SecurityTest extends ApiTestCase
         $this->assertResponseStatusCodeSame($expectedStatusCode);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataSecurityValues')]
+    #[DataProvider('dataSecurityValues')]
     public function testSecurityQueryValues(string $parameterValue, int $expectedStatusCode): void
     {
         self::createClient()->request('GET', \sprintf('with_security_parameters_collection?secret=%s', $parameterValue));

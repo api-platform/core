@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Symfony\Bundle\DependencyInjection;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Configuration;
 use Doctrine\ORM\OptimisticLockException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Controller\ControllerHelper;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -255,7 +256,7 @@ class ConfigurationTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('invalidHttpStatusCodeProvider')]
+    #[DataProvider('invalidHttpStatusCodeProvider')]
     public function testExceptionToStatusConfigWithInvalidHttpStatusCode($invalidHttpStatusCode): void
     {
         $this->expectException(InvalidConfigurationException::class);
@@ -282,7 +283,7 @@ class ConfigurationTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('invalidHttpStatusCodeValueProvider')]
+    #[DataProvider('invalidHttpStatusCodeValueProvider')]
     public function testExceptionToStatusConfigWithInvalidHttpStatusCodeValue($invalidHttpStatusCodeValue): void
     {
         $this->expectException(InvalidTypeException::class);

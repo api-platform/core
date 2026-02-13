@@ -23,6 +23,7 @@ use ApiPlatform\State\SerializerContextBuilderInterface;
 use ApiPlatform\Symfony\Bundle\ArgumentResolver\PayloadArgumentResolver;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ResourceImplementation;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ResourceInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -75,7 +76,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
         $this->assertTrue($resolver->supports($request, $argument));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideUnsupportedArguments')]
+    #[DataProvider('provideUnsupportedArguments')]
     public function testItDoesNotSupportArgumentThatCannotBeResolved(ArgumentMetadata $argument): void
     {
         $resolver = $this->createArgumentResolver();
@@ -89,7 +90,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
         $this->assertFalse($resolver->supports($request, $argument));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideUnsupportedRequests')]
+    #[DataProvider('provideUnsupportedRequests')]
     public function testItDoesNotSupportRequestWithoutPayloadOfExpectedType(Request $request): void
     {
         $resolver = $this->createArgumentResolver();
@@ -183,7 +184,7 @@ class PayloadArgumentResolverTest extends KernelTestCase
         yield 'variadic argument' => [self::createArgumentMetadata(ResourceImplementation::class, true)];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideIntegrationCases')]
+    #[DataProvider('provideIntegrationCases')]
     public function testIntegration(Request $request, callable $controller, array $expectedArguments): void
     {
         self::bootKernel();
