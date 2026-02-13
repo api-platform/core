@@ -121,7 +121,9 @@ class IriConverter implements IriConverterInterface
         }
 
         if ($operation instanceof HttpOperation && 301 === $operation->getStatus()) {
-            $operation = ($operation instanceof CollectionOperationInterface ? new GetCollection() : new Get())->withClass($operation->getClass());
+            /** @var class-string $operationClass */
+            $operationClass = $operation->getClass() ?? $resourceClass;
+            $operation = ($operation instanceof CollectionOperationInterface ? new GetCollection() : new Get())->withClass($operationClass);
             unset($context['uri_variables']);
         }
 

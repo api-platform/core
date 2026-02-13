@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Workbench\App\Providers;
 
+use ApiPlatform\Laravel\Eloquent\Filter\EqualsFilter;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Console\View\Components\Factory;
 use Illuminate\Filesystem\Filesystem;
@@ -41,6 +42,7 @@ class WorkbenchServiceProvider extends ServiceProvider
         $this->app->singleton(MockPurger::class, static fn ($app) => new MockPurger());
         $this->app->singleton(DummyService::class, static fn ($app) => new DummyService($app['config']->get('api-platform.title')));
         $this->app->singleton(CustomProviderWithDependency::class, static fn ($app) => new CustomProviderWithDependency($app->make(DummyService::class)));
+        $this->app->singleton('app.exact_filter', static fn ($app) => new EqualsFilter());
     }
 
     /**

@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
 
 final class PartialSearchFilter implements FilterInterface
 {
+    use NestedPropertyTrait;
     use QueryPropertyTrait;
 
     /**
@@ -27,6 +28,11 @@ final class PartialSearchFilter implements FilterInterface
      */
     public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder
     {
-        return $builder->{$context['whereClause'] ?? 'where'}($this->getQueryProperty($parameter), 'like', '%'.$values.'%');
+        return $this->applyWithNestedProperty(
+            $builder,
+            $parameter,
+            static fn (Builder $query, string $property, string $whereClause) => $query->{$whereClause}($property, 'like', '%'.$values.'%'),
+            $context['whereClause'] ?? 'where'
+        );
     }
 }

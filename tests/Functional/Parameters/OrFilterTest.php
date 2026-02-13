@@ -79,6 +79,34 @@ final class OrFilterTest extends ApiTestCase
         $this->assertStringContainsString('WHERE c1_.id = ? AND (c2_.name = ? OR c2_.ean = ?))', end($db->getQueries()['default'])['sql']);
     }
 
+    public function testOrFilterWithOneToManyRelation(): void
+    {
+        $client = self::createClient();
+        $response = $client->request('GET', '/chicken_coops?chickenNameOrEan=Gertrude')->toArray();
+
+        $this->assertJsonContains(['totalItems' => 1]);
+        $this->assertCount(1, $response['member']);
+        $this->assertArrayHasKey('chickens', $response['member'][0]);
+    }
+
+    public function testOrFilterWithOneToManyRelationByEan(): void
+    {
+        $client = self::createClient();
+        $response = $client->request('GET', '/chicken_coops?chickenNameOrEan=978020137962')->toArray();
+
+        $this->assertJsonContains(['totalItems' => 1]);
+        $this->assertCount(1, $response['member']);
+    }
+
+    public function testOrFilterWithOneToManyRelationMultipleMatches(): void
+    {
+        $client = self::createClient();
+        $response = $client->request('GET', '/chicken_coops?chickenNameOrEan=ette')->toArray();
+
+        $this->assertJsonContains(['totalItems' => 2]);
+        $this->assertCount(2, $response['member']);
+    }
+
     public static function orFilterDataProvider(): \Generator
     {
         yield 'ean through autocomplete' => [
@@ -104,6 +132,7 @@ final class OrFilterTest extends ApiTestCase
 
         $chickenCoop1 = new $coopClass();
         $chickenCoop2 = new $coopClass();
+        $chickenCoop3 = new $coopClass();
 
         $chicken1 = new $chickenClass();
         $chicken1->setName('Gertrude');
@@ -115,13 +144,21 @@ final class OrFilterTest extends ApiTestCase
         $chicken2->setEan('978020137963');
         $chicken2->setChickenCoop($chickenCoop2);
 
+        $chicken3 = new $chickenClass();
+        $chicken3->setName('Violette');
+        $chicken3->setEan('978020137964');
+        $chicken3->setChickenCoop($chickenCoop3);
+
         $chickenCoop1->addChicken($chicken1);
         $chickenCoop2->addChicken($chicken2);
+        $chickenCoop3->addChicken($chicken3);
 
         $manager->persist($chicken1);
         $manager->persist($chicken2);
+        $manager->persist($chicken3);
         $manager->persist($chickenCoop1);
         $manager->persist($chickenCoop2);
+        $manager->persist($chickenCoop3);
         $manager->flush();
     }
 }

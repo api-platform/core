@@ -29,6 +29,8 @@ use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\WithParameter;
 use ApiPlatform\OpenApi\Model\Parameter;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+use Symfony\Component\TypeInfo\Type;
 
 class ParameterResourceMetadataCollectionFactoryTest extends TestCase
 {
@@ -37,13 +39,11 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
         $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'hydra', 'everywhere']));
         $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
-        $propertyMetadata->method('create')->willReturnOnConsecutiveCalls(
-            new ApiProperty(identifier: true),
-            new ApiProperty(readable: true),
-            new ApiProperty(readable: true),
-            new ApiProperty(identifier: true),
-            new ApiProperty(readable: true),
-            new ApiProperty(readable: true)
+        $propertyMetadata->method('create')->willReturnCallback(
+            static fn (string $class, string $property) => match ($property) {
+                'id' => new ApiProperty(identifier: true),
+                default => new ApiProperty(readable: true),
+            }
         );
         $filterLocator = $this->createStub(ContainerInterface::class);
         $filterLocator->method('has')->willReturn(true);
@@ -136,18 +136,59 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertSame('static_param', $staticParam->getKey());
     }
 
+    public function testQueryParameterWithNestedPropertyPlaceholder(): void
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'name', 'related']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+
+        $resourceMetadataCollection = $parameterFactory->create(HasNestedParameterAttribute::class);
+        $operation = $resourceMetadataCollection->getOperation(forceCollection: true);
+        $parameters = $operation->getParameters();
+
+        $this->assertInstanceOf(Parameters::class, $parameters);
+
+        $this->assertFalse($parameters->has('search[:property]'));
+        $this->assertTrue($parameters->has('search[name]'));
+        $this->assertTrue($parameters->has('search[related.nested]'));
+
+        $searchNameParam = $parameters->get('search[name]');
+        $this->assertInstanceOf(QueryParameter::class, $searchNameParam);
+        $this->assertNull($searchNameParam->getDescription());
+        $this->assertSame('name', $searchNameParam->getProperty());
+        $this->assertSame('search[name]', $searchNameParam->getKey());
+
+        $searchRelatedNestedParam = $parameters->get('search[related.nested]');
+        $this->assertInstanceOf(QueryParameter::class, $searchRelatedNestedParam);
+        $this->assertNull($searchRelatedNestedParam->getDescription());
+        $this->assertSame('related.nested', $searchRelatedNestedParam->getProperty());
+        $this->assertSame('search[related.nested]', $searchRelatedNestedParam->getKey());
+    }
+
     public function testParameterFactoryNoFilter(): void
     {
         $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
         $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'hydra', 'everywhere']));
         $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
-        $propertyMetadata->method('create')->willReturnOnConsecutiveCalls(
-            new ApiProperty(identifier: true),
-            new ApiProperty(readable: true),
-            new ApiProperty(readable: true),
-            new ApiProperty(identifier: true),
-            new ApiProperty(readable: true),
-            new ApiProperty(readable: true)
+        $propertyMetadata->method('create')->willReturnCallback(
+            static fn (string $class, string $property) => match ($property) {
+                'id' => new ApiProperty(identifier: true),
+                default => new ApiProperty(readable: true),
+            }
         );
         $filterLocator = $this->createStub(ContainerInterface::class);
         $filterLocator->method('has')->willReturn(false);
@@ -197,6 +238,151 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertSame('name', $param->getKey());
         $this->assertSame(['name'], $param->getProperties());
     }
+
+    public function testNestedPropertyWithNameConverter(): void
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'name', 'related']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator,
+            new CamelCaseToSnakeCaseNameConverter()
+        );
+
+        $resourceMetadataCollection = $parameterFactory->create(HasNestedParameterAttribute::class);
+        $operation = $resourceMetadataCollection->getOperation(forceCollection: true);
+        $parameters = $operation->getParameters();
+
+        $this->assertInstanceOf(Parameters::class, $parameters);
+
+        $this->assertFalse($parameters->has('search[:property]'));
+
+        $this->assertTrue($parameters->has('search[name]'));
+        $searchSimpleParam = $parameters->get('search[name]');
+        $this->assertSame('name', $searchSimpleParam->getProperty());
+        $this->assertSame('search[name]', $searchSimpleParam->getKey());
+
+        $this->assertTrue($parameters->has('search[related.nested]'));
+        $searchNestedParam = $parameters->get('search[related.nested]');
+
+        $this->assertSame('related.nested', $searchNestedParam->getProperty());
+        $this->assertSame('search[related.nested]', $searchNestedParam->getKey());
+    }
+
+    private function createNestedPropertyFactory(): ParameterResourceMetadataCollectionFactory
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'name']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturnCallback(
+            static function (string $class, string $property): ApiProperty {
+                if (NestedTestOrder::class === $class && 'product' === $property) {
+                    return new ApiProperty(readable: true, nativeType: Type::object(NestedTestProduct::class));
+                }
+                if (NestedTestProduct::class === $class && 'productVariations' === $property) {
+                    return new ApiProperty(readable: true, nativeType: Type::list(Type::object(NestedTestVariation::class)));
+                }
+
+                return new ApiProperty(readable: true);
+            }
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        return new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator,
+            new CamelCaseToSnakeCaseNameConverter(),
+        );
+    }
+
+    public function testNestedPropertyInfoOnSingularProperty(): void
+    {
+        $factory = $this->createNestedPropertyFactory();
+        $collection = $factory->create(NestedTestOrder::class);
+        $operation = $collection->getOperation(forceCollection: true);
+        $parameters = $operation->getParameters();
+
+        $param = $parameters->get('product.name');
+        $this->assertNotNull($param, 'Parameter product.name should exist');
+
+        $extra = $param->getExtraProperties();
+        $this->assertArrayHasKey('nested_property_info', $extra);
+
+        $info = $extra['nested_property_info'];
+        $this->assertSame(['product'], $info['relation_segments']);
+        $this->assertSame(['product'], $info['converted_relation_segments']);
+        $this->assertSame('name', $info['leaf_property']);
+        $this->assertSame(NestedTestProduct::class, $info['leaf_class']);
+        $this->assertSame([NestedTestOrder::class], $info['relation_classes']);
+    }
+
+    public function testNestedPropertyInfoOnDeeplyNestedProperty(): void
+    {
+        $factory = $this->createNestedPropertyFactory();
+        $collection = $factory->create(NestedTestOrder::class);
+        $operation = $collection->getOperation('deep_collection');
+        $parameters = $operation->getParameters();
+
+        $param = $parameters->get('product.productVariations.variantName');
+        $this->assertNotNull($param, 'Parameter product.productVariations.variantName should exist');
+
+        $extra = $param->getExtraProperties();
+        $this->assertArrayHasKey('nested_property_info', $extra);
+
+        $info = $extra['nested_property_info'];
+        $this->assertSame(['product', 'productVariations'], $info['relation_segments']);
+        $this->assertSame(['product', 'product_variations'], $info['converted_relation_segments']);
+        $this->assertSame('variant_name', $info['leaf_property']);
+        $this->assertSame(NestedTestVariation::class, $info['leaf_class']);
+        $this->assertSame([NestedTestOrder::class, NestedTestProduct::class], $info['relation_classes']);
+    }
+
+    public function testNestedPropertyInfoOnExpandedPlaceholderParameter(): void
+    {
+        $factory = $this->createNestedPropertyFactory();
+        $collection = $factory->create(NestedTestOrder::class);
+        $operation = $collection->getOperation('search_collection');
+        $parameters = $operation->getParameters();
+
+        $searchProductName = $parameters->get('search[product.name]');
+        $this->assertNotNull($searchProductName, 'Parameter search[product.name] should exist');
+
+        $extra = $searchProductName->getExtraProperties();
+        $this->assertArrayHasKey('nested_property_info', $extra);
+
+        $info = $extra['nested_property_info'];
+        $this->assertSame(['product'], $info['relation_segments']);
+        $this->assertSame('name', $info['leaf_property']);
+        $this->assertSame(NestedTestProduct::class, $info['leaf_class']);
+    }
+
+    public function testSimplePropertyHasNoNestedPropertyInfo(): void
+    {
+        $factory = $this->createNestedPropertyFactory();
+        $collection = $factory->create(NestedTestOrder::class);
+        $operation = $collection->getOperation(forceCollection: true);
+        $parameters = $operation->getParameters();
+
+        $param = $parameters->get('name');
+        $this->assertNotNull($param);
+        $this->assertArrayNotHasKey('nested_property_info', $param->getExtraProperties());
+    }
 }
 
 #[ApiResource(
@@ -219,4 +405,71 @@ class HasParameterAttribute
     public $id;
     public $name;
     public $description;
+}
+
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            parameters: [
+                'search[:property]' => new QueryParameter(
+                    properties: ['name', 'related.nested']
+                ),
+            ]
+        ),
+    ]
+)]
+class HasNestedParameterAttribute
+{
+    public $id;
+    public $name;
+    public $related;
+}
+
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            parameters: [
+                'name' => new QueryParameter(),
+                'product.name' => new QueryParameter(property: 'product.name'),
+            ]
+        ),
+        new GetCollection(
+            uriTemplate: '/nested_test_orders/deep',
+            name: 'deep_collection',
+            parameters: [
+                'product.productVariations.variantName' => new QueryParameter(property: 'product.productVariations.variantName'),
+            ]
+        ),
+        new GetCollection(
+            uriTemplate: '/nested_test_orders/search',
+            name: 'search_collection',
+            parameters: [
+                'search[:property]' => new QueryParameter(
+                    properties: ['name', 'product.name']
+                ),
+            ]
+        ),
+    ]
+)]
+class NestedTestOrder
+{
+    public ?int $id = null;
+    public ?string $name = null;
+    public ?NestedTestProduct $product = null;
+}
+
+#[ApiResource]
+class NestedTestProduct
+{
+    public ?int $id = null;
+    public ?string $name = null;
+    /** @var NestedTestVariation[] */
+    public array $productVariations = [];
+}
+
+#[ApiResource]
+class NestedTestVariation
+{
+    public ?int $id = null;
+    public ?string $variantName = null;
 }
