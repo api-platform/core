@@ -187,7 +187,16 @@ final class ItemNormalizer extends AbstractItemNormalizer
         if (!isset($metadata['@type']) && $operation) {
             $types = $operation instanceof HttpOperation ? $operation->getTypes() : null;
             if (null === $types) {
-                $types = [$operation->getShortName()];
+                // TODO: 5.x break on this as this looks wrong, CollectionReferencingItem returns an IRI that point through
+                // ItemReferencedInCollection but it returns a CollectionReferencingItem therefore we should use the current
+                // object's class Type and not rely on operation ?
+                // Use resource-level shortName to avoid operation-specific overrides
+                $typeClass = $isResourceClass ? $resourceClass : ($operation->getClass() ?? $resourceClass);
+                try {
+                    $types = [$this->resourceMetadataCollectionFactory->create($typeClass)[0]->getShortName()];
+                } catch (\Exception) {
+                    $types = [$operation->getShortName()];
+                }
             }
             $metadata['@type'] = 1 === \count($types) ? $types[0] : $types;
         }

@@ -115,12 +115,11 @@ class IriConverter implements IriConverterInterface
         // This is only for when a class (that is not a resource) extends another one that is a resource, we should remove this behavior
         // Skip this if getResourceClassForIri already determined the class via operation stateOptions
         if (!\is_string($resource) && $resourceClass === $this->getObjectClass($resource)) {
-            /** @var class-string $resourceClass */
             $resourceClass = $this->getResourceClass($resource, true) ?? $resourceClass;
         }
 
         if (!$operation) {
-            $operation = (new Get())->withClass($resourceClass);
+            $operation = (new Get())->withClass($resourceClass); // @phpstan-ignore-line
         }
 
         if ($operation instanceof HttpOperation && 301 === $operation->getStatus()) {
