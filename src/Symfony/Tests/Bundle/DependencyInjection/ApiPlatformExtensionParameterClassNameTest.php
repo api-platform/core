@@ -68,12 +68,6 @@ class ApiPlatformExtensionParameterClassNameTest extends TestCase
     {
         $config = [
             'api_platform' => [
-                'title' => 'Test API',
-                'description' => 'Test Description',
-                'version' => '1.0.0',
-                'formats' => ['json' => ['mime_types' => ['application/json']]],
-                'error_formats' => [],
-                'patch_formats' => [],
                 'defaults' => [
                     'parameters' => [
                         'ApiPlatform\Metadata\HeaderParameter' => [
@@ -95,7 +89,6 @@ class ApiPlatformExtensionParameterClassNameTest extends TestCase
         $defaults = $this->container->getParameter('api_platform.defaults');
         $this->assertArrayHasKey('parameters', $defaults);
 
-        /** @var Parameters $parameters */
         $parameters = $defaults['parameters'];
         $this->assertInstanceOf(Parameters::class, $parameters);
 
@@ -116,12 +109,6 @@ class ApiPlatformExtensionParameterClassNameTest extends TestCase
     {
         $config = [
             'api_platform' => [
-                'title' => 'Test API',
-                'description' => 'Test Description',
-                'version' => '1.0.0',
-                'formats' => ['json' => ['mime_types' => ['application/json']]],
-                'error_formats' => [],
-                'patch_formats' => [],
                 'defaults' => [
                     'parameters' => [
                         'ApiPlatform\Metadata\HeaderParameter' => [
@@ -140,8 +127,10 @@ class ApiPlatformExtensionParameterClassNameTest extends TestCase
         (new ApiPlatformExtension())->load($config, $this->container);
 
         $defaults = $this->container->getParameter('api_platform.defaults');
-        /** @var Parameters $parameters */
+        $this->assertArrayHasKey('parameters', $defaults);
+
         $parameters = $defaults['parameters'];
+        $this->assertInstanceOf(Parameters::class, $parameters);
 
         $paramArray = iterator_to_array($parameters);
 
@@ -156,12 +145,6 @@ class ApiPlatformExtensionParameterClassNameTest extends TestCase
     {
         $config = [
             'api_platform' => [
-                'title' => 'Test API',
-                'description' => 'Test Description',
-                'version' => '1.0.0',
-                'formats' => ['json' => ['mime_types' => ['application/json']]],
-                'error_formats' => [],
-                'patch_formats' => [],
                 'defaults' => [
                     'parameters' => [
                         'ApiPlatform\Metadata\HeaderParameter' => [
@@ -176,8 +159,10 @@ class ApiPlatformExtensionParameterClassNameTest extends TestCase
         (new ApiPlatformExtension())->load($config, $this->container);
 
         $defaults = $this->container->getParameter('api_platform.defaults');
-        /** @var Parameters $parameters */
+        $this->assertArrayHasKey('parameters', $defaults);
+
         $parameters = $defaults['parameters'];
+        $this->assertInstanceOf(Parameters::class, $parameters);
 
         $paramArray = iterator_to_array($parameters);
         $this->assertNotEmpty($paramArray);
