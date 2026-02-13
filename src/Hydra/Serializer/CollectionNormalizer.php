@@ -36,8 +36,10 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
 
     public const FORMAT = 'jsonld';
     public const IRI_ONLY = 'iri_only';
+    public const PRESERVE_COLLECTION_KEYS = 'preserve_collection_keys';
     private array $defaultContext = [
         self::IRI_ONLY => false,
+        self::PRESERVE_COLLECTION_KEYS => false,
     ];
 
     public function __construct(private readonly ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, private readonly IriConverterInterface $iriConverter, array $defaultContext = [])
@@ -79,12 +81,19 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
         $hydraPrefix = $this->getHydraPrefix($context + $this->defaultContext);
         $data = [$hydraPrefix.'member' => []];
         $iriOnly = $context[self::IRI_ONLY] ?? $this->defaultContext[self::IRI_ONLY];
+        $preserveCollectionKey = $context[self::PRESERVE_COLLECTION_KEYS] ?? $this->defaultContext[self::PRESERVE_COLLECTION_KEYS];
 
-        foreach ($object as $obj) {
+        foreach ($object as $key => $obj) {
             if ($iriOnly) {
-                $data[$hydraPrefix.'member'][] = $this->iriConverter->getIriFromResource($obj, UrlGeneratorInterface::ABS_PATH, null, $context);
+                $normalizedItem = $this->iriConverter->getIriFromResource($obj, UrlGeneratorInterface::ABS_PATH, null, $context);
             } else {
-                $data[$hydraPrefix.'member'][] = $this->normalizer->normalize($obj, $format, $context + ['jsonld_has_context' => true]);
+                $normalizedItem = $this->normalizer->normalize($obj, $format, $context + ['jsonld_has_context' => true]);
+            }
+
+            if ($preserveCollectionKey) {
+                $data[$hydraPrefix.'member'][$key] = $normalizedItem;
+            } else {
+                $data[$hydraPrefix.'member'][] = $normalizedItem;
             }
         }
 
