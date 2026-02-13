@@ -217,7 +217,7 @@ return function (ContainerConfigurator $container) {
     $services->alias('api_platform.state.item_provider', 'ApiPlatform\Doctrine\Odm\State\ItemProvider');
 
     $services->set('api_platform.doctrine.odm.metadata.resource.metadata_collection_factory', DoctrineMongoDbOdmResourceCollectionMetadataFactory::class)
-        ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 40)
+        ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, -50)
         ->args([
             service('doctrine_mongodb'),
             service('api_platform.doctrine.odm.metadata.resource.metadata_collection_factory.inner'),

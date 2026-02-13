@@ -247,7 +247,7 @@ return function (ContainerConfigurator $container) {
         ->args([[]]);
 
     $services->set('api_platform.doctrine.orm.metadata.resource.metadata_collection_factory', DoctrineOrmResourceCollectionMetadataFactory::class)
-        ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 40)
+        ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, -50)
         ->args([
             service('doctrine'),
             service('api_platform.doctrine.orm.metadata.resource.metadata_collection_factory.inner'),
