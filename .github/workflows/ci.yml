@@ -769,14 +769,25 @@ jobs:
           php-coveralls --coverage_clover=build/logs/behat/clover.xml
         continue-on-error: true
 
-  elasticsearch-v9:
-    name: Behat (PHP ${{ matrix.php }}) (Elasticsearch v9)
-    runs-on: ubuntu-latest
+  elasticsearch:
+    name: Behat (PHP ${{ matrix.php }}) (Elasticsearch ${{ matrix.elasticsearch-version }})
+    runs-on: ubuntu-22.04
     timeout-minutes: 20
     strategy:
       matrix:
-        php:
-          - '8.5'
+        include:
+          - php: '8.5'
+            elasticsearch-version: '9.0.0'
+            elasticsearch-package: ''
+            extensions: 'intl, bcmath, curl, openssl, mbstring, mongodb'
+          - php: '8.5'
+            elasticsearch-version: '8.4.0'
+            elasticsearch-package: 'elasticsearch/elasticsearch:^8.4'
+            extensions: 'intl, bcmath, curl, openssl, mbstring'
+          - php: '8.3'
+            elasticsearch-version: '7.17.0'
+            elasticsearch-package: 'elasticsearch/elasticsearch:prefer-lowest'
+            extensions: 'intl, bcmath, curl, openssl, mbstring'
       fail-fast: false
     env:
       APP_ENV: elasticsearch
@@ -792,14 +803,14 @@ jobs:
       - name: Runs Elasticsearch
         uses: elastic/elastic-github-actions/elasticsearch@master
         with:
-          stack-version: '9.0.0'
+          stack-version: ${{ matrix.elasticsearch-version }}
           security-enabled: false
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
           tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring, mongodb
+          extensions: ${{ matrix.extensions }}
           coverage: none
           ini-values: memory_limit=-1
       - name: Get composer cache directory
@@ -816,112 +827,11 @@ jobs:
           composer global require soyuka/pmu
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
-      - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
-      - name: Run Behat tests
-        run: vendor/bin/behat --out=std --format=progress --profile=elasticsearch --no-interaction
-
-  elasticsearch-v8:
-    name: Behat (PHP ${{ matrix.php }}) (Elasticsearch v8)
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    strategy:
-      matrix:
-        php:
-          - '8.5'
-      fail-fast: false
-    env:
-      APP_ENV: elasticsearch
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-      - name: Configure sysctl limits
-        run: |
-          sudo swapoff -a
-          sudo sysctl -w vm.swappiness=1
-          sudo sysctl -w fs.file-max=262144
-          sudo sysctl -w vm.max_map_count=262144
-      - name: Runs Elasticsearch
-        uses: elastic/elastic-github-actions/elasticsearch@master
-        with:
-          stack-version: '8.4.0'
-          security-enabled: false
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring
-          coverage: none
-          ini-values: memory_limit=-1
-      - name: Get composer cache directory
-        id: composercache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-      - name: Cache dependencies
-        uses: actions/cache@v5
-        with:
-          path: ${{ steps.composercache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
-          restore-keys: ${{ runner.os }}-composer-
-      - name: Update project dependencies
-        run: |
-          composer global require soyuka/pmu
-          composer global config allow-plugins.soyuka/pmu true --no-interaction
-          composer global link .
-          composer require elasticsearch/elasticsearch "^8.4" -W
-      - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
-      - name: Run Behat tests
-        run: vendor/bin/behat --out=std --format=progress --profile=elasticsearch --no-interaction
-
-  elasticsearch-v7:
-    name: Behat (PHP ${{ matrix.php }}) (Elasticsearch v7)
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    strategy:
-      matrix:
-        php:
-          - '8.3'
-      fail-fast: false
-    env:
-      APP_ENV: elasticsearch
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-      - name: Configure sysctl limits
-        run: |
-          sudo swapoff -a
-          sudo sysctl -w vm.swappiness=1
-          sudo sysctl -w fs.file-max=262144
-          sudo sysctl -w vm.max_map_count=262144
-      - name: Runs Elasticsearch
-        uses: elastic/elastic-github-actions/elasticsearch@master
-        with:
-          stack-version: '7.17.0'
-          security-enabled: false
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          tools: pecl, composer
-          extensions: intl, bcmath, curl, openssl, mbstring
-          coverage: none
-          ini-values: memory_limit=-1
-      - name: Get composer cache directory
-        id: composercache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-      - name: Cache dependencies
-        uses: actions/cache@v5
-        with:
-          path: ${{ steps.composercache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
-          restore-keys: ${{ runner.os }}-composer-
-      - name: Update project dependencies
-        run: |
-          composer global require soyuka/pmu
-          composer global config allow-plugins.soyuka/pmu true --no-interaction
-          composer global link .
-          composer update elasticsearch/elasticsearch --prefer-lowest
+          if [ "${{ matrix.elasticsearch-package }}" == "elasticsearch/elasticsearch:^8.4" ]; then
+            composer require elasticsearch/elasticsearch "^8.4" -W
+          elif [ "${{ matrix.elasticsearch-package }}" == "elasticsearch/elasticsearch:prefer-lowest" ]; then
+            composer update elasticsearch/elasticsearch --prefer-lowest
+          fi
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
