@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Hal\Serializer;
 use ApiPlatform\Hal\Serializer\ObjectNormalizer;
 use ApiPlatform\Hal\Tests\Fixtures\Dummy;
 use ApiPlatform\Metadata\IriConverterInterface;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -42,7 +43,7 @@ class ObjectNormalizerTest extends TestCase
         $normalizer->denormalize(['foo'], 'Foo');
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('legacy')]
+    #[Group('legacy')]
     public function testSupportsNormalization(): void
     {
         $std = new \stdClass();

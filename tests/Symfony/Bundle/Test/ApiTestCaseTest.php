@@ -33,6 +33,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceInterface;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -161,7 +162,7 @@ JSON;
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('providerFormats')]
-    #[\PHPUnit\Framework\Attributes\Group('orm')]
+    #[Group('orm')]
     public function testAssertMatchesResourceCollectionJsonSchemaKeepSerializationContext(string $format, string $mimeType): void
     {
         $this->recreateSchema([Issue6146Parent::class, Issue6146Child::class]);
@@ -202,7 +203,7 @@ JSON;
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('providerFormats')]
-    #[\PHPUnit\Framework\Attributes\Group('orm')]
+    #[Group('orm')]
     public function testAssertMatchesResourceItemJsonSchemaWithCustomJson(string $format, string $mimeType): void
     {
         $this->recreateSchema([JsonSchemaContextDummy::class]);
@@ -218,7 +219,7 @@ JSON;
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('providerFormats')]
-    #[\PHPUnit\Framework\Attributes\Group('orm')]
+    #[Group('orm')]
     public function testAssertMatchesResourceItemJsonSchemaOutput(string $format, string $mimeType): void
     {
         $this->recreateSchema([DummyDtoInputOutput::class]);
@@ -235,7 +236,7 @@ JSON;
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('providerFormats')]
-    #[\PHPUnit\Framework\Attributes\Group('orm')]
+    #[Group('orm')]
     public function testAssertMatchesResourceItemAndCollectionJsonSchemaOutputWithContext(string $format, string $mimeType): void
     {
         $this->recreateSchema([User::class]);
@@ -256,7 +257,7 @@ JSON;
         $this->assertMatchesResourceCollectionJsonSchema(User::class, null, $format, ['groups' => ['api-test-case-group']]);
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('orm')]
+    #[Group('orm')]
     public function testAssertMatchesResourceItemAndCollectionJsonSchemaOutputWithRangeAssertions(): void
     {
         $this->recreateSchema([NumericValidated::class]);
@@ -297,7 +298,7 @@ JSON;
         $this->assertArraySubset([1, 2], [1, 2, 3]);
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('orm')]
+    #[Group('orm')]
     public function testFindIriBy(): void
     {
         $this->recreateSchema([Dummy::class, RelatedOwnedDummy::class, RelatedDummy::class]);
@@ -325,7 +326,7 @@ JSON;
         $this->assertResponseIsSuccessful();
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('mercure')]
+    #[Group('mercure')]
     public function testGetMercureMessages(): void
     {
         self::bootKernel(['environment' => 'mercure']);
