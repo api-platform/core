@@ -47,6 +47,8 @@ use ApiPlatform\Metadata\McpResource;
 use ApiPlatform\Metadata\McpTool;
 use ApiPlatform\Metadata\NotExposed;
 use ApiPlatform\Metadata\OperationMutatorInterface;
+use ApiPlatform\Metadata\Parameter;
+use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
@@ -439,7 +441,64 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $normalizedDefaults['extra_properties'][$option] = $value;
         }
 
+        if (isset($normalizedDefaults['parameters']) && \is_array($normalizedDefaults['parameters'])) {
+            $normalizedDefaults['parameters'] = $this->normalizeParametersConfig($normalizedDefaults['parameters']);
+        }
+
         return $normalizedDefaults;
+    }
+
+    private function normalizeParametersConfig(array $parametersConfig): Parameters|array
+    {
+        $parameters = [];
+        $hasClassNames = false;
+
+        foreach ($parametersConfig as $key => $config) {
+            if (class_exists($key) && is_subclass_of($key, Parameter::class)) {
+                $hasClassNames = true;
+                $parameterClass = $key;
+                $parameterConfig = \is_array($config) ? $config : [];
+
+                try {
+                    $reflection = new \ReflectionClass($parameterClass);
+                    $constructor = $reflection->getConstructor();
+
+                    if (null === $constructor) {
+                        continue;
+                    }
+
+                    $args = [];
+                    foreach ($constructor->getParameters() as $param) {
+                        $paramName = $param->getName();
+                        if (isset($parameterConfig[$paramName])) {
+                            $args[$paramName] = $parameterConfig[$paramName];
+                        } elseif ($param->isDefaultValueAvailable()) {
+                            $args[$paramName] = $param->getDefaultValue();
+                        }
+                    }
+
+                    $instance = $reflection->newInstance(...$args);
+
+                    if (null !== $instance->getKey()) {
+                        $parameters[$instance->getKey()] = $instance;
+                    }
+                } catch (\ReflectionException|\TypeError $e) {
+                    continue;
+                }
+            } else {
+                $parameters[$key] = $config;
+            }
+        }
+
+        if ($hasClassNames || !empty($parameters)) {
+            try {
+                return new Parameters($parameters);
+            } catch (\Throwable $e) {
+                return $parameters;
+            }
+        }
+
+        return $parameters;
     }
 
     private function registerMetadataConfiguration(ContainerBuilder $container, array $config, PhpFileLoader $loader): void
