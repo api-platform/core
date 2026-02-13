@@ -1,11 +1,35 @@
 # Changelog
 
-## Unreleased
+## v4.3.0-alpha.1
 
 ### Features
 
+* [fa3b69635](https://github.com/api-platform/core/commit/fa3b696355cd66ceb8b2b9c516bde469f61ca614) feat(mcp): introduce api-platform/mcp component (#7703)
+* [d13c24759](https://github.com/api-platform/core/commit/d13c24759cde050cd8eaa8b73f2fa1b686d562f8) feat: mcp bundle tool integration (#7595)
+* [ed0ae92ce](https://github.com/api-platform/core/commit/ed0ae92ce3d3b73aa8c388d4ae25c1a48712c2fb) feat: add support of collection to MCP (#7724)
+* [6e9e88dc2](https://github.com/api-platform/core/commit/6e9e88dc2e897ebe7e02716f28eec3115302de7a) feat(laravel): mcp support (#7709)
+* [05a5d4d93](https://github.com/api-platform/core/commit/05a5d4d938bbb24d3d45fdcf69034bd1265d9008) feat(laravel): object mapper (#7704)
+* [32e94848c](https://github.com/api-platform/core/commit/32e94848c78a28102d16eac6672588d4cf1fd62d) feat: support relations on filters (#7711)
+* [64b46b2d0](https://github.com/api-platform/core/commit/64b46b2d03146287bef91391d947772865cdb36e) feat(jsonschema): support for normalization/denormalization with attributes (#7629)
+* [359a128cd](https://github.com/api-platform/core/commit/359a128cd56934aeb3aefc13040fcd1206907157) feat(symfony): isGranted before provider (#7500)
+* [d640d106b](https://github.com/api-platform/core/commit/d640d106b27542c3ed8b718d0d83c3fe7b369f1a) feat(doctrine): uuid filter (#7628)
+* [6ba9c8b4d](https://github.com/api-platform/core/commit/6ba9c8b4dacf18253853017997e6355763f3ee5a) feat(doctrine): Add caseSensitive option to PartialSearchFilter (#7675)
+* [6f5d41458](https://github.com/api-platform/core/commit/6f5d41458b38aace891308c6907a3a0a6d890cac) feat(doctrine): remove PUT & PATCH for readonly entity (#7453)
+* [fe63ddec8](https://github.com/api-platform/core/commit/fe63ddec877af3fee8f5faafbea1b4c5ca0f1385) feat(validator): uuid/ulid parameter validation (#7649)
+* [c70cd449f](https://github.com/api-platform/core/commit/c70cd449f6055c38a8bf7b3edb53aae5cb4c6283) feat(json-schema): handle union object types in iterable properties (#7726)
+* [26d1ac4d6](https://github.com/api-platform/core/commit/26d1ac4d687143186731987e33163cf8448f0afc) feat: allow both uppercase and lowercase order direction in OrderFilter schema (#7741)
 * [21aa2572d](https://github.com/api-platform/core/commit/21aa2572d8fef2b3f05f7307c51348a6c9767e45) feat(elasticsearch): add SSL options for Elasticsearch configuration (#4059)
-* [ba0c76c](https://github.com/api-platform/core/commit/ba0c76c6f5c8afa8622e87a155b8b99f453d6453) feat(doctrine): remove put & path for readonly entity (#7019)
+* [1427dfa91](https://github.com/api-platform/core/commit/1427dfa9117bae55fb82b216f8acd6d651098767) feat(metadata): expose default attribute on parameters (#7551)
+* [350390ba3](https://github.com/api-platform/core/commit/350390ba30f9ff367ee62c967b97fad9f96551ff) feat(state): add headers to comply with LDP specification (#6917)
+* [8bdb2bc91](https://github.com/api-platform/core/commit/8bdb2bc919f24dfef26b3466ac391f7fe01c54fe) feat(symfony): allow symfony makers namespace configuration (#7497)
+* [45831a93c](https://github.com/api-platform/core/commit/45831a93c9d256d9ebecd3db13ac7db34e3778f1) feat: enable to skip autoconfiguration with new `SkipAutoconfigure` attribute (#7467)
+* [63fba2a4e](https://github.com/api-platform/core/commit/63fba2a4efc86d06ae70cc32a2f50fceac91ff82) feat(metadata): cache operation metadata factory (#7516)
+
+### Bug fixes
+
+* [28834e6d6](https://github.com/api-platform/core/commit/28834e6d6121f82775d38d57515206674f0c9e0c) fix(validator): validate entities after ObjectMapper transformation (#7731)
+* [390056fbb](https://github.com/api-platform/core/commit/390056fbbc6630b312ea25c887b33464a926a06f) fix(jsonld)!: item uri template type (#7518)
+* [149fe24a1](https://github.com/api-platform/core/commit/149fe24a103ada47eddd7035661ef681839e42bb) fix(doctrine): throw exception if property is null for the doctrine filters (#7681)
 
 ### Breaking changes
 
