@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Mcp\Server;
 
+use ApiPlatform\Mcp\State\ToolProvider;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\State\ProcessorInterface;
@@ -101,7 +102,7 @@ final class Handler implements RequestHandlerInterface
         }
 
         if (null === $operation->getProvider()) {
-            $operation = $operation->withProvider('api_platform.mcp.state.tool_provider');
+            $operation = $operation->withProvider(ToolProvider::class);
         }
 
         if (null === $operation->canDeserialize()) {
