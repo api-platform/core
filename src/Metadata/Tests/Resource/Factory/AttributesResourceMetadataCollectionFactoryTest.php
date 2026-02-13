@@ -268,6 +268,40 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertTrue($operations->has('password_reset'));
     }
 
+    public function testDeduplicateShortNamesWhenEnabled(): void
+    {
+        $factory = new AttributesResourceMetadataCollectionFactory(defaults: [
+            'extra_properties' => ['deduplicate_resource_short_names' => true],
+        ], graphQlEnabled: true);
+
+        $collection = $factory->create(AttributeResource::class);
+
+        // First resource keeps original shortName
+        $this->assertSame('AttributeResource', $collection[0]->getShortName());
+
+        // Second resource gets deduplicated shortName
+        $this->assertSame('AttributeResource2', $collection[1]->getShortName());
+
+        // Operations on the second resource also get the deduplicated shortName
+        foreach ($collection[1]->getOperations() as $operation) {
+            $this->assertSame('AttributeResource2', $operation->getShortName());
+        }
+    }
+
+    /** @group legacy */
+    public function testDeduplicateShortNamesTriggersDeprecationWhenDisabled(): void
+    {
+        $factory = new AttributesResourceMetadataCollectionFactory(graphQlEnabled: true);
+
+        $this->expectUserDeprecationMessage('Since api-platform/core 4.2: Having multiple "#[ApiResource]" attributes with the same "shortName" "AttributeResource" on class "ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeResource" is deprecated and will result in automatic short name deduplication in API Platform 5.x. Set "defaults.extra_properties.deduplicate_resource_short_names" to "true" in the API Platform configuration to enable it now.');
+
+        $collection = $factory->create(AttributeResource::class);
+
+        // Without the flag, shortNames are NOT deduplicated
+        $this->assertSame('AttributeResource', $collection[0]->getShortName());
+        $this->assertSame('AttributeResource', $collection[1]->getShortName());
+    }
+
     public function testWithParameters(): void
     {
         $attributeResourceMetadataCollectionFactory = new AttributesResourceMetadataCollectionFactory();

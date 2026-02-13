@@ -50,10 +50,6 @@ final class EntrypointNormalizer implements NormalizerInterface
             $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
             foreach ($resourceMetadata as $resource) {
-                if ($resource->getExtraProperties()['is_alternate_resource_metadata'] ?? false) {
-                    continue;
-                }
-
                 foreach ($resource->getOperations() as $operation) {
                     $key = lcfirst($resource->getShortName());
                     if (true === $operation->getHideHydraOperation() || !$operation instanceof CollectionOperationInterface || isset($entrypoint[$key])) {
