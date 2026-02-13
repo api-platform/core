@@ -164,6 +164,13 @@ use ApiPlatform\State\Provider\ParameterProvider;
 use ApiPlatform\State\Provider\ReadProvider;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\SerializerContextBuilderInterface;
+use ApiPlatform\Toon\Serializer\ToonEncoder;
+use ApiPlatform\Toon\Serializer\ToonHydraCollectionNormalizer;
+use ApiPlatform\Toon\Serializer\ToonHydraEntrypointNormalizer;
+use ApiPlatform\Toon\Serializer\ToonJsonApiCollectionNormalizer;
+use ApiPlatform\Toon\Serializer\ToonJsonApiEntrypointNormalizer;
+use ApiPlatform\Toon\Serializer\ToonJsonApiItemNormalizer;
+use ApiPlatform\Toon\Serializer\ToonJsonLdItemNormalizer;
 use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Routing\Router;
@@ -970,6 +977,16 @@ class ApiPlatformProvider extends ServiceProvider
             $list->insert($app->make(JsonApiErrorNormalizer::class), -790);
             $list->insert($app->make(JsonApiObjectNormalizer::class), -995);
 
+            $list->insert(new ToonHydraCollectionNormalizer($app->make(HydraCollectionNormalizer::class)), -880);
+            $list->insert(new ToonHydraEntrypointNormalizer(
+                $app->make(HydraEntrypointNormalizer::class),
+                $app->make(ResourceMetadataCollectionFactoryInterface::class)
+            ), -880);
+            $list->insert(new ToonJsonApiCollectionNormalizer($app->make(JsonApiCollectionNormalizer::class)), -880);
+            $list->insert(new ToonJsonApiEntrypointNormalizer($app->make(JsonApiEntrypointNormalizer::class)), -880);
+            $list->insert(new ToonJsonApiItemNormalizer($app->make(JsonApiItemNormalizer::class)), -880);
+            $list->insert(new ToonJsonLdItemNormalizer($app->make(JsonLdItemNormalizer::class)), -880);
+
             if (interface_exists(FieldsBuilderEnumInterface::class)) {
                 $list->insert($app->make(GraphQlItemNormalizer::class), -890);
                 $list->insert($app->make(GraphQlObjectNormalizer::class), -995);
@@ -994,6 +1011,8 @@ class ApiPlatformProvider extends ServiceProvider
             return new Serializer(
                 iterator_to_array($app->make('api_platform_normalizer_list')),
                 [
+                    // ToonEncoder must come first to handle Toon-encoded formats before JSON encoder
+                    new ToonEncoder(),
                     new JsonEncoder('json'),
                     $app->make(JsonEncoder::class),
                     new JsonEncoder('jsonopenapi'),
