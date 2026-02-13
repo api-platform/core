@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Problem\Serializer;
 
 use ApiPlatform\Problem\Serializer\ConstraintViolationListNormalizer;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -31,7 +32,7 @@ class ConstraintViolationNormalizerTest extends TestCase
 {
     use ProphecyTrait;
 
-    #[\PHPUnit\Framework\Attributes\Group('legacy')]
+    #[Group('legacy')]
     public function testSupportNormalization(): void
     {
         $nameConverterProphecy = $this->prophesize(NameConverterInterface::class);

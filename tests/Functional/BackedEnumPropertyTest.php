@@ -21,6 +21,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Pet;
 use ApiPlatform\Tests\Fixtures\TestBundle\Enum\GenderTypeEnum;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpClient\HttpOptions;
 
 final class BackedEnumPropertyTest extends ApiTestCase
@@ -53,7 +54,7 @@ final class BackedEnumPropertyTest extends ApiTestCase
         ]);
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('legacy')]
+    #[Group('legacy')]
     public function testGraphQl(): void
     {
         $person = $this->createPerson();

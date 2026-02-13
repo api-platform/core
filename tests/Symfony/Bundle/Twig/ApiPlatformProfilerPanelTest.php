@@ -19,6 +19,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -60,7 +61,7 @@ final class ApiPlatformProfilerPanelTest extends WebTestCase
         $this->assertSame('Not an API Platform resource', $block->filterXPath('//div[@class="sf-toolbar-info-piece"][./b[contains(., "Resource Class")]]/span')->html());
     }
 
-    #[\PHPUnit\Framework\Attributes\Group('legacy')]
+    #[Group('legacy')]
     public function testDebugBarContent(): void
     {
         $client = static::createClient();

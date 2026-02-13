@@ -51,7 +51,9 @@ final class DoctrineOrmResourceCollectionMetadataFactory implements ResourceMeta
                         continue;
                     }
 
-                    $operations->add($operationName, $this->addDefaults($operation));
+                    $operation = $this->addDefaults($operation);
+                    $operation = $this->setParametersFilterClass($operation, $entityClass);
+                    $operations->add($operationName, $operation);
                 }
 
                 $resourceMetadata = $resourceMetadata->withOperations($operations);
@@ -67,7 +69,9 @@ final class DoctrineOrmResourceCollectionMetadataFactory implements ResourceMeta
                         continue;
                     }
 
-                    $graphQlOperations[$operationName] = $this->addDefaults($graphQlOperation);
+                    $graphQlOperation = $this->addDefaults($graphQlOperation);
+                    $graphQlOperation = $this->setParametersFilterClass($graphQlOperation, $entityClass);
+                    $graphQlOperations[$operationName] = $graphQlOperation;
                 }
 
                 $resourceMetadata = $resourceMetadata->withGraphQlOperations($graphQlOperations);
@@ -114,5 +118,21 @@ final class DoctrineOrmResourceCollectionMetadataFactory implements ResourceMeta
         }
 
         return 'api_platform.doctrine.orm.state.persist_processor';
+    }
+
+    private function setParametersFilterClass(Operation $operation, string $entityClass): Operation
+    {
+        $parameters = $operation->getParameters();
+        if (!$parameters) {
+            return $operation;
+        }
+
+        foreach ($parameters as $key => $parameter) {
+            if (null === $parameter->getFilterClass()) {
+                $parameters->add($key, $parameter->withFilterClass($entityClass));
+            }
+        }
+
+        return $operation->withParameters($parameters);
     }
 }

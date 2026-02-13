@@ -15,7 +15,9 @@ namespace ApiPlatform\Tests\Functional\Parameters;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\FilterWithStateOptions;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\FilterWithStateOptionsAndNoApiFilter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\SearchFilterParameter as SearchFilterParameterDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilterWithStateOptionsAndNoApiFilterEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilterWithStateOptionsEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ProductWithQueryParameter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SearchFilterParameter;
@@ -35,7 +37,12 @@ final class DoctrineTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [SearchFilterParameter::class, FilterWithStateOptions::class, ProductWithQueryParameter::class];
+        return [
+            SearchFilterParameter::class,
+            FilterWithStateOptions::class,
+            FilterWithStateOptionsAndNoApiFilter::class,
+            ProductWithQueryParameter::class,
+        ];
     }
 
     public function testDoctrineEntitySearchFilter(): void
@@ -145,6 +152,39 @@ final class DoctrineTest extends ApiTestCase
         $a = $response->toArray();
         $this->assertCount(1, $a['hydra:member']);
         $this->assertEquals('after', $a['hydra:member'][0]['name']);
+    }
+
+    public function testStateOptionsAndNoApiFilter(): void
+    {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('Not tested with mongodb.');
+        }
+
+        static::bootKernel();
+        $container = static::$kernel->getContainer();
+        $this->recreateSchema([FilterWithStateOptionsAndNoApiFilterEntity::class]);
+
+        $manager = $container->get('doctrine')->getManager();
+        $manager->persist(new FilterWithStateOptionsAndNoApiFilterEntity(name: 'current'));
+        $manager->persist(new FilterWithStateOptionsAndNoApiFilterEntity(name: 'null'));
+        $manager->persist(new FilterWithStateOptionsAndNoApiFilterEntity(name: 'after'));
+        $manager->flush();
+
+        $uri = '/filter_with_state_options_and_no_api_filters_api_resource';
+
+        $response = self::createClient()->request('GET', $uri);
+        $this->assertResponseIsSuccessful();
+        $a = $response->toArray();
+        $this->assertSame('hydra:Collection', $a['@type']);
+        $this->assertSame(3, $a['hydra:totalItems']);
+        $this->assertCount(3, $a['hydra:member']);
+
+        $response = self::createClient()->request('GET', $uri.'?search[name]=aft');
+        $this->assertResponseIsSuccessful();
+        $a = $response->toArray();
+        $this->assertSame('hydra:Collection', $a['@type']);
+        $this->assertSame(1, $a['hydra:totalItems']);
+        $this->assertCount(1, $a['hydra:member']);
     }
 
     #[DataProvider('partialFilterParameterProviderForSearchFilterParameter')]
