@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -22,7 +23,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-#[ApiResource(operations: [new Get(), new Get(uriTemplate: '/books/by_isbn/{isbn}{._format}', requirements: ['isbn' => '.+'], uriVariables: 'isbn')])]
+#[ApiResource(operations: [new Get(), new Get(uriTemplate: '/books/by_isbn/{isbn}{._format}', requirements: ['isbn' => '.+'], uriVariables: 'isbn'), new GetCollection()])]
 #[ORM\Entity]
 class Book
 {

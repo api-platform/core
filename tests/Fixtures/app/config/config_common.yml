@@ -38,6 +38,11 @@ api_platform:
         Made with love
     enable_swagger: true
     enable_swagger_ui: true
+    defaults:
+        parameters:
+            'ApiPlatform\Metadata\HeaderParameter':
+                key: 'X-Request-ID'
+                description: 'A unique request identifier'
     formats:
         jsonld:                        ['application/ld+json']
         jsonhal:                       ['application/hal+json']
