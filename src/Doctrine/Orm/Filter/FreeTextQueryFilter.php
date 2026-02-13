@@ -17,6 +17,7 @@ use ApiPlatform\Doctrine\Common\Filter\LoggerAwareInterface;
 use ApiPlatform\Doctrine\Common\Filter\LoggerAwareTrait;
 use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
 use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareTrait;
+use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
 use ApiPlatform\Metadata\Operation;
@@ -51,16 +52,47 @@ final class FreeTextQueryFilter implements FilterInterface, ManagerRegistryAware
         $qb->resetDQLPart('where');
         $qb->setParameters(new ArrayCollection());
         foreach ($this->properties ?? $parameter->getProperties() ?? [] as $property) {
+            $subParameter = $parameter->withProperty($property);
+
+            $nestedPropertiesInfo = $parameter->getExtraProperties()['nested_properties_info'] ?? [];
+            if (isset($nestedPropertiesInfo[$property])) {
+                $subParameter = $subParameter->withExtraProperties([
+                    ...$subParameter->getExtraProperties(),
+                    'nested_property_info' => $nestedPropertiesInfo[$property],
+                ]);
+            }
+
             $this->filter->apply(
                 $qb,
                 $queryNameGenerator,
                 $resourceClass,
                 $operation,
-                ['parameter' => $parameter->withProperty($property)] + $context
+                ['parameter' => $subParameter] + $context
             );
         }
 
         $queryBuilder->andWhere($qb->getDQLPart('where'));
+
+        foreach ($qb->getDQLPart('join') as $joins) {
+            foreach ($joins as $join) {
+                $joinString = $join->getJoin();
+                if (str_contains($joinString, '.')) {
+                    [$parentAlias, $association] = explode('.', $joinString, 2);
+                    QueryBuilderHelper::addJoinOnce(
+                        $queryBuilder,
+                        $queryNameGenerator,
+                        $parentAlias,
+                        $association,
+                        $join->getJoinType(),
+                        $join->getConditionType(),
+                        $join->getCondition(),
+                        null,
+                        $join->getAlias()
+                    );
+                }
+            }
+        }
+
         $parameters = $queryBuilder->getParameters();
 
         foreach ($qb->getParameters() as $p) {

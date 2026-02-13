@@ -316,6 +316,31 @@ final class ModelMetadata
     }
 
     /**
+     * Gets the related model class for a given relationship property.
+     *
+     * @param class-string<Model> $modelClass The current model class
+     * @param string              $property   The property/relationship name
+     *
+     * @return class-string<Model>|null The related model class, or null if not a relationship
+     */
+    public function getRelatedModelClass(string $modelClass, string $property): ?string
+    {
+        if (!class_exists($modelClass)) {
+            return null;
+        }
+
+        $relations = $this->getRelations(new $modelClass());
+
+        foreach ($relations as $relation) {
+            if ($relation['method_name'] === $property || $relation['name'] === $property) {
+                return $relation['related'];
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Determines if the given attribute is unique.
      *
      * @param array<int, array{columns: string[], unique: bool}> $indexes
