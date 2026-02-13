@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Symfony\Bundle\Test;
 
 use ApiPlatform\Symfony\Bundle\Test\Response;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\BrowserKit\Response as BrowserKitResponse;
 use Symfony\Component\HttpClient\Exception\ClientException;
@@ -42,7 +43,7 @@ class ResponseTest extends TestCase
         $this->assertSame('', $response->getContent());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('errorProvider')]
+    #[DataProvider('errorProvider')]
     public function testCheckStatus(string $expectedException, int $status): void
     {
         $this->expectException($expectedException);

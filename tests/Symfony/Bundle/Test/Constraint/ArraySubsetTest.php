@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Symfony\Bundle\Test\Constraint;
 
 use ApiPlatform\Symfony\Bundle\Test\Constraint\ArraySubset;
 use ApiPlatform\Tests\Fixtures\ArrayAccessible;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\SelfDescribing;
 use PHPUnit\Framework\TestCase;
@@ -59,7 +60,7 @@ class ArraySubsetTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('evaluateDataProvider')]
+    #[DataProvider('evaluateDataProvider')]
     public function testEvaluate(bool $expected, iterable $subset, iterable $other, bool $strict): void
     {
         $constraint = new ArraySubset($subset, $strict);

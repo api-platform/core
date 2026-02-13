@@ -16,6 +16,7 @@ namespace ApiPlatform\HttpCache\Tests;
 use ApiPlatform\HttpCache\VarnishXKeyPurger;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Response;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
@@ -98,7 +99,7 @@ class VarnishXKeyPurgerTest extends TestCase
         $purger->purge(['/foo', '/bar', '/baz']);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideChunkHeaderCases')]
+    #[DataProvider('provideChunkHeaderCases')]
     public function testItChunksHeaderToAvoidHittingVarnishLimit(int $maxHeaderLength, array $iris, array $keysToSend): void
     {
         $client = new class implements HttpClientInterface {

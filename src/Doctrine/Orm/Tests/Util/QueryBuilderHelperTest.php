@@ -21,6 +21,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -29,7 +30,7 @@ class QueryBuilderHelperTest extends TestCase
 {
     use ProphecyTrait;
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideAddJoinOnce')]
+    #[DataProvider('provideAddJoinOnce')]
     public function testAddJoinOnce(?string $originAliasForJoinOnce, string $expectedAlias): void
     {
         $queryBuilder = new QueryBuilder($this->prophesize(EntityManagerInterface::class)->reveal());

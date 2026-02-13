@@ -20,6 +20,7 @@ use ApiPlatform\State\Provider\BackedEnumProvider;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\BackedEnumIntegerResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\BackedEnumStringResource;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -34,7 +35,7 @@ final class BackedEnumProviderTest extends TestCase
         yield 'String case enum' => [BackedEnumStringResource::class, BackedEnumStringResource::cases()];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideCollection')]
+    #[DataProvider('provideCollection')]
     public function testProvideCollection(string $class, array $expected): void
     {
         $operation = new GetCollection(class: $class);
@@ -48,7 +49,7 @@ final class BackedEnumProviderTest extends TestCase
         yield 'String case enum' => [BackedEnumStringResource::class, 'yes', BackedEnumStringResource::Yes];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideItem')]
+    #[DataProvider('provideItem')]
     public function testProvideItem(string $class, string|int $id, \BackedEnum $expected): void
     {
         $operation = new Get(class: $class);

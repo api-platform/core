@@ -18,6 +18,7 @@ use ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document\Dummy;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Iterator\Iterator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -26,7 +27,7 @@ class PaginatorTest extends TestCase
 {
     use ProphecyTrait;
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('initializeProvider')]
+    #[DataProvider('initializeProvider')]
     public function testInitialize(int $firstResult, int $maxResults, int $totalItems, int $currentPage, int $lastPage, bool $hasNextPage): void
     {
         $paginator = $this->getPaginator($firstResult, $maxResults, $totalItems);

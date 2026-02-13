@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\State\Pagination;
 
 use ApiPlatform\State\Pagination\ArrayPaginator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -21,7 +22,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ArrayPaginatorTest extends TestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('initializeProvider')]
+    #[DataProvider('initializeProvider')]
     public function testInitialize(array $results, $firstResult, $maxResults, $currentItems, $totalItems, $currentPage, $lastPage, $hasNextPage): void
     {
         $paginator = new ArrayPaginator($results, $firstResult, $maxResults);

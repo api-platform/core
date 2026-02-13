@@ -18,6 +18,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\TranslateValidationError;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ValidateParameterBeforeProvider;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\WithParameter;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class ValidationTest extends ApiTestCase
 {
@@ -44,7 +45,7 @@ final class ValidationTest extends ApiTestCase
     /**
      * @param array<int,array{propertyPath: string, message: string}> $expectedViolations
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideQueryStrings')]
+    #[DataProvider('provideQueryStrings')]
     public function testValidation(string $queryString, array $expectedViolations): void
     {
         $response = self::createClient()->request('GET', 'validate_parameters?'.$queryString);

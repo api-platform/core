@@ -30,6 +30,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Tests\Fixtures\Metadata\RestfulApi;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -37,7 +38,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class StringableSecurityParameterTest extends TestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('metadataProvider')]
+    #[DataProvider('metadataProvider')]
     public function testOnMetadata(Metadata $metadata): void
     {
         $this->assertSame($metadata->getSecurity(), 'stringable_security');

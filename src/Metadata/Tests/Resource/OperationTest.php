@@ -26,6 +26,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class OperationTest extends TestCase
@@ -39,7 +40,7 @@ final class OperationTest extends TestCase
         $this->assertInstanceOf(CollectionOperationInterface::class, $operation);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('operationProvider')]
+    #[DataProvider('operationProvider')]
     public function testOperationConstructor(Operation $operation): void
     {
         $this->assertInstanceOf(Operation::class, $operation);

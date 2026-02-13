@@ -15,6 +15,7 @@ namespace ApiPlatform\Symfony\Tests\Validator\Metadata\Property\Restriction;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaCountRestriction;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Validator\Constraint;
@@ -35,7 +36,7 @@ final class PropertySchemaCountRestrictionTest extends TestCase
         $this->propertySchemaCountRestriction = new PropertySchemaCountRestriction();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('supportsProvider')]
+    #[DataProvider('supportsProvider')]
     public function testSupports(Constraint $constraint, ApiProperty $propertyMetadata, bool $expectedResult): void
     {
         self::assertSame($expectedResult, $this->propertySchemaCountRestriction->supports($constraint, $propertyMetadata));
@@ -47,7 +48,7 @@ final class PropertySchemaCountRestrictionTest extends TestCase
         yield 'not supported' => [new Positive(), new ApiProperty(), false];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('createProvider')]
+    #[DataProvider('createProvider')]
     public function testCreate(Count $constraint, ApiProperty $propertyMetadata, array $expectedResult): void
     {
         self::assertSame($expectedResult, $this->propertySchemaCountRestriction->create($constraint, $propertyMetadata));

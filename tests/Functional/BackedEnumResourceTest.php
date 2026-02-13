@@ -22,6 +22,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\BackedEnumStringResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6264\Availability;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6264\AvailabilityStatus;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpClient\HttpOptions;
 
@@ -104,7 +105,7 @@ final class BackedEnumResourceTest extends ApiTestCase
         }
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('providerEnumItemsJson')]
+    #[DataProvider('providerEnumItemsJson')]
     public function testItemJson(string $uri, string $mimeType, array $expected): void
     {
         self::createClient()->request('GET', $uri, ['headers' => ['Accept' => $mimeType]]);
@@ -244,7 +245,7 @@ final class BackedEnumResourceTest extends ApiTestCase
         yield 'String enum item' => [BackedEnumStringResource::class, Get::class, '_api_/backed_enum_string_resources/{id}{._format}_get'];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('providerEnums')]
+    #[DataProvider('providerEnums')]
     public function testOnlyGetOperationsAddedWhenNonSpecified(string $resourceClass, string $operationClass, string $operationName): void
     {
         $factory = self::getContainer()->get('api_platform.metadata.resource.metadata_collection_factory');
@@ -412,7 +413,7 @@ final class BackedEnumResourceTest extends ApiTestCase
         ]];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('providerCollection')]
+    #[DataProvider('providerCollection')]
     public function testCollection(string $mimeType, array $expected): void
     {
         self::createClient()->request('GET', '/backed_enum_integer_resources', ['headers' => ['Accept' => $mimeType]]);
@@ -462,7 +463,7 @@ final class BackedEnumResourceTest extends ApiTestCase
         ]];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('providerItem')]
+    #[DataProvider('providerItem')]
     public function testItem(string $mimeType, array $expected): void
     {
         self::createClient()->request('GET', '/backed_enum_integer_resources/1', ['headers' => ['Accept' => $mimeType]]);
@@ -477,7 +478,7 @@ final class BackedEnumResourceTest extends ApiTestCase
         yield ['/backed_enum_integer_resources/fortytwo'];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider404s')]
+    #[DataProvider('provider404s')]
     public function testItem404(string $uri): void
     {
         self::createClient()->request('GET', $uri);
@@ -512,7 +513,7 @@ GRAPHQL;
         }
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('providerEnumItemsGraphQl')]
+    #[DataProvider('providerEnumItemsGraphQl')]
     #[Group('legacy')]
     public function testItemGraphql(string $query, array $variables, array $expected): void
     {

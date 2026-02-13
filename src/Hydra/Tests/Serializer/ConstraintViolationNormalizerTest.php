@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Hydra\Tests\Serializer;
 
 use ApiPlatform\Hydra\Serializer\ConstraintViolationListNormalizer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -44,7 +45,7 @@ class ConstraintViolationNormalizerTest extends TestCase
         $this->assertSame([ConstraintViolationListInterface::class => true], $normalizer->getSupportedTypes($normalizer::FORMAT));
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('nameConverterAndPayloadFieldsProvider')]
+    #[DataProvider('nameConverterAndPayloadFieldsProvider')]
     public function testNormalize(callable $nameConverterFactory, ?array $fields, array $expected): void
     {
         $normalizer = new ConstraintViolationListNormalizer($fields, $nameConverterFactory($this));

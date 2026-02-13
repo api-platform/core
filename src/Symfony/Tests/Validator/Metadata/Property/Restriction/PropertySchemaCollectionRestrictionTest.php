@@ -19,6 +19,7 @@ use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaFo
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaGreaterThanRestriction;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaLengthRestriction;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRegexRestriction;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Validator\Constraint;
@@ -54,7 +55,7 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
         ]);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('supportsProvider')]
+    #[DataProvider('supportsProvider')]
     public function testSupports(Constraint $constraint, ApiProperty $propertyMetadata, bool $expectedResult): void
     {
         self::assertSame($expectedResult, $this->propertySchemaCollectionRestriction->supports($constraint, $propertyMetadata));
@@ -67,7 +68,7 @@ final class PropertySchemaCollectionRestrictionTest extends TestCase
         yield 'not supported' => [new Positive(), new ApiProperty(), false];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('createProvider')]
+    #[DataProvider('createProvider')]
     public function testCreate(Collection $constraint, ApiProperty $propertyMetadata, array $expectedResult): void
     {
         self::assertEquals($expectedResult, $this->propertySchemaCollectionRestriction->create($constraint, $propertyMetadata));

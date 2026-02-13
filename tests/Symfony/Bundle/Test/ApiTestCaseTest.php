@@ -33,6 +33,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceInterface;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -154,14 +155,14 @@ JSON;
         yield 'jsonld' => ['jsonld', 'application/ld+json'];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('providerFormats')]
+    #[DataProvider('providerFormats')]
     public function testAssertMatchesResourceCollectionJsonSchema(string $format, string $mimeType): void
     {
         self::createClient()->request('GET', '/resource_interfaces', ['headers' => ['Accept' => $mimeType]]);
         $this->assertMatchesResourceCollectionJsonSchema(ResourceInterface::class, format: $format);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('providerFormats')]
+    #[DataProvider('providerFormats')]
     #[Group('orm')]
     public function testAssertMatchesResourceCollectionJsonSchemaKeepSerializationContext(string $format, string $mimeType): void
     {
@@ -188,21 +189,21 @@ JSON;
         $this->assertMatchesResourceCollectionJsonSchema(Issue6146Parent::class, format: $format);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('providerFormats')]
+    #[DataProvider('providerFormats')]
     public function testAssertMatchesResourceItemJsonSchema(string $format, string $mimeType): void
     {
         self::createClient()->request('GET', '/resource_interfaces/some-id', ['headers' => ['Accept' => $mimeType]]);
         $this->assertMatchesResourceItemJsonSchema(ResourceInterface::class, format: $format);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('providerFormats')]
+    #[DataProvider('providerFormats')]
     public function testAssertMatchesResourceItemJsonSchemaWithCustomOutput(string $format, string $mimeType): void
     {
         self::createClient()->request('GET', '/dummy_dto_custom_output/some-id', ['headers' => ['Accept' => $mimeType]]);
         $this->assertMatchesResourceItemJsonSchema(DummyDtoCustom::class, operationName: 'dummy_dto_custom_output_collection', format: $format);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('providerFormats')]
+    #[DataProvider('providerFormats')]
     #[Group('orm')]
     public function testAssertMatchesResourceItemJsonSchemaWithCustomJson(string $format, string $mimeType): void
     {
@@ -218,7 +219,7 @@ JSON;
         $this->assertMatchesResourceItemJsonSchema(JsonSchemaContextDummy::class, format: $format);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('providerFormats')]
+    #[DataProvider('providerFormats')]
     #[Group('orm')]
     public function testAssertMatchesResourceItemJsonSchemaOutput(string $format, string $mimeType): void
     {
@@ -235,7 +236,7 @@ JSON;
         $this->assertMatchesResourceItemJsonSchema(DummyDtoInputOutput::class, format: $format);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('providerFormats')]
+    #[DataProvider('providerFormats')]
     #[Group('orm')]
     public function testAssertMatchesResourceItemAndCollectionJsonSchemaOutputWithContext(string $format, string $mimeType): void
     {

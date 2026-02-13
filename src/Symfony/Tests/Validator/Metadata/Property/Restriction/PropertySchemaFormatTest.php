@@ -15,6 +15,7 @@ namespace ApiPlatform\Symfony\Tests\Validator\Metadata\Property\Restriction;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaFormat;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Validator\Constraint;
@@ -37,7 +38,7 @@ final class PropertySchemaFormatTest extends TestCase
         $this->propertySchemaFormatRestriction = new PropertySchemaFormat();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('supportsProvider')]
+    #[DataProvider('supportsProvider')]
     public function testSupports(Constraint $constraint, ApiProperty $propertyMetadata, bool $expectedResult): void
     {
         self::assertSame($expectedResult, $this->propertySchemaFormatRestriction->supports($constraint, $propertyMetadata));
@@ -62,7 +63,7 @@ final class PropertySchemaFormatTest extends TestCase
         yield 'not supported' => [new Positive(), new ApiProperty(), false];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('createProvider')]
+    #[DataProvider('createProvider')]
     public function testCreate(Constraint $constraint, ApiProperty $propertyMetadata, array $expectedResult): void
     {
         self::assertSame($expectedResult, $this->propertySchemaFormatRestriction->create($constraint, $propertyMetadata));

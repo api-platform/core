@@ -14,11 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Tests\Util;
 
 use ApiPlatform\Metadata\Util\CompositeIdentifierParser;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class CompositeIdentifierParserTest extends TestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('variousIdentifiers')]
+    #[DataProvider('variousIdentifiers')]
     public function testNormalizeCompositeCorrectly(array $identifiers): void
     {
         foreach ($identifiers as $string => $expected) {
@@ -40,7 +41,7 @@ class CompositeIdentifierParserTest extends TestCase
         ]]];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('compositeIdentifiers')]
+    #[DataProvider('compositeIdentifiers')]
     public function testStringify(array $identifiers): void
     {
         foreach ($identifiers as $string => $arr) {
