@@ -15,6 +15,7 @@ namespace ApiPlatform\Metadata;
 
 use ApiPlatform\OpenApi\Attributes\Webhook;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
+use ApiPlatform\OpenApi\Model\PathItem;
 use ApiPlatform\State\OptionsInterface;
 
 /**
@@ -57,6 +58,7 @@ final class NotExposed extends HttpOperation
 
         ?array $hydraContext = null,
         bool|OpenApiOperation|Webhook|null $openapi = false,
+        ?PathItem $openApiPathItem = null,
         ?array $exceptionToStatus = null,
 
         ?bool $queryParameterValidationEnabled = null,
@@ -135,6 +137,7 @@ final class NotExposed extends HttpOperation
             paginationViaCursor: $paginationViaCursor,
             hydraContext: $hydraContext,
             openapi: $openapi,
+            openApiPathItem: $openApiPathItem,
             exceptionToStatus: $exceptionToStatus,
             queryParameterValidationEnabled: $queryParameterValidationEnabled,
             links: $links,
