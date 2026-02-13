@@ -1,5 +1,16 @@
 # Changelog
 
+## v4.2.16
+
+### Bug fixes
+
+* [07100d501](https://github.com/api-platform/core/commit/07100d501be4ab88ca8154def51b9154e33bc126) fix(hydra): use standard xsd prefix and remove duplicate context namespaces (#7740)
+* [3d8e4fb05](https://github.com/api-platform/core/commit/3d8e4fb05f5e89847eb805f4d7c80dd5bda17c5d) fix(laravel): support numeric float types in eloquent metadata factory (#7730)
+* [4f307d3ce](https://github.com/api-platform/core/commit/4f307d3cea91bd858614c9250579b0e64854f513) fix(doctrine): skip uninitialized properties in handleLazyObjectRelations (#7738)
+* [6f85f2aa3](https://github.com/api-platform/core/commit/6f85f2aa3157149ac16b87605f02e6468f33823b) fix(metadata): use entity class from stateOptions for filter property resolution (#7739)
+* [70b17ce56](https://github.com/api-platform/core/commit/70b17ce5611d546ff4a70deaeec3091d5e1ef739) fix(doctrine): allow both uppercase and lowercase order direction in OrderFilter schema (#7741) (#7742)
+* [d70eec574](https://github.com/api-platform/core/commit/d70eec57439e35aa8f3144048d620a07aeb9ec26) fix(serializer): prevent context leakage with service-based entity resolution (#7756)
+
 ## v4.2.15
 
 ### Bug fixes
