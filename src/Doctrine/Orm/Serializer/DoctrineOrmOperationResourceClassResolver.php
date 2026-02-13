@@ -13,20 +13,19 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Serializer;
 
+use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Serializer\OperationResourceClassResolver;
 
 /**
- * Doctrine-specific operation resource resolver.
+ * Doctrine ORM operation resource resolver.
  *
- * Handles entity-to-resource mappings from Doctrine's stateOptions:
- * - getEntityClass() for ORM entities
- * - getDocumentClass() for ODM documents
+ * Handles entity-to-resource mappings from Doctrine ORM's stateOptions.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class DoctrineOperationResourceClassResolver extends OperationResourceClassResolver
+final class DoctrineOrmOperationResourceClassResolver extends OperationResourceClassResolver
 {
     use ClassInfoTrait;
 
@@ -39,15 +38,11 @@ final class DoctrineOperationResourceClassResolver extends OperationResourceClas
         $objectClass = $this->getObjectClass($resource);
         $stateOptions = $operation->getStateOptions();
 
-        // Doctrine-specific: Check for entity or document class in stateOptions
-        if ($stateOptions) {
-            $entityClass = method_exists($stateOptions, 'getEntityClass')
-                ? $stateOptions->getEntityClass()
-                : (method_exists($stateOptions, 'getDocumentClass')
-                    ? $stateOptions->getDocumentClass()
-                    : null);
+        // Doctrine ORM: Check for entity class in stateOptions
+        if ($stateOptions instanceof Options) {
+            $entityClass = $stateOptions->getEntityClass();
 
-            // Validate object matches the backing entity/document class
+            // Validate object matches the backing entity class
             if ($entityClass && is_a($objectClass, $entityClass, true)) {
                 return $operation->getClass();
             }
