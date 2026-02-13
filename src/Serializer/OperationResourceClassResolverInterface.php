@@ -24,7 +24,7 @@ use ApiPlatform\Metadata\Operation;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-interface OperationResourceResolverInterface
+interface OperationResourceClassResolverInterface
 {
     /**
      * Resolves the resource class to use for serializing/generating IRIs.
@@ -32,7 +32,7 @@ interface OperationResourceResolverInterface
      * @param object|string $resource  The object or class name to resolve
      * @param Operation     $operation The operation context providing stateOptions
      *
-     * @return string The resource class to use
+     * @return class-string The resource class to use
      */
     public function resolve(object|string $resource, Operation $operation): string;
 }

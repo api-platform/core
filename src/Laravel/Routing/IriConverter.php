@@ -30,7 +30,7 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
-use ApiPlatform\Serializer\OperationResourceResolverInterface;
+use ApiPlatform\Serializer\OperationResourceClassResolverInterface;
 use ApiPlatform\State\ProviderInterface;
 use Illuminate\Database\Eloquent\Relations\Relation;
 // use Illuminate\Routing\Router;
@@ -57,7 +57,7 @@ class IriConverter implements IriConverterInterface
     /**
      * @param ProviderInterface<object> $provider
      */
-    public function __construct(private readonly ProviderInterface $provider, private readonly OperationMetadataFactoryInterface $operationMetadataFactory, private readonly RouterInterface $router, private readonly IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ?IriConverterInterface $decorated = null, private readonly ?OperationResourceResolverInterface $operationResourceResolver = null)
+    public function __construct(private readonly ProviderInterface $provider, private readonly OperationMetadataFactoryInterface $operationMetadataFactory, private readonly RouterInterface $router, private readonly IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, private readonly ?IriConverterInterface $decorated = null, private readonly ?OperationResourceClassResolverInterface $operationResourceResolver = null)
     {
         $this->resourceClassResolver = $resourceClassResolver;
     }

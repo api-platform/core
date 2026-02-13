@@ -25,7 +25,7 @@ use ApiPlatform\Metadata\Util\ClassInfoTrait;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class OperationResourceResolver implements OperationResourceResolverInterface
+class OperationResourceClassResolver implements OperationResourceClassResolverInterface
 {
     use ClassInfoTrait;
 

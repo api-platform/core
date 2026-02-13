@@ -15,7 +15,7 @@ namespace ApiPlatform\Doctrine\Orm\Serializer;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
-use ApiPlatform\Serializer\OperationResourceResolver;
+use ApiPlatform\Serializer\OperationResourceClassResolver;
 
 /**
  * Doctrine-specific operation resource resolver.
@@ -26,7 +26,7 @@ use ApiPlatform\Serializer\OperationResourceResolver;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class DoctrineOperationResourceResolver extends OperationResourceResolver
+final class DoctrineOperationResourceClassResolver extends OperationResourceClassResolver
 {
     use ClassInfoTrait;
 

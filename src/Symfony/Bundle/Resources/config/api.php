@@ -32,8 +32,8 @@ use ApiPlatform\Serializer\Filter\PropertyFilter;
 use ApiPlatform\Serializer\ItemNormalizer;
 use ApiPlatform\Serializer\Mapping\Factory\ClassMetadataFactory;
 use ApiPlatform\Serializer\Mapping\Loader\PropertyMetadataLoader;
-use ApiPlatform\Serializer\OperationResourceResolver;
-use ApiPlatform\Serializer\OperationResourceResolverInterface;
+use ApiPlatform\Serializer\OperationResourceClassResolver;
+use ApiPlatform\Serializer\OperationResourceClassResolverInterface;
 use ApiPlatform\Serializer\Parameter\SerializerFilterParameterProvider;
 use ApiPlatform\Serializer\SerializerContextBuilder;
 use ApiPlatform\Serializer\SerializerFilterContextBuilder;
@@ -117,8 +117,8 @@ return function (ContainerConfigurator $container) {
 
     $services->alias(GroupFilter::class, 'api_platform.serializer.group_filter');
 
-    $services->set('api_platform.serializer.operation_resource_resolver', OperationResourceResolver::class);
-    $services->alias(OperationResourceResolverInterface::class, 'api_platform.serializer.operation_resource_resolver');
+    $services->set('api_platform.serializer.operation_resource_resolver', OperationResourceClassResolver::class);
+    $services->alias(OperationResourceClassResolverInterface::class, 'api_platform.serializer.operation_resource_resolver');
 
     $services->set('api_platform.serializer.normalizer.item', ItemNormalizer::class)
         ->args([

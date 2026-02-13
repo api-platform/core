@@ -15,7 +15,7 @@ namespace ApiPlatform\Laravel\Serializer;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
-use ApiPlatform\Serializer\OperationResourceResolver;
+use ApiPlatform\Serializer\OperationResourceClassResolver;
 
 /**
  * Laravel Eloquent-specific operation resource resolver.
@@ -25,7 +25,7 @@ use ApiPlatform\Serializer\OperationResourceResolver;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class EloquentOperationResourceResolver extends OperationResourceResolver
+final class EloquentOperationResourceClassResolver extends OperationResourceClassResolver
 {
     use ClassInfoTrait;
 
