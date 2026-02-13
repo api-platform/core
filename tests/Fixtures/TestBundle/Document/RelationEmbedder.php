@@ -27,7 +27,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-#[ApiResource(operations: [new Get(), new Put(extraProperties: ['standard_put' => false]), new Delete(), new Get(routeName: 'relation_embedded.custom_get'), new Get(uriTemplate: '/api/custom-call/{id}'), new Put(uriTemplate: '/api/custom-call/{id}'), new Post(), new GetCollection()], normalizationContext: ['groups' => ['barcelona']], denormalizationContext: ['groups' => ['chicago']], hydraContext: ['@type' => 'hydra:Operation', 'hydra:title' => 'A custom operation', 'returns' => 'xmls:string'])]
+#[ApiResource(operations: [new Get(), new Put(extraProperties: ['standard_put' => false]), new Delete(), new Get(routeName: 'relation_embedded.custom_get'), new Get(uriTemplate: '/api/custom-call/{id}'), new Put(uriTemplate: '/api/custom-call/{id}'), new Post(), new GetCollection()], normalizationContext: ['groups' => ['barcelona']], denormalizationContext: ['groups' => ['chicago']], hydraContext: ['@type' => 'hydra:Operation', 'hydra:title' => 'A custom operation', 'returns' => 'xsd:string'])]
 #[ODM\Document]
 class RelationEmbedder
 {

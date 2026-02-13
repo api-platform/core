@@ -94,17 +94,23 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
     /**
      * @return array{propertyNames: string[], properties: array<string, ApiProperty>}
      */
-    private function getProperties(string $resourceClass, ?Parameter $parameter = null): array
+    private function getProperties(string $resourceClass, ?Parameter $parameter = null, ?Operation $operation = null): array
     {
-        $k = $resourceClass.($parameter?->getProperties() ? ($parameter->getKey() ?? '') : '').(\is_string($parameter->getFilter()) ? $parameter->getFilter() : '');
+        $filterClass = $parameter?->getFilterClass();
+        if (null === $filterClass && null !== $operation) {
+            $filterClass = $this->getStateOptionsClass($operation, $resourceClass);
+        }
+        $filterClass ??= $resourceClass;
+
+        $k = $resourceClass.($parameter?->getProperties() ? ($parameter->getKey() ?? '') : '').(\is_string($parameter->getFilter()) ? $parameter->getFilter() : '').$filterClass;
         if (isset($this->localPropertyCache[$k])) {
             return $this->localPropertyCache[$k];
         }
 
         $propertyNames = [];
         $properties = [];
-        foreach ($parameter?->getProperties() ?? $this->propertyNameCollectionFactory->create($resourceClass) as $property) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property);
+        foreach ($parameter?->getProperties() ?? $this->propertyNameCollectionFactory->create($filterClass) as $property) {
+            $propertyMetadata = $this->propertyMetadataFactory->create($filterClass, $property);
             if ($propertyMetadata->isReadable()) {
                 $propertyNames[] = $property;
                 $properties[$property] = $propertyMetadata;
@@ -147,7 +153,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                 $parameter = $parameter->withKey($key);
             }
 
-            ['propertyNames' => $propertyNames, 'properties' => $properties] = $this->getProperties($resourceClass, $parameter);
+            ['propertyNames' => $propertyNames, 'properties' => $properties] = $this->getProperties($resourceClass, $parameter, $operation);
             $parameter = $parameter->withProperties($propertyNames);
 
             foreach ($propertyNames as $property) {
@@ -176,7 +182,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
 
             $key = $parameter->getKey();
 
-            ['propertyNames' => $propertyNames, 'properties' => $properties] = $this->getProperties($resourceClass, $parameter);
+            ['propertyNames' => $propertyNames, 'properties' => $properties] = $this->getProperties($resourceClass, $parameter, $operation);
 
             if ($filter instanceof PropertiesAwareInterface) {
                 $parameter = $parameter->withProperties($propertyNames);

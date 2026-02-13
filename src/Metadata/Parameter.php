@@ -30,6 +30,7 @@ abstract class Parameter
      * @param Type                                            $nativeType       the PHP native type, we cast values to an array if its a CollectionType, if not and it's an array with a single value we use it (eg: HTTP Header)
      * @param ?bool                                           $castToNativeType whether API Platform should cast your parameter to the nativeType declared
      * @param ?callable(mixed): mixed                         $castFn           the closure used to cast your parameter, this gets called only when $castToNativeType is set
+     * @param ?string                                         $filterClass      the class to use when resolving filter properties (from stateOptions)
      *
      * @phpstan-param array<string, mixed>|null $schema
      *
@@ -57,6 +58,7 @@ abstract class Parameter
         protected ?bool $castToNativeType = null,
         protected mixed $castFn = null,
         protected mixed $default = null,
+        protected ?string $filterClass = null,
     ) {
     }
 
@@ -381,6 +383,19 @@ abstract class Parameter
     {
         $self = clone $this;
         $self->default = $default;
+
+        return $self;
+    }
+
+    public function getFilterClass(): ?string
+    {
+        return $this->filterClass;
+    }
+
+    public function withFilterClass(?string $filterClass): self
+    {
+        $self = clone $this;
+        $self->filterClass = $filterClass;
 
         return $self;
     }

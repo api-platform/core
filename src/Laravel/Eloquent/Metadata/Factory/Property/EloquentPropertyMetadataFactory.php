@@ -75,9 +75,13 @@ final class EloquentPropertyMetadataFactory implements PropertyMetadataFactoryIn
 
             // see https://laravel.com/docs/11.x/eloquent-mutators#attribute-casting
             $builtinType = $p['cast'] ?? $p['type'];
+            // Normalize decimal types with precision/scale (e.g., "decimal(8,2)" -> "decimal")
+            if (str_starts_with($builtinType, 'decimal')) {
+                $builtinType = 'decimal';
+            }
             $type = match ($builtinType) {
                 'integer' => Type::int(),
-                'double', 'real' => Type::float(),
+                'double', 'real', 'float', 'decimal', 'numeric' => Type::float(),
                 'boolean', 'bool' => Type::bool(),
                 'datetime', 'date', 'timestamp' => Type::object(\DateTime::class),
                 'immutable_datetime', 'immutable_date' => Type::object(\DateTimeImmutable::class),

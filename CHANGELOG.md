@@ -11,6 +11,19 @@
 
 * When using `output` with `itemUriTemplate` on a collection operation, the JSON-LD `@type` will now use the resource class name instead of the output DTO class name for semantic consistency with `itemUriTemplate` behavior.
 
+## v4.2.15
+
+### Bug fixes
+
+* [2de06db1d](https://github.com/api-platform/core/commit/2de06db1d0ee5f3c83972381420597ae73dae141) fix(jsonapi): output null on a to-one relationship (#7686)
+* [5577f07bf](https://github.com/api-platform/core/commit/5577f07bf243f2e24e7454a9931fe77c36137804) fix(openapi): change payload type from array to free-form object (#7694)
+* [5d860bdec](https://github.com/api-platform/core/commit/5d860bdec2fb91d700cb329dc15e23dfbf8e3dbb) fix(hydra): memory persistent cache during schema generation (#7718)
+* [696d31597](https://github.com/api-platform/core/commit/696d31597814c114219e8045ddf4fe9813e004ee) fix(metadata): issues with extending xml/yaml resources (#5956)
+* [773289658](https://github.com/api-platform/core/commit/773289658748d732b30fdd12fd7046d5fdb42b1e) fix(laravel): properly transform invokable service to route action (#7720)
+* [881812926](https://github.com/api-platform/core/commit/8818129269498d1257ac41736f7e760549241a3d) fix(symfony): declare api_platform.normalizer.object fixes #7705 (#7717)
+* [cc2f88558](https://github.com/api-platform/core/commit/cc2f88558d4a92eeb3240a074e2184815762ffd2) fix(doctrine): post with mapped relation
+* [f3c2b1a56](https://github.com/api-platform/core/commit/f3c2b1a569cb7838d276a440dd233a6a31896bb4) fix(symfony): prevent symfony name converter service pollution (#7691)
+
 ## v4.2.14
 
 ### Bug fixes

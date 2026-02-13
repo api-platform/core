@@ -468,7 +468,7 @@ class EloquentTest extends TestCase
         $cartData = [
             'productSku' => 'SKU_TEST_001',
             'quantity' => 2,
-            'priceAtAddition' => '19.99',
+            'priceAtAddition' => 19.99,
             'shoppingCart' => [
                 'userIdentifier' => 'user-'.Str::uuid()->toString(),
                 'status' => 'active',
@@ -505,12 +505,12 @@ class EloquentTest extends TestCase
                 [
                     'productSku' => 'SKU_TEST_001',
                     'quantity' => 2,
-                    'priceAtAddition' => '19.99',
+                    'priceAtAddition' => 19.99,
                 ],
                 [
                     'productSku' => 'SKU_TEST_002',
                     'quantity' => 1,
-                    'priceAtAddition' => '25.50',
+                    'priceAtAddition' => 25.50,
                 ],
             ],
         ];
@@ -530,14 +530,14 @@ class EloquentTest extends TestCase
                     '@type' => 'CartItem',
                     'productSku' => 'SKU_TEST_001',
                     'quantity' => 2,
-                    'priceAtAddition' => '19.99',
+                    'priceAtAddition' => 19.99,
                 ],
                 [
                     '@id' => '/api/cart_items/2',
                     '@type' => 'CartItem',
                     'productSku' => 'SKU_TEST_002',
                     'quantity' => 1,
-                    'priceAtAddition' => '25.50',
+                    'priceAtAddition' => 25.50,
                 ],
             ],
         ]);

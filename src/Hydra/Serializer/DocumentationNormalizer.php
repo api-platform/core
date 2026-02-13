@@ -378,23 +378,23 @@ final class DocumentationNormalizer implements NormalizerInterface
             }
 
             if ($nativeType->isIdentifiedBy(TypeIdentifier::STRING)) {
-                $types[] = 'xmls:string';
+                $types[] = 'xsd:string';
             }
 
             if ($nativeType->isIdentifiedBy(TypeIdentifier::INT)) {
-                $types[] = 'xmls:integer';
+                $types[] = 'xsd:integer';
             }
 
             if ($nativeType->isIdentifiedBy(TypeIdentifier::FLOAT)) {
-                $types[] = 'xmls:decimal';
+                $types[] = 'xsd:decimal';
             }
 
             if ($nativeType->isIdentifiedBy(TypeIdentifier::BOOL)) {
-                $types[] = 'xmls:boolean';
+                $types[] = 'xsd:boolean';
             }
 
             if ($nativeType->isIdentifiedBy(\DateTimeInterface::class)) {
-                $types[] = 'xmls:dateTime';
+                $types[] = 'xsd:dateTime';
             }
 
             /** @var class-string|null $className */
@@ -427,23 +427,23 @@ final class DocumentationNormalizer implements NormalizerInterface
 
                 switch ($type->getBuiltinType()) {
                     case LegacyType::BUILTIN_TYPE_STRING:
-                        if (!\in_array('xmls:string', $types, true)) {
-                            $types[] = 'xmls:string';
+                        if (!\in_array('xsd:string', $types, true)) {
+                            $types[] = 'xsd:string';
                         }
                         break;
                     case LegacyType::BUILTIN_TYPE_INT:
-                        if (!\in_array('xmls:integer', $types, true)) {
-                            $types[] = 'xmls:integer';
+                        if (!\in_array('xsd:integer', $types, true)) {
+                            $types[] = 'xsd:integer';
                         }
                         break;
                     case LegacyType::BUILTIN_TYPE_FLOAT:
-                        if (!\in_array('xmls:decimal', $types, true)) {
-                            $types[] = 'xmls:decimal';
+                        if (!\in_array('xsd:decimal', $types, true)) {
+                            $types[] = 'xsd:decimal';
                         }
                         break;
                     case LegacyType::BUILTIN_TYPE_BOOL:
-                        if (!\in_array('xmls:boolean', $types, true)) {
-                            $types[] = 'xmls:boolean';
+                        if (!\in_array('xsd:boolean', $types, true)) {
+                            $types[] = 'xsd:boolean';
                         }
                         break;
                     case LegacyType::BUILTIN_TYPE_OBJECT:
@@ -452,8 +452,8 @@ final class DocumentationNormalizer implements NormalizerInterface
                         }
 
                         if (is_a($className, \DateTimeInterface::class, true)) {
-                            if (!\in_array('xmls:dateTime', $types, true)) {
-                                $types[] = 'xmls:dateTime';
+                            if (!\in_array('xsd:dateTime', $types, true)) {
+                                $types[] = 'xsd:dateTime';
                             }
                             break;
                         }
@@ -555,7 +555,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                         '@type' => 'rdf:Property',
                         'rdfs:label' => 'propertyPath',
                         'domain' => '#ConstraintViolationList',
-                        'range' => 'xmls:string',
+                        'range' => 'xsd:string',
                     ],
                     $hydraPrefix.'title' => 'propertyPath',
                     $hydraPrefix.'description' => 'The property path of the violation',
@@ -569,7 +569,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                         '@type' => 'rdf:Property',
                         'rdfs:label' => 'message',
                         'domain' => '#ConstraintViolationList',
-                        'range' => 'xmls:string',
+                        'range' => 'xsd:string',
                     ],
                     $hydraPrefix.'title' => 'message',
                     $hydraPrefix.'description' => 'The message associated with the violation',
@@ -662,11 +662,6 @@ final class DocumentationNormalizer implements NormalizerInterface
             HYDRA_CONTEXT,
             [
                 '@vocab' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT], UrlGeneratorInterface::ABS_URL).'#',
-                'hydra' => ContextBuilderInterface::HYDRA_NS,
-                'rdf' => ContextBuilderInterface::RDF_NS,
-                'rdfs' => ContextBuilderInterface::RDFS_NS,
-                'xmls' => ContextBuilderInterface::XML_NS,
-                'owl' => ContextBuilderInterface::OWL_NS,
                 'schema' => ContextBuilderInterface::SCHEMA_ORG_NS,
                 'domain' => ['@id' => 'rdfs:domain', '@type' => '@id'],
                 'range' => ['@id' => 'rdfs:range', '@type' => '@id'],
