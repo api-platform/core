@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonApi\Tests\Serializer;
 
+use ApiPlatform\JsonApi\Serializer\ItemDenormalizer;
 use ApiPlatform\JsonApi\Serializer\ItemNormalizer;
 use ApiPlatform\JsonApi\Serializer\ReservedAttributeNameConverter;
 use ApiPlatform\JsonApi\Tests\Fixtures\CircularReference;
@@ -293,7 +294,7 @@ class ItemNormalizerTest extends TestCase
         ]
         ));
 
-        $normalizer = new ItemNormalizer(
+        $denormalizer = new ItemDenormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $iriConverterProphecy->reveal(),
@@ -304,9 +305,9 @@ class ItemNormalizerTest extends TestCase
             [],
             $resourceMetadataCollectionFactory->reveal(),
         );
-        $normalizer->setSerializer($serializerProphecy->reveal());
+        $denormalizer->setSerializer($serializerProphecy->reveal());
 
-        $this->assertInstanceOf(Dummy::class, $normalizer->denormalize($data, Dummy::class, ItemNormalizer::FORMAT));
+        $this->assertInstanceOf(Dummy::class, $denormalizer->denormalize($data, Dummy::class, ItemDenormalizer::FORMAT));
     }
 
     public function testDenormalizeUpdateOperationNotAllowed(): void
@@ -314,14 +315,14 @@ class ItemNormalizerTest extends TestCase
         $this->expectException(NotNormalizableValueException::class);
         $this->expectExceptionMessage('Update is not allowed for this operation.');
 
-        $normalizer = new ItemNormalizer(
+        $denormalizer = new ItemDenormalizer(
             $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
             $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(),
             $this->prophesize(IriConverterInterface::class)->reveal(),
             $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
         );
 
-        $normalizer->denormalize(
+        $denormalizer->denormalize(
             [
                 'data' => [
                     'id' => 1,
@@ -329,7 +330,7 @@ class ItemNormalizerTest extends TestCase
                 ],
             ],
             Dummy::class,
-            ItemNormalizer::FORMAT,
+            ItemDenormalizer::FORMAT,
             [
                 'api_allow_update' => false,
             ]
@@ -373,7 +374,7 @@ class ItemNormalizerTest extends TestCase
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
 
-        $normalizer = new ItemNormalizer(
+        $denormalizer = new ItemDenormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $iriConverterProphecy->reveal(),
@@ -384,7 +385,7 @@ class ItemNormalizerTest extends TestCase
             []
         );
 
-        $normalizer->denormalize($data, Dummy::class, ItemNormalizer::FORMAT);
+        $denormalizer->denormalize($data, Dummy::class, ItemDenormalizer::FORMAT);
     }
 
     public function testDenormalizeCollectionWithInvalidKey(): void
@@ -427,7 +428,7 @@ class ItemNormalizerTest extends TestCase
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
 
-        $normalizer = new ItemNormalizer(
+        $denormalizer = new ItemDenormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $iriConverterProphecy->reveal(),
@@ -438,7 +439,7 @@ class ItemNormalizerTest extends TestCase
             []
         );
 
-        $normalizer->denormalize($data, Dummy::class, ItemNormalizer::FORMAT);
+        $denormalizer->denormalize($data, Dummy::class, ItemDenormalizer::FORMAT);
     }
 
     public function testDenormalizeRelationIsNotResourceLinkage(): void
@@ -475,7 +476,7 @@ class ItemNormalizerTest extends TestCase
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
 
-        $normalizer = new ItemNormalizer(
+        $denormalizer = new ItemDenormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),
             $propertyMetadataFactoryProphecy->reveal(),
             $iriConverterProphecy->reveal(),
@@ -486,7 +487,7 @@ class ItemNormalizerTest extends TestCase
             []
         );
 
-        $normalizer->denormalize($data, Dummy::class, ItemNormalizer::FORMAT);
+        $denormalizer->denormalize($data, Dummy::class, ItemDenormalizer::FORMAT);
     }
 
     public function testNormalizeWithNullToOneAndEmptyToManyRelationships(): void

@@ -21,6 +21,7 @@ use ApiPlatform\Elasticsearch\Filter\OrderFilter;
 use ApiPlatform\Elasticsearch\Filter\TermFilter;
 use ApiPlatform\Elasticsearch\Metadata\Resource\Factory\ElasticsearchProviderResourceMetadataCollectionFactory;
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
+use ApiPlatform\Elasticsearch\Serializer\ItemDenormalizer;
 use ApiPlatform\Elasticsearch\Serializer\ItemNormalizer;
 use ApiPlatform\Elasticsearch\Serializer\NameConverter\InnerFieldsNameConverter;
 use ApiPlatform\Elasticsearch\State\CollectionProvider;
@@ -36,9 +37,23 @@ return function (ContainerConfigurator $container) {
         ->decorate('api_platform.serializer.normalizer.item', null, 0)
         ->args([service('api_platform.elasticsearch.normalizer.item.inner')]);
 
+    $services->set('api_platform.elasticsearch.denormalizer.item', ItemDenormalizer::class)
+        ->args([
+            service('api_platform.metadata.property.name_collection_factory'),
+            service('api_platform.metadata.property.metadata_factory'),
+            service('api_platform.iri_converter'),
+            service('api_platform.resource_class_resolver'),
+            service('api_platform.property_accessor'),
+            service('api_platform.elasticsearch.name_converter.inner_fields'),
+            service('serializer.mapping.class_metadata_factory'),
+            '%api_platform.serializer.default_context%',
+            service('api_platform.metadata.resource.metadata_collection_factory'),
+            service('api_platform.security.resource_access_checker')->nullOnInvalid(),
+        ])
+        ->tag('serializer.normalizer', ['priority' => -895]);
+
     $services->set('api_platform.elasticsearch.normalizer.document', DocumentNormalizer::class)
         ->args([
-            service('api_platform.metadata.resource.metadata_collection_factory'),
             service('serializer.mapping.class_metadata_factory'),
             service('api_platform.elasticsearch.name_converter.inner_fields'),
             service('serializer.property_accessor'),

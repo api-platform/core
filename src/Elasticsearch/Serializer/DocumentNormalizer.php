@@ -13,37 +13,32 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\Serializer;
 
-use ApiPlatform\Metadata\HttpOperation;
-use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
-use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
- * Document denormalizer for Elasticsearch.
+ * Document normalizer for Elasticsearch.
  *
  * @experimental
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-final class DocumentNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
+final class DocumentNormalizer implements NormalizerInterface, SerializerAwareInterface
 {
     public const FORMAT = 'elasticsearch';
 
     private readonly ObjectNormalizer $decoratedNormalizer;
 
     public function __construct(
-        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
         ?ClassMetadataFactoryInterface $classMetadataFactory = null,
-        private readonly ?NameConverterInterface $nameConverter = null,
+        ?NameConverterInterface $nameConverter = null,
         ?PropertyAccessorInterface $propertyAccessor = null,
         ?PropertyTypeExtractorInterface $propertyTypeExtractor = null,
         ?ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null,
@@ -56,66 +51,32 @@ final class DocumentNormalizer implements NormalizerInterface, DenormalizerInter
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
-    {
-        return self::FORMAT === $format && $this->decoratedNormalizer->supportsDenormalization($data, $type, $format, $context);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
-    {
-        if (\is_string($data['_id'] ?? null) && \is_array($data['_source'] ?? null)) {
-            $data = $this->populateIdentifier($data, $type)['_source'];
-        }
-
-        return $this->decoratedNormalizer->denormalize($data, $type, $format, $context);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
-        // prevent the use of lower priority normalizers (e.g. serializer.normalizer.object) for this format
+        // Ensure that a resource is being normalized
+        if (!\is_object($data)) {
+            return false;
+        }
+
+        // Only normalize for the elasticsearch format
         return self::FORMAT === $format;
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @throws LogicException
      */
     public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        throw new LogicException(\sprintf('%s is a write-only format.', self::FORMAT));
-    }
+        $normalizedData = $this->decoratedNormalizer->normalize($data, $format, $context);
 
-    /**
-     * Populates the resource identifier with the document identifier if not present in the original JSON document.
-     */
-    private function populateIdentifier(array $data, string $class): array
-    {
-        $identifier = 'id';
-        $resourceMetadata = $this->resourceMetadataCollectionFactory->create($class);
-
-        $operation = $resourceMetadata->getOperation();
-        if ($operation instanceof HttpOperation) {
-            $uriVariable = $operation->getUriVariables()[0] ?? null;
-
-            if ($uriVariable) {
-                $identifier = $uriVariable->getIdentifiers()[0] ?? 'id';
-            }
+        // Add _id and _source if not already present
+        // This is a basic implementation and might need to be more sophisticated based on specific needs.
+        // It assumes 'id' is the primary identifier for the resource.
+        if (\is_array($normalizedData) && !isset($normalizedData['_id']) && isset($normalizedData['id'])) {
+            $normalizedData = ['_id' => (string) $normalizedData['id'], '_source' => $normalizedData];
         }
 
-        $identifier = null === $this->nameConverter ? $identifier : $this->nameConverter->normalize($identifier, $class, self::FORMAT);
-
-        if (!isset($data['_source'][$identifier])) {
-            $data['_source'][$identifier] = $data['_id'];
-        }
-
-        return $data;
+        return $normalizedData;
     }
 
     /**

@@ -18,6 +18,7 @@ use ApiPlatform\JsonApi\Serializer\CollectionNormalizer;
 use ApiPlatform\JsonApi\Serializer\ConstraintViolationListNormalizer;
 use ApiPlatform\JsonApi\Serializer\EntrypointNormalizer;
 use ApiPlatform\JsonApi\Serializer\ErrorNormalizer;
+use ApiPlatform\JsonApi\Serializer\ItemDenormalizer;
 use ApiPlatform\JsonApi\Serializer\ItemNormalizer;
 use ApiPlatform\JsonApi\Serializer\ObjectNormalizer;
 use ApiPlatform\JsonApi\Serializer\ReservedAttributeNameConverter;
@@ -74,6 +75,22 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.http_cache.tag_collector')->ignoreOnInvalid(),
         ])
         ->tag('serializer.normalizer', ['priority' => -890]);
+
+    $services->set('api_platform.jsonapi.normalizer.item_denormalizer', ItemDenormalizer::class)
+        ->args([
+            service('api_platform.metadata.property.name_collection_factory'),
+            service('api_platform.metadata.property.metadata_factory'),
+            service('api_platform.iri_converter'),
+            service('api_platform.resource_class_resolver'),
+            service('api_platform.property_accessor'),
+            service('api_platform.jsonapi.name_converter.reserved_attribute_name'),
+            service('serializer.mapping.class_metadata_factory')->ignoreOnInvalid(),
+            [],
+            service('api_platform.metadata.resource.metadata_collection_factory'),
+            service('api_platform.security.resource_access_checker')->ignoreOnInvalid(),
+            service('api_platform.http_cache.tag_collector')->ignoreOnInvalid(),
+        ])
+        ->tag('serializer.normalizer', ['priority' => -885]);
 
     $services->set('api_platform.jsonapi.normalizer.object', ObjectNormalizer::class)
         ->args([
