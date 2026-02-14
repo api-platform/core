@@ -50,8 +50,9 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
             $queryBuilder
                 ->{$context['whereClause'] ?? 'andWhere'}(\sprintf('%s.%s IN (:%s)', $alias, $property, $parameterName));
         } else {
+            $operator = $context['operator'] ?? '=';
             $queryBuilder
-                ->{$context['whereClause'] ?? 'andWhere'}(\sprintf('%s.%s = :%s', $alias, $property, $parameterName));
+                ->{$context['whereClause'] ?? 'andWhere'}(\sprintf('%s.%s %s :%s', $alias, $property, $operator, $parameterName));
         }
 
         $queryBuilder->setParameter($parameterName, $value);
