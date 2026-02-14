@@ -119,7 +119,7 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('attributesProvider')]
+    #[DataProvider('attributesProvider')]
     public function testCreateWithAttributes($readAttributes, $writeAttributes): void
     {
         $serializerClassMetadataFactoryProphecy = $this->prophesize(SerializerClassMetadataFactoryInterface::class);

@@ -78,9 +78,11 @@ class AbstractUuidFilter implements FilterInterface, ManagerRegistryAwareInterfa
 
         $metadata = $this->getNestedMetadata($resourceClass, $associations);
 
+        $operator = $context['operator'] ?? '=';
+
         if ($metadata->hasField($field)) {
             $value = $this->convertValuesToTheDatabaseRepresentation($queryBuilder, $this->getDoctrineFieldType($property, $resourceClass), $value);
-            $this->addWhere($queryBuilder, $queryNameGenerator, $alias, $field, $value);
+            $this->addWhere($queryBuilder, $queryNameGenerator, $alias, $field, $value, $operator, $context);
 
             return;
         }
@@ -111,7 +113,7 @@ class AbstractUuidFilter implements FilterInterface, ManagerRegistryAwareInterfa
         }
 
         $value = $this->convertValuesToTheDatabaseRepresentation($queryBuilder, $doctrineTypeField, $value);
-        $this->addWhere($queryBuilder, $queryNameGenerator, $associationAlias, $associationField, $value);
+        $this->addWhere($queryBuilder, $queryNameGenerator, $associationAlias, $associationField, $value, $operator, $context);
     }
 
     /**
@@ -144,21 +146,28 @@ class AbstractUuidFilter implements FilterInterface, ManagerRegistryAwareInterfa
     /**
      * Adds where clause.
      */
-    private function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, mixed $value): void
+    private function addWhere(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $alias, string $field, mixed $value, string $operator = '=', array $context = []): void
     {
         $valueParameter = ':'.$queryNameGenerator->generateParameterName($field);
         $aliasedField = \sprintf('%s.%s', $alias, $field);
+        $whereClause = $context['whereClause'] ?? 'andWhere';
 
         if (!\is_array($value)) {
-            $queryBuilder
-                ->andWhere($queryBuilder->expr()->eq($aliasedField, $valueParameter))
-                ->setParameter($valueParameter, $value, $this->getDoctrineParameterType());
+            if ('=' === $operator) {
+                $queryBuilder
+                    ->{$whereClause}($queryBuilder->expr()->eq($aliasedField, $valueParameter))
+                    ->setParameter($valueParameter, $value, $this->getDoctrineParameterType());
+            } else {
+                $queryBuilder
+                    ->{$whereClause}(\sprintf('%s %s %s', $aliasedField, $operator, $valueParameter))
+                    ->setParameter($valueParameter, $value, $this->getDoctrineParameterType());
+            }
 
             return;
         }
 
         $queryBuilder
-            ->andWhere($queryBuilder->expr()->in($aliasedField, $valueParameter))
+            ->{$whereClause}($queryBuilder->expr()->in($aliasedField, $valueParameter))
             ->setParameter($valueParameter, $value, $this->getDoctrineArrayParameterType());
     }
 

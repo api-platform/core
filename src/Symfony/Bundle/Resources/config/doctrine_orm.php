@@ -23,6 +23,7 @@ use ApiPlatform\Doctrine\Orm\Extension\PaginationExtension;
 use ApiPlatform\Doctrine\Orm\Extension\ParameterExtension;
 use ApiPlatform\Doctrine\Orm\Filter\BackedEnumFilter;
 use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Doctrine\Orm\Filter\ComparisonFilter;
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
 use ApiPlatform\Doctrine\Orm\Filter\NumericFilter;
@@ -251,6 +252,9 @@ return function (ContainerConfigurator $container) {
     $services->set('api_platform.doctrine.orm.search_filter.instance')
         ->parent('api_platform.doctrine.orm.search_filter')
         ->args([[]]);
+
+    $services->set('api_platform.doctrine.orm.comparison_filter', ComparisonFilter::class);
+    $services->alias(ComparisonFilter::class, 'api_platform.doctrine.orm.comparison_filter');
 
     $services->set('api_platform.doctrine.orm.uuid_filter', UuidFilter::class);
     $services->alias(UuidFilter::class, 'api_platform.doctrine.orm.uuid_filter');
