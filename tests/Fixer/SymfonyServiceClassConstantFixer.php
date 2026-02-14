@@ -335,7 +335,6 @@ final class SymfonyServiceClassConstantFixer extends AbstractFixer
             }
 
             $tokensToInsert[] = new Token(';');
-            $tokensToInsert[] = new Token([\T_WHITESPACE, "\n"]);
         }
 
         $tokens->insertAt($insertIndex + 1, $tokensToInsert);
