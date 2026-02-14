@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\ComparisonFilter;
 use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
 use ApiPlatform\Doctrine\Orm\Filter\FreeTextQueryFilter;
 use ApiPlatform\Doctrine\Orm\Filter\IriFilter;
@@ -61,6 +62,10 @@ use Doctrine\ORM\Mapping as ORM;
                 'searchOwnerNameExact[:property]' => new QueryParameter(
                     filter: new ExactFilter(),
                     properties: ['owner.name'],
+                ),
+                'idComparison' => new QueryParameter(
+                    filter: new ComparisonFilter(new ExactFilter()),
+                    property: 'id',
                 ),
             ],
         ),

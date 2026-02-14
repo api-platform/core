@@ -311,6 +311,14 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                 }
             }
 
+            if ($parameter->getCastToNativeType() && null === $parameter->getCastFn()) {
+                $propertyKey = $parameter->getProperty() ?? $key;
+                $propNativeType = ($properties[$propertyKey] ?? null)?->getNativeType();
+                if ($propNativeType && $propNativeType->isIdentifiedBy(\DateTimeInterface::class)) {
+                    $parameter = $parameter->withCastFn([ValueCaster::class, 'toDateTime']);
+                }
+            }
+
             $priority = $parameter->getPriority() ?? $internalPriority--;
             $parameters->add($key, $parameter->withPriority($priority));
         }

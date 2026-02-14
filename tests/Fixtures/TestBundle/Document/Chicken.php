@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
+use ApiPlatform\Doctrine\Odm\Filter\ComparisonFilter;
 use ApiPlatform\Doctrine\Odm\Filter\ExactFilter;
 use ApiPlatform\Doctrine\Odm\Filter\FreeTextQueryFilter;
 use ApiPlatform\Doctrine\Odm\Filter\IriFilter;
@@ -61,6 +62,10 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
                 'searchOwnerNameExact[:property]' => new QueryParameter(
                     filter: new ExactFilter(),
                     properties: ['owner.name'],
+                ),
+                'idComparison' => new QueryParameter(
+                    filter: new ComparisonFilter(new ExactFilter()),
+                    property: 'id',
                 ),
             ],
         ),
