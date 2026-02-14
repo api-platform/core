@@ -76,7 +76,7 @@ final class OrFilterTest extends ApiTestCase
 
         /** @var DoctrineDataCollector */
         $db = $profile->getCollector('db');
-        $this->assertStringContainsString('WHERE c1_.id = ? AND (c2_.name = ? OR c2_.ean = ?))', end($db->getQueries()['default'])['sql']);
+        $this->assertStringContainsString('WHERE c0_.chickenCoop_id = ? AND (c0_.name = ? OR c0_.ean = ?)', end($db->getQueries()['default'])['sql']);
     }
 
     public function testOrFilterWithOneToManyRelation(): void

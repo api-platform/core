@@ -18,7 +18,7 @@ use ApiPlatform\Doctrine\Common\Filter\LoggerAwareTrait;
 use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
 use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareTrait;
 use ApiPlatform\Doctrine\Common\PropertyHelperTrait;
-use ApiPlatform\Doctrine\Orm\PropertyHelperTrait as OrmPropertyHelperTrait;
+use ApiPlatform\Doctrine\Orm\NestedPropertyHelperTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
@@ -33,7 +33,6 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
-use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -44,13 +43,29 @@ class AbstractUuidFilter implements FilterInterface, ManagerRegistryAwareInterfa
     use BackwardCompatibleFilterDescriptionTrait;
     use LoggerAwareTrait;
     use ManagerRegistryAwareTrait;
-    use OrmPropertyHelperTrait;
+    use NestedPropertyHelperTrait;
     use PropertyHelperTrait;
 
     private const UUID_SCHEMA = [
         'type' => 'string',
         'format' => 'uuid',
     ];
+
+    /**
+     * Gets class metadata for the given resource.
+     */
+    protected function getClassMetadata(string $resourceClass): \Doctrine\Persistence\Mapping\ClassMetadata
+    {
+        $manager = $this
+            ->getManagerRegistry()
+            ->getManagerForClass($resourceClass);
+
+        if ($manager) {
+            return $manager->getClassMetadata($resourceClass);
+        }
+
+        return new \Doctrine\ORM\Mapping\ClassMetadata($resourceClass);
+    }
 
     public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
@@ -60,26 +75,28 @@ class AbstractUuidFilter implements FilterInterface, ManagerRegistryAwareInterfa
         }
 
         if (null === $parameter->getProperty()) {
-            throw new InvalidArgumentException(\sprintf('The filter parameter with key "%s" must specify a property. Nested properties are not automatically resolved. Please provide the property explicitly.', $parameter->getKey()));
+            throw new InvalidArgumentException(\sprintf('The filter parameter with key "%s" must specify a property. Please provide the property explicitly.', $parameter->getKey()));
         }
 
-        $this->filterProperty($parameter->getProperty(), $parameter->getValue(), $queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
+        $this->filterProperty($parameter, $queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
     }
 
-    private function filterProperty(string $property, mixed $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
+    private function filterProperty(Parameter $parameter, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
+        $property = $parameter->getProperty();
+        $value = $parameter->getValue();
         $alias = $queryBuilder->getRootAliases()[0];
-        $field = $property;
 
-        $associations = [];
-        if ($this->isPropertyNested($property, $resourceClass)) {
-            [$alias, $field, $associations] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $resourceClass, Join::INNER_JOIN);
-        }
+        [$alias, $field] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $parameter);
 
-        $metadata = $this->getNestedMetadata($resourceClass, $associations);
+        // Get the target resource class for nested properties
+        $nestedInfo = $parameter->getExtraProperties()['nested_property_info'] ?? null;
+        $targetResourceClass = $nestedInfo['leaf_class'] ?? $resourceClass;
+
+        $metadata = $this->getClassMetadata($targetResourceClass);
 
         if ($metadata->hasField($field)) {
-            $value = $this->convertValuesToTheDatabaseRepresentation($queryBuilder, $this->getDoctrineFieldType($property, $resourceClass), $value);
+            $value = $this->convertValuesToTheDatabaseRepresentation($queryBuilder, $this->getDoctrineFieldType($field, $targetResourceClass), $value);
             $this->addWhere($queryBuilder, $queryNameGenerator, $alias, $field, $value);
 
             return;
@@ -89,8 +106,8 @@ class AbstractUuidFilter implements FilterInterface, ManagerRegistryAwareInterfa
         if (!$metadata->hasAssociation($field)) {
             $this->logger->notice('Tried to filter on a non-existent field or association', [
                 'field' => $field,
-                'resource_class' => $resourceClass,
-                'exception' => new InvalidArgumentException(\sprintf('Property "%s" does not exist in resource "%s".', $field, $resourceClass)),
+                'resource_class' => $targetResourceClass,
+                'exception' => new InvalidArgumentException(\sprintf('Property "%s" does not exist in resource "%s".', $field, $targetResourceClass)),
             ]);
 
             return;

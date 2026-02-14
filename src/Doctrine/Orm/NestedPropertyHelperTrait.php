@@ -37,6 +37,7 @@ trait NestedPropertyHelperTrait
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         Parameter $parameter,
+        ?string $joinType = null,
     ): array {
         $extraProperties = $parameter->getExtraProperties();
         $nestedInfo = $extraProperties['nested_property_info'] ?? null;
@@ -50,7 +51,8 @@ trait NestedPropertyHelperTrait
                 $queryBuilder,
                 $queryNameGenerator,
                 $alias,
-                $association
+                $association,
+                $joinType
             );
         }
 
