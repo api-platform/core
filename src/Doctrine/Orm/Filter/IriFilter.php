@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Orm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
+use ApiPlatform\Doctrine\Orm\NestedPropertyHelperTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
@@ -29,6 +30,7 @@ use Doctrine\ORM\QueryBuilder;
 final class IriFilter implements FilterInterface, OpenApiParameterFilterInterface, ParameterProviderFilterInterface
 {
     use BackwardCompatibleFilterDescriptionTrait;
+    use NestedPropertyHelperTrait;
     use OpenApiFilterTrait;
 
     public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
@@ -42,6 +44,9 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
 
         $property = $parameter->getProperty();
         $alias = $queryBuilder->getRootAliases()[0];
+
+        [$alias, $property] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $parameter);
+
         $parameterName = $queryNameGenerator->generateParameterName($property);
 
         $queryBuilder->join(\sprintf('%s.%s', $alias, $property), $parameterName);
