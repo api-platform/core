@@ -43,7 +43,7 @@ class DocumentationActionAppKernel extends \AppKernel
     {
         parent::configureContainer($c, $loader);
 
-        $loader->load(static function (ContainerBuilder $container) {
+        $loader->load(static function (ContainerBuilder $container): void {
             $container->loadFromExtension('api_platform', [
                 'enable_swagger_ui' => DocumentationActionAppKernel::$swaggerUiEnabled,
                 'enable_re_doc' => DocumentationActionAppKernel::$reDocEnabled,

@@ -160,6 +160,7 @@
         "psr/log": "^1.0 || ^2.0 || ^3.0",
         "ramsey/uuid": "^4.7",
         "ramsey/uuid-doctrine": "^2.0",
+        "rector/rector": "^2.3",
         "soyuka/contexts": "^3.3.10",
         "soyuka/pmu": "^0.2.0",
         "soyuka/stubs-mongodb": "^1.0",

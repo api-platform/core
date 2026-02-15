@@ -41,7 +41,7 @@ use ApiPlatform\Doctrine\Orm\State\ItemProvider;
 use ApiPlatform\Doctrine\Orm\State\LinksHandler;
 use Doctrine\Persistence\Mapping\ClassMetadataFactory;
 
-return function (ContainerConfigurator $container) {
+return function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.doctrine.metadata_factory', ClassMetadataFactory::class)->factory([service('doctrine.orm.default_entity_manager'), 'getMetadataFactory']);

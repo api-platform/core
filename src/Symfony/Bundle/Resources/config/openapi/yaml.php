@@ -15,7 +15,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use ApiPlatform\Serializer\YamlEncoder;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.yamlopenapi.encoder', YamlEncoder::class)

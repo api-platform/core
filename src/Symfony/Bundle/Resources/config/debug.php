@@ -17,7 +17,7 @@ use ApiPlatform\Symfony\Bundle\Command\DebugResourceCommand;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('debug.var_dumper.cloner', VarCloner::class);

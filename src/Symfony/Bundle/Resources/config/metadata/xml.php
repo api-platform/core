@@ -16,7 +16,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use ApiPlatform\Metadata\Extractor\XmlPropertyExtractor;
 use ApiPlatform\Metadata\Extractor\XmlResourceExtractor;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.metadata.resource_extractor.xml', XmlResourceExtractor::class)

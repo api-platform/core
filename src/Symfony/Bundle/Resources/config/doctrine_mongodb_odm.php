@@ -35,7 +35,7 @@ use ApiPlatform\Doctrine\Odm\State\ItemProvider;
 use ApiPlatform\Doctrine\Odm\State\LinksHandler;
 use Doctrine\Persistence\Mapping\ClassMetadataFactory;
 
-return function (ContainerConfigurator $container) {
+return function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.doctrine_mongodb.odm.default_document_manager.property_info_extractor', DoctrineExtractor::class)

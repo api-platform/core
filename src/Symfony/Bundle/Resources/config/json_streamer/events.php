@@ -20,7 +20,7 @@ use ApiPlatform\Serializer\State\JsonStreamerProvider;
 use ApiPlatform\Symfony\EventListener\JsonStreamerDeserializeListener;
 use ApiPlatform\Symfony\EventListener\JsonStreamerSerializeListener;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.jsonld.state_processor.json_streamer', HydraJsonStreamerProcessor::class)

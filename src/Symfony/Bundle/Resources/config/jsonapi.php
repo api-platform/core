@@ -23,7 +23,7 @@ use ApiPlatform\JsonApi\Serializer\ObjectNormalizer;
 use ApiPlatform\JsonApi\Serializer\ReservedAttributeNameConverter;
 use ApiPlatform\Serializer\JsonEncoder;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.jsonapi.json_schema.schema_factory', SchemaFactory::class)
