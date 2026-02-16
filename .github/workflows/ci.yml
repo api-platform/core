@@ -178,6 +178,57 @@ jobs:
         run: |
           ./vendor/bin/phpstan analyse --no-interaction --no-progress --ansi
 
+  redocly-lint:
+    name: Lint OpenAPI with Redocly
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        php:
+          - '8.4'
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: intl, bcmath, curl, openssl, mbstring
+          ini-values: memory_limit=-1
+          tools: composer
+          coverage: none
+      - name: Get composer cache directory
+        id: composercache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      - name: Cache dependencies
+        uses: actions/cache@v5
+        with:
+          path: ${{ steps.composercache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-
+      - name: Update project dependencies
+        run: |
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link .
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Redocly CLI
+        run: npm install -g @redocly/cli@latest
+      - name: Clear test app cache
+        run: |
+          rm -Rf tests/Fixtures/app/var/cache/*
+          tests/Fixtures/app/console cache:warmup
+      - name: Generate OpenAPI spec
+        run: |
+          mkdir -p /tmp/openapi
+          tests/Fixtures/app/console api:openapi:export --output=/tmp/openapi/openapi.json --no-ansi
+      - name: Lint OpenAPI spec with Redocly
+        run: redocly lint /tmp/openapi/openapi.json
+
   phpunit:
     name: PHPUnit (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
