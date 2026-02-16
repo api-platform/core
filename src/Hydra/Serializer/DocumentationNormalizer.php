@@ -156,7 +156,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             $class['subClassOf'] = 'Error';
         }
 
-        $types = array_values(array_filter($resourceMetadata->getTypes() ?? [], static fn (string $type) => $type !== $prefixedShortName));
+        $types = array_values(array_filter($resourceMetadata->getTypes() ?? [], static fn (string $type): bool => $type !== $prefixedShortName));
         if ($types) {
             $class['subClassOf'] = 1 === \count($types) ? $types[0] : $types;
         }
@@ -373,7 +373,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                 return null;
             }
 
-            if ($nativeType->isSatisfiedBy(static fn ($t) => $t instanceof CollectionType)) {
+            if ($nativeType->isSatisfiedBy(static fn ($t): bool => $t instanceof CollectionType)) {
                 $nativeType = TypeHelper::getCollectionValueType($nativeType);
             }
 

@@ -62,7 +62,7 @@ class UuidFilterWithCustomSchemaTest extends ApiTestCase
                     'format' => 'uuid',
                 ],
             ],
-            array_map(static fn ($p) => array_intersect_key($p, ['name' => 1, 'in' => 1, 'required' => 1, 'schema' => 1]), $json['paths']['/uuid_filter_with_custom_schemas']['get']['parameters'])
+            array_map(static fn ($p): array => array_intersect_key($p, ['name' => 1, 'in' => 1, 'required' => 1, 'schema' => 1]), $json['paths']['/uuid_filter_with_custom_schemas']['get']['parameters'])
         );
 
         self::assertContains(
@@ -80,7 +80,7 @@ class UuidFilterWithCustomSchemaTest extends ApiTestCase
                 'style' => 'deepObject',
                 'explode' => true,
             ],
-            array_map(static fn ($p) => array_intersect_key($p, ['name' => 1, 'in' => 1, 'required' => 1, 'schema' => 1, 'style' => 1, 'explode' => 1]), $json['paths']['/uuid_filter_with_custom_schemas']['get']['parameters'])
+            array_map(static fn ($p): array => array_intersect_key($p, ['name' => 1, 'in' => 1, 'required' => 1, 'schema' => 1, 'style' => 1, 'explode' => 1]), $json['paths']['/uuid_filter_with_custom_schemas']['get']['parameters'])
         );
     }
 
@@ -102,7 +102,7 @@ class UuidFilterWithCustomSchemaTest extends ApiTestCase
                     'format' => 'uuid',
                 ],
             ],
-            array_map(static fn ($p) => array_intersect_key($p, ['name' => 1, 'in' => 1, 'required' => 1, 'schema' => 1]), $json['paths']['/uuid_filter_with_custom_schemas']['get']['parameters'])
+            array_map(static fn ($p): array => array_intersect_key($p, ['name' => 1, 'in' => 1, 'required' => 1, 'schema' => 1]), $json['paths']['/uuid_filter_with_custom_schemas']['get']['parameters'])
         );
 
         self::assertNotContains(
@@ -138,7 +138,7 @@ class UuidFilterWithCustomSchemaTest extends ApiTestCase
                 'style' => 'deepObject',
                 'explode' => true,
             ],
-            array_map(static fn ($p) => array_intersect_key($p, ['name' => 1, 'in' => 1, 'required' => 1, 'schema' => 1, 'style' => 1, 'explode' => 1]), $json['paths']['/uuid_filter_with_custom_schemas']['get']['parameters'])
+            array_map(static fn ($p): array => array_intersect_key($p, ['name' => 1, 'in' => 1, 'required' => 1, 'schema' => 1, 'style' => 1, 'explode' => 1]), $json['paths']['/uuid_filter_with_custom_schemas']['get']['parameters'])
         );
     }
 
@@ -160,7 +160,7 @@ class UuidFilterWithCustomSchemaTest extends ApiTestCase
                     'format' => 'uuid',
                 ],
             ],
-            array_map(static fn ($p) => array_intersect_key($p, ['name' => 1, 'in' => 1, 'required' => 1, 'schema' => 1]), $json['paths']['/uuid_filter_with_custom_schemas']['get']['parameters'])
+            array_map(static fn ($p): array => array_intersect_key($p, ['name' => 1, 'in' => 1, 'required' => 1, 'schema' => 1]), $json['paths']['/uuid_filter_with_custom_schemas']['get']['parameters'])
         );
 
         self::assertContains(
@@ -178,7 +178,7 @@ class UuidFilterWithCustomSchemaTest extends ApiTestCase
                 'style' => 'deepObject',
                 'explode' => true,
             ],
-            array_map(static fn ($p) => array_intersect_key($p, ['name' => 1, 'in' => 1, 'required' => 1, 'schema' => 1, 'style' => 1, 'explode' => 1]), $json['paths']['/uuid_filter_with_custom_schemas']['get']['parameters'])
+            array_map(static fn ($p): array => array_intersect_key($p, ['name' => 1, 'in' => 1, 'required' => 1, 'schema' => 1, 'style' => 1, 'explode' => 1]), $json['paths']['/uuid_filter_with_custom_schemas']['get']['parameters'])
         );
     }
 

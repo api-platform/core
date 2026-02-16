@@ -97,7 +97,7 @@ class DummyCar
         return $this->secondColors;
     }
 
-    public function setSecondColors($secondColors): void
+    public function setSecondColors(?iterable $secondColors): void
     {
         $this->secondColors = $secondColors;
     }
@@ -107,7 +107,7 @@ class DummyCar
         return $this->thirdColors;
     }
 
-    public function setThirdColors($thirdColors): void
+    public function setThirdColors(?iterable $thirdColors): void
     {
         $this->thirdColors = $thirdColors;
     }
@@ -117,7 +117,7 @@ class DummyCar
         return $this->uuid;
     }
 
-    public function setUuid($uuid): void
+    public function setUuid(?iterable $uuid): void
     {
         $this->uuid = $uuid;
     }

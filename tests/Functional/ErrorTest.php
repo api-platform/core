@@ -34,7 +34,7 @@ final class ErrorTest extends ApiTestCase
     }
 
     #[DataProvider('formatsProvider')]
-    public function testRetrieveError(string $format, string $status, $expected): void
+    public function testRetrieveError(string $format, string $status, array $expected): void
     {
         self::createClient()->request('GET', '/errors/'.$status, ['headers' => ['accept' => $format]]);
         $this->assertJsonContains($expected);

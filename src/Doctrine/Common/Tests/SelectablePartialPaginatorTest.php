@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
 class SelectablePartialPaginatorTest extends TestCase
 {
     #[DataProvider('initializeProvider')]
-    public function testInitialize($results, $currentPage, $itemsPerPage, $currentItems): void
+    public function testInitialize(array $results, int $currentPage, int $itemsPerPage, int $currentItems): void
     {
         $results = new ArrayCollection($results);
         $paginator = new SelectablePartialPaginator($results, $currentPage, $itemsPerPage);

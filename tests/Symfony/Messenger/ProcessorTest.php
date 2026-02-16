@@ -35,7 +35,7 @@ class ProcessorTest extends TestCase
         $dummy = new Dummy();
 
         $messageBus = $this->prophesize(MessageBusInterface::class);
-        $messageBus->dispatch(Argument::that(static fn (Envelope $envelope) => $dummy === $envelope->getMessage() && null !== $envelope->last(ContextStamp::class)))->willReturn(new Envelope($dummy))->shouldBeCalled();
+        $messageBus->dispatch(Argument::that(static fn (Envelope $envelope): bool => $dummy === $envelope->getMessage() && null !== $envelope->last(ContextStamp::class)))->willReturn(new Envelope($dummy))->shouldBeCalled();
 
         $processor = new Processor($messageBus->reveal());
         $this->assertSame($dummy, $processor->process($dummy, new Get()));
@@ -47,7 +47,7 @@ class ProcessorTest extends TestCase
 
         $messageBus = $this->prophesize(MessageBusInterface::class);
 
-        $messageBus->dispatch(Argument::that(static fn (Envelope $envelope) => $dummy === $envelope->getMessage() && null !== $envelope->last(RemoveStamp::class)))->willReturn(new Envelope($dummy))->shouldBeCalled();
+        $messageBus->dispatch(Argument::that(static fn (Envelope $envelope): bool => $dummy === $envelope->getMessage() && null !== $envelope->last(RemoveStamp::class)))->willReturn(new Envelope($dummy))->shouldBeCalled();
 
         $processor = new Processor($messageBus->reveal());
         $processor->process($dummy, new Delete());
@@ -58,7 +58,7 @@ class ProcessorTest extends TestCase
         $dummy = new Dummy();
 
         $messageBus = $this->prophesize(MessageBusInterface::class);
-        $messageBus->dispatch(Argument::that(static fn (Envelope $envelope) => $dummy === $envelope->getMessage() && null !== $envelope->last(ContextStamp::class)))->willReturn((new Envelope($dummy))->with(new HandledStamp($dummy, 'DummyHandler::__invoke')))->shouldBeCalled();
+        $messageBus->dispatch(Argument::that(static fn (Envelope $envelope): bool => $dummy === $envelope->getMessage() && null !== $envelope->last(ContextStamp::class)))->willReturn((new Envelope($dummy))->with(new HandledStamp($dummy, 'DummyHandler::__invoke')))->shouldBeCalled();
 
         $processor = new Processor($messageBus->reveal());
         $this->assertSame($dummy, $processor->process($dummy, new Get()));

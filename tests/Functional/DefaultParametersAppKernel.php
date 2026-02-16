@@ -26,7 +26,7 @@ class DefaultParametersAppKernel extends \AppKernel
     {
         parent::configureContainer($c, $loader);
 
-        $loader->load(static function (ContainerBuilder $container) {
+        $loader->load(static function (ContainerBuilder $container): void {
             if ($container->hasDefinition('phpunit_resource_name_collection')) {
                 $container->removeDefinition('phpunit_resource_name_collection');
             }

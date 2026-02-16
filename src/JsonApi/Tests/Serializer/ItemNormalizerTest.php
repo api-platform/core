@@ -506,7 +506,7 @@ class ItemNormalizerTest extends TestCase
         );
 
         $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactory->method('create')->willReturnCallback(static function ($class, $property) {
+        $propertyMetadataFactory->method('create')->willReturnCallback(static function ($class, $property): ApiProperty {
             return match ($property) {
                 'id' => (new ApiProperty())->withReadable(true)->withIdentifier(true),
                 'name' => (new ApiProperty())->withReadable(true),
@@ -527,10 +527,10 @@ class ItemNormalizerTest extends TestCase
 
         $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
         $resourceClassResolver->method('getResourceClass')->willReturn(Dummy::class);
-        $resourceClassResolver->method('isResourceClass')->willReturnCallback(static fn ($class) => \in_array($class, [Dummy::class, RelatedDummy::class], true));
+        $resourceClassResolver->method('isResourceClass')->willReturnCallback(static fn ($class): bool => \in_array($class, [Dummy::class, RelatedDummy::class], true));
 
         $propertyAccessor = $this->createMock(PropertyAccessorInterface::class);
-        $propertyAccessor->method('getValue')->willReturnCallback(static function ($object, $property) {
+        $propertyAccessor->method('getValue')->willReturnCallback(static function ($object, $property): array|int|string|null {
             return match ($property) {
                 'id' => 1,
                 'name' => 'Dummy with relationships',
@@ -781,7 +781,7 @@ class ItemNormalizerTest extends TestCase
         $getOperation = (new Get(uriVariables: ['id' => new Link(parameterName: 'id', identifiers: ['id'], fromClass: Dummy::class)]))->withClass(Dummy::class);
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, $getOperation, Argument::that(static fn ($ctx) => ($ctx['uri_variables'] ?? null) === ['id' => '10']))->willReturn('/dummies/10');
+        $iriConverterProphecy->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, $getOperation, Argument::that(static fn ($ctx): bool => ($ctx['uri_variables'] ?? null) === ['id' => '10']))->willReturn('/dummies/10');
         $iriConverterProphecy->getResourceFromIri('/dummies/10', Argument::type('array'))->willReturn($dummy);
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
@@ -860,7 +860,7 @@ class ItemNormalizerTest extends TestCase
         );
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResource(RelatedDummy::class, UrlGeneratorInterface::ABS_PATH, $getRelatedOperation, Argument::that(static fn ($ctx) => ($ctx['uri_variables'] ?? null) === ['id' => '1']))->willReturn('/related_dummies/1');
+        $iriConverterProphecy->getIriFromResource(RelatedDummy::class, UrlGeneratorInterface::ABS_PATH, $getRelatedOperation, Argument::that(static fn ($ctx): bool => ($ctx['uri_variables'] ?? null) === ['id' => '1']))->willReturn('/related_dummies/1');
         $iriConverterProphecy->getResourceFromIri('/related_dummies/1', Argument::type('array'))->willReturn($relatedDummy);
 
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);

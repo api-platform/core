@@ -267,7 +267,7 @@ class ConfigurationTest extends TestCase
     }
 
     #[DataProvider('invalidHttpStatusCodeProvider')]
-    public function testExceptionToStatusConfigWithInvalidHttpStatusCode($invalidHttpStatusCode): void
+    public function testExceptionToStatusConfigWithInvalidHttpStatusCode(int $invalidHttpStatusCode): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessageMatches('/The HTTP status code ".+" is not valid\\./');
@@ -294,7 +294,7 @@ class ConfigurationTest extends TestCase
     }
 
     #[DataProvider('invalidHttpStatusCodeValueProvider')]
-    public function testExceptionToStatusConfigWithInvalidHttpStatusCodeValue($invalidHttpStatusCodeValue): void
+    public function testExceptionToStatusConfigWithInvalidHttpStatusCodeValue(bool|float|string|null $invalidHttpStatusCodeValue): void
     {
         $this->expectException(InvalidTypeException::class);
         $this->expectExceptionMessageMatches('/Invalid type for path "api_platform\\.exception_to_status\\.Exception". Expected "?int"?, but got .+\\./');

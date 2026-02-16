@@ -87,7 +87,7 @@ abstract class AbstractResourceExtractor implements ResourceExtractorInterface
             return $value;
         }
 
-        $escapedValue = preg_replace_callback('/%%|%([^%\s]++)%/', function ($match) use ($value) {
+        $escapedValue = preg_replace_callback('/%%|%([^%\s]++)%/', function (array $match) use ($value) {
             $parameter = $match[1] ?? null;
 
             // skip %%

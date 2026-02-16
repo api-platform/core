@@ -28,7 +28,7 @@ class StrictParameters
 {
     public string $id;
 
-    public static function provider()
+    public static function provider(): self
     {
         return new self();
     }

@@ -49,7 +49,7 @@ class ErrorListenerTest extends TestCase
         $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
         $resourceClassResolver->expects($this->once())->method('isResourceClass')->with($exception::class)->willReturn(false);
         $kernel = $this->createStub(KernelInterface::class);
-        $kernel->method('handle')->willReturnCallback(function ($request) {
+        $kernel->method('handle')->willReturnCallback(function ($request): Response {
             $this->assertTrue($request->attributes->has('_api_original_route'));
             $this->assertTrue($request->attributes->has('_api_original_route_params'));
             $this->assertTrue($request->attributes->has('_api_requested_operation'));
@@ -80,7 +80,7 @@ class ErrorListenerTest extends TestCase
         $resourceClassResolver->expects($this->once())->method('isResourceClass')->with($exception::class)->willReturn(false);
 
         $kernel = $this->createStub(KernelInterface::class);
-        $kernel->method('handle')->willReturnCallback(function ($request) {
+        $kernel->method('handle')->willReturnCallback(function ($request): Response {
             $this->assertTrue($request->attributes->has('_api_original_route'));
             $this->assertTrue($request->attributes->has('_api_original_route_params'));
             $this->assertTrue($request->attributes->has('_api_requested_operation'));
@@ -111,7 +111,7 @@ class ErrorListenerTest extends TestCase
         $resourceClassResolver->expects($this->once())->method('isResourceClass')->with(Error::class)->willReturn(true);
 
         $kernel = $this->createStub(KernelInterface::class);
-        $kernel->method('handle')->willReturnCallback(function ($request) {
+        $kernel->method('handle')->willReturnCallback(function ($request): Response {
             $this->assertTrue($request->attributes->has('_api_original_route'));
             $this->assertTrue($request->attributes->has('_api_original_route_params'));
             $this->assertTrue($request->attributes->has('_api_requested_operation'));

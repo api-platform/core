@@ -227,7 +227,7 @@ class ApiPlatformProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/config/api-platform.php', 'api-platform');
 
-        $this->app->singleton(PropertyInfoExtractorInterface::class, static function (Application $app) {
+        $this->app->singleton(PropertyInfoExtractorInterface::class, static function (Application $app): PropertyInfoExtractor {
             $phpstanExtractor = class_exists(PhpDocParser::class) ? new PhpStanExtractor() : null;
             $reflectionExtractor = new ReflectionExtractor();
             $eloquentExtractor = new EloquentExtractor($app->make(ModelMetadata::class));
@@ -241,12 +241,12 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(ModelMetadata::class, static function () {
+        $this->app->singleton(ModelMetadata::class, static function (): ModelMetadata {
             return new ModelMetadata();
         });
 
         $this->app->bind(ClassMetadataFactoryInterface::class, ClassMetadataFactory::class);
-        $this->app->singleton(ClassMetadataFactory::class, static function (Application $app) {
+        $this->app->singleton(ClassMetadataFactory::class, static function (Application $app): ClassMetadataFactory {
             /** @var ConfigRepository */
             $config = $app['config'];
             $nameConverter = $config->get('api-platform.name_converter', SnakeCaseToCamelCaseNameConverter::class);
@@ -266,13 +266,13 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(SerializerClassMetadataFactory::class, static function (Application $app) {
+        $this->app->singleton(SerializerClassMetadataFactory::class, static function (Application $app): SerializerClassMetadataFactory {
             return new SerializerClassMetadataFactory($app->make(ClassMetadataFactoryInterface::class));
         });
 
         $this->app->bind(PathSegmentNameGeneratorInterface::class, UnderscorePathSegmentNameGenerator::class);
 
-        $this->app->singleton(ResourceNameCollectionFactoryInterface::class, static function (Application $app) {
+        $this->app->singleton(ResourceNameCollectionFactoryInterface::class, static function (Application $app): ConcernsResourceNameCollectionFactory {
             /** @var ConfigRepository */
             $config = $app['config'];
             $paths = $config->get('api-platform.resources') ?? [];
@@ -292,16 +292,16 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->bind(ResourceClassResolverInterface::class, ResourceClassResolver::class);
-        $this->app->singleton(ResourceClassResolver::class, static function (Application $app) {
+        $this->app->singleton(ResourceClassResolver::class, static function (Application $app): EloquentResourceClassResolver {
             return new EloquentResourceClassResolver(new ResourceClassResolver($app->make(ResourceNameCollectionFactoryInterface::class)));
         });
 
         $this->app->bind(OperationResourceClassResolverInterface::class, EloquentOperationResourceClassResolver::class);
-        $this->app->singleton(EloquentOperationResourceClassResolver::class, static function (Application $app) {
+        $this->app->singleton(EloquentOperationResourceClassResolver::class, static function (Application $app): EloquentOperationResourceClassResolver {
             return new EloquentOperationResourceClassResolver();
         });
 
-        $this->app->singleton(PropertyMetadataFactoryInterface::class, static function (Application $app) {
+        $this->app->singleton(PropertyMetadataFactoryInterface::class, static function (Application $app): CachePropertyMetadataFactory {
             /** @var ConfigRepository $config */
             $config = $app['config'];
             $nameConverter = $config->get('api-platform.name_converter', SnakeCaseToCamelCaseNameConverter::class);
@@ -332,7 +332,7 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(PropertyNameCollectionFactoryInterface::class, static function (Application $app) {
+        $this->app->singleton(PropertyNameCollectionFactoryInterface::class, static function (Application $app): CachePropertyNameCollectionMetadataFactory {
             /** @var ConfigRepository $config */
             $config = $app['config'];
             $nameConverter = $config->get('api-platform.name_converter', SnakeCaseToCamelCaseNameConverter::class);
@@ -355,7 +355,7 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(LinkFactoryInterface::class, static function (Application $app) {
+        $this->app->singleton(LinkFactoryInterface::class, static function (Application $app): LinkFactory {
             return new LinkFactory(
                 $app->make(PropertyNameCollectionFactoryInterface::class),
                 $app->make(PropertyMetadataFactoryInterface::class),
@@ -363,11 +363,11 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->bind(PropertyAccessorInterface::class, static function (Application $app) {
+        $this->app->bind(PropertyAccessorInterface::class, static function (Application $app): EloquentPropertyAccessor {
             return new EloquentPropertyAccessor(null, $app->make(ModelMetadata::class));
         });
 
-        $this->app->bind(NameConverterInterface::class, static function (Application $app) {
+        $this->app->bind(NameConverterInterface::class, static function (Application $app): HydraPrefixNameConverter {
             $config = $app['config'];
             $nameConverter = $config->get('api-platform.name_converter', SnakeCaseToCamelCaseNameConverter::class);
             if ($nameConverter && class_exists($nameConverter)) {
@@ -381,7 +381,7 @@ class ApiPlatformProvider extends ServiceProvider
 
         // ObjectMapper metadata factory support
         if (interface_exists(ObjectMapperInterface::class)) {
-            $this->app->extend(ResourceMetadataCollectionFactoryInterface::class, static function (ResourceMetadataCollectionFactoryInterface $inner, Application $app) {
+            $this->app->extend(ResourceMetadataCollectionFactoryInterface::class, static function (ResourceMetadataCollectionFactoryInterface $inner, Application $app): ObjectMapperMetadataCollectionFactory {
                 return new ObjectMapperMetadataCollectionFactory(
                     $inner,
                     $app->make(ObjectMapperMetadataFactoryInterface::class)
@@ -390,21 +390,21 @@ class ApiPlatformProvider extends ServiceProvider
         }
 
         // Parameter metadata factory with Laravel Eloquent support
-        $this->app->extend(ResourceMetadataCollectionFactoryInterface::class, static function (ResourceMetadataCollectionFactoryInterface $inner, Application $app) {
+        $this->app->extend(ResourceMetadataCollectionFactoryInterface::class, static function (ResourceMetadataCollectionFactoryInterface $inner, Application $app): Metadata\Resource\Factory\ParameterResourceMetadataCollectionFactory {
             return new Metadata\Resource\Factory\ParameterResourceMetadataCollectionFactory($inner, $app->make(ModelMetadata::class), new \Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter());
         });
 
-        $this->app->singleton(OperationMetadataFactory::class, static function (Application $app) {
+        $this->app->singleton(OperationMetadataFactory::class, static function (Application $app): OperationMetadataFactory {
             return new OperationMetadataFactory($app->make(ResourceNameCollectionFactoryInterface::class), $app->make(ResourceMetadataCollectionFactoryInterface::class));
         });
 
         $this->app->bind(OperationMetadataFactoryInterface::class, OperationMetadataFactory::class);
 
-        $this->app->singleton(ReadProvider::class, static function (Application $app) {
+        $this->app->singleton(ReadProvider::class, static function (Application $app): ReadProvider {
             return new ReadProvider($app->make(CallableProvider::class));
         });
 
-        $this->app->singleton(SwaggerUiProvider::class, static function (Application $app) {
+        $this->app->singleton(SwaggerUiProvider::class, static function (Application $app): SwaggerUiProvider {
             /** @var ConfigRepository */
             $config = $app['config'];
 
@@ -417,11 +417,11 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(DeserializeProvider::class, static function (Application $app) {
+        $this->app->singleton(DeserializeProvider::class, static function (Application $app): DeserializeProvider {
             return new DeserializeProvider($app->make(SwaggerUiProvider::class), $app->make(SerializerInterface::class), $app->make(SerializerContextBuilderInterface::class));
         });
 
-        $this->app->singleton(ValidateProvider::class, static function (Application $app) {
+        $this->app->singleton(ValidateProvider::class, static function (Application $app): ValidateProvider {
             $config = $app['config'];
             $nameConverter = $config->get('api-platform.name_converter', SnakeCaseToCamelCaseNameConverter::class);
             if ($nameConverter && class_exists($nameConverter)) {
@@ -432,23 +432,23 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         if (class_exists(JsonApiProvider::class)) {
-            $this->app->extend(DeserializeProvider::class, static function (ProviderInterface $inner, Application $app) {
+            $this->app->extend(DeserializeProvider::class, static function (ProviderInterface $inner, Application $app): JsonApiProvider {
                 return new JsonApiProvider($inner);
             });
         }
 
-        $this->app->singleton(SortFilterParameterProvider::class, static function (Application $app) {
+        $this->app->singleton(SortFilterParameterProvider::class, static function (Application $app): SortFilterParameterProvider {
             return new SortFilterParameterProvider();
         });
 
-        $this->app->singleton(AccessCheckerProvider::class, static function (Application $app) {
+        $this->app->singleton(AccessCheckerProvider::class, static function (Application $app): AccessCheckerProvider {
             return new AccessCheckerProvider($app->make(ParameterProvider::class), $app->make(ResourceAccessCheckerInterface::class));
         });
 
-        $this->app->singleton(Negotiator::class, static function (Application $app) {
+        $this->app->singleton(Negotiator::class, static function (Application $app): Negotiator {
             return new Negotiator();
         });
-        $this->app->singleton(ContentNegotiationProvider::class, static function (Application $app) {
+        $this->app->singleton(ContentNegotiationProvider::class, static function (Application $app): ContentNegotiationProvider {
             /** @var ConfigRepository */
             $config = $app['config'];
 
@@ -461,18 +461,18 @@ class ApiPlatformProvider extends ServiceProvider
         if (interface_exists(ObjectMapperInterface::class)) {
             $this->app->singleton(ObjectMapperMetadataFactoryInterface::class, ReflectionObjectMapperMetadataFactory::class);
 
-            $this->app->singleton(ObjectMapper::class, static function (Application $app) {
+            $this->app->singleton(ObjectMapper::class, static function (Application $app): ObjectMapper {
                 return new ObjectMapper(
                     $app->make(ObjectMapperMetadataFactoryInterface::class)
                 );
             });
 
-            $this->app->extend(ProviderInterface::class, static function (ProviderInterface $inner, Application $app) {
+            $this->app->extend(ProviderInterface::class, static function (ProviderInterface $inner, Application $app): ObjectMapperProvider {
                 return new ObjectMapperProvider($app->make(ObjectMapper::class), $inner);
             });
         }
 
-        $this->app->singleton(RespondProcessor::class, static function (Application $app) {
+        $this->app->singleton(RespondProcessor::class, static function (Application $app): AddLinkHeaderProcessor {
             $decorated = new RespondProcessor(
                 $app->make(IriConverterInterface::class),
                 $app->make(ResourceClassResolverInterface::class),
@@ -499,11 +499,11 @@ class ApiPlatformProvider extends ServiceProvider
             return new AddLinkHeaderProcessor($decorated, new HttpHeaderSerializer());
         });
 
-        $this->app->singleton(SerializeProcessor::class, static function (Application $app) {
+        $this->app->singleton(SerializeProcessor::class, static function (Application $app): SerializeProcessor {
             return new SerializeProcessor($app->make(RespondProcessor::class), $app->make(Serializer::class), $app->make(SerializerContextBuilderInterface::class));
         });
 
-        $this->app->singleton(WriteProcessor::class, static function (Application $app) {
+        $this->app->singleton(WriteProcessor::class, static function (Application $app): WriteProcessor {
             $inner = $app->make(SerializeProcessor::class);
 
             if (interface_exists(ObjectMapperInterface::class)) {
@@ -513,14 +513,14 @@ class ApiPlatformProvider extends ServiceProvider
             return new WriteProcessor($inner, $app->make(CallableProcessor::class));
         });
 
-        $this->app->singleton(SerializerContextBuilder::class, static function (Application $app) {
+        $this->app->singleton(SerializerContextBuilder::class, static function (Application $app): SerializerContextBuilder {
             /** @var ConfigRepository */
             $config = $app['config'];
 
             return new SerializerContextBuilder($app->make(ResourceMetadataCollectionFactoryInterface::class), $config->get('app.debug'));
         });
         $this->app->bind(SerializerContextBuilderInterface::class, EloquentSerializerContextBuilder::class);
-        $this->app->singleton(EloquentSerializerContextBuilder::class, static function (Application $app) {
+        $this->app->singleton(EloquentSerializerContextBuilder::class, static function (Application $app): EloquentSerializerContextBuilder {
             /** @var ConfigRepository */
             $config = $app['config'];
 
@@ -531,7 +531,7 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(HydraLinkProcessor::class, static function (Application $app) {
+        $this->app->singleton(HydraLinkProcessor::class, static function (Application $app): HydraLinkProcessor {
             return new HydraLinkProcessor($app->make(WriteProcessor::class), $app->make(UrlGeneratorInterface::class));
         });
 
@@ -546,51 +546,51 @@ class ApiPlatformProvider extends ServiceProvider
 
         // ObjectMapperInputProcessor wraps the base processor if available
         if (interface_exists(ObjectMapperInterface::class)) {
-            $this->app->extend(ProcessorInterface::class, static function (ProcessorInterface $inner, Application $app) {
+            $this->app->extend(ProcessorInterface::class, static function (ProcessorInterface $inner, Application $app): ObjectMapperInputProcessor {
                 return new ObjectMapperInputProcessor($app->make(ObjectMapper::class), $inner);
             });
         }
 
-        $this->app->singleton(ObjectNormalizer::class, static function (Application $app) {
+        $this->app->singleton(ObjectNormalizer::class, static function (Application $app): ObjectNormalizer {
             $config = $app['config'];
             $defaultContext = $config->get('api-platform.serializer', []);
 
             return new ObjectNormalizer($app->make(ClassMetadataFactoryInterface::class), defaultContext: $defaultContext);
         });
 
-        $this->app->singleton(DateTimeNormalizer::class, static function (Application $app) {
+        $this->app->singleton(DateTimeNormalizer::class, static function (Application $app): DateTimeNormalizer {
             $config = $app['config'];
             $defaultContext = $config->get('api-platform.serializer', []);
 
             return new DateTimeNormalizer(defaultContext: $defaultContext);
         });
 
-        $this->app->singleton(DateTimeZoneNormalizer::class, static function () {
+        $this->app->singleton(DateTimeZoneNormalizer::class, static function (): DateTimeZoneNormalizer {
             return new DateTimeZoneNormalizer();
         });
 
-        $this->app->singleton(DateIntervalNormalizer::class, static function (Application $app) {
+        $this->app->singleton(DateIntervalNormalizer::class, static function (Application $app): DateIntervalNormalizer {
             $config = $app['config'];
             $defaultContext = $config->get('api-platform.serializer', []);
 
             return new DateIntervalNormalizer(defaultContext: $defaultContext);
         });
 
-        $this->app->singleton(JsonEncoder::class, static function () {
+        $this->app->singleton(JsonEncoder::class, static function (): JsonEncoder {
             return new JsonEncoder('jsonld');
         });
 
         $this->app->bind(IriConverterInterface::class, IriConverter::class);
-        $this->app->singleton(IriConverter::class, static function (Application $app) {
+        $this->app->singleton(IriConverter::class, static function (Application $app): IriConverter {
             return new IriConverter($app->make(CallableProvider::class), $app->make(OperationMetadataFactoryInterface::class), $app->make(UrlGeneratorRouter::class), $app->make(IdentifiersExtractorInterface::class), $app->make(ResourceClassResolverInterface::class), $app->make(ResourceMetadataCollectionFactoryInterface::class), $app->make(SkolemIriConverter::class), null, $app->make(OperationResourceClassResolverInterface::class));
         });
 
-        $this->app->singleton(SkolemIriConverter::class, static function (Application $app) {
+        $this->app->singleton(SkolemIriConverter::class, static function (Application $app): SkolemIriConverter {
             return new SkolemIriConverter($app->make(UrlGeneratorRouter::class));
         });
 
         $this->app->bind(IdentifiersExtractorInterface::class, IdentifiersExtractor::class);
-        $this->app->singleton(IdentifiersExtractor::class, static function (Application $app) {
+        $this->app->singleton(IdentifiersExtractor::class, static function (Application $app): EloquentIdentifiersExtractor {
             return new EloquentIdentifiersExtractor(
                 new IdentifiersExtractor(
                     $app->make(ResourceMetadataCollectionFactoryInterface::class),
@@ -603,7 +603,7 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->bind(UrlGeneratorInterface::class, UrlGeneratorRouter::class);
-        $this->app->singleton(UrlGeneratorRouter::class, static function (Application $app) {
+        $this->app->singleton(UrlGeneratorRouter::class, static function (Application $app): UrlGeneratorRouter {
             $request = $app->make('request');
             // https://github.com/laravel/framework/blob/2bfb70bca53e24227a6f921f39d84ba452efd8e0/src/Illuminate/Routing/CompiledRouteCollection.php#L112
             $trimmedRequest = $request->duplicate();
@@ -620,7 +620,7 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->bind(ContextBuilderInterface::class, JsonLdContextBuilder::class);
-        $this->app->singleton(JsonLdContextBuilder::class, static function (Application $app) {
+        $this->app->singleton(JsonLdContextBuilder::class, static function (Application $app): JsonLdContextBuilder {
             $config = $app['config'];
             $defaultContext = $config->get('api-platform.serializer', []);
 
@@ -636,15 +636,15 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(HydraEntrypointNormalizer::class, static function (Application $app) {
+        $this->app->singleton(HydraEntrypointNormalizer::class, static function (Application $app): HydraEntrypointNormalizer {
             return new HydraEntrypointNormalizer($app->make(ResourceMetadataCollectionFactoryInterface::class), $app->make(IriConverterInterface::class), $app->make(UrlGeneratorInterface::class));
         });
 
-        $this->app->singleton(ResourceAccessCheckerInterface::class, static function () {
+        $this->app->singleton(ResourceAccessCheckerInterface::class, static function (): ResourceAccessChecker {
             return new ResourceAccessChecker();
         });
 
-        $this->app->singleton(ItemNormalizer::class, static function (Application $app) {
+        $this->app->singleton(ItemNormalizer::class, static function (Application $app): ItemNormalizer {
             /** @var ConfigRepository */
             $config = $app['config'];
             $defaultContext = $config->get('api-platform.serializer', []);
@@ -669,7 +669,7 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->bind(AnonymousContextBuilderInterface::class, JsonLdContextBuilder::class);
 
-        $this->app->singleton(JsonLdObjectNormalizer::class, static function (Application $app) {
+        $this->app->singleton(JsonLdObjectNormalizer::class, static function (Application $app): JsonLdObjectNormalizer {
             return new JsonLdObjectNormalizer(
                 $app->make(ObjectNormalizer::class),
                 $app->make(IriConverterInterface::class),
@@ -677,7 +677,7 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(HalCollectionNormalizer::class, static function (Application $app) {
+        $this->app->singleton(HalCollectionNormalizer::class, static function (Application $app): HalCollectionNormalizer {
             /** @var ConfigRepository */
             $config = $app['config'];
 
@@ -688,14 +688,14 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(HalObjectNormalizer::class, static function (Application $app) {
+        $this->app->singleton(HalObjectNormalizer::class, static function (Application $app): HalObjectNormalizer {
             return new HalObjectNormalizer(
                 $app->make(ObjectNormalizer::class),
                 $app->make(IriConverterInterface::class)
             );
         });
 
-        $this->app->singleton(HalItemNormalizer::class, static function (Application $app) {
+        $this->app->singleton(HalItemNormalizer::class, static function (Application $app): HalItemNormalizer {
             /** @var ConfigRepository */
             $config = $app['config'];
             $defaultContext = $config->get('api-platform.serializer', []);
@@ -715,7 +715,7 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(Options::class, static function (Application $app) {
+        $this->app->singleton(Options::class, static function (Application $app): Options {
             /** @var ConfigRepository */
             $config = $app['config'];
 
@@ -744,7 +744,7 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(SwaggerUiProcessor::class, static function (Application $app) {
+        $this->app->singleton(SwaggerUiProcessor::class, static function (Application $app): SwaggerUiProcessor {
             /** @var ConfigRepository */
             $config = $app['config'];
 
@@ -764,11 +764,11 @@ class ApiPlatformProvider extends ServiceProvider
 
         // Note: this class is not included it is used as a string alias as Errors declare this controller
         $this->app->alias(\ApiPlatform\Symfony\Action\NotExposedAction::class, 'api_platform.action.not_exposed');
-        $this->app->singleton('api_platform.action.not_exposed', static function () {
+        $this->app->singleton('api_platform.action.not_exposed', static function (): NotExposedController {
             return new NotExposedController();
         });
 
-        $this->app->singleton(DocumentationController::class, static function (Application $app) {
+        $this->app->singleton(DocumentationController::class, static function (Application $app): DocumentationController {
             /** @var ConfigRepository */
             $config = $app['config'];
 
@@ -788,21 +788,21 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(EntrypointController::class, static function (Application $app) {
+        $this->app->singleton(EntrypointController::class, static function (Application $app): EntrypointController {
             /** @var ConfigRepository */
             $config = $app['config'];
 
             return new EntrypointController($app->make(ResourceNameCollectionFactoryInterface::class), $app->make(ProviderInterface::class), $app->make(ProcessorInterface::class), $config->get('api-platform.docs_formats'));
         });
 
-        $this->app->singleton(Pagination::class, static function (Application $app) {
+        $this->app->singleton(Pagination::class, static function (Application $app): Pagination {
             /** @var ConfigRepository */
             $config = $app['config'];
 
             return new Pagination($config->get('api-platform.pagination'), []);
         });
 
-        $this->app->singleton(PaginationOptions::class, static function (Application $app) {
+        $this->app->singleton(PaginationOptions::class, static function (Application $app): PaginationOptions {
             /** @var ConfigRepository */
             $config = $app['config'];
             $defaults = $config->get('api-platform.defaults');
@@ -824,7 +824,7 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->bind(OpenApiFactoryInterface::class, OpenApiFactory::class);
-        $this->app->singleton(OpenApiFactory::class, static function (Application $app) {
+        $this->app->singleton(OpenApiFactory::class, static function (Application $app): OpenApiFactory {
             /** @var ConfigRepository */
             $config = $app['config'];
 
@@ -844,16 +844,16 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(OpenApiCommand::class, static function (Application $app) {
+        $this->app->singleton(OpenApiCommand::class, static function (Application $app): OpenApiCommand {
             return new OpenApiCommand($app->make(OpenApiFactory::class), $app->make(Serializer::class));
         });
 
         $this->app->bind(DefinitionNameFactoryInterface::class, DefinitionNameFactory::class);
-        $this->app->singleton(DefinitionNameFactory::class, static function (Application $app) {
+        $this->app->singleton(DefinitionNameFactory::class, static function (Application $app): DefinitionNameFactory {
             return new DefinitionNameFactory();
         });
 
-        $this->app->singleton(SchemaFactory::class, static function (Application $app) {
+        $this->app->singleton(SchemaFactory::class, static function (Application $app): SchemaFactory {
             /** @var ConfigRepository */
             $config = $app['config'];
 
@@ -867,7 +867,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(DefinitionNameFactoryInterface::class),
             );
         });
-        $this->app->singleton(JsonApiSchemaFactory::class, static function (Application $app) {
+        $this->app->singleton(JsonApiSchemaFactory::class, static function (Application $app): JsonApiSchemaFactory {
             return new JsonApiSchemaFactory(
                 $app->make(SchemaFactory::class),
                 $app->make(PropertyMetadataFactoryInterface::class),
@@ -876,7 +876,7 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(DefinitionNameFactoryInterface::class),
             );
         });
-        $this->app->singleton(HydraSchemaFactory::class, static function (Application $app) {
+        $this->app->singleton(HydraSchemaFactory::class, static function (Application $app): HydraSchemaFactory {
             $config = $app['config'];
             $defaultContext = $config->get('api-platform.serializer', []);
 
@@ -888,11 +888,11 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->bind(SchemaFactoryInterface::class, HydraSchemaFactory::class);
 
-        $this->app->singleton(OpenApiNormalizer::class, static function (Application $app) {
+        $this->app->singleton(OpenApiNormalizer::class, static function (Application $app): OpenApiNormalizer {
             return new OpenApiNormalizer($app->make(ObjectNormalizer::class));
         });
 
-        $this->app->singleton(HydraDocumentationNormalizer::class, static function (Application $app) {
+        $this->app->singleton(HydraDocumentationNormalizer::class, static function (Application $app): HydraDocumentationNormalizer {
             $config = $app['config'];
             $defaultContext = $config->get('api-platform.serializer', []);
             $entrypointEnabled = $config->get('api-platform.enable_entrypoint', true);
@@ -909,7 +909,7 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(HydraPartialCollectionViewNormalizer::class, static function (Application $app) {
+        $this->app->singleton(HydraPartialCollectionViewNormalizer::class, static function (Application $app): HydraPartialCollectionViewNormalizer {
             $config = $app['config'];
             $defaultContext = $config->get('api-platform.serializer', []);
 
@@ -935,7 +935,7 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(ReservedAttributeNameConverter::class, static function (Application $app) {
+        $this->app->singleton(ReservedAttributeNameConverter::class, static function (Application $app): ReservedAttributeNameConverter {
             return new ReservedAttributeNameConverter($app->make(NameConverterInterface::class));
         });
 
@@ -947,7 +947,7 @@ class ApiPlatformProvider extends ServiceProvider
             $this->registerMcp();
         }
 
-        $this->app->singleton(JsonApiEntrypointNormalizer::class, static function (Application $app) {
+        $this->app->singleton(JsonApiEntrypointNormalizer::class, static function (Application $app): JsonApiEntrypointNormalizer {
             return new JsonApiEntrypointNormalizer(
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(IriConverterInterface::class),
@@ -955,7 +955,7 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(JsonApiCollectionNormalizer::class, static function (Application $app) {
+        $this->app->singleton(JsonApiCollectionNormalizer::class, static function (Application $app): JsonApiCollectionNormalizer {
             /** @var ConfigRepository */
             $config = $app['config'];
 
@@ -966,7 +966,7 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(JsonApiItemNormalizer::class, static function (Application $app) {
+        $this->app->singleton(JsonApiItemNormalizer::class, static function (Application $app): JsonApiItemNormalizer {
             $config = $app['config'];
             $defaultContext = $config->get('api-platform.serializer', []);
 
@@ -985,13 +985,13 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(JsonApiErrorNormalizer::class, static function (Application $app) {
+        $this->app->singleton(JsonApiErrorNormalizer::class, static function (Application $app): JsonApiErrorNormalizer {
             return new JsonApiErrorNormalizer(
                 $app->make(JsonApiItemNormalizer::class),
             );
         });
 
-        $this->app->singleton(JsonApiObjectNormalizer::class, static function (Application $app) {
+        $this->app->singleton(JsonApiObjectNormalizer::class, static function (Application $app): JsonApiObjectNormalizer {
             return new JsonApiObjectNormalizer(
                 $app->make(ObjectNormalizer::class),
                 $app->make(IriConverterInterface::class),
@@ -1000,7 +1000,7 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton('api_platform_normalizer_list', static function (Application $app) {
+        $this->app->singleton('api_platform_normalizer_list', static function (Application $app): \SplPriorityQueue {
             $list = new \SplPriorityQueue();
             $list->insert($app->make(HydraEntrypointNormalizer::class), -800);
             $list->insert($app->make(HydraPartialCollectionViewNormalizer::class), -800);
@@ -1040,7 +1040,7 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->bind(SerializerInterface::class, Serializer::class);
         $this->app->bind(NormalizerInterface::class, Serializer::class);
-        $this->app->singleton(Serializer::class, static function (Application $app) {
+        $this->app->singleton(Serializer::class, static function (Application $app): Serializer {
             // TODO: unused + implement hal/jsonapi ?
             // $list->insert($dataUriNormalizer, -920);
             // $list->insert($unwrappingDenormalizer, 1000);
@@ -1060,7 +1060,7 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(JsonLdItemNormalizer::class, static function (Application $app) {
+        $this->app->singleton(JsonLdItemNormalizer::class, static function (Application $app): JsonLdItemNormalizer {
             $config = $app['config'];
             $defaultContext = $config->get('api-platform.serializer', []);
 
@@ -1083,7 +1083,7 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(InflectorInterface::class, static function (Application $app) {
+        $this->app->singleton(InflectorInterface::class, static function (Application $app): Inflector {
             return new Inflector();
         });
 
@@ -1100,20 +1100,20 @@ class ApiPlatformProvider extends ServiceProvider
 
     private function registerMcp(): void
     {
-        $this->app->singleton(Registry::class, static function (Application $app) {
+        $this->app->singleton(Registry::class, static function (Application $app): Registry {
             return new Registry(
                 null, // event dispatcher (todo)
                 $app->make(LoggerInterface::class)
             );
         });
 
-        $this->app->singleton(McpSchemaFactory::class, static function (Application $app) {
+        $this->app->singleton(McpSchemaFactory::class, static function (Application $app): McpSchemaFactory {
             return new McpSchemaFactory(
                 $app->make(SchemaFactory::class)
             );
         });
 
-        $this->app->singleton(McpLoader::class, static function (Application $app) {
+        $this->app->singleton(McpLoader::class, static function (Application $app): McpLoader {
             return new McpLoader(
                 $app->make(ResourceNameCollectionFactoryInterface::class),
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
@@ -1123,11 +1123,11 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->tag(McpLoader::class, 'mcp.loader');
 
         // TODO: add more stores?
-        $this->app->singleton('mcp.session.store', static function () {
+        $this->app->singleton('mcp.session.store', static function (): InMemorySessionStore {
             return new InMemorySessionStore(3600);
         });
 
-        $this->app->singleton(Builder::class, static function (Application $app) {
+        $this->app->singleton(Builder::class, static function (Application $app): Builder {
             $config = $app['config'];
 
             $builder = Server::builder()
@@ -1155,21 +1155,21 @@ class ApiPlatformProvider extends ServiceProvider
             return $app->make(Builder::class)->build();
         });
 
-        $this->app->singleton(McpOperationMetadataFactory::class, static function (Application $app) {
+        $this->app->singleton(McpOperationMetadataFactory::class, static function (Application $app): McpOperationMetadataFactory {
             return new McpOperationMetadataFactory(
                 $app->make(ResourceNameCollectionFactoryInterface::class),
                 $app->make(ResourceMetadataCollectionFactoryInterface::class)
             );
         });
 
-        $this->app->singleton('api_platform.mcp.state_processor.write', static function (Application $app) {
+        $this->app->singleton('api_platform.mcp.state_processor.write', static function (Application $app): WriteProcessor {
             return new WriteProcessor(
                 null,
                 $app->make(CallableProcessor::class)
             );
         });
 
-        $this->app->singleton(StructuredContentProcessor::class, static function (Application $app) {
+        $this->app->singleton(StructuredContentProcessor::class, static function (Application $app): StructuredContentProcessor {
             return new StructuredContentProcessor(
                 $app->make(SerializerInterface::class),
                 $app->make(SerializerContextBuilderInterface::class),
@@ -1177,11 +1177,11 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(RequestStack::class, static function (Application $app) {
+        $this->app->singleton(RequestStack::class, static function (Application $app): RequestStack {
             return new RequestStack();
         });
 
-        $this->app->singleton(Handler::class, static function (Application $app) {
+        $this->app->singleton(Handler::class, static function (Application $app): Handler {
             return new Handler(
                 $app->make(McpOperationMetadataFactory::class),
                 $app->make(ProviderInterface::class),
@@ -1191,12 +1191,12 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->extend(IriConverterInterface::class, static function (IriConverterInterface $iriConverter) {
+        $this->app->extend(IriConverterInterface::class, static function (IriConverterInterface $iriConverter): McpIriConverter {
             return new McpIriConverter($iriConverter);
         });
 
         // Register Symfony MCP controller
-        $this->app->singleton(McpController::class, static function (Application $app) {
+        $this->app->singleton(McpController::class, static function (Application $app): McpController {
             if (!class_exists('Http\Discovery\Psr17Factory')) {
                 throw new \RuntimeException('PSR-17 HTTP factory implementation not available. Please install php-http/discovery.');
             }
@@ -1222,7 +1222,7 @@ class ApiPlatformProvider extends ServiceProvider
 
     private function registerGraphQl(): void
     {
-        $this->app->singleton(GraphQlItemNormalizer::class, static function (Application $app) {
+        $this->app->singleton(GraphQlItemNormalizer::class, static function (Application $app): GraphQlItemNormalizer {
             return new GraphQlItemNormalizer(
                 $app->make(PropertyNameCollectionFactoryInterface::class),
                 $app->make(PropertyMetadataFactoryInterface::class),
@@ -1238,7 +1238,7 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(GraphQlObjectNormalizer::class, static function (Application $app) {
+        $this->app->singleton(GraphQlObjectNormalizer::class, static function (Application $app): GraphQlObjectNormalizer {
             return new GraphQlObjectNormalizer(
                 $app->make(ObjectNormalizer::class),
                 $app->make(IriConverterInterface::class),
@@ -1246,26 +1246,26 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(GraphQlErrorNormalizer::class, static function () {
+        $this->app->singleton(GraphQlErrorNormalizer::class, static function (): GraphQlErrorNormalizer {
             return new GraphQlErrorNormalizer();
         });
 
-        $this->app->singleton(GraphQlValidationExceptionNormalizer::class, static function (Application $app) {
+        $this->app->singleton(GraphQlValidationExceptionNormalizer::class, static function (Application $app): GraphQlValidationExceptionNormalizer {
             /** @var ConfigRepository */
             $config = $app['config'];
 
             return new GraphQlValidationExceptionNormalizer($config->get('api-platform.exception_to_status'));
         });
 
-        $this->app->singleton(GraphQlHttpExceptionNormalizer::class, static function () {
+        $this->app->singleton(GraphQlHttpExceptionNormalizer::class, static function (): GraphQlHttpExceptionNormalizer {
             return new GraphQlHttpExceptionNormalizer();
         });
 
-        $this->app->singleton(GraphQlRuntimeExceptionNormalizer::class, static function () {
+        $this->app->singleton(GraphQlRuntimeExceptionNormalizer::class, static function (): GraphQlHttpExceptionNormalizer {
             return new GraphQlHttpExceptionNormalizer();
         });
 
-        $this->app->singleton('api_platform.graphql.type_locator', static function (Application $app) {
+        $this->app->singleton('api_platform.graphql.type_locator', static function (Application $app): ServiceLocator {
             $tagged = iterator_to_array($app->tagged('api_platform.graphql.type'));
             $services = [];
             foreach ($tagged as $service) {
@@ -1275,21 +1275,21 @@ class ApiPlatformProvider extends ServiceProvider
             return new ServiceLocator($services);
         });
 
-        $this->app->singleton(TypesFactoryInterface::class, static function (Application $app) {
+        $this->app->singleton(TypesFactoryInterface::class, static function (Application $app): TypesFactory {
             $tagged = iterator_to_array($app->tagged('api_platform.graphql.type'));
 
             return new TypesFactory($app->make('api_platform.graphql.type_locator'), array_column($tagged, 'name'));
         });
 
-        $this->app->singleton(TypesContainerInterface::class, static function () {
+        $this->app->singleton(TypesContainerInterface::class, static function (): TypesContainer {
             return new TypesContainer();
         });
 
-        $this->app->singleton(ResourceFieldResolver::class, static function (Application $app) {
+        $this->app->singleton(ResourceFieldResolver::class, static function (Application $app): ResourceFieldResolver {
             return new ResourceFieldResolver($app->make(IriConverterInterface::class));
         });
 
-        $this->app->singleton(ContextAwareTypeBuilderInterface::class, static function (Application $app) {
+        $this->app->singleton(ContextAwareTypeBuilderInterface::class, static function (Application $app): TypeBuilder {
             return new TypeBuilder(
                 $app->make(TypesContainerInterface::class),
                 $app->make(ResourceFieldResolver::class),
@@ -1298,7 +1298,7 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(TypeConverterInterface::class, static function (Application $app) {
+        $this->app->singleton(TypeConverterInterface::class, static function (Application $app): TypeConverter {
             return new TypeConverter(
                 $app->make(ContextAwareTypeBuilderInterface::class),
                 $app->make(TypesContainerInterface::class),
@@ -1307,11 +1307,11 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(GraphQlSerializerContextBuilder::class, static function (Application $app) {
+        $this->app->singleton(GraphQlSerializerContextBuilder::class, static function (Application $app): GraphQlSerializerContextBuilder {
             return new GraphQlSerializerContextBuilder($app->make(NameConverterInterface::class));
         });
 
-        $this->app->singleton(GraphQlReadProvider::class, function (Application $app) {
+        $this->app->singleton(GraphQlReadProvider::class, function (Application $app): GraphQlReadProvider {
             /** @var ConfigRepository */
             $config = $app['config'];
 
@@ -1324,7 +1324,7 @@ class ApiPlatformProvider extends ServiceProvider
         });
         $this->app->alias(GraphQlReadProvider::class, 'api_platform.graphql.state_provider.read');
 
-        $this->app->singleton(ErrorProvider::class, static function (Application $app) {
+        $this->app->singleton(ErrorProvider::class, static function (Application $app): ErrorProvider {
             /** @var ConfigRepository */
             $config = $app['config'];
 
@@ -1335,7 +1335,7 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(ResolverProvider::class, static function (Application $app) {
+        $this->app->singleton(ResolverProvider::class, static function (Application $app): ResolverProvider {
             $resolvers = iterator_to_array($app->tagged('api_platform.graphql.resolver'));
             $taggedItemResolvers = iterator_to_array($app->tagged(QueryItemResolverInterface::class));
             $taggedCollectionResolvers = iterator_to_array($app->tagged(QueryCollectionResolverInterface::class));
@@ -1348,7 +1348,7 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->alias(ResolverProvider::class, 'api_platform.graphql.state_provider.resolver');
 
-        $this->app->singleton(GraphQlDenormalizeProvider::class, function (Application $app) {
+        $this->app->singleton(GraphQlDenormalizeProvider::class, function (Application $app): GraphQlDenormalizeProvider {
             return new GraphQlDenormalizeProvider(
                 $this->app->make(ResolverProvider::class),
                 $app->make(SerializerInterface::class),
@@ -1358,11 +1358,11 @@ class ApiPlatformProvider extends ServiceProvider
 
         $this->app->alias(GraphQlDenormalizeProvider::class, 'api_platform.graphql.state_provider.denormalize');
 
-        $this->app->singleton('api_platform.graphql.state_provider.access_checker', static function (Application $app) {
+        $this->app->singleton('api_platform.graphql.state_provider.access_checker', static function (Application $app): AccessCheckerProvider {
             return new AccessCheckerProvider($app->make('api_platform.graphql.state_provider.parameter'), $app->make(ResourceAccessCheckerInterface::class));
         });
 
-        $this->app->singleton(NormalizeProcessor::class, static function (Application $app) {
+        $this->app->singleton(NormalizeProcessor::class, static function (Application $app): NormalizeProcessor {
             return new NormalizeProcessor(
                 $app->make(SerializerInterface::class),
                 $app->make(GraphQlSerializerContextBuilder::class),
@@ -1371,14 +1371,14 @@ class ApiPlatformProvider extends ServiceProvider
         });
         $this->app->alias(NormalizeProcessor::class, 'api_platform.graphql.state_processor.normalize');
 
-        $this->app->singleton('api_platform.graphql.state_processor', static function (Application $app) {
+        $this->app->singleton('api_platform.graphql.state_processor', static function (Application $app): WriteProcessor {
             return new WriteProcessor(
                 $app->make('api_platform.graphql.state_processor.normalize'),
                 $app->make(CallableProcessor::class),
             );
         });
 
-        $this->app->singleton(ResolverFactoryInterface::class, static function (Application $app) {
+        $this->app->singleton(ResolverFactoryInterface::class, static function (Application $app): ResolverFactory {
             return new ResolverFactory(
                 $app->make('api_platform.graphql.state_provider.access_checker'),
                 $app->make('api_platform.graphql.state_processor'),
@@ -1386,29 +1386,29 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton('api_platform.graphql.runtime_operation_metadata_factory', static function (Application $app) {
+        $this->app->singleton('api_platform.graphql.runtime_operation_metadata_factory', static function (Application $app): RuntimeOperationMetadataFactory {
             return new RuntimeOperationMetadataFactory(
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(UrlGeneratorRouter::class)
             );
         });
 
-        $this->app->singleton(SchemaBuilderInterface::class, static function (Application $app) {
+        $this->app->singleton(SchemaBuilderInterface::class, static function (Application $app): SchemaBuilder {
             return new SchemaBuilder($app->make(ResourceNameCollectionFactoryInterface::class), $app->make(ResourceMetadataCollectionFactoryInterface::class), $app->make(TypesFactoryInterface::class), $app->make(TypesContainerInterface::class), $app->make(FieldsBuilderEnumInterface::class));
         });
 
-        $this->app->singleton(ErrorHandlerInterface::class, static function () {
+        $this->app->singleton(ErrorHandlerInterface::class, static function (): GraphQlErrorHandler {
             return new GraphQlErrorHandler();
         });
 
-        $this->app->singleton(ExecutorInterface::class, static function (Application $app) {
+        $this->app->singleton(ExecutorInterface::class, static function (Application $app): Executor {
             /** @var ConfigRepository */
             $config = $app['config'];
 
             return new Executor($config->get('api-platform.graphql.introspection.enabled') ?? false, $config->get('api-platform.graphql.max_query_complexity') ?? 500, $config->get('api-platform.graphql.max_query_depth') ?? 200);
         });
 
-        $this->app->singleton(GraphiQlController::class, static function (Application $app) {
+        $this->app->singleton(GraphiQlController::class, static function (Application $app): GraphiQlController {
             /** @var ConfigRepository */
             $config = $app['config'];
             $prefix = $config->get('api-platform.defaults.route_prefix') ?? '';
@@ -1416,7 +1416,7 @@ class ApiPlatformProvider extends ServiceProvider
             return new GraphiQlController($prefix);
         });
 
-        $this->app->singleton(GraphQlEntrypointController::class, static function (Application $app) {
+        $this->app->singleton(GraphQlEntrypointController::class, static function (Application $app): GraphQlEntrypointController {
             /** @var ConfigRepository */
             $config = $app['config'];
 

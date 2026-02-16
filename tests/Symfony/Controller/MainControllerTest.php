@@ -142,7 +142,7 @@ class MainControllerTest extends TestCase
 
         $provider->expects($this->once())
             ->method('provide')
-            ->willReturnCallback(static function () use ($request) {
+            ->willReturnCallback(static function () use ($request): \stdClass {
                 $request->attributes->set('_api_operation', new Error(uriVariables: ['status' => new Link()]));
                 $request->attributes->remove('id');
 

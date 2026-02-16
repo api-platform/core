@@ -30,11 +30,11 @@ class HttpOperation extends Operation
     public const METHOD_OPTIONS = 'OPTIONS';
 
     /** @var array<int|string, string|string[]>|null */
-    protected $formats;
+    protected ?array $formats;
     /** @var array<int|string, string|string[]>|null */
-    protected $inputFormats;
+    protected ?array $inputFormats;
     /** @var array<int|string, string|string[]>|null */
-    protected $outputFormats;
+    protected ?array $outputFormats;
 
     /**
      * @param string[]|null                                  $types         the RDF types of this property
@@ -332,7 +332,7 @@ class HttpOperation extends Operation
     /**
      * @return array<int|string, string|string[]>|null
      */
-    public function getFormats()
+    public function getFormats(): ?array
     {
         return $this->formats;
     }
@@ -351,7 +351,7 @@ class HttpOperation extends Operation
     /**
      * @return array<int|string, string|string[]>|null
      */
-    public function getInputFormats()
+    public function getInputFormats(): ?array
     {
         return $this->inputFormats;
     }
@@ -370,7 +370,7 @@ class HttpOperation extends Operation
     /**
      * @return array<int|string, string|string[]>|null
      */
-    public function getOutputFormats()
+    public function getOutputFormats(): ?array
     {
         return $this->outputFormats;
     }
@@ -475,10 +475,7 @@ class HttpOperation extends Operation
         return $this->stateless;
     }
 
-    /**
-     * @param bool $stateless
-     */
-    public function withStateless($stateless): static
+    public function withStateless(?bool $stateless): static
     {
         $self = clone $this;
         $self->stateless = $stateless;

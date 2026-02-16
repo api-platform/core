@@ -57,7 +57,7 @@ final class OrderFilterTest extends ApiTestCase
         $responseData = $response->toArray();
         $orderedItems = $responseData['hydra:member'];
 
-        $actualOrder = array_map(static fn ($item) => $item['createdAt'] ?? null, $orderedItems);
+        $actualOrder = array_map(static fn (array $item) => $item['createdAt'] ?? null, $orderedItems);
 
         // Default NULL order is different in PostgreSQL.
         if ($this->isPostgres()) {
@@ -109,7 +109,7 @@ final class OrderFilterTest extends ApiTestCase
         $responseData = $response->toArray();
         $orderedItems = $responseData['hydra:member'];
 
-        $actualOrder = array_map(static fn ($item) => $item['createdAt'] ?? null, $orderedItems);
+        $actualOrder = array_map(static fn (array $item) => $item['createdAt'] ?? null, $orderedItems);
 
         $this->assertSame($expectedOrder, $actualOrder, \sprintf('Expected order does not match for URL %s', $url));
     }

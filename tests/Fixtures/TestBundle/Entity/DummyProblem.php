@@ -206,7 +206,7 @@ class DummyProblem
         return $this->dummyDate;
     }
 
-    public function setDummyPrice($dummyPrice)
+    public function setDummyPrice($dummyPrice): static
     {
         $this->dummyPrice = $dummyPrice;
 
@@ -278,10 +278,7 @@ class DummyProblem
         return $this->dummyBoolean;
     }
 
-    /**
-     * @param bool $dummyBoolean
-     */
-    public function setDummyBoolean($dummyBoolean): void
+    public function setDummyBoolean(?bool $dummyBoolean): void
     {
         $this->dummyBoolean = $dummyBoolean;
     }

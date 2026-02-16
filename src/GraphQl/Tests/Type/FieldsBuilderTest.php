@@ -468,7 +468,7 @@ class FieldsBuilderTest extends TestCase
     public function testGetResourceObjectTypeFields(string $resourceClass, Operation $operation, array $properties, bool $input, int $depth, ?array $ioMetadata, array $expectedResourceObjectTypeFields, ?callable $advancedNameConverterFactory = null): void
     {
         $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
-        $resourceClassResolver->method('isResourceClass')->willReturnCallback(static function ($class) use ($resourceClass) {
+        $resourceClassResolver->method('isResourceClass')->willReturnCallback(static function ($class) use ($resourceClass): bool {
             return \in_array($class, [$resourceClass, 'nestedResourceClass', 'nestedResourceNoQueryClass'], true);
         });
 

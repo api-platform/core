@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
  */
 class IdentifierTraitTest extends TestCase
 {
-    private function getIdentifierTraitImplementation()
+    private function getIdentifierTraitImplementation(): object
     {
         return new class {
             use IdentifierTrait {

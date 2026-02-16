@@ -27,7 +27,7 @@ class VoDummyInspection
     #[Groups(['car_read', 'car_write', 'inspection_read', 'inspection_write'])]
     private \DateTime $performed;
 
-    private $attributeWithoutConstructorEquivalent;
+    private string $attributeWithoutConstructorEquivalent;
 
     public function __construct(#[ORM\Column(type: 'boolean')] #[Groups(['car_read', 'car_write', 'inspection_read', 'inspection_write'])] private bool $accepted, #[ORM\ManyToOne(targetEntity: VoDummyCar::class, inversedBy: 'inspections')] #[Groups(['inspection_read', 'inspection_write'])] private ?VoDummyCar $car, ?\DateTime $performed = null, string $parameterWhichIsNotClassAttribute = '')
     {
@@ -50,7 +50,7 @@ class VoDummyInspection
         return $this->performed;
     }
 
-    public function setPerformed(\DateTime $performed)
+    public function setPerformed(\DateTime $performed): static
     {
         $this->performed = $performed;
 

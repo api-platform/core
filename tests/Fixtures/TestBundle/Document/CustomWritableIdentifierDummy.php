@@ -34,10 +34,7 @@ class CustomWritableIdentifierDummy
     #[ODM\Field(name: 'name', type: 'string')]
     private ?string $name = null;
 
-    /**
-     * @param string $slug
-     */
-    public function setSlug($slug): void
+    public function setSlug(?string $slug): void
     {
         $this->slug = $slug;
     }
@@ -52,10 +49,7 @@ class CustomWritableIdentifierDummy
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     */
-    public function setName($name): void
+    public function setName(?string $name): void
     {
         $this->name = $name;
     }

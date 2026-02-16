@@ -78,7 +78,7 @@ final class OperationResourceProcessor implements ProcessorInterface
     /**
      * Checks if doctrine does not manage data automatically.
      */
-    private function isDeferredExplicit(DoctrineObjectManager $manager, $data): bool
+    private function isDeferredExplicit(DoctrineObjectManager $manager, object $data): bool
     {
         $classMetadata = $manager->getClassMetadata($this->getObjectClass($data));
         if (($classMetadata instanceof ClassMetadata || $classMetadata instanceof ODMClassMetadata) && method_exists($classMetadata, 'isChangeTrackingDeferredExplicit')) {

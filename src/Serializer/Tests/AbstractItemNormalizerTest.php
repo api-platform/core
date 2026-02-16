@@ -352,7 +352,7 @@ class AbstractItemNormalizerTest extends TestCase
         $resourceAccessChecker->isGranted(
             SecuredDummy::class,
             'is_granted(\'ROLE_ADMIN\')',
-            Argument::that(static function (array $context) {
+            Argument::that(static function (array $context): bool {
                 return \array_key_exists('property', $context)
                     && \array_key_exists('object', $context)
                     && \array_key_exists('previous_object', $context)
@@ -405,7 +405,7 @@ class AbstractItemNormalizerTest extends TestCase
         $resourceAccessChecker->isGranted(
             SecuredDummy::class,
             'is_granted(\'ROLE_ADMIN\')',
-            Argument::that(static function (array $context) {
+            Argument::that(static function (array $context): bool {
                 return \array_key_exists('property', $context)
                     && \array_key_exists('object', $context)
                     && \array_key_exists('previous_object', $context)
@@ -462,7 +462,7 @@ class AbstractItemNormalizerTest extends TestCase
         $resourceAccessChecker->isGranted(
             SecuredDummy::class,
             'is_granted(\'ROLE_ADMIN\')',
-            Argument::that(static function (array $context) {
+            Argument::that(static function (array $context): bool {
                 return \array_key_exists('property', $context)
                     && \array_key_exists('object', $context)
                     && \array_key_exists('previous_object', $context)
@@ -1650,7 +1650,7 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->setValue(Argument::type(ObjectWithBasicProperties::class), 'float1', Argument::approximate(123.456, 0))->shouldBeCalled();
         $propertyAccessorProphecy->setValue(Argument::type(ObjectWithBasicProperties::class), 'float2', Argument::approximate(-1.2344e56, 1))->shouldBeCalled();
         $propertyAccessorProphecy->setValue(Argument::type(ObjectWithBasicProperties::class), 'float3', Argument::approximate(45E-6, 1))->shouldBeCalled();
-        $propertyAccessorProphecy->setValue(Argument::type(ObjectWithBasicProperties::class), 'floatNaN', Argument::that(static fn (float $arg) => is_nan($arg)))->shouldBeCalled();
+        $propertyAccessorProphecy->setValue(Argument::type(ObjectWithBasicProperties::class), 'floatNaN', Argument::that(static fn (float $arg): bool => is_nan($arg)))->shouldBeCalled();
         $propertyAccessorProphecy->setValue(Argument::type(ObjectWithBasicProperties::class), 'floatInf', \INF)->shouldBeCalled();
         $propertyAccessorProphecy->setValue(Argument::type(ObjectWithBasicProperties::class), 'floatNegInf', -\INF)->shouldBeCalled();
 

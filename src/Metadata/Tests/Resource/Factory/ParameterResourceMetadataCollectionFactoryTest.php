@@ -40,7 +40,7 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'hydra', 'everywhere']));
         $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
         $propertyMetadata->method('create')->willReturnCallback(
-            static fn (string $class, string $property) => match ($property) {
+            static fn (string $class, string $property): ApiProperty => match ($property) {
                 'id' => new ApiProperty(identifier: true),
                 default => new ApiProperty(readable: true),
             }
@@ -185,7 +185,7 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'hydra', 'everywhere']));
         $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
         $propertyMetadata->method('create')->willReturnCallback(
-            static fn (string $class, string $property) => match ($property) {
+            static fn (string $class, string $property): ApiProperty => match ($property) {
                 'id' => new ApiProperty(identifier: true),
                 default => new ApiProperty(readable: true),
             }

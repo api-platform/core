@@ -34,7 +34,7 @@ final class ContextValueTransformer implements ValueTransformerInterface
         return $this->urlGenerator->generate('api_jsonld_context', ['shortName' => $options['operation']->getShortName()], $options['operation']->getUrlGenerationStrategy());
     }
 
-    public static function getStreamValueType(): Type
+    public static function getStreamValueType(): Type\BuiltinType
     {
         return Type::string();
     }

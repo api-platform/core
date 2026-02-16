@@ -34,12 +34,12 @@ class IsGrantedTestResource
         return $this->id;
     }
 
-    public static function provide(Operation $operation, array $uriVariables = [], array $context = [])
+    public static function provide(Operation $operation, array $uriVariables = [], array $context = []): self
     {
         return new self();
     }
 
-    public static function provideShouldNotBeCalled(Operation $operation, array $uriVariables = [], array $context = [])
+    public static function provideShouldNotBeCalled(Operation $operation, array $uriVariables = [], array $context = []): never
     {
         throw new \RuntimeException('provider should not get called');
     }

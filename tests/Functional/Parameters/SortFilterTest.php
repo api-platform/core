@@ -54,7 +54,7 @@ final class SortFilterTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
 
         $data = $response->toArray();
-        $names = array_map(static fn ($item) => $item['name'], $data['hydra:member']);
+        $names = array_map(static fn (array $item) => $item['name'], $data['hydra:member']);
 
         $this->assertSame(['Alice', 'Bob', 'Charlie', 'David'], $names);
     }
@@ -65,7 +65,7 @@ final class SortFilterTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
 
         $data = $response->toArray();
-        $names = array_map(static fn ($item) => $item['name'], $data['hydra:member']);
+        $names = array_map(static fn (array $item) => $item['name'], $data['hydra:member']);
 
         $this->assertSame(['David', 'Charlie', 'Bob', 'Alice'], $names);
     }
@@ -76,7 +76,7 @@ final class SortFilterTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
 
         $data = $response->toArray();
-        $names = array_map(static fn ($item) => $item['name'], $data['hydra:member']);
+        $names = array_map(static fn (array $item) => $item['name'], $data['hydra:member']);
 
         // Engineering (Alice, Bob) then Sales (Charlie, David)
         $this->assertSame(['Alice', 'Bob', 'Charlie', 'David'], $names);
@@ -88,7 +88,7 @@ final class SortFilterTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
 
         $data = $response->toArray();
-        $names = array_map(static fn ($item) => $item['name'], $data['hydra:member']);
+        $names = array_map(static fn (array $item) => $item['name'], $data['hydra:member']);
 
         // Sales (Charlie, David) then Engineering (Alice, Bob)
         $this->assertSame(['Charlie', 'David', 'Alice', 'Bob'], $names);
@@ -100,7 +100,7 @@ final class SortFilterTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
 
         $data = $response->toArray();
-        $names = array_map(static fn ($item) => $item['name'], $data['hydra:member']);
+        $names = array_map(static fn (array $item) => $item['name'], $data['hydra:member']);
 
         // David has null hireDate -> first (NULLS_ALWAYS_FIRST)
         $this->assertSame('David', $names[0]);
@@ -112,7 +112,7 @@ final class SortFilterTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
 
         $data = $response->toArray();
-        $names = array_map(static fn ($item) => $item['name'], $data['hydra:member']);
+        $names = array_map(static fn (array $item) => $item['name'], $data['hydra:member']);
 
         // David has null hireDate -> last (NULLS_ALWAYS_LAST)
         $this->assertSame('David', $names[3]);
@@ -124,7 +124,7 @@ final class SortFilterTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
 
         $data = $response->toArray();
-        $names = array_map(static fn ($item) => $item['name'], $data['hydra:member']);
+        $names = array_map(static fn (array $item) => $item['name'], $data['hydra:member']);
 
         // Acme Corp employees first, then Globex Inc employees
         $acmeNames = \array_slice($names, 0, 2);
@@ -141,7 +141,7 @@ final class SortFilterTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
 
         $data = $response->toArray();
-        $names = array_map(static fn ($item) => $item['name'], $data['hydra:member']);
+        $names = array_map(static fn (array $item) => $item['name'], $data['hydra:member']);
 
         // Globex Inc employees first, then Acme Corp employees
         $globexNames = \array_slice($names, 0, 2);
@@ -166,7 +166,7 @@ final class SortFilterTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
 
         $data = $response->toArray();
-        $names = array_map(static fn ($item) => $item['name'], $data['hydra:member']);
+        $names = array_map(static fn (array $item) => $item['name'], $data['hydra:member']);
         sort($names);
 
         $this->assertSame(['Alice', 'Bob'], $names);
@@ -189,7 +189,7 @@ final class SortFilterTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
 
         $data = $response->toArray();
-        $names = array_map(static fn ($item) => $item['name'], $data['hydra:member']);
+        $names = array_map(static fn (array $item) => $item['name'], $data['hydra:member']);
         sort($names);
 
         $this->assertSame(['Alice', 'Bob'], $names);

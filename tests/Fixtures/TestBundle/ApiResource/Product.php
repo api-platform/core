@@ -43,7 +43,7 @@ class Product
     #[ApiProperty(property: 'name', iris: ['https://schema.org/name'])]
     public string $name;
 
-    public static function provide()
+    public static function provide(): self
     {
         $s = new self();
         $s->code = 'test';

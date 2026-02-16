@@ -33,12 +33,12 @@ class NotAResourceWithUnionIntersectTypes
         return $this->ignoredProperty;
     }
 
-    public function getUnionType()
+    public function getUnionType(): string|int|float|null
     {
         return $this->unionType;
     }
 
-    public function getIntersectType()
+    public function getIntersectType(): Serializable&DummyResourceInterface
     {
         return $this->intersectType;
     }

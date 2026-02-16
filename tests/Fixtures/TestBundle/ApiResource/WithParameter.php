@@ -360,12 +360,12 @@ class WithParameter
     #[Groups(['b', 'custom'])]
     public $b = 'bar';
 
-    public static function collectionProvider()
+    public static function collectionProvider(): array
     {
         return [new self()];
     }
 
-    public static function provide()
+    public static function provide(): self
     {
         return new self();
     }

@@ -116,26 +116,26 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
         }
 
         $this->autoconfigure($classes, QueryExtensionInterface::class, [FilterQueryExtension::class]);
-        $this->app->singleton(ItemProvider::class, static function (Application $app) {
+        $this->app->singleton(ItemProvider::class, static function (Application $app): ItemProvider {
             $tagged = iterator_to_array($app->tagged(LinksHandlerInterface::class));
 
             return new ItemProvider(new LinksHandler($app, $app->make(ResourceMetadataCollectionFactoryInterface::class)), new ServiceLocator($tagged), $app->tagged(QueryExtensionInterface::class));
         });
 
-        $this->app->singleton(CollectionProvider::class, static function (Application $app) {
+        $this->app->singleton(CollectionProvider::class, static function (Application $app): CollectionProvider {
             $tagged = iterator_to_array($app->tagged(LinksHandlerInterface::class));
 
             return new CollectionProvider($app->make(Pagination::class), new LinksHandler($app, $app->make(ResourceMetadataCollectionFactoryInterface::class)), $app->tagged(QueryExtensionInterface::class), new ServiceLocator($tagged));
         });
 
-        $this->app->singleton(SerializerFilterParameterProvider::class, static function (Application $app) {
+        $this->app->singleton(SerializerFilterParameterProvider::class, static function (Application $app): SerializerFilterParameterProvider {
             $tagged = iterator_to_array($app->tagged(SerializerFilterInterface::class));
 
             return new SerializerFilterParameterProvider(new ServiceLocator($tagged));
         });
         $this->app->alias(SerializerFilterParameterProvider::class, 'api_platform.serializer.filter_parameter_provider');
 
-        $this->app->singleton('filters', static function (Application $app) {
+        $this->app->singleton('filters', static function (Application $app): ServiceLocator {
             return new ServiceLocator(array_merge(
                 iterator_to_array($app->tagged(SerializerFilterInterface::class)),
                 iterator_to_array($app->tagged(EloquentFilterInterface::class))
@@ -144,7 +144,7 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
 
         $this->autoconfigure($classes, SerializerFilterInterface::class, [PropertyFilter::class]);
 
-        $this->app->singleton(ParameterProvider::class, static function (Application $app) {
+        $this->app->singleton(ParameterProvider::class, static function (Application $app): ParameterProvider {
             $tagged = iterator_to_array($app->tagged(ParameterProviderInterface::class));
             $tagged['api_platform.serializer.filter_parameter_provider'] = $app->make(SerializerFilterParameterProvider::class);
 
@@ -161,7 +161,7 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
 
         $this->autoconfigure($classes, ParameterProviderInterface::class, [SerializerFilterParameterProvider::class, SortFilterParameterProvider::class, SparseFieldsetParameterProvider::class]);
 
-        $this->app->bind(FilterQueryExtension::class, static function (Application $app) {
+        $this->app->bind(FilterQueryExtension::class, static function (Application $app): FilterQueryExtension {
             $tagged = iterator_to_array($app->tagged(EloquentFilterInterface::class));
 
             return new FilterQueryExtension(new ServiceLocator($tagged));
@@ -180,7 +180,7 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
             SparseFieldset::class,
         ]);
 
-        $this->app->singleton(CallableProcessor::class, static function (Application $app) {
+        $this->app->singleton(CallableProcessor::class, static function (Application $app): CallableProcessor {
             /** @var ConfigRepository */
             $config = $app['config'];
             $tagged = iterator_to_array($app->tagged(ProcessorInterface::class));
@@ -195,7 +195,7 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
 
         $this->autoconfigure($classes, ProcessorInterface::class, [RemoveProcessor::class, PersistProcessor::class]);
 
-        $this->app->singleton(CallableProvider::class, static function (Application $app) {
+        $this->app->singleton(CallableProvider::class, static function (Application $app): CallableProvider {
             $tagged = iterator_to_array($app->tagged(ProviderInterface::class));
 
             return new CallableProvider(new ServiceLocator($tagged));
@@ -204,7 +204,7 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
         $providers = [ItemProvider::class, CollectionProvider::class, ErrorProvider::class];
 
         if (class_exists(ToolProvider::class)) {
-            $this->app->singleton(ToolProvider::class, static function (Application $app) {
+            $this->app->singleton(ToolProvider::class, static function (Application $app): ToolProvider {
                 return new ToolProvider(
                     $app->make(ObjectMapper::class)
                 );
@@ -214,7 +214,7 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
 
         $this->autoconfigure($classes, ProviderInterface::class, $providers);
 
-        $this->app->singleton(ResourceMetadataCollectionFactoryInterface::class, function (Application $app) {
+        $this->app->singleton(ResourceMetadataCollectionFactoryInterface::class, function (Application $app): CacheResourceCollectionMetadataFactory {
             /** @var ConfigRepository $config */
             $config = $app['config'];
             $formats = $config->get('api-platform.formats');
@@ -277,7 +277,7 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
             );
         });
 
-        $this->app->singleton(ErrorRenderer::class, static function (Application $app) {
+        $this->app->singleton(ErrorRenderer::class, static function (Application $app): ErrorRenderer {
             /** @var ConfigRepository */
             $config = $app['config'];
 
@@ -295,7 +295,7 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
 
         $this->app->extend(
             ExceptionHandler::class,
-            static function (ExceptionHandler $decorated, Application $app) {
+            static function (ExceptionHandler $decorated, Application $app): ErrorHandler {
                 /** @var ConfigRepository */
                 $config = $app['config'];
 
@@ -318,7 +318,7 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
 
     private function registerGraphQl(): void
     {
-        $this->app->singleton('api_platform.graphql.state_provider.parameter', static function (Application $app) {
+        $this->app->singleton('api_platform.graphql.state_provider.parameter', static function (Application $app): ParameterProvider {
             $tagged = iterator_to_array($app->tagged(ParameterProviderInterface::class));
             $tagged['api_platform.serializer.filter_parameter_provider'] = $app->make(SerializerFilterParameterProvider::class);
 
@@ -333,7 +333,7 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
             );
         });
 
-        $this->app->singleton(FieldsBuilderEnumInterface::class, static function (Application $app) {
+        $this->app->singleton(FieldsBuilderEnumInterface::class, static function (Application $app): FieldsBuilder {
             /** @var ConfigRepository */
             $config = $app['config'];
 

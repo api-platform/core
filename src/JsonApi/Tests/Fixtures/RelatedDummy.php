@@ -101,10 +101,7 @@ class RelatedDummy implements \Stringable
         return $this->dummyBoolean;
     }
 
-    /**
-     * @param bool $dummyBoolean
-     */
-    public function setDummyBoolean($dummyBoolean): void
+    public function setDummyBoolean(?bool $dummyBoolean): void
     {
         $this->dummyBoolean = $dummyBoolean;
     }

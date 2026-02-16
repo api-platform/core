@@ -94,7 +94,7 @@ trait ParameterParserTrait
             return $value;
         }
 
-        $isCollectionType = static fn ($t) => $t instanceof CollectionType;
+        $isCollectionType = static fn ($t): bool => $t instanceof CollectionType;
         $isCollection = $parameter->getNativeType()?->isSatisfiedBy($isCollectionType) ?? false;
 
         // type-info 7.2

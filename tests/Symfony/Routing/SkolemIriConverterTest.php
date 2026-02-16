@@ -32,7 +32,7 @@ class SkolemIriConverterTest extends TestCase
     {
         $generatedIds = [];
         $router = $this->createStub(RouterInterface::class);
-        $router->method('generate')->willReturnCallback(static function (string $name, array $params) use (&$generatedIds) {
+        $router->method('generate')->willReturnCallback(static function (string $name, array $params) use (&$generatedIds): string {
             $generatedIds[] = $params['id'];
 
             return '/.well-known/genid/'.$params['id'];
@@ -57,7 +57,7 @@ class SkolemIriConverterTest extends TestCase
     {
         $generatedIds = [];
         $router = $this->createStub(RouterInterface::class);
-        $router->method('generate')->willReturnCallback(static function (string $name, array $params) use (&$generatedIds) {
+        $router->method('generate')->willReturnCallback(static function (string $name, array $params) use (&$generatedIds): string {
             $generatedIds[] = $params['id'];
 
             return '/.well-known/genid/'.$params['id'];
@@ -81,7 +81,7 @@ class SkolemIriConverterTest extends TestCase
     {
         $generatedIds = [];
         $router = $this->createStub(RouterInterface::class);
-        $router->method('generate')->willReturnCallback(static function (string $name, array $params) use (&$generatedIds) {
+        $router->method('generate')->willReturnCallback(static function (string $name, array $params) use (&$generatedIds): string {
             $generatedIds[] = $params['id'];
 
             return '/.well-known/genid/'.$params['id'];

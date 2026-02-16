@@ -62,7 +62,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ?ResourceAccessCheckerInterface $resourceAccessChecker = null, ?TagCollectorInterface $tagCollector = null, ?OperationResourceClassResolverInterface $operationResourceResolver = null)
     {
-        $defaultContext[AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER] = function ($object): ?array {
+        $defaultContext[AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER] = function (object|string $object): ?array {
             $iri = $this->iriConverter->getIriFromResource($object);
             if (null === $iri) {
                 return null;
@@ -216,7 +216,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
                         $isOne = $className && $this->resourceClassResolver->isResourceClass($className);
                     }
                 } elseif ($type instanceof Type) {
-                    if ($type->isSatisfiedBy(static fn ($t) => $t instanceof CollectionType)) {
+                    if ($type->isSatisfiedBy(static fn ($t): bool => $t instanceof CollectionType)) {
                         $isMany = TypeHelper::getCollectionValueType($type)?->isSatisfiedBy($typeIsResourceClass);
                     } else {
                         $isOne = $type->isSatisfiedBy($typeIsResourceClass);

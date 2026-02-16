@@ -57,7 +57,7 @@ final class BackedEnumProviderTest extends TestCase
         $this->testProvide($expected, $operation, ['id' => $id]);
     }
 
-    private function testProvide($expected, Operation $operation, array $uriVariables = [], array $context = []): void
+    private function testProvide(array|\BackedEnum $expected, Operation $operation, array $uriVariables = [], array $context = []): void
     {
         $decorated = $this->prophesize(ProviderInterface::class);
         $decorated->provide(Argument::any())->shouldNotBeCalled();

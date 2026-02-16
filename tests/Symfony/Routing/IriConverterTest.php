@@ -316,14 +316,14 @@ class IriConverterTest extends TestCase
     private function getResourceClassResolver()
     {
         $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolver->isResourceClass(Argument::type('string'))->will(static fn ($args) => true);
+        $resourceClassResolver->isResourceClass(Argument::type('string'))->will(static fn ($args): true => true);
 
         $resourceClassResolver->getResourceClass(Argument::cetera())->will(static fn ($args) => $args[0]::class);
 
         return $resourceClassResolver->reveal();
     }
 
-    private function getIriConverter(?ObjectProphecy $stateProviderProphecy = null, ?ObjectProphecy $routerProphecy = null, ?ObjectProphecy $identifiersExtractorProphecy = null, $resourceMetadataCollectionFactoryProphecy = null, $uriVariablesConverter = null, $decorated = null, ?ObjectProphecy $operationMetadataFactory = null): IriConverter
+    private function getIriConverter(?ObjectProphecy $stateProviderProphecy = null, ?ObjectProphecy $routerProphecy = null, ?ObjectProphecy $identifiersExtractorProphecy = null, $resourceMetadataCollectionFactoryProphecy = null, $uriVariablesConverter = null, ?SkolemIriConverter $decorated = null, ?ObjectProphecy $operationMetadataFactory = null): IriConverter
     {
         if (!$stateProviderProphecy) {
             $stateProviderProphecy = $this->prophesize(ProviderInterface::class);

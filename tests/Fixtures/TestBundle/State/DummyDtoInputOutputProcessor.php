@@ -35,7 +35,7 @@ final class DummyDtoInputOutputProcessor implements ProcessorInterface
      *
      * @param InputDto|InputDtoDocument|mixed $data
      */
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): OutputDtoDocument|OutputDto
     {
         if (!($data instanceof InputDto || $data instanceof InputDtoDocument)) {
             throw new \RuntimeException('Data is not an InputDto');

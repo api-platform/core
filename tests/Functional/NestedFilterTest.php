@@ -51,7 +51,7 @@ final class NestedFilterTest extends ApiTestCase
         $data = $response->toArray();
 
         $this->assertCount(2, $data['hydra:member'], 'Should find employees in department 1');
-        $names = array_map(static fn ($m) => $m['name'], $data['hydra:member']);
+        $names = array_map(static fn (array $m) => $m['name'], $data['hydra:member']);
         $this->assertContains('Alice', $names);
         $this->assertContains('Charlie', $names);
     }
@@ -69,7 +69,7 @@ final class NestedFilterTest extends ApiTestCase
         $data = $response->toArray();
 
         $this->assertCount(2, $data['hydra:member'], 'Should find employees whose department belongs to company 1');
-        $names = array_map(static fn ($m) => $m['name'], $data['hydra:member']);
+        $names = array_map(static fn (array $m) => $m['name'], $data['hydra:member']);
         $this->assertContains('Alice', $names);
         $this->assertContains('Charlie', $names);
     }
@@ -87,7 +87,7 @@ final class NestedFilterTest extends ApiTestCase
         $data = $response->toArray();
 
         $this->assertCount(2, $data['hydra:member'], 'Should find employees in department 1 by UUID');
-        $names = array_map(static fn ($m) => $m['name'], $data['hydra:member']);
+        $names = array_map(static fn (array $m) => $m['name'], $data['hydra:member']);
         $this->assertContains('Alice', $names);
         $this->assertContains('Charlie', $names);
     }
@@ -105,7 +105,7 @@ final class NestedFilterTest extends ApiTestCase
         $data = $response->toArray();
 
         $this->assertCount(2, $data['hydra:member'], 'Should find employees whose department belongs to company 1 by UUID');
-        $names = array_map(static fn ($m) => $m['name'], $data['hydra:member']);
+        $names = array_map(static fn (array $m) => $m['name'], $data['hydra:member']);
         $this->assertContains('Alice', $names);
         $this->assertContains('Charlie', $names);
     }

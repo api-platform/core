@@ -18,7 +18,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoNoInput;
 
 final class DoubleBatAction
 {
-    public function __invoke($data)
+    public function __invoke($data): DummyDtoNoInput|DummyDtoNoInputDocument
     {
         if (!$data instanceof DummyDtoNoInput && !$data instanceof DummyDtoNoInputDocument) {
             throw new \InvalidArgumentException();

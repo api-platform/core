@@ -51,10 +51,7 @@ class DummyCarColor
         return $this->car;
     }
 
-    /**
-     * @return static
-     */
-    public function setCar(DummyCar $car)
+    public function setCar(DummyCar $car): static
     {
         $this->car = $car;
 
@@ -66,12 +63,7 @@ class DummyCarColor
         return $this->prop;
     }
 
-    /**
-     * @param string $prop
-     *
-     * @return static
-     */
-    public function setProp($prop)
+    public function setProp(string $prop): static
     {
         $this->prop = $prop;
 

@@ -32,7 +32,7 @@ final class PostWithUriVariables
         return new self(id: 1);
     }
 
-    public static function provide(): void
+    public static function provide(): never
     {
         throw new ValidationException(new ConstraintViolationList());
     }

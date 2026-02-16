@@ -88,7 +88,7 @@ class FieldDatatypeTraitTest extends TestCase
         self::assertFalse($fieldDatatype->isNestedField(Foo::class, 'baz'));
     }
 
-    private function getValidFieldDatatype()
+    private function getValidFieldDatatype(): object
     {
         $fooType = Type::object(Foo::class);
         $barType = Type::list(Type::object(Foo::class));
@@ -106,7 +106,7 @@ class FieldDatatypeTraitTest extends TestCase
             $resourceClassResolverProphecy->reveal());
     }
 
-    private static function createFieldDatatypeInstance(PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver)
+    private static function createFieldDatatypeInstance(PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver): object
     {
         return new class($propertyMetadataFactory, $resourceClassResolver) {
             use FieldDatatypeTrait {

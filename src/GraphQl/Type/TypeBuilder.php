@@ -137,7 +137,7 @@ final class TypeBuilder implements ContextAwareTypeBuilderInterface
                     'description' => 'The id of this node.',
                 ],
             ],
-            'resolveType' => function ($value): ?GraphQLType {
+            'resolveType' => function (array $value): ?GraphQLType {
                 if (!isset($value[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY])) {
                     return null;
                 }

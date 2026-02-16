@@ -104,7 +104,7 @@ class MultiRelationsDummy
 
     public function getNestedCollection(): Collection
     {
-        return $this->nestedCollection->map(static fn ($entry) => ['name' => $entry->name]);
+        return $this->nestedCollection->map(static fn ($entry): array => ['name' => $entry->name]);
     }
 
     public function setNestedCollection(Collection $nestedCollection): self
@@ -116,7 +116,7 @@ class MultiRelationsDummy
 
     public function getNestedPaginatedCollection(): Collection
     {
-        return $this->nestedPaginatedCollection->map(static fn ($entry) => ['name' => $entry->name]);
+        return $this->nestedPaginatedCollection->map(static fn ($entry): array => ['name' => $entry->name]);
     }
 
     public function setNestedPaginatedCollection(Collection $nestedPaginatedCollection): self
