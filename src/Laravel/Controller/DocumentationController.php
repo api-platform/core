@@ -86,7 +86,7 @@ final class DocumentationController
             class: OpenApi::class,
             read: true,
             serialize: true,
-            provider: fn () => $this->openApiFactory->__invoke($context),
+            provider: fn (): OpenApi => $this->openApiFactory->__invoke($context),
             normalizationContext: [
                 ApiGatewayNormalizer::API_GATEWAY => $context['api_gateway'] ?? null,
                 LegacyOpenApiNormalizer::SPEC_VERSION => $context['spec_version'] ?? null,
@@ -114,7 +114,7 @@ final class DocumentationController
             class: Documentation::class,
             read: true,
             serialize: true,
-            provider: fn () => new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version)
+            provider: fn (): Documentation => new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version)
         );
 
         return $this->processor->process($this->provider->provide($operation, [], $context), $operation, [], $context);

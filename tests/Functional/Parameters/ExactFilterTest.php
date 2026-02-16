@@ -67,7 +67,7 @@ final class ExactFilterTest extends ApiTestCase
 
         $this->assertCount($expectedCount, $filteredItems, \sprintf('Expected %d items for URL %s', $expectedCount, $url));
 
-        $names = array_map(static fn ($chicken) => $chicken['name'], $filteredItems);
+        $names = array_map(static fn (array $chicken) => $chicken['name'], $filteredItems);
         sort($names);
         sort($expectedNames);
 
@@ -294,7 +294,7 @@ final class ExactFilterTest extends ApiTestCase
 
         $this->assertCount($expectedCount, $filteredChickens, \sprintf('Expected %d chickens for URL %s', $expectedCount, $url));
 
-        $names = array_map(static fn ($chicken) => $chicken['name'], $filteredChickens);
+        $names = array_map(static fn (array $chicken) => $chicken['name'], $filteredChickens);
         sort($names);
         sort($expectedChickenNames);
 
@@ -333,7 +333,7 @@ final class ExactFilterTest extends ApiTestCase
 
         $this->assertCount($expectedCount, $filteredChickens, \sprintf('Expected %d chickens for URL %s', $expectedCount, $url));
 
-        $names = array_map(static fn ($chicken) => $chicken['name'], $filteredChickens);
+        $names = array_map(static fn (array $chicken) => $chicken['name'], $filteredChickens);
         sort($names);
         sort($expectedChickenNames);
 

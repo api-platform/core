@@ -203,7 +203,7 @@ final class DoctrineTest extends ApiTestCase
 
         $this->assertCount($expectedCount, $filteredItems, \sprintf('Expected %d items for URL %s', $expectedCount, $url));
 
-        $foos = array_map(static fn ($item) => $item['foo'], $filteredItems);
+        $foos = array_map(static fn (array $item) => $item['foo'], $filteredItems);
         sort($foos);
         sort($expectedFoos);
 

@@ -55,7 +55,7 @@ class TypeBuilderTest extends TestCase
 
     private ObjectProphecy $typesContainerProphecy;
     /** @var callable */
-    private $defaultFieldResolver;
+    private \Closure $defaultFieldResolver;
     private ObjectProphecy $fieldsBuilderLocatorProphecy;
     private TypeBuilder $typeBuilder;
 

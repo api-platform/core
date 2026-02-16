@@ -79,7 +79,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     public function __construct(protected PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, protected PropertyMetadataFactoryInterface $propertyMetadataFactory, protected IriConverterInterface $iriConverter, protected ResourceClassResolverInterface $resourceClassResolver, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ?ResourceAccessCheckerInterface $resourceAccessChecker = null, protected ?TagCollectorInterface $tagCollector = null, protected ?OperationResourceClassResolverInterface $operationResourceResolver = null)
     {
         if (!isset($defaultContext['circular_reference_handler'])) {
-            $defaultContext['circular_reference_handler'] = fn ($object): ?string => $this->iriConverter->getIriFromResource($object);
+            $defaultContext['circular_reference_handler'] = fn (object|string $object): ?string => $this->iriConverter->getIriFromResource($object);
         }
 
         parent::__construct($classMetadataFactory, $nameConverter, null, null, \Closure::fromCallable($this->getObjectClass(...)), $defaultContext);
@@ -1334,9 +1334,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         if ($denormalizationException) {
-            if ($type instanceof Type && $type->isSatisfiedBy(static fn ($type) => $type instanceof BuiltinType) && !$type->isSatisfiedBy($typeIsResourceClass)) {
+            if ($type instanceof Type && $type->isSatisfiedBy(static fn ($type): bool => $type instanceof BuiltinType) && !$type->isSatisfiedBy($typeIsResourceClass)) {
                 // If the exception came from object denormalization, preserve its message as it's more specific
-                $message = $type->isSatisfiedBy(static fn ($type) => $type instanceof ObjectType)
+                $message = $type->isSatisfiedBy(static fn ($type): bool => $type instanceof ObjectType)
                     ? $denormalizationException->getMessage()
                     : \sprintf('The type of the "%s" attribute must be "%s", "%s" given.', $attribute, $type, \gettype($value));
 

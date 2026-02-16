@@ -45,7 +45,7 @@ final class IriValueTransformer implements ValueTransformerInterface
         );
     }
 
-    public static function getStreamValueType(): Type
+    public static function getStreamValueType(): Type\BuiltinType
     {
         return Type::string();
     }

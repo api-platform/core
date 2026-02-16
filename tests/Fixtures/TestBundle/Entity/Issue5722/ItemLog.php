@@ -44,6 +44,9 @@ class ItemLog
     #[ApiProperty(readable: false, writable: false, identifier: false)] // identifier was false before 3.1.14, changing this to true fixed some errors
     private ?int $id = null;
 
+    /**
+     * @var \Ramsey\Uuid\UuidInterface
+     */
     #[ApiProperty(writable: false, identifier: true)]
     #[ORM\Column(type: 'uuid', unique: true)]
     public $uuid;

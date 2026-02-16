@@ -162,7 +162,7 @@ class Dummy
         return $this->dummyDate;
     }
 
-    public function setDummyPrice($dummyPrice)
+    public function setDummyPrice($dummyPrice): static
     {
         $this->dummyPrice = $dummyPrice;
 

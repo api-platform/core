@@ -125,7 +125,7 @@ final class PropertyMetadataCompatibilityTest extends TestCase
         return $property;
     }
 
-    private function withNativeType(string $value): Type
+    private function withNativeType(string $value): Type\BuiltinType
     {
         return Type::builtin($value);
     }

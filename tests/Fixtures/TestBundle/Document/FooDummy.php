@@ -43,7 +43,7 @@ class FooDummy
     private $name;
 
     #[ODM\Field(nullable: true)]
-    private $nonWritableProp;
+    private string $nonWritableProp;
 
     /**
      * @var Dummy The foo dummy
@@ -82,7 +82,7 @@ class FooDummy
         return $this->name;
     }
 
-    public function getNonWritableProp()
+    public function getNonWritableProp(): string
     {
         return $this->nonWritableProp;
     }

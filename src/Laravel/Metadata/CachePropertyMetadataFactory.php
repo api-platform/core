@@ -29,7 +29,7 @@ final readonly class CachePropertyMetadataFactory implements PropertyMetadataFac
     {
         $key = hash('xxh3', serialize(['resource_class' => $resourceClass, 'property' => $property] + $options));
 
-        return Cache::store($this->cacheStore)->rememberForever($key, function () use ($resourceClass, $property, $options) {
+        return Cache::store($this->cacheStore)->rememberForever($key, function () use ($resourceClass, $property, $options): ApiProperty {
             return $this->decorated->create($resourceClass, $property, $options);
         });
     }

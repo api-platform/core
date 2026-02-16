@@ -61,10 +61,7 @@ class ThirdLevel
         return $this->level;
     }
 
-    /**
-     * @param int $level
-     */
-    public function setLevel($level): void
+    public function setLevel(int $level): void
     {
         $this->level = $level;
     }
@@ -74,10 +71,7 @@ class ThirdLevel
         return $this->test;
     }
 
-    /**
-     * @param bool $test
-     */
-    public function setTest($test): void
+    public function setTest(bool $test): void
     {
         $this->test = $test;
     }

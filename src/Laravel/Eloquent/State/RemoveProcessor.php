@@ -21,7 +21,7 @@ use ApiPlatform\State\ProcessorInterface;
  */
 final class RemoveProcessor implements ProcessorInterface
 {
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): null
     {
         $data->delete();
 

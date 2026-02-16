@@ -79,7 +79,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     /**
      * @var array<string, bool>
      */
-    private $builtSchema = [];
+    private array $builtSchema = [];
 
     public function __construct(private readonly SchemaFactoryInterface $schemaFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, ResourceClassResolverInterface $resourceClassResolver, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory = null, private ?DefinitionNameFactoryInterface $definitionNameFactory = null)
     {

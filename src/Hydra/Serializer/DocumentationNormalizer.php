@@ -368,7 +368,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                 return null;
             }
 
-            if ($nativeType->isSatisfiedBy(static fn ($t) => $t instanceof CollectionType)) {
+            if ($nativeType->isSatisfiedBy(static fn ($t): bool => $t instanceof CollectionType)) {
                 $nativeType = TypeHelper::getCollectionValueType($nativeType);
             }
 

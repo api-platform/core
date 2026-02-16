@@ -29,9 +29,12 @@ return RectorConfig::configure()
         __DIR__.'/src/Doctrine/Odm/Tests/var',
         __DIR__.'/tests/Fixtures/app/config/reference.php',
         __DIR__.'/src/Symfony/Bundle/DependencyInjection/Configuration.php',
+        __DIR__.'/tests/Fixer/SymfonyServiceClassConstantFixer.php',
     ])
     // uncomment to reach your current PHP version
     // ->withPhpSets()
-    ->withTypeCoverageLevel(0)
+    ->withPreparedSets(
+        typeDeclarations: true,
+    )
     ->withDeadCodeLevel(0)
     ->withCodeQualityLevel(0);

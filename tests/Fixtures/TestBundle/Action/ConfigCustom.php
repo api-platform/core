@@ -29,7 +29,7 @@ class ConfigCustom
     {
     }
 
-    public function __invoke(Request $request, $id)
+    public function __invoke(Request $request, $id): object|array|null
     {
         $attributes = RequestAttributesExtractor::extractAttributes($request);
 

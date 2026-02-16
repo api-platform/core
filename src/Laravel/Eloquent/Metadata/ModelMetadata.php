@@ -29,12 +29,12 @@ final class ModelMetadata
     /**
      * @var array<class-string, array<string, mixed>>
      */
-    private $attributesLocalCache = [];
+    private array $attributesLocalCache = [];
 
     /**
      * @var array<class-string, array<string, mixed>>
      */
-    private $relationsLocalCache = [];
+    private array $relationsLocalCache = [];
 
     /**
      * The methods that can be called in a model to indicate a relation.
@@ -348,7 +348,7 @@ final class ModelMetadata
     private function columnIsUnique(string $column, array $indexes): bool
     {
         return collect($indexes)->contains(
-            static fn ($index) => 1 === \count($index['columns']) && $index['columns'][0] === $column && $index['unique']
+            static fn ($index): bool => 1 === \count($index['columns']) && $index['columns'][0] === $column && $index['unique']
         );
     }
 }

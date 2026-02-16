@@ -59,7 +59,7 @@ class McpTest extends ApiTestCase
         }
     }
 
-    private function callTool($client, string $sessionId, string $toolName, array $arguments = []): mixed
+    private function callTool(\ApiPlatform\Symfony\Bundle\Test\Client $client, string $sessionId, string $toolName, array $arguments = []): mixed
     {
         return $client->request('POST', '/mcp', [
             'headers' => [
@@ -349,7 +349,7 @@ class McpTest extends ApiTestCase
         self::assertArrayNotHasKey('structuredContent', $result['result']);
     }
 
-    private function initializeMcpSession($client): string
+    private function initializeMcpSession(\ApiPlatform\Symfony\Bundle\Test\Client $client): string
     {
         $res = $client->request('POST', '/mcp', [
             'headers' => [
@@ -428,7 +428,7 @@ class McpTest extends ApiTestCase
             self::assertEquals('object', $tool['inputSchema']['type']);
         }
 
-        $listBooks = array_filter($tools, static function (array $input) {
+        $listBooks = array_filter($tools, static function (array $input): bool {
             return 'list_books' === $input['name'];
         });
 
@@ -483,7 +483,7 @@ class McpTest extends ApiTestCase
             ],
         ], $outputSchema);
 
-        $listBooksDto = array_filter($tools, static function (array $input) {
+        $listBooksDto = array_filter($tools, static function (array $input): bool {
             return 'list_books_dto' === $input['name'];
         });
 

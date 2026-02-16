@@ -47,14 +47,14 @@ class DummyTableInheritanceRelated
         return $this->children;
     }
 
-    public function setChildren(Collection|iterable $children)
+    public function setChildren(Collection|iterable $children): static
     {
         $this->children = $children;
 
         return $this;
     }
 
-    public function addChild($child)
+    public function addChild($child): static
     {
         $this->children->add($child);
         $child->setParent($this);
@@ -62,7 +62,7 @@ class DummyTableInheritanceRelated
         return $this;
     }
 
-    public function removeChild($child)
+    public function removeChild(string|int $child): static
     {
         $this->children->remove($child);
 

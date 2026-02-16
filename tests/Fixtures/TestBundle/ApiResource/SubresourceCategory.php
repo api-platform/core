@@ -36,7 +36,7 @@ final class SubresourceCategory
     ) {
     }
 
-    public static function provideNull()
+    public static function provideNull(): null
     {
         return null;
     }

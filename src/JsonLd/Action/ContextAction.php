@@ -64,7 +64,7 @@ final class ContextAction
             $operation = new Get(
                 outputFormats: ['jsonld' => ['application/ld+json']],
                 validate: false,
-                provider: fn () => $this->getContext($shortName),
+                provider: fn (): ?array => $this->getContext($shortName),
                 serialize: false,
                 read: true
             );

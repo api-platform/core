@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
 class CollectionPaginatorTest extends TestCase
 {
     #[DataProvider('initializeProvider')]
-    public function testInitialize($results, $currentPage, $itemsPerPage, $totalItems, $lastPage, $currentItems): void
+    public function testInitialize(array $results, int $currentPage, int $itemsPerPage, int $totalItems, int $lastPage, int $currentItems): void
     {
         $results = new ArrayCollection($results);
         $paginator = new CollectionPaginator($results, $currentPage, $itemsPerPage);

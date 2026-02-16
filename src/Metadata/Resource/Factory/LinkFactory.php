@@ -30,7 +30,7 @@ final class LinkFactory implements LinkFactoryInterface, PropertyLinkFactoryInte
     /**
      * @var array<class-string, string[]>
      */
-    private $localIdentifiersPerResourceClassCache = [];
+    private array $localIdentifiersPerResourceClassCache = [];
 
     public function __construct(private readonly PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, private readonly PropertyMetadataFactoryInterface $propertyMetadataFactory, private readonly ResourceClassResolverInterface $resourceClassResolver)
     {

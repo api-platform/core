@@ -18,7 +18,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Payment;
 
 final class VoidPaymentAction
 {
-    public function __invoke($data)
+    public function __invoke($data): \ApiPlatform\Tests\Fixtures\TestBundle\Entity\VoidPayment|\ApiPlatform\Tests\Fixtures\TestBundle\Document\VoidPayment|null
     {
         if (!$data instanceof Payment && !$data instanceof PaymentDocument) {
             throw new \InvalidArgumentException();

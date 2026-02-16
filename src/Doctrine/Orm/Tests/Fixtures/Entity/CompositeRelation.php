@@ -51,7 +51,7 @@ class CompositeRelation
      *
      * @param string|null $value the value to set
      */
-    public function setValue($value = null): void
+    public function setValue(?string $value = null): void
     {
         $this->value = $value;
     }

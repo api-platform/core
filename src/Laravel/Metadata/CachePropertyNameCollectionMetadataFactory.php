@@ -29,7 +29,7 @@ final readonly class CachePropertyNameCollectionMetadataFactory implements Prope
     {
         $key = hash('xxh3', serialize(['resource_class' => $resourceClass] + $options));
 
-        return Cache::store($this->cacheStore)->rememberForever($key, function () use ($resourceClass, $options) {
+        return Cache::store($this->cacheStore)->rememberForever($key, function () use ($resourceClass, $options): PropertyNameCollection {
             return $this->decorated->create($resourceClass, $options);
         });
     }

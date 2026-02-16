@@ -41,7 +41,7 @@ class NonCloneableDummy
     #[ApiProperty(iris: ['http://schema.org/name'])]
     #[ORM\Column]
     #[Assert\NotBlank]
-    private $name;
+    private string $name;
 
     public function getId()
     {

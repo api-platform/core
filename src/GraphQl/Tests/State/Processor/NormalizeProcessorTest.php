@@ -44,7 +44,7 @@ class NormalizeProcessorTest extends TestCase
     }
 
     #[DataProvider('processItems')]
-    public function testProcess($body, $operation): void
+    public function testProcess(\stdClass $body, Query|Mutation|Subscription $operation): void
     {
         $context = ['args' => []];
         $serializerContext = ['resource_class' => $operation->getClass()];
@@ -66,7 +66,7 @@ class NormalizeProcessorTest extends TestCase
     }
 
     #[DataProvider('processCollection')]
-    public function testProcessCollection($collection, $operation, $args, ?array $expectedResult, array $getFieldSelection, ?string $expectedExceptionClass = null, ?string $expectedExceptionMessage = null): void
+    public function testProcessCollection(ArrayPaginator|\Closure|array $collection, QueryCollection $operation, array $args, ?array $expectedResult, array $getFieldSelection, ?string $expectedExceptionClass = null, ?string $expectedExceptionMessage = null): void
     {
         $this->resolveInfoProphecy->getFieldSelection(1)->willReturn($getFieldSelection);
         $context = ['args' => $args, 'info' => $this->resolveInfoProphecy->reveal()];

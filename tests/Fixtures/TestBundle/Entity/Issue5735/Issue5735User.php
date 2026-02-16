@@ -60,7 +60,7 @@ class Issue5735User
         return $this->uuid;
     }
 
-    public function setUuid($uuid): void
+    public function setUuid(Uuid $uuid): void
     {
         $this->uuid = $uuid;
     }

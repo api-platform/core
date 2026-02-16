@@ -224,7 +224,7 @@ class ItemProviderTest extends TestCase
     /**
      * Gets a mocked manager registry.
      */
-    private function getManagerRegistry(string $resourceClass, array $identifierFields, QueryBuilder $queryBuilder, array $classMetadatas = [])
+    private function getManagerRegistry(string $resourceClass, array $identifierFields, QueryBuilder $queryBuilder, array $classMetadatas = []): \PHPUnit\Framework\MockObject\MockObject
     {
         $classMetadataMock = $this->createMock(ClassMetadata::class);
         $classMetadataMock->method('getIdentifierFieldNames')->willReturn(array_keys($identifierFields));

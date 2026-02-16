@@ -716,7 +716,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         return $operations;
     }
 
-    private function withStateOptions(array $values)
+    private function withStateOptions(array $values): null
     {
         if (!$values) {
             return null;

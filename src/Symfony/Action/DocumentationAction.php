@@ -59,7 +59,7 @@ final class DocumentationAction
     /**
      * @return DocumentationInterface|OpenApi|Response
      */
-    public function __invoke(?Request $request = null)
+    public function __invoke(?Request $request = null): Documentation|OpenApi|Response|DocumentationInterface
     {
         if (false === $this->docsEnabled) {
             throw new NotFoundHttpException();
@@ -129,7 +129,7 @@ final class DocumentationAction
                 class: Documentation::class,
                 read: true,
                 serialize: true,
-                provider: fn () => new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version)
+                provider: fn (): Documentation => new Documentation($this->resourceNameCollectionFactory->create(), $this->title, $this->description, $this->version)
             );
 
             return $this->processor->process($this->provider->provide($operation, [], $context), $operation, [], $context);

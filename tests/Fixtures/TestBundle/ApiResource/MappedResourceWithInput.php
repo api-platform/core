@@ -35,7 +35,7 @@ final class MappedResourceWithInput
     public ?string $id = null;
     public string $username;
 
-    public static function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
+    public static function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): self
     {
         $s = new self();
         $s->id = $data->id;
