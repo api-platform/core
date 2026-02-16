@@ -16,6 +16,7 @@ namespace ApiPlatform\Symfony\Bundle\DependencyInjection;
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Symfony\Controller\MainController;
@@ -656,6 +657,18 @@ final class Configuration implements ConfigurationInterface
         $this->defineDefault($defaultsNode, new \ReflectionClass(ApiResource::class), $nameConverter);
         $this->defineDefault($defaultsNode, new \ReflectionClass(Put::class), $nameConverter);
         $this->defineDefault($defaultsNode, new \ReflectionClass(Post::class), $nameConverter);
+
+        $parametersNode = $defaultsNode
+            ->children()
+                ->arrayNode('parameters')
+                    ->info('Global parameters applied to all resources and operations.')
+                    ->useAttributeAsKey('parameter_class')
+                    ->prototype('array')
+                        ->ignoreExtraKeys(false);
+
+        $this->defineDefault($parametersNode, new \ReflectionClass(Parameter::class), $nameConverter);
+
+        $parametersNode->end()->end()->end();
     }
 
     private function addMakerSection(ArrayNodeDefinition $rootNode): void
