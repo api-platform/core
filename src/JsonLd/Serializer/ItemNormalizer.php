@@ -103,26 +103,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $resourceClass = $this->getObjectClass($data);
         $outputClass = $this->getOutputClass($context);
 
-        if ($outputClass) {
-            if ($context['item_uri_template'] ?? null) {
-                // When both output and item_uri_template are present, temporarily remove
-                // item_uri_template so the output re-dispatch produces the correct @type
-                // from the output class (not from the item_uri_template operation).
-                $itemUriTemplate = $context['item_uri_template'];
-                unset($context['item_uri_template']);
-                $originalData = $data;
-                $data = parent::normalize($data, $format, $context);
-                if (\is_array($data)) {
-                    try {
-                        $context['item_uri_template'] = $itemUriTemplate;
-                        $data['@id'] = $this->iriConverter->getIriFromResource($originalData, UrlGeneratorInterface::ABS_PATH, null, $context);
-                    } catch (\Exception) {
-                    }
-                }
-
-                return $data;
-            }
-
+        if ($outputClass && !($context['item_uri_template'] ?? null)) {
             return parent::normalize($data, $format, $context);
         }
 
@@ -141,14 +122,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             }
 
             if (isset($context['item_uri_template']) && $this->operationMetadataFactory) {
-                $itemOp = $this->operationMetadataFactory->create($context['item_uri_template']);
-                // Use resource-level shortName for @type, not operation-specific shortName
-                try {
-                    $itemResourceShortName = $this->resourceMetadataCollectionFactory->create($itemOp->getClass())[0]->getShortName();
-                    $context['output']['operation'] = $itemOp->withShortName($itemResourceShortName);
-                } catch (\Exception) {
-                    $context['output']['operation'] = $itemOp;
-                }
+                $context['output']['operation'] = $this->operationMetadataFactory->create($context['item_uri_template']);
             } elseif ($this->resourceClassResolver->isResourceClass($resourceClass)) {
                 $context['output']['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
             }
@@ -190,12 +164,18 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 // TODO: 5.x break on this as this looks wrong, CollectionReferencingItem returns an IRI that point through
                 // ItemReferencedInCollection but it returns a CollectionReferencingItem therefore we should use the current
                 // object's class Type and not rely on operation ?
-                // Use resource-level shortName to avoid operation-specific overrides
-                $typeClass = $isResourceClass ? $resourceClass : ($operation->getClass() ?? $resourceClass);
-                try {
-                    $types = [$this->resourceMetadataCollectionFactory->create($typeClass)[0]->getShortName()];
-                } catch (\Exception) {
+                if (isset($context['item_uri_template'])) {
+                    // When the operation comes from item_uri_template, use its shortName directly
+                    // as $resourceClass refers to the collection resource, not the item resource
                     $types = [$operation->getShortName()];
+                } else {
+                    // Use resource-level shortName to avoid operation-specific overrides
+                    $typeClass = $isResourceClass ? $resourceClass : ($operation->getClass() ?? $resourceClass);
+                    try {
+                        $types = [$this->resourceMetadataCollectionFactory->create($typeClass)[0]->getShortName()];
+                    } catch (\Exception) {
+                        $types = [$operation->getShortName()];
+                    }
                 }
             }
             $metadata['@type'] = 1 === \count($types) ? $types[0] : $types;
