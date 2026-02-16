@@ -15,9 +15,20 @@ use Rector\Config\RectorConfig;
 
 return RectorConfig::configure()
     ->withPaths([
-        __DIR__.'/docs',
         __DIR__.'/src',
         __DIR__.'/tests',
+    ])
+    ->withSkip([
+        __DIR__.'/src/Core/Bridge/Symfony/Maker/Resources/skeleton',
+        __DIR__.'/src/Laravel/Console/Maker/Resources/skeleton',
+        __DIR__.'/src/Laravel/config',
+        __DIR__.'/tests/Fixtures/app/var',
+        __DIR__.'/docs/guides',
+        __DIR__.'/docs/var',
+        __DIR__.'/src/Doctrine/Orm/Tests/var',
+        __DIR__.'/src/Doctrine/Odm/Tests/var',
+        __DIR__.'/tests/Fixtures/app/config/reference.php',
+        __DIR__.'/src/Symfony/Bundle/DependencyInjection/Configuration.php',
     ])
     // uncomment to reach your current PHP version
     // ->withPhpSets()
