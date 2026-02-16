@@ -65,8 +65,8 @@
         "phpstan/phpdoc-parser": "^1.29 || ^2.0",
         "phpunit/phpunit": "^12.2",
         "symfony/http-client": "^7.4 || ^8.0",
-        "symfony/mcp-bundle": "dev-main",
-        "symfony/object-mapper": "8.1.x-dev"
+        "symfony/mcp-bundle": "^0.3.0",
+        "symfony/object-mapper": "^7.4 || ^8.0"
     },
     "autoload": {
         "psr-4": {
