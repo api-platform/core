@@ -33,7 +33,7 @@ use Doctrine\ORM\QueryBuilder;
  *
  * Usage: `new QueryParameter(filter: new SortFilter(), property: 'department.name')`.
  *
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * @author Antoine Bluchet <soyuka@gmail.com>
  */
 final class SortFilter implements FilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface
 {

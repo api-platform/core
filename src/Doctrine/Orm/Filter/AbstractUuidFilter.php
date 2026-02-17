@@ -33,6 +33,7 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 
 /**
@@ -64,7 +65,7 @@ class AbstractUuidFilter implements FilterInterface, ManagerRegistryAwareInterfa
             return $manager->getClassMetadata($resourceClass);
         }
 
-        return new \Doctrine\ORM\Mapping\ClassMetadata($resourceClass);
+        return new ClassMetadata($resourceClass);
     }
 
     public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
