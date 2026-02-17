@@ -81,7 +81,7 @@ final class DocumentationNormalizer implements NormalizerInterface
                 }
 
                 $shortName = $resourceMetadata->getShortName();
-                $prefixedShortName = $resourceMetadata->getTypes()[0] ?? "#$shortName";
+                $prefixedShortName = "#$shortName";
 
                 $this->populateEntrypointProperties($resourceMetadata, $shortName, $prefixedShortName, $entrypointProperties, $hydraPrefix);
                 $classes[] = $this->getClass($resourceClass, $resourceMetadata, $shortName, $prefixedShortName, $context, $hydraPrefix);
@@ -154,6 +154,11 @@ final class DocumentationNormalizer implements NormalizerInterface
 
         if ($resourceMetadata instanceof ErrorResource) {
             $class['subClassOf'] = 'Error';
+        }
+
+        $types = array_values(array_filter($resourceMetadata->getTypes() ?? [], static fn (string $type) => $type !== $prefixedShortName));
+        if ($types) {
+            $class['subClassOf'] = 1 === \count($types) ? $types[0] : $types;
         }
 
         if ($isDeprecated) {
@@ -408,12 +413,8 @@ final class DocumentationNormalizer implements NormalizerInterface
                 $resourceMetadata = $this->resourceMetadataFactory->create($className);
                 $operation = $resourceMetadata->getOperation();
 
-                if (!$operation instanceof HttpOperation || !$operation->getTypes()) {
-                    if (!\in_array("#{$operation->getShortName()}", $types, true)) {
-                        $types[] = "#{$operation->getShortName()}";
-                    }
-                } else {
-                    $types = array_unique(array_merge($types, $operation->getTypes()));
+                if (!\in_array("#{$operation->getShortName()}", $types, true)) {
+                    $types[] = "#{$operation->getShortName()}";
                 }
             }
         // TODO: remove in 5.x
@@ -462,14 +463,9 @@ final class DocumentationNormalizer implements NormalizerInterface
                             $resourceMetadata = $this->resourceMetadataFactory->create($className);
                             $operation = $resourceMetadata->getOperation();
 
-                            if (!$operation instanceof HttpOperation || !$operation->getTypes()) {
-                                if (!\in_array("#{$operation->getShortName()}", $types, true)) {
-                                    $types[] = "#{$operation->getShortName()}";
-                                }
-                                break;
+                            if (!\in_array("#{$operation->getShortName()}", $types, true)) {
+                                $types[] = "#{$operation->getShortName()}";
                             }
-
-                            $types = array_unique(array_merge($types, $operation->getTypes()));
                             break;
                         }
                 }

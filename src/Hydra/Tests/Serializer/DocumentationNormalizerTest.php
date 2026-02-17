@@ -213,6 +213,7 @@ class DocumentationNormalizerTest extends TestCase
                             'hydra:writeable' => false,
                         ],
                     ],
+
                     'hydra:supportedOperation' => [
                         [
                             '@type' => ['hydra:Operation', 'schema:FindAction'],
@@ -777,6 +778,7 @@ class DocumentationNormalizerTest extends TestCase
                             'writeable' => false,
                         ],
                     ],
+
                     'supportedOperation' => [
                         [
                             '@type' => ['Operation', 'schema:FindAction'],
@@ -979,6 +981,97 @@ class DocumentationNormalizerTest extends TestCase
         ];
 
         $this->assertEquals($expected, $documentationNormalizer->normalize($documentation, null, [ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX => false]));
+    }
+
+    public function testNormalizeSubClassOfWithSchemaOrgTypes(): void
+    {
+        $title = 'Test Api';
+        $desc = 'test ApiGerard';
+        $version = '0.0.0';
+        $documentation = new Documentation(new ResourceNameCollection(['dummy' => 'dummy']), $title, $desc, $version);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create('dummy', Argument::any())->willReturn(new PropertyNameCollection([]));
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('dummy')->willReturn(new ResourceMetadataCollection('dummy', [
+            (new ApiResource())->withShortName('AdminBook')->withTypes(['https://schema.org/Book'])->withOperations(new Operations([
+                'get' => (new Get())->withShortName('AdminBook'),
+            ])),
+            (new ApiResource())->withShortName('Book')->withTypes(['https://schema.org/Book'])->withOperations(new Operations([
+                'get' => (new Get())->withShortName('Book'),
+                'get_collection' => (new GetCollection())->withShortName('Book'),
+            ])),
+        ]));
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Argument::type('string'))->willReturn(true);
+
+        $urlGenerator = $this->prophesize(UrlGeneratorInterface::class);
+        $urlGenerator->generate('api_entrypoint')->willReturn('/');
+        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'])->willReturn('/doc');
+        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'], 0)->willReturn('/doc');
+
+        $documentationNormalizer = new DocumentationNormalizer(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $urlGenerator->reveal()
+        );
+
+        $doc = $documentationNormalizer->normalize($documentation);
+
+        // Both classes should have unique @id based on shortName
+        $adminClass = $doc['hydra:supportedClass'][0];
+        $bookClass = $doc['hydra:supportedClass'][1];
+
+        $this->assertSame('#AdminBook', $adminClass['@id']);
+        $this->assertSame('AdminBook', $adminClass['hydra:title']);
+        $this->assertSame('https://schema.org/Book', $adminClass['subClassOf']);
+
+        $this->assertSame('#Book', $bookClass['@id']);
+        $this->assertSame('Book', $bookClass['hydra:title']);
+        $this->assertSame('https://schema.org/Book', $bookClass['subClassOf']);
+    }
+
+    public function testNormalizeSubClassOfWithMultipleTypes(): void
+    {
+        $title = 'Test Api';
+        $desc = 'test';
+        $version = '0.0.0';
+        $documentation = new Documentation(new ResourceNameCollection(['dummy' => 'dummy']), $title, $desc, $version);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create('dummy', Argument::any())->willReturn(new PropertyNameCollection([]));
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('dummy')->willReturn(new ResourceMetadataCollection('dummy', [
+            (new ApiResource())->withShortName('Product')->withTypes(['https://schema.org/Product', 'https://schema.org/Offer'])->withOperations(new Operations([
+                'get' => (new Get())->withShortName('Product'),
+            ])),
+        ]));
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $urlGenerator = $this->prophesize(UrlGeneratorInterface::class);
+        $urlGenerator->generate('api_entrypoint')->willReturn('/');
+        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'])->willReturn('/doc');
+        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'], 0)->willReturn('/doc');
+
+        $documentationNormalizer = new DocumentationNormalizer(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $urlGenerator->reveal()
+        );
+
+        $doc = $documentationNormalizer->normalize($documentation);
+        $class = $doc['hydra:supportedClass'][0];
+
+        $this->assertSame('#Product', $class['@id']);
+        // Multiple types should be an array
+        $this->assertSame(['https://schema.org/Product', 'https://schema.org/Offer'], $class['subClassOf']);
     }
 
     public function testNormalizeNoEntrypointAndHideHydraOperation(): void
