@@ -39,7 +39,7 @@ trait OperationContextTrait
         // At some point we should merge the jsonld context here, there's a TODO to simplify this somewhere else
         if ($propertyMetadata) {
             $context['output'] ??= [];
-            $context['output']['gen_id'] = $propertyMetadata->getGenId() ?? true;
+            $context['output']['gen_id'] = $propertyMetadata->getGenId() ?? ($context['gen_id'] ?? true);
         }
 
         if (!$resourceClass) {
