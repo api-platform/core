@@ -85,6 +85,20 @@ class JsonProblemTest extends TestCase
 </html>', $response->getContent());
     }
 
+    public function testProblemExceptionInterface(): void
+    {
+        $response = $this->get('/api/teapot', headers: ['accept' => 'application/json']);
+        $response->assertStatus(418);
+        $response->assertHeader('content-type', 'application/problem+json; charset=utf-8');
+        $response->assertJsonFragment([
+            'type' => '/problem/teapot',
+            'title' => 'I\'m a teapot',
+            'status' => 418,
+            'detail' => 'No coffee here',
+            'instance' => '/teapot',
+        ]);
+    }
+
     /**
      * @return list<array{0: string, 1: string, 2: array<string, mixed>}>
      */
