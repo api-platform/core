@@ -213,6 +213,7 @@ class DocumentationNormalizerTest extends TestCase
                             'hydra:writeable' => false,
                         ],
                     ],
+
                     'hydra:supportedOperation' => [
                         [
                             '@type' => ['hydra:Operation', 'schema:FindAction'],
@@ -777,6 +778,7 @@ class DocumentationNormalizerTest extends TestCase
                             'writeable' => false,
                         ],
                     ],
+
                     'supportedOperation' => [
                         [
                             '@type' => ['Operation', 'schema:FindAction'],

@@ -59,9 +59,10 @@ Feature: Documentation support
     And the value of the node "hydra:property.label" of the property "name" of the Hydra class "Dummy" is "name"
     And the value of the node "hydra:property.domain" of the property "name" of the Hydra class "Dummy" is "#Dummy"
     And the value of the node "hydra:property.range" of the property "name" of the Hydra class "Dummy" is "xsd:string"
-    And the value of the node "hydra:property.range" of the property "relatedDummy" of the Hydra class "Dummy" is "https://schema.org/Product"
+    And the value of the node "subClassOf" of the Hydra class "RelatedDummy" is "https://schema.org/Product"
+    And the value of the node "hydra:property.range" of the property "relatedDummy" of the Hydra class "Dummy" is "#RelatedDummy"
     And the value of the node "hydra:property.owl:maxCardinality" of the property "relatedDummy" of the Hydra class "Dummy" is "1"
-    And the value of the node "hydra:property.range" of the property "relatedDummies" of the Hydra class "Dummy" is "https://schema.org/Product"
+    And the value of the node "hydra:property.range" of the property "relatedDummies" of the Hydra class "Dummy" is "#RelatedDummy"
     And the value of the node "hydra:title" of the property "name" of the Hydra class "Dummy" is "name"
     And the value of the node "hydra:description" of the property "name" of the Hydra class "Dummy" is "The dummy name"
     # Operations
