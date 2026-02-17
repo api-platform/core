@@ -106,7 +106,7 @@ final class PropertySchemaChoiceRestriction implements PropertySchemaRestriction
             return false;
         }
 
-        $types = array_map(static fn (LegacyType $type) => $type->getBuiltinType(), $propertyMetadata->getBuiltinTypes() ?? []);
+        $types = array_map(static fn (LegacyType $type): string => $type->getBuiltinType(), $propertyMetadata->getBuiltinTypes() ?? []);
         if ($propertyMetadata->getExtraProperties()['nested_schema'] ?? false) {
             $types = [LegacyType::BUILTIN_TYPE_STRING];
         }
@@ -116,7 +116,7 @@ final class PropertySchemaChoiceRestriction implements PropertySchemaRestriction
             && $builtinType->isCollection()
             && \count($builtinType->getCollectionValueTypes()) > 0
         ) {
-            $types = array_unique(array_merge($types, array_map(static fn (LegacyType $type) => $type->getBuiltinType(), $builtinType->getCollectionValueTypes())));
+            $types = array_unique(array_merge($types, array_map(static fn (LegacyType $type): string => $type->getBuiltinType(), $builtinType->getCollectionValueTypes())));
         }
 
         return \count($types) > 0 && \count(array_intersect($types, [LegacyType::BUILTIN_TYPE_STRING, LegacyType::BUILTIN_TYPE_INT, LegacyType::BUILTIN_TYPE_FLOAT])) > 0;
