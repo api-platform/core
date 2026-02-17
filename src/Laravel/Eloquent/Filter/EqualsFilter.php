@@ -28,7 +28,7 @@ final class EqualsFilter implements FilterInterface
      */
     public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder
     {
-        return $this->applyWithNestedProperty(
+        return $this->addNestedParameterJoins(
             $builder,
             $parameter,
             static fn (Builder $query, string $property, string $whereClause) => $query->{$whereClause}($property, $values),

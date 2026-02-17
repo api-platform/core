@@ -66,7 +66,7 @@ final class SortFilter implements FilterInterface, JsonSchemaFilterInterface, Op
         $property = $parameter->getProperty();
         $alias = $queryBuilder->getRootAliases()[0];
 
-        [$alias, $field] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $parameter, Join::LEFT_JOIN);
+        [$alias, $field] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter, Join::LEFT_JOIN);
 
         if (null !== $nullsComparison = $this->nullsComparison) {
             $nullsDirection = OrderFilterInterface::NULLS_DIRECTION_MAP[$nullsComparison][$direction];

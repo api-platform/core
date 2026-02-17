@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilterNestedTest;
 
+use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
 use ApiPlatform\Doctrine\Orm\Filter\IriFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SortFilter;
 use ApiPlatform\Doctrine\Orm\Filter\UuidFilter;
@@ -40,6 +41,8 @@ use Symfony\Component\Uid\Uuid;
 
                 'orderDepartmentName' => new QueryParameter(filter: new SortFilter(), property: 'department.name', nativeType: new BuiltinType(TypeIdentifier::STRING)),
                 'orderName' => new QueryParameter(filter: new SortFilter(), property: 'name', nativeType: new BuiltinType(TypeIdentifier::STRING)),
+                'orderHireDate' => new QueryParameter(filter: new SortFilter(nullsComparison: OrderFilterInterface::NULLS_ALWAYS_FIRST), property: 'hireDate', nativeType: new BuiltinType(TypeIdentifier::STRING)),
+                'orderHireDateNullsLast' => new QueryParameter(filter: new SortFilter(nullsComparison: OrderFilterInterface::NULLS_ALWAYS_LAST), property: 'hireDate', nativeType: new BuiltinType(TypeIdentifier::STRING)),
             ]
         ),
     ]
@@ -54,6 +57,9 @@ class FilterEmployee
 
     #[ORM\Column(type: 'string', length: 255)]
     private string $name;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $hireDate = null;
 
     #[ORM\ManyToOne(targetEntity: FilterDepartment::class)]
     #[ORM\JoinColumn(nullable: false)]
@@ -77,6 +83,18 @@ class FilterEmployee
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getHireDate(): ?\DateTimeImmutable
+    {
+        return $this->hireDate;
+    }
+
+    public function setHireDate(?\DateTimeImmutable $hireDate): self
+    {
+        $this->hireDate = $hireDate;
 
         return $this;
     }

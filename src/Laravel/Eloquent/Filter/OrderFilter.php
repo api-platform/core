@@ -19,6 +19,8 @@ use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 
 final class OrderFilter implements FilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface
 {
@@ -43,7 +45,56 @@ final class OrderFilter implements FilterInterface, JsonSchemaFilterInterface, O
             return $builder;
         }
 
-        return $builder->orderBy($this->getQueryProperty($parameter), $values);
+        $direction = strtoupper($values);
+        if (!\in_array($direction, ['ASC', 'DESC'], true)) {
+            return $builder;
+        }
+
+        $nestedInfo = $parameter->getExtraProperties()['nested_property_info'] ?? null;
+
+        if (!$nestedInfo || 0 === \count($nestedInfo['relation_segments'])) {
+            return $builder->orderBy($this->getQueryProperty($parameter), $direction);
+        }
+
+        $relationSegments = $nestedInfo['relation_segments'];
+        $relationClasses = $nestedInfo['relation_classes'];
+        $leafProperty = $nestedInfo['leaf_property'];
+
+        $currentModel = $builder->getModel();
+        foreach ($relationSegments as $i => $segment) {
+            if (!method_exists($currentModel, $segment)) {
+                return $builder;
+            }
+
+            $relation = $currentModel->{$segment}();
+            $relatedTable = $relation->getRelated()->getTable();
+
+            if ($relation instanceof BelongsTo) {
+                $builder->leftJoin(
+                    $relatedTable,
+                    $currentModel->getTable().'.'.$relation->getForeignKeyName(),
+                    '=',
+                    $relatedTable.'.'.$relation->getOwnerKeyName()
+                );
+            } elseif ($relation instanceof HasOneOrMany) {
+                $builder->leftJoin(
+                    $relatedTable,
+                    $currentModel->getTable().'.'.$relation->getLocalKeyName(),
+                    '=',
+                    $relatedTable.'.'.$relation->getForeignKeyName()
+                );
+            } else {
+                return $builder;
+            }
+
+            $nextClass = $relationClasses[$i + 1] ?? null;
+            /** @var Model $currentModel */
+            $currentModel = $nextClass ? new $nextClass() : $relation->getRelated();
+        }
+
+        $builder->select($builder->getModel()->getTable().'.*');
+
+        return $builder->orderBy($currentModel->getTable().'.'.$leafProperty, $direction);
     }
 
     /**
