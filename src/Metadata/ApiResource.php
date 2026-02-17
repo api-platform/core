@@ -1099,9 +1099,6 @@ class ApiResource extends Metadata
         return $self;
     }
 
-    /**
-     * @return array|mixed|string|null
-     */
     public function getFormats(): string|array|null
     {
         return $this->formats;
@@ -1115,17 +1112,11 @@ class ApiResource extends Metadata
         return $self;
     }
 
-    /**
-     * @return array|mixed|string|null
-     */
     public function getInputFormats(): string|array|null
     {
         return $this->inputFormats;
     }
 
-    /**
-     * @param mixed|null $inputFormats
-     */
     public function withInputFormats(string|array|null $inputFormats): static
     {
         $self = clone $this;
@@ -1134,17 +1125,11 @@ class ApiResource extends Metadata
         return $self;
     }
 
-    /**
-     * @return array|mixed|string|null
-     */
     public function getOutputFormats(): string|array|null
     {
         return $this->outputFormats;
     }
 
-    /**
-     * @param mixed|null $outputFormats
-     */
     public function withOutputFormats(string|array|null $outputFormats): static
     {
         $self = clone $this;

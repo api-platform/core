@@ -21,18 +21,12 @@ use ApiPlatform\State\OptionsInterface;
 class Operation extends AbstractOperation
 {
     /**
-     * @param Link[]|null $links
-     * @param array{
-     *     class?: string|null,
-     *     name?: string,
-     * }|string|false|null $input {@see https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation}
-     * @param array{
-     *     class?: string|null,
-     *     name?: string,
-     * }|string|false|null $output {@see https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation}
+     * @param Link[]|null            $links
+     * @param string|null            $input     {@see https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation}
+     * @param string|null            $output    {@see https://api-platform.com/docs/core/dto/#specifying-an-input-or-an-output-data-representation}
      * @param string|array|bool|null $mercure   {@see https://api-platform.com/docs/core/mercure}
      * @param string|bool|null       $messenger {@see https://api-platform.com/docs/core/messenger/#dispatching-a-resource-through-the-message-bus}
-     * @param string|callable|null   $provider  {@see https://api-platform.com/docs/core/state-providers/#state-providers}
+     * @param string|null            $provider  {@see https://api-platform.com/docs/core/state-providers/#state-providers}
      * @param string|callable|null   $processor {@see https://api-platform.com/docs/core/state-processors/#state-processors}
      */
     public function __construct(
