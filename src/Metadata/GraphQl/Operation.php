@@ -70,7 +70,7 @@ class Operation extends AbstractOperation
         ?string $deprecationReason = null,
         ?array $filters = null,
         ?array $validationContext = null,
-        ?array $input = null,
+        ?string $input = null,
         $output = null,
         $mercure = null,
         $messenger = null,
