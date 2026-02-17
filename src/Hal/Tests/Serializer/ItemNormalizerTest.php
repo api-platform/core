@@ -482,9 +482,6 @@ class ItemNormalizerTest extends TestCase
             nameConverter: $nameConverter,
             classMetadataFactory: null,
             defaultContext: [],
-            resourceMetadataCollectionFactory: null,
-            resourceAccessChecker: null,
-            tagCollector: null,
         );
 
         $normalizer->setSerializer($serializer);

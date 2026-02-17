@@ -331,7 +331,6 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
             $type = $this->getParameterType($type);
             if (\is_array($l = $field['leafs'])) {
                 if (0 === key($l)) {
-                    $key = $key;
                     $type = GraphQLType::listOf($type);
                 } else {
                     $n = [];
@@ -657,7 +656,7 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
             if (\is_array($value)) {
                 $value = $this->mergeFilterArgs($args[$key] ?? [], $value);
                 if (!isset($value['#name'])) {
-                    $name = (false === $pos = strrpos($original, '[')) ? $original : substr($original, 0, (int) $pos);
+                    $name = (false === $pos = strrpos($original, '[')) ? $original : substr($original, 0, $pos);
                     $value['#name'] = ($operation ? $operation->getShortName() : '').'Filter_'.strtr($name, ['[' => '_', ']' => '', '.' => '__']);
                 }
             }

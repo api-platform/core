@@ -38,7 +38,7 @@ final class ValidationTest extends ApiTestCase
     {
         $response = self::createClient()->request('GET', 'with_parameters_collection');
         $this->assertArraySubset(['violations' => [['message' => 'This value should not be null.']]], $response->toArray(false));
-        $response = self::createClient()->request('GET', 'with_parameters_collection?hydra');
+        self::createClient()->request('GET', 'with_parameters_collection?hydra');
         $this->assertResponseIsSuccessful();
     }
 

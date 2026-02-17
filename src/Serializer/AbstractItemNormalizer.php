@@ -1118,7 +1118,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         $className = null;
         $typeIsResourceClass = function (Type $type) use (&$className): bool {
-            return $type instanceof ObjectType ? $this->resourceClassResolver->isResourceClass($className = $type->getClassName()) : false;
+            return $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($className = $type->getClassName());
         };
 
         $isMultipleTypes = \count($types) > 1;

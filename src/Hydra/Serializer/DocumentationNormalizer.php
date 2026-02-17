@@ -635,7 +635,7 @@ final class DocumentationNormalizer implements NormalizerInterface
      */
     private function computeDoc(Documentation $object, array $classes, string $hydraPrefix = ContextBuilder::HYDRA_PREFIX): array
     {
-        $doc = ['@context' => $this->getContext($hydraPrefix), '@id' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT]), '@type' => $hydraPrefix.'ApiDocumentation'];
+        $doc = ['@context' => $this->getContext(), '@id' => $this->urlGenerator->generate('api_doc', ['_format' => self::FORMAT]), '@type' => $hydraPrefix.'ApiDocumentation'];
 
         if ('' !== $object->getTitle()) {
             $doc[$hydraPrefix.'title'] = $object->getTitle();
@@ -656,7 +656,7 @@ final class DocumentationNormalizer implements NormalizerInterface
     /**
      * Builds the JSON-LD context for the API documentation.
      */
-    private function getContext(string $hydraPrefix = ContextBuilder::HYDRA_PREFIX): array
+    private function getContext(): array
     {
         return [
             HYDRA_CONTEXT,

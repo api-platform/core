@@ -715,11 +715,11 @@ class ApiPlatformProvider extends ServiceProvider
                 description: $config->get('api-platform.description', ''),
                 version: $config->get('api-platform.version', ''),
                 oAuthEnabled: $config->get('api-platform.swagger_ui.oauth.enabled', false),
-                oAuthType: $config->get('api-platform.swagger_ui.oauth.type', null),
-                oAuthFlow: $config->get('api-platform.swagger_ui.oauth.flow', null),
-                oAuthTokenUrl: $config->get('api-platform.swagger_ui.oauth.tokenUrl', null),
-                oAuthAuthorizationUrl: $config->get('api-platform.swagger_ui.oauth.authorizationUrl', null),
-                oAuthRefreshUrl: $config->get('api-platform.swagger_ui.oauth.refreshUrl', null),
+                oAuthType: $config->get('api-platform.swagger_ui.oauth.type'),
+                oAuthFlow: $config->get('api-platform.swagger_ui.oauth.flow'),
+                oAuthTokenUrl: $config->get('api-platform.swagger_ui.oauth.tokenUrl'),
+                oAuthAuthorizationUrl: $config->get('api-platform.swagger_ui.oauth.authorizationUrl'),
+                oAuthRefreshUrl: $config->get('api-platform.swagger_ui.oauth.refreshUrl'),
                 oAuthScopes: $config->get('api-platform.swagger_ui.oauth.scopes', []),
                 apiKeys: $config->get('api-platform.swagger_ui.apiKeys', []),
                 contactName: $config->get('api-platform.swagger_ui.contact.name', ''),
@@ -1105,8 +1105,7 @@ class ApiPlatformProvider extends ServiceProvider
                     $config->get('api-platform.title', 'API Platform'),
                     $config->get('api-platform.version', '1.0.0'),
                     $config->get('api-platform.description', 'My awesome API'),
-                    [], // icons
-                    null // website_url todo
+                    [] // website_url todo
                 )
                 ->setPaginationLimit(100)
                 ->setRegistry($app->make(Registry::class))

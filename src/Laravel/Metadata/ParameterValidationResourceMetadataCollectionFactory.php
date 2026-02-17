@@ -18,13 +18,11 @@ use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use Illuminate\Validation\Rule;
-use Psr\Container\ContainerInterface;
 
 final class ParameterValidationResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
     public function __construct(
         private readonly ?ResourceMetadataCollectionFactoryInterface $decorated = null,
-        private readonly ?ContainerInterface $filterLocator = null,
     ) {
     }
 

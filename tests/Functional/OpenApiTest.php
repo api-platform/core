@@ -522,7 +522,7 @@ class OpenApiTest extends ApiTestCase
 
     public function testRetrieveTheYamlOpenApiDocumentation(): void
     {
-        $response = self::createClient()->request('GET', '/docs', [
+        self::createClient()->request('GET', '/docs', [
             'headers' => ['Accept' => 'application/vnd.openapi+yaml'],
         ]);
         $this->assertResponseIsSuccessful();
@@ -531,7 +531,7 @@ class OpenApiTest extends ApiTestCase
 
     public function testRetrieveTheOpenApiDocumentationHtml(): void
     {
-        $response = self::createClient()->request('GET', '/', [
+        self::createClient()->request('GET', '/', [
             'headers' => ['Accept' => 'text/html'],
         ]);
         $this->assertResponseIsSuccessful();
@@ -577,7 +577,7 @@ class OpenApiTest extends ApiTestCase
 
     public function testRetrieveTheOpenApiDocumentationInJson(): void
     {
-        $response = self::createClient()->request('GET', '/docs.jsonopenapi', [
+        self::createClient()->request('GET', '/docs.jsonopenapi', [
             'headers' => ['Accept' => 'text/html,*/*;q=0.8'],
         ]);
         $this->assertResponseIsSuccessful();
@@ -588,7 +588,7 @@ class OpenApiTest extends ApiTestCase
     {
         $this->recreateSchema([Dummy::class, RelatedDummy::class, RelatedOwnedDummy::class, RelatedOwningDummy::class]);
         self::createClient()->request('POST', '/dummies', ['json' => ['name' => 'test']]);
-        $response = self::createClient()->request('GET', '/dummies/1.html', [
+        self::createClient()->request('GET', '/dummies/1.html', [
             'headers' => ['Accept' => 'text/html'],
         ]);
         $this->assertResponseIsSuccessful();

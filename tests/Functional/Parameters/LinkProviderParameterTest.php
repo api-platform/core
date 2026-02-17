@@ -219,7 +219,7 @@ final class LinkProviderParameterTest extends ApiTestCase
         $manager->persist($issue7469Dummy);
         $manager->flush();
 
-        $r = self::createClient()->request('GET', '/issue_7469_test_resources/'.$issue7469Dummy->id, ['headers' => ['Accept' => 'application/ld+json']]);
+        self::createClient()->request('GET', '/issue_7469_test_resources/'.$issue7469Dummy->id, ['headers' => ['Accept' => 'application/ld+json']]);
         $this->assertResponseIsSuccessful();
     }
 }

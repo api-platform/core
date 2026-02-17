@@ -105,7 +105,7 @@ class RespondProcessorTest extends TestCase
 
     public function testAddsExceptionHeaders(): void
     {
-        $operation = new Get();
+        new Get();
 
         $respondProcessor = new RespondProcessor();
         $req = new Request();
@@ -171,9 +171,7 @@ class RespondProcessorTest extends TestCase
 
         $respondProcessor = new RespondProcessor(
             null,
-            $resourceClassResolver->reveal(),
-            null,
-            null // No ResourceMetadataCollectionFactory
+            $resourceClassResolver->reveal() // No ResourceMetadataCollectionFactory
         );
 
         $req = new Request();

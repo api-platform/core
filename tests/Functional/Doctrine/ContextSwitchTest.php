@@ -60,7 +60,7 @@ final class ContextSwitchTest extends ApiTestCase
         $manager->clear(); // this is important to avoid doctrine from reusing the objects instead of loading theme from SQL query
 
         $client = static::createClient();
-        $response = $client->request('GET', '/dummy_contexts', ['headers' => ['Accept' => 'application/ld+json']]);
+        $client->request('GET', '/dummy_contexts', ['headers' => ['Accept' => 'application/ld+json']]);
         $this->assertResponseStatusCodeSame(200);
 
         $this->assertJsonContains([
@@ -105,7 +105,7 @@ final class ContextSwitchTest extends ApiTestCase
         $manager->clear(); // this is important to avoid doctrine from reusing the objects instead of loading theme from SQL query
 
         $client = static::createClient();
-        $response = $client->request('GET', '/dummy_contexts', ['headers' => ['Accept' => 'application/ld+json']]);
+        $client->request('GET', '/dummy_contexts', ['headers' => ['Accept' => 'application/ld+json']]);
         $this->assertResponseStatusCodeSame(200);
 
         $this->assertJsonContains([

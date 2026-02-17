@@ -184,8 +184,6 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                             $properties[$property] = $propertyMetadata;
                         }
                     }
-
-                    continue;
                 }
 
                 // If traversal wasn't fully successful but the property was explicitly listed

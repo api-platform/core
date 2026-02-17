@@ -20,10 +20,6 @@ class InstanceOfApiResource
 {
     private $id;
 
-    public function __construct()
-    {
-    }
-
     public function getId()
     {
         return $this->id;

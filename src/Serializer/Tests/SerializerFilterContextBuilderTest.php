@@ -109,7 +109,7 @@ class SerializerFilterContextBuilderTest extends TestCase
             'operation_name' => 'get',
         ];
 
-        $resourceMetadata = $this->getMetadataWithFilter(DummyGroup::class, null);
+        $resourceMetadata = $this->getMetadataWithFilter(DummyGroup::class);
 
         $decoratedProphecy = $this->prophesize(SerializerContextBuilderInterface::class);
         $decoratedProphecy->createFromRequest($request, false, $attributes)->willReturn([])->shouldBeCalled();

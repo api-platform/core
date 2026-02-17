@@ -265,7 +265,6 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             $operationOutputSchemas = [];
 
             foreach ($responseMimeTypes as $operationFormat) {
-                $operationOutputSchema = null;
                 $operationOutputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_OUTPUT, $operation, $schema, null, $forceSchemaCollection);
                 $this->appendSchemaDefinitions($schemas, $operationOutputSchema->getDefinitions());
 
@@ -459,7 +458,6 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 if (null === $content) {
                     $operationInputSchemas = [];
                     foreach ($requestMimeTypes as $operationFormat) {
-                        $operationInputSchema = null;
                         $operationInputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, $operationFormat, Schema::TYPE_INPUT, $operation, $schema, null, $forceSchemaCollection);
                         $this->appendSchemaDefinitions($schemas, $operationInputSchema->getDefinitions());
 
@@ -890,7 +888,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 throw new \LogicException('OAuth flow must be one of: implicit, password, clientCredentials, authorizationCode');
         }
 
-        return new SecurityScheme($this->openApiOptions->getOAuthType(), $description, null, null, null, null, new OAuthFlows($implicit, $password, $clientCredentials, $authorizationCode), null);
+        return new SecurityScheme($this->openApiOptions->getOAuthType(), $description, null, null, null, null, new OAuthFlows($implicit, $password, $clientCredentials, $authorizationCode));
     }
 
     private function getSecuritySchemes(): array
@@ -1006,7 +1004,6 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             $operationErrorSchemas = [];
             foreach ($responseMimeTypes as $operationFormat) {
-                $operationErrorSchema = null;
                 $operationErrorSchema = $this->jsonSchemaFactory->buildSchema($errorResource->getClass(), $operationFormat, Schema::TYPE_OUTPUT, null, $schema);
                 $this->appendSchemaDefinitions($schemas, $operationErrorSchema->getDefinitions());
                 $operationErrorSchemas[$operationFormat] = $operationErrorSchema;

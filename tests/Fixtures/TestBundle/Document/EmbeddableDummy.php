@@ -61,10 +61,6 @@ class EmbeddableDummy
     {
     }
 
-    public function __construct()
-    {
-    }
-
     public function getDummyName(): ?string
     {
         return $this->dummyName;

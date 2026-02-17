@@ -48,13 +48,13 @@ final class EntityReadOnlyTest extends ApiTestCase
         $manager->flush();
 
         $client = static::createClient();
-        $response = $client->request('GET', '/dummy_read_onlies', ['headers' => ['Accept' => 'application/ld+json']]);
+        $client->request('GET', '/dummy_read_onlies', ['headers' => ['Accept' => 'application/ld+json']]);
         $this->assertResponseStatusCodeSame(200);
 
-        $response = $client->request('GET', '/dummy_read_onlies/'.$dummy->getId(), ['headers' => ['Accept' => 'application/ld+json']]);
+        $client->request('GET', '/dummy_read_onlies/'.$dummy->getId(), ['headers' => ['Accept' => 'application/ld+json']]);
         $this->assertResponseStatusCodeSame(200);
 
-        $response = $client->request('POST', '/dummy_read_onlies', [
+        $client->request('POST', '/dummy_read_onlies', [
             'headers' => ['Content-Type' => 'application/ld+json'],
             'json' => [
                 'name' => 'bar',
@@ -62,10 +62,10 @@ final class EntityReadOnlyTest extends ApiTestCase
         ]);
         $this->assertResponseStatusCodeSame(201);
 
-        $response = $client->request('DELETE', '/dummy_read_onlies/'.$dummy->getId(), ['headers' => ['Content-Type' => 'application/ld+json']]);
+        $client->request('DELETE', '/dummy_read_onlies/'.$dummy->getId(), ['headers' => ['Content-Type' => 'application/ld+json']]);
         $this->assertResponseStatusCodeSame(204);
 
-        $response = $client->request('PUT', '/dummy_read_onlies'.$dummy->getId(), [
+        $client->request('PUT', '/dummy_read_onlies'.$dummy->getId(), [
             'headers' => ['Content-Type' => 'application/ld+json'],
             'json' => [
                 'name' => 'baz',
@@ -73,7 +73,7 @@ final class EntityReadOnlyTest extends ApiTestCase
         ]);
         $this->assertResponseStatusCodeSame(404);
 
-        $response = $client->request('PATCH', '/dummy_read_onlies'.$dummy->getId(), [
+        $client->request('PATCH', '/dummy_read_onlies'.$dummy->getId(), [
             'headers' => ['Content-Type' => 'application/ld+json'],
             'json' => [
                 'name' => 'baz',

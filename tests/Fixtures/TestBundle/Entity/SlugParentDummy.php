@@ -95,7 +95,7 @@ class SlugParentDummy
             $this->childDummies->removeElement($childDummy);
             // set the owning side to null (unless already changed)
             if ($childDummy->getParentDummy() === $this) {
-                $childDummy->setParentDummy(null);
+                $childDummy->setParentDummy();
             }
         }
 

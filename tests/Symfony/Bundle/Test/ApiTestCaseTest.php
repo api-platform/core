@@ -319,7 +319,7 @@ JSON;
 
     public function testGetPrioritizedOperation(): void
     {
-        $r = self::createClient()->request('GET', '/operation_priority/1', [
+        self::createClient()->request('GET', '/operation_priority/1', [
             'headers' => [
                 'accept' => 'application/ld+json',
             ],

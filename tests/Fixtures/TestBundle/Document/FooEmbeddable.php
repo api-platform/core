@@ -32,10 +32,6 @@ class FooEmbeddable
     #[ODM\Field(nullable: true)]
     private $nonWritableProp;
 
-    public function __construct()
-    {
-    }
-
     public function getDummyName(): ?string
     {
         return $this->dummyName;

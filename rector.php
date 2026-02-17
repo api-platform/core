@@ -12,6 +12,8 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPromotedPropertyRector;
+use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPublicMethodParameterRector;
 
 return RectorConfig::configure()
     ->withPaths([
@@ -30,11 +32,18 @@ return RectorConfig::configure()
         __DIR__.'/tests/Fixtures/app/config/reference.php',
         __DIR__.'/src/Symfony/Bundle/DependencyInjection/Configuration.php',
         __DIR__.'/tests/Fixer/SymfonyServiceClassConstantFixer.php',
+        RemoveUnusedPromotedPropertyRector::class => [
+            __DIR__.'/tests/Fixtures/TestBundle/Filter/SearchTextAndDateFilter.php',
+            __DIR__.'/tests/Fixtures/TestBundle/Filter/ODMSearchTextAndDateFilter.php',
+        ],
+        RemoveUnusedPublicMethodParameterRector::class => [
+            __DIR__.'/src/GraphQl/Action/GraphiQlAction.php',
+        ],
     ])
     // uncomment to reach your current PHP version
     // ->withPhpSets()
     ->withPreparedSets(
         typeDeclarations: true,
+        deadCode: true,
     )
-    ->withDeadCodeLevel(0)
     ->withCodeQualityLevel(0);

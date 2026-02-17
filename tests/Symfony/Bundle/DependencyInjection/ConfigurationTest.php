@@ -309,7 +309,7 @@ class ConfigurationTest extends TestCase
             'type' => 'query',
         ];
 
-        $config = $this->processor->processConfiguration($this->configuration, [
+        $this->processor->processConfiguration($this->configuration, [
             'api_platform' => [
                 'swagger' => [
                     'api_keys' => ['Some Authorization name, like JWT' => $exampleConfig, 'Another-Auth' => $exampleConfig],

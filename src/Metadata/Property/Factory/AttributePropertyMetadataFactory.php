@@ -125,7 +125,7 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
         }
 
         foreach (get_class_methods(ApiProperty::class) as $method) {
-            if (preg_match('/^(?:get|is)(.*)/', (string) $method, $matches)) {
+            if (preg_match('/^(?:get|is)(.*)/', $method, $matches)) {
                 // BC layer, to remove in 5.0
                 if ('getBuiltinTypes' === $method) {
                     if (method_exists(PropertyInfoExtractor::class, 'getType')) {

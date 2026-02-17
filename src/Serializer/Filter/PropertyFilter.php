@@ -135,7 +135,7 @@ final class PropertyFilter implements FilterInterface, OpenApiParameterFilterInt
         // TODO: ideally we should return the new context, not mutate the context given in our arguments which is the serializer context
         // this would allow to use `Parameter::filterContext` properly, for now let's retrieve it like this:
         /** @var MetadataParameter|null */
-        $parameter = $request->attributes->get('_api_parameter', null);
+        $parameter = $request->attributes->get('_api_parameter');
         $parameterName = $this->parameterName;
         $whitelist = $this->whitelist;
         $overrideDefaultProperties = $this->overrideDefaultProperties;

@@ -76,7 +76,6 @@ class ApiLoaderTest extends TestCase
                 'api_platform.action.get_item',
                 null,
                 RelatedDummyEntity::class,
-                [],
                 'api_dummies_get_item',
                 ['my_default' => 'default_value', '_controller' => 'should_not_be_overriden'],
                 ['GET'],
@@ -91,7 +90,6 @@ class ApiLoaderTest extends TestCase
                 'api_platform.action.placeholder',
                 null,
                 RelatedDummyEntity::class,
-                [],
                 'api_dummies_delete_item',
                 [],
                 ['DELETE'],
@@ -106,7 +104,6 @@ class ApiLoaderTest extends TestCase
                 'api_platform.action.placeholder',
                 null,
                 RelatedDummyEntity::class,
-                [],
                 'api_dummies_put_item',
                 [],
                 ['PUT'],
@@ -121,7 +118,6 @@ class ApiLoaderTest extends TestCase
                 'some.service.name',
                 null,
                 RelatedDummyEntity::class,
-                [],
                 'api_dummies_my_op_collection',
                 ['my_default' => 'default_value', '_format' => 'a valid format'],
                 ['GET'],
@@ -140,7 +136,6 @@ class ApiLoaderTest extends TestCase
                 'api_platform.action.placeholder',
                 null,
                 RelatedDummyEntity::class,
-                [],
                 'api_dummies_my_second_op_collection',
                 [],
                 ['POST'],
@@ -158,7 +153,6 @@ class ApiLoaderTest extends TestCase
                 'api_platform.action.placeholder',
                 null,
                 RelatedDummyEntity::class,
-                [],
                 'api_dummies_my_path_op_collection',
                 [],
                 ['GET'],
@@ -173,7 +167,6 @@ class ApiLoaderTest extends TestCase
                 'api_platform.action.placeholder',
                 true,
                 RelatedDummyEntity::class,
-                [],
                 'api_dummies_my_stateless_op_collection',
                 [],
                 ['GET'],
@@ -188,7 +181,6 @@ class ApiLoaderTest extends TestCase
                 'Foo\\Bar\\MyController::method',
                 null,
                 RelatedDummyEntity::class,
-                [],
                 'api_dummies_my_controller_method_item',
                 [],
                 ['GET'],
@@ -219,7 +211,6 @@ class ApiLoaderTest extends TestCase
                 'api_platform.action.placeholder',
                 null,
                 RelatedDummyEntity::class,
-                [],
                 'api_dummies_get_item',
                 ['my_default' => 'default_value', '_controller' => 'should_not_be_overriden'],
                 ['GET'],
@@ -234,7 +225,6 @@ class ApiLoaderTest extends TestCase
                 'api_platform.action.placeholder',
                 null,
                 RelatedDummyEntity::class,
-                [],
                 'api_dummies_delete_item',
                 [],
                 ['DELETE']
@@ -248,7 +238,6 @@ class ApiLoaderTest extends TestCase
                 'api_platform.action.placeholder',
                 null,
                 RelatedDummyEntity::class,
-                [],
                 'api_dummies_put_item',
                 [],
                 ['PUT']
@@ -315,7 +304,7 @@ class ApiLoaderTest extends TestCase
         return new ApiLoader($kernelProphecy->reveal(), $resourceNameCollectionFactoryProphecy->reveal(), $resourceMetadataFactory, $containerProphecy->reveal(), ['jsonld' => ['application/ld+json']], [], false, true, true, false);
     }
 
-    private function getRoute(string $path, string $controller, ?bool $stateless, string $resourceClass, array $identifiers, string $operationName, array $extraDefaults = [], array $methods = [], array $requirements = [], array $options = [], string $host = '', array $schemes = [], string $condition = ''): Route
+    private function getRoute(string $path, string $controller, ?bool $stateless, string $resourceClass, string $operationName, array $extraDefaults = [], array $methods = [], array $requirements = [], array $options = [], string $host = '', array $schemes = [], string $condition = ''): Route
     {
         return new Route(
             $path,

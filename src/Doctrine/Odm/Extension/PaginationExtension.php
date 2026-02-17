@@ -47,7 +47,7 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
             return;
         }
 
-        if (($context['graphql_operation_name'] ?? false) && !$this->pagination->isGraphQlEnabled($operation, $context)) {
+        if (($context['graphql_operation_name'] ?? false) && !$this->pagination->isGraphQlEnabled($operation)) {
             return;
         }
 
@@ -95,7 +95,7 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
     public function supportsResult(string $resourceClass, ?Operation $operation = null, array $context = []): bool
     {
         if ($context['graphql_operation_name'] ?? false) {
-            return $this->pagination->isGraphQlEnabled($operation, $context);
+            return $this->pagination->isGraphQlEnabled($operation);
         }
 
         return $this->pagination->isEnabled($operation, $context);

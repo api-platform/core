@@ -34,9 +34,7 @@ final class GraphqlContext implements Context
     private ?RestContext $restContext = null;
     private ?JsonContext $jsonContext = null;
 
-    private array $graphqlRequest;
-
-    private ?int $graphqlLine = null; // @phpstan-ignore-line
+    private array $graphqlRequest; // @phpstan-ignore-line
 
     public function __construct(private readonly Request $request)
     {
@@ -65,7 +63,6 @@ final class GraphqlContext implements Context
     public function IHaveTheFollowingGraphqlRequest(PyStringNode $request): void
     {
         $this->graphqlRequest = ['query' => $request->getRaw()];
-        $this->graphqlLine = $request->getLine();
     }
 
     /**

@@ -98,7 +98,7 @@ XML_WRAP
         return [$filename];
     }
 
-    private function buildBuiltinTypes(\SimpleXMLElement $resource): void
+    private function buildBuiltinTypes(): void
     {
         // deprecated, to remove in 5.0
     }

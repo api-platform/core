@@ -63,7 +63,7 @@ final class AddHeadersProcessor implements ProcessorInterface
         $public = ($resourceCacheHeaders['public'] ?? $this->public);
 
         $options = [
-            'etag' => $this->etag && !$response->getEtag() ? hash('xxh3', (string) $content) : null,
+            'etag' => $this->etag && !$response->getEtag() ? hash('xxh3', $content) : null,
             'max_age' => null !== ($maxAge = $resourceCacheHeaders['max_age'] ?? $this->maxAge) && !$response->headers->hasCacheControlDirective('max-age') ? $maxAge : null,
             // Cache-Control "s-maxage" is only relevant is resource is not marked as "private"
             's_maxage' => false !== $public && null !== ($sharedMaxAge = $resourceCacheHeaders['shared_max_age'] ?? $this->sharedMaxAge) && !$response->headers->hasCacheControlDirective('s-maxage') ? $sharedMaxAge : null,
