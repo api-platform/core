@@ -169,9 +169,7 @@ class ErrorHandler extends ExceptionsHandler
         }
 
         try {
-            $response = $this->apiPlatformController->__invoke($dup);
-
-            return $response;
+            return $this->apiPlatformController->__invoke($dup);
         } catch (\Throwable $e) {
             return $this->decorated ? $this->decorated->render($request, $exception) : parent::render($request, $exception);
         }

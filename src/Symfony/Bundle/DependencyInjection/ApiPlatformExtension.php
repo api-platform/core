@@ -176,7 +176,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerOAuthConfiguration($container, $config);
         $this->registerOpenApiConfiguration($container, $config, $loader);
         $this->registerSwaggerConfiguration($container, $config, $loader);
-        $this->registerJsonApiConfiguration($formats, $loader, $config);
+        $this->registerJsonApiConfiguration($formats, $loader);
         $this->registerJsonLdHydraConfiguration($container, $formats, $loader, $config);
         $this->registerJsonHalConfiguration($formats, $loader);
         $this->registerJsonProblemConfiguration($errorFormats, $loader);
@@ -193,7 +193,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerSecurityConfiguration($container, $config, $loader);
         $this->registerMakerConfiguration($container, $config, $loader);
         $this->registerArgumentResolverConfiguration($loader);
-        $this->registerLinkSecurityConfiguration($loader, $config);
+        $this->registerLinkSecurityConfiguration($loader);
         $this->registerJsonStreamerConfiguration($container, $loader, $formats, $config);
 
         // TranslationExtractCommand was introduced in framework-bundle/7.3 with the object mapper service
@@ -676,7 +676,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.swagger_ui.extra_configuration', $config['openapi']['swagger_ui_extra_configuration'] ?: $config['swagger']['swagger_ui_extra_configuration']);
     }
 
-    private function registerJsonApiConfiguration(array $formats, PhpFileLoader $loader, array $config): void
+    private function registerJsonApiConfiguration(array $formats, PhpFileLoader $loader): void
     {
         if (!isset($formats['jsonapi'])) {
             return;
@@ -1070,7 +1070,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('argument_resolver.php');
     }
 
-    private function registerLinkSecurityConfiguration(PhpFileLoader $loader, array $config): void
+    private function registerLinkSecurityConfiguration(PhpFileLoader $loader): void
     {
         $loader->load('link_security.php');
     }

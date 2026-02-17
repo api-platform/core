@@ -168,13 +168,13 @@ class DocumentationActionTest extends TestCase
     }
 
     #[DataProvider('getOpenApiContentTypes')]
-    public function testGetOpenApi($contentType): void
+    public function testGetOpenApi(string $contentType): void
     {
         $request = new Request(server: ['CONTENT_TYPE' => $contentType]);
         $openApiFactory = $this->createMock(OpenApiFactoryInterface::class);
         $resourceNameCollectionFactory = $this->createMock(ResourceNameCollectionFactoryInterface::class);
         $provider = $this->createMock(ProviderInterface::class);
-        $provider->expects($this->once())->method('provide')->willReturnCallback(static fn ($operation, $uriVariables, $context) => new OpenApi(new Info('title', '1.0.0'), [], new Paths()));
+        $provider->expects($this->once())->method('provide')->willReturnCallback(static fn ($operation, $uriVariables, $context): OpenApi => new OpenApi(new Info('title', '1.0.0'), [], new Paths()));
         $processor = $this->createMock(ProcessorInterface::class);
         $processor->expects($this->once())->method('process')->willReturnArgument(0);
         $entrypoint = new DocumentationAction($resourceNameCollectionFactory, provider: $provider, processor: $processor, openApiFactory: $openApiFactory);

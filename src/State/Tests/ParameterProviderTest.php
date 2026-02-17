@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\State\Tests;
 
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\QueryParameter;
@@ -34,7 +33,7 @@ final class ParameterProviderTest extends TestCase
             {
                 if ('test' === $id) {
                     return new class implements ParameterProviderInterface {
-                        public function provide(Parameter $parameter, array $parameters = [], array $context = []): Operation
+                        public function provide(Parameter $parameter, array $parameters = [], array $context = []): Get
                         {
                             return new Get(name: 'ok');
                         }

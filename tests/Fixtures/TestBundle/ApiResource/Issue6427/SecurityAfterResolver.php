@@ -32,7 +32,7 @@ class SecurityAfterResolver
     {
     }
 
-    public static function provide()
+    public static function provide(): self
     {
         return new self('1', '1');
     }

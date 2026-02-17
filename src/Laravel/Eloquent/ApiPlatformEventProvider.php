@@ -40,7 +40,7 @@ class ApiPlatformEventProvider extends ServiceProvider
             return;
         }
 
-        $this->app->singleton('api_platform.http_cache.clients_array', static function (Application $app) {
+        $this->app->singleton('api_platform.http_cache.clients_array', static function (Application $app): array {
             $purgerUrls = Config::get('api-platform.http_cache.invalidation.urls', []);
             $requestOptions = Config::get('api-platform.http_cache.invalidation.request_options', []);
 
@@ -54,11 +54,11 @@ class ApiPlatformEventProvider extends ServiceProvider
 
         $httpClients = static fn (Application $app) => $app->make('api_platform.http_cache.clients_array');
 
-        $this->app->singleton(VarnishPurger::class, static function (Application $app) use ($httpClients) {
+        $this->app->singleton(VarnishPurger::class, static function (Application $app) use ($httpClients): VarnishPurger {
             return new VarnishPurger($httpClients($app));
         });
 
-        $this->app->singleton(VarnishXKeyPurger::class, static function (Application $app) use ($httpClients) {
+        $this->app->singleton(VarnishXKeyPurger::class, static function (Application $app) use ($httpClients): VarnishXKeyPurger {
             return new VarnishXKeyPurger(
                 $httpClients($app),
                 Config::get('api-platform.http_cache.invalidation.max_header_length', 7500),
@@ -66,7 +66,7 @@ class ApiPlatformEventProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(SouinPurger::class, static function (Application $app) use ($httpClients) {
+        $this->app->singleton(SouinPurger::class, static function (Application $app) use ($httpClients): SouinPurger {
             return new SouinPurger(
                 $httpClients($app),
                 Config::get('api-platform.http_cache.invalidation.max_header_length', 7500)
@@ -86,7 +86,7 @@ class ApiPlatformEventProvider extends ServiceProvider
             return $app->make($purgerClass);
         });
 
-        $this->app->singleton(PurgeHttpCacheListener::class, static function (Application $app) {
+        $this->app->singleton(PurgeHttpCacheListener::class, static function (Application $app): PurgeHttpCacheListener {
             return new PurgeHttpCacheListener(
                 $app->make(PurgerInterface::class),
                 $app->make(IriConverterInterface::class),

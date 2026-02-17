@@ -24,10 +24,6 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  */
 final class ErrorProvider implements ProviderInterface
 {
-    public function __construct()
-    {
-    }
-
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ConstraintViolationListInterface|\Throwable
     {
         if (!($request = $context['request'] ?? null) || !$operation instanceof HttpOperation) {

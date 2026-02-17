@@ -35,10 +35,7 @@ class CustomWritableIdentifierDummy
     #[ORM\Column(name: 'name', type: 'string', length: 30)]
     private string $name;
 
-    /**
-     * @param string $slug
-     */
-    public function setSlug($slug): void
+    public function setSlug(string $slug): void
     {
         $this->slug = $slug;
     }
@@ -53,10 +50,7 @@ class CustomWritableIdentifierDummy
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     */
-    public function setName($name): void
+    public function setName(string $name): void
     {
         $this->name = $name;
     }

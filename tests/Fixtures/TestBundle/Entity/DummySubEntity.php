@@ -28,7 +28,7 @@ class DummySubEntity
     #[ORM\OneToOne(inversedBy: 'subEntity', cascade: ['persist'])]
     private ?DummyWithSubEntity $mainEntity = null;
 
-    public function __construct($strId, $name)
+    public function __construct(string $strId, string $name)
     {
         $this->strId = $strId;
         $this->name = $name;

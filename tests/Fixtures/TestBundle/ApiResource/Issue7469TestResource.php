@@ -43,7 +43,7 @@ final class Issue7469TestResource
     /**
      * @param HttpOperation $operation
      */
-    public static function provide(Operation $operation, array $uriVariables = [], array $context = [])
+    public static function provide(Operation $operation): self
     {
         /** @var Issue7469Dummy $dummy */
         $dummy = $operation->getUriVariables()['id']->getValue();

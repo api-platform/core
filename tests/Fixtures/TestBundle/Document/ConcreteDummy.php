@@ -30,7 +30,7 @@ class ConcreteDummy extends AbstractDummy
     #[ODM\Field]
     private ?string $instance = null;
 
-    public function setInstance($instance): void
+    public function setInstance(?string $instance): void
     {
         $this->instance = $instance;
     }

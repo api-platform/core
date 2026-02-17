@@ -15,7 +15,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Filter;
 
 final class DoesNotImplementInterfaceFilter
 {
-    public function getDescription(string $resourceClass): array
+    public function getDescription(): array
     {
         return [];
     }

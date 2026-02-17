@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 final class NotFoundAction
 {
-    public function __invoke(): void
+    public function __invoke(): never
     {
         throw new NotFoundHttpException();
     }

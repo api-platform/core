@@ -39,10 +39,10 @@ class WorkbenchServiceProvider extends ServiceProvider
         $config->set('api-platform.http_cache.invalidation.purger', MockPurger::class);
         $config->set('cache.default', 'null');
 
-        $this->app->singleton(MockPurger::class, static fn ($app) => new MockPurger());
-        $this->app->singleton(DummyService::class, static fn ($app) => new DummyService($app['config']->get('api-platform.title')));
-        $this->app->singleton(CustomProviderWithDependency::class, static fn ($app) => new CustomProviderWithDependency($app->make(DummyService::class)));
-        $this->app->singleton('app.exact_filter', static fn ($app) => new EqualsFilter());
+        $this->app->singleton(MockPurger::class, static fn ($app): MockPurger => new MockPurger());
+        $this->app->singleton(DummyService::class, static fn ($app): DummyService => new DummyService($app['config']->get('api-platform.title')));
+        $this->app->singleton(CustomProviderWithDependency::class, static fn ($app): CustomProviderWithDependency => new CustomProviderWithDependency($app->make(DummyService::class)));
+        $this->app->singleton('app.exact_filter', static fn ($app): EqualsFilter => new EqualsFilter());
     }
 
     /**

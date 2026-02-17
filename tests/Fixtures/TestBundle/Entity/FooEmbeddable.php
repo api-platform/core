@@ -34,11 +34,7 @@ class FooEmbeddable
     private ?string $dummyName = null;
 
     #[ORM\Column(nullable: true)]
-    private $nonWritableProp; // @phpstan-ignore-line
-
-    public function __construct()
-    {
-    }
+    private $nonWritableProp;
 
     public function getDummyName(): ?string
     {

@@ -102,7 +102,7 @@ trait ParameterValidationConstraints
             $assertions[] = new Choice(choices: $schema['enum']);
         }
 
-        $isCollectionType = static fn ($t) => $t instanceof CollectionType;
+        $isCollectionType = static fn ($t): bool => $t instanceof CollectionType;
         $isCollection = $parameter->getNativeType()?->isSatisfiedBy($isCollectionType) ?? false;
 
         // type-info 7.2

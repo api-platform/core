@@ -23,7 +23,7 @@ use PHPUnit\Framework\TestCase;
 class ArrayPaginatorTest extends TestCase
 {
     #[DataProvider('initializeProvider')]
-    public function testInitialize(array $results, $firstResult, $maxResults, $currentItems, $totalItems, $currentPage, $lastPage, $hasNextPage): void
+    public function testInitialize(array $results, int $firstResult, int $maxResults, int $currentItems, int $totalItems, int $currentPage, int $lastPage, bool $hasNextPage): void
     {
         $paginator = new ArrayPaginator($results, $firstResult, $maxResults);
 

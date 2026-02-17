@@ -673,7 +673,7 @@ class OpenApiFactoryTest extends TestCase
             'header' => new SecurityScheme('apiKey', 'Value for the Authorization header parameter.', 'Authorization', 'header'),
             'query' => new SecurityScheme('apiKey', 'Value for the key query parameter.', 'key', 'query'),
             'bearer' => new SecurityScheme('http', 'Value for the http bearer parameter.', null, null, 'bearer', 'JWT'),
-            'basic' => new SecurityScheme('http', 'Value for the http basic parameter.', null, null, 'basic', null),
+            'basic' => new SecurityScheme('http', 'Value for the http basic parameter.', null, null, 'basic'),
         ]));
 
         $this->assertEquals([
@@ -1285,8 +1285,7 @@ class OpenApiFactoryTest extends TestCase
             'Creates a Dummy resource.',
             'Creates a Dummy resource.',
             null,
-            [],
-            null
+            []
         ), $emptyRequestBodyPath->getPost());
 
         $emptyResponsePath = $paths->getPath('/dummyitem/nooutput');
@@ -1436,6 +1435,6 @@ class OpenApiFactoryTest extends TestCase
             ['json' => ['application/problem+json']]
         );
 
-        $openApi = $factory->__invoke();
+        $factory->__invoke();
     }
 }

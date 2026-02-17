@@ -17,17 +17,11 @@ use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Mink\Exception\ExpectationException;
 use Behatch\Context\JsonContext as BaseJsonContext;
-use Behatch\HttpCall\HttpCallResultPool;
 use Behatch\Json\Json;
 use PHPUnit\Framework\Assert;
 
 final class JsonContext extends BaseJsonContext
 {
-    public function __construct(HttpCallResultPool $httpCallResultPool)
-    {
-        parent::__construct($httpCallResultPool);
-    }
-
     /**
      * @Then the JSON node :node should contain:
      */

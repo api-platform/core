@@ -31,7 +31,7 @@ class CallableProcessorTest extends TestCase
 
     public function testCallable(): void
     {
-        $operation = new Get(name: 'hello', processor: static fn () => ['ok']);
+        $operation = new Get(name: 'hello', processor: static fn (): array => ['ok']);
         $this->assertEquals((new CallableProcessor())->process(new \stdClass(), $operation), ['ok']);
     }
 

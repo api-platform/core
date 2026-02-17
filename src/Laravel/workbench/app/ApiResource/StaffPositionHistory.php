@@ -18,7 +18,7 @@ use ApiPlatform\Metadata\ApiResource;
 #[ApiResource(provider: [self::class, 'provide'])]
 class StaffPositionHistory
 {
-    public static function provide()
+    public static function provide(): array
     {
         return [];
     }

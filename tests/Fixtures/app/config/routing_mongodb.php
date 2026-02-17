@@ -14,7 +14,7 @@ declare(strict_types=1);
 use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
-return static function (RoutingConfigurator $routes) {
+return static function (RoutingConfigurator $routes): void {
     $routes->import('routing_common.yml');
     $routes->import('@TestBundle/Controller/MongoDbOdm', 'attribute');
 

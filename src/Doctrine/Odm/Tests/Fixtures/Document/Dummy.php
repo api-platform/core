@@ -112,7 +112,7 @@ class Dummy
         return $this->id;
     }
 
-    public function setId($id): void
+    public function setId(?int $id): void
     {
         $this->id = $id;
     }
@@ -167,7 +167,7 @@ class Dummy
         return $this->dummyDate;
     }
 
-    public function setDummyPrice($dummyPrice)
+    public function setDummyPrice($dummyPrice): static
     {
         $this->dummyPrice = $dummyPrice;
 

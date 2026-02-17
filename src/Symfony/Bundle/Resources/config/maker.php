@@ -17,7 +17,7 @@ use ApiPlatform\Symfony\Maker\MakeFilter;
 use ApiPlatform\Symfony\Maker\MakeStateProcessor;
 use ApiPlatform\Symfony\Maker\MakeStateProvider;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.maker.command.state_processor', MakeStateProcessor::class)

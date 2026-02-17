@@ -30,10 +30,7 @@ use Symfony\Component\Finder\Finder;
  */
 final class CoverageContext implements Context
 {
-    /**
-     * @var CodeCoverage
-     */
-    private static $coverage;
+    private static ?CodeCoverage $coverage = null;
 
     /**
      * @BeforeSuite

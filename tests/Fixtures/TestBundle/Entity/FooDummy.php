@@ -45,7 +45,7 @@ class FooDummy
     private $name;
 
     #[ORM\Column(nullable: true)]
-    private $nonWritableProp;
+    private ?string $nonWritableProp = null;
 
     #[ApiProperty(readableLink: true, writableLink: true)]
     #[ORM\Embedded(class: FooEmbeddable::class)]
@@ -84,7 +84,7 @@ class FooDummy
         return $this->name;
     }
 
-    public function getNonWritableProp()
+    public function getNonWritableProp(): string
     {
         return $this->nonWritableProp;
     }

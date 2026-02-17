@@ -57,7 +57,7 @@ final class StructuredContentProcessor implements ProcessorInterface
 
         $context['original_data'] = $result;
         $class = $operation->getClass();
-        $includeStructuredContent = $operation instanceof McpTool || $operation instanceof McpResource ? $operation->getStructuredContent() ?? true : false;
+        $includeStructuredContent = ($operation instanceof McpTool || $operation instanceof McpResource) && ($operation->getStructuredContent() ?? true);
         $structuredContent = null;
 
         if ($includeStructuredContent) {

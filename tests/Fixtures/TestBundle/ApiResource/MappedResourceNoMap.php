@@ -35,7 +35,7 @@ class MappedResourceNoMap
     {
     }
 
-    public static function provide(Operation $operation, array $uriVariables = [])
+    public static function provide(Operation $operation, array $uriVariables = []): self
     {
         return new self($uriVariables['id'], 'test name');
     }

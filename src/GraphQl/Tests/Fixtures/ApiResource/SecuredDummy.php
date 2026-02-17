@@ -44,10 +44,6 @@ class SecuredDummy
     #[ApiProperty(security: 'object == null or object.getOwner() == user', securityPostDenormalize: 'object.getOwner() == user')]
     private string $ownerOnlyProperty = '';
 
-    public function __construct()
-    {
-    }
-
     public function getId(): ?int
     {
         return $this->id;

@@ -30,10 +30,6 @@ class ReadableOnlyProperty
     #[ORM\Column]
     private string $name = 'Read only';
 
-    public function __construct()
-    {
-    }
-
     public function getId(): ?int
     {
         return $this->id;

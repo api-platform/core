@@ -30,7 +30,7 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
 )]
 class WithSecurityParameter
 {
-    public static function collectionProvider()
+    public static function collectionProvider(): array
     {
         return [new self()];
     }

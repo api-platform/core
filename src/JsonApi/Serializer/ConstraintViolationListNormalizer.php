@@ -100,7 +100,7 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
                 return "data/relationships/$fieldName";
             }
         } else {
-            if ($propertyMetadata->getNativeType()?->isSatisfiedBy(static fn ($t) => $t instanceof ObjectType)) {
+            if ($propertyMetadata->getNativeType()?->isSatisfiedBy(static fn ($t): bool => $t instanceof ObjectType)) {
                 return "data/relationships/$fieldName";
             }
         }

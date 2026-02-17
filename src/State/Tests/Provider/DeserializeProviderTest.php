@@ -188,7 +188,7 @@ class DeserializeProviderTest extends TestCase
             'test',
             \stdClass::class,
             'format',
-            $this->callback(function (array $context) use ($objectToPopulate) {
+            $this->callback(function (array $context) use ($objectToPopulate): true {
                 $this->assertArrayHasKey(AbstractNormalizer::OBJECT_TO_POPULATE, $context);
                 $this->assertSame($objectToPopulate, $context[AbstractNormalizer::OBJECT_TO_POPULATE]);
 
@@ -219,7 +219,7 @@ class DeserializeProviderTest extends TestCase
             'test',
             \stdClass::class,
             'format',
-            $this->callback(function (array $context) {
+            $this->callback(function (array $context): true {
                 $this->assertArrayNotHasKey(AbstractNormalizer::OBJECT_TO_POPULATE, $context);
 
                 return true;

@@ -42,10 +42,6 @@ class GrandSon extends Model
     #[ApiProperty(genId: false, identifier: true)]
     private ?int $id_grand_son;
 
-    private ?string $name = null;
-
-    private ?GrandFather $grandfather = null;
-
     public function grandfather(): BelongsTo
     {
         return $this->belongsTo(GrandFather::class, 'grand_father_id', 'id_grand_father');

@@ -24,10 +24,6 @@ class DummyTableInheritanceNotApiResourceChild extends DummyTableInheritance
     #[ORM\Column(type: 'boolean')]
     private bool $swaggerThanParent = true;
 
-    public function __construct()
-    {
-    }
-
     public function isSwaggerThanParent(): bool
     {
         return $this->swaggerThanParent;

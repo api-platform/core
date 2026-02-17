@@ -196,7 +196,7 @@ final class PersistProcessor implements ProcessorInterface
             $identifiers = $metadata->getIdentifierValues($value);
 
             // Do not get reference for partial objects or objects with null identifiers
-            if (!$identifiers || \count($identifiers) !== \count(array_filter($identifiers, static fn ($v) => null !== $v))) {
+            if (!$identifiers || \count($identifiers) !== \count(array_filter($identifiers, static fn ($v): bool => null !== $v))) {
                 continue;
             }
 

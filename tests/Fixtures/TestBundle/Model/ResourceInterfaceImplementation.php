@@ -22,7 +22,7 @@ class ResourceInterfaceImplementation implements ResourceInterface, ResourceBarI
 
     private ?string $bar = null;
 
-    public function setFoo(string $foo)
+    public function setFoo(string $foo): static
     {
         $this->foo = $foo;
 
@@ -34,7 +34,7 @@ class ResourceInterfaceImplementation implements ResourceInterface, ResourceBarI
         return $this->foo;
     }
 
-    public function setBar(?string $bar)
+    public function setBar(?string $bar): static
     {
         $this->bar = $bar;
 

@@ -96,7 +96,7 @@ class ConstraintViolationNormalizerTest extends TestCase
             return $nameConverterProphecy->reveal();
         };
 
-        $nullNameConverterFactory = static fn () => null;
+        $nullNameConverterFactory = static fn (): null => null;
 
         $expected = $nameConverterBasedExpectation;
         $expected[0]['payload'] = ['severity' => 'warning'];

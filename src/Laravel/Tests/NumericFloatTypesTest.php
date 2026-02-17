@@ -37,7 +37,7 @@ class NumericFloatTypesTest extends TestCase
     protected function defineEnvironment($app): void
     {
         tap($app['config'], static function (Repository $config): void {
-            $config->set('api-platform.name_converter', null);
+            $config->set('api-platform.name_converter');
             $config->set('api-platform.formats', ['jsonld' => ['application/ld+json']]);
             $config->set('api-platform.docs_formats', ['jsonld' => ['application/ld+json']]);
         });

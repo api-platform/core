@@ -18,7 +18,7 @@ use ApiPlatform\State\ObjectMapper\ObjectMapper;
 use ApiPlatform\State\Provider\ObjectMapperProvider;
 use Symfony\Component\ObjectMapper\Metadata\ReflectionObjectMapperMetadataFactory;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.object_mapper.metadata_factory', ReflectionObjectMapperMetadataFactory::class);

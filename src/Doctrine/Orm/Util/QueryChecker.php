@@ -169,7 +169,7 @@ final class QueryChecker
         }
 
         foreach ($joinAliases as $joinAlias) {
-            foreach (QueryBuilderHelper::traverseJoins($joinAlias, $queryBuilder, $managerRegistry) as $alias => [$metadata, $association]) {
+            foreach (QueryBuilderHelper::traverseJoins($joinAlias, $queryBuilder, $managerRegistry) as [$metadata, $association]) {
                 if (null !== $association && $metadata->isCollectionValuedAssociation($association)) {
                     return true;
                 }

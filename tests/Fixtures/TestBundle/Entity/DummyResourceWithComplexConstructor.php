@@ -36,7 +36,7 @@ class DummyResourceWithComplexConstructor
         $this->someInternalTimestamp = new \DateTimeImmutable();
     }
 
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }

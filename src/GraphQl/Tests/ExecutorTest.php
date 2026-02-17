@@ -27,7 +27,7 @@ class ExecutorTest extends TestCase
 {
     public function testEnableIntrospectionQuery(): void
     {
-        $executor = new Executor(true);
+        new Executor(true);
 
         $expected = new DisableIntrospection(DisableIntrospection::DISABLED);
         $this->assertEquals($expected, DocumentValidator::getRule(DisableIntrospection::class));
@@ -35,7 +35,7 @@ class ExecutorTest extends TestCase
 
     public function testDisableIntrospectionQuery(): void
     {
-        $executor = new Executor(false);
+        new Executor(false);
 
         $expected = new DisableIntrospection(DisableIntrospection::ENABLED);
         $this->assertEquals($expected, DocumentValidator::getRule(DisableIntrospection::class));
@@ -43,7 +43,7 @@ class ExecutorTest extends TestCase
 
     public function testChangeValueOfMaxQueryDepth(): void
     {
-        $executor = new Executor(true, 20);
+        new Executor(true, 20);
 
         $expected = new QueryComplexity(20);
         $this->assertEquals($expected, DocumentValidator::getRule(QueryComplexity::class));
@@ -51,7 +51,7 @@ class ExecutorTest extends TestCase
 
     public function testChangeValueOfMaxQueryComplexity(): void
     {
-        $executor = new Executor(true, maxQueryDepth: 20);
+        new Executor(true, maxQueryDepth: 20);
 
         $expected = new QueryDepth(20);
         $this->assertEquals($expected, DocumentValidator::getRule(QueryDepth::class));

@@ -136,7 +136,7 @@ class EloquentTest extends TestCase
 
         $response = $this->get('/api/books', ['Accept' => ['application/ld+json']]);
         $book = $response->json()['member'][0];
-        $updated = $this->patchJson(
+        $this->patchJson(
             $book['@id'],
             ['publicationDate' => null],
             [
@@ -155,7 +155,7 @@ class EloquentTest extends TestCase
 
         $response = $this->get('/api/books', ['Accept' => ['application/ld+json']]);
         $book = $response->json()['member'][0];
-        $updated = $this->patchJson(
+        $this->patchJson(
             $book['@id'],
             ['publicationDate' => null],
             [

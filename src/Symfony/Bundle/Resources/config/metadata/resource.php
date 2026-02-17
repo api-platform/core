@@ -32,7 +32,7 @@ use ApiPlatform\Metadata\Resource\Factory\PhpFileResourceMetadataCollectionFacto
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\UriTemplateResourceMetadataCollectionFactory;
 
-return function (ContainerConfigurator $container) {
+return function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->alias('api_platform.metadata.resource.metadata_collection_factory', 'api_platform.metadata.resource.metadata_collection_factory.attributes');

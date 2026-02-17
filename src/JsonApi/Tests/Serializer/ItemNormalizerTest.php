@@ -501,7 +501,7 @@ class ItemNormalizerTest extends TestCase
         );
 
         $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactory->method('create')->willReturnCallback(static function ($class, $property) {
+        $propertyMetadataFactory->method('create')->willReturnCallback(static function ($class, $property): ApiProperty {
             return match ($property) {
                 'id' => (new ApiProperty())->withReadable(true)->withIdentifier(true),
                 'name' => (new ApiProperty())->withReadable(true),
@@ -522,10 +522,10 @@ class ItemNormalizerTest extends TestCase
 
         $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
         $resourceClassResolver->method('getResourceClass')->willReturn(Dummy::class);
-        $resourceClassResolver->method('isResourceClass')->willReturnCallback(static fn ($class) => \in_array($class, [Dummy::class, RelatedDummy::class], true));
+        $resourceClassResolver->method('isResourceClass')->willReturnCallback(static fn ($class): bool => \in_array($class, [Dummy::class, RelatedDummy::class], true));
 
         $propertyAccessor = $this->createMock(PropertyAccessorInterface::class);
-        $propertyAccessor->method('getValue')->willReturnCallback(static function ($object, $property) {
+        $propertyAccessor->method('getValue')->willReturnCallback(static function ($object, $property): array|int|string|null {
             return match ($property) {
                 'id' => 1,
                 'name' => 'Dummy with relationships',

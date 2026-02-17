@@ -36,7 +36,7 @@ class PolicyDenyTest extends TestCase
      */
     protected function defineEnvironment($app): void
     {
-        Gate::guessPolicyNamesUsing(static function (string $modelClass) {
+        Gate::guessPolicyNamesUsing(static function (string $modelClass): ?string {
             return Book::class === $modelClass ?
                 BookDenyPolicy::class :
                 null;

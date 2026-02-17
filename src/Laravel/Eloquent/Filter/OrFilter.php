@@ -32,7 +32,7 @@ final readonly class OrFilter implements FilterInterface, JsonSchemaFilterInterf
      */
     public function apply(Builder $builder, mixed $values, Parameter $parameter, array $context = []): Builder
     {
-        return $builder->where(function ($builder) use ($values, $parameter, $context): void {
+        return $builder->where(function (Builder $builder) use ($values, $parameter, $context): void {
             foreach ($values as $value) {
                 $this->filter->apply($builder, $value, $parameter, ['whereClause' => 'orWhere'] + $context);
             }

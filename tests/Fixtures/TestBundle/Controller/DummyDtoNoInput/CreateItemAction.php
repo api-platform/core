@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class CreateItemAction
 {
-    public function __invoke(Request $request)
+    public function __invoke(Request $request): DummyDtoNoInput|DummyDtoNoInputDocument
     {
         $resourceClass = $request->attributes->get('_api_resource_class');
         if (!\in_array($resourceClass, [DummyDtoNoInput::class, DummyDtoNoInputDocument::class], true)) {

@@ -15,10 +15,6 @@ namespace Workbench\App\Services;
 
 class DummyService
 {
-    public function __construct(private readonly string $var)
-    {
-    }
-
     public function dummyMethod(): string
     {
         return 'test';

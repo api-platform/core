@@ -80,7 +80,7 @@ final class StateOptionTest extends ApiTestCase
         $manager->flush();
         $iri = '/issue7689_categories/'.$c->getId();
 
-        $response = static::createClient()->request('POST', '/issue7689_products', ['json' => [
+        static::createClient()->request('POST', '/issue7689_products', ['json' => [
             'name' => 'product',
             'category' => $iri,
         ]]);

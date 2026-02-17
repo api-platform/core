@@ -29,7 +29,7 @@ class OriginalDataWithListeners
     {
     }
 
-    public static function process($data, Operation $operation, array $uriVariables = [], array $context = [])
+    public static function process($data, Operation $operation, array $uriVariables = [], array $context = []): self
     {
         \assert($data instanceof UserVerifyInput);
         \assert($context['previous_data'] instanceof self);
@@ -44,7 +44,7 @@ class OriginalDataWithListeners
         return $context['previous_data'];
     }
 
-    public static function provide(Operation $operation, array $uriVariables = [], array $context = [])
+    public static function provide(Operation $operation, array $uriVariables = [], array $context = []): self
     {
         return new self($uriVariables['uuid']);
     }
