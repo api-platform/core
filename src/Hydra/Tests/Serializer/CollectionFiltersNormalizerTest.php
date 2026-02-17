@@ -23,6 +23,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operations;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
@@ -316,6 +317,106 @@ class CollectionFiltersNormalizerTest extends TestCase
                     ],
                 ],
             ],
+        ], $normalizer->normalize($dummy, CollectionNormalizer::FORMAT, [
+            'request_uri' => '/foo?bar=baz',
+            'resource_class' => Dummy::class,
+            'operation_name' => 'get',
+        ]));
+    }
+
+    public function testNormalizeParametersWithFilter(): void
+    {
+        $dummy = new Dummy();
+
+        $decoratedProphecy = $this->prophesize(NormalizerInterface::class);
+        $decoratedProphecy->normalize($dummy, CollectionNormalizer::FORMAT, [
+            'request_uri' => '/foo?bar=baz',
+            'resource_class' => Dummy::class,
+            'operation_name' => 'get',
+        ])->willReturn(['name' => 'foo']);
+
+        $filterProphecy = $this->prophesize(FilterInterface::class);
+        $filterProphecy->getDescription(Dummy::class)->willReturn(['a' => ['property' => 'name', 'required' => true]])->shouldBeCalled();
+
+        $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
+        $filterLocatorProphecy->has('foo')->willReturn(true)->shouldBeCalled();
+        $filterLocatorProphecy->get('foo')->willReturn($filterProphecy->reveal())->shouldBeCalled();
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource(Dummy::class))
+                ->withShortName('Dummy')
+                ->withOperations(new Operations([
+                    'get' => (new GetCollection())->withShortName('Dummy')->withParameters([new QueryParameter(filter: 'foo')])->withFilters([]),
+                ])),
+        ]));
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
+
+        $normalizer = new CollectionFiltersNormalizer(
+            $decoratedProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $filterLocatorProphecy->reveal(),
+        );
+
+        $this->assertEquals([
+            'name' => 'foo',
+            'hydra:search' => [
+                '@type' => 'hydra:IriTemplate',
+                'hydra:template' => '/foo{?a}',
+                'hydra:variableRepresentation' => 'BasicRepresentation',
+                'hydra:mapping' => [
+                    [
+                        '@type' => 'IriTemplateMapping',
+                        'variable' => 'a',
+                        'property' => 'name',
+                        'required' => true,
+                    ],
+                ],
+            ],
+        ], $normalizer->normalize($dummy, CollectionNormalizer::FORMAT, [
+            'request_uri' => '/foo?bar=baz',
+            'resource_class' => Dummy::class,
+            'operation_name' => 'get',
+        ]));
+    }
+
+    public function testNormalizeParametersWithoutFilter(): void
+    {
+        $dummy = new Dummy();
+
+        $decoratedProphecy = $this->prophesize(NormalizerInterface::class);
+        $decoratedProphecy->normalize($dummy, CollectionNormalizer::FORMAT, [
+            'request_uri' => '/foo?bar=baz',
+            'resource_class' => Dummy::class,
+            'operation_name' => 'get',
+        ])->willReturn(['name' => 'foo']);
+
+        $filterLocatorProphecy = $this->prophesize(ContainerInterface::class);
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource(Dummy::class))
+                ->withShortName('Dummy')
+                ->withOperations(new Operations([
+                    'get' => (new GetCollection())->withShortName('Dummy')->withParameters([new QueryParameter(hydra: false)])->withFilters([]),
+                ])),
+        ]));
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
+
+        $normalizer = new CollectionFiltersNormalizer(
+            $decoratedProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $filterLocatorProphecy->reveal(),
+        );
+
+        $this->assertEquals([
+            'name' => 'foo',
         ], $normalizer->normalize($dummy, CollectionNormalizer::FORMAT, [
             'request_uri' => '/foo?bar=baz',
             'resource_class' => Dummy::class,
