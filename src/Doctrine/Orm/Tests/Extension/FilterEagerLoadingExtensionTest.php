@@ -363,8 +363,7 @@ SQL;
             DummyCar::class,
             'car',
             'WITH',
-            'car.id = o.car',
-            null
+            'car.id = o.car'
         );
 
         $qb->select('o')

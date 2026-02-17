@@ -46,7 +46,7 @@ final class DoctrineOrmParameterResourceMetadataCollectionFactory implements Res
 
             if ($operations) {
                 foreach ($operations as $operationName => $operation) {
-                    $operation = $this->enrichOperation($operation, $resourceClass);
+                    $operation = $this->enrichOperation($operation);
                     $operations->add($operationName, $operation);
                 }
 
@@ -57,7 +57,7 @@ final class DoctrineOrmParameterResourceMetadataCollectionFactory implements Res
 
             if ($graphQlOperations) {
                 foreach ($graphQlOperations as $operationName => $graphQlOperation) {
-                    $graphQlOperation = $this->enrichOperation($graphQlOperation, $resourceClass);
+                    $graphQlOperation = $this->enrichOperation($graphQlOperation);
                     $graphQlOperations[$operationName] = $graphQlOperation;
                 }
 
@@ -70,7 +70,7 @@ final class DoctrineOrmParameterResourceMetadataCollectionFactory implements Res
         return $resourceMetadataCollection;
     }
 
-    private function enrichOperation(Operation $operation, string $resourceClass): Operation
+    private function enrichOperation(Operation $operation): Operation
     {
         $parameters = $operation->getParameters();
         if (!$parameters) {

@@ -44,7 +44,7 @@ final class HydraTest extends ApiTestCase
 
     public function testNoPropertyDescription(): void
     {
-        $response = self::createClient()->request('GET', 'with_parameters_filter_without_property.jsonld');
+        self::createClient()->request('GET', 'with_parameters_filter_without_property.jsonld');
         static::assertResponseStatusCodeSame(200);
     }
 }

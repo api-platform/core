@@ -30,7 +30,7 @@ final class OperationResourceProcessor implements ProcessorInterface
     {
     }
 
-    private function persist($data, array $context = [])
+    private function persist($data)
     {
         if (!$manager = $this->getManager($data)) {
             return $data;

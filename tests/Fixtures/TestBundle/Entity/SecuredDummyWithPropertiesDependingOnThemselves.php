@@ -50,10 +50,6 @@ class SecuredDummyWithPropertiesDependingOnThemselves
     #[ORM\Column]
     private bool $property = false;
 
-    public function __construct()
-    {
-    }
-
     public function getId(): ?int
     {
         return $this->id;

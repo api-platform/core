@@ -46,7 +46,7 @@ final class OpenApiCommand extends Command
             ->addOption('output', 'o', InputOption::VALUE_REQUIRED, 'Write output to file')
             ->addOption('spec-version', null, InputOption::VALUE_REQUIRED, 'Open API version to use (2 or 3) (2 is deprecated)', '3')
             ->addOption('api-gateway', null, InputOption::VALUE_NONE, 'Enable the Amazon API Gateway compatibility mode')
-            ->addOption('filter-tags', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Filter only matching x-apiplatform-tag operations', null);
+            ->addOption('filter-tags', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Filter only matching x-apiplatform-tag operations');
     }
 
     /**

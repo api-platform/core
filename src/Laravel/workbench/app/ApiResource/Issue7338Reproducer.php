@@ -39,7 +39,6 @@ class Issue7338Reproducer
 {
     public function __construct(public ?int $id = null, public ?string $title = null)
     {
-        $this->id = $id;
     }
 
     public static function provide(Operation $operation, array $uriVariables = [], array $context = []): Issue7338Output

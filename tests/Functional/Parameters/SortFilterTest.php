@@ -174,7 +174,7 @@ final class SortFilterTest extends ApiTestCase
 
     public function testSortInvalidValueReturnsValidationError(): void
     {
-        $response = self::createClient()->request('GET', '/filter_employees?orderName=invalid');
+        self::createClient()->request('GET', '/filter_employees?orderName=invalid');
         $this->assertResponseStatusCodeSame(422);
     }
 

@@ -24,7 +24,7 @@ trait WithResourceTrait
         foreach (get_class_methods($resource) as $method) {
             if (
                 method_exists($self, $method)
-                && preg_match('/^(?:get|is|can)(.*)/', (string) $method, $matches)
+                && preg_match('/^(?:get|is|can)(.*)/', $method, $matches)
                 && (!$ignoredOptions || !\in_array(lcfirst($matches[1]), $ignoredOptions, true))
                 && null === $self->{$method}()
                 && null !== $val = $resource->{$method}()

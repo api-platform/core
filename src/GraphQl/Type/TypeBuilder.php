@@ -204,7 +204,6 @@ final class TypeBuilder implements ContextAwareTypeBuilderInterface
 
         /** @var FieldsBuilderEnumInterface $fieldsBuilder */
         $fieldsBuilder = $this->fieldsBuilderLocator->get('api_platform.graphql.fields_builder');
-        $enumCases = [];
         $enumCases = $fieldsBuilder->getEnumFields($operation->getClass());
 
         $enumConfig = [

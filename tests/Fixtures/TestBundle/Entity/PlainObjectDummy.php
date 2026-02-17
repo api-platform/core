@@ -30,17 +30,12 @@ class PlainObjectDummy
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
     /**
-     * @var string
-     */
-    private $content;
-    /**
      * @var array
      */
     public $data;
 
     public function setContent($content): void
     {
-        $this->content = $content;
         $this->data = (array) json_decode($content, null, 512, \JSON_THROW_ON_ERROR);
     }
 

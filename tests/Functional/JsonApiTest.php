@@ -185,7 +185,7 @@ class JsonApiTest extends ApiTestCase
      */
     public function testPostWithInputDtoPreservesAttributes(): void
     {
-        $response = self::createClient()->request('POST', '/jsonapi_input_test', [
+        self::createClient()->request('POST', '/jsonapi_input_test', [
             'headers' => [
                 'accept' => 'application/vnd.api+json',
                 'content-type' => 'application/vnd.api+json',
@@ -223,7 +223,7 @@ class JsonApiTest extends ApiTestCase
      */
     public function testPostWithRequiredConstructorArgsInputDto(): void
     {
-        $response = self::createClient()->request('POST', '/jsonapi_required_fields_test', [
+        self::createClient()->request('POST', '/jsonapi_required_fields_test', [
             'headers' => [
                 'accept' => 'application/vnd.api+json',
                 'content-type' => 'application/vnd.api+json',

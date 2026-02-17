@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Serializer;
 
-use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
-
 /**
  * Converts {@see \Symfony\Component\Validator\ConstraintViolationListInterface} the API Problem spec (RFC 7807).
  *
@@ -25,11 +23,6 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 final class ConstraintViolationListNormalizer extends AbstractConstraintViolationListNormalizer
 {
     public const FORMAT = 'json';
-
-    public function __construct(?array $serializePayloadFields = null, ?NameConverterInterface $nameConverter = null)
-    {
-        parent::__construct($serializePayloadFields, $nameConverter);
-    }
 
     /**
      * {@inheritdoc}

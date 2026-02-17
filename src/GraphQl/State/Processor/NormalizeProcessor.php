@@ -46,20 +46,19 @@ final class NormalizeProcessor implements ProcessorInterface
             return $data;
         }
 
-        return $this->getData($data, $operation, $uriVariables, $context);
+        return $this->getData($data, $operation, $context);
     }
 
     /**
-     * @param array<string, mixed> $uriVariables
      * @param array<string, mixed> $context
      *
      * @return array<string, mixed>
      */
-    private function getData(mixed $itemOrCollection, GraphQlOperation $operation, array $uriVariables = [], array $context = []): ?array
+    private function getData(mixed $itemOrCollection, GraphQlOperation $operation, array $context = []): ?array
     {
         if (!($operation->canSerialize() ?? true)) {
             if ($operation instanceof CollectionOperationInterface) {
-                if ($this->pagination->isGraphQlEnabled($operation, $context)) {
+                if ($this->pagination->isGraphQlEnabled($operation)) {
                     return 'cursor' === $this->pagination->getGraphQlPaginationType($operation) ?
                         $this->getDefaultCursorBasedPaginatedData() :
                         $this->getDefaultPageBasedPaginatedData();
@@ -91,7 +90,7 @@ final class NormalizeProcessor implements ProcessorInterface
         }
 
         if ($operation instanceof CollectionOperationInterface && is_iterable($itemOrCollection)) {
-            if (!$this->pagination->isGraphQlEnabled($operation, $context)) {
+            if (!$this->pagination->isGraphQlEnabled($operation)) {
                 $data = [];
                 foreach ($itemOrCollection as $index => $object) {
                     $data[$index] = $this->normalizer->normalize($object, ItemNormalizer::FORMAT, $normalizationContext);

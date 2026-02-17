@@ -15,5 +15,4 @@ namespace ApiPlatform\Metadata\Tests\Fixtures\ApiResource;
 
 class DummyObjectWithOnlyPrivateProperty
 {
-    private $foo; // @phpstan-ignore-line
 }

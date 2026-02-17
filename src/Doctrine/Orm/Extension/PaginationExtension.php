@@ -62,7 +62,7 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
     public function supportsResult(string $resourceClass, ?Operation $operation = null, array $context = []): bool
     {
         if ($context['graphql_operation_name'] ?? false) {
-            return $this->pagination->isGraphQlEnabled($operation, $context);
+            return $this->pagination->isGraphQlEnabled($operation);
         }
 
         return $this->pagination->isEnabled($operation, $context);
@@ -98,7 +98,7 @@ final class PaginationExtension implements QueryResultCollectionExtensionInterfa
      */
     private function getPagination(QueryBuilder $queryBuilder, ?Operation $operation, array $context): ?array
     {
-        $enabled = isset($context['graphql_operation_name']) ? $this->pagination->isGraphQlEnabled($operation, $context) : $this->pagination->isEnabled($operation, $context);
+        $enabled = isset($context['graphql_operation_name']) ? $this->pagination->isGraphQlEnabled($operation) : $this->pagination->isEnabled($operation, $context);
 
         if (!$enabled) {
             return null;

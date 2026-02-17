@@ -36,7 +36,7 @@ class NestedPropertyFilterTest extends TestCase
     protected function defineEnvironment($app): void
     {
         tap($app['config'], static function (Repository $config): void {
-            $config->set('api-platform.name_converter', null);
+            $config->set('api-platform.name_converter');
             $config->set('api-platform.formats', ['jsonld' => ['application/ld+json']]);
         });
     }
@@ -77,14 +77,14 @@ class NestedPropertyFilterTest extends TestCase
         $product1 = Product::create(['name' => 'Laptop', 'price' => 999.99]);
         $product2 = Product::create(['name' => 'Keyboard', 'price' => 79.99]);
 
-        $variation1 = ProductVariation::create([
+        ProductVariation::create([
             'product_id' => $product1->id,
             'variant_name' => 'Gaming Edition',
             'sku_code' => 'LAP-GAMING-001',
             'price_adjustment' => 200.00,
         ]);
 
-        $variation2 = ProductVariation::create([
+        ProductVariation::create([
             'product_id' => $product2->id,
             'variant_name' => 'Mechanical Blue',
             'sku_code' => 'KEY-MECH-BLUE',

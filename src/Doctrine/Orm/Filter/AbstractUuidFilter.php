@@ -79,10 +79,10 @@ class AbstractUuidFilter implements FilterInterface, ManagerRegistryAwareInterfa
             throw new InvalidArgumentException(\sprintf('The filter parameter with key "%s" must specify a property. Please provide the property explicitly.', $parameter->getKey()));
         }
 
-        $this->filterProperty($parameter, $queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context);
+        $this->filterProperty($parameter, $queryBuilder, $queryNameGenerator, $resourceClass, $context);
     }
 
-    private function filterProperty(Parameter $parameter, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
+    private function filterProperty(Parameter $parameter, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, array $context = []): void
     {
         $property = $parameter->getProperty();
         $value = $parameter->getValue();

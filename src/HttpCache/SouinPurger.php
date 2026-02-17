@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\HttpCache;
 
-use Symfony\Contracts\HttpClient\HttpClientInterface;
-
 /**
  * Purges Souin.
  *
@@ -25,12 +23,4 @@ class SouinPurger extends SurrogateKeysPurger
     private const MAX_HEADER_SIZE_PER_BATCH = 1500;
     private const SEPARATOR = ', ';
     private const HEADER = 'Surrogate-Key';
-
-    /**
-     * @param HttpClientInterface[] $clients
-     */
-    public function __construct(iterable $clients, int $maxHeaderLength = self::MAX_HEADER_SIZE_PER_BATCH)
-    {
-        parent::__construct($clients, $maxHeaderLength, self::HEADER, self::SEPARATOR);
-    }
 }

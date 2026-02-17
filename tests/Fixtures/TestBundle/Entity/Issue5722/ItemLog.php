@@ -58,11 +58,8 @@ class ItemLog
     #[ORM\Column]
     public string $action = 'insert';
 
-    private \DateTimeInterface $createdAt;
-
     public function __construct()
     {
-        $this->createdAt = new \DateTime();
         $this->uuid = Uuid::uuid4();
     }
 

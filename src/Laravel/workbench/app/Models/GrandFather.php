@@ -17,7 +17,6 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -42,10 +41,6 @@ class GrandFather extends Model
 
     #[ApiProperty(genId: false, identifier: true)]
     private ?int $id_grand_father;
-
-    private ?string $name = null;
-
-    private ?Collection $sons = null;
 
     public function sons(): HasMany
     {

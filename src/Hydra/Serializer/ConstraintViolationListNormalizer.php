@@ -15,7 +15,6 @@ namespace ApiPlatform\Hydra\Serializer;
 
 use ApiPlatform\JsonLd\Serializer\HydraPrefixTrait;
 use ApiPlatform\Serializer\AbstractConstraintViolationListNormalizer;
-use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * Converts {@see \Symfony\Component\Validator\ConstraintViolationListInterface} to a Hydra error representation.
@@ -26,11 +25,6 @@ final class ConstraintViolationListNormalizer extends AbstractConstraintViolatio
 {
     use HydraPrefixTrait;
     public const FORMAT = 'jsonld';
-
-    public function __construct(?array $serializePayloadFields = null, ?NameConverterInterface $nameConverter = null)
-    {
-        parent::__construct($serializePayloadFields, $nameConverter);
-    }
 
     /**
      * {@inheritdoc}

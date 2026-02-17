@@ -144,8 +144,6 @@ final class LinkFactoryTest extends TestCase
     public function testCreateLinkFromProperty(): void
     {
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-
-        $property = 'test';
         $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
         $propertyMetadataFactoryProphecy->create(Dummy::class, 'test')->willReturn(new ApiProperty(nativeType: Type::object(RelatedDummy::class)));
 

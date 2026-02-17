@@ -339,7 +339,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                 }
             }
 
-            if (\in_array((string) $class, [GetCollection::class, Post::class], true)) {
+            if (\in_array($class, [GetCollection::class, Post::class], true)) {
                 $datum['itemUriTemplate'] = $this->phpize($operation, 'itemUriTemplate', 'string');
             } elseif (isset($operation['itemUriTemplate'])) {
                 throw new InvalidArgumentException(\sprintf('"itemUriTemplate" option is not allowed on a %s operation.', $class));
@@ -356,7 +356,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                 'hideHydraOperation' => $this->phpize($resource, 'hideHydraOperation', 'bool'),
                 'priority' => $this->phpize($operation, 'priority', 'integer'),
                 'name' => $this->phpize($operation, 'name', 'string'),
-                'class' => (string) $class,
+                'class' => $class,
             ]);
         }
 
@@ -401,7 +401,7 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
                 'resolver' => $this->phpize($operation, 'resolver', 'string'),
                 'args' => $operation['args'] ?? null,
                 'extraArgs' => $operation['extraArgs'] ?? null,
-                'class' => (string) $class,
+                'class' => $class,
                 'read' => $this->phpize($operation, 'read', 'bool'),
                 'deserialize' => $this->phpize($operation, 'deserialize', 'bool'),
                 'validate' => $this->phpize($operation, 'validate', 'bool'),

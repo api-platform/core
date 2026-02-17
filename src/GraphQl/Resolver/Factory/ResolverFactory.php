@@ -83,7 +83,7 @@ class ResolverFactory implements ResolverFactoryInterface
                 return null;
             }
 
-            return $this->resolve($source, $args, $info, $rootClass, $operation, null);
+            return $this->resolve($source, $args, $info, $rootClass, $operation);
         };
     }
 

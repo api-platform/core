@@ -198,7 +198,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerSecurityConfiguration($container, $config, $loader);
         $this->registerMakerConfiguration($container, $config, $loader);
         $this->registerArgumentResolverConfiguration($loader);
-        $this->registerLinkSecurityConfiguration($loader, $config);
+        $this->registerLinkSecurityConfiguration($loader);
         $this->registerJsonStreamerConfiguration($container, $loader, $formats, $config);
 
         // TranslationExtractCommand was introduced in framework-bundle/7.3 with the object mapper service
@@ -1090,7 +1090,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('argument_resolver.php');
     }
 
-    private function registerLinkSecurityConfiguration(PhpFileLoader $loader, array $config): void
+    private function registerLinkSecurityConfiguration(PhpFileLoader $loader): void
     {
         $loader->load('link_security.php');
     }

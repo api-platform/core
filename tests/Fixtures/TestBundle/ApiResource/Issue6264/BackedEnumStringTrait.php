@@ -44,6 +44,6 @@ trait BackedEnumStringTrait
      */
     public static function getCase(Operation $operation, array $uriVariables): ?self
     {
-        return array_reduce(self::cases(), static fn ($c, \BackedEnum $case) => $case->value == $uriVariables['id'] ? $case : $c, null);
+        return array_reduce(self::cases(), static fn ($c, \BackedEnum $case) => $case->value == $uriVariables['id'] ? $case : $c);
     }
 }
