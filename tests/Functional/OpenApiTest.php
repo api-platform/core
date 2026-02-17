@@ -14,10 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ChildAttribute;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Crud;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\CrudOpenApiApiPlatformTag;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DummyWebhook;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6151\OverrideOpenApiResponses;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ParentAttribute;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AbstractDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CircularReference;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeItem;
@@ -100,6 +102,8 @@ class OpenApiTest extends ApiTestCase
             JsonSchemaResource::class,
             JsonSchemaResourceRelated::class,
             WrappedResponseEntity::class,
+            ParentAttribute::class,
+            ChildAttribute::class,
         ];
     }
 
@@ -612,5 +616,37 @@ class OpenApiTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+json; charset=utf-8');
         $this->assertJson($response->getContent());
+    }
+
+    public function testOpenApiSchemaWithNormalizationAttributes(): void
+    {
+        $response = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ]);
+        $this->assertResponseIsSuccessful();
+        $json = $response->toArray();
+
+        $this->assertArrayHasKey('ParentAttribute-name_child.label', $json['components']['schemas']);
+        $parentSchema = $json['components']['schemas']['ParentAttribute-name_child.label'];
+
+        $this->assertArrayHasKey('properties', $parentSchema);
+        $parentProperties = $parentSchema['properties'];
+
+        $this->assertArrayHasKey('name', $parentProperties);
+        $this->assertArrayHasKey('child', $parentProperties);
+
+        $this->assertArrayNotHasKey('id', $parentProperties);
+        $this->assertArrayNotHasKey('descriptionn', $parentProperties);
+
+        $this->assertArrayHasKey('ChildAttribute-label', $json['components']['schemas']);
+        $childSchema = $json['components']['schemas']['ChildAttribute-label'];
+
+        $this->assertArrayHasKey('properties', $childSchema);
+        $childProperties = $childSchema['properties'];
+
+        $this->assertArrayHasKey('label', $childProperties);
+
+        $this->assertArrayNotHasKey('hiddenData', $childProperties);
+        $this->assertArrayNotHasKey('id', $childProperties);
     }
 }
