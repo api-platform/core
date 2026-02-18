@@ -14,12 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\GenIdFalse;
 
 use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Metadata\ApiResource;
 
 class Subresource
 {
     public function __construct(
-        #[ApiProperty] public string $title
+        #[ApiProperty] public string $title,
     ) {
     }
 }

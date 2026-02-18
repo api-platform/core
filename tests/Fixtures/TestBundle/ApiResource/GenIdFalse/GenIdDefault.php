@@ -18,14 +18,13 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[Get(uriTemplate: '/gen_id_default', provider: [self::class, 'getData'], normalizationContext: ['hydra_prefix' => false])]
 class GenIdDefault
 {
     public function __construct(
         public string $id,
-        #[ApiProperty] public Collection $subresources
+        #[ApiProperty] public Collection $subresources,
     ) {
     }
 
@@ -36,7 +35,7 @@ class GenIdDefault
             new ArrayCollection(
                 [
                     new Subresource('foo'),
-                    new Subresource('bar')
+                    new Subresource('bar'),
                 ]
             )
         );
