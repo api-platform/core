@@ -136,6 +136,10 @@ class Error extends \Exception implements ProblemExceptionInterface, HttpExcepti
     {
         $headers = ($exception instanceof SymfonyHttpExceptionInterface || $exception instanceof HttpExceptionInterface) ? $exception->getHeaders() : [];
 
+        if ($exception instanceof ProblemExceptionInterface) {
+            return new self($exception->getTitle(), $exception->getDetail(), $exception->getStatus(), $exception->getTrace(), $exception->getInstance(), $exception->getType(), $headers);
+        }
+
         return new self('An error occurred', $exception->getMessage(), $status, $exception->getTrace(), type: '/errors/'.$status, headers: $headers);
     }
 
