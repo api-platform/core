@@ -11,18 +11,18 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Symfony\Bundle\DependencyInjection;
+namespace ApiPlatform\Tests\Validator\Metadata\Resource\Factory;
 
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Configuration;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Processor;
 
 /**
- * Tests the defaults.parameters configuration option.
+ * Tests the defaults.parameters configuration option used by ParameterValidationResourceMetadataCollectionFactory.
  *
  * @author Maxence Castel <maxence.castel59@gmail.com>
  */
-final class ConfigurationDefaultParametersTest extends TestCase
+final class ParameterValidationConfigurationTest extends TestCase
 {
     private Configuration $configuration;
 
