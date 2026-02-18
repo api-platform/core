@@ -30,6 +30,7 @@ use ApiPlatform\Symfony\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Symfony\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Symfony\Tests\Fixtures\TestBundle\Entity\DummyFriend;
 use ApiPlatform\Symfony\Tests\Fixtures\TestBundle\Entity\DummyMercure;
+use ApiPlatform\Symfony\Tests\Fixtures\TestBundle\Entity\DummyMercureMultiResource;
 use ApiPlatform\Symfony\Tests\Fixtures\TestBundle\Entity\DummyOffer;
 use ApiPlatform\Symfony\Tests\Fixtures\TestBundle\Entity\MercureWithTopicsAndGetOperation;
 use Doctrine\ORM\EntityManagerInterface;
@@ -84,14 +85,14 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $resourceClassResolverProphecy->isResourceClass(DummyMercure::class)->willReturn(true);
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResource($toInsert, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummies/1')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromResource($toUpdate, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummies/2')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromResource($toDelete, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummies/3')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromResource($toDelete)->willReturn('/dummies/3')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromResource($toDeleteExpressionLanguage)->willReturn('/dummy_friends/4')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromResource($toDeleteExpressionLanguage, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummy_friends/4')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromResource($toDeleteMercureOptions)->willReturn('/dummy_offers/5')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromResource($toDeleteMercureOptions, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummy_offers/5')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($toInsert, UrlGeneratorInterface::ABS_URL, Argument::any())->willReturn('http://example.com/dummies/1')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($toUpdate, UrlGeneratorInterface::ABS_URL, Argument::any())->willReturn('http://example.com/dummies/2')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($toDelete, UrlGeneratorInterface::ABS_URL, Argument::any())->willReturn('http://example.com/dummies/3')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($toDelete, UrlGeneratorInterface::ABS_PATH, Argument::any())->willReturn('/dummies/3')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($toDeleteExpressionLanguage, UrlGeneratorInterface::ABS_PATH, Argument::any())->willReturn('/dummy_friends/4')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($toDeleteExpressionLanguage, UrlGeneratorInterface::ABS_URL, Argument::any())->willReturn('http://example.com/dummy_friends/4')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($toDeleteMercureOptions, UrlGeneratorInterface::ABS_PATH, Argument::any())->willReturn('/dummy_offers/5')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($toDeleteMercureOptions, UrlGeneratorInterface::ABS_URL, Argument::any())->willReturn('http://example.com/dummy_offers/5')->shouldBeCalled();
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
 
@@ -215,9 +216,8 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $iriConverterProphecy->getIriFromResource($toUpdate, UrlGeneratorInterface::ABS_PATH, null)->willReturn('/mercure_with_topics_and_get_operations/2')->shouldBeCalled();
         $iriConverterProphecy->getIriFromResource($toUpdate, UrlGeneratorInterface::ABS_URL, Argument::exact($customGetOperation))->willReturn('http://example.com/custom_resource/mercure_with_topics_and_get_operations/2')->shouldBeCalled();
 
-        $iriConverterProphecy->getIriFromResource($toDelete)->willReturn('/mercure_with_topics_and_get_operations/3')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromResource($toDelete, UrlGeneratorInterface::ABS_URL, null)->willReturn('http://example.com/mercure_with_topics_and_get_operations/3')->shouldBeCalled();
-        $iriConverterProphecy->getIriFromResource($toDelete, UrlGeneratorInterface::ABS_PATH, null)->willReturn('/mercure_with_topics_and_get_operations/3')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($toDelete, UrlGeneratorInterface::ABS_PATH, Argument::any())->willReturn('/mercure_with_topics_and_get_operations/3')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($toDelete, UrlGeneratorInterface::ABS_URL, Argument::any())->willReturn('http://example.com/mercure_with_topics_and_get_operations/3')->shouldBeCalled();
         $iriConverterProphecy->getIriFromResource($toDelete, UrlGeneratorInterface::ABS_URL, Argument::exact($customGetOperation))->willReturn('http://example.com/custom_resource/mercure_with_topics_and_get_operations/3')->shouldBeCalled();
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
@@ -298,7 +298,7 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
 
         $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResource($toUpdate, UrlGeneratorInterface::ABS_URL)->willReturn('http://example.com/dummies/2');
+        $iriConverterProphecy->getIriFromResource($toUpdate, UrlGeneratorInterface::ABS_URL, Argument::any())->willReturn('http://example.com/dummies/2');
 
         $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
         $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(new Operations([
@@ -362,6 +362,86 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $this->assertEquals([false, false], $private);
         $this->assertEquals([null, null], $retry);
         $this->assertEquals(['2', '["data"]'], $data);
+    }
+
+    public function testPublishUpdateWithMultipleResources(): void
+    {
+        $toInsert = new DummyMercureMultiResource();
+        $toInsert->id = 1;
+        $toInsert->name = 'test';
+
+        $toDelete = new DummyMercureMultiResource();
+        $toDelete->id = 2;
+        $toDelete->name = 'deleted';
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(Argument::type(DummyMercureMultiResource::class))->willReturn(DummyMercureMultiResource::class);
+        $resourceClassResolverProphecy->isResourceClass(DummyMercureMultiResource::class)->willReturn(true);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource($toInsert, UrlGeneratorInterface::ABS_URL, Argument::any())->willReturn('http://example.com/admin/dummy_mercures/1', 'http://example.com/dummy_mercures/1');
+        $iriConverterProphecy->getIriFromResource($toDelete, UrlGeneratorInterface::ABS_PATH, Argument::any())->willReturn('/admin/dummy_mercures/2', '/dummy_mercures/2');
+        $iriConverterProphecy->getIriFromResource($toDelete, UrlGeneratorInterface::ABS_URL, Argument::any())->willReturn('http://example.com/admin/dummy_mercures/2', 'http://example.com/dummy_mercures/2');
+
+        $adminGetOp = (new Get(uriTemplate: '/admin/dummy_mercures/{id}{._format}'))->withShortName('AdminDummyMercure')->withMercure(['enable_async_update' => false, 'hub' => 'managed'])->withNormalizationContext(['groups' => ['admin:read']]);
+        $publicGetOp = (new Get(uriTemplate: '/dummy_mercures/{id}{._format}'))->withShortName('DummyMercure')->withMercure(['enable_async_update' => false, 'hub' => 'managed'])->withNormalizationContext(['groups' => ['read']]);
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(DummyMercureMultiResource::class)->willReturn(new ResourceMetadataCollection(DummyMercureMultiResource::class, [
+            (new ApiResource())->withShortName('AdminDummyMercure')->withOperations(new Operations([
+                'get' => $adminGetOp,
+            ])),
+            (new ApiResource())->withShortName('DummyMercure')->withOperations(new Operations([
+                'get' => $publicGetOp,
+            ])),
+        ]));
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->serialize($toInsert, 'jsonld', ['groups' => ['admin:read']])->willReturn('{"admin":1}');
+        $serializerProphecy->serialize($toInsert, 'jsonld', ['groups' => ['read']])->willReturn('{"public":1}');
+
+        $formats = ['jsonld' => ['application/ld+json']];
+
+        $topics = [];
+        $data = [];
+
+        $managedHub = $this->createMockHub(static function (Update $update) use (&$topics, &$data): string {
+            $topics = array_merge($topics, $update->getTopics());
+            $data[] = $update->getData();
+
+            return 'id';
+        });
+
+        $listener = new PublishMercureUpdatesListener(
+            $resourceClassResolverProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $serializerProphecy->reveal(),
+            $formats,
+            null,
+            new HubRegistry($this->createMock(HubInterface::class), ['managed' => $managedHub]),
+            null,
+            null,
+            null,
+            true,
+        );
+
+        $uowProphecy = $this->prophesize(UnitOfWork::class);
+        $uowProphecy->getScheduledEntityInsertions()->willReturn([$toInsert])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityUpdates()->willReturn([])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityDeletions()->willReturn([$toDelete])->shouldBeCalled();
+
+        $emProphecy = $this->prophesize(EntityManagerInterface::class);
+        $emProphecy->getUnitOfWork()->willReturn($uowProphecy->reveal())->shouldBeCalled();
+        $eventArgs = new OnFlushEventArgs($emProphecy->reveal());
+
+        $listener->onFlush($eventArgs);
+        $listener->postFlush();
+
+        // Both resources should have published updates
+        $this->assertCount(4, $data, 'Expected 4 updates: 2 inserts (admin + public) + 2 deletes (admin + public)');
+        $this->assertEquals('{"admin":1}', $data[0]);
+        $this->assertEquals('{"public":1}', $data[1]);
     }
 
     private function createMockHub(callable $callable): HubInterface
