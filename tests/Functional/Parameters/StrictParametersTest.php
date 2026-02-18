@@ -34,7 +34,7 @@ final class StrictParametersTest extends ApiTestCase
     public function testErrorAsParameterIsNotAllowed(): void
     {
         self::createClient()->request('GET', 'strict_query_parameters?bar=test');
-        $this->assertJsonContains(['detail' => 'Parameter not supported']);
+        $this->assertJsonContains(['detail' => 'Parameter "bar" not supported']);
         $this->assertResponseStatusCodeSame(400);
     }
 
