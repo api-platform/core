@@ -31,12 +31,13 @@ trait NestedPropertyHelperTrait
      * @return array An array where the first element is the join $alias of the leaf entity,
      *               the second element is the leaf property
      */
-    protected function addJoinsForNestedProperty(
+    protected function addNestedParameterJoins(
         string $property,
         string $alias,
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         Parameter $parameter,
+        ?string $joinType = null,
     ): array {
         $extraProperties = $parameter->getExtraProperties();
         $nestedInfo = $extraProperties['nested_property_info'] ?? null;
@@ -50,7 +51,8 @@ trait NestedPropertyHelperTrait
                 $queryBuilder,
                 $queryNameGenerator,
                 $alias,
-                $association
+                $association,
+                $joinType
             );
         }
 

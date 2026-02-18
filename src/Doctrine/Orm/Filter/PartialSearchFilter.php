@@ -45,7 +45,7 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
 
         $property = $parameter->getProperty();
         $alias = $queryBuilder->getRootAliases()[0];
-        [$alias, $property] = $this->addJoinsForNestedProperty($property, $alias, $queryBuilder, $queryNameGenerator, $parameter);
+        [$alias, $property] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter);
         $field = $alias.'.'.$property;
         $values = $parameter->getValue();
 

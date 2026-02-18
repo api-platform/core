@@ -29,7 +29,7 @@ trait NestedPropertyTrait
      *
      * @return Builder<\Illuminate\Database\Eloquent\Model>
      */
-    private function applyWithNestedProperty(
+    private function addNestedParameterJoins(
         Builder $builder,
         Parameter $parameter,
         callable $condition,
