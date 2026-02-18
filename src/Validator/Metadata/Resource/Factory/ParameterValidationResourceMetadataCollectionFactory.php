@@ -23,6 +23,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use ApiPlatform\Validator\Util\ParameterValidationConstraints;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
 final class ParameterValidationResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
@@ -180,30 +181,18 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
      */
     private function createParameterFromConfig(string $parameterClass, array $config): Parameter
     {
-        return new $parameterClass(
-            key: $config['key'] ?? null,
-            schema: $config['schema'] ?? null,
-            openApi: null,
-            provider: null,
-            filter: $config['filter'] ?? null,
-            property: $config['property'] ?? null,
-            description: $config['description'] ?? null,
-            properties: null,
-            required: $config['required'] ?? false,
-            priority: $config['priority'] ?? null,
-            hydra: $config['hydra'] ?? null,
-            constraints: $config['constraints'] ?? null,
-            security: $config['security'] ?? null,
-            securityMessage: $config['security_message'] ?? null,
-            extraProperties: $config['extra_properties'] ?? [],
-            filterContext: null,
-            nativeType: null,
-            castToArray: null,
-            castToNativeType: null,
-            castFn: null,
-            default: $config['default'] ?? null,
-            filterClass: $config['filter_class'] ?? null,
-        );
+        $nameConverter = new CamelCaseToSnakeCaseNameConverter();
+        $reflectionClass = new \ReflectionClass($parameterClass);
+        $constructor = $reflectionClass->getConstructor();
+
+        $args = [];
+        foreach ($constructor->getParameters() as $param) {
+            $paramName = $param->getName();
+            $configKey = $nameConverter->normalize($paramName);
+            $args[$paramName] = $config[$configKey] ?? $param->getDefaultValue();
+        }
+
+        return new $parameterClass(...$args);
     }
 
     /**
