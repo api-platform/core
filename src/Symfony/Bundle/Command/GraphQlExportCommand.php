@@ -27,7 +27,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
  */
-#[AsCommand(name: 'api:graphql:export')]
+#[AsCommand(
+    name: 'api:graphql:export',
+    description: 'Export the GraphQL schema in Schema Definition Language (SDL)'
+)]
 class GraphQlExportCommand extends Command
 {
     public function __construct(private readonly SchemaBuilderInterface $schemaBuilder)
@@ -41,7 +44,6 @@ class GraphQlExportCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setDescription('Export the GraphQL schema in Schema Definition Language (SDL)')
             ->addOption('comment-descriptions', null, InputOption::VALUE_NONE, 'Use preceding comments as the description (deprecated: graphql-php < 15)')
             ->addOption('sort-types', null, InputOption::VALUE_NONE, 'Order types alphabetically')
             ->addOption('output', 'o', InputOption::VALUE_REQUIRED, 'Write output to file');

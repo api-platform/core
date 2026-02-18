@@ -24,7 +24,10 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\VarDumper\Cloner\ClonerInterface;
 use Symfony\Component\VarDumper\Dumper\DataDumperInterface;
 
-#[AsCommand(name: 'debug:api-resource')]
+#[AsCommand(
+    name: 'debug:api-resource',
+    description: 'Debug API Platform resources'
+)]
 final class DebugResourceCommand extends Command
 {
     /**
@@ -41,7 +44,6 @@ final class DebugResourceCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setDescription('Debug API Platform resources')
             ->addArgument('class', InputArgument::REQUIRED, 'The class you want to debug');
     }
 

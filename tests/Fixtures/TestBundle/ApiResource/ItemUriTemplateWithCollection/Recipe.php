@@ -20,14 +20,12 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Recipe as EntityRecipe;
 
 #[Get(
     uriTemplate: '/item_uri_template_recipes/{id}{._format}',
-    shortName: 'ItemRecipe',
     uriVariables: ['id'],
     provider: [self::class, 'provide'],
     openapi: false
 )]
 #[Get(
     uriTemplate: '/item_uri_template_recipes_state_option/{id}{._format}',
-    shortName: 'ItemRecipe',
     uriVariables: ['id'],
     openapi: false,
     stateOptions: new Options(entityClass: EntityRecipe::class)
