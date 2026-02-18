@@ -59,7 +59,7 @@ class AppKernel extends Kernel
 
     private $genIdDefault;
 
-    public function __construct(string $environment, bool $debug, $genIdDefault = null)
+    public function __construct(string $environment, bool $debug, ?bool $genIdDefault = null)
     {
         parent::__construct($environment, $debug);
 
@@ -283,9 +283,11 @@ class AppKernel extends Kernel
                     'vary' => ['Accept', 'Cookie'],
                     'public' => true,
                 ],
-                'normalization_context' => [
+                'normalization_context' => null !== $this->genIdDefault ? [
                     'skip_null_values' => false,
-                    'gen_id' => null !== $this->genIdDefault ? (bool) $this->genIdDefault : true,
+                    'gen_id' => (bool) $this->genIdDefault,
+                ] : [
+                    'skip_null_values' => false,
                 ],
                 'operations' => [
                     Get::class,
