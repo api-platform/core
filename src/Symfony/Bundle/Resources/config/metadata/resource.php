@@ -18,7 +18,6 @@ use ApiPlatform\Metadata\Resource\Factory\AttributesResourceMetadataCollectionFa
 use ApiPlatform\Metadata\Resource\Factory\BackedEnumResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\CachedResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\ConcernsResourceMetadataCollectionFactory;
-use ApiPlatform\Metadata\Resource\Factory\DefaultParametersResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\ExtractorResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\FiltersResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\FormatsResourceMetadataCollectionFactory;
@@ -152,13 +151,6 @@ return function (ContainerConfigurator $container) {
             service('api_platform.filter_locator')->ignoreOnInvalid(),
             service('api_platform.name_converter')->ignoreOnInvalid(),
             service('logger')->ignoreOnInvalid(),
-        ]);
-
-    $services->set('api_platform.metadata.resource.metadata_collection_factory.default_parameters', DefaultParametersResourceMetadataCollectionFactory::class)
-        ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 1001)
-        ->args([
-            '%api_platform.defaults.parameters%',
-            service('api_platform.metadata.resource.metadata_collection_factory.default_parameters.inner'),
         ]);
 
     $services->set('api_platform.metadata.resource.metadata_collection_factory.cached', CachedResourceMetadataCollectionFactory::class)
