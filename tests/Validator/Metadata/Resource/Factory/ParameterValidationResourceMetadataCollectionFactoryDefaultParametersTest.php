@@ -11,22 +11,22 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Metadata\Tests\Resource\Factory;
+namespace ApiPlatform\Tests\Validator\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\HeaderParameter;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\Resource\Factory\AttributesResourceMetadataCollectionFactory;
-use ApiPlatform\Metadata\Resource\Factory\DefaultParametersResourceMetadataCollectionFactory;
+use ApiPlatform\Validator\Metadata\Resource\Factory\ParameterValidationResourceMetadataCollectionFactory;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Integration tests for DefaultParametersResourceMetadataCollectionFactory with real resources.
+ * Integration tests for ParameterValidationResourceMetadataCollectionFactory with default parameters.
  *
  * @author Maxence Castel <maxence.castel59@gmail.com>
  */
-final class DefaultParametersResourceMetadataCollectionFactoryTest extends TestCase
+final class ParameterValidationResourceMetadataCollectionFactoryDefaultParametersTest extends TestCase
 {
     private const DEFAULT_PARAMETERS = [
         HeaderParameter::class => [
@@ -39,11 +39,15 @@ final class DefaultParametersResourceMetadataCollectionFactoryTest extends TestC
     public function testDefaultParametersAppliedToRealResource(): void
     {
         $attributesFactory = new AttributesResourceMetadataCollectionFactory();
-        $defaultParametersFactory = new DefaultParametersResourceMetadataCollectionFactory(self::DEFAULT_PARAMETERS, $attributesFactory);
+        $parameterValidationFactory = new ParameterValidationResourceMetadataCollectionFactory(
+            $attributesFactory,
+            null,
+            self::DEFAULT_PARAMETERS
+        );
 
         $resourceClass = TestProductResource::class;
 
-        $collection = $defaultParametersFactory->create($resourceClass);
+        $collection = $parameterValidationFactory->create($resourceClass);
 
         $this->assertCount(1, $collection);
         $resource = $collection[0];
@@ -73,11 +77,15 @@ final class DefaultParametersResourceMetadataCollectionFactoryTest extends TestC
     public function testDefaultParametersWithOperationOverride(): void
     {
         $attributesFactory = new AttributesResourceMetadataCollectionFactory();
-        $defaultParametersFactory = new DefaultParametersResourceMetadataCollectionFactory(self::DEFAULT_PARAMETERS, $attributesFactory);
+        $parameterValidationFactory = new ParameterValidationResourceMetadataCollectionFactory(
+            $attributesFactory,
+            null,
+            self::DEFAULT_PARAMETERS
+        );
 
         $resourceClass = TestProductResourceWithParameters::class;
 
-        $collection = $defaultParametersFactory->create($resourceClass);
+        $collection = $parameterValidationFactory->create($resourceClass);
 
         $this->assertCount(1, $collection);
         $resource = $collection[0];
