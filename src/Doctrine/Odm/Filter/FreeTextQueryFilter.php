@@ -46,7 +46,17 @@ final class FreeTextQueryFilter implements FilterInterface, ManagerRegistryAware
 
         $parameter = $context['parameter'];
         foreach ($this->properties ?? $parameter->getProperties() ?? [] as $property) {
-            $newContext = ['parameter' => $parameter->withProperty($property), 'match' => $context['match'] ?? $aggregationBuilder->match()->expr()] + $context;
+            $subParameter = $parameter->withProperty($property);
+
+            $nestedPropertiesInfo = $parameter->getExtraProperties()['nested_properties_info'] ?? [];
+            if (isset($nestedPropertiesInfo[$property])) {
+                $subParameter = $subParameter->withExtraProperties([
+                    ...$subParameter->getExtraProperties(),
+                    'nested_property_info' => $nestedPropertiesInfo[$property],
+                ]);
+            }
+
+            $newContext = ['parameter' => $subParameter, 'match' => $context['match'] ?? $aggregationBuilder->match()->expr()] + $context;
             $this->filter->apply(
                 $aggregationBuilder,
                 $resourceClass,
