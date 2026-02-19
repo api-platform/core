@@ -40,7 +40,7 @@ trait NestedPropertyHelperTrait
         ?string $joinType = null,
     ): array {
         $extraProperties = $parameter->getExtraProperties();
-        $nestedInfo = $extraProperties['nested_property_info'] ?? null;
+        $nestedInfo = ($extraProperties['nested_properties_info'] ?? []) ? reset($extraProperties['nested_properties_info']) : null;
 
         if (!$nestedInfo) {
             return [$alias, $property];

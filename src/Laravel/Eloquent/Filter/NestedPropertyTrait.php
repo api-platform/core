@@ -35,7 +35,8 @@ trait NestedPropertyTrait
         callable $condition,
         string $whereClause = 'where',
     ): Builder {
-        $nestedInfo = $parameter->getExtraProperties()['nested_property_info'] ?? null;
+        $nestedPropertiesInfo = $parameter->getExtraProperties()['nested_properties_info'] ?? [];
+        $nestedInfo = $nestedPropertiesInfo ? reset($nestedPropertiesInfo) : null;
 
         if (!$nestedInfo) {
             // No nested property, use simple where clause

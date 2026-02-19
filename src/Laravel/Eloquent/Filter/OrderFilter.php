@@ -50,7 +50,8 @@ final class OrderFilter implements FilterInterface, JsonSchemaFilterInterface, O
             return $builder;
         }
 
-        $nestedInfo = $parameter->getExtraProperties()['nested_property_info'] ?? null;
+        $nestedPropertiesInfo = $parameter->getExtraProperties()['nested_properties_info'] ?? [];
+        $nestedInfo = $nestedPropertiesInfo ? reset($nestedPropertiesInfo) : null;
 
         if (!$nestedInfo || 0 === \count($nestedInfo['relation_segments'])) {
             return $builder->orderBy($this->getQueryProperty($parameter), $direction);

@@ -57,7 +57,8 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                     }
 
                     $extraProperties = $parameter->getExtraProperties();
-                    $nestedInfo = $extraProperties['nested_property_info'] ?? null;
+                    $nestedPropertiesInfo = $extraProperties['nested_properties_info'] ?? [];
+                    $nestedInfo = $nestedPropertiesInfo[$property] ?? null;
 
                     if (!$nestedInfo && $modelClass) {
                         $nestedInfo = $this->buildNestedPropertyInfo($property, $modelClass);
@@ -65,7 +66,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                             continue;
                         }
 
-                        $extraProperties['nested_property_info'] = $nestedInfo;
+                        $extraProperties['nested_properties_info'] = [$property => $nestedInfo];
                         $parameters = $parameters->add(
                             $key,
                             $parameter->withProperty($property)->withExtraProperties($extraProperties)
@@ -83,7 +84,8 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
                         continue;
                     }
 
-                    $extraProperties['nested_property_info'] = $nestedInfo;
+                    $nestedPropertiesInfo[$property] = $nestedInfo;
+                    $extraProperties['nested_properties_info'] = $nestedPropertiesInfo;
                     $parameters = $parameters->add($key, $parameter->withExtraProperties($extraProperties));
                     $modified = true;
                 }
@@ -107,7 +109,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
      * @param string $property   The nested property path (e.g., "product.productVariations.variantName")
      * @param string $modelClass The starting model class
      *
-     * @return array<string, mixed>|null The nested_property_info array, or null if traversal fails
+     * @return array<string, mixed>|null The NestedPropertyInfo array, or null if traversal fails
      */
     private function buildNestedPropertyInfo(string $property, string $modelClass): ?array
     {

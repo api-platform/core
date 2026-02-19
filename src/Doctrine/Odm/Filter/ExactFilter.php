@@ -16,6 +16,7 @@ namespace ApiPlatform\Doctrine\Odm\Filter;
 use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
 use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareTrait;
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
+use ApiPlatform\Doctrine\Odm\NestedPropertyHelperTrait;
 use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
@@ -32,6 +33,7 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
 {
     use BackwardCompatibleFilterDescriptionTrait;
     use ManagerRegistryAwareTrait;
+    use NestedPropertyHelperTrait;
     use OpenApiFilterTrait;
 
     /**
@@ -58,24 +60,30 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
             return;
         }
 
-        $classMetadata = $documentManager->getClassMetadata($resourceClass);
+        $matchField = $this->addNestedParameterLookups($property, $aggregationBuilder, $parameter, false, $context);
 
-        if (!$classMetadata->hasReference($property)) {
+        $nestedPropertiesInfo = $parameter->getExtraProperties()['nested_properties_info'] ?? [];
+        $nestedInfo = $nestedPropertiesInfo ? reset($nestedPropertiesInfo) : null;
+        $leafClass = $nestedInfo['leaf_class'] ?? $resourceClass;
+        $leafProperty = $nestedInfo['leaf_property'] ?? $property;
+        $classMetadata = $documentManager->getClassMetadata($leafClass);
+
+        if (!$classMetadata->hasReference($leafProperty)) {
             $comparisonMethod = $context['comparisonMethod'] ?? (is_iterable($value) ? 'in' : 'equals');
             $match
-                ->{$operator}($aggregationBuilder->matchExpr()->field($property)->{$comparisonMethod}($value));
+                ->{$operator}($aggregationBuilder->matchExpr()->field($matchField)->{$comparisonMethod}($value));
 
             return;
         }
 
-        $mapping = $classMetadata->getFieldMapping($property);
-        $method = $classMetadata->isSingleValuedAssociation($property) ? 'references' : 'includesReferenceTo';
+        $mapping = $classMetadata->getFieldMapping($leafProperty);
+        $method = $classMetadata->isSingleValuedAssociation($leafProperty) ? 'references' : 'includesReferenceTo';
 
         if (is_iterable($value)) {
             $or = $aggregationBuilder->matchExpr();
 
             foreach ($value as $v) {
-                $or->addOr($aggregationBuilder->matchExpr()->field($property)->{$method}($documentManager->getPartialReference($mapping['targetDocument'], $v)));
+                $or->addOr($aggregationBuilder->matchExpr()->field($matchField)->{$method}($documentManager->getPartialReference($mapping['targetDocument'], $v)));
             }
 
             $match->{$operator}($or);
@@ -86,7 +94,7 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
         $match
             ->{$operator}(
                 $aggregationBuilder->matchExpr()
-                    ->field($property)
+                    ->field($matchField)
                     ->{$method}($documentManager->getPartialReference($mapping['targetDocument'], $value))
             );
     }

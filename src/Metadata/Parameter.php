@@ -30,7 +30,6 @@ abstract class Parameter
      * }
      *
      * @param array{
-     *     nested_property_info?: NestedPropertyInfo,
      *     nested_properties_info?: array<string, NestedPropertyInfo>,
      *     ...
      * }|array<string, mixed> $extraProperties
