@@ -57,12 +57,15 @@ class AppKernel extends Kernel
 {
     use MicroKernelTrait;
 
-    public function __construct(string $environment, bool $debug)
+    private $genIdDefault;
+
+    public function __construct(string $environment, bool $debug, ?bool $genIdDefault = null)
     {
         parent::__construct($environment, $debug);
 
         // patch for behat/symfony2-extension not supporting %env(APP_ENV)%
         $this->environment = $_SERVER['APP_ENV'] ?? $environment;
+        $this->genIdDefault = $genIdDefault ?? $_SERVER['GEN_ID_DEFAULT'] ?? null;
     }
 
     public function registerBundles(): array
@@ -106,6 +109,11 @@ class AppKernel extends Kernel
         return __DIR__;
     }
 
+    public function getCacheDir(): string
+    {
+        return parent::getCacheDir().(null !== $this->genIdDefault ? '_gen_id_'.$this->genIdDefault : '');
+    }
+
     protected function configureRoutes($routes): void
     {
         $routes->import(__DIR__."/config/routing_{$this->getEnvironment()}.yml");
@@ -114,6 +122,7 @@ class AppKernel extends Kernel
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
     {
         $c->setParameter('kernel.project_dir', __DIR__);
+        $c->setParameter('app.gen_id_default', $this->genIdDefault);
 
         $loader->load(__DIR__."/config/config_{$this->getEnvironment()}.yml");
 
@@ -274,7 +283,12 @@ class AppKernel extends Kernel
                     'vary' => ['Accept', 'Cookie'],
                     'public' => true,
                 ],
-                'normalization_context' => ['skip_null_values' => false],
+                'normalization_context' => null !== $this->genIdDefault ? [
+                    'skip_null_values' => false,
+                    'gen_id' => (bool) $this->genIdDefault,
+                ] : [
+                    'skip_null_values' => false,
+                ],
                 'operations' => [
                     Get::class,
                     GetCollection::class,
