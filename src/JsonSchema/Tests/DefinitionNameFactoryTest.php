@@ -105,4 +105,24 @@ final class DefinitionNameFactoryTest extends TestCase
             $definitionNameFactory->create(Fixtures\DefinitionNameFactory\NamespaceA\Module\DummyClass::class, 'jsonhal')
         );
     }
+
+    public function testCreateDifferentPrefixesForClassesWithTheSameOperationShortName(): void
+    {
+        $definitionNameFactory = new DefinitionNameFactory();
+
+        self::assertEquals(
+            'DummyClass.jsonapi',
+            $definitionNameFactory->create(Fixtures\DefinitionNameFactory\NamespaceA\Module\DummyClass::class, 'jsonapi', null, new Get(class: Fixtures\DefinitionNameFactory\NamespaceA\Module\DummyClass::class, shortName: 'DummyClass'))
+        );
+
+        self::assertEquals(
+            'Module.DummyClass.jsonapi',
+            $definitionNameFactory->create(Fixtures\DefinitionNameFactory\NamespaceB\Module\DummyClass::class, 'jsonapi', null, new Get(class: Fixtures\DefinitionNameFactory\NamespaceB\Module\DummyClass::class, shortName: 'DummyClass'))
+        );
+
+        self::assertEquals(
+            'NamespaceC.Module.DummyClass.jsonapi',
+            $definitionNameFactory->create(Fixtures\DefinitionNameFactory\NamespaceC\Module\DummyClass::class, 'jsonapi', null, new Get(class: Fixtures\DefinitionNameFactory\NamespaceC\Module\DummyClass::class, shortName: 'DummyClass'))
+        );
+    }
 }
