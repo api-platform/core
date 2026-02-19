@@ -1894,6 +1894,53 @@ class AbstractItemNormalizerTest extends TestCase
         $this->assertEquals(array_keys($operationCacheKey), [\sprintf('%s%s%s%s', Dummy::class, 'operation_name', 'root_operation_name', 'n')]);
         $this->assertEquals(current($operationCacheKey), ['serializer_groups' => ['group'], 'api_allow_update' => false]);
     }
+
+    public function testSupportsDenormalizationWithApiPlatformInputContext(): void
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(\stdClass::class)->willReturn(false);
+
+        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), null, null, [], null, null) extends AbstractItemNormalizer {};
+
+        $this->assertFalse($normalizer->supportsDenormalization([], \stdClass::class));
+        $this->assertTrue($normalizer->supportsDenormalization([], \stdClass::class, null, [
+            'api_platform_input' => true,
+            'resource_class' => \stdClass::class,
+        ]));
+        $this->assertFalse($normalizer->supportsDenormalization([], \stdClass::class, null, [
+            'api_platform_input' => true,
+            'resource_class' => 'SomeOtherClass',
+        ]));
+    }
+
+    public function testSupportsNormalizationWithApiPlatformOutputContext(): void
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(\stdClass::class)->willReturn(false);
+
+        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), null, null, [], null, null) extends AbstractItemNormalizer {};
+
+        $std = new \stdClass();
+        $this->assertFalse($normalizer->supportsNormalization($std));
+        $this->assertTrue($normalizer->supportsNormalization($std, null, [
+            'api_platform_output' => true,
+            'resource_class' => \stdClass::class,
+        ]));
+        $this->assertFalse($normalizer->supportsNormalization($std, null, [
+            'api_platform_output' => true,
+            'resource_class' => 'SomeOtherClass',
+        ]));
+    }
 }
 
 class ObjectWithBasicProperties
