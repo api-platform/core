@@ -11,19 +11,19 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Doctrine\Orm\Filter;
+namespace ApiPlatform\Doctrine\Odm\Filter;
 
+use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
+use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareTrait;
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
-use ApiPlatform\Doctrine\Orm\NestedPropertyHelperTrait;
-use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Doctrine\Odm\NestedPropertyHelperTrait;
 use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
 use ApiPlatform\Metadata\JsonSchemaFilterInterface;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
-use Doctrine\ORM\Query\Expr\Join;
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
 /**
  * Parameter-based order filter for sorting a collection by a property.
@@ -35,9 +35,10 @@ use Doctrine\ORM\QueryBuilder;
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-final class SortFilter implements FilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface
+final class SortFilter implements FilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface, ManagerRegistryAwareInterface
 {
     use BackwardCompatibleFilterDescriptionTrait;
+    use ManagerRegistryAwareTrait;
     use NestedPropertyHelperTrait;
     use OpenApiFilterTrait;
 
@@ -46,7 +47,7 @@ final class SortFilter implements FilterInterface, JsonSchemaFilterInterface, Op
     ) {
     }
 
-    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
+    public function apply(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
         $parameter = $context['parameter'] ?? null;
         if (null === $parameter) {
@@ -64,20 +65,31 @@ final class SortFilter implements FilterInterface, JsonSchemaFilterInterface, Op
         }
 
         $property = $parameter->getProperty();
-        $alias = $queryBuilder->getRootAliases()[0];
+        $matchField = $this->addNestedParameterLookups($property, $aggregationBuilder, $parameter, true);
 
-        [$alias, $field] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter, Join::LEFT_JOIN);
+        $mongoDirection = 'ASC' === $direction ? 1 : -1;
 
         if (null !== $nullsComparison = $this->nullsComparison) {
             $nullsDirection = OrderFilterInterface::NULLS_DIRECTION_MAP[$nullsComparison][$direction] ?? null;
             if (null !== $nullsDirection) {
-                $nullRankHiddenField = \sprintf('_%s_%s_null_rank', $alias, str_replace('.', '_', $field));
-                $queryBuilder->addSelect(\sprintf('CASE WHEN %s.%s IS NULL THEN 0 ELSE 1 END AS HIDDEN %s', $alias, $field, $nullRankHiddenField));
-                $queryBuilder->addOrderBy($nullRankHiddenField, $nullsDirection);
+                $nullRankField = \sprintf('_null_rank_%s', str_replace('.', '_', $matchField));
+                $mongoNullsDirection = 'ASC' === $nullsDirection ? 1 : -1;
+
+                $aggregationBuilder->addFields()
+                    ->field($nullRankField)
+                    ->cond(
+                        $aggregationBuilder->expr()->eq('$'.$matchField, null),
+                        0,
+                        1
+                    );
+
+                $context['mongodb_odm_sort_fields'] = ($context['mongodb_odm_sort_fields'] ?? []) + [$nullRankField => $mongoNullsDirection];
             }
         }
 
-        $queryBuilder->addOrderBy(\sprintf('%s.%s', $alias, $field), $direction);
+        $aggregationBuilder->sort(
+            $context['mongodb_odm_sort_fields'] = ($context['mongodb_odm_sort_fields'] ?? []) + [$matchField => $mongoDirection]
+        );
     }
 
     /**
