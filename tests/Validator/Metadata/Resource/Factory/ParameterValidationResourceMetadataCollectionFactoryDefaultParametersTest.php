@@ -30,7 +30,7 @@ final class ParameterValidationResourceMetadataCollectionFactoryDefaultParameter
 {
     private const DEFAULT_PARAMETERS = [
         HeaderParameter::class => [
-            'key' => 'X-API-Version',
+            'key' => 'API-Version',
             'required' => true,
             'description' => 'API Version',
         ],
@@ -66,10 +66,10 @@ final class ParameterValidationResourceMetadataCollectionFactoryDefaultParameter
 
         $parameters = $collectionOperation->getParameters();
         $this->assertNotNull($parameters);
-        $this->assertTrue($parameters->has('X-API-Version', HeaderParameter::class), 'Default header parameter not found');
+        $this->assertTrue($parameters->has('API-Version', HeaderParameter::class), 'Default header parameter not found');
 
-        $headerParam = $parameters->get('X-API-Version', HeaderParameter::class);
-        $this->assertSame('X-API-Version', $headerParam->getKey());
+        $headerParam = $parameters->get('API-Version', HeaderParameter::class);
+        $this->assertSame('API-Version', $headerParam->getKey());
         $this->assertTrue($headerParam->getRequired());
         $this->assertSame('API Version', $headerParam->getDescription());
     }
@@ -105,7 +105,7 @@ final class ParameterValidationResourceMetadataCollectionFactoryDefaultParameter
         $parameters = $collectionOperation->getParameters();
         $this->assertNotNull($parameters);
 
-        $this->assertTrue($parameters->has('X-API-Version', HeaderParameter::class));
+        $this->assertTrue($parameters->has('API-Version', HeaderParameter::class));
         $this->assertTrue($parameters->has('filter', QueryParameter::class));
     }
 }
