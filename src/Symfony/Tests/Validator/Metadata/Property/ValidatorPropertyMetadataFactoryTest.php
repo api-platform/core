@@ -26,6 +26,7 @@ use ApiPlatform\Symfony\Tests\Fixtures\DummySequentiallyValidatedEntity;
 use ApiPlatform\Symfony\Tests\Fixtures\DummyUniqueValidatedEntity;
 use ApiPlatform\Symfony\Tests\Fixtures\DummyValidatedChoiceEntity;
 use ApiPlatform\Symfony\Tests\Fixtures\DummyValidatedEntity;
+use ApiPlatform\Symfony\Tests\Fixtures\DummyValidatedEntityWithGroupSequence;
 use ApiPlatform\Symfony\Tests\Fixtures\DummyValidatedHostnameEntity;
 use ApiPlatform\Symfony\Tests\Fixtures\DummyValidatedUlidEntity;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaChoiceRestriction;
@@ -137,6 +138,30 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
             []
         );
         $resultedPropertyMetadata = $validatorPropertyMetadataFactory->create(DummyValidatedEntity::class, 'dummyId');
+
+        $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
+    }
+
+    public function testCreateWithPropertyWithRequiredConstraintsAndGroupSequence(): void
+    {
+        $propertyMetadata = (new ApiProperty())->withDescription('A dummy group')->withReadable(true)->withWritable(true);
+        $expectedPropertyMetadata = $propertyMetadata->withRequired(true);
+
+        $decoratedPropertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $decoratedPropertyMetadataFactory->create(DummyValidatedEntityWithGroupSequence::class, 'dummyGroup', [])->willReturn($propertyMetadata)->shouldBeCalled();
+
+        $validatorClassMetadata = new ClassMetadata(DummyValidatedEntityWithGroupSequence::class);
+        (new AttributeLoader())->loadClassMetadata($validatorClassMetadata);
+
+        $validatorMetadataFactory = $this->prophesize(MetadataFactoryInterface::class);
+        $validatorMetadataFactory->getMetadataFor(DummyValidatedEntityWithGroupSequence::class)->willReturn($validatorClassMetadata)->shouldBeCalled();
+
+        $validatorPropertyMetadataFactory = new ValidatorPropertyMetadataFactory(
+            $validatorMetadataFactory->reveal(),
+            $decoratedPropertyMetadataFactory->reveal(),
+            []
+        );
+        $resultedPropertyMetadata = $validatorPropertyMetadataFactory->create(DummyValidatedEntityWithGroupSequence::class, 'dummyGroup');
 
         $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
     }
