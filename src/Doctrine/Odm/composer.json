@@ -27,6 +27,7 @@
         "php": ">=8.2",
         "api-platform/doctrine-common": "^4.2.9",
         "api-platform/metadata": "^4.2",
+        "api-platform/serializer": "^4.2.16",
         "api-platform/state": "^4.2.4",
         "doctrine/mongodb-odm": "^2.10",
         "symfony/property-info": "^6.4 || ^7.1 || ^8.0",
