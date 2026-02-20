@@ -1,5 +1,31 @@
 # Changelog
 
+## v4.3.0-alpha.2
+
+### Bug fixes
+
+* [191a46122](https://github.com/api-platform/core/commit/191a4612267d95cc665ef72e83ceb2f053ab6214) fix(serializer): apply API Platform name converter to input/output DTOs (#7779)
+* [17b6ff221](https://github.com/api-platform/core/commit/17b6ff22138e10decfd09a93cc74995cf566062b) fix(jsonschema): name collision when an operation name is already used by another class (#7778)
+* [23840f9df](https://github.com/api-platform/core/commit/23840f9df42895d334d0db1027e3894ce411cf98) fix(symfony): publish mercure updates for all resources of an entity (#7774)
+* [75ffdc43f](https://github.com/api-platform/core/commit/75ffdc43ff812e52053b169737e06dda9570e97a) fix(hydra): hide search key when there is parameter without filter (#7773)
+* [e0ba0068d](https://github.com/api-platform/core/commit/e0ba0068df66284dc72a66d4c8cae819aaabc562) fix(hydra): unique class @id with subClassOf for semantic types (#7771)
+* [0f025e849](https://github.com/api-platform/core/commit/0f025e8494e52ec9089b184b64e48f7845d2e906) fix(state): handle partial pagination with object mapper (#7769)
+* [a2efb39e1](https://github.com/api-platform/core/commit/a2efb39e12e780ce1384ef9c3e02f155974fea72) fix(elasticsearch): mono-repo v9 support (#7766)
+* [332272c6f](https://github.com/api-platform/core/commit/332272c6f4db27dc7e0ea39d664059b2b05cfb6c) fix(jsonld): restore item_uri_template @type resolution after 4.2 merge (#7764)
+* [f0b355984](https://github.com/api-platform/core/commit/f0b355984da1fdbf3d430289e37a589847e95aa2) fix(symfony): use AsCommand description parameter for console commands (#7763)
+* [a4715f063](https://github.com/api-platform/core/commit/a4715f063d789824cc299a0cc786568b6276c7e2) fix(doctrine): enforce api-platform/serializer dependency (#7781)
+* [4f6c4e1b4](https://github.com/api-platform/core/commit/4f6c4e1b40b5b61c3f4d3f8d19ef3980a8be39b7) fix(laravel): object-mapper / mcp-bundle versions
+
+### Features
+
+* [383a5fa67](https://github.com/api-platform/core/commit/383a5fa67f89f7903d6fca31182d1539033f2add) feat(serializer): global defaults.normalization_context.gen_id configuration option (#7775)
+* [6626549b6](https://github.com/api-platform/core/commit/6626549b6189b81b465f50c8f3859b5f99c61928) feat: correctly map problem-detail fields when using ProblemExceptionInterface (#7776)
+* [c56a35469](https://github.com/api-platform/core/commit/c56a35469e6c68a868e087728f3201f81311da5a) feat(doctrine): add nested relation support to IriFilter and UuidFilter (#7759)
+
+### Notes
+
+* **Hydra class `@id` now always uses `#ShortName`** (#7771): Hydra documentation classes now consistently use `#ShortName` as their `@id` instead of schema.org type URIs (e.g. `schema:Product`). This properly resolves class identifier collisions when multiple resources shared the same semantic type, which previously caused api-doc-parser conflation. Semantic types configured via `types` are now exposed through `rdfs:subClassOf`. Clients should expect class `@id` and property range changes in the Hydra documentation if resources had custom `types` configured.
+
 ## v4.3.0-alpha.1
 
 ### Features
