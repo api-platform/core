@@ -1,5 +1,15 @@
 # Changelog
 
+## v4.2.17
+
+### Bug fixes
+
+* [0f025e849](https://github.com/api-platform/core/commit/0f025e8494e52ec9089b184b64e48f7845d2e906) fix(state): handle partial pagination with object mapper (#7769)
+* [17b6ff221](https://github.com/api-platform/core/commit/17b6ff22138e10decfd09a93cc74995cf566062b) fix(jsonschema): name collision when an operation name is already used by another class (#7778)
+* [191a46122](https://github.com/api-platform/core/commit/191a4612267d95cc665ef72e83ceb2f053ab6214) fix(serializer): apply API Platform name converter to input/output DTOs (#7779)
+* [75ffdc43f](https://github.com/api-platform/core/commit/75ffdc43ff812e52053b169737e06dda9570e97a) fix(hydra): hide search key when there is parameter without filter (#7773)
+* [f0b355984](https://github.com/api-platform/core/commit/f0b355984da1fdbf3d430289e37a589847e95aa2) fix(symfony): use AsCommand description parameter for console commands (#7763)
+
 ## v4.2.16
 
 ### Bug fixes
