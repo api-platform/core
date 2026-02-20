@@ -110,12 +110,15 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
         if ($currentFilters || ($parameters && \count($parameters))) {
             $hydraPrefix = $this->getHydraPrefix($context + $this->defaultContext);
             ['mapping' => $mapping, 'keys' => $keys] = $this->getSearchMappingAndKeys($operation, $resourceClass, $currentFilters, $parameters, [$this, 'getFilter']);
-            $normalizedData[$hydraPrefix.'search'] = [
-                '@type' => $hydraPrefix.'IriTemplate',
-                $hydraPrefix.'template' => \sprintf('%s{?%s}', $requestParts['path'], implode(',', $keys)),
-                $hydraPrefix.'variableRepresentation' => 'BasicRepresentation',
-                $hydraPrefix.'mapping' => $this->convertMappingToArray($mapping),
-            ];
+
+            if ($keys || $mapping) {
+                $normalizedData[$hydraPrefix.'search'] = [
+                    '@type' => $hydraPrefix.'IriTemplate',
+                    $hydraPrefix.'template' => \sprintf('%s{?%s}', $requestParts['path'], implode(',', $keys)),
+                    $hydraPrefix.'variableRepresentation' => 'BasicRepresentation',
+                    $hydraPrefix.'mapping' => $this->convertMappingToArray($mapping),
+                ];
+            }
         }
 
         return $normalizedData;

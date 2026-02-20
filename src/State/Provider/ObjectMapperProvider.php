@@ -16,7 +16,9 @@ namespace ApiPlatform\State\Provider;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Util\CloneTrait;
 use ApiPlatform\State\Pagination\MappedObjectPaginator;
+use ApiPlatform\State\Pagination\MappedObjectPartialPaginator;
 use ApiPlatform\State\Pagination\PaginatorInterface;
+use ApiPlatform\State\Pagination\PartialPaginatorInterface;
 use ApiPlatform\State\ProviderInterface;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 
@@ -61,6 +63,15 @@ final class ObjectMapperProvider implements ProviderInterface
                 $data->getCurrentPage(),
                 $data->getLastPage(),
                 $data->getItemsPerPage(),
+            );
+        } elseif ($data instanceof PartialPaginatorInterface) {
+            $data = new MappedObjectPartialPaginator(
+                $data,
+                $this->objectMapper,
+                $class,
+                $data->getCurrentPage(),
+                $data->getItemsPerPage(),
+                \count($data),
             );
         } elseif (\is_array($data)) {
             foreach ($data as &$v) {
