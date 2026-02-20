@@ -36,7 +36,7 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
     public function create(string $className, string $format = 'json', ?string $inputOrOutputClass = null, ?Operation $operation = null, array $serializerContext = []): string
     {
         if ($operation) {
-            $prefix = $operation->getShortName();
+            $prefix = $this->createPrefixFromOperation($operation);
         }
 
         if (!isset($prefix)) {
@@ -92,6 +92,24 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
     private function encodeDefinitionName(string $name): string
     {
         return preg_replace('/[^a-zA-Z0-9.\-_]/', '.', $name);
+    }
+
+    private function createPrefixFromOperation(Operation $operation): ?string
+    {
+        $name = $operation->getShortName();
+
+        if (!isset($this->prefixCache[$name])) {
+            $this->prefixCache[$name] = $operation->getClass();
+
+            return $name;
+        }
+
+        if ($this->prefixCache[$name] === $operation->getClass()) {
+            return $name;
+        }
+
+        // This will fallback to using `createPrefixFromClass`
+        return null;
     }
 
     private function createPrefixFromClass(string $fullyQualifiedClassName, int $namespaceParts = 1): string
