@@ -162,6 +162,10 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
             }
         }
 
+        if ($classMetadata->hasGroupSequence()) {
+            return $classMetadata->getGroupSequence()->groups;
+        }
+
         if (!method_exists($classMetadata, 'getDefaultGroup')) {
             throw new \UnexpectedValueException(\sprintf('Validator class metadata expected to have method "%s".', 'getDefaultGroup'));
         }
