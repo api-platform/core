@@ -156,12 +156,12 @@ class JsonLdTest extends ApiTestCase
         $this->assertJsonContains([
             'member' => [
                 [
-                    '@type' => 'ItemRecipe',
+                    '@type' => 'Recipe',
                     '@id' => '/item_uri_template_recipes/1',
                     'name' => 'Dummy Recipe',
                 ],
                 [
-                    '@type' => 'ItemRecipe',
+                    '@type' => 'Recipe',
                     '@id' => '/item_uri_template_recipes/2',
                     'name' => 'Dummy Recipe 2',
                 ],
@@ -208,17 +208,17 @@ class JsonLdTest extends ApiTestCase
         $this->assertJsonContains([
             'member' => [
                 [
-                    '@type' => 'ItemRecipe',
+                    '@type' => 'Recipe',
                     '@id' => '/item_uri_template_recipes_state_option/1',
                     'name' => 'Recipe 0',
                 ],
                 [
-                    '@type' => 'ItemRecipe',
+                    '@type' => 'Recipe',
                     '@id' => '/item_uri_template_recipes_state_option/2',
                     'name' => 'Recipe 1',
                 ],
                 [
-                    '@type' => 'ItemRecipe',
+                    '@type' => 'Recipe',
                     '@id' => '/item_uri_template_recipes_state_option/3',
                     'name' => 'Recipe 2',
                 ],
