@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Tests\Fixtures\TestBundle\Controller\InputDtoWithNameConverterController;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\InputDtoWithNameConverter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\OutputDtoWithNameConverter;
 
@@ -32,6 +33,12 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Dto\OutputDtoWithNameConverter;
             input: InputDtoWithNameConverter::class,
             processor: [self::class, 'process'],
             provider: [self::class, 'provide'],
+        ),
+        new Post(
+            uriTemplate: '/dummy_dto_name_converted_controller',
+            controller: InputDtoWithNameConverterController::class,
+            input: InputDtoWithNameConverter::class,
+            output: InputDtoWithNameConverter::class,
         ),
     ]
 )]

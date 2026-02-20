@@ -63,4 +63,23 @@ final class InputOutputNameConverterTest extends ApiTestCase
         $this->assertArrayHasKey('name_converted', $data);
         $this->assertSame('converted', $data['name_converted']);
     }
+
+    /**
+     * Reproduces the controller use case from issue #7705:
+     * when a custom controller deserializes the input DTO via SerializerInterface,
+     * the API Platform name converter must still be applied.
+     *
+     * @see https://github.com/api-platform/core/issues/7705
+     */
+    public function testInputDtoNameConverterIsAppliedWithController(): void
+    {
+        $response = self::createClient()->request('POST', '/dummy_dto_name_converted_controller', [
+            'headers' => ['Content-Type' => 'application/ld+json'],
+            'json' => ['name_converted' => 'converted'],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $data = $response->toArray(false);
+        $this->assertSame('converted', $data['nameConverted']);
+    }
 }
