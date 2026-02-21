@@ -163,6 +163,26 @@ final class JsonLdJsonSchemaTest extends ApiTestCase
         $this->assertEquals(['$ref' => '#/definitions/BagOfTests.jsonld-read'], $schema['allOf'][1]['properties']['hydra:member']['items']);
     }
 
+    public function testHydraCollectionBaseSchemaExample(): void
+    {
+        $schema = $this->schemaFactory->buildSchema(BagOfTests::class, 'jsonld', forceCollection: true);
+
+        $this->assertArrayHasKey('HydraCollectionBaseSchema', $schema['definitions']);
+        $hydraCollectionSchema = $schema['definitions']['HydraCollectionBaseSchema'];
+
+        // Navigate to the hydra:view property example
+        $this->assertArrayHasKey('allOf', $hydraCollectionSchema);
+        $viewProperty = $hydraCollectionSchema['allOf'][1]['properties']['hydra:view'] ?? null;
+        $this->assertNotNull($viewProperty, 'hydra:view property should exist');
+
+        // Check that the example uses @type instead of type
+        $this->assertArrayHasKey('example', $viewProperty);
+        $example = $viewProperty['example'];
+        $this->assertArrayHasKey('@type', $example, 'Example should use @type with @ prefix');
+        $this->assertArrayNotHasKey('type', $example, 'Example should not use type without @ prefix');
+        $this->assertArrayHasKey('@id', $example, 'Example should have @id');
+    }
+
     public function testArraySchemaWithMultipleUnionTypes(): void
     {
         $schema = $this->schemaFactory->buildSchema(Nest::class, 'jsonld', 'output');

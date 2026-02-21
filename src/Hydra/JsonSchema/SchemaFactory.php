@@ -229,7 +229,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                                 ],
                                 'example' => [
                                     '@id' => 'string',
-                                    'type' => 'string',
+                                    '@type' => 'string',
                                     $hydraPrefix.'first' => 'string',
                                     $hydraPrefix.'last' => 'string',
                                     $hydraPrefix.'previous' => 'string',
