@@ -37,5 +37,6 @@ return static function (ContainerConfigurator $container) {
         ->args([
             service('api_platform.validator.metadata.resource.metadata_collection_factory.parameter.inner'),
             service('api_platform.filter_locator'),
+            '%api_platform.defaults.parameters%',
         ]);
 };
