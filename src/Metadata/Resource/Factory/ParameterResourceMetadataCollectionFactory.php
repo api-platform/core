@@ -223,6 +223,8 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             $parameters->add($key, $parameter->withPriority($priority));
         }
 
+        $parameters->sort();
+
         return $parameters;
     }
 
