@@ -13,7 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Dto;
 
+use ApiPlatform\Tests\Fixtures\TestBundle\Enum\GenderTypeEnum;
+
 class OutputDtoWithNameConverter
 {
     public ?string $nameConverted = null;
+    public ?GenderTypeEnum $gender = null;
 }
