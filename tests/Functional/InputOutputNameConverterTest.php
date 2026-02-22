@@ -63,4 +63,18 @@ final class InputOutputNameConverterTest extends ApiTestCase
         $this->assertArrayHasKey('name_converted', $data);
         $this->assertSame('converted', $data['name_converted']);
     }
+
+    /**
+     * Reproduces issue #7785: enum properties in output DTOs were serialized as
+     * {"@type": "...", "@id": "..."} objects instead of their scalar value.
+     */
+    public function testOutputDtoEnumPropertySerializedAsScalar(): void
+    {
+        $response = self::createClient()->request('GET', '/dummy_dto_name_converted/1');
+
+        $this->assertResponseIsSuccessful();
+        $data = $response->toArray();
+        $this->assertArrayHasKey('gender', $data);
+        $this->assertSame('male', $data['gender'], 'Enum in output DTO must serialize as its scalar value, not as a resource object.');
+    }
 }

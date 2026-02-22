@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\InputDtoWithNameConverter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\OutputDtoWithNameConverter;
+use ApiPlatform\Tests\Fixtures\TestBundle\Enum\GenderTypeEnum;
 
 #[ApiResource(
     operations: [
@@ -40,12 +41,13 @@ class DummyDtoNameConverted
     public function __construct(
         public ?int $id = null,
         public ?string $nameConverted = null,
+        public ?GenderTypeEnum $gender = null,
     ) {
     }
 
     public static function provide(Operation $operation, array $uriVariables = [], array $context = []): self
     {
-        return new self(id: 1, nameConverted: 'converted');
+        return new self(id: 1, nameConverted: 'converted', gender: GenderTypeEnum::MALE);
     }
 
     /**

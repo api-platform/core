@@ -116,7 +116,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return true;
         }
 
-        if (isset($context['api_platform_output']) && ($context['resource_class'] ?? null) === $class) {
+        if (isset($context['api_platform_output_class']) && $context['api_platform_output_class'] === $class) {
             return true;
         }
 
@@ -152,6 +152,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             $context['resource_class'] = $outputClass;
             $context['api_sub_level'] = true;
             $context['api_platform_output'] = true;
+            $context['api_platform_output_class'] = $outputClass;
             $context[self::ALLOW_EXTRA_ATTRIBUTES] = false;
 
             return $this->serializer->normalize($data, $format, $context);
@@ -221,7 +222,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return true;
         }
 
-        if (isset($context['api_platform_input']) && ($context['resource_class'] ?? null) === $type) {
+        if (isset($context['api_platform_input_class']) && $context['api_platform_input_class'] === $type) {
             return true;
         }
 
@@ -243,6 +244,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             unset($context['input'], $context['operation'], $context['operation_name'], $context['uri_variables']);
             $context['resource_class'] = $inputClass;
             $context['api_platform_input'] = true;
+            $context['api_platform_input_class'] = $inputClass;
 
             try {
                 return $this->serializer->denormalize($data, $inputClass, $format, $context);
