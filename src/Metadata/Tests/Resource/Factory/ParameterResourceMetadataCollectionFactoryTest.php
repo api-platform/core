@@ -161,6 +161,49 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertInstanceOf(Parameters::class, $parameters = $operation->getParameters());
     }
 
+    public function testPatternParameterPriorityIsPreserved(): void
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'name', 'description']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(new ApiProperty(readable: true));
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+
+        $resourceMetadataCollection = $parameterFactory->create(HasPatternParameterWithPriority::class);
+        $operation = $resourceMetadataCollection->getOperation(forceCollection: true);
+        $parameters = $operation->getParameters();
+
+        $this->assertInstanceOf(Parameters::class, $parameters);
+
+        $expandedParam = $parameters->get('order[name]');
+        $this->assertNotNull($expandedParam);
+        $this->assertSame(10, $expandedParam->getPriority(), 'Expanded pattern parameter must inherit parent priority');
+
+        $qParam = $parameters->get('q');
+        $this->assertNotNull($qParam);
+        $this->assertSame(0, $qParam->getPriority());
+
+        // Parameters must be iterated in priority order (highest first)
+        $iteratedKeys = [];
+        foreach ($parameters as $key => $parameter) {
+            $iteratedKeys[] = $key;
+        }
+
+        $qIndex = array_search('q', $iteratedKeys, true);
+        $orderNameIndex = array_search('order[name]', $iteratedKeys, true);
+        $this->assertLessThan($qIndex, $orderNameIndex, 'Pattern parameter with priority 10 must be iterated before parameter with priority 0');
+    }
+
     public function testParameterFactoryWithLimitedProperties(): void
     {
         $nameCollection = $this->createMock(PropertyNameCollectionFactoryInterface::class);
@@ -219,4 +262,25 @@ class HasParameterAttribute
     public $id;
     public $name;
     public $description;
+}
+
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            parameters: [
+                'order[:property]' => new QueryParameter(
+                    properties: ['name'],
+                    priority: 10,
+                ),
+                'q' => new QueryParameter(
+                    priority: 0,
+                ),
+            ]
+        ),
+    ]
+)]
+class HasPatternParameterWithPriority
+{
+    public $id;
+    public $name;
 }
