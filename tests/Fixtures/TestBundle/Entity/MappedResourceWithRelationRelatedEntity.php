@@ -18,7 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity]
-#[Map(target: MappedResourceWithRelationRelated::class)]
+#[Map(target: MappedResourceWithRelationRelated::class, transform: [MappedResourceWithRelationRelatedEntity::class, 'transformClass'])] // Fail if transform used ?
 class MappedResourceWithRelationRelatedEntity
 {
     #[ORM\Id, ORM\Column, ORM\GeneratedValue]
@@ -35,5 +35,11 @@ class MappedResourceWithRelationRelatedEntity
     public function setId(?int $id = null)
     {
         $this->id = $id;
+    }
+
+    public static function transformClass($value, $source): mixed
+    {
+        $value->classTransformCall = 'MappedResourceWithRelationRelatedEntity';
+        return $value;
     }
 }

@@ -161,6 +161,7 @@ final class MappingTest extends ApiTestCase
             'id' => '4',
             'relationName' => 'test',
             'relation' => '/mapped_resource_with_relation_relateds/1',
+            'classTransformCall' => 'MappedResourceWithRelationEntity',
         ]);
     }
 

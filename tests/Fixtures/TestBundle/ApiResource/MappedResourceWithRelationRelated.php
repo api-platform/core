@@ -34,4 +34,5 @@ class MappedResourceWithRelationRelated
 {
     public string $id;
     public string $name;
+    public string $classTransformCall = 'none';
 }
