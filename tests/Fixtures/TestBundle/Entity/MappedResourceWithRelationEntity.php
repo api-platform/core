@@ -14,11 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResourceWithRelation;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResourceWithRelationRelated;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity]
-#[Map(target: MappedResourceWithRelation::class)]
+#[Map(target: MappedResourceWithRelation::class, transform: [MappedResourceWithRelationEntity::class, 'transformClass'])]
 class MappedResourceWithRelationEntity
 {
     #[ORM\Id, ORM\Column]
@@ -57,5 +58,11 @@ class MappedResourceWithRelationEntity
         $this->related = $related;
 
         return $this;
+    }
+
+    public static function transformClass($value, $source): mixed
+    {
+        $value->classTransformCall = 'MappedResourceWithRelationEntity';
+        return $value;
     }
 }

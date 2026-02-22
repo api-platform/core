@@ -36,6 +36,7 @@ use Symfony\Component\ObjectMapper\Attribute\Map;
 class MappedResourceWithRelation
 {
     public ?string $id = null;
+    public string $classTransformCall = 'none';
     #[Map(if: false)]
     public ?string $relationName = null;
     #[Map(target: 'related')]
