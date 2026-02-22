@@ -50,8 +50,12 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
             $queryBuilder
                 ->{$context['whereClause'] ?? 'andWhere'}(\sprintf('%s.%s IN (:%s)', $alias, $property, $parameterName));
         } else {
+            $operator = $context['operator'] ?? '=';
+            if (!\in_array($operator, ComparisonFilter::ALLOWED_DQL_OPERATORS, true)) {
+                throw new InvalidArgumentException(\sprintf('Unsupported operator "%s".', $operator));
+            }
             $queryBuilder
-                ->{$context['whereClause'] ?? 'andWhere'}(\sprintf('%s.%s = :%s', $alias, $property, $parameterName));
+                ->{$context['whereClause'] ?? 'andWhere'}(\sprintf('%s.%s %s :%s', $alias, $property, $operator, $parameterName));
         }
 
         $queryBuilder->setParameter($parameterName, $value);
