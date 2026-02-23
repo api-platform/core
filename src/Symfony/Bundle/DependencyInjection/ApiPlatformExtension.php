@@ -991,16 +991,21 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             throw new \LogicException('Elasticsearch support cannot be enabled as the Elasticsearch component is not installed. Try running "composer require api-platform/elasticsearch".');
         }
 
-        $clientClass = !class_exists(\Elasticsearch\Client::class)
-            // ES v7
-            ? \Elastic\Elasticsearch\Client::class
+        if ('opensearch' === $config['elasticsearch']['client']) {
+            $clientClass = \OpenSearch\Client::class; // @phpstan-ignore class.notFound
+        } elseif (!class_exists(\Elasticsearch\Client::class)) {
             // ES v8 and up
-            : \Elasticsearch\Client::class;
+            $clientClass = \Elastic\Elasticsearch\Client::class;
+        } else {
+            // ES v7
+            $clientClass = \Elasticsearch\Client::class;
+        }
 
         $clientDefinition = new Definition($clientClass);
         $container->setDefinition('api_platform.elasticsearch.client', $clientDefinition);
         $container->registerForAutoconfiguration(RequestBodySearchCollectionExtensionInterface::class)
             ->addTag('api_platform.elasticsearch.request_body_search_extension.collection');
+        $container->setParameter('api_platform.elasticsearch.client', $config['elasticsearch']['client']);
         $container->setParameter('api_platform.elasticsearch.hosts', $config['elasticsearch']['hosts']);
         $container->setParameter('api_platform.elasticsearch.ssl_ca_bundle', $config['elasticsearch']['ssl_ca_bundle']);
         $container->setParameter('api_platform.elasticsearch.ssl_verification', $config['elasticsearch']['ssl_verification']);

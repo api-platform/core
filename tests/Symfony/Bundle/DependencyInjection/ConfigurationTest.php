@@ -141,6 +141,7 @@ class ConfigurationTest extends TestCase
                 'hosts' => [],
                 'ssl_ca_bundle' => null,
                 'ssl_verification' => true,
+                'client' => 'elasticsearch',
             ],
             'oauth' => [
                 'enabled' => false,
@@ -487,6 +488,25 @@ class ConfigurationTest extends TestCase
         $this->assertTrue($config['elasticsearch']['enabled']);
         $this->assertFalse($config['elasticsearch']['ssl_verification']);
         $this->assertNull($config['elasticsearch']['ssl_ca_bundle']);
+    }
+
+    public function testElasticsearchOpenSearchClientRequiresPackage(): void
+    {
+        if (class_exists(\OpenSearch\Client::class)) {
+            self::markTestSkipped('opensearch-project/opensearch-php is installed.');
+        }
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Setting api_platform.elasticsearch.client to "opensearch" requires the opensearch-project/opensearch-php package.');
+
+        $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'elasticsearch' => [
+                    'enabled' => true,
+                    'client' => 'opensearch',
+                ],
+            ],
+        ]);
     }
 
     public function testElasticsearchSslCaBundleAndVerificationDisabledMutuallyExclusive(): void

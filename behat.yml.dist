@@ -107,6 +107,21 @@ elasticsearch:
       filters:
         tags: '@elasticsearch&&~@mercure&&~@query_parameter_validator'
 
+opensearch:
+  suites:
+    default: false
+    opensearch:
+      paths:
+        - '%paths.base%/features/elasticsearch'
+      contexts:
+        - 'ApiPlatform\Tests\Behat\CommandContext'
+        - 'ApiPlatform\Tests\Behat\ElasticsearchContext'
+        - 'ApiPlatform\Tests\Behat\JsonContext'
+        - 'Behat\MinkExtension\Context\MinkContext'
+        - 'behatch:context:rest'
+      filters:
+        tags: '@elasticsearch&&~@mercure&&~@query_parameter_validator'
+
 default-coverage:
   suites:
     default: &default-coverage-suite
