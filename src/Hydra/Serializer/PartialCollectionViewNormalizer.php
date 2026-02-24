@@ -90,7 +90,7 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
         if ($isPaginatedWithCursor) {
             $data[$hydraPrefix.'view'] = ['@id' => null, '@type' => $hydraPrefix.'PartialCollectionView'];
 
-            return $this->populateDataWithCursorBasedPagination($data, $parsed, $object, $cursorPaginationAttribute, $operation?->getUrlGenerationStrategy() ?? $this->urlGenerationStrategy, $hydraPrefix);
+            return $this->populateDataWithCursorBasedPagination($data, $parsed, $object, $cursorPaginationAttribute, $operation->getUrlGenerationStrategy() ?? $this->urlGenerationStrategy, $hydraPrefix);
         }
 
         $partialCollectionView = $this->getPartialCollectionView($object, $context['uri'] ?? $context['request_uri'] ?? '/', $this->pageParameterName, $this->enabledParameterName, $operation?->getUrlGenerationStrategy() ?? $this->urlGenerationStrategy);

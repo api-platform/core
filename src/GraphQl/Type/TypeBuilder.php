@@ -343,7 +343,7 @@ final class TypeBuilder implements ContextAwareTypeBuilderInterface
                     $wrappedOperationName = $operationName;
 
                     if (!$useWrappedType) {
-                        $wrappedOperationName = $operation instanceof Query ? $operationName : 'item_query';
+                        $wrappedOperationName = 'item_query';
                     }
 
                     $wrappedOperation = $resourceMetadataCollection->getOperation($wrappedOperationName);
