@@ -142,13 +142,14 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
     }
 
-    public function testCreateWithPropertyWithRequiredConstraintsAndGroupSequence(): void
+    #[DataProvider('createWithPropertyWithRequiredConstraintsAndGroupSequenceDataProvider')]
+    public function testCreateWithPropertyWithRequiredConstraintsAndGroupSequence(string $propertyName): void
     {
         $propertyMetadata = (new ApiProperty())->withDescription('A dummy group')->withReadable(true)->withWritable(true);
         $expectedPropertyMetadata = $propertyMetadata->withRequired(true);
 
         $decoratedPropertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $decoratedPropertyMetadataFactory->create(DummyValidatedEntityWithGroupSequence::class, 'dummyGroup', [])->willReturn($propertyMetadata)->shouldBeCalled();
+        $decoratedPropertyMetadataFactory->create(DummyValidatedEntityWithGroupSequence::class, $propertyName, [])->willReturn($propertyMetadata)->shouldBeCalled();
 
         $validatorClassMetadata = new ClassMetadata(DummyValidatedEntityWithGroupSequence::class);
         (new AttributeLoader())->loadClassMetadata($validatorClassMetadata);
@@ -161,9 +162,19 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
             $decoratedPropertyMetadataFactory->reveal(),
             []
         );
-        $resultedPropertyMetadata = $validatorPropertyMetadataFactory->create(DummyValidatedEntityWithGroupSequence::class, 'dummyGroup');
+        $resultedPropertyMetadata = $validatorPropertyMetadataFactory->create(DummyValidatedEntityWithGroupSequence::class, $propertyName);
 
         $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
+    }
+
+    /**
+     * @return iterable<array{string}>
+     */
+    public static function createWithPropertyWithRequiredConstraintsAndGroupSequenceDataProvider(): iterable
+    {
+        yield ['dummyGroup'];
+        yield ['dummyGroup2'];
+        yield ['dummyGroup3'];
     }
 
     public function testCreateWithPropertyWithRightValidationGroupsAndRequiredConstraints(): void
