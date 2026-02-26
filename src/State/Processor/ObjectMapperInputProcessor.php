@@ -15,6 +15,7 @@ namespace ApiPlatform\State\Processor;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
+use ApiPlatform\State\Util\StateOptionsTrait;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 
@@ -25,6 +26,8 @@ use Symfony\Component\ObjectMapper\ObjectMapperInterface;
  */
 final class ObjectMapperInputProcessor implements ProcessorInterface
 {
+    use StateOptionsTrait;
+
     /**
      * @param ProcessorInterface<mixed,mixed>|null $decorated
      */
@@ -51,7 +54,8 @@ final class ObjectMapperInputProcessor implements ProcessorInterface
         }
 
         $request = $context['request'] ?? null;
-        $mapped = $this->objectMapper->map($data, $request?->attributes->get('mapped_data'));
+        $mapped = $this->objectMapper->map($data, $request?->attributes->get('mapped_data') ?? $this->getStateOptionsClass($operation, $operation->getClass()));
+        $request?->attributes->set('mapped_data', $mapped);
 
         return $this->decorated ? $this->decorated->process($mapped, $operation, $uriVariables, $context) : $mapped;
     }
