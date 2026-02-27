@@ -27,7 +27,9 @@ use ApiPlatform\State\Util\OperationRequestInitiatorTrait;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Negotiation\Negotiator;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface as SymfonyHttpExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 
@@ -56,14 +58,14 @@ class ErrorRenderer
         $this->negotiator = $negotiator;
     }
 
-    public function shouldRender($request, \Throwable $throwable)
+    public function shouldRender(Request $request, \Throwable $throwable): bool
     {
         $apiOperation = $this->initializeOperation($request);
 
         return null !== $apiOperation;
     }
 
-    public function render($request, \Throwable $exception)
+    public function render(Request $request, \Throwable $exception): ?Response
     {
         $apiOperation = $this->initializeOperation($request);
 
