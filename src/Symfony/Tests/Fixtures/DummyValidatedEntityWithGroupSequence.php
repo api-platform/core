@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
-#[Assert\GroupSequence(['dummy', 'DummyValidatedEntityWithGroupSequence'])]
+#[Assert\GroupSequence(['dummy', 'DummyValidatedEntityWithGroupSequence', ['dummy2'], new Assert\GroupSequence(['dummy3'])])]
 class DummyValidatedEntityWithGroupSequence
 {
     /**
@@ -72,6 +72,18 @@ class DummyValidatedEntityWithGroupSequence
      */
     #[Assert\NotNull(groups: ['dummy'])]
     public $dummyGroup;
+
+    /**
+     * @var string A dummy group
+     */
+    #[Assert\NotNull(groups: ['dummy2'])]
+    public $dummyGroup2;
+
+    /**
+     * @var string A dummy group
+     */
+    #[Assert\NotNull(groups: ['dummy3'])]
+    public $dummyGroup3;
 
     /**
      * @var string A dummy url
