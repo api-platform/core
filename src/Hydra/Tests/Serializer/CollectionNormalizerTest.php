@@ -23,6 +23,7 @@ use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -123,6 +124,77 @@ class CollectionNormalizerTest extends TestCase
         ], $actual);
     }
 
+    #[DataProvider('normalizeWithKeyDataProvider')]
+    public function testNormalizeResourceWithKeysCollection(bool $preserveKeys): void
+    {
+        $fooOne = new Foo();
+        $fooOne->id = 1;
+        $fooOne->bar = 'baz';
+
+        $fooThree = new Foo();
+        $fooThree->id = 3;
+        $fooThree->bar = 'bzz';
+
+        $data = [$fooOne, 3 => $fooThree];
+
+        $normalizedFooOne = [
+            '@id' => '/foos/1',
+            '@type' => 'Foo',
+            'bar' => 'baz',
+        ];
+
+        $normalizedFooThree = [
+            '@id' => '/foos/3',
+            '@type' => 'Foo',
+            'bar' => 'bzz',
+        ];
+
+        $contextBuilderProphecy = $this->createMock(ContextBuilderInterface::class);
+        $contextBuilderProphecy->method('getResourceContextUri')->with(Foo::class)->willReturn('/contexts/Foo');
+
+        $resourceClassResolverProphecy = $this->createMock(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->method('getResourceClass')->with($data, Foo::class)->willReturn(Foo::class);
+
+        $iriConverterProphecy = $this->createMock(IriConverterInterface::class);
+        $iriConverterProphecy->method('getIriFromResource')->with(Foo::class, UrlGeneratorInterface::ABS_PATH, null)->willReturn('/foos');
+
+        $delegateNormalizerProphecy = $this->createMock(NormalizerInterface::class);
+        $delegateNormalizerProphecy->method('normalize')->willReturnCallback(
+            static fn (Foo $item) => 1 === $item->id ? $normalizedFooOne : $normalizedFooThree
+        );
+
+        $normalizer = new CollectionNormalizer($contextBuilderProphecy, $resourceClassResolverProphecy, $iriConverterProphecy);
+        $normalizer->setNormalizer($delegateNormalizerProphecy);
+
+        $actual = $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
+            'operation_name' => 'get',
+            'resource_class' => Foo::class,
+            CollectionNormalizer::PRESERVE_COLLECTION_KEYS => $preserveKeys,
+        ]);
+
+        $this->assertEquals([
+            '@context' => '/contexts/Foo',
+            '@id' => '/foos',
+            '@type' => 'hydra:Collection',
+            'hydra:member' => $preserveKeys ? [
+                $normalizedFooOne,
+                3 => $normalizedFooThree,
+            ] : [
+                $normalizedFooOne,
+                $normalizedFooThree,
+            ],
+            'hydra:totalItems' => 2,
+        ], $actual);
+    }
+
+    /**
+     * @return array<array{bool}>
+     */
+    public static function normalizeWithKeyDataProvider(): array
+    {
+        return [[false], [true]];
+    }
+
     public function testNormalizePaginator(): void
     {
         $this->assertEquals(
@@ -171,6 +243,7 @@ class CollectionNormalizerTest extends TestCase
             $paginatorProphecy->getTotalItems()->willReturn(1312);
         }
 
+        $paginatorProphecy->key()->willReturn(0);
         $paginatorProphecy->rewind()->will(static function (): void {});
         $paginatorProphecy->valid()->willReturn(true, false);
         $paginatorProphecy->current()->willReturn('foo');
