@@ -676,7 +676,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $uriVariables = $operation->getUriVariables() ?? [];
 
         if (\count($uriVariables) > 1) {
-            throw new UnexpectedValueException('JSON:API entity identifier mode requires operations with a single URI variable. Subresource operations with multiple URI variables are not supported — use IRI identifiers instead.');
+            throw new UnexpectedValueException(\sprintf('JSON:API entity identifier mode requires operations with a single URI variable, operation "%s" has %d. Consider adding a NotExposed Get operation on the resource.', $operation->getName() ?? $operation->getUriTemplate(), \count($uriVariables)));
         }
 
         $parameterName = array_key_first($uriVariables) ?? 'id';

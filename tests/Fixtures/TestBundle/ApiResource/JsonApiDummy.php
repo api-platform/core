@@ -33,6 +33,7 @@ class JsonApiDummy
         public int $id = 0,
         public string $name = '',
         public ?JsonApiRelatedDummy $relatedDummy = null,
+        public ?JsonApiNotExposedRelation $notExposedRelation = null,
     ) {
     }
 
@@ -44,6 +45,7 @@ class JsonApiDummy
             id: $id,
             name: 'Dummy #'.$id,
             relatedDummy: new JsonApiRelatedDummy(id: 1, title: 'Related #1'),
+            notExposedRelation: new JsonApiNotExposedRelation(id: 5, label: 'NotExposed #5'),
         );
     }
 

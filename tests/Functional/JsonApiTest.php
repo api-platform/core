@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Functional;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonApiDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonApiErrorTestResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonApiNotExposedRelation;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonApiRelatedDummy;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
@@ -33,6 +34,7 @@ class JsonApiTest extends ApiTestCase
             JsonApiErrorTestResource::class,
             JsonApiDummy::class,
             JsonApiRelatedDummy::class,
+            JsonApiNotExposedRelation::class,
         ];
     }
 
@@ -101,6 +103,30 @@ class JsonApiTest extends ApiTestCase
                     'type' => 'JsonApiDummy',
                     'links' => [
                         'self' => '/jsonapi_dummies/2',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testRelationWithNotExposedOperationIdentifierMode(): void
+    {
+        $this->bootJsonApiKernel();
+        self::createClient()->request('GET', '/jsonapi_dummies/10', [
+            'headers' => ['accept' => 'application/vnd.api+json'],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains([
+            'data' => [
+                'id' => '10',
+                'type' => 'JsonApiDummy',
+                'relationships' => [
+                    'notExposedRelation' => [
+                        'data' => [
+                            'id' => '5',
+                            'type' => 'JsonApiNotExposedRelation',
+                        ],
                     ],
                 ],
             ],
