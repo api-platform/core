@@ -551,10 +551,19 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     private function addIncluded(array $data, array &$included, array &$context): void
     {
-        if (isset($data['id']) && !\in_array($data['id'], $context['api_included_resources'], true)) {
+        if (!isset($data['id'], $data['type'])) {
+            return;
+        }
+
+        $iriLike = $data['type'] . ':' . $data['id'];
+
+        // Initialize tracking array if needed
+        $context['api_included_resources'] ??= [];
+
+        if (!\in_array($iriLike, $context['api_included_resources'], true)) {
             $included[] = $data;
             // Track already included resources
-            $context['api_included_resources'][] = $data['id'];
+            $context['api_included_resources'][] = $iriLike;
         }
     }
 
