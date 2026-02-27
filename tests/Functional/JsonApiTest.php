@@ -126,9 +126,29 @@ class JsonApiTest extends ApiTestCase
                         'data' => [
                             'id' => '5',
                             'type' => 'JsonApiNotExposedRelation',
+                            // links.self must use the NotExposed IRI, not the subresource URI
+                            'links' => ['self' => '/jsonapi_not_exposed_relations/5'],
                         ],
                     ],
                 ],
+            ],
+        ]);
+    }
+
+    public function testSubresourceNotExposedIdentifierMode(): void
+    {
+        $this->bootJsonApiKernel();
+        self::createClient()->request('GET', '/jsonapi_dummies/10/not_exposed_relation', [
+            'headers' => ['accept' => 'application/vnd.api+json'],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains([
+            'data' => [
+                'id' => '5',
+                'type' => 'JsonApiNotExposedRelation',
+                // links.self must use the NotExposed IRI, not the subresource URI
+                'links' => ['self' => '/jsonapi_not_exposed_relations/5'],
             ],
         ]);
     }
