@@ -49,14 +49,34 @@ composer link ../../
 ./vendor/bin/phpunit
 ```
 
-4. Coding Standards & Conventions
+4. Static Analysis (PHPStan)
+
+**Prerequisites:** You must run at least one PHPUnit test to warm up the cache before running PHPStan. PHPStan relies on the generated cache (autoload, proxies, etc.) to resolve classes correctly.
+
+```
+vendor/bin/phpstan analyse src/YourComponent
+```
+
+* MongoDB Stubs: PHPStan may fail with errors about missing MongoDB classes. Fix by installing the MongoDB ODM packages:
+
+```
+composer require --dev doctrine/mongodb-odm-bundle doctrine/mongodb-odm
+```
+
+* Stale vendor directories: Nested `vendor/` dirs inside `src/` components can confuse PHPStan. Clean them up with:
+
+```
+find src -name vendor -exec rm -r {} \;
+```
+
+5. Coding Standards & Conventions
 
 * Imports: Grouped by type (class, function, const), sorted alphabetically.
 * Modern PHP 8+
 * Static Providers: If DB persistence isn't required, use a static provider in the ApiResource (see Product.php pattern).
 * New Entities: If persistence is required, create a new Entity class (e.g., NewFeatureEntity.php) rather than adding fields to existing ones.
 
-5. Git & Contribution
+6. Git & Contribution
 
 * Commit Messages: Follow Conventional Commits (type(scope): description).
 * Backwards Compatibility: Never break BC.
