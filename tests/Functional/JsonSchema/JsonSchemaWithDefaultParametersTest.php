@@ -51,7 +51,7 @@ final class JsonSchemaWithDefaultParametersTest extends ApiTestCase
         foreach ($resourceMetadata as $operation) {
             $parameters = $operation->getParameters() ?? [];
             foreach ($parameters as $parameter) {
-                if ('X-API-Key' === $parameter->getKey()) {
+                if ('API-Key' === $parameter->getKey()) {
                     $hasDefaultParameters = true;
                     $this->assertFalse($parameter->getRequired());
                     $this->assertSame('API key for authentication', $parameter->getDescription());
@@ -63,7 +63,7 @@ final class JsonSchemaWithDefaultParametersTest extends ApiTestCase
             }
         }
 
-        $this->assertTrue($hasDefaultParameters, 'Default parameter "X-API-Key" should be applied to resource operations');
+        $this->assertTrue($hasDefaultParameters, 'Default parameter "API-Key" should be applied to resource operations');
 
         $schema = $this->schemaFactory->buildSchema(BagOfTests::class, 'jsonld');
 

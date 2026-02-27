@@ -157,12 +157,7 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
                 continue;
             }
 
-            $key = $config['key'] ?? null;
-            if (!$key) {
-                $key = (new \ReflectionClass($parameterClass))->getShortName();
-            }
-
-            $identifier = $key;
+            $identifier = $config['key'] ?? (new \ReflectionClass($parameterClass))->getShortName();
 
             $parameter = $this->createParameterFromConfig($parameterClass, $config);
             $parameters[$identifier] = $parameter;

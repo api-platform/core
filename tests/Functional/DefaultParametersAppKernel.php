@@ -38,7 +38,7 @@ class DefaultParametersAppKernel extends \AppKernel
                     ],
                     'parameters' => [
                         HeaderParameter::class => [
-                            'key' => 'X-API-Key',
+                            'key' => 'API-Key',
                             'required' => false,
                             'description' => 'API key for authentication',
                             'schema' => ['type' => 'string'],

@@ -41,7 +41,7 @@ final class ParameterValidationConfigurationTest extends TestCase
                 'defaults' => [
                     'parameters' => [
                         'ApiPlatform\Metadata\HeaderParameter' => [
-                            'key' => 'X-API-Version',
+                            'key' => 'API-Version',
                             'required' => true,
                             'description' => 'API Version',
                         ],
@@ -52,7 +52,7 @@ final class ParameterValidationConfigurationTest extends TestCase
 
         $this->assertIsArray($config['defaults']['parameters']);
         $this->assertArrayHasKey('ApiPlatform\Metadata\HeaderParameter', $config['defaults']['parameters']);
-        $this->assertSame('X-API-Version', $config['defaults']['parameters']['ApiPlatform\Metadata\HeaderParameter']['key']);
+        $this->assertSame('API-Version', $config['defaults']['parameters']['ApiPlatform\Metadata\HeaderParameter']['key']);
         $this->assertTrue($config['defaults']['parameters']['ApiPlatform\Metadata\HeaderParameter']['required']);
         $this->assertSame('API Version', $config['defaults']['parameters']['ApiPlatform\Metadata\HeaderParameter']['description']);
     }
@@ -64,7 +64,7 @@ final class ParameterValidationConfigurationTest extends TestCase
                 'defaults' => [
                     'parameters' => [
                         'ApiPlatform\Metadata\HeaderParameter' => [
-                            'key' => 'X-API-Version',
+                            'key' => 'API-Version',
                             'required' => true,
                         ],
                         'ApiPlatform\Metadata\QueryParameter' => [
@@ -88,7 +88,7 @@ final class ParameterValidationConfigurationTest extends TestCase
                 'defaults' => [
                     'parameters' => [
                         'ApiPlatform\Metadata\HeaderParameter' => [
-                            'key' => 'X-API-Version',
+                            'key' => 'API-Version',
                             'required' => true,
                             'description' => 'API Version',
                             'property' => 'version',
@@ -106,7 +106,7 @@ final class ParameterValidationConfigurationTest extends TestCase
         ]);
 
         $params = $config['defaults']['parameters']['ApiPlatform\Metadata\HeaderParameter'];
-        $this->assertSame('X-API-Version', $params['key']);
+        $this->assertSame('API-Version', $params['key']);
         $this->assertTrue($params['required']);
         $this->assertSame('API Version', $params['description']);
         $this->assertSame('version', $params['property']);
@@ -140,7 +140,7 @@ final class ParameterValidationConfigurationTest extends TestCase
                 'defaults' => [
                     'parameters' => [
                         'ApiPlatform\Metadata\HeaderParameter' => [
-                            'key' => 'X-API-Version',
+                            'key' => 'API-Version',
                             'required' => true,
                         ],
                     ],

@@ -36,7 +36,7 @@ final class DefaultParametersTest extends ApiTestCase
      * This test verifies that when default parameters are configured via
      * api_platform.defaults.parameters with:
      *   HeaderParameter:
-     *     key: 'X-API-Key'
+     *     key: 'API-Key'
      *     required: false
      *     description: 'API key for authentication'
      *
@@ -65,14 +65,14 @@ final class DefaultParametersTest extends ApiTestCase
 
                 $parameters = $pathItem[$method]['parameters'];
                 foreach ($parameters as $param) {
-                    if ('X-API-Key' === $param['name'] && 'header' === $param['in']) {
+                    if ('API-Key' === $param['name'] && 'header' === $param['in']) {
                         $foundParameter = true;
                         $operationsWithParameter[] = [
                             'path' => $pathName,
                             'method' => $method,
                         ];
 
-                        $this->assertSame('X-API-Key', $param['name']);
+                        $this->assertSame('API-Key', $param['name']);
                         $this->assertSame('header', $param['in']);
                         $this->assertSame('API key for authentication', $param['description']);
                         $this->assertFalse($param['required']);
@@ -88,7 +88,7 @@ final class DefaultParametersTest extends ApiTestCase
         $this->assertTrue(
             $foundParameter,
             \sprintf(
-                'Default header parameter "X-API-Key" not found in any operation. Operations checked: %d',
+                'Default header parameter "API-Key" not found in any operation. Operations checked: %d',
                 \count($content['paths'] ?? [])
             )
         );
@@ -120,7 +120,7 @@ final class DefaultParametersTest extends ApiTestCase
 
                 $parameters = $pathItem[$method]['parameters'];
                 foreach ($parameters as $param) {
-                    if ('X-API-Key' === $param['name'] && 'header' === $param['in']) {
+                    if ('API-Key' === $param['name'] && 'header' === $param['in']) {
                         $operationMethodsWithParameter[$method] = true;
                         break;
                     }
