@@ -34,6 +34,7 @@ use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\DtoWithNullValue;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\Dummy;
+use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\DummyWithMultipleRequiredConstructorArgs;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\DummyTableInheritance;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\DummyTableInheritanceChild;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\DummyTableInheritanceRelated;
@@ -51,6 +52,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -1936,6 +1938,46 @@ class AbstractItemNormalizerTest extends TestCase
         $this->assertFalse($normalizer->supportsNormalization($std, null, [
             'api_platform_output_class' => 'SomeOtherClass',
         ]));
+    }
+
+    public function testDenormalizeReportsAllMissingConstructorArguments(): void
+    {
+        $data = [];
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(DummyWithMultipleRequiredConstructorArgs::class, Argument::type('array'))->willReturn(new PropertyNameCollection(['title', 'rating', 'comment']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+
+        if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
+            $propertyMetadataFactoryProphecy->create(DummyWithMultipleRequiredConstructorArgs::class, 'title', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])->withReadable(true)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(DummyWithMultipleRequiredConstructorArgs::class, 'rating', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)])->withReadable(true)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(DummyWithMultipleRequiredConstructorArgs::class, 'comment', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])->withReadable(true)->withWritable(true));
+        } else {
+            $propertyMetadataFactoryProphecy->create(DummyWithMultipleRequiredConstructorArgs::class, 'title', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(DummyWithMultipleRequiredConstructorArgs::class, 'rating', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType(Type::int())->withReadable(true)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(DummyWithMultipleRequiredConstructorArgs::class, 'comment', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withWritable(true));
+        }
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, DummyWithMultipleRequiredConstructorArgs::class)->willReturn(DummyWithMultipleRequiredConstructorArgs::class);
+        $resourceClassResolverProphecy->isResourceClass(DummyWithMultipleRequiredConstructorArgs::class)->willReturn(true);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+
+        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), null, null, [], null, null) extends AbstractItemNormalizer {};
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        try {
+            $normalizer->denormalize($data, DummyWithMultipleRequiredConstructorArgs::class);
+            $this->fail('Expected MissingConstructorArgumentsException was not thrown');
+        } catch (MissingConstructorArgumentsException $e) {
+            $this->assertCount(3, $e->getMissingConstructorArguments(), 'All three missing constructor arguments (title, rating, comment) should be reported, not just the first one.');
+            $this->assertSame(['title', 'rating', 'comment'], $e->getMissingConstructorArguments());
+        }
     }
 }
 

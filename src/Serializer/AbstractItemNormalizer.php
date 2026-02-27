@@ -392,6 +392,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 } else {
                     if (!isset($context['not_normalizable_value_exceptions'])) {
                         $missingConstructorArguments[] = $constructorParameter->name;
+                        continue;
                     }
 
                     $constructorParameterType = 'unknown';
