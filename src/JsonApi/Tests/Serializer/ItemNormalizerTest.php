@@ -17,6 +17,7 @@ use ApiPlatform\JsonApi\Serializer\ItemNormalizer;
 use ApiPlatform\JsonApi\Serializer\ReservedAttributeNameConverter;
 use ApiPlatform\JsonApi\Tests\Fixtures\CircularReference;
 use ApiPlatform\JsonApi\Tests\Fixtures\Dummy;
+use ApiPlatform\JsonApi\Tests\Fixtures\InputDto;
 use ApiPlatform\JsonApi\Tests\Fixtures\RelatedDummy;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
@@ -38,6 +39,7 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -576,5 +578,88 @@ class ItemNormalizerTest extends TestCase
         // Verify to-many relationship with empty array returns {"data": []}
         $this->assertArrayHasKey('relatedDummies', $result['data']['relationships']);
         $this->assertSame(['data' => []], $result['data']['relationships']['relatedDummies']);
+    }
+
+    /**
+     * Reproducer for https://github.com/api-platform/core/issues/7794.
+     *
+     * When a resource uses an input DTO, AbstractItemNormalizer::denormalize() re-enters
+     * the serializer with the already-unwrapped (flat) data plus an 'api_platform_input'
+     * context flag. Without the guard, JsonApi\ItemNormalizer::denormalize() runs a second
+     * time on the flat data, tries to read $data['data']['attributes'] and gets null,
+     * which nulls every DTO property.
+     */
+    public function testDenormalizeInputDtoDoesNotDoubleUnwrapJsonApiStructure(): void
+    {
+        $jsonApiData = [
+            'data' => [
+                'type' => 'dummy',
+                'attributes' => [
+                    'title' => 'Hello',
+                    'body' => 'World',
+                ],
+            ],
+        ];
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::any())->willReturn(new PropertyNameCollection([]));
+        $propertyNameCollectionFactoryProphecy->create(InputDto::class, Argument::any())->willReturn(new PropertyNameCollection(['title', 'body']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(InputDto::class, 'title', Argument::any())->willReturn((new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withWritable(true));
+        $propertyMetadataFactoryProphecy->create(InputDto::class, 'body', Argument::any())->willReturn((new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withWritable(true));
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->setValue(Argument::type(InputDto::class), Argument::type('string'), Argument::any())
+            ->will(static function ($args): void {
+                $args[0]->{$args[1]} = $args[2];
+            });
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(InputDto::class)->willReturn(false);
+        $resourceClassResolverProphecy->getResourceClass(null, InputDto::class)->willReturn(InputDto::class);
+
+        $resourceMetadataCollectionFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactory->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource())->withOperations(new Operations([new Get(name: 'get')])),
+        ]));
+
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $propertyAccessorProphecy->reveal(),
+            new ReservedAttributeNameConverter(),
+            null,
+            [],
+            $resourceMetadataCollectionFactory->reveal(),
+        );
+
+        // Create a mock serializer that simulates the real serializer chain:
+        // when re-entering for the input DTO, it calls back into the normalizer.
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(DenormalizerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+        $serializerProphecy->denormalize(Argument::type('array'), InputDto::class, ItemNormalizer::FORMAT, Argument::type('array'))
+            ->will(static function ($args) use ($normalizer) {
+                // This simulates the serializer re-entering the normalizer chain
+                return $normalizer->denormalize($args[0], $args[1], $args[2], $args[3]);
+            });
+
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $result = $normalizer->denormalize($jsonApiData, Dummy::class, ItemNormalizer::FORMAT, [
+            'input' => ['class' => InputDto::class],
+            'resource_class' => Dummy::class,
+        ]);
+
+        $this->assertInstanceOf(InputDto::class, $result);
+        $this->assertSame('Hello', $result->title);
+        $this->assertSame('World', $result->body);
     }
 }

@@ -169,6 +169,12 @@ final class ItemNormalizer extends AbstractItemNormalizer
      */
     public function denormalize(mixed $data, string $class, ?string $format = null, array $context = []): mixed
     {
+        // When re-entering for input DTO denormalization, data has already been
+        // unwrapped from the JSON:API structure by the first pass. Skip extraction.
+        if (isset($context['api_platform_input'])) {
+            return parent::denormalize($data, $class, $format, $context);
+        }
+
         // Avoid issues with proxies if we populated the object
         if (!isset($context[self::OBJECT_TO_POPULATE]) && isset($data['data']['id'])) {
             if (true !== ($context['api_allow_update'] ?? true)) {
