@@ -37,6 +37,12 @@ tests/Fixtures/app/console
 # Clear cache (Critical when switching branches/modes)
 rm -rf tests/Fixtures/app/var/cache/test
 
+# Remove stale vendor dirs inside src/ (if PHPUnit hangs)
+# Component packages under src/ may have leftover vendor/ directories
+# from previous `composer link` runs. These cause PHPUnit to scan them
+# indefinitely. Remove them before running tests:
+find src -name vendor -exec rm -rf {} +
+
 # PHPUnit (Preferred)
 vendor/bin/phpunit --filter testMethodName
 
