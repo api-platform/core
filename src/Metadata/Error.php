@@ -15,6 +15,7 @@ namespace ApiPlatform\Metadata;
 
 use ApiPlatform\OpenApi\Attributes\Webhook;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
+use ApiPlatform\OpenApi\Model\PathItem;
 use ApiPlatform\State\OptionsInterface;
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
@@ -45,6 +46,7 @@ final class Error extends HttpOperation
         ?array $paginationViaCursor = null,
         ?array $hydraContext = null,
         bool|OpenApiOperation|Webhook|null $openapi = null,
+        ?PathItem $openApiPathItem = null,
         ?array $exceptionToStatus = null,
         ?bool $queryParameterValidationEnabled = null,
         ?array $links = null,
@@ -123,6 +125,7 @@ final class Error extends HttpOperation
             paginationViaCursor: $paginationViaCursor,
             hydraContext: $hydraContext,
             openapi: $openapi,
+            openApiPathItem: $openApiPathItem,
             exceptionToStatus: $exceptionToStatus,
             queryParameterValidationEnabled: $queryParameterValidationEnabled,
             links: $links,
