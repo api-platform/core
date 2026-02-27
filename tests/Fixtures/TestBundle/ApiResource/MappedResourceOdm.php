@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource;
 use ApiPlatform\Doctrine\Odm\State\Options;
 use ApiPlatform\JsonLd\ContextBuilder;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Symfony\Tests\Fixtures\AnotherMappedObject;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\MappedDocument;
 use Symfony\Component\ObjectMapper\Attribute\Map;
 
@@ -23,6 +24,7 @@ use Symfony\Component\ObjectMapper\Attribute\Map;
     stateOptions: new Options(documentClass: MappedDocument::class),
     normalizationContext: [ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX => false],
 )]
+#[Map(target: AnotherMappedObject::class)]
 #[Map(target: MappedDocument::class)]
 final class MappedResourceOdm
 {
