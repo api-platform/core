@@ -1,5 +1,15 @@
 # Changelog
 
+## v4.2.18
+
+### Bug fixes
+
+* [2e0b8ffb6](https://github.com/api-platform/core/commit/2e0b8ffb6b57ee5552ad8a48b212d8dff9de923a) fix(serializer): prevent api_platform_output context from leaking to nested non-resource objects (#7787)
+* [64247b050](https://github.com/api-platform/core/commit/64247b0505dd0bcb79e958b1f987e983eb6c3fd3) fix(metadata): sort parameters by priority after pattern expansion (#7788)
+* [90dfc3554](https://github.com/api-platform/core/commit/90dfc355496d9f6478f3085d96f146082552a9d2) fix(validator): handle nested groups and group sequences (#7784, #7791)
+* [9f1109365](https://github.com/api-platform/core/commit/9f1109365cc44a21551c77f715dcd0bbed1b161f) fix(hydra): example type - use @type prefix per JSON-LD spec (#7768)
+* [c624daf68](https://github.com/api-platform/core/commit/c624daf68e4ca5a5a0a0dcd95e61b5ea8b154958) fix(symfony): allow toggling GraphQL Playground to ensure BC
+
 ## v4.2.17
 
 ### Bug fixes
