@@ -1,5 +1,12 @@
 # Changelog
 
+## v4.2.19
+
+### Bug fixes
+
+* [04c30b7ee](https://github.com/api-platform/core/commit/04c30b7eee4af443ad16ec6dd2135a4511dc3138) fix(jsonapi): prevent double unwrapping of data.attributes with input DTOs
+* [c6236f313](https://github.com/api-platform/core/commit/c6236f313864661a4cab0caa926a2520500c0257) fix(serializer): report all missing constructor arguments in instantiateObject
+
 ## v4.2.18
 
 ### Bug fixes
