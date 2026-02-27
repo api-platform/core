@@ -746,13 +746,13 @@ class ItemNormalizerTest extends TestCase
         $this->assertSame('Dummy', $result['data']['type']);
         $this->assertSame('/dummies/10', $result['data']['links']['self']);
 
-        // Verify relationship uses entity identifier with links.self
+        // Verify relationship uses entity identifier (no links — resource identifier objects are spec-compliant)
         $this->assertArrayHasKey('relationships', $result['data']);
         $this->assertArrayHasKey('relatedDummy', $result['data']['relationships']);
         $relationData = $result['data']['relationships']['relatedDummy']['data'];
         $this->assertSame('1', $relationData['id']);
         $this->assertSame('RelatedDummy', $relationData['type']);
-        $this->assertSame('/related_dummies/1', $relationData['links']['self']);
+        $this->assertArrayNotHasKey('links', $relationData);
     }
 
     public function testDenormalizeWithEntityIdentifier(): void

@@ -126,8 +126,6 @@ class JsonApiTest extends ApiTestCase
                         'data' => [
                             'id' => '5',
                             'type' => 'JsonApiNotExposedRelation',
-                            // links.self must use the NotExposed IRI, not the subresource URI
-                            'links' => ['self' => '/jsonapi_not_exposed_relations/5'],
                         ],
                     ],
                 ],
@@ -147,8 +145,8 @@ class JsonApiTest extends ApiTestCase
             'data' => [
                 'id' => '5',
                 'type' => 'JsonApiNotExposedRelation',
-                // links.self must use the NotExposed IRI, not the subresource URI
-                'links' => ['self' => '/jsonapi_not_exposed_relations/5'],
+                // links.self uses the subresource URI — the only publicly accessible route
+                'links' => ['self' => '/jsonapi_dummies/10/not_exposed_relation'],
             ],
         ]);
     }

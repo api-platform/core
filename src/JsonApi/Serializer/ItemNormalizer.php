@@ -144,8 +144,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
         if (!$this->useIriAsId) {
             $identifiers = $this->identifiersExtractor->getIdentifiersFromItem($data, context: $context);
             $id = $this->getIdStringFromIdentifiers($identifiers);
-            // Use the resource's own item operation for links.self (not the subresource operation)
-            $iri = $this->iriConverter->getIriFromResource($data);
         }
 
         $resourceShortName = $this->getResourceShortName($resourceClass);
@@ -349,10 +347,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
             'type' => $this->getResourceShortName($resourceClass),
             'id' => $id,
         ];
-
-        if (!$this->useIriAsId) {
-            $relationData['links'] = ['self' => $iri];
-        }
 
         $context['data'] = [
             'data' => $relationData,
