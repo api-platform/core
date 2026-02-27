@@ -132,6 +132,9 @@ class ConfigurationTest extends TestCase
                         'enabled' => true,
                     ],
                 ],
+                'graphql_playground' => [
+                    'enabled' => false,
+                ],
             ],
             'elasticsearch' => [
                 'enabled' => false,
