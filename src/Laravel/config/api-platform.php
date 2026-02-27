@@ -168,4 +168,8 @@ return [
     //         'purger' => ApiPlatform\HttpCache\SouinPurger::class,
     //     ],
     // ],
+
+    'error_handler' => [
+        'extend_laravel_handler' => true,
+    ],
 ];

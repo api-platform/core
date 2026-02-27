@@ -44,6 +44,7 @@ use ApiPlatform\Laravel\Eloquent\State\LinksHandlerInterface;
 use ApiPlatform\Laravel\Eloquent\State\PersistProcessor;
 use ApiPlatform\Laravel\Eloquent\State\RemoveProcessor;
 use ApiPlatform\Laravel\Exception\ErrorHandler;
+use ApiPlatform\Laravel\Exception\ErrorRenderer;
 use ApiPlatform\Laravel\Metadata\CacheResourceCollectionMetadataFactory;
 use ApiPlatform\Laravel\Metadata\ParameterValidationResourceMetadataCollectionFactory;
 use ApiPlatform\Laravel\State\ParameterValidatorProvider;
@@ -272,22 +273,35 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
             );
         });
 
+        $this->app->singleton(ErrorRenderer::class, static function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+
+            return new ErrorRenderer(
+                $app->make(ResourceMetadataCollectionFactoryInterface::class),
+                $app->make(ApiPlatformController::class),
+                $app->make(IdentifiersExtractorInterface::class),
+                $app->make(ResourceClassResolverInterface::class),
+                $app->make(Negotiator::class),
+                $config->get('api-platform.exception_to_status'),
+                $config->get('app.debug'),
+                $config->get('api-platform.error_formats'),
+            );
+        });
+
         $this->app->extend(
             ExceptionHandler::class,
             static function (ExceptionHandler $decorated, Application $app) {
                 /** @var ConfigRepository */
                 $config = $app['config'];
 
+                if (!$config->get('api-platform.error_handler.extend_laravel_handler', true)) {
+                    return $decorated;
+                }
+
                 return new ErrorHandler(
                     $app,
-                    $app->make(ResourceMetadataCollectionFactoryInterface::class),
-                    $app->make(ApiPlatformController::class),
-                    $app->make(IdentifiersExtractorInterface::class),
-                    $app->make(ResourceClassResolverInterface::class),
-                    $app->make(Negotiator::class),
-                    $config->get('api-platform.exception_to_status'),
-                    $config->get('app.debug'),
-                    $config->get('api-platform.error_formats'),
+                    $app->make(ErrorRenderer::class),
                     $decorated
                 );
             }
