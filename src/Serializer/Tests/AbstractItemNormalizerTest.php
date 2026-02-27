@@ -1909,12 +1909,10 @@ class AbstractItemNormalizerTest extends TestCase
 
         $this->assertFalse($normalizer->supportsDenormalization([], \stdClass::class));
         $this->assertTrue($normalizer->supportsDenormalization([], \stdClass::class, null, [
-            'api_platform_input' => true,
-            'resource_class' => \stdClass::class,
+            'api_platform_input_class' => \stdClass::class,
         ]));
         $this->assertFalse($normalizer->supportsDenormalization([], \stdClass::class, null, [
-            'api_platform_input' => true,
-            'resource_class' => 'SomeOtherClass',
+            'api_platform_input_class' => 'SomeOtherClass',
         ]));
     }
 
@@ -1933,12 +1931,10 @@ class AbstractItemNormalizerTest extends TestCase
         $std = new \stdClass();
         $this->assertFalse($normalizer->supportsNormalization($std));
         $this->assertTrue($normalizer->supportsNormalization($std, null, [
-            'api_platform_output' => true,
-            'resource_class' => \stdClass::class,
+            'api_platform_output_class' => \stdClass::class,
         ]));
         $this->assertFalse($normalizer->supportsNormalization($std, null, [
-            'api_platform_output' => true,
-            'resource_class' => 'SomeOtherClass',
+            'api_platform_output_class' => 'SomeOtherClass',
         ]));
     }
 }

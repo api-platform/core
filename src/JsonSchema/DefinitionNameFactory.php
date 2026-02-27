@@ -98,6 +98,11 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
     {
         $name = $operation->getShortName();
 
+        if (null === $name) {
+            return null;
+        }
+
+
         if (!isset($this->prefixCache[$name])) {
             $this->prefixCache[$name] = $operation->getClass();
 

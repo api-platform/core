@@ -149,12 +149,14 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
 
     /**
      * Returns the list of validation groups.
+     *
+     * @return array<string>
      */
     private function getValidationGroups(ValidatorClassMetadataInterface $classMetadata, array $options): array
     {
         if (isset($options['validation_groups'])) {
             if ($options['validation_groups'] instanceof GroupSequence) {
-                return $options['validation_groups']->groups;
+                return $this->getGroupSequenceValidationGroups($options['validation_groups']);
             }
 
             if (!\is_callable($options['validation_groups'])) {
@@ -162,11 +164,34 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
             }
         }
 
+        if ($classMetadata->hasGroupSequence()) {
+            return $this->getGroupSequenceValidationGroups($classMetadata->getGroupSequence());
+        }
+
         if (!method_exists($classMetadata, 'getDefaultGroup')) {
             throw new \UnexpectedValueException(\sprintf('Validator class metadata expected to have method "%s".', 'getDefaultGroup'));
         }
 
         return [$classMetadata->getDefaultGroup()];
+    }
+
+    /**
+     * @return array<string>
+     */
+    private function getGroupSequenceValidationGroups(GroupSequence $groupSequence): array
+    {
+        $groups = [];
+        foreach ($groupSequence->groups as $subGroup) {
+            if (\is_array($subGroup)) {
+                $groups[] = $subGroup;
+            } elseif ($subGroup instanceof GroupSequence) {
+                $groups[] = $this->getGroupSequenceValidationGroups($subGroup);
+            } else {
+                $groups[] = [$subGroup];
+            }
+        }
+
+        return array_merge([], ...$groups);
     }
 
     /**

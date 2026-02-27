@@ -395,6 +395,11 @@ services:
         tags:
             - name: 'messenger.message_handler'
 
+    app.messenger_handler.rpc:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\MessengerHandler\Entity\RPCHandler'
+        tags:
+            - name: 'messenger.message_handler'
+
     ApiPlatform\Tests\Fixtures\TestBundle\Metadata\ProviderResourceMetadatatCollectionFactory:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\Metadata\ProviderResourceMetadatatCollectionFactory'
         decorates: api_platform.metadata.resource.metadata_collection_factory
