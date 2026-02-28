@@ -246,6 +246,9 @@ class ConfigurationTest extends TestCase
             'mcp' => [
                 'enabled' => true,
             ],
+            'jsonapi' => [
+                'use_iri_as_id' => true,
+            ],
         ], $config);
     }
 
