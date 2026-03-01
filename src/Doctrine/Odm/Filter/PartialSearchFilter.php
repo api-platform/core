@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Odm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
+use ApiPlatform\Doctrine\Odm\NestedPropertyHelperTrait;
 use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
@@ -27,6 +28,7 @@ use MongoDB\BSON\Regex;
 final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilterInterface
 {
     use BackwardCompatibleFilterDescriptionTrait;
+    use NestedPropertyHelperTrait;
     use OpenApiFilterTrait;
 
     public function __construct(private readonly bool $caseSensitive = true)
@@ -48,10 +50,12 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
             ->matchExpr();
         $operator = $context['operator'] ?? 'addAnd';
 
+        $matchField = $this->addNestedParameterLookups($property, $aggregationBuilder, $parameter, false, $context);
+
         if (!is_iterable($values)) {
             $escapedValue = preg_quote($values, '/');
             $match->{$operator}(
-                $aggregationBuilder->matchExpr()->field($property)->equals(new Regex($escapedValue, $this->caseSensitive ? '' : 'i'))
+                $aggregationBuilder->matchExpr()->field($matchField)->equals(new Regex($escapedValue, $this->caseSensitive ? '' : 'i'))
             );
 
             return;
@@ -63,7 +67,7 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
 
             $or->addOr(
                 $aggregationBuilder->matchExpr()
-                    ->field($property)
+                    ->field($matchField)
                     ->equals(new Regex($escapedValue, $this->caseSensitive ? '' : 'i'))
             );
         }

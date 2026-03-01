@@ -16,6 +16,7 @@ namespace ApiPlatform\Doctrine\Odm\Filter;
 use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
 use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareTrait;
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
+use ApiPlatform\Doctrine\Odm\NestedPropertyHelperTrait;
 use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
@@ -33,6 +34,7 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
 {
     use BackwardCompatibleFilterDescriptionTrait;
     use ManagerRegistryAwareTrait;
+    use NestedPropertyHelperTrait;
     use OpenApiFilterTrait;
 
     /**
@@ -57,19 +59,25 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
             return;
         }
 
-        $classMetadata = $documentManager->getClassMetadata($resourceClass);
         $property = $parameter->getProperty();
-        if (!$classMetadata->hasReference($property)) {
+        $matchField = $this->addNestedParameterLookups($property, $aggregationBuilder, $parameter, false, $context);
+
+        $nestedInfo = $parameter->getExtraProperties()['nested_property_info'] ?? null;
+        $leafClass = $nestedInfo['leaf_class'] ?? $resourceClass;
+        $leafProperty = $nestedInfo['leaf_property'] ?? $property;
+        $classMetadata = $documentManager->getClassMetadata($leafClass);
+
+        if (!$classMetadata->hasReference($leafProperty)) {
             return;
         }
 
-        $method = $classMetadata->isSingleValuedAssociation($property) ? 'references' : 'includesReferenceTo';
+        $method = $classMetadata->isSingleValuedAssociation($leafProperty) ? 'references' : 'includesReferenceTo';
 
         if (is_iterable($value)) {
             $or = $aggregationBuilder->matchExpr();
 
             foreach ($value as $v) {
-                $or->addOr($aggregationBuilder->matchExpr()->field($property)->{$method}($v));
+                $or->addOr($aggregationBuilder->matchExpr()->field($matchField)->{$method}($v));
             }
 
             $match->{$operator}($or);
@@ -81,7 +89,7 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
             ->{$operator}(
                 $aggregationBuilder
                     ->matchExpr()
-                    ->field($property)
+                    ->field($matchField)
                     ->{$method}($value)
             );
     }

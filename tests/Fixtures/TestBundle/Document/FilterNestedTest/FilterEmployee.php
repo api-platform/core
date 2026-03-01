@@ -11,34 +11,27 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilterNestedTest;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document\FilterNestedTest;
 
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
-use ApiPlatform\Doctrine\Orm\Filter\IriFilter;
-use ApiPlatform\Doctrine\Orm\Filter\SortFilter;
-use ApiPlatform\Doctrine\Orm\Filter\UuidFilter;
+use ApiPlatform\Doctrine\Odm\Filter\IriFilter;
+use ApiPlatform\Doctrine\Odm\Filter\SortFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
-use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
-use Symfony\Component\Uid\Uuid;
 
-/**
- * Employee entity for testing nested filter support with IriFilter, UuidFilter and OrderFilter.
- */
-#[ORM\Entity]
+#[ODM\Document]
 #[ApiResource(
     operations: [
         new GetCollection(
             paginationItemsPerPage: 10,
             parameters: [
                 'department' => new QueryParameter(filter: new IriFilter()),
-                'departmentId' => new QueryParameter(filter: new UuidFilter(), property: 'department'),
 
                 'departmentCompany' => new QueryParameter(filter: new IriFilter(), property: 'department.company'),
-                'departmentCompanyId' => new QueryParameter(filter: new UuidFilter(), property: 'department.company'),
 
                 'orderDepartmentName' => new QueryParameter(filter: new SortFilter(), property: 'department.name', nativeType: new BuiltinType(TypeIdentifier::STRING)),
                 'orderName' => new QueryParameter(filter: new SortFilter(), property: 'name', nativeType: new BuiltinType(TypeIdentifier::STRING)),
@@ -51,28 +44,19 @@ use Symfony\Component\Uid\Uuid;
 )]
 class FilterEmployee
 {
-    #[ORM\Id]
-    #[ORM\Column(type: 'symfony_uuid')]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
-    private Uuid $id;
+    #[ODM\Id(type: 'string', strategy: 'INCREMENT')]
+    private ?string $id = null;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ODM\Field(type: 'string')]
     private string $name;
 
-    #[ORM\Column(nullable: true)]
+    #[ODM\Field(type: 'date_immutable', nullable: true)]
     private ?\DateTimeImmutable $hireDate = null;
 
-    #[ORM\ManyToOne(targetEntity: FilterDepartment::class)]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ODM\ReferenceOne(targetDocument: FilterDepartment::class, storeAs: 'id')]
     private FilterDepartment $department;
 
-    public function __construct()
-    {
-        $this->id = Uuid::v4();
-    }
-
-    public function getId(): Uuid
+    public function getId(): ?string
     {
         return $this->id;
     }
