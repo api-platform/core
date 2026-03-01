@@ -232,4 +232,23 @@ class DeserializeProviderTest extends TestCase
         $request->attributes->set('input_format', 'format');
         $provider->provide($operation, ['id' => 1], ['request' => $request]);
     }
+
+    public function testDeserializeWithInputClass(): void
+    {
+        $serializerContext = [];
+        $operation = new Post(deserialize: true, class: \stdClass::class, input: ['class' => 'InputClass']);
+        $decorated = $this->createStub(ProviderInterface::class);
+        $decorated->method('provide')->willReturn(null);
+
+        $serializerContextBuilder = $this->createMock(SerializerContextBuilderInterface::class);
+        $serializerContextBuilder->expects($this->once())->method('createFromRequest')->willReturn($serializerContext);
+        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer->expects($this->once())->method('deserialize')->with('test', 'InputClass', 'format', ['uri_variables' => ['id' => 1]] + $serializerContext)->willReturn(new \stdClass());
+
+        $provider = new DeserializeProvider($decorated, $serializer, $serializerContextBuilder);
+        $request = new Request(content: 'test');
+        $request->headers->set('CONTENT_TYPE', 'ok');
+        $request->attributes->set('input_format', 'format');
+        $provider->provide($operation, ['id' => 1], ['request' => $request]);
+    }
 }
