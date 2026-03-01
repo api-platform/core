@@ -798,10 +798,6 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
     private function getPaginationParameters(CollectionOperationInterface|HttpOperation $operation): array
     {
-        if (!$this->paginationOptions->isPaginationEnabled()) {
-            return [];
-        }
-
         $parameters = [];
 
         if ($operation->getPaginationEnabled() ?? $this->paginationOptions->isPaginationEnabled()) {
