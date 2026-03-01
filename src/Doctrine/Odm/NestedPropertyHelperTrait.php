@@ -15,27 +15,25 @@ namespace ApiPlatform\Doctrine\Odm;
 
 use ApiPlatform\Metadata\Parameter;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
-use Doctrine\ODM\MongoDB\Mapping\ClassMetadata as MongoDbOdmClassMetadata;
-use Doctrine\ODM\MongoDB\Mapping\MappingException;
-use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * Helper trait for handling nested properties in parameter-based filters.
+ *
+ * Builds $lookup/$unwind pipeline stages from precomputed ODM mapping data
+ * (odm_segments) stored in parameter extra properties at metadata-time.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
 trait NestedPropertyHelperTrait
 {
-    abstract protected function getManagerRegistry(): ManagerRegistry;
-
     /**
-     * Adds the necessary lookups for a nested property using parameter metadata.
+     * Adds the necessary lookups for a nested property using precomputed parameter metadata.
      *
-     * @throws MappingException
+     * @param array<string, mixed> $context Shared context for lookup deduplication across filters within the same request
      *
      * @return string The aliased field name to use in match/sort expressions
      */
-    protected function addNestedParameterLookups(string $property, Builder $aggregationBuilder, Parameter $parameter, bool $preserveNullAndEmptyArrays = false): string
+    protected function addNestedParameterLookups(string $property, Builder $aggregationBuilder, Parameter $parameter, bool $preserveNullAndEmptyArrays = false, array &$context = []): string
     {
         $extraProperties = $parameter->getExtraProperties();
         $nestedInfo = $extraProperties['nested_property_info'] ?? null;
@@ -44,62 +42,45 @@ trait NestedPropertyHelperTrait
             return $property;
         }
 
+        $odmSegments = $nestedInfo['odm_segments'] ?? [];
         $relationSegments = $nestedInfo['relation_segments'] ?? [];
-        $relationClasses = $nestedInfo['relation_classes'] ?? [];
         $leafProperty = $nestedInfo['leaf_property'] ?? $property;
 
-        if (!$relationSegments) {
+        if (!$odmSegments || !$relationSegments) {
             return $property;
         }
 
         $alias = '';
 
-        foreach ($relationSegments as $i => $association) {
-            $class = $relationClasses[$i] ?? null;
-            if (!$class) {
+        foreach ($odmSegments as $i => $segment) {
+            $association = $relationSegments[$i] ?? null;
+            if (!$association) {
                 break;
             }
 
-            $manager = $this->getManagerRegistry()->getManagerForClass($class);
-            if (!$manager) {
-                break;
-            }
-
-            $classMetadata = $manager->getClassMetadata($class);
-
-            if (!$classMetadata instanceof MongoDbOdmClassMetadata) {
-                break;
-            }
-
-            if ($classMetadata->hasReference($association)) {
+            if ('reference' === $segment['type']) {
                 $propertyAlias = "{$association}_lkup";
                 $localField = "$alias$association";
                 $alias .= $propertyAlias;
-                $referenceMapping = $classMetadata->getFieldMapping($association);
 
-                if (($isOwningSide = $referenceMapping['isOwningSide']) && MongoDbOdmClassMetadata::REFERENCE_STORE_AS_ID !== $referenceMapping['storeAs']) {
-                    throw MappingException::cannotLookupDbRefReference($classMetadata->getReflectionClass()->getShortName(), $association);
+                $isOwningSide = $segment['is_owning_side'];
+                $targetDocument = $segment['target_document'];
+                $mappedBy = $segment['mapped_by'] ?? null;
+
+                // Deduplication: skip $lookup/$unwind if already added for this alias
+                if (!isset($context['_odm_lookups'][$alias])) {
+                    $aggregationBuilder->lookup($targetDocument)
+                        ->localField($isOwningSide ? $localField : '_id')
+                        ->foreignField($isOwningSide ? '_id' : $mappedBy)
+                        ->alias($alias);
+                    $aggregationBuilder->unwind("\$$alias")
+                        ->preserveNullAndEmptyArrays($preserveNullAndEmptyArrays);
+
+                    $context['_odm_lookups'][$alias] = true;
                 }
-                if (!$isOwningSide) {
-                    if (isset($referenceMapping['repositoryMethod']) || !isset($referenceMapping['mappedBy'])) {
-                        throw MappingException::repositoryMethodLookupNotAllowed($classMetadata->getReflectionClass()->getShortName(), $association);
-                    }
-
-                    $targetClassMetadata = $manager->getClassMetadata($referenceMapping['targetDocument']);
-                    if ($targetClassMetadata instanceof MongoDbOdmClassMetadata && MongoDbOdmClassMetadata::REFERENCE_STORE_AS_ID !== $targetClassMetadata->getFieldMapping($referenceMapping['mappedBy'])['storeAs']) {
-                        throw MappingException::cannotLookupDbRefReference($classMetadata->getReflectionClass()->getShortName(), $association);
-                    }
-                }
-
-                $aggregationBuilder->lookup($classMetadata->getAssociationTargetClass($association))
-                    ->localField($isOwningSide ? $localField : '_id')
-                    ->foreignField($isOwningSide ? '_id' : $referenceMapping['mappedBy'])
-                    ->alias($alias);
-                $aggregationBuilder->unwind("\$$alias")
-                    ->preserveNullAndEmptyArrays($preserveNullAndEmptyArrays);
 
                 $alias .= '.';
-            } elseif ($classMetadata->hasEmbed($association)) {
+            } elseif ('embed' === $segment['type']) {
                 $alias = "$alias$association.";
             }
         }

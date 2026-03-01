@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Filter;
 
-use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
-use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareTrait;
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
 use ApiPlatform\Doctrine\Odm\NestedPropertyHelperTrait;
@@ -35,10 +33,9 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-final class SortFilter implements FilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface, ManagerRegistryAwareInterface
+final class SortFilter implements FilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface
 {
     use BackwardCompatibleFilterDescriptionTrait;
-    use ManagerRegistryAwareTrait;
     use NestedPropertyHelperTrait;
     use OpenApiFilterTrait;
 
@@ -65,7 +62,7 @@ final class SortFilter implements FilterInterface, JsonSchemaFilterInterface, Op
         }
 
         $property = $parameter->getProperty();
-        $matchField = $this->addNestedParameterLookups($property, $aggregationBuilder, $parameter, true);
+        $matchField = $this->addNestedParameterLookups($property, $aggregationBuilder, $parameter, true, $context);
 
         $mongoDirection = 'ASC' === $direction ? 1 : -1;
 

@@ -60,7 +60,7 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
         }
 
         $property = $parameter->getProperty();
-        $matchField = $this->addNestedParameterLookups($property, $aggregationBuilder, $parameter);
+        $matchField = $this->addNestedParameterLookups($property, $aggregationBuilder, $parameter, false, $context);
 
         $nestedInfo = $parameter->getExtraProperties()['nested_property_info'] ?? null;
         $leafClass = $nestedInfo['leaf_class'] ?? $resourceClass;

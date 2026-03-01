@@ -20,27 +20,20 @@ use ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document\RelatedDummy;
 use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
 
 class PartialSearchFilterTest extends TestCase
 {
     private DocumentManager $manager;
-    private ManagerRegistry $managerRegistry;
 
     protected function setUp(): void
     {
         $this->manager = DoctrineMongoDbOdmTestCase::createTestDocumentManager();
-
-        $managerRegistry = $this->createStub(ManagerRegistry::class);
-        $managerRegistry->method('getManagerForClass')->willReturn($this->manager);
-        $this->managerRegistry = $managerRegistry;
     }
 
     public function testPartialSearchSimpleProperty(): void
     {
         $filter = new PartialSearchFilter();
-        $filter->setManagerRegistry($this->managerRegistry);
 
         $parameter = new QueryParameter(property: 'name', key: 'name');
         $parameter->setValue('foo');
@@ -61,7 +54,6 @@ class PartialSearchFilterTest extends TestCase
     public function testPartialSearchNestedProperty(): void
     {
         $filter = new PartialSearchFilter();
-        $filter->setManagerRegistry($this->managerRegistry);
 
         $parameter = new QueryParameter(
             property: 'relatedDummy.name',
@@ -72,6 +64,14 @@ class PartialSearchFilterTest extends TestCase
                     'relation_classes' => [Dummy::class],
                     'leaf_property' => 'name',
                     'leaf_class' => RelatedDummy::class,
+                    'odm_segments' => [
+                        [
+                            'type' => 'reference',
+                            'target_document' => RelatedDummy::class,
+                            'is_owning_side' => true,
+                            'mapped_by' => null,
+                        ],
+                    ],
                 ],
             ],
         );
@@ -108,7 +108,6 @@ class PartialSearchFilterTest extends TestCase
     public function testPartialSearchNestedPropertyCaseInsensitive(): void
     {
         $filter = new PartialSearchFilter(caseSensitive: false);
-        $filter->setManagerRegistry($this->managerRegistry);
 
         $parameter = new QueryParameter(
             property: 'relatedDummy.name',
@@ -119,6 +118,14 @@ class PartialSearchFilterTest extends TestCase
                     'relation_classes' => [Dummy::class],
                     'leaf_property' => 'name',
                     'leaf_class' => RelatedDummy::class,
+                    'odm_segments' => [
+                        [
+                            'type' => 'reference',
+                            'target_document' => RelatedDummy::class,
+                            'is_owning_side' => true,
+                            'mapped_by' => null,
+                        ],
+                    ],
                 ],
             ],
         );

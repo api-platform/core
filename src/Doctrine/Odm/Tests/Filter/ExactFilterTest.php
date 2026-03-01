@@ -17,6 +17,7 @@ use ApiPlatform\Doctrine\Odm\Filter\ExactFilter;
 use ApiPlatform\Doctrine\Odm\Tests\DoctrineMongoDbOdmTestCase;
 use ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document\Dummy;
 use ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document\RelatedDummy;
+use ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document\ThirdLevel;
 use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -72,6 +73,14 @@ class ExactFilterTest extends TestCase
                     'relation_classes' => [Dummy::class],
                     'leaf_property' => 'name',
                     'leaf_class' => RelatedDummy::class,
+                    'odm_segments' => [
+                        [
+                            'type' => 'reference',
+                            'target_document' => RelatedDummy::class,
+                            'is_owning_side' => true,
+                            'mapped_by' => null,
+                        ],
+                    ],
                 ],
             ],
         );
@@ -102,6 +111,77 @@ class ExactFilterTest extends TestCase
         $this->assertArrayHasKey('$unwind', $pipeline[1]);
 
         // The match expression is populated for the parameter extension to commit
+        $this->assertArrayHasKey('match', $context);
+    }
+
+    public function testExactFilterMultiHopNestedProperty(): void
+    {
+        $filter = new ExactFilter();
+        $filter->setManagerRegistry($this->managerRegistry);
+
+        $parameter = new QueryParameter(
+            property: 'relatedDummy.thirdLevel.level',
+            key: 'relatedDummy.thirdLevel.level',
+            extraProperties: [
+                'nested_property_info' => [
+                    'relation_segments' => ['relatedDummy', 'thirdLevel'],
+                    'relation_classes' => [Dummy::class, RelatedDummy::class],
+                    'leaf_property' => 'level',
+                    'leaf_class' => ThirdLevel::class,
+                    'odm_segments' => [
+                        [
+                            'type' => 'reference',
+                            'target_document' => RelatedDummy::class,
+                            'is_owning_side' => true,
+                            'mapped_by' => null,
+                        ],
+                        [
+                            'type' => 'reference',
+                            'target_document' => ThirdLevel::class,
+                            'is_owning_side' => true,
+                            'mapped_by' => null,
+                        ],
+                    ],
+                ],
+            ],
+        );
+        $parameter->setValue(3);
+
+        $aggregationBuilder = $this->manager->getRepository(Dummy::class)->createAggregationBuilder();
+
+        $context = [
+            'parameter' => $parameter,
+            'filters' => ['relatedDummy.thirdLevel.level' => 3],
+        ];
+
+        $filter->apply($aggregationBuilder, Dummy::class, null, $context);
+        $pipeline = $aggregationBuilder->getPipeline();
+
+        // 2 lookup+unwind pairs = 4 stages
+        $this->assertCount(4, $pipeline);
+
+        $this->assertEquals([
+            '$lookup' => [
+                'from' => 'RelatedDummy',
+                'localField' => 'relatedDummy',
+                'foreignField' => '_id',
+                'as' => 'relatedDummy_lkup',
+            ],
+        ], $pipeline[0]);
+
+        $this->assertArrayHasKey('$unwind', $pipeline[1]);
+
+        $this->assertEquals([
+            '$lookup' => [
+                'from' => 'ThirdLevel',
+                'localField' => 'relatedDummy_lkup.thirdLevel',
+                'foreignField' => '_id',
+                'as' => 'relatedDummy_lkup.thirdLevel_lkup',
+            ],
+        ], $pipeline[2]);
+
+        $this->assertArrayHasKey('$unwind', $pipeline[3]);
+
         $this->assertArrayHasKey('match', $context);
     }
 

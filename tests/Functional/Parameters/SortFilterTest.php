@@ -118,6 +118,60 @@ final class SortFilterTest extends ApiTestCase
         $this->assertSame('David', $names[3]);
     }
 
+    public function testSortByMultiHopCompanyName(): void
+    {
+        $response = self::createClient()->request('GET', '/filter_employees?orderCompanyName=asc');
+        $this->assertResponseIsSuccessful();
+
+        $data = $response->toArray();
+        $names = array_map(static fn ($item) => $item['name'], $data['hydra:member']);
+
+        // Acme Corp employees first, then Globex Inc employees
+        $acmeNames = \array_slice($names, 0, 2);
+        $globexNames = \array_slice($names, 2, 2);
+        sort($acmeNames);
+        sort($globexNames);
+        $this->assertSame(['Alice', 'Bob'], $acmeNames);
+        $this->assertSame(['Charlie', 'David'], $globexNames);
+    }
+
+    public function testSortByMultiHopCompanyNameDesc(): void
+    {
+        $response = self::createClient()->request('GET', '/filter_employees?orderCompanyName=desc');
+        $this->assertResponseIsSuccessful();
+
+        $data = $response->toArray();
+        $names = array_map(static fn ($item) => $item['name'], $data['hydra:member']);
+
+        // Globex Inc employees first, then Acme Corp employees
+        $globexNames = \array_slice($names, 0, 2);
+        $acmeNames = \array_slice($names, 2, 2);
+        sort($globexNames);
+        sort($acmeNames);
+        $this->assertSame(['Charlie', 'David'], $globexNames);
+        $this->assertSame(['Alice', 'Bob'], $acmeNames);
+    }
+
+    public function testLookupDeduplicationSortAndIriFilter(): void
+    {
+        // Get the engineering department IRI
+        $response = self::createClient()->request('GET', '/filter_departments');
+        $this->assertResponseIsSuccessful();
+        $departments = $response->toArray()['hydra:member'];
+        $engineeringIri = $departments[0]['@id'];
+
+        // Apply both IRI filter on department and sort by department.name
+        // This should NOT produce duplicate $lookup/$unwind stages
+        $response = self::createClient()->request('GET', '/filter_employees?department='.$engineeringIri.'&orderDepartmentName=asc');
+        $this->assertResponseIsSuccessful();
+
+        $data = $response->toArray();
+        $names = array_map(static fn ($item) => $item['name'], $data['hydra:member']);
+        sort($names);
+
+        $this->assertSame(['Alice', 'Bob'], $names);
+    }
+
     public function testSortInvalidValueReturnsValidationError(): void
     {
         $response = self::createClient()->request('GET', '/filter_employees?orderName=invalid');

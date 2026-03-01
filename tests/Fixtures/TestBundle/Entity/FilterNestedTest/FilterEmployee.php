@@ -44,6 +44,7 @@ use Symfony\Component\Uid\Uuid;
                 'orderName' => new QueryParameter(filter: new SortFilter(), property: 'name', nativeType: new BuiltinType(TypeIdentifier::STRING)),
                 'orderHireDate' => new QueryParameter(filter: new SortFilter(nullsComparison: OrderFilterInterface::NULLS_ALWAYS_FIRST), property: 'hireDate', nativeType: new BuiltinType(TypeIdentifier::STRING)),
                 'orderHireDateNullsLast' => new QueryParameter(filter: new SortFilter(nullsComparison: OrderFilterInterface::NULLS_ALWAYS_LAST), property: 'hireDate', nativeType: new BuiltinType(TypeIdentifier::STRING)),
+                'orderCompanyName' => new QueryParameter(filter: new SortFilter(), property: 'department.company.name', nativeType: new BuiltinType(TypeIdentifier::STRING)),
             ]
         ),
     ]

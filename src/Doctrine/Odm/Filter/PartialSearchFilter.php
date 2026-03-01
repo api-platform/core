@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Odm\Filter;
 
-use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
-use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareTrait;
 use ApiPlatform\Doctrine\Common\Filter\OpenApiFilterTrait;
 use ApiPlatform\Doctrine\Odm\NestedPropertyHelperTrait;
 use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
@@ -27,10 +25,9 @@ use MongoDB\BSON\Regex;
 /**
  * @author Vincent Amstoutz <vincent.amstoutz.dev@gmail.com>
  */
-final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilterInterface, ManagerRegistryAwareInterface
+final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilterInterface
 {
     use BackwardCompatibleFilterDescriptionTrait;
-    use ManagerRegistryAwareTrait;
     use NestedPropertyHelperTrait;
     use OpenApiFilterTrait;
 
@@ -53,7 +50,7 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
             ->matchExpr();
         $operator = $context['operator'] ?? 'addAnd';
 
-        $matchField = $this->addNestedParameterLookups($property, $aggregationBuilder, $parameter);
+        $matchField = $this->addNestedParameterLookups($property, $aggregationBuilder, $parameter, false, $context);
 
         if (!is_iterable($values)) {
             $escapedValue = preg_quote($values, '/');
