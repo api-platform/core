@@ -281,7 +281,7 @@ jobs:
         run: vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml ${{ matrix.coverage && '--coverage-clover build/logs/phpunit/clover.xml' || '' }}
       - name: Upload test artifacts
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: phpunit-logs-php${{ matrix.php }}
           path: build/logs/phpunit
@@ -374,7 +374,7 @@ jobs:
           composer ${{matrix.component}} test -- --log-junit "/tmp/build/logs/phpunit/junit.xml" ${{ matrix.php.coverage && '--coverage-clover /tmp/build/logs/phpunit/clover.xml' || '' }}${{ matrix.php.lowest && ' --ignore-baseline' || '' }}
       - name: Upload test artifacts
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: phpunit-logs-php${{ matrix.php }}
           path: /tmp/build/logs/phpunit
@@ -510,7 +510,7 @@ jobs:
         continue-on-error: true
       - name: Upload test artifacts
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: behat-logs-php${{ matrix.php }}
           path: build/logs/behat
@@ -708,7 +708,7 @@ jobs:
         continue-on-error: true
       - name: Upload test artifacts
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: behat-logs-php${{ matrix.php }}
           path: build/logs/behat
@@ -798,7 +798,7 @@ jobs:
         continue-on-error: true
       - name: Upload test artifacts
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: behat-logs-php${{ matrix.php }}
           path: build/logs/behat
@@ -1210,7 +1210,7 @@ jobs:
           fi
       - name: Upload test artifacts
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: phpunit-logs-php${{ matrix.php }}
           path: build/logs/phpunit
@@ -1278,7 +1278,7 @@ jobs:
           vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=symfony_listeners --no-interaction
       - name: Upload test artifacts
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: behat-logs-php${{ matrix.php }}
           path: build/logs/behat
