@@ -30,7 +30,7 @@
         "php": ">=8.2",
         "api-platform/metadata": "^4.2",
         "api-platform/json-schema": "^4.2",
-        "mcp/sdk": "^0.3.0",
+        "mcp/sdk": "^0.4.0",
         "symfony/polyfill-php85": "^1.32"
     },
     "autoload": {

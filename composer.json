@@ -146,7 +146,7 @@
         "illuminate/support": "^11.0 || ^12.0",
         "jangregor/phpstan-prophecy": "^2.1.11",
         "justinrainbow/json-schema": "^6.5.2",
-        "mcp/sdk": "^0.3.0",
+        "mcp/sdk": "^0.4.0",
         "laravel/framework": "^11.0 || ^12.0",
         "orchestra/testbench": "^10.9",
         "phpspec/prophecy-phpunit": "^2.2",
