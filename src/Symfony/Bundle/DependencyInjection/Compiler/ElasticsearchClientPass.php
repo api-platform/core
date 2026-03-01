@@ -39,7 +39,9 @@ final class ElasticsearchClientPass implements CompilerPassInterface
             $clientConfiguration['hosts'] = $hosts;
         }
 
-        if (class_exists(\Elasticsearch\ClientBuilder::class)) {
+        if ('opensearch' === $container->getParameter('api_platform.elasticsearch.client')) {
+            $builderName = \OpenSearch\ClientBuilder::class; // @phpstan-ignore class.notFound
+        } elseif (class_exists(\Elasticsearch\ClientBuilder::class)) {
             // ES v7
             $builderName = \Elasticsearch\ClientBuilder::class;
         } else {

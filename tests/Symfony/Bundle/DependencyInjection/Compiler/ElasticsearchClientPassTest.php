@@ -68,6 +68,7 @@ class ElasticsearchClientPassTest extends TestCase
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getParameter('api_platform.elasticsearch.enabled')->willReturn(true)->shouldBeCalled();
+        $containerBuilderProphecy->getParameter('api_platform.elasticsearch.client')->willReturn('elasticsearch')->shouldBeCalled();
         $containerBuilderProphecy->getParameter('api_platform.elasticsearch.hosts')->willReturn(['http://localhost:9200'])->shouldBeCalled();
         $containerBuilderProphecy->getParameter('api_platform.elasticsearch.ssl_ca_bundle')->willReturn(null)->shouldBeCalled();
         $containerBuilderProphecy->getParameter('api_platform.elasticsearch.ssl_verification')->willReturn(true)->shouldBeCalled();
@@ -75,6 +76,53 @@ class ElasticsearchClientPassTest extends TestCase
         $containerBuilderProphecy->getDefinition('api_platform.elasticsearch.client')->willReturn($clientDefinitionProphecy->reveal())->shouldBeCalled();
 
         (new ElasticsearchClientPass())->process($containerBuilderProphecy->reveal());
+    }
+
+    public function testProcessWithOpenSearchClient(): void
+    {
+        if (!class_exists(\OpenSearch\ClientBuilder::class)) {
+            self::markTestSkipped('opensearch-project/opensearch-php is not installed.');
+        }
+
+        $clientDefinition = $this->createMock(Definition::class);
+        $clientDefinition->expects($this->once())
+            ->method('setFactory')
+            ->with([\OpenSearch\ClientBuilder::class, 'fromConfig'])
+            ->willReturnSelf();
+
+        $clientDefinition->expects($this->once())
+            ->method('setArguments')
+            ->with($this->callback(static function ($arguments) {
+                $config = $arguments[0];
+
+                return isset($config['hosts'])
+                    && $config['hosts'] === ['http://localhost:9200']
+                    && isset($config['logger'])
+                    && $config['logger'] instanceof Reference;
+            }))
+            ->willReturnSelf();
+
+        $containerBuilder = $this->createMock(ContainerBuilder::class);
+        $containerBuilder->method('getParameter')
+            ->willReturnMap([
+                ['api_platform.elasticsearch.enabled', true],
+                ['api_platform.elasticsearch.client', 'opensearch'],
+                ['api_platform.elasticsearch.hosts', ['http://localhost:9200']],
+                ['api_platform.elasticsearch.ssl_ca_bundle', null],
+                ['api_platform.elasticsearch.ssl_verification', true],
+            ]);
+
+        $containerBuilder->expects($this->once())
+            ->method('has')
+            ->with('logger')
+            ->willReturn(true);
+
+        $containerBuilder->expects($this->once())
+            ->method('getDefinition')
+            ->with('api_platform.elasticsearch.client')
+            ->willReturn($clientDefinition);
+
+        (new ElasticsearchClientPass())->process($containerBuilder);
     }
 
     public function testProcessWithoutConfiguration(): void
@@ -90,6 +138,7 @@ class ElasticsearchClientPassTest extends TestCase
 
         $containerBuilderProphecy = $this->prophesize(ContainerBuilder::class);
         $containerBuilderProphecy->getParameter('api_platform.elasticsearch.enabled')->willReturn(true)->shouldBeCalled();
+        $containerBuilderProphecy->getParameter('api_platform.elasticsearch.client')->willReturn('elasticsearch')->shouldBeCalled();
         $containerBuilderProphecy->getParameter('api_platform.elasticsearch.hosts')->willReturn([])->shouldBeCalled();
         $containerBuilderProphecy->getParameter('api_platform.elasticsearch.ssl_ca_bundle')->willReturn(null)->shouldBeCalled();
         $containerBuilderProphecy->getParameter('api_platform.elasticsearch.ssl_verification')->willReturn(true)->shouldBeCalled();
@@ -139,6 +188,7 @@ class ElasticsearchClientPassTest extends TestCase
         $containerBuilder->method('getParameter')
             ->willReturnMap([
                 ['api_platform.elasticsearch.enabled', true],
+                ['api_platform.elasticsearch.client', 'elasticsearch'],
                 ['api_platform.elasticsearch.hosts', ['https://localhost:9200']],
                 ['api_platform.elasticsearch.ssl_ca_bundle', '/path/to/ca-bundle.crt'],
                 ['api_platform.elasticsearch.ssl_verification', true],
@@ -187,6 +237,7 @@ class ElasticsearchClientPassTest extends TestCase
         $containerBuilder->method('getParameter')
             ->willReturnMap([
                 ['api_platform.elasticsearch.enabled', true],
+                ['api_platform.elasticsearch.client', 'elasticsearch'],
                 ['api_platform.elasticsearch.hosts', ['https://localhost:9200']],
                 ['api_platform.elasticsearch.ssl_ca_bundle', null],
                 ['api_platform.elasticsearch.ssl_verification', false],

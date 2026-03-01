@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Features
+
+* [f74d7ba1a](https://github.com/api-platform/core/commit/f74d7ba1a) feat(elasticsearch): add OpenSearch support (#7519)
+
 ## v4.3.0-alpha.2
 
 ### Bug fixes

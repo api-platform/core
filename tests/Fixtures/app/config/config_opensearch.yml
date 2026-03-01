@@ -1,0 +1,27 @@
+imports:
+    - { resource: config_common.yml }
+    - { resource: config_behat_orm.yml }
+
+parameters:
+    env(ELASTICSEARCH_URL): http://localhost:9200
+
+api_platform:
+    doctrine: false
+    mapping:
+        paths:
+            - '%kernel.project_dir%/../Elasticsearch/Model'
+    elasticsearch:
+        hosts: '%env(resolve:ELASTICSEARCH_URL)%'
+        client: opensearch
+
+services:
+    test.api_platform.elasticsearch.client:
+        parent: api_platform.elasticsearch.client
+        public: true
+
+    ApiPlatform\Tests\Behat\ElasticsearchContext:
+        public: true
+        arguments:
+            $client: '@test.api_platform.elasticsearch.client'
+            $elasticsearchMappingsPath: '%kernel.project_dir%/../Elasticsearch/Mappings/'
+            $elasticsearchFixturesPath: '%kernel.project_dir%/../Elasticsearch/Fixtures/'
