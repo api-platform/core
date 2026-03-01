@@ -56,4 +56,21 @@ final class ValueCaster
 
         return false === $value ? $v : $value;
     }
+
+    public static function toDateTime(mixed $v, Parameter $parameter = null): mixed
+    {
+        if ($v instanceof \DateTimeInterface) {
+            return $v;
+        }
+
+        if (!\is_string($v)) {
+            return $v;
+        }
+
+        try {
+            return new \DateTimeImmutable($v);
+        } catch (\Exception) {
+            return $v;
+        }
+    }
 }
