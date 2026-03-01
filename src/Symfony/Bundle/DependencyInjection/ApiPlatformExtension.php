@@ -392,7 +392,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $container->setAlias('api_platform.name_converter', $config['name_converter']);
         }
         $container->setParameter('api_platform.asset_package', $config['asset_package']);
-        $container->setParameter('api_platform.defaults', $this->normalizeDefaults($config['defaults'] ?? []));
+        $normalizedDefaults = $this->normalizeDefaults($config['defaults'] ?? []);
+        $container->setParameter('api_platform.defaults', $normalizedDefaults);
+        $container->setParameter('api_platform.defaults.parameters', $config['defaults']['parameters'] ?? []);
 
         if ($container->getParameter('kernel.debug')) {
             $container->removeDefinition('api_platform.serializer.mapping.cache_class_metadata_factory');
@@ -421,6 +423,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         $normalizedDefaults = ['extra_properties' => $defaults['extra_properties'] ?? []];
         unset($defaults['extra_properties']);
+        unset($defaults['parameters']);
 
         $rc = new \ReflectionClass(ApiResource::class);
         $publicProperties = [];
