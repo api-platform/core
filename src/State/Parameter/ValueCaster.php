@@ -57,7 +57,7 @@ final class ValueCaster
         return false === $value ? $v : $value;
     }
 
-    public static function toDateTime(mixed $v): mixed
+    public static function toDateTime(mixed $v, Parameter $parameter = null): mixed
     {
         if ($v instanceof \DateTimeInterface) {
             return $v;
