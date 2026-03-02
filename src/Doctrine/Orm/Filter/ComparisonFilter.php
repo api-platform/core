@@ -45,6 +45,7 @@ final class ComparisonFilter implements FilterInterface, OpenApiParameterFilterI
         'gte' => '>=',
         'lt' => '<',
         'lte' => '<=',
+        'ne' => '!=',
     ];
 
     public const ALLOWED_DQL_OPERATORS = ['=', '>', '>=', '<', '<=', '!=', '<>'];
@@ -91,6 +92,7 @@ final class ComparisonFilter implements FilterInterface, OpenApiParameterFilterI
             new OpenApiParameter(name: "{$key}[gte]", in: $in),
             new OpenApiParameter(name: "{$key}[lt]", in: $in),
             new OpenApiParameter(name: "{$key}[lte]", in: $in),
+            new OpenApiParameter(name: "{$key}[ne]", in: $in),
         ];
     }
 
@@ -108,6 +110,7 @@ final class ComparisonFilter implements FilterInterface, OpenApiParameterFilterI
                 'gte' => $innerSchema,
                 'lt' => $innerSchema,
                 'lte' => $innerSchema,
+                'ne' => $innerSchema,
             ],
         ];
     }
