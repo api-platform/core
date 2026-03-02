@@ -69,12 +69,18 @@ final class ParameterExtension implements AggregationCollectionExtensionInterfac
 
             $this->configureFilter($filter, $parameter);
 
+            $previousFilters = $context['filters'] ?? null;
             $context['filters'] = $values;
             $context['parameter'] = $parameter;
 
             $filter->apply($aggregationBuilder, $resourceClass, $operation, $context);
 
-            unset($context['filters'], $context['parameter']);
+            unset($context['parameter']);
+            if (null !== $previousFilters) {
+                $context['filters'] = $previousFilters;
+            } else {
+                unset($context['filters']);
+            }
         }
 
         if (isset($context['match'])) {

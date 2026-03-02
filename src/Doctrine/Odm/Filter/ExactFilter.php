@@ -61,8 +61,9 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
         $classMetadata = $documentManager->getClassMetadata($resourceClass);
 
         if (!$classMetadata->hasReference($property)) {
+            $comparisonMethod = $context['comparisonMethod'] ?? (is_iterable($value) ? 'in' : 'equals');
             $match
-                ->{$operator}($aggregationBuilder->matchExpr()->field($property)->{is_iterable($value) ? 'in' : 'equals'}($value));
+                ->{$operator}($aggregationBuilder->matchExpr()->field($property)->{$comparisonMethod}($value));
 
             return;
         }

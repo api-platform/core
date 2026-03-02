@@ -14,7 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Doctrine\Common\Filter\DateFilterInterface;
+use ApiPlatform\Doctrine\Odm\Filter\ComparisonFilter;
 use ApiPlatform\Doctrine\Odm\Filter\DateFilter;
+use ApiPlatform\Doctrine\Odm\Filter\ExactFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
@@ -44,6 +46,11 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
             filter: new DateFilter(properties: ['createdAt' => DateFilterInterface::INCLUDE_NULL_BEFORE_AND_AFTER]),
             property: 'createdAt',
             openApi: new Parameter('date_old_way', 'query', allowEmptyValue: true)
+        ),
+        'createdAtComparison' => new QueryParameter(
+            filter: new ComparisonFilter(new ExactFilter()),
+            property: 'createdAt',
+            castToNativeType: true,
         ),
     ],
 )]

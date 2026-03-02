@@ -14,7 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Doctrine\Common\Filter\DateFilterInterface;
+use ApiPlatform\Doctrine\Orm\Filter\ComparisonFilter;
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
@@ -44,6 +46,11 @@ use Doctrine\ORM\Mapping as ORM;
             filter: new DateFilter(properties: ['createdAt' => DateFilterInterface::INCLUDE_NULL_BEFORE_AND_AFTER]),
             property: 'createdAt',
             openApi: new Parameter('date_old_way', 'query', allowEmptyValue: true)
+        ),
+        'createdAtComparison' => new QueryParameter(
+            filter: new ComparisonFilter(new ExactFilter()),
+            property: 'createdAt',
+            castToNativeType: true,
         ),
     ],
 )]
