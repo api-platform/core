@@ -367,42 +367,38 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         }
 
         // Transfer nested property metadata from ApiProperty to Parameter
+        // Always use nested_properties_info (plural) as a map keyed by original property path
         $propertyKey = $parameter->getProperty() ?? $key;
+        $nestedPropertiesInfo = [];
         if (isset($properties[$propertyKey])) {
             $apiPropertyExtraProps = $properties[$propertyKey]->getExtraProperties();
             if (isset($apiPropertyExtraProps['nested_property_info'])) {
                 $nestedInfo = $apiPropertyExtraProps['nested_property_info'];
-                $parameter = $parameter->withExtraProperties([
-                    ...$parameter->getExtraProperties(),
-                    'nested_property_info' => $nestedInfo,
-                ]);
+                $nestedPropertiesInfo[$propertyKey] = $nestedInfo;
 
                 $fullPath = implode('.', [...$nestedInfo['converted_relation_segments'], $nestedInfo['leaf_property']]);
                 $parameter = $parameter->withProperty($fullPath);
             }
         } else {
-            // For parameters with plural properties (e.g. FreeTextQueryFilter), build a map
-            // so that sub-parameters created via withProperty() can look up their nested info
-            $nestedPropertiesInfo = [];
             foreach ($properties as $propPath => $apiProperty) {
                 $apiPropExtra = $apiProperty->getExtraProperties();
                 if (isset($apiPropExtra['nested_property_info'])) {
                     $nestedPropertiesInfo[$propPath] = $apiPropExtra['nested_property_info'];
                 }
             }
+        }
 
-            if ($nestedPropertiesInfo) {
-                $parameter = $parameter->withExtraProperties([
-                    ...$parameter->getExtraProperties(),
-                    'nested_properties_info' => $nestedPropertiesInfo,
-                ]);
-            }
+        if ($nestedPropertiesInfo) {
+            $parameter = $parameter->withExtraProperties([
+                ...$parameter->getExtraProperties(),
+                'nested_properties_info' => $nestedPropertiesInfo,
+            ]);
         }
 
         if ($this->nameConverter && $property = $parameter->getProperty()) {
             // Skip name conversion if we already have nested property info
             $paramExtraProps = $parameter->getExtraProperties();
-            if (!isset($paramExtraProps['nested_property_info'])) {
+            if (!isset($paramExtraProps['nested_properties_info'])) {
                 $parameter = $parameter->withProperty($this->nameConverter->normalize($property));
             }
         }

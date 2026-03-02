@@ -91,7 +91,8 @@ class AbstractUuidFilter implements FilterInterface, ManagerRegistryAwareInterfa
         [$alias, $field] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter);
 
         // Get the target resource class for nested properties
-        $nestedInfo = $parameter->getExtraProperties()['nested_property_info'] ?? null;
+        $nestedPropertiesInfo = $parameter->getExtraProperties()['nested_properties_info'] ?? [];
+        $nestedInfo = $nestedPropertiesInfo ? reset($nestedPropertiesInfo) : null;
         $targetResourceClass = $nestedInfo['leaf_class'] ?? $resourceClass;
 
         $metadata = $this->getClassMetadata($targetResourceClass);

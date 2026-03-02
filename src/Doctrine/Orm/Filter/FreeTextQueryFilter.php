@@ -58,7 +58,7 @@ final class FreeTextQueryFilter implements FilterInterface, ManagerRegistryAware
             if (isset($nestedPropertiesInfo[$property])) {
                 $subParameter = $subParameter->withExtraProperties([
                     ...$subParameter->getExtraProperties(),
-                    'nested_property_info' => $nestedPropertiesInfo[$property],
+                    'nested_properties_info' => [$property => $nestedPropertiesInfo[$property]],
                 ]);
             }
 
