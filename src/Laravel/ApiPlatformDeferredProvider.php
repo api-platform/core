@@ -100,7 +100,7 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
     public function register(): void
     {
         $directory = app_path();
-        $classes = ReflectionClassRecursiveIterator::getReflectionClassesFromDirectories([$directory], '(?!.*Test\.php$)');
+        $classes = ReflectionClassRecursiveIterator::getReflectionClassesFromDirectories([$directory], '(?!.*(?:Test|\.blade)\.php$)');
 
         $this->autoconfigure($classes, QueryExtensionInterface::class, [FilterQueryExtension::class]);
         $this->app->singleton(ItemProvider::class, static function (Application $app) {
