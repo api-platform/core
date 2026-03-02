@@ -377,7 +377,7 @@ jobs:
         if: ${{ matrix.opensearch }}
         run: |
           cd $(composer ${{matrix.component}} --cwd)
-          composer require --dev opensearch-project/opensearch-php "^2.5"
+          composer require --dev opensearch-project/opensearch-php "^2.5" -W
       - name: Run ${{ matrix.component }} tests
         run: |
           mkdir -p /tmp/build/logs/phpunit
@@ -950,7 +950,7 @@ jobs:
           composer global require soyuka/pmu
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
-          composer require opensearch-project/opensearch-php "^2.5" -W
+          composer require --dev opensearch-project/opensearch-php "^2.5" -W
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
