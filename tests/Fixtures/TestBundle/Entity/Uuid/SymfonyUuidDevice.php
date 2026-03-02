@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\Uuid;
 
+use ApiPlatform\Doctrine\Orm\Filter\ComparisonFilter;
 use ApiPlatform\Doctrine\Orm\Filter\UuidFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
@@ -28,6 +29,10 @@ use Symfony\Component\Uid\Uuid;
         parameters: [
             'id' => new QueryParameter(
                 filter: new UuidFilter(),
+            ),
+            'idComparison' => new QueryParameter(
+                filter: new ComparisonFilter(new UuidFilter()),
+                property: 'id',
             ),
         ]
     ),

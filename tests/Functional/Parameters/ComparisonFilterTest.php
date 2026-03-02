@@ -98,6 +98,24 @@ final class ComparisonFilterTest extends ApiTestCase
         $this->assertSame(['Bravo', 'Charlie'], $names);
     }
 
+    public function testNe(): void
+    {
+        // ne "Bravo": all names except "Bravo" → Alpha, Charlie, Delta
+        $response = self::createClient()->request('GET', '/chickens?nameComparison[ne]=Bravo');
+        $this->assertResponseIsSuccessful();
+        $names = array_map(static fn ($c) => $c['name'], $response->toArray()['member']);
+        sort($names);
+        $this->assertSame(['Alpha', 'Charlie', 'Delta'], $names);
+    }
+
+    public function testNeNoMatch(): void
+    {
+        // ne "Unknown": no chicken has that name, so all are returned
+        $response = self::createClient()->request('GET', '/chickens?nameComparison[ne]=Unknown&itemsPerPage=10');
+        $this->assertResponseIsSuccessful();
+        $this->assertCount(4, $response->toArray()['member']);
+    }
+
     public function testGtNoResults(): void
     {
         // gt "ZZZZ": no name is alphabetically after "ZZZZ"
@@ -125,7 +143,7 @@ final class ComparisonFilterTest extends ApiTestCase
         $parameters = $openApiDoc['paths']['/chickens']['get']['parameters'];
         $parameterNames = array_column($parameters, 'name');
 
-        foreach (['nameComparison[gt]', 'nameComparison[gte]', 'nameComparison[lt]', 'nameComparison[lte]'] as $expectedName) {
+        foreach (['nameComparison[gt]', 'nameComparison[gte]', 'nameComparison[lt]', 'nameComparison[lte]', 'nameComparison[ne]'] as $expectedName) {
             $this->assertContains($expectedName, $parameterNames, \sprintf('Expected parameter "%s" in OpenAPI documentation', $expectedName));
         }
 
