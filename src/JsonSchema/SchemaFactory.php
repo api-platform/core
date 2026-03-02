@@ -23,6 +23,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\TypeHelper;
+use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
@@ -160,22 +161,15 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             $this->buildPropertySchema($schema, $definitionName, $normalizedPropertyName, $propertyMetadata, $serializerContext, $format, $type);
         }
 
+        $this->buildDiscriminatorSchema($schema, $definitions, $definitionName, $definition, $inputOrOutputClass, $format, $type, $version, $options, $serializerContext, $isJsonMergePatch);
+
         return $schema;
     }
 
     private function buildPropertySchema(Schema $schema, string $definitionName, string $normalizedPropertyName, ApiProperty $propertyMetadata, array $serializerContext, string $format, string $parentType): void
     {
         $version = $schema->getVersion();
-        if (Schema::VERSION_SWAGGER === $version || Schema::VERSION_OPENAPI === $version) {
-            $additionalPropertySchema = $propertyMetadata->getOpenapiContext();
-        } else {
-            $additionalPropertySchema = $propertyMetadata->getJsonSchemaContext();
-        }
-
-        $propertySchema = array_merge(
-            $propertyMetadata->getSchema() ?? [],
-            $additionalPropertySchema ?? []
-        );
+        $propertySchema = $this->getBasePropertySchema($propertyMetadata, $version);
 
         $extraProperties = $propertyMetadata->getExtraProperties();
         // see AttributePropertyMetadataFactory
@@ -431,5 +425,125 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
 
         return $schema[$key] ?? $schema['allOf'][0][$key] ?? $schema['anyOf'][0][$key] ?? $schema['oneOf'][0][$key] ?? null;
+    }
+
+    private function getBasePropertySchema(ApiProperty $propertyMetadata, string $version): array
+    {
+        if (Schema::VERSION_SWAGGER === $version || Schema::VERSION_OPENAPI === $version) {
+            $additionalPropertySchema = $propertyMetadata->getOpenapiContext();
+        } else {
+            $additionalPropertySchema = $propertyMetadata->getJsonSchemaContext();
+        }
+
+        return array_merge(
+            $propertyMetadata->getSchema() ?? [],
+            $additionalPropertySchema ?? []
+        );
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function buildSubclassPropertySchema(Schema $schema, ApiProperty $propertyMetadata): ?array
+    {
+        $propertySchema = $this->getBasePropertySchema($propertyMetadata, $schema->getVersion());
+
+        return $propertySchema ?: null;
+    }
+
+    /**
+     * Builds polymorphic schema (oneOf + discriminator) when the class has a Symfony DiscriminatorMap attribute.
+     */
+    private function buildDiscriminatorSchema(Schema $schema, \ArrayObject $definitions, string $definitionName, \ArrayObject $definition, string $inputOrOutputClass, string $format, string $type, string $version, array $options, array $serializerContext, bool $isJsonMergePatch): void
+    {
+        $reflectionClass = new \ReflectionClass($inputOrOutputClass);
+
+        $discriminatorMapAttributes = $reflectionClass->getAttributes(DiscriminatorMap::class);
+        if (!$discriminatorMapAttributes) {
+            return;
+        }
+
+        $discriminatorMapInstance = $discriminatorMapAttributes[0]->newInstance();
+
+        $discriminatorReflection = new \ReflectionObject($discriminatorMapInstance);
+        $typeProperty = $discriminatorReflection->getProperty('typeProperty');
+        $mappingProperty = $discriminatorReflection->getProperty('mapping');
+
+        $typeProperty = $typeProperty->getValue($discriminatorMapInstance);
+        $mapping = $mappingProperty->getValue($discriminatorMapInstance);
+
+        if (!$mapping) {
+            return;
+        }
+
+        $uriPrefix = $this->getSchemaUriPrefix($version);
+        $oneOf = [];
+        $discriminatorMapping = [];
+
+        $parentPropertyNames = [];
+        foreach ($this->propertyNameCollectionFactory->create($inputOrOutputClass, $options) as $propertyName) {
+            $parentPropertyNames[$propertyName] = true;
+        }
+
+        foreach ($mapping as $typeValue => $subClassName) {
+            $subDefinitionName = $this->definitionNameFactory->create($subClassName, $format, $subClassName, null, $serializerContext + ['schema_type' => $type]);
+
+            if (isset($definitions[$subDefinitionName])) {
+                $oneOf[] = ['$ref' => $uriPrefix.$subDefinitionName];
+                $discriminatorMapping[$typeValue] = $uriPrefix.$subDefinitionName;
+                continue;
+            }
+
+            /** @var \ArrayObject<string, array<string, mixed>> $subclassProperties */
+            $subclassProperties = new \ArrayObject();
+
+            foreach ($this->propertyNameCollectionFactory->create($subClassName, $options) as $propertyName) {
+                if (isset($parentPropertyNames[$propertyName])) {
+                    continue;
+                }
+
+                $propertyMetadata = $this->propertyMetadataFactory->create($subClassName, $propertyName, $options);
+
+                if (false === $propertyMetadata->isReadable() && false === $propertyMetadata->isWritable()) {
+                    continue;
+                }
+
+                $normalizedPropertyName = $this->nameConverter ? $this->nameConverter->normalize($propertyName, $subClassName, $format, $serializerContext) : $propertyName;
+                if ($propertyMetadata->isRequired() && !$isJsonMergePatch) {
+                    $definition['required'][] = $normalizedPropertyName;
+                }
+
+                if ($propertySchema = $this->buildSubclassPropertySchema($schema, $propertyMetadata)) {
+                    $subclassProperties[$normalizedPropertyName] = $propertySchema;
+                }
+            }
+
+            $allOf = [
+                ['$ref' => $uriPrefix.$definitionName],
+            ];
+
+            if (\count($subclassProperties) > 0) {
+                $extra = ['type' => 'object', 'properties' => $subclassProperties->getArrayCopy()];
+                if (isset($definition['required']) && \count($definition['required']) > 0) {
+                    $extra['required'] = $definition['required'];
+                }
+                $allOf[] = $extra;
+            }
+
+            $subDefinition = new \ArrayObject(['allOf' => new \ArrayObject($allOf)]);
+            $definitions[$subDefinitionName] = $subDefinition;
+
+            $oneOf[] = ['$ref' => $uriPrefix.$subDefinitionName];
+            $discriminatorMapping[$typeValue] = $uriPrefix.$subDefinitionName;
+        }
+
+        if (\count($oneOf) > 0) {
+            $definition['oneOf'] = $oneOf;
+            $normalizedTypeProperty = $this->nameConverter ? $this->nameConverter->normalize($typeProperty, $inputOrOutputClass, $format, $serializerContext) : $typeProperty;
+            $definition['discriminator'] = [
+                'propertyName' => $normalizedTypeProperty,
+                'mapping' => $discriminatorMapping,
+            ];
+        }
     }
 }
