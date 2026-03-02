@@ -63,9 +63,9 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
                     filter: new ExactFilter(),
                     properties: ['owner.name'],
                 ),
-                'idComparison' => new QueryParameter(
+                'nameComparison' => new QueryParameter(
                     filter: new ComparisonFilter(new ExactFilter()),
-                    property: 'id',
+                    property: 'name',
                 ),
             ],
         ),

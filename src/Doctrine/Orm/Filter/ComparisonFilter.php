@@ -85,19 +85,21 @@ final class ComparisonFilter implements FilterInterface, OpenApiParameterFilterI
     {
         $in = $parameter instanceof QueryParameter ? 'query' : 'header';
         $key = $parameter->getKey();
-        $schema = $this->getInnerSchema($parameter);
 
         return [
-            new OpenApiParameter(name: "{$key}[gt]", in: $in, schema: $schema),
-            new OpenApiParameter(name: "{$key}[gte]", in: $in, schema: $schema),
-            new OpenApiParameter(name: "{$key}[lt]", in: $in, schema: $schema),
-            new OpenApiParameter(name: "{$key}[lte]", in: $in, schema: $schema),
+            new OpenApiParameter(name: "{$key}[gt]", in: $in),
+            new OpenApiParameter(name: "{$key}[gte]", in: $in),
+            new OpenApiParameter(name: "{$key}[lt]", in: $in),
+            new OpenApiParameter(name: "{$key}[lte]", in: $in),
         ];
     }
 
     public function getSchema(Parameter $parameter): array
     {
-        $innerSchema = $this->getInnerSchema($parameter);
+        $innerSchema = ['type' => 'string'];
+        if ($this->filter instanceof JsonSchemaFilterInterface) {
+            $innerSchema = $this->filter->getSchema($parameter);
+        }
 
         return [
             'type' => 'object',
@@ -110,6 +112,9 @@ final class ComparisonFilter implements FilterInterface, OpenApiParameterFilterI
         ];
     }
 
+    /**
+     * @param array<string,mixed> $context
+     */
     private function applyOperator(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation, array $context, Parameter $parameter, string $operator, mixed $value): void
     {
         if (!\is_string($value) && !is_numeric($value) && !$value instanceof \DateTimeInterface) {
@@ -124,14 +129,5 @@ final class ComparisonFilter implements FilterInterface, OpenApiParameterFilterI
             $operation,
             ['operator' => $operator, 'parameter' => $subParameter] + $context
         );
-    }
-
-    private function getInnerSchema(Parameter $parameter): array
-    {
-        if ($this->filter instanceof JsonSchemaFilterInterface) {
-            return $this->filter->getSchema($parameter);
-        }
-
-        return ['type' => 'string'];
     }
 }

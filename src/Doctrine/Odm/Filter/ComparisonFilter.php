@@ -46,8 +46,6 @@ final class ComparisonFilter implements FilterInterface, OpenApiParameterFilterI
         'lte' => 'lte',
     ];
 
-    public const ALLOWED_COMPARISON_METHODS = ['equals', 'gt', 'gte', 'lt', 'lte'];
-
     public function __construct(private readonly FilterInterface $filter)
     {
     }
@@ -87,19 +85,21 @@ final class ComparisonFilter implements FilterInterface, OpenApiParameterFilterI
     {
         $in = $parameter instanceof QueryParameter ? 'query' : 'header';
         $key = $parameter->getKey();
-        $schema = $this->getInnerSchema($parameter);
 
         return [
-            new OpenApiParameter(name: "{$key}[gt]", in: $in, schema: $schema),
-            new OpenApiParameter(name: "{$key}[gte]", in: $in, schema: $schema),
-            new OpenApiParameter(name: "{$key}[lt]", in: $in, schema: $schema),
-            new OpenApiParameter(name: "{$key}[lte]", in: $in, schema: $schema),
+            new OpenApiParameter(name: "{$key}[gt]", in: $in),
+            new OpenApiParameter(name: "{$key}[gte]", in: $in),
+            new OpenApiParameter(name: "{$key}[lt]", in: $in),
+            new OpenApiParameter(name: "{$key}[lte]", in: $in),
         ];
     }
 
     public function getSchema(Parameter $parameter): array
     {
-        $innerSchema = $this->getInnerSchema($parameter);
+        $innerSchema = ['type' => 'string'];
+        if ($this->filter instanceof JsonSchemaFilterInterface) {
+            $innerSchema = $this->filter->getSchema($parameter);
+        }
 
         return [
             'type' => 'object',
@@ -129,14 +129,5 @@ final class ComparisonFilter implements FilterInterface, OpenApiParameterFilterI
         if (isset($newContext['match'])) {
             $context['match'] = $newContext['match'];
         }
-    }
-
-    private function getInnerSchema(Parameter $parameter): array
-    {
-        if ($this->filter instanceof JsonSchemaFilterInterface) {
-            return $this->filter->getSchema($parameter);
-        }
-
-        return ['type' => 'string'];
     }
 }

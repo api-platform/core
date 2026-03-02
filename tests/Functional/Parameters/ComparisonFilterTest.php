@@ -48,26 +48,10 @@ final class ComparisonFilterTest extends ApiTestCase
         $this->loadFixtures();
     }
 
-    /**
-     * @return array<string, int|string> name => id mapping
-     */
-    private function getChickenIds(): array
-    {
-        $response = self::createClient()->request('GET', '/chickens?itemsPerPage=10');
-        $members = $response->toArray()['member'];
-        $ids = [];
-        foreach ($members as $member) {
-            $ids[$member['name']] = $member['id'];
-        }
-
-        return $ids;
-    }
-
     public function testGt(): void
     {
-        $ids = $this->getChickenIds();
-        // gt: id > second chicken should return third and fourth
-        $response = self::createClient()->request('GET', '/chickens?idComparison[gt]='.$ids['Bravo']);
+        // gt "Bravo": names > "Bravo" alphabetically → Charlie, Delta
+        $response = self::createClient()->request('GET', '/chickens?nameComparison[gt]=Bravo');
         $this->assertResponseIsSuccessful();
         $names = array_map(static fn ($c) => $c['name'], $response->toArray()['member']);
         sort($names);
@@ -76,8 +60,8 @@ final class ComparisonFilterTest extends ApiTestCase
 
     public function testGte(): void
     {
-        $ids = $this->getChickenIds();
-        $response = self::createClient()->request('GET', '/chickens?idComparison[gte]='.$ids['Bravo']);
+        // gte "Bravo": names >= "Bravo" → Bravo, Charlie, Delta
+        $response = self::createClient()->request('GET', '/chickens?nameComparison[gte]=Bravo');
         $this->assertResponseIsSuccessful();
         $names = array_map(static fn ($c) => $c['name'], $response->toArray()['member']);
         sort($names);
@@ -86,8 +70,8 @@ final class ComparisonFilterTest extends ApiTestCase
 
     public function testLt(): void
     {
-        $ids = $this->getChickenIds();
-        $response = self::createClient()->request('GET', '/chickens?idComparison[lt]='.$ids['Charlie']);
+        // lt "Charlie": names < "Charlie" → Alpha, Bravo
+        $response = self::createClient()->request('GET', '/chickens?nameComparison[lt]=Charlie');
         $this->assertResponseIsSuccessful();
         $names = array_map(static fn ($c) => $c['name'], $response->toArray()['member']);
         sort($names);
@@ -96,8 +80,8 @@ final class ComparisonFilterTest extends ApiTestCase
 
     public function testLte(): void
     {
-        $ids = $this->getChickenIds();
-        $response = self::createClient()->request('GET', '/chickens?idComparison[lte]='.$ids['Charlie']);
+        // lte "Charlie": names <= "Charlie" → Alpha, Bravo, Charlie
+        $response = self::createClient()->request('GET', '/chickens?nameComparison[lte]=Charlie');
         $this->assertResponseIsSuccessful();
         $names = array_map(static fn ($c) => $c['name'], $response->toArray()['member']);
         sort($names);
@@ -106,8 +90,8 @@ final class ComparisonFilterTest extends ApiTestCase
 
     public function testCombinedGtAndLt(): void
     {
-        $ids = $this->getChickenIds();
-        $response = self::createClient()->request('GET', '/chickens?idComparison[gt]='.$ids['Alpha'].'&idComparison[lt]='.$ids['Delta']);
+        // gt "Alpha" AND lt "Delta" → Bravo, Charlie
+        $response = self::createClient()->request('GET', '/chickens?nameComparison[gt]=Alpha&nameComparison[lt]=Delta');
         $this->assertResponseIsSuccessful();
         $names = array_map(static fn ($c) => $c['name'], $response->toArray()['member']);
         sort($names);
@@ -116,16 +100,16 @@ final class ComparisonFilterTest extends ApiTestCase
 
     public function testGtNoResults(): void
     {
-        $response = self::createClient()->request('GET', '/chickens?idComparison[gt]=999999');
+        // gt "ZZZZ": no name is alphabetically after "ZZZZ"
+        $response = self::createClient()->request('GET', '/chickens?nameComparison[gt]=ZZZZ');
         $this->assertResponseIsSuccessful();
         $this->assertCount(0, $response->toArray()['member']);
     }
 
     public function testGteAllResults(): void
     {
-        $ids = $this->getChickenIds();
-        $minId = min($ids);
-        $response = self::createClient()->request('GET', '/chickens?idComparison[gte]='.$minId.'&itemsPerPage=10');
+        // gte "A": all names start with A or later → all 4
+        $response = self::createClient()->request('GET', '/chickens?nameComparison[gte]=A&itemsPerPage=10');
         $this->assertResponseIsSuccessful();
         $this->assertCount(4, $response->toArray()['member']);
     }
@@ -141,16 +125,13 @@ final class ComparisonFilterTest extends ApiTestCase
         $parameters = $openApiDoc['paths']['/chickens']['get']['parameters'];
         $parameterNames = array_column($parameters, 'name');
 
-        foreach (['idComparison[gt]', 'idComparison[gte]', 'idComparison[lt]', 'idComparison[lte]'] as $expectedName) {
+        foreach (['nameComparison[gt]', 'nameComparison[gte]', 'nameComparison[lt]', 'nameComparison[lte]'] as $expectedName) {
             $this->assertContains($expectedName, $parameterNames, \sprintf('Expected parameter "%s" in OpenAPI documentation', $expectedName));
         }
 
-        $comparisonParams = array_filter($parameters, static fn ($p) => str_starts_with($p['name'], 'idComparison['));
+        $comparisonParams = array_filter($parameters, static fn ($p) => str_starts_with($p['name'], 'nameComparison['));
         foreach ($comparisonParams as $param) {
             $this->assertSame('query', $param['in']);
-            $this->assertArrayHasKey('schema', $param);
-
-            $this->assertSame('string', $param['schema']['type']);
         }
     }
 

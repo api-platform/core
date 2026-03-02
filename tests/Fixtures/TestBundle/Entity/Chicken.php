@@ -63,9 +63,9 @@ use Doctrine\ORM\Mapping as ORM;
                     filter: new ExactFilter(),
                     properties: ['owner.name'],
                 ),
-                'idComparison' => new QueryParameter(
+                'nameComparison' => new QueryParameter(
                     filter: new ComparisonFilter(new ExactFilter()),
-                    property: 'id',
+                    property: 'name',
                 ),
             ],
         ),

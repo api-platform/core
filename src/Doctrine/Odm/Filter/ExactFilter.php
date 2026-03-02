@@ -62,9 +62,6 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
 
         if (!$classMetadata->hasReference($property)) {
             $comparisonMethod = $context['comparisonMethod'] ?? (is_iterable($value) ? 'in' : 'equals');
-            if (!\in_array($comparisonMethod, ComparisonFilter::ALLOWED_COMPARISON_METHODS, true) && 'in' !== $comparisonMethod) {
-                throw new InvalidArgumentException(\sprintf('Unsupported comparison method "%s".', $comparisonMethod));
-            }
             $match
                 ->{$operator}($aggregationBuilder->matchExpr()->field($property)->{$comparisonMethod}($value));
 
