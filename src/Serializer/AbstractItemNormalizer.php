@@ -478,11 +478,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         $resourceClass = $this->resourceClassResolver->getResourceClass(null, $context['resource_class']); // fix for abstract classes and interfaces
         $options = $this->getFactoryOptions($context);
-        $propertyNames = $this->propertyNameCollectionFactory->create($resourceClass, $options);
+        $propertyNames = $this->propertyNameCollectionFactory->create($context['resource_class'], $options);
 
         $allowedAttributes = [];
         foreach ($propertyNames as $propertyName) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName, $options);
+            $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $propertyName, $options);
 
             if (
                 $this->isAllowedAttribute($classOrObject, $propertyName, null, $context)
