@@ -24,6 +24,8 @@ use Elastic\Elasticsearch\Exception\ClientResponseException;
 use Elastic\Elasticsearch\Response\Elasticsearch;
 use Elasticsearch\Client as V7Client;
 use Elasticsearch\Common\Exceptions\Missing404Exception as V7Missing404Exception;
+use OpenSearch\Client as OpenSearchClient;
+use OpenSearch\Common\Exceptions\Missing404Exception as OpenSearchMissing404Exception;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -36,7 +38,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 final class ItemProvider implements ProviderInterface
 {
     public function __construct(
-        private readonly V7Client|Client $client, // @phpstan-ignore-line
+        private readonly V7Client|Client|OpenSearchClient $client, // @phpstan-ignore-line
         private readonly ?DenormalizerInterface $denormalizer = null,
         private readonly ?InflectorInterface $inflector = new Inflector(),
     ) {
@@ -60,7 +62,7 @@ final class ItemProvider implements ProviderInterface
 
         try {
             $document = $this->client->get($params); // @phpstan-ignore-line
-        } catch (V7Missing404Exception) { // @phpstan-ignore-line
+        } catch (V7Missing404Exception|OpenSearchMissing404Exception) { // @phpstan-ignore-line
             return null;
         } catch (ClientResponseException $e) {
             $response = $e->getResponse();

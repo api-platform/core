@@ -202,6 +202,7 @@
     "suggest": {
         "doctrine/mongodb-odm-bundle": "To support MongoDB. Only versions 4.0 and later are supported.",
         "elasticsearch/elasticsearch": "To support Elasticsearch.",
+        "opensearch-project/opensearch-php": "To support OpenSearch (^2.5).",
         "phpstan/phpdoc-parser": "To support extracting metadata from PHPDoc.",
         "psr/cache-implementation": "To use metadata caching.",
         "ramsey/uuid": "To support Ramsey's UUID identifiers.",

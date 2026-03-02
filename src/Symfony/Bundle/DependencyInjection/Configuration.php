@@ -505,8 +505,10 @@ final class Configuration implements ConfigurationInterface
                                         !class_exists(\Elasticsearch\Client::class)
                                         // ES v8 and up
                                         && !class_exists(\Elastic\Elasticsearch\Client::class)
+                                        // OpenSearch
+                                        && !class_exists(\OpenSearch\Client::class)
                                     ) {
-                                        throw new InvalidConfigurationException('The elasticsearch/elasticsearch package is required for Elasticsearch support.');
+                                        throw new InvalidConfigurationException('The elasticsearch/elasticsearch or opensearch-project/opensearch-php package is required for Elasticsearch support.');
                                     }
 
                                     return $v;
@@ -525,6 +527,21 @@ final class Configuration implements ConfigurationInterface
                         ->booleanNode('ssl_verification')
                             ->defaultTrue()
                             ->info('Enable or disable SSL verification for Elasticsearch connections.')
+                        ->end()
+                        ->enumNode('client')
+                            ->values(['elasticsearch', 'opensearch'])
+                            ->defaultValue('elasticsearch')
+                            ->info('The search engine client to use: "elasticsearch" or "opensearch".')
+                            ->validate()
+                                ->ifString()
+                                ->then(static function (string $v): string {
+                                    if ('opensearch' === $v && !class_exists(\OpenSearch\Client::class)) {
+                                        throw new InvalidConfigurationException('Setting api_platform.elasticsearch.client to "opensearch" requires the opensearch-project/opensearch-php package. Try running "composer require opensearch-project/opensearch-php".');
+                                    }
+
+                                    return $v;
+                                })
+                            ->end()
                         ->end()
                     ->end()
                 ->end()
