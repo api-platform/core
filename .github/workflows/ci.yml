@@ -377,7 +377,7 @@ jobs:
         if: ${{ matrix.opensearch }}
         run: |
           cd $(composer ${{matrix.component}} --cwd)
-          composer require opensearch-project/opensearch-php "^2.5" -W
+          composer require --dev opensearch-project/opensearch-php "^2.5"
       - name: Run ${{ matrix.component }} tests
         run: |
           mkdir -p /tmp/build/logs/phpunit
