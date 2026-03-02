@@ -87,24 +87,30 @@ final class ExactFilterTest extends ApiTestCase
             0,
             [],
         ];
+    }
 
-        yield 'filter by exact coop id' => [
-            '/chickens?chickenCoopId=1',
-            1,
-            ['Gertrude'],
-        ];
+    public function testExactSearchFilterByCoopId(): void
+    {
+        $client = self::createClient();
+        // Fetch the first coop's id dynamically (INCREMENT strategy doesn't reset on collection drop)
+        $coops = $client->request('GET', '/chicken_coops')->toArray()['member'];
+        $firstCoopId = $coops[0]['id'];
 
-        yield 'filter by coop id and correct name' => [
-            '/chickens?chickenCoopId=1&name=Gertrude',
-            1,
-            ['Gertrude'],
-        ];
+        // filter by exact coop id
+        $response = $client->request('GET', '/chickens?chickenCoopId='.$firstCoopId);
+        $this->assertResponseIsSuccessful();
+        $this->assertCount(1, $response->toArray()['member']);
+        $this->assertSame('Gertrude', $response->toArray()['member'][0]['name']);
 
-        yield 'filter by coop id and incorrect name' => [
-            '/chickens?chickenCoopId=1&name=Henriette',
-            0,
-            [],
-        ];
+        // filter by coop id and correct name
+        $response = $client->request('GET', '/chickens?chickenCoopId='.$firstCoopId.'&name=Gertrude');
+        $this->assertResponseIsSuccessful();
+        $this->assertCount(1, $response->toArray()['member']);
+
+        // filter by coop id and incorrect name
+        $response = $client->request('GET', '/chickens?chickenCoopId='.$firstCoopId.'&name=Henriette');
+        $this->assertResponseIsSuccessful();
+        $this->assertCount(0, $response->toArray()['member']);
     }
 
     #[DataProvider('exactSearchFilterWithOneToManyRelationProvider')]

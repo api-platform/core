@@ -37,13 +37,33 @@ final class IriFilterTest extends ApiTestCase
         return [ChickenCoop::class, Chicken::class];
     }
 
+    /**
+     * @return array{chickenIris: string[], coopIris: string[]}
+     */
+    private function getIris(): array
+    {
+        $client = self::createClient();
+        $chickens = $client->request('GET', '/chickens')->toArray()['member'];
+        $coops = $client->request('GET', '/chicken_coops')->toArray()['member'];
+
+        $chickenIris = [];
+        foreach ($chickens as $c) {
+            $chickenIris[$c['name']] = '/chickens/'.$c['id'];
+        }
+
+        $coopIris = array_map(static fn ($c) => '/chicken_coops/'.$c['id'], $coops);
+
+        return ['chickenIris' => $chickenIris, 'coopIris' => $coopIris];
+    }
+
     public function testIriFilter(): void
     {
+        $iris = $this->getIris();
         $client = $this->createClient();
 
-        $res = $client->request('GET', '/chickens?chickenCoop=/chicken_coops/2')->toArray();
+        $res = $client->request('GET', '/chickens?chickenCoop='.$iris['coopIris'][1])->toArray();
         $this->assertCount(1, $res['member']);
-        $this->assertEquals('/chicken_coops/2', $res['member'][0]['chickenCoop']);
+        $this->assertEquals($iris['coopIris'][1], $res['member'][0]['chickenCoop']);
 
         $res = $client->request('GET', '/chickens?chickenCoop=/chicken_coops/595')->toArray();
         $this->assertCount(0, $res['member']);
@@ -51,34 +71,37 @@ final class IriFilterTest extends ApiTestCase
 
     public function testIriFilterMultiple(): void
     {
+        $iris = $this->getIris();
         $client = $this->createClient();
-        $res = $client->request('GET', '/chickens?chickenCoop[]=/chicken_coops/2&chickenCoop[]=/chicken_coops/1')->toArray();
+        $res = $client->request('GET', '/chickens?chickenCoop[]='.$iris['coopIris'][1].'&chickenCoop[]='.$iris['coopIris'][0])->toArray();
         $this->assertCount(2, $res['member']);
     }
 
     public function testIriFilterWithOneToManyRelation(): void
     {
+        $iris = $this->getIris();
+        $chickenIri = $iris['chickenIris']['Gertrude'];
         $client = $this->createClient();
 
-        $response = $client->request('GET', '/chicken_coops?chickenIri=/chickens/1');
+        $response = $client->request('GET', '/chicken_coops?chickenIri='.$chickenIri);
         $this->assertResponseIsSuccessful();
 
         $responseData = $response->toArray();
         $filteredCoops = $responseData['member'];
 
-        $this->assertCount(1, $filteredCoops, 'Expected 1 coop for URL /chicken_coops?chickenIri=/chickens/1');
+        $this->assertCount(1, $filteredCoops);
 
         $allChickenNames = [];
         foreach ($filteredCoops as $coop) {
-            foreach ($coop['chickens'] as $chickenIri) {
-                $chickenResponse = $this->createClient()->request('GET', $chickenIri);
+            foreach ($coop['chickens'] as $ci) {
+                $chickenResponse = $this->createClient()->request('GET', $ci);
                 $chickenData = $chickenResponse->toArray();
                 $allChickenNames[] = $chickenData['name'];
             }
         }
 
         sort($allChickenNames);
-        $this->assertSame(['Gertrude'], $allChickenNames, 'The chicken names in coops do not match the expected values.');
+        $this->assertSame(['Gertrude'], $allChickenNames);
 
         $res = $client->request('GET', '/chicken_coops?chickenIri=/chickens/595')->toArray();
         $this->assertCount(0, $res['member']);
@@ -86,51 +109,57 @@ final class IriFilterTest extends ApiTestCase
 
     public function testIriFilterWithOneToManyRelationWithMultiple(): void
     {
-        $response = $this->createClient()->request('GET', '/chicken_coops?chickenIri[]=/chickens/1&chickenIri[]=/chickens/2');
+        $iris = $this->getIris();
+        $chicken1Iri = $iris['chickenIris']['Gertrude'];
+        $chicken2Iri = $iris['chickenIris']['Henriette'];
+
+        $response = $this->createClient()->request('GET', '/chicken_coops?chickenIri[]='.$chicken1Iri.'&chickenIri[]='.$chicken2Iri);
         $this->assertResponseIsSuccessful();
 
         $responseData = $response->toArray();
         $filteredCoops = $responseData['member'];
 
-        $this->assertCount(2, $filteredCoops, 'Expected 2 coops for URL /chicken_coops?chickenIri[]=/chickens/1&chickenIri[]=/chickens/2');
+        $this->assertCount(2, $filteredCoops);
 
         $allChickenNames = [];
         foreach ($filteredCoops as $coop) {
-            foreach ($coop['chickens'] as $chickenIri) {
-                $chickenResponse = $this->createClient()->request('GET', $chickenIri);
+            foreach ($coop['chickens'] as $ci) {
+                $chickenResponse = $this->createClient()->request('GET', $ci);
                 $chickenData = $chickenResponse->toArray();
                 $allChickenNames[] = $chickenData['name'];
             }
         }
 
         sort($allChickenNames);
-        $this->assertSame(['Gertrude', 'Henriette'], $allChickenNames, 'The chicken names in coops do not match the expected values.');
+        $this->assertSame(['Gertrude', 'Henriette'], $allChickenNames);
     }
 
     public function testIriFilterWithOneToManyRelationWithPropertyPlaceholder(): void
     {
+        $iris = $this->getIris();
+        $chickenIri = $iris['chickenIris']['Gertrude'];
         $client = $this->createClient();
 
         $propertyName = $this->isMongoDB() ? 'chickenReferences' : 'chickens';
-        $response = $client->request('GET', '/chicken_coops?searchChickenIri['.$propertyName.']=/chickens/1');
+        $response = $client->request('GET', '/chicken_coops?searchChickenIri['.$propertyName.']='.$chickenIri);
         $this->assertResponseIsSuccessful();
 
         $responseData = $response->toArray();
         $filteredCoops = $responseData['member'];
 
-        $this->assertCount(1, $filteredCoops, 'Expected 1 coop for URL /chicken_coops?searchChickenIri['.$propertyName.']=/chickens/1');
+        $this->assertCount(1, $filteredCoops);
 
         $allChickenNames = [];
         foreach ($filteredCoops as $coop) {
-            foreach ($coop['chickens'] as $chickenIri) {
-                $chickenResponse = $this->createClient()->request('GET', $chickenIri);
+            foreach ($coop['chickens'] as $ci) {
+                $chickenResponse = $this->createClient()->request('GET', $ci);
                 $chickenData = $chickenResponse->toArray();
                 $allChickenNames[] = $chickenData['name'];
             }
         }
 
         sort($allChickenNames);
-        $this->assertSame(['Gertrude'], $allChickenNames, 'The chicken names in coops do not match the expected values.');
+        $this->assertSame(['Gertrude'], $allChickenNames);
 
         $res = $client->request('GET', '/chicken_coops?searchChickenIri['.$propertyName.']=/chickens/595')->toArray();
         $this->assertCount(0, $res['member']);
@@ -138,30 +167,36 @@ final class IriFilterTest extends ApiTestCase
 
     public function testIriFilterWithOneToManyRelationWithMultiplePropertyPlaceholder(): void
     {
-        $response = $this->createClient()->request('GET', '/chicken_coops?searchChickenIri[chickens][]=/chickens/1&searchChickenIri[chickens][]=/chickens/2');
+        $iris = $this->getIris();
+        $chicken1Iri = $iris['chickenIris']['Gertrude'];
+        $chicken2Iri = $iris['chickenIris']['Henriette'];
+        $propertyName = $this->isMongoDB() ? 'chickenReferences' : 'chickens';
+
+        $response = $this->createClient()->request('GET', '/chicken_coops?searchChickenIri['.$propertyName.'][]='.$chicken1Iri.'&searchChickenIri['.$propertyName.'][]='.$chicken2Iri);
         $this->assertResponseIsSuccessful();
 
         $responseData = $response->toArray();
         $filteredCoops = $responseData['member'];
 
-        $this->assertCount(2, $filteredCoops, 'Expected 2 coops for URL /chicken_coops?searchChickenIri[chickens][]=/chickens/1&searchChickenIri[chickens][]=/chickens/2');
+        $this->assertCount(2, $filteredCoops);
 
         $allChickenNames = [];
         foreach ($filteredCoops as $coop) {
-            foreach ($coop['chickens'] as $chickenIri) {
-                $chickenResponse = $this->createClient()->request('GET', $chickenIri);
+            foreach ($coop['chickens'] as $ci) {
+                $chickenResponse = $this->createClient()->request('GET', $ci);
                 $chickenData = $chickenResponse->toArray();
                 $allChickenNames[] = $chickenData['name'];
             }
         }
 
         sort($allChickenNames);
-        $this->assertSame(['Gertrude', 'Henriette'], $allChickenNames, 'The chicken names in coops do not match the expected values.');
+        $this->assertSame(['Gertrude', 'Henriette'], $allChickenNames);
     }
 
     public function testIriFilterThrowsExceptionWhenPropertyIsMissing(): void
     {
-        $response = self::createClient()->request('GET', '/chickens?chickenCoopNoProperty=/chicken_coops/1');
+        $iris = $this->getIris();
+        $response = self::createClient()->request('GET', '/chickens?chickenCoopNoProperty='.$iris['coopIris'][0]);
         $this->assertResponseStatusCodeSame(400);
 
         $responseData = $response->toArray(false);
