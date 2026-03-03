@@ -104,7 +104,7 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
     public function register(): void
     {
         $directory = app_path();
-        $classes = ReflectionClassRecursiveIterator::getReflectionClassesFromDirectories([$directory], '(?!.*Test\.php$)');
+        $classes = ReflectionClassRecursiveIterator::getReflectionClassesFromDirectories([$directory], '(?!.*(?:Test|\.blade)\.php$)');
 
         foreach ($classes as $className => $refl) {
             foreach ($refl->getAttributes() as $attribute) {

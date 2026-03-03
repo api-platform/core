@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Laravel\Eloquent\Metadata;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Str;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
@@ -77,7 +78,10 @@ final class ModelMetadata
         $indexes = $schema->getIndexes($table);
         $relations = $this->getRelations($model);
 
-        $foreignKeys = array_flip(array_filter(array_column($relations, 'foreign_key')));
+        // Only exclude BelongsTo foreign keys — those are local columns on this model's table.
+        // HasMany/HasOne foreign keys reference the related table and should not be excluded.
+        $belongsToRelations = array_filter($relations, static fn ($r) => is_a($r['type'], BelongsTo::class, true));
+        $foreignKeys = array_flip(array_filter(array_column($belongsToRelations, 'foreign_key')));
         $attributes = [];
 
         foreach ($columns as $column) {
