@@ -130,6 +130,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             if (!isset($config['defaults']['hideHydraOperation']) && !isset($config['defaults']['hide_hydra_operation'])) {
                 $config['defaults']['hideHydraOperation'] = true;
             }
+            // Disabling docs is a master switch: also disable Swagger UI and ReDoc
+            // to prevent HTML documentation from being served on resource endpoints.
+            $config['enable_swagger_ui'] = false;
+            $config['enable_re_doc'] = false;
         }
         $jsonSchemaFormats = $config['jsonschema_formats'];
 
