@@ -178,5 +178,4 @@ final class DocumentationActionTest extends ApiTestCase
         $client->request('GET', '/docs', ['headers' => ['Accept' => 'text/html']]);
         $this->assertResponseStatusCodeSame(404);
     }
-
 }
