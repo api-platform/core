@@ -213,8 +213,13 @@
         @endif
 
         <div id="swagger-ui" class="api-platform"></div>
-        <script src="/vendor/api-platform/swagger-ui/swagger-ui-bundle.js"></script>
-        <script src="/vendor/api-platform/swagger-ui/swagger-ui-standalone-preset.js"></script>
-        <script src="/vendor/api-platform/init-swagger-ui.js"></script>
+        @if (($scalar_enabled ?? false) && request()->query('ui') === 'scalar')
+            <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+            <script src="/vendor/api-platform/init-scalar-ui.js"></script>
+        @else
+            <script src="/vendor/api-platform/swagger-ui/swagger-ui-bundle.js"></script>
+            <script src="/vendor/api-platform/swagger-ui/swagger-ui-standalone-preset.js"></script>
+            <script src="/vendor/api-platform/init-swagger-ui.js"></script>
+        @endif
     </body>
 </html>

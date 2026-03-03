@@ -34,6 +34,7 @@ final class SwaggerUiProcessor implements ProcessorInterface
 
     /**
      * @param array<string, string[]> $formats
+     * @param array<string, mixed>    $scalarExtraConfiguration
      */
     public function __construct(
         private readonly UrlGeneratorInterface $urlGenerator,
@@ -43,6 +44,8 @@ final class SwaggerUiProcessor implements ProcessorInterface
         private readonly ?string $oauthClientId = null,
         private readonly ?string $oauthClientSecret = null,
         private readonly bool $oauthPkce = false,
+        private readonly bool $scalarEnabled = false,
+        private readonly array $scalarExtraConfiguration = [],
     ) {
     }
 
@@ -92,7 +95,9 @@ final class SwaggerUiProcessor implements ProcessorInterface
             $status = $requestedOperation->getStatus() ?? $status;
         }
 
-        return new Response(view('api-platform::swagger-ui', $swaggerContext + ['swagger_data' => $swaggerData]), 200);
+        $swaggerData['scalarExtraConfiguration'] = $this->scalarExtraConfiguration;
+
+        return new Response(view('api-platform::swagger-ui', $swaggerContext + ['swagger_data' => $swaggerData, 'scalar_enabled' => $this->scalarEnabled]), 200);
     }
 
     /**

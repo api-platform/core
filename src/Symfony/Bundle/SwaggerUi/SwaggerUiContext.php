@@ -18,7 +18,7 @@ final class SwaggerUiContext
     /**
      * @param string|null $assetPackage
      */
-    public function __construct(private readonly bool $swaggerUiEnabled = false, private readonly bool $showWebby = true, private readonly bool $reDocEnabled = false, private readonly bool $graphQlEnabled = false, private readonly bool $graphiQlEnabled = false, private $assetPackage = null, private readonly array $extraConfiguration = [])
+    public function __construct(private readonly bool $swaggerUiEnabled = false, private readonly bool $showWebby = true, private readonly bool $reDocEnabled = false, private readonly bool $graphQlEnabled = false, private readonly bool $graphiQlEnabled = false, private $assetPackage = null, private readonly array $extraConfiguration = [], private readonly bool $scalarEnabled = false, private readonly array $scalarExtraConfiguration = [])
     {
     }
 
@@ -55,5 +55,15 @@ final class SwaggerUiContext
     public function getExtraConfiguration(): array
     {
         return $this->extraConfiguration;
+    }
+
+    public function isScalarEnabled(): bool
+    {
+        return $this->scalarEnabled;
+    }
+
+    public function getScalarExtraConfiguration(): array
+    {
+        return $this->scalarExtraConfiguration;
     }
 }

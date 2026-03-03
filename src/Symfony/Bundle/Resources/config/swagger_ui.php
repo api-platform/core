@@ -28,6 +28,8 @@ return static function (ContainerConfigurator $container) {
             '%api_platform.graphql.graphiql.enabled%',
             '%api_platform.asset_package%',
             '%api_platform.swagger_ui.extra_configuration%',
+            '%api_platform.enable_scalar%',
+            '%api_platform.scalar.extra_configuration%',
         ]);
 
     $services->set('api_platform.swagger_ui.processor', SwaggerUiProcessor::class)
