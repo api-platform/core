@@ -204,7 +204,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         // When re-entering for input DTO denormalization, data has already been
         // unwrapped from the JSON:API structure by the first pass. Skip extraction.
         if (isset($context['api_platform_input'])) {
-            return parent::denormalize($data, $class, $format, $context);
+            return parent::denormalize($data, $type, $format, $context);
         }
 
         // Avoid issues with proxies if we populated the object
