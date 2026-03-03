@@ -1,10 +1,36 @@
 # Changelog
 
-## Unreleased
+## v4.3.0-beta.1
+
+### Bug fixes
+
+* [04c30b7ee](https://github.com/api-platform/core/commit/04c30b7eee4af443ad16ec6dd2135a4511dc3138) fix(jsonapi): prevent double unwrapping of data.attributes with input DTOs
+* [17b6ff221](https://github.com/api-platform/core/commit/17b6ff22138e10decfd09a93cc74995cf566062b) fix(jsonschema): name collision when an operation name is already used by another class (#7778)
+* [191a46122](https://github.com/api-platform/core/commit/191a4612267d95cc665ef72e83ceb2f053ab6214) fix(serializer): apply API Platform name converter to input/output DTOs (#7779)
+* [2e0b8ffb6](https://github.com/api-platform/core/commit/2e0b8ffb6b57ee5552ad8a48b212d8dff9de923a) fix(serializer): prevent api_platform_output context from leaking to nested non-resource objects (#7787)
+* [31289b838](https://github.com/api-platform/core/commit/31289b838513dba263f1087ded32d50ea370f4f3) fix(symfony): make enable_docs a master switch for disabling documentation (#7806)
+* [64247b050](https://github.com/api-platform/core/commit/64247b0505dd0bcb79e958b1f987e983eb6c3fd3) fix(metadata): sort parameters by priority after pattern expansion (#7788)
+* [813e4f793](https://github.com/api-platform/core/commit/813e4f793d4bd4ba966f411c376da64c71e4f921) fix(validator): missing required properties when using GroupSequence (#7784)
+* [90dfc3554](https://github.com/api-platform/core/commit/90dfc355496d9f6478f3085d96f146082552a9d2) fix(validator): handle nested groups and group sequences (#7791)
+* [95ec407bf](https://github.com/api-platform/core/commit/95ec407bf8515e93df4b3699c6e7913a9ccdf916) fix(jsonapi): wrong variable name during merge (#7816)
+* [98b8efb68](https://github.com/api-platform/core/commit/98b8efb68785cf930fd5b136eb40e6b4a9b54db4) fix(laravel): exclude .blade.php files from recursive class scan (#7813)
+* [9f1109365](https://github.com/api-platform/core/commit/9f1109365cc44a21551c77f715dcd0bbed1b161f) fix(hydra) example type - use @type prefix per JSON-LD spec (#7768)
+* [9fdc6c27d](https://github.com/api-platform/core/commit/9fdc6c27dd61e66957505099b27dac29659183ba) fix(openapi): allow Operations to override global config in getPaginationParameters (#7807)
+* [c6236f313](https://github.com/api-platform/core/commit/c6236f313864661a4cab0caa926a2520500c0257) fix(serializer): report all missing constructor arguments in instantiateObject
+* [c624daf68](https://github.com/api-platform/core/commit/c624daf68e4ca5a5a0a0dcd95e61b5ea8b154958) fix(symfony): allow toggling GraphQL Playground to ensure BC
+* [c741bd62e](https://github.com/api-platform/core/commit/c741bd62e7765d4aa3e380ea1e8741cb34bc214a) fix(tests): add missing RPC messenger handler for Symfony 8.1 compatibility
+* [cfdc22c1c](https://github.com/api-platform/core/commit/cfdc22c1c8895a420f2e9b91e541a333265e09a2) fix(laravel): do not exclude custom primary keys matching HasMany foreign keys (#7810)
 
 ### Features
 
-* [f74d7ba1a](https://github.com/api-platform/core/commit/f74d7ba1a) feat(elasticsearch): add OpenSearch support (#7519)
+* [19809c617](https://github.com/api-platform/core/commit/19809c617e894ac01141e7db790513f72d0dacee) feat(doctrine): ne (not equal) operator for ComparisonFilter (#7814)
+* [2682fc5fc](https://github.com/api-platform/core/commit/2682fc5fc9fdcc40591859e25e45c9fa5fc2ddb9) feat: defaults parameters (#7758)
+* [516ee3a28](https://github.com/api-platform/core/commit/516ee3a283f19bf1a3e3a605827d5bfbb2c6a97f) feat(elasticsearch): OpenSearch support (#7811)
+* [5a876cc92](https://github.com/api-platform/core/commit/5a876cc926cd2aa05e42bf4dbc3960d2d2c2435c) feat(doctrine): ComparisonFilter decorator for range filtering (#7760)
+* [625438cf2](https://github.com/api-platform/core/commit/625438cf22e2ded21eda28dd5fba3c9d83ac9699) feat(jsonapi): support entity identifiers instead of IRIs as resource id
+* [833f3fec6](https://github.com/api-platform/core/commit/833f3fec655a75db794680933cdb7e7e0bfc02c0) feat(serializer): option to preserve key in CollectionNormalizer (#7721)
+* [9f98aff46](https://github.com/api-platform/core/commit/9f98aff46e044a80c13c2b03df2448f5d66d1ee7) feat(doctrine): add ODM SortFilter and nested property support for parameter-based filters (#7780)
+* [db147a52f](https://github.com/api-platform/core/commit/db147a52fd27c5ecae863d601a2759ed62d699cf) feat(laravel): split render logic from error handler (#7790)
 
 ## v4.3.0-alpha.2
 
