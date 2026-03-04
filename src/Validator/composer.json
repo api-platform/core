@@ -23,7 +23,7 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/metadata": "^4.2",
+        "api-platform/metadata": "^4.3",
         "symfony/type-info": "^7.3 || ^8.0",
         "symfony/http-kernel": "^6.4 || ^7.1 || ^8.0",
         "symfony/serializer": "^6.4 || ^7.1 || ^8.0",
@@ -66,5 +66,7 @@
     },
     "scripts": {
         "test": "./vendor/bin/phpunit"
-    }
+    },
+    "minimum-stability": "beta",
+    "prefer-stable": true
 }

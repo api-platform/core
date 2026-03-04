@@ -22,10 +22,10 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/state": "^4.2.4",
-        "api-platform/metadata": "^4.2",
-        "api-platform/documentation": "^4.2",
-        "api-platform/serializer": "^4.2.4",
+        "api-platform/state": "^4.3",
+        "api-platform/metadata": "^4.3",
+        "api-platform/documentation": "^4.3",
+        "api-platform/serializer": "^4.3",
         "symfony/type-info": "^7.3 || ^8.0"
     },
     "autoload": {
@@ -66,6 +66,8 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^12.2",
-        "api-platform/json-schema": "^4.1.11"
-    }
+        "api-platform/json-schema": "^4.3"
+    },
+    "minimum-stability": "beta",
+    "prefer-stable": true
 }
