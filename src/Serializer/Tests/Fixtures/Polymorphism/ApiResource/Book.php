@@ -11,10 +11,12 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\Polymorphism;
+namespace ApiPlatform\Serializer\Tests\Fixtures\Polymorphism\ApiResource;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Serializer\Tests\Fixtures\Polymorphism\Entity\FictionBook;
+use ApiPlatform\Serializer\Tests\Fixtures\Polymorphism\Entity\TechnicalBook;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ApiResource(

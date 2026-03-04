@@ -11,8 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\Polymorphism;
+namespace ApiPlatform\Serializer\Tests\Fixtures\Polymorphism\Entity;
 
+use ApiPlatform\Serializer\Tests\Fixtures\Polymorphism\ApiResource\Author;
+use ApiPlatform\Serializer\Tests\Fixtures\Polymorphism\ApiResource\Book;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
