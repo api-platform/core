@@ -49,7 +49,15 @@ final class Handler implements RequestHandlerInterface
 
     public function supports(Request $request): bool
     {
-        return $request instanceof CallToolRequest || $request instanceof ReadResourceRequest;
+        if ($request instanceof CallToolRequest) {
+            return null !== $this->operationMetadataFactory->create($request->name);
+        }
+
+        if ($request instanceof ReadResourceRequest) {
+            return null !== $this->operationMetadataFactory->create($request->uri);
+        }
+
+        return false;
     }
 
     /**
@@ -72,6 +80,7 @@ final class Handler implements RequestHandlerInterface
 
         /** @var HttpOperation $operation */
         $operation = $this->operationMetadataFactory->create($operationNameOrUri);
+        \assert(null !== $operation);
 
         $uriVariables = [];
         if (!$isResource) {
