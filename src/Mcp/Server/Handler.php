@@ -78,9 +78,12 @@ final class Handler implements RequestHandlerInterface
             $this->logger->debug('Executing tool', ['name' => $operationNameOrUri, 'arguments' => $arguments]);
         }
 
-        /** @var HttpOperation $operation */
+        /** @var HttpOperation|null $operation */
         $operation = $this->operationMetadataFactory->create($operationNameOrUri);
-        \assert(null !== $operation);
+
+        if (null === $operation) {
+            return Error::forMethodNotFound(\sprintf('MCP operation "%s" not found.', $operationNameOrUri), $request->getId());
+        }
 
         $uriVariables = [];
         if (!$isResource) {
@@ -92,7 +95,7 @@ final class Handler implements RequestHandlerInterface
         }
 
         $context = [
-            'request' => ($httpRequest = $this->requestStack->getCurrentRequest()),
+            'request' => $this->requestStack->getCurrentRequest(),
             'mcp_request' => $request,
             'uri_variables' => $uriVariables,
             'resource_class' => $operation->getClass(),
@@ -101,6 +104,10 @@ final class Handler implements RequestHandlerInterface
         if (!$isResource) {
             $context['mcp_data'] = $arguments;
         }
+
+        $operation = $operation->withExtraProperties(
+            array_merge($operation->getExtraProperties(), ['_api_disable_swagger_provider' => true])
+        );
 
         if (null === $operation->canValidate()) {
             $operation = $operation->withValidate(false);
@@ -121,6 +128,7 @@ final class Handler implements RequestHandlerInterface
         $body = $this->provider->provide($operation, $uriVariables, $context);
 
         if (!$isResource) {
+            $httpRequest = $context['request'];
             $context['previous_data'] = $httpRequest->attributes->get('previous_data');
             $context['data'] = $httpRequest->attributes->get('data');
             $context['read_data'] = $httpRequest->attributes->get('read_data');
