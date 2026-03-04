@@ -66,6 +66,7 @@ abstract class Book
     public function setTitle(string $title): self
     {
         $this->title = $title;
+
         return $this;
     }
 
@@ -77,6 +78,7 @@ abstract class Book
     public function setAuthor(Author $author): self
     {
         $this->author = $author;
+
         return $this;
     }
 
@@ -88,6 +90,7 @@ abstract class Book
     public function setIsbn(string $isbn): self
     {
         $this->isbn = $isbn;
+
         return $this;
     }
 

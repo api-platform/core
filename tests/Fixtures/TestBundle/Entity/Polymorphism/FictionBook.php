@@ -18,7 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 class FictionBook extends Book
 {
-    public const string BOOK_TYPE = 'fiction';
+    public const BOOK_TYPE = 'fiction';
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
     private ?string $genre = null;
@@ -31,7 +31,7 @@ class FictionBook extends Book
         ?Author $author = null,
         string $isbn = '',
         ?string $genre = null,
-        ?int $pageCount = null
+        ?int $pageCount = null,
     ) {
         parent::__construct($title, $author, $isbn);
         $this->genre = $genre;
@@ -51,6 +51,7 @@ class FictionBook extends Book
     public function setGenre(?string $genre): self
     {
         $this->genre = $genre;
+
         return $this;
     }
 
@@ -62,6 +63,7 @@ class FictionBook extends Book
     public function setPageCount(?int $pageCount): self
     {
         $this->pageCount = $pageCount;
+
         return $this;
     }
 }
