@@ -206,6 +206,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load($config['use_symfony_listeners'] ? 'symfony/object_mapper.php' : 'state/object_mapper_processor.php');
         }
 
+        $container->setParameter('api_platform.mcp.format', $config['mcp']['format'] ?? null);
+
         if (($config['mcp']['enabled'] ?? false) && class_exists(McpBundle::class)) {
             $loader->load('mcp/mcp.php');
             $loader->load($config['use_symfony_listeners'] ? 'mcp/events.php' : 'mcp/state.php');

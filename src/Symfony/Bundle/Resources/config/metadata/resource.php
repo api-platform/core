@@ -132,6 +132,7 @@ return function (ContainerConfigurator $container) {
             '%api_platform.formats%',
             '%api_platform.patch_formats%',
             '%api_platform.error_formats%',
+            '%api_platform.mcp.format%',
         ]);
 
     $services->set('api_platform.metadata.resource.metadata_collection_factory.filters', FiltersResourceMetadataCollectionFactory::class)
