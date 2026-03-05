@@ -59,9 +59,11 @@ final class SchemaFactory implements SchemaFactoryInterface
     }
 
     /**
-     * Recursively resolve $ref and allOf into a flat schema node.
+     * Recursively resolve $ref, allOf, and nested structures into a flat schema node.
+     *
+     * @param array $resolving Tracks the current $ref resolution chain to detect circular references
      */
-    public static function resolveNode(array|\ArrayObject $node, array $definitions): array
+    public static function resolveNode(array|\ArrayObject $node, array $definitions, array &$resolving = []): array
     {
         if ($node instanceof \ArrayObject) {
             $node = $node->getArrayCopy();
@@ -69,27 +71,33 @@ final class SchemaFactory implements SchemaFactoryInterface
 
         if (isset($node['$ref'])) {
             $refKey = str_replace('#/definitions/', '', $node['$ref']);
-            if (isset($definitions[$refKey])) {
-                return self::resolveNode($definitions[$refKey], $definitions);
+            if (!isset($definitions[$refKey]) || isset($resolving[$refKey])) {
+                return ['type' => 'object'];
             }
+            $resolving[$refKey] = true;
+            $resolved = self::resolveNode($definitions[$refKey], $definitions, $resolving);
+            unset($resolving[$refKey]);
 
-            return ['type' => 'object'];
+            return $resolved;
         }
 
         if (isset($node['allOf'])) {
-            $merged = ['type' => 'object', 'properties' => [], 'required' => []];
+            $merged = ['type' => 'object', 'properties' => []];
+            $requiredSets = [];
             foreach ($node['allOf'] as $entry) {
-                $resolved = self::resolveNode($entry, $definitions);
+                $resolved = self::resolveNode($entry, $definitions, $resolving);
                 if (isset($resolved['properties'])) {
-                    $merged['properties'] = array_merge($merged['properties'], $resolved['properties']);
+                    foreach ($resolved['properties'] as $k => $v) {
+                        $merged['properties'][$k] = $v;
+                    }
                 }
                 if (isset($resolved['required'])) {
-                    $merged['required'] = array_merge($merged['required'], $resolved['required']);
+                    $requiredSets[] = $resolved['required'];
                 }
             }
 
-            if ([] === $merged['required']) {
-                unset($merged['required']);
+            if ($requiredSets) {
+                $merged['required'] = array_merge(...$requiredSets);
             }
             if ([] === $merged['properties']) {
                 unset($merged['properties']);
@@ -98,52 +106,36 @@ final class SchemaFactory implements SchemaFactoryInterface
                 $merged['description'] = $node['description'];
             }
 
-            return self::resolveProperties($merged, $definitions);
+            return self::resolveDeep($merged, $definitions, $resolving);
         }
 
         if (!isset($node['type'])) {
             $node['type'] = 'object';
         }
 
-        return self::resolveProperties($node, $definitions);
+        return self::resolveDeep($node, $definitions, $resolving);
     }
 
     /**
-     * Recursively resolve $ref inside property schemas and array items.
+     * Recursively resolve nested properties and array items.
      */
-    private static function resolveProperties(array $node, array $definitions): array
+    private static function resolveDeep(array $node, array $definitions, array &$resolving): array
     {
-        if (isset($node['properties']) && \is_array($node['properties'])) {
-            foreach ($node['properties'] as $propName => $propSchema) {
-                $node['properties'][$propName] = self::resolvePropertyNode($propSchema, $definitions);
-            }
-        }
-
-        return $node;
-    }
-
-    private static function resolvePropertyNode(array|\ArrayObject $node, array $definitions): array
-    {
-        if ($node instanceof \ArrayObject) {
-            $node = $node->getArrayCopy();
-        }
-
-        if (isset($node['$ref'])) {
-            $refKey = str_replace('#/definitions/', '', $node['$ref']);
-            if (isset($definitions[$refKey])) {
-                return self::resolveNode($definitions[$refKey], $definitions);
-            }
-
-            return ['type' => 'object'];
-        }
-
         if (isset($node['items'])) {
-            $node['items'] = self::resolvePropertyNode($node['items'], $definitions);
+            $node['items'] = self::resolveNode(
+                $node['items'] instanceof \ArrayObject ? $node['items']->getArrayCopy() : $node['items'],
+                $definitions,
+                $resolving,
+            );
         }
 
         if (isset($node['properties']) && \is_array($node['properties'])) {
             foreach ($node['properties'] as $propName => $propSchema) {
-                $node['properties'][$propName] = self::resolvePropertyNode($propSchema, $definitions);
+                $node['properties'][$propName] = self::resolveNode(
+                    $propSchema instanceof \ArrayObject ? $propSchema->getArrayCopy() : $propSchema,
+                    $definitions,
+                    $resolving,
+                );
             }
         }
 
