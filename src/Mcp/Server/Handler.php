@@ -109,6 +109,11 @@ final class Handler implements RequestHandlerInterface
             array_merge($operation->getExtraProperties(), ['_api_disable_swagger_provider' => true])
         );
 
+        // MCP has its own transport (JSON-RPC) — HTTP content negotiation is irrelevant.
+        if (null === $operation->canNegotiateContent()) {
+            $operation = $operation->withContentNegotiation(false);
+        }
+
         if (null === $operation->canValidate()) {
             $operation = $operation->withValidate(false);
         }
@@ -127,8 +132,7 @@ final class Handler implements RequestHandlerInterface
 
         $body = $this->provider->provide($operation, $uriVariables, $context);
 
-        if (!$isResource) {
-            $httpRequest = $context['request'];
+        if (!$isResource && null !== ($httpRequest = $context['request'] ?? null)) {
             $context['previous_data'] = $httpRequest->attributes->get('previous_data');
             $context['data'] = $httpRequest->attributes->get('data');
             $context['read_data'] = $httpRequest->attributes->get('read_data');
