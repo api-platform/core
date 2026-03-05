@@ -202,6 +202,7 @@ return static function (ContainerConfigurator $container) {
             '%api_platform.enable_swagger_ui%',
             '%api_platform.enable_docs%',
             '%api_platform.enable_re_doc%',
+            '%api_platform.enable_scalar%',
         ]);
 
     $services->set('api_platform.action.placeholder', PlaceholderAction::class)

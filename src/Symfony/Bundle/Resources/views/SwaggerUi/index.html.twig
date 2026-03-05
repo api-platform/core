@@ -3,17 +3,23 @@
 <head>
     {% block head_metas %}
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% endblock %}
 
     {% block title %}
         <title>{% if title %}{{ title }} - {% endif %}API Platform</title>
     {% endblock %}
 
+    {% set active_ui = app.request.query.get('ui', 'swagger_ui') %}
+    {% set is_scalar = (scalarEnabled and not swaggerUiEnabled and not reDocEnabled) or (scalarEnabled and 'scalar' == active_ui) %}
+
     {% block stylesheet %}
-        <link rel="stylesheet" href="{{ asset('bundles/apiplatform/fonts/open-sans/400.css', assetPackage) }}">
-        <link rel="stylesheet" href="{{ asset('bundles/apiplatform/fonts/open-sans/700.css', assetPackage) }}">
-        <link rel="stylesheet" href="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui.css', assetPackage) }}">
-        <link rel="stylesheet" href="{{ asset('bundles/apiplatform/style.css', assetPackage) }}">
+        {% if not is_scalar %}
+            <link rel="stylesheet" href="{{ asset('bundles/apiplatform/fonts/open-sans/400.css', assetPackage) }}">
+            <link rel="stylesheet" href="{{ asset('bundles/apiplatform/fonts/open-sans/700.css', assetPackage) }}">
+            <link rel="stylesheet" href="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui.css', assetPackage) }}">
+            <link rel="stylesheet" href="{{ asset('bundles/apiplatform/style.css', assetPackage) }}">
+        {% endif %}
     {% endblock %}
 
     {% set oauth_data = {'oauth': swagger_data.oauth|merge({'redirectUrl' : absolute_url(asset('bundles/apiplatform/swagger-ui/oauth2-redirect.html', assetPackage)) })} %}
@@ -25,6 +31,7 @@
 </head>
 
 <body>
+{% if not is_scalar %}
 <svg xmlns="http://www.w3.org/2000/svg" class="svg-icons">
     <defs>
         <symbol viewBox="0 0 20 20" id="unlocked">
@@ -69,9 +76,11 @@
     <div class="web"><img src="{{ asset('bundles/apiplatform/web.png', assetPackage) }}"></div>
     <div class="webby"><img src="{{ asset('bundles/apiplatform/webby.png', assetPackage) }}"></div>
 {% endif %}
+{% endif %}
 
 <div id="swagger-ui" class="api-platform"></div>
 
+{% if not is_scalar %}
 <div class="swagger-ui" id="formats">
     <div class="information-container wrapper">
         <div class="info">
@@ -81,16 +90,20 @@
             {% endfor %}
             <br>
             Other API docs:
-            {% set active_ui = app.request.query.get('ui', 'swagger_ui') %}
             {% if swaggerUiEnabled and active_ui != 'swagger_ui' %}<a href="{{ path(originalRoute, originalRouteParams) }}">Swagger UI</a>{% endif %}
             {% if reDocEnabled and active_ui != 're_doc' %}<a href="{{ path(originalRoute, originalRouteParams|merge({'ui': 're_doc'})) }}">ReDoc</a>{% endif %}
+            {% if scalarEnabled and active_ui != 'scalar' %}<a href="{{ path(originalRoute, originalRouteParams|merge({'ui': 'scalar'})) }}">Scalar</a>{% endif %}
             {% if not graphQlEnabled or graphiQlEnabled %}<a {% if graphiQlEnabled %}href="{{ path('api_graphql_graphiql') }}"{% endif %} class="graphiql-link">GraphiQL</a>{% endif %}
         </div>
     </div>
 </div>
+{% endif %}
 
 {% block javascript %}
-    {% if (reDocEnabled and not swaggerUiEnabled) or (reDocEnabled and 're_doc' == active_ui) %}
+    {% if is_scalar %}
+        <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+        <script src="{{ asset('bundles/apiplatform/init-scalar-ui.js', assetPackage) }}"></script>
+    {% elseif (reDocEnabled and not swaggerUiEnabled) or (reDocEnabled and 're_doc' == active_ui) %}
         <script src="{{ asset('bundles/apiplatform/redoc/redoc.standalone.js', assetPackage) }}"></script>
         <script src="{{ asset('bundles/apiplatform/init-redoc-ui.js', assetPackage) }}"></script>
     {% else %}
@@ -98,7 +111,9 @@
         <script src="{{ asset('bundles/apiplatform/swagger-ui/swagger-ui-standalone-preset.js', assetPackage) }}"></script>
         <script src="{{ asset('bundles/apiplatform/init-swagger-ui.js', assetPackage) }}"></script>
     {% endif %}
-    <script src="{{ asset('bundles/apiplatform/init-common-ui.js', assetPackage) }}" defer></script>
+    {% if not is_scalar %}
+        <script src="{{ asset('bundles/apiplatform/init-common-ui.js', assetPackage) }}" defer></script>
+    {% endif %}
 {% endblock %}
 
 </body>

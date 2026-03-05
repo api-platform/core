@@ -24,18 +24,19 @@ class DocumentationActionAppKernel extends \AppKernel
 {
     public static bool $swaggerUiEnabled = true;
     public static bool $reDocEnabled = true;
+    public static bool $scalarEnabled = true;
     public static bool $docsEnabled = true;
 
     public function getCacheDir(): string
     {
-        $suffix = (self::$swaggerUiEnabled ? 'ui_' : 'no_ui_').(self::$reDocEnabled ? 'redoc' : 'no_redoc').(self::$docsEnabled ? '' : '_no_docs');
+        $suffix = (self::$swaggerUiEnabled ? 'ui_' : 'no_ui_').(self::$reDocEnabled ? 'redoc' : 'no_redoc').(self::$scalarEnabled ? '_scalar' : '_no_scalar').(self::$docsEnabled ? '' : '_no_docs');
 
         return parent::getCacheDir().'/'.$suffix;
     }
 
     public function getLogDir(): string
     {
-        $suffix = (self::$swaggerUiEnabled ? 'ui_' : 'no_ui_').(self::$reDocEnabled ? 'redoc' : 'no_redoc').(self::$docsEnabled ? '' : '_no_docs');
+        $suffix = (self::$swaggerUiEnabled ? 'ui_' : 'no_ui_').(self::$reDocEnabled ? 'redoc' : 'no_redoc').(self::$scalarEnabled ? '_scalar' : '_no_scalar').(self::$docsEnabled ? '' : '_no_docs');
 
         return parent::getLogDir().'/'.$suffix;
     }
@@ -48,6 +49,7 @@ class DocumentationActionAppKernel extends \AppKernel
             $container->loadFromExtension('api_platform', [
                 'enable_swagger_ui' => DocumentationActionAppKernel::$swaggerUiEnabled,
                 'enable_re_doc' => DocumentationActionAppKernel::$reDocEnabled,
+                'enable_scalar' => DocumentationActionAppKernel::$scalarEnabled,
                 'enable_docs' => DocumentationActionAppKernel::$docsEnabled,
             ]);
         });
@@ -63,32 +65,36 @@ final class DocumentationActionTest extends ApiTestCase
         return DocumentationActionAppKernel::class;
     }
 
-    public function testHtmlDocumentationIsNotAccessibleWhenSwaggerUiAndReDocAreDisabled(): void
+    public function testHtmlDocumentationIsNotAccessibleWhenSwaggerUiAndReDocAndScalarAreDisabled(): void
     {
         DocumentationActionAppKernel::$swaggerUiEnabled = false;
         DocumentationActionAppKernel::$reDocEnabled = false;
+        DocumentationActionAppKernel::$scalarEnabled = false;
 
         $client = self::createClient();
 
         $container = static::getContainer();
         $this->assertFalse($container->getParameter('api_platform.enable_swagger_ui'));
         $this->assertFalse($container->getParameter('api_platform.enable_re_doc'));
+        $this->assertFalse($container->getParameter('api_platform.enable_scalar'));
 
         $client->request('GET', '/docs', ['headers' => ['Accept' => 'text/html']]);
         $this->assertResponseStatusCodeSame(404);
-        $this->assertStringContainsString('Swagger UI and ReDoc are disabled.', $client->getResponse()->getContent(false));
+        $this->assertStringContainsString('Swagger UI, ReDoc and Scalar are disabled.', $client->getResponse()->getContent(false));
     }
 
     public function testJsonDocumentationIsAccessibleWhenSwaggerUiIsDisabled(): void
     {
         DocumentationActionAppKernel::$swaggerUiEnabled = false;
         DocumentationActionAppKernel::$reDocEnabled = false;
+        DocumentationActionAppKernel::$scalarEnabled = false;
 
         $client = self::createClient();
 
         $container = static::getContainer();
         $this->assertFalse($container->getParameter('api_platform.enable_swagger_ui'));
         $this->assertFalse($container->getParameter('api_platform.enable_re_doc'));
+        $this->assertFalse($container->getParameter('api_platform.enable_scalar'));
 
         $client->request('GET', '/docs.jsonopenapi', ['headers' => ['Accept' => 'application/vnd.openapi+json']]);
         $this->assertResponseIsSuccessful();
@@ -161,10 +167,47 @@ final class DocumentationActionTest extends ApiTestCase
         $this->assertJsonContains(['info' => ['title' => 'My Dummy API']]);
     }
 
-    public function testEnableDocsFalseDisablesSwaggerUiAndReDoc(): void
+    public function testHtmlDocumentationIsAccessibleWhenOnlyScalarIsEnabled(): void
+    {
+        DocumentationActionAppKernel::$swaggerUiEnabled = false;
+        DocumentationActionAppKernel::$reDocEnabled = false;
+        DocumentationActionAppKernel::$scalarEnabled = true;
+
+        $client = self::createClient();
+
+        $container = static::getContainer();
+        $this->assertFalse($container->getParameter('api_platform.enable_swagger_ui'));
+        $this->assertFalse($container->getParameter('api_platform.enable_re_doc'));
+        $this->assertTrue($container->getParameter('api_platform.enable_scalar'));
+
+        $client->request('GET', '/docs', ['headers' => ['Accept' => 'text/html']]);
+        $this->assertResponseIsSuccessful();
+        $content = $client->getResponse()->getContent();
+        $this->assertStringContainsString('cdn.jsdelivr.net/npm/@scalar/api-reference', $content);
+        $this->assertStringContainsString('init-scalar-ui.js', $content);
+    }
+
+    public function testScalarUiIsAccessibleWithUiQueryParameter(): void
     {
         DocumentationActionAppKernel::$swaggerUiEnabled = true;
         DocumentationActionAppKernel::$reDocEnabled = true;
+        DocumentationActionAppKernel::$scalarEnabled = true;
+
+        $client = self::createClient();
+
+        $client->request('GET', '/docs?ui=scalar', ['headers' => ['Accept' => 'text/html']]);
+        $this->assertResponseIsSuccessful();
+        $content = $client->getResponse()->getContent();
+        $this->assertStringContainsString('cdn.jsdelivr.net/npm/@scalar/api-reference', $content);
+        $this->assertStringContainsString('init-scalar-ui.js', $content);
+        $this->assertStringNotContainsString('swagger-ui-bundle.js', $content);
+    }
+
+    public function testEnableDocsFalseDisablesSwaggerUiAndReDocAndScalar(): void
+    {
+        DocumentationActionAppKernel::$swaggerUiEnabled = true;
+        DocumentationActionAppKernel::$reDocEnabled = true;
+        DocumentationActionAppKernel::$scalarEnabled = true;
         DocumentationActionAppKernel::$docsEnabled = false;
 
         $client = self::createClient();
@@ -174,6 +217,7 @@ final class DocumentationActionTest extends ApiTestCase
         // enable_docs: false acts as a master switch, forcing these to false
         $this->assertFalse($container->getParameter('api_platform.enable_swagger_ui'));
         $this->assertFalse($container->getParameter('api_platform.enable_re_doc'));
+        $this->assertFalse($container->getParameter('api_platform.enable_scalar'));
 
         $client->request('GET', '/docs', ['headers' => ['Accept' => 'text/html']]);
         $this->assertResponseStatusCodeSame(404);

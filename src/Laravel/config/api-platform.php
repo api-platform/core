@@ -97,6 +97,11 @@ return [
         AuthorizationException::class => 403,
     ],
 
+    'scalar' => [
+        'enabled' => true,
+        'extra_configuration' => [],
+    ],
+
     'swagger_ui' => [
         'enabled' => true,
         // 'apiKeys' => [

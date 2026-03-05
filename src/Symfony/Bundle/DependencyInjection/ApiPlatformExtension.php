@@ -151,6 +151,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             // to prevent HTML documentation from being served on resource endpoints.
             $config['enable_swagger_ui'] = false;
             $config['enable_re_doc'] = false;
+            $config['enable_scalar'] = false;
         }
         $jsonSchemaFormats = $config['jsonschema_formats'];
 
@@ -649,6 +650,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if (!$config['enable_swagger']) {
             $container->setParameter('api_platform.enable_swagger_ui', false);
             $container->setParameter('api_platform.enable_re_doc', false);
+            $container->setParameter('api_platform.enable_scalar', false);
 
             return;
         }
@@ -659,7 +661,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('openapi/yaml.php');
         }
 
-        if ($config['enable_swagger_ui'] || $config['enable_re_doc']) {
+        if ($config['enable_swagger_ui'] || $config['enable_re_doc'] || $config['enable_scalar']) {
             $loader->load('swagger_ui.php');
 
             if ($config['use_symfony_listeners']) {
@@ -669,13 +671,14 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('state/swagger_ui.php');
         }
 
-        if (!$config['enable_swagger_ui'] && !$config['enable_re_doc']) {
+        if (!$config['enable_swagger_ui'] && !$config['enable_re_doc'] && !$config['enable_scalar']) {
             // Remove the listener but keep the controller to allow customizing the path of the UI
             $container->removeDefinition('api_platform.swagger.listener.ui');
         }
 
         $container->setParameter('api_platform.enable_swagger_ui', $config['enable_swagger_ui']);
         $container->setParameter('api_platform.enable_re_doc', $config['enable_re_doc']);
+        $container->setParameter('api_platform.enable_scalar', $config['enable_scalar']);
         $container->setParameter('api_platform.swagger.api_keys', $config['swagger']['api_keys']);
         $container->setParameter('api_platform.swagger.persist_authorization', $config['swagger']['persist_authorization']);
         $container->setParameter('api_platform.swagger.http_auth', $config['swagger']['http_auth']);
@@ -683,6 +686,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             throw new RuntimeException('You can not set "swagger_ui_extra_configuration" twice - in "openapi" and "swagger" section.');
         }
         $container->setParameter('api_platform.swagger_ui.extra_configuration', $config['openapi']['swagger_ui_extra_configuration'] ?: $config['swagger']['swagger_ui_extra_configuration']);
+        $container->setParameter('api_platform.scalar.extra_configuration', $config['openapi']['scalar_extra_configuration']);
     }
 
     private function registerJsonApiConfiguration(ContainerBuilder $container, array $formats, PhpFileLoader $loader, array $config): void

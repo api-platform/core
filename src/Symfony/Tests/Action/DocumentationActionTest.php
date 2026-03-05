@@ -37,10 +37,10 @@ class DocumentationActionTest extends TestCase
 {
     use ProphecyTrait;
 
-    public function testHtmlFormatWhenSwaggerUiAndReDocDisabledThrows404(): void
+    public function testHtmlFormatWhenSwaggerUiAndReDocAndScalarDisabledThrows404(): void
     {
         $this->expectException(NotFoundHttpException::class);
-        $this->expectExceptionMessage('Swagger UI and ReDoc are disabled.');
+        $this->expectExceptionMessage('Swagger UI, ReDoc and Scalar are disabled.');
 
         $request = new Request();
         $request->attributes->set('_format', 'html');
@@ -57,6 +57,7 @@ class DocumentationActionTest extends TestCase
             ],
             swaggerUiEnabled: false,
             reDocEnabled: false,
+            scalarEnabled: false,
         );
 
         $documentation($request);
