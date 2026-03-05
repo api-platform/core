@@ -52,6 +52,7 @@ final class DocumentationAction
         private readonly bool $swaggerUiEnabled = true,
         private readonly bool $docsEnabled = true,
         private readonly bool $reDocEnabled = true,
+        private readonly bool $scalarEnabled = true,
     ) {
         $this->negotiator = $negotiator ?? new Negotiator();
     }
@@ -91,8 +92,8 @@ final class DocumentationAction
      */
     private function getOpenApiDocumentation(array $context, string $format, Request $request): OpenApi|Response
     {
-        if ('html' === $format && !$this->swaggerUiEnabled && !$this->reDocEnabled) {
-            throw new NotFoundHttpException('Swagger UI and ReDoc are disabled.');
+        if ('html' === $format && !$this->swaggerUiEnabled && !$this->reDocEnabled && !$this->scalarEnabled) {
+            throw new NotFoundHttpException('Swagger UI, ReDoc and Scalar are disabled.');
         }
 
         if ($this->provider && $this->processor) {
@@ -105,7 +106,7 @@ final class DocumentationAction
                 outputFormats: $this->documentationFormats
             );
 
-            if ('html' === $format && ($this->swaggerUiEnabled || $this->reDocEnabled)) {
+            if ('html' === $format && ($this->swaggerUiEnabled || $this->reDocEnabled || $this->scalarEnabled)) {
                 $operation = $operation->withProcessor('api_platform.swagger_ui.processor')->withWrite(true);
             }
 

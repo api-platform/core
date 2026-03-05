@@ -231,6 +231,7 @@ class ConfigurationTest extends TestCase
                 'tags' => [],
                 'error_resource_class' => null,
                 'validation_error_resource_class' => null,
+                'scalar_extra_configuration' => [],
             ],
             'maker' => [
                 'enabled' => true,
@@ -250,6 +251,7 @@ class ConfigurationTest extends TestCase
             'jsonapi' => [
                 'use_iri_as_id' => true,
             ],
+            'enable_scalar' => true,
         ], $config);
     }
 
