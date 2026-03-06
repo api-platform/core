@@ -75,6 +75,7 @@ Feature: Table inheritance
                   "href": "/dummy_table_inheritances/2"
                 }
               },
+              "swaggerThanParent": true,
               "id": 2,
               "name": "Foobarbaz inheritance"
             }

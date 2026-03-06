@@ -43,6 +43,10 @@ use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\PropertyCollectionIriOnly;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\PropertyCollectionIriOnlyRelation;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\RelatedDummy;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\SecuredDummy;
+use ApiPlatform\Serializer\Tests\Fixtures\Polymorphism\ApiResource\Author;
+use ApiPlatform\Serializer\Tests\Fixtures\Polymorphism\ApiResource\Book;
+use ApiPlatform\Serializer\Tests\Fixtures\Polymorphism\Entity\FictionBook;
+use ApiPlatform\Serializer\Tests\Fixtures\Polymorphism\Entity\TechnicalBook;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -1978,6 +1982,171 @@ class AbstractItemNormalizerTest extends TestCase
             $this->assertCount(3, $e->getMissingConstructorArguments(), 'All three missing constructor arguments (title, rating, comment) should be reported, not just the first one.');
             $this->assertSame(['title', 'rating', 'comment'], $e->getMissingConstructorArguments());
         }
+    }
+
+    public function testNormalizePolymorphicFictionBook(): void
+    {
+        $author = new Author();
+        $author->setName('author name');
+
+        $fictionBook = new FictionBook();
+        $fictionBook->setTitle('The Hobbit');
+        $fictionBook->setAuthor($author);
+        $fictionBook->setIsbn('978-0-345-33312-1');
+        $fictionBook->setGenre('Fantasy');
+        $fictionBook->setPageCount(310);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(FictionBook::class, Argument::type('array'))->willReturn(new PropertyNameCollection(['title', 'author', 'isbn', 'bookType', 'genre', 'pageCount']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+
+        if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
+            $stringType = new LegacyType(LegacyType::BUILTIN_TYPE_STRING);
+            $intType = new LegacyType(LegacyType::BUILTIN_TYPE_INT);
+            $authorType = new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, Author::class);
+
+            $propertyMetadataFactoryProphecy->create(FictionBook::class, 'title', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([$stringType])->withReadable(true)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(FictionBook::class, 'author', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([$authorType])->withReadable(true)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(FictionBook::class, 'isbn', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([$stringType])->withReadable(true)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(FictionBook::class, 'bookType', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([$stringType])->withReadable(true)->withWritable(false));
+            $propertyMetadataFactoryProphecy->create(FictionBook::class, 'genre', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([$stringType])->withReadable(true)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(FictionBook::class, 'pageCount', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([$intType])->withReadable(true)->withWritable(true));
+        } else {
+            $propertyMetadataFactoryProphecy->create(FictionBook::class, 'title', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(FictionBook::class, 'author', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType(Type::object(Author::class))->withReadable(true)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(FictionBook::class, 'isbn', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(FictionBook::class, 'bookType', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withWritable(false));
+            $propertyMetadataFactoryProphecy->create(FictionBook::class, 'genre', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(FictionBook::class, 'pageCount', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType(Type::int())->withReadable(true)->withWritable(true));
+        }
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource($fictionBook, Argument::cetera())->willReturn('/books/1');
+        $iriConverterProphecy->getIriFromResource($author, Argument::cetera())->willReturn('/authors/1');
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->getValue($fictionBook, 'title')->willReturn('The Hobbit');
+        $propertyAccessorProphecy->getValue($fictionBook, 'author')->willReturn($author);
+        $propertyAccessorProphecy->getValue($fictionBook, 'isbn')->willReturn('978-0-345-33312-1');
+        $propertyAccessorProphecy->getValue($fictionBook, 'bookType')->willReturn('fiction');
+        $propertyAccessorProphecy->getValue($fictionBook, 'genre')->willReturn('Fantasy');
+        $propertyAccessorProphecy->getValue($fictionBook, 'pageCount')->willReturn(310);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, FictionBook::class)->willReturn(Book::class);
+        $resourceClassResolverProphecy->getResourceClass($fictionBook, null)->willReturn(FictionBook::class);
+        $resourceClassResolverProphecy->getResourceClass($author, Author::class)->willReturn(Author::class);
+        $resourceClassResolverProphecy->isResourceClass(FictionBook::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(Author::class)->willReturn(true);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+        $serializerProphecy->normalize('The Hobbit', null, Argument::type('array'))->willReturn('The Hobbit');
+        $serializerProphecy->normalize('/authors/1', null, Argument::type('array'))->willReturn('/authors/1');
+        $serializerProphecy->normalize('978-0-345-33312-1', null, Argument::type('array'))->willReturn('978-0-345-33312-1');
+        $serializerProphecy->normalize('fiction', null, Argument::type('array'))->willReturn('fiction');
+        $serializerProphecy->normalize('Fantasy', null, Argument::type('array'))->willReturn('Fantasy');
+        $serializerProphecy->normalize(310, null, Argument::type('array'))->willReturn(310);
+
+        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), null, null, [], null, null) extends AbstractItemNormalizer {};
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $expected = [
+            'title' => 'The Hobbit',
+            'author' => '/authors/1',
+            'isbn' => '978-0-345-33312-1',
+            'bookType' => 'fiction',
+            'genre' => 'Fantasy',
+            'pageCount' => 310,
+        ];
+        $result = $normalizer->normalize($fictionBook, null, ['resources' => []]);
+        $this->assertSame($expected, $result);
+    }
+
+    public function testNormalizePolymorphicTechnicalBook(): void
+    {
+        $author = new Author();
+        $author->setName('author name');
+
+        $technicalBook = new TechnicalBook();
+        $technicalBook->setTitle('Design Patterns');
+        $technicalBook->setAuthor($author);
+        $technicalBook->setIsbn('978-0-201-63361-0');
+        $technicalBook->setProgrammingLanguage('C++');
+        $technicalBook->setDifficultyLevel('advanced');
+        $technicalBook->setTopic('Software Design');
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(TechnicalBook::class, Argument::type('array'))->willReturn(new PropertyNameCollection(['title', 'author', 'isbn', 'bookType', 'programmingLanguage', 'difficultyLevel', 'topic']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+
+        if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
+            $stringType = new LegacyType(LegacyType::BUILTIN_TYPE_STRING);
+            $authorType = new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, Author::class);
+
+            $propertyMetadataFactoryProphecy->create(TechnicalBook::class, 'title', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([$stringType])->withReadable(true)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(TechnicalBook::class, 'author', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([$authorType])->withReadable(true)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(TechnicalBook::class, 'isbn', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([$stringType])->withReadable(true)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(TechnicalBook::class, 'bookType', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([$stringType])->withReadable(true)->withWritable(false));
+            $propertyMetadataFactoryProphecy->create(TechnicalBook::class, 'programmingLanguage', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([$stringType])->withReadable(true)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(TechnicalBook::class, 'difficultyLevel', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([$stringType])->withReadable(true)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(TechnicalBook::class, 'topic', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([$stringType])->withReadable(true)->withWritable(true));
+        } else {
+            $propertyMetadataFactoryProphecy->create(TechnicalBook::class, 'title', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(TechnicalBook::class, 'author', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType(Type::object(Author::class))->withReadable(true)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(TechnicalBook::class, 'isbn', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(TechnicalBook::class, 'bookType', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withWritable(false));
+            $propertyMetadataFactoryProphecy->create(TechnicalBook::class, 'programmingLanguage', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(TechnicalBook::class, 'difficultyLevel', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(TechnicalBook::class, 'topic', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withWritable(true));
+        }
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource($technicalBook, Argument::cetera())->willReturn('/books/2');
+        $iriConverterProphecy->getIriFromResource($author, Argument::cetera())->willReturn('/authors/1');
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->getValue($technicalBook, 'title')->willReturn('Design Patterns');
+        $propertyAccessorProphecy->getValue($technicalBook, 'author')->willReturn($author);
+        $propertyAccessorProphecy->getValue($technicalBook, 'isbn')->willReturn('978-0-201-63361-0');
+        $propertyAccessorProphecy->getValue($technicalBook, 'bookType')->willReturn('technical');
+        $propertyAccessorProphecy->getValue($technicalBook, 'programmingLanguage')->willReturn('C++');
+        $propertyAccessorProphecy->getValue($technicalBook, 'difficultyLevel')->willReturn('advanced');
+        $propertyAccessorProphecy->getValue($technicalBook, 'topic')->willReturn('Software Design');
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, TechnicalBook::class)->willReturn(Book::class);
+        $resourceClassResolverProphecy->getResourceClass($technicalBook, null)->willReturn(TechnicalBook::class);
+        $resourceClassResolverProphecy->getResourceClass($author, Author::class)->willReturn(Author::class);
+        $resourceClassResolverProphecy->isResourceClass(TechnicalBook::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(Author::class)->willReturn(true);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+        $serializerProphecy->normalize('Design Patterns', null, Argument::type('array'))->willReturn('Design Patterns');
+        $serializerProphecy->normalize('/authors/1', null, Argument::type('array'))->willReturn('/authors/1');
+        $serializerProphecy->normalize('978-0-201-63361-0', null, Argument::type('array'))->willReturn('978-0-201-63361-0');
+        $serializerProphecy->normalize('technical', null, Argument::type('array'))->willReturn('technical');
+        $serializerProphecy->normalize('C++', null, Argument::type('array'))->willReturn('C++');
+        $serializerProphecy->normalize('advanced', null, Argument::type('array'))->willReturn('advanced');
+        $serializerProphecy->normalize('Software Design', null, Argument::type('array'))->willReturn('Software Design');
+
+        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), null, null, [], null, null) extends AbstractItemNormalizer {};
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $expected = [
+            'title' => 'Design Patterns',
+            'author' => '/authors/1',
+            'isbn' => '978-0-201-63361-0',
+            'bookType' => 'technical',
+            'programmingLanguage' => 'C++',
+            'difficultyLevel' => 'advanced',
+            'topic' => 'Software Design',
+        ];
+        $result = $normalizer->normalize($technicalBook, null, ['resources' => []]);
+        $this->assertSame($expected, $result);
     }
 }
 

@@ -20,6 +20,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\CrudOpenApiApiPlatformTag;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DummyWebhook;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6151\OverrideOpenApiResponses;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ParentAttribute;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Polymorphism\Book;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AbstractDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CircularReference;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeItem;
@@ -104,6 +105,7 @@ class OpenApiTest extends ApiTestCase
             WrappedResponseEntity::class,
             ParentAttribute::class,
             ChildAttribute::class,
+            Book::class,
         ];
     }
 
@@ -648,5 +650,95 @@ class OpenApiTest extends ApiTestCase
 
         $this->assertArrayNotHasKey('hiddenData', $childProperties);
         $this->assertArrayNotHasKey('id', $childProperties);
+    }
+
+    public function testOpenApiPolymorphicBookSchema(): void
+    {
+        $response = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ]);
+        $this->assertResponseIsSuccessful();
+        $json = $response->toArray();
+
+        $this->assertArrayHasKey('components', $json);
+        $this->assertArrayHasKey('schemas', $json['components']);
+
+        $schemas = $json['components']['schemas'];
+
+        $this->assertArrayHasKey('Book', $schemas, 'Book parent schema should exist');
+        $bookSchema = $schemas['Book'];
+
+        $this->assertArrayHasKey('discriminator', $bookSchema);
+        $discriminator = $bookSchema['discriminator'];
+
+        $this->assertIsArray($discriminator);
+
+        $this->assertArrayHasKey('propertyName', $discriminator);
+        $this->assertSame('bookType', $discriminator['propertyName']);
+
+        $this->assertArrayHasKey('mapping', $discriminator);
+        $discriminatorMapping = $discriminator['mapping'];
+        $this->assertIsArray($discriminatorMapping);
+        $this->assertArrayHasKey('fiction', $discriminatorMapping);
+        $this->assertArrayHasKey('technical', $discriminatorMapping);
+        $this->assertSame('#/components/schemas/FictionBook', $discriminatorMapping['fiction']);
+        $this->assertSame('#/components/schemas/TechnicalBook', $discriminatorMapping['technical']);
+
+        $this->assertArrayHasKey('oneOf', $bookSchema);
+        $bookSchemaOneOf = $bookSchema['oneOf'];
+        $this->assertIsArray($bookSchemaOneOf);
+        $this->assertCount(2, $bookSchemaOneOf);
+
+        $this->assertArrayHasKey('$ref', $bookSchemaOneOf[0]);
+        $this->assertSame('#/components/schemas/FictionBook', $bookSchemaOneOf[0]['$ref']);
+        $this->assertArrayHasKey('$ref', $bookSchemaOneOf[1]);
+        $this->assertSame('#/components/schemas/TechnicalBook', $bookSchemaOneOf[1]['$ref']);
+
+        $this->assertArrayHasKey('FictionBook', $schemas, 'FictionBook schema should exist');
+        $fictionBookSchema = $schemas['FictionBook'];
+
+        $this->assertIsArray($fictionBookSchema['allOf']);
+
+        $fictionProperties = null;
+        foreach ($fictionBookSchema['allOf'] as $part) {
+            if (isset($part['properties'])) {
+                $fictionProperties = $part['properties'];
+                break;
+            }
+        }
+        $this->assertNotNull($fictionProperties, 'FictionBook should have properties in allOf');
+        $this->assertArrayHasKey('genre', $fictionProperties);
+        $this->assertArrayHasKey('pageCount', $fictionProperties);
+
+        $this->assertArrayHasKey('TechnicalBook', $schemas, 'TechnicalBook schema should exist');
+        $technicalBookSchema = $schemas['TechnicalBook'];
+
+        if (isset($technicalBookSchema['allOf'])) {
+            $this->assertIsArray($technicalBookSchema['allOf']);
+            $technicalProperties = null;
+            foreach ($technicalBookSchema['allOf'] as $part) {
+                if (isset($part['properties'])) {
+                    $technicalProperties = $part['properties'];
+                    break;
+                }
+            }
+            $this->assertNotNull($technicalProperties, 'TechnicalBook should have properties in allOf');
+            $this->assertArrayHasKey('programmingLanguage', $technicalProperties);
+            $this->assertArrayHasKey('difficultyLevel', $technicalProperties);
+            $this->assertArrayHasKey('topic', $technicalProperties);
+        } else {
+            $this->assertArrayHasKey('properties', $technicalBookSchema);
+            $this->assertArrayHasKey('programmingLanguage', $technicalBookSchema['properties']);
+            $this->assertArrayHasKey('difficultyLevel', $technicalBookSchema['properties']);
+            $this->assertArrayHasKey('topic', $technicalBookSchema['properties']);
+        }
+
+        if (isset($bookSchema['mapping'])) {
+            $this->assertArrayHasKey('fiction', $bookSchema['mapping']);
+            $this->assertArrayHasKey('technical', $bookSchema['mapping']);
+        } elseif (isset($bookSchema['discriminator']['mapping'])) {
+            $this->assertArrayHasKey('fiction', $bookSchema['discriminator']['mapping']);
+            $this->assertArrayHasKey('technical', $bookSchema['discriminator']['mapping']);
+        }
     }
 }
