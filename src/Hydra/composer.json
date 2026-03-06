@@ -25,19 +25,19 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/state": "^4.2.4",
-        "api-platform/documentation": "^4.2",
-        "api-platform/metadata": "^4.2",
-        "api-platform/jsonld": "^4.2",
-        "api-platform/json-schema": "^4.2",
-        "api-platform/serializer": "^4.2.4",
+        "api-platform/state": "^4.3",
+        "api-platform/documentation": "^4.3",
+        "api-platform/metadata": "^4.3",
+        "api-platform/jsonld": "^4.3",
+        "api-platform/json-schema": "^4.3",
+        "api-platform/serializer": "^4.3",
         "symfony/web-link": "^6.4 || ^7.1 || ^8.0",
         "symfony/type-info": "^7.3 || ^8.0"
     },
     "require-dev": {
-        "api-platform/doctrine-odm": "^4.2",
-        "api-platform/doctrine-orm": "^4.2",
-        "api-platform/doctrine-common": "^4.2",
+        "api-platform/doctrine-odm": "^4.3",
+        "api-platform/doctrine-orm": "^4.3",
+        "api-platform/doctrine-common": "^4.3",
         "phpspec/prophecy": "^1.19",
         "phpspec/prophecy-phpunit": "^2.2",
         "phpunit/phpunit": "^12.2"
@@ -77,5 +77,7 @@
     },
     "scripts": {
         "test": "./vendor/bin/phpunit"
-    }
+    },
+    "minimum-stability": "beta",
+    "prefer-stable": true
 }
