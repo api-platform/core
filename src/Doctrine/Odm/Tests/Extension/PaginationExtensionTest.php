@@ -259,6 +259,24 @@ class PaginationExtensionTest extends TestCase
         $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', (new GetCollection())->withPaginationEnabled(true)->withPaginationClientEnabled(true)->withPaginationMaximumItemsPerPage(80), $context);
     }
 
+    public function testApplyToCollectionWithPartialPagination(): void
+    {
+        $pagination = new Pagination([
+            'partial' => true,
+            'page_parameter_name' => '_page',
+        ]);
+
+        $aggregationBuilderProphecy = $this->mockAggregationBuilder(20, 20, true);
+
+        $context = ['filters' => ['_page' => 2, 'itemsPerPage' => 20]];
+
+        $extension = new PaginationExtension(
+            $this->managerRegistryProphecy->reveal(),
+            $pagination
+        );
+        $extension->applyToCollection($aggregationBuilderProphecy->reveal(), 'Foo', (new GetCollection())->withPaginationEnabled(true)->withPaginationPartial(true)->withPaginationClientEnabled(true)->withPaginationItemsPerPage(20), $context);
+    }
+
     public function testSupportsResult(): void
     {
         $pagination = new Pagination();
@@ -430,11 +448,14 @@ class PaginationExtensionTest extends TestCase
         $this->assertInstanceOf(PaginatorInterface::class, $result);
     }
 
-    private function mockAggregationBuilder(int $expectedOffset, int $expectedLimit): ObjectProphecy
+    private function mockAggregationBuilder(int $expectedOffset, int $expectedLimit, bool $partial = false): ObjectProphecy
     {
         $countProphecy = $this->prophesize(Count::class);
         $countAggregationBuilderProphecy = $this->prophesize(Builder::class);
-        $countAggregationBuilderProphecy->count('count')->shouldBeCalled()->willReturn($countProphecy->reveal());
+
+        if (!$partial) {
+            $countAggregationBuilderProphecy->count('count')->shouldBeCalled()->willReturn($countProphecy->reveal());
+        }
 
         $repositoryProphecy = $this->prophesize(DocumentRepository::class);
 
@@ -448,10 +469,17 @@ class PaginationExtensionTest extends TestCase
 
         if ($expectedLimit > 0) {
             $resultsAggregationBuilderProphecy = $this->prophesize(Builder::class);
-            $repositoryProphecy->createAggregationBuilder()->shouldBeCalled()->willReturn(
-                $resultsAggregationBuilderProphecy->reveal(),
-                $countAggregationBuilderProphecy->reveal()
-            );
+
+            if ($partial) {
+                $repositoryProphecy->createAggregationBuilder()->shouldBeCalled()->willReturn(
+                    $resultsAggregationBuilderProphecy->reveal()
+                );
+            } else {
+                $repositoryProphecy->createAggregationBuilder()->shouldBeCalled()->willReturn(
+                    $resultsAggregationBuilderProphecy->reveal(),
+                    $countAggregationBuilderProphecy->reveal()
+                );
+            }
 
             $skipProphecy = $this->prophesize(Skip::class);
             $skipProphecy->limit($expectedLimit)->shouldBeCalled()->willReturn($skipProphecy->reveal());
@@ -467,8 +495,10 @@ class PaginationExtensionTest extends TestCase
             $addFieldsProphecy->literal([])->shouldBeCalled()->willReturn($addFieldsProphecy->reveal());
         }
 
-        $facetProphecy->field('count')->shouldBeCalled()->willReturn($facetProphecy->reveal());
-        $facetProphecy->pipeline($countProphecy)->shouldBeCalled()->willReturn($facetProphecy->reveal());
+        if (!$partial) {
+            $facetProphecy->field('count')->shouldBeCalled()->willReturn($facetProphecy->reveal());
+            $facetProphecy->pipeline($countProphecy)->shouldBeCalled()->willReturn($facetProphecy->reveal());
+        }
 
         $addFieldsProphecy->field('__api_first_result__')->shouldBeCalled()->willReturn($addFieldsProphecy->reveal());
         $addFieldsProphecy->literal($expectedOffset)->shouldBeCalled()->willReturn($addFieldsProphecy->reveal());
@@ -476,6 +506,11 @@ class PaginationExtensionTest extends TestCase
         $addFieldsProphecy->literal($expectedLimit)->shouldBeCalled()->willReturn($addFieldsProphecy->reveal());
 
         $aggregationBuilderProphecy = $this->prophesize(Builder::class);
+
+        if ($partial && $expectedLimit > 0) {
+            $aggregationBuilderProphecy->limit($expectedOffset + $expectedLimit)->shouldBeCalled();
+        }
+
         $aggregationBuilderProphecy->facet()->shouldBeCalled()->willReturn($facetProphecy->reveal());
         $aggregationBuilderProphecy->addFields()->shouldBeCalled()->willReturn($addFieldsProphecy->reveal());
 
