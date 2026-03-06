@@ -568,11 +568,11 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         return $propertySchema;
     }
 
-    private function buildSubclassPropertySchema(Schema $schema, ApiProperty $propertyMetadata): ?\ArrayObject
+    private function buildSubclassPropertySchema(Schema $schema, ApiProperty $propertyMetadata): ?array
     {
         $propertySchema = $this->getBasePropertySchema($propertyMetadata, $schema->getVersion());
 
-        return $propertySchema ? new \ArrayObject($propertySchema) : null;
+        return $propertySchema ?: null;
     }
 
     /**
