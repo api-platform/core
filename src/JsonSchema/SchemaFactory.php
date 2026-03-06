@@ -645,7 +645,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             if (\count($subclassProperties) > 0) {
                 $extra = ['type' => 'object', 'properties' => $subclassProperties->getArrayCopy()];
                 if (isset($definition['required']) && \count($definition['required']) > 0) {
-                    $extra['required'] = array_values((array) $definition['required']);
+                    $extra['required'] = $definition['required'];
                 }
                 $allOf[] = $extra;
             }
