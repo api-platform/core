@@ -726,6 +726,12 @@ final class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('mcp')
                     ->canBeDisabled()
+                    ->children()
+                        ->scalarNode('format')
+                            ->defaultValue('jsonld')
+                            ->info('The serialization format used for MCP tool input/output. Must be a format registered in api_platform.formats (e.g. "jsonld", "json", "jsonapi").')
+                        ->end()
+                    ->end()
                 ->end()
             ->end();
     }

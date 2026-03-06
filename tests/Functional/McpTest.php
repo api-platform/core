@@ -444,44 +444,31 @@ class McpTest extends ApiTestCase
         ], $listBooks);
         self::assertArrayHasKeyAndValue('description', 'List Books', $listBooks);
 
+        // Output schemas are flattened for MCP compliance: no $ref, no allOf, no definitions
         $outputSchema = $listBooks['outputSchema'];
-        self::assertArrayHasKeyAndValue('$schema', 'http://json-schema.org/draft-07/schema#', $outputSchema);
+        self::assertArrayNotHasKey('$schema', $outputSchema);
+        self::assertArrayNotHasKey('definitions', $outputSchema);
+        self::assertArrayNotHasKey('allOf', $outputSchema);
         self::assertArrayHasKeyAndValue('type', 'object', $outputSchema);
 
-        self::assertArrayHasKey('definitions', $outputSchema);
-        $definitions = $outputSchema['definitions'];
-        self::assertArrayHasKey('McpBook.jsonld', $definitions);
-        $McpBookJsonLd = $definitions['McpBook.jsonld'];
-        self::assertArrayHasKeyAndValue('allOf', [
-            [
-                '$ref' => '#/definitions/HydraItemBaseSchema',
-            ],
-            [
-                'type' => 'object',
-                'properties' => [
-                    'id' => ['readOnly' => true, 'type' => 'integer'],
-                    'title' => ['type' => 'string'],
-                    'isbn' => ['type' => 'string'],
-                    'status' => ['type' => ['string', 'null']],
-                ],
-            ],
-        ], $McpBookJsonLd);
+        // Collection schema: hydra:member contains flattened item schemas
+        self::assertArrayHasKey('properties', $outputSchema);
+        self::assertArrayHasKey('hydra:member', $outputSchema['properties']);
+        $hydraMember = $outputSchema['properties']['hydra:member'];
+        self::assertArrayHasKeyAndValue('type', 'array', $hydraMember);
 
-        self::assertArrayHasKeyAndValue('allOf', [
-            ['$ref' => '#/definitions/HydraCollectionBaseSchema'],
-            [
-                'type' => 'object',
-                'required' => ['hydra:member'],
-                'properties' => [
-                    'hydra:member' => [
-                        'type' => 'array',
-                        'items' => [
-                            '$ref' => '#/definitions/McpBook.jsonld',
-                        ],
-                    ],
-                ],
-            ],
-        ], $outputSchema);
+        // Items are inlined (no $ref)
+        self::assertArrayHasKey('items', $hydraMember);
+        self::assertArrayNotHasKey('$ref', $hydraMember['items']);
+        self::assertArrayHasKeyAndValue('type', 'object', $hydraMember['items']);
+        self::assertArrayHasKey('properties', $hydraMember['items']);
+        $itemProps = $hydraMember['items']['properties'];
+        self::assertArrayHasKey('id', $itemProps);
+        self::assertArrayHasKey('title', $itemProps);
+        self::assertArrayHasKey('isbn', $itemProps);
+        self::assertArrayHasKey('status', $itemProps);
+
+        self::assertSame(['hydra:member'], $outputSchema['required']);
 
         $listBooksDto = array_filter($tools, static function (array $input) {
             return 'list_books_dto' === $input['name'];
@@ -499,20 +486,15 @@ class McpTest extends ApiTestCase
         ], $listBooksDto);
         self::assertArrayHasKeyAndValue('description', 'List Books and return a DTO', $listBooksDto);
 
+        // DTO output schema is also flattened
         $outputSchema = $listBooksDto['outputSchema'];
-        self::assertArrayHasKeyAndValue('$schema', 'http://json-schema.org/draft-07/schema#', $outputSchema);
-        self::assertArrayNotHasKey('type', $outputSchema);
-
-        self::assertArrayHasKey('definitions', $outputSchema);
-        $definitions = $outputSchema['definitions'];
-        self::assertArrayHasKeyAndValue('McpBookOutputDto.jsonld', [
-            'type' => 'object',
-            'properties' => [
-                'id' => ['type' => 'integer'],
-                'name' => ['type' => 'string'],
-                'isbn' => ['type' => 'string'],
-            ],
-        ], $definitions);
+        self::assertArrayNotHasKey('$schema', $outputSchema);
+        self::assertArrayNotHasKey('definitions', $outputSchema);
+        self::assertArrayHasKeyAndValue('type', 'object', $outputSchema);
+        self::assertArrayHasKey('properties', $outputSchema);
+        self::assertArrayHasKey('id', $outputSchema['properties']);
+        self::assertArrayHasKey('name', $outputSchema['properties']);
+        self::assertArrayHasKey('isbn', $outputSchema['properties']);
     }
 
     public function testMcpToolAttribute(): void
@@ -799,14 +781,11 @@ class McpTest extends ApiTestCase
         $structuredContent = $result['structuredContent'] ?? null;
         $this->assertIsArray($structuredContent);
 
-        // when api_platform.use_symfony_listeners is true, the result is formatted as JSON-LD
-        if (true === $this->getContainer()->getParameter('api_platform.use_symfony_listeners')) {
-            self::assertArrayHasKeyAndValue('@context', '/contexts/McpBook', $structuredContent);
-            self::assertArrayHasKeyAndValue('hydra:totalItems', 1, $structuredContent);
-            $members = $structuredContent['hydra:member'];
-        } else {
-            $members = $structuredContent;
-        }
+        // MCP Handler overrides Accept to match the operation's output format (jsonld by default),
+        // so the response is always formatted as JSON-LD regardless of use_symfony_listeners.
+        self::assertArrayHasKeyAndValue('@context', '/contexts/McpBook', $structuredContent);
+        self::assertArrayHasKeyAndValue('hydra:totalItems', 1, $structuredContent);
+        $members = $structuredContent['hydra:member'];
 
         $this->assertCount(1, $members, json_encode($members, \JSON_PRETTY_PRINT));
         $actualBook = array_first($members);
@@ -877,18 +856,17 @@ class McpTest extends ApiTestCase
         $structuredContent = $result['structuredContent'] ?? null;
         $this->assertIsArray($structuredContent);
 
-        // when api_platform.use_symfony_listeners is true, the result is formatted as JSON-LD
-        if (true === $this->getContainer()->getParameter('api_platform.use_symfony_listeners')) {
-            self::assertArrayHasKeyAndValue('@context', [
-                '@vocab' => 'http://localhost/docs.jsonld#',
-                'hydra' => 'http://www.w3.org/ns/hydra/core#',
-                'id' => 'McpBookOutputDto/id',
-                'name' => 'McpBookOutputDto/name',
-                'isbn' => 'McpBookOutputDto/isbn',
-            ], $structuredContent);
-            self::assertArrayHasKey('@id', $structuredContent);
-            self::assertArrayHasKeyAndValue('@type', 'McpBookOutputDto', $structuredContent);
-        }
+        // MCP Handler overrides Accept to match the operation's output format (jsonld by default),
+        // so the response is always formatted as JSON-LD.
+        self::assertArrayHasKeyAndValue('@context', [
+            '@vocab' => 'http://localhost/docs.jsonld#',
+            'hydra' => 'http://www.w3.org/ns/hydra/core#',
+            'id' => 'McpBookOutputDto/id',
+            'name' => 'McpBookOutputDto/name',
+            'isbn' => 'McpBookOutputDto/isbn',
+        ], $structuredContent);
+        self::assertArrayHasKey('@id', $structuredContent);
+        self::assertArrayHasKeyAndValue('@type', 'McpBookOutputDto', $structuredContent);
 
         self::assertArrayHasKeyAndValue('id', 1, $structuredContent);
         self::assertArrayHasKeyAndValue('name', 'API Platform Guide for MCP', $structuredContent);

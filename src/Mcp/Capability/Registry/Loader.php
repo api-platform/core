@@ -50,22 +50,25 @@ final class Loader implements LoaderInterface
                 foreach ($resource->getMcp() ?? [] as $mcp) {
                     if ($mcp instanceof McpTool) {
                         $inputClass = $mcp->getInput()['class'] ?? $mcp->getClass();
-                        $inputFormat = array_first($mcp->getInputFormats() ?? ['json']);
+                        $inputFormat = array_key_first($mcp->getInputFormats() ?? ['json' => ['application/json']]);
                         $inputSchema = $this->schemaFactory->buildSchema($inputClass, $inputFormat, Schema::TYPE_INPUT, $mcp, null, [SchemaFactory::FORCE_SUBSCHEMA => true]);
 
-                        $outputClass = $mcp->getOutput()['class'] ?? $mcp->getClass();
-                        $outputFormat = array_first($mcp->getOutputFormats() ?? ['jsonld']);
-                        $outputSchema = $this->schemaFactory->buildSchema($outputClass, $outputFormat, Schema::TYPE_OUTPUT, $mcp, null, [SchemaFactory::FORCE_SUBSCHEMA => true]);
+                        $outputSchema = null;
+                        if (false !== $mcp->getStructuredContent()) {
+                            $outputClass = $mcp->getOutput()['class'] ?? $mcp->getClass();
+                            $outputFormat = array_key_first($mcp->getOutputFormats() ?? ['json' => ['application/json']]);
+                            $outputSchema = $this->schemaFactory->buildSchema($outputClass, $outputFormat, Schema::TYPE_OUTPUT, $mcp, null, [SchemaFactory::FORCE_SUBSCHEMA => true])->getArrayCopy();
+                        }
 
                         $registry->registerTool(
                             new Tool(
                                 name: $mcp->getName(),
-                                inputSchema: $inputSchema->getDefinitions()[$inputSchema->getRootDefinitionKey()]->getArrayCopy(),
+                                inputSchema: $inputSchema->getArrayCopy(),
                                 description: $mcp->getDescription(),
                                 annotations: $mcp->getAnnotations() ? ToolAnnotations::fromArray($mcp->getAnnotations()) : null,
                                 icons: $mcp->getIcons(),
                                 meta: $mcp->getMeta(),
-                                outputSchema: $outputSchema->getArrayCopy(),
+                                outputSchema: $outputSchema,
                             ),
                             self::HANDLER,
                             true,

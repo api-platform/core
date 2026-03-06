@@ -108,6 +108,7 @@ use ApiPlatform\Laravel\State\SwaggerUiProcessor;
 use ApiPlatform\Laravel\State\SwaggerUiProvider;
 use ApiPlatform\Laravel\State\ValidateProvider;
 use ApiPlatform\Mcp\Capability\Registry\Loader as McpLoader;
+use ApiPlatform\Mcp\JsonSchema\SchemaFactory as McpSchemaFactory;
 use ApiPlatform\Mcp\Metadata\Operation\Factory\OperationMetadataFactory as McpOperationMetadataFactory;
 use ApiPlatform\Mcp\Routing\IriConverter as McpIriConverter;
 use ApiPlatform\Mcp\Server\Handler;
@@ -1085,11 +1086,17 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
+        $this->app->singleton(McpSchemaFactory::class, static function (Application $app) {
+            return new McpSchemaFactory(
+                $app->make(SchemaFactory::class)
+            );
+        });
+
         $this->app->singleton(McpLoader::class, static function (Application $app) {
             return new McpLoader(
                 $app->make(ResourceNameCollectionFactoryInterface::class),
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
-                $app->make(SchemaFactoryInterface::class)
+                $app->make(McpSchemaFactory::class)
             );
         });
         $this->app->tag(McpLoader::class, 'mcp.loader');
