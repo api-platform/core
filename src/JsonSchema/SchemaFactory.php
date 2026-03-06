@@ -560,14 +560,15 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             $additionalPropertySchema = $propertyMetadata->getJsonSchemaContext();
         }
 
-        $propertySchema = array_merge(
+        return array_merge(
             $propertyMetadata->getSchema() ?? [],
             $additionalPropertySchema ?? []
         );
-
-        return $propertySchema;
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     private function buildSubclassPropertySchema(Schema $schema, ApiProperty $propertyMetadata): ?array
     {
         $propertySchema = $this->getBasePropertySchema($propertyMetadata, $schema->getVersion());
@@ -613,6 +614,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 continue;
             }
 
+            /** @var \ArrayObject<string, array<string, mixed>> $subclassProperties */
             $subclassProperties = new \ArrayObject();
 
             foreach ($this->propertyNameCollectionFactory->create($subClassName, $options) as $propertyName) {
@@ -631,13 +633,11 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                     $definition['required'][] = $normalizedPropertyName;
                 }
 
-                $subclassProperties[$normalizedPropertyName] = $this->buildSubclassPropertySchema($schema, $propertyMetadata);
-                if (null === $subclassProperties[$normalizedPropertyName]) {
-                    unset($subclassProperties[$normalizedPropertyName]);
+                if ($propertySchema = $this->buildSubclassPropertySchema($schema, $propertyMetadata)) {
+                    $subclassProperties[$normalizedPropertyName] = $propertySchema;
                 }
             }
 
-            $subDefinition = new \ArrayObject();
             $allOf = [
                 ['$ref' => $uriPrefix.$definitionName],
             ];
@@ -645,19 +645,19 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             if (\count($subclassProperties) > 0) {
                 $extra = ['type' => 'object', 'properties' => $subclassProperties->getArrayCopy()];
                 if (isset($definition['required']) && \count($definition['required']) > 0) {
-                    $extra['required'] = $definition['required'];
+                    $extra['required'] = array_values((array) $definition['required']);
                 }
                 $allOf[] = $extra;
             }
 
-            $subDefinition['allOf'] = $allOf;
+            $subDefinition = new \ArrayObject(['allOf' => new \ArrayObject($allOf)]);
             $definitions[$subDefinitionName] = $subDefinition;
 
             $oneOf[] = ['$ref' => $uriPrefix.$subDefinitionName];
             $discriminatorMapping[$typeValue] = $uriPrefix.$subDefinitionName;
         }
 
-        if ($oneOf) {
+        if (\count($oneOf) > 0) {
             $definition['oneOf'] = $oneOf;
             $normalizedTypeProperty = $this->nameConverter ? $this->nameConverter->normalize($typeProperty, $inputOrOutputClass, $format, $serializerContext) : $typeProperty;
             $definition['discriminator'] = [
