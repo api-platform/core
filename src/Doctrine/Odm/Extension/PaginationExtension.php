@@ -67,6 +67,11 @@ final class PaginationExtension implements AggregationResultCollectionExtensionI
          */
         $repository = $manager->getRepository($resourceClass);
 
+        // Limit the documents entering $facet to avoid buffering the whole result set
+        if (!$doesCount && $limit > 0) {
+            $aggregationBuilder->limit($offset + $limit);
+        }
+
         $facet = $aggregationBuilder->facet();
         $addFields = $aggregationBuilder->addFields();
 
