@@ -406,7 +406,13 @@ class ApiPlatformProvider extends ServiceProvider
             /** @var ConfigRepository */
             $config = $app['config'];
 
-            return new SwaggerUiProvider($app->make(ReadProvider::class), $app->make(OpenApiFactoryInterface::class), $config->get('api-platform.swagger_ui.enabled', false), $config->get('api-platform.scalar.enabled', false));
+            return new SwaggerUiProvider(
+                decorated: $app->make(ReadProvider::class),
+                openApiFactory: $app->make(OpenApiFactoryInterface::class),
+                swaggerUiEnabled: $config->get('api-platform.swagger_ui.enabled', false),
+                scalarEnabled: $config->get('api-platform.scalar.enabled', false),
+                redocEnabled: $config->get('api-platform.redoc.enabled', false)
+            );
         });
 
         $this->app->singleton(DeserializeProvider::class, static function (Application $app) {
@@ -747,8 +753,10 @@ class ApiPlatformProvider extends ServiceProvider
                 oauthClientId: $config->get('api-platform.swagger_ui.oauth.clientId'),
                 oauthClientSecret: $config->get('api-platform.swagger_ui.oauth.clientSecret'),
                 oauthPkce: $config->get('api-platform.swagger_ui.oauth.pkce', false),
+                swaggerEnabled: $config->get('api-platform.swagger_ui.enabled', false),
                 scalarEnabled: $config->get('api-platform.scalar.enabled', false),
                 scalarExtraConfiguration: $config->get('api-platform.scalar.extra_configuration', []),
+                redocEnabled: $config->get('api-platform.redoc.enabled', false),
             );
         });
 
@@ -762,7 +770,20 @@ class ApiPlatformProvider extends ServiceProvider
             /** @var ConfigRepository */
             $config = $app['config'];
 
-            return new DocumentationController($app->make(ResourceNameCollectionFactoryInterface::class), $config->get('api-platform.title') ?? '', $config->get('api-platform.description') ?? '', $config->get('api-platform.version') ?? '', $app->make(OpenApiFactoryInterface::class), $app->make(ProviderInterface::class), $app->make(ProcessorInterface::class), $app->make(Negotiator::class), $config->get('api-platform.docs_formats'), $config->get('api-platform.swagger_ui.enabled', false), $config->get('api-platform.scalar.enabled', false));
+            return new DocumentationController(
+                resourceNameCollectionFactory: $app->make(ResourceNameCollectionFactoryInterface::class),
+                title: $config->get('api-platform.title') ?? '',
+                description: $config->get('api-platform.description') ?? '',
+                version: $config->get('api-platform.version') ?? '',
+                openApiFactory: $app->make(OpenApiFactoryInterface::class),
+                provider: $app->make(ProviderInterface::class),
+                processor: $app->make(ProcessorInterface::class),
+                negotiator: $app->make(Negotiator::class),
+                documentationFormats: $config->get('api-platform.docs_formats'),
+                swaggerUiEnabled: $config->get('api-platform.swagger_ui.enabled', false),
+                scalarEnabled: $config->get('api-platform.scalar.enabled', false),
+                redocEnabled: $config->get('api-platform.redoc.enabled', false),
+            );
         });
 
         $this->app->singleton(EntrypointController::class, static function (Application $app) {

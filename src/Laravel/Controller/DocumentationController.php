@@ -54,6 +54,7 @@ final class DocumentationController
         private readonly array $documentationFormats = [OpenApiNormalizer::JSON_FORMAT => ['application/vnd.openapi+json'], OpenApiNormalizer::FORMAT => ['application/json']],
         private readonly bool $swaggerUiEnabled = true,
         private readonly bool $scalarEnabled = true,
+        private readonly bool $redocEnabled = true,
     ) {
         $this->negotiator = $negotiator ?? new Negotiator();
     }
@@ -95,7 +96,7 @@ final class DocumentationController
             outputFormats: $this->documentationFormats
         );
 
-        if ('html' === $format && ($this->swaggerUiEnabled || $this->scalarEnabled)) {
+        if ('html' === $format && ($this->swaggerUiEnabled || $this->scalarEnabled || $this->redocEnabled)) {
             $operation = $operation->withProcessor('api_platform.swagger_ui.processor')->withWrite(true);
         }
 

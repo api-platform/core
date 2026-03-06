@@ -97,6 +97,10 @@ return [
         AuthorizationException::class => 403,
     ],
 
+    'redoc' => [
+        'enabled' => true,
+    ],
+
     'scalar' => [
         'enabled' => true,
         'extra_configuration' => [],
