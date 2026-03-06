@@ -40,7 +40,7 @@ final class ContentNegotiationProvider implements ProviderInterface, StopwatchAw
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        if (!($request = $context['request'] ?? null) || !$operation instanceof HttpOperation) {
+        if (!($request = $context['request'] ?? null) || !$operation instanceof HttpOperation || false === $operation->canNegotiateContent()) {
             return $this->decorated?->provide($operation, $uriVariables, $context);
         }
 

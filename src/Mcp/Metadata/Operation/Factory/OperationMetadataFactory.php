@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Mcp\Metadata\Operation\Factory;
 
-use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\McpResource;
 use ApiPlatform\Metadata\McpTool;
@@ -32,10 +31,7 @@ final class OperationMetadataFactory implements OperationMetadataFactoryInterfac
     ) {
     }
 
-    /**
-     * @throws RuntimeException
-     */
-    public function create(string $operationName, array $context = []): HttpOperation
+    public function create(string $operationName, array $context = []): ?HttpOperation
     {
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
             foreach ($this->resourceMetadataCollectionFactory->create($resourceClass) as $resource) {
@@ -55,6 +51,6 @@ final class OperationMetadataFactory implements OperationMetadataFactoryInterfac
             }
         }
 
-        throw new RuntimeException(\sprintf('MCP operation "%s" not found.', $operationName));
+        return null;
     }
 }

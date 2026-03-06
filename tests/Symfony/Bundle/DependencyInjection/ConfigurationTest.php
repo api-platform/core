@@ -246,6 +246,7 @@ class ConfigurationTest extends TestCase
             'enable_phpdoc_parser' => true,
             'mcp' => [
                 'enabled' => true,
+                'format' => 'jsonld',
             ],
             'jsonapi' => [
                 'use_iri_as_id' => true,

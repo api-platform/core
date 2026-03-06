@@ -18,6 +18,8 @@ use ApiPlatform\Metadata\ErrorResource;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\McpResource;
+use ApiPlatform\Metadata\McpTool;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
@@ -39,6 +41,7 @@ final class FormatsResourceMetadataCollectionFactory implements ResourceMetadata
         private readonly array $formats,
         private readonly array $patchFormats,
         private readonly ?array $errorFormats = null,
+        private readonly ?string $mcpFormat = null,
     ) {
     }
 
@@ -63,6 +66,22 @@ final class FormatsResourceMetadataCollectionFactory implements ResourceMetadata
             }
 
             $resourceMetadataCollection[$index] = $resourceMetadataCollection[$index]->withOperations($this->normalize($resourceInputFormats, $resourceOutputFormats, $resourceMetadata->getOperations()));
+
+            // Apply MCP-specific format to MCP operations
+            if (null !== $this->mcpFormat && null !== ($mcp = $resourceMetadata->getMcp())) {
+                if (!isset($this->formats[$this->mcpFormat])) {
+                    throw new InvalidArgumentException(\sprintf('The MCP format "%s" is not configured in api_platform.formats. Available formats: %s.', $this->mcpFormat, implode(', ', array_keys($this->formats))));
+                }
+                $mcpFormats = [$this->mcpFormat => $this->formats[$this->mcpFormat]];
+                $newMcp = [];
+                foreach ($mcp as $key => $operation) {
+                    if (($operation instanceof McpTool || $operation instanceof McpResource) && null === $operation->getFormats() && null === $operation->getInputFormats() && null === $operation->getOutputFormats()) {
+                        $operation = $operation->withInputFormats($mcpFormats)->withOutputFormats($mcpFormats);
+                    }
+                    $newMcp[$key] = $operation;
+                }
+                $resourceMetadataCollection[$index] = $resourceMetadataCollection[$index]->withMcp($newMcp);
+            }
         }
 
         return $resourceMetadataCollection;
