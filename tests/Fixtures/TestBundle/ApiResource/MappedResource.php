@@ -23,6 +23,7 @@ use Symfony\Component\ObjectMapper\Attribute\Map;
     stateOptions: new Options(entityClass: MappedEntity::class),
     normalizationContext: [ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX => false],
 )]
+#[Map(target: UnexpectedMappingTarget::class)]
 #[Map(target: MappedEntity::class)]
 final class MappedResource
 {
