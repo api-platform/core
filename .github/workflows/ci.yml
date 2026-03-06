@@ -1472,6 +1472,6 @@ jobs:
           composer global link ../src/Laravel --permanent
           composer config minimum-stability dev
           composer config prefer-stable true
-          composer require api-platform/laravel:"@dev"
+          composer require api-platform/laravel:"@dev" -W
           php ./artisan api-platform:install
         working-directory: 'test-api-platform-install'
