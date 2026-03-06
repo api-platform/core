@@ -23,10 +23,10 @@ jobs:
     steps:
       - name: Generate App Token
         id: generate_token
-        uses: tibdex/github-app-token@v2
+        uses: actions/create-github-app-token@v1
         with:
-          app_id: ${{ secrets.API_PLATFORM_APP_ID }}
-          private_key: ${{ secrets.API_PLATFORM_APP_PRIVATE_KEY }}
+          app-id: ${{ secrets.API_PLATFORM_APP_ID }}
+          private-key: ${{ secrets.API_PLATFORM_APP_PRIVATE_KEY }}
 
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -52,10 +52,10 @@ jobs:
     steps:
       - name: Generate App Token
         id: generate_token
-        uses: tibdex/github-app-token@v2
+        uses: actions/create-github-app-token@v1
         with:
-          app_id: ${{ secrets.API_PLATFORM_APP_ID }}
-          private_key: ${{ secrets.API_PLATFORM_APP_PRIVATE_KEY }}
+          app-id: ${{ secrets.API_PLATFORM_APP_ID }}
+          private-key: ${{ secrets.API_PLATFORM_APP_PRIVATE_KEY }}
 
       - name: Update distribution
         env:
