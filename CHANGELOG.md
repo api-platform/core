@@ -1,5 +1,15 @@
 # Changelog
 
+## v4.2.20
+
+### Bug fixes
+
+* [31289b838](https://github.com/api-platform/core/commit/31289b838513dba263f1087ded32d50ea370f4f3) fix(symfony): make enable_docs a master switch for disabling documentation (#7806)
+* [64115e152](https://github.com/api-platform/core/commit/64115e152301b896b9e6d7999b7b3f50f1d85085) fix(odm): partial pagination limit the documents entering $facet (#7822)
+* [98b8efb68](https://github.com/api-platform/core/commit/98b8efb68785cf930fd5b136eb40e6b4a9b54db4) fix(laravel): exclude .blade.php files from recursive class scan (#7813)
+* [9fdc6c27d](https://github.com/api-platform/core/commit/9fdc6c27dd61e66957505099b27dac29659183ba) fix(openapi): allow Operations to override global config in getPaginationParameters (#7807)
+* [cfdc22c1c](https://github.com/api-platform/core/commit/cfdc22c1c8895a420f2e9b91e541a333265e09a2) fix(laravel): do not exclude custom primary keys matching HasMany foreign keys (#7810)
+
 ## v4.2.19
 
 ### Bug fixes
