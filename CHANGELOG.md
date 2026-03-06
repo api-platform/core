@@ -1,5 +1,16 @@
 # Changelog
 
+## v4.3.0-beta.2
+
+### Bug fixes
+
+* [5ca646111](https://github.com/api-platform/core/commit/5ca6461118e8cce34a6894a521003d9ce05187bc) fix(mcp): fallback to sdk handler when not found (#7818)
+
+
+### Features
+
+* [6addc554d](https://github.com/api-platform/core/commit/6addc554d0e968f93ccc5de12bf12b8a86290ae1) feat(openapi): Scalar API Reference documentation support (#7817)
+
 ## v4.3.0-beta.1
 
 ### Bug fixes
