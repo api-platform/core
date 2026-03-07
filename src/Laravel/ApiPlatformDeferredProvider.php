@@ -185,7 +185,7 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
             $config = $app['config'];
             $tagged = iterator_to_array($app->tagged(ProcessorInterface::class));
 
-            if ($config->get('api-platform.swagger_ui.enabled', false)) {
+            if ($config->get('api-platform.swagger_ui.enabled', false) || $config->get('api-platform.redoc.enabled', false) || $config->get('api-platform.scalar.enabled', false)) {
                 // TODO: tag SwaggerUiProcessor instead?
                 $tagged['api_platform.swagger_ui.processor'] = $app->make(SwaggerUiProcessor::class);
             }
@@ -216,7 +216,7 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
             $config = $app['config'];
             $formats = $config->get('api-platform.formats');
 
-            if ($config->get('api-platform.swagger_ui.enabled', false) && !isset($formats['html'])) {
+            if (($config->get('api-platform.swagger_ui.enabled', false) || $config->get('api-platform.redoc.enabled', false) || $config->get('api-platform.scalar.enabled', false)) && !isset($formats['html'])) {
                 $formats['html'] = ['text/html'];
             }
 

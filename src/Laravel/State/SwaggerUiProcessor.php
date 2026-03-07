@@ -44,8 +44,10 @@ final class SwaggerUiProcessor implements ProcessorInterface
         private readonly ?string $oauthClientId = null,
         private readonly ?string $oauthClientSecret = null,
         private readonly bool $oauthPkce = false,
+        private readonly bool $swaggerEnabled = false,
         private readonly bool $scalarEnabled = false,
         private readonly array $scalarExtraConfiguration = [],
+        private readonly bool $redocEnabled = false,
     ) {
     }
 
@@ -97,7 +99,7 @@ final class SwaggerUiProcessor implements ProcessorInterface
 
         $swaggerData['scalarExtraConfiguration'] = $this->scalarExtraConfiguration;
 
-        return new Response(view('api-platform::swagger-ui', $swaggerContext + ['swagger_data' => $swaggerData, 'scalar_enabled' => $this->scalarEnabled]), 200);
+        return new Response(view('api-platform::swagger-ui', $swaggerContext + ['swagger_data' => $swaggerData, 'ui' => $this->getUi()]), 200);
     }
 
     /**
@@ -116,5 +118,26 @@ final class SwaggerUiProcessor implements ProcessorInterface
         }
 
         throw new RuntimeException(\sprintf('The operation "%s" cannot be found in the Swagger specification.', $swaggerData['operationId']));
+    }
+
+    private function getUi(): string
+    {
+        $requested = request()->query('ui');
+
+        $available = array_keys(array_filter([
+            'swagger' => $this->swaggerEnabled,
+            'redoc' => $this->redocEnabled,
+            'scalar' => $this->scalarEnabled,
+        ]));
+
+        if ([] === $available) {
+            throw new RuntimeException('No documentation UI is enabled.');
+        }
+
+        if (\in_array($requested, $available, true)) {
+            return $requested;
+        }
+
+        return $available[0];
     }
 }
