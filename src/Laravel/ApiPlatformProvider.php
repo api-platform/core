@@ -941,7 +941,9 @@ class ApiPlatformProvider extends ServiceProvider
             $this->registerGraphQl();
         }
 
-        $this->registerMcp();
+        if (class_exists(McpController::class)) {
+            $this->registerMcp();
+        }
 
         $this->app->singleton(JsonApiEntrypointNormalizer::class, static function (Application $app) {
             return new JsonApiEntrypointNormalizer(
@@ -1096,10 +1098,6 @@ class ApiPlatformProvider extends ServiceProvider
 
     private function registerMcp(): void
     {
-        if (!class_exists(McpController::class)) {
-            return;
-        }
-
         $this->app->singleton(Registry::class, static function (Application $app) {
             return new Registry(
                 null, // event dispatcher (todo)
