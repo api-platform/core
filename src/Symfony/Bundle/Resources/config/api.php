@@ -194,7 +194,8 @@ return function (ContainerConfigurator $container) {
         ->tag('routing.loader');
 
     $services->set('api_platform.symfony.iri_converter.skolem', SkolemIriConverter::class)
-        ->args([service('api_platform.router')]);
+        ->args([service('api_platform.router')])
+        ->tag('kernel.reset', ['method' => 'reset']);
 
     $services->set('api_platform.api.identifiers_extractor', IdentifiersExtractor::class)
         ->args([
