@@ -93,7 +93,7 @@ class SkolemIriConverterTest extends TestCase
         for ($i = 0; $i < 3; ++$i) {
             $resource = new \stdClass();
             $converter->getIriFromResource($resource);
-            $converter->getIriFromResource('SomeClass');
+            $converter->getIriFromResource(\stdClass::class);
             $converter->reset();
         }
 
