@@ -1253,7 +1253,6 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
 
         $serializerProphecy = $this->prophesize(SerializerInterface::class);
-        $serializerProphecy->willImplement(DenormalizerInterface::class);
 
         $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), null, null, [], null, null) extends AbstractItemNormalizer {};
         $normalizer->setSerializer($serializerProphecy->reveal());
