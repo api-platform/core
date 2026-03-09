@@ -686,16 +686,16 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected function denormalizeRelation(string $attributeName, ApiProperty $propertyMetadata, string $className, mixed $value, ?string $format, array $context): ?object
     {
         if (\is_string($value) || $propertyMetadata->isWritableLink()) {
-            if ($propertyMetadata->isWritableLink()) {
-                $context['api_allow_update'] = true;
-            }
-
             if (!$this->serializer instanceof DenormalizerInterface) {
                 if (\is_string($value)) {
                     return $this->getResourceFromIri($value, $context, $className);
                 }
 
                 throw new LogicException(\sprintf('The injected serializer must be an instance of "%s".', DenormalizerInterface::class));
+            }
+
+            if ($propertyMetadata->isWritableLink()) {
+                $context['api_allow_update'] = true;
             }
 
             $item = $this->serializer->denormalize($value, $className, $format, $context);
