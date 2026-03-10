@@ -16,6 +16,8 @@ namespace ApiPlatform\JsonLd\Serializer;
 use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
 use ApiPlatform\JsonLd\ContextBuilder;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
+use ApiPlatform\JsonLd\OperationContextBuilderInterface;
+use ApiPlatform\Metadata\HttpOperation;
 
 /**
  * Creates and manipulates the Serializer context.
@@ -37,13 +39,20 @@ trait JsonLdContextTrait
 
         $context['jsonld_has_context'] = true;
 
+        $operation = $context['operation'] ?? null;
+        $useOperationAware = $operation instanceof HttpOperation && $contextBuilder instanceof OperationContextBuilderInterface;
+
         if (isset($context['jsonld_embed_context'])) {
-            $data['@context'] = $contextBuilder->getResourceContext($resourceClass);
+            $data['@context'] = $useOperationAware
+                ? $contextBuilder->getResourceContextFromOperation($operation, $resourceClass)
+                : $contextBuilder->getResourceContext($resourceClass);
 
             return $data;
         }
 
-        $data['@context'] = $contextBuilder->getResourceContextUri($resourceClass);
+        $data['@context'] = $useOperationAware
+            ? $contextBuilder->getResourceContextUriFromOperation($operation)
+            : $contextBuilder->getResourceContextUri($resourceClass);
 
         return $data;
     }
