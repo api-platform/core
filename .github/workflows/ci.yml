@@ -276,7 +276,9 @@ jobs:
         if: matrix.php == '8.2'
         run: composer require phpunit/phpunit:^11.5 --dev --with-all-dependencies
       - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
+        run: |
+          rm -Rf tests/Fixtures/app/var/cache/*
+          tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml ${{ matrix.coverage && '--coverage-clover build/logs/phpunit/clover.xml' || '' }}
       - name: Upload test artifacts
@@ -495,7 +497,9 @@ jobs:
         if: matrix.php == '8.2'
         run: composer require phpunit/phpunit:^11.5 --dev --with-all-dependencies
       - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
+        run: |
+          rm -Rf tests/Fixtures/app/var/cache/*
+          tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests (PHP ${{ matrix.php }})
         run: |
           mkdir -p build/logs/behat
@@ -579,11 +583,15 @@ jobs:
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
+        run: |
+          rm -Rf tests/Fixtures/app/var/cache/*
+          tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit
       - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
+        run: |
+          rm -Rf tests/Fixtures/app/var/cache/*
+          tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
         run: |
           vendor/bin/behat --out=std --format=progress --profile=postgres --no-interaction -vv
@@ -634,11 +642,15 @@ jobs:
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
+        run: |
+          rm -Rf tests/Fixtures/app/var/cache/*
+          tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit
       - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
+        run: |
+          rm -Rf tests/Fixtures/app/var/cache/*
+          tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
         run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction --tags '~@!mysql'
 
@@ -690,11 +702,15 @@ jobs:
           composer global link . --permanent
           composer require --dev doctrine/mongodb-odm-bundle
       - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
+        run: |
+          rm -Rf tests/Fixtures/app/var/cache/*
+          tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --coverage-clover build/logs/phpunit/clover.xml --exclude-group=orm
       - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
+        run: |
+          rm -Rf tests/Fixtures/app/var/cache/*
+          tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
         run: |
           mkdir -p build/logs/behat
@@ -782,7 +798,9 @@ jobs:
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
+        run: |
+          rm -Rf tests/Fixtures/app/var/cache/*
+          tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --coverage-clover build/logs/phpunit/clover.xml --group mercure
       - name: Run Behat tests
@@ -884,7 +902,9 @@ jobs:
             composer update elasticsearch/elasticsearch --prefer-lowest
           fi
       - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
+        run: |
+          rm -Rf tests/Fixtures/app/var/cache/*
+          tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
         run: vendor/bin/behat --out=std --format=progress --profile=elasticsearch --no-interaction
 
@@ -923,7 +943,9 @@ jobs:
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
+        run: |
+          rm -Rf tests/Fixtures/app/var/cache/*
+          tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit --fail-on-deprecation --display-deprecations
 
@@ -966,7 +988,9 @@ jobs:
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
+        run: |
+          rm -Rf tests/Fixtures/app/var/cache/*
+          tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit --fail-on-deprecation
 
@@ -1011,7 +1035,9 @@ jobs:
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
+        run: |
+          rm -Rf tests/Fixtures/app/var/cache/*
+          tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
         run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction
 
@@ -1063,7 +1089,9 @@ jobs:
           composer global link . --working-directory='${{ steps.get-cwd.outputs.cwd }}'
       - name: Clear test app cache
         shell: bash
-        run: tests/Fixtures/app/console cache:clear --ansi
+        run: |
+          rm -Rf tests/Fixtures/app/var/cache/*
+          tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
         shell: bash
         run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction
@@ -1106,7 +1134,9 @@ jobs:
           composer global link . --permanent
           composer update --prefer-lowest
       - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
+        run: |
+          rm -Rf tests/Fixtures/app/var/cache/*
+          tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit
         env:
@@ -1152,7 +1182,9 @@ jobs:
           composer global link . --permanent
           composer update --prefer-lowest
       - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
+        run: |
+          rm -Rf tests/Fixtures/app/var/cache/*
+          tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests
         run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction --tags='~@disableForSymfonyLowest'
 
@@ -1199,7 +1231,9 @@ jobs:
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
+        run: |
+          rm -Rf tests/Fixtures/app/var/cache/*
+          tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
         run: |
           mkdir -p build/logs/phpunit
@@ -1271,7 +1305,9 @@ jobs:
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
+        run: |
+          rm -Rf tests/Fixtures/app/var/cache/*
+          tests/Fixtures/app/console cache:clear --ansi
       - name: Run Behat tests (PHP 8)
         run: |
           mkdir -p build/logs/behat
@@ -1322,7 +1358,9 @@ jobs:
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
+        run: |
+          rm -Rf tests/Fixtures/app/var/cache/*
+          tests/Fixtures/app/console cache:clear --ansi
       - name: Export OpenAPI documents
         run: |
           mkdir -p build/out/openapi
