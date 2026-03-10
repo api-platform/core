@@ -285,6 +285,10 @@ services:
         tags:
             - name: 'messenger.message_handler'
 
+    ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue3975\ActionSimulationResolver:
+        tags:
+            - name: 'api_platform.graphql.resolver'
+
     app.graphql.query_resolver.dummy_custom_item:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryItemResolver'
         tags:

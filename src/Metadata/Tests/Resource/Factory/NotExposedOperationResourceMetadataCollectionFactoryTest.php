@@ -232,7 +232,7 @@ class NotExposedOperationResourceMetadataCollectionFactoryTest extends TestCase
                     types: ['https://schema.org/Book'],
                     operations: [
                         '_api_AttributeResource_get_collection' => new GetCollection(controller: 'api_platform.action.placeholder', shortName: 'AttributeResource', class: AttributeResource::class),
-                        '_api_AttributeResource_get' => new NotExposed(uriTemplate: '/.well-known/genid/{id}', controller: 'api_platform.action.not_exposed', shortName: 'AttributeResource', class: AttributeResource::class, output: false, read: false, extraProperties: ['generated_operation' => true], types: ['https://schema.org/Book']),
+                        '_api_AttributeResource_get' => new NotExposed(uriTemplate: '/.well-known/genid/{id}', uriVariables: [], controller: 'api_platform.action.not_exposed', shortName: 'AttributeResource', class: AttributeResource::class, output: false, read: false, extraProperties: ['generated_operation' => true], types: ['https://schema.org/Book']),
                     ],
                     class: AttributeResource::class
                 ),

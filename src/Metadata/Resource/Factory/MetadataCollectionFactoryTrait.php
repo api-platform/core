@@ -99,6 +99,9 @@ trait MetadataCollectionFactoryTrait
             }
 
             if ($metadata instanceof GraphQlOperation) {
+                if (-1 === $index) {
+                    $resources[++$index] = $this->getResourceWithDefaults($resourceClass, $shortName, new ApiResource());
+                }
                 [$key, $operation] = $this->getOperationWithDefaults($resources[$index], $metadata);
                 $graphQlOperations = $resources[$index]->getGraphQlOperations();
                 $graphQlOperations[$key] = $operation;
