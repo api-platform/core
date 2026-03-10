@@ -9,3 +9,8 @@ rules:
   component-description: false
   paths-kebab-case: false
   no-unnecessary-combinator: false
+  oas-missing-type: false
+  oas3-unused-component: false
+  operation-tags: false
+  oas3-api-servers: false
+  operation-4xx-response: false

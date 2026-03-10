@@ -39,7 +39,7 @@ class NumericValidated
     #[ORM\Column]
     public int $greaterThanMe;
 
-    #[Assert\GreaterThanOrEqual(value: '10.99')]
+    #[Assert\GreaterThanOrEqual(value: 10.99)]
     #[ORM\Column]
     public float $greaterThanOrEqualToMe;
 
@@ -47,7 +47,7 @@ class NumericValidated
     #[ORM\Column]
     public int $lessThanMe;
 
-    #[Assert\LessThanOrEqual(value: '99.33')]
+    #[Assert\LessThanOrEqual(value: 99.33)]
     #[ORM\Column]
     public float $lessThanOrEqualToMe;
 
