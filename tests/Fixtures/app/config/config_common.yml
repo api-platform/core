@@ -182,6 +182,11 @@ services:
         tags:
             - name: 'serializer.normalizer'
 
+    app.serializer.denormalizer.input_dto:
+      class: 'ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Denormalizer\InputDtoDenormalizer'
+      tags:
+          -   name: 'serializer.normalizer'
+
     app.name_converter:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter'
 
