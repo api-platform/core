@@ -1,0 +1,7 @@
+extends:
+  - recommended
+rules:
+  operation-4xx-response: off
+  no-enum-type-mismatch: off
+  no-unused-components: off
+  struct: off

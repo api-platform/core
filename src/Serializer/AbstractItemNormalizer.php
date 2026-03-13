@@ -266,21 +266,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         if (\is_string($data)) {
-            try {
-                return $this->iriConverter->getResourceFromIri($data, $context + ['fetch_data' => true]);
-            } catch (ItemNotFoundException $e) {
-                if (!isset($context['not_normalizable_value_exceptions'])) {
-                    throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
-                }
-
-                throw NotNormalizableValueException::createForUnexpectedDataType($e->getMessage(), $data, [$resourceClass], $context['deserialization_path'] ?? null, true, $e->getCode(), $e);
-            } catch (InvalidArgumentException $e) {
-                if (!isset($context['not_normalizable_value_exceptions'])) {
-                    throw new UnexpectedValueException(\sprintf('Invalid IRI "%s".', $data), $e->getCode(), $e);
-                }
-
-                throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Invalid IRI "%s".', $data), $data, [$resourceClass], $context['deserialization_path'] ?? null, true, $e->getCode(), $e);
-            }
+            return $this->getResourceFromIri($data, $context, $resourceClass);
         }
 
         if (!\is_array($data)) {
@@ -699,33 +685,17 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function denormalizeRelation(string $attributeName, ApiProperty $propertyMetadata, string $className, mixed $value, ?string $format, array $context): ?object
     {
-        if (\is_string($value)) {
-            try {
-                return $this->iriConverter->getResourceFromIri($value, $context + ['fetch_data' => true]);
-            } catch (ItemNotFoundException $e) {
-                if (false === ($context['denormalize_throw_on_relation_not_found'] ?? true)) {
-                    return null;
-                }
-
-                if (!isset($context['not_normalizable_value_exceptions'])) {
-                    throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
-                }
-
-                throw NotNormalizableValueException::createForUnexpectedDataType($e->getMessage(), $value, [$className], $context['deserialization_path'] ?? null, true, $e->getCode(), $e);
-            } catch (InvalidArgumentException $e) {
-                if (!isset($context['not_normalizable_value_exceptions'])) {
-                    throw new UnexpectedValueException(\sprintf('Invalid IRI "%s".', $value), $e->getCode(), $e);
-                }
-
-                throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Invalid IRI "%s".', $value), $value, [$className], $context['deserialization_path'] ?? null, true, $e->getCode(), $e);
-            }
-        }
-
-        if ($propertyMetadata->isWritableLink()) {
-            $context['api_allow_update'] = true;
-
+        if (\is_string($value) || $propertyMetadata->isWritableLink()) {
             if (!$this->serializer instanceof DenormalizerInterface) {
+                if (\is_string($value)) {
+                    return $this->getResourceFromIri($value, $context, $className);
+                }
+
                 throw new LogicException(\sprintf('The injected serializer must be an instance of "%s".', DenormalizerInterface::class));
+            }
+
+            if ($propertyMetadata->isWritableLink()) {
+                $context['api_allow_update'] = true;
             }
 
             $item = $this->serializer->denormalize($value, $className, $format, $context);
@@ -741,6 +711,29 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Nested documents for attribute "%s" are not allowed. Use IRIs instead.', $attributeName), $value, ['array', 'string'], $context['deserialization_path'] ?? null, true);
+    }
+
+    private function getResourceFromIri(string $data, array $context, string $resourceClass): ?object
+    {
+        try {
+            return $this->iriConverter->getResourceFromIri($data, $context + ['fetch_data' => true]);
+        } catch (ItemNotFoundException $e) {
+            if (false === ($context['denormalize_throw_on_relation_not_found'] ?? true)) {
+                return null;
+            }
+
+            if (!isset($context['not_normalizable_value_exceptions'])) {
+                throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
+            }
+
+            throw NotNormalizableValueException::createForUnexpectedDataType($e->getMessage(), $data, [$resourceClass], $context['deserialization_path'] ?? null, true, $e->getCode(), $e);
+        } catch (InvalidArgumentException $e) {
+            if (!isset($context['not_normalizable_value_exceptions'])) {
+                throw new UnexpectedValueException(\sprintf('Invalid IRI "%s".', $data), $e->getCode(), $e);
+            }
+
+            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Invalid IRI "%s".', $data), $data, [$resourceClass], $context['deserialization_path'] ?? null, true, $e->getCode(), $e);
+        }
     }
 
     /**

@@ -174,7 +174,9 @@ use ApiPlatform\State\SerializerContextBuilderInterface;
 use Http\Discovery\Psr17Factory;
 use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Foundation\Http\Events\RequestHandled;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Mcp\Capability\Registry;
 use Mcp\Server;
@@ -1455,6 +1457,10 @@ class ApiPlatformProvider extends ServiceProvider
             $typeBuilder = $this->app->make(ContextAwareTypeBuilderInterface::class);
             $typeBuilder->setFieldsBuilderLocator(new ServiceLocator(['api_platform.graphql.fields_builder' => $fieldsBuilder]));
         }
+
+        Event::listen(RequestHandled::class, function (): void {
+            $this->app->make(SkolemIriConverter::class)->reset();
+        });
 
         $this->loadRoutesFrom(__DIR__.'/routes/api.php');
     }

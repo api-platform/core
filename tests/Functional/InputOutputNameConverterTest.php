@@ -52,6 +52,39 @@ final class InputOutputNameConverterTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(201);
         $data = $response->toArray();
         $this->assertSame('converted', $data['name_converted']);
+        $this->assertNull($data['childRelation']);
+    }
+
+    public function testInputDtoDenormalizerIsApplied(): void
+    {
+        $response = self::createClient()->request('POST', '/dummy_dto_name_converted', [
+            'headers' => ['Content-Type' => 'application/ld+json'],
+            'json' => [
+                'name_converted' => 'converted',
+                'childRelation' => 'child_relation',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(201);
+        $data = $response->toArray();
+        $this->assertSame('converted', $data['name_converted']);
+        $this->assertSame('/dummy_dto_name_converted/42', $data['childRelation']);
+    }
+
+    public function testInputDtoIriConverterIsApplied(): void
+    {
+        $response = self::createClient()->request('POST', '/dummy_dto_name_converted', [
+            'headers' => ['Content-Type' => 'application/ld+json'],
+            'json' => [
+                'name_converted' => 'converted',
+                'childRelation' => '/dummy_dto_name_converted/child_relation',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(201);
+        $data = $response->toArray();
+        $this->assertSame('converted', $data['name_converted']);
+        $this->assertSame('/dummy_dto_name_converted/1', $data['childRelation']);
     }
 
     public function testOutputDtoNameConverterIsApplied(): void

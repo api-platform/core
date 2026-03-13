@@ -11,13 +11,8 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\Dto;
+namespace ApiPlatform\Symfony\Tests\Fixtures;
 
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DummyDtoNameConverted;
-
-class InputDtoWithNameConverter
+class AnotherMappedObject
 {
-    public ?string $nameConverted = null;
-
-    public ?DummyDtoNameConverted $childRelation = null;
 }

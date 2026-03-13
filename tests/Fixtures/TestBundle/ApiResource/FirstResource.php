@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Symfony\Tests\Fixtures\AnotherMappedObject;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SameEntity;
 use Symfony\Component\ObjectMapper\Attribute\Map;
 
@@ -24,6 +25,7 @@ use Symfony\Component\ObjectMapper\Attribute\Map;
     operations: [new GetCollection()],
     stateOptions: new Options(entityClass: SameEntity::class)
 )]
+#[Map(target: AnotherMappedObject::class)]
 #[Map(target: SameEntity::class)]
 final class FirstResource
 {

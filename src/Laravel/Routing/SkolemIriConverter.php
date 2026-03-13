@@ -42,6 +42,12 @@ final class SkolemIriConverter implements IriConverterInterface
         $this->objectHashMap = new \SplObjectStorage();
     }
 
+    public function reset(): void
+    {
+        $this->objectHashMap = new \SplObjectStorage();
+        $this->classHashMap = [];
+    }
+
     /**
      * {@inheritdoc}
      */

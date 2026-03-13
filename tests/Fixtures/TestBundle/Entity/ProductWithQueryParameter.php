@@ -61,6 +61,11 @@ use Doctrine\ORM\Mapping as ORM;
                     property: 'tags',
                     schema: ['anyOf' => [['type' => 'array', 'items' => ['type' => 'string']], ['type' => 'string']]]
                 ),
+                'listOfTags' => new QueryParameter(
+                    filter: new ExactFilter(),
+                    property: 'tags',
+                    schema: ['type' => 'array', 'items' => ['type' => 'string']],
+                ),
             ]
         ),
     ]

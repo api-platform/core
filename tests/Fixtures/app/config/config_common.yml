@@ -206,6 +206,11 @@ services:
         tags:
             - name: 'serializer.normalizer'
 
+    app.serializer.denormalizer.input_dto:
+      class: 'ApiPlatform\Tests\Fixtures\TestBundle\Serializer\Denormalizer\InputDtoDenormalizer'
+      tags:
+          -   name: 'serializer.normalizer'
+
     app.name_converter:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\Serializer\NameConverter\CustomConverter'
 
@@ -303,6 +308,10 @@ services:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\MessengerHandler\MessengerWithResponseHandler'
         tags:
             - name: 'messenger.message_handler'
+
+    ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue3975\ActionSimulationResolver:
+        tags:
+            - name: 'api_platform.graphql.resolver'
 
     app.graphql.query_resolver.dummy_custom_item:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryItemResolver'

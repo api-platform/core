@@ -21,7 +21,7 @@ use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\PathItem;
 
 #[ApiResource(operations: [new Get(openapi: new Webhook(
-    name: 'a',
+    name: 'a/{id}',
     pathItem: new PathItem(
         get: new Operation(
             summary: 'Something else here',
