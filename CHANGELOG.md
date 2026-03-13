@@ -104,6 +104,21 @@
 
 * When using `output` with `itemUriTemplate` on a collection operation, the JSON-LD `@type` will now use the resource class name instead of the output DTO class name for semantic consistency with `itemUriTemplate` behavior.
 
+## v4.2.21
+
+### Bug fixes
+
+* [20ced5fca](https://github.com/api-platform/core/commit/20ced5fcaa02b8d4eba7f0d34e90a7ec5c6793cc) fix(laravel): clear SkolemIriConverter state between requests (#7838)
+* [2b2b7bca2](https://github.com/api-platform/core/commit/2b2b7bca2598d741cd90498f76d44dad0c193964) fix(filter): use correct type for int-backed enums in BackedEnumFilter
+* [42a2d7fc6](https://github.com/api-platform/core/commit/42a2d7fc60abe7726e88dc16f84d2f8b791d63fe) fix(symfony): register DateTimeValueObjectTransformer for JsonStreamer (#7839)
+* [63e6b57f8](https://github.com/api-platform/core/commit/63e6b57f829cc5be666da7abbc80acfebbef3c05) fix(openapi): correct redocly openapi errors (#7834)
+* [6a472a2db](https://github.com/api-platform/core/commit/6a472a2db68078743b31a57d0f2929800f450618) fix(jsonapi): swap arguments in DefinitionNameFactory::create() call
+* [bbfd4cafa](https://github.com/api-platform/core/commit/bbfd4cafaa1dd5b0d3cf93f804dce7e6a3029bb9) fix(filter): do not nest array while generating default schema (#7832)
+* [c20a41c20](https://github.com/api-platform/core/commit/c20a41c20a22b41e3a4caa0bca337915d190c3d3) fix(symfony): clear SkolemIriConverter state between requests via ResetInterface (#7829)
+* [d6ecbe122](https://github.com/api-platform/core/commit/d6ecbe12257e0a1f00b483b48409de60b998509e) fix(serializer): Use serializer when denormalizing relation inside Input (#7830)
+* [da6232468](https://github.com/api-platform/core/commit/da62324686379cb969134141f1660eda814f374c) fix(metadata): allow GraphQL-only resources without identifiers (#3975) (#7836)
+* [f4002902a](https://github.com/api-platform/core/commit/f4002902a6f3551fcaf4ea698f330218c794bbdc) fix(state): on creation, give expected class to object mapper (#7795)
+
 ## v4.2.20
 
 ### Bug fixes
