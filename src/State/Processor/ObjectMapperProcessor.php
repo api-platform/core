@@ -31,9 +31,8 @@ final class ObjectMapperProcessor implements ProcessorInterface
      */
     public function __construct(
         private readonly ?ObjectMapperInterface $objectMapper,
-        private readonly ProcessorInterface     $decorated,
-    )
-    {
+        private readonly ProcessorInterface $decorated,
+    ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): object|array|null
@@ -55,7 +54,7 @@ final class ObjectMapperProcessor implements ProcessorInterface
 
         // maps the Resource to an Entity
         if ($request?->attributes->get('mapped_data')) {
-            $mappedData = $this->objectMapper->map($data, $request?->attributes->get('mapped_data'));
+            $mappedData = $this->objectMapper->map($data, $request->attributes->get('mapped_data'));
         } else {
             $mappedData = $this->objectMapper->map($data, $this->getStateOptionsClass($operation, $operation->getClass()));
         }
@@ -77,7 +76,7 @@ final class ObjectMapperProcessor implements ProcessorInterface
 
         // return the Resource representation of the persisted entity
         return $this->objectMapper->map(
-        // persist the entity
+            // persist the entity
             $persisted,
             $operation->getClass()
         );
