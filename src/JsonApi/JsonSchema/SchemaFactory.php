@@ -125,7 +125,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
 
         $schema = $this->schemaFactory->buildSchema($className, 'json', $type, $operation, $schema, $jsonApiSerializerContext, $forceCollection);
-        $definitionName = $this->definitionNameFactory->create($inputOrOutputClass, $format, $className, $operation, $jsonApiSerializerContext + ['schema_type' => $type]);
+        $definitionName = $this->definitionNameFactory->create($className, $format, $inputOrOutputClass, $operation, $jsonApiSerializerContext + ['schema_type' => $type]);
         $prefix = $this->getSchemaUriPrefix($schema->getVersion());
         $definitions = $schema->getDefinitions();
         $collectionKey = $schema->getItemsDefinitionKey();
