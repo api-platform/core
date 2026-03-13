@@ -70,10 +70,10 @@ jobs:
     steps:
       - name: Generate App Token
         id: generate_token
-        uses: actions/create-github-app-token@v1
+        uses: tibdex/github-app-token@v2
         with:
-          app-id: ${{ secrets.API_PLATFORM_APP_ID }}
-          private-key: ${{ secrets.API_PLATFORM_APP_PRIVATE_KEY }}
+          app_id: ${{ secrets.API_PLATFORM_APP_ID }}
+          private_key: ${{ secrets.API_PLATFORM_APP_PRIVATE_KEY }}
 
       - name: Update demo
         env:
