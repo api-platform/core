@@ -1475,3 +1475,10 @@ jobs:
           composer require api-platform/laravel:"@dev" -W
           php ./artisan api-platform:install
         working-directory: 'test-api-platform-install'
+      - name: Smoke test
+        run: |
+          php ./artisan serve &
+          sleep 2
+          curl -f http://127.0.0.1:8000/api || exit 1
+          kill %1
+        working-directory: 'test-api-platform-install'
