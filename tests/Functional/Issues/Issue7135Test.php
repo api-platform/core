@@ -47,7 +47,7 @@ class Issue7135Test extends ApiTestCase
         $this->recreateSchema(self::getResources());
         $bar = $this->loadBarFixture();
 
-        $response = self::createClient()->request('POST', '/pull-request-7135/foo/', [
+        $response = self::createClient()->request('POST', '/pull-request-7135/foo', [
             'json' => [
                 'bar' => 'pull-request-7135/bar/'.$bar->id,
             ],
@@ -63,7 +63,7 @@ class Issue7135Test extends ApiTestCase
             $this->markTestSkipped();
         }
 
-        $response = self::createClient()->request('POST', '/pull-request-7135/foo/', [
+        $response = self::createClient()->request('POST', '/pull-request-7135/foo', [
             'json' => [
                 'bar' => 'pull-request-7135/bar/invalid-uuid',
             ],

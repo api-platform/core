@@ -227,7 +227,7 @@ jobs:
           mkdir -p /tmp/openapi
           tests/Fixtures/app/console api:openapi:export --output=/tmp/openapi/openapi.json --no-ansi
       - name: Lint OpenAPI spec with Redocly
-        run: redocly lint /tmp/openapi/openapi.json
+        run: redocly lint --config .redocly.yaml /tmp/openapi/openapi.json
 
   phpunit:
     name: PHPUnit (PHP ${{ matrix.php }})
