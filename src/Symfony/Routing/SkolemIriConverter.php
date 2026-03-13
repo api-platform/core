@@ -18,13 +18,14 @@ use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * {@inheritdoc}
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-final class SkolemIriConverter implements IriConverterInterface
+final class SkolemIriConverter implements IriConverterInterface, ResetInterface
 {
     public static string $skolemUriTemplate = '/.well-known/genid/{id}';
 
@@ -69,5 +70,11 @@ final class SkolemIriConverter implements IriConverterInterface
         }
 
         return $this->router->generate('api_genid', ['id' => $id], $referenceType);
+    }
+
+    public function reset(): void
+    {
+        $this->objectHashMap = new \SplObjectStorage();
+        $this->classHashMap = [];
     }
 }
