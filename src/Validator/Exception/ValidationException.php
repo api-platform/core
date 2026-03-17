@@ -111,6 +111,7 @@ class ValidationException extends RuntimeException implements ConstraintViolatio
         if ($message instanceof ConstraintViolationListInterface) {
             $this->constraintViolationList = $message;
             parent::__construct($this->__toString(), $code ?? 0, $previous);
+            $this->detail = $this->getMessage();
 
             return;
         }
@@ -119,6 +120,7 @@ class ValidationException extends RuntimeException implements ConstraintViolatio
 
         trigger_deprecation('api_platform/core', '5.0', \sprintf('The "%s" exception will have a "%s" first argument in 5.x.', self::class, ConstraintViolationListInterface::class));
         parent::__construct($message ?: $this->__toString(), $code ?? 0, $previous);
+        $this->detail = $this->getMessage();
     }
 
     public function getId(): string
