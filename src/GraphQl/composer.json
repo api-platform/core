@@ -32,7 +32,7 @@
     },
     "require-dev": {
         "phpspec/prophecy-phpunit": "^2.2",
-        "api-platform/validator": "^4.3",
+        "api-platform/validator": "^4.3.1",
         "twig/twig": "^1.42.3 || ^2.12 || ^3.0",
         "symfony/mercure-bundle": "*",
         "symfony/routing": "^6.4 || ^7.0 || ^8.0",

@@ -37,7 +37,7 @@
         "api-platform/metadata": "^4.3",
         "api-platform/serializer": "^4.3",
         "api-platform/state": "^4.3",
-        "api-platform/validator": "^4.3",
+        "api-platform/validator": "^4.3.1",
         "api-platform/openapi": "^4.3",
         "symfony/asset": "^6.4 || ^7.0 || ^8.0",
         "symfony/finder": "^6.4 || ^7.0 || ^8.0",
