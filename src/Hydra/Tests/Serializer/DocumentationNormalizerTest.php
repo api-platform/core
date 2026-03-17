@@ -733,10 +733,10 @@ class DocumentationNormalizerTest extends TestCase
                                 '@type' => 'Link',
                                 'domain' => '#Entrypoint',
                                 'range' => [
-                                    ['@id' => 'Collection'],
+                                    ['@id' => 'hydra:Collection'],
                                     [
                                         'owl:equivalentClass' => [
-                                            'owl:onProperty' => ['@id' => 'member'],
+                                            'owl:onProperty' => ['@id' => 'hydra:member'],
                                             'owl:allValuesFrom' => ['@id' => '#dummy'],
                                         ],
                                     ],
