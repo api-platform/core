@@ -270,10 +270,9 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             Put::class,
             ApiResource::class,
         ] as $class) {
-            $container->registerAttributeForAutoconfiguration($class, static function (ChildDefinition $definition) use ($class): void {
+            $container->registerAttributeForAutoconfiguration($class, static function (ChildDefinition $definition): void {
                 $definition->setAbstract(true)
-                    ->addTag('api_platform.resource')
-                    ->addTag('container.excluded', ['source' => 'by #['.(new \ReflectionClass($class))->getShortName().'] attribute']);
+                    ->addTag('api_platform.resource');
             });
         }
 
