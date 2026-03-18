@@ -31,7 +31,7 @@ class ValidateProcessorTest extends TestCase
         $validator = $this->createMock(ValidatorInterface::class);
         $validator->expects($this->once())->method('validate')->with($obj, $validationContext);
         $processor = new ValidateProcessor($decorated, $validator);
-        $processor->process($obj, new Post(validationContext: $validationContext));
+        $processor->process($obj, new Post(map: true, validationContext: $validationContext));
     }
 
     public function testNoValidate(): void
@@ -75,7 +75,7 @@ class ValidateProcessorTest extends TestCase
         $validator = $this->createMock(ValidatorInterface::class);
         $validator->expects($this->once())->method('validate')->with($obj, $validationContext);
         $processor = new ValidateProcessor($decorated, $validator);
-        $processor->process($obj, new Post(validationContext: $validationContext));
+        $processor->process($obj, new Post(map: true, validationContext: $validationContext));
     }
 
     public function testDecoratorChainContinues(): void
@@ -110,5 +110,28 @@ class ValidateProcessorTest extends TestCase
         $processor = new ValidateProcessor($decorated, $validator);
         // Delete operations typically have write: false
         $processor->process($obj, new Post(write: false));
+    }
+
+    public function testSkipsWhenCanMapIsNull(): void
+    {
+        $obj = new \stdClass();
+        $decorated = $this->createMock(ProcessorInterface::class);
+        $decorated->expects($this->once())->method('process')->with($obj)->willReturn($obj);
+        $validator = $this->createMock(ValidatorInterface::class);
+        $validator->expects($this->never())->method('validate');
+        $processor = new ValidateProcessor($decorated, $validator);
+        // Default: map is null (no ObjectMapper), ValidateProvider already validated
+        $processor->process($obj, new Post());
+    }
+
+    public function testSkipsWhenCanMapIsFalse(): void
+    {
+        $obj = new \stdClass();
+        $decorated = $this->createMock(ProcessorInterface::class);
+        $decorated->expects($this->once())->method('process')->with($obj)->willReturn($obj);
+        $validator = $this->createMock(ValidatorInterface::class);
+        $validator->expects($this->never())->method('validate');
+        $processor = new ValidateProcessor($decorated, $validator);
+        $processor->process($obj, new Post(map: false));
     }
 }

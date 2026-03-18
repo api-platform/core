@@ -45,6 +45,13 @@ final class ValidateProcessorListener
             return;
         }
 
+        // Only validate at the processor level when ObjectMapper is used (canMap() is true).
+        // Without ObjectMapper, the validate listener already handles validation,
+        // so running it again here would cause duplicate validation.
+        if (!$operation->canMap()) {
+            return;
+        }
+
         if (null === $operation->canWrite()) {
             $operation = $operation->withWrite(!$request->isMethodSafe());
         }
