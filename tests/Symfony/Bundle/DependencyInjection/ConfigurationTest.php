@@ -528,4 +528,20 @@ class ConfigurationTest extends TestCase
             ],
         ]);
     }
+
+    public function testOauthScopeNaming(): void
+    {
+        $config = $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'oauth' => [
+                    'enabled' => true,
+                    'scopes' => [
+                        'resource:read-write' => 'Read and write resource data'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals(['resource:read-write' => 'Read and write resource data'], $config['oauth']['scopes']);
+    }
 }
