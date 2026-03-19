@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\AccessDeniedException;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
+use ApiPlatform\Metadata\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -276,10 +277,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $previousObject = $this->clone($objectToPopulate);
         $object = parent::denormalize($data, $type, $format, $context);
 
-        if (!$this->resourceClassResolver->isResourceClass($type)) {
-            return $object;
-        }
-
         // Bypass the post-denormalize attribute revert logic if the object could not be
         // cloned since we cannot possibly revert any changes made to it.
         if (null !== $objectToPopulate && null === $previousObject) {
@@ -296,7 +293,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         // Revert attributes that aren't allowed to be changed after a post-denormalize check
         foreach (array_keys($data) as $attribute) {
             $attribute = $this->nameConverter ? $this->nameConverter->denormalize((string) $attribute) : $attribute;
-            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $attribute, $options);
+
+            try {
+                $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $attribute, $options);
+            } catch (PropertyNotFoundException) {
+                continue;
+            }
+
             $attributeExtraProperties = $propertyMetadata->getExtraProperties();
             $throwOnPropertyAccessDenied = $attributeExtraProperties['throw_on_access_denied'] ?? $throwOnAccessDenied;
             if (!\in_array($attribute, $propertyNames, true)) {
@@ -500,12 +503,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function canAccessAttribute(?object $object, string $attribute, array $context = []): bool
     {
-        if (!$this->resourceClassResolver->isResourceClass($context['resource_class'])) {
+        $options = $this->getFactoryOptions($context);
+
+        try {
+            $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $options);
+        } catch (PropertyNotFoundException) {
             return true;
         }
-
-        $options = $this->getFactoryOptions($context);
-        $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $options);
         $security = $propertyMetadata->getSecurity() ?? $propertyMetadata->getPolicy();
         if (null !== $this->resourceAccessChecker && $security) {
             return $this->resourceAccessChecker->isGranted($context['resource_class'], $security, [
