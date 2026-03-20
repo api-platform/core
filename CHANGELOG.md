@@ -1,5 +1,12 @@
 # Changelog
 
+## v4.2.22
+
+### Bug fixes
+
+* [3e96fc679](https://github.com/api-platform/core/commit/3e96fc6798d6460802bc07f5566c2a3158b53eb8) fix(serializer): evaluate ApiProperty security on input DTOs (#7852)
+* [c7ababf2d](https://github.com/api-platform/core/commit/c7ababf2dfee43c8f21e8d4d02ad4f1072d3cbba) fix(hydra): use compact IRI for owl:onProperty and Collection @id in DocumentationNormalizer (#7849)
+
 ## v4.2.21
 
 ### Bug fixes
