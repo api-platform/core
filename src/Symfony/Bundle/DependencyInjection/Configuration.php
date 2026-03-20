@@ -439,7 +439,7 @@ final class Configuration implements ConfigurationInterface
                                     ->info('Specify a purger to use (available values: "api_platform.http_cache.purger.varnish.ban", "api_platform.http_cache.purger.varnish.xkey", "api_platform.http_cache.purger.souin").')
                                 ->end()
                                 ->arrayNode('xkey')
-                                    ->setDeprecated('api-platform/core', '3.0', 'The "xkey" configuration is deprecated, use your own purger to customize surrogate keys or the appropriate paramters.')
+                                    ->setDeprecated('api-platform/core', '3.0', 'The "xkey" configuration is deprecated, use your own purger to customize surrogate keys or the appropriate parameters.')
                                     ->addDefaultsIfNotSet()
                                     ->children()
                                         ->scalarNode('glue')
