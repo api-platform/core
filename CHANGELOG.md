@@ -1,5 +1,14 @@
 # Changelog
 
+## v4.3.1
+
+### Bug fixes
+
+* [13cc3950c](https://github.com/api-platform/core/commit/13cc3950cbf89cefb0005d61d39451ed8f907717) fix(doctrine): reset nested_properties_info for non-nested properties in FreeTextQueryFilter (#7850)
+* [1fa8c05ca](https://github.com/api-platform/core/commit/1fa8c05cab2bc58984d988ad367f0896cb5e64f4) fix(validator): fallback to message when detail is uninitialized (#7844)
+* [aff1cf2cc](https://github.com/api-platform/core/commit/aff1cf2cc6ce451322c58b1ee03e4f5d6bcd3649) fix(symfony): do not exclude resources from DI (#7847)
+* [e45b5791d](https://github.com/api-platform/core/commit/e45b5791db3c5c7f0874816675e9891bacb20ca6) fix(validator): skip ValidateProcessor when ObjectMapper is not used (#7848)
+
 ## v4.3.0
 
 ### Features
