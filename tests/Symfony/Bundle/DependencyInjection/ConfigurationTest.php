@@ -536,7 +536,7 @@ class ConfigurationTest extends TestCase
                 'oauth' => [
                     'enabled' => true,
                     'scopes' => [
-                        'resource:read-write' => 'Read and write resource data'],
+                        'resource:read-write' => 'Read and write resource data',
                     ],
                 ],
             ],
