@@ -23,7 +23,7 @@ use Symfony\Component\Uid\Uuid;
     shortName: 'FooPr7135',
     operations: [
         new Post(
-            uriTemplate: '/pull-request-7135/foo/',
+            uriTemplate: '/pull-request-7135/foo',
         ),
     ],
     normalizationContext: ['iri_only' => true],

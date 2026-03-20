@@ -185,7 +185,7 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
             $config = $app['config'];
             $tagged = iterator_to_array($app->tagged(ProcessorInterface::class));
 
-            if ($config->get('api-platform.swagger_ui.enabled', false)) {
+            if ($config->get('api-platform.swagger_ui.enabled', false) || $config->get('api-platform.redoc.enabled', false) || $config->get('api-platform.scalar.enabled', false)) {
                 // TODO: tag SwaggerUiProcessor instead?
                 $tagged['api_platform.swagger_ui.processor'] = $app->make(SwaggerUiProcessor::class);
             }
@@ -201,22 +201,25 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
             return new CallableProvider(new ServiceLocator($tagged));
         });
 
+        $providers = [ItemProvider::class, CollectionProvider::class, ErrorProvider::class];
+
         if (class_exists(ToolProvider::class)) {
             $this->app->singleton(ToolProvider::class, static function (Application $app) {
                 return new ToolProvider(
                     $app->make(ObjectMapper::class)
                 );
             });
+            $providers[] = ToolProvider::class;
         }
 
-        $this->autoconfigure($classes, ProviderInterface::class, [ItemProvider::class, CollectionProvider::class, ErrorProvider::class, ToolProvider::class]);
+        $this->autoconfigure($classes, ProviderInterface::class, $providers);
 
         $this->app->singleton(ResourceMetadataCollectionFactoryInterface::class, function (Application $app) {
             /** @var ConfigRepository $config */
             $config = $app['config'];
             $formats = $config->get('api-platform.formats');
 
-            if ($config->get('api-platform.swagger_ui.enabled', false) && !isset($formats['html'])) {
+            if (($config->get('api-platform.swagger_ui.enabled', false) || $config->get('api-platform.redoc.enabled', false) || $config->get('api-platform.scalar.enabled', false)) && !isset($formats['html'])) {
                 $formats['html'] = ['text/html'];
             }
 
@@ -377,7 +380,7 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
      */
     public function provides(): array
     {
-        return [
+        $provides = [
             CallableProvider::class,
             CallableProcessor::class,
             ItemProvider::class,
@@ -390,7 +393,12 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
             'api_platform.graphql.state_provider.parameter',
             FieldsBuilderEnumInterface::class,
             ExceptionHandlerInterface::class,
-            ToolProvider::class,
         ];
+
+        if (class_exists(ToolProvider::class)) {
+            $provides[] = ToolProvider::class;
+        }
+
+        return $provides;
     }
 }

@@ -30,7 +30,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-final class ContextBuilder implements AnonymousContextBuilderInterface
+final class ContextBuilder implements AnonymousContextBuilderInterface, OperationContextBuilderInterface
 {
     use ClassInfoTrait;
     use HydraPrefixTrait;
@@ -162,6 +162,38 @@ final class ContextBuilder implements AnonymousContextBuilderInterface
         }
 
         return $jsonLdContext;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getResourceContextUriFromOperation(HttpOperation $operation, ?int $referenceType = null): string
+    {
+        if (null === $referenceType) {
+            $referenceType = $operation->getUrlGenerationStrategy();
+        }
+
+        return $this->urlGenerator->generate('api_jsonld_context', ['shortName' => $operation->getShortName()], $referenceType ?? UrlGeneratorInterface::ABS_PATH);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getResourceContextFromOperation(HttpOperation $operation, string $resourceClass, int $referenceType = UrlGeneratorInterface::ABS_PATH): array
+    {
+        if (null === $shortName = $operation->getShortName()) {
+            return [];
+        }
+
+        $context = $operation->getNormalizationContext();
+        if ($context['iri_only'] ?? false) {
+            $context = $this->getBaseContext($referenceType);
+            $context[$this->getHydraPrefix($context).'member']['@type'] = '@id';
+
+            return $context;
+        }
+
+        return $this->getResourceContextWithShortname($resourceClass, $referenceType, $shortName, $operation);
     }
 
     private function getResourceContextWithShortname(string $resourceClass, int $referenceType, string $shortName, ?HttpOperation $operation = null): array

@@ -361,7 +361,7 @@ class OpenApiTest extends ApiTestCase
         $this->assertSame('Allows you to reduce the response to contain only the properties you need. If your desired property is nested, you can address it using nested arrays. Example: foobar[]={propertyName}&foobar[]={anotherPropertyName}&foobar[{nestedPropertyParent}][]={nestedProperty}', $json['paths']['/dummy_cars']['get']['parameters'][9]['description']);
 
         // Webhook
-        $this->assertSame('Something else here for example', $json['webhooks']['a']['get']['description']);
+        $this->assertSame('Something else here for example', $json['webhooks']['a/{id}']['get']['description']);
         $this->assertSame('Hi! it\'s me, I\'m the problem, it\'s me', $json['webhooks']['b']['post']['description']);
 
         // Subcollection - check filter on subResource

@@ -430,6 +430,14 @@ final class DoctrineTest extends ApiTestCase
                 'expectedDescription' => '',
                 'expectedSchema' => ['type' => 'array', 'items' => ['anyOf' => [['type' => 'array', 'items' => ['type' => 'string']], ['type' => 'string']]]],
             ],
+            'with schema and default castToArray should not wrap schema in array type if already an array' => [
+                'parameterName' => 'listOfTags',
+                'shouldHaveArrayNotation' => true,
+                'expectedStyle' => 'deepObject',
+                'expectedExplode' => true,
+                'expectedDescription' => '',
+                'expectedSchema' => ['type' => 'array', 'items' => ['type' => 'string']],
+            ],
         ];
     }
 }

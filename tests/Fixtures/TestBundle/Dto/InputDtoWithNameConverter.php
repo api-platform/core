@@ -13,7 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Dto;
 
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DummyDtoNameConverted;
+
 class InputDtoWithNameConverter
 {
     public ?string $nameConverted = null;
+
+    public ?DummyDtoNameConverted $childRelation = null;
 }

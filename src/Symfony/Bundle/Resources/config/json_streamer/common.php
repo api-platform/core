@@ -21,6 +21,7 @@ use Symfony\Component\JsonStreamer\CacheWarmer\LazyGhostCacheWarmer;
 use Symfony\Component\JsonStreamer\JsonStreamReader;
 use Symfony\Component\JsonStreamer\JsonStreamWriter;
 use Symfony\Component\JsonStreamer\StreamerDumper;
+use Symfony\Component\JsonStreamer\Transformer\DateTimeValueObjectTransformer;
 
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
@@ -75,4 +76,11 @@ return static function (ContainerConfigurator $container) {
     $services->set('api_platform.jsonld.json_streamer.write.value_transformer.context', ContextValueTransformer::class)
         ->args([service('api_platform.router')])
         ->tag('json_streamer.value_transformer');
+
+    // Register DateTimeValueObjectTransformer for Symfony 8.1+ where DateTimeTypePropertyMetadataLoader is a no-op.
+    // Service ID must be DateTimeInterface so that tagged_locator keys match what getValueObjectTransformerId() looks up.
+    if (class_exists(DateTimeValueObjectTransformer::class)) {
+        $services->set(\DateTimeInterface::class, DateTimeValueObjectTransformer::class)
+            ->tag('json_streamer.value_transformer');
+    }
 };

@@ -73,7 +73,7 @@ final class NotExposedOperationResourceMetadataCollectionFactory implements Reso
         [$key, $operation] = $this->getOperationWithDefaults($resource, new NotExposed(), true, ['uriTemplate', 'uriVariables']); // @phpstan-ignore-line $resource is defined if count > 0
 
         if (!$this->linkFactory->createLinksFromIdentifiers($operation)) {
-            $operation = $operation->withUriTemplate(self::$skolemUriTemplate);
+            $operation = $operation->withUriTemplate(self::$skolemUriTemplate)->withUriVariables([]);
         }
 
         $operations->add($key, $operation)->sort(); // @phpstan-ignore-line $operation exists

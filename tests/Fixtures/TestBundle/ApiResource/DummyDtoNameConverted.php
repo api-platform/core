@@ -42,6 +42,7 @@ class DummyDtoNameConverted
         public ?int $id = null,
         public ?string $nameConverted = null,
         public ?GenderTypeEnum $gender = null,
+        public ?self $childRelation = null,
     ) {
     }
 
@@ -55,6 +56,6 @@ class DummyDtoNameConverted
      */
     public static function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): self
     {
-        return new self(id: 1, nameConverted: $data->nameConverted);
+        return new self(id: 1, nameConverted: $data->nameConverted, childRelation: $data->childRelation);
     }
 }

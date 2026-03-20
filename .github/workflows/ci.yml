@@ -10,7 +10,7 @@ concurrency:
 
 env:
   COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  COMPOSER_ROOT_VERSION: "4.2.x-dev"
+  COMPOSER_ROOT_VERSION: "4.3.x-dev"
 
 jobs:
   architecture:
@@ -227,7 +227,7 @@ jobs:
           mkdir -p /tmp/openapi
           tests/Fixtures/app/console api:openapi:export --output=/tmp/openapi/openapi.json --no-ansi
       - name: Lint OpenAPI spec with Redocly
-        run: redocly lint /tmp/openapi/openapi.json
+        run: redocly lint --config .redocly.yaml /tmp/openapi/openapi.json
 
   phpunit:
     name: PHPUnit (PHP ${{ matrix.php }})
@@ -1472,6 +1472,13 @@ jobs:
           composer global link ../src/Laravel --permanent
           composer config minimum-stability dev
           composer config prefer-stable true
-          composer require api-platform/laravel:"@dev"
+          composer require api-platform/laravel:"@dev" -W
           php ./artisan api-platform:install
+        working-directory: 'test-api-platform-install'
+      - name: Smoke test
+        run: |
+          php ./artisan serve &
+          sleep 2
+          curl -f http://127.0.0.1:8000/api || exit 1
+          kill %1
         working-directory: 'test-api-platform-install'

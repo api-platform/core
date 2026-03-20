@@ -26,13 +26,14 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ItemUriTemplateWithCollect
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ItemUriTemplateWithCollection\RecipeCollection;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6465\Bar;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6465\Foo;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MultiResourceEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Recipe as EntityRecipe;
+use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Tools\SchemaTool;
 
 class JsonLdTest extends ApiTestCase
 {
+    use RecreateSchemaTrait;
     use SetupClassResourcesTrait;
 
     protected static ?bool $alwaysBootKernel = false;
@@ -55,6 +56,7 @@ class JsonLdTest extends ApiTestCase
             ImageModuleResource::class,
             Recipe::class,
             RecipeCollection::class,
+            MultiResourceEntity::class,
         ];
     }
 
@@ -226,28 +228,41 @@ class JsonLdTest extends ApiTestCase
         ]);
     }
 
+    /**
+     * Tests that @context uses the correct shortName when an entity has multiple ApiResource attributes.
+     */
+    public function testMultiResourceContextUsesCorrectShortName(): void
+    {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped();
+        }
+
+        // Test the second declared ApiResource (shortName: 'MultiResource')
+        $response = self::createClient()->request('GET', '/multi_resources');
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains([
+            '@context' => '/contexts/MultiResource',
+        ]);
+
+        // Test the first declared ApiResource (shortName: 'AdminMultiResource')
+        $response = self::createClient()->request('GET', '/admin/multi_resources');
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains([
+            '@context' => '/contexts/AdminMultiResource',
+        ]);
+    }
+
     protected function setUp(): void
     {
         self::bootKernel();
 
-        $container = static::getContainer();
-        $registry = $container->get('doctrine');
-        $manager = $registry->getManager();
-        if (!$manager instanceof EntityManagerInterface) {
-            return;
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('This test uses Doctrine ORM entities without MongoDB equivalents.');
         }
 
-        $classes = [];
-        foreach ([Foo::class, Bar::class, EntityRecipe::class] as $entityClass) {
-            $classes[] = $manager->getClassMetadata($entityClass);
-        }
+        $this->recreateSchema([Foo::class, Bar::class, EntityRecipe::class, MultiResourceEntity::class]);
 
-        try {
-            $schemaTool = new SchemaTool($manager);
-            @$schemaTool->createSchema($classes);
-        } catch (\Exception $e) {
-        }
-
+        $manager = $this->getManager();
         $foo = new Foo();
         $foo->title = 'Foo';
         $manager->persist($foo);
@@ -260,25 +275,9 @@ class JsonLdTest extends ApiTestCase
         $bar2 = new Bar();
         $bar2->title = 'Bar two';
         $manager->persist($bar2);
+        $multi = new MultiResourceEntity();
+        $multi->title = 'Multi Resource';
+        $manager->persist($multi);
         $manager->flush();
-    }
-
-    protected function tearDown(): void
-    {
-        $container = static::getContainer();
-        $registry = $container->get('doctrine');
-        $manager = $registry->getManager();
-        if (!$manager instanceof EntityManagerInterface) {
-            return;
-        }
-
-        $classes = [];
-        foreach ([Foo::class, Bar::class] as $entityClass) {
-            $classes[] = $manager->getClassMetadata($entityClass);
-        }
-
-        $schemaTool = new SchemaTool($manager);
-        @$schemaTool->dropSchema($classes);
-        parent::tearDown();
     }
 }

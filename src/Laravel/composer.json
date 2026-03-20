@@ -28,17 +28,16 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/documentation": "^4.2",
-        "api-platform/hal": "^4.2.0-beta.1",
-        "api-platform/hydra": "^4.2",
-        "api-platform/json-api": "^4.2",
-        "api-platform/json-schema": "^4.2",
-        "api-platform/jsonld": "^4.2",
-        "api-platform/metadata": "^4.2",
-        "api-platform/mcp": "dev-main",
-        "api-platform/openapi": "^4.2",
-        "api-platform/serializer": "^4.2.4",
-        "api-platform/state": "^4.2.4",
+        "api-platform/documentation": "^4.3",
+        "api-platform/hal": "^4.3",
+        "api-platform/hydra": "^4.3",
+        "api-platform/json-api": "^4.3",
+        "api-platform/json-schema": "^4.3",
+        "api-platform/jsonld": "^4.3",
+        "api-platform/metadata": "^4.3",
+        "api-platform/openapi": "^4.3",
+        "api-platform/serializer": "^4.3",
+        "api-platform/state": "^4.3",
         "illuminate/config": "^11.0 || ^12.0",
         "illuminate/container": "^11.0 || ^12.0",
         "illuminate/contracts": "^11.0 || ^12.0",
@@ -54,8 +53,9 @@
         "willdurand/negotiation": "^3.1"
     },
     "require-dev": {
-        "api-platform/graphql": "^4.1",
-        "api-platform/http-cache": "^4.1",
+        "api-platform/graphql": "^4.3",
+        "api-platform/http-cache": "^4.3",
+        "api-platform/mcp": "^4.3",
         "doctrine/dbal": "^4.0",
         "larastan/larastan": "^2.0 || ^3.0",
         "laravel/sanctum": "^4.0",
@@ -86,6 +86,7 @@
     "suggest": {
         "api-platform/graphql": "Enable GraphQl support.",
         "api-platform/http-cache": "Enable HTTP Cache support.",
+        "api-platform/mcp": "Enable MCP (Model Context Protocol) support for AI agents.",
         "phpstan/phpdoc-parser": "To support extracting metadata from PHPDoc."
     },
     "extra": {
@@ -97,7 +98,7 @@
             ]
         },
         "branch-alias": {
-            "dev-main": "4.3.x-dev",
+            "dev-main": "4.4.x-dev",
             "dev-4.2": "4.2.x-dev",
             "dev-3.4": "3.4.x-dev",
             "dev-4.1": "4.1.x-dev"
@@ -135,5 +136,6 @@
             "@php vendor/bin/phpstan analyse --verbose --ansi"
         ]
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

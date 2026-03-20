@@ -112,6 +112,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $metadata = [];
         if ($isResourceClass = $this->resourceClassResolver->isResourceClass($resourceClass) && (null === $previousResourceClass || $this->resourceClassResolver->isResourceClass($previousResourceClass))) {
             $resourceClass = $this->resourceClassResolver->getResourceClass($data, $previousResourceClass);
+            if (isset($context['operation']) && $context['operation'] instanceof HttpOperation && $context['operation']->getClass() !== $resourceClass) {
+                $context['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation(null, false, true);
+            }
             $context = $this->initContext($resourceClass, $context);
             $metadata = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
         } elseif ($this->contextBuilder instanceof AnonymousContextBuilderInterface) {

@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\AccessDeniedException;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
+use ApiPlatform\Metadata\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -266,21 +267,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         if (\is_string($data)) {
-            try {
-                return $this->iriConverter->getResourceFromIri($data, $context + ['fetch_data' => true]);
-            } catch (ItemNotFoundException $e) {
-                if (!isset($context['not_normalizable_value_exceptions'])) {
-                    throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
-                }
-
-                throw NotNormalizableValueException::createForUnexpectedDataType($e->getMessage(), $data, [$resourceClass], $context['deserialization_path'] ?? null, true, $e->getCode(), $e);
-            } catch (InvalidArgumentException $e) {
-                if (!isset($context['not_normalizable_value_exceptions'])) {
-                    throw new UnexpectedValueException(\sprintf('Invalid IRI "%s".', $data), $e->getCode(), $e);
-                }
-
-                throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Invalid IRI "%s".', $data), $data, [$resourceClass], $context['deserialization_path'] ?? null, true, $e->getCode(), $e);
-            }
+            return $this->getResourceFromIri($data, $context, $resourceClass);
         }
 
         if (!\is_array($data)) {
@@ -289,10 +276,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         $previousObject = $this->clone($objectToPopulate);
         $object = parent::denormalize($data, $type, $format, $context);
-
-        if (!$this->resourceClassResolver->isResourceClass($type)) {
-            return $object;
-        }
 
         // Bypass the post-denormalize attribute revert logic if the object could not be
         // cloned since we cannot possibly revert any changes made to it.
@@ -310,7 +293,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         // Revert attributes that aren't allowed to be changed after a post-denormalize check
         foreach (array_keys($data) as $attribute) {
             $attribute = $this->nameConverter ? $this->nameConverter->denormalize((string) $attribute) : $attribute;
-            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $attribute, $options);
+
+            try {
+                $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $attribute, $options);
+            } catch (PropertyNotFoundException) {
+                continue;
+            }
+
             $attributeExtraProperties = $propertyMetadata->getExtraProperties();
             $throwOnPropertyAccessDenied = $attributeExtraProperties['throw_on_access_denied'] ?? $throwOnAccessDenied;
             if (!\in_array($attribute, $propertyNames, true)) {
@@ -514,12 +503,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function canAccessAttribute(?object $object, string $attribute, array $context = []): bool
     {
-        if (!$this->resourceClassResolver->isResourceClass($context['resource_class'])) {
+        $options = $this->getFactoryOptions($context);
+
+        try {
+            $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $options);
+        } catch (PropertyNotFoundException) {
             return true;
         }
-
-        $options = $this->getFactoryOptions($context);
-        $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $options);
         $security = $propertyMetadata->getSecurity() ?? $propertyMetadata->getPolicy();
         if (null !== $this->resourceAccessChecker && $security) {
             return $this->resourceAccessChecker->isGranted($context['resource_class'], $security, [
@@ -699,33 +689,17 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
      */
     protected function denormalizeRelation(string $attributeName, ApiProperty $propertyMetadata, string $className, mixed $value, ?string $format, array $context): ?object
     {
-        if (\is_string($value)) {
-            try {
-                return $this->iriConverter->getResourceFromIri($value, $context + ['fetch_data' => true]);
-            } catch (ItemNotFoundException $e) {
-                if (false === ($context['denormalize_throw_on_relation_not_found'] ?? true)) {
-                    return null;
-                }
-
-                if (!isset($context['not_normalizable_value_exceptions'])) {
-                    throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
-                }
-
-                throw NotNormalizableValueException::createForUnexpectedDataType($e->getMessage(), $value, [$className], $context['deserialization_path'] ?? null, true, $e->getCode(), $e);
-            } catch (InvalidArgumentException $e) {
-                if (!isset($context['not_normalizable_value_exceptions'])) {
-                    throw new UnexpectedValueException(\sprintf('Invalid IRI "%s".', $value), $e->getCode(), $e);
-                }
-
-                throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Invalid IRI "%s".', $value), $value, [$className], $context['deserialization_path'] ?? null, true, $e->getCode(), $e);
-            }
-        }
-
-        if ($propertyMetadata->isWritableLink()) {
-            $context['api_allow_update'] = true;
-
+        if (\is_string($value) || $propertyMetadata->isWritableLink()) {
             if (!$this->serializer instanceof DenormalizerInterface) {
+                if (\is_string($value)) {
+                    return $this->getResourceFromIri($value, $context, $className);
+                }
+
                 throw new LogicException(\sprintf('The injected serializer must be an instance of "%s".', DenormalizerInterface::class));
+            }
+
+            if ($propertyMetadata->isWritableLink()) {
+                $context['api_allow_update'] = true;
             }
 
             $item = $this->serializer->denormalize($value, $className, $format, $context);
@@ -741,6 +715,29 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Nested documents for attribute "%s" are not allowed. Use IRIs instead.', $attributeName), $value, ['array', 'string'], $context['deserialization_path'] ?? null, true);
+    }
+
+    private function getResourceFromIri(string $data, array $context, string $resourceClass): ?object
+    {
+        try {
+            return $this->iriConverter->getResourceFromIri($data, $context + ['fetch_data' => true]);
+        } catch (ItemNotFoundException $e) {
+            if (false === ($context['denormalize_throw_on_relation_not_found'] ?? true)) {
+                return null;
+            }
+
+            if (!isset($context['not_normalizable_value_exceptions'])) {
+                throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
+            }
+
+            throw NotNormalizableValueException::createForUnexpectedDataType($e->getMessage(), $data, [$resourceClass], $context['deserialization_path'] ?? null, true, $e->getCode(), $e);
+        } catch (InvalidArgumentException $e) {
+            if (!isset($context['not_normalizable_value_exceptions'])) {
+                throw new UnexpectedValueException(\sprintf('Invalid IRI "%s".', $data), $e->getCode(), $e);
+            }
+
+            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Invalid IRI "%s".', $data), $data, [$resourceClass], $context['deserialization_path'] ?? null, true, $e->getCode(), $e);
+        }
     }
 
     /**

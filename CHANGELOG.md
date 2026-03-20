@@ -1,38 +1,6 @@
 # Changelog
 
-## Unreleased
-
-### Features
-
-* [f74d7ba1a](https://github.com/api-platform/core/commit/f74d7ba1a) feat(elasticsearch): add OpenSearch support (#7519)
-
-## v4.3.0-alpha.2
-
-### Bug fixes
-
-* [191a46122](https://github.com/api-platform/core/commit/191a4612267d95cc665ef72e83ceb2f053ab6214) fix(serializer): apply API Platform name converter to input/output DTOs (#7779)
-* [17b6ff221](https://github.com/api-platform/core/commit/17b6ff22138e10decfd09a93cc74995cf566062b) fix(jsonschema): name collision when an operation name is already used by another class (#7778)
-* [23840f9df](https://github.com/api-platform/core/commit/23840f9df42895d334d0db1027e3894ce411cf98) fix(symfony): publish mercure updates for all resources of an entity (#7774)
-* [75ffdc43f](https://github.com/api-platform/core/commit/75ffdc43ff812e52053b169737e06dda9570e97a) fix(hydra): hide search key when there is parameter without filter (#7773)
-* [e0ba0068d](https://github.com/api-platform/core/commit/e0ba0068df66284dc72a66d4c8cae819aaabc562) fix(hydra): unique class @id with subClassOf for semantic types (#7771)
-* [0f025e849](https://github.com/api-platform/core/commit/0f025e8494e52ec9089b184b64e48f7845d2e906) fix(state): handle partial pagination with object mapper (#7769)
-* [a2efb39e1](https://github.com/api-platform/core/commit/a2efb39e12e780ce1384ef9c3e02f155974fea72) fix(elasticsearch): mono-repo v9 support (#7766)
-* [332272c6f](https://github.com/api-platform/core/commit/332272c6f4db27dc7e0ea39d664059b2b05cfb6c) fix(jsonld): restore item_uri_template @type resolution after 4.2 merge (#7764)
-* [f0b355984](https://github.com/api-platform/core/commit/f0b355984da1fdbf3d430289e37a589847e95aa2) fix(symfony): use AsCommand description parameter for console commands (#7763)
-* [a4715f063](https://github.com/api-platform/core/commit/a4715f063d789824cc299a0cc786568b6276c7e2) fix(doctrine): enforce api-platform/serializer dependency (#7781)
-* [4f6c4e1b4](https://github.com/api-platform/core/commit/4f6c4e1b40b5b61c3f4d3f8d19ef3980a8be39b7) fix(laravel): object-mapper / mcp-bundle versions
-
-### Features
-
-* [383a5fa67](https://github.com/api-platform/core/commit/383a5fa67f89f7903d6fca31182d1539033f2add) feat(serializer): global defaults.normalization_context.gen_id configuration option (#7775)
-* [6626549b6](https://github.com/api-platform/core/commit/6626549b6189b81b465f50c8f3859b5f99c61928) feat: correctly map problem-detail fields when using ProblemExceptionInterface (#7776)
-* [c56a35469](https://github.com/api-platform/core/commit/c56a35469e6c68a868e087728f3201f81311da5a) feat(doctrine): add nested relation support to IriFilter and UuidFilter (#7759)
-
-### Notes
-
-* **Hydra class `@id` now always uses `#ShortName`** (#7771): Hydra documentation classes now consistently use `#ShortName` as their `@id` instead of schema.org type URIs (e.g. `schema:Product`). This properly resolves class identifier collisions when multiple resources shared the same semantic type, which previously caused api-doc-parser conflation. Semantic types configured via `types` are now exposed through `rdfs:subClassOf`. Clients should expect class `@id` and property range changes in the Hydra documentation if resources had custom `types` configured.
-
-## v4.3.0-alpha.1
+## v4.3.0
 
 ### Features
 
@@ -40,32 +8,110 @@
 * [d13c24759](https://github.com/api-platform/core/commit/d13c24759cde050cd8eaa8b73f2fa1b686d562f8) feat: mcp bundle tool integration (#7595)
 * [ed0ae92ce](https://github.com/api-platform/core/commit/ed0ae92ce3d3b73aa8c388d4ae25c1a48712c2fb) feat: add support of collection to MCP (#7724)
 * [6e9e88dc2](https://github.com/api-platform/core/commit/6e9e88dc2e897ebe7e02716f28eec3115302de7a) feat(laravel): mcp support (#7709)
+* [6addc554d](https://github.com/api-platform/core/commit/6addc554d0e968f93ccc5de12bf12b8a86290ae1) feat(openapi): Scalar API Reference documentation support (#7817)
 * [05a5d4d93](https://github.com/api-platform/core/commit/05a5d4d938bbb24d3d45fdcf69034bd1265d9008) feat(laravel): object mapper (#7704)
-* [32e94848c](https://github.com/api-platform/core/commit/32e94848c78a28102d16eac6672588d4cf1fd62d) feat: support relations on filters (#7711)
-* [64b46b2d0](https://github.com/api-platform/core/commit/64b46b2d03146287bef91391d947772865cdb36e) feat(jsonschema): support for normalization/denormalization with attributes (#7629)
 * [359a128cd](https://github.com/api-platform/core/commit/359a128cd56934aeb3aefc13040fcd1206907157) feat(symfony): isGranted before provider (#7500)
+* [32e94848c](https://github.com/api-platform/core/commit/32e94848c78a28102d16eac6672588d4cf1fd62d) feat: support relations on filters (#7711)
+* [2682fc5fc](https://github.com/api-platform/core/commit/2682fc5fc9fdcc40591859e25e45c9fa5fc2ddb9) feat: defaults parameters (#7758)
 * [d640d106b](https://github.com/api-platform/core/commit/d640d106b27542c3ed8b718d0d83c3fe7b369f1a) feat(doctrine): uuid filter (#7628)
+* [c56a35469](https://github.com/api-platform/core/commit/c56a35469e6c68a868e087728f3201f81311da5a) feat(doctrine): add nested relation support to IriFilter and UuidFilter (#7759)
+* [5a876cc92](https://github.com/api-platform/core/commit/5a876cc926cd2aa05e42bf4dbc3960d2d2c2435c) feat(doctrine): ComparisonFilter decorator for range filtering (#7760)
+* [19809c617](https://github.com/api-platform/core/commit/19809c617e894ac01141e7db790513f72d0dacee) feat(doctrine): ne (not equal) operator for ComparisonFilter (#7814)
 * [6ba9c8b4d](https://github.com/api-platform/core/commit/6ba9c8b4dacf18253853017997e6355763f3ee5a) feat(doctrine): Add caseSensitive option to PartialSearchFilter (#7675)
+* [9f98aff46](https://github.com/api-platform/core/commit/9f98aff46e044a80c13c2b03df2448f5d66d1ee7) feat(doctrine): add ODM SortFilter and nested property support for parameter-based filters (#7780)
 * [6f5d41458](https://github.com/api-platform/core/commit/6f5d41458b38aace891308c6907a3a0a6d890cac) feat(doctrine): remove PUT & PATCH for readonly entity (#7453)
-* [fe63ddec8](https://github.com/api-platform/core/commit/fe63ddec877af3fee8f5faafbea1b4c5ca0f1385) feat(validator): uuid/ulid parameter validation (#7649)
+* [64b46b2d0](https://github.com/api-platform/core/commit/64b46b2d03146287bef91391d947772865cdb36e) feat(jsonschema): support for normalization/denormalization with attributes (#7629)
 * [c70cd449f](https://github.com/api-platform/core/commit/c70cd449f6055c38a8bf7b3edb53aae5cb4c6283) feat(json-schema): handle union object types in iterable properties (#7726)
-* [26d1ac4d6](https://github.com/api-platform/core/commit/26d1ac4d687143186731987e33163cf8448f0afc) feat: allow both uppercase and lowercase order direction in OrderFilter schema (#7741)
+* [625438cf2](https://github.com/api-platform/core/commit/625438cf22e2ded21eda28dd5fba3c9d83ac9699) feat(jsonapi): support entity identifiers instead of IRIs as resource id
+* [833f3fec6](https://github.com/api-platform/core/commit/833f3fec655a75db794680933cdb7e7e0bfc02c0) feat(serializer): option to preserve key in CollectionNormalizer (#7721)
+* [383a5fa67](https://github.com/api-platform/core/commit/383a5fa67f89f7903d6fca31182d1539033f2add) feat(serializer): global defaults.normalization_context.gen_id configuration option (#7775)
+* [516ee3a28](https://github.com/api-platform/core/commit/516ee3a283f19bf1a3e3a605827d5bfbb2c6a97f) feat(elasticsearch): OpenSearch support (#7811)
 * [21aa2572d](https://github.com/api-platform/core/commit/21aa2572d8fef2b3f05f7307c51348a6c9767e45) feat(elasticsearch): add SSL options for Elasticsearch configuration (#4059)
+* [fe63ddec8](https://github.com/api-platform/core/commit/fe63ddec877af3fee8f5faafbea1b4c5ca0f1385) feat(validator): uuid/ulid parameter validation (#7649)
 * [1427dfa91](https://github.com/api-platform/core/commit/1427dfa9117bae55fb82b216f8acd6d651098767) feat(metadata): expose default attribute on parameters (#7551)
+* [63fba2a4e](https://github.com/api-platform/core/commit/63fba2a4efc86d06ae70cc32a2f50fceac91ff82) feat(metadata): cache operation metadata factory (#7516)
 * [350390ba3](https://github.com/api-platform/core/commit/350390ba30f9ff367ee62c967b97fad9f96551ff) feat(state): add headers to comply with LDP specification (#6917)
 * [8bdb2bc91](https://github.com/api-platform/core/commit/8bdb2bc919f24dfef26b3466ac391f7fe01c54fe) feat(symfony): allow symfony makers namespace configuration (#7497)
 * [45831a93c](https://github.com/api-platform/core/commit/45831a93c9d256d9ebecd3db13ac7db34e3778f1) feat: enable to skip autoconfiguration with new `SkipAutoconfigure` attribute (#7467)
-* [63fba2a4e](https://github.com/api-platform/core/commit/63fba2a4efc86d06ae70cc32a2f50fceac91ff82) feat(metadata): cache operation metadata factory (#7516)
+* [26d1ac4d6](https://github.com/api-platform/core/commit/26d1ac4d687143186731987e33163cf8448f0afc) feat: allow both uppercase and lowercase order direction in OrderFilter schema (#7741)
+* [6626549b6](https://github.com/api-platform/core/commit/6626549b6189b81b465f50c8f3859b5f99c61928) feat: correctly map problem-detail fields when using ProblemExceptionInterface (#7776)
+* [db147a52f](https://github.com/api-platform/core/commit/db147a52fd27c5ecae863d601a2759ed62d699cf) feat(laravel): split render logic from error handler (#7790)
 
 ### Bug fixes
 
+* [263dbd8b2](https://github.com/api-platform/core/commit/263dbd8b27645971c269254b1d17525e9769b0a8) fix: call object mapper with the expected class on 4.3 (#7796)
+* [af7c22749](https://github.com/api-platform/core/commit/af7c22749d9fbdeb3a5fe90e7a6272230c38b22d) fix(jsonld): use operation shortName for @context URI with multiple ApiResources
+* [86b97d5ea](https://github.com/api-platform/core/commit/86b97d5eab188c5090d27a87cb310841a559b408) fix(mcp): propagate session via processor context
+* [3b9ed3bd4](https://github.com/api-platform/core/commit/3b9ed3bd41faf5ac39b6c532064ccbeddd8f0931) fix(laravel): make api-platform/mcp optional (#7824) (#7828)
+* [27cc4dbb3](https://github.com/api-platform/core/commit/27cc4dbb32dd4e005b04e51d42b889a4670e7354) fix(laravel): improve UI selection for documentation (#7826)
+* [e16f7ec4f](https://github.com/api-platform/core/commit/e16f7ec4fbf94e27c46bd07f1053617f9921200c) fix(laravel): add init-scalar-ui.js to Laravel's assets (#7825)
+* [5ca646111](https://github.com/api-platform/core/commit/5ca6461118e8cce34a6894a521003d9ce05187bc) fix(mcp): fallback to sdk handler when not found (#7818)
+* [95ec407bf](https://github.com/api-platform/core/commit/95ec407bf8515e93df4b3699c6e7913a9ccdf916) fix(jsonapi): wrong variable name during merge (#7816)
+* [04c30b7ee](https://github.com/api-platform/core/commit/04c30b7eee4af443ad16ec6dd2135a4511dc3138) fix(jsonapi): prevent double unwrapping of data.attributes with input DTOs
+* [191a46122](https://github.com/api-platform/core/commit/191a4612267d95cc665ef72e83ceb2f053ab6214) fix(serializer): apply API Platform name converter to input/output DTOs (#7779)
+* [2e0b8ffb6](https://github.com/api-platform/core/commit/2e0b8ffb6b57ee5552ad8a48b212d8dff9de923a) fix(serializer): prevent api_platform_output context from leaking to nested non-resource objects (#7787)
+* [c6236f313](https://github.com/api-platform/core/commit/c6236f313864661a4cab0caa926a2520500c0257) fix(serializer): report all missing constructor arguments in instantiateObject
+* [31289b838](https://github.com/api-platform/core/commit/31289b838513dba263f1087ded32d50ea370f4f3) fix(symfony): make enable_docs a master switch for disabling documentation (#7806)
+* [64247b050](https://github.com/api-platform/core/commit/64247b0505dd0bcb79e958b1f987e983eb6c3fd3) fix(metadata): sort parameters by priority after pattern expansion (#7788)
+* [813e4f793](https://github.com/api-platform/core/commit/813e4f793d4bd4ba966f411c376da64c71e4f921) fix(validator): missing required properties when using GroupSequence (#7784)
+* [90dfc3554](https://github.com/api-platform/core/commit/90dfc355496d9f6478f3085d96f146082552a9d2) fix(validator): handle nested groups and group sequences (#7791)
 * [28834e6d6](https://github.com/api-platform/core/commit/28834e6d6121f82775d38d57515206674f0c9e0c) fix(validator): validate entities after ObjectMapper transformation (#7731)
-* [390056fbb](https://github.com/api-platform/core/commit/390056fbbc6630b312ea25c887b33464a926a06f) fix(jsonld)!: item uri template type (#7518)
+* [98b8efb68](https://github.com/api-platform/core/commit/98b8efb68785cf930fd5b136eb40e6b4a9b54db4) fix(laravel): exclude .blade.php files from recursive class scan (#7813)
+* [cfdc22c1c](https://github.com/api-platform/core/commit/cfdc22c1c8895a420f2e9b91e541a333265e09a2) fix(laravel): do not exclude custom primary keys matching HasMany foreign keys (#7810)
+* [9f1109365](https://github.com/api-platform/core/commit/9f1109365cc44a21551c77f715dcd0bbed1b161f) fix(hydra): example type - use @type prefix per JSON-LD spec (#7768)
+* [75ffdc43f](https://github.com/api-platform/core/commit/75ffdc43ff812e52053b169737e06dda9570e97a) fix(hydra): hide search key when there is parameter without filter (#7773)
+* [e0ba0068d](https://github.com/api-platform/core/commit/e0ba0068df66284dc72a66d4c8cae819aaabc562) fix(hydra): unique class @id with subClassOf for semantic types (#7771)
+* [9fdc6c27d](https://github.com/api-platform/core/commit/9fdc6c27dd61e66957505099b27dac29659183ba) fix(openapi): allow Operations to override global config in getPaginationParameters (#7807)
+* [0f025e849](https://github.com/api-platform/core/commit/0f025e8494e52ec9089b184b64e48f7845d2e906) fix(state): handle partial pagination with object mapper (#7769)
+* [a2efb39e1](https://github.com/api-platform/core/commit/a2efb39e12e780ce1384ef9c3e02f155974fea72) fix(elasticsearch): mono-repo v9 support (#7766)
+* [332272c6f](https://github.com/api-platform/core/commit/332272c6f4db27dc7e0ea39d664059b2b05cfb6c) fix(jsonld): restore item_uri_template @type resolution after 4.2 merge (#7764)
+* [390056fbb](https://github.com/api-platform/core/commit/390056fbbc6630b312ea25c887b33464a926a06f) fix(jsonld): item uri template type (#7518)
+* [f0b355984](https://github.com/api-platform/core/commit/f0b355984da1fdbf3d430289e37a589847e95aa2) fix(symfony): use AsCommand description parameter for console commands (#7763)
+* [23840f9df](https://github.com/api-platform/core/commit/23840f9df42895d334d0db1027e3894ce411cf98) fix(symfony): publish mercure updates for all resources of an entity (#7774)
+* [c624daf68](https://github.com/api-platform/core/commit/c624daf68e4ca5a5a0a0dcd95e61b5ea8b154958) fix(symfony): allow toggling GraphQL Playground to ensure BC
+* [c741bd62e](https://github.com/api-platform/core/commit/c741bd62e7765d4aa3e380ea1e8741cb34bc214a) fix: add missing RPC messenger handler for Symfony 8.1 compatibility
+* [a4715f063](https://github.com/api-platform/core/commit/a4715f063d789824cc299a0cc786568b6276c7e2) fix(doctrine): enforce api-platform/serializer dependency (#7781)
 * [149fe24a1](https://github.com/api-platform/core/commit/149fe24a103ada47eddd7035661ef681839e42bb) fix(doctrine): throw exception if property is null for the doctrine filters (#7681)
+* [17b6ff221](https://github.com/api-platform/core/commit/17b6ff22138e10decfd09a93cc74995cf566062b) fix(jsonschema): name collision when an operation name is already used by another class (#7778)
+* [4f6c4e1b4](https://github.com/api-platform/core/commit/4f6c4e1b40b5b61c3f4d3f8d19ef3980a8be39b7) fix(laravel): object-mapper / mcp-bundle versions
 
 ### Breaking changes
 
-* When using `output` with `itemUriTemplate` on a collection operation, the JSON-LD `@type` will now use the resource class name instead of the output DTO class name for semantic consistency with `itemUriTemplate` behavior.
+* **JSON-LD `@type` with `output` and `itemUriTemplate`**: When using `output` with `itemUriTemplate` on a collection operation, the JSON-LD `@type` now uses the resource class name instead of the output DTO class name for semantic consistency with `itemUriTemplate` behavior. Update any client code that relies on the DTO class name in `@type`.
+* **Doctrine filters require explicit `property`** (#7681): Doctrine parameter-based filters (`ExactFilter`, `IriFilter`, `PartialSearchFilter`, `UuidFilter`) now throw `InvalidArgumentException` if the `property` attribute is missing. If you have filter parameters without an explicit `property`, you must either add one or use the `:property` placeholder in your parameter name.
+* **Readonly Doctrine entities lose PUT & PATCH** (#7453): Entities marked as readonly via Doctrine metadata (`$classMetadata->markReadOnly()`) will no longer expose PUT and PATCH operations. Clients sending PUT/PATCH to these resources will receive a 404. If you need write operations on readonly entities, explicitly define them in your `ApiResource` attribute.
+
+### Behavioral changes
+
+* **Hydra class `@id` now always uses `#ShortName`** (#7771): Hydra documentation classes now consistently use `#ShortName` as their `@id` instead of schema.org type URIs (e.g. `schema:Product`). This resolves class identifier collisions when multiple resources shared the same semantic type, which previously caused api-doc-parser conflation. Semantic types configured via `types` are now exposed through `rdfs:subClassOf`. Clients should expect class `@id` and property range changes in the Hydra documentation if resources had custom `types` configured.
+* **`isGranted` evaluated before provider** (#7500): Security expressions are now evaluated before the state provider runs. Expressions that do not reference the `object` variable will be checked earlier (at the `pre_read` stage), improving security by preventing unnecessary database queries on unauthorized requests. Expressions that reference `object` still wait for the provider to resolve the entity. Review any security expressions that relied on provider side-effects running before authorization.
+* **LDP-compliant response headers** (#6917): API responses now include `Allow` and `Accept-Post` headers per the Linked Data Platform specification. These are informational headers that help clients discover API capabilities and should not break existing integrations.
+* **Scalar API Reference UI** (#7817): Scalar is now available as an alternative documentation UI alongside Swagger UI. It is enabled by default when TwigBundle is available. Access it via `?ui=scalar`. To disable it, set `enable_scalar: false` in your API Platform configuration.
+
+## v4.2.21
+
+### Bug fixes
+
+* [20ced5fca](https://github.com/api-platform/core/commit/20ced5fcaa02b8d4eba7f0d34e90a7ec5c6793cc) fix(laravel): clear SkolemIriConverter state between requests (#7838)
+* [2b2b7bca2](https://github.com/api-platform/core/commit/2b2b7bca2598d741cd90498f76d44dad0c193964) fix(filter): use correct type for int-backed enums in BackedEnumFilter
+* [42a2d7fc6](https://github.com/api-platform/core/commit/42a2d7fc60abe7726e88dc16f84d2f8b791d63fe) fix(symfony): register DateTimeValueObjectTransformer for JsonStreamer (#7839)
+* [63e6b57f8](https://github.com/api-platform/core/commit/63e6b57f829cc5be666da7abbc80acfebbef3c05) fix(openapi): correct redocly openapi errors (#7834)
+* [6a472a2db](https://github.com/api-platform/core/commit/6a472a2db68078743b31a57d0f2929800f450618) fix(jsonapi): swap arguments in DefinitionNameFactory::create() call
+* [bbfd4cafa](https://github.com/api-platform/core/commit/bbfd4cafaa1dd5b0d3cf93f804dce7e6a3029bb9) fix(filter): do not nest array while generating default schema (#7832)
+* [c20a41c20](https://github.com/api-platform/core/commit/c20a41c20a22b41e3a4caa0bca337915d190c3d3) fix(symfony): clear SkolemIriConverter state between requests via ResetInterface (#7829)
+* [d6ecbe122](https://github.com/api-platform/core/commit/d6ecbe12257e0a1f00b483b48409de60b998509e) fix(serializer): Use serializer when denormalizing relation inside Input (#7830)
+* [da6232468](https://github.com/api-platform/core/commit/da62324686379cb969134141f1660eda814f374c) fix(metadata): allow GraphQL-only resources without identifiers (#3975) (#7836)
+* [f4002902a](https://github.com/api-platform/core/commit/f4002902a6f3551fcaf4ea698f330218c794bbdc) fix(state): on creation, give expected class to object mapper (#7795)
+
+## v4.2.20
+
+### Bug fixes
+
+* [31289b838](https://github.com/api-platform/core/commit/31289b838513dba263f1087ded32d50ea370f4f3) fix(symfony): make enable_docs a master switch for disabling documentation (#7806)
+* [64115e152](https://github.com/api-platform/core/commit/64115e152301b896b9e6d7999b7b3f50f1d85085) fix(odm): partial pagination limit the documents entering $facet (#7822)
+* [98b8efb68](https://github.com/api-platform/core/commit/98b8efb68785cf930fd5b136eb40e6b4a9b54db4) fix(laravel): exclude .blade.php files from recursive class scan (#7813)
+* [9fdc6c27d](https://github.com/api-platform/core/commit/9fdc6c27dd61e66957505099b27dac29659183ba) fix(openapi): allow Operations to override global config in getPaginationParameters (#7807)
+* [cfdc22c1c](https://github.com/api-platform/core/commit/cfdc22c1c8895a420f2e9b91e541a333265e09a2) fix(laravel): do not exclude custom primary keys matching HasMany foreign keys (#7810)
 
 ## v4.2.19
 

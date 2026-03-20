@@ -103,6 +103,39 @@ final class MappingTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(204);
     }
 
+    /**
+     * When an API resource has multiple #[Map] targets (e.g. MappedEntity + AnotherMappedObject),
+     * the ObjectMapperProcessor must resolve the correct target using stateOptions during POST.
+     */
+    public function testPostWithMultipleMapTargetsResolvesCorrectEntity(): void
+    {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('MongoDB not tested.');
+        }
+
+        if (!$this->getContainer()->has('api_platform.object_mapper')) {
+            $this->markTestSkipped('ObjectMapper not installed');
+        }
+
+        $this->recreateSchema([MappedEntity::class]);
+        $client = self::createClient();
+        $r = $client->request('POST', 'mapped_resources', ['json' => ['username' => 'multi target']]);
+
+        $this->assertResponseStatusCodeSame(201);
+        $this->assertJsonContains(['username' => 'multi target']);
+
+        // Verify the mapped_data is the entity from stateOptions, not AnotherMappedObject
+        $mappedData = $client->getKernelBrowser()->getRequest()->attributes->get('mapped_data');
+        $this->assertInstanceOf(MappedEntity::class, $mappedData, 'ObjectMapper should resolve to the stateOptions entity class, not the first #[Map] target.');
+
+        // Verify persistence
+        $repo = $this->getManager()->getRepository(MappedEntity::class);
+        $persisted = $repo->findOneBy(['id' => $r->toArray()['id']]);
+        $this->assertNotNull($persisted);
+        $this->assertSame('multi', $persisted->getFirstName());
+        $this->assertSame('target', $persisted->getLastName());
+    }
+
     public function testShouldMapToTheCorrectResource(): void
     {
         if ($this->isMongoDB()) {

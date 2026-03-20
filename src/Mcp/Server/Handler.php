@@ -97,6 +97,7 @@ final class Handler implements RequestHandlerInterface
         $context = [
             'request' => $this->requestStack->getCurrentRequest(),
             'mcp_request' => $request,
+            'mcp_session' => $session,
             'uri_variables' => $uriVariables,
             'resource_class' => $operation->getClass(),
         ];

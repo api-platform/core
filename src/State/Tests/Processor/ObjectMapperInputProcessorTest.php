@@ -108,7 +108,7 @@ class ObjectMapperInputProcessorTest extends TestCase
         $objectMapper = $this->createMock(ObjectMapperInterface::class);
         $objectMapper->expects($this->once())
             ->method('map')
-            ->with($dto, null)
+            ->with($dto, \stdClass::class)
             ->willReturn($entity);
 
         $decorated = $this->createMock(ProcessorInterface::class);

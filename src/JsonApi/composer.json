@@ -22,11 +22,11 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/documentation": "^4.2",
-        "api-platform/json-schema": "^4.2",
-        "api-platform/metadata": "^4.2",
-        "api-platform/serializer": "^4.2.18",
-        "api-platform/state": "^4.2.4",
+        "api-platform/documentation": "^4.3",
+        "api-platform/json-schema": "^4.3",
+        "api-platform/metadata": "^4.3",
+        "api-platform/serializer": "^4.3",
+        "api-platform/state": "^4.3",
         "symfony/error-handler": "^6.4 || ^7.0 || ^8.0",
         "symfony/http-foundation": "^6.4.14 || ^7.0 || ^8.0",
         "symfony/type-info": "^7.3 || ^8.0"
@@ -57,7 +57,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "4.3.x-dev",
+            "dev-main": "4.4.x-dev",
             "dev-4.2": "4.2.x-dev",
             "dev-3.4": "3.4.x-dev",
             "dev-4.1": "4.1.x-dev"
@@ -72,5 +72,7 @@
     },
     "scripts": {
         "test": "./vendor/bin/phpunit"
-    }
+    },
+    "minimum-stability": "beta",
+    "prefer-stable": true
 }
