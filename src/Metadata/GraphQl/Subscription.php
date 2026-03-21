@@ -130,11 +130,10 @@ final class Subscription extends Operation
             stateOptions                   : $stateOptions,
             parameters                     : $parameters,
             queryParameterValidationEnabled: $queryParameterValidationEnabled,
-            policy: $policy,
-            rules: $rules,
-            extraProperties: $extraProperties,
-            map: $map
-            map                           : $map,
+            rules                          : $rules,
+            policy                         : $policy,
+            extraProperties                : $extraProperties,
+            map                            : $map,
         );
     }
 
