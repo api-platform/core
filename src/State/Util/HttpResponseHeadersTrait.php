@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\Util;
 
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Error;
 use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
@@ -26,6 +27,8 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\Util\CloneTrait;
+use ApiPlatform\State\Pagination\PaginatorInterface;
+use ApiPlatform\State\Pagination\PartialPaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface as SymfonyHttpExceptionInterface;
@@ -145,7 +148,44 @@ trait HttpResponseHeadersTrait
             $this->addLinkedDataPlatformHeaders($headers, $operation);
         }
 
+        if ($operation instanceof CollectionOperationInterface && $originalData instanceof PartialPaginatorInterface) {
+            $headers['Accept-Ranges'] = self::extractRangeUnit($operation);
+
+            if ('HEAD' !== $method) {
+                $this->addContentRangeHeader($headers, $operation, $originalData);
+            }
+        }
+
         return $headers;
+    }
+
+    private function addContentRangeHeader(array &$headers, HttpOperation $operation, PartialPaginatorInterface $paginator): void
+    {
+        $unit = self::extractRangeUnit($operation);
+        $currentCount = $paginator->count();
+        $rangeStart = (int) (($paginator->getCurrentPage() - 1) * $paginator->getItemsPerPage());
+
+        if ($paginator instanceof PaginatorInterface) {
+            $totalItems = (int) $paginator->getTotalItems();
+            $headers['Content-Range'] = 0 === $currentCount
+                ? \sprintf('%s */%d', $unit, $totalItems)
+                : \sprintf('%s %d-%d/%d', $unit, $rangeStart, $rangeStart + $currentCount - 1, $totalItems);
+        } elseif (0 < $currentCount) {
+            $headers['Content-Range'] = \sprintf('%s %d-%d/*', $unit, $rangeStart, $rangeStart + $currentCount - 1);
+        }
+    }
+
+    private static function extractRangeUnit(HttpOperation $operation): string
+    {
+        if ($uriTemplate = $operation->getUriTemplate()) {
+            $path = strtok($uriTemplate, '{');
+            $segments = array_filter(explode('/', trim($path, '/')));
+            if ($last = end($segments)) {
+                return strtolower($last);
+            }
+        }
+
+        return strtolower($operation->getShortName() ?? 'items') ?: 'items';
     }
 
     private function addLinkedDataPlatformHeaders(array &$headers, HttpOperation $operation): void
