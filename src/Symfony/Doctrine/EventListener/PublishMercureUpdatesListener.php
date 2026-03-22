@@ -25,6 +25,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
+use ApiPlatform\Metadata\Util\PropertyAccessorValueExtractor;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use Doctrine\Common\EventArgs;
 use Doctrine\ODM\MongoDB\Event\OnFlushEventArgs as MongoDbOdmOnFlushEventArgs;
@@ -35,6 +36,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\PropertyAccess\Exception\AccessException;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -224,14 +227,17 @@ final class PublishMercureUpdatesListener
                 $privateFields = $mercureOptions['private_fields'] ?? [];
                 if ($private && $privateFields) {
                     foreach ($privateFields as $privateField) {
-                        if (property_exists($object, $privateField)) {
-                            $privateData[$privateField] = $this->getResourceId($privateField, $object);
+                        try {
+                            $privateData[$privateField] = $this->getPrivateFieldValue($privateField, $object);
+                        } catch (NoSuchPropertyException|AccessException) {
+                            continue;
                         }
                     }
                 }
 
                 $this->deletedObjects[] = [
                     'object' => (object) [
+                        'resourceClass' => $resourceClass,
                         'id' => $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $operation),
                         'iri' => $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_URL, $operation),
                         'type' => 1 === \count($types) ? $types[0] : $types,
@@ -337,16 +343,8 @@ final class PublishMercureUpdatesListener
         return new Update($iri, $data, $options['private'] ?? false, $options['id'] ?? null, $options['type'] ?? null, $options['retry'] ?? null);
     }
 
-    private function getResourceId(string $privateField, object $object): string
+    private function getPrivateFieldValue(string $privateField, object $object): string
     {
-        $id = $object->{'get'.ucfirst($privateField)}();
-        if (is_object($id) && method_exists($id, 'getId')) {
-            $id = $id->getId();
-        }
-        if ($id instanceof \Stringable || is_numeric($id)) {
-            return (string) $id;
-        }
-
-        return $id;
+        return PropertyAccessorValueExtractor::getValue($object, $privateField);
     }
 }

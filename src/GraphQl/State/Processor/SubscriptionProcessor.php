@@ -16,7 +16,6 @@ namespace ApiPlatform\GraphQl\State\Processor;
 use ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface;
 use ApiPlatform\GraphQl\Subscription\OperationAwareSubscriptionManagerInterface;
 use ApiPlatform\GraphQl\Subscription\SubscriptionManagerInterface;
-use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
@@ -50,9 +49,6 @@ final class SubscriptionProcessor implements ProcessorInterface
 
             $hub = \is_array($mercure) ? ($mercure['hub'] ?? null) : null;
             $data['mercureUrl'] = $this->mercureSubscriptionIriGenerator->generateMercureUrl($subscriptionId, $hub);
-            if ($operation instanceof Subscription) {
-                $data['isCollection'] = $operation->isCollection();
-            }
         }
 
         return $data;

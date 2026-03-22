@@ -13,11 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\GraphQl;
 
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\State\OptionsInterface;
 
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
-class Subscription extends Operation
+final class SubscriptionCollection extends Subscription implements CollectionOperationInterface
 {
     public function __construct(
         ?string $resolver = null,
@@ -123,7 +124,7 @@ class Subscription extends Operation
             fetchPartial: $fetchPartial,
             forceEager: $forceEager,
             priority: $priority,
-            name: $name ?: 'update_subscription',
+            name: $name ?: 'update_collection_subscription',
             provider: $provider,
             processor: $processor,
             stateOptions: $stateOptions,

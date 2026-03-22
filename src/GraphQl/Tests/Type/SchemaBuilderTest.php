@@ -23,6 +23,7 @@ use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
+use ApiPlatform\Metadata\GraphQl\SubscriptionCollection;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -79,6 +80,7 @@ class SchemaBuilderTest extends TestCase
         $this->fieldsBuilderProphecy->getCollectionQueryFields($resourceClass, Argument::that(static fn (Operation $arg): bool => 'custom_collection_query' === $arg->getName()), [])->willReturn(['custom_collection_query' => ['custom_collection_query_fields']]);
         $this->fieldsBuilderProphecy->getMutationFields($resourceClass, Argument::that(static fn (Operation $arg): bool => 'mutation' === $arg->getName()))->willReturn(['mutation' => ['mutation_fields']]);
         $this->fieldsBuilderProphecy->getSubscriptionFields($resourceClass, Argument::that(static fn (Operation $arg): bool => 'update' === $arg->getName()))->willReturn(['subscription' => ['subscription_fields']]);
+        $this->fieldsBuilderProphecy->getSubscriptionFields($resourceClass, Argument::that(static fn (Operation $arg): bool => 'update_collection' === $arg->getName()))->willReturn(['collectionSubscription' => ['collection_subscription_fields']]);
 
         $this->resourceNameCollectionFactoryProphecy->create()->willReturn(new ResourceNameCollection([$resourceClass]));
         $this->resourceMetadataCollectionFactoryProphecy->create($resourceClass)->willReturn($resourceMetadata);
@@ -173,6 +175,40 @@ class SchemaBuilderTest extends TestCase
                     'name' => 'Subscription',
                     'fields' => [
                         'subscription' => ['subscription_fields'],
+                    ],
+                ]),
+            ],
+            'collection subscription' => [$resourceClass = 'resourceClass', new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations(['update_collection' => (new SubscriptionCollection())->withName('update_collection')->withMercure(true)])]),
+                new ObjectType([
+                    'name' => 'Query',
+                    'fields' => [
+                        'node' => ['node_fields'],
+                    ],
+                ]),
+                null,
+                new ObjectType([
+                    'name' => 'Subscription',
+                    'fields' => [
+                        'collectionSubscription' => ['collection_subscription_fields'],
+                    ],
+                ]),
+            ],
+            'item and collection subscriptions' => [$resourceClass = 'resourceClass', new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withGraphQlOperations([
+                'update' => (new Subscription())->withName('update')->withMercure(true),
+                'update_collection' => (new SubscriptionCollection())->withName('update_collection')->withMercure(true),
+            ])]),
+                new ObjectType([
+                    'name' => 'Query',
+                    'fields' => [
+                        'node' => ['node_fields'],
+                    ],
+                ]),
+                null,
+                new ObjectType([
+                    'name' => 'Subscription',
+                    'fields' => [
+                        'subscription' => ['subscription_fields'],
+                        'collectionSubscription' => ['collection_subscription_fields'],
                     ],
                 ]),
             ],
