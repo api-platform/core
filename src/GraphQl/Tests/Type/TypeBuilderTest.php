@@ -26,6 +26,7 @@ use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
+use ApiPlatform\Metadata\GraphQl\SubscriptionCollection;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\State\Pagination\Pagination;
 use GraphQL\Type\Definition\EnumType;
@@ -468,6 +469,74 @@ class TypeBuilderTest extends TestCase
         $fieldsBuilderProphecy->getResourceObjectTypeFields(\stdClass::class, $operation, false, 1, null)->shouldBeCalled();
         $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->shouldBeCalled()->willReturn($fieldsBuilderProphecy->reveal());
         $resourceObjectType->config['fields']();
+    }
+
+    public function testGetResourceObjectTypeCollectionSubscription(): void
+    {
+        $resourceMetadata = new ResourceMetadataCollection(\stdClass::class, [(new ApiResource())->withGraphQlOperations([
+            'update_collection' => (new SubscriptionCollection())->withName('update_collection')->withShortName('shortName')->withDescription('description')->withMercure(true),
+            'item_query' => (new Query())->withShortName('shortName')->withDescription('description'),
+            'collection_query' => new QueryCollection(),
+        ])]);
+        $this->typesContainerProphecy->has('update_collectionShortNameSubscriptionPayload')->shouldBeCalled()->willReturn(false);
+        $this->typesContainerProphecy->set('update_collectionShortNameSubscriptionPayload', Argument::type(ObjectType::class))->shouldBeCalled();
+        $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
+        $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
+
+        $operation = (new SubscriptionCollection())->withName('update_collection')->withShortName('shortName')->withDescription('description')->withMercure(true)->withClass(\stdClass::class);
+        /** @var ObjectType $resourceObjectType */
+        $resourceObjectType = $this->typeBuilder->getResourceObjectType($resourceMetadata, $operation, null, ['input' => false]);
+        $this->assertSame('update_collectionShortNameSubscriptionPayload', $resourceObjectType->name);
+        $this->assertSame('description', $resourceObjectType->description);
+        $this->assertSame($this->defaultFieldResolver, $resourceObjectType->resolveFieldFn);
+        $this->assertArrayHasKey('interfaces', $resourceObjectType->config);
+        $this->assertEquals([], $resourceObjectType->config['interfaces']);
+        $this->assertArrayHasKey('fields', $resourceObjectType->config);
+
+        $this->typesContainerProphecy->has('shortName')->shouldBeCalled()->willReturn(false);
+        $this->typesContainerProphecy->set('shortName', Argument::type(ObjectType::class))->shouldBeCalled();
+
+        $fieldsType = $resourceObjectType->config['fields']();
+        $this->assertArrayHasKey('shortName', $fieldsType);
+        $this->assertArrayHasKey('clientSubscriptionId', $fieldsType);
+        $this->assertArrayHasKey('mercureUrl', $fieldsType);
+        $this->assertSame(GraphQLType::string(), $fieldsType['clientSubscriptionId']);
+        $this->assertSame(GraphQLType::string(), $fieldsType['mercureUrl']);
+    }
+
+    public function testGetResourceObjectTypeCollectionSubscriptionUsesItemQueryAsWrappedPayload(): void
+    {
+        $itemQuery = (new Query())->withName('item_query')->withShortName('shortName')->withDescription('item description')->withClass(\stdClass::class);
+        $collectionQuery = (new QueryCollection())->withName('collection_query')->withShortName('shortName')->withDescription('collection description')->withClass(\stdClass::class);
+        $collectionSubscription = (new SubscriptionCollection())->withName('update_collection')->withShortName('shortName')->withDescription('subscription description')->withMercure(true)->withClass(\stdClass::class);
+        $resourceMetadata = new ResourceMetadataCollection(\stdClass::class, [(new ApiResource())->withGraphQlOperations([
+            'update_collection' => $collectionSubscription,
+            'item_query' => $itemQuery,
+            'collection_query' => $collectionQuery,
+        ])]);
+
+        $this->typesContainerProphecy->has('update_collectionShortNameSubscriptionPayload')->shouldBeCalled()->willReturn(false);
+        $this->typesContainerProphecy->set('update_collectionShortNameSubscriptionPayload', Argument::type(ObjectType::class))->shouldBeCalled();
+        $this->typesContainerProphecy->has('Node')->shouldBeCalled()->willReturn(false);
+        $this->typesContainerProphecy->set('Node', Argument::type(InterfaceType::class))->shouldBeCalled();
+        $this->typesContainerProphecy->has('shortName')->shouldBeCalled()->willReturn(false);
+        $this->typesContainerProphecy->set('shortName', Argument::type(ObjectType::class))->shouldBeCalled();
+
+        /** @var ObjectType $resourceObjectType */
+        $resourceObjectType = $this->typeBuilder->getResourceObjectType($resourceMetadata, $collectionSubscription, null, ['input' => false]);
+
+        $fieldsBuilderProphecy = $this->prophesize(FieldsBuilderEnumInterface::class);
+        $fieldsBuilderProphecy->getResourceObjectTypeFields(\stdClass::class, $itemQuery, false, 0, null)->shouldBeCalled()->willReturn([]);
+        $this->fieldsBuilderLocatorProphecy->get('api_platform.graphql.fields_builder')->shouldBeCalled()->willReturn($fieldsBuilderProphecy->reveal());
+
+        $fields = $resourceObjectType->config['fields']();
+        /** @var ObjectType $wrappedType */
+        $wrappedType = $fields['shortName'];
+        $wrappedType->config['fields']();
+
+        $this->assertArrayHasKey('shortName', $fields);
+        $this->assertArrayHasKey('clientSubscriptionId', $fields);
+        $this->assertArrayHasKey('mercureUrl', $fields);
     }
 
     public function testGetNodeInterface(): void

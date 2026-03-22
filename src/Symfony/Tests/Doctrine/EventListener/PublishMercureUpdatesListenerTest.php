@@ -364,6 +364,812 @@ class PublishMercureUpdatesListenerTest extends TestCase
         $this->assertEquals(['2', '["data"]'], $data);
     }
 
+    public function testPublishGraphQlCreateUpdates(): void
+    {
+        $toInsert = new Dummy();
+        $toInsert->setId(1);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(Argument::type(Dummy::class))->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource($toInsert, UrlGeneratorInterface::ABS_URL, Argument::any())->willReturn('http://example.com/dummies/1');
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(new Operations([
+            'get' => (new Get())->withMercure(['enable_async_update' => false])->withNormalizationContext(['groups' => ['foo', 'bar']]),
+        ]))]));
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->serialize($toInsert, 'jsonld', ['groups' => ['foo', 'bar']])->willReturn('1');
+
+        $formats = ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']];
+
+        $topics = [];
+        $private = [];
+        $retry = [];
+        $data = [];
+
+        $defaultHub = $this->createMockHub(static function (Update $update) use (&$topics, &$private, &$retry, &$data): string {
+            $topics = array_merge($topics, $update->getTopics());
+            $private[] = $update->isPrivate();
+            $retry[] = $update->getRetry();
+            $data[] = $update->getData();
+
+            return 'id';
+        });
+
+        $graphQlSubscriptionManagerProphecy = $this->prophesize(GraphQlSubscriptionManagerInterface::class);
+        $graphQlSubscriptionId = 'subscription-id';
+        $graphQlSubscriptionData = ['data'];
+        $graphQlSubscriptionManagerProphecy->getPushPayloads($toInsert, 'create')->willReturn([[$graphQlSubscriptionId, $graphQlSubscriptionData]]);
+        $graphQlMercureSubscriptionIriGenerator = $this->prophesize(GraphQlMercureSubscriptionIriGeneratorInterface::class);
+        $topicIri = 'subscription-topic-iri';
+        $graphQlMercureSubscriptionIriGenerator->generateTopicIri($graphQlSubscriptionId)->willReturn($topicIri);
+
+        $listener = new PublishMercureUpdatesListener(
+            $resourceClassResolverProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $serializerProphecy->reveal(),
+            $formats,
+            null,
+            new HubRegistry($defaultHub, ['default' => $defaultHub]),
+            $graphQlSubscriptionManagerProphecy->reveal(),
+            $graphQlMercureSubscriptionIriGenerator->reveal(),
+            null,
+            true,
+        );
+
+        $uowProphecy = $this->prophesize(UnitOfWork::class);
+        $uowProphecy->getScheduledEntityInsertions()->willReturn([$toInsert])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityUpdates()->willReturn([])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityDeletions()->willReturn([])->shouldBeCalled();
+
+        $emProphecy = $this->prophesize(EntityManagerInterface::class);
+        $emProphecy->getUnitOfWork()->willReturn($uowProphecy->reveal())->shouldBeCalled();
+        $eventArgs = new OnFlushEventArgs($emProphecy->reveal());
+
+        $listener->onFlush($eventArgs);
+        $listener->postFlush();
+
+        $this->assertEquals(['http://example.com/dummies/1', 'subscription-topic-iri'], $topics);
+        $this->assertEquals([false, false], $private);
+        $this->assertEquals([null, null], $retry);
+        $this->assertEquals(['1', '["data"]'], $data);
+    }
+
+    public function testPublishGraphQlCreateUpdatesForCollectionSubscriptions(): void
+    {
+        $toInsert = new Dummy();
+        $toInsert->setId(1);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(Argument::type(Dummy::class))->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource($toInsert, UrlGeneratorInterface::ABS_URL, Argument::any())->willReturn('http://example.com/dummies/1');
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(new Operations([
+            'get' => (new Get())->withMercure(['enable_async_update' => false])->withNormalizationContext(['groups' => ['foo', 'bar']]),
+        ]))]));
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->serialize($toInsert, 'jsonld', ['groups' => ['foo', 'bar']])->willReturn('1');
+
+        $formats = ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']];
+
+        $topics = [];
+        $private = [];
+        $retry = [];
+        $data = [];
+
+        $defaultHub = $this->createMockHub(static function (Update $update) use (&$topics, &$private, &$retry, &$data): string {
+            $topics = array_merge($topics, $update->getTopics());
+            $private[] = $update->isPrivate();
+            $retry[] = $update->getRetry();
+            $data[] = $update->getData();
+
+            return 'id';
+        });
+
+        $graphQlSubscriptionManagerProphecy = $this->prophesize(GraphQlSubscriptionManagerInterface::class);
+        $graphQlCollectionSubscriptionPayloads = [
+            ['collection-subscription-id-1', ['data' => ['collection' => 'first']]],
+            ['collection-subscription-id-2', ['data' => ['collection' => 'second']]],
+        ];
+        $graphQlSubscriptionManagerProphecy->getPushPayloads($toInsert, 'create')->willReturn($graphQlCollectionSubscriptionPayloads);
+        $graphQlMercureSubscriptionIriGenerator = $this->prophesize(GraphQlMercureSubscriptionIriGeneratorInterface::class);
+        $graphQlMercureSubscriptionIriGenerator->generateTopicIri('collection-subscription-id-1')->willReturn('collection-subscription-topic-iri-1');
+        $graphQlMercureSubscriptionIriGenerator->generateTopicIri('collection-subscription-id-2')->willReturn('collection-subscription-topic-iri-2');
+
+        $listener = new PublishMercureUpdatesListener(
+            $resourceClassResolverProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $serializerProphecy->reveal(),
+            $formats,
+            null,
+            new HubRegistry($defaultHub, ['default' => $defaultHub]),
+            $graphQlSubscriptionManagerProphecy->reveal(),
+            $graphQlMercureSubscriptionIriGenerator->reveal(),
+            null,
+            true,
+        );
+
+        $uowProphecy = $this->prophesize(UnitOfWork::class);
+        $uowProphecy->getScheduledEntityInsertions()->willReturn([$toInsert])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityUpdates()->willReturn([])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityDeletions()->willReturn([])->shouldBeCalled();
+
+        $emProphecy = $this->prophesize(EntityManagerInterface::class);
+        $emProphecy->getUnitOfWork()->willReturn($uowProphecy->reveal())->shouldBeCalled();
+        $eventArgs = new OnFlushEventArgs($emProphecy->reveal());
+
+        $listener->onFlush($eventArgs);
+        $listener->postFlush();
+
+        $this->assertEquals(['http://example.com/dummies/1', 'collection-subscription-topic-iri-1', 'collection-subscription-topic-iri-2'], $topics);
+        $this->assertEquals([false, false, false], $private);
+        $this->assertEquals([null, null, null], $retry);
+        $this->assertEquals(['1', '{"data":{"collection":"first"}}', '{"data":{"collection":"second"}}'], $data);
+    }
+
+    public function testPublishGraphQlDeleteUpdates(): void
+    {
+        $toDelete = new Dummy();
+        $toDelete->setId(2);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(Argument::type(Dummy::class))->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource($toDelete, UrlGeneratorInterface::ABS_PATH, Argument::any())->willReturn('/dummies/2')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($toDelete, UrlGeneratorInterface::ABS_URL, Argument::any())->willReturn('http://example.com/dummies/2')->shouldBeCalled();
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(new Operations([
+            'get' => (new Get())->withMercure(['enable_async_update' => false])->withShortName('Dummy')->withNormalizationContext(['groups' => ['foo', 'bar']]),
+        ]))]));
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+
+        $formats = ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']];
+
+        $topics = [];
+        $private = [];
+        $retry = [];
+        $data = [];
+
+        $defaultHub = $this->createMockHub(static function (Update $update) use (&$topics, &$private, &$retry, &$data): string {
+            $topics = array_merge($topics, $update->getTopics());
+            $private[] = $update->isPrivate();
+            $retry[] = $update->getRetry();
+            $data[] = $update->getData();
+
+            return 'id';
+        });
+
+        $graphQlSubscriptionManagerProphecy = $this->prophesize(GraphQlSubscriptionManagerInterface::class);
+        $graphQlSubscriptionId = 'subscription-id';
+        $graphQlSubscriptionData = ['data'];
+        $graphQlSubscriptionManagerProphecy->getPushPayloads(Argument::that(static fn ($object): bool => $object instanceof \stdClass && Dummy::class === $object->resourceClass && '/dummies/2' === $object->id && 'http://example.com/dummies/2' === $object->iri), 'delete')->willReturn([[$graphQlSubscriptionId, $graphQlSubscriptionData]]);
+        $graphQlMercureSubscriptionIriGenerator = $this->prophesize(GraphQlMercureSubscriptionIriGeneratorInterface::class);
+        $topicIri = 'subscription-topic-iri';
+        $graphQlMercureSubscriptionIriGenerator->generateTopicIri($graphQlSubscriptionId)->willReturn($topicIri);
+
+        $listener = new PublishMercureUpdatesListener(
+            $resourceClassResolverProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $serializerProphecy->reveal(),
+            $formats,
+            null,
+            new HubRegistry($defaultHub, ['default' => $defaultHub]),
+            $graphQlSubscriptionManagerProphecy->reveal(),
+            $graphQlMercureSubscriptionIriGenerator->reveal(),
+            null,
+            true,
+        );
+
+        $uowProphecy = $this->prophesize(UnitOfWork::class);
+        $uowProphecy->getScheduledEntityInsertions()->willReturn([])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityUpdates()->willReturn([])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityDeletions()->willReturn([$toDelete])->shouldBeCalled();
+
+        $emProphecy = $this->prophesize(EntityManagerInterface::class);
+        $emProphecy->getUnitOfWork()->willReturn($uowProphecy->reveal())->shouldBeCalled();
+        $eventArgs = new OnFlushEventArgs($emProphecy->reveal());
+
+        $listener->onFlush($eventArgs);
+        $listener->postFlush();
+
+        $this->assertEquals(['http://example.com/dummies/2', 'subscription-topic-iri'], $topics);
+        $this->assertEquals([false, false], $private);
+        $this->assertEquals([null, null], $retry);
+        $this->assertEquals(['{"@id":"\/dummies\/2","@type":"Dummy"}', '["data"]'], $data);
+    }
+
+    public function testPublishGraphQlDeleteUpdatesKeepsPrivateMercureFlag(): void
+    {
+        $toDelete = new Dummy();
+        $toDelete->setId(2);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(Argument::type(Dummy::class))->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource($toDelete, UrlGeneratorInterface::ABS_PATH, Argument::any())->willReturn('/dummies/2')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($toDelete, UrlGeneratorInterface::ABS_URL, Argument::any())->willReturn('http://example.com/dummies/2')->shouldBeCalled();
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(new Operations([
+            'get' => (new Get())->withMercure(['private' => true, 'enable_async_update' => false])->withShortName('Dummy')->withNormalizationContext(['groups' => ['foo', 'bar']]),
+        ]))]));
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+
+        $formats = ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']];
+
+        $topics = [];
+        $private = [];
+        $retry = [];
+        $data = [];
+
+        $defaultHub = $this->createMockHub(static function (Update $update) use (&$topics, &$private, &$retry, &$data): string {
+            $topics = array_merge($topics, $update->getTopics());
+            $private[] = $update->isPrivate();
+            $retry[] = $update->getRetry();
+            $data[] = $update->getData();
+
+            return 'id';
+        });
+
+        $graphQlSubscriptionManagerProphecy = $this->prophesize(GraphQlSubscriptionManagerInterface::class);
+        $graphQlSubscriptionId = 'subscription-id';
+        $graphQlSubscriptionData = ['data'];
+        $graphQlSubscriptionManagerProphecy->getPushPayloads(Argument::that(static fn ($object): bool => $object instanceof \stdClass && Dummy::class === $object->resourceClass && '/dummies/2' === $object->id && 'http://example.com/dummies/2' === $object->iri && [] === $object->private), 'delete')->willReturn([[$graphQlSubscriptionId, $graphQlSubscriptionData]]);
+        $graphQlMercureSubscriptionIriGenerator = $this->prophesize(GraphQlMercureSubscriptionIriGeneratorInterface::class);
+        $topicIri = 'subscription-topic-iri';
+        $graphQlMercureSubscriptionIriGenerator->generateTopicIri($graphQlSubscriptionId)->willReturn($topicIri);
+
+        $listener = new PublishMercureUpdatesListener(
+            $resourceClassResolverProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $serializerProphecy->reveal(),
+            $formats,
+            null,
+            new HubRegistry($defaultHub, ['default' => $defaultHub]),
+            $graphQlSubscriptionManagerProphecy->reveal(),
+            $graphQlMercureSubscriptionIriGenerator->reveal(),
+            null,
+            true,
+        );
+
+        $uowProphecy = $this->prophesize(UnitOfWork::class);
+        $uowProphecy->getScheduledEntityInsertions()->willReturn([])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityUpdates()->willReturn([])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityDeletions()->willReturn([$toDelete])->shouldBeCalled();
+
+        $emProphecy = $this->prophesize(EntityManagerInterface::class);
+        $emProphecy->getUnitOfWork()->willReturn($uowProphecy->reveal())->shouldBeCalled();
+        $eventArgs = new OnFlushEventArgs($emProphecy->reveal());
+
+        $listener->onFlush($eventArgs);
+        $listener->postFlush();
+
+        $this->assertEquals(['http://example.com/dummies/2', 'subscription-topic-iri'], $topics);
+        $this->assertEquals([true, true], $private);
+        $this->assertEquals([null, null], $retry);
+        $this->assertEquals(['{"@id":"\/dummies\/2","@type":"Dummy"}', '["data"]'], $data);
+    }
+
+    public function testPublishGraphQlUpdatesForCollectionSubscriptions(): void
+    {
+        $toUpdate = new Dummy();
+        $toUpdate->setId(2);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(Argument::type(Dummy::class))->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource($toUpdate, UrlGeneratorInterface::ABS_URL, Argument::any())->willReturn('http://example.com/dummies/2');
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(new Operations([
+            'get' => (new Get())->withMercure(['enable_async_update' => false])->withNormalizationContext(['groups' => ['foo', 'bar']]),
+        ]))]));
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->serialize($toUpdate, 'jsonld', ['groups' => ['foo', 'bar']])->willReturn('2');
+
+        $formats = ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']];
+
+        $topics = [];
+        $private = [];
+        $retry = [];
+        $data = [];
+
+        $defaultHub = $this->createMockHub(static function (Update $update) use (&$topics, &$private, &$retry, &$data): string {
+            $topics = array_merge($topics, $update->getTopics());
+            $private[] = $update->isPrivate();
+            $retry[] = $update->getRetry();
+            $data[] = $update->getData();
+
+            return 'id';
+        });
+
+        $graphQlSubscriptionManagerProphecy = $this->prophesize(GraphQlSubscriptionManagerInterface::class);
+        $graphQlCollectionSubscriptionPayloads = [
+            ['collection-subscription-id-1', ['data' => ['collection' => 'first']]],
+            ['collection-subscription-id-2', ['data' => ['collection' => 'second']]],
+        ];
+        $graphQlSubscriptionManagerProphecy->getPushPayloads($toUpdate, 'update')->willReturn($graphQlCollectionSubscriptionPayloads);
+        $graphQlMercureSubscriptionIriGenerator = $this->prophesize(GraphQlMercureSubscriptionIriGeneratorInterface::class);
+        $graphQlMercureSubscriptionIriGenerator->generateTopicIri('collection-subscription-id-1')->willReturn('collection-subscription-topic-iri-1');
+        $graphQlMercureSubscriptionIriGenerator->generateTopicIri('collection-subscription-id-2')->willReturn('collection-subscription-topic-iri-2');
+
+        $listener = new PublishMercureUpdatesListener(
+            $resourceClassResolverProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $serializerProphecy->reveal(),
+            $formats,
+            null,
+            new HubRegistry($defaultHub, ['default' => $defaultHub]),
+            $graphQlSubscriptionManagerProphecy->reveal(),
+            $graphQlMercureSubscriptionIriGenerator->reveal(),
+            null,
+            true,
+        );
+
+        $uowProphecy = $this->prophesize(UnitOfWork::class);
+        $uowProphecy->getScheduledEntityInsertions()->willReturn([])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityUpdates()->willReturn([$toUpdate])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityDeletions()->willReturn([])->shouldBeCalled();
+
+        $emProphecy = $this->prophesize(EntityManagerInterface::class);
+        $emProphecy->getUnitOfWork()->willReturn($uowProphecy->reveal())->shouldBeCalled();
+        $eventArgs = new OnFlushEventArgs($emProphecy->reveal());
+
+        $listener->onFlush($eventArgs);
+        $listener->postFlush();
+
+        $this->assertEquals(['http://example.com/dummies/2', 'collection-subscription-topic-iri-1', 'collection-subscription-topic-iri-2'], $topics);
+        $this->assertEquals([false, false, false], $private);
+        $this->assertEquals([null, null, null], $retry);
+        $this->assertEquals(['2', '{"data":{"collection":"first"}}', '{"data":{"collection":"second"}}'], $data);
+    }
+
+    public function testPublishGraphQlUpdatesKeepsPrivateMercureFlag(): void
+    {
+        $toUpdate = new Dummy();
+        $toUpdate->setId(2);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(Argument::type(Dummy::class))->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource($toUpdate, UrlGeneratorInterface::ABS_URL, Argument::any())->willReturn('http://example.com/dummies/2');
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [(new ApiResource())->withOperations(new Operations([
+            'get' => (new Get())->withMercure(['private' => true, 'enable_async_update' => false])->withNormalizationContext(['groups' => ['foo', 'bar']]),
+        ]))]));
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->serialize($toUpdate, 'jsonld', ['groups' => ['foo', 'bar']])->willReturn('2');
+
+        $formats = ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']];
+
+        $topics = [];
+        $private = [];
+        $retry = [];
+        $data = [];
+
+        $defaultHub = $this->createMockHub(static function (Update $update) use (&$topics, &$private, &$retry, &$data): string {
+            $topics = array_merge($topics, $update->getTopics());
+            $private[] = $update->isPrivate();
+            $retry[] = $update->getRetry();
+            $data[] = $update->getData();
+
+            return 'id';
+        });
+
+        $graphQlSubscriptionManagerProphecy = $this->prophesize(GraphQlSubscriptionManagerInterface::class);
+        $graphQlSubscriptionId = 'subscription-id';
+        $graphQlSubscriptionData = ['data'];
+        $graphQlSubscriptionManagerProphecy->getPushPayloads($toUpdate, 'update')->willReturn([[$graphQlSubscriptionId, $graphQlSubscriptionData]]);
+        $graphQlMercureSubscriptionIriGenerator = $this->prophesize(GraphQlMercureSubscriptionIriGeneratorInterface::class);
+        $topicIri = 'subscription-topic-iri';
+        $graphQlMercureSubscriptionIriGenerator->generateTopicIri($graphQlSubscriptionId)->willReturn($topicIri);
+
+        $listener = new PublishMercureUpdatesListener(
+            $resourceClassResolverProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $serializerProphecy->reveal(),
+            $formats,
+            null,
+            new HubRegistry($defaultHub, ['default' => $defaultHub]),
+            $graphQlSubscriptionManagerProphecy->reveal(),
+            $graphQlMercureSubscriptionIriGenerator->reveal(),
+            null,
+            true,
+        );
+
+        $uowProphecy = $this->prophesize(UnitOfWork::class);
+        $uowProphecy->getScheduledEntityInsertions()->willReturn([])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityUpdates()->willReturn([$toUpdate])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityDeletions()->willReturn([])->shouldBeCalled();
+
+        $emProphecy = $this->prophesize(EntityManagerInterface::class);
+        $emProphecy->getUnitOfWork()->willReturn($uowProphecy->reveal())->shouldBeCalled();
+        $eventArgs = new OnFlushEventArgs($emProphecy->reveal());
+
+        $listener->onFlush($eventArgs);
+        $listener->postFlush();
+
+        $this->assertEquals(['http://example.com/dummies/2', 'subscription-topic-iri'], $topics);
+        $this->assertEquals([true, true], $private);
+        $this->assertEquals([null, null], $retry);
+        $this->assertEquals(['2', '["data"]'], $data);
+    }
+
+    public function testPublishGraphQlCreateUpdatesKeepsPrivatePartitionContext(): void
+    {
+        $toInsert = new class {
+            private int $id = 1;
+            private int $tenant = 42;
+
+            public function getId(): int
+            {
+                return $this->id;
+            }
+
+            public function getTenant(): int
+            {
+                return $this->tenant;
+            }
+        };
+        $resourceClass = $toInsert::class;
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(Argument::type($resourceClass))->willReturn($resourceClass);
+        $resourceClassResolverProphecy->isResourceClass($resourceClass)->willReturn(true);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource($toInsert, UrlGeneratorInterface::ABS_URL, Argument::any())->willReturn('http://example.com/partitioned_dummies/1');
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withOperations(new Operations([
+            'get' => (new Get())->withMercure(['private' => true, 'private_fields' => ['tenant'], 'enable_async_update' => false])->withNormalizationContext(['groups' => ['foo', 'bar']]),
+        ]))]));
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->serialize($toInsert, 'jsonld', ['groups' => ['foo', 'bar']])->willReturn('1');
+
+        $formats = ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']];
+
+        $topics = [];
+        $private = [];
+        $retry = [];
+        $data = [];
+
+        $defaultHub = $this->createMockHub(static function (Update $update) use (&$topics, &$private, &$retry, &$data): string {
+            $topics = array_merge($topics, $update->getTopics());
+            $private[] = $update->isPrivate();
+            $retry[] = $update->getRetry();
+            $data[] = $update->getData();
+
+            return 'id';
+        });
+
+        $graphQlSubscriptionManagerProphecy = $this->prophesize(GraphQlSubscriptionManagerInterface::class);
+        $graphQlSubscriptionId = 'subscription-id';
+        $graphQlSubscriptionData = ['data'];
+        $graphQlSubscriptionManagerProphecy->getPushPayloads($toInsert, 'create')->willReturn([[$graphQlSubscriptionId, $graphQlSubscriptionData]]);
+        $graphQlMercureSubscriptionIriGenerator = $this->prophesize(GraphQlMercureSubscriptionIriGeneratorInterface::class);
+        $topicIri = 'subscription-topic-iri';
+        $graphQlMercureSubscriptionIriGenerator->generateTopicIri($graphQlSubscriptionId)->willReturn($topicIri);
+
+        $listener = new PublishMercureUpdatesListener(
+            $resourceClassResolverProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $serializerProphecy->reveal(),
+            $formats,
+            null,
+            new HubRegistry($defaultHub, ['default' => $defaultHub]),
+            $graphQlSubscriptionManagerProphecy->reveal(),
+            $graphQlMercureSubscriptionIriGenerator->reveal(),
+            null,
+            true,
+        );
+
+        $uowProphecy = $this->prophesize(UnitOfWork::class);
+        $uowProphecy->getScheduledEntityInsertions()->willReturn([$toInsert])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityUpdates()->willReturn([])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityDeletions()->willReturn([])->shouldBeCalled();
+
+        $emProphecy = $this->prophesize(EntityManagerInterface::class);
+        $emProphecy->getUnitOfWork()->willReturn($uowProphecy->reveal())->shouldBeCalled();
+        $eventArgs = new OnFlushEventArgs($emProphecy->reveal());
+
+        $listener->onFlush($eventArgs);
+        $listener->postFlush();
+
+        $this->assertEquals(['http://example.com/partitioned_dummies/1', 'subscription-topic-iri'], $topics);
+        $this->assertEquals([true, true], $private);
+        $this->assertEquals([null, null], $retry);
+        $this->assertEquals(['1', '["data"]'], $data);
+    }
+
+    public function testPublishGraphQlUpdatesKeepsPrivatePartitionContext(): void
+    {
+        $toUpdate = new class {
+            private int $id = 2;
+            private int $tenant = 42;
+
+            public function getId(): int
+            {
+                return $this->id;
+            }
+
+            public function getTenant(): int
+            {
+                return $this->tenant;
+            }
+        };
+        $resourceClass = $toUpdate::class;
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(Argument::type($resourceClass))->willReturn($resourceClass);
+        $resourceClassResolverProphecy->isResourceClass($resourceClass)->willReturn(true);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource($toUpdate, UrlGeneratorInterface::ABS_URL, Argument::any())->willReturn('http://example.com/partitioned_dummies/2');
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withOperations(new Operations([
+            'get' => (new Get())->withMercure(['private' => true, 'private_fields' => ['tenant'], 'enable_async_update' => false])->withNormalizationContext(['groups' => ['foo', 'bar']]),
+        ]))]));
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->serialize($toUpdate, 'jsonld', ['groups' => ['foo', 'bar']])->willReturn('2');
+
+        $formats = ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']];
+
+        $topics = [];
+        $private = [];
+        $retry = [];
+        $data = [];
+
+        $defaultHub = $this->createMockHub(static function (Update $update) use (&$topics, &$private, &$retry, &$data): string {
+            $topics = array_merge($topics, $update->getTopics());
+            $private[] = $update->isPrivate();
+            $retry[] = $update->getRetry();
+            $data[] = $update->getData();
+
+            return 'id';
+        });
+
+        $graphQlSubscriptionManagerProphecy = $this->prophesize(GraphQlSubscriptionManagerInterface::class);
+        $graphQlSubscriptionId = 'subscription-id';
+        $graphQlSubscriptionData = ['data'];
+        $graphQlSubscriptionManagerProphecy->getPushPayloads($toUpdate, 'update')->willReturn([[$graphQlSubscriptionId, $graphQlSubscriptionData]]);
+        $graphQlMercureSubscriptionIriGenerator = $this->prophesize(GraphQlMercureSubscriptionIriGeneratorInterface::class);
+        $topicIri = 'subscription-topic-iri';
+        $graphQlMercureSubscriptionIriGenerator->generateTopicIri($graphQlSubscriptionId)->willReturn($topicIri);
+
+        $listener = new PublishMercureUpdatesListener(
+            $resourceClassResolverProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $serializerProphecy->reveal(),
+            $formats,
+            null,
+            new HubRegistry($defaultHub, ['default' => $defaultHub]),
+            $graphQlSubscriptionManagerProphecy->reveal(),
+            $graphQlMercureSubscriptionIriGenerator->reveal(),
+            null,
+            true,
+        );
+
+        $uowProphecy = $this->prophesize(UnitOfWork::class);
+        $uowProphecy->getScheduledEntityInsertions()->willReturn([])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityUpdates()->willReturn([$toUpdate])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityDeletions()->willReturn([])->shouldBeCalled();
+
+        $emProphecy = $this->prophesize(EntityManagerInterface::class);
+        $emProphecy->getUnitOfWork()->willReturn($uowProphecy->reveal())->shouldBeCalled();
+        $eventArgs = new OnFlushEventArgs($emProphecy->reveal());
+
+        $listener->onFlush($eventArgs);
+        $listener->postFlush();
+
+        $this->assertEquals(['http://example.com/partitioned_dummies/2', 'subscription-topic-iri'], $topics);
+        $this->assertEquals([true, true], $private);
+        $this->assertEquals([null, null], $retry);
+        $this->assertEquals(['2', '["data"]'], $data);
+    }
+
+    public function testPublishGraphQlDeleteUpdatesKeepsPrivatePartitionData(): void
+    {
+        $toDelete = new class {
+            private int $id = 2;
+            private int $tenant = 42;
+
+            public function getId(): int
+            {
+                return $this->id;
+            }
+
+            public function getTenant(): int
+            {
+                return $this->tenant;
+            }
+        };
+        $resourceClass = $toDelete::class;
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(Argument::type($resourceClass))->willReturn($resourceClass);
+        $resourceClassResolverProphecy->isResourceClass($resourceClass)->willReturn(true);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource($toDelete, UrlGeneratorInterface::ABS_PATH, Argument::any())->willReturn('/partitioned_dummies/2')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($toDelete, UrlGeneratorInterface::ABS_URL, Argument::any())->willReturn('http://example.com/partitioned_dummies/2')->shouldBeCalled();
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withOperations(new Operations([
+            'get' => (new Get())->withMercure(['private' => true, 'private_fields' => ['tenant'], 'enable_async_update' => false])->withShortName('PartitionedDummy')->withNormalizationContext(['groups' => ['foo', 'bar']]),
+        ]))]));
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+
+        $formats = ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']];
+
+        $topics = [];
+        $private = [];
+        $retry = [];
+        $data = [];
+
+        $defaultHub = $this->createMockHub(static function (Update $update) use (&$topics, &$private, &$retry, &$data): string {
+            $topics = array_merge($topics, $update->getTopics());
+            $private[] = $update->isPrivate();
+            $retry[] = $update->getRetry();
+            $data[] = $update->getData();
+
+            return 'id';
+        });
+
+        $graphQlSubscriptionManagerProphecy = $this->prophesize(GraphQlSubscriptionManagerInterface::class);
+        $graphQlSubscriptionId = 'subscription-id';
+        $graphQlSubscriptionData = ['data'];
+        $graphQlSubscriptionManagerProphecy->getPushPayloads(Argument::that(static fn ($object) => $object instanceof \stdClass && $resourceClass === $object->resourceClass && '/partitioned_dummies/2' === $object->id && 'http://example.com/partitioned_dummies/2' === $object->iri && ['tenant' => '42'] === $object->private), 'delete')->willReturn([[$graphQlSubscriptionId, $graphQlSubscriptionData]]);
+        $graphQlMercureSubscriptionIriGenerator = $this->prophesize(GraphQlMercureSubscriptionIriGeneratorInterface::class);
+        $topicIri = 'subscription-topic-iri';
+        $graphQlMercureSubscriptionIriGenerator->generateTopicIri($graphQlSubscriptionId)->willReturn($topicIri);
+
+        $listener = new PublishMercureUpdatesListener(
+            $resourceClassResolverProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $serializerProphecy->reveal(),
+            $formats,
+            null,
+            new HubRegistry($defaultHub, ['default' => $defaultHub]),
+            $graphQlSubscriptionManagerProphecy->reveal(),
+            $graphQlMercureSubscriptionIriGenerator->reveal(),
+            null,
+            true,
+        );
+
+        $uowProphecy = $this->prophesize(UnitOfWork::class);
+        $uowProphecy->getScheduledEntityInsertions()->willReturn([])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityUpdates()->willReturn([])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityDeletions()->willReturn([$toDelete])->shouldBeCalled();
+
+        $emProphecy = $this->prophesize(EntityManagerInterface::class);
+        $emProphecy->getUnitOfWork()->willReturn($uowProphecy->reveal())->shouldBeCalled();
+        $eventArgs = new OnFlushEventArgs($emProphecy->reveal());
+
+        $listener->onFlush($eventArgs);
+        $listener->postFlush();
+
+        $this->assertEquals(['http://example.com/partitioned_dummies/2', 'subscription-topic-iri'], $topics);
+        $this->assertEquals([true, true], $private);
+        $this->assertEquals([null, null], $retry);
+        $this->assertEquals(['{"@id":"\/partitioned_dummies\/2","@type":"PartitionedDummy"}', '["data"]'], $data);
+    }
+
+    public function testPublishGraphQlDeleteUpdatesKeepsPrivatePartitionDataUsingPropertyAccess(): void
+    {
+        $toDelete = new class {
+            public int $id = 2;
+            public int $tenant = 42;
+        };
+        $resourceClass = $toDelete::class;
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(Argument::type($resourceClass))->willReturn($resourceClass);
+        $resourceClassResolverProphecy->isResourceClass($resourceClass)->willReturn(true);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource($toDelete, UrlGeneratorInterface::ABS_PATH, Argument::any())->willReturn('/partitioned_dummies/2')->shouldBeCalled();
+        $iriConverterProphecy->getIriFromResource($toDelete, UrlGeneratorInterface::ABS_URL, Argument::any())->willReturn('http://example.com/partitioned_dummies/2')->shouldBeCalled();
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create($resourceClass)->willReturn(new ResourceMetadataCollection($resourceClass, [(new ApiResource())->withOperations(new Operations([
+            'get' => (new Get())->withMercure(['private' => true, 'private_fields' => ['tenant'], 'enable_async_update' => false])->withShortName('PartitionedDummy')->withNormalizationContext(['groups' => ['foo', 'bar']]),
+        ]))]));
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+
+        $formats = ['jsonld' => ['application/ld+json'], 'jsonhal' => ['application/hal+json']];
+
+        $topics = [];
+        $private = [];
+        $retry = [];
+        $data = [];
+
+        $defaultHub = $this->createMockHub(static function (Update $update) use (&$topics, &$private, &$retry, &$data): string {
+            $topics = array_merge($topics, $update->getTopics());
+            $private[] = $update->isPrivate();
+            $retry[] = $update->getRetry();
+            $data[] = $update->getData();
+
+            return 'id';
+        });
+
+        $graphQlSubscriptionManagerProphecy = $this->prophesize(GraphQlSubscriptionManagerInterface::class);
+        $graphQlSubscriptionId = 'subscription-id';
+        $graphQlSubscriptionData = ['data'];
+        $graphQlSubscriptionManagerProphecy->getPushPayloads(Argument::that(static fn ($object) => $object instanceof \stdClass && $resourceClass === $object->resourceClass && '/partitioned_dummies/2' === $object->id && 'http://example.com/partitioned_dummies/2' === $object->iri && ['tenant' => '42'] === $object->private), 'delete')->willReturn([[$graphQlSubscriptionId, $graphQlSubscriptionData]]);
+        $graphQlMercureSubscriptionIriGenerator = $this->prophesize(GraphQlMercureSubscriptionIriGeneratorInterface::class);
+        $topicIri = 'subscription-topic-iri';
+        $graphQlMercureSubscriptionIriGenerator->generateTopicIri($graphQlSubscriptionId)->willReturn($topicIri);
+
+        $listener = new PublishMercureUpdatesListener(
+            $resourceClassResolverProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $serializerProphecy->reveal(),
+            $formats,
+            null,
+            new HubRegistry($defaultHub, ['default' => $defaultHub]),
+            $graphQlSubscriptionManagerProphecy->reveal(),
+            $graphQlMercureSubscriptionIriGenerator->reveal(),
+            null,
+            true,
+        );
+
+        $uowProphecy = $this->prophesize(UnitOfWork::class);
+        $uowProphecy->getScheduledEntityInsertions()->willReturn([])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityUpdates()->willReturn([])->shouldBeCalled();
+        $uowProphecy->getScheduledEntityDeletions()->willReturn([$toDelete])->shouldBeCalled();
+
+        $emProphecy = $this->prophesize(EntityManagerInterface::class);
+        $emProphecy->getUnitOfWork()->willReturn($uowProphecy->reveal())->shouldBeCalled();
+        $eventArgs = new OnFlushEventArgs($emProphecy->reveal());
+
+        $listener->onFlush($eventArgs);
+        $listener->postFlush();
+
+        $this->assertEquals(['http://example.com/partitioned_dummies/2', 'subscription-topic-iri'], $topics);
+        $this->assertEquals([true, true], $private);
+        $this->assertEquals([null, null], $retry);
+        $this->assertEquals(['{"@id":"\/partitioned_dummies\/2","@type":"PartitionedDummy"}', '["data"]'], $data);
+    }
+
     public function testPublishUpdateWithMultipleResources(): void
     {
         $toInsert = new DummyMercureMultiResource();
