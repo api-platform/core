@@ -15,7 +15,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Controller\Common;
 
 use ApiPlatform\Tests\Fixtures\TestBundle\Model\CustomObject;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Custom Controller.
