@@ -20,6 +20,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
 use Workbench\App\Models\Book;
+use Workbench\App\Models\BookWithMethodCasts;
 use Workbench\App\Models\Device;
 
 /**
@@ -80,6 +81,25 @@ final class ModelMetadataTest extends TestCase
 
         $metadata = new ModelMetadata();
         $this->assertCount(1, $metadata->getRelations($model));
+    }
+
+    /**
+     * Casts defined via the casts() method (Laravel 11+) should be detected
+     * just like those defined via the $casts property.
+     *
+     * @see https://github.com/api-platform/core/issues/7662
+     */
+    public function testCastsMethodIsDetected(): void
+    {
+        // Use newInstanceWithoutConstructor to replicate how API Platform creates models
+        $refl = new \ReflectionClass(BookWithMethodCasts::class);
+        $model = $refl->newInstanceWithoutConstructor();
+
+        $metadata = new ModelMetadata();
+        $attributes = $metadata->getAttributes($model);
+
+        $this->assertSame('boolean', $attributes['is_available']['cast']);
+        $this->assertSame('datetime', $attributes['publication_date']['cast']);
     }
 
     /**
