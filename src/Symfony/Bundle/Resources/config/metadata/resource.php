@@ -152,6 +152,7 @@ return function (ContainerConfigurator $container) {
             service('api_platform.filter_locator')->ignoreOnInvalid(),
             service('api_platform.name_converter')->ignoreOnInvalid(),
             service('logger')->ignoreOnInvalid(),
+            service('api_platform.resource_class_resolver')->ignoreOnInvalid(),
         ]);
 
     $services->set('api_platform.metadata.resource.metadata_collection_factory.cached', CachedResourceMetadataCollectionFactory::class)
