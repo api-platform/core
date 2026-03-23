@@ -21,16 +21,16 @@ use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\PropertyAccessorValueExtractor;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use ApiPlatform\Metadata\Util\SortTrait;
 use ApiPlatform\State\ProcessorInterface;
 use GraphQL\Type\Definition\ResolveInfo;
-use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\PropertyAccess\Exception\AccessException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+
 /**
  * Manages all the queried subscriptions by creating their ID
  * and saving to a cache the information needed to publish updated data.
@@ -69,7 +69,7 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
 
         if ($operation instanceof CollectionOperationInterface) {
             $subscriptionId = $this->updateSubscriptionCollectionCacheData(
-                $this->getCollectionSubscriptionIriFromOperation($iri, $operation),
+                $this->getCollectionSubscriptionKeyFromOperation($iri, $operation),
                 $fields,
                 $privatePartitionKey
             );
@@ -131,13 +131,13 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
         return PropertyAccessorValueExtractor::getValue($object, $privateField);
     }
 
-    private function getCollectionSubscriptionIriFromOperation(string $iri, Operation $operation): string
+    private function getCollectionSubscriptionKeyFromOperation(string $iri, Operation $operation): string
     {
         if (null === $operation->getClass()) {
             return $this->getCollectionIri($iri);
         }
 
-        return $this->iriConverter->getIriFromResource($operation->getClass(), UrlGeneratorInterface::ABS_PATH, $operation) ?? $this->getCollectionIri($iri);
+        return $this->getGraphQlCollectionSubscriptionKey($operation);
     }
 
     private function getCollectionIri(string $iri): string
@@ -145,17 +145,24 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
         return substr($iri, 0, strrpos($iri, '/'));
     }
 
-    private function getCollectionSubscriptionIri(string $resourceClass, object $object, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory): string
+    private function getCollectionSubscriptionKey(string $resourceClass, object $object, ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory): string
     {
         $resourceMetadata = $resourceMetadataCollectionFactory->create($resourceClass);
 
         try {
             $collectionOperation = $resourceMetadata->getOperation(forceCollection: true, forceGraphQl: true);
 
-            return $this->iriConverter->getIriFromResource($resourceClass, UrlGeneratorInterface::ABS_PATH, $collectionOperation) ?? $this->getCollectionIri($this->iriConverter->getIriFromResource($object));
+            return $this->getGraphQlCollectionSubscriptionKey($collectionOperation);
         } catch (OperationNotFoundException) {
             return $this->getCollectionIri($this->iriConverter->getIriFromResource($object));
         }
+    }
+
+    private function getGraphQlCollectionSubscriptionKey(Operation $operation): string
+    {
+        $resourceKey = $operation->getShortName() ?? str_replace('\\', '.', ltrim($operation->getClass() ?? 'resource', '\\'));
+
+        return '/graphql/collection-subscriptions/'.$resourceKey.'/'.$operation->getName();
     }
 
     /**
@@ -222,7 +229,7 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
                 $privatePartitionKey = $this->getPrivatePartitionKey($privateFieldData);
 
                 $iri = $this->iriConverter->getIriFromResource($object);
-                $collectionIri = $this->getCollectionSubscriptionIri($resourceClass, $object, $this->resourceMetadataCollectionFactory);
+                $collectionIri = $this->getCollectionSubscriptionKey($resourceClass, $object, $this->resourceMetadataCollectionFactory);
                 $this->appendNormalizedPayloads(
                     $payloadsBySubscriptionId,
                     $this->getSubscriptionsFromIri($collectionIri, $privatePartitionKey),
@@ -253,8 +260,10 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
     }
 
     /**
-     * @param array<string, array{string, mixed}>                              $payloadsBySubscriptionId
+     * @param array<string, array{string, mixed}> $payloadsBySubscriptionId
+     *
      * @param-out array<string, array{string, mixed}>                          $payloadsBySubscriptionId
+     *
      * @param array<array{string, array<string, mixed>, array<string, mixed>}> $subscriptions
      *
      * @return array<array{string, array<string, mixed>, array<string, mixed>}>
@@ -293,7 +302,7 @@ final class SubscriptionManager implements OperationAwareSubscriptionManagerInte
         $payloads = [];
         $payload = ['type' => 'delete', 'payload' => ['id' => $object->id, 'iri' => $object->iri, 'type' => $object->type]];
         // Check for resource class
-        $collectionIri = isset($object->resourceClass) ? $this->getCollectionSubscriptionIri($object->resourceClass, (object) ['id' => $iri], $this->resourceMetadataCollectionFactory) : $this->getCollectionIri($iri);
+        $collectionIri = isset($object->resourceClass) ? $this->getCollectionSubscriptionKey($object->resourceClass, (object) ['id' => $iri], $this->resourceMetadataCollectionFactory) : $this->getCollectionIri($iri);
         foreach ($this->getSubscriptionsFromIri($iri, $privatePartitionKey) as [$subscriptionId, $subscriptionFields, $subscriptionResult]) {
             $payloads[] = [$subscriptionId, $payload];
         }

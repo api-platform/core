@@ -25,7 +25,6 @@ use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
-use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\State\ProcessorInterface;
 use GraphQL\Type\Definition\ResolveInfo;
 use PHPUnit\Framework\TestCase;
@@ -419,7 +418,7 @@ class SubscriptionManagerTest extends TestCase
         $this->assertSame($subscriptionId, $this->subscriptionManager->retrieveSubscriptionId($context, null, $operation));
     }
 
-    public function testRetrieveSubscriptionIdCollectionUsesOperationBasedCollectionSubscriptionIri(): void
+    public function testRetrieveSubscriptionIdCollectionUsesGraphQlOperationKey(): void
     {
         $infoProphecy = $this->prophesize(ResolveInfo::class);
         $fields = ['fields' => true];
@@ -431,10 +430,9 @@ class SubscriptionManagerTest extends TestCase
         $cacheItemProphecy = $this->prophesize(CacheItemInterface::class);
         $cacheItemProphecy->isHit()->willReturn(false);
         $subscriptionId = 'subscriptionId';
-        $this->iriConverterProphecy->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, $operation)->shouldBeCalled()->willReturn('/graphql/dummies');
         $this->subscriptionIdentifierGeneratorProphecy->generateSubscriptionIdentifier($fields + ['__collection' => true])->willReturn($subscriptionId);
         $cacheItemProphecy->set([[$subscriptionId, $fields, []]])->shouldBeCalled()->willReturn($cacheItemProphecy->reveal());
-        $this->subscriptionsCacheProphecy->getItem('_graphql_dummies')->shouldBeCalled()->willReturn($cacheItemProphecy->reveal());
+        $this->subscriptionsCacheProphecy->getItem('_graphql_collection-subscriptions_Dummy_update_collection')->shouldBeCalled()->willReturn($cacheItemProphecy->reveal());
         $this->subscriptionsCacheProphecy->save($cacheItemProphecy->reveal())->shouldBeCalled();
 
         $this->assertSame($subscriptionId, $this->subscriptionManager->retrieveSubscriptionId($context, null, $operation));
@@ -478,7 +476,6 @@ class SubscriptionManagerTest extends TestCase
         ]));
 
         $this->iriConverterProphecy->getIriFromResource($object)->willReturn('/dummies/2');
-        $this->iriConverterProphecy->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, $collectionOperation)->shouldBeCalled()->willReturn('/graphql/dummies');
 
         $cacheItemProphecy = $this->prophesize(CacheItemInterface::class);
         $cacheItemProphecy->isHit()->willReturn(true);
@@ -497,7 +494,7 @@ class SubscriptionManagerTest extends TestCase
             ['subscriptionIdBar', ['fieldsBar'], []],
         ]);
         $this->subscriptionsCacheProphecy->getItem('_dummies_2')->willReturn($cacheItemProphecy->reveal());
-        $this->subscriptionsCacheProphecy->getItem('_graphql_dummies')->shouldBeCalled()->willReturn($cacheItemProphecyCollection->reveal());
+        $this->subscriptionsCacheProphecy->getItem('_graphql_collection-subscriptions_Dummy_update_collection')->shouldBeCalled()->willReturn($cacheItemProphecyCollection->reveal());
         $this->subscriptionsCacheProphecy->save($cacheItemProphecy->reveal())->shouldBeCalled();
 
         $this->normalizeProcessor->process(
@@ -537,7 +534,6 @@ class SubscriptionManagerTest extends TestCase
         ]));
 
         $this->iriConverterProphecy->getIriFromResource($object)->willReturn('/dummies/2');
-        $this->iriConverterProphecy->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, $collectionOperation)->willReturn('/graphql/dummies');
 
         $itemCacheItemFirstCallProphecy = $this->prophesize(CacheItemInterface::class);
         $itemCacheItemFirstCallProphecy->isHit()->willReturn(true);
@@ -558,7 +554,7 @@ class SubscriptionManagerTest extends TestCase
         $collectionCacheItemProphecy = $this->prophesize(CacheItemInterface::class);
         $collectionCacheItemProphecy->isHit()->willReturn(false);
 
-        $this->subscriptionsCacheProphecy->getItem('_graphql_dummies')->willReturn($collectionCacheItemProphecy->reveal());
+        $this->subscriptionsCacheProphecy->getItem('_graphql_collection-subscriptions_Dummy_update_collection')->willReturn($collectionCacheItemProphecy->reveal());
         $this->subscriptionsCacheProphecy->getItem('_dummies_2')->willReturn(
             $itemCacheItemFirstCallProphecy->reveal(),
             $itemCacheItemSecondCallProphecy->reveal()
@@ -595,14 +591,13 @@ class SubscriptionManagerTest extends TestCase
         ]));
 
         $this->iriConverterProphecy->getIriFromResource($object)->willReturn('/dummies/2');
-        $this->iriConverterProphecy->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, $collectionOperation)->shouldBeCalled()->willReturn('/graphql/dummies');
 
         $cacheItemProphecyCollection = $this->prophesize(CacheItemInterface::class);
         $cacheItemProphecyCollection->isHit()->willReturn(true);
         $cacheItemProphecyCollection->get()->willReturn([
             ['collectionSubscriptionId', ['collectionFields'], []],
         ]);
-        $this->subscriptionsCacheProphecy->getItem('_graphql_dummies')->shouldBeCalled()->willReturn($cacheItemProphecyCollection->reveal());
+        $this->subscriptionsCacheProphecy->getItem('_graphql_collection-subscriptions_Dummy_update_collection')->shouldBeCalled()->willReturn($cacheItemProphecyCollection->reveal());
         $this->subscriptionsCacheProphecy->getItem('_dummies_2')->shouldNotBeCalled();
 
         $this->normalizeProcessor->process(
@@ -633,7 +628,6 @@ class SubscriptionManagerTest extends TestCase
         ]));
 
         $this->iriConverterProphecy->getIriFromResource($object)->willReturn('/dummies/2');
-        $this->iriConverterProphecy->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, $collectionOperation)->shouldBeCalled()->willReturn('/graphql/dummies');
 
         $collectionCacheItemProphecy = $this->prophesize(CacheItemInterface::class);
         $collectionCacheItemProphecy->isHit()->willReturn(true);
@@ -641,7 +635,7 @@ class SubscriptionManagerTest extends TestCase
             ['sharedPrivateCollectionSubscriptionId', ['collectionFields'], []],
         ]);
 
-        $this->subscriptionsCacheProphecy->getItem('_graphql_dummies')->shouldBeCalled()->willReturn($collectionCacheItemProphecy->reveal());
+        $this->subscriptionsCacheProphecy->getItem('_graphql_collection-subscriptions_Dummy_update_collection')->shouldBeCalled()->willReturn($collectionCacheItemProphecy->reveal());
         $this->subscriptionsCacheProphecy->getItem(Argument::containingString(hash('sha256', 'tenant=')))->shouldNotBeCalled();
 
         $this->normalizeProcessor->process(
@@ -678,7 +672,6 @@ class SubscriptionManagerTest extends TestCase
         ]));
 
         $this->iriConverterProphecy->getIriFromResource($object)->willReturn('/dummies/2');
-        $this->iriConverterProphecy->getIriFromResource($object::class, UrlGeneratorInterface::ABS_PATH, $collectionOperation)->shouldBeCalled()->willReturn('/graphql/dummies');
 
         $collectionCacheItemProphecy = $this->prophesize(CacheItemInterface::class);
         $collectionCacheItemProphecy->isHit()->willReturn(true);
@@ -686,7 +679,7 @@ class SubscriptionManagerTest extends TestCase
             ['partitionedCollectionSubscriptionId', ['collectionFields'], []],
         ]);
 
-        $this->subscriptionsCacheProphecy->getItem('_graphql_dummies_'.$partitionKey)->shouldBeCalled()->willReturn($collectionCacheItemProphecy->reveal());
+        $this->subscriptionsCacheProphecy->getItem('_graphql_collection-subscriptions_Dummy_update_collection_'.$partitionKey)->shouldBeCalled()->willReturn($collectionCacheItemProphecy->reveal());
 
         $this->normalizeProcessor->process(
             $object,
@@ -716,7 +709,6 @@ class SubscriptionManagerTest extends TestCase
         ]));
 
         $this->iriConverterProphecy->getIriFromResource($object)->willReturn('/dummies/2');
-        $this->iriConverterProphecy->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, $collectionOperation)->shouldBeCalled()->willReturn('/graphql/dummies');
 
         $itemCacheItemProphecy = $this->prophesize(CacheItemInterface::class);
         $itemCacheItemProphecy->isHit()->willReturn(false);
@@ -728,7 +720,7 @@ class SubscriptionManagerTest extends TestCase
         ]);
 
         $this->subscriptionsCacheProphecy->getItem('_dummies_2')->shouldBeCalled()->willReturn($itemCacheItemProphecy->reveal());
-        $this->subscriptionsCacheProphecy->getItem('_graphql_dummies')->shouldBeCalled()->willReturn($collectionCacheItemProphecy->reveal());
+        $this->subscriptionsCacheProphecy->getItem('_graphql_collection-subscriptions_Dummy_update_collection')->shouldBeCalled()->willReturn($collectionCacheItemProphecy->reveal());
 
         $this->normalizeProcessor->process(
             $object,
@@ -760,7 +752,6 @@ class SubscriptionManagerTest extends TestCase
         ]));
 
         $this->iriConverterProphecy->getIriFromResource($object)->willReturn('/dummies/2');
-        $this->iriConverterProphecy->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, $collectionOperation)->shouldBeCalled()->willReturn('/graphql/dummies');
 
         $itemCacheItemProphecy = $this->prophesize(CacheItemInterface::class);
         $itemCacheItemProphecy->isHit()->willReturn(false);
@@ -772,7 +763,7 @@ class SubscriptionManagerTest extends TestCase
         ]);
 
         $this->subscriptionsCacheProphecy->getItem('_dummies_2')->shouldBeCalled()->willReturn($itemCacheItemProphecy->reveal());
-        $this->subscriptionsCacheProphecy->getItem('_graphql_dummies')->shouldBeCalled()->willReturn($collectionCacheItemProphecy->reveal());
+        $this->subscriptionsCacheProphecy->getItem('_graphql_collection-subscriptions_Dummy_update_collection')->shouldBeCalled()->willReturn($collectionCacheItemProphecy->reveal());
 
         $this->normalizeProcessor->process(
             $object,
@@ -810,7 +801,6 @@ class SubscriptionManagerTest extends TestCase
         ]));
 
         $this->iriConverterProphecy->getIriFromResource($object)->willReturn('/dummies/2');
-        $this->iriConverterProphecy->getIriFromResource($object::class, UrlGeneratorInterface::ABS_PATH, $collectionOperation)->shouldBeCalled()->willReturn('/graphql/dummies');
 
         $itemCacheItemProphecy = $this->prophesize(CacheItemInterface::class);
         $itemCacheItemProphecy->isHit()->willReturn(false);
@@ -822,7 +812,7 @@ class SubscriptionManagerTest extends TestCase
         ]);
 
         $this->subscriptionsCacheProphecy->getItem('_dummies_2_'.$partitionKey)->shouldBeCalled()->willReturn($itemCacheItemProphecy->reveal());
-        $this->subscriptionsCacheProphecy->getItem('_graphql_dummies_'.$partitionKey)->shouldBeCalled()->willReturn($collectionCacheItemProphecy->reveal());
+        $this->subscriptionsCacheProphecy->getItem('_graphql_collection-subscriptions_Dummy_update_collection_'.$partitionKey)->shouldBeCalled()->willReturn($collectionCacheItemProphecy->reveal());
 
         $this->normalizeProcessor->process(
             $object,
@@ -906,7 +896,7 @@ class SubscriptionManagerTest extends TestCase
         ], $this->subscriptionManager->getPushPayloads($object, 'delete'));
     }
 
-    public function testGetPushPayloadsDeleteUsesMetadataBasedCollectionSubscriptionIri(): void
+    public function testGetPushPayloadsDeleteUsesMetadataBasedCollectionSubscriptionKey(): void
     {
         $object = new class {
             public string $resourceClass = Dummy::class;
@@ -923,8 +913,6 @@ class SubscriptionManagerTest extends TestCase
             ]),
         ]));
 
-        $this->iriConverterProphecy->getIriFromResource(Dummy::class, UrlGeneratorInterface::ABS_PATH, $collectionOperation)->shouldBeCalled()->willReturn('/graphql/dummies');
-
         $itemCacheItemProphecy = $this->prophesize(CacheItemInterface::class);
         $itemCacheItemProphecy->isHit()->willReturn(true);
         $itemCacheItemProphecy->get()->willReturn([
@@ -938,7 +926,7 @@ class SubscriptionManagerTest extends TestCase
         ]);
 
         $this->subscriptionsCacheProphecy->getItem('_dummies_2')->shouldBeCalled()->willReturn($itemCacheItemProphecy->reveal());
-        $this->subscriptionsCacheProphecy->getItem('_graphql_dummies')->shouldBeCalled()->willReturn($collectionCacheItemProphecy->reveal());
+        $this->subscriptionsCacheProphecy->getItem('_graphql_collection-subscriptions_Dummy_update_collection')->shouldBeCalled()->willReturn($collectionCacheItemProphecy->reveal());
         $this->subscriptionsCacheProphecy->hasItem('_dummies_2')->shouldBeCalled()->willReturn(true);
         $this->subscriptionsCacheProphecy->deleteItem('_dummies_2')->shouldBeCalled();
 
