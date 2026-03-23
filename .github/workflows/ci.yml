@@ -1469,6 +1469,7 @@ jobs:
           laravel new test-api-platform-install --pest --no-interaction
       - name: Install api-platform/laravel
         run: |
+          composer require laravel/framework:"^12.0" --no-update
           composer global link ../src/Laravel --permanent
           composer config minimum-stability dev
           composer config prefer-stable true
