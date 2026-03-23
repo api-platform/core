@@ -202,7 +202,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             $data[$attributeName] = $this->phpize($attributes, $attributeName, 'deprecated' === $attributeName ? 'bool' : 'string');
         }
 
-        $data['tags'] = $this->buildArrayValue($resource, 'tag');
+        $data['tags'] = $this->buildArrayValue($openapi, 'tag');
 
         if (isset($openapi->responses->response)) {
             foreach ($openapi->responses->response as $response) {
