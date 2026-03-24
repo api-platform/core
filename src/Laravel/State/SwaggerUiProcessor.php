@@ -138,6 +138,6 @@ final class SwaggerUiProcessor implements ProcessorInterface
             return $requested;
         }
 
-        return $available[0];
+        return $available[0]; // @phpstan-ignore offsetAccess.notFound
     }
 }
