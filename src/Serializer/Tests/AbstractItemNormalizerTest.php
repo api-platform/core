@@ -90,7 +90,7 @@ class AbstractItemNormalizerTest extends TestCase
         $this->assertTrue($normalizer->supportsDenormalization($dummy, Dummy::class));
         $this->assertFalse($normalizer->supportsDenormalization($std, \stdClass::class));
         $this->assertFalse($normalizer->supportsNormalization([]));
-        $this->assertSame(['object' => true], $normalizer->getSupportedTypes('any'));
+        $this->assertSame(['object' => false], $normalizer->getSupportedTypes('any'));
     }
 
     public function testNormalize(): void
