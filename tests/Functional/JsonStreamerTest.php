@@ -255,6 +255,11 @@ class JsonStreamerTest extends ApiTestCase
             $this->markTestSkipped('PHP version is lower than 8.4');
         }
 
+        // FrameworkBundle 8.1+ registers TransformerPass which is required for Symfony's core json_streamer services to handle DateTime
+        if (!class_exists(\Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConsoleArgumentValueResolverPass::class)) {
+            $this->markTestSkipped('FrameworkBundle 8.1+ is required.');
+        }
+
         $r = self::createClient()->request('POST', '/json_stream_resources', [
             'json' => [
                 'title' => 'asd',
