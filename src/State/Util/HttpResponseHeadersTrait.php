@@ -23,9 +23,11 @@ use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\ResponseHeaderParameterInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\Util\CloneTrait;
+use ApiPlatform\State\ParameterNotFound;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface as SymfonyHttpExceptionInterface;
@@ -66,6 +68,19 @@ trait HttpResponseHeadersTrait
 
         if ($operationHeaders = $operation->getHeaders()) {
             $headers = array_merge($headers, $operationHeaders);
+        }
+
+        foreach ($operation->getParameters() ?? [] as $key => $parameter) {
+            if (!$parameter instanceof ResponseHeaderParameterInterface) {
+                continue;
+            }
+
+            $value = $parameter->getValue();
+            if ($value instanceof ParameterNotFound || null === $value) {
+                continue;
+            }
+
+            $headers[$key] = (string) $value;
         }
 
         if ($sunset = $operation->getSunset()) {
