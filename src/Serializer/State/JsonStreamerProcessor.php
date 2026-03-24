@@ -24,6 +24,7 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\Util\HttpResponseHeadersTrait;
 use ApiPlatform\State\Util\HttpResponseStatusTrait;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\JsonStreamer\StreamWriterInterface;
@@ -48,11 +49,13 @@ final class JsonStreamerProcessor implements ProcessorInterface
         ?ResourceClassResolverInterface $resourceClassResolver = null,
         ?OperationMetadataFactoryInterface $operationMetadataFactory = null,
         ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
+        ?ContainerInterface $responseHeaderProviderLocator = null,
     ) {
         $this->resourceClassResolver = $resourceClassResolver;
         $this->iriConverter = $iriConverter;
         $this->operationMetadataFactory = $operationMetadataFactory;
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
+        $this->responseHeaderProviderLocator = $responseHeaderProviderLocator;
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])

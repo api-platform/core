@@ -33,6 +33,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\OpenApi\Attributes\Webhook;
 use ApiPlatform\OpenApi\Model\Components;
 use ApiPlatform\OpenApi\Model\Contact;
+use ApiPlatform\OpenApi\Model\Header;
 use ApiPlatform\OpenApi\Model\Info;
 use ApiPlatform\OpenApi\Model\License;
 use ApiPlatform\OpenApi\Model\Link;
@@ -449,6 +450,42 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             if (!$openapiOperation->getResponses()) {
                 $openapiOperation = $openapiOperation->withResponse('default', new Response('Unexpected error'));
+            }
+
+            if ($responseHeaders = $operation->getResponseHeaders()) {
+                /** @var \ArrayObject<string, Header> $documentedHeaders */
+                $documentedHeaders = new \ArrayObject();
+                foreach ($responseHeaders as $name => $responseHeader) {
+                    if (false === $responseHeader->getOpenApi()) {
+                        continue;
+                    }
+
+                    $openapiHeader = $responseHeader->getOpenApi();
+                    if ($openapiHeader instanceof Header) {
+                        $documentedHeaders[$name] = $openapiHeader;
+                        continue;
+                    }
+
+                    $documentedHeaders[$name] = new Header(
+                        description: $responseHeader->getDescription() ?? '',
+                        required: $responseHeader->getRequired() ?? false,
+                        deprecated: $responseHeader->getDeprecated() ?? false,
+                        schema: $responseHeader->getSchema() ?? ['type' => 'string'],
+                    );
+                }
+
+                if (\count($documentedHeaders)) {
+                    foreach ($openapiOperation->getResponses() as $status => $response) {
+                        $existingHeaders = $response->getHeaders();
+                        $mergedHeaders = $existingHeaders ? clone $existingHeaders : new \ArrayObject();
+                        foreach ($documentedHeaders as $name => $header) {
+                            if (!isset($mergedHeaders[$name])) {
+                                $mergedHeaders[$name] = $header;
+                            }
+                        }
+                        $openapiOperation = $openapiOperation->withResponse($status, $response->withHeaders($mergedHeaders));
+                    }
+                }
             }
 
             if (

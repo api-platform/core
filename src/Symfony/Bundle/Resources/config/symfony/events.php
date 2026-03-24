@@ -104,6 +104,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.resource_class_resolver'),
             service('api_platform.metadata.operation.metadata_factory'),
             service('api_platform.metadata.resource.metadata_collection_factory'),
+            tagged_locator('api_platform.response_header_provider', 'key'),
         ]);
 
     $services->set('api_platform.state_processor.add_link_header', AddLinkHeaderProcessor::class)
