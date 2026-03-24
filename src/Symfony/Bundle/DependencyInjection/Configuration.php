@@ -269,6 +269,7 @@ final class Configuration implements ConfigurationInterface
                         ->scalarNode('authorizationUrl')->defaultValue('')->info('The oauth authentication url.')->end()
                         ->scalarNode('refreshUrl')->defaultValue('')->info('The oauth refresh url.')->end()
                         ->arrayNode('scopes')
+                            ->normalizeKeys(false)
                             ->prototype('scalar')->end()
                         ->end()
                     ->end()
