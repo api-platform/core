@@ -27,6 +27,7 @@ use ApiPlatform\Metadata\PropertiesAwareInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use ApiPlatform\Serializer\Filter\FilterInterface as SerializerFilterInterface;
@@ -55,7 +56,9 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         private readonly ?ContainerInterface $filterLocator = null,
         private readonly ?NameConverterInterface $nameConverter = null,
         private readonly ?LoggerInterface $logger = null,
+        ?ResourceClassResolverInterface $resourceClassResolver = null,
     ) {
+        $this->resourceClassResolver = $resourceClassResolver;
     }
 
     public function create(string $resourceClass): ResourceMetadataCollection
