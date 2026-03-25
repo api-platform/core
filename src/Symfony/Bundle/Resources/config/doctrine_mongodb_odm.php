@@ -180,6 +180,7 @@ return function (ContainerConfigurator $container) {
             service('api_platform.filter_locator'),
             service('doctrine_mongodb')->nullOnInvalid(),
             service('logger')->nullOnInvalid(),
+            service('api_platform.name_converter')->nullOnInvalid(),
         ])
         ->tag('api_platform.doctrine_mongodb.odm.aggregation_extension.collection', ['priority' => 32])
         ->tag('api_platform.doctrine_mongodb.odm.aggregation_extension.item');

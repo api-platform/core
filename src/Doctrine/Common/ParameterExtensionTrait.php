@@ -15,11 +15,13 @@ namespace ApiPlatform\Doctrine\Common;
 
 use ApiPlatform\Doctrine\Common\Filter\LoggerAwareInterface;
 use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
+use ApiPlatform\Doctrine\Common\Filter\NameConverterAwareInterface;
 use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterInterface;
 use ApiPlatform\Metadata\Parameter;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 trait ParameterExtensionTrait
 {
@@ -28,6 +30,7 @@ trait ParameterExtensionTrait
     protected ContainerInterface $filterLocator;
     protected ?ManagerRegistry $managerRegistry = null;
     protected ?LoggerInterface $logger = null;
+    protected ?NameConverterInterface $nameConverter = null;
 
     /**
      * @param object    $filter    the filter instance to configure
@@ -41,6 +44,10 @@ trait ParameterExtensionTrait
 
         if ($this->logger && $filter instanceof LoggerAwareInterface && !$filter->hasLogger()) {
             $filter->setLogger($this->logger);
+        }
+
+        if ($this->nameConverter && $filter instanceof NameConverterAwareInterface && !$filter->hasNameConverter()) {
+            $filter->setNameConverter($this->nameConverter);
         }
 
         if ($filter instanceof PropertyAwareFilterInterface) {
