@@ -68,7 +68,11 @@ trait LinksHandlerTrait
             $hasCompositeIdentifiers = 1 < \count($identifierProperties);
 
             if (!$link->getFromProperty() && !$link->getToProperty()) {
-                $currentAlias = $fromClass === $entityClass ? $alias : $queryNameGenerator->generateJoinAlias($alias);
+                if ($fromClass !== $entityClass) {
+                    continue;
+                }
+
+                $currentAlias = $alias;
 
                 foreach ($identifierProperties as $identifierProperty) {
                     $placeholder = $queryNameGenerator->generateParameterName($identifierProperty);
