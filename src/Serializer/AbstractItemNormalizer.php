@@ -130,7 +130,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     public function getSupportedTypes(?string $format): array
     {
         return [
-            'object' => true,
+            'object' => false,
         ];
     }
 
