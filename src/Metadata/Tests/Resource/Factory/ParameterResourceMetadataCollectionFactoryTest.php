@@ -15,8 +15,10 @@ namespace ApiPlatform\Metadata\Tests\Resource\Factory;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\HeaderParameter;
 use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -282,6 +284,380 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertSame(['name'], $param->getProperties());
     }
 
+    public function testQueryParameterFromPropertyAttributes(): void
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'name', 'isActive']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+
+        $resourceMetadataCollection = $parameterFactory->create(ParameterOnProperties::class);
+        $operation = $resourceMetadataCollection->getOperation(forceCollection: true);
+        $parameters = $operation->getParameters();
+
+        $this->assertInstanceOf(Parameters::class, $parameters);
+
+        $this->assertTrue($parameters->has('search'));
+        $searchParam = $parameters->get('search', QueryParameter::class);
+        $this->assertInstanceOf(QueryParameter::class, $searchParam);
+        $this->assertSame('search', $searchParam->getKey());
+        $this->assertSame('name', $searchParam->getProperty());
+        $this->assertSame('Search by name', $searchParam->getDescription());
+
+        $this->assertTrue($parameters->has('filter_active'));
+        $filterParam = $parameters->get('filter_active', QueryParameter::class);
+        $this->assertInstanceOf(QueryParameter::class, $filterParam);
+        $this->assertSame('filter_active', $filterParam->getKey());
+        $this->assertSame('isActive', $filterParam->getProperty());
+        $this->assertSame('Filter by active status', $filterParam->getDescription());
+    }
+
+    public function testQueryParameterFromPropertyAttributeThrowsExceptionWhenPropertyMismatch(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Parameter attribute on property "name" must target itself or have no explicit property. Got "property: \'description\'" instead.');
+
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'name', 'description']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+
+        $parameterFactory->create(ParameterOnPropertiesMismatchPropertyException::class);
+    }
+
+    public function testQueryParameterFromPropertyAttributeThrowsExceptionWhenPropertiesMismatch(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Parameter attribute on property "name" must target itself or have no explicit properties. Got "properties: [description]" instead.');
+
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'name', 'description']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+
+        $parameterFactory->create(ParameterOnPropertiesMismatchPropertiesException::class);
+    }
+
+    public function testQueryParameterFromPropertyAttributeThrowsExceptionWhenPropertiesHasMultipleWithoutSelf(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Parameter attribute on property "name" must target itself or have no explicit properties. Got "properties: [description, active]" instead.');
+
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'name', 'description', 'active']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+
+        $parameterFactory->create(ParameterOnPropertiesMismatchMultiplePropertiesException::class);
+    }
+
+    public function testQueryParameterFromPropertyAttributePropertiesSingleCorrectProperty(): void
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'name', 'description']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+
+        $resourceMetadataCollection = $parameterFactory->create(ParameterOnPropertiesSingleCorrectProperty::class);
+        $operation = $resourceMetadataCollection->getOperation(forceCollection: true);
+        $parameters = $operation->getParameters();
+
+        $this->assertInstanceOf(Parameters::class, $parameters);
+
+        $this->assertTrue($parameters->has('search'));
+        $searchParam = $parameters->get('search', QueryParameter::class);
+        $this->assertInstanceOf(QueryParameter::class, $searchParam);
+        $this->assertSame('search', $searchParam->getKey());
+        $this->assertSame('name', $searchParam->getProperty());
+        $this->assertSame(['name'], $searchParam->getProperties());
+    }
+
+    public function testQueryParameterFromPropertyAttributePropertiesHasMultipleIncludingSelf(): void
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'name', 'description']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+
+        $resourceMetadataCollection = $parameterFactory->create(ParameterOnPropertiesMultiplePropertiesIncludingSelf::class);
+        $operation = $resourceMetadataCollection->getOperation(forceCollection: true);
+        $parameters = $operation->getParameters();
+
+        $this->assertInstanceOf(Parameters::class, $parameters);
+
+        $this->assertTrue($parameters->has('search'));
+        $searchParam = $parameters->get('search', QueryParameter::class);
+        $this->assertInstanceOf(QueryParameter::class, $searchParam);
+        $this->assertSame('search', $searchParam->getKey());
+        $this->assertSame('name', $searchParam->getProperty());
+        $this->assertSame(['name'], $searchParam->getProperties());
+    }
+
+    public function testHeaderParameterFromPropertyAttributes(): void
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'authToken', 'token']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+
+        $resourceMetadataCollection = $parameterFactory->create(HeaderParameterOnPropertiesTest::class);
+        $operation = $resourceMetadataCollection->getOperation(forceCollection: true);
+        $parameters = $operation->getParameters();
+
+        $this->assertInstanceOf(Parameters::class, $parameters);
+
+        $this->assertTrue($parameters->has('X-Authorization', HeaderParameter::class));
+        $authParam = $parameters->get('X-Authorization', HeaderParameter::class);
+        $this->assertInstanceOf(HeaderParameter::class, $authParam);
+        $this->assertSame('X-Authorization', $authParam->getKey());
+        $this->assertSame('authToken', $authParam->getProperty());
+        $this->assertSame('Authorization header', $authParam->getDescription());
+
+        $this->assertTrue($parameters->has('X-Token', HeaderParameter::class));
+        $tokenParam = $parameters->get('X-Token', HeaderParameter::class);
+        $this->assertInstanceOf(HeaderParameter::class, $tokenParam);
+        $this->assertSame('X-Token', $tokenParam->getKey());
+        $this->assertSame('token', $tokenParam->getProperty());
+        $this->assertSame('API Token header', $tokenParam->getDescription());
+    }
+
+    public function testHeaderParameterFromPropertyAttributeThrowsExceptionWhenPropertyMismatch(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Parameter attribute on property "authToken" must target itself or have no explicit property. Got "property: \'token\'" instead.');
+
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'authToken', 'token']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+
+        $parameterFactory->create(HeaderParameterOnPropertiesMismatchException::class);
+    }
+
+    public function testHeaderParameterFromPropertyAttributeThrowsExceptionWhenPropertiesMismatch(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Parameter attribute on property "authToken" must target itself or have no explicit properties. Got "properties: [token]" instead.');
+
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'authToken', 'token']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+
+        $parameterFactory->create(HeaderParameterOnPropertiesMismatchPropertiesException::class);
+    }
+
+    public function testHeaderParameterFromPropertyAttributeThrowsExceptionWhenPropertiesHasMultipleWithoutSelf(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Parameter attribute on property "authToken" must target itself or have no explicit properties. Got "properties: [token, token2]" instead.');
+
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'authToken', 'token', 'token2']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+
+        $parameterFactory->create(HeaderParameterOnPropertiesMismatchMultiplePropertiesException::class);
+    }
+
+    public function testHeaderParameterFromPropertyAttributePropertiesSingleCorrectProperty(): void
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'authToken', 'token']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+
+        $resourceMetadataCollection = $parameterFactory->create(HeaderParameterOnPropertiesSingleCorrectProperty::class);
+        $operation = $resourceMetadataCollection->getOperation(forceCollection: true);
+        $parameters = $operation->getParameters();
+
+        $this->assertInstanceOf(Parameters::class, $parameters);
+
+        $this->assertTrue($parameters->has('X-Authorization', HeaderParameter::class));
+        $authParam = $parameters->get('X-Authorization', HeaderParameter::class);
+        $this->assertInstanceOf(HeaderParameter::class, $authParam);
+        $this->assertSame('X-Authorization', $authParam->getKey());
+        $this->assertSame('authToken', $authParam->getProperty());
+        $this->assertSame(['authToken'], $authParam->getProperties());
+    }
+
+    public function testHeaderParameterFromPropertyAttributePropertiesHasMultipleIncludingSelf(): void
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'authToken', 'token']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+
+        $resourceMetadataCollection = $parameterFactory->create(HeaderParameterOnPropertiesMultiplePropertiesIncludingSelf::class);
+        $operation = $resourceMetadataCollection->getOperation(forceCollection: true);
+        $parameters = $operation->getParameters();
+
+        $this->assertInstanceOf(Parameters::class, $parameters);
+
+        $this->assertTrue($parameters->has('X-Authorization', HeaderParameter::class));
+        $authParam = $parameters->get('X-Authorization', HeaderParameter::class);
+        $this->assertInstanceOf(HeaderParameter::class, $authParam);
+        $this->assertSame('X-Authorization', $authParam->getKey());
+        $this->assertSame('authToken', $authParam->getProperty());
+        $this->assertSame(['authToken'], $authParam->getProperties());
+    }
+
     public function testNestedPropertyWithNameConverter(): void
     {
         $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
@@ -536,4 +912,118 @@ class NestedTestVariation
 {
     public ?int $id = null;
     public ?string $variantName = null;
+}
+
+#[ApiResource]
+class ParameterOnProperties
+{
+    #[QueryParameter(key: 'search', description: 'Search by name')]
+    public string $name = '';
+
+    #[QueryParameter(key: 'filter_active', description: 'Filter by active status')]
+    public bool $isActive = true;
+}
+
+#[ApiResource]
+class ParameterOnPropertiesMismatchPropertyException
+{
+    #[QueryParameter(key: 'search', property: 'description')]
+    public string $name = '';
+
+    public string $description = '';
+}
+
+#[ApiResource]
+class ParameterOnPropertiesMismatchPropertiesException
+{
+    #[QueryParameter(key: 'search', properties: ['description'])]
+    public string $name = '';
+
+    public string $description = '';
+}
+
+#[ApiResource]
+class ParameterOnPropertiesMismatchMultiplePropertiesException
+{
+    #[QueryParameter(key: 'search', properties: ['description', 'active'])]
+    public string $name = '';
+
+    public string $description = '';
+
+    public bool $active = true;
+}
+
+#[ApiResource]
+class ParameterOnPropertiesSingleCorrectProperty
+{
+    #[QueryParameter(key: 'search', properties: ['name'])]
+    public string $name = '';
+
+    public string $description = '';
+}
+
+#[ApiResource]
+class ParameterOnPropertiesMultiplePropertiesIncludingSelf
+{
+    #[QueryParameter(key: 'search', properties: ['description', 'name'])]
+    public string $name = '';
+
+    public string $description = '';
+}
+
+#[ApiResource]
+class HeaderParameterOnPropertiesTest
+{
+    #[HeaderParameter(key: 'X-Authorization', description: 'Authorization header')]
+    public string $authToken = '';
+
+    #[HeaderParameter(key: 'X-Token', description: 'API Token header')]
+    public string $token = '';
+}
+
+#[ApiResource]
+class HeaderParameterOnPropertiesMismatchException
+{
+    #[HeaderParameter(key: 'X-Authorization', property: 'token')]
+    public string $authToken = '';
+
+    public string $token = '';
+}
+
+#[ApiResource]
+class HeaderParameterOnPropertiesSingleCorrectProperty
+{
+    #[HeaderParameter(key: 'X-Authorization', properties: ['authToken'])]
+    public string $authToken = '';
+
+    public string $token = '';
+}
+
+#[ApiResource]
+class HeaderParameterOnPropertiesMultiplePropertiesIncludingSelf
+{
+    #[HeaderParameter(key: 'X-Authorization', properties: ['token', 'authToken'])]
+    public string $authToken = '';
+
+    public string $token = '';
+}
+
+#[ApiResource]
+class HeaderParameterOnPropertiesMismatchPropertiesException
+{
+    #[HeaderParameter(key: 'X-Authorization', properties: ['token'])]
+    public string $authToken = '';
+
+    public string $token = '';
+}
+
+#[ApiResource]
+class HeaderParameterOnPropertiesMismatchMultiplePropertiesException
+{
+    #[HeaderParameter(key: 'X-Authorization', properties: ['token', 'token2'])]
+    public string $authToken = '';
+
+    public string $token = '';
+
+    public string $token2 = '';
 }
