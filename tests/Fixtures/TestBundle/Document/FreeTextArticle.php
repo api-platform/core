@@ -43,7 +43,7 @@ class FreeTextArticle
     #[ODM\Field(type: 'string')]
     private string $content;
 
-    #[ODM\ReferenceOne(targetDocument: FreeTextTag::class)]
+    #[ODM\ReferenceOne(targetDocument: FreeTextTag::class, storeAs: 'id')]
     private ?FreeTextTag $tag = null;
 
     public function getId(): ?string

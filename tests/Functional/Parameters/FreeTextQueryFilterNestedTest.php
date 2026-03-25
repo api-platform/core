@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional\Parameters;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\FreeTextArticle as DocumentFreeTextArticle;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\FreeTextTag as DocumentFreeTextTag;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FreeTextArticle;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FreeTextTag;
 use ApiPlatform\Tests\RecreateSchemaTrait;
@@ -68,14 +70,18 @@ final class FreeTextQueryFilterNestedTest extends ApiTestCase
     private function loadFixtures(): void
     {
         $manager = $this->getManager();
+        $isMongoDB = $this->isMongoDB();
 
-        $tag1 = new FreeTextTag();
+        $tagClass = $isMongoDB ? DocumentFreeTextTag::class : FreeTextTag::class;
+        $articleClass = $isMongoDB ? DocumentFreeTextArticle::class : FreeTextArticle::class;
+
+        $tag1 = new $tagClass();
         $tag1->setContent('unrelated-tag');
 
-        $tag2 = new FreeTextTag();
+        $tag2 = new $tagClass();
         $tag2->setContent('tag-match-value');
 
-        $tag3 = new FreeTextTag();
+        $tag3 = new $tagClass();
         $tag3->setContent('shared-tag');
 
         $manager->persist($tag1);
@@ -83,17 +89,17 @@ final class FreeTextQueryFilterNestedTest extends ApiTestCase
         $manager->persist($tag3);
 
         // article1: root content matches "root-match" and "shared", tag does not
-        $article1 = new FreeTextArticle();
+        $article1 = new $articleClass();
         $article1->setContent('root-match-shared');
         $article1->setTag($tag1);
 
         // article2: root content does not match, but tag matches "tag-match"
-        $article2 = new FreeTextArticle();
+        $article2 = new $articleClass();
         $article2->setContent('nothing-special');
         $article2->setTag($tag2);
 
         // article3: root content does not match "shared", but tag matches "shared"
-        $article3 = new FreeTextArticle();
+        $article3 = new $articleClass();
         $article3->setContent('nothing-here');
         $article3->setTag($tag3);
 
