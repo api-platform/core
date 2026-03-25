@@ -281,10 +281,22 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     continue;
                 }
 
+                $description = $uriVariable->getDescription();
+                if (null === $description) {
+                    $fromClass = $uriVariable->getFromClass();
+                    if (null !== $fromClass && $fromClass !== $resourceClass) {
+                        $uriResourceName = (new \ReflectionClass($fromClass))->getShortName();
+                    } else {
+                        $uriResourceName = $resourceShortName;
+                    }
+
+                    $description = "$uriResourceName identifier";
+                }
+
                 $parameter = new Parameter(
                     $parameterName,
                     'path',
-                    $uriVariable->getDescription() ?? "$resourceShortName identifier",
+                    $description,
                     $uriVariable->getRequired() ?? true,
                     false,
                     null,
