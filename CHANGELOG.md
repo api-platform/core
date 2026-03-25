@@ -1,5 +1,14 @@
 # Changelog
 
+## v4.3.1
+
+### Bug fixes
+
+* [13cc3950c](https://github.com/api-platform/core/commit/13cc3950cbf89cefb0005d61d39451ed8f907717) fix(doctrine): reset nested_properties_info for non-nested properties in FreeTextQueryFilter (#7850)
+* [1fa8c05ca](https://github.com/api-platform/core/commit/1fa8c05cab2bc58984d988ad367f0896cb5e64f4) fix(validator): fallback to message when detail is uninitialized (#7844)
+* [aff1cf2cc](https://github.com/api-platform/core/commit/aff1cf2cc6ce451322c58b1ee03e4f5d6bcd3649) fix(symfony): do not exclude resources from DI (#7847)
+* [e45b5791d](https://github.com/api-platform/core/commit/e45b5791db3c5c7f0874816675e9891bacb20ca6) fix(validator): skip ValidateProcessor when ObjectMapper is not used (#7848)
+
 ## v4.3.0
 
 ### Features
@@ -87,6 +96,13 @@
 * **`isGranted` evaluated before provider** (#7500): Security expressions are now evaluated before the state provider runs. Expressions that do not reference the `object` variable will be checked earlier (at the `pre_read` stage), improving security by preventing unnecessary database queries on unauthorized requests. Expressions that reference `object` still wait for the provider to resolve the entity. Review any security expressions that relied on provider side-effects running before authorization.
 * **LDP-compliant response headers** (#6917): API responses now include `Allow` and `Accept-Post` headers per the Linked Data Platform specification. These are informational headers that help clients discover API capabilities and should not break existing integrations.
 * **Scalar API Reference UI** (#7817): Scalar is now available as an alternative documentation UI alongside Swagger UI. It is enabled by default when TwigBundle is available. Access it via `?ui=scalar`. To disable it, set `enable_scalar: false` in your API Platform configuration.
+
+## v4.2.22
+
+### Bug fixes
+
+* [3e96fc679](https://github.com/api-platform/core/commit/3e96fc6798d6460802bc07f5566c2a3158b53eb8) fix(serializer): evaluate ApiProperty security on input DTOs (#7852)
+* [c7ababf2d](https://github.com/api-platform/core/commit/c7ababf2dfee43c8f21e8d4d02ad4f1072d3cbba) fix(hydra): use compact IRI for owl:onProperty and Collection @id in DocumentationNormalizer (#7849)
 
 ## v4.2.21
 

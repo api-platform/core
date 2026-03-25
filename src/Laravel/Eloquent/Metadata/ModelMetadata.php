@@ -268,6 +268,13 @@ final class ModelMetadata
     /**
      * Gets the model casts, including any date casts.
      *
+     * In Laravel 11+, casts can be defined via the protected casts() method
+     * in addition to the $casts property. Since models may be instantiated
+     * without calling the constructor (newInstanceWithoutConstructor),
+     * initializeHasAttributes() is never called and the casts() method
+     * results are not merged into $casts. We call casts() via reflection
+     * to ensure both sources are included.
+     *
      * @return array<string, mixed>
      */
     private function getCastsWithDates(Model $model): array
@@ -280,7 +287,15 @@ final class ModelMetadata
             }
         }
 
-        return array_merge($dateCasts, $model->getCasts());
+        $casts = $model->getCasts();
+
+        try {
+            $castsMethod = new \ReflectionMethod($model, 'casts');
+            $casts = array_merge($casts, $castsMethod->invoke($model));
+        } catch (\ReflectionException) {
+        }
+
+        return array_merge($dateCasts, $casts);
     }
 
     /**
