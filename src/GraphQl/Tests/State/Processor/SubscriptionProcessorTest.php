@@ -15,8 +15,10 @@ namespace ApiPlatform\GraphQl\Tests\State\Processor;
 
 use ApiPlatform\GraphQl\State\Processor\SubscriptionProcessor;
 use ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface;
+use ApiPlatform\GraphQl\Subscription\OperationAwareSubscriptionManagerInterface;
 use ApiPlatform\GraphQl\Subscription\SubscriptionManagerInterface;
 use ApiPlatform\Metadata\GraphQl\Subscription;
+use ApiPlatform\Metadata\GraphQl\SubscriptionCollection;
 use ApiPlatform\State\ProcessorInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -31,9 +33,11 @@ class SubscriptionProcessorTest extends TestCase
         $subscriptionManager = $this->createMock(SubscriptionManagerInterface::class);
         $subscriptionManager->expects($this->once())->method('retrieveSubscriptionId')->willReturn('/1');
         $mercureSubscriptionIriGenerator = $this->createMock(MercureSubscriptionIriGeneratorInterface::class);
-        $mercureSubscriptionIriGenerator->expects($this->once())->method('generateMercureUrl')->with('/1', $operation->getMercure()['hub']);
+        $mercureSubscriptionIriGenerator->expects($this->once())->method('generateMercureUrl')->with('/1', $operation->getMercure()['hub'])->willReturn('mercure-url');
         $processor = new SubscriptionProcessor($decorated, $subscriptionManager, $mercureSubscriptionIriGenerator);
-        $processor->process([], $operation, [], $context);
+        $result = $processor->process([], $operation, [], $context);
+
+        $this->assertSame('mercure-url', $result['mercureUrl']);
     }
 
     public function testProcessWithoutId(): void
@@ -62,5 +66,47 @@ class SubscriptionProcessorTest extends TestCase
         $mercureSubscriptionIriGenerator->expects($this->never())->method('generateMercureUrl');
         $processor = new SubscriptionProcessor($decorated, $subscriptionManager, $mercureSubscriptionIriGenerator);
         $processor->process([], $operation, [], $context);
+    }
+
+    public function testProcessForwardsCollectionOperationToOperationAwareManager(): void
+    {
+        $operation = new SubscriptionCollection(mercure: ['hub' => 'mercure.rocks']);
+        $context = ['context' => 'value'];
+        $decorated = $this->createMock(ProcessorInterface::class);
+        $decorated->expects($this->once())->method('process')->willReturn([]);
+        $subscriptionManager = $this->createMock(OperationAwareSubscriptionManagerInterface::class);
+        $subscriptionManager->expects($this->once())->method('retrieveSubscriptionId')->with($context, [], $operation)->willReturn('/1');
+        $mercureSubscriptionIriGenerator = $this->createMock(MercureSubscriptionIriGeneratorInterface::class);
+        $mercureSubscriptionIriGenerator->expects($this->once())->method('generateMercureUrl')->with('/1', $operation->getMercure()['hub'])->willReturn('mercure-url');
+        $processor = new SubscriptionProcessor($decorated, $subscriptionManager, $mercureSubscriptionIriGenerator);
+
+        $result = $processor->process([], $operation, [], $context);
+
+        $this->assertSame('mercure-url', $result['mercureUrl']);
+    }
+
+    public function testProcessCollectionSubscriptionKeepsDecoratedPayloadShape(): void
+    {
+        $operation = new SubscriptionCollection(mercure: ['hub' => 'mercure.rocks']);
+        $context = ['context' => 'value'];
+        $decoratedPayload = [
+            'shortName' => ['id' => '/dummies/1'],
+            'clientSubscriptionId' => 'client-subscription-id',
+        ];
+
+        $decorated = $this->createMock(ProcessorInterface::class);
+        $decorated->expects($this->once())->method('process')->willReturn($decoratedPayload);
+        $subscriptionManager = $this->createMock(OperationAwareSubscriptionManagerInterface::class);
+        $subscriptionManager->expects($this->once())->method('retrieveSubscriptionId')->with($context, $decoratedPayload, $operation)->willReturn('/1');
+        $mercureSubscriptionIriGenerator = $this->createMock(MercureSubscriptionIriGeneratorInterface::class);
+        $mercureSubscriptionIriGenerator->expects($this->once())->method('generateMercureUrl')->with('/1', $operation->getMercure()['hub'])->willReturn('mercure-url');
+        $processor = new SubscriptionProcessor($decorated, $subscriptionManager, $mercureSubscriptionIriGenerator);
+
+        $result = $processor->process([], $operation, [], $context);
+
+        $this->assertSame(['id' => '/dummies/1'], $result['shortName']);
+        $this->assertSame('client-subscription-id', $result['clientSubscriptionId']);
+        $this->assertSame('mercure-url', $result['mercureUrl']);
+        $this->assertArrayNotHasKey('isCollection', $result);
     }
 }

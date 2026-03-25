@@ -16,7 +16,7 @@ namespace ApiPlatform\GraphQl\State\Processor;
 use ApiPlatform\GraphQl\Subscription\MercureSubscriptionIriGeneratorInterface;
 use ApiPlatform\GraphQl\Subscription\OperationAwareSubscriptionManagerInterface;
 use ApiPlatform\GraphQl\Subscription\SubscriptionManagerInterface;
-use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
+use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 
@@ -32,7 +32,7 @@ final class SubscriptionProcessor implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
         $data = $this->decorated->process($data, $operation, $uriVariables, $context);
-        if (!$operation instanceof GraphQlOperation || !($mercure = $operation->getMercure())) {
+        if (!$operation instanceof Subscription || !($mercure = $operation->getMercure())) {
             return $data;
         }
 
