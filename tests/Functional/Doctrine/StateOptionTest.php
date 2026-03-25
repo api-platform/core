@@ -17,9 +17,13 @@ use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6039\UserApi;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7689\Issue7689CategoryDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7689\Issue7689ProductDto;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7801\Issue7801CategoryDto;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7801\Issue7801ProductDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6039\Issue6039EntityUser;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue7689\Issue7689Category;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue7689\Issue7689Product;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue7801\Issue7801Category;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue7801\Issue7801Product;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Symfony\Component\ObjectMapper\Metadata\ReverseClassObjectMapperMetadataFactory;
@@ -36,7 +40,7 @@ final class StateOptionTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [UserApi::class, Issue7689ProductDto::class, Issue7689CategoryDto::class];
+        return [UserApi::class, Issue7689ProductDto::class, Issue7689CategoryDto::class, Issue7801ProductDto::class, Issue7801CategoryDto::class];
     }
 
     public function testDtoWithEntityClassOptionCollection(): void
@@ -90,5 +94,37 @@ final class StateOptionTest extends ApiTestCase
         $product = $manager->getRepository(Issue7689Product::class)->findOneBy(['name' => 'product']);
         $this->assertNotNull($product->category);
         $this->assertEquals(1, $product->category->getId());
+    }
+
+    public function testGetWithNestedDtoMapping(): void
+    {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('MongoDB not tested.');
+        }
+
+        if (!class_exists(ReverseClassObjectMapperMetadataFactory::class)) {
+            $this->markTestSkipped('This test requires symfony/object-mapper >= 8.1');
+        }
+
+        $this->recreateSchema([Issue7801Product::class, Issue7801Category::class]);
+        $manager = static::getContainer()->get('doctrine')->getManager();
+
+        $category = new Issue7801Category();
+        $category->name = 'electronics';
+        $manager->persist($category);
+
+        $product = new Issue7801Product();
+        $product->name = 'laptop';
+        $product->category = $category;
+        $manager->persist($product);
+        $manager->flush();
+
+        $response = static::createClient()->request('GET', '/issue7801_products/'.$product->getId(), ['headers' => ['Accept' => 'application/ld+json']]);
+        $this->assertResponseStatusCodeSame(200);
+
+        $json = $response->toArray();
+        $this->assertSame('laptop', $json['name']);
+        $this->assertArrayHasKey('category', $json);
+        $this->assertSame('electronics', $json['category']['name']);
     }
 }
