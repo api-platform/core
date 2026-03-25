@@ -87,7 +87,13 @@ final class ReadLinkParameterProvider implements ParameterProviderInterface
             throw new NotFoundHttpException('Relation for link security not found.');
         }
 
-        $context['request']?->attributes->set($securityObjectName, $relation);
+        // Only set the request attribute if the security object name differs from the parameter key.
+        // When they are the same, SecurityParameterProvider already has the value via $parameter->getKey() => $value,
+        // and setting the request attribute would overwrite the route parameter (a scalar) with an entity object,
+        // breaking IRI generation.
+        if ($securityObjectName !== $parameter->getKey()) {
+            $context['request']?->attributes->set($securityObjectName, $relation);
+        }
 
         if ($parameter instanceof Link) {
             $uriVariables = $operation->getUriVariables();
