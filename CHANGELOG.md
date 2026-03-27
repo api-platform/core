@@ -1,5 +1,18 @@
 # Changelog
 
+## v4.2.23
+
+### Bug fixes
+
+* [1bddff82f](https://github.com/api-platform/core/commit/1bddff82f7853a253bd257e70525b2b4eea53653) fix(doctrine): inject nameConverter into AbstractFilter via QueryParameter (#7877)
+* [5a3a7dc4b](https://github.com/api-platform/core/commit/5a3a7dc4b24060f9a9d9adb2e33a83026ed23154) fix(state): prioritize input class over output in ObjectMapperProvider (#7879)
+* [7c562a51f](https://github.com/api-platform/core/commit/7c562a51ff13c6c4626301f4ccaef93f47f57268) fix(laravel): partial patch validation config to replace required with sometimes (#7882)
+* [9c2810b08](https://github.com/api-platform/core/commit/9c2810b08767bcaef418c239ce190e88ab4bbf2b) fix(metadata): read operation tags from OpenAPI context in XML (#7865)
+* [a1292592e](https://github.com/api-platform/core/commit/a1292592e879ebb5e825cc7821b8d6cfa3cea6c9) fix(doctrine): skip links with no join info when fromClass differs from entityClass (#7878)
+* [aefeca529](https://github.com/api-platform/core/commit/aefeca529351f089822d5d427526204fb36a8356) fix(symfony): remove json stream conflicting service (#7867)
+* [e447ab1fc](https://github.com/api-platform/core/commit/e447ab1fc4feb5d389224eba364e304ea52ee408) fix(serializer): disable normalizer cache to prevent wrong normalizer in worker mode (#7868) (#7873)
+* [fff8213b2](https://github.com/api-platform/core/commit/fff8213b2059aff14b0e165c814357ef79b0c764) fix(serializer): handle nullable constructor params without default value (#7883)
+
 ## v4.2.22
 
 ### Bug fixes
