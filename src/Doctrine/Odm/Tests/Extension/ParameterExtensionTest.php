@@ -17,6 +17,7 @@ use ApiPlatform\Doctrine\Common\Filter\LoggerAwareInterface;
 use ApiPlatform\Doctrine\Common\Filter\LoggerAwareTrait;
 use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
 use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareTrait;
+use ApiPlatform\Doctrine\Common\Filter\NameConverterAwareInterface;
 use ApiPlatform\Doctrine\Odm\Extension\ParameterExtension;
 use ApiPlatform\Doctrine\Odm\Filter\FilterInterface;
 use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
@@ -30,6 +31,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 class ParameterExtensionTest extends TestCase
 {
@@ -121,6 +123,62 @@ class ParameterExtensionTest extends TestCase
         $this->assertSame([], $context);
         $this->assertNotNull($filter->getLogger());
         $this->assertNotNull($filter->getManagerRegistry());
+    }
+
+    public function testApplyToCollectionWithNameConverter(): void
+    {
+        $aggregationBuilder = $this->createMock(Builder::class);
+        $nameConverter = $this->createMock(NameConverterInterface::class);
+
+        $filter = new class($nameConverter) implements FilterInterface, NameConverterAwareInterface {
+            use BackwardCompatibleFilterDescriptionTrait;
+
+            private ?NameConverterInterface $nameConverter = null;
+
+            public function __construct(private readonly NameConverterInterface $expectedNameConverter)
+            {
+            }
+
+            public function hasNameConverter(): bool
+            {
+                return $this->nameConverter instanceof NameConverterInterface;
+            }
+
+            public function getNameConverter(): ?NameConverterInterface
+            {
+                return $this->nameConverter;
+            }
+
+            public function setNameConverter(NameConverterInterface $nameConverter): void
+            {
+                $this->nameConverter = $nameConverter;
+            }
+
+            public function apply(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
+            {
+                Assert::assertTrue($this->hasNameConverter());
+                Assert::assertSame($this->expectedNameConverter, $this->getNameConverter());
+                Assert::assertSame('SomeClass', $resourceClass);
+            }
+        };
+
+        $operation = (new GetCollection())
+            ->withParameters([
+                (new QueryParameter(
+                    key: 'param1',
+                    filter: $filter,
+                ))->setValue(1),
+            ]);
+
+        $extension = new ParameterExtension(
+            $this->createNonCalledFilterLocator(),
+            nameConverter: $nameConverter,
+        );
+        $context = [];
+        $extension->applyToCollection($aggregationBuilder, 'SomeClass', $operation, $context);
+
+        $this->assertSame([], $context);
+        $this->assertSame($nameConverter, $filter->getNameConverter());
     }
 
     public function testApplyToCollectionPassesContext(): void
