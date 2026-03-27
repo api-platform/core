@@ -38,6 +38,7 @@ use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\DummyTableInheritance;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\DummyTableInheritanceChild;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\DummyTableInheritanceRelated;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\DummyWithMultipleRequiredConstructorArgs;
+use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\DummyWithNullableConstructorArg;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\NonCloneableDummy;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\PropertyCollectionIriOnly;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\PropertyCollectionIriOnlyRelation;
@@ -90,7 +91,7 @@ class AbstractItemNormalizerTest extends TestCase
         $this->assertTrue($normalizer->supportsDenormalization($dummy, Dummy::class));
         $this->assertFalse($normalizer->supportsDenormalization($std, \stdClass::class));
         $this->assertFalse($normalizer->supportsNormalization([]));
-        $this->assertSame(['object' => true], $normalizer->getSupportedTypes('any'));
+        $this->assertSame(['object' => false], $normalizer->getSupportedTypes('any'));
     }
 
     public function testNormalize(): void
@@ -1977,6 +1978,42 @@ class AbstractItemNormalizerTest extends TestCase
             $this->assertCount(3, $e->getMissingConstructorArguments(), 'All three missing constructor arguments (title, rating, comment) should be reported, not just the first one.');
             $this->assertSame(['title', 'rating', 'comment'], $e->getMissingConstructorArguments());
         }
+    }
+
+    public function testDenormalizeNullableConstructorArgWithoutDefault(): void
+    {
+        $data = ['title' => 'Hello'];
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(DummyWithNullableConstructorArg::class, Argument::type('array'))->willReturn(new PropertyNameCollection(['title', 'description']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+
+        if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
+            $propertyMetadataFactoryProphecy->create(DummyWithNullableConstructorArg::class, 'title', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])->withReadable(true)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(DummyWithNullableConstructorArg::class, 'description', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING, true)])->withReadable(true)->withWritable(true));
+        } else {
+            $propertyMetadataFactoryProphecy->create(DummyWithNullableConstructorArg::class, 'title', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withWritable(true));
+            $propertyMetadataFactoryProphecy->create(DummyWithNullableConstructorArg::class, 'description', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType(Type::nullable(Type::string()))->withReadable(true)->withWritable(true));
+        }
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, DummyWithNullableConstructorArg::class)->willReturn(DummyWithNullableConstructorArg::class);
+        $resourceClassResolverProphecy->isResourceClass(DummyWithNullableConstructorArg::class)->willReturn(true);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+
+        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), null, null, [], null, null) extends AbstractItemNormalizer {};
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $result = $normalizer->denormalize($data, DummyWithNullableConstructorArg::class);
+
+        $this->assertInstanceOf(DummyWithNullableConstructorArg::class, $result);
+        $this->assertSame('Hello', $result->title);
+        $this->assertNull($result->description);
     }
 }
 

@@ -41,7 +41,7 @@ final class ObjectMapperProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         $data = $this->decorated->provide($operation, $uriVariables, $context);
-        $class = $operation->getOutput()['class'] ?? $operation->getClass();
+        $class = $operation->getInput()['class'] ?? $operation->getOutput()['class'] ?? $operation->getClass();
 
         if (!$this->objectMapper || !$operation->canMap()) {
             return $data;

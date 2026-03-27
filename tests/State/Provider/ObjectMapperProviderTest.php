@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\State\Provider;
 
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\State\Pagination\ArrayPaginator;
 use ApiPlatform\State\Pagination\MappedObjectPaginator;
 use ApiPlatform\State\Provider\ObjectMapperProvider;
@@ -168,6 +169,42 @@ class ObjectMapperProviderTest extends TestCase
         $this->assertSame($targetResource2, $items[1]);
     }
 
+    public function testProvideMapsToInputClassWhenInputIsSet(): void
+    {
+        $sourceEntity = new SourceEntity();
+        $inputResource = new InputResource();
+        $operation = new Patch(class: TargetResource::class, input: ['class' => InputResource::class], output: ['class' => OutputResource::class], map: true);
+        $objectMapper = $this->createMock(ObjectMapperInterface::class);
+        $objectMapper->expects($this->once())
+            ->method('map')
+            ->with($sourceEntity, InputResource::class)
+            ->willReturn($inputResource);
+        $decorated = $this->createStub(ProviderInterface::class);
+        $decorated->method('provide')->willReturn($sourceEntity);
+        $provider = new ObjectMapperProvider($objectMapper, $decorated);
+
+        $result = $provider->provide($operation);
+        $this->assertSame($inputResource, $result);
+    }
+
+    public function testProvideMapsToOutputClassWhenNoInput(): void
+    {
+        $sourceEntity = new SourceEntity();
+        $outputResource = new OutputResource();
+        $operation = new Get(class: TargetResource::class, output: ['class' => OutputResource::class], map: true);
+        $objectMapper = $this->createMock(ObjectMapperInterface::class);
+        $objectMapper->expects($this->once())
+            ->method('map')
+            ->with($sourceEntity, OutputResource::class)
+            ->willReturn($outputResource);
+        $decorated = $this->createStub(ProviderInterface::class);
+        $decorated->method('provide')->willReturn($sourceEntity);
+        $provider = new ObjectMapperProvider($objectMapper, $decorated);
+
+        $result = $provider->provide($operation);
+        $this->assertSame($outputResource, $result);
+    }
+
     public function testProvideMapsEmptyArray(): void
     {
         $operation = new Get(class: TargetResource::class, map: true);
@@ -206,4 +243,14 @@ class SourceEntity
 class TargetResource
 {
     public string $name = 'target';
+}
+
+class InputResource
+{
+    public string $name = 'input';
+}
+
+class OutputResource
+{
+    public string $name = 'output';
 }

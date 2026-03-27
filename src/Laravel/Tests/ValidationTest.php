@@ -19,6 +19,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Orchestra\Testbench\Concerns\WithWorkbench;
 use Orchestra\Testbench\TestCase;
+use Workbench\Database\Factories\Issue7648CommentFactory;
 
 class ValidationTest extends TestCase
 {
@@ -34,6 +35,7 @@ class ValidationTest extends TestCase
         tap($app['config'], static function (Repository $config): void {
             $config->set('api-platform.formats', ['jsonld' => ['application/ld+json']]);
             $config->set('api-platform.docs_formats', ['jsonld' => ['application/ld+json']]);
+            $config->set('api-platform.partial_patch_validation', true);
         });
     }
 
@@ -74,6 +76,29 @@ class ValidationTest extends TestCase
         $response->assertStatus(404);
         $response = $this->get('api/issue_7194_requirements/1', ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
+    }
+
+    /**
+     * @see https://github.com/api-platform/core/issues/7648
+     */
+    public function testPatchDoesNotRequireRelationshipFields(): void
+    {
+        $comment = Issue7648CommentFactory::new()->create();
+        $iri = $this->getIriFromResource($comment);
+
+        // PATCH with empty body should not fail on 'required' for relationship fields
+        $response = $this->patchJson($iri, [], ['accept' => 'application/ld+json', 'content-type' => 'application/merge-patch+json']);
+        $response->assertStatus(200);
+    }
+
+    /**
+     * @see https://github.com/api-platform/core/issues/7648
+     */
+    public function testPostStillRequiresRelationshipFields(): void
+    {
+        $response = $this->postJson('/api/issue7648_comments', ['content' => 'test'], ['accept' => 'application/ld+json', 'content-type' => 'application/ld+json']);
+        $response->assertStatus(422);
+        $response->assertJsonFragment(['propertyPath' => 'article', 'message' => 'The article field is required.']);
     }
 
     public function testGetCollectionWithFormRequestValidation(): void

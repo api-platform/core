@@ -28,14 +28,14 @@ return static function (ContainerConfigurator $container) {
 
     $services->set('api_platform.jsonld.json_streamer.stream_writer', JsonStreamWriter::class)
         ->args([
-            tagged_locator('json_streamer.value_transformer'),
+            tagged_locator('json_streamer.value_transformer', 'key'),
             service('api_platform.jsonld.json_streamer.write.property_metadata_loader'),
             '%.json_streamer.stream_writers_dir.jsonld%',
             service('config_cache_factory')->ignoreOnInvalid(),
         ]);
 
     $jsonStreamReaderArgs = [
-        tagged_locator('json_streamer.value_transformer'),
+        tagged_locator('json_streamer.value_transformer', 'key'),
         service('json_streamer.read.property_metadata_loader'),
         '%.json_streamer.stream_readers_dir.jsonld%',
     ];
@@ -77,10 +77,9 @@ return static function (ContainerConfigurator $container) {
         ->args([service('api_platform.router')])
         ->tag('json_streamer.value_transformer');
 
-    // Register DateTimeValueObjectTransformer for Symfony 8.1+ where DateTimeTypePropertyMetadataLoader is a no-op.
-    // Service ID must be DateTimeInterface so that tagged_locator keys match what getValueObjectTransformerId() looks up.
     if (class_exists(DateTimeValueObjectTransformer::class)) {
-        $services->set(\DateTimeInterface::class, DateTimeValueObjectTransformer::class)
-            ->tag('json_streamer.value_transformer');
+        $services->set('api_platform.jsonld.json_streamer.value_transformer.date_time', DateTimeValueObjectTransformer::class)
+            ->tag('json_streamer.value_transformer', ['key' => \DateTimeInterface::class])
+            ->tag('json_streamer.value_object_transformer');
     }
 };

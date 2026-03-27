@@ -21,6 +21,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Company;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Employee;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue7469Dummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue7797\Pairing;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue7797\Plan;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedOwnedDummy;
 use ApiPlatform\Tests\RecreateSchemaTrait;
@@ -38,7 +40,7 @@ final class LinkProviderParameterTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [WithParameter::class, Dummy::class, Employee::class, Company::class, LinkParameterProviderResource::class, Issue7469TestResource::class, Issue7469Dummy::class];
+        return [WithParameter::class, Dummy::class, Employee::class, Company::class, LinkParameterProviderResource::class, Issue7469TestResource::class, Issue7469Dummy::class, Pairing::class, Plan::class];
     }
 
     /**
@@ -46,7 +48,7 @@ final class LinkProviderParameterTest extends ApiTestCase
      */
     protected function setUp(): void
     {
-        $this->recreateSchema([Dummy::class, RelatedOwnedDummy::class, RelatedDummy::class, Employee::class, Company::class, Issue7469Dummy::class]);
+        $this->recreateSchema([Dummy::class, RelatedOwnedDummy::class, RelatedDummy::class, Employee::class, Company::class, Issue7469Dummy::class, Plan::class, Pairing::class]);
     }
 
     public function testReadDummyProviderFromQueryParameter(): void
@@ -203,6 +205,34 @@ final class LinkProviderParameterTest extends ApiTestCase
 
         $this->assertJsonContains([
             '@id' => '/link_parameter_provider_resources/1',
+        ]);
+    }
+
+    /**
+     * @see https://github.com/api-platform/core/issues/7797
+     */
+    public function testSecurityLinkWithDifferentFromClassDoesNotBreakDoctrine(): void
+    {
+        $container = static::getContainer();
+        if ('mongodb' === $container->getParameter('kernel.environment')) {
+            $this->markTestSkipped();
+        }
+
+        $manager = $this->getManager();
+        $plan = new Plan();
+        $plan->name = 'Test Plan';
+        $manager->persist($plan);
+        $pairing = new Pairing();
+        $pairing->name = 'Test Pairing';
+        $manager->persist($pairing);
+        $manager->flush();
+
+        $response = self::createClient()->request('GET', '/issue7797_plans/'.$plan->id.'/pairings');
+        self::assertResponseStatusCodeSame(200);
+        self::assertJsonContains([
+            'hydra:member' => [
+                ['name' => 'Test Pairing'],
+            ],
         ]);
     }
 

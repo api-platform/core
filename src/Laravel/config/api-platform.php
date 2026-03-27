@@ -44,6 +44,10 @@ return [
         'json' => ['application/merge-patch+json'],
     ],
 
+    // When true, 'required' validation rules are replaced with 'sometimes'
+    // on PATCH operations, allowing partial updates without requiring all fields.
+    'partial_patch_validation' => false,
+
     'docs_formats' => [
         'jsonld' => ['application/ld+json'],
         // 'jsonapi' => ['application/vnd.api+json'],
