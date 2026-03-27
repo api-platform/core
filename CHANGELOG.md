@@ -1,5 +1,19 @@
 # Changelog
 
+## v4.3.2
+
+### Bug fixes
+
+* [2d6e47460](https://github.com/api-platform/core/commit/2d6e47460c1d0e4e79fda9cec8783b5277835a3c) fix(openapi)!:  oauth scopes with dashes in name (#7853)
+* [892c1c796](https://github.com/api-platform/core/commit/892c1c796a1cc5f498f8dd981eb57055c4a49bcf) fix(openapi): uri variable default description (#7884)
+* [a0daa07f9](https://github.com/api-platform/core/commit/a0daa07f953fe1930a9e0ce30489ecada501e1f7) fix(openapi): fallback description on summary (#7874)
+* [a7072be4a](https://github.com/api-platform/core/commit/a7072be4a461fe5f2205cbf20a3a5baba3f42d0c) fix(metadata): nested filtering only on resource classes (#7864)
+* [e14ae87fa](https://github.com/api-platform/core/commit/e14ae87fa31fd1103f715816eb8185a5ca339400) fix(laravel): resolve casts defined via casts() method (#7859)
+
+### Notes
+
+* The fix for oauth scopes with dashes in name (#7853) may change the current OpenAPI description but the risk is low.
+
 ## v4.3.1
 
 ### Bug fixes
