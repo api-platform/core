@@ -173,8 +173,8 @@ final class DocumentationNormalizer implements NormalizerInterface
      */
     private function getPropertyMetadataFactoryContext(ApiResource $resourceMetadata): array
     {
-        $normalizationGroups = $resourceMetadata->getNormalizationContext()[AbstractNormalizer::GROUPS] ?? null;
-        $denormalizationGroups = $resourceMetadata->getDenormalizationContext()[AbstractNormalizer::GROUPS] ?? null;
+        $normalizationGroups = (array)(($resourceMetadata->getNormalizationContext() ?? [])[AbstractNormalizer::GROUPS] ?? null);
+        $denormalizationGroups = (array)(($resourceMetadata->getDenormalizationContext() ?? [])[AbstractNormalizer::GROUPS] ?? null);
         $propertyContext = [
             'normalization_groups' => $normalizationGroups,
             'denormalization_groups' => $denormalizationGroups,
