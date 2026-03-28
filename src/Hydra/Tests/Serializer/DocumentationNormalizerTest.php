@@ -1170,4 +1170,52 @@ class DocumentationNormalizerTest extends TestCase
 
         $this->assertEquals($expected, $documentationNormalizer->normalize($documentation, null, [ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX => false]));
     }
+
+    public function testNormalizeWithStringGroups(): void
+    {
+        $title = 'Test Api';
+        $desc = 'test';
+        $version = '0.0.0';
+        $documentation = new Documentation(new ResourceNameCollection(['dummy' => 'dummy']), $title, $desc, $version);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create('dummy', Argument::type('array'))->shouldBeCalled()->willReturn(new PropertyNameCollection(['name']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create('dummy', 'name', Argument::type('array'))->shouldBeCalled()->willReturn(
+            (new ApiProperty())->withNativeType(Type::string())->withDescription('name')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true)
+        );
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('dummy')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('dummy', [
+            (new ApiResource())
+                ->withShortName('dummy')
+                ->withOperations(new Operations([
+                    'get' => (new Get())->withShortName('dummy'),
+                ]))
+                ->withNormalizationContext(['groups' => 'read'])
+                ->withDenormalizationContext(['groups' => 'write']),
+        ]));
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Argument::type('string'))->willReturn(false);
+
+        $urlGenerator = $this->prophesize(UrlGeneratorInterface::class);
+        $urlGenerator->generate('api_entrypoint')->willReturn('/');
+        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'])->willReturn('/doc');
+        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'], 0)->willReturn('/doc');
+
+        $documentationNormalizer = new DocumentationNormalizer(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $urlGenerator->reveal()
+        );
+
+        $doc = $documentationNormalizer->normalize($documentation);
+
+        $this->assertSame('#dummy', $doc['hydra:supportedClass'][0]['@id']);
+        $this->assertNotEmpty($doc['hydra:supportedClass'][0]['hydra:supportedProperty']);
+    }
 }
