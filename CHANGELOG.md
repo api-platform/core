@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.3.3
+
+### Bug fixes
+
+* [4ad230247](https://github.com/api-platform/core/commit/4ad23024747d59ea2483bbe693b498a6b08873fc) fix(openapi): default explode to true for form and cookie style param… (#7891)
+
 ## v4.3.2
 
 ### Bug fixes
