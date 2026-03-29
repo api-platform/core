@@ -169,22 +169,22 @@ class ObjectMapperProviderTest extends TestCase
         $this->assertSame($targetResource2, $items[1]);
     }
 
-    public function testProvideMapsToInputClassWhenInputIsSet(): void
+    public function testProvideIgnoresInputClassAndMapsToOutputClass(): void
     {
         $sourceEntity = new SourceEntity();
-        $inputResource = new InputResource();
+        $outputResource = new OutputResource();
         $operation = new Patch(class: TargetResource::class, input: ['class' => InputResource::class], output: ['class' => OutputResource::class], map: true);
         $objectMapper = $this->createMock(ObjectMapperInterface::class);
         $objectMapper->expects($this->once())
             ->method('map')
-            ->with($sourceEntity, InputResource::class)
-            ->willReturn($inputResource);
+            ->with($sourceEntity, OutputResource::class)
+            ->willReturn($outputResource);
         $decorated = $this->createStub(ProviderInterface::class);
         $decorated->method('provide')->willReturn($sourceEntity);
         $provider = new ObjectMapperProvider($objectMapper, $decorated);
 
         $result = $provider->provide($operation);
-        $this->assertSame($inputResource, $result);
+        $this->assertSame($outputResource, $result);
     }
 
     public function testProvideMapsToOutputClassWhenNoInput(): void
@@ -203,6 +203,24 @@ class ObjectMapperProviderTest extends TestCase
 
         $result = $provider->provide($operation);
         $this->assertSame($outputResource, $result);
+    }
+
+    public function testProvideMapsToResourceClassWhenInputSetButNoOutput(): void
+    {
+        $sourceEntity = new SourceEntity();
+        $targetResource = new TargetResource();
+        $operation = new Patch(class: TargetResource::class, input: ['class' => InputResource::class], map: true);
+        $objectMapper = $this->createMock(ObjectMapperInterface::class);
+        $objectMapper->expects($this->once())
+            ->method('map')
+            ->with($sourceEntity, TargetResource::class)
+            ->willReturn($targetResource);
+        $decorated = $this->createStub(ProviderInterface::class);
+        $decorated->method('provide')->willReturn($sourceEntity);
+        $provider = new ObjectMapperProvider($objectMapper, $decorated);
+
+        $result = $provider->provide($operation);
+        $this->assertSame($targetResource, $result);
     }
 
     public function testProvideMapsEmptyArray(): void
