@@ -17,6 +17,7 @@ use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\BookStoreResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\FirstResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7563\BookDto;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedPatchResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResourceNoMap;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\MappedResourceOdm;
@@ -31,6 +32,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\BookStore;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MappedEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MappedEntityNoMap;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MappedEntitySourceOnly;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MappedPatchEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MappedResourceWithRelationEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MappedResourceWithRelationRelatedEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\SameEntity;
@@ -61,6 +63,7 @@ final class MappingTest extends ApiTestCase
             MappedResourceNoMap::class,
             BookDto::class,
             BookStoreResource::class,
+            MappedPatchResource::class,
         ];
     }
 
@@ -475,6 +478,44 @@ final class MappingTest extends ApiTestCase
             'isbn' => '978-1234567890',
             'description' => 'A comprehensive guide to API Platform',
             'author' => 'John Doe',
+        ]);
+    }
+
+    /**
+     * Test PATCH with input DTO + ObjectMapper: only client-sent fields should be updated.
+     * The input DTO uses uninitialized properties so ObjectMapper skips unsent fields.
+     */
+    public function testPatchWithInputDtoOnlyUpdatessentFields(): void
+    {
+        if (!$this->getContainer()->has('api_platform.object_mapper')) {
+            $this->markTestSkipped('ObjectMapper not installed');
+        }
+
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('MongoDB not tested');
+        }
+
+        $this->recreateSchema([MappedPatchEntity::class]);
+
+        $manager = $this->getManager();
+        $entity = new MappedPatchEntity();
+        $entity->name = 'original name';
+        $entity->description = 'original description';
+        $manager->persist($entity);
+        $manager->flush();
+
+        $id = $entity->id;
+
+        // PATCH only the name — description should remain unchanged
+        self::createClient()->request('PATCH', '/mapped_patch_resources/'.$id, [
+            'headers' => ['content-type' => 'application/merge-patch+json'],
+            'json' => ['name' => 'updated name'],
+        ]);
+
+        self::assertResponseIsSuccessful();
+        self::assertJsonContains([
+            'name' => 'updated name',
+            'description' => 'original description',
         ]);
     }
 }
