@@ -968,7 +968,7 @@ class OpenApiFactoryTest extends TestCase
                 ], 'form', true, true, 'bar'),
                 new Parameter('ha', 'query', '', false, false, null, [
                     'type' => 'integer',
-                ]),
+                ], 'form', false),
                 new Parameter('toto', 'query', '', true, false, null, [
                     'type' => 'array',
                     'items' => ['type' => 'string'],
@@ -976,7 +976,7 @@ class OpenApiFactoryTest extends TestCase
                 new Parameter('order[name]', 'query', '', false, false, null, [
                     'type' => 'string',
                     'enum' => ['asc', 'desc'],
-                ]),
+                ], 'form', false),
             ],
         ), $filteredPath->getGet());
 
