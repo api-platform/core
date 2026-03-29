@@ -111,6 +111,12 @@
 * **LDP-compliant response headers** (#6917): API responses now include `Allow` and `Accept-Post` headers per the Linked Data Platform specification. These are informational headers that help clients discover API capabilities and should not break existing integrations.
 * **Scalar API Reference UI** (#7817): Scalar is now available as an alternative documentation UI alongside Swagger UI. It is enabled by default when TwigBundle is available. Access it via `?ui=scalar`. To disable it, set `enable_scalar: false` in your API Platform configuration.
 
+## v4.2.24
+
+### Bug fixes
+
+* [8cb5a6044](https://github.com/api-platform/core/commit/8cb5a6044b9ccea34a2ba67fb613d40e19560955) fix(state): do not map to input class in ObjectMapperProvider (#7892)
+
 ## v4.2.23
 
 ### Bug fixes
