@@ -246,6 +246,48 @@ class DeserializeProviderTest extends TestCase
         }
     }
 
+    /**
+     * Simulates Symfony 8.1 BackedEnumNormalizer behavior (symfony/serializer PR #62574):
+     * when a value has the right type but is not a valid enum case, the exception
+     * is created with expectedTypes=null and a user-friendly message listing valid values.
+     */
+    #[IgnoreDeprecations]
+    public function testDeserializeUsesExceptionMessageWhenExpectedTypesIsNull(): void
+    {
+        $operation = new Post(deserialize: true, class: \stdClass::class);
+        $decorated = $this->createStub(ProviderInterface::class);
+        $decorated->method('provide')->willReturn(null);
+
+        $exception = new NotNormalizableValueException(
+            message: "The data must be one of the following values: 'hearts', 'diamonds', 'clubs', 'spades'",
+            path: 'suit',
+            useMessageForUser: true,
+        );
+        $partialException = new PartialDenormalizationException('Denormalization failed.', [$exception]);
+
+        $serializerContextBuilder = $this->createMock(SerializerContextBuilderInterface::class);
+        $serializerContextBuilder->method('createFromRequest')->willReturn([]);
+        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer->method('deserialize')->willThrowException($partialException);
+
+        $provider = new DeserializeProvider($decorated, $serializer, $serializerContextBuilder);
+        $request = new Request(content: '{"suit":"invalid"}');
+        $request->headers->set('CONTENT_TYPE', 'application/json');
+        $request->attributes->set('input_format', 'json');
+
+        try {
+            $provider->provide($operation, [], ['request' => $request]);
+            $this->fail('Expected ValidationException');
+        } catch (ValidationException $e) {
+            $violations = $e->getConstraintViolationList();
+            $this->assertCount(1, $violations);
+            $this->assertSame("The data must be one of the following values: 'hearts', 'diamonds', 'clubs', 'spades'", $violations[0]->getMessage());
+            $this->assertSame("The data must be one of the following values: 'hearts', 'diamonds', 'clubs', 'spades'", $violations[0]->getMessageTemplate());
+            $this->assertSame('suit', $violations[0]->getPropertyPath());
+            $this->assertSame((string) Type::INVALID_TYPE_ERROR, $violations[0]->getCode());
+        }
+    }
+
     #[IgnoreDeprecations]
     public function testDeserializeUsesTypeMessageWhenCannotUseMessageForUser(): void
     {
