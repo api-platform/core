@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.2.24
+
+### Bug fixes
+
+* [8cb5a6044](https://github.com/api-platform/core/commit/8cb5a6044b9ccea34a2ba67fb613d40e19560955) fix(state): do not map to input class in ObjectMapperProvider (#7892)
+
 ## v4.2.23
 
 ### Bug fixes
