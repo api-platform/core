@@ -258,6 +258,11 @@ class DeserializeProviderTest extends TestCase
         $decorated = $this->createStub(ProviderInterface::class);
         $decorated->method('provide')->willReturn(null);
 
+        $ctor = new \ReflectionMethod(NotNormalizableValueException::class, '__construct');
+        if ($ctor->getNumberOfParameters() <= 3) {
+            $this->markTestSkipped('NotNormalizableValueException does not support extended constructor parameters.');
+        }
+
         $exception = new NotNormalizableValueException(
             "The data must be one of the following values: 'hearts', 'diamonds', 'clubs', 'spades'",
             0,
