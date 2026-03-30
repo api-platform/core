@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\State\ApiResource\Error;
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DataUriFileUpload\FileUploadResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ErrorResourceWithGroups\Error as ErrorResourceWithGroupsError;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ErrorResourceWithGroups\ThrowsAnExceptionWithGroup;
