@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Parameters;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\FilterNestedTest\FilterCompany as DocumentFilterCompany;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\FilterNestedTest\FilterDepartment as DocumentFilterDepartment;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\FilterNestedTest\FilterEmployee as DocumentFilterEmployee;
