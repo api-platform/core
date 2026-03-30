@@ -548,6 +548,9 @@ Feature: Table inheritance
           "type": "string",
           "pattern": "^single item$"
         },
+        "bar": {
+          "type": ["string", "null"]
+        },
         "fooz": {
           "type": "string",
           "pattern": "fooz"
