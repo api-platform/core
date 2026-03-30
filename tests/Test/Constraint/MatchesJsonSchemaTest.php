@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Symfony\Bundle\Test\Constraint;
+namespace ApiPlatform\Tests\Test\Constraint;
 
-use ApiPlatform\Symfony\Bundle\Test\Constraint\MatchesJsonSchema;
+use ApiPlatform\Test\Constraint\MatchesJsonSchema;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 

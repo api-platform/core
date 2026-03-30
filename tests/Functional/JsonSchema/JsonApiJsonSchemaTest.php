@@ -16,7 +16,7 @@ namespace ApiPlatform\Tests\Functional\JsonSchema;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Animal;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\AnimalObservation;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6317\Issue6317;

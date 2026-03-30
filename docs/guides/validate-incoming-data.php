@@ -121,7 +121,7 @@ namespace App\Playground {
 
 namespace App\Tests {
     use ApiPlatform\Playground\Test\TestGuideTrait;
-    use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+    use ApiPlatform\Test\ApiTestCase;
 
     final class BookTest extends ApiTestCase
     {

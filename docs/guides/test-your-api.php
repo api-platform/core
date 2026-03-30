@@ -9,10 +9,10 @@
 
 namespace App\Tests {
     use ApiPlatform\Playground\Test\TestGuideTrait;
-    use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+    use ApiPlatform\Test\ApiTestCase;
     use App\ApiResource\Book;
 
-    // API Platform [testing utilities](/docs/core/testing/) provides an [ApiTestCase](/docs/reference/Symfony/Bundle/Test/ApiTestCase/)
+    // API Platform [testing utilities](/docs/core/testing/) provides an [ApiTestCase](/docs/reference/Test/ApiTestCase/)
     // that allows you to send an HTTP Request, and to perform assertions on the Response.
     final class BookTest extends ApiTestCase
     {
@@ -20,7 +20,7 @@ namespace App\Tests {
 
         public function testBookDoesNotExists(): void
         {
-            // For starters we can get an [HTTP Client](/docs/reference/Symfony/Bundle/Test/Client/) with the `createClient` method.
+            // For starters we can get an [HTTP Client](/docs/reference/Test/Client/) with the `createClient` method.
             $client = static::createClient();
             // Then, issue an HTTP request via this client, as we didn't load any data we'd expect this to send a 404 Not found.
             $client->request(method: 'GET', url: '/books/1');
