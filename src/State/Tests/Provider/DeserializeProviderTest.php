@@ -21,10 +21,10 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\State\Provider\DeserializeProvider;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\SerializerContextBuilderInterface;
+use ApiPlatform\Validator\Exception\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
-use ApiPlatform\Validator\Exception\ValidationException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -259,9 +259,13 @@ class DeserializeProviderTest extends TestCase
         $decorated->method('provide')->willReturn(null);
 
         $exception = new NotNormalizableValueException(
-            message: "The data must be one of the following values: 'hearts', 'diamonds', 'clubs', 'spades'",
-            path: 'suit',
-            useMessageForUser: true,
+            "The data must be one of the following values: 'hearts', 'diamonds', 'clubs', 'spades'",
+            0,
+            null,
+            null,
+            null,
+            'suit',
+            true,
         );
         $partialException = new PartialDenormalizationException('Denormalization failed.', [$exception]);
 

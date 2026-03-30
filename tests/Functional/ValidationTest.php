@@ -85,7 +85,7 @@ final class ValidationTest extends ApiTestCase
 
         $violationBaz = $findViolation('baz');
         $this->assertNotNull($violationBaz, 'Violation for "baz" not found.');
-        $this->assertSame('This value should be of type string.', $violationBaz['message']);
+        $this->assertSame('Failed to create object because the class misses the "baz" property.', $violationBaz['message']);
         $this->assertArrayHasKey('hint', $violationBaz);
         $this->assertSame('Failed to create object because the class misses the "baz" property.', $violationBaz['hint']);
 
