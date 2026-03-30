@@ -95,7 +95,7 @@ class Dummy
     #[Context(denormalizationContext: ['datetime_format' => 'Y-m-d'])]
     #[ApiProperty(iris: ['https://schema.org/DateTime'])]
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private $dummyDateWithFormat;
+    private ?\DateTime $dummyDateWithFormat;
 
     /**
      * @var float|null A dummy float
@@ -220,12 +220,12 @@ class Dummy
         return $this->dummyDate;
     }
 
-    public function getDummyDateWithFormat()
+    public function getDummyDateWithFormat(): ?\DateTime
     {
         return $this->dummyDateWithFormat;
     }
 
-    public function setDummyPrice($dummyPrice)
+    public function setDummyPrice($dummyPrice): static
     {
         $this->dummyPrice = $dummyPrice;
 
@@ -300,10 +300,7 @@ class Dummy
         return $this->dummyBoolean;
     }
 
-    /**
-     * @param bool $dummyBoolean
-     */
-    public function setDummyBoolean($dummyBoolean): void
+    public function setDummyBoolean(?bool $dummyBoolean): void
     {
         $this->dummyBoolean = $dummyBoolean;
     }

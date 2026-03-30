@@ -42,14 +42,14 @@ class Relation3
         return $this->relation2s;
     }
 
-    public function addRelation2(Relation2 $relation)
+    public function addRelation2(Relation2 $relation): static
     {
         $this->relation2s->add($relation);
 
         return $this;
     }
 
-    public function removeRelation2(Relation2 $relation)
+    public function removeRelation2(Relation2 $relation): static
     {
         $this->relation2s->removeElement($relation);
 

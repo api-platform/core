@@ -27,7 +27,7 @@ final readonly class CacheResourceCollectionMetadataFactory implements ResourceM
 
     public function create(string $resourceClass): ResourceMetadataCollection
     {
-        return Cache::store($this->cacheStore)->rememberForever($resourceClass, function () use ($resourceClass) {
+        return Cache::store($this->cacheStore)->rememberForever($resourceClass, function () use ($resourceClass): ResourceMetadataCollection {
             return $this->decorated->create($resourceClass);
         });
     }

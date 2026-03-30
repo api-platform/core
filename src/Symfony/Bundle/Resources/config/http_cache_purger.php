@@ -17,7 +17,7 @@ use ApiPlatform\HttpCache\SouinPurger;
 use ApiPlatform\HttpCache\VarnishPurger;
 use ApiPlatform\HttpCache\VarnishXKeyPurger;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->alias('api_platform.http_cache.purger.varnish', 'api_platform.http_cache.purger.varnish.ban');

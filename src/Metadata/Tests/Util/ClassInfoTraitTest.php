@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 
 class ClassInfoTraitTest extends TestCase
 {
-    private function getClassInfoTraitImplementation()
+    private function getClassInfoTraitImplementation(): object
     {
         return new class {
             use ClassInfoTrait {

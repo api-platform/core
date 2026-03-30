@@ -83,7 +83,7 @@ class Dummy
     #[Context(denormalizationContext: ['datetime_format' => 'Y-m-d'])]
     #[ApiProperty(iris: ['https://schema.org/DateTime'])]
     #[ODM\Field(type: 'date', nullable: true)]
-    private $dummyDateWithFormat;
+    private ?\DateTime $dummyDateWithFormat;
     /**
      * @var float|null A dummy float
      */
@@ -133,7 +133,7 @@ class Dummy
         return $this->id;
     }
 
-    public function setId($id): void
+    public function setId(?int $id): void
     {
         $this->id = $id;
     }
@@ -188,12 +188,12 @@ class Dummy
         return $this->dummyDate;
     }
 
-    public function getDummyDateWithFormat()
+    public function getDummyDateWithFormat(): ?\DateTime
     {
         return $this->dummyDateWithFormat;
     }
 
-    public function setDummyPrice($dummyPrice)
+    public function setDummyPrice($dummyPrice): static
     {
         $this->dummyPrice = $dummyPrice;
 

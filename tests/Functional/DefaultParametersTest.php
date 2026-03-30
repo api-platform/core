@@ -112,7 +112,7 @@ final class DefaultParametersTest extends ApiTestCase
 
         $operationMethodsWithParameter = [];
 
-        foreach ($content['paths'] as $pathName => $pathItem) {
+        foreach ($content['paths'] as $pathItem) {
             foreach (['get', 'post', 'put', 'patch', 'delete'] as $method) {
                 if (!isset($pathItem[$method]['parameters'])) {
                     continue;

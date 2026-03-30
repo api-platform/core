@@ -15,7 +15,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use ApiPlatform\Metadata\Resource\Factory\PhpDocResourceMetadataCollectionFactory;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.metadata.resource.metadata_collection_factory.php_doc', PhpDocResourceMetadataCollectionFactory::class)

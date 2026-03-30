@@ -76,12 +76,15 @@ parameters:
 			paths:
 				- tests/Fixtures/TestBundle/Document/
 				- src/Metadata/Tests/Fixtures/ApiResource/
+				- tests/Fixtures/TestBundle/Entity/FooEmbeddable.php
 		- '#Access to an undefined property Prophecy\\Prophecy\\ObjectProphecy<(\\?[a-zA-Z0-9_]+)+>::\$[a-zA-Z0-9_]+#'
 		# https://github.com/phpstan/phpstan-symfony/issues/76
 		-
 			message: '#Service "test" is not registered in the container\.#'
 			path: src/GraphQl/Tests/Type/TypesContainerTest.php
-
+		-
+			message: '#Constant.*is unused\.#'
+			path: src/HttpCache/SouinPurger.php
 		# Expected, due to backward compatibility
 		- '#Method GraphQL\\Type\\Definition\\WrappingType::getWrappedType\(\) invoked with 1 parameter, 0 required\.#'
 		- '#Access to an undefined property GraphQL\\Type\\Definition\\NamedType&GraphQL\\Type\\Definition\\Type::\$name\.#'

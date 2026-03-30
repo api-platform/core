@@ -37,7 +37,7 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
 
         $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
         $propertyMetadata->method('create')->willReturnCallback(
-            static function (string $class, string $property) {
+            static function (string $class, string $property): ApiProperty {
                 return new ApiProperty(readable: true);
             }
         );

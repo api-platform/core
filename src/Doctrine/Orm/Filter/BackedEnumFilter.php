@@ -128,7 +128,7 @@ final class BackedEnumFilter extends AbstractFilter
         $values = \is_array($value) ? $value : [$value];
 
         $normalizedValues = array_filter(array_map(
-            fn ($v) => $this->normalizeValue($v, $property),
+            fn ($v): mixed => $this->normalizeValue($v, $property),
             $values
         ));
 

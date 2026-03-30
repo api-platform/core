@@ -32,7 +32,7 @@ use ApiPlatform\Symfony\EventListener\RespondListener;
 use ApiPlatform\Symfony\EventListener\SerializeListener;
 use ApiPlatform\Symfony\EventListener\WriteListener;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.state_provider.content_negotiation', ContentNegotiationProvider::class)

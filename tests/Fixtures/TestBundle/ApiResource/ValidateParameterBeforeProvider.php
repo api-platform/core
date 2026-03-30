@@ -38,7 +38,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 )]
 class ValidateParameterBeforeProvider
 {
-    public static function provide(Operation $operation, array $uriVariables = [], array $context = [])
+    public static function provide(Operation $operation, array $uriVariables = [], array $context = []): JsonResponse
     {
         if (!$context['request']->query->get('search')) {
             throw new \RuntimeException('Not supposed to happen');

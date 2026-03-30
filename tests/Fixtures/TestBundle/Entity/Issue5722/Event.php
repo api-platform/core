@@ -38,6 +38,9 @@ class Event
     #[ApiProperty(readable: false, writable: false, identifier: false)]
     public $id;
 
+    /**
+     * @var \Ramsey\Uuid\UuidInterface
+     */
     #[ApiProperty(writable: false, identifier: true)]
     #[ORM\Column(type: 'uuid', unique: true)]
     public $uuid;

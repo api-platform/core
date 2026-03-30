@@ -160,7 +160,7 @@ class CollectionNormalizerTest extends TestCase
 
         $delegateNormalizerProphecy = $this->createMock(NormalizerInterface::class);
         $delegateNormalizerProphecy->method('normalize')->willReturnCallback(
-            static fn (Foo $item) => 1 === $item->id ? $normalizedFooOne : $normalizedFooThree
+            static fn (Foo $item): array => 1 === $item->id ? $normalizedFooOne : $normalizedFooThree
         );
 
         $normalizer = new CollectionNormalizer($contextBuilderProphecy, $resourceClassResolverProphecy, $iriConverterProphecy);

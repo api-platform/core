@@ -33,9 +33,6 @@ class JsonSchemaContextDummy
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     public $id;
 
-    /**
-     * @var array
-     */
     #[ApiProperty(
         jsonSchemaContext: [
             'type' => 'array',
@@ -44,14 +41,14 @@ class JsonSchemaContextDummy
             'maxItems' => 2,
         ]
     )]
-    private $things = ['pool', 'bag'];
+    private array $things = ['pool', 'bag'];
 
     public function getId()
     {
         return $this->id;
     }
 
-    public function getThings()
+    public function getThings(): array
     {
         return $this->things;
     }

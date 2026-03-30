@@ -16,7 +16,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use ApiPlatform\Serializer\JsonEncoder;
 use ApiPlatform\Symfony\Validator\Serializer\ValidationExceptionNormalizer;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.problem.encoder', JsonEncoder::class)

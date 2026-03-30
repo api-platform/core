@@ -204,7 +204,7 @@ final class ParameterValidationResourceMetadataCollectionFactory implements Reso
         foreach ($operations = $resource->getOperations() ?? [] as $operationName => $operation) {
             $operationParameters = $operation->getParameters() ?? new Parameters();
             $mergedOperationParameters = $this->mergeParameters($operationParameters, $defaultParams);
-            $operations->add((string) $operationName, $operation->withParameters($mergedOperationParameters));
+            $operations->add($operationName, $operation->withParameters($mergedOperationParameters));
         }
 
         if ($operations) {

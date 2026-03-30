@@ -171,7 +171,7 @@ final class UuidComparisonFilterTest extends ApiTestCase
         $json = $response->toArray();
         self::assertSame(2, $json['hydra:totalItems']);
 
-        $returnedIds = array_map(static fn ($m) => $m['id'], $json['hydra:member']);
+        $returnedIds = array_map(static fn (array $m) => $m['id'], $json['hydra:member']);
         self::assertNotContains((string) $device2->id, $returnedIds);
     }
 

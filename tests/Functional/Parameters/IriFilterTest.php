@@ -51,7 +51,7 @@ final class IriFilterTest extends ApiTestCase
             $chickenIris[$c['name']] = '/chickens/'.$c['id'];
         }
 
-        $coopIris = array_map(static fn ($c) => '/chicken_coops/'.$c['id'], $coops);
+        $coopIris = array_map(static fn (array $c): string => '/chicken_coops/'.$c['id'], $coops);
 
         return ['chickenIris' => $chickenIris, 'coopIris' => $coopIris];
     }

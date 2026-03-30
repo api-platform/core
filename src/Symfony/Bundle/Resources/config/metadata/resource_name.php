@@ -21,7 +21,7 @@ use ApiPlatform\Metadata\Resource\Factory\ExtractorResourceNameCollectionFactory
 use ApiPlatform\Metadata\Resource\Factory\PhpFileResourceNameCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 
-return function (ContainerConfigurator $container) {
+return function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.cache.metadata.resource')

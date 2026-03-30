@@ -54,7 +54,7 @@ final class TypeValueTransformer implements ValueTransformerInterface
         return $this->getOperationType($op);
     }
 
-    public static function getStreamValueType(): Type
+    public static function getStreamValueType(): Type\BuiltinType
     {
         return Type::string();
     }

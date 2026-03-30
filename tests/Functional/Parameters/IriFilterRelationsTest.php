@@ -83,7 +83,7 @@ final class IriFilterRelationsTest extends ApiTestCase
         $data = $response->toArray();
 
         $this->assertCount(2, $data['hydra:member'], 'Should find authors with profile1 or profile2');
-        $names = array_map(static fn ($m) => $m['name'], $data['hydra:member']);
+        $names = array_map(static fn (array $m) => $m['name'], $data['hydra:member']);
         sort($names);
         $this->assertEquals(['Jane Smith', 'John Doe'], $names);
     }
@@ -119,7 +119,7 @@ final class IriFilterRelationsTest extends ApiTestCase
         $data = $response->toArray();
 
         $this->assertCount(2, $data['hydra:member'], 'Should find profiles whose author has publisher1');
-        $bios = array_map(static fn ($m) => $m['bio'], $data['hydra:member']);
+        $bios = array_map(static fn (array $m) => $m['bio'], $data['hydra:member']);
         $this->assertContains('Bio of John Doe', $bios);
         $this->assertContains('Bio of Jane Smith', $bios);
     }
@@ -150,7 +150,7 @@ final class IriFilterRelationsTest extends ApiTestCase
         $data = $response->toArray();
 
         $this->assertCount(2, $data['hydra:member'], 'Should find books by author1');
-        $titles = array_map(static fn ($m) => $m['title'], $data['hydra:member']);
+        $titles = array_map(static fn (array $m) => $m['title'], $data['hydra:member']);
         sort($titles);
         $this->assertEquals(['API Design', 'PHP Mastery'], $titles);
     }
@@ -165,7 +165,7 @@ final class IriFilterRelationsTest extends ApiTestCase
         $data = $response->toArray();
 
         $this->assertCount(2, $data['hydra:member'], 'Should find books by author1 or author2');
-        $titles = array_map(static fn ($m) => $m['title'], $data['hydra:member']);
+        $titles = array_map(static fn (array $m) => $m['title'], $data['hydra:member']);
         sort($titles);
         $this->assertEquals(['API Design', 'PHP Mastery'], $titles);
     }
@@ -179,7 +179,7 @@ final class IriFilterRelationsTest extends ApiTestCase
         $data = $response->toArray();
 
         $this->assertCount(2, $data['hydra:member'], 'Should find authors of book1');
-        $names = array_map(static fn ($m) => $m['name'], $data['hydra:member']);
+        $names = array_map(static fn (array $m) => $m['name'], $data['hydra:member']);
         sort($names);
         $this->assertEquals(['Jane Smith', 'John Doe'], $names);
     }
@@ -194,7 +194,7 @@ final class IriFilterRelationsTest extends ApiTestCase
         $data = $response->toArray();
 
         $this->assertCount(3, $data['hydra:member'], 'Should find authors of book1 or book3');
-        $names = array_map(static fn ($m) => $m['name'], $data['hydra:member']);
+        $names = array_map(static fn (array $m) => $m['name'], $data['hydra:member']);
         sort($names);
         $this->assertEquals(['Jane Smith', 'John Doe', 'Mike Brown'], $names);
     }
@@ -233,7 +233,7 @@ final class IriFilterRelationsTest extends ApiTestCase
         $data = $response->toArray();
 
         $this->assertCount(2, $data['hydra:member'], 'Should find books whose publisher is in country1');
-        $titles = array_map(static fn ($m) => $m['title'], $data['hydra:member']);
+        $titles = array_map(static fn (array $m) => $m['title'], $data['hydra:member']);
         sort($titles);
         $this->assertEquals(['API Design', 'PHP Mastery'], $titles);
     }
@@ -260,7 +260,7 @@ final class IriFilterRelationsTest extends ApiTestCase
         $data = $response->toArray();
 
         $this->assertCount(2, $data['hydra:member'], 'Should find authors whose publisher is in country1');
-        $names = array_map(static fn ($m) => $m['name'], $data['hydra:member']);
+        $names = array_map(static fn (array $m) => $m['name'], $data['hydra:member']);
         sort($names);
         $this->assertEquals(['Jane Smith', 'John Doe'], $names);
     }
@@ -274,7 +274,7 @@ final class IriFilterRelationsTest extends ApiTestCase
         $data = $response->toArray();
 
         $this->assertCount(2, $data['hydra:member'], 'Should find books whose publisher is in country1');
-        $titles = array_map(static fn ($m) => $m['title'], $data['hydra:member']);
+        $titles = array_map(static fn (array $m) => $m['title'], $data['hydra:member']);
         sort($titles);
         $this->assertEquals(['API Design', 'PHP Mastery'], $titles);
     }
@@ -289,7 +289,7 @@ final class IriFilterRelationsTest extends ApiTestCase
         $data = $response->toArray();
 
         $this->assertCount(3, $data['hydra:member'], 'Should find authors whose publisher is in country1 or country2');
-        $names = array_map(static fn ($m) => $m['name'], $data['hydra:member']);
+        $names = array_map(static fn (array $m) => $m['name'], $data['hydra:member']);
         sort($names);
         $this->assertEquals(['Jane Smith', 'John Doe', 'Sarah Johnson'], $names);
     }
@@ -313,7 +313,7 @@ final class IriFilterRelationsTest extends ApiTestCase
         $data = $response->toArray();
 
         $this->assertCount(2, $data['hydra:member'], 'Should find authors who have books with publisher1');
-        $names = array_map(static fn ($m) => $m['name'], $data['hydra:member']);
+        $names = array_map(static fn (array $m) => $m['name'], $data['hydra:member']);
         sort($names);
         $this->assertEquals(['Jane Smith', 'John Doe'], $names);
     }
@@ -383,7 +383,7 @@ final class IriFilterRelationsTest extends ApiTestCase
         $response = self::createClient()->request('GET', '/authors');
         $data = $response->toArray();
 
-        $names = array_map(static fn ($m) => $m['name'], $data['hydra:member']);
+        $names = array_map(static fn (array $m) => $m['name'], $data['hydra:member']);
         $this->assertContains('Jane Smith', $names, 'Author without biography should be queryable');
     }
 
@@ -396,12 +396,12 @@ final class IriFilterRelationsTest extends ApiTestCase
         // Get books by author1
         $booksResponse = self::createClient()->request('GET', '/books?author=/authors/'.$author1->getId());
         $booksData = $booksResponse->toArray();
-        $bookIds = array_map(static fn ($m) => (int) basename($m['@id']), $booksData['hydra:member']);
+        $bookIds = array_map(static fn (array $m): int => (int) basename($m['@id']), $booksData['hydra:member']);
 
         // Get authors of book1
         $authorsResponse = self::createClient()->request('GET', '/authors?book=/books/'.$book1->getId());
         $authorsData = $authorsResponse->toArray();
-        $authorIds = array_map(static fn ($m) => (int) basename($m['@id']), $authorsData['hydra:member']);
+        $authorIds = array_map(static fn (array $m): int => (int) basename($m['@id']), $authorsData['hydra:member']);
 
         // Verify bidirectional consistency
         $this->assertContains($book1->getId(), $bookIds, 'Author1 should have book1');
@@ -418,7 +418,7 @@ final class IriFilterRelationsTest extends ApiTestCase
         $data = $response->toArray();
 
         $this->assertCount(3, $data['hydra:member'], 'Should find authors whose publisher is in country1 or country2');
-        $names = array_map(static fn ($m) => $m['name'], $data['hydra:member']);
+        $names = array_map(static fn (array $m) => $m['name'], $data['hydra:member']);
         sort($names);
         $this->assertEquals(['Jane Smith', 'John Doe', 'Sarah Johnson'], $names);
     }

@@ -89,7 +89,7 @@ final class Operations implements \IteratorAggregate, \Countable
 
     public function has(string $key): bool
     {
-        foreach ($this->operations as $i => [$operationName, $operation]) {
+        foreach ($this->operations as [$operationName, $operation]) {
             if ($operationName === $key) {
                 return true;
             }
@@ -105,7 +105,7 @@ final class Operations implements \IteratorAggregate, \Countable
 
     public function sort(): self
     {
-        usort($this->operations, static fn ($a, $b): int => $a[1]->getPriority() - $b[1]->getPriority());
+        usort($this->operations, static fn (array $a, array $b): int => $a[1]->getPriority() - $b[1]->getPriority());
 
         return $this;
     }

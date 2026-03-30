@@ -39,15 +39,14 @@ class Issue7338Reproducer
 {
     public function __construct(public ?int $id = null, public ?string $title = null)
     {
-        $this->id = $id;
     }
 
-    public static function provide(Operation $operation, array $uriVariables = [], array $context = [])
+    public static function provide(Operation $operation, array $uriVariables = [], array $context = []): Issue7338Output
     {
         return new Issue7338Output((int) $uriVariables['id'], 'Test Name', new \DateTimeImmutable());
     }
 
-    public static function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
+    public static function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): self
     {
         \assert(null === $data->description);
 

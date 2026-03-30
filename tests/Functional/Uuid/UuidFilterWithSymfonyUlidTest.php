@@ -73,7 +73,7 @@ class UuidFilterWithSymfonyUlidTest extends UuidFilterBaseTestCase
                     'format' => 'ulid',
                 ],
             ],
-            array_map(static fn ($p) => array_intersect_key($p, ['name' => 1, 'in' => 1, 'required' => 1, 'schema' => 1]), $json['paths']['/'.$this->getUrlPrefix().'_device_endpoints']['get']['parameters'])
+            array_map(static fn ($p): array => array_intersect_key($p, ['name' => 1, 'in' => 1, 'required' => 1, 'schema' => 1]), $json['paths']['/'.$this->getUrlPrefix().'_device_endpoints']['get']['parameters'])
         );
 
         self::assertContains(
@@ -91,7 +91,7 @@ class UuidFilterWithSymfonyUlidTest extends UuidFilterBaseTestCase
                 'style' => 'deepObject',
                 'explode' => true,
             ],
-            array_map(static fn ($p) => array_intersect_key($p, ['name' => 1, 'in' => 1, 'required' => 1, 'schema' => 1, 'style' => 1, 'explode' => 1]), $json['paths']['/'.$this->getUrlPrefix().'_device_endpoints']['get']['parameters'])
+            array_map(static fn ($p): array => array_intersect_key($p, ['name' => 1, 'in' => 1, 'required' => 1, 'schema' => 1, 'style' => 1, 'explode' => 1]), $json['paths']['/'.$this->getUrlPrefix().'_device_endpoints']['get']['parameters'])
         );
     }
 }

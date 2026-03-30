@@ -23,7 +23,7 @@ use Symfony\Component\JsonStreamer\JsonStreamWriter;
 use Symfony\Component\JsonStreamer\StreamerDumper;
 use Symfony\Component\JsonStreamer\Transformer\DateTimeValueObjectTransformer;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.jsonld.json_streamer.stream_writer', JsonStreamWriter::class)

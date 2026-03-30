@@ -42,7 +42,6 @@ final class GraphiQlAction
                 'assetPackage' => $this->assetPackage,
             ]), 200, ['content-type' => 'text/html']);
         }
-
         throw new BadRequestHttpException('GraphiQL is not enabled.');
     }
 }

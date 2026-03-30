@@ -69,10 +69,7 @@ class DummyValidation
         return $this->name;
     }
 
-    /**
-     * @param string|null $name
-     */
-    public function setName($name): self
+    public function setName(?string $name): self
     {
         $this->name = $name;
 
@@ -84,10 +81,7 @@ class DummyValidation
         return $this->title;
     }
 
-    /**
-     * @param string|null $title
-     */
-    public function setTitle($title): self
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
 
@@ -99,10 +93,7 @@ class DummyValidation
         return $this->code;
     }
 
-    /**
-     * @param string $code
-     */
-    public function setCode($code): self
+    public function setCode(?string $code): self
     {
         $this->code = $code;
 

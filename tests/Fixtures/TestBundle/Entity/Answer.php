@@ -67,10 +67,8 @@ class Answer
 
     /**
      * Set content.
-     *
-     * @param string $content
      */
-    public function setContent($content): self
+    public function setContent(?string $content): self
     {
         $this->content = $content;
 

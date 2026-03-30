@@ -36,8 +36,6 @@ class JsonSchemaContextDummy
     private $id;
 
     /**
-     * @var array
-     *
      * @ApiProperty(
      *     attributes={
      *         "json_schema_context"={
@@ -49,14 +47,14 @@ class JsonSchemaContextDummy
      *     },
      * )
      */
-    private $things = ['pool', 'bag'];
+    private array $things = ['pool', 'bag'];
 
     public function getId()
     {
         return $this->id;
     }
 
-    public function getThings()
+    public function getThings(): array
     {
         return $this->things;
     }

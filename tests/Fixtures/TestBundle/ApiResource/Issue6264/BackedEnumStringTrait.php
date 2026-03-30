@@ -20,7 +20,7 @@ trait BackedEnumStringTrait
 {
     public static function values(): array
     {
-        return array_map(static fn (\BackedEnum $feature) => $feature->value, self::cases());
+        return array_map(static fn (\BackedEnum $feature): string => $feature->value, self::cases());
     }
 
     public function getId(): string
@@ -44,6 +44,6 @@ trait BackedEnumStringTrait
      */
     public static function getCase(Operation $operation, array $uriVariables): ?self
     {
-        return array_reduce(self::cases(), static fn ($c, \BackedEnum $case) => $case->value == $uriVariables['id'] ? $case : $c, null);
+        return array_reduce(self::cases(), static fn ($c, \BackedEnum $case) => $case->value == $uriVariables['id'] ? $case : $c);
     }
 }

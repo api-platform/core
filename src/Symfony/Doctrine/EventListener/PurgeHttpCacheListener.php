@@ -228,7 +228,7 @@ final class PurgeHttpCacheListener
                 }
 
                 $resources = array_map(
-                    fn ($mapping) => $this->objectMapper->map($entity, $mapping->target),
+                    fn ($mapping): object => $this->objectMapper->map($entity, $mapping->target),
                     $mappings
                 );
             } else {
@@ -240,7 +240,7 @@ final class PurgeHttpCacheListener
 
                 // loop over all mappings to fetch all resources mapped to this entity
                 $resources = array_map(
-                    fn ($mapAttribute) => $this->objectMapper->map($entity, $mapAttribute->newInstance()->target),
+                    fn ($mapAttribute): object => $this->objectMapper->map($entity, $mapAttribute->newInstance()->target),
                     $mapAttributes
                 );
             }

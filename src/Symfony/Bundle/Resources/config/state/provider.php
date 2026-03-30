@@ -19,7 +19,7 @@ use ApiPlatform\State\Provider\ParameterProvider;
 use ApiPlatform\State\Provider\ReadProvider;
 use ApiPlatform\Symfony\EventListener\ErrorListener;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->alias('api_platform.state_provider.main', 'api_platform.state_provider.locator');

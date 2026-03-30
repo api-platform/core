@@ -33,7 +33,7 @@ class SlotsForDate
     public string $name = 'Morning Slot';
     public string $note = 'This is a morning slot';
 
-    public static function provide()
+    public static function provide(): array
     {
         return [];
     }

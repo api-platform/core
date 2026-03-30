@@ -101,7 +101,7 @@ class ClientTest extends ApiTestCase
     }
 
     #[DataProvider('authBasicProvider')]
-    public function testAuthBasic($basic): void
+    public function testAuthBasic(string|array $basic): void
     {
         $this->recreateSchema([SecuredDummy::class, RelatedDummy::class]);
         $client = self::createClient();

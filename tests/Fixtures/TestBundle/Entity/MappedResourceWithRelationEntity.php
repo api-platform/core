@@ -40,7 +40,7 @@ class MappedResourceWithRelationEntity
         return $this->id;
     }
 
-    public function setId(?int $id = null)
+    public function setId(?int $id = null): static
     {
         $this->id = $id;
 

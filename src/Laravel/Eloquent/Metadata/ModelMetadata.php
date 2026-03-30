@@ -30,12 +30,12 @@ final class ModelMetadata
     /**
      * @var array<class-string, array<string, mixed>>
      */
-    private $attributesLocalCache = [];
+    private array $attributesLocalCache = [];
 
     /**
      * @var array<class-string, array<string, mixed>>
      */
-    private $relationsLocalCache = [];
+    private array $relationsLocalCache = [];
 
     /**
      * The methods that can be called in a model to indicate a relation.
@@ -80,7 +80,7 @@ final class ModelMetadata
 
         // Only exclude BelongsTo foreign keys — those are local columns on this model's table.
         // HasMany/HasOne foreign keys reference the related table and should not be excluded.
-        $belongsToRelations = array_filter($relations, static fn ($r) => is_a($r['type'], BelongsTo::class, true));
+        $belongsToRelations = array_filter($relations, static fn (array $r): bool => is_a($r['type'], BelongsTo::class, true));
         $foreignKeys = array_flip(array_filter(array_column($belongsToRelations, 'foreign_key')));
         $attributes = [];
 
@@ -367,7 +367,7 @@ final class ModelMetadata
     private function columnIsUnique(string $column, array $indexes): bool
     {
         return collect($indexes)->contains(
-            static fn ($index) => 1 === \count($index['columns']) && $index['columns'][0] === $column && $index['unique']
+            static fn ($index): bool => 1 === \count($index['columns']) && $index['columns'][0] === $column && $index['unique']
         );
     }
 }

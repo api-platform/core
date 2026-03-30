@@ -45,7 +45,7 @@ class Query
         return $this;
     }
 
-    public function getParameters()
+    public function getParameters(): ArrayCollection
     {
         return new ArrayCollection();
     }
@@ -55,12 +55,12 @@ class Query
         return $this;
     }
 
-    public function getHints()
+    public function getHints(): array
     {
         return [];
     }
 
-    public function getFetchJoinCollection()
+    public function getFetchJoinCollection(): bool
     {
         return false;
     }

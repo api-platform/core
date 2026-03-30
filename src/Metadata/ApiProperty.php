@@ -376,10 +376,7 @@ final class ApiProperty
         return $this->deprecationReason;
     }
 
-    /**
-     * @param string $deprecationReason
-     */
-    public function withDeprecationReason($deprecationReason): static
+    public function withDeprecationReason(?string $deprecationReason): static
     {
         $self = clone $this;
         $self->deprecationReason = $deprecationReason;
@@ -392,10 +389,7 @@ final class ApiProperty
         return $this->fetchable;
     }
 
-    /**
-     * @param bool $fetchable
-     */
-    public function withFetchable($fetchable): static
+    public function withFetchable(?bool $fetchable): static
     {
         $self = clone $this;
         $self->fetchable = $fetchable;
@@ -408,10 +402,7 @@ final class ApiProperty
         return $this->fetchEager;
     }
 
-    /**
-     * @param bool $fetchEager
-     */
-    public function withFetchEager($fetchEager): static
+    public function withFetchEager(?bool $fetchEager): static
     {
         $self = clone $this;
         $self->fetchEager = $fetchEager;
@@ -424,10 +415,7 @@ final class ApiProperty
         return $this->jsonldContext;
     }
 
-    /**
-     * @param array $jsonldContext
-     */
-    public function withJsonldContext($jsonldContext): static
+    public function withJsonldContext(?array $jsonldContext): static
     {
         $self = clone $this;
         $self->jsonldContext = $jsonldContext;
@@ -440,10 +428,7 @@ final class ApiProperty
         return $this->openapiContext;
     }
 
-    /**
-     * @param array $openapiContext
-     */
-    public function withOpenapiContext($openapiContext): static
+    public function withOpenapiContext(?array $openapiContext): static
     {
         $self = clone $this;
         $self->openapiContext = $openapiContext;
@@ -456,10 +441,7 @@ final class ApiProperty
         return $this->jsonSchemaContext;
     }
 
-    /**
-     * @param array $jsonSchemaContext
-     */
-    public function withJsonSchemaContext($jsonSchemaContext): static
+    public function withJsonSchemaContext(?array $jsonSchemaContext): static
     {
         $self = clone $this;
         $self->jsonSchemaContext = $jsonSchemaContext;
@@ -472,10 +454,7 @@ final class ApiProperty
         return $this->push;
     }
 
-    /**
-     * @param bool $push
-     */
-    public function withPush($push): static
+    public function withPush(?bool $push): static
     {
         $self = clone $this;
         $self->push = $push;

@@ -70,8 +70,7 @@ class MainControllerTest extends TestCase
         $processor = $this->createMock(ProcessorInterface::class);
         $controller = new MainController($resourceMetadataFactory, $provider, $processor);
 
-        $body = new \stdClass();
-        $response = new Response();
+        new Response();
         $request = new Request();
         $request->attributes->set('_api_operation', new Get(uriVariables: ['id' => new Link()]));
 
@@ -142,7 +141,7 @@ class MainControllerTest extends TestCase
 
         $provider->expects($this->once())
             ->method('provide')
-            ->willReturnCallback(static function () use ($request) {
+            ->willReturnCallback(static function () use ($request): \stdClass {
                 $request->attributes->set('_api_operation', new Error(uriVariables: ['status' => new Link()]));
                 $request->attributes->remove('id');
 

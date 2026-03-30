@@ -15,7 +15,6 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource;
 
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\JsonLd\ContextBuilder;
-use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Tests\Fixtures\TestBundle\Dto\MappedResouceInput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MappedEntity;
@@ -35,7 +34,7 @@ final class MappedResourceWithInput
     public ?string $id = null;
     public string $username;
 
-    public static function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
+    public static function process(mixed $data): self
     {
         $s = new self();
         $s->id = $data->id;

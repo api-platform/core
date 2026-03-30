@@ -32,7 +32,7 @@ final class ListenerTest extends ApiTestCase
         ];
     }
 
-    public function testListener()
+    public function testListener(): void
     {
         self::createClient()->request('PATCH', '/original_data_with_listeners/123/verify', [
             'headers' => ['content-type' => 'application/merge-patch+json'],

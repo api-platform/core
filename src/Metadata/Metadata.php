@@ -167,10 +167,7 @@ abstract class Metadata
         return $this->deprecationReason;
     }
 
-    /**
-     * @param string $deprecationReason
-     */
-    public function withDeprecationReason($deprecationReason): static
+    public function withDeprecationReason(?string $deprecationReason): static
     {
         $self = clone $this;
         $self->deprecationReason = $deprecationReason;

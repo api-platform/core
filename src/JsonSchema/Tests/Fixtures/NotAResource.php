@@ -47,7 +47,7 @@ class NotAResource
     /**
      * @return array<GenericChild<object>>
      */
-    public function getItems()
+    public function getItems(): array
     {
         return $this->items;
     }

@@ -60,7 +60,7 @@ class ProviderResourceMetadatatCollectionFactory implements ResourceMetadataColl
         return $resourceMetadataCollection;
     }
 
-    private function setProvider(ResourceMetadataCollection $resourceMetadataCollection, string $provider)
+    private function setProvider(ResourceMetadataCollection $resourceMetadataCollection, string $provider): ResourceMetadataCollection
     {
         foreach ($resourceMetadataCollection as $i => $resourceMetadata) {
             $operations = $resourceMetadata->getOperations();

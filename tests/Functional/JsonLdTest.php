@@ -238,14 +238,14 @@ class JsonLdTest extends ApiTestCase
         }
 
         // Test the second declared ApiResource (shortName: 'MultiResource')
-        $response = self::createClient()->request('GET', '/multi_resources');
+        self::createClient()->request('GET', '/multi_resources');
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains([
             '@context' => '/contexts/MultiResource',
         ]);
 
         // Test the first declared ApiResource (shortName: 'AdminMultiResource')
-        $response = self::createClient()->request('GET', '/admin/multi_resources');
+        self::createClient()->request('GET', '/admin/multi_resources');
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains([
             '@context' => '/contexts/AdminMultiResource',

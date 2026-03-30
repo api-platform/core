@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Symfony\Component\Routing\Loader\Configurator;
 
-return static function (RoutingConfigurator $routes) {
+return static function (RoutingConfigurator $routes): void {
     $routes->add('api_entrypoint', '/{index}.{_format}')
         ->controller('api_platform.action.entrypoint')
         ->methods(['GET', 'HEAD'])

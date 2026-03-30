@@ -53,7 +53,7 @@ final class ComparisonFilterTest extends ApiTestCase
         // gt "Bravo": names > "Bravo" alphabetically → Charlie, Delta
         $response = self::createClient()->request('GET', '/chickens?nameComparison[gt]=Bravo');
         $this->assertResponseIsSuccessful();
-        $names = array_map(static fn ($c) => $c['name'], $response->toArray()['member']);
+        $names = array_map(static fn (array $c) => $c['name'], $response->toArray()['member']);
         sort($names);
         $this->assertSame(['Charlie', 'Delta'], $names);
     }
@@ -63,7 +63,7 @@ final class ComparisonFilterTest extends ApiTestCase
         // gte "Bravo": names >= "Bravo" → Bravo, Charlie, Delta
         $response = self::createClient()->request('GET', '/chickens?nameComparison[gte]=Bravo');
         $this->assertResponseIsSuccessful();
-        $names = array_map(static fn ($c) => $c['name'], $response->toArray()['member']);
+        $names = array_map(static fn (array $c) => $c['name'], $response->toArray()['member']);
         sort($names);
         $this->assertSame(['Bravo', 'Charlie', 'Delta'], $names);
     }
@@ -73,7 +73,7 @@ final class ComparisonFilterTest extends ApiTestCase
         // lt "Charlie": names < "Charlie" → Alpha, Bravo
         $response = self::createClient()->request('GET', '/chickens?nameComparison[lt]=Charlie');
         $this->assertResponseIsSuccessful();
-        $names = array_map(static fn ($c) => $c['name'], $response->toArray()['member']);
+        $names = array_map(static fn (array $c) => $c['name'], $response->toArray()['member']);
         sort($names);
         $this->assertSame(['Alpha', 'Bravo'], $names);
     }
@@ -83,7 +83,7 @@ final class ComparisonFilterTest extends ApiTestCase
         // lte "Charlie": names <= "Charlie" → Alpha, Bravo, Charlie
         $response = self::createClient()->request('GET', '/chickens?nameComparison[lte]=Charlie');
         $this->assertResponseIsSuccessful();
-        $names = array_map(static fn ($c) => $c['name'], $response->toArray()['member']);
+        $names = array_map(static fn (array $c) => $c['name'], $response->toArray()['member']);
         sort($names);
         $this->assertSame(['Alpha', 'Bravo', 'Charlie'], $names);
     }
@@ -93,7 +93,7 @@ final class ComparisonFilterTest extends ApiTestCase
         // gt "Alpha" AND lt "Delta" → Bravo, Charlie
         $response = self::createClient()->request('GET', '/chickens?nameComparison[gt]=Alpha&nameComparison[lt]=Delta');
         $this->assertResponseIsSuccessful();
-        $names = array_map(static fn ($c) => $c['name'], $response->toArray()['member']);
+        $names = array_map(static fn (array $c) => $c['name'], $response->toArray()['member']);
         sort($names);
         $this->assertSame(['Bravo', 'Charlie'], $names);
     }
@@ -103,7 +103,7 @@ final class ComparisonFilterTest extends ApiTestCase
         // ne "Bravo": all names except "Bravo" → Alpha, Charlie, Delta
         $response = self::createClient()->request('GET', '/chickens?nameComparison[ne]=Bravo');
         $this->assertResponseIsSuccessful();
-        $names = array_map(static fn ($c) => $c['name'], $response->toArray()['member']);
+        $names = array_map(static fn (array $c) => $c['name'], $response->toArray()['member']);
         sort($names);
         $this->assertSame(['Alpha', 'Charlie', 'Delta'], $names);
     }
@@ -147,7 +147,7 @@ final class ComparisonFilterTest extends ApiTestCase
             $this->assertContains($expectedName, $parameterNames, \sprintf('Expected parameter "%s" in OpenAPI documentation', $expectedName));
         }
 
-        $comparisonParams = array_filter($parameters, static fn ($p) => str_starts_with($p['name'], 'nameComparison['));
+        $comparisonParams = array_filter($parameters, static fn (array $p): bool => str_starts_with($p['name'], 'nameComparison['));
         foreach ($comparisonParams as $param) {
             $this->assertSame('query', $param['in']);
         }

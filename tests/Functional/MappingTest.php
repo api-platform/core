@@ -96,10 +96,10 @@ final class MappingTest extends ApiTestCase
         self::createClient()->request('GET', $uri);
         $this->assertJsonContains(['username' => 'so yuka']);
 
-        $r = self::createClient()->request('PATCH', $uri, ['json' => ['username' => 'ba zar'], 'headers' => ['content-type' => 'application/merge-patch+json']]);
+        self::createClient()->request('PATCH', $uri, ['json' => ['username' => 'ba zar'], 'headers' => ['content-type' => 'application/merge-patch+json']]);
         $this->assertJsonContains(['username' => 'ba zar']);
 
-        $r = self::createClient()->request('DELETE', $uri);
+        self::createClient()->request('DELETE', $uri);
         $this->assertResponseStatusCodeSame(204);
     }
 
@@ -209,7 +209,7 @@ final class MappingTest extends ApiTestCase
 
         $this->recreateSchema([MappedEntity::class]);
         $this->loadFixtures();
-        $r = self::createClient()->request('POST', 'mapped_resource_with_input', [
+        self::createClient()->request('POST', 'mapped_resource_with_input', [
             'headers' => [
                 'content-type' => 'application/ld+json',
             ],
@@ -261,7 +261,7 @@ final class MappingTest extends ApiTestCase
         self::createClient()->request('GET', $uri);
         $this->assertJsonContains(['username' => 'so yuka']);
 
-        $r = self::createClient()->request('PATCH', $uri, ['json' => ['username' => 'ba zar'], 'headers' => ['content-type' => 'application/merge-patch+json']]);
+        self::createClient()->request('PATCH', $uri, ['json' => ['username' => 'ba zar'], 'headers' => ['content-type' => 'application/merge-patch+json']]);
         $this->assertJsonContains(['username' => 'ba zar']);
     }
 
@@ -467,7 +467,7 @@ final class MappingTest extends ApiTestCase
         }
 
         // Test Get (single item) returns all fields from the full resource
-        $response = self::createClient()->request('GET', '/book_store_resources/1');
+        self::createClient()->request('GET', '/book_store_resources/1');
         self::assertResponseIsSuccessful();
         self::assertJsonContains([
             'id' => 1,

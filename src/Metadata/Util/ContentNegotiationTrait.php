@@ -94,7 +94,6 @@ trait ContentNegotiationTrait
         }
 
         // First, try to guess the format from the Accept header
-        /** @var string|null $accept */
         $accept = $request->headers->get('Accept');
         if (null !== $accept) {
             if ($mediaType = $this->negotiator->getBest($accept, $mimeTypes)) {

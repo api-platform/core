@@ -19,7 +19,7 @@ use ApiPlatform\Mcp\Metadata\Operation\Factory\OperationMetadataFactory;
 use ApiPlatform\Mcp\Routing\IriConverter;
 use ApiPlatform\Mcp\State\ToolProvider;
 
-return static function (ContainerConfigurator $container) {
+return static function (ContainerConfigurator $container): void {
     $services = $container->services();
 
     $services->set('api_platform.mcp.json_schema.schema_factory', SchemaFactory::class)

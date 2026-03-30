@@ -28,7 +28,7 @@ final class ToolProvider implements ProviderInterface
     {
     }
 
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?object
     {
         if (!isset($context['mcp_request'])) {
             return null;

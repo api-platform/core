@@ -108,7 +108,7 @@ class PartialCollectionViewNormalizerTest extends TestCase
         );
     }
 
-    private function normalizePaginator(bool $partial = false, bool $cursor = false)
+    private function normalizePaginator(bool $partial = false, bool $cursor = false): string|int|float|bool|\ArrayObject|array|null
     {
         $paginatorProphecy = $this->prophesize($partial ? PartialPaginatorInterface::class : PaginatorInterface::class);
 

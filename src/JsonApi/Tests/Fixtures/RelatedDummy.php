@@ -52,10 +52,6 @@ class RelatedDummy implements \Stringable
     #[Groups(['friends'])]
     public ?bool $dummyBoolean = null;
 
-    public function __construct()
-    {
-    }
-
     public function getId()
     {
         return $this->id;
@@ -101,10 +97,7 @@ class RelatedDummy implements \Stringable
         return $this->dummyBoolean;
     }
 
-    /**
-     * @param bool $dummyBoolean
-     */
-    public function setDummyBoolean($dummyBoolean): void
+    public function setDummyBoolean(?bool $dummyBoolean): void
     {
         $this->dummyBoolean = $dummyBoolean;
     }

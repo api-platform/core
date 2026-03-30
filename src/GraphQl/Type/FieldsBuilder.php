@@ -331,7 +331,6 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
             $type = $this->getParameterType($type);
             if (\is_array($l = $field['leafs'])) {
                 if (0 === key($l)) {
-                    $key = $key;
                     $type = GraphQLType::listOf($type);
                 } else {
                     $n = [];
@@ -406,7 +405,7 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
         }
 
         try {
-            $isCollectionType = $type->isSatisfiedBy(static fn ($t) => $t instanceof CollectionType) && ($v = TypeHelper::getCollectionValueType($type)) && TypeHelper::getClassName($v);
+            $isCollectionType = $type->isSatisfiedBy(static fn ($t): bool => $t instanceof CollectionType) && ($v = TypeHelper::getCollectionValueType($type)) && TypeHelper::getClassName($v);
 
             $valueType = $type;
             if ($isCollectionType) {
@@ -657,7 +656,7 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
             if (\is_array($value)) {
                 $value = $this->mergeFilterArgs($args[$key] ?? [], $value);
                 if (!isset($value['#name'])) {
-                    $name = (false === $pos = strrpos($original, '[')) ? $original : substr($original, 0, (int) $pos);
+                    $name = (false === $pos = strrpos($original, '[')) ? $original : substr($original, 0, $pos);
                     $value['#name'] = ($operation ? $operation->getShortName() : '').'Filter_'.strtr($name, ['[' => '_', ']' => '', '.' => '__']);
                 }
             }
@@ -730,7 +729,7 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
             $graphqlType = $this->typesContainer->get($graphqlType);
         }
 
-        if ($type->isSatisfiedBy(static fn ($t) => $t instanceof CollectionType) && ($collectionValueType = TypeHelper::getCollectionValueType($type)) && TypeHelper::getClassName($collectionValueType)) {
+        if ($type->isSatisfiedBy(static fn ($t): bool => $t instanceof CollectionType) && ($collectionValueType = TypeHelper::getCollectionValueType($type)) && TypeHelper::getClassName($collectionValueType)) {
             if (!$input && !$this->isEnumClass($resourceClass) && $this->pagination->isGraphQlEnabled($resourceOperation)) {
                 return $this->typeBuilder->getPaginatedCollectionType($graphqlType, $resourceOperation);
             }

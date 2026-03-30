@@ -42,7 +42,7 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
     }
 
     #[DataProvider('groupsProvider')]
-    public function testCreateWithGroups($readGroups, $writeGroups): void
+    public function testCreateWithGroups(string|array $readGroups, string|array $writeGroups): void
     {
         $serializerClassMetadataFactoryProphecy = $this->prophesize(SerializerClassMetadataFactoryInterface::class);
         $dummySerializerClassMetadata = new SerializerClassMetadata(Dummy::class);
@@ -120,7 +120,7 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
     }
 
     #[DataProvider('attributesProvider')]
-    public function testCreateWithAttributes($readAttributes, $writeAttributes): void
+    public function testCreateWithAttributes(array $readAttributes, array $writeAttributes): void
     {
         $serializerClassMetadataFactoryProphecy = $this->prophesize(SerializerClassMetadataFactoryInterface::class);
         $dummySerializerClassMetadata = new SerializerClassMetadata(Dummy::class);

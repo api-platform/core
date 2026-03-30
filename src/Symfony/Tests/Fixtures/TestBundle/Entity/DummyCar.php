@@ -52,10 +52,6 @@ class DummyCar
     #[ORM\Column]
     private string $brand = 'DummyBrand';
 
-    public function __construct()
-    {
-    }
-
     /**
      * Get name.
      */

@@ -137,7 +137,7 @@ final class TypeBuilder implements ContextAwareTypeBuilderInterface
                     'description' => 'The id of this node.',
                 ],
             ],
-            'resolveType' => function ($value): ?GraphQLType {
+            'resolveType' => function (array $value): ?GraphQLType {
                 if (!isset($value[ItemNormalizer::ITEM_RESOURCE_CLASS_KEY])) {
                     return null;
                 }
@@ -204,7 +204,6 @@ final class TypeBuilder implements ContextAwareTypeBuilderInterface
 
         /** @var FieldsBuilderEnumInterface $fieldsBuilder */
         $fieldsBuilder = $this->fieldsBuilderLocator->get('api_platform.graphql.fields_builder');
-        $enumCases = [];
         $enumCases = $fieldsBuilder->getEnumFields($operation->getClass());
 
         $enumConfig = [

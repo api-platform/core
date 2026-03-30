@@ -20,7 +20,7 @@ trait WithResourcesTrait
      */
     protected static function writeResources(array $resources): void
     {
-        file_put_contents(__DIR__.'/Fixtures/app/var/resources.php', \sprintf('<?php return [%s];', implode(',', array_map(static fn ($v) => $v.'::class', $resources))));
+        file_put_contents(__DIR__.'/Fixtures/app/var/resources.php', \sprintf('<?php return [%s];', implode(',', array_map(static fn (string $v): string => $v.'::class', $resources))));
     }
 
     protected static function removeResources(): void

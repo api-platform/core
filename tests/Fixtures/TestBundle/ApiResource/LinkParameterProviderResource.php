@@ -38,7 +38,7 @@ class LinkParameterProviderResource
     /**
      * @param HttpOperation $operation
      */
-    public static function provide(Operation $operation, array $uriVariables = [])
+    public static function provide(Operation $operation, array $uriVariables = []): self
     {
         $d = new self();
         $d->id = '1';

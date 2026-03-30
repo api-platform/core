@@ -1099,10 +1099,7 @@ class ApiResource extends Metadata
         return $self;
     }
 
-    /**
-     * @return array|mixed|string|null
-     */
-    public function getFormats()
+    public function getFormats(): string|array|null
     {
         return $this->formats;
     }
@@ -1115,18 +1112,12 @@ class ApiResource extends Metadata
         return $self;
     }
 
-    /**
-     * @return array|mixed|string|null
-     */
-    public function getInputFormats()
+    public function getInputFormats(): string|array|null
     {
         return $this->inputFormats;
     }
 
-    /**
-     * @param mixed|null $inputFormats
-     */
-    public function withInputFormats($inputFormats): static
+    public function withInputFormats(string|array|null $inputFormats): static
     {
         $self = clone $this;
         $self->inputFormats = $inputFormats;
@@ -1134,18 +1125,12 @@ class ApiResource extends Metadata
         return $self;
     }
 
-    /**
-     * @return array|mixed|string|null
-     */
-    public function getOutputFormats()
+    public function getOutputFormats(): string|array|null
     {
         return $this->outputFormats;
     }
 
-    /**
-     * @param mixed|null $outputFormats
-     */
-    public function withOutputFormats($outputFormats): static
+    public function withOutputFormats(string|array|null $outputFormats): static
     {
         $self = clone $this;
         $self->outputFormats = $outputFormats;
@@ -1268,10 +1253,7 @@ class ApiResource extends Metadata
         return $this->status;
     }
 
-    /**
-     * @param int $status
-     */
-    public function withStatus($status): static
+    public function withStatus(?int $status): static
     {
         $self = clone $this;
         $self->status = $status;

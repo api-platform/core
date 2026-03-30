@@ -42,7 +42,7 @@ final class AttributeFilterPass implements CompilerPassInterface
     {
         $resourceClassDirectories = $container->getParameter('api_platform.resource_class_directories');
 
-        foreach (ReflectionClassRecursiveIterator::getReflectionClassesFromDirectories($resourceClassDirectories) as $className => $reflectionClass) {
+        foreach (ReflectionClassRecursiveIterator::getReflectionClassesFromDirectories($resourceClassDirectories) as $reflectionClass) {
             $this->createFilterDefinitions($reflectionClass, $container);
         }
     }

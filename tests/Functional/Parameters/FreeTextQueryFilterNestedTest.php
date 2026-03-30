@@ -45,19 +45,19 @@ final class FreeTextQueryFilterNestedTest extends ApiTestCase
         $client = $this->createClient();
 
         // Should match article1 by root content
-        $response = $client->request('GET', '/free_text_articles?search=root-match')->toArray();
+        $client->request('GET', '/free_text_articles?search=root-match')->toArray();
         $this->assertJsonContains(['totalItems' => 1]);
 
         // Should match article2 by tag.content
-        $response = $client->request('GET', '/free_text_articles?search=tag-match')->toArray();
+        $client->request('GET', '/free_text_articles?search=tag-match')->toArray();
         $this->assertJsonContains(['totalItems' => 1]);
 
         // Should match both articles (article1 root content contains "shared", article3 tag content contains "shared")
-        $response = $client->request('GET', '/free_text_articles?search=shared')->toArray();
+        $client->request('GET', '/free_text_articles?search=shared')->toArray();
         $this->assertJsonContains(['totalItems' => 2]);
 
         // Should match nothing
-        $response = $client->request('GET', '/free_text_articles?search=nonexistent')->toArray();
+        $client->request('GET', '/free_text_articles?search=nonexistent')->toArray();
         $this->assertJsonContains(['totalItems' => 0]);
     }
 
