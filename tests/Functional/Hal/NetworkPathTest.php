@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Hal;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Hal\NetworkPathParent;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Hal\NetworkPathResource;
 use ApiPlatform\Tests\SetupClassResourcesTrait;

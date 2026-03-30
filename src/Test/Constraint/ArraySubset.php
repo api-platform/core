@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Symfony\Bundle\Test\Constraint;
+namespace ApiPlatform\Test\Constraint;
 
 use PHPUnit\Framework\Constraint\Constraint;
 

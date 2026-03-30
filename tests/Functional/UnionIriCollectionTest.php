@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\UnionIriCollection\Bar;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\UnionIriCollection\Container;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\UnionIriCollection\Foo;

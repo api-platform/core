@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ProcessorEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ProviderEntity;
 use ApiPlatform\Tests\RecreateSchemaTrait;

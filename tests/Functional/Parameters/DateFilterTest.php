@@ -15,7 +15,7 @@ namespace ApiPlatform\Tests\Functional\Parameters;
 
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\FilteredDateParameter as FilteredDateParameterDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilteredDateParameter;
 use ApiPlatform\Tests\RecreateSchemaTrait;

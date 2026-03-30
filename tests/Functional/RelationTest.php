@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Address;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Customer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
