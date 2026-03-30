@@ -110,12 +110,6 @@ final class DocumentationNormalizer implements NormalizerInterface
                 'owl:maxCardinality' => 1,
                 'range' => [
                     ['@id' => 'hydra:Collection'],
-                    [
-                        'owl:equivalentClass' => [
-                            'owl:onProperty' => ['@id' => 'hydra:member'],
-                            'owl:allValuesFrom' => ['@id' => $prefixedShortName],
-                        ],
-                    ],
                 ],
                 $hydraPrefix.'supportedOperation' => $hydraCollectionOperations,
             ],
@@ -123,6 +117,10 @@ final class DocumentationNormalizer implements NormalizerInterface
             $hydraPrefix.'description' => "The collection of $shortName resources",
             $hydraPrefix.'readable' => true,
             $hydraPrefix.'writeable' => false,
+            $hydraPrefix.'manages' => [
+                $hydraPrefix.'property' => 'hydra:member',
+                $hydraPrefix.'object' => \sprintf('#%s', $shortName),
+            ],
         ];
 
         if ($resourceMetadata->getDeprecationReason()) {

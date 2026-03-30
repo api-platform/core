@@ -335,12 +335,6 @@ class DocumentationNormalizerTest extends TestCase
                                 'domain' => '#Entrypoint',
                                 'range' => [
                                     ['@id' => 'hydra:Collection'],
-                                    [
-                                        'owl:equivalentClass' => [
-                                            'owl:onProperty' => ['@id' => 'hydra:member'],
-                                            'owl:allValuesFrom' => ['@id' => '#dummy'],
-                                        ],
-                                    ],
                                 ],
                                 'owl:maxCardinality' => 1,
                                 'hydra:supportedOperation' => [
@@ -365,6 +359,10 @@ class DocumentationNormalizerTest extends TestCase
                             'hydra:description' => 'The collection of dummy resources',
                             'hydra:readable' => true,
                             'hydra:writeable' => false,
+                            'hydra:manages' => [
+                                'hydra:property' => 'hydra:member',
+                                'hydra:object' => '#dummy',
+                            ],
                         ],
                     ],
                     'hydra:supportedOperation' => [
@@ -900,12 +898,6 @@ class DocumentationNormalizerTest extends TestCase
                                 'domain' => '#Entrypoint',
                                 'range' => [
                                     ['@id' => 'hydra:Collection'],
-                                    [
-                                        'owl:equivalentClass' => [
-                                            'owl:onProperty' => ['@id' => 'hydra:member'],
-                                            'owl:allValuesFrom' => ['@id' => '#dummy'],
-                                        ],
-                                    ],
                                 ],
                                 'owl:maxCardinality' => 1,
                                 'supportedOperation' => [
@@ -930,6 +922,10 @@ class DocumentationNormalizerTest extends TestCase
                             'description' => 'The collection of dummy resources',
                             'readable' => true,
                             'writeable' => false,
+                            'manages' => [
+                                'property' => 'hydra:member',
+                                'object' => '#dummy',
+                            ],
                         ],
                     ],
                     'supportedOperation' => [
@@ -1169,5 +1165,57 @@ class DocumentationNormalizerTest extends TestCase
         ];
 
         $this->assertEquals($expected, $documentationNormalizer->normalize($documentation, null, [ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX => false]));
+    }
+
+    public function testManagesBlock(): void
+    {
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create('dummy')->shouldBeCalled()->willReturn(new ResourceMetadataCollection('dummy', [
+            (new ApiResource())->withShortName('dummy')->withDescription('dummy')->withTypes(['#dummy'])->withOperations(new Operations([
+                'get' => (new Get())->withTypes(['#dummy'])->withShortName('dummy'),
+                'get_collection' => (new GetCollection())->withShortName('dummy'),
+                'post' => (new Post())->withShortName('dummy'),
+            ])),
+        ]));
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create('dummy', Argument::type('array'))->willReturn(new PropertyNameCollection([]));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+
+        $urlGenerator = $this->prophesize(UrlGeneratorInterface::class);
+        $urlGenerator->generate('api_entrypoint')->willReturn('/');
+        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'])->willReturn('/doc');
+        $urlGenerator->generate('api_doc', ['_format' => 'jsonld'], 0)->willReturn('/doc');
+
+        $documentationNormalizer = new DocumentationNormalizer(
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $urlGenerator->reveal()
+        );
+
+        $documentation = new Documentation(new ResourceNameCollection(['dummy' => 'dummy']), 'Test Api', 'test', '1.0.0');
+        $normalized = $documentationNormalizer->normalize($documentation);
+
+        $entrypointClass = array_filter($normalized['hydra:supportedClass'], static fn ($class) => '#Entrypoint' === $class['@id']);
+        $this->assertNotEmpty($entrypointClass, 'Entrypoint class should exist');
+
+        $entrypointClass = reset($entrypointClass);
+        $dummyProperty = array_filter($entrypointClass['hydra:supportedProperty'], static fn ($prop) => str_contains($prop['hydra:property']['@id'] ?? '', 'Entrypoint/dummy'));
+        $this->assertNotEmpty($dummyProperty, 'Entrypoint property for dummy should exist');
+
+        $dummyProperty = reset($dummyProperty);
+
+        $this->assertArrayHasKey('hydra:manages', $dummyProperty, 'The entrypoint property should have a manages block');
+
+        $manages = $dummyProperty['hydra:manages'];
+        $this->assertIsArray($manages, 'The manages block should be an array');
+        $this->assertArrayHasKey('hydra:property', $manages, 'The manages block should have a property');
+        $this->assertArrayHasKey('hydra:object', $manages, 'The manages block should have an object');
+        $this->assertSame('#dummy', $manages['hydra:object'], 'The object should be #dummy');
+        $this->assertSame('hydra:member', $manages['hydra:property'], 'The property should be hydra:member');
     }
 }
