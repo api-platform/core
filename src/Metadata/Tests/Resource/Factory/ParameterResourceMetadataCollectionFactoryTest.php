@@ -17,9 +17,13 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\FilterInterface;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\HeaderParameter;
 use ApiPlatform\Metadata\Parameters;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
@@ -305,20 +309,42 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         );
 
         $resourceMetadataCollection = $parameterFactory->create(ParameterOnProperties::class);
-        $operation = $resourceMetadataCollection->getOperation(forceCollection: true);
-        $parameters = $operation->getParameters();
+        $operations = array_values(iterator_to_array($resourceMetadataCollection[0]->getOperations()));
 
-        $this->assertInstanceOf(Parameters::class, $parameters);
+        $this->assertCount(5, $operations);
 
-        $this->assertTrue($parameters->has('search'));
-        $searchParam = $parameters->get('search', QueryParameter::class);
+        $getOperation = $operations[0];
+        $this->assertInstanceOf(Get::class, $getOperation);
+        $this->assertTrue($getOperation->getParameters()->has('search'));
+        $this->assertTrue($getOperation->getParameters()->has('filter_active'));
+
+        $collectionOperation = $operations[1];
+        $this->assertInstanceOf(GetCollection::class, $collectionOperation);
+        $this->assertTrue($collectionOperation->getParameters()->has('search'));
+        $this->assertTrue($collectionOperation->getParameters()->has('filter_active'));
+
+        $postOperation = $operations[2];
+        $this->assertInstanceOf(Post::class, $postOperation);
+        $this->assertTrue($postOperation->getParameters()->has('search'));
+        $this->assertTrue($postOperation->getParameters()->has('filter_active'));
+
+        $patchOperation = $operations[3];
+        $this->assertInstanceOf(Patch::class, $patchOperation);
+        $this->assertTrue($patchOperation->getParameters()->has('search'));
+        $this->assertTrue($patchOperation->getParameters()->has('filter_active'));
+
+        $deleteOperation = $operations[4];
+        $this->assertInstanceOf(Delete::class, $deleteOperation);
+        $this->assertTrue($deleteOperation->getParameters()->has('search'));
+        $this->assertTrue($deleteOperation->getParameters()->has('filter_active'));
+
+        $searchParam = $collectionOperation->getParameters()->get('search', QueryParameter::class);
         $this->assertInstanceOf(QueryParameter::class, $searchParam);
         $this->assertSame('search', $searchParam->getKey());
         $this->assertSame('name', $searchParam->getProperty());
         $this->assertSame('Search by name', $searchParam->getDescription());
 
-        $this->assertTrue($parameters->has('filter_active'));
-        $filterParam = $parameters->get('filter_active', QueryParameter::class);
+        $filterParam = $collectionOperation->getParameters()->get('filter_active', QueryParameter::class);
         $this->assertInstanceOf(QueryParameter::class, $filterParam);
         $this->assertSame('filter_active', $filterParam->getKey());
         $this->assertSame('isActive', $filterParam->getProperty());
@@ -424,13 +450,31 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         );
 
         $resourceMetadataCollection = $parameterFactory->create(ParameterOnPropertiesSingleCorrectProperty::class);
-        $operation = $resourceMetadataCollection->getOperation(forceCollection: true);
-        $parameters = $operation->getParameters();
+        $operations = array_values(iterator_to_array($resourceMetadataCollection[0]->getOperations()));
 
-        $this->assertInstanceOf(Parameters::class, $parameters);
+        $this->assertCount(5, $operations);
 
-        $this->assertTrue($parameters->has('search'));
-        $searchParam = $parameters->get('search', QueryParameter::class);
+        $getOperation = $operations[0];
+        $this->assertInstanceOf(Get::class, $getOperation);
+        $this->assertTrue($getOperation->getParameters()->has('search'));
+
+        $collectionOperation = $operations[1];
+        $this->assertInstanceOf(GetCollection::class, $collectionOperation);
+        $this->assertTrue($collectionOperation->getParameters()->has('search'));
+
+        $postOperation = $operations[2];
+        $this->assertInstanceOf(Post::class, $postOperation);
+        $this->assertTrue($postOperation->getParameters()->has('search'));
+
+        $patchOperation = $operations[3];
+        $this->assertInstanceOf(Patch::class, $patchOperation);
+        $this->assertTrue($patchOperation->getParameters()->has('search'));
+
+        $deleteOperation = $operations[4];
+        $this->assertInstanceOf(Delete::class, $deleteOperation);
+        $this->assertTrue($deleteOperation->getParameters()->has('search'));
+
+        $searchParam = $collectionOperation->getParameters()->get('search', QueryParameter::class);
         $this->assertInstanceOf(QueryParameter::class, $searchParam);
         $this->assertSame('search', $searchParam->getKey());
         $this->assertSame('name', $searchParam->getProperty());
@@ -458,13 +502,31 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         );
 
         $resourceMetadataCollection = $parameterFactory->create(ParameterOnPropertiesMultiplePropertiesIncludingSelf::class);
-        $operation = $resourceMetadataCollection->getOperation(forceCollection: true);
-        $parameters = $operation->getParameters();
+        $operations = array_values(iterator_to_array($resourceMetadataCollection[0]->getOperations()));
 
-        $this->assertInstanceOf(Parameters::class, $parameters);
+        $this->assertCount(5, $operations);
 
-        $this->assertTrue($parameters->has('search'));
-        $searchParam = $parameters->get('search', QueryParameter::class);
+        $getOperation = $operations[0];
+        $this->assertInstanceOf(Get::class, $getOperation);
+        $this->assertTrue($getOperation->getParameters()->has('search'));
+
+        $collectionOperation = $operations[1];
+        $this->assertInstanceOf(GetCollection::class, $collectionOperation);
+        $this->assertTrue($collectionOperation->getParameters()->has('search'));
+
+        $postOperation = $operations[2];
+        $this->assertInstanceOf(Post::class, $postOperation);
+        $this->assertTrue($postOperation->getParameters()->has('search'));
+
+        $patchOperation = $operations[3];
+        $this->assertInstanceOf(Patch::class, $patchOperation);
+        $this->assertTrue($patchOperation->getParameters()->has('search'));
+
+        $deleteOperation = $operations[4];
+        $this->assertInstanceOf(Delete::class, $deleteOperation);
+        $this->assertTrue($deleteOperation->getParameters()->has('search'));
+
+        $searchParam = $collectionOperation->getParameters()->get('search', QueryParameter::class);
         $this->assertInstanceOf(QueryParameter::class, $searchParam);
         $this->assertSame('search', $searchParam->getKey());
         $this->assertSame('name', $searchParam->getProperty());
@@ -492,20 +554,42 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         );
 
         $resourceMetadataCollection = $parameterFactory->create(HeaderParameterOnPropertiesTest::class);
-        $operation = $resourceMetadataCollection->getOperation(forceCollection: true);
-        $parameters = $operation->getParameters();
+        $operations = array_values(iterator_to_array($resourceMetadataCollection[0]->getOperations()));
 
-        $this->assertInstanceOf(Parameters::class, $parameters);
+        $this->assertCount(5, $operations);
 
-        $this->assertTrue($parameters->has('X-Authorization', HeaderParameter::class));
-        $authParam = $parameters->get('X-Authorization', HeaderParameter::class);
+        $getOperation = $operations[0];
+        $this->assertInstanceOf(Get::class, $getOperation);
+        $this->assertTrue($getOperation->getParameters()->has('X-Authorization', HeaderParameter::class));
+        $this->assertTrue($getOperation->getParameters()->has('X-Token', HeaderParameter::class));
+
+        $collectionOperation = $operations[1];
+        $this->assertInstanceOf(GetCollection::class, $collectionOperation);
+        $this->assertTrue($collectionOperation->getParameters()->has('X-Authorization', HeaderParameter::class));
+        $this->assertTrue($collectionOperation->getParameters()->has('X-Token', HeaderParameter::class));
+
+        $postOperation = $operations[2];
+        $this->assertInstanceOf(Post::class, $postOperation);
+        $this->assertTrue($postOperation->getParameters()->has('X-Authorization', HeaderParameter::class));
+        $this->assertTrue($postOperation->getParameters()->has('X-Token', HeaderParameter::class));
+
+        $patchOperation = $operations[3];
+        $this->assertInstanceOf(Patch::class, $patchOperation);
+        $this->assertTrue($patchOperation->getParameters()->has('X-Authorization', HeaderParameter::class));
+        $this->assertTrue($patchOperation->getParameters()->has('X-Token', HeaderParameter::class));
+
+        $deleteOperation = $operations[4];
+        $this->assertInstanceOf(Delete::class, $deleteOperation);
+        $this->assertTrue($deleteOperation->getParameters()->has('X-Authorization', HeaderParameter::class));
+        $this->assertTrue($deleteOperation->getParameters()->has('X-Token', HeaderParameter::class));
+
+        $authParam = $collectionOperation->getParameters()->get('X-Authorization', HeaderParameter::class);
         $this->assertInstanceOf(HeaderParameter::class, $authParam);
         $this->assertSame('X-Authorization', $authParam->getKey());
         $this->assertSame('authToken', $authParam->getProperty());
         $this->assertSame('Authorization header', $authParam->getDescription());
 
-        $this->assertTrue($parameters->has('X-Token', HeaderParameter::class));
-        $tokenParam = $parameters->get('X-Token', HeaderParameter::class);
+        $tokenParam = $collectionOperation->getParameters()->get('X-Token', HeaderParameter::class);
         $this->assertInstanceOf(HeaderParameter::class, $tokenParam);
         $this->assertSame('X-Token', $tokenParam->getKey());
         $this->assertSame('token', $tokenParam->getProperty());
@@ -611,13 +695,31 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         );
 
         $resourceMetadataCollection = $parameterFactory->create(HeaderParameterOnPropertiesSingleCorrectProperty::class);
-        $operation = $resourceMetadataCollection->getOperation(forceCollection: true);
-        $parameters = $operation->getParameters();
+        $operations = array_values(iterator_to_array($resourceMetadataCollection[0]->getOperations()));
 
-        $this->assertInstanceOf(Parameters::class, $parameters);
+        $this->assertCount(5, $operations);
 
-        $this->assertTrue($parameters->has('X-Authorization', HeaderParameter::class));
-        $authParam = $parameters->get('X-Authorization', HeaderParameter::class);
+        $getOperation = $operations[0];
+        $this->assertInstanceOf(Get::class, $getOperation);
+        $this->assertTrue($getOperation->getParameters()->has('X-Authorization', HeaderParameter::class));
+
+        $collectionOperation = $operations[1];
+        $this->assertInstanceOf(GetCollection::class, $collectionOperation);
+        $this->assertTrue($collectionOperation->getParameters()->has('X-Authorization', HeaderParameter::class));
+
+        $postOperation = $operations[2];
+        $this->assertInstanceOf(Post::class, $postOperation);
+        $this->assertTrue($postOperation->getParameters()->has('X-Authorization', HeaderParameter::class));
+
+        $patchOperation = $operations[3];
+        $this->assertInstanceOf(Patch::class, $patchOperation);
+        $this->assertTrue($patchOperation->getParameters()->has('X-Authorization', HeaderParameter::class));
+
+        $deleteOperation = $operations[4];
+        $this->assertInstanceOf(Delete::class, $deleteOperation);
+        $this->assertTrue($deleteOperation->getParameters()->has('X-Authorization', HeaderParameter::class));
+
+        $authParam = $collectionOperation->getParameters()->get('X-Authorization', HeaderParameter::class);
         $this->assertInstanceOf(HeaderParameter::class, $authParam);
         $this->assertSame('X-Authorization', $authParam->getKey());
         $this->assertSame('authToken', $authParam->getProperty());
@@ -645,17 +747,111 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         );
 
         $resourceMetadataCollection = $parameterFactory->create(HeaderParameterOnPropertiesMultiplePropertiesIncludingSelf::class);
-        $operation = $resourceMetadataCollection->getOperation(forceCollection: true);
-        $parameters = $operation->getParameters();
+        $operations = array_values(iterator_to_array($resourceMetadataCollection[0]->getOperations()));
 
-        $this->assertInstanceOf(Parameters::class, $parameters);
+        $this->assertCount(5, $operations);
 
-        $this->assertTrue($parameters->has('X-Authorization', HeaderParameter::class));
-        $authParam = $parameters->get('X-Authorization', HeaderParameter::class);
+        $getOperation = $operations[0];
+        $this->assertInstanceOf(Get::class, $getOperation);
+        $this->assertTrue($getOperation->getParameters()->has('X-Authorization', HeaderParameter::class));
+
+        $collectionOperation = $operations[1];
+        $this->assertInstanceOf(GetCollection::class, $collectionOperation);
+        $this->assertTrue($collectionOperation->getParameters()->has('X-Authorization', HeaderParameter::class));
+
+        $postOperation = $operations[2];
+        $this->assertInstanceOf(Post::class, $postOperation);
+        $this->assertTrue($postOperation->getParameters()->has('X-Authorization', HeaderParameter::class));
+
+        $patchOperation = $operations[3];
+        $this->assertInstanceOf(Patch::class, $patchOperation);
+        $this->assertTrue($patchOperation->getParameters()->has('X-Authorization', HeaderParameter::class));
+
+        $deleteOperation = $operations[4];
+        $this->assertInstanceOf(Delete::class, $deleteOperation);
+        $this->assertTrue($deleteOperation->getParameters()->has('X-Authorization', HeaderParameter::class));
+
+        $authParam = $collectionOperation->getParameters()->get('X-Authorization', HeaderParameter::class);
         $this->assertInstanceOf(HeaderParameter::class, $authParam);
         $this->assertSame('X-Authorization', $authParam->getKey());
         $this->assertSame('authToken', $authParam->getProperty());
         $this->assertSame(['authToken'], $authParam->getProperties());
+    }
+
+    public function testQueryParameterOnPropertiesWithOperations(): void
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'name']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+
+        $resourceMetadataCollection = $parameterFactory->create(QueryParameterOnPropertiesWithOperations::class);
+        $operations = array_values(iterator_to_array($resourceMetadataCollection[0]->getOperations()));
+
+        $this->assertCount(2, $operations);
+
+        $collectionOperation = $operations[0];
+        $this->assertInstanceOf(GetCollection::class, $collectionOperation);
+        $collectionParameters = $collectionOperation->getParameters();
+        $this->assertTrue($collectionParameters->has('search'));
+        $this->assertFalse($collectionParameters->has('filter_id'));
+
+        $getOperation = $operations[1];
+        $this->assertInstanceOf(Get::class, $getOperation);
+        $getParameters = $getOperation->getParameters();
+        $this->assertTrue($getParameters->has('search'));
+        $this->assertTrue($getParameters->has('filter_id'));
+    }
+
+    public function testHeaderParameterOnPropertiesWithOperations(): void
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'authToken', 'apiKey']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+
+        $resourceMetadataCollection = $parameterFactory->create(HeaderParameterOnPropertiesWithOperations::class);
+        $operations = array_values(iterator_to_array($resourceMetadataCollection[0]->getOperations()));
+
+        $this->assertCount(2, $operations);
+
+        $collectionOperation = $operations[0];
+        $this->assertInstanceOf(GetCollection::class, $collectionOperation);
+        $collectionParameters = $collectionOperation->getParameters();
+        $this->assertFalse($collectionParameters->has('X-Authorization', HeaderParameter::class));
+        $this->assertTrue($collectionParameters->has('X-API-Key', HeaderParameter::class));
+
+        $getOperation = $operations[1];
+        $this->assertInstanceOf(Get::class, $getOperation);
+        $getParameters = $getOperation->getParameters();
+        $this->assertTrue($getParameters->has('X-Authorization', HeaderParameter::class));
+        $this->assertTrue($getParameters->has('X-API-Key', HeaderParameter::class));
     }
 
     public function testNestedPropertyWithNameConverter(): void
@@ -1026,4 +1222,34 @@ class HeaderParameterOnPropertiesMismatchMultiplePropertiesException
     public string $token = '';
 
     public string $token2 = '';
+}
+
+#[ApiResource(
+    operations: [
+        new GetCollection(),
+        new Get(),
+    ]
+)]
+class QueryParameterOnPropertiesWithOperations
+{
+    #[QueryParameter(key: 'search', description: 'Search by name', operations: [new GetCollection(), new Get()])]
+    public string $name = '';
+
+    #[QueryParameter(key: 'filter_id', description: 'Filter by ID', operations: [new Get(), new Patch()])]
+    public int $id = 0;
+}
+
+#[ApiResource(
+    operations: [
+        new GetCollection(),
+        new Get(),
+    ]
+)]
+class HeaderParameterOnPropertiesWithOperations
+{
+    #[HeaderParameter(key: 'X-Authorization', description: 'Authorization header', operations: [new Get()])]
+    public string $authToken = '';
+
+    #[HeaderParameter(key: 'X-API-Key', description: 'API key header', operations: [new GetCollection(), new Get()])]
+    public string $apiKey = '';
 }
