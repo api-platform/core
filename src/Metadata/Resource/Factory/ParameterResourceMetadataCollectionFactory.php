@@ -486,6 +486,17 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             foreach ($reflectionProperty->getAttributes(Parameter::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
                 $parameter = $attribute->newInstance();
 
+                if (
+                    null !== ($parameterOperations = $parameter->getOperations())
+                    && !\in_array(
+                        $operation::class,
+                        array_map(static fn ($parameterOperation) => $parameterOperation::class, $parameterOperations),
+                        true
+                    )
+                ) {
+                    continue;
+                }
+
                 $propertyName = $reflectionProperty->getName();
                 $key = $parameter->getKey() ?? $propertyName;
 

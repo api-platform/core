@@ -17,9 +17,11 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\FilterInterface;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\HeaderParameter;
 use ApiPlatform\Metadata\Parameters;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
@@ -658,6 +660,78 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertSame(['authToken'], $authParam->getProperties());
     }
 
+    public function testQueryParameterOnPropertiesWithOperations(): void
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'name']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+
+        $resourceMetadataCollection = $parameterFactory->create(QueryParameterOnPropertiesWithOperations::class);
+        $operations = array_values(iterator_to_array($resourceMetadataCollection[0]->getOperations()));
+
+        $collectionOperation = $operations[0];
+        $this->assertInstanceOf(GetCollection::class, $collectionOperation);
+        $collectionParameters = $collectionOperation->getParameters();
+        $this->assertTrue($collectionParameters->has('search'));
+        $this->assertFalse($collectionParameters->has('filter_id'));
+
+        $getOperation = $operations[1];
+        $this->assertInstanceOf(Get::class, $getOperation);
+        $getParameters = $getOperation->getParameters();
+        $this->assertTrue($getParameters->has('search'));
+        $this->assertTrue($getParameters->has('filter_id'));
+    }
+
+    public function testHeaderParameterOnPropertiesWithOperations(): void
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'authToken', 'apiKey']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(
+            new ApiProperty(readable: true),
+        );
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator
+        );
+
+        $resourceMetadataCollection = $parameterFactory->create(HeaderParameterOnPropertiesWithOperations::class);
+        $operations = array_values(iterator_to_array($resourceMetadataCollection[0]->getOperations()));
+
+        $collectionOperation = $operations[0];
+        $this->assertInstanceOf(GetCollection::class, $collectionOperation);
+        $collectionParameters = $collectionOperation->getParameters();
+        $this->assertFalse($collectionParameters->has('X-Authorization', HeaderParameter::class));
+        $this->assertTrue($collectionParameters->has('X-API-Key', HeaderParameter::class));
+
+        $getOperation = $operations[1];
+        $this->assertInstanceOf(Get::class, $getOperation);
+        $getParameters = $getOperation->getParameters();
+        $this->assertTrue($getParameters->has('X-Authorization', HeaderParameter::class));
+        $this->assertTrue($getParameters->has('X-API-Key', HeaderParameter::class));
+    }
+
     public function testNestedPropertyWithNameConverter(): void
     {
         $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
@@ -1026,4 +1100,34 @@ class HeaderParameterOnPropertiesMismatchMultiplePropertiesException
     public string $token = '';
 
     public string $token2 = '';
+}
+
+#[ApiResource(
+    operations: [
+        new GetCollection(),
+        new Get(),
+    ]
+)]
+class QueryParameterOnPropertiesWithOperations
+{
+    #[QueryParameter(key: 'search', description: 'Search by name', operations: [new GetCollection(), new Get()])]
+    public string $name = '';
+
+    #[QueryParameter(key: 'filter_id', description: 'Filter by ID', operations: [new Get(), new Patch()])]
+    public int $id = 0;
+}
+
+#[ApiResource(
+    operations: [
+        new GetCollection(),
+        new Get(),
+    ]
+)]
+class HeaderParameterOnPropertiesWithOperations
+{
+    #[HeaderParameter(key: 'X-Authorization', description: 'Authorization header', operations: [new Get()])]
+    public string $authToken = '';
+
+    #[HeaderParameter(key: 'X-API-Key', description: 'API key header', operations: [new GetCollection(), new Get()])]
+    public string $apiKey = '';
 }
