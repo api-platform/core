@@ -39,7 +39,7 @@ final class ObjectMapperInputProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $class = $operation->getInput()['class'] ?? $operation->getClass();
+        $class = $operation->getInputClass();
 
         if (
             $data instanceof Response

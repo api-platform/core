@@ -48,7 +48,9 @@ class ApiResource extends Metadata
      * @param mixed|null                                                       $mercure
      * @param mixed|null                                                       $messenger
      * @param mixed|null                                                       $input
+     * @param string|null                                                      $inputClass
      * @param mixed|null                                                       $output
+     * @param string|null                                                      $outputClass
      * @param array<string, McpResource|McpTool>|null                          $mcp          A list of Mcp resources or tools
      */
     public function __construct(
@@ -430,8 +432,16 @@ class ApiResource extends Metadata
          * @var string|bool|null
          */
         protected $messenger = null,
+        /**
+         * @deprecated use inputClass instead
+         */
         protected $input = null,
+        protected ?string $inputClass = null,
+        /**
+         * @deprecated use outputClass instead
+         */
         protected $output = null,
+        protected ?string $outputClass = null,
         /**
          * Override the default order of items in your collection. Note that this is handled by our doctrine filters such as
          * the [OrderFilter](/docs/reference/Doctrine/Orm/Filter/OrderFilter).
@@ -988,7 +998,9 @@ class ApiResource extends Metadata
             mercure: $mercure,
             messenger: $messenger,
             input: $input,
+            inputClass: $inputClass,
             output: $output,
+            outputClass: $outputClass,
             order: $order,
             fetchPartial: $fetchPartial,
             forceEager: $forceEager,

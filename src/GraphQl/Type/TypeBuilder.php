@@ -311,15 +311,12 @@ final class TypeBuilder implements ContextAwareTypeBuilderInterface
     private function getResourceObjectTypeConfiguration(string $shortName, ResourceMetadataCollection $resourceMetadataCollection, Operation $operation, array $context = []): InputObjectType|ObjectType
     {
         $operationName = $operation->getName();
-        $resourceClass = $operation->getClass();
         $input = $context['input'];
         $depth = $context['depth'] ?? 0;
         $wrapped = $context['wrapped'] ?? false;
 
-        $ioMetadata = $input ? $operation->getInput() : $operation->getOutput();
-        if (null !== $ioMetadata && \array_key_exists('class', $ioMetadata) && null !== $ioMetadata['class']) {
-            $resourceClass = $ioMetadata['class'];
-        }
+        $resourceClass = $input ? $operation->getInputClass() : $operation->getOutputClass();
+        $ioMetadata = $resourceClass ? ['class' => $resourceClass] : null;
 
         $wrapData = !$wrapped && ($operation instanceof Mutation || $operation instanceof Subscription) && !$input && $depth < 1;
 

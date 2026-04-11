@@ -729,8 +729,16 @@ abstract class Operation extends Metadata
          * For more examples, read our guide on [validation](/guides/validation).
          */
         protected ?array $validationContext = null,
+        /**
+         * @deprecated use inputClass instead
+         */
         protected $input = null,
+        protected ?string $inputClass = null,
+        /**
+         * @deprecated use outputClass instead
+         */
         protected $output = null,
+        protected ?string $outputClass = null,
         protected $mercure = null,
         /**
          * The `messenger` option dispatches the current resource through the Message Bus.
@@ -831,7 +839,9 @@ abstract class Operation extends Metadata
             mercure: $mercure,
             messenger: $messenger,
             input: $input,
+            inputClass: $inputClass,
             output: $output,
+            outputClass: $outputClass,
             order: $order,
             fetchPartial: $fetchPartial,
             forceEager: $forceEager,

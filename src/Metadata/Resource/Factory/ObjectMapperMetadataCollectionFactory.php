@@ -57,8 +57,8 @@ class ObjectMapperMetadataCollectionFactory implements ResourceMetadataCollectio
                     $entityClass = $options->getModelClass();
                 }
 
-                $class = $operation->getInput()['class'] ?? $operation->getClass();
-                $outputClass = $operation->getOutput()['class'] ?? null;
+                $class = $operation->getInputClass();
+                $outputClass = $operation->getOutputClass();
                 $entityMap = null;
 
                 // Look for Mapping metadata
@@ -89,8 +89,12 @@ class ObjectMapperMetadataCollectionFactory implements ResourceMetadataCollectio
     /**
      * @return bool|list<Mapping>
      */
-    private function canBeMapped(string $class): bool|array
+    private function canBeMapped(?string $class): bool|array
     {
+        if(!$class) {
+            return false;
+        }
+
         try {
             $r = new \ReflectionClass($class);
             if (!$r->isInstantiable() || !($mapping = $this->objectMapperMetadata->create($r->newInstanceWithoutConstructor(), null, ['_api_check_can_be_mapped' => true]))) {

@@ -29,8 +29,10 @@ abstract class Metadata
      * @param string|\Stringable|null                                                           $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
      * @param mixed|null                                                                        $mercure
      * @param mixed|null                                                                        $messenger
-     * @param mixed|null                                                                        $input
-     * @param mixed|null                                                                        $output
+     * @param mixed|null                                                                        $input                   @deprecated use inputClass instead
+     * @param mixed|null                                                                        $inputClass
+     * @param mixed|null                                                                        $output                  @deprecated use outputClass instead
+     * @param mixed|null                                                                        $outputClass
      * @param mixed|null                                                                        $provider
      * @param mixed|null                                                                        $processor
      * @param Parameters|array<string, Parameter>                                               $parameters
@@ -50,7 +52,9 @@ abstract class Metadata
         protected $mercure = null,
         protected $messenger = null,
         protected $input = null,
+        protected ?string $inputClass = null,
         protected $output = null,
+        protected ?string $outputClass = null,
         protected ?array $order = null,
         protected ?bool $fetchPartial = null,
         protected ?bool $forceEager = null,
@@ -272,26 +276,108 @@ abstract class Metadata
         return $self;
     }
 
+    /**
+     * @deprecated use getInputClass() instead
+     */
     public function getInput(): mixed
     {
+        trigger_deprecation('api-platform/metadata', '4.3', 'The method "getInput()" is deprecated, use "getInputClass()" instead.');
+
         return $this->input;
     }
 
+    /**
+     * @deprecated use withInputClass() instead
+     */
     public function withInput(mixed $input): static
     {
+        trigger_deprecation('api-platform/metadata', '4.3', 'The method "withInput()" is deprecated, use "withInputClass()" instead.');
+
         $self = clone $this;
         $self->input = $input;
 
         return $self;
     }
 
+    public function getInputClass(): ?string
+    {
+        if (null !== $this->inputClass) {
+            return $this->inputClass;
+        }
+
+        if (false === $this->input) {
+            return null;
+        }
+
+        if (\is_array($this->input) && \is_string($this->input['class'] ?? null)) {
+            return $this->input['class'];
+        }
+
+        if (null === $this->input) {
+            return $this->getClass();
+        }
+
+        return null;
+    }
+
+    /**
+     * @param class-string|null $inputClass
+     * @return $this
+     */
+    public function withInputClass(?string $inputClass): static
+    {
+        $self = clone $this;
+        $self->inputClass = $inputClass;
+
+        return $self;
+    }
+
+    public function getOutputClass(): ?string
+    {
+        if (null !== $this->outputClass) {
+            return $this->outputClass;
+        }
+
+        if (false === $this->output) {
+            return null;
+        }
+
+        if (\is_array($this->output) && \is_string($this->output['class'] ?? null)) {
+            return $this->output['class'];
+        }
+
+        if (null === $this->output) {
+            return $this->getClass();
+        }
+
+        return null;
+    }
+
+    public function withOutputClass(?string $outputClass): static
+    {
+        $self = clone $this;
+        $self->outputClass = $outputClass;
+
+        return $self;
+    }
+
+    /**
+     * @deprecated use getOutputClass() instead
+     */
     public function getOutput(): mixed
     {
+        trigger_deprecation('api-platform/metadata', '4.3', 'The method "getOutput()" is deprecated, use "getOutputClass()" instead.');
+
         return $this->output;
     }
 
+    /**
+     * @deprecated use withOutputClass() instead
+     */
     public function withOutput(mixed $output): static
     {
+        trigger_deprecation('api-platform/metadata', '4.3', 'The method "withOutput()" is deprecated, use "withOutputClass()" instead.');
+
         $self = clone $this;
         $self->output = $output;
 

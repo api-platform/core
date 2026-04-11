@@ -453,7 +453,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             if (
                 \in_array($method, ['PATCH', 'PUT', 'POST'], true)
-                && !(false === ($input = $operation->getInput()) || (\is_array($input) && null === $input['class']))
+                && $operation->getInputClass()
             ) {
                 $content = $openapiOperation->getRequestBody()?->getContent();
                 if (null === $content) {
@@ -501,7 +501,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
      */
     private function buildOpenApiResponse(array $existingResponses, int|string $status, string $description, Operation $openapiOperation, ?HttpOperation $operation = null, ?array $responseMimeTypes = null, ?array $operationOutputSchemas = null, ?ResourceMetadataCollection $resourceMetadataCollection = null, bool $isErrorResponse = false): Operation
     {
-        $noOutput = !$isErrorResponse && \is_array($operation?->getOutput()) && null === $operation->getOutput()['class'];
+        $noOutput = !$isErrorResponse && null === $operation?->getOutputClass();
 
         $response = $existingResponses[$status] ?? new Response($description);
         if (null === $response->getDescription()) {
