@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata;
 
+use ApiPlatform\State\DataOptionsInterface;
 use ApiPlatform\State\OptionsInterface;
 
 /**
@@ -87,12 +88,17 @@ abstract class Metadata
         protected ?bool $jsonStream = null,
         protected ?bool $map = null,
         protected array $extraProperties = [],
+        protected ?string $dataClass = null,
     ) {
         if (\is_array($parameters) && $parameters) {
             $parameters = new Parameters($parameters);
         }
 
         $this->parameters = $parameters;
+
+        if (!$this->dataClass && $this->stateOptions instanceof DataOptionsInterface) {
+            $this->dataClass = $this->stateOptions->getDataClass();
+        }
     }
 
     public function canMap(): ?bool
@@ -322,6 +328,7 @@ abstract class Metadata
 
     /**
      * @param class-string|null $inputClass
+     *
      * @return $this
      */
     public function withInputClass(?string $inputClass): static
@@ -666,6 +673,33 @@ abstract class Metadata
     {
         $self = clone $this;
         $self->stateOptions = $stateOptions;
+
+        if ($stateOptions instanceof DataOptionsInterface) {
+            $self->dataClass = $stateOptions->getDataClass();
+        }
+
+        return $self;
+    }
+
+    /**
+     * @return class-string|null
+     */
+    public function getDataClass(): ?string
+    {
+        if (null === $this->dataClass) {
+            return $this->class;
+        }
+
+        return $this->dataClass;
+    }
+
+    /**
+     * @param class-string|null $dataClass
+     */
+    public function withDataClass(?string $dataClass): static
+    {
+        $self = clone $this;
+        $self->dataClass = $dataClass;
 
         return $self;
     }

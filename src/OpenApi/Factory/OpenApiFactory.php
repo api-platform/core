@@ -313,7 +313,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 }
             }
 
-            $entityClass = $this->getStateOptionsClass($operation, $operation->getClass());
+            $entityClass = $operation->getDataClass();
             $openapiParameters = $openapiOperation->getParameters();
             foreach ($operation->getParameters() ?? [] as $key => $p) {
                 if (false === $p->getOpenApi()) {
@@ -680,7 +680,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     {
         $parameters = [];
         $resourceFilters = $operation->getFilters();
-        $entityClass = $this->getStateOptionsClass($operation, $operation->getClass());
+        $entityClass = $operation->getDataClass();
 
         foreach ($resourceFilters ?? [] as $filterId) {
             if (!$this->filterLocator->has($filterId)) {

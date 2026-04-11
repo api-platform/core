@@ -42,12 +42,12 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         $context['operation'] = $operation;
         $context['input'] = $operation->getInputClass() === $operation->getClass() ? null : ['class' => $operation->getInputClass()];
         $context['output'] = $operation->getOutputClass() === $operation->getClass() ? null : ['class' => $operation->getOutputClass()];
-//        if (($inputClass = $operation->getInputClass()) !== $operation->getClass()) {
-//            $context['input'] = ['class' => $inputClass];
-//        }
-//        if (($outputClass = $operation->getOutputClass()) !== $operation->getClass()) {
-//            $context['output'] =  ['class' => $outputClass];
-//        }
+        //        if (($inputClass = $operation->getInputClass()) !== $operation->getClass()) {
+        //            $context['input'] = ['class' => $inputClass];
+        //        }
+        //        if (($outputClass = $operation->getOutputClass()) !== $operation->getClass()) {
+        //            $context['output'] =  ['class' => $outputClass];
+        //        }
         $context = $normalization ? array_merge($operation->getNormalizationContext() ?? [], $context) : array_merge($operation->getDenormalizationContext() ?? [], $context);
 
         if ($normalization) {
@@ -101,7 +101,7 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
                 continue;
             }
 
-            $denormalizedFields[$this->denormalizePropertyName((string)$key, $resourceClass, $context)] = \is_array($value) ? $this->replaceIdKeys($value, $resourceClass, $context) : $value;
+            $denormalizedFields[$this->denormalizePropertyName((string) $key, $resourceClass, $context)] = \is_array($value) ? $this->replaceIdKeys($value, $resourceClass, $context) : $value;
         }
 
         return $denormalizedFields;

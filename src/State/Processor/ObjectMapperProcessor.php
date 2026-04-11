@@ -58,7 +58,7 @@ final class ObjectMapperProcessor implements ProcessorInterface
         if ($request?->attributes->get('mapped_data')) {
             $mappedData = $this->objectMapper->map($data, $request->attributes->get('mapped_data'));
         } else {
-            $mappedData = $this->objectMapper->map($data, $this->getStateOptionsClass($operation, $operation->getClass()));
+            $mappedData = $this->objectMapper->map($data, $operation->getDataClass());
         }
         $request?->attributes->set('mapped_data', $mappedData);
 

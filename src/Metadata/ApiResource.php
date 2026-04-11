@@ -48,9 +48,7 @@ class ApiResource extends Metadata
      * @param mixed|null                                                       $mercure
      * @param mixed|null                                                       $messenger
      * @param mixed|null                                                       $input
-     * @param string|null                                                      $inputClass
      * @param mixed|null                                                       $output
-     * @param string|null                                                      $outputClass
      * @param array<string, McpResource|McpTool>|null                          $mcp          A list of Mcp resources or tools
      */
     public function __construct(
@@ -983,6 +981,7 @@ class ApiResource extends Metadata
         protected array $extraProperties = [],
         ?bool $map = null,
         protected ?array $mcp = null,
+        protected ?string $dataClass = null,
     ) {
         parent::__construct(
             shortName: $shortName,
@@ -1032,6 +1031,7 @@ class ApiResource extends Metadata
             jsonStream: $jsonStream,
             extraProperties: $extraProperties,
             map: $map,
+            dataClass: $dataClass,
         );
 
         /* @var Operations<HttpOperation> $operations> */

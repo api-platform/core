@@ -103,7 +103,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
     {
         $filterClass = $parameter?->getFilterClass();
         if (null === $filterClass && null !== $operation) {
-            $filterClass = $this->getStateOptionsClass($operation, $resourceClass);
+            $filterClass = $operation->getDataClass();
         }
         $filterClass ??= $resourceClass;
 
@@ -427,7 +427,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
 
     private function getLegacyFilterMetadata(Parameter $parameter, Operation $operation, FilterInterface $filter): Parameter
     {
-        $description = $filter->getDescription($this->getStateOptionsClass($operation, $operation->getClass()));
+        $description = $operation->getDataClass();
         $key = $parameter->getKey();
         if (($schema = $description[$key]['schema'] ?? null) && null === $parameter->getSchema()) {
             $parameter = $parameter->withSchema($schema);

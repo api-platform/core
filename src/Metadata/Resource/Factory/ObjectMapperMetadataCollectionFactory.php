@@ -91,7 +91,7 @@ class ObjectMapperMetadataCollectionFactory implements ResourceMetadataCollectio
      */
     private function canBeMapped(?string $class): bool|array
     {
-        if(!$class) {
+        if (!$class) {
             return false;
         }
 

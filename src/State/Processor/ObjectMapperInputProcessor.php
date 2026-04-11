@@ -54,7 +54,7 @@ final class ObjectMapperInputProcessor implements ProcessorInterface
         }
 
         $request = $context['request'] ?? null;
-        $mapped = $this->objectMapper->map($data, $request?->attributes->get('mapped_data') ?? $this->getStateOptionsClass($operation, $operation->getClass()));
+        $mapped = $this->objectMapper->map($data, $request?->attributes->get('mapped_data') ?? $operation->getDataClass());
         $request?->attributes->set('mapped_data', $mapped);
 
         return $this->decorated ? $this->decorated->process($mapped, $operation, $uriVariables, $context) : $mapped;

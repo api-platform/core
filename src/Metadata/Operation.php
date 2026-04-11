@@ -824,6 +824,7 @@ abstract class Operation extends Metadata
         protected ?bool $jsonStream = null,
         protected array $extraProperties = [],
         ?bool $map = null,
+        protected ?string $dataClass = null,
     ) {
         parent::__construct(
             shortName: $shortName,
@@ -873,7 +874,8 @@ abstract class Operation extends Metadata
             hideHydraOperation: $hideHydraOperation,
             jsonStream: $jsonStream,
             extraProperties: $extraProperties,
-            map: $map
+            map: $map,
+            dataClass: $dataClass
         );
     }
 
