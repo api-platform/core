@@ -156,16 +156,16 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
     {
         if (isset($options['validation_groups'])) {
             if ($options['validation_groups'] instanceof GroupSequence) {
-                return $this->getGroupSequenceValidationGroups($options['validation_groups']);
+                return $this->flattenValidationGroups($options['validation_groups']->groups);
             }
 
-            if (!\is_callable($options['validation_groups'])) {
-                return $options['validation_groups'];
+            if (\is_array($options['validation_groups']) && !\is_callable($options['validation_groups'])) {
+                return $this->flattenValidationGroups($options['validation_groups']);
             }
         }
 
         if ($classMetadata->hasGroupSequence()) {
-            return $this->getGroupSequenceValidationGroups($classMetadata->getGroupSequence());
+            return $this->flattenValidationGroups($classMetadata->getGroupSequence()->groups);
         }
 
         if (!method_exists($classMetadata, 'getDefaultGroup')) {
@@ -176,22 +176,24 @@ final class ValidatorPropertyMetadataFactory implements PropertyMetadataFactoryI
     }
 
     /**
-     * @return array<string>
+     * @param array<string|string[]|GroupSequence> $groups
+     *
+     * @return string[]
      */
-    private function getGroupSequenceValidationGroups(GroupSequence $groupSequence): array
+    private function flattenValidationGroups(array $groups): array
     {
-        $groups = [];
-        foreach ($groupSequence->groups as $subGroup) {
-            if (\is_array($subGroup)) {
-                $groups[] = $subGroup;
-            } elseif ($subGroup instanceof GroupSequence) {
-                $groups[] = $this->getGroupSequenceValidationGroups($subGroup);
+        $flattenGroups = [];
+        foreach ($groups as $group) {
+            if (\is_array($group)) {
+                $flattenGroups[] = $this->flattenValidationGroups($group);
+            } elseif ($group instanceof GroupSequence) {
+                $flattenGroups[] = $this->flattenValidationGroups($group->groups);
             } else {
-                $groups[] = [$subGroup];
+                $flattenGroups[] = [$group];
             }
         }
 
-        return array_merge([], ...$groups);
+        return array_merge([], ...$flattenGroups);
     }
 
     /**
