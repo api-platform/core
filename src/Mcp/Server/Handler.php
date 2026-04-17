@@ -74,7 +74,7 @@ final class Handler implements RequestHandlerInterface
         } else {
             \assert($request instanceof CallToolRequest);
             $operationNameOrUri = $request->name;
-            $arguments = $request->arguments ?? [];
+            $arguments = $request->arguments;
             $this->logger->debug('Executing tool', ['name' => $operationNameOrUri, 'arguments' => $arguments]);
         }
 
