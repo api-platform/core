@@ -13,31 +13,31 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Tests\Extractor;
 
-use ApiPlatform\Metadata\Extractor\AbstractPropertyExtractor;
-use ApiPlatform\Metadata\Extractor\YamlPropertyExtractor;
+use ApiPlatform\Metadata\Extractor\AbstractResourceExtractor;
+use ApiPlatform\Metadata\Extractor\YamlResourceExtractor;
 use PHPUnit\Framework\TestCase;
 
-class YamlPropertyExtractorResetTest extends TestCase
+class YamlResourceExtractorResetTest extends TestCase
 {
     public function testReset(): void
     {
-        $extractor = new YamlPropertyExtractor([]);
+        $extractor = new YamlResourceExtractor([]);
 
         $refl = new \ReflectionClass($extractor);
-        $properties = $refl->getProperty('properties');
-        $properties->setAccessible(true);
-        $properties->setValue($extractor, ['foo' => 'bar']);
+        $resources = $refl->getProperty('resources');
+        $resources->setAccessible(true);
+        $resources->setValue($extractor, ['foo' => 'bar']);
         
-        $collectedParameters = new \ReflectionProperty(AbstractPropertyExtractor::class, 'collectedParameters');
+        $collectedParameters = new \ReflectionProperty(AbstractResourceExtractor::class, 'collectedParameters');
         $collectedParameters->setAccessible(true);
         $collectedParameters->setValue($extractor, ['param' => 'value']);
 
-        $this->assertNotEmpty($properties->getValue($extractor));
+        $this->assertNotEmpty($resources->getValue($extractor));
         $this->assertNotEmpty($collectedParameters->getValue($extractor));
 
         $extractor->reset();
 
-        $this->assertNull($properties->getValue($extractor));
+        $this->assertNull($resources->getValue($extractor));
         $this->assertEmpty($collectedParameters->getValue($extractor));
     }
 }
