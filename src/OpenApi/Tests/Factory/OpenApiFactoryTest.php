@@ -1458,7 +1458,9 @@ class OpenApiFactoryTest extends TestCase
         $refl = new \ReflectionClass($factory);
         $routeCollection = $refl->getProperty('routeCollection');
         $routeCollection->setAccessible(true);
-        $routeCollection->setValue($factory, new \Symfony\Component\Routing\RouteCollection());
+        if (class_exists(\Symfony\Component\Routing\RouteCollection::class)) {
+            $routeCollection->setValue($factory, $this->createMock(\Symfony\Component\Routing\RouteCollection::class));
+        }
 
         $localErrorResourceCache = $refl->getProperty('localErrorResourceCache');
         $localErrorResourceCache->setAccessible(true);
