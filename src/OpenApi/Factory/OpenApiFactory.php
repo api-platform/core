@@ -62,11 +62,12 @@ use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeIdentifier;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Generates an Open API v3 specification.
  */
-final class OpenApiFactory implements OpenApiFactoryInterface
+final class OpenApiFactory implements OpenApiFactoryInterface, ResetInterface
 {
     use NormalizeOperationNameTrait;
     use StateOptionsTrait;
@@ -1064,5 +1065,11 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         }
 
         return $this->localErrorResourceCache[$error] = $errorResource;
+    }
+
+    public function reset(): void
+    {
+        $this->routeCollection = null;
+        $this->localErrorResourceCache = [];
     }
 }

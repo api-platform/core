@@ -1438,4 +1438,38 @@ class OpenApiFactoryTest extends TestCase
 
         $openApi = $factory->__invoke();
     }
+
+    public function testReset(): void
+    {
+        $resourceNameCollectionFactory = $this->createMock(ResourceNameCollectionFactoryInterface::class);
+        $resourceCollectionMetadataFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
+        $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
+        $schemaFactory = $this->createMock(\ApiPlatform\JsonSchema\SchemaFactoryInterface::class);
+
+        $factory = new OpenApiFactory(
+            $resourceNameCollectionFactory,
+            $resourceCollectionMetadataFactory,
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $schemaFactory
+        );
+
+        $refl = new \ReflectionClass($factory);
+        $routeCollection = $refl->getProperty('routeCollection');
+        $routeCollection->setAccessible(true);
+        $routeCollection->setValue($factory, new \Symfony\Component\Routing\RouteCollection());
+
+        $localErrorResourceCache = $refl->getProperty('localErrorResourceCache');
+        $localErrorResourceCache->setAccessible(true);
+        $localErrorResourceCache->setValue($factory, ['foo' => 'bar']);
+
+        $this->assertNotNull($routeCollection->getValue($factory));
+        $this->assertNotEmpty($localErrorResourceCache->getValue($factory));
+
+        $factory->reset();
+
+        $this->assertNull($routeCollection->getValue($factory));
+        $this->assertEmpty($localErrorResourceCache->getValue($factory));
+    }
 }
