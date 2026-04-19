@@ -15,13 +15,14 @@ namespace ApiPlatform\Metadata\Extractor;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Base file extractor.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-abstract class AbstractResourceExtractor implements ResourceExtractorInterface
+abstract class AbstractResourceExtractor implements ResourceExtractorInterface, ResetInterface
 {
     protected ?array $resources = null;
     private array $collectedParameters = [];
@@ -54,6 +55,15 @@ abstract class AbstractResourceExtractor implements ResourceExtractorInterface
      * Extracts metadata from a given path.
      */
     abstract protected function extractPath(string $path): void;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset(): void
+    {
+        $this->resources = null;
+        $this->collectedParameters = [];
+    }
 
     /**
      * Recursively replaces placeholders with the service container parameters.

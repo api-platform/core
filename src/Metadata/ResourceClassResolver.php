@@ -16,6 +16,7 @@ namespace ApiPlatform\Metadata;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * {@inheritdoc}
@@ -23,7 +24,7 @@ use ApiPlatform\Metadata\Util\ClassInfoTrait;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Samuel ROZE <samuel.roze@gmail.com>
  */
-final class ResourceClassResolver implements ResourceClassResolverInterface
+final class ResourceClassResolver implements ResourceClassResolverInterface, ResetInterface
 {
     use ClassInfoTrait;
     private array $localIsResourceClassCache = [];
@@ -104,5 +105,14 @@ final class ResourceClassResolver implements ResourceClassResolverInterface
         }
 
         return $this->localIsResourceClassCache[$type] = false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset(): void
+    {
+        $this->localIsResourceClassCache = [];
+        $this->localMostSpecificResourceClassCache = [];
     }
 }
