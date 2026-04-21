@@ -919,7 +919,8 @@ class ApiPlatformProvider extends ServiceProvider
                         $app->make(ContextBuilderInterface::class),
                         $app->make(ResourceClassResolverInterface::class),
                         $app->make(IriConverterInterface::class),
-                        $defaultContext
+                        $defaultContext,
+                        $app->make(ResourceMetadataCollectionFactoryInterface::class)
                     ),
                     $app->make(ResourceMetadataCollectionFactoryInterface::class),
                     $app->make(ResourceClassResolverInterface::class),
