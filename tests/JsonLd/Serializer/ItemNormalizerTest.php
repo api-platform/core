@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operations;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
@@ -94,6 +95,236 @@ class ItemNormalizerTest extends TestCase
             '@context' => '/contexts/Dummy',
             '@id' => '/dummies/1988',
             '@type' => 'Dummy',
+            'name' => 'hello',
+        ];
+        $this->assertEquals($expected, $normalizer->normalize($dummy));
+    }
+
+    public function testNormalizeWithHydraOperations(): void
+    {
+        $dummy = new Dummy();
+        $dummy->setName('hello');
+
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection('Dummy', [
+            (new ApiResource())
+                ->withShortName('Dummy')
+                ->withOperations(new Operations(['get' => (new Get())->withShortName('Dummy')])),
+        ]));
+        $propertyNameCollection = new PropertyNameCollection(['name']);
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::any())->willReturn($propertyNameCollection);
+
+        $propertyMetadata = (new ApiProperty())->withReadable(true);
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::type('array'))->willReturn($propertyMetadata);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource($dummy, UrlGeneratorInterface::ABS_PATH, null, Argument::any())->willReturn('/dummies/1989');
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+        $serializerProphecy->normalize('hello', null, Argument::type('array'))->willReturn('hello');
+        $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
+        $contextBuilderProphecy->getResourceContextUri(Dummy::class)->willReturn('/contexts/Dummy');
+
+        $normalizer = new ItemNormalizer(
+            $resourceMetadataCollectionFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $contextBuilderProphecy->reveal(),
+            null,
+            null,
+            null,
+            ['hydra_prefix' => false, 'hydra_operations' => true]
+        );
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $expected = [
+            '@context' => '/contexts/Dummy',
+            '@id' => '/dummies/1989',
+            '@type' => 'Dummy',
+            'operation' => [
+                [
+                    '@type' => [
+                        'Operation',
+                        'schema:FindAction',
+                    ],
+                    'description' => 'Retrieves a Dummy resource.',
+                    'method' => 'GET',
+                    'returns' => 'Dummy',
+                    'title' => 'getDummy',
+                ],
+            ],
+            'name' => 'hello',
+        ];
+        $this->assertEquals($expected, $normalizer->normalize($dummy));
+    }
+
+    public function testNormalizeWithHydraOperationsMultipleApiResource(): void
+    {
+        $dummy = new Dummy();
+        $dummy->setName('hello');
+
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection('Dummy', [
+            (new ApiResource())
+                ->withShortName('Dummy')
+                ->withOperations(new Operations(['get' => (new Get())->withShortName('Dummy')])),
+            (new ApiResource())
+                ->withShortName('Dummy')
+                ->withOperations(new Operations(['patch' => (new Patch())->withShortName('Dummy')])),
+        ]));
+        $propertyNameCollection = new PropertyNameCollection(['name']);
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::any())->willReturn($propertyNameCollection);
+
+        $propertyMetadata = (new ApiProperty())->withReadable(true);
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::type('array'))->willReturn($propertyMetadata);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource($dummy, UrlGeneratorInterface::ABS_PATH, null, Argument::any())->willReturn('/dummies/1990');
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+        $serializerProphecy->normalize('hello', null, Argument::type('array'))->willReturn('hello');
+        $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
+        $contextBuilderProphecy->getResourceContextUri(Dummy::class)->willReturn('/contexts/Dummy');
+
+        $normalizer = new ItemNormalizer(
+            $resourceMetadataCollectionFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $contextBuilderProphecy->reveal(),
+            null,
+            null,
+            null,
+            ['hydra_prefix' => false, 'hydra_operations' => true]
+        );
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $expected = [
+            '@context' => '/contexts/Dummy',
+            '@id' => '/dummies/1990',
+            '@type' => 'Dummy',
+            'operation' => [
+                [
+                    '@type' => [
+                        'Operation',
+                        'schema:FindAction',
+                    ],
+                    'description' => 'Retrieves a Dummy resource.',
+                    'method' => 'GET',
+                    'returns' => 'Dummy',
+                    'title' => 'getDummy',
+                ],
+                [
+                    '@type' => 'Operation',
+                    'description' => 'Updates the Dummy resource.',
+                    'method' => 'PATCH',
+                    'returns' => 'Dummy',
+                    'title' => 'patchDummy',
+                    'expects' => 'Dummy',
+                    'expectsHeader' => [
+                        [
+                            'headerName' => 'Content-Type',
+                            'possibleValue' => [],
+                        ],
+                    ],
+                ],
+            ],
+            'name' => 'hello',
+        ];
+        $this->assertEquals($expected, $normalizer->normalize($dummy));
+    }
+
+    public function testNormalizeWithHydraOperationsMultipleApiResourceWithOperationInDuplicate(): void
+    {
+        $dummy = new Dummy();
+        $dummy->setName('hello');
+
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection('Dummy', [
+            (new ApiResource())
+                ->withShortName('Dummy')
+                ->withOperations(new Operations(['get' => (new Get())->withShortName('Dummy')])),
+            (new ApiResource())
+                ->withShortName('Dummy')
+                ->withOperations(new Operations(['get' => (new Get())->withShortName('Dummy')])),
+        ]));
+        $propertyNameCollection = new PropertyNameCollection(['name']);
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::any())->willReturn($propertyNameCollection);
+
+        $propertyMetadata = (new ApiProperty())->withReadable(true);
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::type('array'))->willReturn($propertyMetadata);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource($dummy, UrlGeneratorInterface::ABS_PATH, null, Argument::any())->willReturn('/dummies/1990');
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+        $serializerProphecy->normalize('hello', null, Argument::type('array'))->willReturn('hello');
+        $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
+        $contextBuilderProphecy->getResourceContextUri(Dummy::class)->willReturn('/contexts/Dummy');
+
+        $normalizer = new ItemNormalizer(
+            $resourceMetadataCollectionFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $contextBuilderProphecy->reveal(),
+            null,
+            null,
+            null,
+            ['hydra_prefix' => false, 'hydra_operations' => true]
+        );
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $expected = [
+            '@context' => '/contexts/Dummy',
+            '@id' => '/dummies/1990',
+            '@type' => 'Dummy',
+            'operation' => [
+                [
+                    '@type' => [
+                        'Operation',
+                        'schema:FindAction',
+                    ],
+                    'description' => 'Retrieves a Dummy resource.',
+                    'method' => 'GET',
+                    'returns' => 'Dummy',
+                    'title' => 'getDummy',
+                ],
+            ],
             'name' => 'hello',
         ];
         $this->assertEquals($expected, $normalizer->normalize($dummy));

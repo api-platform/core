@@ -26,6 +26,53 @@ use ApiPlatform\Metadata\HttpOperation;
 trait HydraOperationsTrait
 {
     /**
+     * Gets Hydra operations from all resource metadata.
+     */
+    private function getHydraOperationsFromResourceMetadatas(string $resourceClass, bool $collection, string $hydraPrefix = ContextBuilder::HYDRA_PREFIX): array
+    {
+        $allHydraOperations = [];
+        $operationNames = [];
+
+        foreach ($this->resourceMetadataCollectionFactory->create($resourceClass) as $resourceMetadata) {
+            $hydraOperations = $this->getHydraOperationsFromResourceMetadata(
+                $collection,
+                $resourceMetadata,
+                $hydraPrefix,
+                $operationNames
+            );
+
+            $allHydraOperations = array_merge($allHydraOperations, $hydraOperations);
+        }
+
+        return $allHydraOperations;
+    }
+
+    /**
+     * Gets Hydra operations from a single resource metadata.
+     */
+    private function getHydraOperationsFromResourceMetadata(bool $collection, ApiResource $resourceMetadata, string $hydraPrefix, array &$operationNames): array
+    {
+        $operations = [];
+        $hydraOperations = $this->getHydraOperations(
+            $collection,
+            $resourceMetadata,
+            $hydraPrefix
+        );
+
+        if (!empty($hydraOperations)) {
+            foreach ($hydraOperations as $operation) {
+                $operationName = $operation[$hydraPrefix.'method'];
+                if (!\in_array($operationName, $operationNames, true)) {
+                    $operationNames[] = $operationName;
+                    $operations[] = $operation;
+                }
+            }
+        }
+
+        return $operations;
+    }
+
+    /**
      * Gets Hydra operations.
      */
     private function getHydraOperations(bool $collection, ApiResource $resourceMetadata, string $hydraPrefix = ContextBuilder::HYDRA_PREFIX): array
