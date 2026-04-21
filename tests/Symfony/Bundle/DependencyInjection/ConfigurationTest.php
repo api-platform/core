@@ -242,7 +242,8 @@ class ConfigurationTest extends TestCase
             // TODO: remove in 5.0
             'enable_link_security' => true,
             'serializer' => [
-                'hydra_prefix' => null,
+                'hydra_prefix' => false,
+                'hydra_operations' => false,
             ],
             'enable_phpdoc_parser' => true,
             'mcp' => [
