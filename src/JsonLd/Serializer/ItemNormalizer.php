@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonLd\Serializer;
 
+use ApiPlatform\Hydra\Serializer\HydraOperationsTrait;
 use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Metadata\HttpOperation;
@@ -43,6 +44,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
 {
     use ClassInfoTrait;
     use ContextTrait;
+    use HydraOperationsTrait;
+    use HydraPrefixTrait;
     use ItemNormalizerTrait {
         denormalize as private doDenormalize;
     }
@@ -50,8 +53,11 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     public const FORMAT = 'jsonld';
 
+    private array $itemNormalizerDefaultContext = [];
+
     public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, private readonly ContextBuilderInterface $contextBuilder, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ?ResourceAccessCheckerInterface $resourceAccessChecker = null, protected ?TagCollectorInterface $tagCollector = null, private ?OperationMetadataFactoryInterface $operationMetadataFactory = null, ?OperationResourceClassResolverInterface $operationResourceResolver = null)
     {
+        $this->itemNormalizerDefaultContext = $defaultContext;
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $defaultContext, $resourceMetadataCollectionFactory, $resourceAccessChecker, $tagCollector, $operationResourceResolver);
     }
 
@@ -132,6 +138,19 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         if (!isset($metadata['@type']) && null !== ($type = $this->resolveType($resourceClass, $isResourceClass, $context))) {
             $metadata['@type'] = $type;
+        }
+
+        if ($isResourceClass && ($context['hydra_operations'] ?? $this->itemNormalizerDefaultContext['hydra_operations'] ?? false)) {
+            $hydraPrefix = $this->getHydraPrefix($context + $this->itemNormalizerDefaultContext);
+            $allHydraOperations = $this->getHydraOperationsFromResourceMetadatas(
+                $resourceClass,
+                false,
+                $hydraPrefix
+            );
+
+            if (!empty($allHydraOperations)) {
+                $metadata[$hydraPrefix.'operation'] = $allHydraOperations;
+            }
         }
 
         return $metadata + $normalizedData;
