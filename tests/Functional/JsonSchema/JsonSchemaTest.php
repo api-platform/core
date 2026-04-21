@@ -158,6 +158,7 @@ class JsonSchemaTest extends ApiTestCase
         ]));
 
         $this->assertEquals($schema['definitions']['BagOfTests-write']['properties']['description'], new \ArrayObject([
+            'type' => 'string',
             'maxLength' => 255,
         ]));
 
