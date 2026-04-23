@@ -62,8 +62,7 @@ trait ResourceClassInfoTrait
             return \count($this->resourceMetadataFactory->create($class)) > 0;
         }
 
-        // assume that it's a resource class
-        return true;
+        return false;
     }
 
     private function getTypeFromProperty(ApiProperty $propertyMetadata): ?Type

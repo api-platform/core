@@ -213,4 +213,84 @@ class SerializerPropertyMetadataFactoryTest extends TestCase
         self::assertFalse($result->isReadable());
         self::assertFalse($result->isWritable());
     }
+
+    public function testWithResourceClassResolverIdentifiesResourceClass(): void
+    {
+        $serializerClassMetadataFactoryProphecy = $this->prophesize(SerializerClassMetadataFactoryInterface::class);
+        $dummySerializerClassMetadata = new SerializerClassMetadata(Dummy::class);
+        $relatedDummySerializerAttributeMetadata = new SerializerAttributeMetadata('relatedDummy');
+        $dummySerializerClassMetadata->addAttributeMetadata($relatedDummySerializerAttributeMetadata);
+        $serializerClassMetadataFactoryProphecy->getMetadataFor(Dummy::class)->willReturn($dummySerializerClassMetadata);
+        $relatedDummySerializerClassMetadata = new SerializerClassMetadata(RelatedDummy::class);
+        $serializerClassMetadataFactoryProphecy->getMetadataFor(RelatedDummy::class)->willReturn($relatedDummySerializerClassMetadata);
+
+        $context = [];
+
+        $decoratedProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $relatedDummyPropertyMetadata = (new ApiProperty())
+            ->withNativeType(Type::nullable(Type::object(RelatedDummy::class)));
+        $decoratedProphecy->create(Dummy::class, 'relatedDummy', $context)->willReturn($relatedDummyPropertyMetadata);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->getResourceClass(null, RelatedDummy::class)->willReturn(RelatedDummy::class);
+
+        $serializerPropertyMetadataFactory = new SerializerPropertyMetadataFactory(
+            $serializerClassMetadataFactoryProphecy->reveal(),
+            $decoratedProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal()
+        );
+
+        $actual = $serializerPropertyMetadataFactory->create(Dummy::class, 'relatedDummy', $context);
+
+        $this->assertInstanceOf(ApiProperty::class, $actual);
+        $this->assertTrue($actual->isReadable());
+        $this->assertTrue($actual->isWritable());
+    }
+
+    /**
+     * Test that isResourceClass() falls back to false when resourceClassResolver is NOT provided.
+     * This demonstrates the bug that occurs without the fix in ApiPlatformProvider.
+     *
+     * When resourceClassResolver is null and resourceMetadataFactory is null,
+     * isResourceClass() returns false, preventing proper link status detection.
+     */
+    public function testWithoutResourceClassResolverFallsBackToFalse(): void
+    {
+        $serializerClassMetadataFactoryProphecy = $this->prophesize(SerializerClassMetadataFactoryInterface::class);
+        $dummySerializerClassMetadata = new SerializerClassMetadata(Dummy::class);
+        $relatedDummySerializerAttributeMetadata = new SerializerAttributeMetadata('relatedDummy');
+        $dummySerializerClassMetadata->addAttributeMetadata($relatedDummySerializerAttributeMetadata);
+        $serializerClassMetadataFactoryProphecy->getMetadataFor(Dummy::class)->willReturn($dummySerializerClassMetadata);
+        $relatedDummySerializerClassMetadata = new SerializerClassMetadata(RelatedDummy::class);
+        $serializerClassMetadataFactoryProphecy->getMetadataFor(RelatedDummy::class)->willReturn($relatedDummySerializerClassMetadata);
+
+        $context = [];
+
+        $decoratedProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $relatedDummyPropertyMetadata = (new ApiProperty())
+            ->withNativeType(Type::nullable(Type::object(RelatedDummy::class)));
+        $decoratedProphecy->create(Dummy::class, 'relatedDummy', $context)->willReturn($relatedDummyPropertyMetadata);
+
+        // Create factory WITHOUT resourceClassResolver (passing null)
+        $serializerPropertyMetadataFactory = new SerializerPropertyMetadataFactory(
+            $serializerClassMetadataFactoryProphecy->reveal(),
+            $decoratedProphecy->reveal(),
+            null // No resourceClassResolver
+        );
+
+        $actual = $serializerPropertyMetadataFactory->create(Dummy::class, 'relatedDummy', $context);
+
+        $this->assertInstanceOf(ApiProperty::class, $actual);
+        // Without resourceClassResolver, isResourceClass() falls back to false,
+        // so transformLinkStatus() skips the link status logic
+        // This results in null link statuses, which causes serializer to reject nested documents
+        $this->assertTrue($actual->isReadable());
+        $this->assertTrue($actual->isWritable());
+        // The key difference: link statuses remain null (not explicitly set)
+        // This is the root cause of the Laravel test failures
+        $this->assertNull($actual->isReadableLink(), 'readableLink is null when resourceClassResolver is missing');
+        $this->assertNull($actual->isWritableLink(), 'writeableLink is null when resourceClassResolver is missing');
+    }
 }
