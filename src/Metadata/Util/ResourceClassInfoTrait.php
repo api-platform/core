@@ -85,8 +85,6 @@ trait ResourceClassInfoTrait
             return null;
         }
 
-        $className = $this->extractClassNameFromType($type);
-
-        return $className && $this->isResourceClass($className) ? $className : null;
+        return $this->extractClassNameFromType($type);
     }
 }
