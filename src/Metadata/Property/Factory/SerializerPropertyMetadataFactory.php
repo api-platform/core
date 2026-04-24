@@ -200,8 +200,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
             return $propertyMetadata;
         }
 
-        $collectionValueType = TypeHelper::getCollectionValueType($type);
-        $className = $collectionValueType ? TypeHelper::getClassName($collectionValueType) : TypeHelper::getClassName($type);
+        $className = $this->extractClassNameFromType($type);
 
         // if property is not a resource relation, don't set link status (as it would have no meaning)
         if (!$className || !$this->isResourceClass($className)) {
