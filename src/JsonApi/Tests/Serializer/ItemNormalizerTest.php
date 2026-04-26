@@ -26,6 +26,7 @@ use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operations;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
@@ -988,5 +989,93 @@ class ItemNormalizerTest extends TestCase
         $this->assertInstanceOf(InputDto::class, $result);
         $this->assertSame('Hello', $result->title);
         $this->assertSame('World', $result->body);
+    }
+
+    public function testDenormalizePostWithIdThrowsWithoutOptIn(): void
+    {
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('Client-generated IDs are not allowed on this operation.');
+
+        $normalizer = new ItemNormalizer(
+            $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
+            $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(),
+            $this->prophesize(IriConverterInterface::class)->reveal(),
+            $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
+        );
+
+        $normalizer->denormalize(
+            [
+                'data' => [
+                    'id' => 'b1f3e6a4-1234-4abc-9def-0123456789ab',
+                    'type' => 'dummy',
+                ],
+            ],
+            Dummy::class,
+            ItemNormalizer::FORMAT,
+            [
+                'operation' => new Post(),
+            ]
+        );
+    }
+
+    public function testDenormalizePostWithIdSucceedsWithOptIn(): void
+    {
+        $clientId = 'b1f3e6a4-1234-4abc-9def-0123456789ab';
+        $data = [
+            'data' => [
+                'type' => 'dummy',
+                'id' => $clientId,
+                'attributes' => [
+                    'name' => 'foo',
+                ],
+            ],
+        ];
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::any())->willReturn(new PropertyNameCollection(['id', 'name']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id', Argument::any())->willReturn((new ApiProperty())->withNativeType(Type::string())->withReadable(false)->withWritable(true)->withIdentifier(true));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::any())->willReturn((new ApiProperty())->withNativeType(Type::string())->withReadable(false)->withWritable(true));
+
+        // The IRI converter MUST NOT be queried for an existing resource on POST with a client-generated id.
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getResourceFromIri(Argument::cetera())->shouldNotBeCalled();
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'name', 'foo')->shouldBeCalled();
+        $propertyAccessorProphecy->setValue(Argument::type(Dummy::class), 'id', $clientId)->shouldBeCalled();
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $resourceMetadataCollectionFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactory->create(Dummy::class)->willReturn(new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource())->withOperations(new Operations([new Post(name: 'post')])),
+        ]));
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $propertyAccessorProphecy->reveal(),
+            new ReservedAttributeNameConverter(),
+            null,
+            [],
+            $resourceMetadataCollectionFactory->reveal(),
+        );
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $result = $normalizer->denormalize($data, Dummy::class, ItemNormalizer::FORMAT, [
+            'operation' => new Post(),
+            ItemNormalizer::ALLOW_CLIENT_GENERATED_ID => true,
+        ]);
+
+        $this->assertInstanceOf(Dummy::class, $result);
     }
 }
