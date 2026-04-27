@@ -32,8 +32,6 @@
         "api-platform/documentation": "^4.3",
         "api-platform/http-cache": "^4.3",
         "api-platform/json-schema": "^4.3",
-        "api-platform/jsonld": "^4.3",
-        "api-platform/hydra": "^4.3",
         "api-platform/metadata": "^4.3",
         "api-platform/serializer": "^4.3",
         "api-platform/state": "^4.3",

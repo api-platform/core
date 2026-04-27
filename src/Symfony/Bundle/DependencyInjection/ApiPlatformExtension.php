@@ -711,6 +711,14 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             return;
         }
 
+        if (!InstalledVersions::isInstalled('api-platform/jsonld')) {
+            throw new \LogicException('JSON+LD support cannot be enabled as the JSON+LD component is not installed. Try running "composer require api-platform/jsonld".');
+        }
+
+        if (!InstalledVersions::isInstalled('api-platform/hydra')) {
+            throw new \LogicException('JSON+LD support cannot be enabled as the Hydra component is not installed. Try running "composer require api-platform/hydra".');
+        }
+
         if ($config['use_symfony_listeners']) {
             $loader->load('symfony/jsonld.php');
         } else {
