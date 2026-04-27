@@ -68,7 +68,7 @@ final class SerializeProcessor implements ProcessorInterface, StopwatchAwareInte
 
         $serializerContext['uri_variables'] = $uriVariables;
 
-        if (isset($serializerContext['output']) && \array_key_exists('class', $serializerContext['output']) && null === $serializerContext['output']['class']) {
+        if (isset($serializerContext['output']) && null === $serializerContext['output']) {
             $this->stopwatch?->stop('api_platform.processor.serialize');
 
             return $this->processor ? $this->processor->process(null, $operation, $uriVariables, $context) : null;

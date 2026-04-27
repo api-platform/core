@@ -729,8 +729,16 @@ abstract class Operation extends Metadata
          * For more examples, read our guide on [validation](/guides/validation).
          */
         protected ?array $validationContext = null,
+        /**
+         * @deprecated use inputClass instead
+         */
         protected $input = null,
+        protected ?string $inputClass = null,
+        /**
+         * @deprecated use outputClass instead
+         */
         protected $output = null,
+        protected ?string $outputClass = null,
         protected $mercure = null,
         /**
          * The `messenger` option dispatches the current resource through the Message Bus.
@@ -816,6 +824,7 @@ abstract class Operation extends Metadata
         protected ?bool $jsonStream = null,
         protected array $extraProperties = [],
         ?bool $map = null,
+        protected ?string $dataClass = null,
     ) {
         parent::__construct(
             shortName: $shortName,
@@ -831,7 +840,9 @@ abstract class Operation extends Metadata
             mercure: $mercure,
             messenger: $messenger,
             input: $input,
+            inputClass: $inputClass,
             output: $output,
+            outputClass: $outputClass,
             order: $order,
             fetchPartial: $fetchPartial,
             forceEager: $forceEager,
@@ -863,7 +874,8 @@ abstract class Operation extends Metadata
             hideHydraOperation: $hideHydraOperation,
             jsonStream: $jsonStream,
             extraProperties: $extraProperties,
-            map: $map
+            map: $map,
+            dataClass: $dataClass
         );
     }
 

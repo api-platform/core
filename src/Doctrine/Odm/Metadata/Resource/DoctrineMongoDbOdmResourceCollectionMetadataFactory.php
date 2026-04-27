@@ -45,7 +45,7 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactory implements Resou
 
             if ($operations) {
                 foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
-                    $documentClass = $this->getStateOptionsClass($operation, $operation->getClass(), Options::class);
+                    $documentClass = $operation->getDataClass();
                     if (!$this->managerRegistry->getManagerForClass($documentClass) instanceof DocumentManager) {
                         continue;
                     }
@@ -62,7 +62,7 @@ final class DoctrineMongoDbOdmResourceCollectionMetadataFactory implements Resou
 
             if ($graphQlOperations) {
                 foreach ($graphQlOperations as $operationName => $graphQlOperation) {
-                    $documentClass = $this->getStateOptionsClass($graphQlOperation, $graphQlOperation->getClass(), Options::class);
+                    $documentClass = $operation->getDataClass();
                     if (!$this->managerRegistry->getManagerForClass($documentClass) instanceof DocumentManager) {
                         continue;
                     }

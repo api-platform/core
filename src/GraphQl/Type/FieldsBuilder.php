@@ -616,7 +616,7 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
                 continue;
             }
 
-            $entityClass = $this->getStateOptionsClass($resourceOperation, $resourceOperation->getClass());
+            $entityClass = $resourceOperation->getDataClass();
             foreach ($this->filterLocator->get($filterId)->getDescription($entityClass) as $key => $description) {
                 $filterType = \in_array($description['type'], TypeIdentifier::values(), true) ? Type::builtin($description['type']) : Type::object($description['type']);
                 if (!($description['required'] ?? false)) {

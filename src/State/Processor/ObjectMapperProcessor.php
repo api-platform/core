@@ -40,7 +40,7 @@ final class ObjectMapperProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $class = $operation->getInput()['class'] ?? $operation->getClass();
+        $class = $operation->getInputClass();
 
         if (
             $data instanceof Response
@@ -52,14 +52,13 @@ final class ObjectMapperProcessor implements ProcessorInterface
         ) {
             return $this->decorated->process($data, $operation, $uriVariables, $context);
         }
-
         $request = $context['request'] ?? null;
 
         // maps the Resource to an Entity
         if ($request?->attributes->get('mapped_data')) {
             $mappedData = $this->objectMapper->map($data, $request->attributes->get('mapped_data'));
         } else {
-            $mappedData = $this->objectMapper->map($data, $this->getStateOptionsClass($operation, $operation->getClass()));
+            $mappedData = $this->objectMapper->map($data, $operation->getDataClass());
         }
         $request?->attributes->set('mapped_data', $mappedData);
 
