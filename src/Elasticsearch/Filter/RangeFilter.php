@@ -14,9 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\Elasticsearch\Filter;
 
 /**
- * The range filter allows to find resources that [range](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html) the specified text on full text fields.
+ * The range filter allows to find resources matching a numeric or date [range](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html)
+ * on the given properties.
  *
- * Syntax: `?property[]=value`.
+ * Syntax: `?property[<operator>]=value` where `<operator>` is one of `gt`, `gte`, `lt`, `lte`.
+ * Operators can be combined to express bounded ranges.
  *
  * <div data-code-selector>
  *
@@ -28,7 +30,7 @@ namespace ApiPlatform\Elasticsearch\Filter;
  * use ApiPlatform\Elasticsearch\Filter\RangeFilter;
  *
  * #[ApiResource]
- * #[ApiFilter(RangeFilter::class, properties: ['title'])]
+ * #[ApiFilter(RangeFilter::class, properties: ['price'])]
  * class Book
  * {
  *     // ...
@@ -40,7 +42,7 @@ namespace ApiPlatform\Elasticsearch\Filter;
  * services:
  *     book.range_filter:
  *         parent: 'api_platform.elasticsearch.range_filter'
- *         arguments: [ { title: ~ } ]
+ *         arguments: [ { price: ~ } ]
  *         tags:  [ 'api_platform.filter' ]
  *         # The following are mandatory only if a _defaults section is defined with inverted values.
  *         # You may want to isolate filters in a dedicated file to avoid adding the following lines (by adding them in the defaults section)
@@ -68,7 +70,7 @@ namespace ApiPlatform\Elasticsearch\Filter;
  *     <services>
  *         <service id="book.range_filter" parent="api_platform.elasticsearch.range_filter">
  *             <argument type="collection">
- *                 <argument key="title"/>
+ *                 <argument key="price"/>
  *             </argument>
  *             <tag name="api_platform.filter"/>
  *         </service>
@@ -94,7 +96,10 @@ namespace ApiPlatform\Elasticsearch\Filter;
  *
  * </div>
  *
- * Given that the collection endpoint is `/books`, you can filter books by title content with the following query: `/books?title=Foundation`.
+ * Given that the collection endpoint is `/books`, you can filter books priced between 10 and 50
+ * with the following query: `/books?price[gte]=10&price[lte]=50`.
+ *
+ * Unknown operators are ignored, so only `gt`, `gte`, `lt` and `lte` ever reach the underlying query.
  *
  * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html
  *
@@ -109,6 +114,7 @@ final class RangeFilter extends AbstractSearchFilter
     public const LT = 'lt';
 
     public const LTE = 'lte';
+
     /**
      * {@inheritdoc}
      */
