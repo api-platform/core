@@ -61,6 +61,18 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     public const FORMAT = 'jsonapi';
 
+    /**
+     * Opt-in flag enabling client-generated IDs on a POST request, per
+     * https://jsonapi.org/format/#crud-creating-client-ids
+     * Off by default to prevent ID spoofing on public endpoints.
+     *
+     * Can be enabled either via the denormalization context, or declaratively
+     * on the operation via `extraProperties`:
+     *
+     *     #[Post(extraProperties: [ItemNormalizer::ALLOW_CLIENT_GENERATED_ID => true])]
+     */
+    public const ALLOW_CLIENT_GENERATED_ID = 'allow_client_generated_id';
+
     private array $componentsCache = [];
     private bool $useIriAsId;
 
@@ -207,21 +219,32 @@ final class ItemNormalizer extends AbstractItemNormalizer
             return parent::denormalize($data, $type, $format, $context);
         }
 
+        $operation = $context['operation'] ?? null;
+        $isPostOperation = $operation instanceof HttpOperation && 'POST' === $operation->getMethod();
+
+        $allowClientGeneratedId = $context[self::ALLOW_CLIENT_GENERATED_ID] ?? null;
+        if (null === $allowClientGeneratedId && $isPostOperation) {
+            $allowClientGeneratedId = $operation->getExtraProperties()[self::ALLOW_CLIENT_GENERATED_ID] ?? false;
+        }
+        $allowClientGeneratedId = true === $allowClientGeneratedId;
+
         // Avoid issues with proxies if we populated the object
         if (!isset($context[self::OBJECT_TO_POPULATE]) && isset($data['data']['id'])) {
-            if (true !== ($context['api_allow_update'] ?? true)) {
+            if ($isPostOperation) {
+                if (!$allowClientGeneratedId) {
+                    throw new NotNormalizableValueException(\sprintf('Client-generated IDs are not allowed on this operation. Pass "%s" => true in the denormalization context (or set it via the operation\'s extraProperties) to enable.', self::ALLOW_CLIENT_GENERATED_ID));
+                }
+                // Fall through: id flows into the denormalized payload below.
+            } elseif (true !== ($context['api_allow_update'] ?? true)) {
                 throw new NotNormalizableValueException('Update is not allowed for this operation.');
-            }
-
-            $context += ['fetch_data' => false];
-            if ($this->useIriAsId) {
-                $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri(
-                    $data['data']['id'],
-                    $context
-                );
             } else {
-                $operation = $context['operation'] ?? null;
-                if ($operation instanceof HttpOperation) {
+                $context += ['fetch_data' => false];
+                if ($this->useIriAsId) {
+                    $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri(
+                        $data['data']['id'],
+                        $context
+                    );
+                } elseif ($operation instanceof HttpOperation) {
                     $iri = $this->reconstructIri($type, (string) $data['data']['id'], $operation);
                     $context[self::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri($iri, $context);
                 }
@@ -233,6 +256,11 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $data['data']['attributes'] ?? [],
             $data['data']['relationships'] ?? []
         );
+
+        // Surface the client-generated id so the entity setter receives it.
+        if ($isPostOperation && $allowClientGeneratedId && isset($data['data']['id'])) {
+            $dataToDenormalize['id'] = $data['data']['id'];
+        }
 
         return parent::denormalize(
             $dataToDenormalize,

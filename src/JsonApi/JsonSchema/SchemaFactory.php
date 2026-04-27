@@ -20,6 +20,7 @@ use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryAwareInterface;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\JsonSchema\SchemaUriPrefixTrait;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -282,6 +283,10 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
     private function buildDefinitionPropertiesSchema(string $key, string $className, string $format, string $type, ?Operation $operation, Schema $schema, ?array $serializerContext): array
     {
+        // Capture the operation for the resource being built; the loop below
+        // reassigns $operation while resolving relationships.
+        $resourceOperation = $operation;
+
         $definitions = $schema->getDefinitions();
         $properties = $definitions[$key]['properties'] ?? [];
 
@@ -369,11 +374,18 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             ];
         }
 
+        // Per JSON:API spec, `id` is optional in the request body of a creation:
+        // https://jsonapi.org/format/#crud-creating
+        $required = ['type', 'id'];
+        if (Schema::TYPE_INPUT === $type && $resourceOperation instanceof HttpOperation && 'POST' === $resourceOperation->getMethod()) {
+            $required = ['type'];
+        }
+
         return [
             'data' => [
                 'type' => 'object',
                 'properties' => $replacement,
-                'required' => ['type', 'id'],
+                'required' => $required,
             ],
         ] + $included;
     }
