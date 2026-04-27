@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Issues;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6926\Error;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6926\ThrowsAnExceptionWithGroup;
 use ApiPlatform\Tests\SetupClassResourcesTrait;

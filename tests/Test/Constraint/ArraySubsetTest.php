@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Symfony\Bundle\Test\Constraint;
+namespace ApiPlatform\Tests\Test\Constraint;
 
-use ApiPlatform\Symfony\Bundle\Test\Constraint\ArraySubset;
+use ApiPlatform\Test\Constraint\ArraySubset;
 use ApiPlatform\Tests\Fixtures\ArrayAccessible;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\ExpectationFailedException;
