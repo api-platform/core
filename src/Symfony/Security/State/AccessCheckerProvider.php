@@ -85,7 +85,14 @@ final class AccessCheckerProvider implements ProviderInterface
             ];
         }
 
-        if ('pre_read' === $this->event && $this->resourceAccessChecker instanceof ObjectVariableCheckerInterface && $this->resourceAccessChecker->usesObjectVariable($isGranted, $resourceAccessCheckerContext)) {
+        // Skip pre_read optimization when object is used via granted (or usage is not predicatable)
+        if (
+            'pre_read' === $this->event
+            && (
+                !$this->resourceAccessChecker instanceof ObjectVariableCheckerInterface
+                || $this->resourceAccessChecker->usesObjectVariable($isGranted, $resourceAccessCheckerContext)
+            )
+        ) {
             return $this->decorated->provide($operation, $uriVariables, $context);
         }
 
