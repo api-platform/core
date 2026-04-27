@@ -2,7 +2,18 @@ name: CI
 
 on:
   push:
+    branches:
+      - main
+      - '[0-9]+.[0-9]+'
+    paths-ignore:
+      - '**.md'
+      - '**.rst'
+      - 'docs/**'
   pull_request:
+    paths-ignore:
+      - '**.md'
+      - '**.rst'
+      - 'docs/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
@@ -235,15 +246,8 @@ jobs:
     timeout-minutes: 20
     strategy:
       matrix:
-        php:
-          - '8.2'
-          - '8.3'
-          - '8.4'
-          - '8.5'
+        php: ${{ fromJSON(github.event_name == 'pull_request' && '["8.2","8.5"]' || '["8.2","8.3","8.4","8.5"]') }}
         include:
-          - php: '8.2'
-          - php: '8.3'
-          - php: '8.4'
           - php: '8.5'
             coverage: true
       fail-fast: false
@@ -311,16 +315,7 @@ jobs:
     timeout-minutes: 20
     strategy:
       matrix:
-        php:
-          - version: '8.2'
-          - version: '8.3'
-          - version: '8.4'
-          - version: '8.5'
-            coverage: true
-          - version: '8.5'
-            lowest: true
-          - version: '8.5'
-            minimal-changes: true
+        php: ${{ fromJSON(github.event_name == 'pull_request' && '[{"version":"8.2"},{"version":"8.5","coverage":true},{"version":"8.5","lowest":true},{"version":"8.5","minimal-changes":true}]' || '[{"version":"8.2"},{"version":"8.3"},{"version":"8.4"},{"version":"8.5","coverage":true},{"version":"8.5","lowest":true},{"version":"8.5","minimal-changes":true}]') }}
         component:
           - api-platform/doctrine-common
           - api-platform/doctrine-orm
@@ -459,21 +454,20 @@ jobs:
           ./vendor/bin/phpunit --fail-on-deprecation --display-deprecations --log-junit "/tmp/build/logs/phpunit/junit.xml" 
 
   behat:
-    name: Behat (PHP ${{ matrix.php }})
+    name: Behat (PHP ${{ matrix.php }} ${{ matrix.shard }})
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
       matrix:
-        php:
-          - '8.2'
-          - '8.3'
-          - '8.4'
-          - '8.5'
+        php: ${{ fromJSON(github.event_name == 'pull_request' && '["8.2","8.5"]' || '["8.2","8.3","8.4","8.5"]') }}
+        shard:
+          - main
+          - ld-api-hal-hydra
+          - graphql-doctrine
+          - misc
         include:
-          - php: '8.2'
-          - php: '8.3'
-          - php: '8.4'
           - php: '8.5'
+            shard: main
             coverage: true
       fail-fast: false
     steps:
@@ -506,10 +500,20 @@ jobs:
         run: composer require phpunit/phpunit:^11.5 --dev --with-all-dependencies
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
-      - name: Run Behat tests (PHP ${{ matrix.php }})
+      - name: Resolve shard paths
+        id: shard
+        run: |
+          case "${{ matrix.shard }}" in
+            main) paths="features/main" ;;
+            ld-api-hal-hydra) paths="features/jsonld features/jsonapi features/hal features/hydra" ;;
+            graphql-doctrine) paths="features/graphql features/doctrine" ;;
+            misc) paths="features/authorization features/filter features/issues features/security features/serializer features/http_cache features/sub_resources features/json features/xml features/push_relations features/mercure" ;;
+          esac
+          echo "paths=$paths" >> $GITHUB_OUTPUT
+      - name: Run Behat tests (PHP ${{ matrix.php }} ${{ matrix.shard }})
         run: |
           mkdir -p build/logs/behat
-          vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --no-interaction ${{ matrix.coverage && '--profile=default-coverage' || '--profile=default' }}
+          vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --no-interaction ${{ matrix.coverage && '--profile=default-coverage' || '--profile=default' }} ${{ steps.shard.outputs.paths }}
       - name: Merge code coverage reports
         if: matrix.coverage
         run: |
@@ -522,7 +526,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v6
         with:
-          name: behat-logs-php${{ matrix.php }}
+          name: behat-logs-php${{ matrix.php }}-shard${{ matrix.shard }}
           path: build/logs/behat
         continue-on-error: true
       - name: Upload coverage results to Codecov
@@ -530,7 +534,7 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           directory: build/logs/behat
-          name: behat-php${{ matrix.php }}
+          name: behat-php${{ matrix.php }}-shard${{ matrix.shard }}
           flags: behat
           fail_ci_if_error: true
         continue-on-error: true
@@ -1406,15 +1410,8 @@ jobs:
     timeout-minutes: 20
     strategy:
       matrix:
-        php:
-          - '8.2'
-          - '8.3'
-          - '8.4'
-          - '8.5'
+        php: ${{ fromJSON(github.event_name == 'pull_request' && '["8.2","8.5"]' || '["8.2","8.3","8.4","8.5"]') }}
         include:
-          - php: '8.2'
-          - php: '8.3'
-          - php: '8.4'
           - php: '8.5'
             coverage: true
       fail-fast: false

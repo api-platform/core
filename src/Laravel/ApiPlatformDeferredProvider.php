@@ -271,7 +271,8 @@ class ApiPlatformDeferredProvider extends ServiceProvider implements DeferrableP
                             $app->make(ResourceClassResolverInterface::class),
                         ),
                         $app->make('filters')
-                    )
+                    ),
+                    (bool) $config->get('api-platform.partial_patch_validation', false)
                 ),
                 true === $config->get('app.debug') ? 'array' : $config->get('api-platform.cache', 'file')
             );

@@ -109,6 +109,7 @@ return (new PhpCsFixer\Config())
         'phpdoc_trim_consecutive_blank_line_separation' => true,
         'phpdoc_var_annotation_correct_order' => true,
         'return_assignment' => true,
+        'declare_strict_types' => true,
         'strict_param' => true,
         'visibility_required' => [
             'elements' => [

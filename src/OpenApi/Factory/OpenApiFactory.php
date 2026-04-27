@@ -231,13 +231,15 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $openapiOperation = $openapiAttribute;
             }
 
+            $summary = null !== $openapiOperation->getSummary() ? $openapiOperation->getSummary() : $this->getPathDescription($resourceShortName, $method, $operation instanceof CollectionOperationInterface);
+
             // Complete with defaults
             $openapiOperation = new Operation(
                 operationId: null !== $openapiOperation->getOperationId() ? $openapiOperation->getOperationId() : $this->normalizeOperationName($operationName),
                 tags: null !== $openapiOperation->getTags() ? $openapiOperation->getTags() : [$operation->getShortName() ?: $resourceShortName],
                 responses: null !== $openapiOperation->getResponses() ? $openapiOperation->getResponses() : [],
-                summary: null !== $openapiOperation->getSummary() ? $openapiOperation->getSummary() : $this->getPathDescription($resourceShortName, $method, $operation instanceof CollectionOperationInterface),
-                description: null !== $openapiOperation->getDescription() ? $openapiOperation->getDescription() : $this->getPathDescription($resourceShortName, $method, $operation instanceof CollectionOperationInterface),
+                summary: $summary,
+                description: null !== $openapiOperation->getDescription() ? $openapiOperation->getDescription() : $summary,
                 externalDocs: $openapiOperation->getExternalDocs(),
                 parameters: null !== $openapiOperation->getParameters() ? $openapiOperation->getParameters() : [],
                 requestBody: $openapiOperation->getRequestBody(),
@@ -279,10 +281,22 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     continue;
                 }
 
+                $description = $uriVariable->getDescription();
+                if (null === $description) {
+                    $fromClass = $uriVariable->getFromClass();
+                    if (null !== $fromClass && $fromClass !== $resourceClass) {
+                        $uriResourceName = (new \ReflectionClass($fromClass))->getShortName();
+                    } else {
+                        $uriResourceName = $resourceShortName;
+                    }
+
+                    $description = "$uriResourceName identifier";
+                }
+
                 $parameter = new Parameter(
                     $parameterName,
                     'path',
-                    $uriVariable->getDescription() ?? "$resourceShortName identifier",
+                    $description,
                     $uriVariable->getRequired() ?? true,
                     false,
                     null,
