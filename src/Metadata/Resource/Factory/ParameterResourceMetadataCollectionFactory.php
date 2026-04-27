@@ -59,6 +59,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         ?ResourceClassResolverInterface $resourceClassResolver = null,
     ) {
         $this->resourceClassResolver = $resourceClassResolver;
+        $this->resourceMetadataFactory = $this->decorated;
     }
 
     public function create(string $resourceClass): ResourceMetadataCollection
