@@ -292,7 +292,7 @@ jobs:
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           directory: build/logs/phpunit
           name: phpunit-php${{ matrix.php }}
@@ -386,7 +386,7 @@ jobs:
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           directory: /tmp/build/logs/phpunit
           name: phpunit-php${{ matrix.php }}
@@ -531,7 +531,7 @@ jobs:
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           directory: build/logs/behat
           name: behat-php${{ matrix.php }}-shard${{ matrix.shard }}
@@ -728,7 +728,7 @@ jobs:
           path: build/logs/behat
         continue-on-error: true
       - name: Upload coverage results to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           directory: build/logs/behat
           name: behat-php${{ matrix.php }}
@@ -818,7 +818,7 @@ jobs:
           path: build/logs/behat
         continue-on-error: true
       - name: Upload coverage results to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           directory: build/logs/behat
           name: behat-php${{ matrix.php }}
@@ -1289,7 +1289,7 @@ jobs:
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           directory: build/logs/phpunit
           name: phpunit-php${{ matrix.php }}
