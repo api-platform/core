@@ -162,6 +162,34 @@ class RespondProcessorTest extends TestCase
         $this->assertSame('application/ld+json', $response->headers->get('Accept-Post'));
     }
 
+    public function testDynamicResponseStatusFromRequestAttribute(): void
+    {
+        $operation = new Post(class: Employee::class);
+
+        $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolver->isResourceClass(Employee::class)->willReturn(true);
+
+        $respondProcessor = new RespondProcessor(null, $resourceClassResolver->reveal());
+
+        $req = new Request([], [], ['_api_response_status' => 200]);
+        $req->setMethod('POST');
+        $response = $respondProcessor->process('content', $operation, context: [
+            'request' => $req,
+            'original_data' => new Employee(),
+        ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+
+        $req = new Request();
+        $req->setMethod('POST');
+        $response = $respondProcessor->process('content', $operation, context: [
+            'request' => $req,
+            'original_data' => new Employee(),
+        ]);
+
+        $this->assertSame(201, $response->getStatusCode());
+    }
+
     public function testDoesNotAddLinkedDataPlatformHeadersWithoutFactory(): void
     {
         $operation = new Get(uriTemplate: '/employees/{id}', class: Employee::class);
