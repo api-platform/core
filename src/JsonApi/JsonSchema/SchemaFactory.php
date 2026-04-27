@@ -21,7 +21,6 @@ use ApiPlatform\JsonSchema\SchemaFactoryAwareInterface;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\JsonSchema\SchemaUriPrefixTrait;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
@@ -377,7 +376,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         // Per JSON:API spec, `id` is optional in the request body of a creation:
         // https://jsonapi.org/format/#crud-creating
         $required = ['type', 'id'];
-        if (Schema::TYPE_INPUT === $type && $resourceOperation instanceof Post) {
+        if (Schema::TYPE_INPUT === $type && $resourceOperation && 'POST' === $resourceOperation->getMethod()) {
             $required = ['type'];
         }
 
