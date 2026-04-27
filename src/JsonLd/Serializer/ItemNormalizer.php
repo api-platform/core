@@ -110,7 +110,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
         // TODO: we should not remove the resource_class in the normalizeRawCollection as we would find out anyway that it's not the same as the requested one
         $previousResourceClass = $context['resource_class'] ?? null;
         $metadata = [];
-        if ($isResourceClass = $this->resourceClassResolver->isResourceClass($resourceClass) && (null === $previousResourceClass || $this->resourceClassResolver->isResourceClass($previousResourceClass))) {
+        $isResourceClass = $this->resourceClassResolver->isResourceClass($resourceClass);
+        if ($isResourceClass && (null === $previousResourceClass || $this->resourceClassResolver->isResourceClass($previousResourceClass))) {
             $resourceClass = $this->resourceClassResolver->getResourceClass($data, $previousResourceClass);
             if (isset($context['operation']) && $context['operation'] instanceof HttpOperation && $context['operation']->getClass() !== $resourceClass) {
                 $context['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation(null, false, true);
@@ -126,7 +127,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
             if (isset($context['item_uri_template']) && $this->operationMetadataFactory) {
                 $context['output']['operation'] = $this->operationMetadataFactory->create($context['item_uri_template']);
-            } elseif ($this->resourceClassResolver->isResourceClass($resourceClass)) {
+            } elseif ($isResourceClass) {
                 $context['output']['operation'] = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
             }
 
