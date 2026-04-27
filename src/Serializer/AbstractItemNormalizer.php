@@ -61,6 +61,7 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  */
 abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 {
+    use CacheKeyTrait;
     use ClassInfoTrait;
     use CloneTrait;
     use ContextTrait;
@@ -76,6 +77,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     protected array $localCache = [];
     protected array $localFactoryOptionsCache = [];
     protected ?ResourceAccessCheckerInterface $resourceAccessChecker;
+
+    private array $safeCacheKeysCache = [];
 
     public function __construct(protected PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, protected PropertyMetadataFactoryInterface $propertyMetadataFactory, protected IriConverterInterface $iriConverter, protected ResourceClassResolverInterface $resourceClassResolver, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ?ResourceAccessCheckerInterface $resourceAccessChecker = null, protected ?TagCollectorInterface $tagCollector = null, protected ?OperationResourceClassResolverInterface $operationResourceResolver = null)
     {
@@ -187,6 +190,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         if (!$this->tagCollector && isset($context['resources'])) {
             $context['resources'][$iri] = $iri;
+        }
+
+        if ($this->isCacheKeySafe($context)) {
+            $context['cache_key'] = $this->getCacheKey($format, $context);
+        } else {
+            $context['cache_key'] = false;
         }
 
         $context['object'] = $data;
@@ -540,6 +549,34 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         return true;
+    }
+
+    /**
+     * Check if any property contains a security grants, which makes the cache key not safe,
+     * as allowed_properties can differ for 2 instances of the same object.
+     */
+    private function isCacheKeySafe(array $context): bool
+    {
+        if (!isset($context['resource_class']) || !$this->resourceClassResolver->isResourceClass($context['resource_class'])) {
+            return false;
+        }
+        $resourceClass = $this->resourceClassResolver->getResourceClass(null, $context['resource_class']);
+        if (isset($this->safeCacheKeysCache[$resourceClass])) {
+            return $this->safeCacheKeysCache[$resourceClass];
+        }
+        $options = $this->getFactoryOptions($context);
+        $propertyNames = $this->propertyNameCollectionFactory->create($resourceClass, $options);
+
+        $this->safeCacheKeysCache[$resourceClass] = true;
+        foreach ($propertyNames as $propertyName) {
+            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName, $options);
+            if (null !== $propertyMetadata->getSecurity()) {
+                $this->safeCacheKeysCache[$resourceClass] = false;
+                break;
+            }
+        }
+
+        return $this->safeCacheKeysCache[$resourceClass];
     }
 
     /**
