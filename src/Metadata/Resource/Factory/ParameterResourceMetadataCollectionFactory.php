@@ -234,6 +234,10 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         $propertyNames = $properties = [];
         $parameters = $operation->getParameters() ?? new Parameters();
 
+        foreach ($this->createParametersFromAttributes($operation) as $key => $parameter) {
+            $parameters->add($key, $parameter);
+        }
+
         // First loop we look for the :property placeholder and replace its key
         foreach ($parameters as $key => $parameter) {
             if (!str_contains($key, ':property')) {
@@ -468,5 +472,50 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         }
 
         return $this->filterLocator->get($filter);
+    }
+
+    private function createParametersFromAttributes(Operation $operation): Parameters
+    {
+        $parameters = new Parameters();
+
+        if (null === $resourceClass = $operation->getClass()) {
+            return $parameters;
+        }
+
+        foreach ((new \ReflectionClass($resourceClass))->getProperties() as $reflectionProperty) {
+            foreach ($reflectionProperty->getAttributes(Parameter::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+                $parameter = $attribute->newInstance();
+
+                if (
+                    null !== ($parameterOperations = $parameter->getOperations())
+                    && !\in_array(
+                        $operation::class,
+                        array_map(static fn ($parameterOperation) => $parameterOperation::class, $parameterOperations),
+                        true
+                    )
+                ) {
+                    continue;
+                }
+
+                $propertyName = $reflectionProperty->getName();
+                $key = $parameter->getKey() ?? $propertyName;
+
+                if (null === $parameterPropertyName = $parameter->getProperty()) {
+                    $parameter = $parameter->withProperty($propertyName);
+                } elseif ($parameterPropertyName !== $propertyName) {
+                    throw new RuntimeException(\sprintf('Parameter attribute on property "%s" must target itself or have no explicit property. Got "property: \'%s\'" instead.', $propertyName, $parameterPropertyName));
+                }
+
+                if (null === ($parameterProperties = $parameter->getProperties()) || \in_array($propertyName, $parameterProperties, true)) {
+                    $parameter = $parameter->withProperties([$propertyName]);
+                } elseif (!\in_array($propertyName, $parameterProperties, true)) {
+                    throw new RuntimeException(\sprintf('Parameter attribute on property "%s" must target itself or have no explicit properties. Got "properties: [%s]" instead.', $propertyName, implode(', ', $parameterProperties)));
+                }
+
+                $parameters->add($key, $parameter);
+            }
+        }
+
+        return $parameters;
     }
 }
