@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonLd\Serializer;
 
+use ApiPlatform\Hydra\Serializer\HydraOperationsTrait;
 use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
@@ -45,6 +46,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
 {
     use ClassInfoTrait;
     use ContextTrait;
+    use HydraOperationsTrait;
+    use HydraPrefixTrait;
     use JsonLdContextTrait;
 
     public const FORMAT = 'jsonld';
@@ -72,8 +75,11 @@ final class ItemNormalizer extends AbstractItemNormalizer
         '@vocab',
     ];
 
+    private array $itemNormalizerDefaultContext = [];
+
     public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, private readonly ContextBuilderInterface $contextBuilder, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ?ResourceAccessCheckerInterface $resourceAccessChecker = null, protected ?TagCollectorInterface $tagCollector = null, private ?OperationMetadataFactoryInterface $operationMetadataFactory = null, ?OperationResourceClassResolverInterface $operationResourceResolver = null)
     {
+        $this->itemNormalizerDefaultContext = $defaultContext;
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $defaultContext, $resourceMetadataCollectionFactory, $resourceAccessChecker, $tagCollector, $operationResourceResolver);
     }
 
@@ -182,6 +188,20 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 }
             }
             $metadata['@type'] = 1 === \count($types) ? $types[0] : $types;
+        }
+
+        $hydraPrefix = $this->getHydraPrefix($context + $this->itemNormalizerDefaultContext);
+
+        if ($isResourceClass && ($context['hydra_operations'] ?? $this->itemNormalizerDefaultContext['hydra_operations'] ?? false)) {
+            $allHydraOperations = $this->getHydraOperationsFromResourceMetadatas(
+                $resourceClass,
+                false,
+                $hydraPrefix
+            );
+
+            if (!empty($allHydraOperations)) {
+                $metadata[$hydraPrefix.'operation'] = $allHydraOperations;
+            }
         }
 
         return $metadata + $normalizedData;
