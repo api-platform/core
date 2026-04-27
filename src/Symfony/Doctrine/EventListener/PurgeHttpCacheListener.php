@@ -145,7 +145,7 @@ final class PurgeHttpCacheListener
 
         /** @var array|AssociationMapping $associationMapping according to the version of doctrine orm */
         foreach ($associationMappings as $property => $associationMapping) {
-            if ($associationMapping instanceof AssociationMapping && ($associationMapping->targetEntity ?? null) && !$this->resourceClassResolver->isResourceClass($associationMapping->targetEntity)) {
+            if ($associationMapping instanceof AssociationMapping && !$this->resourceClassResolver->isResourceClass($associationMapping->targetEntity)) {
                 return;
             }
             if (!$this->propertyAccessor->isReadable($entity, $property)) {
