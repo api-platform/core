@@ -18,7 +18,6 @@ use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
-use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -66,6 +65,11 @@ final class ItemNormalizer extends AbstractItemNormalizer
      * Opt-in flag enabling client-generated IDs on a POST request, per
      * https://jsonapi.org/format/#crud-creating-client-ids
      * Off by default to prevent ID spoofing on public endpoints.
+     *
+     * Can be enabled either via the denormalization context, or declaratively
+     * on the operation via `extraProperties`:
+     *
+     *     #[Post(extraProperties: [ItemNormalizer::ALLOW_CLIENT_GENERATED_ID => true])]
      */
     public const ALLOW_CLIENT_GENERATED_ID = 'allow_client_generated_id';
 
@@ -216,13 +220,19 @@ final class ItemNormalizer extends AbstractItemNormalizer
         }
 
         $operation = $context['operation'] ?? null;
-        $allowClientGeneratedId = true === ($context[self::ALLOW_CLIENT_GENERATED_ID] ?? false);
+        $isPostOperation = $operation instanceof HttpOperation && 'POST' === $operation->getMethod();
+
+        $allowClientGeneratedId = $context[self::ALLOW_CLIENT_GENERATED_ID] ?? null;
+        if (null === $allowClientGeneratedId && $isPostOperation) {
+            $allowClientGeneratedId = $operation->getExtraProperties()[self::ALLOW_CLIENT_GENERATED_ID] ?? false;
+        }
+        $allowClientGeneratedId = true === $allowClientGeneratedId;
 
         // Avoid issues with proxies if we populated the object
         if (!isset($context[self::OBJECT_TO_POPULATE]) && isset($data['data']['id'])) {
-            if ($operation instanceof Post) {
+            if ($isPostOperation) {
                 if (!$allowClientGeneratedId) {
-                    throw new NotNormalizableValueException(\sprintf('Client-generated IDs are not allowed on this operation. Pass "%s" => true in the denormalization context to enable.', self::ALLOW_CLIENT_GENERATED_ID));
+                    throw new NotNormalizableValueException(\sprintf('Client-generated IDs are not allowed on this operation. Pass "%s" => true in the denormalization context (or set it via the operation\'s extraProperties) to enable.', self::ALLOW_CLIENT_GENERATED_ID));
                 }
                 // Fall through: id flows into the denormalized payload below.
             } elseif (true !== ($context['api_allow_update'] ?? true)) {
@@ -248,7 +258,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         );
 
         // Surface the client-generated id so the entity setter receives it.
-        if ($operation instanceof Post && $allowClientGeneratedId && isset($data['data']['id'])) {
+        if ($isPostOperation && $allowClientGeneratedId && isset($data['data']['id'])) {
             $dataToDenormalize['id'] = $data['data']['id'];
         }
 
