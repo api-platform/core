@@ -16,6 +16,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use ApiPlatform\State\Provider\ContentNegotiationProvider;
 use ApiPlatform\State\Provider\DeserializeProvider;
 use ApiPlatform\State\Provider\ParameterProvider;
+use ApiPlatform\State\Provider\RangeHeaderProvider;
 use ApiPlatform\State\Provider\ReadProvider;
 use ApiPlatform\Symfony\EventListener\ErrorListener;
 
@@ -38,6 +39,13 @@ return static function (ContainerConfigurator $container) {
         ->args([
             service('api_platform.state_provider.read.inner'),
             service('api_platform.serializer.context_builder'),
+        ]);
+
+    $services->set('api_platform.state_provider.range_header', RangeHeaderProvider::class)
+        ->decorate('api_platform.state_provider.read', null, 1)
+        ->args([
+            service('api_platform.state_provider.range_header.inner'),
+            service('api_platform.pagination'),
         ]);
 
     $services->set('api_platform.state_provider.deserialize', DeserializeProvider::class)

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\Util;
 
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Error;
 use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
@@ -26,6 +27,8 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\Util\CloneTrait;
+use ApiPlatform\State\Pagination\PaginatorInterface;
+use ApiPlatform\State\Pagination\PartialPaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface as SymfonyHttpExceptionInterface;
@@ -135,7 +138,55 @@ trait HttpResponseHeadersTrait
             $this->addLinkedDataPlatformHeaders($headers, $operation);
         }
 
+        if ($operation instanceof CollectionOperationInterface && $originalData instanceof PartialPaginatorInterface) {
+            $this->addContentRangeHeaders($headers, $operation, $originalData);
+        }
+
         return $headers;
+    }
+
+    /**
+     * Adds Content-Range and Accept-Ranges headers for paginated collections.
+     *
+     * When the total is unknown (PartialPaginatorInterface), the unsatisfied-range
+     * format is skipped because "*​/*" is invalid ABNF (complete-length = 1*DIGIT).
+     *
+     * @see https://datatracker.ietf.org/doc/html/rfc9110#section-14.4
+     * @see https://datatracker.ietf.org/doc/html/rfc9110#section-14.3
+     */
+    private function addContentRangeHeaders(array &$headers, HttpOperation $operation, PartialPaginatorInterface $paginator): void
+    {
+        $unit = self::extractRangeUnit($operation);
+        $currentCount = $paginator->count();
+        $rangeStart = (int) (($paginator->getCurrentPage() - 1) * $paginator->getItemsPerPage());
+
+        if ($paginator instanceof PaginatorInterface) {
+            $totalItems = (int) $paginator->getTotalItems();
+            $headers['Content-Range'] = 0 === $currentCount
+                ? \sprintf('%s */%d', $unit, $totalItems)
+                : \sprintf('%s %d-%d/%d', $unit, $rangeStart, $rangeStart + $currentCount - 1, $totalItems);
+        } elseif (0 < $currentCount) {
+            $headers['Content-Range'] = \sprintf('%s %d-%d/*', $unit, $rangeStart, $rangeStart + $currentCount - 1);
+        }
+
+        $headers['Accept-Ranges'] = $unit;
+    }
+
+    /**
+     * Extracts the range unit from the operation's uriTemplate (e.g., "/books{._format}" → "books").
+     * Falls back to lowercase shortName, then "items".
+     */
+    private static function extractRangeUnit(HttpOperation $operation): string
+    {
+        if ($uriTemplate = $operation->getUriTemplate()) {
+            $path = strtok($uriTemplate, '{');
+            $segments = array_filter(explode('/', trim($path, '/')));
+            if ($last = end($segments)) {
+                return strtolower($last);
+            }
+        }
+
+        return strtolower($operation->getShortName() ?? 'items') ?: 'items';
     }
 
     private function addLinkedDataPlatformHeaders(array &$headers, HttpOperation $operation): void
