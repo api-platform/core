@@ -46,16 +46,31 @@ trait NestedPropertyHelperTrait
             return [$alias, $property];
         }
 
-        foreach ($nestedInfo['converted_relation_segments'] as $association) {
-            $alias = QueryBuilderHelper::addJoinOnce(
-                $queryBuilder,
-                $queryNameGenerator,
-                $alias,
-                $association,
-                $joinType
-            );
+        $relationClasses = $nestedInfo['relation_classes'] ?? [];
+        $association = null;
+        $embedded = false;
+
+        foreach ($nestedInfo['converted_relation_segments'] as $id => $association) {
+            $entityClass = $relationClasses[$id] ?? null;
+            if (!$entityClass) {
+                continue;
+            }
+
+            $embedded = !$queryBuilder->getEntityManager()->getClassMetadata($entityClass)->hasAssociation($association);
+
+            if (!$embedded) {
+                $alias = QueryBuilderHelper::addJoinOnce(
+                    $queryBuilder,
+                    $queryNameGenerator,
+                    $alias,
+                    $association,
+                    $joinType
+                );
+            }
         }
 
-        return [$alias, $nestedInfo['leaf_property']];
+        $leafProperty = $nestedInfo['leaf_property'];
+
+        return [$alias, $embedded && $association ? $association.'.'.$leafProperty : $leafProperty];
     }
 }

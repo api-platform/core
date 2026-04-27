@@ -76,7 +76,11 @@ trait ResourceClassInfoTrait
     }
 
     /**
-     * Gets the class name from a property metadata if it's a resource class.
+     * Gets the class name referenced by a property's type, if any.
+     *
+     * Returns the underlying class for object types (including the inner type of collections);
+     * returns null for scalar/builtin types or untyped properties. The returned class is not
+     * required to be an API resource — callers that need that constraint must check explicitly.
      */
     protected function getClassNameFromProperty(ApiProperty $propertyMetadata): ?string
     {
@@ -84,8 +88,6 @@ trait ResourceClassInfoTrait
             return null;
         }
 
-        $className = $this->extractClassNameFromType($type);
-
-        return $className && $this->isResourceClass($className) ? $className : null;
+        return $this->extractClassNameFromType($type);
     }
 }
