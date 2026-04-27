@@ -27,5 +27,5 @@ interface SerializerAwareProviderInterface
     /**
      * @return void
      */
-    public function setSerializerLocator(ContainerInterface $serializerLocator);
+    public function setSerializerLocator(ContainerInterface $serializerLocator): void;
 }
