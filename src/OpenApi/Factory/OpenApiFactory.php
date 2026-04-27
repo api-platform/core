@@ -25,6 +25,7 @@ use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\HeaderParameterInterface;
 use ApiPlatform\Metadata\HttpOperation;
+use ApiPlatform\Metadata\ResponseHeaderParameterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -33,6 +34,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\OpenApi\Attributes\Webhook;
 use ApiPlatform\OpenApi\Model\Components;
 use ApiPlatform\OpenApi\Model\Contact;
+use ApiPlatform\OpenApi\Model\Header;
 use ApiPlatform\OpenApi\Model\Info;
 use ApiPlatform\OpenApi\Model\License;
 use ApiPlatform\OpenApi\Model\Link;
@@ -329,8 +331,14 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             $entityClass = $this->getStateOptionsClass($operation, $operation->getClass());
             $openapiParameters = $openapiOperation->getParameters();
+            $responseHeaderParameters = [];
             foreach ($operation->getParameters() ?? [] as $key => $p) {
                 if (false === $p->getOpenApi()) {
+                    continue;
+                }
+
+                if ($p instanceof ResponseHeaderParameterInterface) {
+                    $responseHeaderParameters[$key] = $p;
                     continue;
                 }
 
@@ -463,6 +471,24 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             if (!$openapiOperation->getResponses()) {
                 $openapiOperation = $openapiOperation->withResponse('default', new Response('Unexpected error'));
+            }
+
+            if ($responseHeaderParameters) {
+                $responseHeaders = new \ArrayObject();
+                foreach ($responseHeaderParameters as $key => $p) {
+                    $responseHeaders[$key] = new Header(description: $p->getDescription() ?? '', schema: $p->getSchema() ?? ['type' => 'string']);
+                }
+
+                foreach ($openapiOperation->getResponses() as $status => $response) {
+                    $existingHeaders = $response->getHeaders();
+                    $mergedHeaders = $existingHeaders ? clone $existingHeaders : new \ArrayObject();
+                    foreach ($responseHeaders as $name => $header) {
+                        if (!isset($mergedHeaders[$name])) {
+                            $mergedHeaders[$name] = $header;
+                        }
+                    }
+                    $openapiOperation = $openapiOperation->withResponse($status, $response->withHeaders($mergedHeaders));
+                }
             }
 
             if (

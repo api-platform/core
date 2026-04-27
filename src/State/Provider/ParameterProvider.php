@@ -16,6 +16,7 @@ namespace ApiPlatform\State\Provider;
 use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
+use ApiPlatform\Metadata\ResponseHeaderParameterInterface;
 use ApiPlatform\State\Exception\ParameterNotSupportedException;
 use ApiPlatform\State\Exception\ProviderNotFoundException;
 use ApiPlatform\State\ParameterNotFound;
@@ -146,7 +147,7 @@ final class ParameterProvider implements ProviderInterface, StopwatchAwareInterf
      */
     private function callParameterProvider(Operation $operation, Parameter $parameter, mixed $values, array $context): Operation
     {
-        if ($parameter->getValue() instanceof ParameterNotFound) {
+        if ($parameter->getValue() instanceof ParameterNotFound && !$parameter instanceof ResponseHeaderParameterInterface) {
             return $operation;
         }
 
