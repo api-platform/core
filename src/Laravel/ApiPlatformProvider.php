@@ -158,6 +158,7 @@ use ApiPlatform\State\ErrorProvider;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginationOptions;
 use ApiPlatform\State\Processor\AddLinkHeaderProcessor;
+use ApiPlatform\State\Processor\CacheableDocumentationProcessor;
 use ApiPlatform\State\Processor\ObjectMapperInputProcessor;
 use ApiPlatform\State\Processor\ObjectMapperOutputProcessor;
 use ApiPlatform\State\Processor\RespondProcessor;
@@ -551,6 +552,12 @@ class ApiPlatformProvider extends ServiceProvider
             });
         }
 
+        // Documentation/entrypoint processor wraps the base ProcessorInterface with the cache decorator.
+        // MainController and the rest keep the bare ProcessorInterface so regular resource responses are not cached as docs.
+        $this->app->bind('api_platform.state_processor.documentation', static function (Application $app) {
+            return new CacheableDocumentationProcessor($app->make(ProcessorInterface::class));
+        });
+
         $this->app->singleton(ObjectNormalizer::class, static function (Application $app) {
             $config = $app['config'];
             $defaultContext = $config->get('api-platform.serializer', []);
@@ -779,7 +786,7 @@ class ApiPlatformProvider extends ServiceProvider
                 version: $config->get('api-platform.version') ?? '',
                 openApiFactory: $app->make(OpenApiFactoryInterface::class),
                 provider: $app->make(ProviderInterface::class),
-                processor: $app->make(ProcessorInterface::class),
+                processor: $app->make('api_platform.state_processor.documentation'),
                 negotiator: $app->make(Negotiator::class),
                 documentationFormats: $config->get('api-platform.docs_formats'),
                 swaggerUiEnabled: $config->get('api-platform.swagger_ui.enabled', false),
@@ -792,7 +799,7 @@ class ApiPlatformProvider extends ServiceProvider
             /** @var ConfigRepository */
             $config = $app['config'];
 
-            return new EntrypointController($app->make(ResourceNameCollectionFactoryInterface::class), $app->make(ProviderInterface::class), $app->make(ProcessorInterface::class), $config->get('api-platform.docs_formats'));
+            return new EntrypointController($app->make(ResourceNameCollectionFactoryInterface::class), $app->make(ProviderInterface::class), $app->make('api_platform.state_processor.documentation'), $config->get('api-platform.docs_formats'));
         });
 
         $this->app->singleton(Pagination::class, static function (Application $app) {
