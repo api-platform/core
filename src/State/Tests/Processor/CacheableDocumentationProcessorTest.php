@@ -16,7 +16,6 @@ namespace ApiPlatform\State\Tests\Processor;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\State\Processor\CacheableDocumentationProcessor;
 use ApiPlatform\State\ProcessorInterface;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

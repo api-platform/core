@@ -198,6 +198,16 @@ class ConfigurationTest extends TestCase
                 ],
                 'public' => null,
             ],
+            'documentation' => [
+                'cache_headers' => [
+                    'enabled' => true,
+                    'max_age' => 0,
+                    'shared_max_age' => null,
+                    'public' => true,
+                    'must_revalidate' => true,
+                    'etag' => true,
+                ],
+            ],
             'doctrine' => [
                 'enabled' => \in_array('orm', $doctrineIntegrationsToLoad, true),
             ],
