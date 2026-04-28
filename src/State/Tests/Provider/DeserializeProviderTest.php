@@ -21,17 +21,13 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\State\Provider\DeserializeProvider;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\SerializerContextBuilderInterface;
-use ApiPlatform\Validator\Exception\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
-use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
-use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Validator\Constraints\Type;
 
 class DeserializeProviderTest extends TestCase
 {
@@ -205,135 +201,6 @@ class DeserializeProviderTest extends TestCase
         $request->headers->set('CONTENT_TYPE', 'ok');
         $request->attributes->set('input_format', 'format');
         $provider->provide($operation, ['id' => 1], ['request' => $request]);
-    }
-
-    #[IgnoreDeprecations]
-    public function testDeserializeUsesExceptionMessageWhenCanUseMessageForUser(): void
-    {
-        $operation = new Post(deserialize: true, class: \stdClass::class);
-        $decorated = $this->createStub(ProviderInterface::class);
-        $decorated->method('provide')->willReturn(null);
-
-        $exception = NotNormalizableValueException::createForUnexpectedDataType(
-            'The data must belong to a backed enumeration of type Suit.',
-            'invalid',
-            ['string'],
-            'status',
-            true,
-        );
-        $partialException = new PartialDenormalizationException('Denormalization failed.', [$exception]);
-
-        $serializerContextBuilder = $this->createMock(SerializerContextBuilderInterface::class);
-        $serializerContextBuilder->method('createFromRequest')->willReturn([]);
-        $serializer = $this->createMock(SerializerInterface::class);
-        $serializer->method('deserialize')->willThrowException($partialException);
-
-        $provider = new DeserializeProvider($decorated, $serializer, $serializerContextBuilder);
-        $request = new Request(content: '{"status":"invalid"}');
-        $request->headers->set('CONTENT_TYPE', 'application/json');
-        $request->attributes->set('input_format', 'json');
-
-        try {
-            $provider->provide($operation, [], ['request' => $request]);
-            $this->fail('Expected ValidationException');
-        } catch (ValidationException $e) {
-            $violations = $e->getConstraintViolationList();
-            $this->assertCount(1, $violations);
-            $this->assertSame('The data must belong to a backed enumeration of type Suit.', $violations[0]->getMessage());
-            $this->assertSame('The data must belong to a backed enumeration of type Suit.', $violations[0]->getMessageTemplate());
-            $this->assertSame('status', $violations[0]->getPropertyPath());
-            $this->assertSame((string) Type::INVALID_TYPE_ERROR, $violations[0]->getCode());
-        }
-    }
-
-    /**
-     * Simulates Symfony 8.1 BackedEnumNormalizer behavior (symfony/serializer PR #62574):
-     * when a value has the right type but is not a valid enum case, the exception
-     * is created with expectedTypes=null and a user-friendly message listing valid values.
-     */
-    #[IgnoreDeprecations]
-    public function testDeserializeUsesExceptionMessageWhenExpectedTypesIsNull(): void
-    {
-        $operation = new Post(deserialize: true, class: \stdClass::class);
-        $decorated = $this->createStub(ProviderInterface::class);
-        $decorated->method('provide')->willReturn(null);
-
-        $ctor = new \ReflectionMethod(NotNormalizableValueException::class, '__construct');
-        if ($ctor->getNumberOfParameters() <= 3) {
-            $this->markTestSkipped('NotNormalizableValueException does not support extended constructor parameters.');
-        }
-
-        $exception = new NotNormalizableValueException(
-            "The data must be one of the following values: 'hearts', 'diamonds', 'clubs', 'spades'",
-            0,
-            null,
-            null,
-            null,
-            'suit',
-            true,
-        );
-        $partialException = new PartialDenormalizationException('Denormalization failed.', [$exception]);
-
-        $serializerContextBuilder = $this->createMock(SerializerContextBuilderInterface::class);
-        $serializerContextBuilder->method('createFromRequest')->willReturn([]);
-        $serializer = $this->createMock(SerializerInterface::class);
-        $serializer->method('deserialize')->willThrowException($partialException);
-
-        $provider = new DeserializeProvider($decorated, $serializer, $serializerContextBuilder);
-        $request = new Request(content: '{"suit":"invalid"}');
-        $request->headers->set('CONTENT_TYPE', 'application/json');
-        $request->attributes->set('input_format', 'json');
-
-        try {
-            $provider->provide($operation, [], ['request' => $request]);
-            $this->fail('Expected ValidationException');
-        } catch (ValidationException $e) {
-            $violations = $e->getConstraintViolationList();
-            $this->assertCount(1, $violations);
-            $this->assertSame("The data must be one of the following values: 'hearts', 'diamonds', 'clubs', 'spades'", $violations[0]->getMessage());
-            $this->assertSame("The data must be one of the following values: 'hearts', 'diamonds', 'clubs', 'spades'", $violations[0]->getMessageTemplate());
-            $this->assertSame('suit', $violations[0]->getPropertyPath());
-            $this->assertSame((string) Type::INVALID_TYPE_ERROR, $violations[0]->getCode());
-        }
-    }
-
-    #[IgnoreDeprecations]
-    public function testDeserializeUsesTypeMessageWhenCannotUseMessageForUser(): void
-    {
-        $operation = new Post(deserialize: true, class: \stdClass::class);
-        $decorated = $this->createStub(ProviderInterface::class);
-        $decorated->method('provide')->willReturn(null);
-
-        $exception = NotNormalizableValueException::createForUnexpectedDataType(
-            'Internal error detail',
-            42,
-            ['string'],
-            'name',
-            false,
-        );
-        $partialException = new PartialDenormalizationException('Denormalization failed.', [$exception]);
-
-        $serializerContextBuilder = $this->createMock(SerializerContextBuilderInterface::class);
-        $serializerContextBuilder->method('createFromRequest')->willReturn([]);
-        $serializer = $this->createMock(SerializerInterface::class);
-        $serializer->method('deserialize')->willThrowException($partialException);
-
-        $provider = new DeserializeProvider($decorated, $serializer, $serializerContextBuilder);
-        $request = new Request(content: '{"name":42}');
-        $request->headers->set('CONTENT_TYPE', 'application/json');
-        $request->attributes->set('input_format', 'json');
-
-        try {
-            $provider->provide($operation, [], ['request' => $request]);
-            $this->fail('Expected ValidationException');
-        } catch (ValidationException $e) {
-            $violations = $e->getConstraintViolationList();
-            $this->assertCount(1, $violations);
-            $this->assertStringContainsString('string', $violations[0]->getMessage());
-            $this->assertSame('name', $violations[0]->getPropertyPath());
-            $this->assertSame((string) Type::INVALID_TYPE_ERROR, $violations[0]->getCode());
-            $this->assertArrayNotHasKey('hint', $violations[0]->getParameters());
-        }
     }
 
     public function testDeserializeDoesNotSetObjectToPopulateWhenContextIsFalse(): void

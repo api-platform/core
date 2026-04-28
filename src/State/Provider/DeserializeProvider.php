@@ -112,15 +112,12 @@ final class DeserializeProvider implements ProviderInterface, StopwatchAwareInte
                     continue;
                 }
                 $expectedTypes = $this->normalizeExpectedTypes($exception->getExpectedTypes());
+                $message = (new Type($expectedTypes))->message;
                 $parameters = [];
                 if ($exception->canUseMessageForUser()) {
                     $parameters['hint'] = $exception->getMessage();
-                    $violationMessage = $exception->getMessage();
-                    $violations->add(new ConstraintViolation($violationMessage, $violationMessage, $parameters, null, $exception->getPath(), null, null, (string) Type::INVALID_TYPE_ERROR));
-                } else {
-                    $message = (new Type($expectedTypes))->message;
-                    $violations->add(new ConstraintViolation($this->translator->trans($message, ['{{ type }}' => implode('|', $expectedTypes)], 'validators'), $message, $parameters, null, $exception->getPath(), null, null, (string) Type::INVALID_TYPE_ERROR));
                 }
+                $violations->add(new ConstraintViolation($this->translator->trans($message, ['{{ type }}' => implode('|', $expectedTypes)], 'validators'), $message, $parameters, null, $exception->getPath(), null, null, (string) Type::INVALID_TYPE_ERROR));
             }
             if (0 !== \count($violations)) {
                 throw new ValidationException($violations);
