@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Routing;
 
 use ApiPlatform\Metadata\Exception\RuntimeException;
+use ApiPlatform\Metadata\NotExposed;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\OpenApi\Attributes\Webhook;
@@ -34,6 +35,8 @@ use Symfony\Component\Routing\RouteCollection;
 final class ApiLoader extends Loader
 {
     public const DEFAULT_ACTION_PATTERN = 'api_platform.action.';
+    public const TYPE = 'api_platform';
+    public const TYPE_IRIS = 'api_platform_iris';
 
     private readonly PhpFileLoader $fileLoader;
 
@@ -48,15 +51,24 @@ final class ApiLoader extends Loader
      */
     public function load(mixed $data, ?string $type = null): RouteCollection
     {
+        $notExposedOnly = self::TYPE_IRIS === $type;
+
         $routeCollection = new RouteCollection();
         foreach ($this->resourceClassDirectories as $directory) {
             $routeCollection->addResource(new DirectoryResource($directory, '/\.php$/'));
         }
 
-        $this->loadExternalFiles($routeCollection);
+        if (!$notExposedOnly) {
+            $this->loadExternalFiles($routeCollection);
+        }
+
         foreach ($this->resourceNameCollectionFactory->create() as $resourceClass) {
             foreach ($this->resourceMetadataFactory->create($resourceClass) as $resourceMetadata) {
                 foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
+                    if ($notExposedOnly && !$operation instanceof NotExposed) {
+                        continue;
+                    }
+
                     if ($operation->getOpenapi() instanceof Webhook) {
                         continue;
                     }
@@ -119,7 +131,7 @@ final class ApiLoader extends Loader
      */
     public function supports(mixed $resource, ?string $type = null): bool
     {
-        return 'api_platform' === $type;
+        return self::TYPE === $type || self::TYPE_IRIS === $type;
     }
 
     /**
