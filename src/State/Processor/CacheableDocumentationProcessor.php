@@ -37,8 +37,14 @@ final class CacheableDocumentationProcessor implements ProcessorInterface, Stopw
     /**
      * @param ProcessorInterface<T1, T2> $decorated
      */
-    public function __construct(private readonly ProcessorInterface $decorated)
-    {
+    public function __construct(
+        private readonly ProcessorInterface $decorated,
+        private readonly int $maxAge = 0,
+        private readonly ?int $sharedMaxAge = null,
+        private readonly bool $public = true,
+        private readonly bool $mustRevalidate = true,
+        private readonly bool $etag = true,
+    ) {
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
@@ -56,12 +62,27 @@ final class CacheableDocumentationProcessor implements ProcessorInterface, Stopw
 
         $this->stopwatch?->start('api_platform.processor.cacheable_documentation');
 
-        $response->setEtag(md5($content));
-        $response->setPublic();
-        $response->setMaxAge(0);
-        $response->headers->addCacheControlDirective('must-revalidate');
+        if ($this->etag) {
+            $response->setEtag(md5($content));
+        }
 
-        if (($request = $context['request'] ?? null) instanceof Request) {
+        if ($this->public) {
+            $response->setPublic();
+        } else {
+            $response->setPrivate();
+        }
+
+        $response->setMaxAge($this->maxAge);
+
+        if (null !== $this->sharedMaxAge) {
+            $response->setSharedMaxAge($this->sharedMaxAge);
+        }
+
+        if ($this->mustRevalidate) {
+            $response->headers->addCacheControlDirective('must-revalidate');
+        }
+
+        if ($this->etag && ($request = $context['request'] ?? null) instanceof Request) {
             $response->isNotModified($request);
         }
 

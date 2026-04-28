@@ -16,6 +16,7 @@ namespace ApiPlatform\State\Tests\Processor;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\State\Processor\CacheableDocumentationProcessor;
 use ApiPlatform\State\ProcessorInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -93,6 +94,56 @@ class CacheableDocumentationProcessorTest extends TestCase
         $this->assertInstanceOf(Response::class, $response);
         $this->assertSame('"'.md5($body).'"', $response->getEtag());
         $this->assertSame(200, $response->getStatusCode());
+    }
+
+    public function testItHonorsCustomMaxAge(): void
+    {
+        $processor = new CacheableDocumentationProcessor($this->decoratedReturning(new Response('body')), maxAge: 3600);
+
+        $response = $processor->process(new \stdClass(), new Get(), [], ['request' => new Request()]);
+
+        $this->assertSame(3600, (int) $response->headers->getCacheControlDirective('max-age'));
+    }
+
+    public function testItHonorsSharedMaxAge(): void
+    {
+        $processor = new CacheableDocumentationProcessor($this->decoratedReturning(new Response('body')), sharedMaxAge: 600);
+
+        $response = $processor->process(new \stdClass(), new Get(), [], ['request' => new Request()]);
+
+        $this->assertSame(600, (int) $response->headers->getCacheControlDirective('s-maxage'));
+    }
+
+    public function testItSetsPrivateWhenPublicIsFalse(): void
+    {
+        $processor = new CacheableDocumentationProcessor($this->decoratedReturning(new Response('body')), public: false);
+
+        $response = $processor->process(new \stdClass(), new Get(), [], ['request' => new Request()]);
+
+        $this->assertFalse($response->headers->hasCacheControlDirective('public'));
+        $this->assertTrue($response->headers->hasCacheControlDirective('private'));
+    }
+
+    public function testItOmitsMustRevalidateWhenDisabled(): void
+    {
+        $processor = new CacheableDocumentationProcessor($this->decoratedReturning(new Response('body')), mustRevalidate: false);
+
+        $response = $processor->process(new \stdClass(), new Get(), [], ['request' => new Request()]);
+
+        $this->assertFalse($response->headers->hasCacheControlDirective('must-revalidate'));
+    }
+
+    public function testItOmitsEtagWhenDisabled(): void
+    {
+        $body = 'body';
+        $request = new Request();
+        $request->headers->set('If-None-Match', '"'.md5($body).'"');
+        $processor = new CacheableDocumentationProcessor($this->decoratedReturning(new Response($body)), etag: false);
+
+        $response = $processor->process(new \stdClass(), new Get(), [], ['request' => $request]);
+
+        $this->assertNull($response->getEtag());
+        $this->assertSame(200, $response->getStatusCode(), 'When etag is disabled, isNotModified short-circuit must not run');
     }
 
     private function decoratedReturning(mixed $value): ProcessorInterface

@@ -65,4 +65,57 @@ class CacheableDocumentationTest extends TestCase
         $this->assertStringNotContainsString('must-revalidate', $cacheControl, 'regular resource must not be wrapped by the documentation cache decorator');
         $this->assertStringNotContainsString('max-age=0', $cacheControl, 'regular resource must not be wrapped by the documentation cache decorator');
     }
+
+    public function testCustomMaxAgeAndSharedMaxAgeAreApplied(): void
+    {
+        $this->app['config']->set('api-platform.documentation.cache_headers.max_age', 3600);
+        $this->app['config']->set('api-platform.documentation.cache_headers.shared_max_age', 600);
+        $this->app->forgetInstance('api_platform.state_processor.documentation');
+
+        $response = $this->get('/api/docs.jsonld');
+        $response->assertStatus(200);
+
+        $cacheControl = $response->headers->get('cache-control') ?? '';
+        $this->assertStringContainsString('max-age=3600', $cacheControl);
+        $this->assertStringContainsString('s-maxage=600', $cacheControl);
+    }
+
+    public function testMustRevalidateCanBeDisabled(): void
+    {
+        $this->app['config']->set('api-platform.documentation.cache_headers.must_revalidate', false);
+        $this->app->forgetInstance('api_platform.state_processor.documentation');
+
+        $response = $this->get('/api/docs.jsonld');
+        $response->assertStatus(200);
+
+        $cacheControl = $response->headers->get('cache-control') ?? '';
+        $this->assertStringNotContainsString('must-revalidate', $cacheControl);
+    }
+
+    public function testEtagCanBeDisabled(): void
+    {
+        $this->app['config']->set('api-platform.documentation.cache_headers.etag', false);
+        $this->app->forgetInstance('api_platform.state_processor.documentation');
+
+        $response = $this->get('/api/docs.jsonld');
+        $response->assertStatus(200);
+
+        // documentation decorator stays wired (must-revalidate proves it) but its md5 ETag must not be set
+        $cacheControl = $response->headers->get('cache-control') ?? '';
+        $this->assertStringContainsString('must-revalidate', $cacheControl);
+        $etag = trim($response->headers->get('etag') ?? '', '"');
+        $this->assertFalse(1 === preg_match('/^[a-f0-9]{32}$/', $etag), 'documentation decorator must not produce its md5 ETag when etag is disabled');
+    }
+
+    public function testFeatureCanBeDisabled(): void
+    {
+        $this->app['config']->set('api-platform.documentation.cache_headers.enabled', false);
+        $this->app->forgetInstance('api_platform.state_processor.documentation');
+
+        $response = $this->get('/api/docs.jsonld');
+        $response->assertStatus(200);
+
+        $cacheControl = $response->headers->get('cache-control') ?? '';
+        $this->assertStringNotContainsString('must-revalidate', $cacheControl, 'when disabled, the cache decorator must not be wired');
+    }
 }

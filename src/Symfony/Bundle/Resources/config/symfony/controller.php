@@ -35,7 +35,14 @@ return static function (ContainerConfigurator $container) {
 
     $services->set('api_platform.state_processor.documentation.cache', CacheableDocumentationProcessor::class)
         ->decorate('api_platform.state_processor.documentation', null, 300)
-        ->args([service('api_platform.state_processor.documentation.cache.inner')]);
+        ->args([
+            service('api_platform.state_processor.documentation.cache.inner'),
+            '%api_platform.documentation.cache_headers.max_age%',
+            '%api_platform.documentation.cache_headers.shared_max_age%',
+            '%api_platform.documentation.cache_headers.public%',
+            '%api_platform.documentation.cache_headers.must_revalidate%',
+            '%api_platform.documentation.cache_headers.etag%',
+        ]);
 
     $services->set('api_platform.action.entrypoint', EntrypointAction::class)
         ->public()

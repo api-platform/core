@@ -555,7 +555,21 @@ class ApiPlatformProvider extends ServiceProvider
         // Documentation/entrypoint processor wraps the base ProcessorInterface with the cache decorator.
         // MainController and the rest keep the bare ProcessorInterface so regular resource responses are not cached as docs.
         $this->app->bind('api_platform.state_processor.documentation', static function (Application $app) {
-            return new CacheableDocumentationProcessor($app->make(ProcessorInterface::class));
+            $cfg = $app['config']->get('api-platform.documentation.cache_headers', []);
+            $base = $app->make(ProcessorInterface::class);
+
+            if (false === ($cfg['enabled'] ?? true)) {
+                return $base;
+            }
+
+            return new CacheableDocumentationProcessor(
+                $base,
+                $cfg['max_age'] ?? 0,
+                $cfg['shared_max_age'] ?? null,
+                $cfg['public'] ?? true,
+                $cfg['must_revalidate'] ?? true,
+                $cfg['etag'] ?? true,
+            );
         });
 
         $this->app->singleton(ObjectNormalizer::class, static function (Application $app) {

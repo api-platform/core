@@ -182,6 +182,7 @@ final class Configuration implements ConfigurationInterface
         $this->addGraphQlSection($rootNode);
         $this->addSwaggerSection($rootNode);
         $this->addHttpCacheSection($rootNode);
+        $this->addDocumentationSection($rootNode);
         $this->addMercureSection($rootNode);
         $this->addMessengerSection($rootNode);
         $this->addElasticsearchSection($rootNode);
@@ -449,6 +450,31 @@ final class Configuration implements ConfigurationInterface
                                         ->end()
                                     ->end()
                                 ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+    }
+
+    private function addDocumentationSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('documentation')
+                    ->info('Documentation/entrypoint response options. Unrelated to the operation-level "defaults.cache_headers" / "http_cache" knobs which apply to API resource responses.')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->arrayNode('cache_headers')
+                            ->info('HTTP cache headers added to documentation and entrypoint responses.')
+                            ->canBeDisabled()
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->integerNode('max_age')->defaultValue(0)->info('Cache-Control max-age, in seconds.')->end()
+                                ->integerNode('shared_max_age')->defaultNull()->info('Cache-Control s-maxage, in seconds. Useful for CDN edges.')->end()
+                                ->booleanNode('public')->defaultTrue()->info('Whether the response is public (shared caches may store it).')->end()
+                                ->booleanNode('must_revalidate')->defaultTrue()->info('Whether to add the must-revalidate Cache-Control directive.')->end()
+                                ->booleanNode('etag')->defaultTrue()->info('Whether to add a content-hash ETag header (and short-circuit to 304 on If-None-Match).')->end()
                             ->end()
                         ->end()
                     ->end()
