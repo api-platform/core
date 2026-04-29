@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\NotExposed;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
@@ -257,6 +258,25 @@ class ApiLoaderTest extends TestCase
         );
     }
 
+    public function testApiLoaderIrisTypeOnlyEmitsNotExposedRoutes(): void
+    {
+        $resourceCollection = new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource())->withShortName('dummy')->withOperations(new Operations([
+                'api_dummies_get_item' => (new Get())->withUriTemplate('/dummies/{id}{._format}')->withController('api_platform.action.get_item'),
+                'api_dummies_get_collection' => (new GetCollection())->withUriTemplate('/dummies{._format}'),
+                'api_dummies_not_exposed_item' => (new NotExposed())->withUriTemplate('/dummies/{id}{._format}'),
+            ])),
+        ]);
+
+        $routeCollection = $this->getApiLoaderWithResourceMetadataCollection($resourceCollection)->load(null, ApiLoader::TYPE_IRIS);
+
+        $this->assertNull($routeCollection->get('api_dummies_get_item'));
+        $this->assertNull($routeCollection->get('api_dummies_get_collection'));
+        $this->assertNotNull($routeCollection->get('api_dummies_not_exposed_item'));
+        $this->assertNull($routeCollection->get('api_jsonld_context'));
+        $this->assertNull($routeCollection->get('api_entrypoint'));
+    }
+
     public function testApiLoaderWithUndefinedControllerService(): void
     {
         $this->expectExceptionObject(new \RuntimeException('Operation "api_dummies_my_undefined_controller_method_item" is defining an unknown service as controller "Foo\\Bar\\MyUndefinedController". Make sure it is properly registered in the dependency injection container.'));
@@ -284,6 +304,7 @@ class ApiLoaderTest extends TestCase
             'api_platform.action.get_item',
             'api_platform.action.put_item',
             'api_platform.action.delete_item',
+            'api_platform.action.not_exposed',
             'Foo\\Bar\\MyController',
         ];
         $containerProphecy = $this->prophesize(ContainerInterface::class);
