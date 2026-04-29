@@ -30,6 +30,7 @@ use ApiPlatform\Tests\SetupClassResourcesTrait;
  * to non-ApiResource entities.
  *
  * @see https://github.com/api-platform/core/issues/7916
+ *
  * @group issue-7916
  */
 final class Issue7916NestedFilterOnNonResourceTest extends ApiTestCase
@@ -64,7 +65,7 @@ final class Issue7916NestedFilterOnNonResourceTest extends ApiTestCase
     /**
      * Test filtering on user.name where User is NOT an ApiResource.
      * This was failing in #7916 with error:
-     * "[Semantical Error] Class UserAction has no field or association named user.name"
+     * "[Semantical Error] Class UserAction has no field or association named user.name".
      */
     public function testFilteringOnNonResourceRelationName(): void
     {

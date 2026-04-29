@@ -101,13 +101,13 @@ class EntrypointActionTest extends TestCase
         $this->assertEquals(
             new ResourceNameCollection(['ResourceA']),
             $action1->provide()->getResourceNameCollection(),
-            "Instance 1 was polluted by Instance 2 (likely due to a static property)"
+            'Instance 1 was polluted by Instance 2 (likely due to a static property)'
         );
 
         $this->assertEquals(
             new ResourceNameCollection(['ResourceB']),
             $action2->provide()->getResourceNameCollection(),
-            "Instance 2 has incorrect state."
+            'Instance 2 has incorrect state.'
         );
     }
 }

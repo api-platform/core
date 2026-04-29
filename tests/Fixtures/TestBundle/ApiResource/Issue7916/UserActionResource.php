@@ -23,7 +23,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue7916\UserAction;
 /**
  * API Resource DTO for UserAction using stateOptions pattern.
  * This is a separate API Resource for the UserAction entity which is NOT itself marked #[ApiResource].
- * 
+ *
  * Tests that nested property filters work on relations to non-ApiResource entities (User).
  *
  * @see https://github.com/api-platform/core/issues/7916
