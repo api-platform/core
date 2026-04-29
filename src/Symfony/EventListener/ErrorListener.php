@@ -92,7 +92,6 @@ final class ErrorListener extends SymfonyErrorListener
         }
 
         $dup = parent::duplicateRequest($exception, $request);
-
         $operation = $this->initializeExceptionOperation($request, $exception, $format, $apiOperation);
 
         if (null === $operation->getProvider()) {
