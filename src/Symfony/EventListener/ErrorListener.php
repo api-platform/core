@@ -80,9 +80,11 @@ final class ErrorListener extends SymfonyErrorListener
 
         // Let the error handler take this we don't handle HTML nor non-api platform requests
         if (false === ($apiOperation?->getExtraProperties()['_api_error_handler'] ?? true) || 'html' === $format) {
-            $this->controller = 'error_controller';
+            $dup = parent::duplicateRequest($exception, $request);
+            // Override parent's `_controller` attribute without mutating $this->controller (worker-mode safety).
+            $dup->attributes->set('_controller', 'error_controller');
 
-            return parent::duplicateRequest($exception, $request);
+            return $dup;
         }
 
         if ($this->debug) {
