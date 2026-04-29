@@ -85,7 +85,7 @@ final class ValidationTest extends ApiTestCase
 
         $violationBaz = $findViolation('baz');
         $this->assertNotNull($violationBaz, 'Violation for "baz" not found.');
-        $this->assertSame('Failed to create object because the class misses the "baz" property.', $violationBaz['message']);
+        $this->assertSame('This value should be of type string.', $violationBaz['message']);
         $this->assertArrayHasKey('hint', $violationBaz);
         $this->assertSame('Failed to create object because the class misses the "baz" property.', $violationBaz['hint']);
 
@@ -117,14 +117,14 @@ final class ValidationTest extends ApiTestCase
         $violationUuid = $findViolation('uuid');
         $this->assertNotNull($violationUuid);
         if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
-            $this->assertSame('Invalid UUID string: y', $violationUuid['message']);
+            $this->assertSame('This value should be of type uuid.', $violationUuid['message']);
         } else {
             $this->assertSame('This value should be of type UuidInterface|null.', $violationUuid['message']);
         }
 
         $violationRelatedDummy = $findViolation('relatedDummy');
         $this->assertNotNull($violationRelatedDummy);
-        $this->assertSame('The type of the "relatedDummy" attribute must be "array" (nested document) or "string" (IRI), "integer" given.', $violationRelatedDummy['message']);
+        $this->assertSame('This value should be of type array|string.', $violationRelatedDummy['message']);
 
         $violationRelatedDummies = $findViolation('relatedDummies');
         $this->assertNotNull($violationRelatedDummies);

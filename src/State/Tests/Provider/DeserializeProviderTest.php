@@ -208,7 +208,7 @@ class DeserializeProviderTest extends TestCase
     }
 
     #[IgnoreDeprecations]
-    public function testDeserializeUsesExceptionMessageWhenCanUseMessageForUser(): void
+    public function testDeserializeKeepsTypeMessageWhenExpectedTypesAreSet(): void
     {
         $operation = new Post(deserialize: true, class: \stdClass::class);
         $decorated = $this->createStub(ProviderInterface::class);
@@ -239,10 +239,10 @@ class DeserializeProviderTest extends TestCase
         } catch (ValidationException $e) {
             $violations = $e->getConstraintViolationList();
             $this->assertCount(1, $violations);
-            $this->assertSame('The data must belong to a backed enumeration of type Suit.', $violations[0]->getMessage());
-            $this->assertSame('The data must belong to a backed enumeration of type Suit.', $violations[0]->getMessageTemplate());
+            $this->assertSame('This value should be of type string.', $violations[0]->getMessage());
             $this->assertSame('status', $violations[0]->getPropertyPath());
             $this->assertSame((string) Type::INVALID_TYPE_ERROR, $violations[0]->getCode());
+            $this->assertSame('The data must belong to a backed enumeration of type Suit.', $violations[0]->getParameters()['hint'] ?? null);
         }
     }
 
