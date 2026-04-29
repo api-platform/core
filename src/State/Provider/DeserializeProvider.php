@@ -115,6 +115,8 @@ final class DeserializeProvider implements ProviderInterface, StopwatchAwareInte
                 $parameters = [];
                 if ($exception->canUseMessageForUser()) {
                     $parameters['hint'] = $exception->getMessage();
+                }
+                if (!$expectedTypes && $exception->canUseMessageForUser()) {
                     $violationMessage = $exception->getMessage();
                     $violations->add(new ConstraintViolation($violationMessage, $violationMessage, $parameters, null, $exception->getPath(), null, null, (string) Type::INVALID_TYPE_ERROR));
                 } else {
