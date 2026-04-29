@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\Security\Exception\AccessDeniedException;
+use ApiPlatform\Symfony\Security\ObjectVariableCheckerInterface;
 use ApiPlatform\Symfony\Security\State\AccessCheckerProvider;
 use ApiPlatform\Tests\Fixtures\DummyEntity;
 use PHPUnit\Framework\TestCase;
@@ -61,6 +62,44 @@ class AccessCheckerProviderTest extends TestCase
         $accessChecker->provide($operation, [], []);
     }
 
+    public function testPreReadSkipsSecurityWhenResourceAccessCheckerIsDecorated(): void
+    {
+        $obj = new \stdClass();
+        $operation = new Get(class: DummyEntity::class, security: 'is_granted("ROLE_ADMIN")');
+        $decorated = $this->createMock(ProviderInterface::class);
+        $decorated->expects($this->once())->method('provide')->willReturn($obj);
+        $resourceAccessChecker = $this->createMock(ResourceAccessCheckerInterface::class);
+        $resourceAccessChecker->expects($this->never())->method('isGranted');
+        $accessChecker = new AccessCheckerProvider($decorated, $resourceAccessChecker, 'pre_read');
+        $this->assertSame($obj, $accessChecker->provide($operation, [], []));
+    }
+
+    public function testPreReadChecksSecurityWhenObjectVariableIsNotUsed(): void
+    {
+        $obj = new \stdClass();
+        $operation = new Get(class: DummyEntity::class, security: 'is_granted("ROLE_ADMIN")');
+        $decorated = $this->createMock(ProviderInterface::class);
+        $decorated->expects($this->once())->method('provide')->willReturn($obj);
+        $resourceAccessChecker = $this->createMock(ResourceAccessCheckerWithObjectVariableInterface::class);
+        $resourceAccessChecker->method('usesObjectVariable')->willReturn(false);
+        $resourceAccessChecker->expects($this->once())->method('isGranted')->with(DummyEntity::class, 'is_granted("ROLE_ADMIN")', ['object' => null, 'previous_object' => null, 'request' => null])->willReturn(true);
+        $accessChecker = new AccessCheckerProvider($decorated, $resourceAccessChecker, 'pre_read');
+        $this->assertSame($obj, $accessChecker->provide($operation, [], []));
+    }
+
+    public function testPreReadSkipsSecurityWhenObjectVariableIsUsed(): void
+    {
+        $obj = new \stdClass();
+        $operation = new Get(class: DummyEntity::class, security: 'is_granted("ROLE_ADMIN") and object.owner == user');
+        $decorated = $this->createMock(ProviderInterface::class);
+        $decorated->expects($this->once())->method('provide')->willReturn($obj);
+        $resourceAccessChecker = $this->createMock(ResourceAccessCheckerWithObjectVariableInterface::class);
+        $resourceAccessChecker->method('usesObjectVariable')->willReturn(true);
+        $resourceAccessChecker->expects($this->never())->method('isGranted');
+        $accessChecker = new AccessCheckerProvider($decorated, $resourceAccessChecker, 'pre_read');
+        $this->assertSame($obj, $accessChecker->provide($operation, [], []));
+    }
+
     public function testCheckAccessDenied(): void
     {
         $this->expectException(AccessDeniedException::class);
@@ -90,4 +129,8 @@ class AccessCheckerProviderTest extends TestCase
         $accessChecker = new AccessCheckerProvider($decorated, $resourceAccessChecker);
         $accessChecker->provide($operation, [], []);
     }
+}
+
+interface ResourceAccessCheckerWithObjectVariableInterface extends ResourceAccessCheckerInterface, ObjectVariableCheckerInterface
+{
 }
