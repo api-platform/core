@@ -266,7 +266,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      * @throws RuntimeException
      * @throws UnexpectedValueException
      */
-    protected function denormalizeRelation(string $attributeName, ApiProperty $propertyMetadata, string $className, mixed $value, ?string $format, array $context): ?object
+    protected function denormalizeRelation(string $attributeName, ApiProperty $propertyMetadata, string $targetClass, mixed $value, ?string $format, array $context): ?object
     {
         if (!\is_array($value) || !isset($value['id'], $value['type'])) {
             throw new UnexpectedValueException('Only resource linkage supported currently, see: http://jsonapi.org/format/#document-resource-object-linkage.');
@@ -276,19 +276,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $context += ['fetch_data' => true];
             if ($this->useIriAsId) {
                 return $this->iriConverter->getResourceFromIri($value['id'], $context);
-            }
-
-            $targetClass = null;
-            $nativeType = $propertyMetadata->getNativeType();
-
-            if ($nativeType) {
-                $nativeType->isSatisfiedBy(function (Type $type) use (&$targetClass): bool {
-                    return $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($targetClass = $type->getClassName());
-                });
-            }
-
-            if (null === $targetClass) {
-                throw new ItemNotFoundException(\sprintf('Cannot determine target class for property "%s".', $attributeName));
             }
 
             /** @var HttpOperation $getOperation */
@@ -303,7 +290,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $context['not_normalizable_value_exceptions'][] = NotNormalizableValueException::createForUnexpectedDataType(
                 $e->getMessage(),
                 $value,
-                [$className],
+                [$targetClass],
                 $context['deserialization_path'] ?? null,
                 true,
                 $e->getCode(),
