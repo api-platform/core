@@ -69,7 +69,7 @@
     },
     "require-dev": {
         "symfony/type-info": "^7.3 || ^8.0",
-        "phpunit/phpunit": "^12.2"
+        "phpunit/phpunit": "^11.5 || ^12.2"
     },
     "minimum-stability": "beta",
     "prefer-stable": true

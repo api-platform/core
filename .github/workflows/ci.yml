@@ -276,9 +276,6 @@ jobs:
           composer global require soyuka/pmu
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
-      - name: Force PHPUnit 11.5 for PHP 8.2
-        if: matrix.php == '8.2'
-        run: composer require phpunit/phpunit:^11.5 --dev --with-all-dependencies
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
@@ -353,11 +350,6 @@ jobs:
         run: |
           composer global require soyuka/pmu
           composer global config allow-plugins.soyuka/pmu true --no-interaction
-      - name: Force PHPUnit 11.5 for PHP 8.2
-        if: matrix.php.version == '8.2'
-        run: |
-          cd $(composer ${{matrix.component}} --cwd)
-          composer require phpunit/phpunit:^11.5 --dev --with-all-dependencies
       - name: Linking
         if: ${{ !matrix.php.lowest && !matrix.php.minimal-changes }}
         run: |
@@ -495,9 +487,6 @@ jobs:
           composer global require soyuka/pmu
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
-      - name: Force PHPUnit 11.5 for PHP 8.2
-        if: matrix.php == '8.2'
-        run: composer require phpunit/phpunit:^11.5 --dev --with-all-dependencies
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Resolve shard paths
@@ -1420,10 +1409,6 @@ jobs:
           tools: pecl, composer
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
           ini-values: memory_limit=-1
-      - name: Force PHPUnit 11.5 for PHP 8.2
-        if: matrix.php == '8.2'
-        working-directory: 'src/Laravel'
-        run: composer require phpunit/phpunit:^11.5 --dev --with-all-dependencies
       - name: Update project dependencies
         run: |
           composer global require soyuka/pmu

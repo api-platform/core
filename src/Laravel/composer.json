@@ -63,7 +63,7 @@
         "orchestra/testbench": "^10.1 || ^11.0",
         "phpdocumentor/type-resolver": "^1.7",
         "phpstan/phpdoc-parser": "^1.29 || ^2.0",
-        "phpunit/phpunit": "^12.2",
+        "phpunit/phpunit": "^11.5 || ^12.2",
         "symfony/http-client": "^7.4 || ^8.0",
         "symfony/mcp-bundle": "dev-main",
         "symfony/object-mapper": "^7.4 || ^8.0"
