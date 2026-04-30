@@ -142,4 +142,26 @@ class ErrorListenerTest extends TestCase
         $errorListener = new ErrorListener('action', null, true, [], $resourceMetadataCollectionFactory, ['jsonld' => ['application/ld+json']], [], $identifiersExtractor, $resourceClassResolver);
         $errorListener->onKernelException($exceptionEvent);
     }
+
+    public function testStateIsNeverModified(): void
+    {
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $kernel = $this->createStub(KernelInterface::class);
+        $kernel->method('handle')->willReturn(new Response());
+
+        $request = Request::create('/');
+        $request->headers->set('Accept', 'text/html');
+        $exception = new \Exception();
+        $exceptionEvent = new ExceptionEvent($kernel, $request, HttpKernelInterface::SUB_REQUEST, $exception);
+
+        $initialController = 'initial_controller';
+        $errorListener = new ErrorListener($initialController, null, false, [], null, ['jsonproblem' => ['application/problem+json']], [], null, $resourceClassResolver);
+
+        $errorListener->onKernelException($exceptionEvent);
+
+        $refl = new \ReflectionClass($errorListener);
+        $controllerProp = $refl->getProperty('controller');
+
+        $this->assertEquals($initialController, $controllerProp->getValue($errorListener), 'The controller property must never be modified.');
+    }
 }

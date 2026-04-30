@@ -49,6 +49,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\Hostname;
 use Symfony\Component\Validator\Constraints\Ulid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -194,6 +195,29 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
             []
         );
         $resultedPropertyMetadata = $validatorPropertyMetadataFactory->create(DummyValidatedEntity::class, 'dummyGroup', ['validation_groups' => ['dummy']]);
+
+        $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
+    }
+
+    public function testCreateWithPropertyWithGroupSequenceValidationGroupsAndRequiredConstraints(): void
+    {
+        $propertyMetadata = (new ApiProperty())->withDescription('A dummy group')->withReadable(true)->withWritable(true);
+        $expectedPropertyMetadata = $propertyMetadata->withRequired(true);
+
+        $groups = [new GroupSequence(['dummy'])];
+
+        $decoratedPropertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $decoratedPropertyMetadataFactory->create(DummyValidatedEntity::class, 'dummyGroup', ['validation_groups' => $groups])->willReturn($propertyMetadata)->shouldBeCalled();
+
+        $validatorMetadataFactory = $this->prophesize(MetadataFactoryInterface::class);
+        $validatorMetadataFactory->getMetadataFor(DummyValidatedEntity::class)->willReturn($this->validatorClassMetadata)->shouldBeCalled();
+
+        $validatorPropertyMetadataFactory = new ValidatorPropertyMetadataFactory(
+            $validatorMetadataFactory->reveal(),
+            $decoratedPropertyMetadataFactory->reveal(),
+            []
+        );
+        $resultedPropertyMetadata = $validatorPropertyMetadataFactory->create(DummyValidatedEntity::class, 'dummyGroup', ['validation_groups' => $groups]);
 
         $this->assertEquals($expectedPropertyMetadata, $resultedPropertyMetadata);
     }

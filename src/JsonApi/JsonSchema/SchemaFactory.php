@@ -147,7 +147,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                     'items' => [
                         'allOf' => [
                             ['$ref' => $prefix.$key],
-                            ['type' => 'object', 'properties' => ['source' => ['type' => 'object'], 'status' => ['type' => 'string']]],
+                            ['type' => 'object', 'properties' => ['source' => ['type' => 'object'], 'status' => ['type' => ['string', 'integer', 'null']]]],
                         ],
                     ],
                 ],

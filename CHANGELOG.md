@@ -1,5 +1,23 @@
 # Changelog
 
+## v4.3.4
+
+### Bug fixes
+
+* [0160a72e1](https://github.com/api-platform/core/commit/0160a72e155915f15731e38cd1c75da076bc35c8) fix(doctrine): IriFilter ignores custom ApiProperty identifier on ODM (#7937)
+* [37f248a45](https://github.com/api-platform/core/commit/37f248a4561f31801901b673adaf15899b84fbb8) fix(state): use exception message for user-facing violation when available (#7894)
+* [472ae3f22](https://github.com/api-platform/core/commit/472ae3f223dfa00f2913bf90a10d0f83ac04f163) fix(openapi): generate both singular and array parameter variants for filters (#7906)
+* [88ddc3680](https://github.com/api-platform/core/commit/88ddc368067d01a2c06662c50cde6ec6ca0fccd4) fix(symfony): ensure ErrorListener is fully stateless to prevent stat… (#7921)
+* [90875fb46](https://github.com/api-platform/core/commit/90875fb46d958e279745555a1f5a7a2bba611f66) fix: unnecessary nullable operator
+* [967ff7925](https://github.com/api-platform/core/commit/967ff7925914db16023f5551164f925bea64cea0) fix(jsonapi): use parent-resolved class in denormalizeRelation
+* [98112eab7](https://github.com/api-platform/core/commit/98112eab70b1a56755179545e632b3f22a54bee3) fix(symfony): api_platform_iris route loader for graphql-only setups (#7934)
+* [98f3d0f49](https://github.com/api-platform/core/commit/98f3d0f495344ec42d20ebbec127e3ed3c781966) fix(symfony): security regression when ResourceAccessChecker is decorated (#7896) (#7897)
+* [ac374fcc4](https://github.com/api-platform/core/commit/ac374fcc4539eeb30d63de40795e97a127d6af79) fix(state): preserve Type message when expectedTypes is set (#7935)
+* [cf80a82d5](https://github.com/api-platform/core/commit/cf80a82d5115765d4d930c1938e95ec2b58ec7ed) fix(laravel): skip relation metadata for abstract Eloquent models (#7933)
+* [d08eb7f44](https://github.com/api-platform/core/commit/d08eb7f44bfcb34d5eb87ccc78295bcc55db4445) fix: `ResourceClassInfoTrait::isResourceClass()` is always true (#7924)
+* [e19154930](https://github.com/api-platform/core/commit/e191549304ff661408d9824860d55e034657dc2f) fix(validator): handle nested groups and group sequences (#7914)
+* [fcfaf3844](https://github.com/api-platform/core/commit/fcfaf3844fca371c57d9e141b779209de58c572e) fix(metadata): nested property filters fail to generate JOINs when relation target entity is not directly declared as ApiResource (#7926)
+
 ## v4.3.3
 
 ### Bug fixes

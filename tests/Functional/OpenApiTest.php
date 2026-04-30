@@ -161,7 +161,7 @@ class OpenApiTest extends ApiTestCase
                         ],
                         'status' => [
                             'type' => [
-                                'number',
+                                'integer',
                                 'null',
                             ],
                             'examples' => [
@@ -202,7 +202,11 @@ class OpenApiTest extends ApiTestCase
                         'type' => 'object',
                     ],
                     'status' => [
-                        'type' => 'string',
+                        'type' => [
+                            'string',
+                            'integer',
+                            'null',
+                        ],
                     ],
                 ]],
             ]], $res['components']['schemas']['Error.jsonapi']['properties']['errors']['items']);

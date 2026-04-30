@@ -57,7 +57,13 @@ final class ItemProvider implements ProviderInterface
 
         $fetchData = $context['fetch_data'] ?? true;
         if (!$fetchData) {
-            return $manager->getReference($documentClass, reset($uriVariables));
+            $identifier = $manager->getClassMetadata($documentClass)->identifier;
+            if ($identifier && 1 === \count($uriVariables) && \array_key_exists($identifier, $uriVariables)) {
+                return $manager->getReference($documentClass, $uriVariables[$identifier]);
+            }
+            // When URI variables don't correspond to the document identifier (e.g. custom
+            // ApiProperty identifier on a non-#[Id] field), fall through to a real lookup
+            // so that the returned document carries the actual database identifier.
         }
 
         $repository = $manager->getRepository($documentClass);

@@ -17,7 +17,6 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
-use ApiPlatform\Metadata\Util\TypeHelper;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface as SerializerClassMetadataFactoryInterface;
@@ -200,8 +199,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
             return $propertyMetadata;
         }
 
-        $collectionValueType = TypeHelper::getCollectionValueType($type);
-        $className = $collectionValueType ? TypeHelper::getClassName($collectionValueType) : TypeHelper::getClassName($type);
+        $className = $this->extractClassNameFromType($type);
 
         // if property is not a resource relation, don't set link status (as it would have no meaning)
         if (!$className || !$this->isResourceClass($className)) {

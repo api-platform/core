@@ -42,6 +42,10 @@ final class RelationMetadataLoader implements LoaderInterface
         }
 
         $refl = $classMetadata->getReflectionClass();
+        if ($refl->isAbstract()) {
+            return false;
+        }
+
         /** @var Model */
         $model = $refl->newInstanceWithoutConstructor();
         $attributesMetadata = $classMetadata->getAttributesMetadata();

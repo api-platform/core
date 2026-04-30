@@ -78,10 +78,24 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
             $or = $aggregationBuilder->matchExpr();
 
             foreach ($value as $v) {
+                if (!\is_object($v)) {
+                    continue;
+                }
+
                 $or->addOr($aggregationBuilder->matchExpr()->field($matchField)->{$method}($v));
             }
 
             $match->{$operator}($or);
+
+            return;
+        }
+
+        // The IRI did not resolve to a resource: emit an always-false clause so the query
+        // returns no result rather than attempting to match against a raw IRI string.
+        if (!\is_object($value)) {
+            $match->{$operator}(
+                $aggregationBuilder->matchExpr()->field($matchField)->in([])
+            );
 
             return;
         }

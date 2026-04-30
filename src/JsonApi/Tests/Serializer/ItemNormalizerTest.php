@@ -314,6 +314,67 @@ class ItemNormalizerTest extends TestCase
         $this->assertInstanceOf(Dummy::class, $normalizer->denormalize($data, Dummy::class, ItemNormalizer::FORMAT));
     }
 
+    // https://github.com/api-platform/core/pull/7938
+    public function testDenormalizeRelationUsesClassNameArgument(): void
+    {
+        $relatedDummy = new RelatedDummy();
+        $relatedDummy->setId(1);
+
+        $propertyMetadata = (new ApiProperty())
+            ->withNativeType(Type::collection(Type::object(ArrayCollection::class), Type::object(RelatedDummy::class), Type::int()))
+            ->withReadable(false)->withWritable(true)
+            ->withReadableLink(false)->withWritableLink(false);
+
+        $iriConverter = $this->createStub(IriConverterInterface::class);
+        $iriConverter->method('getIriFromResource')->willReturn('/related_dummies/1');
+        $iriConverter->method('getResourceFromIri')->willReturn($relatedDummy);
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturnMap([
+            [RelatedDummy::class, true],
+            [ArrayCollection::class, false],
+        ]);
+
+        $resourceMetadataCollectionFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactory->expects($this->once())
+            ->method('create')
+            ->with(RelatedDummy::class)
+            ->willReturn(new ResourceMetadataCollection(RelatedDummy::class, [
+                (new ApiResource())->withOperations(new Operations([
+                    new Get(name: 'get', uriTemplate: '/related_dummies/{id}', uriVariables: ['id' => new Link(fromClass: RelatedDummy::class, identifiers: ['id'])]),
+                ])),
+            ]));
+
+        $normalizer = new ItemNormalizer(
+            $this->createStub(PropertyNameCollectionFactoryInterface::class),
+            $this->createStub(PropertyMetadataFactoryInterface::class),
+            $iriConverter,
+            $resourceClassResolver,
+            null,
+            new ReservedAttributeNameConverter(),
+            null,
+            [],
+            $resourceMetadataCollectionFactory,
+            null,
+            null,
+            null,
+            null,
+            false,
+        );
+
+        $result = (new \ReflectionMethod(ItemNormalizer::class, 'denormalizeRelation'))->invoke(
+            $normalizer,
+            'relatedDummies',
+            $propertyMetadata,
+            RelatedDummy::class,
+            ['type' => 'related-dummy', 'id' => '1'],
+            null,
+            []
+        );
+
+        $this->assertSame($relatedDummy, $result);
+    }
+
     public function testDenormalizeUpdateOperationNotAllowed(): void
     {
         $this->expectException(NotNormalizableValueException::class);

@@ -326,6 +326,7 @@ class ApiPlatformProvider extends ServiceProvider
                             ),
                             $app->make(ResourceClassResolverInterface::class)
                         ),
+                        $app->make(ResourceClassResolverInterface::class)
                     )
                 ),
                 true === $config->get('app.debug') ? 'array' : $config->get('api-platform.cache', 'file')

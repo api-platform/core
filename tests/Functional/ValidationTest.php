@@ -116,7 +116,6 @@ final class ValidationTest extends ApiTestCase
 
         $violationUuid = $findViolation('uuid');
         $this->assertNotNull($violationUuid);
-        $this->assertNotNull($violationUuid);
         if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
             $this->assertSame('This value should be of type uuid.', $violationUuid['message']);
         } else {
@@ -126,6 +125,8 @@ final class ValidationTest extends ApiTestCase
         $violationRelatedDummy = $findViolation('relatedDummy');
         $this->assertNotNull($violationRelatedDummy);
         $this->assertSame('This value should be of type array|string.', $violationRelatedDummy['message']);
+        $this->assertArrayHasKey('hint', $violationRelatedDummy);
+        $this->assertSame('The type of the "relatedDummy" attribute must be "array" (nested document) or "string" (IRI), "integer" given.', $violationRelatedDummy['hint']);
 
         $violationRelatedDummies = $findViolation('relatedDummies');
         $this->assertNotNull($violationRelatedDummies);

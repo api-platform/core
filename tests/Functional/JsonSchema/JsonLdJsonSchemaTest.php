@@ -65,6 +65,7 @@ final class JsonLdJsonSchemaTest extends ApiTestCase
                             'readOnly' => true,
                         ]),
                         'description' => new \ArrayObject([
+                            'type' => 'string',
                             'maxLength' => 255,
                         ]),
                         'tests' => new \ArrayObject([

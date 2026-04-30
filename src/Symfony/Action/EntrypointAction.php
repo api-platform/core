@@ -29,7 +29,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class EntrypointAction
 {
-    private static ResourceNameCollection $resourceNameCollection;
+    private ?ResourceNameCollection $resourceNameCollection = null;
 
     public function __construct(
         private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory,
@@ -41,7 +41,7 @@ final class EntrypointAction
 
     public function __invoke(Request $request): mixed
     {
-        static::$resourceNameCollection = $this->resourceNameCollectionFactory->create();
+        $this->resourceNameCollection ??= $this->resourceNameCollectionFactory->create();
         $context = [
             'request' => $request,
             'spec_version' => (string) $request->query->get(LegacyOpenApiNormalizer::SPEC_VERSION),
@@ -52,7 +52,7 @@ final class EntrypointAction
             read: true,
             serialize: true,
             class: Entrypoint::class,
-            provider: [self::class, 'provide']
+            provider: [$this, 'provide']
         );
         $request->attributes->set('_api_operation', $operation);
         $body = $this->provider->provide($operation, [], $context);
@@ -61,8 +61,8 @@ final class EntrypointAction
         return $this->processor->process($body, $operation, [], $context);
     }
 
-    public static function provide(): Entrypoint
+    public function provide(): Entrypoint
     {
-        return new Entrypoint(static::$resourceNameCollection);
+        return new Entrypoint($this->resourceNameCollection);
     }
 }

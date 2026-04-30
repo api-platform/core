@@ -342,7 +342,7 @@ final class DoctrineTest extends ApiTestCase
     }
 
     #[DataProvider('openApiParameterDocumentationProvider')]
-    public function testOpenApiParameterDocumentation(string $parameterName, bool $shouldHaveArrayNotation, string $expectedStyle, bool $expectedExplode, string $expectedDescription = '', ?array $expectedSchema = null): void
+    public function testOpenApiParameterDocumentation(string $parameterName, bool $shouldHaveArrayNotation, string $expectedStyle, bool $expectedExplode, string $expectedDescription = '', ?array $expectedSchema = null, bool $shouldHaveBothVariants = false): void
     {
         if ($this->isMongoDB()) {
             $this->markTestSkipped('Not tested with mongodb.');
@@ -359,12 +359,38 @@ final class DoctrineTest extends ApiTestCase
         $openApiDoc = $response->toArray();
 
         $parameters = $openApiDoc['paths']['/product_with_query_parameters']['get']['parameters'];
+
+        if ($shouldHaveBothVariants) {
+            $singularParameter = null;
+            $arrayParameter = null;
+
+            foreach ($parameters as $parameter) {
+                if ($parameter['name'] === $parameterName) {
+                    $singularParameter = $parameter;
+                }
+                if ($parameter['name'] === $parameterName.'[]') {
+                    $arrayParameter = $parameter;
+                }
+            }
+
+            $this->assertNotNull($singularParameter, \sprintf('%s singular parameter should be present in OpenAPI documentation', $parameterName));
+            $this->assertNotNull($arrayParameter, \sprintf('%s[] array parameter should be present in OpenAPI documentation', $parameterName));
+            $this->assertSame('query', $arrayParameter['in']);
+            $this->assertSame($expectedStyle, $arrayParameter['style'] ?? 'form');
+            $this->assertSame($expectedExplode, $arrayParameter['explode'] ?? false);
+
+            if ($expectedSchema) {
+                $this->assertSame($expectedSchema, $arrayParameter['schema'], 'Array parameter schema should match expected schema');
+            }
+
+            return;
+        }
+
         $foundParameter = null;
         $expectedName = $shouldHaveArrayNotation ? $parameterName.'[]' : $parameterName;
-        $alternativeName = $shouldHaveArrayNotation ? $parameterName : $parameterName.'[]';
 
         foreach ($parameters as $parameter) {
-            if ($parameter['name'] === $expectedName || $parameter['name'] === $alternativeName) {
+            if ($parameter['name'] === $expectedName) {
                 $foundParameter = $parameter;
                 break;
             }
@@ -390,21 +416,23 @@ final class DoctrineTest extends ApiTestCase
     public static function openApiParameterDocumentationProvider(): array
     {
         return [
-            'default behavior (no castToArray, no schema) should use array notation' => [
+            'default behavior (no castToArray, no schema) should generate both singular and array parameters' => [
                 'parameterName' => 'brand',
                 'shouldHaveArrayNotation' => true,
                 'expectedStyle' => 'deepObject',
                 'expectedExplode' => true,
                 'expectedDescription' => '',
                 'expectedSchema' => ['type' => 'array', 'items' => ['type' => 'string']],
+                'shouldHaveBothVariants' => true,
             ],
-            'default behavior with an extra description' => [
+            'default behavior with an extra description should generate both variants' => [
                 'parameterName' => 'brandWithDescription',
                 'shouldHaveArrayNotation' => true,
                 'expectedStyle' => 'deepObject',
                 'expectedExplode' => true,
                 'expectedDescription' => 'Extra description about the filter',
                 'expectedSchema' => ['type' => 'array', 'items' => ['type' => 'string']],
+                'shouldHaveBothVariants' => true,
             ],
             'explicit schema type string should not use array notation' => [
                 'parameterName' => 'exactBrand',
@@ -422,21 +450,23 @@ final class DoctrineTest extends ApiTestCase
                 'expectedDescription' => '',
                 'expectedSchema' => ['type' => 'string'],
             ],
-            'with schema and default castToArray should wrap schema in array type' => [
+            'with schema and default castToArray should generate both variants wrapping schema in array type' => [
                 'parameterName' => 'tags',
                 'shouldHaveArrayNotation' => true,
                 'expectedStyle' => 'deepObject',
                 'expectedExplode' => true,
                 'expectedDescription' => '',
                 'expectedSchema' => ['type' => 'array', 'items' => ['anyOf' => [['type' => 'array', 'items' => ['type' => 'string']], ['type' => 'string']]]],
+                'shouldHaveBothVariants' => true,
             ],
-            'with schema and default castToArray should not wrap schema in array type if already an array' => [
+            'with schema and default castToArray should generate both variants without wrapping if already array' => [
                 'parameterName' => 'listOfTags',
                 'shouldHaveArrayNotation' => true,
                 'expectedStyle' => 'deepObject',
                 'expectedExplode' => true,
                 'expectedDescription' => '',
                 'expectedSchema' => ['type' => 'array', 'items' => ['type' => 'string']],
+                'shouldHaveBothVariants' => true,
             ],
         ];
     }
