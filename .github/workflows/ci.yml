@@ -517,11 +517,10 @@ jobs:
       - name: Merge code coverage reports
         if: matrix.coverage
         run: |
-          wget -qO /usr/local/bin/phpcov https://phar.phpunit.de/phpcov.phar
+          wget -qO /usr/local/bin/phpcov https://phar.phpunit.de/phpcov-12.phar
           chmod +x /usr/local/bin/phpcov
           mkdir -p build/coverage
           phpcov merge --clover build/logs/behat/clover.xml build/coverage
-        continue-on-error: true
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v6
