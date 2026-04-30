@@ -266,7 +266,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
      * @throws RuntimeException
      * @throws UnexpectedValueException
      */
-    protected function denormalizeRelation(string $attributeName, ApiProperty $propertyMetadata, string $targetClass, mixed $value, ?string $format, array $context): ?object
+    protected function denormalizeRelation(string $attributeName, ApiProperty $propertyMetadata, string $className, mixed $value, ?string $format, array $context): ?object
     {
         if (!\is_array($value) || !isset($value['id'], $value['type'])) {
             throw new UnexpectedValueException('Only resource linkage supported currently, see: http://jsonapi.org/format/#document-resource-object-linkage.');
@@ -279,8 +279,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
             }
 
             /** @var HttpOperation $getOperation */
-            $getOperation = $this->resourceMetadataCollectionFactory->create($targetClass)->getOperation(httpOperation: true);
-            $iri = $this->reconstructIri($targetClass, (string) $value['id'], $getOperation);
+            $getOperation = $this->resourceMetadataCollectionFactory->create($className)->getOperation(httpOperation: true);
+            $iri = $this->reconstructIri($className, (string) $value['id'], $getOperation);
 
             return $this->iriConverter->getResourceFromIri($iri, $context);
         } catch (ItemNotFoundException $e) {
@@ -290,7 +290,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $context['not_normalizable_value_exceptions'][] = NotNormalizableValueException::createForUnexpectedDataType(
                 $e->getMessage(),
                 $value,
-                [$targetClass],
+                [$className],
                 $context['deserialization_path'] ?? null,
                 true,
                 $e->getCode(),
