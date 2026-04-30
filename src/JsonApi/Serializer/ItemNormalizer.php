@@ -278,22 +278,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 return $this->iriConverter->getResourceFromIri($value['id'], $context);
             }
 
-            $targetClass = null;
-            $nativeType = $propertyMetadata->getNativeType();
-
-            if ($nativeType) {
-                $nativeType->isSatisfiedBy(function (Type $type) use (&$targetClass): bool {
-                    return $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($targetClass = $type->getClassName());
-                });
-            }
-
-            if (null === $targetClass) {
-                throw new ItemNotFoundException(\sprintf('Cannot determine target class for property "%s".', $attributeName));
-            }
-
             /** @var HttpOperation $getOperation */
-            $getOperation = $this->resourceMetadataCollectionFactory->create($targetClass)->getOperation(httpOperation: true);
-            $iri = $this->reconstructIri($targetClass, (string) $value['id'], $getOperation);
+            $getOperation = $this->resourceMetadataCollectionFactory->create($className)->getOperation(httpOperation: true);
+            $iri = $this->reconstructIri($className, (string) $value['id'], $getOperation);
 
             return $this->iriConverter->getResourceFromIri($iri, $context);
         } catch (ItemNotFoundException $e) {
