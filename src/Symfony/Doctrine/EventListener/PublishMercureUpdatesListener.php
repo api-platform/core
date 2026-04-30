@@ -25,6 +25,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
+use ApiPlatform\Metadata\Util\PropertyAccessorValueExtractor;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
 use Doctrine\Common\EventArgs;
 use Doctrine\ODM\MongoDB\Event\OnFlushEventArgs as MongoDbOdmOnFlushEventArgs;
@@ -35,6 +36,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\PropertyAccess\Exception\AccessException;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -50,6 +53,7 @@ final class PublishMercureUpdatesListener
         'topics' => true,
         'data' => true,
         'private' => true,
+        'private_fields' => true,
         'id' => true,
         'type' => true,
         'retry' => true,
@@ -217,11 +221,27 @@ final class PublishMercureUpdatesListener
                 // We need to evaluate it here, because in publishUpdate() the resource would be already deleted
                 $this->evaluateTopics($options, $object);
 
+                $privateData = [];
+                $mercureOptions = $operation ? ($operation->getMercure() ?? false) : false;
+                $private = $mercureOptions['private'] ?? false;
+                $privateFields = $mercureOptions['private_fields'] ?? [];
+                if ($private && $privateFields) {
+                    foreach ($privateFields as $privateField) {
+                        try {
+                            $privateData[$privateField] = $this->getPrivateFieldValue($privateField, $object);
+                        } catch (NoSuchPropertyException|AccessException) {
+                            continue;
+                        }
+                    }
+                }
+
                 $this->deletedObjects[] = [
                     'object' => (object) [
+                        'resourceClass' => $resourceClass,
                         'id' => $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $operation),
                         'iri' => $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_URL, $operation),
                         'type' => 1 === \count($types) ? $types[0] : $types,
+                        'private' => $privateData,
                     ],
                     'options' => $options,
                     'operation' => $operation,
@@ -297,11 +317,11 @@ final class PublishMercureUpdatesListener
      */
     private function getGraphQlSubscriptionUpdates(object $object, array $options, string $type): array
     {
-        if ('update' !== $type || !$this->graphQlSubscriptionManager || !$this->graphQlMercureSubscriptionIriGenerator) {
+        if (!$this->graphQlSubscriptionManager || !$this->graphQlMercureSubscriptionIriGenerator) {
             return [];
         }
 
-        $payloads = $this->graphQlSubscriptionManager->getPushPayloads($object);
+        $payloads = $this->graphQlSubscriptionManager->getPushPayloads($object, $type);
 
         $updates = [];
         foreach ($payloads as [$subscriptionId, $data]) {
@@ -321,5 +341,10 @@ final class PublishMercureUpdatesListener
     private function buildUpdate(string|array $iri, string $data, array $options): Update
     {
         return new Update($iri, $data, $options['private'] ?? false, $options['id'] ?? null, $options['type'] ?? null, $options['retry'] ?? null);
+    }
+
+    private function getPrivateFieldValue(string $privateField, object $object): string
+    {
+        return PropertyAccessorValueExtractor::getValue($object, $privateField);
     }
 }
