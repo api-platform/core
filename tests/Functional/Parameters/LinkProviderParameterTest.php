@@ -15,6 +15,9 @@ namespace ApiPlatform\Tests\Functional\Parameters;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7469TestResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7939BarResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7939BazResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7939FooResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\LinkParameterProviderResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\WithParameter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Company;
@@ -40,7 +43,7 @@ final class LinkProviderParameterTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [WithParameter::class, Dummy::class, Employee::class, Company::class, LinkParameterProviderResource::class, Issue7469TestResource::class, Issue7469Dummy::class, Pairing::class, Plan::class];
+        return [WithParameter::class, Dummy::class, Employee::class, Company::class, LinkParameterProviderResource::class, Issue7469TestResource::class, Issue7469Dummy::class, Pairing::class, Plan::class, Issue7939FooResource::class, Issue7939BarResource::class, Issue7939BazResource::class];
     }
 
     /**
@@ -234,6 +237,47 @@ final class LinkProviderParameterTest extends ApiTestCase
                 ['name' => 'Test Pairing'],
             ],
         ]);
+    }
+
+    /**
+     * @see https://github.com/api-platform/core/issues/7939
+     */
+    public function testReadLinkParameterProviderResolvesNestedUriVariables(): void
+    {
+        $container = static::getContainer();
+        if ('mongodb' === $container->getParameter('kernel.environment')) {
+            $this->markTestSkipped();
+        }
+
+        $response = self::createClient()->request('GET', '/issue7939_foos/F/bars/B/baz');
+        self::assertResponseStatusCodeSame(200);
+        self::assertJsonContains([
+            'fooId' => 'F',
+            'barId' => 'B',
+        ]);
+    }
+
+    /**
+     * @see https://github.com/api-platform/core/issues/7939
+     */
+    public function testParentLinkProviderEnforcesParentScope(): void
+    {
+        $container = static::getContainer();
+        if ('mongodb' === $container->getParameter('kernel.environment')) {
+            $this->markTestSkipped();
+        }
+
+        $client = self::createClient();
+
+        $client->request('GET', '/issue7939_foos/F2/bars/B/baz_strict');
+        self::assertResponseStatusCodeSame(200);
+        self::assertJsonContains([
+            'fooId' => 'F2',
+            'barId' => 'B',
+        ]);
+
+        $client->request('GET', '/issue7939_foos/F1/bars/B/baz_strict');
+        self::assertResponseStatusCodeSame(404);
     }
 
     public function testIssue7469IriGenerationFailsForLinkedResource(): void
