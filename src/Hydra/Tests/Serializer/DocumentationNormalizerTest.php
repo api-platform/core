@@ -333,16 +333,12 @@ class DocumentationNormalizerTest extends TestCase
                                 '@id' => '#Entrypoint/dummy',
                                 '@type' => 'hydra:Link',
                                 'domain' => '#Entrypoint',
-                                'range' => [
-                                    ['@id' => 'hydra:Collection'],
-                                    [
-                                        'owl:equivalentClass' => [
-                                            'owl:onProperty' => ['@id' => 'hydra:member'],
-                                            'owl:allValuesFrom' => ['@id' => '#dummy'],
-                                        ],
-                                    ],
-                                ],
                                 'owl:maxCardinality' => 1,
+                                'range' => 'hydra:Collection',
+                                'hydra:memberAssertion' => [
+                                    'hydra:property' => ['@id' => 'rdf:type'],
+                                    'hydra:object' => ['@id' => '#dummy'],
+                                ],
                                 'hydra:supportedOperation' => [
                                     [
                                         '@type' => ['hydra:Operation', 'schema:FindAction'],
@@ -898,16 +894,12 @@ class DocumentationNormalizerTest extends TestCase
                                 '@id' => '#Entrypoint/dummy',
                                 '@type' => 'Link',
                                 'domain' => '#Entrypoint',
-                                'range' => [
-                                    ['@id' => 'hydra:Collection'],
-                                    [
-                                        'owl:equivalentClass' => [
-                                            'owl:onProperty' => ['@id' => 'hydra:member'],
-                                            'owl:allValuesFrom' => ['@id' => '#dummy'],
-                                        ],
-                                    ],
-                                ],
                                 'owl:maxCardinality' => 1,
+                                'range' => 'hydra:Collection',
+                                'memberAssertion' => [
+                                    'property' => ['@id' => 'rdf:type'],
+                                    'object' => ['@id' => '#dummy'],
+                                ],
                                 'supportedOperation' => [
                                     [
                                         '@type' => ['Operation', 'schema:FindAction'],

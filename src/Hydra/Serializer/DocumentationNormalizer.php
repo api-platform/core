@@ -108,14 +108,10 @@ final class DocumentationNormalizer implements NormalizerInterface
                 '@type' => $hydraPrefix.'Link',
                 'domain' => '#Entrypoint',
                 'owl:maxCardinality' => 1,
-                'range' => [
-                    ['@id' => 'hydra:Collection'],
-                    [
-                        'owl:equivalentClass' => [
-                            'owl:onProperty' => ['@id' => 'hydra:member'],
-                            'owl:allValuesFrom' => ['@id' => $prefixedShortName],
-                        ],
-                    ],
+                'range' => 'hydra:Collection',
+                $hydraPrefix.'memberAssertion' => [
+                    $hydraPrefix.'property' => ['@id' => 'rdf:type'],
+                    $hydraPrefix.'object' => ['@id' => $prefixedShortName],
                 ],
                 $hydraPrefix.'supportedOperation' => $hydraCollectionOperations,
             ],
