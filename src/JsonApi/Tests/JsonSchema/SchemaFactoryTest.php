@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operations;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
@@ -49,6 +50,7 @@ class SchemaFactoryTest extends TestCase
         );
         $propertyNameCollectionFactory = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactory->create(Dummy::class, ['enable_getter_setter_extraction' => true, 'schema_type' => Schema::TYPE_OUTPUT])->willReturn(new PropertyNameCollection());
+        $propertyNameCollectionFactory->create(Dummy::class, ['enable_getter_setter_extraction' => true, 'schema_type' => Schema::TYPE_INPUT])->willReturn(new PropertyNameCollection());
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
 
         $definitionNameFactory = new DefinitionNameFactory(null);
@@ -163,5 +165,23 @@ class SchemaFactoryTest extends TestCase
 
         $forcedCollection = $this->schemaFactory->buildSchema(Dummy::class, 'jsonapi', Schema::TYPE_OUTPUT, forceCollection: true);
         $this->assertEquals($resultSchema['allOf'][0]['$ref'], $forcedCollection['allOf'][0]['$ref']);
+    }
+
+    public function testBuildSchemaForPostInputDoesNotRequireId(): void
+    {
+        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonapi', Schema::TYPE_INPUT, new Post());
+        $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
+        $properties = $resultSchema['definitions'][$rootDefinitionKey]['properties'];
+
+        $this->assertSame(['type'], $properties['data']['required']);
+    }
+
+    public function testBuildSchemaForPostOutputStillRequiresId(): void
+    {
+        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonapi', Schema::TYPE_OUTPUT, new Post());
+        $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
+        $properties = $resultSchema['definitions'][$rootDefinitionKey]['properties'];
+
+        $this->assertSame(['type', 'id'], $properties['data']['required']);
     }
 }
