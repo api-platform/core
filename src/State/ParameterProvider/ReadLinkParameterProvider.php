@@ -105,11 +105,13 @@ final class ReadLinkParameterProvider implements ParameterProviderInterface
     }
 
     /**
-     * @return array<string, string>
+     * @return array<string, mixed>
      */
     private function getUriVariables(mixed $value, Parameter $parameter, Operation $operation): array
     {
-        $extraProperties = $parameter->getExtraProperties();
+        if (\is_array($value)) {
+            return $value;
+        }
 
         if ($operation instanceof HttpOperation) {
             $links = $operation->getUriVariables();
@@ -119,24 +121,30 @@ final class ReadLinkParameterProvider implements ParameterProviderInterface
             $links = [];
         }
 
-        if (!\is_array($value)) {
-            $uriVariables = [];
+        $extraProperties = $parameter->getExtraProperties();
+        $linkClass = $parameter instanceof Link
+            ? ($parameter->getFromClass() ?? $parameter->getToClass())
+            : null;
 
-            foreach ($links as $key => $link) {
-                if (!\is_string($key)) {
-                    $key = $link->getParameterName() ?? $extraProperties['uri_variable'] ?? $link->getFromProperty();
-                }
-
-                if (!$key || !\is_string($key)) {
-                    continue;
-                }
-
-                $uriVariables[$key] = $value;
+        $fallbackKey = null;
+        foreach ($links as $key => $link) {
+            if (!\is_string($key)) {
+                $key = $link->getParameterName() ?? $extraProperties['uri_variable'] ?? $link->getFromProperty();
             }
 
-            return $uriVariables;
+            if (!$key || !\is_string($key)) {
+                continue;
+            }
+
+            $linkFromClass = $link instanceof Link ? ($link->getFromClass() ?? $link->getToClass()) : null;
+
+            if (null !== $linkClass && $linkFromClass === $linkClass) {
+                return [$key => $value];
+            }
+
+            $fallbackKey ??= $key;
         }
 
-        return $value;
+        return null === $fallbackKey ? [] : [$fallbackKey => $value];
     }
 }
