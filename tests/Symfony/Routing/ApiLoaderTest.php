@@ -258,23 +258,28 @@ class ApiLoaderTest extends TestCase
         );
     }
 
-    public function testApiLoaderIrisTypeOnlyEmitsNotExposedRoutes(): void
+    public function testApiLoaderIrisTypeRegistersItemRoutesWithNotExposedController(): void
     {
         $resourceCollection = new ResourceMetadataCollection(Dummy::class, [
             (new ApiResource())->withShortName('dummy')->withOperations(new Operations([
                 'api_dummies_get_item' => (new Get())->withUriTemplate('/dummies/{id}{._format}')->withController('api_platform.action.get_item'),
                 'api_dummies_get_collection' => (new GetCollection())->withUriTemplate('/dummies{._format}'),
                 'api_dummies_not_exposed_item' => (new NotExposed())->withUriTemplate('/dummies/{id}{._format}'),
+                'api_dummies_not_exposed_by_uuid_item' => (new NotExposed())->withUriTemplate('/dummies/by_uuid/{uuid}{._format}'),
             ])),
         ]);
 
         $routeCollection = $this->getApiLoaderWithResourceMetadataCollection($resourceCollection)->load(null, ApiLoader::TYPE_IRIS);
 
-        $this->assertNull($routeCollection->get('api_dummies_get_item'));
-        $this->assertNull($routeCollection->get('api_dummies_get_collection'));
+        $itemRoute = $routeCollection->get('api_dummies_get_item');
+        $this->assertNotNull($itemRoute);
+        $this->assertSame('api_platform.action.not_exposed', $itemRoute->getDefault('_controller'));
         $this->assertNotNull($routeCollection->get('api_dummies_not_exposed_item'));
+        $this->assertNotNull($routeCollection->get('api_dummies_not_exposed_by_uuid_item'));
+        $this->assertNull($routeCollection->get('api_dummies_get_collection'));
         $this->assertNull($routeCollection->get('api_jsonld_context'));
         $this->assertNull($routeCollection->get('api_entrypoint'));
+        $this->assertNotNull($routeCollection->get('api_genid'));
     }
 
     public function testApiLoaderWithUndefinedControllerService(): void
