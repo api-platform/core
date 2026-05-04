@@ -338,6 +338,14 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         if (!$container->hasParameter('serializer.default_context')) {
             $container->setParameter('serializer.default_context', $container->getParameter('api_platform.serializer.default_context'));
         }
+        $documentationCacheHeaders = $config['documentation']['cache_headers'];
+        $container->setParameter('api_platform.documentation.cache_headers.enabled', $documentationCacheHeaders['enabled']);
+        $container->setParameter('api_platform.documentation.cache_headers.max_age', $documentationCacheHeaders['max_age']);
+        $container->setParameter('api_platform.documentation.cache_headers.shared_max_age', $documentationCacheHeaders['shared_max_age']);
+        $container->setParameter('api_platform.documentation.cache_headers.public', $documentationCacheHeaders['public']);
+        $container->setParameter('api_platform.documentation.cache_headers.must_revalidate', $documentationCacheHeaders['must_revalidate']);
+        $container->setParameter('api_platform.documentation.cache_headers.etag', $documentationCacheHeaders['etag']);
+
         if ($config['use_symfony_listeners']) {
             $loader->load('symfony/events.php');
         } else {
@@ -346,6 +354,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             $loader->load('state/processor.php');
         }
         $loader->load('state/parameter_provider.php');
+
+        if (!$documentationCacheHeaders['enabled'] && $container->hasDefinition('api_platform.state_processor.documentation.cache')) {
+            $container->removeDefinition('api_platform.state_processor.documentation.cache');
+        }
 
         $container->setParameter('api_platform.enable_entrypoint', $config['enable_entrypoint']);
         $container->setParameter('api_platform.enable_docs', $config['enable_docs']);

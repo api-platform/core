@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use ApiPlatform\State\Processor\AddLinkHeaderProcessor;
+use ApiPlatform\State\Processor\CacheableDocumentationProcessor;
 use ApiPlatform\State\Processor\RespondProcessor;
 use ApiPlatform\State\Processor\SerializeProcessor;
 use ApiPlatform\State\Processor\WriteProcessor;
@@ -144,6 +145,17 @@ return static function (ContainerConfigurator $container) {
         ->arg('$negotiator', service('api_platform.negotiator'));
 
     $services->alias('api_platform.state_processor.documentation', 'api_platform.state_processor.respond');
+
+    $services->set('api_platform.state_processor.documentation.cache', CacheableDocumentationProcessor::class)
+        ->decorate('api_platform.state_processor.documentation', null, 300)
+        ->args([
+            service('api_platform.state_processor.documentation.cache.inner'),
+            '%api_platform.documentation.cache_headers.max_age%',
+            '%api_platform.documentation.cache_headers.shared_max_age%',
+            '%api_platform.documentation.cache_headers.public%',
+            '%api_platform.documentation.cache_headers.must_revalidate%',
+            '%api_platform.documentation.cache_headers.etag%',
+        ]);
 
     $services->set('api_platform.state_processor.documentation.serialize', SerializeProcessor::class)
         ->decorate('api_platform.state_processor.documentation', null, 200)

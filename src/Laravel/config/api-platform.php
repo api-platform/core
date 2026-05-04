@@ -182,6 +182,19 @@ return [
     //     ],
     // ],
 
+    // HTTP cache headers added to documentation and entrypoint responses (e.g. /api/docs, /api).
+    // Unrelated to the resource-level "http_cache" block above which targets API resource responses.
+    'documentation' => [
+        'cache_headers' => [
+            'enabled' => true,
+            'max_age' => 0,
+            'shared_max_age' => null,
+            'public' => true,
+            'must_revalidate' => true,
+            'etag' => true,
+        ],
+    ],
+
     'error_handler' => [
         'extend_laravel_handler' => true,
     ],
