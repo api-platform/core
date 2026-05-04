@@ -1,0 +1,7 @@
+The <info>%command.name%</info> command generates a new API Platform ApiResource class (DTO) with optional fields, operations, state provider, and state processor.
+
+<info>php %command.full_name% BookResource</info>
+
+If the argument is missing, the command will ask for the class name interactively.
+
+The command will guide you through adding <info>fields</info>, selecting <info>operations</info>, and optionally generating a <info>StateProvider</info> and <info>StateProcessor</info>.
