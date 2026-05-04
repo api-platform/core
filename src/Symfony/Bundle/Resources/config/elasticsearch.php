@@ -18,6 +18,7 @@ use ApiPlatform\Elasticsearch\Extension\SortExtension;
 use ApiPlatform\Elasticsearch\Extension\SortFilterExtension;
 use ApiPlatform\Elasticsearch\Filter\MatchFilter;
 use ApiPlatform\Elasticsearch\Filter\OrderFilter;
+use ApiPlatform\Elasticsearch\Filter\RangeFilter;
 use ApiPlatform\Elasticsearch\Filter\TermFilter;
 use ApiPlatform\Elasticsearch\Metadata\Resource\Factory\ElasticsearchProviderResourceMetadataCollectionFactory;
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
@@ -92,6 +93,12 @@ return function (ContainerConfigurator $container) {
         ->parent('api_platform.elasticsearch.search_filter');
 
     $services->alias(MatchFilter::class, 'api_platform.elasticsearch.match_filter');
+
+    $services->set('api_platform.elasticsearch.range_filter', RangeFilter::class)
+        ->abstract()
+        ->parent('api_platform.elasticsearch.search_filter');
+
+    $services->alias(RangeFilter::class, 'api_platform.elasticsearch.range_filter');
 
     $services->set('api_platform.elasticsearch.order_filter', OrderFilter::class)
         ->abstract()
