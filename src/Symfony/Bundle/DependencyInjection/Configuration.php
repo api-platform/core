@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Symfony\Controller\MainController;
+use Composer\InstalledVersions;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
 use Doctrine\ORM\EntityManagerInterface;
@@ -56,6 +57,8 @@ final class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder('api_platform');
         $rootNode = $treeBuilder->getRootNode();
+
+        $jsonLdInstalled = InstalledVersions::isInstalled('api-platform/jsonld') && InstalledVersions::isInstalled('api-platform/hydra');
 
         $rootNode
             ->beforeNormalization()
@@ -191,15 +194,17 @@ final class Configuration implements ConfigurationInterface
 
         $this->addExceptionToStatusSection($rootNode);
 
-        $this->addFormatSection($rootNode, 'formats', [
-            'jsonld' => ['mime_types' => ['application/ld+json']],
+        $this->addFormatSection($rootNode, 'formats', $jsonLdInstalled ? [
+            'jsonld' => ['mime_types' => ['application/ld+json']]
+        ] : [
+            'json' => ['mime_types' => ['application/json']]
         ]);
         $this->addFormatSection($rootNode, 'patch_formats', [
             'json' => ['mime_types' => ['application/merge-patch+json']],
         ]);
 
-        $defaultDocFormats = [
-            'jsonld' => ['mime_types' => ['application/ld+json']],
+        $defaultDocFormats = $jsonLdInstalled ? ['jsonld' => ['mime_types' => ['application/ld+json']]] : [];
+        $defaultDocFormats += [
             'jsonopenapi' => ['mime_types' => ['application/vnd.openapi+json']],
             'html' => ['mime_types' => ['text/html']],
         ];
@@ -210,11 +215,19 @@ final class Configuration implements ConfigurationInterface
 
         $this->addFormatSection($rootNode, 'docs_formats', $defaultDocFormats);
 
-        $this->addFormatSection($rootNode, 'error_formats', [
-            'jsonld' => ['mime_types' => ['application/ld+json']],
+        $defaultDocFormats = $jsonLdInstalled ? ['jsonld' => ['mime_types' => ['application/ld+json']]] : [];
+        $defaultDocFormats += [
+            'jsonopenapi' => ['mime_types' => ['application/vnd.openapi+json']],
+            'html' => ['mime_types' => ['text/html']],
+        ];
+
+        $defaultErrorFormats = $jsonLdInstalled ? ['jsonld' => ['mime_types' => ['application/ld+json']]] : [];
+        $defaultErrorFormats += [
             'jsonproblem' => ['mime_types' => ['application/problem+json']],
             'json' => ['mime_types' => ['application/problem+json', 'application/json']],
-        ]);
+        ];
+        $this->addFormatSection($rootNode, 'error_formats', $defaultErrorFormats);
+
         $rootNode
             ->children()
                 ->arrayNode('jsonschema_formats')
