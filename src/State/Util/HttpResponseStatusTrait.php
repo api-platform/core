@@ -37,6 +37,10 @@ trait HttpResponseStatusTrait
      */
     private function getStatus(Request $request, HttpOperation $operation, array $context): int
     {
+        if ($request->attributes->has('_api_response_status')) {
+            return $request->attributes->getInt('_api_response_status');
+        }
+
         $status = $operation->getStatus();
         $method = $request->getMethod();
 
