@@ -21,11 +21,11 @@ class ResourceAccessChecker implements ResourceAccessCheckerInterface
 {
     public function isGranted(string $resourceClass, string $expression, array $extraVariables = []): bool
     {
+        $object = $extraVariables['object'] ?? null;
+
         return Gate::allows(
             $expression,
-            $extraVariables['object'] instanceof Paginator ?
-                $resourceClass :
-                $extraVariables['object']
+            ($object instanceof Paginator || null === $object) ? $resourceClass : $object
         );
     }
 }
