@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\State\ApiResource\Error;
 use ApiPlatform\Symfony\EventListener\ErrorListener;
+use Composer\InstalledVersions;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,7 +33,11 @@ class ErrorListenerTest extends TestCase
 {
     protected function tearDown(): void
     {
-        restore_exception_handler();
+        // symfony/http-kernel < 6.4.13 leaks an exception handler when no previous handler was set:
+        // restore_exception_handler() was only called when set_exception_handler() returned a non-null value.
+        if (version_compare(InstalledVersions::getVersion('symfony/http-kernel'), '6.4.13', '<')) {
+            restore_exception_handler();
+        }
     }
 
     public function testDuplicateException(): void
