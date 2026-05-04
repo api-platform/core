@@ -13,7 +13,7 @@ parameters:
 		objectManagerLoader: tests/Fixtures/app/object-manager.php
 	bootstrapFiles:
 		# We're aliasing classes for phpunit in this file, it needs to be added here see phpstan/#2194
-		- src/Symfony/Bundle/Test/Constraint/ArraySubset.php
+		- src/Test/Constraint/ArraySubset.php
 		- tests/Fixtures/app/AppKernel.php
 
 	excludePaths:
@@ -152,7 +152,7 @@ parameters:
 				- src/Metadata/Tests
 				- src/OpenApi/Tests
 				- src/Serializer/Tests
-				- src/Symfony/Bundle/Test
+				- src/Test
 				- src/Symfony/Tests
 				- tests
 		-
@@ -174,7 +174,7 @@ parameters:
 		-
 			identifier: argument.templateType
 			paths:
-				- src/Symfony/Bundle/Test
+				- src/Test
 				- tests
 				- src # TODO
 

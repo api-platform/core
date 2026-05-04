@@ -1,0 +1,68 @@
+{
+    "name": "api-platform/test",
+    "description": "Testing utilities for API Platform",
+    "type": "library",
+    "keywords": [
+        "REST",
+        "API",
+        "GraphQL",
+        "JSON-LD",
+        "Test",
+        "PHPUnit"
+    ],
+    "homepage": "https://api-platform.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kévin Dunglas",
+            "email": "kevin@dunglas.fr",
+            "homepage": "https://dunglas.fr"
+        },
+        {
+            "name": "Antoine Bluchet",
+            "email": "soyuka@gmail.com",
+            "homepage": "https://soyuka.me"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "api-platform/metadata": "^4.3",
+        "api-platform/json-schema": "^4.3",
+        "phpunit/phpunit": "^12.2",
+        "symfony/browser-kit": "^6.4 || ^7.0 || ^8.0",
+        "symfony/http-client": "^6.4 || ^7.0 || ^8.0",
+        "symfony/framework-bundle": "^6.4 || ^7.0 || ^8.0"
+    },
+    "suggest": {
+        "doctrine/orm": "To use findIriBy() with Doctrine ORM",
+        "doctrine/mongodb-odm": "To use findIriBy() with MongoDB",
+        "justinrainbow/json-schema": "To validate JSON schemas in assertions"
+    },
+    "autoload": {
+        "psr-4": {
+            "ApiPlatform\\Test\\": ""
+        }
+    },
+    "config": {
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true,
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true,
+            "phpstan/extension-installer": true,
+            "php-http/discovery": true
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "4.4.x-dev"
+        },
+        "thanks": {
+            "name": "api-platform/api-platform",
+            "url": "https://github.com/api-platform/api-platform"
+        }
+    },
+    "minimum-stability": "beta",
+    "prefer-stable": true
+}

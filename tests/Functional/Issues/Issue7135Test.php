@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Issues;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue7135\Bar;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue7135\Foo;
 use ApiPlatform\Tests\RecreateSchemaTrait;

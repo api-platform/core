@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Symfony\Bundle\Test;
+namespace ApiPlatform\Test;
 
 use ApiPlatform\JsonSchema\BackwardCompatibleSchemaFactory;
 use ApiPlatform\JsonSchema\Schema;
@@ -19,8 +19,8 @@ use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
-use ApiPlatform\Symfony\Bundle\Test\Constraint\ArraySubset;
-use ApiPlatform\Symfony\Bundle\Test\Constraint\MatchesJsonSchema;
+use ApiPlatform\Test\Constraint\ArraySubset;
+use ApiPlatform\Test\Constraint\MatchesJsonSchema;
 use PHPUnit\Framework\Constraint\JsonMatches;
 use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Bundle\FrameworkBundle\Test\BrowserKitAssertionsTrait;

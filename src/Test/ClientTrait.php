@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Symfony\Bundle\Test;
+namespace ApiPlatform\Test;
 
 trait ClientTrait
 {

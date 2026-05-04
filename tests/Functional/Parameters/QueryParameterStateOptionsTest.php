@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Parameters;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\AgentApi;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResourceOdm\AgentDocumentApi;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\AgentDocument;
