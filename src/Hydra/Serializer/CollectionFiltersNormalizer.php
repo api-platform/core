@@ -105,7 +105,7 @@ final class CollectionFiltersNormalizer implements NormalizerInterface, Normaliz
             }
         }
 
-        $resourceClass = $this->getStateOptionsClass($operation, $resourceClass);
+        $resourceClass = $operation->getDataClass();
 
         if ($currentFilters || ($parameters && \count($parameters))) {
             $hydraPrefix = $this->getHydraPrefix($context + $this->defaultContext);

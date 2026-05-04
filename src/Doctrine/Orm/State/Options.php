@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace ApiPlatform\Doctrine\Orm\State;
 
 use ApiPlatform\Doctrine\Common\State\Options as CommonOptions;
-use ApiPlatform\State\OptionsInterface;
+use ApiPlatform\State\DataOptionsInterface;
 
-class Options extends CommonOptions implements OptionsInterface
+class Options extends CommonOptions implements DataOptionsInterface
 {
     /**
      * @param string|callable $handleLinks experimental callable, typed mixed as we may want a service name in the future
@@ -28,6 +28,11 @@ class Options extends CommonOptions implements OptionsInterface
         mixed $handleLinks = null,
     ) {
         parent::__construct(handleLinks: $handleLinks);
+    }
+
+    public function getDataClass(): ?string
+    {
+        return $this->entityClass;
     }
 
     public function getEntityClass(): ?string

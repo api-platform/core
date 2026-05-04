@@ -15,7 +15,6 @@ namespace ApiPlatform\Laravel\Eloquent\Metadata\Factory\Resource;
 
 use ApiPlatform\Laravel\Eloquent\State\CollectionProvider;
 use ApiPlatform\Laravel\Eloquent\State\ItemProvider;
-use ApiPlatform\Laravel\Eloquent\State\Options;
 use ApiPlatform\Laravel\Eloquent\State\PersistProcessor;
 use ApiPlatform\Laravel\Eloquent\State\RemoveProcessor;
 use ApiPlatform\Metadata\CollectionOperationInterface;
@@ -82,7 +81,7 @@ final class EloquentResourceCollectionMetadataFactory implements ResourceMetadat
             $operations = $resourceMetadata->getOperations();
             foreach ($operations ?? [] as $operationName => $operation) {
                 // Check if this operation uses Eloquent via stateOptions
-                $modelClass = $this->getStateOptionsClass($operation, $resourceClass, Options::class);
+                $modelClass = $operation->getDataClass();
                 $usesEloquent = $isModel || ($modelClass !== $resourceClass);
 
                 if (!$usesEloquent) {
@@ -123,7 +122,7 @@ final class EloquentResourceCollectionMetadataFactory implements ResourceMetadat
             $graphQlOperations = $resourceMetadata->getGraphQlOperations();
             foreach ($graphQlOperations ?? [] as $operationName => $graphQlOperation) {
                 // Check if this operation uses Eloquent via stateOptions
-                $modelClass = $this->getStateOptionsClass($graphQlOperation, $resourceClass, Options::class);
+                $modelClass = $operation->getDataClass();
                 $usesEloquent = $isModel || ($modelClass !== $resourceClass);
 
                 if (!$usesEloquent) {

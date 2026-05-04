@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Doctrine\Orm\Metadata\Resource;
 
-use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -77,7 +76,7 @@ final class DoctrineOrmParameterResourceMetadataCollectionFactory implements Res
             return $operation;
         }
 
-        $entityClass = $this->getStateOptionsClass($operation, $operation->getClass(), Options::class);
+        $entityClass = $operation->getDataClass();
         if (!$this->managerRegistry->getManagerForClass($entityClass) instanceof EntityManagerInterface) {
             return $operation;
         }

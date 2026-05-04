@@ -39,7 +39,7 @@ final class ObjectMapperInputProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $class = $operation->getInput()['class'] ?? $operation->getClass();
+        $class = $operation->getInputClass();
 
         if (
             $data instanceof Response
@@ -54,7 +54,7 @@ final class ObjectMapperInputProcessor implements ProcessorInterface
         }
 
         $request = $context['request'] ?? null;
-        $mapped = $this->objectMapper->map($data, $request?->attributes->get('mapped_data') ?? $this->getStateOptionsClass($operation, $operation->getClass()));
+        $mapped = $this->objectMapper->map($data, $request?->attributes->get('mapped_data') ?? $operation->getDataClass());
         $request?->attributes->set('mapped_data', $mapped);
 
         return $this->decorated ? $this->decorated->process($mapped, $operation, $uriVariables, $context) : $mapped;

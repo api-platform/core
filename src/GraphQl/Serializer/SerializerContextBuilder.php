@@ -40,12 +40,14 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
         }
 
         $context['operation'] = $operation;
-        if ($operation->getInput()) {
-            $context['input'] = $operation->getInput();
-        }
-        if ($operation->getOutput()) {
-            $context['output'] = $operation->getOutput();
-        }
+        $context['input'] = $operation->getInputClass() === $operation->getClass() ? null : ['class' => $operation->getInputClass()];
+        $context['output'] = $operation->getOutputClass() === $operation->getClass() ? null : ['class' => $operation->getOutputClass()];
+        //        if (($inputClass = $operation->getInputClass()) !== $operation->getClass()) {
+        //            $context['input'] = ['class' => $inputClass];
+        //        }
+        //        if (($outputClass = $operation->getOutputClass()) !== $operation->getClass()) {
+        //            $context['output'] =  ['class' => $outputClass];
+        //        }
         $context = $normalization ? array_merge($operation->getNormalizationContext() ?? [], $context) : array_merge($operation->getDenormalizationContext() ?? [], $context);
 
         if ($normalization) {
