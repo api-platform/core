@@ -49,4 +49,40 @@ class DocsTest extends TestCase
         $this->assertArrayHasKey('@context', $res->json());
         $this->assertSame('application/ld+json; charset=utf-8', $res->headers->get('content-type'));
     }
+
+    public function testHtmlDocsRendersSwaggerUiByDefault(): void
+    {
+        $res = $this->get('/api/docs', headers: ['accept' => 'text/html']);
+        $res->assertOk();
+        $content = $res->getContent();
+
+        $this->assertStringContainsString('init-swagger-ui.js', $content);
+        $this->assertStringContainsString('id="formats"', $content);
+        $this->assertStringContainsString('>ReDoc</a>', $content);
+        $this->assertStringContainsString('>Scalar</a>', $content);
+        $this->assertStringNotContainsString('>Swagger UI</a>', $content);
+    }
+
+    public function testHtmlDocsRendersRedocWhenRequested(): void
+    {
+        $res = $this->get('/api/docs?ui=redoc', headers: ['accept' => 'text/html']);
+        $res->assertOk();
+        $content = $res->getContent();
+
+        $this->assertStringContainsString('init-redoc-ui.js', $content);
+        $this->assertStringContainsString('id="formats"', $content);
+        $this->assertStringContainsString('>Swagger UI</a>', $content);
+        $this->assertStringContainsString('>Scalar</a>', $content);
+        $this->assertStringNotContainsString('>ReDoc</a>', $content);
+    }
+
+    public function testHtmlDocsRendersScalarWithoutFooterWhenRequested(): void
+    {
+        $res = $this->get('/api/docs?ui=scalar', headers: ['accept' => 'text/html']);
+        $res->assertOk();
+        $content = $res->getContent();
+
+        $this->assertStringContainsString('init-scalar-ui.js', $content);
+        $this->assertStringNotContainsString('id="formats"', $content);
+    }
 }

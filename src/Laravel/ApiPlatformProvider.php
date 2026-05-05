@@ -749,10 +749,13 @@ class ApiPlatformProvider extends ServiceProvider
             /** @var ConfigRepository */
             $config = $app['config'];
 
+            $graphQlEnabled = (bool) $config->get('api-platform.graphql.enabled', false);
+
             return new SwaggerUiProcessor(
                 urlGenerator: $app->make(UrlGeneratorInterface::class),
                 normalizer: $app->make(NormalizerInterface::class),
                 openApiOptions: $app->make(Options::class),
+                formats: $config->get('api-platform.docs_formats', []),
                 oauthClientId: $config->get('api-platform.swagger_ui.oauth.clientId'),
                 oauthClientSecret: $config->get('api-platform.swagger_ui.oauth.clientSecret'),
                 oauthPkce: $config->get('api-platform.swagger_ui.oauth.pkce', false),
@@ -760,6 +763,8 @@ class ApiPlatformProvider extends ServiceProvider
                 scalarEnabled: $config->get('api-platform.scalar.enabled', false),
                 scalarExtraConfiguration: $config->get('api-platform.scalar.extra_configuration', []),
                 redocEnabled: $config->get('api-platform.redoc.enabled', false),
+                graphQlEnabled: $graphQlEnabled,
+                graphiQlEnabled: $graphQlEnabled && (bool) $config->get('api-platform.graphiql.enabled', true),
             );
         });
 

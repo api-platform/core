@@ -48,6 +48,8 @@ final class SwaggerUiProcessor implements ProcessorInterface
         private readonly bool $scalarEnabled = false,
         private readonly array $scalarExtraConfiguration = [],
         private readonly bool $redocEnabled = false,
+        private readonly bool $graphQlEnabled = false,
+        private readonly bool $graphiQlEnabled = false,
     ) {
     }
 
@@ -62,8 +64,8 @@ final class SwaggerUiProcessor implements ProcessorInterface
             'formats' => $this->formats,
             'title' => $openApi->getInfo()->getTitle(),
             'description' => $openApi->getInfo()->getDescription(),
-            'originalRoute' => $request->attributes->get('_api_original_route', $request->attributes->get('_route')),
-            'originalRouteParams' => $request->attributes->get('_api_original_route_params', $request->attributes->get('_route_params', [])),
+            'originalRoute' => $request->attributes->get('_api_original_route') ?? $request->route()?->getName(),
+            'originalRouteParams' => $request->attributes->get('_api_original_route_params') ?? $request->route()?->parameters() ?? [],
         ];
 
         $swaggerData = [
@@ -99,7 +101,15 @@ final class SwaggerUiProcessor implements ProcessorInterface
 
         $swaggerData['scalarExtraConfiguration'] = $this->scalarExtraConfiguration;
 
-        return new Response(view('api-platform::swagger-ui', $swaggerContext + ['swagger_data' => $swaggerData, 'ui' => $this->getUi()]), 200);
+        return new Response(view('api-platform::swagger-ui', $swaggerContext + [
+            'swagger_data' => $swaggerData,
+            'ui' => $this->getUi(),
+            'swaggerUiEnabled' => $this->swaggerEnabled,
+            'redocEnabled' => $this->redocEnabled,
+            'scalarEnabled' => $this->scalarEnabled,
+            'graphQlEnabled' => $this->graphQlEnabled,
+            'graphiQlEnabled' => $this->graphiQlEnabled,
+        ]), 200);
     }
 
     /**
