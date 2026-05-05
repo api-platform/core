@@ -26,17 +26,13 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
- * Generic item normalizer.
- *
- * TODO: do not hardcode "id"
+ * Generic item denormalizer.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ItemNormalizer extends AbstractItemNormalizer
+class ItemDenormalizer extends AbstractItemNormalizer
 {
-    use ItemNormalizerTrait {
-        denormalize as private doDenormalize;
-    }
+    use ItemNormalizerTrait;
 
     private readonly LoggerInterface $logger;
 
@@ -47,10 +43,8 @@ class ItemNormalizer extends AbstractItemNormalizer
         $this->logger = $logger ?: new NullLogger();
     }
 
-    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
-        trigger_deprecation('api-platform/core', '4.4', 'Calling "denormalize()" on "%s" is deprecated, use "%s" instead.', self::class, ItemDenormalizer::class);
-
-        return $this->doDenormalize($data, $type, $format, $context);
+        return false;
     }
 }

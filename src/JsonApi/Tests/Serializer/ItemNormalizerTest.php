@@ -34,6 +34,7 @@ use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use Doctrine\Common\Collections\ArrayCollection;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -51,6 +52,7 @@ use Symfony\Component\TypeInfo\Type;
 /**
  * @author Amrouche Hamza <hamza.simperfit@gmail.com>
  */
+#[IgnoreDeprecations]
 class ItemNormalizerTest extends TestCase
 {
     use ProphecyTrait;
