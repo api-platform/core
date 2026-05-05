@@ -16,6 +16,7 @@ namespace ApiPlatform\Metadata;
 use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
 use ApiPlatform\OpenApi\Attributes\Webhook;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
+use ApiPlatform\OpenApi\Model\PathItem;
 use ApiPlatform\State\OptionsInterface;
 use Symfony\Component\WebLink\Link as WebLink;
 
@@ -164,7 +165,7 @@ class HttpOperation extends Operation
         protected ?array $cacheHeaders = null,
         protected ?array $paginationViaCursor = null,
         protected ?array $hydraContext = null,
-        protected bool|OpenApiOperation|Webhook|null $openapi = null,
+        protected bool|OpenApiOperation|Webhook|PathItem|null $openapi = null,
         protected ?array $exceptionToStatus = null,
         protected ?array $links = null,
         protected ?array $errors = null,
@@ -629,12 +630,12 @@ class HttpOperation extends Operation
         return $self;
     }
 
-    public function getOpenapi(): bool|OpenApiOperation|Webhook|null
+    public function getOpenapi(): bool|OpenApiOperation|Webhook|PathItem|null
     {
         return $this->openapi;
     }
 
-    public function withOpenapi(bool|OpenApiOperation|Webhook $openapi): static
+    public function withOpenapi(bool|OpenApiOperation|Webhook|PathItem $openapi): static
     {
         $self = clone $this;
         $self->openapi = $openapi;
