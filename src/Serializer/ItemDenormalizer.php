@@ -26,13 +26,11 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
- * Generic item normalizer.
- *
- * TODO: do not hardcode "id"
+ * Generic item denormalizer.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class ItemNormalizer extends AbstractItemNormalizer
+class ItemDenormalizer extends AbstractItemNormalizer
 {
     use ItemNormalizerTrait;
 
@@ -43,5 +41,10 @@ class ItemNormalizer extends AbstractItemNormalizer
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $defaultContext, $resourceMetadataFactory, $resourceAccessChecker, $tagCollector, $operationResourceResolver);
 
         $this->logger = $logger ?: new NullLogger();
+    }
+
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
+    {
+        return false;
     }
 }
