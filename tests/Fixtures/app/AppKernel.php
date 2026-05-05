@@ -98,12 +98,6 @@ class AppKernel extends Kernel
         return $bundles;
     }
 
-    public function shutdown(): void
-    {
-        parent::shutdown();
-        restore_exception_handler();
-    }
-
     public function getProjectDir(): string
     {
         return __DIR__;
