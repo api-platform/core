@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Routing;
 
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\RuntimeException;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\NotExposed;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
@@ -58,7 +60,9 @@ final class ApiLoader extends Loader
             $routeCollection->addResource(new DirectoryResource($directory, '/\.php$/'));
         }
 
-        if (!$notExposedOnly) {
+        if ($notExposedOnly) {
+            $routeCollection->addCollection($this->fileLoader->load('genid.php'));
+        } else {
             $this->loadExternalFiles($routeCollection);
         }
 
@@ -66,7 +70,11 @@ final class ApiLoader extends Loader
             foreach ($this->resourceMetadataFactory->create($resourceClass) as $resourceMetadata) {
                 foreach ($resourceMetadata->getOperations() as $operationName => $operation) {
                     if ($notExposedOnly && !$operation instanceof NotExposed) {
-                        continue;
+                        if ($operation instanceof CollectionOperationInterface || !$operation instanceof HttpOperation) {
+                            continue;
+                        }
+
+                        $operation = $operation->withController('api_platform.action.not_exposed');
                     }
 
                     if ($operation->getOpenapi() instanceof Webhook) {
