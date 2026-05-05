@@ -54,7 +54,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
     use CacheKeyTrait;
     use ClassInfoTrait;
     use ContextTrait;
-    use ItemNormalizerTrait;
+    use ItemNormalizerTrait {
+        denormalize as private doDenormalize;
+    }
 
     public const FORMAT = 'jsonapi';
 
@@ -82,6 +84,13 @@ final class ItemNormalizer extends AbstractItemNormalizer
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && parent::supportsNormalization($data, $format, $context) && !($data instanceof \Exception || $data instanceof FlattenException);
+    }
+
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
+    {
+        trigger_deprecation('api-platform/core', '4.4', 'Calling "denormalize()" on "%s" is deprecated, use "%s" instead.', self::class, ItemDenormalizer::class);
+
+        return $this->doDenormalize($data, $type, $format, $context);
     }
 
     public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null

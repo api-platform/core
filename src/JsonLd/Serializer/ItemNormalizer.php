@@ -43,7 +43,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
 {
     use ClassInfoTrait;
     use ContextTrait;
-    use ItemNormalizerTrait;
+    use ItemNormalizerTrait {
+        denormalize as private doDenormalize;
+    }
     use JsonLdContextTrait;
 
     public const FORMAT = 'jsonld';
@@ -170,5 +172,12 @@ final class ItemNormalizer extends AbstractItemNormalizer
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return self::FORMAT === $format && parent::supportsDenormalization($data, $type, $format, $context);
+    }
+
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
+    {
+        trigger_deprecation('api-platform/core', '4.4', 'Calling "denormalize()" on "%s" is deprecated, use "%s" instead.', self::class, ItemDenormalizer::class);
+
+        return $this->doDenormalize($data, $type, $format, $context);
     }
 }

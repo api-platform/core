@@ -34,7 +34,9 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 class ItemNormalizer extends AbstractItemNormalizer
 {
-    use ItemNormalizerTrait;
+    use ItemNormalizerTrait {
+        denormalize as private doDenormalize;
+    }
 
     private readonly LoggerInterface $logger;
 
@@ -43,5 +45,12 @@ class ItemNormalizer extends AbstractItemNormalizer
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $defaultContext, $resourceMetadataFactory, $resourceAccessChecker, $tagCollector, $operationResourceResolver);
 
         $this->logger = $logger ?: new NullLogger();
+    }
+
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
+    {
+        trigger_deprecation('api-platform/core', '4.4', 'Calling "denormalize()" on "%s" is deprecated, use "%s" instead.', self::class, ItemDenormalizer::class);
+
+        return $this->doDenormalize($data, $type, $format, $context);
     }
 }
