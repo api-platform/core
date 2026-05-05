@@ -30,11 +30,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class ErrorListenerTest extends TestCase
 {
-    protected function tearDown(): void
-    {
-        restore_exception_handler();
-    }
-
     public function testDuplicateException(): void
     {
         $exception = new \Exception();

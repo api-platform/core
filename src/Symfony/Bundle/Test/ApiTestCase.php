@@ -14,9 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Bundle\Test;
 
 use ApiPlatform\Metadata\IriConverterInterface;
+use PHPUnit\Framework\Attributes\After;
+use PHPUnit\Framework\Attributes\Before;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use Symfony\Component\ErrorHandler\ErrorHandler;
 use Symfony\Component\HttpClient\HttpClientTrait;
 
 /**
@@ -37,6 +40,37 @@ abstract class ApiTestCase extends KernelTestCase
      * - `true` always boots the kernel without any deprecation message
      */
     protected static ?bool $alwaysBootKernel = null;
+
+    private bool $symfonyErrorHandlerWasRegistered = false;
+
+    /**
+     * Symfony\Bundle\FrameworkBundle\FrameworkBundle::boot() registers Symfony's ErrorHandler via
+     * set_exception_handler() but never unregisters it: each kernel boot leaks one entry on the
+     * exception handler stack, which PHPUnit flags as Risky. Track whether the handler was already
+     * present before the test (e.g. the kernel was booted from setUpBeforeClass) so we only pop
+     * the entry our own test introduced.
+     */
+    #[Before]
+    protected function captureExceptionHandlerStack(): void
+    {
+        $this->symfonyErrorHandlerWasRegistered = self::isSymfonyErrorHandlerRegistered();
+    }
+
+    #[After]
+    protected function restoreExceptionHandlerStack(): void
+    {
+        if (!$this->symfonyErrorHandlerWasRegistered && self::isSymfonyErrorHandlerRegistered()) {
+            restore_exception_handler();
+        }
+    }
+
+    private static function isSymfonyErrorHandlerRegistered(): bool
+    {
+        $current = set_exception_handler(static fn () => null);
+        restore_exception_handler();
+
+        return \is_array($current) && $current[0] instanceof ErrorHandler;
+    }
 
     /**
      * Creates a Client.
