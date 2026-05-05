@@ -62,12 +62,14 @@ use ApiPlatform\JsonApi\JsonSchema\SchemaFactory as JsonApiSchemaFactory;
 use ApiPlatform\JsonApi\Serializer\CollectionNormalizer as JsonApiCollectionNormalizer;
 use ApiPlatform\JsonApi\Serializer\EntrypointNormalizer as JsonApiEntrypointNormalizer;
 use ApiPlatform\JsonApi\Serializer\ErrorNormalizer as JsonApiErrorNormalizer;
+use ApiPlatform\JsonApi\Serializer\ItemDenormalizer as JsonApiItemDenormalizer;
 use ApiPlatform\JsonApi\Serializer\ItemNormalizer as JsonApiItemNormalizer;
 use ApiPlatform\JsonApi\Serializer\ObjectNormalizer as JsonApiObjectNormalizer;
 use ApiPlatform\JsonApi\Serializer\ReservedAttributeNameConverter;
 use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
 use ApiPlatform\JsonLd\ContextBuilder as JsonLdContextBuilder;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
+use ApiPlatform\JsonLd\Serializer\ItemDenormalizer as JsonLdItemDenormalizer;
 use ApiPlatform\JsonLd\Serializer\ItemNormalizer as JsonLdItemNormalizer;
 use ApiPlatform\JsonLd\Serializer\ObjectNormalizer as JsonLdObjectNormalizer;
 use ApiPlatform\JsonSchema\DefinitionNameFactory;
@@ -146,6 +148,7 @@ use ApiPlatform\OpenApi\Factory\OpenApiFactory;
 use ApiPlatform\OpenApi\Factory\OpenApiFactoryInterface;
 use ApiPlatform\OpenApi\Options;
 use ApiPlatform\OpenApi\Serializer\OpenApiNormalizer;
+use ApiPlatform\Serializer\ItemDenormalizer;
 use ApiPlatform\Serializer\ItemNormalizer;
 use ApiPlatform\Serializer\JsonEncoder;
 use ApiPlatform\Serializer\Mapping\Factory\ClassMetadataFactory as SerializerClassMetadataFactory;
@@ -668,6 +671,28 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
+        $this->app->singleton(ItemDenormalizer::class, static function (Application $app) {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+            $defaultContext = $config->get('api-platform.serializer', []);
+
+            return new ItemDenormalizer(
+                $app->make(PropertyNameCollectionFactoryInterface::class),
+                $app->make(PropertyMetadataFactoryInterface::class),
+                $app->make(IriConverterInterface::class),
+                $app->make(ResourceClassResolverInterface::class),
+                $app->make(PropertyAccessorInterface::class),
+                $app->make(NameConverterInterface::class),
+                $app->make(ClassMetadataFactoryInterface::class),
+                $app->make(LoggerInterface::class),
+                $app->make(ResourceMetadataCollectionFactoryInterface::class),
+                $app->make(ResourceAccessCheckerInterface::class),
+                $defaultContext,
+                null,
+                $app->make(OperationResourceClassResolverInterface::class),
+            );
+        });
+
         $this->app->bind(AnonymousContextBuilderInterface::class, JsonLdContextBuilder::class);
 
         $this->app->singleton(JsonLdObjectNormalizer::class, static function (Application $app) {
@@ -986,6 +1011,24 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
+        $this->app->singleton(JsonApiItemDenormalizer::class, static function (Application $app) {
+            $config = $app['config'];
+            $defaultContext = $config->get('api-platform.serializer', []);
+
+            return new JsonApiItemDenormalizer(
+                $app->make(PropertyNameCollectionFactoryInterface::class),
+                $app->make(PropertyMetadataFactoryInterface::class),
+                $app->make(IriConverterInterface::class),
+                $app->make(ResourceClassResolverInterface::class),
+                $app->make(PropertyAccessorInterface::class),
+                $app->make(NameConverterInterface::class),
+                $app->make(ClassMetadataFactoryInterface::class),
+                $defaultContext,
+                $app->make(ResourceMetadataCollectionFactoryInterface::class),
+                $app->make(ResourceAccessCheckerInterface::class),
+            );
+        });
+
         $this->app->singleton(JsonApiErrorNormalizer::class, static function (Application $app) {
             return new JsonApiErrorNormalizer(
                 $app->make(JsonApiItemNormalizer::class),
@@ -1010,6 +1053,7 @@ class ApiPlatformProvider extends ServiceProvider
             $list->insert($app->make(HalObjectNormalizer::class), -995);
             $list->insert($app->make(HalItemNormalizer::class), -890);
             $list->insert($app->make(JsonLdItemNormalizer::class), -890);
+            $list->insert($app->make(JsonLdItemDenormalizer::class), -889);
             $list->insert($app->make(JsonLdObjectNormalizer::class), -995);
             $list->insert($app->make(ArrayDenormalizer::class), -990);
             $list->insert($app->make(DateTimeZoneNormalizer::class), -915);
@@ -1018,12 +1062,14 @@ class ApiPlatformProvider extends ServiceProvider
             $list->insert($app->make(BackedEnumNormalizer::class), -910);
             $list->insert($app->make(ObjectNormalizer::class), -1000);
             $list->insert($app->make(ItemNormalizer::class), -895);
+            $list->insert($app->make(ItemDenormalizer::class), -894);
             $list->insert($app->make(OpenApiNormalizer::class), -780);
             $list->insert($app->make(HydraDocumentationNormalizer::class), -790);
 
             $list->insert($app->make(JsonApiEntrypointNormalizer::class), -800);
             $list->insert($app->make(JsonApiCollectionNormalizer::class), -985);
             $list->insert($app->make(JsonApiItemNormalizer::class), -890);
+            $list->insert($app->make(JsonApiItemDenormalizer::class), -889);
             $list->insert($app->make(JsonApiErrorNormalizer::class), -790);
             $list->insert($app->make(JsonApiObjectNormalizer::class), -995);
 
@@ -1079,6 +1125,26 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(ResourceAccessCheckerInterface::class),
                 // $app->make(TagCollectorInterface::class)
                 null,
+                null,
+                $app->make(OperationResourceClassResolverInterface::class),
+            );
+        });
+
+        $this->app->singleton(JsonLdItemDenormalizer::class, static function (Application $app) {
+            $config = $app['config'];
+            $defaultContext = $config->get('api-platform.serializer', []);
+
+            return new JsonLdItemDenormalizer(
+                $app->make(ResourceMetadataCollectionFactoryInterface::class),
+                $app->make(PropertyNameCollectionFactoryInterface::class),
+                $app->make(PropertyMetadataFactoryInterface::class),
+                $app->make(IriConverterInterface::class),
+                $app->make(ResourceClassResolverInterface::class),
+                $app->make(PropertyAccessorInterface::class),
+                $app->make(NameConverterInterface::class),
+                $app->make(ClassMetadataFactoryInterface::class),
+                $defaultContext,
+                $app->make(ResourceAccessCheckerInterface::class),
                 null,
                 $app->make(OperationResourceClassResolverInterface::class),
             );
