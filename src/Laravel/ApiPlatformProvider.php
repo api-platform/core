@@ -27,6 +27,7 @@ use ApiPlatform\GraphQl\Serializer\Exception\ErrorNormalizer as GraphQlErrorNorm
 use ApiPlatform\GraphQl\Serializer\Exception\HttpExceptionNormalizer as GraphQlHttpExceptionNormalizer;
 use ApiPlatform\GraphQl\Serializer\Exception\RuntimeExceptionNormalizer as GraphQlRuntimeExceptionNormalizer;
 use ApiPlatform\GraphQl\Serializer\Exception\ValidationExceptionNormalizer as GraphQlValidationExceptionNormalizer;
+use ApiPlatform\GraphQl\Serializer\ItemDenormalizer as GraphQlItemDenormalizer;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer as GraphQlItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\ObjectNormalizer as GraphQlObjectNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilder as GraphQlSerializerContextBuilder;
@@ -1080,6 +1081,7 @@ class ApiPlatformProvider extends ServiceProvider
 
             if (interface_exists(FieldsBuilderEnumInterface::class)) {
                 $list->insert($app->make(GraphQlItemNormalizer::class), -890);
+                $list->insert($app->make(GraphQlItemDenormalizer::class), -889);
                 $list->insert($app->make(GraphQlObjectNormalizer::class), -995);
                 $list->insert($app->make(GraphQlErrorNormalizer::class), -790);
                 $list->insert($app->make(GraphQlValidationExceptionNormalizer::class), -780);
@@ -1300,6 +1302,21 @@ class ApiPlatformProvider extends ServiceProvider
                 $app->make(PropertyMetadataFactoryInterface::class),
                 $app->make(IriConverterInterface::class),
                 $app->make(IdentifiersExtractorInterface::class),
+                $app->make(ResourceClassResolverInterface::class),
+                $app->make(PropertyAccessorInterface::class),
+                $app->make(NameConverterInterface::class),
+                $app->make(SerializerClassMetadataFactory::class),
+                null,
+                $app->make(ResourceMetadataCollectionFactoryInterface::class),
+                $app->make(ResourceAccessCheckerInterface::class)
+            );
+        });
+
+        $this->app->singleton(GraphQlItemDenormalizer::class, static function (Application $app) {
+            return new GraphQlItemDenormalizer(
+                $app->make(PropertyNameCollectionFactoryInterface::class),
+                $app->make(PropertyMetadataFactoryInterface::class),
+                $app->make(IriConverterInterface::class),
                 $app->make(ResourceClassResolverInterface::class),
                 $app->make(PropertyAccessorInterface::class),
                 $app->make(NameConverterInterface::class),

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\GraphQl\State\Provider;
 
-use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
+use ApiPlatform\GraphQl\Serializer\ItemDenormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilderInterface;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\Operation;
@@ -47,7 +47,7 @@ final class DenormalizeProvider implements ProviderInterface
             $denormalizationContext[AbstractNormalizer::OBJECT_TO_POPULATE] = $data;
         }
 
-        $item = $this->denormalizer->denormalize($context['args']['input'], $operation->getClass(), ItemNormalizer::FORMAT, $denormalizationContext);
+        $item = $this->denormalizer->denormalize($context['args']['input'], $operation->getClass(), ItemDenormalizer::FORMAT, $denormalizationContext);
 
         if (!\is_object($item)) {
             throw new \UnexpectedValueException('Expected item to be an object.');

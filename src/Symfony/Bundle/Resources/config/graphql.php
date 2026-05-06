@@ -24,6 +24,7 @@ use ApiPlatform\GraphQl\Serializer\Exception\ErrorNormalizer;
 use ApiPlatform\GraphQl\Serializer\Exception\HttpExceptionNormalizer;
 use ApiPlatform\GraphQl\Serializer\Exception\RuntimeExceptionNormalizer;
 use ApiPlatform\GraphQl\Serializer\Exception\ValidationExceptionNormalizer;
+use ApiPlatform\GraphQl\Serializer\ItemDenormalizer;
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Serializer\ObjectNormalizer;
 use ApiPlatform\GraphQl\Serializer\SerializerContextBuilder;
@@ -249,6 +250,21 @@ return function (ContainerConfigurator $container) {
             service('api_platform.security.resource_access_checker')->ignoreOnInvalid(),
         ])
         ->tag('serializer.normalizer', ['priority' => -890]);
+
+    $services->set('api_platform.graphql.denormalizer.item', ItemDenormalizer::class)
+        ->args([
+            service('api_platform.metadata.property.name_collection_factory'),
+            service('api_platform.metadata.property.metadata_factory'),
+            service('api_platform.symfony.iri_converter'),
+            service('api_platform.resource_class_resolver'),
+            service('api_platform.property_accessor'),
+            service('api_platform.name_converter')->ignoreOnInvalid(),
+            service('serializer.mapping.class_metadata_factory')->ignoreOnInvalid(),
+            null,
+            service('api_platform.metadata.resource.metadata_collection_factory')->ignoreOnInvalid(),
+            service('api_platform.security.resource_access_checker')->ignoreOnInvalid(),
+        ])
+        ->tag('serializer.normalizer', ['priority' => -889]);
 
     $services->set('api_platform.graphql.normalizer.object', ObjectNormalizer::class)
         ->args([

@@ -28,7 +28,6 @@ use ApiPlatform\Metadata\UrlGeneratorInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -252,40 +251,5 @@ class ItemNormalizerTest extends TestCase
             'resources' => [],
             'no_resolver_data' => true,
         ]));
-    }
-
-    public function testDenormalize(): void
-    {
-        $context = ['resource_class' => Dummy::class, 'api_allow_update' => true];
-
-        $propertyNameCollection = new PropertyNameCollection(['name']);
-        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::type('array'))->willReturn($propertyNameCollection)->shouldBeCalled();
-
-        $propertyMetadata = (new ApiProperty())->withWritable(true)->withReadable(true);
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::type('array'))->willReturn($propertyMetadata)->shouldBeCalled();
-
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-
-        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
-
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
-        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
-
-        $serializerProphecy = $this->prophesize(SerializerInterface::class);
-        $serializerProphecy->willImplement(DenormalizerInterface::class);
-
-        $normalizer = new ItemNormalizer(
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
-            $identifiersExtractorProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal()
-        );
-        $normalizer->setSerializer($serializerProphecy->reveal());
-
-        $this->assertInstanceOf(Dummy::class, $normalizer->denormalize(['name' => 'hello'], Dummy::class, ItemNormalizer::FORMAT, $context));
     }
 }
