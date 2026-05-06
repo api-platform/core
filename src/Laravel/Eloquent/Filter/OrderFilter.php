@@ -45,8 +45,8 @@ final class OrderFilter implements FilterInterface, JsonSchemaFilterInterface, O
             return $builder;
         }
 
-        $direction = strtoupper($values);
-        if (!\in_array($direction, ['ASC', 'DESC'], true)) {
+        $direction = strtolower($values);
+        if (!\in_array($direction, ['asc', 'desc'], true)) {
             return $builder;
         }
 
