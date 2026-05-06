@@ -31,33 +31,36 @@ final class AbsoluteUrlTest extends ApiTestCase
 
     public function testCollectionUsesAbsoluteUrls(): void
     {
-        $response = self::createClient()->request('GET', '/jsonld_absolute_url_children', [
+        $client = self::createClient([], ['base_uri' => 'http://example.com']);
+        $response = $client->request('GET', '/jsonld_absolute_url_children', [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
         $this->assertResponseIsSuccessful();
         $body = $response->toArray();
-        $this->assertSame('http://localhost/contexts/JsonLdAbsoluteUrlChild', $body['@context']);
-        $this->assertSame('http://localhost/jsonld_absolute_url_children', $body['@id']);
+        $this->assertSame('http://example.com/contexts/JsonLdAbsoluteUrlChild', $body['@context']);
+        $this->assertSame('http://example.com/jsonld_absolute_url_children', $body['@id']);
         $this->assertSame('hydra:Collection', $body['@type']);
-        $this->assertSame('http://localhost/jsonld_absolute_url_children/1', $body['hydra:member'][0]['@id']);
+        $this->assertSame('http://example.com/jsonld_absolute_url_children/1', $body['hydra:member'][0]['@id']);
     }
 
     public function testItemUsesAbsoluteUrls(): void
     {
-        $response = self::createClient()->request('GET', '/jsonld_absolute_url_children/1', [
+        $client = self::createClient([], ['base_uri' => 'http://example.com']);
+        $response = $client->request('GET', '/jsonld_absolute_url_children/1', [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
         $this->assertResponseIsSuccessful();
         $body = $response->toArray();
-        $this->assertSame('http://localhost/contexts/JsonLdAbsoluteUrlChild', $body['@context']);
-        $this->assertSame('http://localhost/jsonld_absolute_url_children/1', $body['@id']);
+        $this->assertSame('http://example.com/contexts/JsonLdAbsoluteUrlChild', $body['@context']);
+        $this->assertSame('http://example.com/jsonld_absolute_url_children/1', $body['@id']);
         $this->assertSame('JsonLdAbsoluteUrlChild', $body['@type']);
-        $this->assertSame('http://localhost/jsonld_absolute_url_parents/1', $body['parent']);
+        $this->assertSame('http://example.com/jsonld_absolute_url_parents/1', $body['parent']);
     }
 
     public function testPostAcceptsAbsoluteUrlInPayload(): void
     {
-        $response = self::createClient()->request('POST', '/jsonld_absolute_url_parents', [
+        $client = self::createClient([], ['base_uri' => 'http://example.com']);
+        $response = $client->request('POST', '/jsonld_absolute_url_parents', [
             'headers' => [
                 'Accept' => 'application/ld+json',
                 'Content-Type' => 'application/json',
@@ -66,18 +69,19 @@ final class AbsoluteUrlTest extends ApiTestCase
         ]);
         $this->assertResponseStatusCodeSame(201);
         $body = $response->toArray();
-        $this->assertSame('http://localhost/jsonld_absolute_url_parents/2', $body['@id']);
+        $this->assertSame('http://example.com/jsonld_absolute_url_parents/2', $body['@id']);
     }
 
     public function testSubresourceCollectionUsesAbsoluteUrls(): void
     {
-        $response = self::createClient()->request('GET', '/jsonld_absolute_url_parents/1/children', [
+        $client = self::createClient([], ['base_uri' => 'http://example.com']);
+        $response = $client->request('GET', '/jsonld_absolute_url_parents/1/children', [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
         $this->assertResponseIsSuccessful();
         $body = $response->toArray();
-        $this->assertSame('http://localhost/contexts/JsonLdAbsoluteUrlChild', $body['@context']);
-        $this->assertSame('http://localhost/jsonld_absolute_url_parents/1/children', $body['@id']);
+        $this->assertSame('http://example.com/contexts/JsonLdAbsoluteUrlChild', $body['@context']);
+        $this->assertSame('http://example.com/jsonld_absolute_url_parents/1/children', $body['@id']);
         $this->assertSame('hydra:Collection', $body['@type']);
     }
 }

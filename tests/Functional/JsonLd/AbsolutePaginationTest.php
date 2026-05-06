@@ -30,18 +30,19 @@ final class AbsolutePaginationTest extends ApiTestCase
 
     public function testHydraViewUrlsAreAbsolute(): void
     {
-        $response = self::createClient()->request('GET', '/jsonld_absolute_paged?page=3', [
+        $client = self::createClient([], ['base_uri' => 'http://example.com']);
+        $response = $client->request('GET', '/jsonld_absolute_paged?page=3', [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
         $this->assertResponseIsSuccessful();
         $body = $response->toArray();
         $this->assertSame([
-            '@id' => 'http://localhost/jsonld_absolute_paged?page=3',
+            '@id' => 'http://example.com/jsonld_absolute_paged?page=3',
             '@type' => 'hydra:PartialCollectionView',
-            'hydra:first' => 'http://localhost/jsonld_absolute_paged?page=1',
-            'hydra:last' => 'http://localhost/jsonld_absolute_paged?page=10',
-            'hydra:previous' => 'http://localhost/jsonld_absolute_paged?page=2',
-            'hydra:next' => 'http://localhost/jsonld_absolute_paged?page=4',
+            'hydra:first' => 'http://example.com/jsonld_absolute_paged?page=1',
+            'hydra:last' => 'http://example.com/jsonld_absolute_paged?page=10',
+            'hydra:previous' => 'http://example.com/jsonld_absolute_paged?page=2',
+            'hydra:next' => 'http://example.com/jsonld_absolute_paged?page=4',
         ], $body['hydra:view']);
     }
 }

@@ -30,7 +30,7 @@ final class RenamedGetterSetterTest extends ApiTestCase
 
     public function testPostExposesRenamedField(): void
     {
-        $response = self::createClient()->request('POST', '/jsonld_renamed_getter_setters', [
+        $response = self::createClient()->request('POST', '/json_ld_renamed_getter_setters', [
             'headers' => [
                 'Accept' => 'application/ld+json',
                 'Content-Type' => 'application/ld+json',
@@ -39,10 +39,11 @@ final class RenamedGetterSetterTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(201);
-        $body = $response->toArray();
-        $this->assertSame('/contexts/JsonLdRenamedGetterSetter', $body['@context']);
-        $this->assertSame('JsonLdRenamedGetterSetter', $body['@type']);
-        $this->assertSame('Sarah', $body['firstnameOnly']);
-        $this->assertArrayHasKey('@id', $body);
+        $this->assertSame([
+            '@context' => '/contexts/JsonLdRenamedGetterSetter',
+            '@id' => '/json_ld_renamed_getter_setters',
+            '@type' => 'JsonLdRenamedGetterSetter',
+            'firstnameOnly' => 'Sarah',
+        ], $response->toArray());
     }
 }

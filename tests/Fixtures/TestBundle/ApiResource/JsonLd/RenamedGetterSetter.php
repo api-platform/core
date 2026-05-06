@@ -14,22 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd;
 
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Operation;
 
 #[ApiResource(
     shortName: 'JsonLdRenamedGetterSetter',
-    operations: [
-        new GetCollection(
-            uriTemplate: '/jsonld_renamed_getter_setters',
-            provider: [self::class, 'provideCollection'],
-        ),
-        new Post(
-            uriTemplate: '/jsonld_renamed_getter_setters',
-            provider: [self::class, 'provide'],
-            processor: [self::class, 'process'],
-        ),
-    ],
+    provider: [self::class, 'provide'],
+    processor: [self::class, 'process'],
 )]
 class RenamedGetterSetter
 {
@@ -45,12 +35,7 @@ class RenamedGetterSetter
         $this->name = $name;
     }
 
-    public static function provide(): self
-    {
-        return new self();
-    }
-
-    public static function provideCollection(): array
+    public static function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
         return [];
     }

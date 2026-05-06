@@ -16,6 +16,9 @@ namespace ApiPlatform\Tests\Functional\JsonLd;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\CustomInputResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\CustomOutputResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\DummyCollectionDto;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\DummyFooCollectionDto;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\DummyIdCollectionDto;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\InputOutputResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\NoInputResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\PostNoOutputResource;
@@ -35,6 +38,9 @@ final class InputOutputDtoTest extends ApiTestCase
             InputOutputResource::class,
             NoInputResource::class,
             PostNoOutputResource::class,
+            DummyCollectionDto::class,
+            DummyFooCollectionDto::class,
+            DummyIdCollectionDto::class,
         ];
     }
 
@@ -169,5 +175,60 @@ final class InputOutputDtoTest extends ApiTestCase
         $body = $response->toArray();
         $this->assertSame('JsonLdNoInput', $body['@type']);
         $this->assertSame('testtest', $body['bat']);
+    }
+
+    public function testCollectionWithCustomOutputAndNoIdentifierUsesGenid(): void
+    {
+        $response = self::createClient()->request('GET', '/jsonld_dummy_collection_dtos', [
+            'headers' => ['Accept' => 'application/ld+json'],
+        ]);
+        $this->assertResponseIsSuccessful();
+        $body = $response->toArray();
+        $this->assertSame('/contexts/JsonLdDummyCollectionDto', $body['@context']);
+        $this->assertSame('/jsonld_dummy_collection_dtos', $body['@id']);
+        $this->assertSame('hydra:Collection', $body['@type']);
+        $this->assertCount(2, $body['hydra:member']);
+        $this->assertSame(2, $body['hydra:totalItems']);
+        foreach ($body['hydra:member'] as $member) {
+            $this->assertStringStartsWith('/.well-known/genid/', $member['@id']);
+            $this->assertSame('DummyCollectionDtoOutput', $member['@type']);
+            $this->assertSame('foo', $member['foo']);
+            $this->assertIsInt($member['bar']);
+        }
+    }
+
+    public function testCollectionWithItemUriTemplateUsesIt(): void
+    {
+        $response = self::createClient()->request('GET', '/jsonld_dummy_foo_collection_dtos', [
+            'headers' => ['Accept' => 'application/ld+json'],
+        ]);
+        $this->assertResponseIsSuccessful();
+        $body = $response->toArray();
+        $this->assertSame('/contexts/JsonLdDummyFooCollectionDto', $body['@context']);
+        $this->assertSame('/jsonld_dummy_foo_collection_dtos', $body['@id']);
+        $this->assertSame('hydra:Collection', $body['@type']);
+        $this->assertCount(2, $body['hydra:member']);
+        foreach ($body['hydra:member'] as $member) {
+            $this->assertStringContainsString('/jsonld_dummy_foos/bar', $member['@id']);
+            $this->assertSame('JsonLdDummyFooCollectionDto', $member['@type']);
+        }
+    }
+
+    public function testCollectionWithCustomOutputResourceWithIdentifierUsesGenid(): void
+    {
+        $response = self::createClient()->request('GET', '/jsonld_dummy_id_collection_dtos', [
+            'headers' => ['Accept' => 'application/ld+json'],
+        ]);
+        $this->assertResponseIsSuccessful();
+        $body = $response->toArray();
+        $this->assertSame('/contexts/JsonLdDummyIdCollectionDto', $body['@context']);
+        $this->assertCount(2, $body['hydra:member']);
+        foreach ($body['hydra:member'] as $member) {
+            $this->assertStringStartsWith('/.well-known/genid/', $member['@id']);
+            $this->assertSame('DummyIdCollectionDtoOutput', $member['@type']);
+            $this->assertArrayHasKey('id', $member);
+            $this->assertArrayHasKey('foo', $member);
+            $this->assertArrayHasKey('bar', $member);
+        }
     }
 }

@@ -31,33 +31,36 @@ final class NetworkPathTest extends ApiTestCase
 
     public function testCollectionUsesNetworkPaths(): void
     {
-        $response = self::createClient()->request('GET', '/jsonld_network_path_children', [
+        $client = self::createClient([], ['base_uri' => 'http://example.com']);
+        $response = $client->request('GET', '/jsonld_network_path_children', [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
         $this->assertResponseIsSuccessful();
         $body = $response->toArray();
-        $this->assertSame('//localhost/contexts/JsonLdNetworkPathChild', $body['@context']);
-        $this->assertSame('//localhost/jsonld_network_path_children', $body['@id']);
+        $this->assertSame('//example.com/contexts/JsonLdNetworkPathChild', $body['@context']);
+        $this->assertSame('//example.com/jsonld_network_path_children', $body['@id']);
         $this->assertSame('hydra:Collection', $body['@type']);
-        $this->assertSame('//localhost/jsonld_network_path_children/1', $body['hydra:member'][0]['@id']);
+        $this->assertSame('//example.com/jsonld_network_path_children/1', $body['hydra:member'][0]['@id']);
     }
 
     public function testItemUsesNetworkPaths(): void
     {
-        $response = self::createClient()->request('GET', '/jsonld_network_path_children/1', [
+        $client = self::createClient([], ['base_uri' => 'http://example.com']);
+        $response = $client->request('GET', '/jsonld_network_path_children/1', [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
         $this->assertResponseIsSuccessful();
         $body = $response->toArray();
-        $this->assertSame('//localhost/contexts/JsonLdNetworkPathChild', $body['@context']);
-        $this->assertSame('//localhost/jsonld_network_path_children/1', $body['@id']);
+        $this->assertSame('//example.com/contexts/JsonLdNetworkPathChild', $body['@context']);
+        $this->assertSame('//example.com/jsonld_network_path_children/1', $body['@id']);
         $this->assertSame('JsonLdNetworkPathChild', $body['@type']);
-        $this->assertSame('//localhost/jsonld_network_path_parents/1', $body['parent']);
+        $this->assertSame('//example.com/jsonld_network_path_parents/1', $body['parent']);
     }
 
     public function testPostReturnsNetworkPath(): void
     {
-        $response = self::createClient()->request('POST', '/jsonld_network_path_parents', [
+        $client = self::createClient([], ['base_uri' => 'http://example.com']);
+        $response = $client->request('POST', '/jsonld_network_path_parents', [
             'headers' => [
                 'Accept' => 'application/ld+json',
                 'Content-Type' => 'application/json',
@@ -66,18 +69,19 @@ final class NetworkPathTest extends ApiTestCase
         ]);
         $this->assertResponseStatusCodeSame(201);
         $body = $response->toArray();
-        $this->assertSame('//localhost/jsonld_network_path_parents/2', $body['@id']);
+        $this->assertSame('//example.com/jsonld_network_path_parents/2', $body['@id']);
     }
 
     public function testSubresourceCollectionUsesNetworkPaths(): void
     {
-        $response = self::createClient()->request('GET', '/jsonld_network_path_parents/1/children', [
+        $client = self::createClient([], ['base_uri' => 'http://example.com']);
+        $response = $client->request('GET', '/jsonld_network_path_parents/1/children', [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
         $this->assertResponseIsSuccessful();
         $body = $response->toArray();
-        $this->assertSame('//localhost/contexts/JsonLdNetworkPathChild', $body['@context']);
-        $this->assertSame('//localhost/jsonld_network_path_parents/1/children', $body['@id']);
+        $this->assertSame('//example.com/contexts/JsonLdNetworkPathChild', $body['@context']);
+        $this->assertSame('//example.com/jsonld_network_path_parents/1/children', $body['@id']);
         $this->assertSame('hydra:Collection', $body['@type']);
     }
 }

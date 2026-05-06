@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional\JsonLd;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\HydraDocsDeprecated;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\HydraDocsRelated;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\HydraDocsResource;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
@@ -25,7 +27,7 @@ final class HydraDocsTest extends ApiTestCase
 
     public static function getResources(): array
     {
-        return [HydraDocsResource::class];
+        return [HydraDocsResource::class, HydraDocsRelated::class, HydraDocsDeprecated::class];
     }
 
     public function testDocumentationLinkHeader(): void
@@ -56,60 +58,116 @@ final class HydraDocsTest extends ApiTestCase
         $this->assertSame('/', $body['hydra:entrypoint']);
     }
 
-    public function testSupportedClassesIncludeRegisteredResource(): void
+    public function testSupportedClassesIncludeRegisteredAndOmitNonResources(): void
     {
         $response = self::createClient()->request('GET', '/docs.jsonld');
-        $this->assertResponseIsSuccessful();
         $body = $response->toArray();
         $titles = array_column($body['hydra:supportedClass'], 'hydra:title');
         $this->assertContains('Entrypoint', $titles);
         $this->assertContains('JsonLdHydraDocs', $titles);
+        $this->assertContains('JsonLdHydraDocsRelated', $titles);
+        $this->assertNotContains('UnknownDummy', $titles);
+        $this->assertNotContains('HydraDocsResource', $titles, 'class FQCN should not leak when shortName is set');
     }
 
-    public function testSupportedClassDescribesPropertiesAndOperations(): void
+    public function testResourceClassMetadata(): void
     {
-        $response = self::createClient()->request('GET', '/docs.jsonld');
-        $this->assertResponseIsSuccessful();
-        $body = $response->toArray();
-
+        $body = self::createClient()->request('GET', '/docs.jsonld')->toArray();
         $resource = $this->findClass($body['hydra:supportedClass'], 'JsonLdHydraDocs');
-        $this->assertNotNull($resource, 'JsonLdHydraDocs must appear in hydra:supportedClass');
+        $this->assertNotNull($resource);
+        $this->assertSame('#JsonLdHydraDocs', $resource['@id']);
         $this->assertSame('hydra:Class', $resource['@type']);
+        $this->assertSame('JsonLdHydraDocs', $resource['hydra:title']);
         $this->assertSame('A docs sample.', $resource['hydra:description']);
+    }
 
+    public function testSubClassOfFromTypes(): void
+    {
+        $body = self::createClient()->request('GET', '/docs.jsonld')->toArray();
+        $related = $this->findClass($body['hydra:supportedClass'], 'JsonLdHydraDocsRelated');
+        $this->assertNotNull($related);
+        $this->assertSame('https://schema.org/Product', $related['subClassOf']);
+    }
+
+    public function testPropertyMetadataReadableWritableRequired(): void
+    {
+        $body = self::createClient()->request('GET', '/docs.jsonld')->toArray();
+        $resource = $this->findClass($body['hydra:supportedClass'], 'JsonLdHydraDocs');
         $name = $this->findProperty($resource, 'name');
         $this->assertNotNull($name);
         $this->assertSame('hydra:SupportedProperty', $name['@type']);
         $this->assertTrue($name['hydra:readable']);
         $this->assertSame('https://schema.org/name', $name['hydra:property']['@id']);
         $this->assertSame('rdf:Property', $name['hydra:property']['@type']);
+        $this->assertSame('name', $name['hydra:property']['label']);
+        $this->assertSame('#JsonLdHydraDocs', $name['hydra:property']['domain']);
+        $this->assertSame('xsd:string', $name['hydra:property']['range']);
+        $this->assertSame('name', $name['hydra:title']);
+        $this->assertSame('The doc resource name.', $name['hydra:description']);
+    }
+
+    public function testRelationPropertyRangeAndCardinality(): void
+    {
+        $body = self::createClient()->request('GET', '/docs.jsonld')->toArray();
+        $resource = $this->findClass($body['hydra:supportedClass'], 'JsonLdHydraDocs');
+
+        $related = $this->findProperty($resource, 'related');
+        $this->assertNotNull($related);
+        $this->assertSame('#JsonLdHydraDocsRelated', $related['hydra:property']['range']);
+        $this->assertSame(1, $related['hydra:property']['owl:maxCardinality']);
+
+        $relateds = $this->findProperty($resource, 'relateds');
+        $this->assertNotNull($relateds);
+        $this->assertSame('#JsonLdHydraDocsRelated', $relateds['hydra:property']['range']);
+        $this->assertArrayNotHasKey('owl:maxCardinality', $relateds['hydra:property']);
+    }
+
+    public function testOperationMetadata(): void
+    {
+        $body = self::createClient()->request('GET', '/docs.jsonld')->toArray();
+        $resource = $this->findClass($body['hydra:supportedClass'], 'JsonLdHydraDocs');
 
         $get = $this->findOperation($resource, 'GET');
         $this->assertNotNull($get);
         $this->assertContains('hydra:Operation', (array) $get['@type']);
+        $this->assertContains('schema:FindAction', (array) $get['@type']);
         $this->assertSame('GET', $get['hydra:method']);
+        $this->assertSame('getJsonLdHydraDocs', $get['hydra:title']);
+        $this->assertSame('Retrieves a JsonLdHydraDocs resource.', $get['hydra:description']);
         $this->assertSame('JsonLdHydraDocs', $get['returns']);
+
+        $put = $this->findOperation($resource, 'PUT');
+        $this->assertNotNull($put);
+        $this->assertSame('putJsonLdHydraDocs', $put['hydra:title']);
+        $this->assertSame('Replaces the JsonLdHydraDocs resource.', $put['hydra:description']);
 
         $delete = $this->findOperation($resource, 'DELETE');
         $this->assertNotNull($delete);
+        $this->assertSame('deleteJsonLdHydraDocs', $delete['hydra:title']);
+        $this->assertSame('Deletes the JsonLdHydraDocs resource.', $delete['hydra:description']);
         $this->assertSame('owl:Nothing', $delete['returns']);
     }
 
-    public function testDeprecatedFlagSurvivesOnResource(): void
+    public function testDeprecationOnResourceAndProperty(): void
     {
-        $response = self::createClient()->request('GET', '/docs.jsonld');
-        $this->assertResponseIsSuccessful();
-        $body = $response->toArray();
-        $resource = $this->findClass($body['hydra:supportedClass'], 'JsonLdHydraDocs');
-        $deprecatedField = $this->findProperty($resource, 'deprecatedField');
+        $body = self::createClient()->request('GET', '/docs.jsonld')->toArray();
+        $deprecated = $this->findClass($body['hydra:supportedClass'], 'JsonLdHydraDocsDeprecated');
+        $this->assertNotNull($deprecated);
+        $this->assertTrue($deprecated['owl:deprecated']);
+
+        $deprecatedField = $this->findProperty($deprecated, 'deprecatedField');
         $this->assertNotNull($deprecatedField);
         $this->assertTrue($deprecatedField['hydra:property']['owl:deprecated']);
+
+        $entrypoint = $this->findClass($body['hydra:supportedClass'], 'Entrypoint');
+        $this->assertNotNull($entrypoint);
+        $deprecatedEntrypointProp = $this->findProperty($entrypoint, 'getJsonLdHydraDocsDeprecatedCollection');
+        $this->assertNotNull($deprecatedEntrypointProp, 'deprecation on resource must propagate to entrypoint property');
+        $this->assertTrue($deprecatedEntrypointProp['owl:deprecated']);
     }
 
     /**
      * @param list<array<string, mixed>> $supportedClass
-     *
-     * @return array<string, mixed>|null
      */
     private function findClass(array $supportedClass, string $title): ?array
     {
@@ -124,8 +182,6 @@ final class HydraDocsTest extends ApiTestCase
 
     /**
      * @param array<string, mixed> $resource
-     *
-     * @return array<string, mixed>|null
      */
     private function findProperty(array $resource, string $name): ?array
     {
@@ -140,8 +196,6 @@ final class HydraDocsTest extends ApiTestCase
 
     /**
      * @param array<string, mixed> $resource
-     *
-     * @return array<string, mixed>|null
      */
     private function findOperation(array $resource, string $method): ?array
     {

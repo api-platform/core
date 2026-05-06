@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Put;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -28,6 +29,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     shortName: 'JsonLdHydraDocs',
     operations: [
         new Get(uriTemplate: '/jsonld_hydra_docs/{id}', uriVariables: ['id'], provider: [self::class, 'provide']),
+        new GetCollection(uriTemplate: '/jsonld_hydra_docs', provider: [self::class, 'provideCollection']),
         new Put(uriTemplate: '/jsonld_hydra_docs/{id}', uriVariables: ['id'], processor: [self::class, 'process']),
         new Delete(uriTemplate: '/jsonld_hydra_docs/{id}', uriVariables: ['id'], processor: [self::class, 'process']),
     ],
@@ -44,11 +46,10 @@ class HydraDocsResource
     #[Assert\NotBlank]
     public string $name = '';
 
-    /**
-     * @deprecated this field is deprecated
-     */
-    #[ApiProperty(deprecationReason: 'This field is deprecated.')]
-    public ?string $deprecatedField = null;
+    public ?HydraDocsRelated $related = null;
+
+    /** @var array<HydraDocsRelated> */
+    public array $relateds = [];
 
     public static function provide(Operation $operation, array $uriVariables = [], array $context = []): self
     {
@@ -56,6 +57,11 @@ class HydraDocsResource
         $r->id = (int) ($uriVariables['id'] ?? 1);
 
         return $r;
+    }
+
+    public static function provideCollection(): array
+    {
+        return [];
     }
 
     public static function process(mixed $data): mixed

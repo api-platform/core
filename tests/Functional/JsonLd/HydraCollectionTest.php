@@ -155,7 +155,7 @@ final class HydraCollectionTest extends ApiTestCase
         $this->assertCount(0, $body['hydra:member']);
     }
 
-    public function testPartialPaginationStillExposesNavigationLinks(): void
+    public function testPartialPaginationDropsFirstAndLast(): void
     {
         $response = self::createClient()->request('GET', '/jsonld_collection_paged?page=7&partial=1', [
             'headers' => ['Accept' => 'application/ld+json'],
@@ -163,6 +163,8 @@ final class HydraCollectionTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
         $body = $response->toArray();
         $this->assertSame('hydra:PartialCollectionView', $body['hydra:view']['@type']);
+        $this->assertArrayNotHasKey('hydra:first', $body['hydra:view']);
+        $this->assertArrayNotHasKey('hydra:last', $body['hydra:view']);
         $this->assertArrayHasKey('hydra:next', $body['hydra:view']);
         $this->assertArrayHasKey('hydra:previous', $body['hydra:view']);
     }
