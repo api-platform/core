@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Functional\JsonLd;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\CollectionNoPrefix;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\CollectionPagedResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\PaginationCapped;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
 final class HydraCollectionTest extends ApiTestCase
@@ -26,7 +27,7 @@ final class HydraCollectionTest extends ApiTestCase
 
     public static function getResources(): array
     {
-        return [CollectionPagedResource::class, CollectionNoPrefix::class];
+        return [CollectionPagedResource::class, CollectionNoPrefix::class, PaginationCapped::class];
     }
 
     public function testFirstPageHasFirstThreeItemsAndNextLink(): void
@@ -180,5 +181,25 @@ final class HydraCollectionTest extends ApiTestCase
         $this->assertArrayHasKey('member', $body);
         $this->assertArrayNotHasKey('hydra:totalItems', $body);
         $this->assertArrayNotHasKey('hydra:member', $body);
+    }
+
+    public function testItemsPerPageZeroAndPageGreaterThanOneReturns400(): void
+    {
+        $response = self::createClient()->request('GET', '/jsonld_pagination_capped?itemsPerPage=0&page=2', [
+            'headers' => ['Accept' => 'application/ld+json'],
+        ]);
+        $this->assertResponseStatusCodeSame(400);
+        $body = $response->toArray(false);
+        $this->assertSame('Page should not be greater than 1 if limit is equal to 0', $body['detail']);
+    }
+
+    public function testPaginationMaximumItemsPerPageCapsClientItemsPerPage(): void
+    {
+        $response = self::createClient()->request('GET', '/jsonld_pagination_capped?itemsPerPage=40', [
+            'headers' => ['Accept' => 'application/ld+json'],
+        ]);
+        $this->assertResponseIsSuccessful();
+        $body = $response->toArray();
+        $this->assertCount(30, $body['hydra:member']);
     }
 }

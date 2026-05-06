@@ -60,16 +60,18 @@ final class AbsoluteUrlTest extends ApiTestCase
     public function testPostAcceptsAbsoluteUrlInPayload(): void
     {
         $client = self::createClient([], ['base_uri' => 'http://example.com']);
-        $response = $client->request('POST', '/jsonld_absolute_url_parents', [
+        $response = $client->request('POST', '/jsonld_absolute_url_children', [
             'headers' => [
                 'Accept' => 'application/ld+json',
-                'Content-Type' => 'application/json',
+                'Content-Type' => 'application/ld+json',
             ],
-            'json' => new \stdClass(),
+            'json' => ['parent' => 'http://example.com/jsonld_absolute_url_parents/1'],
         ]);
         $this->assertResponseStatusCodeSame(201);
         $body = $response->toArray();
-        $this->assertSame('http://example.com/jsonld_absolute_url_parents/2', $body['@id']);
+        $this->assertSame('http://example.com/jsonld_absolute_url_children/2', $body['@id']);
+        $this->assertSame('JsonLdAbsoluteUrlChild', $body['@type']);
+        $this->assertSame('http://example.com/jsonld_absolute_url_parents/1', $body['parent']);
     }
 
     public function testSubresourceCollectionUsesAbsoluteUrls(): void

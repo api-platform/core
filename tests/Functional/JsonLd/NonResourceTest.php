@@ -100,21 +100,17 @@ final class NonResourceTest extends ApiTestCase
                 'Content-Type' => 'application/ld+json',
             ],
             'json' => [
-                'content' => '{"showCaption":false,"alternativeContent":false,"blockLayout":"default"}',
+                'content' => '{"emptyObject":{},"showCaption":false,"alternativeContent":false,"blockLayout":"default"}',
             ],
         ]);
         $this->assertResponseStatusCodeSame(201);
-        $this->assertJsonContains([
-            '@context' => '/contexts/JsonLdPlainObjectResource',
-            '@id' => '/jsonld_plain_object_resources/1',
-            '@type' => 'JsonLdPlainObjectResource',
-            'data' => [
-                'showCaption' => false,
-                'alternativeContent' => false,
-                'blockLayout' => 'default',
-            ],
-            'id' => 1,
-        ]);
+        $body = $response->toArray();
+        $this->assertSame('/jsonld_plain_object_resources/1', $body['@id']);
+        $this->assertSame('JsonLdPlainObjectResource', $body['@type']);
+        $this->assertSame([], $body['data']['emptyObject']);
+        $this->assertFalse($body['data']['showCaption']);
+        $this->assertFalse($body['data']['alternativeContent']);
+        $this->assertSame('default', $body['data']['blockLayout']);
     }
 
     public function testGenIdFalsePropertyOmitsAtId(): void

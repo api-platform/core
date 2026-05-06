@@ -37,6 +37,25 @@ class JsonLdContextDummy
 
     public ?JsonLdContextRelation $related = null;
 
+    /**
+     * Exercises the collection-valued relation context mapping.
+     *
+     * @var JsonLdContextRelation[]
+     */
+    public array $relatedCollection = [];
+
+    #[ApiProperty(readableLink: true)]
+    public ?JsonLdContextRelation $embedded = null;
+
+    #[ApiProperty(iris: ['https://schema.org/DateTime'])]
+    public ?\DateTimeInterface $dummyDate = null;
+
+    public ?array $arrayData = null;
+
+    public mixed $jsonData = null;
+
+    public ?string $nameConverted = null;
+
     public static function provide(): array
     {
         return [];

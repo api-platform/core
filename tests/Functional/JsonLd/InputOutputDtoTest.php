@@ -22,6 +22,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\DummyIdCollectionDt
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\InputOutputResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\NoInputResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\PostNoOutputResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\UserResource;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
 final class InputOutputDtoTest extends ApiTestCase
@@ -41,6 +42,7 @@ final class InputOutputDtoTest extends ApiTestCase
             DummyCollectionDto::class,
             DummyFooCollectionDto::class,
             DummyIdCollectionDto::class,
+            UserResource::class,
         ];
     }
 
@@ -230,5 +232,32 @@ final class InputOutputDtoTest extends ApiTestCase
             $this->assertArrayHasKey('foo', $member);
             $this->assertArrayHasKey('bar', $member);
         }
+    }
+
+    public function testResetPasswordViaInputDto(): void
+    {
+        $response = self::createClient()->request('POST', '/user-reset-password', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+                'Content-Type' => 'application/ld+json',
+            ],
+            'json' => ['email' => 'user@example.com'],
+        ]);
+        $this->assertResponseStatusCodeSame(201);
+        $this->assertSame('application/ld+json; charset=utf-8', $response->getHeaders()['content-type'][0]);
+        $body = $response->toArray();
+        $this->assertSame('user@example.com', $body['email']);
+    }
+
+    public function testResetPasswordWithInvalidEmailReturns422(): void
+    {
+        $response = self::createClient()->request('POST', '/user-reset-password', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+                'Content-Type' => 'application/ld+json',
+            ],
+            'json' => ['email' => 'this is not an email'],
+        ]);
+        $this->assertResponseStatusCodeSame(422);
     }
 }

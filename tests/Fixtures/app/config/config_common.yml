@@ -179,6 +179,12 @@ services:
         tags:
             - name: 'api_platform.state_provider'
 
+    ApiPlatform\Tests\Fixtures\TestBundle\State\JsonLdPaginationCappedProvider:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\JsonLdPaginationCappedProvider'
+        arguments: ['@api_platform.pagination']
+        tags:
+            - name: 'api_platform.state_provider'
+
     ApiPlatform\Tests\Fixtures\TestBundle\State\CarProcessor:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\CarProcessor'
         tags:

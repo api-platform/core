@@ -92,6 +92,12 @@ final class HydraErrorTest extends ApiTestCase
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
         $this->assertResponseStatusCodeSame(404);
+        $headers = $response->getHeaders(false);
+        $this->assertSame('application/problem+json; charset=utf-8', $headers['content-type'][0]);
+        $this->assertStringContainsString(
+            '<http://www.w3.org/ns/hydra/error>; rel="http://www.w3.org/ns/json-ld#error"',
+            implode(',', $headers['link']),
+        );
         $body = $response->toArray(false);
         $this->assertArrayHasKey('@context', $body);
         $this->assertArrayHasKey('type', $body);
@@ -110,6 +116,12 @@ final class HydraErrorTest extends ApiTestCase
             'json' => new \stdClass(),
         ]);
         $this->assertResponseStatusCodeSame(405);
+        $headers = $response->getHeaders(false);
+        $this->assertSame('application/problem+json; charset=utf-8', $headers['content-type'][0]);
+        $this->assertStringContainsString(
+            '<http://www.w3.org/ns/hydra/error>; rel="http://www.w3.org/ns/json-ld#error"',
+            implode(',', $headers['link']),
+        );
         $body = $response->toArray(false);
         $this->assertArrayHasKey('@context', $body);
         $this->assertArrayHasKey('type', $body);
@@ -128,6 +140,12 @@ final class HydraErrorTest extends ApiTestCase
             'json' => new \stdClass(),
         ]);
         $this->assertResponseStatusCodeSame(400);
+        $headers = $response->getHeaders(false);
+        $this->assertSame('application/problem+json; charset=utf-8', $headers['content-type'][0]);
+        $this->assertStringContainsString(
+            '<http://www.w3.org/ns/hydra/error>; rel="http://www.w3.org/ns/json-ld#error"',
+            implode(',', $headers['link']),
+        );
         $body = $response->toArray(false);
         $this->assertArrayHasKey('@context', $body);
         $this->assertArrayHasKey('type', $body);

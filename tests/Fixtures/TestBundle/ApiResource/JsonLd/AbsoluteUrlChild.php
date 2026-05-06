@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 
 #[ApiResource(
@@ -33,6 +34,10 @@ use ApiPlatform\Metadata\UrlGeneratorInterface;
             uriTemplate: '/jsonld_absolute_url_children/{id}',
             uriVariables: ['id'],
             provider: [self::class, 'provide'],
+        ),
+        new Post(
+            uriTemplate: '/jsonld_absolute_url_children',
+            processor: [self::class, 'process'],
         ),
     ],
 )]
@@ -66,5 +71,12 @@ class AbsoluteUrlChild
     public static function provideCollection(): array
     {
         return [self::provide(new Get(), ['id' => 1], [])];
+    }
+
+    public static function process(self $data): self
+    {
+        $data->id = 2;
+
+        return $data;
     }
 }

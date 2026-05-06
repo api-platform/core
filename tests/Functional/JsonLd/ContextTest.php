@@ -67,4 +67,49 @@ final class ContextTest extends ApiTestCase
             '@type' => '@id',
         ], $body['@context']['related']);
     }
+
+    public function testRelatedCollectionMappingHasIdReference(): void
+    {
+        $response = self::createClient()->request('GET', '/contexts/JsonLdContextDummy');
+        $this->assertResponseIsSuccessful();
+        $body = $response->toArray();
+        $this->assertSame([
+            '@id' => 'JsonLdContextDummy/relatedCollection',
+            '@type' => '@id',
+        ], $body['@context']['relatedCollection']);
+    }
+
+    public function testDateTimePropertyExposesSchemaOrgDateTime(): void
+    {
+        $response = self::createClient()->request('GET', '/contexts/JsonLdContextDummy');
+        $this->assertResponseIsSuccessful();
+        $body = $response->toArray();
+        $this->assertSame('https://schema.org/DateTime', $body['@context']['dummyDate']);
+    }
+
+    public function testNameConvertedPropertyKeyIsNormalized(): void
+    {
+        $response = self::createClient()->request('GET', '/contexts/JsonLdContextDummy');
+        $this->assertResponseIsSuccessful();
+        $body = $response->toArray();
+        $this->assertArrayHasKey('name_converted', $body['@context']);
+        $this->assertArrayNotHasKey('nameConverted', $body['@context']);
+    }
+
+    public function testJsonAndArrayDataAreExposed(): void
+    {
+        $response = self::createClient()->request('GET', '/contexts/JsonLdContextDummy');
+        $this->assertResponseIsSuccessful();
+        $body = $response->toArray();
+        $this->assertArrayHasKey('jsonData', $body['@context']);
+        $this->assertArrayHasKey('arrayData', $body['@context']);
+    }
+
+    public function testEmbeddedRelationMappingIsPlainString(): void
+    {
+        $response = self::createClient()->request('GET', '/contexts/JsonLdContextDummy');
+        $this->assertResponseIsSuccessful();
+        $body = $response->toArray();
+        $this->assertSame('JsonLdContextDummy/embedded', $body['@context']['embedded']);
+    }
 }

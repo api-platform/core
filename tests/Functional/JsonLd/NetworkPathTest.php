@@ -72,6 +72,23 @@ final class NetworkPathTest extends ApiTestCase
         $this->assertSame('//example.com/jsonld_network_path_parents/2', $body['@id']);
     }
 
+    public function testPostAcceptsNetworkPathInPayload(): void
+    {
+        $client = self::createClient([], ['base_uri' => 'http://example.com']);
+        $response = $client->request('POST', '/jsonld_network_path_children', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+                'Content-Type' => 'application/ld+json',
+            ],
+            'json' => ['parent' => '//example.com/jsonld_network_path_parents/1'],
+        ]);
+        $this->assertResponseStatusCodeSame(201);
+        $body = $response->toArray();
+        $this->assertSame('//example.com/jsonld_network_path_children/2', $body['@id']);
+        $this->assertSame('JsonLdNetworkPathChild', $body['@type']);
+        $this->assertSame('//example.com/jsonld_network_path_parents/1', $body['parent']);
+    }
+
     public function testSubresourceCollectionUsesNetworkPaths(): void
     {
         $client = self::createClient([], ['base_uri' => 'http://example.com']);
