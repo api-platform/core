@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -53,6 +54,7 @@ class ItemDenormalizerTest extends TestCase
     }
 
     #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testDenormalizeOnLegacyItemNormalizerIsDeprecated(): void
     {
         $this->expectUserDeprecationMessage('Since api-platform/core 4.4: Calling "denormalize()" on "ApiPlatform\JsonApi\Serializer\ItemNormalizer" is deprecated, use "ApiPlatform\JsonApi\Serializer\ItemDenormalizer" instead.');

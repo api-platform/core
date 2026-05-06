@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Serializer\ItemNormalizer;
 use ApiPlatform\Serializer\Tests\Fixtures\ApiResource\Dummy;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -146,6 +147,7 @@ class ItemNormalizerTest extends TestCase
     }
 
     #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testDenormalizeIsDeprecated(): void
     {
         $this->expectUserDeprecationMessage('Since api-platform/core 4.4: Calling "denormalize()" on "ApiPlatform\Serializer\ItemNormalizer" is deprecated, use "ApiPlatform\Serializer\ItemDenormalizer" instead.');
