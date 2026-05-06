@@ -54,7 +54,7 @@ class DocsTest extends TestCase
     {
         $res = $this->get('/api/docs', headers: ['accept' => 'text/html']);
         $res->assertOk();
-        $content = $res->getContent();
+        $content = (string) $res->getContent();
 
         $this->assertStringContainsString('init-swagger-ui.js', $content);
         $this->assertStringContainsString('id="formats"', $content);
@@ -67,7 +67,7 @@ class DocsTest extends TestCase
     {
         $res = $this->get('/api/docs?ui=redoc', headers: ['accept' => 'text/html']);
         $res->assertOk();
-        $content = $res->getContent();
+        $content = (string) $res->getContent();
 
         $this->assertStringContainsString('init-redoc-ui.js', $content);
         $this->assertStringContainsString('id="formats"', $content);
@@ -80,7 +80,7 @@ class DocsTest extends TestCase
     {
         $res = $this->get('/api/docs?ui=scalar', headers: ['accept' => 'text/html']);
         $res->assertOk();
-        $content = $res->getContent();
+        $content = (string) $res->getContent();
 
         $this->assertStringContainsString('init-scalar-ui.js', $content);
         $this->assertStringNotContainsString('id="formats"', $content);
