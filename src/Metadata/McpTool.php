@@ -27,6 +27,7 @@ class McpTool extends HttpOperation
 {
     /**
      * @param string|null                                    $name              The name of the tool (defaults to the method name)
+     * @param string|null                                    $title             Optional human-readable title for display in UI
      * @param string|null                                    $description       The description of the tool (defaults to the DocBlock/inferred)
      * @param bool|null                                      $structuredContent Whether to include structured content in the response (defaults to true)
      * @param mixed|null                                     $annotations       Optional annotations describing tool behavior
@@ -90,6 +91,7 @@ class McpTool extends HttpOperation
      */
     public function __construct(
         ?string $name = null,
+        protected ?string $title = null,
         ?string $description = null,
         protected ?bool $structuredContent = null,
         protected mixed $annotations = null,
@@ -318,6 +320,19 @@ class McpTool extends HttpOperation
     {
         $self = clone $this;
         $self->structuredContent = $structuredContent;
+
+        return $self;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function withTitle(?string $title): static
+    {
+        $self = clone $this;
+        $self->title = $title;
 
         return $self;
     }

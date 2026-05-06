@@ -63,6 +63,7 @@ final class Loader implements LoaderInterface
                         $registry->registerTool(
                             new Tool(
                                 name: $mcp->getName(),
+                                title: $mcp->getTitle(),
                                 inputSchema: $inputSchema->getArrayCopy(),
                                 description: $mcp->getDescription(),
                                 annotations: $mcp->getAnnotations() ? ToolAnnotations::fromArray($mcp->getAnnotations()) : null,
