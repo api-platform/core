@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
@@ -48,9 +49,10 @@ final class PurgeHttpCacheListener
     public function __construct(private readonly PurgerInterface $purger,
         private readonly IriConverterInterface $iriConverter,
         private readonly ResourceClassResolverInterface $resourceClassResolver,
+        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
         ?PropertyAccessorInterface $propertyAccessor = null,
         private readonly ?ObjectMapperInterface $objectMapper = null,
-        private readonly ?ObjectMapperMetadataFactoryInterface $objectMapperMetadata = null)
+        private readonly ?ObjectMapperMetadataFactoryInterface $objectMapperMetadata = null, )
     {
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
     }
@@ -128,8 +130,17 @@ final class PurgeHttpCacheListener
 
         foreach ($resources as $resource) {
             try {
-                $iri = $this->iriConverter->getIriFromResource($resource, UrlGeneratorInterface::ABS_PATH, new GetCollection());
-                $this->tags[$iri] = $iri;
+                // Here we need to loop on all GetCollection Operations, there can be multiple for a single resource class
+                $resourceClass = $this->resourceClassResolver->getResourceClass($resource);
+                $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);
+                foreach ($resourceMetadataCollection as $resourceMetadata) {
+                    foreach ($resourceMetadata->getOperations() as $operation) {
+                        if ($operation instanceof GetCollection) {
+                            $iri = $this->iriConverter->getIriFromResource($resource, UrlGeneratorInterface::ABS_PATH, $operation);
+                            $this->tags[$iri] = $iri;
+                        }
+                    }
+                }
 
                 if ($purgeItem) {
                     $this->addTagForItem($entity);

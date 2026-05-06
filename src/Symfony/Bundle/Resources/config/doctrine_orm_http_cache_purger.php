@@ -23,6 +23,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.http_cache.purger'),
             service('api_platform.iri_converter'),
             service('api_platform.resource_class_resolver'),
+            service('api_platform.metadata.resource.metadata_collection_factory'),
             service('api_platform.property_accessor'),
             service('api_platform.object_mapper')->nullOnInvalid(),
             service('api_platform.object_mapper.metadata_factory')->nullOnInvalid(),
