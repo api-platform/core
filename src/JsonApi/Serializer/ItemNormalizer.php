@@ -86,6 +86,11 @@ final class ItemNormalizer extends AbstractItemNormalizer
         return self::FORMAT === $format && parent::supportsNormalization($data, $format, $context) && !($data instanceof \Exception || $data instanceof FlattenException);
     }
 
+    public function getSupportedTypes(?string $format): array
+    {
+        return self::FORMAT === $format ? parent::getSupportedTypes($format) : [];
+    }
+
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         trigger_deprecation('api-platform/core', '4.4', 'Calling "denormalize()" on "%s" is deprecated, use "%s" instead.', self::class, ItemDenormalizer::class);
