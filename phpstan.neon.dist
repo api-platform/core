@@ -59,6 +59,7 @@ parameters:
 				- tests/Fixtures/TestBundle/Document/
 				- tests/Fixtures/TestBundle/Entity/
 				- src/OpenApi/Factory/OpenApiFactory.php
+				- src/JsonLd/Serializer/ObjectNormalizer.php
 		-
 			message: '#is never assigned .* so it can be removed from the property type.#'
 			paths:

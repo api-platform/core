@@ -59,9 +59,7 @@ trait JsonLdContextTrait
 
     private function createJsonLdContext(AnonymousContextBuilderInterface $contextBuilder, object $object, array &$context): array
     {
-        $anonymousContext = ($context['output'] ?? []) + [
-            'api_resource' => $context['api_resource'] ?? null,
-        ];
+        $anonymousContext = $context['output'] ?? [];
 
         if (isset($context['item_uri_template'])) {
             $anonymousContext['item_uri_template'] = $context['item_uri_template'];

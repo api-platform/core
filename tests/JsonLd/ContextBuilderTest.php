@@ -226,57 +226,6 @@ class ContextBuilderTest extends TestCase
         $this->assertEquals($expected, $contextBuilder->getAnonymousResourceContext($output, ['iri' => '/dummies', 'name' => 'Dummy']));
     }
 
-    public function testAnonymousResourceContextWithApiResource(): void
-    {
-        $output = new OutputDto();
-        $this->propertyNameCollectionFactoryProphecy->create(OutputDto::class)->willReturn(new PropertyNameCollection(['dummyPropertyA']));
-        $this->propertyMetadataFactoryProphecy->create(OutputDto::class, 'dummyPropertyA', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType(Type::string())->withDescription('Dummy property A')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true));
-        $this->urlGeneratorProphecy->generate('api_doc', ['_format' => 'jsonld'], UrlGeneratorInterface::ABS_URL)->willReturn('');
-
-        $this->resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection('Dummy', [
-            (new ApiResource())
-                ->withShortName('Dummy')
-                ->withOperations(new Operations(['get' => (new Get())->withShortName('Dummy')])),
-        ]));
-
-        $contextBuilder = new ContextBuilder($this->resourceNameCollectionFactoryProphecy->reveal(), $this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->propertyNameCollectionFactoryProphecy->reveal(), $this->propertyMetadataFactoryProphecy->reveal(), $this->urlGeneratorProphecy->reveal());
-
-        $expected = [
-            '@context' => [
-                '@vocab' => '#',
-                'hydra' => 'http://www.w3.org/ns/hydra/core#',
-                'dummyPropertyA' => 'OutputDto/dummyPropertyA',
-            ],
-            '@id' => '/dummies',
-            '@type' => 'Dummy',
-        ];
-
-        $this->assertEquals($expected, $contextBuilder->getAnonymousResourceContext($output, ['iri' => '/dummies', 'name' => 'Dummy', 'api_resource' => new Dummy()]));
-    }
-
-    public function testAnonymousResourceContextWithApiResourceHavingContext(): void
-    {
-        $output = new OutputDto();
-        $this->propertyNameCollectionFactoryProphecy->create(OutputDto::class)->willReturn(new PropertyNameCollection(['dummyPropertyA']));
-        $this->propertyMetadataFactoryProphecy->create(OutputDto::class, 'dummyPropertyA', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType(Type::string())->withDescription('Dummy property A')->withReadable(true)->withWritable(true)->withReadableLink(true)->withWritableLink(true));
-        $this->urlGeneratorProphecy->generate('api_doc', ['_format' => 'jsonld'], UrlGeneratorInterface::ABS_URL)->willReturn('');
-
-        $this->resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection('Dummy', [
-            (new ApiResource())
-                ->withShortName('Dummy')
-                ->withOperations(new Operations(['get' => (new Get())->withShortName('Dummy')])),
-        ]));
-
-        $contextBuilder = new ContextBuilder($this->resourceNameCollectionFactoryProphecy->reveal(), $this->resourceMetadataCollectionFactoryProphecy->reveal(), $this->propertyNameCollectionFactoryProphecy->reveal(), $this->propertyMetadataFactoryProphecy->reveal(), $this->urlGeneratorProphecy->reveal());
-
-        $expected = [
-            '@id' => '/dummies',
-            '@type' => 'Dummy',
-        ];
-
-        $this->assertEquals($expected, $contextBuilder->getAnonymousResourceContext($output, ['iri' => '/dummies', 'name' => 'Dummy', 'api_resource' => new Dummy(), 'has_context' => true]));
-    }
-
     public function testResourceContextWithoutHydraPrefix(): void
     {
         $this->resourceMetadataCollectionFactoryProphecy->create($this->entityClass)->willReturn(new ResourceMetadataCollection('DummyEntity', [

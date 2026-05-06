@@ -152,6 +152,18 @@ final class ItemNormalizer extends AbstractItemNormalizer
             return $normalizedData;
         }
 
+        if (!isset($metadata['@type']) && null !== ($type = $this->resolveType($resourceClass, $isResourceClass, $context))) {
+            $metadata['@type'] = $type;
+        }
+
+        return $metadata + $normalizedData;
+    }
+
+    /**
+     * @return string|array<int, string>|null
+     */
+    private function resolveType(string $resourceClass, bool $isResourceClass, array $context): string|array|null
+    {
         $operation = $context['operation'] ?? null;
 
         if ($this->operationMetadataFactory && isset($context['item_uri_template']) && !$operation) {
@@ -162,30 +174,31 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation();
         }
 
-        if (!isset($metadata['@type']) && $operation) {
-            $types = $operation instanceof HttpOperation ? $operation->getTypes() : null;
-            if (null === $types) {
-                // TODO: 5.x break on this as this looks wrong, CollectionReferencingItem returns an IRI that point through
-                // ItemReferencedInCollection but it returns a CollectionReferencingItem therefore we should use the current
-                // object's class Type and not rely on operation ?
-                if (isset($context['item_uri_template'])) {
-                    // When the operation comes from item_uri_template, use its shortName directly
-                    // as $resourceClass refers to the collection resource, not the item resource
-                    $types = [$operation->getShortName()];
-                } else {
-                    // Use resource-level shortName to avoid operation-specific overrides
-                    $typeClass = $isResourceClass ? $resourceClass : ($operation->getClass() ?? $resourceClass);
-                    try {
-                        $types = [$this->resourceMetadataCollectionFactory->create($typeClass)[0]->getShortName()];
-                    } catch (\Exception) {
-                        $types = [$operation->getShortName()];
-                    }
-                }
-            }
-            $metadata['@type'] = 1 === \count($types) ? $types[0] : $types;
+        if (!$operation) {
+            return null;
         }
 
-        return $metadata + $normalizedData;
+        $types = $operation instanceof HttpOperation ? $operation->getTypes() : null;
+        if (null === $types) {
+            // TODO: 5.x break on this as this looks wrong, CollectionReferencingItem returns an IRI that point through
+            // ItemReferencedInCollection but it returns a CollectionReferencingItem therefore we should use the current
+            // object's class Type and not rely on operation ?
+            if (isset($context['item_uri_template'])) {
+                // When the operation comes from item_uri_template, use its shortName directly
+                // as $resourceClass refers to the collection resource, not the item resource
+                $types = [$operation->getShortName()];
+            } else {
+                // Use resource-level shortName to avoid operation-specific overrides
+                $typeClass = $isResourceClass ? $resourceClass : ($operation->getClass() ?? $resourceClass);
+                try {
+                    $types = [$this->resourceMetadataCollectionFactory->create($typeClass)[0]->getShortName()];
+                } catch (\Exception) {
+                    $types = [$operation->getShortName()];
+                }
+            }
+        }
+
+        return 1 === \count($types) ? $types[0] : $types;
     }
 
     /**

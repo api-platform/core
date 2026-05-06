@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonLd\Serializer;
 
 use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
-use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\IriConverterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -53,11 +52,6 @@ final class ObjectNormalizer implements NormalizerInterface
      */
     public function normalize(mixed $data, ?string $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
-        if (isset($context['api_resource'])) {
-            $originalResource = $context['api_resource'];
-            unset($context['api_resource']);
-        }
-
         /*
          * Converts the normalized data array of a resource into an IRI, if the
          * normalized data array is empty.
@@ -73,15 +67,6 @@ final class ObjectNormalizer implements NormalizerInterface
         $normalizedData = $this->decorated->normalize($data, $format, $context);
         if (!\is_array($normalizedData) || !$normalizedData) {
             return $normalizedData;
-        }
-
-        if (isset($originalResource)) {
-            try {
-                $context['output']['iri'] = $this->iriConverter->getIriFromResource($originalResource);
-            } catch (InvalidArgumentException) {
-                // The original resource has no identifiers
-            }
-            $context['api_resource'] = $originalResource;
         }
 
         $metadata = $this->createJsonLdContext($this->anonymousContextBuilder, $data, $context);
