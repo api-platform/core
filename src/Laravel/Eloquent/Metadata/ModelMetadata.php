@@ -104,7 +104,15 @@ final class ModelMetadata
             ];
         }
 
-        return $this->attributesLocalCache[$model::class] = array_merge($attributes, $this->getVirtualAttributes($model, $columns));
+        $result = array_merge($attributes, $this->getVirtualAttributes($model, $columns));
+
+        // Don't cache an empty result for a missing table: the table may be created later
+        // (e.g. by RefreshDatabase between MCP boot-time discovery and the actual request).
+        if ([] === $result && !$schema->hasTable($table)) {
+            return $result;
+        }
+
+        return $this->attributesLocalCache[$model::class] = $result;
     }
 
     /**
