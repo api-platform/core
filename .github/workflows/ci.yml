@@ -1078,6 +1078,7 @@ jobs:
       - name: Run Behat tests
         run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction
 
+  # remove once behat can be installed with symfony 8.1
   phpunit-symfony-edge:
     name: PHPUnit (PHP ${{ matrix.php }}) (Symfony 8.1)
     runs-on: ubuntu-latest

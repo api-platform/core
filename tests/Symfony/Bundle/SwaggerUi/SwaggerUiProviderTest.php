@@ -29,7 +29,6 @@ class SwaggerUiProviderTest extends TestCase
     public function testProvideWithBaseUrl(): void
     {
         $openapiFactory = $this->createMock(OpenApiFactoryInterface::class);
-        // Symfony 8.1 added a "set" property hook on Request::$query whose generated double would need to mock the (final) InputBag class — so we cannot use createStub(Request::class) here.
         $request = new class extends Request {
             public function getBaseUrl(): string
             {
