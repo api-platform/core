@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Functional;
+namespace ApiPlatform\Tests\Functional\JsonLd;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6718\Organization;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
-class ItemUriTemplateTest extends ApiTestCase
+class ItemUriTemplateNotFoundTest extends ApiTestCase
 {
     use SetupClassResourcesTrait;
 
@@ -31,7 +31,7 @@ class ItemUriTemplateTest extends ApiTestCase
         return [Organization::class];
     }
 
-    public function testIssue6718(): void
+    public function testNotFoundOnInvalidItemUriTemplateRelation(): void
     {
         self::createClient()->request('GET', '/6718_users/1/organisation', [
             'headers' => ['accept' => 'application/ld+json'],

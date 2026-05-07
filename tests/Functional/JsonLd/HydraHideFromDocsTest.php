@@ -11,14 +11,14 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Functional;
+namespace ApiPlatform\Tests\Functional\JsonLd;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\HideHydraClass;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\HideHydraOperation;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
-class HydraTest extends ApiTestCase
+class HydraHideFromDocsTest extends ApiTestCase
 {
     use SetupClassResourcesTrait;
 
@@ -32,10 +32,7 @@ class HydraTest extends ApiTestCase
         return [HideHydraOperation::class, HideHydraClass::class];
     }
 
-    /**
-     * The input DTO denormalizes an existing Doctrine entity.
-     */
-    public function testIssue6465(): void
+    public function testHideHydraClassAndOperationFromDocsAndEntrypoint(): void
     {
         $response = self::createClient()->request('GET', 'docs', [
             'headers' => ['accept' => 'application/ld+json'],
