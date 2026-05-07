@@ -1078,6 +1078,54 @@ jobs:
       - name: Run Behat tests
         run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction
 
+  phpunit-symfony-edge:
+    name: PHPUnit (PHP ${{ matrix.php }}) (Symfony 8.1)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    continue-on-error: true
+    strategy:
+      matrix:
+        php:
+          - '8.5'
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: pecl, composer
+          extensions: intl, bcmath, curl, openssl, mbstring
+          coverage: none
+          ini-values: memory_limit=-1
+      - name: Get composer cache directory
+        id: composercache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      - name: Allow unstable project dependencies
+        run: composer config minimum-stability dev
+      - name: Drop Behat dev dependencies (incompatible with Symfony 8.1)
+        run: composer remove --no-update --no-interaction --dev behat/behat behat/mink soyuka/contexts friends-of-behat/symfony-extension friends-of-behat/mink-browserkit-driver friends-of-behat/mink-extension
+      - name: Force Symfony 8.1 dev for framework-bundle and json-streamer
+        run: composer require --dev --no-update --no-interaction "symfony/framework-bundle:8.1.x-dev" "symfony/json-streamer:8.1.x-dev"
+      - name: Cache dependencies
+        uses: actions/cache@v5
+        with:
+          path: ${{ steps.composercache.outputs.dir }}
+          key: ${{ runner.os }}-composer-symfony-edge-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-symfony-edge-
+      - name: Remove cache
+        run: rm -Rf tests/Fixtures/app/var/cache/*
+      - name: Update project dependencies
+        run: |
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link .
+      - name: Clear test app cache
+        run: tests/Fixtures/app/console cache:clear --ansi
+      - name: Run PHPUnit tests
+        run: vendor/bin/phpunit
+
   windows-behat:
     name: Windows Behat (PHP ${{ matrix.php }}) (SQLite)
     runs-on: windows-latest
