@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Functional;
+namespace ApiPlatform\Tests\Functional\Kernel;
 
 use ApiPlatform\Metadata\HeaderParameter;
 use Symfony\Component\Config\Loader\LoaderInterface;

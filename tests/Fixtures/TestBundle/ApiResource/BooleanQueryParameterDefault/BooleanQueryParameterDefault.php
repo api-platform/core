@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7354;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\BooleanQueryParameterDefault;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
@@ -22,7 +22,7 @@ use ApiPlatform\Metadata\QueryParameter;
     operations: [
         new Get(
             normalizationContext: ['hydra_prefix' => false],
-            uriTemplate: '/issue7354_boolean_query_parameters',
+            uriTemplate: '/boolean_query_parameter_defaults',
             parameters: [
                 'booleanParameter' => new QueryParameter(
                     schema: [
@@ -39,7 +39,7 @@ use ApiPlatform\Metadata\QueryParameter;
         ),
     ]
 )]
-class BooleanQueryParameter
+class BooleanQueryParameterDefault
 {
     public function __construct(
         public bool $booleanParameter,

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue7135;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\UuidIriRelation;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
@@ -20,14 +20,14 @@ use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity()]
 #[ApiResource(
-    shortName: 'BarPr7135',
+    shortName: 'UuidIriRelationBar',
     operations: [
         new Get(
-            uriTemplate: '/pull-request-7135/bar/{id}',
+            uriTemplate: '/uuid_iri_relation/bar/{id}',
         ),
     ]
 )]
-#[ORM\Table(name: 'bar6466')]
+#[ORM\Table(name: 'uuid_iri_relation_bar')]
 class Bar
 {
     #[ORM\Id]

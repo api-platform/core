@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6926;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ErrorResourceWithGroups;
 
 use ApiPlatform\Metadata\ErrorResource;
 use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;

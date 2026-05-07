@@ -16,9 +16,12 @@ namespace ApiPlatform\Tests\Functional;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue4358\ResourceA;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue4358\ResourceB;
+use ApiPlatform\Tests\SetupClassResourcesTrait;
 
-class HALCircularReference extends ApiTestCase
+class HalCircularReferenceTest extends ApiTestCase
 {
+    use SetupClassResourcesTrait;
+
     protected static ?bool $alwaysBootKernel = false;
 
     public function testIssue4358(): void

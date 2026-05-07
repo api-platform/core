@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Functional\Issues;
+namespace ApiPlatform\Tests\Functional\Doctrine;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use ApiPlatform\Tests\Fixtures\TestBundle\Document\Issue7349\Foo7349;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\PartialPaginationMongo\PartialPaginationMongoDummy;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
-class Issue7349Test extends ApiTestCase
+class PartialPaginationMongoDbTest extends ApiTestCase
 {
     use RecreateSchemaTrait;
     use RefreshDatabase;
@@ -37,7 +37,7 @@ class Issue7349Test extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [Foo7349::class];
+        return [PartialPaginationMongoDummy::class];
     }
 
     /**
@@ -49,7 +49,7 @@ class Issue7349Test extends ApiTestCase
             $this->markTestSkipped();
         }
 
-        $response = self::createClient()->request('GET', '/foo7349s?page=1&itemsPerPage=3&partial=true', [
+        $response = self::createClient()->request('GET', '/partial_pagination_mongo_dummies?page=1&itemsPerPage=3&partial=true', [
             'headers' => [
                 'Accept' => 'application/ld+json',
             ],
@@ -73,7 +73,7 @@ class Issue7349Test extends ApiTestCase
             $this->markTestSkipped();
         }
 
-        $response = self::createClient()->request('GET', '/foo7349s?page=1&itemsPerPage=3&partial=false', [
+        $response = self::createClient()->request('GET', '/partial_pagination_mongo_dummies?page=1&itemsPerPage=3&partial=false', [
             'headers' => [
                 'Accept' => 'application/ld+json',
             ],

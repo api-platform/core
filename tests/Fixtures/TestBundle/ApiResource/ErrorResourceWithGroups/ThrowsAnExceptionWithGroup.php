@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6926;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ErrorResourceWithGroups;
 
 use ApiPlatform\Metadata\Post;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[Post(
-    uriTemplate: '/issue6926',
+    uriTemplate: '/error_resource_with_groups',
     processor: [self::class, 'process'],
     denormalizationContext: ['groups' => ['login_request:write']],
     normalizationContext: ['groups' => ['login_request:read']],

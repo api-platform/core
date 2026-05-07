@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Functional\Kernel\DefaultParametersAppKernel;
 
 /**
  * Tests that default parameters configured via api_platform.defaults.parameters

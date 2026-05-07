@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7490;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DataUriFileUpload;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\File\File;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/issue7490_file_uploads',
+            uriTemplate: '/data_uri_file_uploads',
         ),
     ]
 )]

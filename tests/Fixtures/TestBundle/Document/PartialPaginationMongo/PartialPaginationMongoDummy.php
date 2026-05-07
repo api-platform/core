@@ -11,21 +11,17 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\Document\Issue7349;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document\PartialPaginationMongo;
 
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
-/**
- * Foo7349.
- *
- * @author Maxime Valin <contact@maximeval.in>
- */
 #[ApiResource(
+    shortName: 'PartialPaginationMongoDummy',
     paginationClientPartial: true,
 )]
 #[ODM\Document]
-class Foo7349
+class PartialPaginationMongoDummy
 {
     /**
      * @var int id

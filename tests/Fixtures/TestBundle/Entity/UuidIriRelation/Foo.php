@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue7135;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\UuidIriRelation;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
@@ -20,15 +20,15 @@ use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity()]
 #[ApiResource(
-    shortName: 'FooPr7135',
+    shortName: 'UuidIriRelationFoo',
     operations: [
         new Post(
-            uriTemplate: '/pull-request-7135/foo',
+            uriTemplate: '/uuid_iri_relation/foo',
         ),
     ],
     normalizationContext: ['iri_only' => true],
 )]
-#[ORM\Table(name: 'foo6466')]
+#[ORM\Table(name: 'uuid_iri_relation_foo')]
 class Foo
 {
     #[ORM\Id]

@@ -11,13 +11,13 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Functional;
+namespace ApiPlatform\Tests\Functional\Parameters;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7354\BooleanQueryParameter;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\BooleanQueryParameterDefault\BooleanQueryParameterDefault;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
-final class Issue7354Test extends ApiTestCase
+final class BooleanQueryParameterDefaultTest extends ApiTestCase
 {
     use SetupClassResourcesTrait;
 
@@ -28,26 +28,26 @@ final class Issue7354Test extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [BooleanQueryParameter::class];
+        return [BooleanQueryParameterDefault::class];
     }
 
     public function testBooleanQueryParameterDefaultOverride(): void
     {
-        self::createClient()->request('GET', '/issue7354_boolean_query_parameters?booleanParameter=false');
+        self::createClient()->request('GET', '/boolean_query_parameter_defaults?booleanParameter=false');
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains(['booleanParameter' => false]);
     }
 
     public function testBooleanQueryParameterDefaultNotOverride(): void
     {
-        self::createClient()->request('GET', '/issue7354_boolean_query_parameters?booleanParameter=true');
+        self::createClient()->request('GET', '/boolean_query_parameter_defaults?booleanParameter=true');
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains(['booleanParameter' => true]);
     }
 
     public function testBooleanQueryParameterDefaultValue(): void
     {
-        self::createClient()->request('GET', '/issue7354_boolean_query_parameters');
+        self::createClient()->request('GET', '/boolean_query_parameter_defaults');
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains(['booleanParameter' => true]);
     }

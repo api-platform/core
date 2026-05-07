@@ -15,6 +15,9 @@ namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\State\ApiResource\Error;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DataUriFileUpload\FileUploadResource;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ErrorResourceWithGroups\Error as ErrorResourceWithGroupsError;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ErrorResourceWithGroups\ThrowsAnExceptionWithGroup;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\XmlWithJsonError;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -30,7 +33,7 @@ final class ErrorTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [Error::class, XmlWithJsonError::class];
+        return [Error::class, XmlWithJsonError::class, ThrowsAnExceptionWithGroup::class, ErrorResourceWithGroupsError::class, FileUploadResource::class];
     }
 
     #[DataProvider('formatsProvider')]
@@ -107,5 +110,31 @@ final class ErrorTest extends ApiTestCase
 
         $this->assertResponseStatusCodeSame(404);
         $this->assertResponseHeaderSame('content-type', 'application/xml; charset=utf-8');
+    }
+
+    public function testErrorResourceThrownFromProcessorRespectsGroups(): void
+    {
+        $response = self::createClient()->request('POST', '/error_resource_with_groups', ['json' => []]);
+        $this->assertEquals('This should be returned in the response.', $response->toArray(false)['detail'] ?? false);
+    }
+
+    public function testDataUriExceptionMessageIsNotWrapped(): void
+    {
+        $response = self::createClient()->request('POST', '/data_uri_file_uploads', [
+            'json' => [
+                'file' => 'data:invalid',
+            ],
+            'headers' => [
+                'Content-Type' => 'application/ld+json',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(400);
+        $this->assertResponseHeaderSame('content-type', 'application/problem+json; charset=utf-8');
+
+        $responseData = $response->toArray(false);
+
+        $this->assertStringContainsString('The provided "data:" URI is not valid', $responseData['hydra:description'] ?? $responseData['detail']);
+        $this->assertStringNotContainsString('The type of the "file" attribute must be', $responseData['hydra:description'] ?? $responseData['detail']);
     }
 }

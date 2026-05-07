@@ -11,18 +11,18 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Functional\Issues;
+namespace ApiPlatform\Tests\Functional\Uuid;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue7135\Bar;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue7135\Foo;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\UuidIriRelation\Bar;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\UuidIriRelation\Foo;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Component\Uid\Uuid;
 
-class Issue7135Test extends ApiTestCase
+class UuidIriRelationTest extends ApiTestCase
 {
     use RecreateSchemaTrait;
     use SetupClassResourcesTrait;
@@ -47,9 +47,9 @@ class Issue7135Test extends ApiTestCase
         $this->recreateSchema(self::getResources());
         $bar = $this->loadBarFixture();
 
-        $response = self::createClient()->request('POST', '/pull-request-7135/foo', [
+        $response = self::createClient()->request('POST', '/uuid_iri_relation/foo', [
             'json' => [
-                'bar' => 'pull-request-7135/bar/'.$bar->id,
+                'bar' => 'uuid_iri_relation/bar/'.$bar->id,
             ],
         ]);
 
@@ -63,14 +63,14 @@ class Issue7135Test extends ApiTestCase
             $this->markTestSkipped();
         }
 
-        $response = self::createClient()->request('POST', '/pull-request-7135/foo', [
+        $response = self::createClient()->request('POST', '/uuid_iri_relation/foo', [
             'json' => [
-                'bar' => 'pull-request-7135/bar/invalid-uuid',
+                'bar' => 'uuid_iri_relation/bar/invalid-uuid',
             ],
         ]);
 
         self::assertEquals(400, $response->getStatusCode());
-        self::assertJsonContains(['detail' => 'Invalid IRI "pull-request-7135/bar/invalid-uuid".']);
+        self::assertJsonContains(['detail' => 'Invalid IRI "uuid_iri_relation/bar/invalid-uuid".']);
     }
 
     public function testInvalidGetRequestWhenIdentifierIsUuid(): void
@@ -80,7 +80,7 @@ class Issue7135Test extends ApiTestCase
             $this->markTestSkipped();
         }
 
-        $response = self::createClient()->request('GET', '/pull-request-7135/bar/invalid-uuid');
+        $response = self::createClient()->request('GET', '/uuid_iri_relation/bar/invalid-uuid');
 
         self::assertEquals(404, $response->getStatusCode());
     }

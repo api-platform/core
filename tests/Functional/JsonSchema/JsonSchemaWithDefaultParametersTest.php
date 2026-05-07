@@ -17,7 +17,7 @@ use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5793\BagOfTests;
-use ApiPlatform\Tests\Functional\DefaultParametersAppKernel;
+use ApiPlatform\Tests\Functional\Kernel\DefaultParametersAppKernel;
 
 /**
  * Test that JsonSchema can be generated when default parameters are configured.
