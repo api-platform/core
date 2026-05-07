@@ -888,7 +888,9 @@ class ApiPlatformProvider extends ServiceProvider
 
             return new HydraSchemaFactory(
                 $app->make(JsonApiSchemaFactory::class),
-                $defaultContext
+                $defaultContext,
+                $app->make(DefinitionNameFactoryInterface::class),
+                $app->make(ResourceMetadataCollectionFactoryInterface::class),
             );
         });
 
