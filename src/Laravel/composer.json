@@ -38,6 +38,7 @@
         "api-platform/openapi": "^4.3",
         "api-platform/serializer": "^4.3",
         "api-platform/state": "^4.3",
+        "api-platform/toon": "^4.3",
         "illuminate/config": "^11.0 || ^12.0 || ^13.0",
         "illuminate/container": "^11.0 || ^12.0 || ^13.0",
         "illuminate/contracts": "^11.0 || ^12.0 || ^13.0",

@@ -39,22 +39,40 @@ api_platform:
     enable_swagger: true
     enable_swagger_ui: true
     formats:
-        jsonld:                        ['application/ld+json']
-        jsonhal:                       ['application/hal+json']
-        jsonapi:                       ['application/vnd.api+json']
-        xml:                           ['application/xml', 'text/xml']
-        json:                          ['application/json']
-        html:                          ['text/html']
         graphql:                       ['application/graphql']
+        html:                          ['text/html']
+        hydra:                         ['application/ld+json'] # Explicitly adding hydra
+        hydra_toon:                    ['text/ld+toon'] # Added explicit hydra_toon
+        json:                          ['application/json']
+        jsonapi:                       ['application/vnd.api+json']
+        jsonapi_toon:                  ['text/vnd.api+toon']
+        jsonhal:                       ['application/hal+json']
+        jsonhal_toon:                  ['text/hal+toon']
+        jsonld:                        ['application/ld+json']
+        jsonld_toon:                   ['text/ld+toon'] # Added explicit jsonld_toon
         multipart:                     ['multipart/form-data']
+        toon:                          ['text/ld+toon']
+        xml:                           ['application/xml', 'text/xml']
+    patch_formats:
+        jsonhal:                       ['application/hal+json']
+        jsonhal_toon:                  ['text/hal+toon']
+        jsonapi_toon:                  ['text/vnd.api+toon']
+        jsonld:                        ['application/ld+json', 'application/merge-patch+json']
+        jsonld_toon:                   ['text/ld+toon'] # Added explicit jsonld_toon
+        toon:                          ['text/ld+toon']
+        hydra_toon:                    ['text/ld+toon'] # Added explicit hydra_toon
     docs_formats:
         html:                          ['text/html']
         json:                          ['application/json']
-        jsonopenapi:                   ['application/vnd.openapi+json']
-        yamlopenapi:                   ['application/vnd.openapi+yaml']
-        jsonld:                        ['application/ld+json']
-        jsonhal:                       ['application/hal+json']
         jsonapi:                       ['application/vnd.api+json']
+        jsonhal:                       ['application/hal+json']
+        jsonld:                        ['application/ld+json']
+        jsonld_toon:                   ['text/ld+toon'] # Added explicit jsonld_toon
+        jsonopenapi:                   ['application/vnd.openapi+json']
+        jsonopenapi_toon:              ['text/vnd.openapi+toon']
+        hydra_toon:                    ['text/ld+toon'] # Added explicit hydra_toon
+        toon:                          ['text/ld+toon']
+        yamlopenapi:                   ['application/vnd.openapi+yaml']
     error_formats:
         jsonproblem:                   ['application/problem+json']
         jsonld:                        ['application/ld+json']
