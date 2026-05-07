@@ -71,12 +71,12 @@ class CollectionPagedResource
             $itemsPerPage = 3;
         }
 
-        $paginationDisabled = (string) ($filters['pagination'] ?? '1') === '0';
+        $paginationDisabled = '0' === (string) ($filters['pagination'] ?? '1');
         if ($paginationDisabled) {
             return new ArrayPaginator($items, 0, \count($items));
         }
 
-        $partial = (string) ($filters['partial'] ?? '') === '1';
+        $partial = '1' === (string) ($filters['partial'] ?? '');
         if ($partial) {
             return new CollectionPartialPaginator(\array_slice($items, ($page - 1) * $itemsPerPage, $itemsPerPage), $page, $itemsPerPage);
         }
