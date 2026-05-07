@@ -43,7 +43,7 @@ final class InterfaceTaxonImpl implements InterfaceTaxon
     {
     }
 
-    public function getCode(): ?string
+    public function getCode(): string
     {
         return $this->code;
     }
