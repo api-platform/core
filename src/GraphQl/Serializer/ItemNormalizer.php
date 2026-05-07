@@ -16,6 +16,7 @@ namespace ApiPlatform\GraphQl\Serializer;
 use ApiPlatform\GraphQl\State\Provider\NoopProvider;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -26,6 +27,7 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Serializer\CacheKeyTrait;
 use ApiPlatform\Serializer\ItemNormalizer as BaseItemNormalizer;
+use Doctrine\Common\Collections\Collection;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -109,6 +111,11 @@ final class ItemNormalizer extends BaseItemNormalizer
             $normalizedData[self::ITEM_IDENTIFIERS_KEY] = $this->identifiersExtractor->getIdentifiersFromItem($data, $context['operation'] ?? null);
         }
 
+        if (isset($context['graphql_operation_name']) && 'mercure_subscription' === $context['graphql_operation_name'] && \is_object($data) && isset($normalizedData['id']) && !isset($normalizedData['_id'])) {
+            $normalizedData['_id'] = $normalizedData['id'];
+            $normalizedData['id'] = $this->iriConverter->getIriFromResource($data);
+        }
+
         return $normalizedData;
     }
 
@@ -123,8 +130,41 @@ final class ItemNormalizer extends BaseItemNormalizer
             return [...$attributeValue];
         }
 
+        // Handle relationships for mercure subscriptions
+        if ($operation instanceof QueryCollection && 'mercure_subscription' === $context['graphql_operation_name'] && $attributeValue instanceof Collection && !$attributeValue->isEmpty()) {
+            $relationContext = $context;
+            $relationContext['attributes'] = $context['attributes']['collection'];
+            $data['collection'] = [];
+            foreach ($attributeValue as $item) {
+                $data['collection'][] = $this->normalize($item, $format, $relationContext);
+            }
+
+            return $this->addPagination($attributeValue->count(), $data, $context);
+        }
+
         // to-many are handled directly by the GraphQL resolver
         return [];
+    }
+
+    private function addPagination(int $totalCount, array $data, array $context): array
+    {
+        if ($context['attributes']['paginationInfo'] ?? false) {
+            $data['paginationInfo'] = [];
+            if (\array_key_exists('hasNextPage', $context['attributes']['paginationInfo'])) {
+                $data['paginationInfo']['hasNextPage'] = $totalCount > ($context['pagination']['itemsPerPage'] ?? 10);
+            }
+            if (\array_key_exists('itemsPerPage', $context['attributes']['paginationInfo'])) {
+                $data['paginationInfo']['itemsPerPage'] = $context['pagination']['itemsPerPage'] ?? 10;
+            }
+            if (\array_key_exists('lastPage', $context['attributes']['paginationInfo'])) {
+                $data['paginationInfo']['lastPage'] = (int) ceil($totalCount / ($context['pagination']['itemsPerPage'] ?? 10));
+            }
+            if (\array_key_exists('totalCount', $context['attributes']['paginationInfo'])) {
+                $data['paginationInfo']['totalCount'] = $totalCount;
+            }
+        }
+
+        return $data;
     }
 
     /**

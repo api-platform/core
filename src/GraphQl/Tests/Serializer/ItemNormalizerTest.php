@@ -15,22 +15,29 @@ namespace ApiPlatform\GraphQl\Tests\Serializer;
 
 use ApiPlatform\GraphQl\Serializer\ItemNormalizer;
 use ApiPlatform\GraphQl\Tests\Fixtures\ApiResource\Dummy;
+use ApiPlatform\GraphQl\Tests\Fixtures\ApiResource\MercureSubscriptionChildDummy;
 use ApiPlatform\GraphQl\Tests\Fixtures\ApiResource\SecuredDummy;
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
+use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\TypeInfo\Type;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -252,6 +259,111 @@ class ItemNormalizerTest extends TestCase
             'resources' => [],
             'no_resolver_data' => true,
         ]));
+    }
+
+    public function testNormalizeMercureSubscriptionNestedCollectionRelations(): void
+    {
+        $firstChild = new MercureSubscriptionChildDummy();
+        $firstChild->setName('alpha');
+        $secondChild = new MercureSubscriptionChildDummy();
+        $secondChild->setName('beta');
+        $thirdChild = new MercureSubscriptionChildDummy();
+        $thirdChild->setName('gamma');
+
+        $children = new ArrayCollection([$firstChild, $secondChild, $thirdChild]);
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(MercureSubscriptionChildDummy::class, Argument::type('array'))->willReturn(new PropertyNameCollection(['name']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(MercureSubscriptionChildDummy::class, 'name', Argument::type('array'))->willReturn(
+            (new ApiProperty())
+                ->withNativeType(Type::string())
+                ->withReadable(true)
+        );
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $identifiersExtractorProphecy = $this->prophesize(IdentifiersExtractorInterface::class);
+
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactoryProphecy->create(MercureSubscriptionChildDummy::class)->willReturn(new ResourceMetadataCollection(MercureSubscriptionChildDummy::class, [
+            (new ApiResource())->withGraphQlOperations([
+                'collection_query' => (new QueryCollection())->withName('collection_query')->withClass(MercureSubscriptionChildDummy::class),
+            ]),
+        ]));
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, MercureSubscriptionChildDummy::class)->willReturn(MercureSubscriptionChildDummy::class);
+        $resourceClassResolverProphecy->getResourceClass($firstChild, null)->willReturn(MercureSubscriptionChildDummy::class);
+        $resourceClassResolverProphecy->getResourceClass($secondChild, null)->willReturn(MercureSubscriptionChildDummy::class);
+        $resourceClassResolverProphecy->getResourceClass($thirdChild, null)->willReturn(MercureSubscriptionChildDummy::class);
+        $resourceClassResolverProphecy->isResourceClass(MercureSubscriptionChildDummy::class)->willReturn(true);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+        $serializerProphecy->normalize('alpha', ItemNormalizer::FORMAT, Argument::type('array'))->willReturn('alpha');
+        $serializerProphecy->normalize('beta', ItemNormalizer::FORMAT, Argument::type('array'))->willReturn('beta');
+        $serializerProphecy->normalize('gamma', ItemNormalizer::FORMAT, Argument::type('array'))->willReturn('gamma');
+
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $identifiersExtractorProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            null,
+            null,
+            null,
+            null,
+            $resourceMetadataCollectionFactoryProphecy->reveal()
+        );
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $relationProperty = (new ApiProperty())
+            ->withNativeType(Type::collection(Type::object(ArrayCollection::class), Type::object(MercureSubscriptionChildDummy::class), Type::int()))
+            ->withReadable(true)
+            ->withWritable(false)
+            ->withReadableLink(true);
+
+        $normalizeCollectionOfRelations = \Closure::bind(
+            static fn (ItemNormalizer $normalizer, ApiProperty $property, iterable $attributeValue, string $resourceClass, ?string $format, array $context): array => $normalizer->normalizeCollectionOfRelations($property, $attributeValue, $resourceClass, $format, $context),
+            null,
+            ItemNormalizer::class
+        );
+
+        $this->assertSame([
+            'collection' => [
+                ['name' => 'alpha'],
+                ['name' => 'beta'],
+                ['name' => 'gamma'],
+            ],
+            'paginationInfo' => [
+                'hasNextPage' => true,
+                'itemsPerPage' => 2,
+                'lastPage' => 2,
+                'totalCount' => 3,
+            ],
+        ], $normalizeCollectionOfRelations(
+            $normalizer,
+            $relationProperty,
+            $children,
+            MercureSubscriptionChildDummy::class,
+            ItemNormalizer::FORMAT,
+            [
+                'graphql_operation_name' => 'mercure_subscription',
+                'attributes' => [
+                    'collection' => ['name' => true],
+                    'paginationInfo' => [
+                        'hasNextPage' => true,
+                        'itemsPerPage' => true,
+                        'lastPage' => true,
+                        'totalCount' => true,
+                    ],
+                ],
+                'pagination' => ['itemsPerPage' => 2],
+                'no_resolver_data' => true,
+            ]
+        ));
     }
 
     public function testDenormalize(): void

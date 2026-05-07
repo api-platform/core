@@ -28,6 +28,7 @@ use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
+use ApiPlatform\Metadata\GraphQl\SubscriptionCollection;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
@@ -447,6 +448,46 @@ class FieldsBuilderTest extends TestCase
                     'actionShortNameSubscribe' => [
                         'type' => $graphqlType,
                         'description' => 'Custom description.',
+                        'args' => [
+                            'input' => [
+                                'type' => $inputGraphqlType,
+                                'description' => null,
+                                'args' => [],
+                                'resolve' => null,
+                                'deprecationReason' => null,
+                            ],
+                        ],
+                        'resolve' => $subscriptionResolver,
+                        'deprecationReason' => null,
+                    ],
+                ],
+            ],
+            'collection subscription' => [\stdClass::class, (new SubscriptionCollection())->withClass(\stdClass::class)->withName('action_collection')->withShortName('ShortName')->withMercure(true), $graphqlType = new ObjectType(['name' => 'subscription', 'fields' => []]), $inputGraphqlType = new ObjectType(['name' => 'input', 'fields' => []]), $subscriptionResolver = static function (): void {
+            },
+                [
+                    'action_collectionShortNameSubscribe' => [
+                        'type' => $graphqlType,
+                        'description' => 'Subscribes to the action event of a ShortName.',
+                        'args' => [
+                            'input' => [
+                                'type' => $inputGraphqlType,
+                                'description' => null,
+                                'args' => [],
+                                'resolve' => null,
+                                'deprecationReason' => null,
+                            ],
+                        ],
+                        'resolve' => $subscriptionResolver,
+                        'deprecationReason' => null,
+                    ],
+                ],
+            ],
+            'collection subscription custom description' => [\stdClass::class, (new SubscriptionCollection())->withClass(\stdClass::class)->withName('action_collection')->withShortName('ShortName')->withMercure(true)->withDescription('Custom collection description.'), $graphqlType = new ObjectType(['name' => 'subscription', 'fields' => []]), $inputGraphqlType = new ObjectType(['name' => 'input', 'fields' => []]), $subscriptionResolver = static function (): void {
+            },
+                [
+                    'action_collectionShortNameSubscribe' => [
+                        'type' => $graphqlType,
+                        'description' => 'Custom collection description.',
                         'args' => [
                             'input' => [
                                 'type' => $inputGraphqlType,
