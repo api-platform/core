@@ -1,6 +1,5 @@
 imports:
     - { resource: config_common.yml }
-    - { resource: config_behat_orm.yml }
 
 parameters:
     env(ELASTICSEARCH_URL): http://localhost:9200

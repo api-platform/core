@@ -1,6 +1,5 @@
 imports:
     - { resource: config_common.yml }
-    - { resource: config_behat_mongodb.yml }
 
 parameters:
     env(MONGODB_DB): api_platform_test
