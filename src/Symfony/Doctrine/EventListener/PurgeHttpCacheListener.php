@@ -49,10 +49,10 @@ final class PurgeHttpCacheListener
     public function __construct(private readonly PurgerInterface $purger,
         private readonly IriConverterInterface $iriConverter,
         private readonly ResourceClassResolverInterface $resourceClassResolver,
-        private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
         ?PropertyAccessorInterface $propertyAccessor = null,
         private readonly ?ObjectMapperInterface $objectMapper = null,
-        private readonly ?ObjectMapperMetadataFactoryInterface $objectMapperMetadata = null, )
+        private readonly ?ObjectMapperMetadataFactoryInterface $objectMapperMetadata = null,
+        private readonly ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null)
     {
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
     }
@@ -130,6 +130,12 @@ final class PurgeHttpCacheListener
 
         foreach ($resources as $resource) {
             try {
+                if (!$this->resourceMetadataCollectionFactory) {
+                    // BC: fallback to the previous version
+                    $iri = $this->iriConverter->getIriFromResource($resource, UrlGeneratorInterface::ABS_PATH, new GetCollection());
+                    $this->tags[$iri] = $iri;
+                    continue;
+                }
                 // Here we need to loop on all GetCollection Operations, there can be multiple for a single resource class
                 $resourceClass = $this->resourceClassResolver->getResourceClass($resource);
                 $resourceMetadataCollection = $this->resourceMetadataCollectionFactory->create($resourceClass);

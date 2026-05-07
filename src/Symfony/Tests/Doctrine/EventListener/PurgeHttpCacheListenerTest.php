@@ -122,8 +122,8 @@ class PurgeHttpCacheListenerTest extends TestCase
         $propertyAccessorProphecy->getValue(Argument::type(Dummy::class), 'relatedOwningDummy')->willReturn(null)->shouldNotBeCalled();
 
         $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(), $resourceMetadataCollectionFactoryProphecy->reveal(),
-            $propertyAccessorProphecy->reveal(), null, null);
+            $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), null, null,
+            $resourceMetadataCollectionFactoryProphecy->reveal(), );
 
         $listener->onFlush($eventArgs);
         $listener->postFlush();
@@ -181,7 +181,8 @@ class PurgeHttpCacheListenerTest extends TestCase
         $eventArgs = new PreUpdateEventArgs($dummy, $emProphecy->reveal(), $changeSet);
 
         $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(), $resourceMetadataCollectionFactoryProphecy->reveal());
+            $resourceClassResolverProphecy->reveal(), null, null, null,
+            $resourceMetadataCollectionFactoryProphecy->reveal());
         $listener->preUpdate($eventArgs);
         $listener->postFlush();
     }
@@ -219,7 +220,7 @@ class PurgeHttpCacheListenerTest extends TestCase
             ]));
 
         $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(),
-            $resourceMetadataCollectionFactoryProphecy->reveal());
+            null, null, null, $resourceMetadataCollectionFactoryProphecy->reveal());
         $listener->preUpdate($eventArgs);
         $listener->postFlush();
     }
@@ -275,8 +276,8 @@ class PurgeHttpCacheListenerTest extends TestCase
             ]));
 
         $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(), $resourceMetadataCollectionFactoryProphecy->reveal(),
-            $propertyAccessorProphecy->reveal());
+            $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(),
+            null, null, $resourceMetadataCollectionFactoryProphecy->reveal(), );
         $listener->onFlush($eventArgs);
         $listener->postFlush();
     }
@@ -332,7 +333,8 @@ class PurgeHttpCacheListenerTest extends TestCase
                 ]),
             ]));
         $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(), $resourceMetadataCollectionFactoryProphecy->reveal(), $propertyAccessorProphecy->reveal(), );
+            $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), null, null,
+            $resourceMetadataCollectionFactoryProphecy->reveal());
         $listener->onFlush($eventArgs);
         $listener->postFlush();
     }
@@ -400,8 +402,8 @@ class PurgeHttpCacheListenerTest extends TestCase
         $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
 
         $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(), $resourceMetadataCollectionFactoryProphecy->reveal(),
-            $propertyAccessorProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), null, null,
+            $resourceMetadataCollectionFactoryProphecy->reveal(),
         );
         $listener->onFlush($eventArgs);
         $listener->postFlush();
@@ -460,8 +462,8 @@ class PurgeHttpCacheListenerTest extends TestCase
             ]));
 
         $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(), $resourceMetadataCollectionFactoryProphecy->reveal(), $propertyAccessorProphecy->reveal(),
-            $objectMapperProphecy->reveal()
+            $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(),
+            $objectMapperProphecy->reveal(), null, $resourceMetadataCollectionFactoryProphecy->reveal()
         );
         $listener->onFlush($eventArgs);
         $listener->postFlush();
