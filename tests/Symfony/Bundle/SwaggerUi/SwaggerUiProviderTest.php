@@ -22,8 +22,6 @@ use ApiPlatform\OpenApi\OpenApi;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\Bundle\SwaggerUi\SwaggerUiProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\InputBag;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 
 class SwaggerUiProviderTest extends TestCase
@@ -31,11 +29,14 @@ class SwaggerUiProviderTest extends TestCase
     public function testProvideWithBaseUrl(): void
     {
         $openapiFactory = $this->createMock(OpenApiFactoryInterface::class);
-        $request = $this->createStub(Request::class);
-        $request->attributes = new ParameterBag();
-        $request->query = new InputBag();
-        $request->method('getRequestFormat')->willReturn('html');
-        $request->method('getBaseUrl')->willReturn('test');
+        // Symfony 8.1 added a "set" property hook on Request::$query whose generated double would need to mock the (final) InputBag class — so we cannot use createStub(Request::class) here.
+        $request = new class extends Request {
+            public function getBaseUrl(): string
+            {
+                return 'test';
+            }
+        };
+        $request->setRequestFormat('html');
         $decorated = $this->createStub(ProviderInterface::class);
         $provider = new SwaggerUiProvider($decorated, $openapiFactory);
         $openapiFactory->expects($this->once())->method('__invoke')->with(['base_url' => 'test', 'filter_tags' => []])->willReturn(new OpenApi(new Info('test', '1'), [], new Paths()));
