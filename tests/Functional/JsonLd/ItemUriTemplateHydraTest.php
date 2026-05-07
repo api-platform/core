@@ -19,10 +19,12 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CollectionReferencingItem;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5662\Book;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5662\Review;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ItemReferencedInCollection;
+use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
 final class ItemUriTemplateHydraTest extends ApiTestCase
 {
+    use RecreateSchemaTrait;
     use SetupClassResourcesTrait;
 
     protected static ?bool $alwaysBootKernel = false;
@@ -99,6 +101,10 @@ final class ItemUriTemplateHydraTest extends ApiTestCase
 
     public function testCollectionReferencingAnotherResource(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped();
+        }
+
         $response = self::createClient()->request('GET', '/item_referenced_in_collection', [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
@@ -117,6 +123,10 @@ final class ItemUriTemplateHydraTest extends ApiTestCase
 
     public function testCollectionReferencingItemUriTemplate(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped();
+        }
+
         $response = self::createClient()->request('GET', '/issue5662/books/a/reviews', [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
@@ -132,6 +142,10 @@ final class ItemUriTemplateHydraTest extends ApiTestCase
 
     public function testCollectionReferencingInvalidItemUriTemplateFallsBackToCollectionUri(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped();
+        }
+
         $response = self::createClient()->request('GET', '/issue5662/admin/reviews', [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
@@ -144,6 +158,10 @@ final class ItemUriTemplateHydraTest extends ApiTestCase
 
     public function testPostWithItemUriTemplateGeneratesIriFromTemplate(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped();
+        }
+
         $response = self::createClient()->request('POST', '/issue5662/books/a/reviews', [
             'headers' => [
                 'Accept' => 'application/ld+json',

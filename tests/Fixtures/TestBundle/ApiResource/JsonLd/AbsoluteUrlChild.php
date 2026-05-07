@@ -39,17 +39,13 @@ use ApiPlatform\Metadata\UrlGeneratorInterface;
             uriTemplate: '/jsonld_absolute_url_children',
             processor: [self::class, 'process'],
         ),
-    ],
-)]
-#[ApiResource(
-    shortName: 'JsonLdAbsoluteUrlChild',
-    uriTemplate: '/jsonld_absolute_url_parents/{parentId}/children',
-    urlGenerationStrategy: UrlGeneratorInterface::ABS_URL,
-    uriVariables: [
-        'parentId' => new Link(fromClass: AbsoluteUrlParent::class, identifiers: ['id']),
-    ],
-    operations: [
-        new GetCollection(provider: [self::class, 'provideCollection']),
+        new GetCollection(
+            uriTemplate: '/jsonld_absolute_url_parents/{parentId}/children',
+            uriVariables: [
+                'parentId' => new Link(fromClass: AbsoluteUrlParent::class, identifiers: ['id']),
+            ],
+            provider: [self::class, 'provideCollection'],
+        ),
     ],
 )]
 class AbsoluteUrlChild

@@ -36,11 +36,6 @@ use ApiPlatform\Metadata\Post;
             uriTemplate: '/jsonld_uri_template_cars',
             processor: [self::class, 'process'],
         ),
-    ],
-)]
-#[ApiResource(
-    shortName: 'JsonLdUriTemplateCar',
-    operations: [
         new GetCollection(
             uriTemplate: '/jsonld_uri_template_brands/renault/cars',
             itemUriTemplate: '/jsonld_uri_template_brands/renault/cars/{id}',

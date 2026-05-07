@@ -39,17 +39,13 @@ use ApiPlatform\Metadata\UrlGeneratorInterface;
             uriTemplate: '/jsonld_network_path_children',
             processor: [self::class, 'process'],
         ),
-    ],
-)]
-#[ApiResource(
-    shortName: 'JsonLdNetworkPathChild',
-    uriTemplate: '/jsonld_network_path_parents/{parentId}/children',
-    urlGenerationStrategy: UrlGeneratorInterface::NET_PATH,
-    uriVariables: [
-        'parentId' => new Link(fromClass: NetworkPathParent::class, identifiers: ['id']),
-    ],
-    operations: [
-        new GetCollection(provider: [self::class, 'provideCollection']),
+        new GetCollection(
+            uriTemplate: '/jsonld_network_path_parents/{parentId}/children',
+            uriVariables: [
+                'parentId' => new Link(fromClass: NetworkPathParent::class, identifiers: ['id']),
+            ],
+            provider: [self::class, 'provideCollection'],
+        ),
     ],
 )]
 class NetworkPathResource

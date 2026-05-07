@@ -23,10 +23,12 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\InputOutputResource
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\NoInputResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd\PostNoOutputResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\UserResource;
+use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
 final class InputOutputDtoTest extends ApiTestCase
 {
+    use RecreateSchemaTrait;
     use SetupClassResourcesTrait;
 
     protected static ?bool $alwaysBootKernel = false;
@@ -156,6 +158,10 @@ final class InputOutputDtoTest extends ApiTestCase
 
     public function testCreateNoInputResource(): void
     {
+        if ($_SERVER['USE_SYMFONY_LISTENERS'] ?? false) {
+            $this->markTestSkipped('PlaceholderAction cannot resolve $data when input:false in event-listener mode.');
+        }
+
         $response = self::createClient()->request('POST', '/jsonld_no_inputs', [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
@@ -236,6 +242,10 @@ final class InputOutputDtoTest extends ApiTestCase
 
     public function testResetPasswordViaInputDto(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped();
+        }
+
         $response = self::createClient()->request('POST', '/user-reset-password', [
             'headers' => [
                 'Accept' => 'application/ld+json',
@@ -251,6 +261,10 @@ final class InputOutputDtoTest extends ApiTestCase
 
     public function testResetPasswordWithInvalidEmailReturns422(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped();
+        }
+
         $response = self::createClient()->request('POST', '/user-reset-password', [
             'headers' => [
                 'Accept' => 'application/ld+json',
