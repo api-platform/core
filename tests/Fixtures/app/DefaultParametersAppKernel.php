@@ -11,8 +11,6 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Functional\Kernel;
-
 use ApiPlatform\Metadata\HeaderParameter;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -20,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * @author Maxence Castel <maxence.castel59@gmail.com>
  */
-class DefaultParametersAppKernel extends \AppKernel
+class DefaultParametersAppKernel extends AppKernel
 {
     protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
     {
