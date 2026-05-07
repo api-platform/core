@@ -84,6 +84,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\JsonStreamer\JsonStreamWriter;
 use Symfony\Component\ObjectMapper\ObjectMapper;
+use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\Normalizer\NumberNormalizer;
 use Symfony\Component\Uid\AbstractUid;
@@ -201,15 +202,18 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $this->registerLinkSecurityConfiguration($loader, $config);
         $this->registerJsonStreamerConfiguration($container, $loader, $formats, $config);
 
-        // TranslationExtractCommand was introduced in framework-bundle/7.3 with the object mapper service
-        if (class_exists(ObjectMapper::class) && class_exists(TranslationExtractCommand::class)) {
+        // TranslationExtractCommand was introduced in framework-bundle/7.3 with the object mapper service.
+        // willBeAvailable mirrors FrameworkBundle's own gate: when symfony/object-mapper is in dev-only,
+        // FrameworkBundle skips object_mapper.php and the "object_mapper" service we alias to does not exist.
+        if (class_exists(ObjectMapper::class) && class_exists(TranslationExtractCommand::class) && ContainerBuilder::willBeAvailable('symfony/object-mapper', ObjectMapperInterface::class, ['symfony/framework-bundle'])) {
             $loader->load('state/object_mapper.php');
             $loader->load($config['use_symfony_listeners'] ? 'symfony/object_mapper.php' : 'state/object_mapper_processor.php');
         }
 
         $container->setParameter('api_platform.mcp.format', $config['mcp']['format'] ?? null);
 
-        if (($config['mcp']['enabled'] ?? false) && class_exists(McpBundle::class)) {
+        // McpToolProvider requires Symfony's object_mapper service; mirror FrameworkBundle's gate so we don't try to wire it when object-mapper is dev-only.
+        if (($config['mcp']['enabled'] ?? false) && class_exists(McpBundle::class) && ContainerBuilder::willBeAvailable('symfony/object-mapper', ObjectMapperInterface::class, ['symfony/framework-bundle'])) {
             $loader->load('mcp/mcp.php');
             $loader->load($config['use_symfony_listeners'] ? 'mcp/events.php' : 'mcp/state.php');
         }

@@ -13,10 +13,15 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Symfony\Config\ApiPlatformConfig;
-
-return static function (ApiPlatformConfig $apiPlatformConfig): void {
-    $apiPlatformConfig->swagger()->apiKeys('Some_Authorization_Name')
-        ->name('Authorization')
-        ->type('header');
+return static function (ContainerConfigurator $container): void {
+    $container->extension('api_platform', [
+        'swagger' => [
+            'api_keys' => [
+                'Some_Authorization_Name' => [
+                    'name' => 'Authorization',
+                    'type' => 'header',
+                ],
+            ],
+        ],
+    ]);
 };
