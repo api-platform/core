@@ -17,6 +17,7 @@ use ApiPlatform\JsonLd\JsonStreamer\ValueTransformer\ContextValueTransformer;
 use ApiPlatform\JsonLd\JsonStreamer\ValueTransformer\IriValueTransformer;
 use ApiPlatform\JsonLd\JsonStreamer\ValueTransformer\TypeValueTransformer;
 use ApiPlatform\JsonLd\JsonStreamer\WritePropertyMetadataLoader;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DeprecateJsonStreamerValueTransformerTagPass;
 use Symfony\Component\JsonStreamer\CacheWarmer\LazyGhostCacheWarmer;
 use Symfony\Component\JsonStreamer\JsonStreamReader;
 use Symfony\Component\JsonStreamer\JsonStreamWriter;
@@ -77,9 +78,9 @@ return static function (ContainerConfigurator $container) {
         ->args([service('api_platform.router')])
         ->tag('json_streamer.value_transformer');
 
-    if (class_exists(DateTimeValueObjectTransformer::class)) {
+    // FrameworkBundle 8.1+ registers DateTimeValueObjectTransformer itself; skip to avoid duplicate registration and TransformerPass validation breakage (issue #7954).
+    if (class_exists(DateTimeValueObjectTransformer::class) && !class_exists(DeprecateJsonStreamerValueTransformerTagPass::class)) {
         $services->set('api_platform.jsonld.json_streamer.value_transformer.date_time', DateTimeValueObjectTransformer::class)
-            ->tag('json_streamer.value_transformer', ['key' => \DateTimeInterface::class])
             ->tag('json_streamer.value_object_transformer');
     }
 };
