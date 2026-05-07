@@ -260,7 +260,7 @@ return function (ContainerConfigurator $container) {
             service('api_platform.property_accessor'),
             service('api_platform.name_converter')->ignoreOnInvalid(),
             service('serializer.mapping.class_metadata_factory')->ignoreOnInvalid(),
-            null,
+            [],
             service('api_platform.metadata.resource.metadata_collection_factory')->ignoreOnInvalid(),
             service('api_platform.security.resource_access_checker')->ignoreOnInvalid(),
         ])
