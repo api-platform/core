@@ -81,7 +81,7 @@ class AppKernel extends Kernel
             new MakerBundle(),
         ];
 
-        if (null === ($_ENV['APP_PHPUNIT'] ?? null)) {
+        if (null === ($_ENV['APP_PHPUNIT'] ?? null) && class_exists(FriendsOfBehatSymfonyExtensionBundle::class)) {
             $bundles[] = new FriendsOfBehatSymfonyExtensionBundle();
         }
 
