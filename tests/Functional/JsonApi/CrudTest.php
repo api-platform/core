@@ -14,14 +14,16 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional\JsonApi;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonApi\CrudDummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonApi\CrudRelatedDummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonApi\CrudRelationEmbedder;
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonApi\CrudThirdLevel;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelationEmbedder;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ThirdLevel;
+use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
 final class CrudTest extends ApiTestCase
 {
+    use RecreateSchemaTrait;
     use SetupClassResourcesTrait;
 
     protected static ?bool $alwaysBootKernel = false;
@@ -29,36 +31,47 @@ final class CrudTest extends ApiTestCase
     public static function getResources(): array
     {
         return [
-            CrudThirdLevel::class,
-            CrudRelatedDummy::class,
-            CrudDummy::class,
-            CrudRelationEmbedder::class,
+            ThirdLevel::class,
+            RelatedDummy::class,
+            Dummy::class,
+            RelationEmbedder::class,
         ];
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped();
+        }
+        $this->recreateSchema(self::getResources());
     }
 
     public function testCreateThirdLevel(): void
     {
-        $response = self::createClient()->request('POST', '/jsonapi_third_levels', [
+        $response = self::createClient()->request('POST', '/third_levels', [
             'headers' => [
                 'Accept' => 'application/vnd.api+json',
                 'Content-Type' => 'application/vnd.api+json',
             ],
             'json' => [
                 'data' => [
-                    'type' => 'JsonApiThirdLevel',
+                    'type' => 'third-level',
                     'attributes' => ['level' => 3],
                 ],
             ],
         ]);
         $this->assertResponseStatusCodeSame(201);
         $body = $response->toArray();
-        $this->assertNotEmpty($body['data']['id']);
-        $this->assertSame('JsonApiThirdLevel', $body['data']['type']);
+        $this->assertSame('/third_levels/1', $body['data']['id']);
+        $this->assertSame('ThirdLevel', $body['data']['type']);
     }
 
     public function testGetThirdLevelCollection(): void
     {
-        $response = self::createClient()->request('GET', '/jsonapi_third_levels', [
+        $this->seedThirdLevel();
+
+        $response = self::createClient()->request('GET', '/third_levels', [
             'headers' => ['Accept' => 'application/vnd.api+json'],
         ]);
         $this->assertResponseIsSuccessful();
@@ -69,29 +82,32 @@ final class CrudTest extends ApiTestCase
 
     public function testGetThirdLevelItem(): void
     {
-        $response = self::createClient()->request('GET', '/jsonapi_third_levels/1', [
+        $this->seedThirdLevel();
+
+        $response = self::createClient()->request('GET', '/third_levels/1', [
             'headers' => ['Accept' => 'application/vnd.api+json'],
         ]);
         $this->assertResponseIsSuccessful();
         $body = $response->toArray();
-        $this->assertSame('/jsonapi_third_levels/1', $body['data']['id']);
-        $this->assertSame('JsonApiThirdLevel', $body['data']['type']);
+        $this->assertSame('/third_levels/1', $body['data']['id']);
     }
 
-    public function testCreateRelatedDummyWithThirdLevel(): void
+    public function testCreateRelatedDummyWithThirdLevelRelation(): void
     {
-        $response = self::createClient()->request('POST', '/jsonapi_crud_related_dummies', [
+        $this->seedThirdLevel();
+
+        $response = self::createClient()->request('POST', '/related_dummies', [
             'headers' => [
                 'Accept' => 'application/vnd.api+json',
                 'Content-Type' => 'application/vnd.api+json',
             ],
             'json' => [
                 'data' => [
-                    'type' => 'JsonApiCrudRelatedDummy',
+                    'type' => 'related-dummy',
                     'attributes' => ['name' => 'John Doe', 'age' => 23],
                     'relationships' => [
                         'thirdLevel' => [
-                            'data' => ['type' => 'JsonApiThirdLevel', 'id' => '/jsonapi_third_levels/1'],
+                            'data' => ['type' => 'third-level', 'id' => '/third_levels/1'],
                         ],
                     ],
                 ],
@@ -99,21 +115,21 @@ final class CrudTest extends ApiTestCase
         ]);
         $this->assertResponseStatusCodeSame(201);
         $body = $response->toArray();
-        $this->assertNotEmpty($body['data']['id']);
+        $this->assertSame('/related_dummies/1', $body['data']['id']);
         $this->assertSame('John Doe', $body['data']['attributes']['name']);
         $this->assertSame(23, $body['data']['attributes']['age']);
     }
 
     public function testCreateRelatedDummyWithEmptyThirdLevel(): void
     {
-        $response = self::createClient()->request('POST', '/jsonapi_crud_related_dummies', [
+        $response = self::createClient()->request('POST', '/related_dummies', [
             'headers' => [
                 'Accept' => 'application/vnd.api+json',
                 'Content-Type' => 'application/vnd.api+json',
             ],
             'json' => [
                 'data' => [
-                    'type' => 'JsonApiCrudRelatedDummy',
+                    'type' => 'related-dummy',
                     'attributes' => ['name' => 'John Doe'],
                     'relationships' => [
                         'thirdLevel' => ['data' => null],
@@ -124,84 +140,30 @@ final class CrudTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(201);
     }
 
-    public function testGetRelatedDummyCollectionExposesRelationships(): void
-    {
-        $response = self::createClient()->request('GET', '/jsonapi_crud_related_dummies', [
-            'headers' => ['Accept' => 'application/vnd.api+json'],
-        ]);
-        $this->assertResponseIsSuccessful();
-        $body = $response->toArray();
-        $this->assertSame(
-            '/jsonapi_third_levels/1',
-            $body['data'][0]['relationships']['thirdLevel']['data']['id'],
-        );
-    }
-
-    public function testGetRelatedDummyItemFullBody(): void
-    {
-        $response = self::createClient()->request('GET', '/jsonapi_crud_related_dummies/1', [
-            'headers' => ['Accept' => 'application/vnd.api+json'],
-        ]);
-        $this->assertResponseIsSuccessful();
-        $this->assertJsonContains([
-            'data' => [
-                'id' => '/jsonapi_crud_related_dummies/1',
-                'type' => 'JsonApiCrudRelatedDummy',
-                'attributes' => [
-                    'name' => 'John Doe',
-                    'age' => 23,
-                ],
-                'relationships' => [
-                    'thirdLevel' => [
-                        'data' => ['type' => 'JsonApiThirdLevel', 'id' => '/jsonapi_third_levels/1'],
-                    ],
-                ],
-            ],
-        ]);
-    }
-
-    public function testPatchRelatedDummyName(): void
-    {
-        $response = self::createClient()->request('PATCH', '/jsonapi_crud_related_dummies/1', [
-            'headers' => [
-                'Accept' => 'application/vnd.api+json',
-                'Content-Type' => 'application/vnd.api+json',
-            ],
-            'json' => [
-                'data' => [
-                    'type' => 'JsonApiCrudRelatedDummy',
-                    'attributes' => ['name' => 'Jane Doe'],
-                ],
-            ],
-        ]);
-        $this->assertResponseIsSuccessful();
-        $body = $response->toArray();
-        $this->assertSame('Jane Doe', $body['data']['attributes']['name']);
-        $this->assertSame(23, $body['data']['attributes']['age']);
-    }
-
     public function testCreateDummyWithRelations(): void
     {
-        $response = self::createClient()->request('POST', '/jsonapi_crud_dummies', [
+        $this->seedRelatedDummies(2);
+
+        $response = self::createClient()->request('POST', '/dummies', [
             'headers' => [
                 'Accept' => 'application/vnd.api+json',
                 'Content-Type' => 'application/vnd.api+json',
             ],
             'json' => [
                 'data' => [
-                    'type' => 'JsonApiCrudDummy',
+                    'type' => 'dummy',
                     'attributes' => [
                         'name' => 'Dummy with relations',
                         'dummyDate' => '2015-03-01T10:00:00+00:00',
                     ],
                     'relationships' => [
                         'relatedDummy' => [
-                            'data' => ['type' => 'JsonApiCrudRelatedDummy', 'id' => '/jsonapi_crud_related_dummies/2'],
+                            'data' => ['type' => 'related-dummy', 'id' => '/related_dummies/2'],
                         ],
                         'relatedDummies' => [
                             'data' => [
-                                ['type' => 'JsonApiCrudRelatedDummy', 'id' => '/jsonapi_crud_related_dummies/1'],
-                                ['type' => 'JsonApiCrudRelatedDummy', 'id' => '/jsonapi_crud_related_dummies/2'],
+                                ['type' => 'related-dummy', 'id' => '/related_dummies/1'],
+                                ['type' => 'related-dummy', 'id' => '/related_dummies/2'],
                             ],
                         ],
                     ],
@@ -212,28 +174,31 @@ final class CrudTest extends ApiTestCase
         $body = $response->toArray();
         $this->assertCount(2, $body['data']['relationships']['relatedDummies']['data']);
         $this->assertSame(
-            '/jsonapi_crud_related_dummies/2',
+            '/related_dummies/2',
             $body['data']['relationships']['relatedDummy']['data']['id'],
         );
     }
 
     public function testPatchDummyManyToMany(): void
     {
-        $response = self::createClient()->request('PATCH', '/jsonapi_crud_dummies/1', [
+        $this->seedRelatedDummies(2);
+        $this->seedDummyWithTwoRelatedDummies();
+
+        $response = self::createClient()->request('PATCH', '/dummies/1', [
             'headers' => [
                 'Accept' => 'application/vnd.api+json',
                 'Content-Type' => 'application/vnd.api+json',
             ],
             'json' => [
                 'data' => [
-                    'type' => 'JsonApiCrudDummy',
+                    'type' => 'dummy',
                     'relationships' => [
                         'relatedDummy' => [
-                            'data' => ['type' => 'JsonApiCrudRelatedDummy', 'id' => '/jsonapi_crud_related_dummies/1'],
+                            'data' => ['type' => 'related-dummy', 'id' => '/related_dummies/1'],
                         ],
                         'relatedDummies' => [
                             'data' => [
-                                ['type' => 'JsonApiCrudRelatedDummy', 'id' => '/jsonapi_crud_related_dummies/2'],
+                                ['type' => 'related-dummy', 'id' => '/related_dummies/2'],
                             ],
                         ],
                     ],
@@ -244,24 +209,89 @@ final class CrudTest extends ApiTestCase
         $body = $response->toArray();
         $this->assertCount(1, $body['data']['relationships']['relatedDummies']['data']);
         $this->assertSame(
-            '/jsonapi_crud_related_dummies/1',
+            '/related_dummies/1',
             $body['data']['relationships']['relatedDummy']['data']['id'],
         );
     }
 
-    public function testCreateRelationEmbedder(): void
+    public function testGetCollectionRelatedDummiesExposesRelationships(): void
     {
-        $response = self::createClient()->request('POST', '/jsonapi_crud_relation_embedders', [
+        $this->seedRelatedDummiesWithThirdLevel(1);
+
+        $response = self::createClient()->request('GET', '/related_dummies', [
+            'headers' => ['Accept' => 'application/vnd.api+json'],
+        ]);
+        $this->assertResponseIsSuccessful();
+        $body = $response->toArray();
+        $this->assertSame(
+            '/third_levels/1',
+            $body['data'][0]['relationships']['thirdLevel']['data']['id'],
+        );
+    }
+
+    public function testGetRelatedDummyFullBody(): void
+    {
+        $this->seedRelatedDummiesWithThirdLevel(1);
+
+        $response = self::createClient()->request('GET', '/related_dummies/1', [
+            'headers' => ['Accept' => 'application/vnd.api+json'],
+        ]);
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains([
+            'data' => [
+                'id' => '/related_dummies/1',
+                'type' => 'RelatedDummy',
+                'attributes' => [
+                    '_id' => 1,
+                    'name' => 'John Doe',
+                    'symfony' => 'symfony',
+                    'age' => 23,
+                ],
+                'relationships' => [
+                    'thirdLevel' => [
+                        'data' => ['type' => 'ThirdLevel', 'id' => '/third_levels/1'],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function testPatchRelatedDummyName(): void
+    {
+        $this->seedRelatedDummiesWithThirdLevel(1);
+
+        $response = self::createClient()->request('PATCH', '/related_dummies/1', [
             'headers' => [
                 'Accept' => 'application/vnd.api+json',
                 'Content-Type' => 'application/vnd.api+json',
             ],
             'json' => [
                 'data' => [
-                    'type' => 'JsonApiCrudRelationEmbedder',
+                    'type' => 'related-dummy',
+                    'attributes' => ['name' => 'Jane Doe'],
+                ],
+            ],
+        ]);
+        $this->assertResponseIsSuccessful();
+        $body = $response->toArray();
+        $this->assertSame('Jane Doe', $body['data']['attributes']['name']);
+        $this->assertSame(23, $body['data']['attributes']['age']);
+    }
+
+    public function testCreateRelationEmbedder(): void
+    {
+        $this->seedRelatedDummies(1);
+
+        $response = self::createClient()->request('POST', '/relation_embedders', [
+            'headers' => [
+                'Accept' => 'application/vnd.api+json',
+                'Content-Type' => 'application/vnd.api+json',
+            ],
+            'json' => [
+                'data' => [
                     'relationships' => [
                         'related' => [
-                            'data' => ['type' => 'JsonApiCrudRelatedDummy', 'id' => '/jsonapi_crud_related_dummies/1'],
+                            'data' => ['type' => 'related-dummy', 'id' => '/related_dummies/1'],
                         ],
                     ],
                 ],
@@ -269,11 +299,64 @@ final class CrudTest extends ApiTestCase
         ]);
         $this->assertResponseStatusCodeSame(201);
         $body = $response->toArray();
-        $this->assertNotEmpty($body['data']['id']);
         $this->assertSame('Krondstadt', $body['data']['attributes']['krondstadt']);
         $this->assertSame(
-            '/jsonapi_crud_related_dummies/1',
+            '/related_dummies/1',
             $body['data']['relationships']['related']['data']['id'],
         );
+    }
+
+    private function seedThirdLevel(): void
+    {
+        $manager = $this->getManager();
+        $thirdLevel = new ThirdLevel();
+        $thirdLevel->setLevel(3);
+        $manager->persist($thirdLevel);
+        $manager->flush();
+        $manager->clear();
+    }
+
+    private function seedRelatedDummies(int $nb): void
+    {
+        $manager = $this->getManager();
+        for ($i = 1; $i <= $nb; ++$i) {
+            $relatedDummy = new RelatedDummy();
+            $relatedDummy->setName("RelatedDummy #{$i}");
+            $manager->persist($relatedDummy);
+        }
+        $manager->flush();
+        $manager->clear();
+    }
+
+    private function seedRelatedDummiesWithThirdLevel(int $nb): void
+    {
+        $manager = $this->getManager();
+        for ($i = 1; $i <= $nb; ++$i) {
+            $thirdLevel = new ThirdLevel();
+            $relatedDummy = new RelatedDummy();
+            $relatedDummy->setName('John Doe');
+            $relatedDummy->setAge(23);
+            $relatedDummy->thirdLevel = $thirdLevel;
+            $manager->persist($thirdLevel);
+            $manager->persist($relatedDummy);
+        }
+        $manager->flush();
+        $manager->clear();
+    }
+
+    private function seedDummyWithTwoRelatedDummies(): void
+    {
+        $manager = $this->getManager();
+        $dummy = new Dummy();
+        $dummy->setName('Dummy with relations');
+        $relatedDummies = $manager->getRepository(RelatedDummy::class)->findBy([], ['id' => 'ASC']);
+        if (\count($relatedDummies) >= 2) {
+            $dummy->setRelatedDummy($relatedDummies[1]);
+            $dummy->addRelatedDummy($relatedDummies[0]);
+            $dummy->addRelatedDummy($relatedDummies[1]);
+        }
+        $manager->persist($dummy);
+        $manager->flush();
+        $manager->clear();
     }
 }
