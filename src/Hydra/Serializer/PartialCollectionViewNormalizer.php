@@ -181,6 +181,59 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
             $data[$hydraPrefix.'view'][$hydraPrefix.'previous'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], $this->cursorPaginationFields($cursorPaginationAttribute, -1, $firstObject)), urlGenerationStrategy: $urlGenerationStrategy);
         }
 
+        if (false === $firstObject && \is_array($cursorPaginationAttribute) && $object instanceof PartialPaginatorInterface) {
+            $itemsPerPage = $object->getItemsPerPage();
+            $nextFilters = $this->cursorPaginationFieldsFromUrl($cursorPaginationAttribute, $parsed['parameters'], $itemsPerPage, 1);
+            $previousFilters = $this->cursorPaginationFieldsFromUrl($cursorPaginationAttribute, $parsed['parameters'], $itemsPerPage, -1);
+
+            if (null !== $nextFilters) {
+                $data[$hydraPrefix.'view'][$hydraPrefix.'next'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], $nextFilters), urlGenerationStrategy: $urlGenerationStrategy);
+            }
+
+            if (null !== $previousFilters) {
+                $data[$hydraPrefix.'view'][$hydraPrefix.'previous'] = IriHelper::createIri($parsed['parts'], array_merge($parsed['parameters'], $previousFilters), urlGenerationStrategy: $urlGenerationStrategy);
+            }
+        }
+
         return $data;
+    }
+
+    private function cursorPaginationFieldsFromUrl(array $fields, array $parameters, float $itemsPerPage, int $direction): ?array
+    {
+        $paginationFilters = [];
+
+        foreach ($fields as $field) {
+            $forwardOperator = 'desc' === strtolower($field['direction']) ? 'lt' : 'gt';
+            $backwardOperator = 'gt' === $forwardOperator ? 'lt' : 'gt';
+
+            if (!\is_array($parameters[$field['field']] ?? null)) {
+                return null;
+            }
+
+            $currentOperator = (string) array_key_first($parameters[$field['field']]);
+            if (!\in_array($currentOperator, ['gt', 'lt'], true)) {
+                return null;
+            }
+
+            $currentValue = (float) current($parameters[$field['field']]);
+
+            if ($direction > 0) {
+                if ($currentOperator === $forwardOperator) {
+                    $newValue = 'gt' === $currentOperator ? $currentValue + $itemsPerPage : $currentValue - $itemsPerPage;
+                    $paginationFilters[$field['field']] = [$currentOperator => (string) $newValue];
+                } else {
+                    $paginationFilters[$field['field']] = [$forwardOperator => (string) $currentValue];
+                }
+            } else {
+                if ($currentOperator === $backwardOperator) {
+                    $newValue = 'gt' === $currentOperator ? $currentValue + $itemsPerPage : $currentValue - $itemsPerPage;
+                    $paginationFilters[$field['field']] = [$currentOperator => (string) $newValue];
+                } else {
+                    $paginationFilters[$field['field']] = [$backwardOperator => (string) $currentValue];
+                }
+            }
+        }
+
+        return $paginationFilters;
     }
 }

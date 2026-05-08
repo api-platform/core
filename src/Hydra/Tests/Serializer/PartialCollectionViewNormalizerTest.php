@@ -108,6 +108,89 @@ class PartialCollectionViewNormalizerTest extends TestCase
         );
     }
 
+    public function testNormalizeWithCursorBasedPaginationEmptyCollection(): void
+    {
+        $paginator = new class implements PartialPaginatorInterface, \Iterator {
+            public function rewind(): void
+            {
+            }
+
+            public function valid(): bool
+            {
+                return false;
+            }
+
+            public function current(): mixed
+            {
+                return false;
+            }
+
+            public function key(): mixed
+            {
+                return null;
+            }
+
+            public function next(): void
+            {
+            }
+
+            public function count(): int
+            {
+                return 0;
+            }
+
+            public function getCurrentPage(): float
+            {
+                return 1.;
+            }
+
+            public function getItemsPerPage(): float
+            {
+                return 3.;
+            }
+        };
+
+        $decoratedNormalizer = $this->createStub(NormalizerInterface::class);
+        $decoratedNormalizer->method('normalize')->willReturn(['foo' => 'bar']);
+
+        $soManyMetadata = new ResourceMetadataCollection(SoMany::class, [
+            (new ApiResource())->withShortName('SoMany')->withOperations(new Operations([
+                'get' => (new GetCollection())->withPaginationViaCursor([['field' => 'id', 'direction' => 'desc']]),
+            ])),
+        ]);
+
+        $resourceMetadataFactory = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactory->method('create')->willReturn($soManyMetadata);
+
+        $normalizer = new PartialCollectionViewNormalizer(
+            $decoratedNormalizer,
+            '_page',
+            'pagination',
+            $resourceMetadataFactory
+        );
+
+        self::assertEquals(
+            [
+                'foo' => 'bar',
+                'hydra:view' => [
+                    '@id' => '/?id%5Bgt%5D=10',
+                    '@type' => 'hydra:PartialCollectionView',
+                    'hydra:next' => '/?id%5Blt%5D=10',
+                    'hydra:previous' => '/?id%5Bgt%5D=13',
+                ],
+            ],
+            $normalizer->normalize(
+                $paginator,
+                null,
+                [
+                    'resource_class' => SoMany::class,
+                    'operation_name' => 'get',
+                    'request_uri' => '/?id%5Bgt%5D=10',
+                ]
+            )
+        );
+    }
+
     private function normalizePaginator(bool $partial = false, bool $cursor = false)
     {
         $paginatorProphecy = $this->prophesize($partial ? PartialPaginatorInterface::class : PaginatorInterface::class);
