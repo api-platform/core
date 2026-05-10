@@ -109,6 +109,13 @@ final class SchemaFactory implements SchemaFactoryInterface
             return self::resolveDeep($merged, $definitions, $resolving);
         }
 
+        // oneOf/anyOf nodes must not receive a type fallback — their type is expressed
+        // through the sub-schemas. Adding 'type: object' here would break schemas like
+        // HydraItemBaseSchema's @context, which is oneOf: [string, object].
+        if (isset($node['oneOf']) || isset($node['anyOf'])) {
+            return self::resolveDeep($node, $definitions, $resolving);
+        }
+
         if (!isset($node['type'])) {
             $node['type'] = 'object';
         }
