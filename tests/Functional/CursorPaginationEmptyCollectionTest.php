@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue7953\Dummy;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CursorPaginatedDummy;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
@@ -33,7 +33,7 @@ final class CursorPaginationEmptyCollectionTest extends ApiTestCase
 
     public static function getResources(): array
     {
-        return [Dummy::class];
+        return [CursorPaginatedDummy::class];
     }
 
     protected function setUp(): void
@@ -48,7 +48,7 @@ final class CursorPaginationEmptyCollectionTest extends ApiTestCase
 
         $manager = $this->getManager();
         for ($i = 0; $i < 10; ++$i) {
-            $manager->persist(new Dummy());
+            $manager->persist(new CursorPaginatedDummy());
         }
         $manager->flush();
     }
@@ -56,7 +56,7 @@ final class CursorPaginationEmptyCollectionTest extends ApiTestCase
     public function testEmptyCollectionWithCursorFilterHasNavigationLinks(): void
     {
         // id[gt]=10 matches nothing (max id is 10), so the collection is empty
-        $response = self::createClient()->request('GET', '/issue7953s?id[gt]=10&order[id]=desc', [
+        $response = self::createClient()->request('GET', '/cursor_paginated_dummies?id[gt]=10&order[id]=desc', [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
 
