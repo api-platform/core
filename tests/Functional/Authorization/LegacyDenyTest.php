@@ -83,17 +83,11 @@ final class LegacyDenyTest extends ApiTestCase
     public function testUserCannotGetItemTheyDontOwn(): void
     {
         $this->recreateSchema([LegacySecuredDummy::class]);
-        $admin = self::createClient();
-        $admin->loginUser(new InMemoryUser('admin', 'kitten', ['ROLE_ADMIN']));
-        $admin->request('POST', '/legacy_secured_dummies', [
-            'headers' => ['Content-Type' => 'application/ld+json'],
-            'json' => ['title' => '#1', 'description' => '', 'owner' => 'someone'],
-        ]);
-        $this->assertResponseStatusCodeSame(201);
+        $iri = $this->createLegacySecuredDummy(owner: 'someone');
 
         $client = self::createClient();
         $client->loginUser(new InMemoryUser('dunglas', 'kevin', ['ROLE_USER']));
-        $client->request('GET', '/legacy_secured_dummies/1', [
+        $client->request('GET', $iri, [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
         $this->assertResponseStatusCodeSame(403);
@@ -102,17 +96,11 @@ final class LegacyDenyTest extends ApiTestCase
     public function testUserCanGetItemTheyOwn(): void
     {
         $this->recreateSchema([LegacySecuredDummy::class]);
-        $admin = self::createClient();
-        $admin->loginUser(new InMemoryUser('admin', 'kitten', ['ROLE_ADMIN']));
-        $admin->request('POST', '/legacy_secured_dummies', [
-            'headers' => ['Content-Type' => 'application/ld+json'],
-            'json' => ['title' => '#1', 'description' => '', 'owner' => 'dunglas'],
-        ]);
-        $this->assertResponseStatusCodeSame(201);
+        $iri = $this->createLegacySecuredDummy(owner: 'dunglas');
 
         $client = self::createClient();
         $client->loginUser(new InMemoryUser('dunglas', 'kevin', ['ROLE_USER']));
-        $client->request('GET', '/legacy_secured_dummies/1', [
+        $client->request('GET', $iri, [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
         $this->assertResponseIsSuccessful();
@@ -121,17 +109,11 @@ final class LegacyDenyTest extends ApiTestCase
     public function testUserCannotReassignItem(): void
     {
         $this->recreateSchema([LegacySecuredDummy::class]);
-        $admin = self::createClient();
-        $admin->loginUser(new InMemoryUser('admin', 'kitten', ['ROLE_ADMIN']));
-        $admin->request('POST', '/legacy_secured_dummies', [
-            'headers' => ['Content-Type' => 'application/ld+json'],
-            'json' => ['title' => '#1', 'description' => '', 'owner' => 'dunglas'],
-        ]);
-        $this->assertResponseStatusCodeSame(201);
+        $iri = $this->createLegacySecuredDummy(owner: 'dunglas');
 
         $client = self::createClient();
         $client->loginUser(new InMemoryUser('admin', 'kitten', ['ROLE_ADMIN']));
-        $client->request('PUT', '/legacy_secured_dummies/1', [
+        $client->request('PUT', $iri, [
             'headers' => [
                 'Accept' => 'application/ld+json',
                 'Content-Type' => 'application/ld+json',
@@ -144,17 +126,11 @@ final class LegacyDenyTest extends ApiTestCase
     public function testUserCanTransferItemTheyOwn(): void
     {
         $this->recreateSchema([LegacySecuredDummy::class]);
-        $admin = self::createClient();
-        $admin->loginUser(new InMemoryUser('admin', 'kitten', ['ROLE_ADMIN']));
-        $admin->request('POST', '/legacy_secured_dummies', [
-            'headers' => ['Content-Type' => 'application/ld+json'],
-            'json' => ['title' => '#1', 'description' => '', 'owner' => 'dunglas'],
-        ]);
-        $this->assertResponseStatusCodeSame(201);
+        $iri = $this->createLegacySecuredDummy(owner: 'dunglas');
 
         $client = self::createClient();
         $client->loginUser(new InMemoryUser('dunglas', 'kevin', ['ROLE_USER']));
-        $client->request('PUT', '/legacy_secured_dummies/1', [
+        $client->request('PUT', $iri, [
             'headers' => [
                 'Accept' => 'application/ld+json',
                 'Content-Type' => 'application/ld+json',
@@ -162,5 +138,22 @@ final class LegacyDenyTest extends ApiTestCase
             'json' => ['owner' => 'vincent'],
         ]);
         $this->assertResponseIsSuccessful();
+    }
+
+    /**
+     * Avoids hard-coding id=1, which is flaky on MongoDB ODM (INCREMENT counter
+     * survives collection drops).
+     */
+    private function createLegacySecuredDummy(string $owner): string
+    {
+        $admin = self::createClient();
+        $admin->loginUser(new InMemoryUser('admin', 'kitten', ['ROLE_ADMIN']));
+        $response = $admin->request('POST', '/legacy_secured_dummies', [
+            'headers' => ['Content-Type' => 'application/ld+json'],
+            'json' => ['title' => '#1', 'description' => '', 'owner' => $owner],
+        ]);
+        $this->assertResponseStatusCodeSame(201);
+
+        return $response->toArray()['@id'];
     }
 }

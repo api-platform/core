@@ -101,24 +101,12 @@ final class DenyTest extends ApiTestCase
 
     public function testUserCannotGetItemTheyDontOwn(): void
     {
-        // MongoDB ODM INCREMENT id strategy keeps a persistent counter outside the
-        // dropped collection, so seeding then GET /secured_dummies/1 mis-targets.
-        if ($this->isMongoDB()) {
-            $this->markTestSkipped();
-        }
-
         $this->recreateSchema([SecuredDummy::class]);
-        $admin = self::createClient();
-        $admin->loginUser(new InMemoryUser('admin', 'kitten', ['ROLE_ADMIN']));
-        $admin->request('POST', '/secured_dummies', [
-            'headers' => ['Content-Type' => 'application/ld+json'],
-            'json' => ['title' => '#1', 'owner' => 'someone'],
-        ]);
-        $this->assertResponseStatusCodeSame(201);
+        $iri = $this->createSecuredDummy(owner: 'someone');
 
         $client = self::createClient();
         $client->loginUser(new InMemoryUser('dunglas', 'kevin', ['ROLE_USER']));
-        $client->request('GET', '/secured_dummies/1', [
+        $client->request('GET', $iri, [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
         $this->assertResponseStatusCodeSame(403);
@@ -126,22 +114,12 @@ final class DenyTest extends ApiTestCase
 
     public function testUserCanGetItemTheyOwn(): void
     {
-        if ($this->isMongoDB()) {
-            $this->markTestSkipped();
-        }
-
         $this->recreateSchema([SecuredDummy::class]);
-        $admin = self::createClient();
-        $admin->loginUser(new InMemoryUser('admin', 'kitten', ['ROLE_ADMIN']));
-        $admin->request('POST', '/secured_dummies', [
-            'headers' => ['Content-Type' => 'application/ld+json'],
-            'json' => ['title' => '#1', 'owner' => 'dunglas'],
-        ]);
-        $this->assertResponseStatusCodeSame(201);
+        $iri = $this->createSecuredDummy(owner: 'dunglas');
 
         $client = self::createClient();
         $client->loginUser(new InMemoryUser('dunglas', 'kevin', ['ROLE_USER']));
-        $client->request('GET', '/secured_dummies/1', [
+        $client->request('GET', $iri, [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
         $this->assertResponseIsSuccessful();
@@ -149,22 +127,12 @@ final class DenyTest extends ApiTestCase
 
     public function testOwnerSeesOwnerOnlyAndAttributeBasedProperties(): void
     {
-        if ($this->isMongoDB()) {
-            $this->markTestSkipped();
-        }
-
         $this->recreateSchema([SecuredDummy::class]);
-        $admin = self::createClient();
-        $admin->loginUser(new InMemoryUser('admin', 'kitten', ['ROLE_ADMIN']));
-        $admin->request('POST', '/secured_dummies', [
-            'headers' => ['Content-Type' => 'application/ld+json'],
-            'json' => ['title' => '#1', 'owner' => 'dunglas'],
-        ]);
-        $this->assertResponseStatusCodeSame(201);
+        $iri = $this->createSecuredDummy(owner: 'dunglas');
 
         $client = self::createClient();
         $client->loginUser(new InMemoryUser('dunglas', 'kevin', ['ROLE_USER']));
-        $response = $client->request('GET', '/secured_dummies/1', [
+        $response = $client->request('GET', $iri, [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
         $this->assertResponseIsSuccessful();
@@ -251,22 +219,12 @@ final class DenyTest extends ApiTestCase
 
     public function testUserCannotReassignItem(): void
     {
-        if ($this->isMongoDB()) {
-            $this->markTestSkipped();
-        }
-
         $this->recreateSchema([SecuredDummy::class]);
-        $admin = self::createClient();
-        $admin->loginUser(new InMemoryUser('admin', 'kitten', ['ROLE_ADMIN']));
-        $admin->request('POST', '/secured_dummies', [
-            'headers' => ['Content-Type' => 'application/ld+json'],
-            'json' => ['title' => '#1', 'owner' => 'dunglas'],
-        ]);
-        $this->assertResponseStatusCodeSame(201);
+        $iri = $this->createSecuredDummy(owner: 'dunglas');
 
         $client = self::createClient();
         $client->loginUser(new InMemoryUser('admin', 'kitten', ['ROLE_ADMIN']));
-        $client->request('PUT', '/secured_dummies/1', [
+        $client->request('PUT', $iri, [
             'headers' => [
                 'Accept' => 'application/ld+json',
                 'Content-Type' => 'application/ld+json',
@@ -278,22 +236,12 @@ final class DenyTest extends ApiTestCase
 
     public function testUserCanTransferItemTheyOwn(): void
     {
-        if ($this->isMongoDB()) {
-            $this->markTestSkipped();
-        }
-
         $this->recreateSchema([SecuredDummy::class]);
-        $admin = self::createClient();
-        $admin->loginUser(new InMemoryUser('admin', 'kitten', ['ROLE_ADMIN']));
-        $admin->request('POST', '/secured_dummies', [
-            'headers' => ['Content-Type' => 'application/ld+json'],
-            'json' => ['title' => '#1', 'owner' => 'dunglas'],
-        ]);
-        $this->assertResponseStatusCodeSame(201);
+        $iri = $this->createSecuredDummy(owner: 'dunglas');
 
         $client = self::createClient();
         $client->loginUser(new InMemoryUser('dunglas', 'kevin', ['ROLE_USER']));
-        $client->request('PUT', '/secured_dummies/1', [
+        $client->request('PUT', $iri, [
             'headers' => [
                 'Accept' => 'application/ld+json',
                 'Content-Type' => 'application/ld+json',
@@ -368,27 +316,19 @@ final class DenyTest extends ApiTestCase
 
     public function testUserCannotUpdateAdminOnlyProperty(): void
     {
-        if ($this->isMongoDB()) {
-            $this->markTestSkipped();
-        }
-
         $this->recreateSchema([SecuredDummy::class]);
-        $admin = self::createClient();
-        $admin->loginUser(new InMemoryUser('admin', 'kitten', ['ROLE_ADMIN']));
-        $admin->request('POST', '/secured_dummies', [
-            'headers' => ['Content-Type' => 'application/ld+json'],
-            'json' => [
+        $iri = $this->createSecuredDummy(
+            owner: 'dunglas',
+            extra: [
                 'title' => 'Common Title',
                 'description' => 'Description',
-                'owner' => 'dunglas',
                 'adminOnlyProperty' => 'Is it safe?',
             ],
-        ]);
-        $this->assertResponseStatusCodeSame(201);
+        );
 
         $client = self::createClient();
         $client->loginUser(new InMemoryUser('dunglas', 'kevin', ['ROLE_USER']));
-        $response = $client->request('PUT', '/secured_dummies/1', [
+        $response = $client->request('PUT', $iri, [
             'headers' => [
                 'Accept' => 'application/ld+json',
                 'Content-Type' => 'application/ld+json',
@@ -410,22 +350,12 @@ final class DenyTest extends ApiTestCase
 
     public function testUserCanUpdateOwnerOnlyAndAttributeBasedProperties(): void
     {
-        if ($this->isMongoDB()) {
-            $this->markTestSkipped();
-        }
-
         $this->recreateSchema([SecuredDummy::class]);
-        $admin = self::createClient();
-        $admin->loginUser(new InMemoryUser('admin', 'kitten', ['ROLE_ADMIN']));
-        $admin->request('POST', '/secured_dummies', [
-            'headers' => ['Content-Type' => 'application/ld+json'],
-            'json' => ['title' => '#1', 'owner' => 'dunglas'],
-        ]);
-        $this->assertResponseStatusCodeSame(201);
+        $iri = $this->createSecuredDummy(owner: 'dunglas');
 
         $client = self::createClient();
         $client->loginUser(new InMemoryUser('dunglas', 'kevin', ['ROLE_USER']));
-        $response = $client->request('PUT', '/secured_dummies/1', [
+        $response = $client->request('PUT', $iri, [
             'headers' => [
                 'Accept' => 'application/ld+json',
                 'Content-Type' => 'application/ld+json',
@@ -452,91 +382,73 @@ final class DenyTest extends ApiTestCase
 
     public function testLinkSecurityToFromAuthorized(): void
     {
-        if ($this->isMongoDB()) {
-            $this->markTestSkipped();
-        }
-
-        $this->seedLinkedDummy(owner: 'dunglas');
+        [$securedId, $linkedId] = $this->seedLinkedDummy(owner: 'dunglas');
 
         $client = self::createClient();
         $client->loginUser(new InMemoryUser('dunglas', 'kevin', ['ROLE_USER']));
-        $response = $client->request('GET', '/secured_dummies/1/to_from', [
+        $response = $client->request('GET', "/secured_dummies/{$securedId}/to_from", [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
         $this->assertResponseIsSuccessful();
         $body = $response->toArray();
         $this->assertStringContainsString('securedDummy', $response->getContent());
-        $this->assertSame(1, $body['hydra:member'][0]['id']);
+        $this->assertSame($linkedId, $body['hydra:member'][0]['id']);
     }
 
     public function testLinkSecurityWithNameAuthorized(): void
     {
-        if ($this->isMongoDB()) {
-            $this->markTestSkipped();
-        }
-
-        $this->seedLinkedDummy(owner: 'dunglas');
+        [$securedId, $linkedId] = $this->seedLinkedDummy(owner: 'dunglas');
 
         $client = self::createClient();
         $client->loginUser(new InMemoryUser('dunglas', 'kevin', ['ROLE_USER']));
-        $response = $client->request('GET', '/secured_dummies/1/with_name', [
+        $response = $client->request('GET', "/secured_dummies/{$securedId}/with_name", [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
         $this->assertResponseIsSuccessful();
         $body = $response->toArray();
         $this->assertStringContainsString('securedDummy', $response->getContent());
-        $this->assertSame(1, $body['hydra:member'][0]['id']);
+        $this->assertSame($linkedId, $body['hydra:member'][0]['id']);
     }
 
     public function testLinkSecurityFromFromAuthorized(): void
     {
-        if ($this->isMongoDB()) {
-            $this->markTestSkipped();
-        }
-
-        $this->seedLinkedDummy(owner: 'dunglas');
+        [$securedId, $linkedId] = $this->seedLinkedDummy(owner: 'dunglas');
 
         $client = self::createClient();
         $client->loginUser(new InMemoryUser('dunglas', 'kevin', ['ROLE_USER']));
-        $response = $client->request('GET', '/related_linked_dummies/1/from_from', [
+        $response = $client->request('GET', "/related_linked_dummies/{$linkedId}/from_from", [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
         $this->assertResponseIsSuccessful();
         $body = $response->toArray();
         $this->assertStringContainsString('id', $response->getContent());
-        $this->assertSame(1, $body['hydra:member'][0]['id']);
+        // The /related_linked_dummies/{relatedDummyId}/from_from operation
+        // returns the linked SecuredDummy collection, not the relation itself.
+        $this->assertSame($securedId, $body['hydra:member'][0]['id']);
     }
 
     public function testLinkSecurityMultipleLinksAuthorized(): void
     {
-        if ($this->isMongoDB()) {
-            $this->markTestSkipped();
-        }
-
-        $this->seedLinkedDummy(owner: 'dunglas');
+        [$securedId, $linkedId] = $this->seedLinkedDummy(owner: 'dunglas');
 
         $client = self::createClient();
         $client->loginUser(new InMemoryUser('dunglas', 'kevin', ['ROLE_USER']));
-        $response = $client->request('GET', '/secured_dummies/1/related/1', [
+        $response = $client->request('GET', "/secured_dummies/{$securedId}/related/{$linkedId}", [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
         $this->assertResponseIsSuccessful();
         $body = $response->toArray();
         $this->assertStringContainsString('id', $response->getContent());
-        $this->assertSame(1, $body['hydra:member'][0]['id']);
+        $this->assertSame($linkedId, $body['hydra:member'][0]['id']);
     }
 
     public function testLinkSecurityToFromUnauthorized(): void
     {
-        if ($this->isMongoDB()) {
-            $this->markTestSkipped();
-        }
-
-        $this->seedLinkedDummy(owner: 'someone');
+        [$securedId] = $this->seedLinkedDummy(owner: 'someone');
 
         $client = self::createClient();
         $client->loginUser(new InMemoryUser('dunglas', 'kevin', ['ROLE_USER']));
-        $client->request('GET', '/secured_dummies/1/to_from', [
+        $client->request('GET', "/secured_dummies/{$securedId}/to_from", [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
         $this->assertResponseStatusCodeSame(403);
@@ -544,15 +456,11 @@ final class DenyTest extends ApiTestCase
 
     public function testLinkSecurityWithNameUnauthorized(): void
     {
-        if ($this->isMongoDB()) {
-            $this->markTestSkipped();
-        }
-
-        $this->seedLinkedDummy(owner: 'someone');
+        [$securedId] = $this->seedLinkedDummy(owner: 'someone');
 
         $client = self::createClient();
         $client->loginUser(new InMemoryUser('dunglas', 'kevin', ['ROLE_USER']));
-        $client->request('GET', '/secured_dummies/1/with_name', [
+        $client->request('GET', "/secured_dummies/{$securedId}/with_name", [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
         $this->assertResponseStatusCodeSame(403);
@@ -560,15 +468,11 @@ final class DenyTest extends ApiTestCase
 
     public function testLinkSecurityFromFromUnauthorized(): void
     {
-        if ($this->isMongoDB()) {
-            $this->markTestSkipped();
-        }
-
-        $this->seedLinkedDummy(owner: 'someone');
+        [, $linkedId] = $this->seedLinkedDummy(owner: 'someone');
 
         $client = self::createClient();
         $client->loginUser(new InMemoryUser('dunglas', 'kevin', ['ROLE_USER']));
-        $client->request('GET', '/related_linked_dummies/1/from_from', [
+        $client->request('GET', "/related_linked_dummies/{$linkedId}/from_from", [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
         $this->assertResponseStatusCodeSame(403);
@@ -576,35 +480,63 @@ final class DenyTest extends ApiTestCase
 
     public function testLinkSecurityMultipleLinksUnauthorized(): void
     {
-        if ($this->isMongoDB()) {
-            $this->markTestSkipped();
-        }
-
-        $this->seedLinkedDummy(owner: 'someone');
+        [$securedId, $linkedId] = $this->seedLinkedDummy(owner: 'someone');
 
         $client = self::createClient();
         $client->loginUser(new InMemoryUser('dunglas', 'kevin', ['ROLE_USER']));
-        $client->request('GET', '/secured_dummies/1/related/1', [
+        $client->request('GET', "/secured_dummies/{$securedId}/related/{$linkedId}", [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
         $this->assertResponseStatusCodeSame(403);
     }
 
-    private function seedLinkedDummy(string $owner): void
+    /**
+     * Admin-POSTs a SecuredDummy and returns its IRI. Avoids hard-coding id=1,
+     * which is flaky on MongoDB ODM (INCREMENT counter survives collection drops).
+     */
+    private function createSecuredDummy(string $owner, array $extra = []): string
+    {
+        $admin = self::createClient();
+        $admin->loginUser(new InMemoryUser('admin', 'kitten', ['ROLE_ADMIN']));
+        $response = $admin->request('POST', '/secured_dummies', [
+            'headers' => ['Content-Type' => 'application/ld+json'],
+            'json' => ['title' => '#1', 'owner' => $owner] + $extra,
+        ]);
+        $this->assertResponseStatusCodeSame(201);
+
+        return $response->toArray()['@id'];
+    }
+
+    /**
+     * Seeds one SecuredDummy + one RelatedLinkedDummy via the API so the same
+     * helper works against either ORM or ODM persistence, and returns the
+     * generated ids (parsed from the IRIs). Hard-coding id=1 is flaky.
+     *
+     * @return array{0:int, 1:int}
+     */
+    private function seedLinkedDummy(string $owner): array
     {
         $this->recreateSchema([SecuredDummy::class, RelatedLinkedDummy::class]);
-        $manager = $this->getManager();
 
-        $dummy = new SecuredDummy();
-        $dummy->setTitle('#1');
-        $dummy->setOwner($owner);
-        $manager->persist($dummy);
+        $admin = self::createClient();
+        $admin->loginUser(new InMemoryUser('admin', 'kitten', ['ROLE_ADMIN']));
+        $dummyResponse = $admin->request('POST', '/secured_dummies', [
+            'headers' => ['Content-Type' => 'application/ld+json'],
+            'json' => ['title' => '#1', 'owner' => $owner],
+        ]);
+        $this->assertResponseStatusCodeSame(201);
+        $securedIri = $dummyResponse->toArray()['@id'];
 
-        $linked = new RelatedLinkedDummy();
-        $linked->setSecuredDummy($dummy);
-        $manager->persist($linked);
+        $linkedResponse = $admin->request('POST', '/related_linked_dummies', [
+            'headers' => ['Content-Type' => 'application/ld+json'],
+            'json' => ['securedDummy' => $securedIri],
+        ]);
+        $this->assertResponseStatusCodeSame(201);
+        $linkedId = $linkedResponse->toArray()['id'];
 
-        $manager->flush();
+        $securedId = (int) basename($securedIri);
+
+        return [$securedId, (int) $linkedId];
     }
 
     public function testUserSeesOwnerOnlyPropertyWithJsonFormat(): void
