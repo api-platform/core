@@ -61,10 +61,10 @@ class PaginationDummy
             $itemsPerPage = 3;
         }
 
-        $offset = ($page - 1) * $itemsPerPage;
-        if (!is_int($offset) || $offset > \PHP_INT_MAX - $itemsPerPage) {
+        if ($page > intdiv(\PHP_INT_MAX, $itemsPerPage) + 1) {
             throw new InvalidArgumentException('Page is out of range.');
         }
+        $offset = ($page - 1) * $itemsPerPage;
 
         return new ArrayPaginator($items, $offset, $itemsPerPage);
     }

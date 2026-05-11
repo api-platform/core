@@ -36,7 +36,7 @@ final class OrderingTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
         $body = $response->toArray();
         $ids = array_map(static fn (array $d): int => (int) $d['attributes']['_id'], $body['data']);
-        $this->assertSame([1, 2, 3], array_slice($ids, 0, 3));
+        $this->assertSame([1, 2, 3], \array_slice($ids, 0, 3));
     }
 
     public function testSortDescendingOnSingleField(): void
@@ -47,7 +47,7 @@ final class OrderingTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
         $body = $response->toArray();
         $ids = array_map(static fn (array $d): int => (int) $d['attributes']['_id'], $body['data']);
-        $this->assertSame([30, 29, 28], array_slice($ids, 0, 3));
+        $this->assertSame([30, 29, 28], \array_slice($ids, 0, 3));
     }
 
     public function testSortMultipleFields(): void
@@ -58,6 +58,6 @@ final class OrderingTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
         $body = $response->toArray();
         $ids = array_map(static fn (array $d): int => (int) $d['attributes']['_id'], $body['data']);
-        $this->assertSame([30, 28, 26], array_slice($ids, 0, 3));
+        $this->assertSame([30, 28, 26], \array_slice($ids, 0, 3));
     }
 }
