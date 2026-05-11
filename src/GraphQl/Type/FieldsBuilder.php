@@ -512,20 +512,16 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
                 $name = key($leafs);
 
                 $filterLeafs = [];
-                if (($filterId = $parameter->getFilter()) && $this->filterLocator->has($filterId)) {
-                    $filter = $this->filterLocator->get($filterId);
+                if ($filter = $this->resolveFilter($parameter->getFilter())) {
+                    $property = $parameter->getProperty() ?? $name;
+                    $property = str_replace('.', $this->nestingSeparator, $property);
+                    $description = $filter->getDescription($operation->getClass());
 
-                    if ($filter instanceof FilterInterface) {
-                        $property = $parameter->getProperty() ?? $name;
-                        $property = str_replace('.', $this->nestingSeparator, $property);
-                        $description = $filter->getDescription($operation->getClass());
-
-                        foreach ($description as $descKey => $descValue) {
-                            $descKey = str_replace('.', $this->nestingSeparator, $descKey);
-                            parse_str($descKey, $descValues);
-                            if (isset($descValues[$property]) && \is_array($descValues[$property])) {
-                                $filterLeafs = array_merge($filterLeafs, $descValues[$property]);
-                            }
+                    foreach ($description as $descKey => $descValue) {
+                        $descKey = str_replace('.', $this->nestingSeparator, $descKey);
+                        parse_str($descKey, $descValues);
+                        if (isset($descValues[$property]) && \is_array($descValues[$property])) {
+                            $filterLeafs = array_merge($filterLeafs, $descValues[$property]);
                         }
                     }
                 }
@@ -612,12 +608,12 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
         }
 
         foreach ($resourceOperation->getFilters() ?? [] as $filterId) {
-            if (!$this->filterLocator->has($filterId)) {
+            if (!($filter = $this->resolveFilter($filterId))) {
                 continue;
             }
 
             $entityClass = $this->getStateOptionsClass($resourceOperation, $resourceOperation->getClass());
-            foreach ($this->filterLocator->get($filterId)->getDescription($entityClass) as $key => $description) {
+            foreach ($filter->getDescription($entityClass) as $key => $description) {
                 $filterType = \in_array($description['type'], TypeIdentifier::values(), true) ? Type::builtin($description['type']) : Type::object($description['type']);
                 if (!($description['required'] ?? false)) {
                     $filterType = Type::nullable($filterType);
@@ -750,5 +746,25 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
         }
 
         return $this->nameConverter->normalize($property, $resourceClass);
+    }
+
+    /**
+     * Resolves a filter reference to a {@see FilterInterface} instance, supporting
+     * both a string service id (legacy/locator path) and an object form
+     * (`new QueryParameter(filter: new SortFilter())`).
+     */
+    private function resolveFilter(mixed $filter): ?FilterInterface
+    {
+        if ($filter instanceof FilterInterface) {
+            return $filter;
+        }
+
+        if (\is_string($filter) && $this->filterLocator->has($filter)) {
+            $resolved = $this->filterLocator->get($filter);
+
+            return $resolved instanceof FilterInterface ? $resolved : null;
+        }
+
+        return null;
     }
 }
