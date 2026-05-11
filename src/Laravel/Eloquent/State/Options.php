@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Eloquent\State;
 
-use ApiPlatform\State\OptionsInterface;
+use ApiPlatform\State\DataOptionsInterface;
 
-class Options implements OptionsInterface
+class Options implements DataOptionsInterface
 {
     /**
      * @param string|callable $handleLinks experimental callable, typed mixed as we may want a service name in the future
@@ -26,6 +26,11 @@ class Options implements OptionsInterface
         protected ?string $modelClass = null,
         protected mixed $handleLinks = null,
     ) {
+    }
+
+    public function getDataClass(): ?string
+    {
+        return $this->modelClass;
     }
 
     public function getHandleLinks(): mixed

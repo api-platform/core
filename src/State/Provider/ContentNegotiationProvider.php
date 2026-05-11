@@ -98,8 +98,7 @@ final class ContentNegotiationProvider implements ProviderInterface, StopwatchAw
     private function getInputFormat(HttpOperation $operation, Request $request): ?string
     {
         if (
-            false === ($input = $operation->getInput())
-            || (\is_array($input) && null === $input['class'])
+            null === $operation->getInputClass()
             || false === $operation->canDeserialize()
         ) {
             return null;

@@ -165,12 +165,12 @@ trait LinksHandlerTrait
     private function getLinkFromClass(Link $link, Operation $operation): string
     {
         $fromClass = $link->getFromClass();
-        if ($fromClass === $operation->getClass() && $entityClass = $this->getStateOptionsClass($operation, $operation->getClass(), Options::class)) {
+        if ($fromClass === $operation->getClass() && $entityClass = $operation->getDataClass()) {
             return $entityClass;
         }
 
         $operation = $this->resourceMetadataCollectionFactory->create($fromClass)->getOperation();
 
-        return $this->getStateOptionsClass($operation, $operation->getClass(), Options::class);
+        return $operation->getDataClass();
     }
 }
