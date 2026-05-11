@@ -19,8 +19,9 @@ use ApiPlatform\Metadata\Link;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Entity;
 
-#[ApiResource()]
+#[ApiResource]
 #[ApiResource(
+    shortName: 'RelatedLinkedDummyToFrom',
     uriTemplate: '/secured_dummies/{securedDummyId}/to_from',
     operations: [new GetCollection()],
     uriVariables: [
@@ -28,6 +29,7 @@ use Doctrine\ORM\Mapping\Entity;
     ]
 )]
 #[ApiResource(
+    shortName: 'RelatedLinkedDummyWithName',
     uriTemplate: '/secured_dummies/{securedDummyId}/with_name',
     operations: [new GetCollection()],
     uriVariables: [
@@ -35,6 +37,7 @@ use Doctrine\ORM\Mapping\Entity;
     ]
 )]
 #[ApiResource(
+    shortName: 'RelatedLinkedDummyMultiLink',
     uriTemplate: '/secured_dummies/{securedDummyId}/related/{id}',
     operations: [new GetCollection()],
     uriVariables: [

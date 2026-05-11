@@ -456,7 +456,6 @@ jobs:
         php: ${{ fromJSON(github.event_name == 'pull_request' && '["8.2","8.5"]' || '["8.2","8.3","8.4","8.5"]') }}
         shard:
           - main
-          - ld-api-hal-hydra
           - graphql-doctrine
           - misc
         include:
@@ -496,9 +495,8 @@ jobs:
         run: |
           case "${{ matrix.shard }}" in
             main) paths="features/main" ;;
-            ld-api-hal-hydra) paths="features/jsonld features/jsonapi features/hal features/hydra" ;;
             graphql-doctrine) paths="features/graphql features/doctrine" ;;
-            misc) paths="features/authorization features/filter features/issues features/security features/serializer features/http_cache features/sub_resources features/json features/xml features/push_relations features/mercure" ;;
+            misc) paths="features/filter features/issues features/security features/serializer features/http_cache features/sub_resources features/json features/xml features/push_relations features/mercure" ;;
           esac
           echo "paths=$paths" >> $GITHUB_OUTPUT
       - name: Run Behat tests (PHP ${{ matrix.php }} ${{ matrix.shard }})

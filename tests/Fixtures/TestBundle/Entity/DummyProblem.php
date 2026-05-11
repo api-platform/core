@@ -22,7 +22,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * DummyProblem.
- * Tests features/hal/problem.feature.
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
