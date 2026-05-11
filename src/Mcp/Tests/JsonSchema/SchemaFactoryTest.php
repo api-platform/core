@@ -302,4 +302,73 @@ class SchemaFactoryTest extends TestCase
         $arr = $result->getArrayCopy();
         $this->assertSame(['type' => 'object'], $arr);
     }
+
+    public function testOneOfPropertyKeepsSubSchemasWithoutTypeFallback(): void
+    {
+        $innerSchema = new Schema(Schema::VERSION_JSON_SCHEMA);
+        unset($innerSchema['$schema']);
+        $definitions = $innerSchema->getDefinitions();
+        $definitions['Root'] = new \ArrayObject([
+            'type' => 'object',
+            'properties' => [
+                '@context' => new \ArrayObject([
+                    'oneOf' => [
+                        ['type' => 'string'],
+                        [
+                            'type' => 'object',
+                            'properties' => [
+                                '@vocab' => ['type' => 'string'],
+                            ],
+                            'required' => ['@vocab'],
+                        ],
+                    ],
+                ]),
+            ],
+        ]);
+        $innerSchema['$ref'] = '#/definitions/Root';
+
+        $inner = $this->createMock(SchemaFactoryInterface::class);
+        $inner->method('buildSchema')->willReturn($innerSchema);
+
+        $factory = new SchemaFactory($inner);
+        $result = $factory->buildSchema('App\\Dummy', 'json');
+
+        $arr = $result->getArrayCopy();
+        $context = $arr['properties']['@context'];
+        $this->assertArrayNotHasKey('type', $context);
+        $this->assertArrayHasKey('oneOf', $context);
+        $this->assertSame(['type' => 'string'], $context['oneOf'][0]);
+        $this->assertSame('object', $context['oneOf'][1]['type']);
+        $this->assertSame(['@vocab' => ['type' => 'string']], $context['oneOf'][1]['properties']);
+    }
+
+    public function testAnyOfPropertyKeepsSubSchemasWithoutTypeFallback(): void
+    {
+        $innerSchema = new Schema(Schema::VERSION_JSON_SCHEMA);
+        unset($innerSchema['$schema']);
+        $definitions = $innerSchema->getDefinitions();
+        $definitions['Root'] = new \ArrayObject([
+            'type' => 'object',
+            'properties' => [
+                'value' => new \ArrayObject([
+                    'anyOf' => [
+                        ['type' => 'string'],
+                        ['type' => 'integer'],
+                    ],
+                ]),
+            ],
+        ]);
+        $innerSchema['$ref'] = '#/definitions/Root';
+
+        $inner = $this->createMock(SchemaFactoryInterface::class);
+        $inner->method('buildSchema')->willReturn($innerSchema);
+
+        $factory = new SchemaFactory($inner);
+        $result = $factory->buildSchema('App\\Dummy', 'json');
+
+        $arr = $result->getArrayCopy();
+        $value = $arr['properties']['value'];
+        $this->assertArrayNotHasKey('type', $value);
+        $this->assertSame([['type' => 'string'], ['type' => 'integer']], $value['anyOf']);
+    }
 }
