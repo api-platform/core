@@ -30,6 +30,7 @@ use ApiPlatform\GraphQl\Resolver\MutationResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryItemResolverInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
+use ApiPlatform\HttpCache\PurgeTagProviderInterface;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\AsOperationMutator;
 use ApiPlatform\Metadata\AsResourceMutator;
@@ -228,6 +229,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.uri_variables.transformer');
         $container->registerForAutoconfiguration(ParameterProviderInterface::class)
             ->addTag('api_platform.parameter_provider');
+        $container->registerForAutoconfiguration(PurgeTagProviderInterface::class)
+            ->addTag('api_platform.http_cache.purge_tag_provider');
 
         $container->registerAttributeForAutoconfiguration(
             AsResourceMutator::class,

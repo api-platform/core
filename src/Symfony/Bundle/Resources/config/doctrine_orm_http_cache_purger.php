@@ -26,6 +26,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.property_accessor'),
             service('api_platform.object_mapper')->nullOnInvalid(),
             service('api_platform.object_mapper.metadata_factory')->nullOnInvalid(),
+            tagged_iterator('api_platform.http_cache.purge_tag_provider'),
         ])
         ->tag('doctrine.event_listener', ['event' => 'preUpdate'])
         ->tag('doctrine.event_listener', ['event' => 'onFlush'])
