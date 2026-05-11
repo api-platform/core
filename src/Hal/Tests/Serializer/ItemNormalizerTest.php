@@ -422,8 +422,8 @@ class ItemNormalizerTest extends TestCase
     }
 
     /**
-     * @param array<int,mixed> $context
-     * @param array<int,mixed> $expected
+     * @param array<string,mixed> $context
+     * @param array<string,mixed> $expected
      */
     #[DataProvider('getSkipNullToOneRelationCases')]
     public function testSkipNullToOneRelation(array $context, array $expected): void
