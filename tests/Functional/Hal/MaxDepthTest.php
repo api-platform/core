@@ -70,4 +70,25 @@ final class MaxDepthTest extends ApiTestCase
         $this->assertSame('level 2', $body['_embedded']['child']['name']);
         $this->assertArrayNotHasKey('_embedded', $body['_embedded']['child']);
     }
+
+    public function testPutTruncatesSecondLevelChildByMaxDepth(): void
+    {
+        $response = self::createClient()->request('PUT', '/hal_max_depth_resources/1', [
+            'headers' => [
+                'Accept' => 'application/hal+json',
+                'Content-Type' => 'application/json',
+            ],
+            'json' => [
+                'child' => [
+                    'child' => ['name' => 'level 3'],
+                ],
+            ],
+        ]);
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('Content-Type', 'application/hal+json; charset=utf-8');
+        $body = $response->toArray();
+        $this->assertArrayHasKey('_embedded', $body);
+        $this->assertArrayHasKey('child', $body['_embedded']);
+        $this->assertArrayNotHasKey('_embedded', $body['_embedded']['child']);
+    }
 }

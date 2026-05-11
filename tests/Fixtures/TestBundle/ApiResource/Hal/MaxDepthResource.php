@@ -15,7 +15,9 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Hal;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\MaxDepth;
 
@@ -26,6 +28,13 @@ use Symfony\Component\Serializer\Attribute\MaxDepth;
     operations: [
         new Post(
             uriTemplate: '/hal_max_depth_resources',
+            processor: [self::class, 'process'],
+        ),
+        new Put(
+            uriTemplate: '/hal_max_depth_resources/{id}',
+            uriVariables: ['id'],
+            extraProperties: ['standard_put' => false],
+            provider: [self::class, 'provide'],
             processor: [self::class, 'process'],
         ),
     ],
@@ -54,5 +63,17 @@ class MaxDepthResource
         }
 
         return $data;
+    }
+
+    public static function provide(Operation $operation, array $uriVariables = [], array $context = []): self
+    {
+        $root = new self();
+        $root->id = (int) ($uriVariables['id'] ?? 1);
+        $root->name = 'level 1';
+        $root->child = new self();
+        $root->child->id = 2;
+        $root->child->name = 'level 2';
+
+        return $root;
     }
 }

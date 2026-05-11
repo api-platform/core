@@ -81,4 +81,40 @@ final class HalTest extends ApiTestCase
         $this->assertSame('/hal_related_resources/1', $body['_links']['related']['href']);
         $this->assertSame('Krondstadt', $body['krondstadt']);
     }
+
+    public function testPutReturnsHalPayloadAndKeepsPreviousRelation(): void
+    {
+        $response = self::createClient()->request('PUT', '/hal_relation_embedders/1', [
+            'headers' => [
+                'Accept' => 'application/hal+json',
+                'Content-Type' => 'application/json',
+            ],
+            'json' => ['krondstadt' => 'Updated'],
+        ]);
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('Content-Type', 'application/hal+json; charset=utf-8');
+        $body = $response->toArray();
+        $this->assertSame('/hal_relation_embedders/1', $body['_links']['self']['href']);
+        $this->assertSame('/hal_related_resources/1', $body['_links']['related']['href']);
+        $this->assertSame('Updated', $body['krondstadt']);
+        $this->assertSame('/hal_related_resources/1', $body['_embedded']['related']['_links']['self']['href']);
+    }
+
+    public function testPatchReturnsHalPayloadWithMergePatch(): void
+    {
+        $response = self::createClient()->request('PATCH', '/hal_relation_embedders/1', [
+            'headers' => [
+                'Accept' => 'application/hal+json',
+                'Content-Type' => 'application/merge-patch+json',
+            ],
+            'json' => ['krondstadt' => 'Patched'],
+        ]);
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('Content-Type', 'application/hal+json; charset=utf-8');
+        $body = $response->toArray();
+        $this->assertSame('/hal_relation_embedders/1', $body['_links']['self']['href']);
+        $this->assertSame('/hal_related_resources/1', $body['_links']['related']['href']);
+        $this->assertSame('Patched', $body['krondstadt']);
+        $this->assertSame('/hal_related_resources/1', $body['_embedded']['related']['_links']['self']['href']);
+    }
 }

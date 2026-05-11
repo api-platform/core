@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonLd;
 
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Serializer\Filter\PropertyFilter;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
@@ -30,6 +32,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         ),
     ],
 )]
+#[ApiFilter(PropertyFilter::class)]
 class NonResourceContainer
 {
     #[ApiProperty(identifier: true)]

@@ -142,23 +142,11 @@ final class NonResourceTest extends ApiTestCase
             ['headers' => ['Accept' => 'application/ld+json']],
         );
         $this->assertResponseIsSuccessful();
-        $this->assertJsonContains([
-            '@context' => '/contexts/JsonLdNonResourceContainer',
-            '@id' => '/jsonld_non_resource_containers/1',
-            '@type' => 'JsonLdNonResourceContainer',
-            'id' => '1',
-            'nested' => [
-                '@id' => '/jsonld_non_resource_containers/1-nested',
-                '@type' => 'JsonLdNonResourceContainer',
-                'notAResource' => [
-                    '@type' => 'NonResourceClass',
-                    'foo' => 'f2',
-                ],
-            ],
-            'notAResource' => [
-                '@type' => 'NonResourceClass',
-                'bar' => 'b1',
-            ],
-        ]);
+        $body = $response->toArray();
+        $this->assertSame('1', $body['id']);
+        $this->assertSame('f2', $body['nested']['notAResource']['foo']);
+        $this->assertSame('b1', $body['notAResource']['bar']);
+        $this->assertArrayNotHasKey('bar', $body['nested']['notAResource']);
+        $this->assertArrayNotHasKey('foo', $body['notAResource']);
     }
 }

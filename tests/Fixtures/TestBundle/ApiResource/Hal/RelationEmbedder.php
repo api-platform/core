@@ -18,7 +18,9 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 
 #[ApiResource(
     shortName: 'HalRelationEmbedder',
@@ -34,6 +36,19 @@ use ApiPlatform\Metadata\Post;
         ),
         new Post(
             uriTemplate: '/hal_relation_embedders',
+            processor: [self::class, 'process'],
+        ),
+        new Put(
+            uriTemplate: '/hal_relation_embedders/{id}',
+            uriVariables: ['id'],
+            extraProperties: ['standard_put' => false],
+            provider: [self::class, 'provide'],
+            processor: [self::class, 'process'],
+        ),
+        new Patch(
+            uriTemplate: '/hal_relation_embedders/{id}',
+            uriVariables: ['id'],
+            provider: [self::class, 'provide'],
             processor: [self::class, 'process'],
         ),
     ],
