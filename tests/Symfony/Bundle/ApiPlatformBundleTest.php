@@ -22,6 +22,7 @@ use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ElasticsearchClientP
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlResolverPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlTypePass;
+use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\JsonStreamerTransformerPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\MetadataAwareNameConverterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\MutatorPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\SerializerMappingLoaderPass;
@@ -57,6 +58,7 @@ class ApiPlatformBundleTest extends TestCase
         $containerProphecy->addCompilerPass(Argument::type(AuthenticatorManagerPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(SerializerMappingLoaderPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
         $containerProphecy->addCompilerPass(Argument::type(MutatorPass::class))->willReturn($containerProphecy->reveal())->shouldBeCalled();
+        $containerProphecy->addCompilerPass(Argument::type(JsonStreamerTransformerPass::class), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10)->willReturn($containerProphecy->reveal())->shouldBeCalled();
 
         $bundle = new ApiPlatformBundle();
         $bundle->build($containerProphecy->reveal());
