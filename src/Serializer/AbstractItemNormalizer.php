@@ -28,6 +28,8 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\Util\CloneTrait;
+use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException as PropertyAccessInvalidArgumentException;
+use Symfony\Component\PropertyAccess\Exception\InvalidTypeException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -554,6 +556,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             if (!isset($context['not_normalizable_value_exceptions'])) {
                 throw $exception;
             }
+        } catch (PropertyAccessInvalidArgumentException $exception) {
+            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Failed to denormalize attribute "%s" value for class "%s": %s', $attribute, $object::class, $exception->getMessage()), $value, $exception instanceof InvalidTypeException ? [$exception->expectedType] : ['unknown'], $context['deserialization_path'] ?? null, false, $exception->getCode(), $exception);
         }
     }
 
