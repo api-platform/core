@@ -304,6 +304,30 @@ class JsonLdTest extends TestCase
         $response->assertNotFound();
     }
 
+    public function testJsonLdContextHasCorrectContentType(): void
+    {
+        $response = $this->get('/api/contexts/Entrypoint', ['accept' => 'application/ld+json']);
+        $response->assertStatus(200);
+        $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertArrayHasKey('@context', $response->json());
+    }
+
+    public function testJsonLdResourceContextHasCorrectContentType(): void
+    {
+        $response = $this->get('/api/contexts/Book', ['accept' => 'application/ld+json']);
+        $response->assertStatus(200);
+        $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertArrayHasKey('@context', $response->json());
+    }
+
+    public function testJsonLdContextDefaultsToEntrypoint(): void
+    {
+        $response = $this->get('/api/contexts/', ['accept' => 'application/ld+json']);
+        $response->assertStatus(200);
+        $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertArrayHasKey('@context', $response->json());
+    }
+
     public function testHidden(): void
     {
         PostFactory::new()->has(CommentFactory::new()->count(10))->count(10)->create();
