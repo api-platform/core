@@ -13,21 +13,14 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
-use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 
 /**
- * Ensures the property_info service is always available.
- *
- * When symfony/framework-bundle has property_info disabled (which is the default
- * on a full-stack Symfony application unless explicitly opted-in), API Platform's
- * prependExtensionConfig() fallback can be overridden by user configuration.
- * This pass registers a minimal fallback so API Platform never fails with
- * "service not found" for property_info.
+ * Registers a ReflectionExtractor fallback for api_platform.property_info when
+ * framework.property_info is disabled, so tagged_iterator('property_info.*') is never empty.
  *
  * @internal
  */
@@ -35,27 +28,15 @@ final class PropertyInfoPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        if ($container->hasDefinition('property_info') || $container->hasAlias('property_info')) {
+        if ($container->hasDefinition('property_info.reflection_extractor')) {
             return;
         }
 
-        if (!$container->hasDefinition('property_info.reflection_extractor')) {
-            $reflectionExtractor = new Definition(ReflectionExtractor::class);
-            $reflectionExtractor->addTag('property_info.list_extractor', ['priority' => -1000]);
-            $reflectionExtractor->addTag('property_info.type_extractor', ['priority' => -1002]);
-            $reflectionExtractor->addTag('property_info.access_extractor', ['priority' => -1000]);
-            $reflectionExtractor->addTag('property_info.initializable_extractor', ['priority' => -1000]);
-            $container->setDefinition('property_info.reflection_extractor', $reflectionExtractor);
-        }
-
-        $definition = new Definition(PropertyInfoExtractor::class);
-        $definition->setArguments([
-            new TaggedIteratorArgument('property_info.list_extractor'),
-            new TaggedIteratorArgument('property_info.type_extractor'),
-            new TaggedIteratorArgument('property_info.description_extractor'),
-            new TaggedIteratorArgument('property_info.access_extractor'),
-            new TaggedIteratorArgument('property_info.initializable_extractor'),
-        ]);
-        $container->setDefinition('property_info', $definition);
+        $definition = new Definition(ReflectionExtractor::class);
+        $definition->addTag('property_info.list_extractor', ['priority' => -1000]);
+        $definition->addTag('property_info.type_extractor', ['priority' => -1002]);
+        $definition->addTag('property_info.access_extractor', ['priority' => -1000]);
+        $definition->addTag('property_info.initializable_extractor', ['priority' => -1000]);
+        $container->setDefinition('api_platform.property_info.reflection_extractor', $definition);
     }
 }

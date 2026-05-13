@@ -46,6 +46,7 @@ use ApiPlatform\Symfony\Routing\IriConverter;
 use ApiPlatform\Symfony\Routing\Router;
 use ApiPlatform\Symfony\Routing\SkolemIriConverter;
 use Negotiation\Negotiator;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
@@ -68,7 +69,14 @@ return function (ContainerConfigurator $container) {
 
     $services->alias('api_platform.property_accessor', 'property_accessor');
 
-    $services->alias('api_platform.property_info', 'property_info');
+    $services->set('api_platform.property_info', PropertyInfoExtractor::class)
+        ->args([
+            tagged_iterator('property_info.list_extractor'),
+            tagged_iterator('property_info.type_extractor'),
+            tagged_iterator('property_info.description_extractor'),
+            tagged_iterator('property_info.access_extractor'),
+            tagged_iterator('property_info.initializable_extractor'),
+        ]);
 
     $services->set('api_platform.negotiator', Negotiator::class);
 
