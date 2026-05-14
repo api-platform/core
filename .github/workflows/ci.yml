@@ -42,7 +42,7 @@ jobs:
           php-version: ${{ matrix.php }}
           extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           ini-values: memory_limit=-1
-          tools: pecl, composer
+          tools: pecl, composer:2.9.8
           coverage: none
       - name: Get composer cache directory
         id: composercache
@@ -103,7 +103,7 @@ jobs:
           php-version: ${{ matrix.php }}
           extensions: intl, bcmath, curl, openssl, mbstring
           ini-values: memory_limit=-1
-          tools: composer
+          tools: composer:2.9.8
           coverage: none
       - name: Get composer cache directory
         id: composercache
@@ -143,7 +143,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: pecl, composer
+          tools: pecl, composer:2.9.8
           extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           coverage: none
           ini-values: memory_limit=-1
@@ -207,7 +207,7 @@ jobs:
           php-version: ${{ matrix.php }}
           extensions: intl, bcmath, curl, openssl, mbstring
           ini-values: memory_limit=-1
-          tools: composer
+          tools: composer:2.9.8
           coverage: none
       - name: Get composer cache directory
         id: composercache
@@ -258,7 +258,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: pecl, composer
+          tools: pecl, composer:2.9.8
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
           coverage: pcov
           ini-values: memory_limit=-1
@@ -344,7 +344,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php.version }}
-          tools: pecl, composer
+          tools: pecl, composer:2.9.8
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
           ini-values: memory_limit=-1
       - name: PMU
@@ -430,7 +430,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php.version }}
-          tools: pecl, composer
+          tools: pecl, composer:2.9.8
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
           ini-values: memory_limit=-1
       - name: Linking
@@ -471,7 +471,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: pecl, composer
+          tools: pecl, composer:2.9.8
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
           coverage: pcov
           ini-values: memory_limit=-1
@@ -565,7 +565,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: pecl, composer
+          tools: pecl, composer:2.9.8
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_pgsql
           coverage: none
           ini-values: memory_limit=-1
@@ -620,7 +620,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: pecl, composer
+          tools: pecl, composer:2.9.8
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_mysql
           coverage: none
           ini-values: memory_limit=-1
@@ -675,7 +675,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: pecl, composer
+          tools: pecl, composer:2.9.8
           extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           coverage: pcov
           ini-values: memory_limit=-1
@@ -769,7 +769,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: pecl, composer
+          tools: pecl, composer:2.9.8
           extensions: intl, bcmath, curl, openssl, mbstring, mongodb
           coverage: pcov
           ini-values: memory_limit=-1
@@ -867,7 +867,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: pecl, composer
+          tools: pecl, composer:2.9.8
           extensions: ${{ matrix.extensions }}
           coverage: none
           ini-values: memory_limit=-1
@@ -929,7 +929,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: pecl, composer
+          tools: pecl, composer:2.9.8
           extensions: ${{ matrix.extensions }}
           coverage: none
           ini-values: memory_limit=-1
@@ -969,7 +969,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: pecl, composer
+          tools: pecl, composer:2.9.8
           extensions: intl, bcmath, curl, openssl, mbstring
           coverage: none
           ini-values: memory_limit=-1
@@ -1008,7 +1008,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: pecl, composer
+          tools: pecl, composer:2.9.8
           extensions: intl, bcmath, curl, openssl, mbstring
           coverage: none
           ini-values: memory_limit=-1
@@ -1051,7 +1051,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: pecl, composer
+          tools: pecl, composer:2.9.8
           extensions: intl, bcmath, curl, openssl, mbstring
           coverage: none
           ini-values: memory_limit=-1
@@ -1096,7 +1096,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: pecl, composer
+          tools: pecl, composer:2.9.8
           extensions: intl, bcmath, curl, openssl, mbstring
           coverage: none
           ini-values: memory_limit=-1
@@ -1146,7 +1146,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: pecl, composer
+          tools: pecl, composer:2.9.8
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, fileinfo
           coverage: none
           ini-values: memory_limit=-1
@@ -1196,7 +1196,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: pecl, composer
+          tools: pecl, composer:2.9.8
           extensions: intl, bcmath, curl, openssl, mbstring
           coverage: none
           ini-values: memory_limit=-1
@@ -1240,7 +1240,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: pecl, composer
+          tools: pecl, composer:2.9.8
           extensions: intl, bcmath, curl, openssl, mbstring
           coverage: none
           ini-values: memory_limit=-1
@@ -1287,7 +1287,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: pecl, composer
+          tools: pecl, composer:2.9.8
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
           coverage: pcov
           ini-values: memory_limit=-1
@@ -1363,7 +1363,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: pecl, composer
+          tools: pecl, composer:2.9.8
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
           coverage: pcov
           ini-values: memory_limit=-1
@@ -1411,7 +1411,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: pecl, composer
+          tools: pecl, composer:2.9.8
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
           ini-values: memory_limit=-1
       - name: Setup node
@@ -1461,7 +1461,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: pecl, composer
+          tools: pecl, composer:2.9.8
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
           ini-values: memory_limit=-1
       - name: Update project dependencies
@@ -1487,7 +1487,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.5
-          tools: pecl, composer
+          tools: pecl, composer:2.9.8
           extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
           ini-values: memory_limit=-1
       - name: Update project dependencies
