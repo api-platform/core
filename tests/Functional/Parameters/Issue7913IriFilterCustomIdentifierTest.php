@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Parameters;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Issue7913\Agent as DocumentAgent;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Issue7913\Mail as DocumentMail;
 use ApiPlatform\Tests\RecreateSchemaTrait;

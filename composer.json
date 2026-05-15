@@ -104,6 +104,7 @@
         "api-platform/serializer": "self.version",
         "api-platform/state": "self.version",
         "api-platform/symfony": "self.version",
+        "api-platform/test": "self.version",
         "api-platform/validator": "self.version"
     },
     "require": {

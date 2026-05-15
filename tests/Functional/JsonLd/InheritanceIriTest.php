@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\JsonLd;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5438\Contractor;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5438\Employee;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5438\Person;

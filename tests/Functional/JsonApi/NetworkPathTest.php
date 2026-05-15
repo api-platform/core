@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\JsonApi;
 
-use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonApi\NetworkPathDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\JsonApi\NetworkPathRelationDummy;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
