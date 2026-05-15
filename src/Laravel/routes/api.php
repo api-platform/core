@@ -80,8 +80,9 @@ Route::domain($domain)->middleware($globalMiddlewares)->group(static function ()
 
     Route::group(['prefix' => $prefix], static function (): void {
         Route::group(['middleware' => ApiPlatformMiddleware::class], static function (): void {
-            Route::get('/contexts/{shortName?}{_format?}', ContextAction::class)
-                ->name('api_jsonld_context');
+            Route::get('/contexts/{shortName?}{_format?}', static function (Request $request, ContextAction $contextAction, string $shortName = 'Entrypoint') {
+                return $contextAction($shortName, $request);
+            })->name('api_jsonld_context');
 
             Route::get('/validation_errors/{id}', static fn () => throw new NotExposedHttpException('Not exposed.'))
                 ->name('api_validation_errors')
