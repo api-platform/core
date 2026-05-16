@@ -25,7 +25,6 @@ use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlTypePass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\JsonStreamerTransformerPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\MetadataAwareNameConverterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\MutatorPass;
-use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\PropertyInfoPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\SerializerMappingLoaderPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\TestClientPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\TestMercureHubPass;
@@ -58,7 +57,6 @@ class ApiPlatformBundleTest extends TestCase
         $this->assertContains(TestClientPass::class, $passClasses);
         $this->assertContains(TestMercureHubPass::class, $passClasses);
         $this->assertContains(AuthenticatorManagerPass::class, $passClasses);
-        $this->assertContains(PropertyInfoPass::class, $passClasses);
         $this->assertContains(SerializerMappingLoaderPass::class, $passClasses);
         $this->assertContains(MutatorPass::class, $passClasses);
         $this->assertContains(JsonStreamerTransformerPass::class, $passClasses);
