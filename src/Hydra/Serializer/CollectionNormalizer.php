@@ -18,6 +18,7 @@ use ApiPlatform\JsonLd\Serializer\HydraPrefixTrait;
 use ApiPlatform\JsonLd\Serializer\JsonLdContextTrait;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Serializer\AbstractCollectionNormalizer;
@@ -44,7 +45,7 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
         self::PRESERVE_COLLECTION_KEYS => false,
     ];
 
-    public function __construct(private readonly ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, private readonly IriConverterInterface $iriConverter, array $defaultContext = [], private readonly ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null)
+    public function __construct(private readonly ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, private readonly IriConverterInterface $iriConverter, array $defaultContext = [], private readonly ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, private readonly ?ResourceAccessCheckerInterface $resourceAccessChecker = null)
     {
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
 
@@ -72,15 +73,17 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
             $data[$hydraPrefix.'totalItems'] = \count($object);
         }
 
-        if (null !== $this->resourceMetadataCollectionFactory && ($context['hydra_operations'] ?? $this->defaultContext['hydra_operations'] ?? false)) {
-            $allHydraOperations = $this->getHydraOperationsFromResourceMetadatas(
+        if (null !== $this->resourceMetadataCollectionFactory) {
+            $hydraOperationsFromAttributes = $this->getHydraOperationsFromAttributes(
                 $resourceClass,
                 true,
+                null,
+                $context,
                 $hydraPrefix
             );
 
-            if (!empty($allHydraOperations)) {
-                $data[$hydraPrefix.'operation'] = $allHydraOperations;
+            if (!empty($hydraOperationsFromAttributes)) {
+                $data[$hydraPrefix.'operation'] = $hydraOperationsFromAttributes;
             }
         }
 

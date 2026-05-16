@@ -53,11 +53,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
     public const FORMAT = 'jsonld';
 
-    private array $itemNormalizerDefaultContext = [];
-
     public function __construct(ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory, PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, ResourceClassResolverInterface $resourceClassResolver, private readonly ContextBuilderInterface $contextBuilder, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, array $defaultContext = [], ?ResourceAccessCheckerInterface $resourceAccessChecker = null, protected ?TagCollectorInterface $tagCollector = null, private ?OperationMetadataFactoryInterface $operationMetadataFactory = null, ?OperationResourceClassResolverInterface $operationResourceResolver = null)
     {
-        $this->itemNormalizerDefaultContext = $defaultContext;
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $defaultContext, $resourceMetadataCollectionFactory, $resourceAccessChecker, $tagCollector, $operationResourceResolver);
     }
 
@@ -140,16 +137,18 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $metadata['@type'] = $type;
         }
 
-        if ($isResourceClass && ($context['hydra_operations'] ?? $this->itemNormalizerDefaultContext['hydra_operations'] ?? false)) {
-            $hydraPrefix = $this->getHydraPrefix($context + $this->itemNormalizerDefaultContext);
-            $allHydraOperations = $this->getHydraOperationsFromResourceMetadatas(
+        if ($isResourceClass && null !== $this->resourceMetadataCollectionFactory) {
+            $hydraPrefix = $this->getHydraPrefix($context + $this->defaultContext);
+            $hydraOperationsFromAttributes = $this->getHydraOperationsFromAttributes(
                 $resourceClass,
                 false,
+                $data,
+                $context,
                 $hydraPrefix
             );
 
-            if (!empty($allHydraOperations)) {
-                $metadata[$hydraPrefix.'operation'] = $allHydraOperations;
+            if (!empty($hydraOperationsFromAttributes)) {
+                $metadata[$hydraPrefix.'operation'] = $hydraOperationsFromAttributes;
             }
         }
 

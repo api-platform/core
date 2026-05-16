@@ -239,7 +239,6 @@ class ConfigurationTest extends TestCase
             'handle_symfony_errors' => false,
             'serializer' => [
                 'hydra_prefix' => false,
-                'hydra_operations' => false,
             ],
             'enable_phpdoc_parser' => true,
             'mcp' => [
