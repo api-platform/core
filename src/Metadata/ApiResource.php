@@ -973,6 +973,7 @@ class ApiResource extends Metadata
         protected array $extraProperties = [],
         ?bool $map = null,
         protected ?array $mcp = null,
+        protected ?array $hydraOperations = null,
     ) {
         parent::__construct(
             shortName: $shortName,
@@ -1046,6 +1047,25 @@ class ApiResource extends Metadata
     {
         $self = clone $this;
         $self->mcp = $mcp;
+
+        return $self;
+    }
+
+    /**
+     * @return array<int, HydraOperation>|null
+     */
+    public function getHydraOperations(): ?array
+    {
+        return $this->hydraOperations;
+    }
+
+    /**
+     * @param array<int, HydraOperation> $hydraOperations
+     */
+    public function withHydraOperations(array $hydraOperations): static
+    {
+        $self = clone $this;
+        $self->hydraOperations = $hydraOperations;
 
         return $self;
     }

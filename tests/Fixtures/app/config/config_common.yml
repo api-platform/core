@@ -38,8 +38,6 @@ api_platform:
         Made with love
     enable_swagger: true
     enable_swagger_ui: true
-    serializer:
-        hydra_operations: false
     formats:
         jsonld:                        ['application/ld+json']
         jsonhal:                       ['application/hal+json']

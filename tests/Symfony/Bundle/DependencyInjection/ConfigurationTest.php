@@ -243,7 +243,6 @@ class ConfigurationTest extends TestCase
             'enable_link_security' => true,
             'serializer' => [
                 'hydra_prefix' => false,
-                'hydra_operations' => false,
             ],
             'enable_phpdoc_parser' => true,
             'mcp' => [

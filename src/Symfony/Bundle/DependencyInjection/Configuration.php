@@ -172,7 +172,6 @@ final class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->booleanNode('hydra_prefix')->defaultFalse()->info('Use the "hydra:" prefix.')->end()
-                        ->booleanNode('hydra_operations')->defaultFalse()->info('Add the "operation" attribute to Hydra responses.')->end()
                     ->end()
                 ->end()
             ->end();

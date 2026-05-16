@@ -70,6 +70,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.iri_converter'),
             '%api_platform.serializer.default_context%',
             service('api_platform.metadata.resource.metadata_collection_factory'),
+            service('api_platform.security.resource_access_checker')->ignoreOnInvalid(),
         ])
         ->tag('serializer.normalizer', ['priority' => -985]);
 

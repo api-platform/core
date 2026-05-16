@@ -230,6 +230,33 @@ XML_WRAP
         $this->buildValues($resource->addChild('hydraContext'), $values);
     }
 
+    private function buildHydraOperations(\SimpleXMLElement $resource, ?array $values): void
+    {
+        if (null === $values) {
+            return;
+        }
+
+        $node = $resource->addChild('hydraOperations');
+        foreach ($values as $operation) {
+            $child = $node->addChild('hydraOperation');
+            foreach ($operation as $key => $value) {
+                if (\is_string($value) || null === $value || is_numeric($value) || \is_bool($value)) {
+                    $child->addAttribute($key, $this->parse($value));
+                    continue;
+                }
+
+                if (\is_array($value)) {
+                    $method = 'build'.ucfirst($key);
+                    if (method_exists($this, $method)) {
+                        $this->{$method}($child, $value);
+                        continue;
+                    }
+                    $this->buildValues($child->addChild($key), $value);
+                }
+            }
+        }
+    }
+
     private function buildOpenapi(\SimpleXMLElement $resource, array $values): void
     {
         $node = $resource->openapi ?? $resource->addChild('openapi');
