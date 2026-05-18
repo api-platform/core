@@ -190,6 +190,7 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.path_segment_name_generator.dash',
             'api_platform.path_segment_name_generator.underscore',
             'api_platform.metadata.inflector',
+            'api_platform.property_info',
             'api_platform.resource_class_resolver',
             'api_platform.route_loader',
             'api_platform.router',
@@ -231,7 +232,6 @@ class ApiPlatformExtensionTest extends TestCase
             'api_platform.iri_converter',
             'api_platform.path_segment_name_generator',
             'api_platform.property_accessor',
-            'api_platform.property_info',
             'api_platform.serializer',
             'api_platform.inflector',
         ];
