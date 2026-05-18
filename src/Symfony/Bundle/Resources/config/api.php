@@ -47,6 +47,14 @@ use ApiPlatform\Symfony\Routing\IriConverter;
 use ApiPlatform\Symfony\Routing\Router;
 use ApiPlatform\Symfony\Routing\SkolemIriConverter;
 use Negotiation\Negotiator;
+use phpDocumentor\Reflection\DocBlockFactory;
+use phpDocumentor\Reflection\Types\ContextFactory;
+use PHPStan\PhpDocParser\Parser\PhpDocParser;
+use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\PropertyInfo\PropertyInfoCacheExtractor;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
@@ -69,7 +77,38 @@ return function (ContainerConfigurator $container) {
 
     $services->alias('api_platform.property_accessor', 'property_accessor');
 
-    $services->alias('api_platform.property_info', 'property_info');
+    $services->set('api_platform.property_info.reflection_extractor', ReflectionExtractor::class)
+        ->tag('property_info.list_extractor', ['priority' => -1000])
+        ->tag('property_info.type_extractor', ['priority' => -1002])
+        ->tag('property_info.access_extractor', ['priority' => -1000])
+        ->tag('property_info.initializable_extractor', ['priority' => -1000]);
+
+    if (class_exists(DocBlockFactory::class)) {
+        $services->set('api_platform.property_info.php_doc_extractor', PhpDocExtractor::class)
+            ->tag('property_info.description_extractor', ['priority' => -1000])
+            ->tag('property_info.type_extractor', ['priority' => -1001]);
+    }
+
+    if (class_exists(PhpDocParser::class) && class_exists(ContextFactory::class)) {
+        $services->set('api_platform.property_info.phpstan_extractor', PhpStanExtractor::class)
+            ->tag('property_info.type_extractor', ['priority' => -1000]);
+    }
+
+    $services->set('api_platform.property_info', PropertyInfoExtractor::class)
+        ->args([
+            tagged_iterator('property_info.list_extractor'),
+            tagged_iterator('property_info.type_extractor'),
+            tagged_iterator('property_info.description_extractor'),
+            tagged_iterator('property_info.access_extractor'),
+            tagged_iterator('property_info.initializable_extractor'),
+        ]);
+
+    $services->set('api_platform.property_info.cache', PropertyInfoCacheExtractor::class)
+        ->decorate('api_platform.property_info')
+        ->args([
+            service('.inner'),
+            service('cache.property_info'),
+        ]);
 
     $services->set('api_platform.negotiator', Negotiator::class);
 
