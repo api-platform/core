@@ -112,4 +112,13 @@ final class ContextTest extends ApiTestCase
         $body = $response->toArray();
         $this->assertSame('JsonLdContextDummy/embedded', $body['@context']['embedded']);
     }
+
+    public function testResourceLevelJsonLdContextAddsNamespacePrefixes(): void
+    {
+        $response = self::createClient()->request('GET', '/contexts/JsonLdContextDummy');
+        $this->assertResponseIsSuccessful();
+        $body = $response->toArray();
+        $this->assertSame('http://purl.org/dc/terms/', $body['@context']['dct']);
+        $this->assertSame('dct:title', $body['@context']['title']);
+    }
 }
