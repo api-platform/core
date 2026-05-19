@@ -137,7 +137,6 @@ final class PurgeHttpCacheListener
             } catch (OperationNotFoundException|InvalidArgumentException) {
             }
         }
-
     }
 
     private function gatherRelationTags(EntityManagerInterface $em, object $entity): void
