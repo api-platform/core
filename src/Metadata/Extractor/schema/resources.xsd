@@ -479,6 +479,7 @@
             <xsd:element name="defaults" minOccurs="0" type="sequenceWithValues"/>
             <xsd:element name="formats" minOccurs="0" type="formats"/>
             <xsd:element name="hydraContext" minOccurs="0" type="sequenceWithValues"/>
+            <xsd:element name="jsonldContext" minOccurs="0" type="sequenceWithValues"/>
             <xsd:element name="inputFormats" minOccurs="0" type="formats"/>
             <xsd:element name="openapi" minOccurs="0" type="openApiOperation"/>
             <xsd:element name="parameters" minOccurs="0" type="parameters"/>

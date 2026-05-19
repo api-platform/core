@@ -180,6 +180,11 @@ final class ContextBuilder implements AnonymousContextBuilderInterface, Operatio
     private function getResourceContextWithShortname(string $resourceClass, int $referenceType, string $shortName, ?HttpOperation $operation = null): array
     {
         $context = $this->getBaseContext($referenceType);
+
+        if ($operation && $jsonldContext = $operation->getJsonldContext()) {
+            $context = array_merge($context, $jsonldContext);
+        }
+
         $propertyContext = $operation ? ['normalization_groups' => $operation->getNormalizationContext()['groups'] ?? null, 'denormalization_groups' => $operation->getDenormalizationContext()['groups'] ?? null] : ['normalization_groups' => [], 'denormalization_groups' => []];
 
         foreach ($this->propertyNameCollectionFactory->create($resourceClass) as $propertyName) {
