@@ -14,12 +14,10 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Tests\Doctrine\EventListener;
 
 use ApiPlatform\HttpCache\PurgerInterface;
-use ApiPlatform\HttpCache\PurgeTagProviderInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\IriConverterInterface;
-use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Symfony\Doctrine\EventListener\PurgeHttpCacheListener;
@@ -269,58 +267,6 @@ class PurgeHttpCacheListenerTest extends TestCase
 
         $listener = new PurgeHttpCacheListener($purgerProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal());
         $listener->onFlush($eventArgs);
-        $listener->postFlush();
-    }
-
-    public function testPurgeTagProviders(): void
-    {
-        if (!interface_exists(PurgeTagProviderInterface::class)) {
-            $this->markTestSkipped('PurgeTagProviderInterface not available in installed api-platform/http-cache version.');
-        }
-
-        $dummy = new Dummy();
-        $dummy->setId(1);
-
-        $purger = $this->createMock(PurgerInterface::class);
-        $purger->expects($this->once())
-            ->method('purge')
-            ->with(['/dummies', '/dummies/1', '/parents/42/children']);
-
-        $iriConverter = $this->createStub(IriConverterInterface::class);
-        $iriConverter->method('getIriFromResource')
-            ->willReturnCallback(static function (object|string $resource, int $referenceType = UrlGeneratorInterface::ABS_PATH, ?Operation $operation = null, array $context = []): string {
-                if ($operation instanceof GetCollection) {
-                    return '/dummies';
-                }
-
-                return '/dummies/1';
-            });
-
-        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
-        $resourceClassResolver->method('isResourceClass')->willReturn(true);
-
-        $classMetadata = new ClassMetadata(Dummy::class);
-        $classMetadata->associationMappings = [];
-
-        $em = $this->createStub(EntityManagerInterface::class);
-        $em->method('getClassMetadata')->willReturn($classMetadata);
-
-        $changeSet = [];
-        $eventArgs = new PreUpdateEventArgs($dummy, $em, $changeSet);
-
-        $provider = $this->createMock(PurgeTagProviderInterface::class);
-        $provider->expects($this->once())
-            ->method('getTagsForResource')
-            ->with($dummy)
-            ->willReturn(['/parents/42/children']);
-
-        $listener = new PurgeHttpCacheListener(
-            $purger,
-            $iriConverter,
-            $resourceClassResolver,
-            purgeTagProviders: [$provider],
-        );
-        $listener->preUpdate($eventArgs);
         $listener->postFlush();
     }
 

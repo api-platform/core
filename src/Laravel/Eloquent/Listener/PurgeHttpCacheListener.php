@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Laravel\Eloquent\Listener;
 
 use ApiPlatform\HttpCache\PurgerInterface;
-use ApiPlatform\HttpCache\PurgeTagProviderInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\GetCollection;
@@ -29,14 +28,10 @@ final class PurgeHttpCacheListener
      */
     private array $tags = [];
 
-    /**
-     * @param iterable<PurgeTagProviderInterface> $purgeTagProviders
-     */
     public function __construct(
         private readonly PurgerInterface $purger,
         private readonly IriConverterInterface $iriConverter,
         private readonly ResourceClassResolverInterface $resourceClassResolver,
-        private readonly iterable $purgeTagProviders = [],
     ) {
     }
 
@@ -46,19 +41,15 @@ final class PurgeHttpCacheListener
     public function handleModelSaved(string $eventName, array $data): void
     {
         foreach ($data as $model) {
-            if ($this->resourceClassResolver->isResourceClass($model::class)) {
-                try {
-                    $this->tags[] = $this->iriConverter->getIriFromResource($model);
-                    $this->tags[] = $this->iriConverter->getIriFromResource($model::class, operation: new GetCollection(class: $model::class));
-                } catch (InvalidArgumentException|ItemNotFoundException $e) {
-                    // do nothing
-                }
+            if (!$this->resourceClassResolver->isResourceClass($model::class)) {
+                return;
             }
 
-            foreach ($this->purgeTagProviders as $provider) {
-                foreach ($provider->getTagsForResource($model) as $tag) {
-                    $this->tags[] = $tag;
-                }
+            try {
+                $this->tags[] = $this->iriConverter->getIriFromResource($model);
+                $this->tags[] = $this->iriConverter->getIriFromResource($model::class, operation: new GetCollection(class: $model::class));
+            } catch (InvalidArgumentException|ItemNotFoundException $e) {
+                // do nothing
             }
         }
     }
@@ -69,19 +60,15 @@ final class PurgeHttpCacheListener
     public function handleModelDeleted(string $eventName, array $data): void
     {
         foreach ($data as $model) {
-            if ($this->resourceClassResolver->isResourceClass($model::class)) {
-                try {
-                    $this->tags[] = $this->iriConverter->getIriFromResource($model);
-                    $this->tags[] = $this->iriConverter->getIriFromResource($model::class, operation: new GetCollection(class: $model::class));
-                } catch (InvalidArgumentException|ItemNotFoundException $e) {
-                    // do nothing
-                }
+            if (!$this->resourceClassResolver->isResourceClass($model::class)) {
+                return;
             }
 
-            foreach ($this->purgeTagProviders as $provider) {
-                foreach ($provider->getTagsForResource($model) as $tag) {
-                    $this->tags[] = $tag;
-                }
+            try {
+                $this->tags[] = $this->iriConverter->getIriFromResource($model);
+                $this->tags[] = $this->iriConverter->getIriFromResource($model::class, operation: new GetCollection(class: $model::class));
+            } catch (InvalidArgumentException|ItemNotFoundException $e) {
+                // do nothing
             }
         }
     }

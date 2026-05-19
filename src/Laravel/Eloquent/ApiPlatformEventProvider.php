@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Laravel\Eloquent;
 
 use ApiPlatform\HttpCache\PurgerInterface;
-use ApiPlatform\HttpCache\PurgeTagProviderInterface;
 use ApiPlatform\HttpCache\SouinPurger;
 use ApiPlatform\HttpCache\VarnishPurger;
 use ApiPlatform\HttpCache\VarnishXKeyPurger;
@@ -92,7 +91,6 @@ class ApiPlatformEventProvider extends ServiceProvider
                 $app->make(PurgerInterface::class),
                 $app->make(IriConverterInterface::class),
                 $app->make(ResourceClassResolverInterface::class),
-                $app->tagged(PurgeTagProviderInterface::class),
             );
         });
     }

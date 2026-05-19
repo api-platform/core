@@ -14,12 +14,22 @@ declare(strict_types=1);
 namespace ApiPlatform\HttpCache;
 
 /**
- * Collects extra HTTP cache tags to invalidate for a given entity.
+ * Collects extra HTTP cache tags to invalidate for a given resource.
  */
 interface PurgeTagProviderInterface
 {
     /**
      * @return iterable<string>
      */
-    public function getTagsForResource(object $entity): iterable;
+    public function getTagsForInsert(object $resource): iterable;
+
+    /**
+     * @return iterable<string>
+     */
+    public function getTagsForUpdate(object $resource, object $previousResource): iterable;
+
+    /**
+     * @return iterable<string>
+     */
+    public function getTagsForDelete(object $resource): iterable;
 }

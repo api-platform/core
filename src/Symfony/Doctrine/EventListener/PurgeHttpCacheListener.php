@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Symfony\Doctrine\EventListener;
 
 use ApiPlatform\HttpCache\PurgerInterface;
-use ApiPlatform\HttpCache\PurgeTagProviderInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\GetCollection;
@@ -46,16 +45,12 @@ final class PurgeHttpCacheListener
 
     private array $scheduledInsertions = [];
 
-    /**
-     * @param iterable<PurgeTagProviderInterface> $purgeTagProviders
-     */
     public function __construct(private readonly PurgerInterface $purger,
         private readonly IriConverterInterface $iriConverter,
         private readonly ResourceClassResolverInterface $resourceClassResolver,
         ?PropertyAccessorInterface $propertyAccessor = null,
         private readonly ?ObjectMapperInterface $objectMapper = null,
-        private readonly ?ObjectMapperMetadataFactoryInterface $objectMapperMetadata = null,
-        private readonly iterable $purgeTagProviders = [])
+        private readonly ?ObjectMapperMetadataFactoryInterface $objectMapperMetadata = null)
     {
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
     }
@@ -143,11 +138,6 @@ final class PurgeHttpCacheListener
             }
         }
 
-        foreach ($this->purgeTagProviders as $provider) {
-            foreach ($provider->getTagsForResource($entity) as $tag) {
-                $this->tags[$tag] = $tag;
-            }
-        }
     }
 
     private function gatherRelationTags(EntityManagerInterface $em, object $entity): void

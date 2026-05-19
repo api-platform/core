@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\Laravel\Tests\Unit\Listener;
 
 use ApiPlatform\HttpCache\PurgerInterface;
-use ApiPlatform\HttpCache\PurgeTagProviderInterface;
 use ApiPlatform\Laravel\Eloquent\Listener\PurgeHttpCacheListener;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\GetCollection;
@@ -25,7 +24,7 @@ use PHPUnit\Framework\TestCase;
 
 class PurgeHttpCacheListenerTest extends TestCase
 {
-    public function testPurgeTagProviders(): void
+    public function testHandleModelSaved(): void
     {
         $model = new class extends Model {
         };
@@ -33,7 +32,7 @@ class PurgeHttpCacheListenerTest extends TestCase
         $purger = $this->createMock(PurgerInterface::class);
         $purger->expects($this->once())
             ->method('purge')
-            ->with(['/models/1', '/models', '/parents/42/children']);
+            ->with(['/models/1', '/models']);
 
         $iriConverter = $this->createStub(IriConverterInterface::class);
         $iriConverter->method('getIriFromResource')
@@ -48,18 +47,12 @@ class PurgeHttpCacheListenerTest extends TestCase
         $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
         $resourceClassResolver->method('isResourceClass')->willReturn(true);
 
-        $provider = $this->createMock(PurgeTagProviderInterface::class);
-        $provider->expects($this->once())
-            ->method('getTagsForResource')
-            ->with($model)
-            ->willReturn(['/parents/42/children']);
-
-        $listener = new PurgeHttpCacheListener($purger, $iriConverter, $resourceClassResolver, [$provider]);
+        $listener = new PurgeHttpCacheListener($purger, $iriConverter, $resourceClassResolver);
         $listener->handleModelSaved('eloquent.saved: '.$model::class, [$model]);
         $listener->postFlush();
     }
 
-    public function testPurgeTagProvidersOnDelete(): void
+    public function testHandleModelDeleted(): void
     {
         $model = new class extends Model {
         };
@@ -67,7 +60,7 @@ class PurgeHttpCacheListenerTest extends TestCase
         $purger = $this->createMock(PurgerInterface::class);
         $purger->expects($this->once())
             ->method('purge')
-            ->with(['/models/1', '/models', '/parents/42/children']);
+            ->with(['/models/1', '/models']);
 
         $iriConverter = $this->createStub(IriConverterInterface::class);
         $iriConverter->method('getIriFromResource')
@@ -82,18 +75,12 @@ class PurgeHttpCacheListenerTest extends TestCase
         $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
         $resourceClassResolver->method('isResourceClass')->willReturn(true);
 
-        $provider = $this->createMock(PurgeTagProviderInterface::class);
-        $provider->expects($this->once())
-            ->method('getTagsForResource')
-            ->with($model)
-            ->willReturn(['/parents/42/children']);
-
-        $listener = new PurgeHttpCacheListener($purger, $iriConverter, $resourceClassResolver, [$provider]);
+        $listener = new PurgeHttpCacheListener($purger, $iriConverter, $resourceClassResolver);
         $listener->handleModelDeleted('eloquent.deleted: '.$model::class, [$model]);
         $listener->postFlush();
     }
 
-    public function testNoTagsWhenNoProviders(): void
+    public function testNoPurgeWhenIriConversionFails(): void
     {
         $model = new class extends Model {
         };
