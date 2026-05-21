@@ -288,7 +288,8 @@ trait MetadataCollectionFactoryTrait
                 $parameterName = $key;
             }
 
-            if (!$parameters->has($parameterName, $parameter::class)) {
+            // `:property` is a template expanded per-property later; multiple templates must coexist.
+            if (str_contains((string) $parameterName, ':property') || !$parameters->has($parameterName, $parameter::class)) {
                 $parameters->add($parameterName, $parameter);
             }
         }

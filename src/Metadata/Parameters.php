@@ -37,7 +37,12 @@ final class Parameters implements \IteratorAggregate, \Countable
                 $parameterName = $parameter->getKey();
             }
 
-            $key = \sprintf('%s.%s', $parameter::class, $parameterName);
+            // `:property` is a template expanded per-property later; multiple templates with disjoint properties must coexist.
+            if (str_contains((string) $parameterName, ':property')) {
+                $key = \sprintf('%s.%s.%s', $parameter::class, $parameterName, self::propertyDiscriminator($parameter));
+            } else {
+                $key = \sprintf('%s.%s', $parameter::class, $parameterName);
+            }
 
             $this->parameters[$key] = [$parameterName, $parameter];
         }
@@ -61,17 +66,36 @@ final class Parameters implements \IteratorAggregate, \Countable
 
     public function add(string $key, Parameter $value): self
     {
-        foreach ($this->parameters as $i => [$parameterName, $parameter]) {
-            if ($parameterName === $key && $value::class === $parameter::class) {
-                $this->parameters[$i] = [$key, $value];
+        // `:property` is a template expanded per-property later; templates with disjoint properties coexist, identical ones override.
+        $isTemplate = str_contains($key, ':property');
+        $valueDiscriminator = $isTemplate ? self::propertyDiscriminator($value) : null;
 
-                return $this;
+        foreach ($this->parameters as $i => [$parameterName, $parameter]) {
+            if ($parameterName !== $key || $value::class !== $parameter::class) {
+                continue;
             }
+
+            if ($isTemplate && self::propertyDiscriminator($parameter) !== $valueDiscriminator) {
+                continue;
+            }
+
+            $this->parameters[$i] = [$key, $value];
+
+            return $this;
         }
 
         $this->parameters[] = [$key, $value];
 
         return $this;
+    }
+
+    private static function propertyDiscriminator(Parameter $parameter): string
+    {
+        if ($properties = $parameter->getProperties()) {
+            return '['.implode(',', $properties).']';
+        }
+
+        return $parameter->getProperty() ?? '';
     }
 
     /**
