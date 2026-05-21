@@ -1,0 +1,90 @@
+<?php
+
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
+namespace ApiPlatform\Tests\Functional;
+
+use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\EnumValidationResource;
+use ApiPlatform\Tests\SetupClassResourcesTrait;
+use Composer\InstalledVersions;
+
+/**
+ * @see https://github.com/api-platform/core/issues/8183
+ */
+final class EnumDenormalizationValidationTest extends ApiTestCase
+{
+    use SetupClassResourcesTrait;
+
+    protected static ?bool $alwaysBootKernel = false;
+
+    /**
+     * @return class-string[]
+     */
+    public static function getResources(): array
+    {
+        return [EnumValidationResource::class];
+    }
+
+    protected function setUp(): void
+    {
+        // On symfony/property-info < 7.1, nullable backed enums resolve to a
+        // single legacy Type instead of a UnionType. AbstractItemNormalizer
+        // then does not re-wrap the BackedEnumNormalizer exception with the
+        // enum FQCN, and DeserializeProvider cannot detect it as a BackedEnum
+        // failure. The 400 response is expected on those versions.
+        if (version_compare(ltrim(InstalledVersions::getPrettyVersion('symfony/property-info') ?? '0', 'v'), '7.1.0', '<')) {
+            $this->markTestSkipped('Requires symfony/property-info >= 7.1 for BackedEnum type detection.');
+        }
+    }
+
+    public function testInvalidBackedEnumValueProducesValidationViolation(): void
+    {
+        $response = static::createClient()->request('POST', '/enum_validation_resources', [
+            'headers' => ['Content-Type' => 'application/ld+json'],
+            'json' => ['gender' => 'unknown'],
+        ]);
+
+        $this->assertResponseStatusCodeSame(422);
+        $this->assertResponseHeaderSame('content-type', 'application/problem+json; charset=utf-8');
+
+        $content = $response->toArray(false);
+        $this->assertArrayHasKey('violations', $content);
+        $this->assertNotEmpty($content['violations']);
+
+        $genderViolation = $this->findViolation($content['violations'], 'gender');
+        $this->assertNotNull($genderViolation, 'Expected a constraint violation on "gender" property.');
+    }
+
+    public function testInvalidBackedEnumValueWithCollectDenormalizationErrors(): void
+    {
+        $response = static::createClient()->request('POST', '/enum_validation_resources_collect', [
+            'headers' => ['Content-Type' => 'application/ld+json'],
+            'json' => ['gender' => 'unknown'],
+        ]);
+
+        $this->assertResponseStatusCodeSame(422);
+        $content = $response->toArray(false);
+        $this->assertNotNull($this->findViolation($content['violations'] ?? [], 'gender'));
+    }
+
+    private function findViolation(array $violations, string $propertyPath): ?array
+    {
+        foreach ($violations as $violation) {
+            if (($violation['propertyPath'] ?? null) === $propertyPath) {
+                return $violation;
+            }
+        }
+
+        return null;
+    }
+}
