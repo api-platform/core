@@ -97,7 +97,15 @@ trait ContentNegotiationTrait
         /** @var string|null $accept */
         $accept = $request->headers->get('Accept');
         if (null !== $accept) {
-            if ($mediaType = $this->negotiator->getBest($accept, $mimeTypes)) {
+            $mediaType = $this->negotiator->getBest($accept, $mimeTypes);
+            // willdurand/negotiation treats media-range parameters as match
+            // constraints, so a wildcard carrying informational params
+            // (e.g. `*\/*; charset=utf-8` from PhpStorm) fails negotiation.
+            // Retry on a bare wildcard. See #1532.
+            if (!$mediaType && str_contains($accept, '*/*')) {
+                $mediaType = $this->negotiator->getBest('*/*', $mimeTypes);
+            }
+            if ($mediaType) {
                 return $this->getMimeTypeFormat($mediaType->getType(), $formats);
             }
 
