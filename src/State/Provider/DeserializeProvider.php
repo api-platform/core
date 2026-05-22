@@ -111,22 +111,21 @@ final class DeserializeProvider implements ProviderInterface, StopwatchAwareInte
                 if (!$exception instanceof NotNormalizableValueException) {
                     continue;
                 }
-                $expectedTypes = $this->normalizeExpectedTypes($exception->getExpectedTypes());
-                $parameters = [];
-                if ($exception->canUseMessageForUser()) {
-                    $parameters['hint'] = $exception->getMessage();
-                }
-                if (!$expectedTypes && $exception->canUseMessageForUser()) {
-                    $violationMessage = $exception->getMessage();
-                    $violations->add(new ConstraintViolation($violationMessage, $violationMessage, $parameters, null, $exception->getPath(), null, null, (string) Type::INVALID_TYPE_ERROR));
-                } else {
-                    $message = (new Type($expectedTypes))->message;
-                    $violations->add(new ConstraintViolation($this->translator->trans($message, ['{{ type }}' => implode('|', $expectedTypes)], 'validators'), $message, $parameters, null, $exception->getPath(), null, null, (string) Type::INVALID_TYPE_ERROR));
-                }
+                $violations->add($this->createViolationFromException($exception));
             }
             if (0 !== \count($violations)) {
                 throw new ValidationException($violations);
             }
+        } catch (NotNormalizableValueException $e) {
+            // BackedEnum denormalization errors should surface as validation violations (422)
+            // rather than denormalization errors (400). See https://github.com/api-platform/core/issues/8183.
+            if (!class_exists(ConstraintViolationList::class) || !$this->isBackedEnumException($e)) {
+                throw $e;
+            }
+
+            $violations = new ConstraintViolationList();
+            $violations->add($this->createViolationFromException($e));
+            throw new ValidationException($violations);
         }
 
         $this->stopwatch?->stop('api_platform.provider.deserialize');
@@ -152,5 +151,46 @@ final class DeserializeProvider implements ProviderInterface, StopwatchAwareInte
         }
 
         return $normalizedTypes;
+    }
+
+    private function createViolationFromException(NotNormalizableValueException $exception): ConstraintViolation
+    {
+        $expectedTypes = $this->normalizeExpectedTypes($exception->getExpectedTypes());
+        $parameters = [];
+        if ($exception->canUseMessageForUser()) {
+            $parameters['hint'] = $exception->getMessage();
+        }
+
+        if (!$expectedTypes && $exception->canUseMessageForUser()) {
+            $violationMessage = $exception->getMessage();
+
+            return new ConstraintViolation($violationMessage, $violationMessage, $parameters, null, $exception->getPath(), null, null, (string) Type::INVALID_TYPE_ERROR);
+        }
+
+        $message = (new Type($expectedTypes))->message;
+
+        return new ConstraintViolation($this->translator->trans($message, ['{{ type }}' => implode('|', $expectedTypes)], 'validators'), $message, $parameters, null, $exception->getPath(), null, null, (string) Type::INVALID_TYPE_ERROR);
+    }
+
+    private function isBackedEnumException(NotNormalizableValueException $exception): bool
+    {
+        foreach ($exception->getExpectedTypes() ?? [] as $expectedType) {
+            if (\is_string($expectedType) && (class_exists($expectedType) || interface_exists($expectedType)) && is_subclass_of($expectedType, \BackedEnum::class)) {
+                return true;
+            }
+        }
+
+        for ($previous = $exception->getPrevious(); $previous instanceof \Throwable; $previous = $previous->getPrevious()) {
+            if (!$previous instanceof NotNormalizableValueException) {
+                continue;
+            }
+            foreach ($previous->getExpectedTypes() ?? [] as $expectedType) {
+                if (\is_string($expectedType) && (class_exists($expectedType) || interface_exists($expectedType)) && is_subclass_of($expectedType, \BackedEnum::class)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
