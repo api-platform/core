@@ -29,9 +29,16 @@ trait RecreateSchemaTrait
 
         if ($manager instanceof DocumentManager) {
             $schemaManager = $manager->getSchemaManager();
+            $firstDocumentClass = null;
             foreach ($classes as $c) {
                 $class = str_contains($c, 'Entity') ? str_replace('Entity', 'Document', $c) : $c;
+                $firstDocumentClass ??= $class;
                 $schemaManager->dropDocumentCollection($class);
+            }
+
+            // Reset INCREMENT id counters; otherwise IDs persist across test methods.
+            if (null !== $firstDocumentClass) {
+                $manager->getDocumentDatabase($firstDocumentClass)->dropCollection('doctrine_increment_ids');
             }
 
             return;
