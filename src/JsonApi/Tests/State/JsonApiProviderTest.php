@@ -37,4 +37,25 @@ class JsonApiProviderTest extends TestCase
         $provider = new JsonApiProvider($decorated);
         $provider->provide($operation, [], $context);
     }
+
+    public function testProvideMergesFlatPaginationWithBracketFilter(): void
+    {
+        $request = new Request(['page' => '2', 'itemsPerPage' => '5', 'pagination' => 'true', 'filter' => ['custom' => 'true']]);
+        $request->setRequestFormat('jsonapi');
+
+        $operation = new Get(class: \stdClass::class, shortName: 'dummy');
+        $context = ['request' => $request];
+        $decorated = $this->createMock(ProviderInterface::class);
+        $decorated->expects($this->once())->method('provide')->with($operation, [], $context);
+
+        $provider = new JsonApiProvider($decorated);
+        $provider->provide($operation, [], $context);
+
+        $this->assertSame([
+            'custom' => 'true',
+            'page' => '2',
+            'itemsPerPage' => '5',
+            'pagination' => 'true',
+        ], $request->attributes->get('_api_filters'));
+    }
 }
