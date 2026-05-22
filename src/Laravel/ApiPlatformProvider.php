@@ -767,7 +767,8 @@ class ApiPlatformProvider extends ServiceProvider
                 httpAuth: $config->get('api-platform.swagger_ui.http_auth', []),
                 tags: $config->get('api-platform.openapi.tags', []),
                 errorResourceClass: Error::class,
-                validationErrorResourceClass: ValidationError::class
+                validationErrorResourceClass: ValidationError::class,
+                withCredentials: $config->get('api-platform.swagger_ui.with_credentials', false),
             );
         });
 

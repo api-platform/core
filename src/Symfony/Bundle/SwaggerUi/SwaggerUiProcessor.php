@@ -64,6 +64,7 @@ final class SwaggerUiProcessor implements ProcessorInterface
             'url' => $this->urlGenerator->generate('api_doc', ['format' => 'json']),
             'spec' => $this->normalizer->normalize($openApi, 'json', []),
             'persistAuthorization' => $this->openApiOptions->hasPersistAuthorization(),
+            'withCredentials' => $this->openApiOptions->getWithCredentials(),
             'oauth' => [
                 'enabled' => $this->openApiOptions->getOAuthEnabled(),
                 'type' => $this->openApiOptions->getOAuthType(),
