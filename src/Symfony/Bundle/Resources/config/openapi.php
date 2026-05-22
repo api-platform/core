@@ -70,6 +70,7 @@ return function (ContainerConfigurator $container) {
             '%api_platform.openapi.errorResourceClass%',
             '%api_platform.openapi.validationErrorResourceClass%',
             '%api_platform.openapi.license.identifier%',
+            '%api_platform.swagger.with_credentials%',
         ]);
 
     $services->alias(Options::class, 'api_platform.openapi.options');

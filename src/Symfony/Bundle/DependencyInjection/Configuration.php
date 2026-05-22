@@ -324,6 +324,7 @@ final class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->booleanNode('persist_authorization')->defaultValue(false)->info('Persist the SwaggerUI Authorization in the localStorage.')->end()
+                        ->booleanNode('with_credentials')->defaultValue(false)->info('Send credentials (cookies, authorization headers) on Swagger UI cross-origin requests (e.g. when running behind Cloudflare Access).')->end()
                         ->arrayNode('versions')
                             ->info('The active versions of OpenAPI to be exported or used in Swagger UI. The first value is the default.')
                             ->defaultValue($supportedVersions)

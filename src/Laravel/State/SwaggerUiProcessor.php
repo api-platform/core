@@ -83,6 +83,7 @@ final class SwaggerUiProcessor implements ProcessorInterface
                 'clientSecret' => $this->oauthClientSecret,
                 'pkce' => $this->oauthPkce,
             ],
+            'withCredentials' => $this->openApiOptions->getWithCredentials(),
         ];
 
         $status = 200;

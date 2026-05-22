@@ -85,4 +85,10 @@ class DocsTest extends TestCase
         $this->assertStringContainsString('init-scalar-ui.js', $content);
         $this->assertStringNotContainsString('id="formats"', $content);
     }
+
+    public function testSwaggerDataDoesNotContainWithCredentialsByDefault(): void
+    {
+        $res = $this->get('/api/docs', headers: ['accept' => 'text/html']);
+        $this->assertStringNotContainsString('"withCredentials":true', (string) $res->getContent());
+    }
 }

@@ -143,6 +143,8 @@ return [
         //         'bearerFormat' => 'JWT',
         //     ],
         // ],
+        //
+        // 'with_credentials' => true,
     ],
 
     // 'openapi' => [
