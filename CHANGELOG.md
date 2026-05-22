@@ -1,5 +1,20 @@
 # Changelog
 
+## v4.3.6
+
+### Bug fixes
+
+* [080574ad3](https://github.com/api-platform/core/commit/080574ad3579d8d7d55c6e03d6da6378aa4b0f94) fix(symfony): register property_info fallback when not provided by Symfony (#7969)
+* [286a47e72](https://github.com/api-platform/core/commit/286a47e728926fefde957186ead322a7eff561ec) fix(jsonapi): merge flat page/itemsPerPage params with bracket filter (#8193)
+* [412682ede](https://github.com/api-platform/core/commit/412682edee3571e910666200e410881b7091901c) fix(serializer): translate PropertyAccess type mismatches to NotNormalizableValueException (#7967)
+* [44bb18ddd](https://github.com/api-platform/core/commit/44bb18ddd13d7ba2bdd25fc0c410390f814b3712) fix(state): convert BackedEnum denormalization errors into validation violations (#8195)
+* [53d8f5615](https://github.com/api-platform/core/commit/53d8f5615dcaa6264e37667d913f38871c87aab5) fix(metadata): :property dedup drops repeated parameters (#8196)
+* [84d15b1f1](https://github.com/api-platform/core/commit/84d15b1f145cf5e6f17e1f5d0049d137aa73a1db) fix(metadata): negotiate wildcard Accept with parameters (#8192)
+* [91f93e013](https://github.com/api-platform/core/commit/91f93e01333fc4fe1c8aee8e69cd9ba79bd4cf06) fix(laravel): set application/ld+json content-type on /contexts/{shortName} (#7973)
+* [ae4ea864e](https://github.com/api-platform/core/commit/ae4ea864eee1cfeff764f84b1fa70b8cec6e579e) fix(symfony,laravel): IriConverter local cache key collision between item and collection ops (#7975)
+* [bf3fded64](https://github.com/api-platform/core/commit/bf3fded64baa765ac006842146a2418a56b8ff2b) fix(symfony): include value-object transformers in JSON-LD streamer locator (#7968)
+* [f533810f7](https://github.com/api-platform/core/commit/f533810f789d032bd118742100dbad3c1ab94f35) fix(graphql): accept FilterInterface instance in QueryParameter (#7972)
+
 ## v4.3.5
 
 ### Bug fixes

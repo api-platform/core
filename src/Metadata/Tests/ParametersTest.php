@@ -49,4 +49,32 @@ class ParametersTest extends TestCase
         $this->assertSame($r2, $parameters->get('a'));
         $this->assertSame($r4, $parameters->get('a', HeaderParameter::class));
     }
+
+    public function testPropertyPlaceholderKeysAreNotDeduplicated(): void
+    {
+        $r1 = new QueryParameter(key: ':property', properties: ['field1', 'field2']);
+        $r2 = new QueryParameter(key: ':property', properties: ['field3', 'field4']);
+        $parameters = new Parameters([$r1, $r2]);
+
+        $this->assertCount(2, $parameters);
+
+        $collected = [];
+        foreach ($parameters as $key => $parameter) {
+            $collected[] = [$key, $parameter];
+        }
+
+        $this->assertSame(':property', $collected[0][0]);
+        $this->assertSame(':property', $collected[1][0]);
+        $this->assertSame(['field1', 'field2'], $collected[0][1]->getProperties());
+        $this->assertSame(['field3', 'field4'], $collected[1][1]->getProperties());
+    }
+
+    public function testPropertyPlaceholderKeysAreNotDeduplicatedViaAdd(): void
+    {
+        $parameters = new Parameters();
+        $parameters->add(':property', new QueryParameter(key: ':property', properties: ['field1', 'field2']));
+        $parameters->add(':property', new QueryParameter(key: ':property', properties: ['field3', 'field4']));
+
+        $this->assertCount(2, $parameters);
+    }
 }

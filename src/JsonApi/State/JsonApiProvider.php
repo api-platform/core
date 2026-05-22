@@ -70,6 +70,12 @@ final class JsonApiProvider implements ProviderInterface
             $filters = array_merge($pageParameter, $filters);
         }
 
+        foreach (['page', 'itemsPerPage', 'pagination', 'partial'] as $paginationParameter) {
+            if (isset($queryParameters[$paginationParameter]) && !\is_array($queryParameters[$paginationParameter]) && !isset($filters[$paginationParameter])) {
+                $filters[$paginationParameter] = $queryParameters[$paginationParameter];
+            }
+        }
+
         [$included, $properties] = $this->transformFieldsetsParameters($queryParameters, $operation->getShortName() ?? '');
 
         if ($properties) {

@@ -113,7 +113,9 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         if ($parameter) {
             $paramKey = $parameter->getProperties() ? ($parameter->getKey() ?? '') : ($parameter->getProperty() ?? $parameter->getKey() ?? '');
         }
-        $k = $resourceClass.$paramKey.(\is_string($parameter->getFilter()) ? $parameter->getFilter() : '').$filterClass;
+        // Include properties list so repeated `:property` templates with disjoint properties get distinct cache entries.
+        $paramProperties = $parameter?->getProperties() ? '['.implode(',', $parameter->getProperties()).']' : '';
+        $k = $resourceClass.$paramKey.$paramProperties.(\is_string($parameter->getFilter()) ? $parameter->getFilter() : '').$filterClass;
         if (isset($this->localPropertyCache[$k])) {
             return $this->localPropertyCache[$k];
         }
