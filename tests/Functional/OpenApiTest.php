@@ -261,6 +261,24 @@ class OpenApiTest extends ApiTestCase
         ], 'description' => 'A resource used for OpenAPI tests.'], $res['components']['schemas']['Crud.jsonld']);
     }
 
+    public function testJsonApiCollectionSchemaDocumentsIncludedResources(): void
+    {
+        $response = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $json = $response->toArray();
+        $schema = $json['paths']['/dummies']['get']['responses']['200']['content']['application/vnd.api+json']['schema'];
+        $properties = $schema['allOf'][1]['properties'];
+
+        $this->assertArrayHasKey('included', $properties);
+        $this->assertSame('array', $properties['included']['type']);
+        $this->assertTrue($properties['included']['readOnly']);
+        $this->assertArrayHasKey('anyOf', $properties['included']['items']);
+        $this->assertNotEmpty($properties['included']['items']['anyOf']);
+    }
+
     public function testRetrieveTheOpenApiDocumentation(): void
     {
         $response = self::createClient()->request('GET', '/docs', ['headers' => ['accept' => 'application/vnd.openapi+json']]);
