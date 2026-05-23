@@ -124,11 +124,19 @@ final class SubResourceTest extends ApiTestCase
 
     public function testGetOneToOneSubResource(): void
     {
-        // The Answer.relatedQuestions OneToMany is mapped against Question.answer which itself
-        // is OneToOne. Doctrine 3 asserts isManyToOne() on the owning side and throws when
-        // hydrating, which aborts the response with a 500. Behat ran with a stricter normalizer
-        // config that resolved this; skipped until the fixture relation is cleaned up.
-        $this->markTestSkipped('Answer.relatedQuestions OneToMany mapping needs fixing.');
+        $this->seedAnswerToQuestion();
+
+        $response = self::createClient()->request('GET', '/questions/1/answer', [
+            'headers' => ['Accept' => 'application/ld+json'],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $data = $response->toArray();
+        $this->assertSame('/contexts/Answer', $data['@context']);
+        $this->assertSame('/questions/1/answer', $data['@id']);
+        $this->assertSame('Answer', $data['@type']);
+        $this->assertSame('42', $data['content']);
     }
 
     public function testGetNonExistentSubResourceReturns404(): void
@@ -142,7 +150,22 @@ final class SubResourceTest extends ApiTestCase
 
     public function testGetRecursiveSubResource(): void
     {
-        $this->markTestSkipped('Depends on Answer.relatedQuestions mapping fix (see testGetOneToOneSubResource).');
+        $this->seedAnswerToQuestion();
+
+        $response = self::createClient()->request('GET', '/questions/1/answer/related_questions', [
+            'headers' => ['Accept' => 'application/ld+json'],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $data = $response->toArray();
+        $this->assertSame('/contexts/Question', $data['@context']);
+        $this->assertSame('/questions/1/answer/related_questions', $data['@id']);
+        $this->assertSame('hydra:Collection', $data['@type']);
+        $this->assertCount(1, $data['hydra:member']);
+        $this->assertSame('/questions/1', $data['hydra:member'][0]['@id']);
+        $this->assertSame('Question', $data['hydra:member'][0]['@type']);
+        $this->assertSame('/answers/1', $data['hydra:member'][0]['answer']);
+        $this->assertSame(1, $data['hydra:totalItems']);
     }
 
     public function testGetSubResourceCollection(): void
@@ -223,11 +246,22 @@ final class SubResourceTest extends ApiTestCase
 
     public function testGetEmbeddedRelationAtFourthLevel(): void
     {
-        // The current FourthLevel.badThirdLevel inverse-side bag fails to normalize through the
-        // nested subresource path with "Unexpected non-iterable value for to-many relation".
-        // Behat ran the assertion successfully so the fixture has drifted; revisit when the
-        // mapping is corrected.
-        $this->markTestSkipped('FourthLevel.badThirdLevel inverse mapping needs adjustment.');
+        $this->seedDummyWithFourthLevel();
+
+        $response = self::createClient()->request('GET', '/dummies/1/related_dummies/1/third_level/fourth_level', [
+            'headers' => ['Accept' => 'application/ld+json'],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertJsonEquals([
+            '@context' => '/contexts/FourthLevel',
+            '@id' => '/dummies/1/related_dummies/1/third_level/fourth_level',
+            '@type' => 'FourthLevel',
+            'badThirdLevel' => [],
+            'id' => 1,
+            'level' => 4,
+        ]);
     }
 
     private function seedProductWithOffers(): void

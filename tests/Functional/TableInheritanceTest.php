@@ -24,7 +24,6 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ExternalUser;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\InternalUser;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Site;
 use ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceInterface;
-use ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceInterfaceImplementation;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 
@@ -46,10 +45,8 @@ final class TableInheritanceTest extends ApiTestCase
             DummyTableInheritanceDifferentChild::class,
             DummyTableInheritanceRelated::class,
             ResourceInterface::class,
-            ResourceInterfaceImplementation::class,
             Site::class,
             AbstractUser::class,
-            InternalUser::class,
             ExternalUser::class,
         ];
     }
@@ -191,24 +188,71 @@ final class TableInheritanceTest extends ApiTestCase
 
     public function testInterfaceCollection(): void
     {
-        // ResourceInterface is registered via YAML in TestBundle/Resources/config/api_resources/resources.yaml.
-        // The whitelist-based SetupClassResourcesTrait doesn't surface interface-typed resources by class string.
-        // Migrate when interface-as-resource registration works through the writeResources() path.
-        $this->markTestSkipped('Interface-as-resource needs YAML registration in the test kernel.');
+        $response = self::createClient()->request('GET', '/resource_interfaces', [
+            'headers' => ['Accept' => 'application/ld+json'],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $data = $response->toArray();
+        $members = $data['hydra:member'];
+        $this->assertCount(2, $members);
+        $this->assertSame('ResourceInterface', $members[0]['@type']);
+        $this->assertSame('/resource_interfaces/item1', $members[0]['@id']);
+        $this->assertSame('item1', $members[0]['foo']);
+        $this->assertSame('fooz', $members[0]['fooz']);
+        $this->assertSame('ResourceInterface', $members[1]['@type']);
+        $this->assertSame('/resource_interfaces/item2', $members[1]['@id']);
+        $this->assertSame('item2', $members[1]['foo']);
     }
 
     public function testInterfaceItem(): void
     {
-        $this->markTestSkipped('Interface-as-resource needs YAML registration in the test kernel.');
+        $response = self::createClient()->request('GET', '/resource_interfaces/some-id', [
+            'headers' => ['Accept' => 'application/ld+json'],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $data = $response->toArray();
+        $this->assertSame('/contexts/ResourceInterface', $data['@context']);
+        $this->assertSame('/resource_interfaces/single%20item', $data['@id']);
+        $this->assertSame('ResourceInterface', $data['@type']);
+        $this->assertSame('single item', $data['foo']);
+        $this->assertSame('fooz', $data['fooz']);
     }
 
     public function testSitesWithInternalOwnerUseParentIri(): void
     {
-        // Site.owner targets the AbstractUser parent resource. With the current resource
-        // whitelist the IRI generator falls back to genid instead of /custom_users/{id}.
-        // Migrate once cross-class IRI generation matches the Behat behavior or a richer
-        // resource registration path is wired up.
-        $this->markTestSkipped('Parent-class IRI generation falls back to genid in this kernel.');
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped();
+        }
+
+        $manager = $this->getManager();
+        for ($i = 1; $i <= 3; ++$i) {
+            $user = new InternalUser();
+            $user->setFirstname('Internal');
+            $user->setLastname('User');
+            $user->setEmail('john.doe@example.com');
+            $user->setInternalId('INT');
+            $site = new Site();
+            $site->setTitle('title');
+            $site->setDescription('description');
+            $site->setOwner($user);
+            $manager->persist($site);
+        }
+        $manager->flush();
+
+        $response = self::createClient()->request('GET', '/sites', [
+            'headers' => ['Content-Type' => 'application/ld+json'],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $data = $response->toArray();
+        foreach ($data['hydra:member'] as $i => $member) {
+            $ownerIri = \is_string($member['owner']) ? $member['owner'] : $member['owner']['@id'];
+            $this->assertSame('/custom_users/'.($i + 1), $ownerIri);
+        }
     }
 
     public function testSitesWithExternalOwnerUseCurrentResourceIri(): void

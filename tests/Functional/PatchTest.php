@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Functional;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5736\Alpha;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5736\Beta;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6355\OrderProductCount;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\PatchDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\PatchDummyRelation;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
@@ -34,7 +35,7 @@ final class PatchTest extends ApiTestCase
      */
     public static function getResources(): array
     {
-        return [PatchDummy::class, PatchDummyRelation::class, RelatedDummy::class, Beta::class, Alpha::class];
+        return [PatchDummy::class, PatchDummyRelation::class, RelatedDummy::class, Beta::class, Alpha::class, OrderProductCount::class];
     }
 
     protected function setUp(): void
@@ -141,10 +142,16 @@ final class PatchTest extends ApiTestCase
 
     public function testPatchNonReadableResource(): void
     {
-        // Requires use_symfony_listeners=true (Behat @use_listener @controller suite).
-        // The MainController path returns the controller's return value directly, while the
-        // SerializeListener kicks in only when use_symfony_listeners=true to wrap the DTO into
-        // a Symfony Response. Migrate when a listener-mode test kernel is wired up.
-        $this->markTestSkipped('Patch non-readable resource scenario requires use_symfony_listeners kernel mode.');
+        if (!($_SERVER['USE_SYMFONY_LISTENERS'] ?? false)) {
+            $this->markTestSkipped('Requires USE_SYMFONY_LISTENERS=1.');
+        }
+
+        $response = self::createClient()->request('PATCH', '/order_products/1/count', [
+            'headers' => ['Content-Type' => 'application/merge-patch+json'],
+            'json' => ['id' => 1, 'count' => 10],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertSame(1, $response->toArray()['id']);
     }
 }

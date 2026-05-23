@@ -53,7 +53,6 @@ final class RelationTest extends ApiTestCase
             Address::class,
             Person::class,
             Pet::class,
-            PersonToPet::class,
         ];
     }
 
@@ -428,13 +427,6 @@ final class RelationTest extends ApiTestCase
 
     public function testIssue1222PeopleWithPets(): void
     {
-        // PersonToPet is the join entity for Person.pets but not declared as a resource.
-        // Behat ran with the legacy AnnotationLoader picking up implicit resources; the
-        // attribute-only test kernel now fails with "Operation '' not found for resource PersonToPet".
-        // Re-enable once the kernel exposes implicit nested resources or PersonToPet gets
-        // an explicit (NotExposed) operation.
-        $this->markTestSkipped('PersonToPet is not registered as a resource in the attribute-only kernel.');
-
         $this->recreateSchema([Person::class, Pet::class, PersonToPet::class]);
 
         $manager = $this->getManager();
