@@ -23,6 +23,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyOffer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyProduct;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FourthLevel;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Greeting;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\OneToOneSubresourceAnswer;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\OneToOneSubresourceQuestion;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Person;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Question;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
@@ -51,6 +53,8 @@ final class SubResourceTest extends ApiTestCase
         return [
             Question::class,
             Answer::class,
+            OneToOneSubresourceQuestion::class,
+            OneToOneSubresourceAnswer::class,
             FourthLevel::class,
             ThirdLevel::class,
             RelatedDummy::class,
@@ -82,6 +86,25 @@ final class SubResourceTest extends ApiTestCase
         $question->setContent("What's the answer to the Ultimate Question of Life, the Universe and Everything?");
         $question->setAnswer($answer);
         $answer->addRelatedQuestion($question);
+
+        $manager->persist($answer);
+        $manager->persist($question);
+        $manager->flush();
+        $manager->clear();
+    }
+
+    private function seedOneToOneSubresource(): void
+    {
+        $this->recreateSchema([OneToOneSubresourceQuestion::class, OneToOneSubresourceAnswer::class]);
+
+        $manager = $this->getManager();
+        $answer = new OneToOneSubresourceAnswer();
+        $answer->setContent('42');
+
+        $question = new OneToOneSubresourceQuestion();
+        $question->setContent("What's the answer to the Ultimate Question of Life, the Universe and Everything?");
+        $question->setAnswer($answer);
+        $answer->setQuestion($question);
 
         $manager->persist($answer);
         $manager->persist($question);
@@ -132,11 +155,34 @@ final class SubResourceTest extends ApiTestCase
 
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
-        $data = $response->toArray();
-        $this->assertSame('/contexts/Answer', $data['@context']);
-        $this->assertSame('/questions/1/answer', $data['@id']);
-        $this->assertSame('Answer', $data['@type']);
-        $this->assertSame('42', $data['content']);
+        $this->assertJsonEquals([
+            '@context' => '/contexts/Answer',
+            '@id' => '/questions/1/answer',
+            '@type' => 'Answer',
+            'id' => 1,
+            'content' => '42',
+            'relatedQuestions' => ['/questions/1'],
+        ]);
+    }
+
+    public function testOneToOneSubresourceExposesInverseSideBackIri(): void
+    {
+        $this->seedOneToOneSubresource();
+
+        self::createClient()->request('GET', '/one_to_one_subresource_questions/1/answer', [
+            'headers' => ['Accept' => 'application/ld+json'],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertJsonEquals([
+            '@context' => '/contexts/OneToOneSubresourceAnswer',
+            '@id' => '/one_to_one_subresource_questions/1/answer',
+            '@type' => 'OneToOneSubresourceAnswer',
+            'id' => 1,
+            'content' => '42',
+            'question' => '/one_to_one_subresource_questions/1',
+        ]);
     }
 
     public function testGetNonExistentSubResourceReturns404(): void
@@ -152,20 +198,24 @@ final class SubResourceTest extends ApiTestCase
     {
         $this->seedAnswerToQuestion();
 
-        $response = self::createClient()->request('GET', '/questions/1/answer/related_questions', [
+        self::createClient()->request('GET', '/questions/1/answer/related_questions', [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
 
         $this->assertResponseStatusCodeSame(200);
-        $data = $response->toArray();
-        $this->assertSame('/contexts/Question', $data['@context']);
-        $this->assertSame('/questions/1/answer/related_questions', $data['@id']);
-        $this->assertSame('hydra:Collection', $data['@type']);
-        $this->assertCount(1, $data['hydra:member']);
-        $this->assertSame('/questions/1', $data['hydra:member'][0]['@id']);
-        $this->assertSame('Question', $data['hydra:member'][0]['@type']);
-        $this->assertSame('/answers/1', $data['hydra:member'][0]['answer']);
-        $this->assertSame(1, $data['hydra:totalItems']);
+        $this->assertJsonEquals([
+            '@context' => '/contexts/Question',
+            '@id' => '/questions/1/answer/related_questions',
+            '@type' => 'hydra:Collection',
+            'hydra:member' => [[
+                '@id' => '/questions/1',
+                '@type' => 'Question',
+                'content' => "What's the answer to the Ultimate Question of Life, the Universe and Everything?",
+                'id' => 1,
+                'answer' => '/answers/1',
+            ]],
+            'hydra:totalItems' => 1,
+        ]);
     }
 
     public function testGetSubResourceCollection(): void

@@ -204,6 +204,7 @@ final class TableInheritanceTest extends ApiTestCase
         $this->assertSame('ResourceInterface', $members[1]['@type']);
         $this->assertSame('/resource_interfaces/item2', $members[1]['@id']);
         $this->assertSame('item2', $members[1]['foo']);
+        $this->assertSame('fooz', $members[1]['fooz']);
     }
 
     public function testInterfaceItem(): void
@@ -248,8 +249,14 @@ final class TableInheritanceTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
         $data = $response->toArray();
+        $this->assertCount(3, $data['hydra:member']);
         foreach ($data['hydra:member'] as $i => $member) {
+            $this->assertSame('Site', $member['@type']);
+            $this->assertSame('/sites/'.($i + 1), $member['@id']);
+            $this->assertSame('title', $member['title']);
+            $this->assertSame('description', $member['description']);
             $ownerIri = \is_string($member['owner']) ? $member['owner'] : $member['owner']['@id'];
             $this->assertSame('/custom_users/'.($i + 1), $ownerIri);
         }
