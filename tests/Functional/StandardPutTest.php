@@ -36,6 +36,10 @@ final class StandardPutTest extends ApiTestCase
 
     protected function setUp(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('UidIdentified fixture has no MongoDB document twin.');
+        }
+
         $this->recreateSchema([StandardPut::class, UidIdentified::class]);
     }
 

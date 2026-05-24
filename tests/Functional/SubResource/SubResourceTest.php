@@ -167,6 +167,10 @@ final class SubResourceTest extends ApiTestCase
 
     public function testOneToOneSubresourceExposesInverseSideBackIri(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('OneToOneSubresource fixtures are ORM-only.');
+        }
+
         $this->seedOneToOneSubresource();
 
         self::createClient()->request('GET', '/one_to_one_subresource_questions/1/answer', [

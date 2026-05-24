@@ -36,6 +36,10 @@ final class ProviderProcessorEntityTest extends ApiTestCase
 
     protected function setUp(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('Processor/Provider entity fixtures are ORM-only.');
+        }
+
         $this->recreateSchema([ProcessorEntity::class, ProviderEntity::class]);
     }
 

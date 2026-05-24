@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Functional;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AbstractUser;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceDifferentChild;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceNotApiResourceChild;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceRelated;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AbstractUser;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ExternalUser;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\InternalUser;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Site;
@@ -53,6 +53,10 @@ final class TableInheritanceTest extends ApiTestCase
 
     protected function setUp(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('Table inheritance fixtures are ORM-only.');
+        }
+
         $this->recreateSchema([
             DummyTableInheritance::class,
             DummyTableInheritanceChild::class,
