@@ -259,15 +259,15 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         $properties = $this->buildDefinitionPropertiesSchema($key, $className, $format, $type, $operation, $schema, []);
         $properties['data']['properties']['attributes']['$ref'] = $prefix.$key;
 
+        $properties['data'] = [
+            'type' => 'array',
+            'items' => $properties['data'],
+        ];
+
         $schema['description'] = "$definitionName collection.";
         $schema['allOf'] = [
             ['$ref' => $prefix.(false === $operation->getPaginationEnabled() ? self::COLLECTION_BASE_SCHEMA_NAME_NO_PAGINATION : self::COLLECTION_BASE_SCHEMA_NAME)],
-            ['type' => 'object', 'properties' => [
-                'data' => [
-                    'type' => 'array',
-                    'items' => $properties['data'],
-                ],
-            ]],
+            ['type' => 'object', 'properties' => $properties],
         ];
 
         return $schema;
