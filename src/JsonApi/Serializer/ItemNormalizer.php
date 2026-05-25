@@ -24,7 +24,6 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
-use ApiPlatform\Serializer\CacheKeyTrait;
 use ApiPlatform\Serializer\ContextTrait;
 use ApiPlatform\Serializer\TagCollectorInterface;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
@@ -46,7 +45,6 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 final class ItemNormalizer extends AbstractItemNormalizer
 {
-    use CacheKeyTrait;
     use ClassInfoTrait;
     use ContextTrait;
 
@@ -99,7 +97,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $context['api_normalize'] = true;
 
         if (!isset($context['cache_key'])) {
-            $context['cache_key'] = $this->getCacheKey($format, $context);
+            $context['cache_key'] = $this->isCacheKeySafe($context) ? $this->getCacheKey($format, $context) : false;
         }
 
         $data = parent::normalize($object, $format, $context);
