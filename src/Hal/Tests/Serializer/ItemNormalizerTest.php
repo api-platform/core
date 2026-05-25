@@ -170,6 +170,52 @@ class ItemNormalizerTest extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($dummy));
     }
 
+    public function testCacheKeyIsFalseWhenAPropertyHasSecurity(): void
+    {
+        $dummy = new Dummy();
+        $dummy->setName('hello');
+
+        $propertyNameCollection = new PropertyNameCollection(['name']);
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::type('array'))->willReturn($propertyNameCollection);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::type('array'))->willReturn(
+            (new ApiProperty())->withNativeType(Type::string())->withDescription('')->withReadable(true)->withSecurity('is_granted(\'ROLE_ADMIN\')')
+        );
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource($dummy, Argument::cetera())->willReturn('/dummies/1');
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+        $serializerProphecy->normalize('hello', null, Argument::type('array'))->willReturn('hello');
+
+        $nameConverter = $this->prophesize(NameConverterInterface::class);
+        $nameConverter->normalize('name', Argument::any(), Argument::any(), Argument::any())->willReturn('name');
+
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            null,
+            $nameConverter->reveal()
+        );
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $normalizer->normalize($dummy);
+
+        $componentsCacheRef = new \ReflectionProperty(ItemNormalizer::class, 'componentsCache');
+        $this->assertSame([], $componentsCacheRef->getValue($normalizer), 'componentsCache must not be populated when a property has security set');
+    }
+
     public function testNormalizeWithUnionIntersectTypes(): void
     {
         $author = new Author(id: 2, name: 'Isaac Asimov');

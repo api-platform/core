@@ -24,7 +24,6 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
-use ApiPlatform\Serializer\CacheKeyTrait;
 use ApiPlatform\Serializer\ItemNormalizer as BaseItemNormalizer;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -40,14 +39,11 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class ItemNormalizer extends BaseItemNormalizer
 {
-    use CacheKeyTrait;
     use ClassInfoTrait;
 
     public const FORMAT = 'graphql';
     public const ITEM_RESOURCE_CLASS_KEY = '#itemResourceClass';
     public const ITEM_IDENTIFIERS_KEY = '#itemIdentifiers';
-
-    private array $safeCacheKeysCache = [];
 
     public function __construct(PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory, PropertyMetadataFactoryInterface $propertyMetadataFactory, IriConverterInterface $iriConverter, private readonly IdentifiersExtractorInterface $identifiersExtractor, ResourceClassResolverInterface $resourceClassResolver, ?PropertyAccessorInterface $propertyAccessor = null, ?NameConverterInterface $nameConverter = null, ?ClassMetadataFactoryInterface $classMetadataFactory = null, ?LoggerInterface $logger = null, ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, ?ResourceAccessCheckerInterface $resourceAccessChecker = null)
     {
@@ -88,12 +84,6 @@ final class ItemNormalizer extends BaseItemNormalizer
             ];
 
             return parent::normalize($data, $format, $context);
-        }
-
-        if ($this->isCacheKeySafe($context)) {
-            $context['cache_key'] = $this->getCacheKey($format, $context);
-        } else {
-            $context['cache_key'] = false;
         }
 
         unset($context['operation_name'], $context['operation']); // Remove operation and operation_name only when cache key has been created
@@ -160,33 +150,5 @@ final class ItemNormalizer extends BaseItemNormalizer
         }
 
         parent::setAttributeValue($object, $attribute, $value, $format, $context);
-    }
-
-    /**
-     * Check if any property contains a security grants, which makes the cache key not safe,
-     * as allowed_properties can differ for 2 instances of the same object.
-     */
-    private function isCacheKeySafe(array $context): bool
-    {
-        if (!isset($context['resource_class']) || !$this->resourceClassResolver->isResourceClass($context['resource_class'])) {
-            return false;
-        }
-        $resourceClass = $this->resourceClassResolver->getResourceClass(null, $context['resource_class']);
-        if (isset($this->safeCacheKeysCache[$resourceClass])) {
-            return $this->safeCacheKeysCache[$resourceClass];
-        }
-        $options = $this->getFactoryOptions($context);
-        $propertyNames = $this->propertyNameCollectionFactory->create($resourceClass, $options);
-
-        $this->safeCacheKeysCache[$resourceClass] = true;
-        foreach ($propertyNames as $propertyName) {
-            $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $propertyName, $options);
-            if (null !== $propertyMetadata->getSecurity()) {
-                $this->safeCacheKeysCache[$resourceClass] = false;
-                break;
-            }
-        }
-
-        return $this->safeCacheKeysCache[$resourceClass];
     }
 }
