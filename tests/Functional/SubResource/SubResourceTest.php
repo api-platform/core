@@ -76,6 +76,10 @@ final class SubResourceTest extends ApiTestCase
 
     private function seedAnswerToQuestion(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('Subresource Question/Answer fixtures use ORM-specific relations.');
+        }
+
         $this->recreateSchema([Question::class, Answer::class]);
 
         $manager = $this->getManager();
@@ -114,6 +118,10 @@ final class SubResourceTest extends ApiTestCase
 
     private function seedDummyWithFourthLevel(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('Nested subresource fixtures use ORM-specific relations.');
+        }
+
         $this->recreateSchema([Dummy::class, RelatedDummy::class, ThirdLevel::class, FourthLevel::class]);
 
         $manager = $this->getManager();
@@ -320,6 +328,10 @@ final class SubResourceTest extends ApiTestCase
 
     private function seedProductWithOffers(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('Product/Offer fixtures use ORM-specific relations.');
+        }
+
         $this->recreateSchema([DummyProduct::class, DummyAggregateOffer::class, DummyOffer::class]);
 
         $manager = $this->getManager();
@@ -414,6 +426,10 @@ final class SubResourceTest extends ApiTestCase
 
     public function testPersonSentGreetings(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('Person/Greeting fixtures use ORM-specific relations.');
+        }
+
         $this->recreateSchema([Person::class, Greeting::class]);
 
         $manager = $this->getManager();
@@ -449,6 +465,10 @@ final class SubResourceTest extends ApiTestCase
 
     public function testOneToOneFromOwnedSide(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('RelatedOwnedDummy fixtures use ORM-specific relations.');
+        }
+
         $this->recreateSchema([Dummy::class, RelatedOwnedDummy::class]);
 
         $manager = $this->getManager();
@@ -477,6 +497,10 @@ final class SubResourceTest extends ApiTestCase
 
     public function testOneToOneFromOwningSide(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('RelatedOwningDummy fixtures use ORM-specific relations.');
+        }
+
         $this->recreateSchema([Dummy::class, RelatedOwningDummy::class]);
 
         $manager = $this->getManager();

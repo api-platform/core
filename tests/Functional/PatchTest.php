@@ -75,6 +75,10 @@ final class PatchTest extends ApiTestCase
 
     public function testPatchRemovesPropertyWithNull(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('PatchDummy fixture is ORM-only.');
+        }
+
         $client = self::createClient();
         $client->request('POST', '/patch_dummies', [
             'headers' => ['Content-Type' => 'application/ld+json'],
@@ -92,6 +96,10 @@ final class PatchTest extends ApiTestCase
 
     public function testPatchRelation(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('PatchDummyRelation/RelatedDummy fixtures are ORM-only.');
+        }
+
         $manager = $this->getManager();
         $related = new RelatedDummy();
         $manager->persist($related);

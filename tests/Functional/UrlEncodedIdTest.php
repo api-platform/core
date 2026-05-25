@@ -45,6 +45,10 @@ final class UrlEncodedIdTest extends ApiTestCase
     #[DataProvider('urlVariants')]
     public function testGetEncodedIdWhetherOrNotEncoded(string $url): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('UrlEncodedId fixture is ORM-only.');
+        }
+
         $this->recreateSchema([UrlEncodedId::class]);
 
         $client = self::createClient();

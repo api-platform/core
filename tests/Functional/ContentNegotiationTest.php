@@ -221,6 +221,10 @@ final class ContentNegotiationTest extends ApiTestCase
 
     public function testSecurityErrorInJson(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('SecuredDummy seed uses ORM Entity class.');
+        }
+
         $manager = $this->getManager();
         $securedDummy = new SecuredDummy();
         $securedDummy->setTitle('#1');

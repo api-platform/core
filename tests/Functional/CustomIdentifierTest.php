@@ -145,6 +145,10 @@ final class CustomIdentifierTest extends ApiTestCase
 
     public function testGetCustomMultipleIdentifierDummy(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('CustomMultipleIdentifierDummy fixture is ORM-only.');
+        }
+
         $manager = $this->getManager();
         $dummy = new CustomMultipleIdentifierDummy();
         $dummy->setName('Orwell');

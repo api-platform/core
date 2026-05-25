@@ -72,6 +72,10 @@ final class OperationTest extends ApiTestCase
 
     public function testEmbeddedDummyWithGroups(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('EmbeddedDummy fixture uses ORM Embeddable.');
+        }
+
         $manager = $this->getManager();
         $dummy = new EmbeddedDummy();
         $dummy->setName('Dummy #1');
@@ -113,6 +117,10 @@ final class OperationTest extends ApiTestCase
 
     public function testGetBookByCustomUriTemplate(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('Book fixture is ORM-only.');
+        }
+
         $manager = $this->getManager();
         $book = new Book();
         $book->name = '1984';

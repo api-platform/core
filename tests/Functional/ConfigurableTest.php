@@ -36,6 +36,10 @@ final class ConfigurableTest extends ApiTestCase
 
     private function seedFileConfigDummy(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('FileConfigDummy fixtures are ORM-only.');
+        }
+
         $this->recreateSchema($this->getResources());
 
         $manager = $this->getManager();

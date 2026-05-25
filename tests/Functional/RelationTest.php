@@ -365,6 +365,10 @@ final class RelationTest extends ApiTestCase
 
     public function testEagerLoadOrdersAreNotDuplicated(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('Order/Customer/Address fixtures use ORM-specific relations.');
+        }
+
         $this->recreateSchema([Order::class, Customer::class, Address::class]);
 
         $manager = $this->getManager();
@@ -427,6 +431,10 @@ final class RelationTest extends ApiTestCase
 
     public function testIssue1222PeopleWithPets(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('Person/Pet/PersonToPet fixtures use ORM-specific relations.');
+        }
+
         $this->recreateSchema([Person::class, Pet::class, PersonToPet::class]);
 
         $manager = $this->getManager();
