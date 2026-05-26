@@ -311,7 +311,7 @@ class AbstractItemNormalizerTest extends TestCase
         PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
         PropertyMetadataFactoryInterface $propertyMetadataFactory,
         ResourceClassResolverInterface $resourceClassResolver,
-    ): AbstractItemNormalizer {
+    ): object {
         return new class($propertyNameCollectionFactory, $propertyMetadataFactory, $this->prophesize(IriConverterInterface::class)->reveal(), $resourceClassResolver, $this->prophesize(PropertyAccessorInterface::class)->reveal(), null, null, [], null, null) extends AbstractItemNormalizer {
             public function probeIsCacheKeySafe(array $context): bool
             {
