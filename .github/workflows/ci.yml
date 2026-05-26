@@ -455,12 +455,11 @@ jobs:
       matrix:
         php: ${{ fromJSON(github.event_name == 'pull_request' && '["8.2","8.5"]' || '["8.2","8.3","8.4","8.5"]') }}
         shard:
-          - main
           - graphql-doctrine
           - misc
         include:
           - php: '8.5'
-            shard: main
+            shard: graphql-doctrine
             coverage: true
       fail-fast: false
     steps:
@@ -494,7 +493,6 @@ jobs:
         id: shard
         run: |
           case "${{ matrix.shard }}" in
-            main) paths="features/main" ;;
             graphql-doctrine) paths="features/graphql features/doctrine" ;;
             misc) paths="features/filter features/issues features/security features/serializer features/http_cache features/sub_resources features/json features/xml features/push_relations features/mercure" ;;
           esac

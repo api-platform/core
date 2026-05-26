@@ -42,9 +42,6 @@ class Answer
     #[ORM\Column(nullable: false)]
     #[Serializer\Groups(['foobar'])]
     private ?string $content = null;
-    #[ORM\OneToOne(targetEntity: Question::class, mappedBy: 'answer')]
-    #[Serializer\Groups(['foobar'])]
-    private ?Question $question = null;
     /**
      * @var Collection<int, Question>
      */
@@ -83,24 +80,6 @@ class Answer
     public function getContent(): ?string
     {
         return $this->content;
-    }
-
-    /**
-     * Set question.
-     */
-    public function setQuestion(?Question $question = null): self
-    {
-        $this->question = $question;
-
-        return $this;
-    }
-
-    /**
-     * Get question.
-     */
-    public function getQuestion(): ?Question
-    {
-        return $this->question;
     }
 
     /**
