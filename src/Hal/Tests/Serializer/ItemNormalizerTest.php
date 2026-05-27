@@ -183,40 +183,36 @@ class ItemNormalizerTest extends TestCase
         $dummy = new Dummy();
         $dummy->setName('hello');
 
-        $propertyNameCollection = new PropertyNameCollection(['name']);
-        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::type('array'))->willReturn($propertyNameCollection);
+        $propertyNameCollectionFactoryMock = $this->createMock(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryMock->method('create')->with(Dummy::class)->willReturn(new PropertyNameCollection(['name']));
 
-        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::type('array'))->willReturn(
-            (new ApiProperty())->withNativeType(Type::string())->withDescription('')->withReadable(true)->withSecurity('is_granted(\'ROLE_ADMIN\')')
+        $propertyMetadataFactoryMock = $this->createMock(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryMock->method('create')->with(Dummy::class, 'name')->willReturn(
+            (new ApiProperty())->withDescription('')->withReadable(true)->withSecurity('is_granted(\'ROLE_ADMIN\')')
         );
 
-        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
-        $iriConverterProphecy->getIriFromResource($dummy, Argument::cetera())->willReturn('/dummies/1');
+        $iriConverterMock = $this->createMock(IriConverterInterface::class);
+        $iriConverterMock->method('getIriFromResource')->willReturn('/dummies/1');
 
-        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
-        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
-        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
-        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverMock = $this->createMock(ResourceClassResolverInterface::class);
+        $resourceClassResolverMock->method('isResourceClass')->with(Dummy::class)->willReturn(true);
+        $resourceClassResolverMock->method('getResourceClass')->willReturn(Dummy::class);
 
-        $serializerProphecy = $this->prophesize(SerializerInterface::class);
-        $serializerProphecy->willImplement(NormalizerInterface::class);
-        $serializerProphecy->normalize('hello', null, Argument::type('array'))->willReturn('hello');
+        $serializerMock = $this->createMock(Serializer::class);
+        $serializerMock->method('normalize')->willReturn('hello');
 
-        $nameConverter = $this->prophesize(NameConverterInterface::class);
-        $nameConverter->normalize('name', Argument::any(), Argument::any(), Argument::any())->willReturn('name');
+        $nameConverterMock = $this->createMock(NameConverterInterface::class);
+        $nameConverterMock->method('normalize')->willReturn('name');
 
         $normalizer = new ItemNormalizer(
-            $propertyNameCollectionFactoryProphecy->reveal(),
-            $propertyMetadataFactoryProphecy->reveal(),
-            $iriConverterProphecy->reveal(),
-            $resourceClassResolverProphecy->reveal(),
+            $propertyNameCollectionFactoryMock,
+            $propertyMetadataFactoryMock,
+            $iriConverterMock,
+            $resourceClassResolverMock,
             null,
-            $nameConverter->reveal()
+            $nameConverterMock
         );
-        $normalizer->setSerializer($serializerProphecy->reveal());
+        $normalizer->setSerializer($serializerMock);
 
         $normalizer->normalize($dummy);
 

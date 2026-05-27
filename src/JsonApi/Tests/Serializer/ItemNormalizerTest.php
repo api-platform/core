@@ -164,7 +164,7 @@ class ItemNormalizerTest extends TestCase
             $iriConverterProphecy->reveal(),
             $resourceClassResolverProphecy->reveal(),
             $propertyAccessorProphecy->reveal(),
-            new ReservedAttributeNameConverter(),
+            null,
             null,
             [],
             $resourceMetadataCollectionFactoryProphecy->reveal(),
