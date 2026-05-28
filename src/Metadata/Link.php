@@ -40,7 +40,7 @@ final class Link extends Parameter
         mixed $filter = null,
         ?string $property = null,
         ?array $properties = null,
-        ?string $description = null,
+        string|\Stringable|null $description = null,
         ?bool $required = null,
         array $extraProperties = [],
 

@@ -54,7 +54,7 @@ abstract class Parameter
         protected mixed $provider = null,
         protected mixed $filter = null,
         protected ?string $property = null,
-        protected ?string $description = null,
+        protected string|\Stringable|null $description = null,
         protected ?array $properties = null,
         protected ?bool $required = null,
         protected ?int $priority = null,
@@ -115,7 +115,7 @@ abstract class Parameter
 
     public function getDescription(): ?string
     {
-        return $this->description;
+        return $this->description instanceof \Stringable ? (string) $this->description : $this->description;
     }
 
     public function getRequired(): ?bool
@@ -258,7 +258,7 @@ abstract class Parameter
         return $self;
     }
 
-    public function withDescription(string $description): static
+    public function withDescription(string|\Stringable $description): static
     {
         $self = clone $this;
         $self->description = $description;
