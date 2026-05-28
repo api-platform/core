@@ -40,7 +40,7 @@ final class StrongTypingTest extends ApiTestCase
 
     public function testIgnoreUnsupportedAttributes(): void
     {
-        $response = self::createClient()->request(
+        self::createClient()->request(
             'POST',
             '/dummies',
             [
@@ -51,14 +51,28 @@ final class StrongTypingTest extends ApiTestCase
 
         $this->assertResponseStatusCodeSame(201);
         $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
-        $this->assertJsonContains([
+        $this->assertJsonEquals([
             '@context' => '/contexts/Dummy',
+            '@id' => '/dummies/1',
             '@type' => 'Dummy',
+            'description' => null,
+            'dummy' => null,
+            'dummyBoolean' => null,
+            'dummyDate' => null,
+            'dummyFloat' => null,
+            'dummyPrice' => null,
+            'relatedDummy' => null,
+            'relatedDummies' => [],
+            'jsonData' => [],
+            'arrayData' => [],
+            'name_converted' => null,
+            'relatedOwnedDummy' => null,
+            'relatedOwningDummy' => null,
+            'id' => 1,
             'name' => 'Not existing',
+            'alias' => null,
+            'foo' => null,
         ]);
-        $body = $response->toArray();
-        $this->assertSame('/dummies/1', $body['@id']);
-        $this->assertArrayNotHasKey('unsupported', $body);
     }
 
     public function testNullValueForRequiredStringTriggersTypeError(): void
