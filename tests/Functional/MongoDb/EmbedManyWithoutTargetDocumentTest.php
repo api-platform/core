@@ -35,9 +35,7 @@ final class EmbedManyWithoutTargetDocumentTest extends ApiTestCase
         if (!$this->isMongoDB()) {
             $this->markTestSkipped('Requires APP_ENV=mongodb.');
         }
-        // @todo Re-enable once the union-typed `array|Collection $embeddedDummies` property is
-        //       denormalized without "Could not denormalize object of type Collection".
-        $this->markTestSkipped('Pending serializer fix for union-typed EmbedMany properties.');
+        $this->recreateSchema([DummyWithEmbedManyOmittingTargetDocument::class]);
     }
 
     public function testPostHydratesEmbedManyWithoutTargetDocument(): void
