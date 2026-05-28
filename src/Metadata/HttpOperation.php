@@ -164,6 +164,7 @@ class HttpOperation extends Operation
         protected ?array $cacheHeaders = null,
         protected ?array $paginationViaCursor = null,
         protected ?array $hydraContext = null,
+        protected ?array $jsonldContext = null,
         protected bool|OpenApiOperation|Webhook|null $openapi = null,
         protected ?array $exceptionToStatus = null,
         protected ?array $links = null,
@@ -625,6 +626,19 @@ class HttpOperation extends Operation
     {
         $self = clone $this;
         $self->hydraContext = $hydraContext;
+
+        return $self;
+    }
+
+    public function getJsonldContext(): ?array
+    {
+        return $this->jsonldContext;
+    }
+
+    public function withJsonldContext(array $jsonldContext): static
+    {
+        $self = clone $this;
+        $self->jsonldContext = $jsonldContext;
 
         return $self;
     }

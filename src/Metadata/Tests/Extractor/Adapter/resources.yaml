@@ -66,6 +66,8 @@ resources:
                     hydraContext:
                         foo:
                             bar: baz
+                    jsonldContext:
+                        dct: 'http://purl.org/dc/terms/'
                     openapi:
                         extensionProperties:
                             bar: baz
@@ -191,6 +193,8 @@ resources:
             hydraContext:
                 foo:
                     bar: baz
+            jsonldContext:
+                dct: 'http://purl.org/dc/terms/'
             openapi:
                 extensionProperties:
                     bar: baz

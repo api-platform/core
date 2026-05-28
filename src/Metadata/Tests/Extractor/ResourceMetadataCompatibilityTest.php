@@ -142,6 +142,9 @@ final class ResourceMetadataCompatibilityTest extends TestCase
             'hydraContext' => [
                 'foo' => ['bar' => 'baz'],
             ],
+            'jsonldContext' => [
+                'dct' => 'http://purl.org/dc/terms/',
+            ],
             'openapi' => [
                 'extensionProperties' => [
                     'bar' => 'baz',
@@ -356,6 +359,9 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                     'hydraContext' => [
                         'foo' => ['bar' => 'baz'],
                     ],
+                    'jsonldContext' => [
+                        'dct' => 'http://purl.org/dc/terms/',
+                    ],
                     'openapi' => [
                         'extensionProperties' => [
                             'bar' => 'baz',
@@ -501,6 +507,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         'schemes',
         'cacheHeaders',
         'hydraContext',
+        'jsonldContext',
         'openapi',
         'paginationViaCursor',
         'stateOptions',
