@@ -1,17 +1,49 @@
-@elasticsearch
-Feature: Retrieve from Elasticsearch
-  In order to use an hypermedia API
-  As a client software developer
-  I need to be able to retrieve JSON-LD encoded resources from Elasticsearch
+<?php
 
-  Scenario: Get a resource
-    When I send a "GET" request to "/users/116b83f8-6c32-48d8-8e28-c5c247532d3f"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
+namespace ApiPlatform\Tests\Functional\Elasticsearch;
+
+use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\Elasticsearch\Model\Book;
+use ApiPlatform\Tests\Fixtures\Elasticsearch\Model\Genre;
+use ApiPlatform\Tests\Fixtures\Elasticsearch\Model\Library;
+use ApiPlatform\Tests\Fixtures\Elasticsearch\Model\Tweet;
+use ApiPlatform\Tests\Fixtures\Elasticsearch\Model\User;
+use ApiPlatform\Tests\SetupClassResourcesTrait;
+
+final class ReadTest extends ApiTestCase
+{
+    use ElasticsearchSetupTrait;
+    use SetupClassResourcesTrait;
+
+    protected static ?bool $alwaysBootKernel = false;
+
+    public static function getResources(): array
     {
+        return [User::class, Tweet::class, Library::class, Book::class, Genre::class];
+    }
+
+    public function testGetAResource(): void
+    {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/users/116b83f8-6c32-48d8-8e28-c5c247532d3f', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertJsonEquals(<<<'JSON'
+{
       "@context": "/contexts/User",
       "@id": "/users/116b83f8-6c32-48d8-8e28-c5c247532d3f",
       "@type": "User",
@@ -45,20 +77,30 @@ Feature: Retrieve from Elasticsearch
         }
       ]
     }
-    """
+JSON);
+    }
 
-  Scenario: Get a not found exception
-    When I send a "GET" request to "/users/12345678-abcd-1234-abcdefgh"
-    Then the response status code should be 404
-
-  Scenario: Get the first page of a collection
-    When I send a "GET" request to "/tweets"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
+    public function testGetANotFoundException(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/users/12345678-abcd-1234-abcdefgh', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(404);
+    }
+
+    public function testGetTheFirstPageOfACollection(): void
+    {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/tweets', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertJsonEquals(<<<'JSON'
+{
       "@context": "/contexts/Tweet",
       "@id": "/tweets",
       "@type": "hydra:Collection",
@@ -164,16 +206,20 @@ Feature: Retrieve from Elasticsearch
         ]
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Get a page of a collection
-    When I send a "GET" request to "/tweets?page=3"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
+    public function testGetAPageOfACollection(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/tweets?page=3', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertJsonEquals(<<<'JSON'
+{
       "@context": "/contexts/Tweet",
       "@id": "/tweets",
       "@type": "hydra:Collection",
@@ -280,16 +326,20 @@ Feature: Retrieve from Elasticsearch
         ]
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Get the last page of a collection
-    When I send a "GET" request to "/tweets?page=7"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
+    public function testGetTheLastPageOfACollection(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/tweets?page=7', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertJsonEquals(<<<'JSON'
+{
       "@context": "/contexts/Tweet",
       "@id": "/tweets",
       "@type": "hydra:Collection",
@@ -379,16 +429,20 @@ Feature: Retrieve from Elasticsearch
         ]
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Get a resource with new elasticsearch operations
-    When I send a "GET" request to "/libraries/116b83f8-6c32-48d8-8e28-c5c247532d3f"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
+    public function testGetAResourceWithNewElasticsearchOperations(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/libraries/116b83f8-6c32-48d8-8e28-c5c247532d3f', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertJsonEquals(<<<'JSON'
+{
       "@context": "/contexts/Library",
       "@id": "/libraries/116b83f8-6c32-48d8-8e28-c5c247532d3f",
       "@type": "Library",
@@ -422,20 +476,30 @@ Feature: Retrieve from Elasticsearch
         }
       ]
     }
-    """
+JSON);
+    }
 
-  Scenario: Get a not found exception with new elasticsearch operations
-    When I send a "GET" request to "/libraries/12345678-abcd-1234-abcdefgh"
-    Then the response status code should be 404
-
-  Scenario: Get the first page of a collection with new elasticsearch operations
-    When I send a "GET" request to "/books"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
+    public function testGetANotFoundExceptionWithNewElasticsearchOperations(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/libraries/12345678-abcd-1234-abcdefgh', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(404);
+    }
+
+    public function testGetTheFirstPageOfACollectionWithNewElasticsearchOperations(): void
+    {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/books', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertJsonEquals(<<<'JSON'
+{
       "@context": "/contexts/Book",
       "@id": "/books",
       "@type": "hydra:Collection",
@@ -553,16 +617,20 @@ Feature: Retrieve from Elasticsearch
         ]
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Get a page of a collection with new elasticsearch operations
-    When I send a "GET" request to "/books?page=3"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
+    public function testGetAPageOfACollectionWithNewElasticsearchOperations(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/books?page=3', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertJsonEquals(<<<'JSON'
+{
       "@context": "/contexts/Book",
       "@id": "/books",
       "@type": "hydra:Collection",
@@ -681,16 +749,20 @@ Feature: Retrieve from Elasticsearch
         ]
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Get the last page of a collection with new elasticsearch operations
-    When I send a "GET" request to "/books?page=7"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
+    public function testGetTheLastPageOfACollectionWithNewElasticsearchOperations(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/books?page=7', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertJsonEquals(<<<'JSON'
+{
       "@context": "/contexts/Book",
       "@id": "/books",
       "@type": "hydra:Collection",
@@ -792,4 +864,6 @@ Feature: Retrieve from Elasticsearch
         ]
       }
     }
-    """
+JSON);
+    }
+}

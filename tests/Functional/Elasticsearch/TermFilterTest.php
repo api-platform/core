@@ -1,17 +1,49 @@
-@elasticsearch
-Feature: Term filter on collections from Elasticsearch
-  In order to get specific results from a large collections of resources from Elasticsearch
-  As a client software developer
-  I need to search for resources containing the exact terms specified
+<?php
 
-  Scenario: Term filter on an identifier property
-    When I send a "GET" request to "/users?id=%2Fusers%2Fcf875c95-41ab-48df-af66-38c74db18f72"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
+namespace ApiPlatform\Tests\Functional\Elasticsearch;
+
+use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\Elasticsearch\Model\Book;
+use ApiPlatform\Tests\Fixtures\Elasticsearch\Model\Genre;
+use ApiPlatform\Tests\Fixtures\Elasticsearch\Model\Library;
+use ApiPlatform\Tests\Fixtures\Elasticsearch\Model\Tweet;
+use ApiPlatform\Tests\Fixtures\Elasticsearch\Model\User;
+use ApiPlatform\Tests\SetupClassResourcesTrait;
+
+final class TermFilterTest extends ApiTestCase
+{
+    use ElasticsearchSetupTrait;
+    use SetupClassResourcesTrait;
+
+    protected static ?bool $alwaysBootKernel = false;
+
+    public static function getResources(): array
     {
+        return [User::class, Tweet::class, Library::class, Book::class, Genre::class];
+    }
+
+    public function testTermFilterOnAnIdentifierProperty(): void
+    {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/users?id=%2Fusers%2Fcf875c95-41ab-48df-af66-38c74db18f72', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/User$"},
@@ -37,16 +69,20 @@ Feature: Term filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Term filter on a property of keyword type
-    When I send a "GET" request to "/users?gender=female"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testTermFilterOnAPropertyOfKeywordType(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/users?gender=female', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/User$"},
@@ -79,16 +115,20 @@ Feature: Term filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Combining term filters on a property of integer type and a property of keyword type
-    When I send a "GET" request to "/users?age=42&gender=female"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testCombiningTermFiltersOnAPropertyOfIntegerTypeAndAPropertyOfKeywordType(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/users?age=42&gender=female', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/User$"},
@@ -124,16 +164,20 @@ Feature: Term filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Combining term filters on a property of integer type and a property of keyword type
-    When I send a "GET" request to "/users?age=42&gender=male"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testCombiningTermFiltersOnAPropertyOfIntegerTypeAndAPropertyOfKeywordType2(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/users?age=42&gender=male', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/User$"},
@@ -153,16 +197,20 @@ Feature: Term filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Term filter on a property of text type
-    When I send a "GET" request to "/users?firstName=xavier"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testTermFilterOnAPropertyOfTextType(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/users?firstName=xavier', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/User$"},
@@ -189,17 +237,20 @@ Feature: Term filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Term filter on a nested identifier property
-    When I send a "GET" request to "/users?tweets.id=%2Ftweets%2Fdcaef1db-225d-442b-960e-5de6984a44be"
-    Then the response should be in JSON
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testTermFilterOnANestedIdentifierProperty(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/users?tweets.id=%2Ftweets%2Fdcaef1db-225d-442b-960e-5de6984a44be', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/User$"},
@@ -225,17 +276,20 @@ Feature: Term filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Term filter on a nested property of date type
-    When I send a "GET" request to "/users?tweets.date=2018-02-02%2014%3A14%3A14"
-    Then the response should be in JSON
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testTermFilterOnANestedPropertyOfDateType(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/users?tweets.date=2018-02-02%2014%3A14%3A14', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/User$"},
@@ -261,16 +315,20 @@ Feature: Term filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Term filter on an identifier property with elasticsearch operations
-    When I send a "GET" request to "/libraries?id=%2Flibraries%2Fcf875c95-41ab-48df-af66-38c74db18f72"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testTermFilterOnAnIdentifierPropertyWithElasticsearchOperations(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/libraries?id=%2Flibraries%2Fcf875c95-41ab-48df-af66-38c74db18f72', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Library$"},
@@ -296,16 +354,20 @@ Feature: Term filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Term filter on a property of keyword type with elasticsearch operations
-    When I send a "GET" request to "/libraries?gender=female"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testTermFilterOnAPropertyOfKeywordTypeWithElasticsearchOperations(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/libraries?gender=female', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Library$"},
@@ -338,16 +400,20 @@ Feature: Term filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Combining term filters on a property of integer type and a property of keyword type with elasticsearch operations
-    When I send a "GET" request to "/libraries?age=42&gender=female"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testCombiningTermFiltersOnAPropertyOfIntegerTypeAndAPropertyOfKeywordTypeWithElasticsearchOperations(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/libraries?age=42&gender=female', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Library$"},
@@ -383,16 +449,20 @@ Feature: Term filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Combining term filters on a property of integer type and a property of keyword type with elasticsearch operations
-    When I send a "GET" request to "/libraries?age=42&gender=male"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testCombiningTermFiltersOnAPropertyOfIntegerTypeAndAPropertyOfKeywordTypeWithElasticsearchOperations2(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/libraries?age=42&gender=male', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Library$"},
@@ -412,16 +482,20 @@ Feature: Term filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Term filter on a property of text type with elasticsearch operations
-    When I send a "GET" request to "/libraries?firstName=xavier"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testTermFilterOnAPropertyOfTextTypeWithElasticsearchOperations(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/libraries?firstName=xavier', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Library$"},
@@ -448,17 +522,20 @@ Feature: Term filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Term filter on a nested identifier property with elasticsearch operations
-    When I send a "GET" request to "/libraries?books.id=%2Fbooks%2Fdcaef1db-225d-442b-960e-5de6984a44be"
-    Then the response should be in JSON
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testTermFilterOnANestedIdentifierPropertyWithElasticsearchOperations(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/libraries?books.id=%2Fbooks%2Fdcaef1db-225d-442b-960e-5de6984a44be', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Library$"},
@@ -484,17 +561,20 @@ Feature: Term filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Term filter on a nested property of date type with elasticsearch operations
-    When I send a "GET" request to "/libraries?books.date=2018-02-02%2014%3A14%3A14"
-    Then the response should be in JSON
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testTermFilterOnANestedPropertyOfDateTypeWithElasticsearchOperations(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/libraries?books.date=2018-02-02%2014%3A14%3A14', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Library$"},
@@ -520,4 +600,6 @@ Feature: Term filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
+}

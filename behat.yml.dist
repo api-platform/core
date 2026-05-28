@@ -92,36 +92,6 @@ mercure:
       filters:
         tags: '@mercure'
 
-elasticsearch:
-  suites:
-    default: false
-    elasticsearch: &elasticsearch-suite
-      paths:
-        - '%paths.base%/features/elasticsearch'
-      contexts:
-        - 'ApiPlatform\Tests\Behat\CommandContext'
-        - 'ApiPlatform\Tests\Behat\ElasticsearchContext'
-        - 'ApiPlatform\Tests\Behat\JsonContext'
-        - 'Behat\MinkExtension\Context\MinkContext'
-        - 'behatch:context:rest'
-      filters:
-        tags: '@elasticsearch&&~@mercure&&~@query_parameter_validator'
-
-opensearch:
-  suites:
-    default: false
-    opensearch:
-      paths:
-        - '%paths.base%/features/elasticsearch'
-      contexts:
-        - 'ApiPlatform\Tests\Behat\CommandContext'
-        - 'ApiPlatform\Tests\Behat\ElasticsearchContext'
-        - 'ApiPlatform\Tests\Behat\JsonContext'
-        - 'Behat\MinkExtension\Context\MinkContext'
-        - 'behatch:context:rest'
-      filters:
-        tags: '@elasticsearch&&~@mercure&&~@query_parameter_validator'
-
 default-coverage:
   suites:
     default: &default-coverage-suite
@@ -177,19 +147,6 @@ mercure-coverage:
         - 'ApiPlatform\Tests\Behat\MercureContext'
         - 'ApiPlatform\Tests\Behat\CoverageContext'
         - 'ApiPlatform\Tests\Behat\XmlContext'
-        - 'Behat\MinkExtension\Context\MinkContext'
-        - 'behatch:context:rest'
-
-elasticsearch-coverage:
-  suites:
-    default: false
-    elasticsearch: &elasticsearch-coverage-suite
-      <<: *elasticsearch-suite
-      contexts:
-        - 'ApiPlatform\Tests\Behat\CommandContext'
-        - 'ApiPlatform\Tests\Behat\ElasticsearchContext'
-        - 'ApiPlatform\Tests\Behat\JsonContext'
-        - 'ApiPlatform\Tests\Behat\CoverageContext'
         - 'Behat\MinkExtension\Context\MinkContext'
         - 'behatch:context:rest'
 

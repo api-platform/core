@@ -1,17 +1,49 @@
-@elasticsearch
-Feature: Match filter on collections from Elasticsearch
-  In order to get specific results from a large collections of resources from Elasticsearch
-  As a client software developer
-  I need to search for resources matching the text specified
+<?php
 
-  Scenario: Match filter on a text property
-    When I send a "GET" request to "/tweets?message=Good%20job"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
+namespace ApiPlatform\Tests\Functional\Elasticsearch;
+
+use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\Elasticsearch\Model\Book;
+use ApiPlatform\Tests\Fixtures\Elasticsearch\Model\Genre;
+use ApiPlatform\Tests\Fixtures\Elasticsearch\Model\Library;
+use ApiPlatform\Tests\Fixtures\Elasticsearch\Model\Tweet;
+use ApiPlatform\Tests\Fixtures\Elasticsearch\Model\User;
+use ApiPlatform\Tests\SetupClassResourcesTrait;
+
+final class MatchFilterTest extends ApiTestCase
+{
+    use ElasticsearchSetupTrait;
+    use SetupClassResourcesTrait;
+
+    protected static ?bool $alwaysBootKernel = false;
+
+    public static function getResources(): array
     {
+        return [User::class, Tweet::class, Library::class, Book::class, Genre::class];
+    }
+
+    public function testMatchFilterOnATextProperty(): void
+    {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/tweets?message=Good%20job', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Tweet$"},
@@ -52,16 +84,20 @@ Feature: Match filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Match filter on a text property
-    When I send a "GET" request to "/tweets?message%5B%5D=Good%20job&message%5B%5D=run"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testMatchFilterOnATextProperty2(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/tweets?message%5B%5D=Good%20job&message%5B%5D=run', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Tweet$"},
@@ -115,16 +151,20 @@ Feature: Match filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Match filter on a nested property of text type
-    When I send a "GET" request to "/tweets?author.firstName=Caroline"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testMatchFilterOnANestedPropertyOfTextType(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/tweets?author.firstName=Caroline', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Tweet$"},
@@ -165,16 +205,20 @@ Feature: Match filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Combining match filters on properties of text type and a nested property of text type
-    When I send a "GET" request to "/tweets?message%5B%5D=Good%20job&message%5B%5D=run&author.firstName=Caroline"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testCombiningMatchFiltersOnPropertiesOfTextTypeAndANestedPropertyOfTextType(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/tweets?message%5B%5D=Good%20job&message%5B%5D=run&author.firstName=Caroline', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Tweet$"},
@@ -215,16 +259,20 @@ Feature: Match filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Match filter on a text property with new elasticsearch operations
-    When I send a "GET" request to "/books?message=Good%20job"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testMatchFilterOnATextPropertyWithNewElasticsearchOperations(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/books?message=Good%20job', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Book$"},
@@ -265,16 +313,20 @@ Feature: Match filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Match filter on a text property with new elasticsearch operations
-    When I send a "GET" request to "/books?message%5B%5D=Good%20job&message%5B%5D=run"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testMatchFilterOnATextPropertyWithNewElasticsearchOperations2(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/books?message%5B%5D=Good%20job&message%5B%5D=run', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Book$"},
@@ -328,16 +380,20 @@ Feature: Match filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Match filter on a nested property of text type with new elasticsearch operations
-    When I send a "GET" request to "/books?library.firstName=Caroline"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testMatchFilterOnANestedPropertyOfTextTypeWithNewElasticsearchOperations(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/books?library.firstName=Caroline', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Book$"},
@@ -378,16 +434,20 @@ Feature: Match filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Combining match filters on properties of text type and a nested property of text type with new elasticsearch operations
-    When I send a "GET" request to "/books?message%5B%5D=Good%20job&message%5B%5D=run&library.firstName=Caroline"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testCombiningMatchFiltersOnPropertiesOfTextTypeAndANestedPropertyOfTextTypeWithNewElasticsearchOperations(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/books?message%5B%5D=Good%20job&message%5B%5D=run&library.firstName=Caroline', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Book$"},
@@ -428,16 +488,20 @@ Feature: Match filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Match filter on a multi-level nested property of text type with new elasticsearch operations
-    When I send a "GET" request to "/books?library.relatedGenres.name=Fiction"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testMatchFilterOnAMultiLevelNestedPropertyOfTextTypeWithNewElasticsearchOperations(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/books?library.relatedGenres.name=Fiction', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Book$"},
@@ -478,5 +542,6 @@ Feature: Match filter on collections from Elasticsearch
         }
       }
     }
-    """
-
+JSON);
+    }
+}
