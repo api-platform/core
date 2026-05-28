@@ -17,7 +17,12 @@ use ApiPlatform\Hydra\Serializer\CollectionNormalizer;
 use ApiPlatform\Hydra\Tests\Fixtures\Foo;
 use ApiPlatform\JsonLd\ContextBuilder;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\HydraOperation;
 use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
+use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
@@ -443,6 +448,427 @@ class CollectionNormalizerTest extends TestCase
                 $normalizedFooThree,
             ],
             'totalItems' => 2,
+        ], $actual);
+    }
+
+    public function testNormalizeResourceCollectionWithHydraOperationsMultipleApiResourceWithOperationInDuplicate(): void
+    {
+        $fooOne = new Foo();
+        $fooOne->id = 1;
+        $fooOne->bar = 'baz';
+
+        $data = [$fooOne];
+
+        $normalizedFooOne = [
+            '@id' => '/foos/1',
+            '@type' => 'Foo',
+            'bar' => 'baz',
+        ];
+
+        $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
+        $contextBuilderProphecy->getResourceContextUri(Foo::class)->willReturn('/contexts/Foo');
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($data, Foo::class)->willReturn(Foo::class);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource(Foo::class, UrlGeneratorInterface::ABS_PATH, Argument::any(), Argument::any())->willReturn('/foos');
+
+        $hydraOperations = new HydraOperation(method: 'POST', collection: true);
+
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactoryProphecy->create(Foo::class)->willReturn(new ResourceMetadataCollection('Foo', [
+            (new ApiResource())
+                ->withShortName('Foo')
+                ->withHydraOperations([$hydraOperations]),
+            (new ApiResource())
+                ->withShortName('Foo')
+                ->withHydraOperations([$hydraOperations]),
+        ]));
+
+        $delegateNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
+        $delegateNormalizerProphecy->normalize($fooOne, CollectionNormalizer::FORMAT, Argument::allOf(
+            Argument::withEntry('resource_class', Foo::class),
+            Argument::withEntry('api_sub_level', true)
+        ))->willReturn($normalizedFooOne);
+
+        $normalizer = new CollectionNormalizer(
+            $contextBuilderProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            ['hydra_prefix' => false],
+            $resourceMetadataCollectionFactoryProphecy->reveal()
+        );
+        $normalizer->setNormalizer($delegateNormalizerProphecy->reveal());
+
+        $actual = $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
+            'operation_name' => 'get',
+            'resource_class' => Foo::class,
+        ]);
+
+        $this->assertEquals([
+            '@context' => '/contexts/Foo',
+            '@id' => '/foos',
+            '@type' => 'Collection',
+            'member' => [
+                $normalizedFooOne,
+            ],
+            'totalItems' => 1,
+            'operation' => [
+                [
+                    '@type' => [
+                        'Operation',
+                        'schema:CreateAction',
+                    ],
+                    'expects' => 'Foo',
+                    'method' => 'POST',
+                    'returns' => 'Foo',
+                    'title' => 'postFoo',
+                ],
+            ],
+        ], $actual);
+    }
+
+    public function testNormalizeResourceCollectionWithHydraOperationsWithoutSecurity(): void
+    {
+        $fooOne = new Foo();
+        $fooOne->id = 1;
+        $fooOne->bar = 'baz';
+
+        $data = [$fooOne];
+
+        $normalizedFooOne = [
+            '@id' => '/foos/1',
+            '@type' => 'Foo',
+            'bar' => 'baz',
+        ];
+
+        $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
+        $contextBuilderProphecy->getResourceContextUri(Foo::class)->willReturn('/contexts/Foo');
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($data, Foo::class)->willReturn(Foo::class);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource(Foo::class, UrlGeneratorInterface::ABS_PATH, Argument::any(), Argument::any())->willReturn('/foos');
+
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactoryProphecy->create(Foo::class)->willReturn(new ResourceMetadataCollection('Foo', [
+            (new ApiResource())
+                ->withShortName('Foo')
+                ->withHydraOperations([
+                    new HydraOperation(method: 'POST', collection: true),
+                ]),
+        ]));
+
+        $delegateNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
+        $delegateNormalizerProphecy->normalize($fooOne, CollectionNormalizer::FORMAT, Argument::allOf(
+            Argument::withEntry('resource_class', Foo::class),
+            Argument::withEntry('api_sub_level', true)
+        ))->willReturn($normalizedFooOne);
+
+        $normalizer = new CollectionNormalizer(
+            $contextBuilderProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            ['hydra_prefix' => false],
+            $resourceMetadataCollectionFactoryProphecy->reveal()
+        );
+        $normalizer->setNormalizer($delegateNormalizerProphecy->reveal());
+
+        $actual = $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
+            'operation_name' => 'get',
+            'resource_class' => Foo::class,
+        ]);
+
+        $this->assertEquals([
+            '@context' => '/contexts/Foo',
+            '@id' => '/foos',
+            '@type' => 'Collection',
+            'member' => [
+                $normalizedFooOne,
+            ],
+            'totalItems' => 1,
+            'operation' => [
+                [
+                    '@type' => [
+                        'Operation',
+                        'schema:CreateAction',
+                    ],
+                    'expects' => 'Foo',
+                    'method' => 'POST',
+                    'returns' => 'Foo',
+                    'title' => 'postFoo',
+                ],
+            ],
+        ], $actual);
+    }
+
+    public function testNormalizeResourceCollectionWithHydraOperationGrantedBySecurity(): void
+    {
+        $fooOne = new Foo();
+        $fooOne->id = 1;
+        $fooOne->bar = 'baz';
+
+        $data = [$fooOne];
+
+        $normalizedFooOne = [
+            '@id' => '/foos/1',
+            '@type' => 'Foo',
+            'bar' => 'baz',
+        ];
+
+        $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
+        $contextBuilderProphecy->getResourceContextUri(Foo::class)->willReturn('/contexts/Foo');
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($data, Foo::class)->willReturn(Foo::class);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource(Foo::class, UrlGeneratorInterface::ABS_PATH, Argument::any(), Argument::any())->willReturn('/foos');
+
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactoryProphecy->create(Foo::class)->willReturn(new ResourceMetadataCollection('Foo', [
+            (new ApiResource())
+                ->withShortName('Foo')
+                ->withHydraOperations([
+                    new HydraOperation(method: 'POST', collection: true, security: "is_granted('ROLE_ADMIN')"),
+                ]),
+        ]));
+
+        $accessCheckerProphecy = $this->prophesize(ResourceAccessCheckerInterface::class);
+        $accessCheckerProphecy->isGranted(Foo::class, "is_granted('ROLE_ADMIN')", Argument::any())->willReturn(true);
+
+        $delegateNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
+        $delegateNormalizerProphecy->normalize($fooOne, CollectionNormalizer::FORMAT, Argument::allOf(
+            Argument::withEntry('resource_class', Foo::class),
+            Argument::withEntry('api_sub_level', true)
+        ))->willReturn($normalizedFooOne);
+
+        $normalizer = new CollectionNormalizer(
+            $contextBuilderProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            ['hydra_prefix' => false],
+            $resourceMetadataCollectionFactoryProphecy->reveal(),
+            $accessCheckerProphecy->reveal()
+        );
+        $normalizer->setNormalizer($delegateNormalizerProphecy->reveal());
+
+        $actual = $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
+            'operation_name' => 'get',
+            'resource_class' => Foo::class,
+        ]);
+
+        $this->assertEquals([
+            '@context' => '/contexts/Foo',
+            '@id' => '/foos',
+            '@type' => 'Collection',
+            'member' => [
+                $normalizedFooOne,
+            ],
+            'totalItems' => 1,
+            'operation' => [
+                [
+                    '@type' => [
+                        'Operation',
+                        'schema:CreateAction',
+                    ],
+                    'expects' => 'Foo',
+                    'method' => 'POST',
+                    'returns' => 'Foo',
+                    'title' => 'postFoo',
+                ],
+            ],
+        ], $actual);
+    }
+
+    public function testNormalizeResourceCollectionWithHydraOperationDeniedBySecurity(): void
+    {
+        $fooOne = new Foo();
+        $fooOne->id = 1;
+        $fooOne->bar = 'baz';
+
+        $data = [$fooOne];
+
+        $normalizedFooOne = [
+            '@id' => '/foos/1',
+            '@type' => 'Foo',
+            'bar' => 'baz',
+        ];
+
+        $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
+        $contextBuilderProphecy->getResourceContextUri(Foo::class)->willReturn('/contexts/Foo');
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($data, Foo::class)->willReturn(Foo::class);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource(Foo::class, UrlGeneratorInterface::ABS_PATH, Argument::any(), Argument::any())->willReturn('/foos');
+
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactoryProphecy->create(Foo::class)->willReturn(new ResourceMetadataCollection('Foo', [
+            (new ApiResource())
+                ->withShortName('Foo')
+                ->withHydraOperations([
+                    new HydraOperation(method: 'POST', collection: true, security: "is_granted('ROLE_ADMIN')"),
+                ]),
+        ]));
+
+        $accessCheckerProphecy = $this->prophesize(ResourceAccessCheckerInterface::class);
+        $accessCheckerProphecy->isGranted(Foo::class, "is_granted('ROLE_ADMIN')", Argument::any())->willReturn(false);
+
+        $delegateNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
+        $delegateNormalizerProphecy->normalize($fooOne, CollectionNormalizer::FORMAT, Argument::allOf(
+            Argument::withEntry('resource_class', Foo::class),
+            Argument::withEntry('api_sub_level', true)
+        ))->willReturn($normalizedFooOne);
+
+        $normalizer = new CollectionNormalizer(
+            $contextBuilderProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            ['hydra_prefix' => false],
+            $resourceMetadataCollectionFactoryProphecy->reveal(),
+            $accessCheckerProphecy->reveal()
+        );
+        $normalizer->setNormalizer($delegateNormalizerProphecy->reveal());
+
+        $actual = $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
+            'operation_name' => 'get',
+            'resource_class' => Foo::class,
+        ]);
+
+        $this->assertEquals([
+            '@context' => '/contexts/Foo',
+            '@id' => '/foos',
+            '@type' => 'Collection',
+            'member' => [
+                $normalizedFooOne,
+            ],
+            'totalItems' => 1,
+        ], $actual);
+    }
+
+    public function testNormalizeResourceCollectionWithoutHydraOperations(): void
+    {
+        $fooOne = new Foo();
+        $fooOne->id = 1;
+        $fooOne->bar = 'baz';
+
+        $data = [$fooOne];
+
+        $normalizedFooOne = [
+            '@id' => '/foos/1',
+            '@type' => 'Foo',
+            'bar' => 'baz',
+        ];
+
+        $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
+        $contextBuilderProphecy->getResourceContextUri(Foo::class)->willReturn('/contexts/Foo');
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($data, Foo::class)->willReturn(Foo::class);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource(Foo::class, UrlGeneratorInterface::ABS_PATH, Argument::any(), Argument::any())->willReturn('/foos');
+
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactoryProphecy->create(Foo::class)->willReturn(new ResourceMetadataCollection('Foo', [
+            (new ApiResource())->withShortName('Foo'),
+        ]));
+
+        $delegateNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
+        $delegateNormalizerProphecy->normalize($fooOne, CollectionNormalizer::FORMAT, Argument::allOf(
+            Argument::withEntry('resource_class', Foo::class),
+            Argument::withEntry('api_sub_level', true)
+        ))->willReturn($normalizedFooOne);
+
+        $normalizer = new CollectionNormalizer(
+            $contextBuilderProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            ['hydra_prefix' => false],
+            $resourceMetadataCollectionFactoryProphecy->reveal()
+        );
+        $normalizer->setNormalizer($delegateNormalizerProphecy->reveal());
+
+        $actual = $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
+            'operation_name' => 'get',
+            'resource_class' => Foo::class,
+        ]);
+
+        $this->assertEquals([
+            '@context' => '/contexts/Foo',
+            '@id' => '/foos',
+            '@type' => 'Collection',
+            'member' => [
+                $normalizedFooOne,
+            ],
+            'totalItems' => 1,
+        ], $actual);
+    }
+
+    public function testNormalizeResourceCollectionWithHydraOperationFilteredByCollection(): void
+    {
+        $fooOne = new Foo();
+        $fooOne->id = 1;
+        $fooOne->bar = 'baz';
+
+        $data = [$fooOne];
+
+        $normalizedFooOne = [
+            '@id' => '/foos/1',
+            '@type' => 'Foo',
+            'bar' => 'baz',
+        ];
+
+        $contextBuilderProphecy = $this->prophesize(ContextBuilderInterface::class);
+        $contextBuilderProphecy->getResourceContextUri(Foo::class)->willReturn('/contexts/Foo');
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($data, Foo::class)->willReturn(Foo::class);
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource(Foo::class, UrlGeneratorInterface::ABS_PATH, Argument::any(), Argument::any())->willReturn('/foos');
+
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactoryProphecy->create(Foo::class)->willReturn(new ResourceMetadataCollection('Foo', [
+            (new ApiResource())
+                ->withShortName('Foo')
+                ->withHydraOperations([
+                    new HydraOperation(method: 'DELETE', collection: false),
+                ]),
+        ]));
+
+        $delegateNormalizerProphecy = $this->prophesize(NormalizerInterface::class);
+        $delegateNormalizerProphecy->normalize($fooOne, CollectionNormalizer::FORMAT, Argument::allOf(
+            Argument::withEntry('resource_class', Foo::class),
+            Argument::withEntry('api_sub_level', true)
+        ))->willReturn($normalizedFooOne);
+
+        $normalizer = new CollectionNormalizer(
+            $contextBuilderProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            ['hydra_prefix' => false],
+            $resourceMetadataCollectionFactoryProphecy->reveal()
+        );
+        $normalizer->setNormalizer($delegateNormalizerProphecy->reveal());
+
+        $actual = $normalizer->normalize($data, CollectionNormalizer::FORMAT, [
+            'operation_name' => 'get',
+            'resource_class' => Foo::class,
+        ]);
+
+        $this->assertEquals([
+            '@context' => '/contexts/Foo',
+            '@id' => '/foos',
+            '@type' => 'Collection',
+            'member' => [
+                $normalizedFooOne,
+            ],
+            'totalItems' => 1,
         ], $actual);
     }
 }

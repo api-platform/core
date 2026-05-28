@@ -345,3 +345,4 @@ resources:
                     'Lorem ipsum': 'Dolor sit amet'
             map: null
             mcp: null
+            hydraOperations: null

@@ -21,11 +21,11 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\ErrorResource;
-use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\TypeHelper;
@@ -48,8 +48,12 @@ use const ApiPlatform\JsonLd\HYDRA_CONTEXT;
  */
 final class DocumentationNormalizer implements NormalizerInterface
 {
+    use HydraOperationsTrait;
     use HydraPrefixTrait;
     public const FORMAT = 'jsonld';
+
+    private ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory;
+    private ?ResourceAccessCheckerInterface $resourceAccessChecker;
 
     public function __construct(
         private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataFactory,
@@ -60,7 +64,10 @@ final class DocumentationNormalizer implements NormalizerInterface
         private readonly ?NameConverterInterface $nameConverter = null,
         private readonly ?array $defaultContext = [],
         private readonly ?bool $entrypointEnabled = true,
+        ?ResourceAccessCheckerInterface $resourceAccessChecker = null,
     ) {
+        $this->resourceMetadataCollectionFactory = $resourceMetadataFactory;
+        $this->resourceAccessChecker = $resourceAccessChecker;
     }
 
     /**
@@ -248,106 +255,6 @@ final class DocumentationNormalizer implements NormalizerInterface
         }
 
         return $properties;
-    }
-
-    /**
-     * Gets Hydra operations.
-     */
-    private function getHydraOperations(bool $collection, ApiResource $resourceMetadata, string $hydraPrefix = ContextBuilder::HYDRA_PREFIX): array
-    {
-        $hydraOperations = [];
-        foreach ($resourceMetadata->getOperations() as $operation) {
-            if (true === $operation->getHideHydraOperation()) {
-                continue;
-            }
-
-            if (('POST' === $operation->getMethod() || $operation instanceof CollectionOperationInterface) !== $collection) {
-                continue;
-            }
-
-            $hydraOperations[] = $this->getHydraOperation($operation, $operation->getShortName(), $hydraPrefix);
-        }
-
-        return $hydraOperations;
-    }
-
-    /**
-     * Gets and populates if applicable a Hydra operation.
-     */
-    private function getHydraOperation(HttpOperation $operation, string $prefixedShortName, string $hydraPrefix): array
-    {
-        $method = $operation->getMethod() ?: 'GET';
-
-        $hydraOperation = $operation->getHydraContext() ?? [];
-        if ($operation->getDeprecationReason()) {
-            $hydraOperation['owl:deprecated'] = true;
-        }
-
-        $shortName = $operation->getShortName();
-        $inputMetadata = $operation->getInput() ?? [];
-        $outputMetadata = $operation->getOutput() ?? [];
-
-        $inputClass = \array_key_exists('class', $inputMetadata) ? $inputMetadata['class'] : false;
-        $outputClass = \array_key_exists('class', $outputMetadata) ? $outputMetadata['class'] : false;
-
-        if ('GET' === $method && $operation instanceof CollectionOperationInterface) {
-            $hydraOperation += [
-                '@type' => [$hydraPrefix.'Operation', 'schema:FindAction'],
-                $hydraPrefix.'description' => "Retrieves the collection of $shortName resources.",
-                'returns' => null === $outputClass ? 'owl:Nothing' : $hydraPrefix.'Collection',
-            ];
-        } elseif ('GET' === $method) {
-            $hydraOperation += [
-                '@type' => [$hydraPrefix.'Operation', 'schema:FindAction'],
-                $hydraPrefix.'description' => "Retrieves a $shortName resource.",
-                'returns' => null === $outputClass ? 'owl:Nothing' : $prefixedShortName,
-            ];
-        } elseif ('PATCH' === $method) {
-            $hydraOperation += [
-                '@type' => $hydraPrefix.'Operation',
-                $hydraPrefix.'description' => "Updates the $shortName resource.",
-                'returns' => null === $outputClass ? 'owl:Nothing' : $prefixedShortName,
-                'expects' => null === $inputClass ? 'owl:Nothing' : $prefixedShortName,
-            ];
-
-            if (null !== $inputClass) {
-                $possibleValue = [];
-                foreach ($operation->getInputFormats() ?? [] as $mimeTypes) {
-                    foreach ($mimeTypes as $mimeType) {
-                        $possibleValue[] = $mimeType;
-                    }
-                }
-
-                $hydraOperation['expectsHeader'] = [['headerName' => 'Content-Type', 'possibleValue' => $possibleValue]];
-            }
-        } elseif ('POST' === $method) {
-            $hydraOperation += [
-                '@type' => [$hydraPrefix.'Operation', 'schema:CreateAction'],
-                $hydraPrefix.'description' => "Creates a $shortName resource.",
-                'returns' => null === $outputClass ? 'owl:Nothing' : $prefixedShortName,
-                'expects' => null === $inputClass ? 'owl:Nothing' : $prefixedShortName,
-            ];
-        } elseif ('PUT' === $method) {
-            $hydraOperation += [
-                '@type' => [$hydraPrefix.'Operation', 'schema:ReplaceAction'],
-                $hydraPrefix.'description' => "Replaces the $shortName resource.",
-                'returns' => null === $outputClass ? 'owl:Nothing' : $prefixedShortName,
-                'expects' => null === $inputClass ? 'owl:Nothing' : $prefixedShortName,
-            ];
-        } elseif ('DELETE' === $method) {
-            $hydraOperation += [
-                '@type' => [$hydraPrefix.'Operation', 'schema:DeleteAction'],
-                $hydraPrefix.'description' => "Deletes the $shortName resource.",
-                'returns' => 'owl:Nothing',
-            ];
-        }
-
-        $hydraOperation[$hydraPrefix.'method'] ??= $method;
-        $hydraOperation[$hydraPrefix.'title'] ??= strtolower($method).$shortName.($operation instanceof CollectionOperationInterface ? 'Collection' : '');
-
-        ksort($hydraOperation);
-
-        return $hydraOperation;
     }
 
     /**

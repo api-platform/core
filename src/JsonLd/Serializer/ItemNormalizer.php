@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonLd\Serializer;
 
+use ApiPlatform\Hydra\Serializer\HydraOperationsTrait;
 use ApiPlatform\JsonLd\AnonymousContextBuilderInterface;
 use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Metadata\HttpOperation;
@@ -43,6 +44,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
 {
     use ClassInfoTrait;
     use ContextTrait;
+    use HydraOperationsTrait;
+    use HydraPrefixTrait;
     use ItemNormalizerTrait {
         denormalize as private doDenormalize;
     }
@@ -132,6 +135,21 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         if (!isset($metadata['@type']) && null !== ($type = $this->resolveType($resourceClass, $isResourceClass, $context))) {
             $metadata['@type'] = $type;
+        }
+
+        if ($isResourceClass && null !== $this->resourceMetadataCollectionFactory) {
+            $hydraPrefix = $this->getHydraPrefix($context + $this->defaultContext);
+            $hydraOperationsFromAttributes = $this->getHydraOperationsFromAttributes(
+                $resourceClass,
+                false,
+                $data,
+                $context,
+                $hydraPrefix
+            );
+
+            if (!empty($hydraOperationsFromAttributes)) {
+                $metadata[$hydraPrefix.'operation'] = $hydraOperationsFromAttributes;
+            }
         }
 
         return $metadata + $normalizedData;

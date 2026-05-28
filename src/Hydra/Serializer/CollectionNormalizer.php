@@ -17,6 +17,8 @@ use ApiPlatform\JsonLd\ContextBuilderInterface;
 use ApiPlatform\JsonLd\Serializer\HydraPrefixTrait;
 use ApiPlatform\JsonLd\Serializer\JsonLdContextTrait;
 use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
+use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Serializer\AbstractCollectionNormalizer;
@@ -31,6 +33,7 @@ use ApiPlatform\State\Pagination\PartialPaginatorInterface;
  */
 final class CollectionNormalizer extends AbstractCollectionNormalizer
 {
+    use HydraOperationsTrait;
     use HydraPrefixTrait;
     use JsonLdContextTrait;
 
@@ -42,7 +45,7 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
         self::PRESERVE_COLLECTION_KEYS => false,
     ];
 
-    public function __construct(private readonly ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, private readonly IriConverterInterface $iriConverter, array $defaultContext = [])
+    public function __construct(private readonly ContextBuilderInterface $contextBuilder, ResourceClassResolverInterface $resourceClassResolver, private readonly IriConverterInterface $iriConverter, array $defaultContext = [], private readonly ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null, private readonly ?ResourceAccessCheckerInterface $resourceAccessChecker = null)
     {
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
 
@@ -68,6 +71,20 @@ final class CollectionNormalizer extends AbstractCollectionNormalizer
 
         if (\is_array($object) || ($object instanceof \Countable && !$object instanceof PartialPaginatorInterface)) {
             $data[$hydraPrefix.'totalItems'] = \count($object);
+        }
+
+        if (null !== $this->resourceMetadataCollectionFactory) {
+            $hydraOperationsFromAttributes = $this->getHydraOperationsFromAttributes(
+                $resourceClass,
+                true,
+                null,
+                $context,
+                $hydraPrefix
+            );
+
+            if (!empty($hydraOperationsFromAttributes)) {
+                $data[$hydraPrefix.'operation'] = $hydraOperationsFromAttributes;
+            }
         }
 
         return $data;
