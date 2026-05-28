@@ -48,7 +48,7 @@ foreach ($args as $featurePath) {
     foreach ($lines as $line) {
         if (preg_match('/^\s*Scenario:\s*(.+)$/', $line, $m)) {
             $flush();
-            $cur = ['title' => trim($m[1]), 'url' => null, 'httpMethod' => 'GET', 'status' => 200, 'json' => null, 'jsonMode' => null, 'requestBody' => null, 'contentType' => null, 'expectedContentType' => null];
+            $cur = ['title' => trim($m[1]), 'url' => null, 'httpMethod' => 'GET', 'status' => 200, 'json' => null, 'jsonMode' => null, 'requestBody' => null, 'contentType' => null, 'expectedContentType' => null, 'jsonNodes' => [], 'jsonNodeExists' => []];
             $inBody = false;
             $body = '';
             continue;
@@ -102,6 +102,21 @@ foreach ($args as $featurePath) {
             continue;
         }
 
+        if (preg_match('/the JSON node "([^"]+)" should be equal to "([^"]*)"/', $line, $m)) {
+            $cur['jsonNodes'][$m[1]] = $m[2];
+            continue;
+        }
+
+        if (preg_match("/the JSON node \"([^\"]+)\" should be equal to '([^']*)'/", $line, $m)) {
+            $cur['jsonNodes'][$m[1]] = $m[2];
+            continue;
+        }
+
+        if (preg_match('/the JSON node "([^"]+)" should exist/', $line, $m)) {
+            $cur['jsonNodeExists'][] = $m[1];
+            continue;
+        }
+
         if (preg_match('/JSON should be equal to:\s*$/', $line)) {
             $cur['jsonMode'] = 'equals';
             continue;
@@ -151,9 +166,6 @@ function emitMethod(array $s): string
     $out = "\n    public function {$method}(): void\n    {\n";
     if (!empty($s['setupHook'])) {
         $out .= "        \$this->{$s['setupHook']}();\n\n";
-    } else {
-        $out .= "        \$this->skipIfNotElasticsearch();\n";
-        $out .= "        \$this->initializeElasticsearch();\n\n";
     }
     $headers = ['Accept' => 'application/ld+json'];
     if (!empty($s['contentType'])) {
@@ -167,7 +179,9 @@ function emitMethod(array $s): string
         $requestOptions['body'] = $s['requestBody'];
     }
     $requestOptionsExport = var_export($requestOptions, true);
-    $out .= "        \$response = self::createClient()->request('{$httpMethod}', ".var_export($url, true).", {$requestOptionsExport});\n\n";
+    $needsResponse = !empty($s['jsonNodeExists']);
+    $assignment = $needsResponse ? '$response = ' : '';
+    $out .= "        {$assignment}self::createClient()->request('{$httpMethod}', ".var_export($url, true).", {$requestOptionsExport});\n\n";
     $out .= "        \$this->assertResponseStatusCodeSame({$status});\n";
     if (!empty($s['expectedContentType'])) {
         $out .= "        \$this->assertResponseHeaderSame('content-type', ".var_export($s['expectedContentType'], true).");\n";
@@ -181,6 +195,14 @@ function emitMethod(array $s): string
             $assert = 'contains' === $s['jsonMode'] ? 'assertJsonContains' : 'assertJsonEquals';
             $out .= "        \$this->{$assert}({$heredoc});\n";
         }
+    }
+
+    if (!empty($s['jsonNodes'])) {
+        $out .= '        $this->assertJsonContains('.var_export($s['jsonNodes'], true).");\n";
+    }
+
+    foreach ($s['jsonNodeExists'] as $node) {
+        $out .= "        \$this->assertArrayHasKey(".var_export($node, true).", \$response->toArray(false));\n";
     }
 
     $out .= "    }\n";
