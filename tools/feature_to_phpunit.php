@@ -202,7 +202,7 @@ function emitMethod(array $s): string
     }
 
     foreach ($s['jsonNodeExists'] as $node) {
-        $out .= "        \$this->assertArrayHasKey(".var_export($node, true).", \$response->toArray(false));\n";
+        $out .= '        $this->assertArrayHasKey('.var_export($node, true).", \$response->toArray(false));\n";
     }
 
     $out .= "    }\n";
