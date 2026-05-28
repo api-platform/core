@@ -87,7 +87,7 @@ final class MatchFilterTest extends ApiTestCase
 JSON);
     }
 
-    public function testMatchFilterOnATextProperty2(): void
+    public function testMatchFilterOnATextPropertyWithMultipleValues(): void
     {
         $this->skipIfNotElasticsearch();
         $this->initializeElasticsearch();
@@ -316,7 +316,7 @@ JSON);
 JSON);
     }
 
-    public function testMatchFilterOnATextPropertyWithNewElasticsearchOperations2(): void
+    public function testMatchFilterOnATextPropertyWithMultipleValuesWithNewElasticsearchOperations(): void
     {
         $this->skipIfNotElasticsearch();
         $this->initializeElasticsearch();

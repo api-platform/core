@@ -167,7 +167,7 @@ JSON);
 JSON);
     }
 
-    public function testCombiningTermFiltersOnAPropertyOfIntegerTypeAndAPropertyOfKeywordType2(): void
+    public function testCombiningTermFiltersOnAPropertyOfIntegerTypeAndAPropertyOfKeywordTypeReturningNoMatch(): void
     {
         $this->skipIfNotElasticsearch();
         $this->initializeElasticsearch();
@@ -452,7 +452,7 @@ JSON);
 JSON);
     }
 
-    public function testCombiningTermFiltersOnAPropertyOfIntegerTypeAndAPropertyOfKeywordTypeWithElasticsearchOperations2(): void
+    public function testCombiningTermFiltersOnAPropertyOfIntegerTypeAndAPropertyOfKeywordTypeReturningNoMatchWithElasticsearchOperations(): void
     {
         $this->skipIfNotElasticsearch();
         $this->initializeElasticsearch();

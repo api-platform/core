@@ -226,7 +226,7 @@ JSON);
 JSON);
     }
 
-    public function testGetACollectionOfResourcesByAttributesFooBarGroupBazAndGroupQux2(): void
+    public function testGetACollectionOfResourcesByWhitelistedNestedPropertiesFooBarAndGroupBaz(): void
     {
         $this->loadFixtures();
 
