@@ -125,7 +125,7 @@ final class EntrypointAction
      */
     private function parseData(?string $query, ?string $operationName, array $variables, string $jsonContent): array
     {
-        if (!\is_array($data = json_decode($jsonContent, true, 512, \JSON_ERROR_NONE))) {
+        if (!\is_array($data = json_decode($jsonContent, true))) {
             throw new BadRequestHttpException('GraphQL data is not valid JSON.');
         }
 
@@ -162,7 +162,7 @@ final class EntrypointAction
         [$query, $operationName, $variables] = $this->parseData($query, $operationName, $variables, $operations);
 
         /** @var string $map */
-        if (!\is_array($decodedMap = json_decode($map, true, 512, \JSON_ERROR_NONE))) {
+        if (!\is_array($decodedMap = json_decode($map, true))) {
             throw new BadRequestHttpException('GraphQL multipart request map is not valid JSON.');
         }
 
@@ -218,7 +218,7 @@ final class EntrypointAction
      */
     private function decodeVariables(string $variables): array
     {
-        if (!\is_array($decoded = json_decode($variables, true, 512, \JSON_ERROR_NONE))) {
+        if (!\is_array($decoded = json_decode($variables, true))) {
             throw new BadRequestHttpException('GraphQL variables are not valid JSON.');
         }
 
