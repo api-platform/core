@@ -1,18 +1,91 @@
-Feature: Filter with serialization attributes on items and collections
-  In order to retrieve, create and update resources or large collection of resources
-  As a client software developer
-  I need to retrieve, create and update resources or collections of resources with serialization attributes
+<?php
 
-  @createSchema
-  Scenario: Get a collection of resources by attributes id, foo and bar
-    Given there are 10 dummy property objects
-    When I send a "GET" request to "/dummy_properties?properties[]=id&properties[]=foo&properties[]=bar&properties[]=name_converted"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
+namespace ApiPlatform\Tests\Functional\Serializer;
+
+use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyGroup;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyProperty;
+use ApiPlatform\Tests\RecreateSchemaTrait;
+use ApiPlatform\Tests\SetupClassResourcesTrait;
+use Doctrine\ORM\EntityManagerInterface;
+
+final class PropertyFilterTest extends ApiTestCase
+{
+    use RecreateSchemaTrait;
+    use SetupClassResourcesTrait;
+
+    protected static ?bool $alwaysBootKernel = false;
+
+    public static function getResources(): array
     {
+        return [DummyProperty::class, DummyGroup::class];
+    }
+
+    private static bool $fixturesLoaded = false;
+
+    protected function loadFixtures(): void
+    {
+        if (self::$fixturesLoaded) {
+            return;
+        }
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('ORM-only fixture; direct EntityManager persist of Entity\\DummyGroup is not portable to DocumentManager.');
+        }
+        self::createClient();
+        $this->recreateSchema([DummyProperty::class, DummyGroup::class]);
+
+        /** @var EntityManagerInterface $manager */
+        $manager = $this->getManager();
+
+        for ($i = 1; $i <= 10; ++$i) {
+            $group = new DummyGroup();
+            $property = new DummyProperty();
+
+            foreach (['foo', 'bar', 'baz'] as $field) {
+                $property->{$field} = $group->{$field} = ucfirst($field).' #'.$i;
+            }
+            $property->nameConverted = "NameConverted #{$i}";
+            $property->group = $group;
+
+            $manager->persist($group);
+            $manager->persist($property);
+        }
+        $manager->flush();
+        $manager->clear();
+        self::$fixturesLoaded = true;
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        self::$fixturesLoaded = false;
+        parent::tearDownAfterClass();
+    }
+
+    public function testGetACollectionOfResourcesByAttributesIdFooAndBar(): void
+    {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('GET', '/dummy_properties?properties[]=id&properties[]=foo&properties[]=bar&properties[]=name_converted', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/DummyProperty$"},
@@ -46,16 +119,23 @@ Feature: Filter with serialization attributes on items and collections
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Get a collection of resources by attributes foo, bar, group.baz and group.qux
-    When I send a "GET" request to "/dummy_properties?properties[]=foo&properties[]=bar&properties[group][]=baz&properties[group][]=qux"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetACollectionOfResourcesByAttributesFooBarGroupBazAndGroupQux(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('GET', '/dummy_properties?properties[]=foo&properties[]=bar&properties[group][]=baz&properties[group][]=qux', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/DummyProperty$"},
@@ -96,16 +176,23 @@ Feature: Filter with serialization attributes on items and collections
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Get a collection of resources by attributes foo, bar
-    When I send a "GET" request to "/dummy_properties?whitelisted_properties[]=foo&whitelisted_properties[]=bar&whitelisted_properties[]=name_converted"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetACollectionOfResourcesByAttributesFooBar(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('GET', '/dummy_properties?whitelisted_properties[]=foo&whitelisted_properties[]=bar&whitelisted_properties[]=name_converted', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/DummyProperty$"},
@@ -136,16 +223,23 @@ Feature: Filter with serialization attributes on items and collections
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Get a collection of resources by attributes foo, bar, group.baz and group.qux
-    When I send a "GET" request to "/dummy_properties?whitelisted_nested_properties[]=foo&whitelisted_nested_properties[]=bar&whitelisted_nested_properties[group][]=baz"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetACollectionOfResourcesByWhitelistedNestedPropertiesFooBarAndGroupBaz(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('GET', '/dummy_properties?whitelisted_nested_properties[]=foo&whitelisted_nested_properties[]=bar&whitelisted_nested_properties[group][]=baz', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/DummyProperty$"},
@@ -185,16 +279,23 @@ Feature: Filter with serialization attributes on items and collections
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Get a collection of resources by attributes bar not allowed
-    When I send a "GET" request to "/dummy_properties?whitelisted_properties[]=bar"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetACollectionOfResourcesByAttributesBarNotAllowed(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('GET', '/dummy_properties?whitelisted_properties[]=bar', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/DummyProperty$"},
@@ -223,16 +324,23 @@ Feature: Filter with serialization attributes on items and collections
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Get a collection of resources by attributes empty
-    When I send a "GET" request to "/dummy_properties?properties[]=&properties[group][]="
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetACollectionOfResourcesByAttributesEmpty(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('GET', '/dummy_properties?properties[]=&properties[group][]=', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/DummyProperty$"},
@@ -270,16 +378,23 @@ Feature: Filter with serialization attributes on items and collections
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Get a resource by attributes id, foo and bar
-    When I send a "GET" request to "/dummy_properties/1?properties[]=id&properties[]=foo&properties[]=bar"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetAResourceByAttributesIdFooAndBar(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('GET', '/dummy_properties/1?properties[]=id&properties[]=foo&properties[]=bar', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/DummyProperty$"},
@@ -292,16 +407,23 @@ Feature: Filter with serialization attributes on items and collections
       "additionalProperties": false,
       "required": ["@context", "@id", "@type", "id", "foo", "bar"]
     }
-    """
+JSON);
+    }
 
-  Scenario: Get a resource by attributes foo, bar, group.baz and group.qux
-    When I send a "GET" request to "/dummy_properties/1?properties[]=foo&properties[]=bar&properties[group][]=baz&properties[group][]=qux"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetAResourceByAttributesFooBarGroupBazAndGroupQux(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('GET', '/dummy_properties/1?properties[]=foo&properties[]=bar&properties[group][]=baz&properties[group][]=qux', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/DummyProperty$"},
@@ -323,16 +445,23 @@ Feature: Filter with serialization attributes on items and collections
       "additionalProperties": false,
       "required": ["@context", "@id", "@type", "foo", "bar", "group"]
     }
-    """
+JSON);
+    }
 
-  Scenario: Get a resource by attributes empty
-    When I send a "GET" request to "/dummy_properties/1?properties[]=&properties[group][]="
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetAResourceByAttributesEmpty(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('GET', '/dummy_properties/1?properties[]=&properties[group][]=', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/DummyProperty$"},
@@ -351,36 +480,47 @@ Feature: Filter with serialization attributes on items and collections
       "additionalProperties": false,
       "required": ["@context", "@id", "@type", "group"]
     }
-    """
+JSON);
+    }
 
-  Scenario: Create a resource by attributes foo and bar
-    When I add "Content-Type" header equal to "application/ld+json"
-    And I send a "POST" request to "/dummy_properties?properties[]=foo&properties[]=bar" with body:
-    """
+    public function testCreateAResourceByAttributesFooAndBar(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('POST', '/dummy_properties?properties[]=foo&properties[]=bar', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+                'Content-Type' => 'application/ld+json',
+            ],
+            'body' => '{
       "foo": "Foo",
       "bar": "Bar"
-    }
-    """
-    Then the response status code should be 201
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
-    {
+    }',
+        ]);
+
+        $this->assertResponseStatusCodeSame(201);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertJsonEquals(<<<'JSON'
+{
       "@context": "/contexts/DummyProperty",
       "@id": "/dummy_properties/11",
       "@type": "DummyProperty",
       "foo": "Foo",
       "bar": "Bar"
     }
-    """
+JSON);
+    }
 
-  Scenario: Create a resource by attributes foo, bar, group.foo, group.baz and group.qux
-    When I add "Content-Type" header equal to "application/ld+json"
-    And I send a "POST" request to "/dummy_properties?properties[]=foo&properties[]=bar&properties[group][]=foo&properties[group][]=baz&properties[group][]=qux" with body:
-    """
+    public function testCreateAResourceByAttributesFooBarGroupFooGroupBazAndGroupQux(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('POST', '/dummy_properties?properties[]=foo&properties[]=bar&properties[group][]=foo&properties[group][]=baz&properties[group][]=qux', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+                'Content-Type' => 'application/ld+json',
+            ],
+            'body' => '{
       "foo": "Foo",
       "bar": "Bar",
       "group": {
@@ -388,14 +528,13 @@ Feature: Filter with serialization attributes on items and collections
         "baz": "Baz",
         "qux": "Qux"
       }
-    }
-    """
-    Then the response status code should be 201
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
-    {
+    }',
+        ]);
+
+        $this->assertResponseStatusCodeSame(201);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertJsonEquals(<<<'JSON'
+{
       "@context": "/contexts/DummyProperty",
       "@id": "/dummy_properties/12",
       "@type": "DummyProperty",
@@ -408,4 +547,6 @@ Feature: Filter with serialization attributes on items and collections
         "baz": null
       }
     }
-    """
+JSON);
+    }
+}
