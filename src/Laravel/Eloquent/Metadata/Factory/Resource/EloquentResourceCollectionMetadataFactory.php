@@ -111,7 +111,13 @@ final class EloquentResourceCollectionMetadataFactory implements ResourceMetadat
                 if ($this->partialPatchValidation && $operation instanceof Patch) {
                     $rules = $operation->getRules();
                     if (\is_array($rules)) {
-                        $operation = $operation->withRules($this->replaceRequiredWithSometimes($rules));
+                        $stringKeyedRules = [];
+                        foreach ($rules as $field => $fieldRules) {
+                            if (\is_string($field)) {
+                                $stringKeyedRules[$field] = $fieldRules;
+                            }
+                        }
+                        $operation = $operation->withRules($this->replaceRequiredWithSometimes($stringKeyedRules));
                     }
                 }
 
