@@ -456,7 +456,6 @@ jobs:
         php: ${{ fromJSON(github.event_name == 'pull_request' && '["8.2","8.5"]' || '["8.2","8.3","8.4","8.5"]') }}
         shard:
           - graphql-doctrine
-          - misc
         include:
           - php: '8.5'
             shard: graphql-doctrine
@@ -494,7 +493,6 @@ jobs:
         run: |
           case "${{ matrix.shard }}" in
             graphql-doctrine) paths="features/graphql features/doctrine" ;;
-            misc) paths="features/filter features/issues features/security features/serializer features/http_cache features/sub_resources features/json features/xml features/push_relations features/mercure" ;;
           esac
           echo "paths=$paths" >> $GITHUB_OUTPUT
       - name: Run Behat tests (PHP ${{ matrix.php }} ${{ matrix.shard }})
@@ -824,7 +822,7 @@ jobs:
         continue-on-error: true
 
   elasticsearch:
-    name: Behat (PHP ${{ matrix.php }}) (Elasticsearch ${{ matrix.elasticsearch-version }})
+    name: PHPUnit (PHP ${{ matrix.php }}) (Elasticsearch ${{ matrix.elasticsearch-version }})
     runs-on: ubuntu-22.04
     timeout-minutes: 20
     strategy:
@@ -888,11 +886,11 @@ jobs:
           fi
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
-      - name: Run Behat tests
-        run: vendor/bin/behat --out=std --format=progress --profile=elasticsearch --no-interaction
+      - name: Run PHPUnit tests
+        run: vendor/bin/phpunit tests/Functional/Elasticsearch/
 
   opensearch:
-    name: Behat (PHP ${{ matrix.php }}) (OpenSearch ${{ matrix.opensearch-version }})
+    name: PHPUnit (PHP ${{ matrix.php }}) (OpenSearch ${{ matrix.opensearch-version }})
     runs-on: ubuntu-22.04
     timeout-minutes: 20
     strategy:
@@ -946,8 +944,8 @@ jobs:
           composer require --dev opensearch-project/opensearch-php "^2.5" -W
       - name: Clear test app cache
         run: tests/Fixtures/app/console cache:clear --ansi
-      - name: Run Behat tests
-        run: vendor/bin/behat --out=std --format=progress --profile=opensearch --no-interaction
+      - name: Run PHPUnit tests
+        run: vendor/bin/phpunit tests/Functional/Elasticsearch/
 
   phpunit-no-deprecations:
     name: PHPUnit (PHP ${{ matrix.php }}) (no deprecations)

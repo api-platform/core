@@ -1,17 +1,49 @@
-@elasticsearch
-Feature: Order filter on collections from Elasticsearch
-  In order to retrieve ordered large collections of resources from Elasticsearch
-  As a client software developer
-  I need to retrieve collections ordered properties
+<?php
 
-  Scenario: Get collection ordered in ascending order on an identifier property
-    When I send a "GET" request to "/tweets?order%5Bid%5D=asc"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
+namespace ApiPlatform\Tests\Functional\Elasticsearch;
+
+use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\Elasticsearch\Model\Book;
+use ApiPlatform\Tests\Fixtures\Elasticsearch\Model\Genre;
+use ApiPlatform\Tests\Fixtures\Elasticsearch\Model\Library;
+use ApiPlatform\Tests\Fixtures\Elasticsearch\Model\Tweet;
+use ApiPlatform\Tests\Fixtures\Elasticsearch\Model\User;
+use ApiPlatform\Tests\SetupClassResourcesTrait;
+
+final class OrderFilterTest extends ApiTestCase
+{
+    use ElasticsearchSetupTrait;
+    use SetupClassResourcesTrait;
+
+    protected static ?bool $alwaysBootKernel = false;
+
+    public static function getResources(): array
     {
+        return [User::class, Tweet::class, Library::class, Book::class, Genre::class];
+    }
+
+    public function testGetCollectionOrderedInAscendingOrderOnAnIdentifierProperty(): void
+    {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/tweets?order%5Bid%5D=asc', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Tweet$"},
@@ -61,16 +93,20 @@ Feature: Order filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Get collection ordered in descending order on an identifier property
-    When I send a "GET" request to "/tweets?order%5Bid%5D=desc"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetCollectionOrderedInDescendingOrderOnAnIdentifierProperty(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/tweets?order%5Bid%5D=desc', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Tweet$"},
@@ -120,16 +156,20 @@ Feature: Order filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Get collection ordered in ascending order on an identifier property and in ascending order on a nested identifier property
-    When I send a "GET" request to "/tweets?order%5Bauthor.id%5D=asc&order%5Bid%5D=asc"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetCollectionOrderedInAscendingOrderOnAnIdentifierPropertyAndInAscendingOrderOnANestedIdentifierProperty(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/tweets?order%5Bauthor.id%5D=asc&order%5Bid%5D=asc', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Tweet$"},
@@ -179,16 +219,20 @@ Feature: Order filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Get collection ordered in descending order on an identifier property and in ascending order on a nested identifier property
-    When I send a "GET" request to "/tweets?order%5Bauthor.id%5D=asc&order%5Bid%5D=desc"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetCollectionOrderedInDescendingOrderOnAnIdentifierPropertyAndInAscendingOrderOnANestedIdentifierProperty(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/tweets?order%5Bauthor.id%5D=asc&order%5Bid%5D=desc', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Tweet$"},
@@ -238,16 +282,20 @@ Feature: Order filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Get collection ordered in ascending order on an identifier property and in descending order on a nested identifier property
-    When I send a "GET" request to "/tweets?order%5Bauthor.id%5D=desc&order%5Bid%5D=asc"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetCollectionOrderedInAscendingOrderOnAnIdentifierPropertyAndInDescendingOrderOnANestedIdentifierProperty(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/tweets?order%5Bauthor.id%5D=desc&order%5Bid%5D=asc', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Tweet$"},
@@ -297,16 +345,20 @@ Feature: Order filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Get collection ordered in descending order on an identifier property and in descending order on a nested identifier property
-    When I send a "GET" request to "/tweets?order%5Bauthor.id%5D=desc&order%5Bid%5D=desc"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetCollectionOrderedInDescendingOrderOnAnIdentifierPropertyAndInDescendingOrderOnANestedIdentifierProperty(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/tweets?order%5Bauthor.id%5D=desc&order%5Bid%5D=desc', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Tweet$"},
@@ -356,16 +408,20 @@ Feature: Order filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Get collection ordered in ascending order on an identifier property with new elasticsearch operations
-    When I send a "GET" request to "/books?order%5Bid%5D=asc"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetCollectionOrderedInAscendingOrderOnAnIdentifierPropertyWithNewElasticsearchOperations(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/books?order%5Bid%5D=asc', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Book$"},
@@ -415,16 +471,20 @@ Feature: Order filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Get collection ordered in descending order on an identifier property with new elasticsearch operations
-    When I send a "GET" request to "/books?order%5Bid%5D=desc"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetCollectionOrderedInDescendingOrderOnAnIdentifierPropertyWithNewElasticsearchOperations(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/books?order%5Bid%5D=desc', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Book$"},
@@ -474,16 +534,20 @@ Feature: Order filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Get collection ordered in ascending order on an identifier property and in ascending order on a nested identifier property with new elasticsearch operations
-    When I send a "GET" request to "/books?order%5Blibrary.id%5D=asc&order%5Bid%5D=asc"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetCollectionOrderedInAscendingOrderOnAnIdentifierPropertyAndInAscendingOrderOnANestedIdentifierPropertyWithNewElasticsearchOperations(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/books?order%5Blibrary.id%5D=asc&order%5Bid%5D=asc', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Book$"},
@@ -533,16 +597,20 @@ Feature: Order filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Get collection ordered in descending order on an identifier property and in ascending order on a nested identifier property with new elasticsearch operations
-    When I send a "GET" request to "/books?order%5Blibrary.id%5D=asc&order%5Bid%5D=desc"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetCollectionOrderedInDescendingOrderOnAnIdentifierPropertyAndInAscendingOrderOnANestedIdentifierPropertyWithNewElasticsearchOperations(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/books?order%5Blibrary.id%5D=asc&order%5Bid%5D=desc', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Book$"},
@@ -592,16 +660,20 @@ Feature: Order filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Get collection ordered in ascending order on an identifier property and in descending order on a nested identifier property with new elasticsearch operations
-    When I send a "GET" request to "/books?order%5Blibrary.id%5D=desc&order%5Bid%5D=asc"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetCollectionOrderedInAscendingOrderOnAnIdentifierPropertyAndInDescendingOrderOnANestedIdentifierPropertyWithNewElasticsearchOperations(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/books?order%5Blibrary.id%5D=desc&order%5Bid%5D=asc', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Book$"},
@@ -651,16 +723,20 @@ Feature: Order filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Get collection ordered in descending order on an identifier property and in descending order on a nested identifier property with new elasticsearch operations
-    When I send a "GET" request to "/books?order%5Blibrary.id%5D=desc&order%5Bid%5D=desc"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetCollectionOrderedInDescendingOrderOnAnIdentifierPropertyAndInDescendingOrderOnANestedIdentifierPropertyWithNewElasticsearchOperations(): void
     {
+        $this->skipIfNotElasticsearch();
+        $this->initializeElasticsearch();
+
+        $response = self::createClient()->request('GET', '/books?order%5Blibrary.id%5D=desc&order%5Bid%5D=desc', ['headers' => ['Accept' => 'application/ld+json']]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/Book$"},
@@ -710,4 +786,6 @@ Feature: Order filter on collections from Elasticsearch
         }
       }
     }
-    """
+JSON);
+    }
+}
