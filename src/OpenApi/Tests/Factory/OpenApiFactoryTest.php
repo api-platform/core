@@ -49,6 +49,7 @@ use ApiPlatform\OpenApi\Model\OAuthFlows;
 use ApiPlatform\OpenApi\Model\Operation;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\OpenApi\Model\Parameter;
+use ApiPlatform\OpenApi\Model\PathItem;
 use ApiPlatform\OpenApi\Model\RequestBody;
 use ApiPlatform\OpenApi\Model\Response;
 use ApiPlatform\OpenApi\Model\Response as OpenApiResponse;
@@ -89,7 +90,7 @@ class OpenApiFactoryTest extends TestCase
 
         $dummyResourceWebhook = (new ApiResource())->withOperations(new Operations([
             'dummy webhook' => (new Get())->withUriTemplate('/dummy/{id}')->withShortName('short')->withOpenapi(new Webhook('first webhook')),
-            'an other dummy webhook' => (new Post())->withUriTemplate('/dummies')->withShortName('short something')->withOpenapi(new Webhook('happy webhook', new Model\PathItem(post: new Operation(
+            'an other dummy webhook' => (new Post())->withUriTemplate('/dummies')->withShortName('short something')->withOpenapi(new Webhook('happy webhook', new PathItem(post: new Operation(
                 summary: 'well...',
                 description: 'I dont\'t know what to say',
             )))),
@@ -1437,5 +1438,135 @@ class OpenApiFactoryTest extends TestCase
         );
 
         $openApi = $factory->__invoke();
+    }
+
+    public function testResourcePathItemWithSummaryAndDescription(): void
+    {
+        $baseOperation = (new HttpOperation())->withTypes(['http://schema.example.com/Dummy'])->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats'])->withClass(Dummy::class)->withOutput([
+            'class' => OutputDto::class,
+        ])->withPaginationClientItemsPerPage(true)->withShortName('Dummy')->withDescription('This is a dummy');
+
+        $dummyResource = (new ApiResource())->withOperations(
+            new Operations([
+                'getDummyCollection' => (new GetCollection())->withUriTemplate('/dummies')->withOperation($baseOperation),
+                'postDummy' => (new Post())->withUriTemplate('/dummies')->withOperation($baseOperation),
+            ])
+        )->withOpenapi(new PathItem(
+            summary: 'Dummy collection endpoint',
+            description: 'Manage dummy resources'
+        ));
+
+        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactoryProphecy->create()->shouldBeCalled()->willReturn(new ResourceNameCollection([Dummy::class]));
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, [$dummyResource]));
+        $resourceMetadataFactoryProphecy->create(Error::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Error::class, []));
+        $resourceMetadataFactoryProphecy->create(ValidationException::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(ValidationException::class, []));
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description', 'dummyDate', 'enum']));
+        $propertyNameCollectionFactoryProphecy->create(OutputDto::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['id', 'name', 'description', 'dummyDate', 'enum']));
+        $propertyNameCollectionFactoryProphecy->create(Error::class, Argument::any())->shouldBeCalled()->willReturn(new PropertyNameCollection(['type', 'title', 'status', 'detail', 'instance']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Argument::any(), Argument::any(), Argument::any())->willReturn(new ApiProperty());
+
+        $definitionNameFactory = new DefinitionNameFactory();
+        $schemaFactory = new SchemaFactory(
+            resourceMetadataFactory: $resourceMetadataFactoryProphecy->reveal(),
+            propertyNameCollectionFactory: $propertyNameCollectionFactoryProphecy->reveal(),
+            propertyMetadataFactory: $propertyMetadataFactoryProphecy->reveal(),
+            nameConverter: new CamelCaseToSnakeCaseNameConverter(),
+            definitionNameFactory: $definitionNameFactory,
+        );
+
+        $factory = new OpenApiFactory(
+            $resourceNameCollectionFactoryProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $schemaFactory,
+            null,
+            [],
+            new Options('Test API', 'This is a test API.', '1.2.3'),
+            new PaginationOptions(),
+            null,
+            ['json' => ['application/problem+json']]
+        );
+
+        $openApi = $factory->__invoke();
+        $paths = $openApi->getPaths();
+        $dummyPath = $paths->getPath('/dummies');
+
+        $this->assertEquals('Dummy collection endpoint', $dummyPath->getSummary());
+        $this->assertEquals('Manage dummy resources', $dummyPath->getDescription());
+
+        $this->assertNotNull($dummyPath->getGet());
+        $this->assertNotNull($dummyPath->getPost());
+    }
+
+    public function testOperationPathItemOverridesResourcePathItem(): void
+    {
+        $baseOperation = (new HttpOperation())->withTypes(['http://schema.example.com/Dummy'])->withInputFormats(self::OPERATION_FORMATS['input_formats'])->withOutputFormats(self::OPERATION_FORMATS['output_formats'])->withClass(Dummy::class)->withOutput([
+            'class' => OutputDto::class,
+        ])->withPaginationClientItemsPerPage(true)->withShortName('Dummy')->withDescription('This is a dummy');
+
+        $dummyResource = (new ApiResource())->withOperations(
+            new Operations([
+                'getDummy' => (new Get())->withUriTemplate('/dummies/{id}')->withOperation($baseOperation)->withOpenapi(new PathItem(
+                    summary: 'Operation-level PathItem',
+                    get: new Operation(summary: 'Operation-level summary')
+                )),
+            ])
+        )->withOpenapi(new PathItem(
+            summary: 'Resource-level PathItem',
+            description: 'This should be overridden'
+        ));
+
+        $resourceNameCollectionFactoryProphecy = $this->prophesize(ResourceNameCollectionFactoryInterface::class);
+        $resourceNameCollectionFactoryProphecy->create()->shouldBeCalled()->willReturn(new ResourceNameCollection([Dummy::class]));
+
+        $resourceMetadataFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactoryProphecy->create(Dummy::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Dummy::class, [$dummyResource]));
+        $resourceMetadataFactoryProphecy->create(Error::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(Error::class, []));
+        $resourceMetadataFactoryProphecy->create(ValidationException::class)->shouldBeCalled()->willReturn(new ResourceMetadataCollection(ValidationException::class, []));
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Argument::cetera())->willReturn(new PropertyNameCollection(['id', 'name', 'description', 'dummyDate', 'enum']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Argument::any(), Argument::any(), Argument::any())->willReturn(new ApiProperty());
+
+        $definitionNameFactory = new DefinitionNameFactory();
+        $schemaFactory = new SchemaFactory(
+            resourceMetadataFactory: $resourceMetadataFactoryProphecy->reveal(),
+            propertyNameCollectionFactory: $propertyNameCollectionFactoryProphecy->reveal(),
+            propertyMetadataFactory: $propertyMetadataFactoryProphecy->reveal(),
+            nameConverter: new CamelCaseToSnakeCaseNameConverter(),
+            definitionNameFactory: $definitionNameFactory,
+        );
+
+        $factory = new OpenApiFactory(
+            $resourceNameCollectionFactoryProphecy->reveal(),
+            $resourceMetadataFactoryProphecy->reveal(),
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $schemaFactory,
+            null,
+            [],
+            new Options('Test API', 'This is a test API.', '1.2.3'),
+            new PaginationOptions(),
+            null,
+            ['json' => ['application/problem+json']]
+        );
+
+        $openApi = $factory->__invoke();
+        $paths = $openApi->getPaths();
+        $dummyPath = $paths->getPath('/dummies/{id}');
+
+        $this->assertEquals('Operation-level PathItem', $dummyPath->getSummary());
+
+        $this->assertEquals('Operation-level summary', $dummyPath->getGet()->getSummary());
     }
 }

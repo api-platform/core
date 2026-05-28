@@ -185,6 +185,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
 
             $openapiAttribute = $operation->getOpenapi();
 
+            // if (null === $openapiAttribute) {
+            //     $openapiAttribute = $resource->getOpenapi();
+            // }
+
             // Operation ignored from OpenApi
             if (false === $openapiAttribute) {
                 continue;
@@ -225,6 +229,9 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             if ($openapiAttribute instanceof Webhook) {
                 $pathItem = $openapiAttribute->getPathItem() ?: new PathItem();
                 $openapiOperation = $pathItem->{'get'.ucfirst(strtolower($method))}() ?: new Operation();
+            } elseif ($openapiAttribute instanceof PathItem) {
+                $pathItem = $openapiAttribute;
+                $openapiOperation = $pathItem->{'get'.ucfirst(strtolower($method))}() ?: new Operation();
             } elseif (!\is_object($openapiAttribute)) {
                 $openapiOperation = new Operation();
             } else {
@@ -249,6 +256,50 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 servers: null !== $openapiOperation->getServers() ? $openapiOperation->getServers() : null,
                 extensionProperties: $openapiOperation->getExtensionProperties(),
             );
+
+            if ($openapiAttribute instanceof PathItem) {
+                if ($globalPathSummary = $openapiAttribute->getSummary()) {
+                    $pathItem = $pathItem->withSummary($globalPathSummary);
+
+                    foreach (PathItem::$methods as $pathMethod) {
+                        $getMethod = 'get'.ucfirst(strtolower($pathMethod));
+                        $withMethod = 'with'.ucfirst(strtolower($pathMethod));
+
+                        if (($existingOperation = $pathItem->{$getMethod}()) && $existingOperation instanceof Operation) {
+                            $existingOperationSummary = $existingOperation->getSummary();
+
+                            if ($existingOperationSummary === $this->getPathDescription($resourceShortName, $pathMethod, false) || $existingOperationSummary === $this->getPathDescription($resourceShortName, $pathMethod, true)) {
+                                $pathItem = $pathItem->{$withMethod}($existingOperation->withSummary($globalPathSummary));
+                            }
+                        }
+                    }
+                }
+
+                if ($globalPathDescription = $openapiAttribute->getDescription()) {
+                    $pathItem = $pathItem->withDescription($globalPathDescription);
+
+                    foreach (PathItem::$methods as $pathMethod) {
+                        $getMethod = 'get'.ucfirst(strtolower($pathMethod));
+                        $withMethod = 'with'.ucfirst(strtolower($pathMethod));
+
+                        if (($existingOperation = $pathItem->{$getMethod}()) && $existingOperation instanceof Operation) {
+                            $existingOperationDescription = $existingOperation->getDescription();
+
+                            if ($existingOperationDescription === $this->getPathDescription($resourceShortName, $pathMethod, false) || $existingOperationDescription === $this->getPathDescription($resourceShortName, $pathMethod, true)) {
+                                $pathItem = $pathItem->{$withMethod}($existingOperation->withDescription($globalPathDescription));
+                            }
+                        }
+                    }
+                }
+            }
+
+            if ($openapiAttribute instanceof PathItem && $openapiSummary = $openapiAttribute->getSummary()) {
+                $openapiOperation = $openapiOperation->withSummary($openapiSummary);
+            }
+
+            if ($openapiAttribute instanceof PathItem && $openapiDescription = $openapiAttribute->getDescription()) {
+                $openapiOperation = $openapiOperation->withDescription($openapiDescription);
+            }
 
             foreach ($openapiOperation->getTags() as $v) {
                 $tags[$v] = new Tag(name: $v, description: $resource->getDescription() ?? "Resource '$v' operations.");
@@ -506,7 +557,19 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $openapiOperation = $existingOperation->withResponse(200, $currentResponse->withContent($currentResponseContent));
             }
 
-            $paths->addPath($path, $pathItem->{'with'.ucfirst($method)}($openapiOperation));
+            $finalPathItem = $pathItem->{'with'.ucfirst($method)}($openapiOperation);
+
+            if (null === $operation->getOpenapi() && $resource->getOpenapi() instanceof PathItem) {
+                $resourcePathItem = $resource->getOpenapi();
+                if ($resourcePathItem->getSummary()) {
+                    $finalPathItem = $finalPathItem->withSummary($resourcePathItem->getSummary());
+                }
+                if ($resourcePathItem->getDescription()) {
+                    $finalPathItem = $finalPathItem->withDescription($resourcePathItem->getDescription());
+                }
+            }
+
+            $paths->addPath($path, $finalPathItem);
         }
     }
 
