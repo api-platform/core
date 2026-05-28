@@ -212,7 +212,7 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
         }
 
         if (($filter = $this->getFilterInstance($parameter->getFilter())) && $filter instanceof PropertyAwareFilterInterface) {
-            if (!method_exists($filter, 'getProperties')) { // @phpstan-ignore-line todo 5.x remove this check
+            if (!method_exists($filter, 'getProperties')) { // todo 5.x remove this check
                 trigger_deprecation('api-platform/core', 'In API Platform 5.0 "%s" will implement a method named "getProperties"', PropertyAwareFilterInterface::class);
                 $refl = new \ReflectionClass($filter);
                 $filterProperties = $refl->hasProperty('properties') ? $refl->getProperty('properties')->getValue($filter) : [];

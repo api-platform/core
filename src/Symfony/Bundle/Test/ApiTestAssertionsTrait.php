@@ -166,7 +166,7 @@ trait ApiTestAssertionsTrait
     public static function assertMercureUpdateMatchesJsonSchema(Update $update, array $topics, array|object|string $jsonSchema = '', bool $private = false, ?string $id = null, ?string $type = null, ?int $retry = null, string $message = ''): void
     {
         static::assertSame($topics, $update->getTopics(), $message);
-        static::assertThat(json_decode($update->getData(), true, \JSON_THROW_ON_ERROR), new MatchesJsonSchema($jsonSchema), $message);
+        static::assertThat(json_decode($update->getData(), true, flags: \JSON_THROW_ON_ERROR), new MatchesJsonSchema($jsonSchema), $message);
         static::assertSame($private, $update->isPrivate(), $message);
         static::assertSame($id, $update->getId(), $message);
         static::assertSame($type, $update->getType(), $message);
