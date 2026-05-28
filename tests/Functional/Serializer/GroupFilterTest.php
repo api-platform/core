@@ -1,18 +1,84 @@
-Feature: Filter with serialization groups on items and collections
-  In order to retrieve, create and update resources or large collections of resources
-  As a client software developer
-  I need to retrieve, create and update resources or collections of resources with serialization groups
+<?php
 
-  @createSchema
-  Scenario: Get a collection of resources by group dummy_foo without overriding
-    Given there are 10 dummy group objects
-    When I send a "GET" request to "/dummy_groups?groups[]=dummy_foo"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
+namespace ApiPlatform\Tests\Functional\Serializer;
+
+use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyGroup;
+use ApiPlatform\Tests\RecreateSchemaTrait;
+use ApiPlatform\Tests\SetupClassResourcesTrait;
+use Doctrine\ORM\EntityManagerInterface;
+
+final class GroupFilterTest extends ApiTestCase
+{
+    use RecreateSchemaTrait;
+    use SetupClassResourcesTrait;
+
+    protected static ?bool $alwaysBootKernel = false;
+
+    private static bool $fixturesLoaded = false;
+
+    public static function getResources(): array
     {
+        return [DummyGroup::class];
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        self::$fixturesLoaded = false;
+        parent::tearDownAfterClass();
+    }
+
+    protected function loadFixtures(): void
+    {
+        if (self::$fixturesLoaded) {
+            return;
+        }
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('ORM-only fixture; direct EntityManager persist of Entity\\DummyGroup is not portable to DocumentManager.');
+        }
+        self::createClient();
+        $this->recreateSchema([DummyGroup::class]);
+
+        /** @var EntityManagerInterface $manager */
+        $manager = $this->getManager();
+
+        for ($i = 1; $i <= 10; ++$i) {
+            $group = new DummyGroup();
+            foreach (['foo', 'bar', 'baz', 'qux'] as $field) {
+                $group->{$field} = ucfirst($field).' #'.$i;
+            }
+            $manager->persist($group);
+        }
+        $manager->flush();
+        $manager->clear();
+        self::$fixturesLoaded = true;
+    }
+
+    public function testGetACollectionOfResourcesByGroupDummyFooWithoutOverriding(): void
+    {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('GET', '/dummy_groups?groups[]=dummy_foo', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/DummyGroup$"},
@@ -74,16 +140,23 @@ Feature: Filter with serialization groups on items and collections
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Get a collection of resources by group dummy_foo with overriding
-    When I send a "GET" request to "/dummy_groups?override_groups[]=dummy_foo"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetACollectionOfResourcesByGroupDummyFooWithOverriding(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('GET', '/dummy_groups?override_groups[]=dummy_foo', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/DummyGroup$"},
@@ -136,16 +209,23 @@ Feature: Filter with serialization groups on items and collections
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Get a collection of resources by groups dummy_foo, dummy_qux and without overriding
-    When I send a "GET" request to "/dummy_groups?groups[]=dummy_foo&groups[]=dummy_qux"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetACollectionOfResourcesByGroupsDummyFooDummyQuxAndWithoutOverriding(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('GET', '/dummy_groups?groups[]=dummy_foo&groups[]=dummy_qux', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/DummyGroup$"},
@@ -210,16 +290,23 @@ Feature: Filter with serialization groups on items and collections
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Get a collection of resources by groups dummy_foo, dummy_qux and with overriding
-    When I send a "GET" request to "/dummy_groups?override_groups[]=dummy_foo&override_groups[]=dummy_qux"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetACollectionOfResourcesByGroupsDummyFooDummyQuxAndWithOverriding(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('GET', '/dummy_groups?override_groups[]=dummy_foo&override_groups[]=dummy_qux', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/DummyGroup$"},
@@ -275,17 +362,23 @@ Feature: Filter with serialization groups on items and collections
         }
       }
     }
-    """
+JSON);
+    }
 
-
-  Scenario: Get a collection of resources by groups dummy_foo, dummy_qux, without overriding and with whitelist
-    When I send a "GET" request to "/dummy_groups?whitelisted_groups[]=dummy_foo&whitelisted_groups[]=dummy_qux"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetACollectionOfResourcesByGroupsDummyFooDummyQuxWithoutOverridingAndWithWhitelist(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('GET', '/dummy_groups?whitelisted_groups[]=dummy_foo&whitelisted_groups[]=dummy_qux', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/DummyGroup$"},
@@ -347,16 +440,23 @@ Feature: Filter with serialization groups on items and collections
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Get a collection of resources by groups dummy_foo, dummy_qux with overriding and with whitelist
-    When I send a "GET" request to "/dummy_groups?override_whitelisted_groups[]=dummy_foo&override_whitelisted_groups[]=dummy_qux"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetACollectionOfResourcesByGroupsDummyFooDummyQuxWithOverridingAndWithWhitelist(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('GET', '/dummy_groups?override_whitelisted_groups[]=dummy_foo&override_whitelisted_groups[]=dummy_qux', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/DummyGroup$"},
@@ -409,16 +509,23 @@ Feature: Filter with serialization groups on items and collections
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Get a collection of resources by group empty and without overriding
-    When I send a "GET" request to "/dummy_groups?groups[]="
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetACollectionOfResourcesByGroupEmptyAndWithoutOverriding(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('GET', '/dummy_groups?groups[]=', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/DummyGroup$"},
@@ -480,16 +587,23 @@ Feature: Filter with serialization groups on items and collections
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Get a collection of resources by group empty and with overriding
-    When I send a "GET" request to "/dummy_groups?override_groups[]="
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetACollectionOfResourcesByGroupEmptyAndWithOverriding(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('GET', '/dummy_groups?override_groups[]=', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/DummyGroup$"},
@@ -539,16 +653,23 @@ Feature: Filter with serialization groups on items and collections
         }
       }
     }
-    """
+JSON);
+    }
 
-  Scenario: Get a resource by group dummy_foo without overriding
-    When I send a "GET" request to "/dummy_groups/1?groups[]=dummy_foo"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetAResourceByGroupDummyFooWithoutOverriding(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('GET', '/dummy_groups/1?groups[]=dummy_foo', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/DummyGroup$"},
@@ -562,16 +683,23 @@ Feature: Filter with serialization groups on items and collections
       "additionalProperties": false,
       "required": ["@context", "@id", "@type", "id", "foo", "bar", "baz"]
     }
-    """
+JSON);
+    }
 
-  Scenario: Get a resource by group dummy_foo with overriding
-    When I send a "GET" request to "/dummy_groups/1?override_groups[]=dummy_foo"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetAResourceByGroupDummyFooWithOverriding(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('GET', '/dummy_groups/1?override_groups[]=dummy_foo', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/DummyGroup$"},
@@ -582,16 +710,23 @@ Feature: Filter with serialization groups on items and collections
       "additionalProperties": false,
       "required": ["@context", "@id", "@type", "foo"]
     }
-    """
+JSON);
+    }
 
-  Scenario: Get a resource by groups dummy_foo, dummy_qux and without overriding
-    When I send a "GET" request to "/dummy_groups/1?groups[]=dummy_foo&groups[]=dummy_qux"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetAResourceByGroupsDummyFooDummyQuxAndWithoutOverriding(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('GET', '/dummy_groups/1?groups[]=dummy_foo&groups[]=dummy_qux', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/DummyGroup$"},
@@ -606,16 +741,23 @@ Feature: Filter with serialization groups on items and collections
       "additionalProperties": false,
       "required": ["@context", "@id", "@type", "id", "foo", "bar", "baz", "qux"]
     }
-    """
+JSON);
+    }
 
-  Scenario: Get a resource by groups dummy_foo, dummy_qux and with overriding
-    When I send a "GET" request to "/dummy_groups/1?override_groups[]=dummy_foo&override_groups[]=dummy_qux"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetAResourceByGroupsDummyFooDummyQuxAndWithOverriding(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('GET', '/dummy_groups/1?override_groups[]=dummy_foo&override_groups[]=dummy_qux', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/DummyGroup$"},
@@ -627,16 +769,23 @@ Feature: Filter with serialization groups on items and collections
       "additionalProperties": false,
       "required": ["@context", "@id", "@type", "foo", "qux"]
     }
-    """
+JSON);
+    }
 
-  Scenario: Get a resource by groups dummy_foo, dummy_qux and without overriding and with whitelist
-    When I send a "GET" request to "/dummy_groups/1?whitelisted_groups[]=dummy_foo&whitelisted_groups[]=dummy_qux"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetAResourceByGroupsDummyFooDummyQuxAndWithoutOverridingAndWithWhitelist(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('GET', '/dummy_groups/1?whitelisted_groups[]=dummy_foo&whitelisted_groups[]=dummy_qux', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/DummyGroup$"},
@@ -650,16 +799,23 @@ Feature: Filter with serialization groups on items and collections
       "additionalProperties": false,
       "required": ["@context", "@id", "@type", "id", "foo", "bar", "baz"]
     }
-    """
+JSON);
+    }
 
-  Scenario: Get a resource by groups dummy_foo, dummy_qux and with overriding and with whitelist
-    When I send a "GET" request to "/dummy_groups/1?override_whitelisted_groups[]=dummy_foo&override_whitelisted_groups[]=dummy_qux"
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetAResourceByGroupsDummyFooDummyQuxAndWithOverridingAndWithWhitelist(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('GET', '/dummy_groups/1?override_whitelisted_groups[]=dummy_foo&override_whitelisted_groups[]=dummy_qux', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/DummyGroup$"},
@@ -670,16 +826,23 @@ Feature: Filter with serialization groups on items and collections
       "additionalProperties": false,
       "required": ["@context", "@id", "@type", "foo"]
     }
-    """
+JSON);
+    }
 
-  Scenario: Get a resource by group empty and without overriding
-    When I send a "GET" request to "/dummy_groups/1?groups[]="
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetAResourceByGroupEmptyAndWithoutOverriding(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('GET', '/dummy_groups/1?groups[]=', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/DummyGroup$"},
@@ -693,16 +856,23 @@ Feature: Filter with serialization groups on items and collections
       "additionalProperties": false,
       "required": ["@context", "@id", "@type", "id", "foo", "bar", "baz"]
     }
-    """
+JSON);
+    }
 
-  Scenario: Get a resource by group empty and with overriding
-    When I send a "GET" request to "/dummy_groups/1?override_groups[]="
-    Then the response status code should be 200
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be valid according to this schema:
-    """
+    public function testGetAResourceByGroupEmptyAndWithOverriding(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('GET', '/dummy_groups/1?override_groups[]=', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(200);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertMatchesJsonSchema(<<<'JSON'
+{
       "type": "object",
       "properties": {
         "@context": {"pattern": "^/contexts/DummyGroup$"},
@@ -712,25 +882,30 @@ Feature: Filter with serialization groups on items and collections
       "additionalProperties": false,
       "required": ["@context", "@id", "@type"]
     }
-    """
+JSON);
+    }
 
-  Scenario: Create a resource by group dummy_foo and without overriding
-    When I add "Content-Type" header equal to "application/ld+json"
-    And I send a "POST" request to "/dummy_groups?groups[]=dummy_foo" with body:
-    """
+    public function testCreateAResourceByGroupDummyFooAndWithoutOverriding(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('POST', '/dummy_groups?groups[]=dummy_foo', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+                'Content-Type' => 'application/ld+json',
+            ],
+            'body' => '{
       "foo": "Foo",
       "bar": "Bar",
       "baz": "Baz",
       "qux": "Qux"
-    }
-    """
-    Then the response status code should be 201
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
-    {
+    }',
+        ]);
+
+        $this->assertResponseStatusCodeSame(201);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertJsonEquals(<<<'JSON'
+{
       "@context": "/contexts/DummyGroup",
       "@id": "/dummy_groups/11",
       "@type": "DummyGroup",
@@ -739,49 +914,59 @@ Feature: Filter with serialization groups on items and collections
       "bar": "Bar",
       "baz": null
     }
-    """
+JSON);
+    }
 
-  Scenario: Create a resource by group dummy_foo and with overriding
-    When I add "Content-Type" header equal to "application/ld+json"
-    And I send a "POST" request to "/dummy_groups?override_groups[]=dummy_foo" with body:
-    """
+    public function testCreateAResourceByGroupDummyFooAndWithOverriding(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('POST', '/dummy_groups?override_groups[]=dummy_foo', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+                'Content-Type' => 'application/ld+json',
+            ],
+            'body' => '{
       "foo": "Foo",
       "bar": "Bar",
       "baz": "Baz",
       "qux": "Qux"
-    }
-    """
-    Then the response status code should be 201
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
-    {
+    }',
+        ]);
+
+        $this->assertResponseStatusCodeSame(201);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertJsonEquals(<<<'JSON'
+{
       "@context": "/contexts/DummyGroup",
       "@id": "/dummy_groups/12",
       "@type": "DummyGroup",
       "foo": "Foo"
     }
-    """
+JSON);
+    }
 
-  Scenario: Create a resource by groups dummy_foo, dummy_baz, dummy_qux and without overriding
-    When I add "Content-Type" header equal to "application/ld+json"
-    And I send a "POST" request to "/dummy_groups?groups[]=dummy_foo&groups[]=dummy_baz&groups[]=dummy_qux" with body:
-    """
+    public function testCreateAResourceByGroupsDummyFooDummyBazDummyQuxAndWithoutOverriding(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('POST', '/dummy_groups?groups[]=dummy_foo&groups[]=dummy_baz&groups[]=dummy_qux', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+                'Content-Type' => 'application/ld+json',
+            ],
+            'body' => '{
       "foo": "Foo",
       "bar": "Bar",
       "baz": "Baz",
       "qux": "Qux"
-    }
-    """
-    Then the response status code should be 201
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
-    {
+    }',
+        ]);
+
+        $this->assertResponseStatusCodeSame(201);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertJsonEquals(<<<'JSON'
+{
       "@context": "/contexts/DummyGroup",
       "@id": "/dummy_groups/13",
       "@type": "DummyGroup",
@@ -791,25 +976,30 @@ Feature: Filter with serialization groups on items and collections
       "baz": "Baz",
       "qux": "Qux"
     }
-    """
+JSON);
+    }
 
-  Scenario: Create a resource by groups dummy_foo, dummy_baz, dummy_qux and with overriding
-    When I add "Content-Type" header equal to "application/ld+json"
-    And I send a "POST" request to "/dummy_groups?override_groups[]=dummy_foo&override_groups[]=dummy_baz&override_groups[]=dummy_qux" with body:
-    """
+    public function testCreateAResourceByGroupsDummyFooDummyBazDummyQuxAndWithOverriding(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('POST', '/dummy_groups?override_groups[]=dummy_foo&override_groups[]=dummy_baz&override_groups[]=dummy_qux', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+                'Content-Type' => 'application/ld+json',
+            ],
+            'body' => '{
       "foo": "Foo",
       "bar": "Bar",
       "baz": "Baz",
       "qux": "Qux"
-    }
-    """
-    Then the response status code should be 201
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
-    {
+    }',
+        ]);
+
+        $this->assertResponseStatusCodeSame(201);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertJsonEquals(<<<'JSON'
+{
       "@context": "/contexts/DummyGroup",
       "@id": "/dummy_groups/14",
       "@type": "DummyGroup",
@@ -817,25 +1007,30 @@ Feature: Filter with serialization groups on items and collections
       "baz": "Baz",
       "qux": "Qux"
     }
-    """
+JSON);
+    }
 
-  Scenario: Create a resource by groups dummy, dummy_baz, without overriding
-    When I add "Content-Type" header equal to "application/ld+json"
-    And I send a "POST" request to "/dummy_groups?groups[]=dummy&groups[]=dummy_baz" with body:
-    """
+    public function testCreateAResourceByGroupsDummyDummyBazWithoutOverriding(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('POST', '/dummy_groups?groups[]=dummy&groups[]=dummy_baz', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+                'Content-Type' => 'application/ld+json',
+            ],
+            'body' => '{
       "foo": "Foo",
       "bar": "Bar",
       "baz": "Baz",
       "qux": "Qux"
-    }
-    """
-    Then the response status code should be 201
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
-    {
+    }',
+        ]);
+
+        $this->assertResponseStatusCodeSame(201);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertJsonEquals(<<<'JSON'
+{
       "@context": "/contexts/DummyGroup",
       "@id": "/dummy_groups/15",
       "@type": "DummyGroup",
@@ -845,25 +1040,30 @@ Feature: Filter with serialization groups on items and collections
       "baz": "Baz",
       "qux": "Qux"
     }
-    """
+JSON);
+    }
 
-  Scenario: Create a resource by groups dummy, dummy_baz and with overriding
-    When I add "Content-Type" header equal to "application/ld+json"
-    And I send a "POST" request to "/dummy_groups?override_groups[]=dummy&override_groups[]=dummy_baz" with body:
-    """
+    public function testCreateAResourceByGroupsDummyDummyBazAndWithOverriding(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('POST', '/dummy_groups?override_groups[]=dummy&override_groups[]=dummy_baz', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+                'Content-Type' => 'application/ld+json',
+            ],
+            'body' => '{
       "foo": "Foo",
       "bar": "Bar",
       "baz": "Baz",
       "qux": "Qux"
-    }
-    """
-    Then the response status code should be 201
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
-    {
+    }',
+        ]);
+
+        $this->assertResponseStatusCodeSame(201);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertJsonEquals(<<<'JSON'
+{
       "@context": "/contexts/DummyGroup",
       "@id": "/dummy_groups/16",
       "@type": "DummyGroup",
@@ -873,25 +1073,30 @@ Feature: Filter with serialization groups on items and collections
       "baz": "Baz",
       "qux": "Qux"
     }
-    """
+JSON);
+    }
 
-  Scenario: Create a resource by group empty and without overriding
-    When I add "Content-Type" header equal to "application/ld+json"
-    And I send a "POST" request to "/dummy_groups?groups[]=" with body:
-    """
+    public function testCreateAResourceByGroupEmptyAndWithoutOverriding(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('POST', '/dummy_groups?groups[]=', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+                'Content-Type' => 'application/ld+json',
+            ],
+            'body' => '{
       "foo": "Foo",
       "bar": "Bar",
       "baz": "Baz",
       "qux": "Qux"
-    }
-    """
-    Then the response status code should be 201
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
-    {
+    }',
+        ]);
+
+        $this->assertResponseStatusCodeSame(201);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertJsonEquals(<<<'JSON'
+{
       "@context": "/contexts/DummyGroup",
       "@id": "/dummy_groups/17",
       "@type": "DummyGroup",
@@ -900,48 +1105,58 @@ Feature: Filter with serialization groups on items and collections
       "bar": "Bar",
       "baz": null
     }
-    """
+JSON);
+    }
 
-  Scenario: Create a resource by group empty and with overriding
-    When I add "Content-Type" header equal to "application/ld+json"
-    And I send a "POST" request to "/dummy_groups?override_groups[]=" with body:
-    """
+    public function testCreateAResourceByGroupEmptyAndWithOverriding(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('POST', '/dummy_groups?override_groups[]=', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+                'Content-Type' => 'application/ld+json',
+            ],
+            'body' => '{
       "foo": "Foo",
       "bar": "Bar",
       "baz": "Baz",
       "qux": "Qux"
-    }
-    """
-    Then the response status code should be 201
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
-    {
+    }',
+        ]);
+
+        $this->assertResponseStatusCodeSame(201);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertJsonEquals(<<<'JSON'
+{
       "@context": "/contexts/DummyGroup",
       "@id": "/dummy_groups/18",
       "@type": "DummyGroup"
     }
-    """
+JSON);
+    }
 
-  Scenario: Create a resource by groups dummy, dummy_baz, without overriding and with whitelist
-    When I add "Content-Type" header equal to "application/ld+json"
-    And I send a "POST" request to "/dummy_groups?whitelisted_groups[]=dummy&whitelisted_groups[]=dummy_baz" with body:
-    """
+    public function testCreateAResourceByGroupsDummyDummyBazWithoutOverridingAndWithWhitelist(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('POST', '/dummy_groups?whitelisted_groups[]=dummy&whitelisted_groups[]=dummy_baz', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+                'Content-Type' => 'application/ld+json',
+            ],
+            'body' => '{
       "foo": "Foo",
       "bar": "Bar",
       "baz": "Baz",
       "qux": "Qux"
-    }
-    """
-    Then the response status code should be 201
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
-    {
+    }',
+        ]);
+
+        $this->assertResponseStatusCodeSame(201);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertJsonEquals(<<<'JSON'
+{
       "@context": "/contexts/DummyGroup",
       "@id": "/dummy_groups/19",
       "@type": "DummyGroup",
@@ -950,28 +1165,35 @@ Feature: Filter with serialization groups on items and collections
       "bar": "Bar",
       "baz": "Baz"
     }
-    """
+JSON);
+    }
 
-  Scenario: Create a resource by groups dummy, dummy_baz, with overriding and with whitelist
-    When I add "Content-Type" header equal to "application/ld+json"
-    And I send a "POST" request to "/dummy_groups?override_whitelisted_groups[]=dummy&override_whitelisted_groups[]=dummy_baz" with body:
-    """
+    public function testCreateAResourceByGroupsDummyDummyBazWithOverridingAndWithWhitelist(): void
     {
+        $this->loadFixtures();
+
+        $response = self::createClient()->request('POST', '/dummy_groups?override_whitelisted_groups[]=dummy&override_whitelisted_groups[]=dummy_baz', [
+            'headers' => [
+                'Accept' => 'application/ld+json',
+                'Content-Type' => 'application/ld+json',
+            ],
+            'body' => '{
       "foo": "Foo",
       "bar": "Bar",
       "baz": "Baz",
       "qux": "Qux"
-    }
-    """
-    Then the response status code should be 201
-    And the response should be in JSON
-    And the header "Content-Type" should be equal to "application/ld+json; charset=utf-8"
-    And the JSON should be equal to:
-    """
-    {
+    }',
+        ]);
+
+        $this->assertResponseStatusCodeSame(201);
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertJsonEquals(<<<'JSON'
+{
       "@context": "/contexts/DummyGroup",
       "@id": "/dummy_groups/20",
       "@type": "DummyGroup",
       "baz": "Baz"
     }
-    """
+JSON);
+    }
+}
