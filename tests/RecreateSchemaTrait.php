@@ -31,7 +31,7 @@ trait RecreateSchemaTrait
             $schemaManager = $manager->getSchemaManager();
             $firstDocumentClass = null;
             foreach ($classes as $c) {
-                $class = str_contains($c, 'Entity') ? str_replace('Entity', 'Document', $c) : $c;
+                $class = str_contains($c, '\\Entity\\') ? str_replace('\\Entity\\', '\\Document\\', $c) : $c;
                 $firstDocumentClass ??= $class;
                 $schemaManager->dropDocumentCollection($class);
             }

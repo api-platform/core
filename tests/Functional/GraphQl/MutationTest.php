@@ -15,15 +15,16 @@ namespace ApiPlatform\Tests\Functional\GraphQl;
 
 use ApiPlatform\GraphQl\Test\GraphQlTestTrait;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6354\ActivityLog;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyCustomMutation as DummyCustomMutationDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyGroup as DummyGroupDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Foo as FooDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\FooDummy as FooDummyDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\FooEmbeddable as FooEmbeddableDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Person as PersonDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\RelatedDummy as RelatedDummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\WritableId as WritableIdDocument;
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6354\ActivityLog;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeItem;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeLabel;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CompositeRelation;
@@ -826,7 +827,8 @@ final class MutationTest extends ApiTestCase
         $foo = new $fooClass();
         $foo->setName('Hawsepipe');
 
-        $embedded = new FooEmbeddable();
+        $embeddedClass = $this->isMongoDB() ? FooEmbeddableDocument::class : FooEmbeddable::class;
+        $embedded = new $embeddedClass();
         $embedded->setDummyName('embeddedHawsepipe');
         $foo->setEmbeddedFoo($embedded);
         $foo->setDummy($dummy);

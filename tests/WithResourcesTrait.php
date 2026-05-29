@@ -23,13 +23,13 @@ trait WithResourcesTrait
     protected static function writeResources(array $resources): void
     {
         file_put_contents(__DIR__.'/Fixtures/app/var/resources.php', \sprintf('<?php return [%s];', implode(',', array_map(static fn ($v) => $v.'::class', $resources))));
-        static::invalidateMetadataPools();
+        self::invalidateMetadataPools();
     }
 
     protected static function removeResources(): void
     {
         file_put_contents(__DIR__.'/Fixtures/app/var/resources.php', '<?php return [];');
-        static::invalidateMetadataPools();
+        self::invalidateMetadataPools();
     }
 
     /**

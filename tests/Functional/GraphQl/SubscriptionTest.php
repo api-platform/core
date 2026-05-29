@@ -184,7 +184,7 @@ final class SubscriptionTest extends ApiTestCase
 
     /**
      * @param list<\Symfony\Component\Mercure\Update> $updates
-     * @param array<string, mixed> $expectedPayload
+     * @param array<string, mixed>                    $expectedPayload
      */
     private function assertMercureUpdatePresent(array $updates, string $topicPattern, array $expectedPayload): void
     {

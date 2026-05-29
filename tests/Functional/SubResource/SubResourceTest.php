@@ -369,7 +369,7 @@ final class SubResourceTest extends ApiTestCase
 
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonEquals([
-            '@context' => '/contexts/DummyOffer',
+            '@context' => '/contexts/DummyOfferByProductOffer',
             '@id' => '/dummy_products/2/offers/1/offers',
             '@type' => 'hydra:Collection',
             'hydra:member' => [[
@@ -391,7 +391,7 @@ final class SubResourceTest extends ApiTestCase
 
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonEquals([
-            '@context' => '/contexts/DummyOffer',
+            '@context' => '/contexts/DummyOfferByAggregate',
             '@id' => '/dummy_aggregate_offers/1/offers',
             '@type' => 'hydra:Collection',
             'hydra:member' => [[
@@ -448,7 +448,7 @@ final class SubResourceTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
         $this->assertJsonEquals([
-            '@context' => '/contexts/Greeting',
+            '@context' => '/contexts/GreetingBySender',
             '@id' => '/people/1/sent_greetings',
             '@type' => 'hydra:Collection',
             'hydra:member' => [[

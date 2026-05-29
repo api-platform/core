@@ -27,7 +27,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 trait GraphQlTestTrait
 {
     /**
-     * @param array<string, mixed> $variables
+     * @param array<string, mixed>           $variables
      * @param array<string, string|string[]> $headers
      */
     protected function executeGraphQl(string $query, array $variables = [], ?string $operationName = null, array $headers = []): ResponseInterface
@@ -63,8 +63,8 @@ trait GraphQlTestTrait
      * Send a `multipart/form-data` GraphQL request following the
      * graphql-multipart-request-spec (https://github.com/jaydenseric/graphql-multipart-request-spec).
      *
-     * @param array<string, string> $files Map of file marker => absolute file path
-     * @param array<string, string|string[]> $headers
+     * @param array<int|string, string|\Symfony\Component\HttpFoundation\File\UploadedFile> $files   Map of file marker => absolute file path or UploadedFile
+     * @param array<string, string|string[]>                                                $headers
      */
     protected function executeGraphQlMultipart(string $operations, string $map, array $files, array $headers = []): ResponseInterface
     {

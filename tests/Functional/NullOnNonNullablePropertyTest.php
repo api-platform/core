@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Functional;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\NullOnNonNullableProperty\NullOnNonNullableResource;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /** @see https://github.com/symfony/symfony/issues/64159 */
 final class NullOnNonNullablePropertyTest extends ApiTestCase
@@ -45,8 +46,13 @@ final class NullOnNonNullablePropertyTest extends ApiTestCase
         $this->assertStringContainsString('Expected argument of type "string", "null" given at property path "name"', $body['hydra:description'] ?? $body['detail'] ?? '');
     }
 
+    #[IgnoreDeprecations]
     public function testNullOnNonNullablePropertyReturns422WhenCollectingErrors(): void
     {
+        if (method_exists(\Symfony\Component\Serializer\Exception\PartialDenormalizationException::class, 'getNotNormalizableValueErrors')) {
+            $this->expectUserDeprecationMessage('Since symfony/serializer 8.1: The "Symfony\Component\Serializer\Exception\PartialDenormalizationException::getErrors()" method is deprecated, use "Symfony\Component\Serializer\Exception\PartialDenormalizationException::getNotNormalizableValueErrors()" instead.');
+        }
+
         $response = self::createClient()->request('POST', '/null_on_non_nullable_resources_collect', [
             'headers' => ['Content-Type' => 'application/ld+json'],
             'json' => ['name' => null],

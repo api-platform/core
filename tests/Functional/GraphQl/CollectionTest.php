@@ -15,7 +15,6 @@ namespace ApiPlatform\Tests\Functional\GraphQl;
 
 use ApiPlatform\GraphQl\Test\GraphQlTestTrait;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use ApiPlatform\Tests\Fixtures\TestBundle\Document\CompositePrimitiveItem as CompositePrimitiveItemDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyCustomQuery as DummyCustomQueryDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\DummyDifferentGraphQlSerializationGroup as DummyDifferentGraphQlSerializationGroupDocument;
