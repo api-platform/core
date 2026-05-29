@@ -1,81 +1,54 @@
-var initParameters = {};
-var entrypoint = null;
+import 'graphiql/setup-workers/esm.sh';
+import { createElement } from 'react';
+import { createRoot } from 'react-dom/client';
+import { GraphiQL } from 'graphiql';
+import { createGraphiQLFetcher } from '@graphiql/toolkit';
 
-function onEditQuery(newQuery) {
-    initParameters.query = newQuery;
-    updateURL();
-}
+const data = JSON.parse(document.getElementById('graphiql-data').textContent);
 
-function onEditVariables(newVariables) {
-    initParameters.variables = newVariables;
-    updateURL();
-}
-
-function onEditOperationName(newOperationName) {
-    initParameters.operationName = newOperationName;
-    updateURL();
-}
-
-function updateURL() {
-    var newSearch = '?' + Object.keys(initParameters).filter(function (key) {
-        return Boolean(initParameters[key]);
-    }).map(function (key) {
-        return encodeURIComponent(key) + '=' + encodeURIComponent(initParameters[key]);
-    }).join('&');
-    history.replaceState(null, null, newSearch);
-}
-
-function graphQLFetcher(graphQLParams, {headers}) {
-    return fetch(entrypoint, {
-        method: 'post',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            ...headers
-        },
-        body: JSON.stringify(graphQLParams),
-        credentials: 'include'
-    }).then(function (response) {
-        return response.text();
-    }).then(function (responseBody) {
-        try {
-            return JSON.parse(responseBody);
-        } catch (error) {
-            return responseBody;
-        }
-    });
-}
-
-window.onload = function() {
-    var data = JSON.parse(document.getElementById('graphiql-data').innerText);
-    entrypoint = data.entrypoint;
-
-    var search = window.location.search;
-    search.substr(1).split('&').forEach(function (entry) {
-        var eq = entry.indexOf('=');
-        if (eq >= 0) {
-            initParameters[decodeURIComponent(entry.slice(0, eq))] = decodeURIComponent(entry.slice(eq + 1));
-        }
-    });
-
-    if (initParameters.variables) {
-        try {
-            initParameters.variables = JSON.stringify(JSON.parse(initParameters.variables), null, 2);
-        } catch (e) {
-            // Do nothing, we want to display the invalid JSON as a string, rather than present an error.
-        }
+const params = new URLSearchParams(window.location.search);
+const rawVariables = params.get('variables');
+let initialVariables;
+if (rawVariables) {
+    try {
+        initialVariables = JSON.stringify(JSON.parse(rawVariables), null, 2);
+    } catch {
+        initialVariables = rawVariables;
     }
-
-    ReactDOM.render(
-        React.createElement(GraphiQL, {
-            fetcher: graphQLFetcher,
-            query: initParameters.query,
-            variables: initParameters.variables,
-            operationName: initParameters.operationName,
-            onEditQuery: onEditQuery,
-            onEditVariables: onEditVariables,
-            onEditOperationName: onEditOperationName
-        }),
-        document.getElementById('graphiql')
-    );
 }
+
+const fetcher = createGraphiQLFetcher({
+    url: data.entrypoint,
+    fetch: (url, init) => fetch(url, { ...init, credentials: 'include' }),
+});
+
+function updateUrl({ query, variables, operationName }) {
+    const next = new URLSearchParams();
+    if (query) next.set('query', query);
+    if (variables) next.set('variables', variables);
+    if (operationName) next.set('operationName', operationName);
+    const search = next.toString();
+    window.history.replaceState(null, '', search ? `?${search}` : window.location.pathname);
+}
+
+function onTabChange({ tabs, activeTabIndex }) {
+    const tab = tabs[activeTabIndex];
+    if (!tab) {
+        return;
+    }
+    updateUrl({
+        query: tab.query,
+        variables: tab.variables,
+        operationName: tab.operationName,
+    });
+}
+
+createRoot(document.getElementById('graphiql')).render(
+    createElement(GraphiQL, {
+        fetcher,
+        initialQuery: params.get('query') ?? undefined,
+        initialVariables,
+        operationName: params.get('operationName') ?? undefined,
+        onTabChange,
+    }),
+);
