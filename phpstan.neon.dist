@@ -181,3 +181,13 @@ parameters:
 			identifier: method.notFound
 			paths:
 				- tests/Functional/JsonStreamerTest.php
+
+		# Symfony Console 7.4 added Application::addCommand(); 8.1 removed add(). One branch is unreachable depending on installed version.
+		-
+			message: '#Call to an undefined method Symfony\\Component\\Console\\Application::(add|addCommand)\(\)\.#'
+			path: tests/Symfony/Bundle/Command/DebugResourceCommandTest.php
+			reportUnmatched: false
+		-
+			identifier: function.alreadyNarrowedType
+			path: tests/Symfony/Bundle/Command/DebugResourceCommandTest.php
+			reportUnmatched: false
