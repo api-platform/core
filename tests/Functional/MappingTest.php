@@ -73,7 +73,7 @@ final class MappingTest extends ApiTestCase
             $this->markTestSkipped('ObjectMapper not installed');
         }
 
-        $this->recreateSchema([MappedEntity::class]);
+        $this->recreateSchema([$this->isMongoDB() ? MappedDocument::class : MappedEntity::class]);
         $this->loadFixtures();
         $client = self::createClient();
         $client->request('GET', $this->isMongoDB() ? 'mapped_resource_odms' : 'mapped_resources');

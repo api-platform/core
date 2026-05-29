@@ -17,6 +17,8 @@ use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\EnumValidationResource;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Composer\InstalledVersions;
+use Composer\Semver\VersionParser;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * @see https://github.com/api-platform/core/issues/8183
@@ -65,8 +67,13 @@ final class EnumDenormalizationValidationTest extends ApiTestCase
         $this->assertNotNull($genderViolation, 'Expected a constraint violation on "gender" property.');
     }
 
+    #[IgnoreDeprecations]
     public function testInvalidBackedEnumValueWithCollectDenormalizationErrors(): void
     {
+        if (InstalledVersions::satisfies(new VersionParser(), 'symfony/serializer', '>=8.1')) {
+            $this->expectUserDeprecationMessage('Since symfony/serializer 8.1: The "Symfony\Component\Serializer\Exception\PartialDenormalizationException::getErrors()" method is deprecated, use "Symfony\Component\Serializer\Exception\PartialDenormalizationException::getNotNormalizableValueErrors()" instead.');
+        }
+
         $response = static::createClient()->request('POST', '/enum_validation_resources_collect', [
             'headers' => ['Content-Type' => 'application/ld+json'],
             'json' => ['gender' => 'unknown'],
