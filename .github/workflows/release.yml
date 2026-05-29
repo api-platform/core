@@ -42,7 +42,7 @@ jobs:
           echo "$(pwd)" >> $GITHUB_PATH
 
       - name: Split to manyrepo
-        run: find src -maxdepth 3 -name composer.json -print0 | xargs -I '{}' -n 1 -0 bash subtree.sh {} ${{ github.ref }}
+        run: find src -maxdepth 3 -name composer.json -print0 | xargs -I '{}' -n 1 -0 bash tools/subtree.sh {} ${{ github.ref }}
 
   dispatch-distribution-update:
     name: Dispatch Distribution Update
