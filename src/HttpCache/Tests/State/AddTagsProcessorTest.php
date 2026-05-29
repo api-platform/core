@@ -22,24 +22,16 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\State\ProcessorInterface;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class AddTagsProcessorTest extends TestCase
 {
     public function testAddTags(): void
     {
         $operation = new Get();
-        $response = $this->createMock(Response::class);
-        $response->method('isCacheable')->willReturn(true);
-        $response->headers = $this->createMock(ResponseHeaderBag::class);
-        $response->headers->expects($this->once())->method('set')->with('Cache-Tags', 'a,b');
-        $request = $this->createMock(Request::class);
-        $request->method('isMethodCacheable')->willReturn(true);
-        $request->attributes = $this->createMock(ParameterBag::class);
-        $request->attributes->method('get')->with('_resources', [])->willReturn(['a', 'b']);
+        $response = new Response('', 200, ['Cache-Control' => 'public, max-age=10']);
+        $request = new Request(attributes: ['_resources' => ['a', 'b']]);
         $context = ['request' => $request];
         $decorated = $this->createMock(ProcessorInterface::class);
         $decorated->method('process')->willReturn($response);
@@ -47,20 +39,15 @@ class AddTagsProcessorTest extends TestCase
         $iriConverter->expects($this->never())->method('getIriFromResource');
         $processor = new AddTagsProcessor($decorated, $iriConverter);
         $processor->process($response, $operation, [], $context);
+
+        $this->assertSame('a,b', $response->headers->get('Cache-Tags'));
     }
 
     public function testAddTagsCollection(): void
     {
         $operation = new GetCollection(class: \stdClass::class, uriVariables: ['id' => new Link()]);
-        $response = $this->createMock(Response::class);
-        $response->method('isCacheable')->willReturn(true);
-        $response->headers = $this->createMock(ResponseHeaderBag::class);
-        $response->headers->expects($this->once())->method('set')->with('Cache-Tags', 'a,b,/foos/1/bars');
-        $request = $this->createMock(Request::class);
-        $request->method('isMethodCacheable')->willReturn(true);
-        $request->attributes = $this->createMock(ParameterBag::class);
-        $request->attributes->method('get')->with('_resources', [])->willReturn(['a', 'b']);
-        $request->attributes->method('all')->willReturn(['id' => 1]);
+        $response = new Response('', 200, ['Cache-Control' => 'public, max-age=10']);
+        $request = new Request(attributes: ['_resources' => ['a', 'b'], 'id' => 1]);
         $context = ['request' => $request];
         $decorated = $this->createMock(ProcessorInterface::class);
         $decorated->method('process')->willReturn($response);
@@ -68,19 +55,15 @@ class AddTagsProcessorTest extends TestCase
         $iriConverter->expects($this->once())->method('getIriFromResource')->with(\stdClass::class, UrlGeneratorInterface::ABS_PATH, $operation, ['uri_variables' => ['id' => 1]])->willReturn('/foos/1/bars');
         $processor = new AddTagsProcessor($decorated, $iriConverter);
         $processor->process($response, $operation, [], $context);
+
+        $this->assertSame('a,b,/foos/1/bars', $response->headers->get('Cache-Tags'));
     }
 
     public function testAddTagsWithPurger(): void
     {
         $operation = new Get();
-        $response = $this->createMock(Response::class);
-        $response->method('isCacheable')->willReturn(true);
-        $response->headers = $this->createMock(ResponseHeaderBag::class);
-        $response->headers->expects($this->once())->method('set')->with('Cache-Tags', 'a,b');
-        $request = $this->createMock(Request::class);
-        $request->method('isMethodCacheable')->willReturn(true);
-        $request->attributes = $this->createMock(ParameterBag::class);
-        $request->attributes->method('get')->with('_resources', [])->willReturn(['a', 'b']);
+        $response = new Response('', 200, ['Cache-Control' => 'public, max-age=10']);
+        $request = new Request(attributes: ['_resources' => ['a', 'b']]);
         $context = ['request' => $request];
         $decorated = $this->createMock(ProcessorInterface::class);
         $decorated->method('process')->willReturn($response);
@@ -90,5 +73,7 @@ class AddTagsProcessorTest extends TestCase
         $purger->expects($this->once())->method('getResponseHeaders')->willReturn(['Cache-Tags' => 'a,b']);
         $processor = new AddTagsProcessor($decorated, $iriConverter, $purger);
         $processor->process($response, $operation, [], $context);
+
+        $this->assertSame('a,b', $response->headers->get('Cache-Tags'));
     }
 }
