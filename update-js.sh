@@ -2,8 +2,11 @@
 rm -f package.lock
 rm -f package-lock.json
 echo "{}" > package.json
-# /!\ UMD is removed since react@19: https://react.dev/blog/2024/04/25/react-19-upgrade-guide#umd-builds-removed
-npm i @fontsource/open-sans swagger-ui es6-promise fetch react@18 react-dom@18 graphiql redoc
+# GraphiQL v5 + React are loaded at runtime via importmap + esm.sh CDN
+# (see src/Symfony/Bundle/Resources/views/Graphiql/index.html.twig and
+# src/Laravel/resources/views/graphiql.blade.php). React 19 removed UMD
+# builds, so no React/GraphiQL assets are bundled here.
+npm i @fontsource/open-sans swagger-ui redoc
 
 for public in src/Symfony/Bundle/Resources/public/ src/Laravel/public/; do
 
@@ -65,22 +68,6 @@ cp node_modules/swagger-ui/dist/swagger-ui-standalone-preset.js "$dest"
 cp node_modules/swagger-ui/dist/swagger-ui.css "$dest"
 cp node_modules/swagger-ui/dist/swagger-ui.css.map "$dest"
 cp node_modules/swagger-ui/dist/oauth2-redirect.html "$dest"
-
-dest="${public}react/"
-if [[ -d "$dest" ]]; then
-rm -Rf "$dest"
-fi
-mkdir -p "$dest"
-cp node_modules/react/umd/react.production.min.js "$dest"
-cp node_modules/react-dom/umd/react-dom.production.min.js "$dest"
-
-dest="${public}graphiql/"
-if [[ -d "$dest" ]]; then
-rm -Rf "$dest"
-fi
-mkdir -p "$dest"
-cp node_modules/graphiql/graphiql.min.js "$dest"
-cp node_modules/graphiql/graphiql.css "$dest"
 
 dest="${public}redoc/"
 if [[ -d "$dest" ]]; then
