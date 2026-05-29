@@ -4,7 +4,6 @@ default:
       contexts:
         - 'ApiPlatform\Tests\Behat\CommandContext'
         - 'ApiPlatform\Tests\Behat\DoctrineContext'
-        - 'ApiPlatform\Tests\Behat\GraphqlContext'
         - 'ApiPlatform\Tests\Behat\JsonContext'
         - 'ApiPlatform\Tests\Behat\HydraContext'
         - 'ApiPlatform\Tests\Behat\HttpCacheContext'
@@ -39,7 +38,6 @@ postgres:
       contexts:
         - 'ApiPlatform\Tests\Behat\CommandContext'
         - 'ApiPlatform\Tests\Behat\DoctrineContext'
-        - 'ApiPlatform\Tests\Behat\GraphqlContext'
         - 'ApiPlatform\Tests\Behat\JsonContext'
         - 'ApiPlatform\Tests\Behat\HydraContext'
         - 'ApiPlatform\Tests\Behat\HttpCacheContext'
@@ -59,7 +57,6 @@ mongodb:
       contexts:
         - 'ApiPlatform\Tests\Behat\CommandContext'
         - 'ApiPlatform\Tests\Behat\DoctrineContext'
-        - 'ApiPlatform\Tests\Behat\GraphqlContext'
         - 'ApiPlatform\Tests\Behat\JsonContext'
         - 'ApiPlatform\Tests\Behat\HydraContext'
         - 'ApiPlatform\Tests\Behat\HttpCacheContext'
@@ -79,7 +76,6 @@ mercure:
       contexts:
         - 'ApiPlatform\Tests\Behat\CommandContext'
         - 'ApiPlatform\Tests\Behat\DoctrineContext'
-        - 'ApiPlatform\Tests\Behat\GraphqlContext'
         - 'ApiPlatform\Tests\Behat\JsonContext'
         - 'ApiPlatform\Tests\Behat\HydraContext'
         - 'ApiPlatform\Tests\Behat\HttpCacheContext'
@@ -98,7 +94,6 @@ default-coverage:
       contexts:
         - 'ApiPlatform\Tests\Behat\CommandContext'
         - 'ApiPlatform\Tests\Behat\DoctrineContext'
-        - 'ApiPlatform\Tests\Behat\GraphqlContext'
         - 'ApiPlatform\Tests\Behat\JsonContext'
         - 'ApiPlatform\Tests\Behat\HydraContext'
         - 'ApiPlatform\Tests\Behat\HttpCacheContext'
@@ -118,7 +113,6 @@ mongodb-coverage:
       contexts:
         - 'ApiPlatform\Tests\Behat\CommandContext'
         - 'ApiPlatform\Tests\Behat\DoctrineContext'
-        - 'ApiPlatform\Tests\Behat\GraphqlContext'
         - 'ApiPlatform\Tests\Behat\JsonContext'
         - 'ApiPlatform\Tests\Behat\HydraContext'
         - 'ApiPlatform\Tests\Behat\HttpCacheContext'
@@ -138,7 +132,6 @@ mercure-coverage:
       contexts:
         - 'ApiPlatform\Tests\Behat\CommandContext'
         - 'ApiPlatform\Tests\Behat\DoctrineContext'
-        - 'ApiPlatform\Tests\Behat\GraphqlContext'
         - 'ApiPlatform\Tests\Behat\JsonContext'
         - 'ApiPlatform\Tests\Behat\HydraContext'
         - 'ApiPlatform\Tests\Behat\HttpCacheContext'
@@ -156,7 +149,6 @@ legacy:
       contexts:
         - 'ApiPlatform\Tests\Behat\CommandContext'
         - 'ApiPlatform\Tests\Behat\DoctrineContext'
-        - 'ApiPlatform\Tests\Behat\GraphqlContext'
         - 'ApiPlatform\Tests\Behat\JsonContext'
         - 'ApiPlatform\Tests\Behat\HydraContext'
         - 'ApiPlatform\Tests\Behat\HttpCacheContext'
@@ -190,7 +182,6 @@ symfony_listeners:
       contexts:
         - 'ApiPlatform\Tests\Behat\CommandContext'
         - 'ApiPlatform\Tests\Behat\DoctrineContext'
-        - 'ApiPlatform\Tests\Behat\GraphqlContext'
         - 'ApiPlatform\Tests\Behat\JsonContext'
         - 'ApiPlatform\Tests\Behat\HydraContext'
         - 'ApiPlatform\Tests\Behat\HttpCacheContext'
