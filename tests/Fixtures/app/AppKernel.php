@@ -18,7 +18,6 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Symfony\Bundle\ApiPlatformBundle;
-use ApiPlatform\Tests\Behat\DoctrineContext;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\User as UserDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Tests\Fixtures\TestBundle\TestBundle;
@@ -27,7 +26,6 @@ use Doctrine\Bundle\DoctrineBundle\ConnectionFactory;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
 use Doctrine\Bundle\MongoDBBundle\Command\TailCursorDoctrineODMCommand;
 use Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle;
-use FriendsOfBehat\SymfonyExtension\Bundle\FriendsOfBehatSymfonyExtensionBundle;
 use Symfony\AI\McpBundle\McpBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
@@ -63,7 +61,6 @@ class AppKernel extends Kernel
     {
         parent::__construct($environment, $debug);
 
-        // patch for behat/symfony2-extension not supporting %env(APP_ENV)%
         $this->environment = $_SERVER['APP_ENV'] ?? $environment;
         $this->genIdDefault = $genIdDefault ?? $_SERVER['GEN_ID_DEFAULT'] ?? null;
     }
@@ -80,10 +77,6 @@ class AppKernel extends Kernel
             new FrameworkBundle(),
             new MakerBundle(),
         ];
-
-        if (null === ($_ENV['APP_PHPUNIT'] ?? null) && class_exists(FriendsOfBehatSymfonyExtensionBundle::class)) {
-            $bundles[] = new FriendsOfBehatSymfonyExtensionBundle();
-        }
 
         if (extension_loaded('mongodb') && class_exists(DoctrineMongoDBBundle::class)) {
             $bundles[] = new DoctrineMongoDBBundle();
@@ -119,11 +112,6 @@ class AppKernel extends Kernel
         $c->setParameter('app.gen_id_default', $this->genIdDefault);
 
         $loader->load(__DIR__."/config/config_{$this->getEnvironment()}.yml");
-
-        if (interface_exists(Behat\Behat\Context\Context::class) && class_exists(DoctrineContext::class)) {
-            $loader->load(__DIR__.('mongodb' === $this->getEnvironment() ? '/config/config_behat_mongodb.yml' : '/config/config_behat_orm.yml'));
-            $c->getDefinition(DoctrineContext::class)->setArgument('$passwordHasher', class_exists(NativePasswordHasher::class) ? 'security.user_password_encoder' : 'security.user_password_hasher');
-        }
 
         $messengerConfig = [
             'default_bus' => 'messenger.bus.default',

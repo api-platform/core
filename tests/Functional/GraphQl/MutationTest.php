@@ -55,7 +55,7 @@ final class MutationTest extends ApiTestCase
 
     protected static ?bool $alwaysBootKernel = false;
 
-    private const FIXTURES_DIR = __DIR__.'/../../../features/files';
+    private const FIXTURES_DIR = __DIR__.'/Fixtures';
 
     /**
      * @return class-string[]
