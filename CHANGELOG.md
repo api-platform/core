@@ -1,5 +1,12 @@
 # Changelog
 
+## v4.3.7
+
+### Bug fixes
+
+* [90ae5142b](https://github.com/api-platform/core/commit/90ae5142b38a9aee78cd5dcbd787181af42b6359) fix(openapi): include jsonapi collection schema (#8190)
+* [ab8bfd529](https://github.com/api-platform/core/commit/ab8bfd5296711b6db882919a4baa259ced65fe9a) fix(symfony): isolate api_platform.property_info tags (#8206)
+
 ## v4.3.6
 
 ### Bug fixes
