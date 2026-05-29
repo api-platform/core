@@ -250,11 +250,13 @@ If you include code from another project, please mention it in the Pull Request 
 
 This section is for maintainers.
 
-1. Update the JavaScript dependencies by running `./update-js.sh` (always check if it works in a browser)
+Maintenance scripts live in [`tools/`](tools/). GitHub Actions helper scripts live in [`.github/scripts/`](.github/scripts/).
+
+1. Update the JavaScript dependencies by running `./tools/update-js.sh` (always check if it works in a browser)
 2. Update the `CHANGELOG.md` file (be sure to include Pull Request numbers when appropriate) we use:
 
 ```bash
-bash generate-changelog.sh v4.1.11 v4.1.12 > CHANGELOG.new
+bash tools/generate-changelog.sh v4.1.11 v4.1.12 > CHANGELOG.new
 mv CHANGELOG.new CHANGELOG.md
 ```
 4. Update `composer.json` `version` node and use 

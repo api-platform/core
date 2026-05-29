@@ -1,0 +1,33 @@
+name: Mark stale issues
+
+on:
+  schedule:
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Log actions without mutating issues'
+        type: boolean
+        default: true
+      max_actions:
+        description: 'Maximum mutating actions per run'
+        type: string
+        default: '25'
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    env:
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
+      MAX_ACTIONS_PER_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.max_actions || '25' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const script = require('./.github/scripts/stale.js');
+            await script({ github, context, core });
