@@ -313,7 +313,14 @@ jobs:
     timeout-minutes: 20
     strategy:
       matrix:
-        php: ${{ fromJSON(github.event_name == 'pull_request' && '[{"version":"8.2"},{"version":"8.5","coverage":true},{"version":"8.5","lowest":true},{"version":"8.5","minimal-changes":true}]' || '[{"version":"8.2"},{"version":"8.3"},{"version":"8.4"},{"version":"8.5","coverage":true},{"version":"8.5","lowest":true},{"version":"8.5","minimal-changes":true}]') }}
+        php:
+          - version: '8.2'
+          - version: '8.5'
+            coverage: true
+          - version: '8.5'
+            lowest: true
+          - version: '8.5'
+            minimal-changes: true
         component:
           - api-platform/doctrine-common
           - api-platform/doctrine-orm
@@ -370,6 +377,11 @@ jobs:
         run: |
           mkdir -p /tmp/build/logs/phpunit
           composer ${{matrix.component}} test -- --log-junit "/tmp/build/logs/phpunit/junit.xml" ${{ matrix.php.coverage && '--coverage-clover /tmp/build/logs/phpunit/clover.xml' || '' }}${{ matrix.php.lowest && ' --ignore-baseline' || '' }}
+      - name: Run ${{ matrix.component }} tests (no deprecations)
+        if: ${{ matrix.php.version == '8.5' && !matrix.php.lowest && !matrix.php.minimal-changes }}
+        run: |
+          cd $(composer ${{matrix.component}} --cwd)
+          ./vendor/bin/phpunit --fail-on-deprecation --display-deprecations
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v6
@@ -396,56 +408,6 @@ jobs:
           export PATH="$PATH:$HOME/.composer/vendor/bin"
           php-coveralls --coverage_clover=/tmp/build/logs/phpunit/clover.xml
         continue-on-error: true
-
-  phpunit-components-fail-deprecation:
-    name: PHPUnit no deprecations ${{ matrix.component }} (PHP ${{ matrix.php.version }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    strategy:
-      matrix:
-        php:
-          - version: '8.5'
-        component:
-          - api-platform/doctrine-common
-          - api-platform/doctrine-orm
-          - api-platform/doctrine-odm
-          - api-platform/metadata
-          - api-platform/hydra
-          - api-platform/json-api
-          - api-platform/json-schema
-          - api-platform/elasticsearch
-          - api-platform/openapi
-          - api-platform/graphql
-          - api-platform/http-cache
-          - api-platform/ramsey-uuid
-          - api-platform/serializer
-          - api-platform/state
-          - api-platform/symfony
-          - api-platform/validator
-      fail-fast: false
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php.version }}
-          tools: pecl, composer:2.9.8
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
-          ini-values: memory_limit=-1
-      - name: Linking
-        run: |
-          composer global require soyuka/pmu
-          composer global config allow-plugins.soyuka/pmu true --no-interaction
-          composer global link . --permanent
-      - name: Run ${{ matrix.component }} install
-        run: |
-          composer ${{matrix.component}} update
-      - name: Run ${{ matrix.component }} tests
-        run: |
-          mkdir -p /tmp/build/logs/phpunit
-          cd $(composer ${{matrix.component}} --cwd)
-          ./vendor/bin/phpunit --fail-on-deprecation --display-deprecations --log-junit "/tmp/build/logs/phpunit/junit.xml" 
 
   postgresql:
     name: PHPUnit (PHP ${{ matrix.php }}) (PostgreSQL)
