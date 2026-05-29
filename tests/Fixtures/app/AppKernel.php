@@ -309,8 +309,10 @@ class AppKernel extends Kernel
 
         $loader->load(__DIR__.'/config/config_swagger.php');
 
-        // Reduce the amount of resources to the strict minimum to speed up tests.
-        $loader->load(__DIR__.'/config/phpunit.yml');
+        // We reduce the amount of resources to the strict minimum to speed up tests
+        if (null !== ($_ENV['APP_PHPUNIT'] ?? null)) {
+            $loader->load(__DIR__.'/config/phpunit.yml');
+        }
 
         if ('mongodb' === $this->environment) {
             $c->prependExtensionConfig('api_platform', [

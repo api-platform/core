@@ -26,16 +26,12 @@ final class PhpUnitResourceNameCollectionFactory implements ResourceNameCollecti
     /**
      * @param class-string[] $classes
      */
-    public function __construct(private readonly string $env, private readonly array $classes, private readonly ResourceNameCollectionFactoryInterface $decorated)
+    public function __construct(private readonly string $env, private readonly array $classes)
     {
     }
 
     public function create(): ResourceNameCollection
     {
-        if ([] === $this->classes) {
-            return $this->decorated->create();
-        }
-
         /* @var array<class-string, bool> */
         $classes = [];
         foreach ($this->classes as $c) {

@@ -7,6 +7,5 @@ services:
         arguments:
             $env: '%kernel.environment%'
             $classes: '%env(require:RESOURCES)%'
-            $decorated: '@.inner'
     config_cache_factory:
         class: ApiPlatform\Tests\ConfigCacheFactory
