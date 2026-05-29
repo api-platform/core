@@ -412,4 +412,36 @@ class ApiPlatformExtensionTest extends TestCase
         $this->assertTrue($this->container->hasParameter('api_platform.collection.pagination.maximum_items_per_page'));
         $this->assertSame(30, $this->container->getParameter('api_platform.collection.pagination.maximum_items_per_page'));
     }
+
+    /**
+     * @see https://github.com/api-platform/core/issues/8201
+     */
+    public function testPropertyInfoExtractorsDoNotLeakIntoFrameworkPropertyInfo(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $services = ['api_platform.property_info.reflection_extractor'];
+        if (class_exists(\phpDocumentor\Reflection\DocBlockFactory::class)) {
+            $services[] = 'api_platform.property_info.php_doc_extractor';
+        }
+        if (class_exists(\PHPStan\PhpDocParser\Parser\PhpDocParser::class) && class_exists(\phpDocumentor\Reflection\Types\ContextFactory::class)) {
+            $services[] = 'api_platform.property_info.phpstan_extractor';
+        }
+
+        foreach ($services as $service) {
+            $this->assertContainerHasService($service);
+            $tags = $this->container->getDefinition($service)->getTags();
+            foreach ($tags as $name => $_) {
+                $this->assertStringStartsNotWith('property_info.', $name, \sprintf('Service "%s" must not use the global "property_info.*" tag namespace (leaks into Symfony\'s property_info and breaks the validator chain — issue #8201). Found tag "%s".', $service, $name));
+            }
+        }
+
+        $apiPlatformPropertyInfo = $this->container->getDefinition('api_platform.property_info');
+        foreach ($apiPlatformPropertyInfo->getArguments() as $arg) {
+            if ($arg instanceof \Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument) {
+                $this->assertStringStartsWith('api_platform.property_info.', $arg->getTag(), \sprintf('api_platform.property_info must consume only "api_platform.property_info.*" private tags; found "%s".', $arg->getTag()));
+            }
+        }
+    }
 }

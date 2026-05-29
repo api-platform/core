@@ -78,29 +78,29 @@ return function (ContainerConfigurator $container) {
     $services->alias('api_platform.property_accessor', 'property_accessor');
 
     $services->set('api_platform.property_info.reflection_extractor', ReflectionExtractor::class)
-        ->tag('property_info.list_extractor', ['priority' => -1000])
-        ->tag('property_info.type_extractor', ['priority' => -1002])
-        ->tag('property_info.access_extractor', ['priority' => -1000])
-        ->tag('property_info.initializable_extractor', ['priority' => -1000]);
+        ->tag('api_platform.property_info.list_extractor', ['priority' => -1000])
+        ->tag('api_platform.property_info.type_extractor', ['priority' => -1002])
+        ->tag('api_platform.property_info.access_extractor', ['priority' => -1000])
+        ->tag('api_platform.property_info.initializable_extractor', ['priority' => -1000]);
 
     if (class_exists(DocBlockFactory::class)) {
         $services->set('api_platform.property_info.php_doc_extractor', PhpDocExtractor::class)
-            ->tag('property_info.description_extractor', ['priority' => -1000])
-            ->tag('property_info.type_extractor', ['priority' => -1001]);
+            ->tag('api_platform.property_info.description_extractor', ['priority' => -1000])
+            ->tag('api_platform.property_info.type_extractor', ['priority' => -1001]);
     }
 
     if (class_exists(PhpDocParser::class) && class_exists(ContextFactory::class)) {
         $services->set('api_platform.property_info.phpstan_extractor', PhpStanExtractor::class)
-            ->tag('property_info.type_extractor', ['priority' => -1000]);
+            ->tag('api_platform.property_info.type_extractor', ['priority' => -1000]);
     }
 
     $services->set('api_platform.property_info', PropertyInfoExtractor::class)
         ->args([
-            tagged_iterator('property_info.list_extractor'),
-            tagged_iterator('property_info.type_extractor'),
-            tagged_iterator('property_info.description_extractor'),
-            tagged_iterator('property_info.access_extractor'),
-            tagged_iterator('property_info.initializable_extractor'),
+            tagged_iterator('api_platform.property_info.list_extractor'),
+            tagged_iterator('api_platform.property_info.type_extractor'),
+            tagged_iterator('api_platform.property_info.description_extractor'),
+            tagged_iterator('api_platform.property_info.access_extractor'),
+            tagged_iterator('api_platform.property_info.initializable_extractor'),
         ]);
 
     $services->set('api_platform.property_info.cache', PropertyInfoCacheExtractor::class)

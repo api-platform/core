@@ -17,7 +17,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Symfony\State\MercureLinkProcessor;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mercure\Discovery;
 use Symfony\Component\Mercure\HubInterface;
@@ -28,8 +27,7 @@ class MercureLinkProcessorTest extends TestCase
     public function testProcess(): void
     {
         $obj = new \stdClass();
-        $request = $this->createMock(Request::class);
-        $request->attributes = $this->createMock(ParameterBag::class);
+        $request = new Request();
         $decorated = $this->createMock(ProcessorInterface::class);
         $decorated->expects($this->once())->method('process');
         $discovery = new Discovery(new HubRegistry($this->createMock(HubInterface::class), ['example.com' => $this->createMock(HubInterface::class)]));

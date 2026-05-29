@@ -224,7 +224,7 @@ jobs:
           composer global config allow-plugins.soyuka/pmu true --no-interaction
           composer global link .
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '20'
       - name: Install Redocly CLI
