@@ -61,9 +61,6 @@ final class ApiPlatformBundle extends Bundle
         $container->addCompilerPass(new AuthenticatorManagerPass());
         $container->addCompilerPass(new SerializerMappingLoaderPass());
         $container->addCompilerPass(new MutatorPass());
-        // Bridges Symfony's public `property_info.*` tags to API Platform's private
-        // `api_platform.property_info.*` tags. Runs late in TYPE_BEFORE_OPTIMIZATION
-        // so framework-/third-party-registered extractors are already tagged.
         $container->addCompilerPass(new PropertyInfoTagPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -100);
         // Must run after Symfony's TransformerPass so we can rely on the value_object_transformer tag being processed.
         $container->addCompilerPass(new JsonStreamerTransformerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10);
