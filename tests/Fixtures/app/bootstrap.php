@@ -24,8 +24,8 @@ require __DIR__.'/AppKernel.php';
 require __DIR__.'/DefaultParametersAppKernel.php';
 
 if (!is_file($resourcesFile = __DIR__.'/var/resources.php')) {
-    if (!is_dir(\dirname($resourcesFile))) {
-        mkdir(\dirname($resourcesFile), 0777, true);
+    if (!is_dir(dirname($resourcesFile))) {
+        mkdir(dirname($resourcesFile), 0777, true);
     }
     file_put_contents($resourcesFile, '<?php return [];');
 }
