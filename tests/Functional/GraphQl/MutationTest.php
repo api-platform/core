@@ -365,6 +365,9 @@ final class MutationTest extends ApiTestCase
 
     public function testModifyNonWritablePropertyRejected(): void
     {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('Embedded object scenario @!mongodb');
+        }
         $this->recreateSchema([Dummy::class, FooDummy::class]);
         $this->seedFooDummyWithEmbeddable();
 
