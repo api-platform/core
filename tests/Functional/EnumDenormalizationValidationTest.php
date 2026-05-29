@@ -17,6 +17,7 @@ use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\EnumValidationResource;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Composer\InstalledVersions;
+use Composer\Semver\VersionParser;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
@@ -69,7 +70,7 @@ final class EnumDenormalizationValidationTest extends ApiTestCase
     #[IgnoreDeprecations]
     public function testInvalidBackedEnumValueWithCollectDenormalizationErrors(): void
     {
-        if (method_exists(\Symfony\Component\Serializer\Exception\PartialDenormalizationException::class, 'getNotNormalizableValueErrors')) {
+        if (InstalledVersions::satisfies(new VersionParser(), 'symfony/serializer', '>=8.1')) {
             $this->expectUserDeprecationMessage('Since symfony/serializer 8.1: The "Symfony\Component\Serializer\Exception\PartialDenormalizationException::getErrors()" method is deprecated, use "Symfony\Component\Serializer\Exception\PartialDenormalizationException::getNotNormalizableValueErrors()" instead.');
         }
 
