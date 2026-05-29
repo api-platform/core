@@ -447,94 +447,8 @@ jobs:
           cd $(composer ${{matrix.component}} --cwd)
           ./vendor/bin/phpunit --fail-on-deprecation --display-deprecations --log-junit "/tmp/build/logs/phpunit/junit.xml" 
 
-  behat:
-    name: Behat (PHP ${{ matrix.php }} ${{ matrix.shard }})
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    strategy:
-      matrix:
-        php: ${{ fromJSON(github.event_name == 'pull_request' && '["8.2","8.5"]' || '["8.2","8.3","8.4","8.5"]') }}
-        shard:
-          - graphql-doctrine
-        include:
-          - php: '8.5'
-            shard: graphql-doctrine
-            coverage: true
-      fail-fast: false
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          tools: pecl, composer:2.9.8
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
-          coverage: pcov
-          ini-values: memory_limit=-1
-      - name: Get composer cache directory
-        id: composercache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-      - name: Cache dependencies
-        uses: actions/cache@v5
-        with:
-          path: ${{ steps.composercache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
-          restore-keys: ${{ runner.os }}-composer-
-      - name: Update project dependencies
-        run: |
-          composer global require soyuka/pmu
-          composer global config allow-plugins.soyuka/pmu true --no-interaction
-          composer global link .
-      - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
-      - name: Resolve shard paths
-        id: shard
-        run: |
-          case "${{ matrix.shard }}" in
-            graphql-doctrine) paths="features/graphql features/doctrine" ;;
-          esac
-          echo "paths=$paths" >> $GITHUB_OUTPUT
-      - name: Run Behat tests (PHP ${{ matrix.php }} ${{ matrix.shard }})
-        run: |
-          mkdir -p build/logs/behat
-          vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --no-interaction ${{ matrix.coverage && '--profile=default-coverage' || '--profile=default' }} ${{ steps.shard.outputs.paths }}
-      - name: Merge code coverage reports
-        if: matrix.coverage
-        run: |
-          wget -qO /usr/local/bin/phpcov https://phar.phpunit.de/phpcov-12.phar
-          chmod +x /usr/local/bin/phpcov
-          mkdir -p build/coverage
-          phpcov merge --clover build/logs/behat/clover.xml build/coverage
-      - name: Upload test artifacts
-        if: always()
-        uses: actions/upload-artifact@v6
-        with:
-          name: behat-logs-php${{ matrix.php }}-shard${{ matrix.shard }}
-          path: build/logs/behat
-        continue-on-error: true
-      - name: Upload coverage results to Codecov
-        if: matrix.coverage
-        uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          directory: build/logs/behat
-          name: behat-php${{ matrix.php }}-shard${{ matrix.shard }}
-          flags: behat
-          fail_ci_if_error: true
-        continue-on-error: true
-      - name: Upload coverage results to Coveralls
-        if: matrix.coverage
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          composer global require --prefer-dist --no-interaction --no-progress --ansi php-coveralls/php-coveralls
-          export PATH="$PATH:$HOME/.composer/vendor/bin"
-          php-coveralls --coverage_clover=build/logs/behat/clover.xml
-        continue-on-error: true
-
   postgresql:
-    name: PHPUnit + Behat (PHP ${{ matrix.php }}) (PostgreSQL)
+    name: PHPUnit (PHP ${{ matrix.php }}) (PostgreSQL)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -581,14 +495,9 @@ jobs:
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit
-      - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
-      - name: Run Behat tests
-        run: |
-          vendor/bin/behat --out=std --format=progress --profile=postgres --no-interaction -vv
 
   mysql:
-    name: PHPUnit + Behat (PHP ${{ matrix.php }}) (MySQL)
+    name: PHPUnit (PHP ${{ matrix.php }}) (MySQL)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -636,13 +545,9 @@ jobs:
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit
-      - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
-      - name: Run Behat tests
-        run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction --tags '~@!mysql'
 
   mongodb:
-    name: PHPUnit + Behat (PHP ${{ matrix.php }}) (MongoDB)
+    name: PHPUnit (PHP ${{ matrix.php }}) (MongoDB)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -692,33 +597,20 @@ jobs:
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --coverage-clover build/logs/phpunit/clover.xml --exclude-group=orm
-      - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
-      - name: Run Behat tests
-        run: |
-          mkdir -p build/logs/behat
-          vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=mongodb-coverage --no-interaction
-      - name: Merge code coverage reports
-        run: |
-          wget -qO /usr/local/bin/phpcov https://phar.phpunit.de/phpcov-12.phar
-          chmod +x /usr/local/bin/phpcov
-          mkdir -p build/coverage
-          phpcov merge --clover build/logs/behat/clover.xml build/coverage
-        continue-on-error: true
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v6
         with:
-          name: behat-logs-php${{ matrix.php }}
-          path: build/logs/behat
+          name: phpunit-logs-php${{ matrix.php }}-mongodb
+          path: build/logs/phpunit
         continue-on-error: true
       - name: Upload coverage results to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          directory: build/logs/behat
-          name: behat-php${{ matrix.php }}
-          flags: behat
+          directory: build/logs/phpunit
+          name: phpunit-php${{ matrix.php }}-mongodb
+          flags: phpunit
           fail_ci_if_error: true
         continue-on-error: true
       - name: Upload coverage results to Coveralls
@@ -727,11 +619,11 @@ jobs:
         run: |
           composer global require --prefer-dist --no-interaction --no-progress --ansi php-coveralls/php-coveralls
           export PATH="$PATH:$HOME/.composer/vendor/bin"
-          php-coveralls --coverage_clover=build/logs/behat/clover.xml
+          php-coveralls --coverage_clover=build/logs/phpunit/clover.xml
         continue-on-error: true
 
   mercure:
-    name: PHPUnit + Behat (PHP ${{ matrix.php }}) (Mercure)
+    name: PHPUnit (PHP ${{ matrix.php }}) (Mercure)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -785,31 +677,20 @@ jobs:
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit --log-junit build/logs/phpunit/junit.xml --coverage-clover build/logs/phpunit/clover.xml --group mercure
-      - name: Run Behat tests
-        run: |
-          mkdir -p build/logs/behat
-          vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=mercure-coverage --no-interaction
-      - name: Merge code coverage reports
-        run: |
-          wget -qO /usr/local/bin/phpcov https://phar.phpunit.de/phpcov-12.phar
-          chmod +x /usr/local/bin/phpcov
-          mkdir -p build/coverage
-          phpcov merge --clover build/logs/behat/clover.xml build/coverage
-        continue-on-error: true
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v6
         with:
-          name: behat-logs-php${{ matrix.php }}
-          path: build/logs/behat
+          name: phpunit-logs-php${{ matrix.php }}-mercure
+          path: build/logs/phpunit
         continue-on-error: true
       - name: Upload coverage results to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          directory: build/logs/behat
-          name: behat-php${{ matrix.php }}
-          flags: behat
+          directory: build/logs/phpunit
+          name: phpunit-php${{ matrix.php }}-mercure
+          flags: phpunit
           fail_ci_if_error: true
         continue-on-error: true
       - name: Upload coverage results to Coveralls
@@ -818,7 +699,7 @@ jobs:
         run: |
           composer global require --prefer-dist --no-interaction --no-progress --ansi php-coveralls/php-coveralls
           export PATH="$PATH:$HOME/.composer/vendor/bin"
-          php-coveralls --coverage_clover=build/logs/behat/clover.xml
+          php-coveralls --coverage_clover=build/logs/phpunit/clover.xml
         continue-on-error: true
 
   elasticsearch:
@@ -1029,50 +910,6 @@ jobs:
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit --fail-on-deprecation
 
-  behat-symfony-next:
-    name: Behat (PHP ${{ matrix.php }}) (Symfony dev)
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    strategy:
-      matrix:
-        php:
-          - '8.5'
-      fail-fast: false
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          tools: pecl, composer:2.9.8
-          extensions: intl, bcmath, curl, openssl, mbstring
-          coverage: none
-          ini-values: memory_limit=-1
-      - name: Get composer cache directory
-        id: composercache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-      - name: Allow unstable project dependencies
-        run: composer config minimum-stability dev
-      - name: Cache dependencies
-        uses: actions/cache@v5
-        with:
-          path: ${{ steps.composercache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
-          restore-keys: ${{ runner.os }}-composer-
-      - name: Remove cache
-        run: rm -Rf tests/Fixtures/app/var/cache/*
-      - name: Update project dependencies
-        run: |
-          composer global require soyuka/pmu
-          composer global config allow-plugins.soyuka/pmu true --no-interaction
-          composer global link .
-      - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
-      - name: Run Behat tests
-        run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction
-
-  # remove once behat can be installed with symfony 8.1
   phpunit-symfony-edge:
     name: PHPUnit (PHP ${{ matrix.php }}) (Symfony 8.1)
     runs-on: ubuntu-latest
@@ -1099,8 +936,6 @@ jobs:
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Allow unstable project dependencies
         run: composer config minimum-stability dev
-      - name: Drop Behat dev dependencies (incompatible with Symfony 8.1)
-        run: composer remove --no-update --no-interaction --dev behat/behat behat/mink soyuka/contexts friends-of-behat/symfony-extension friends-of-behat/mink-browserkit-driver friends-of-behat/mink-extension
       - name: Force Symfony 8.1 dev for framework-bundle and json-streamer
         run: composer require --dev --no-update --no-interaction "symfony/framework-bundle:8.1.x-dev" "symfony/json-streamer:8.1.x-dev"
       - name: Cache dependencies
@@ -1120,59 +955,6 @@ jobs:
         run: tests/Fixtures/app/console cache:clear --ansi
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit
-
-  windows-behat:
-    name: Windows Behat (PHP ${{ matrix.php }}) (SQLite)
-    runs-on: windows-latest
-    timeout-minutes: 20
-    strategy:
-      matrix:
-        php:
-          - '8.5'
-      fail-fast: false
-    env:
-      APP_ENV: sqlite
-      DATABASE_URL: sqlite:///%kernel.project_dir%/var/data.db
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-      - name: Setup PHP with pre-release PECL extension
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          tools: pecl, composer:2.9.8
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite, fileinfo
-          coverage: none
-          ini-values: memory_limit=-1
-      - name: Get composer cache directory
-        id: composercache
-        shell: bash
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-      - name: Cache dependencies
-        uses: actions/cache@v5
-        with:
-          path: ${{ steps.composercache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
-          restore-keys: ${{ runner.os }}-composer-
-      - name: Keep windows path
-        id: get-cwd
-        shell: bash
-        run: |
-          cwd=$(php -r 'echo(str_replace("\\", "\\\\", $_SERVER["argv"][1]));' '${{ github.workspace }}')
-          echo cwd=$cwd >> $GITHUB_OUTPUT
-      - name: Update project dependencies
-        shell: bash
-        run: |
-          php -m
-          composer global require soyuka/pmu
-          composer global config allow-plugins.soyuka/pmu true --no-interaction
-          composer global link . --working-directory='${{ steps.get-cwd.outputs.cwd }}'
-      - name: Clear test app cache
-        shell: bash
-        run: tests/Fixtures/app/console cache:clear --ansi
-      - name: Run Behat tests
-        shell: bash
-        run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction
 
   phpunit-symfony-lowest:
     name: PHPUnit (PHP ${{ matrix.php }}) (Symfony lowest)
@@ -1217,48 +999,6 @@ jobs:
         run: vendor/bin/phpunit
         env:
           SYMFONY_DEPRECATIONS_HELPER: max[self]=0&ignoreFile=./tests/.ignored-deprecations
-
-  behat-symfony-lowest:
-    name: Behat (PHP ${{ matrix.php }}) (Symfony lowest)
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    strategy:
-      matrix:
-        php:
-          - '8.5'
-      fail-fast: false
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          tools: pecl, composer:2.9.8
-          extensions: intl, bcmath, curl, openssl, mbstring
-          coverage: none
-          ini-values: memory_limit=-1
-      - name: Get composer cache directory
-        id: composercache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-      - name: Cache dependencies
-        uses: actions/cache@v5
-        with:
-          path: ${{ steps.composercache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
-          restore-keys: ${{ runner.os }}-composer-
-      - name: Remove cache
-        run: rm -Rf tests/Fixtures/app/var/cache/*
-      - name: Update project dependencies
-        run: |
-          composer global require soyuka/pmu
-          composer global config allow-plugins.soyuka/pmu true --no-interaction
-          composer global link . --permanent
-          composer update --prefer-lowest
-      - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
-      - name: Run Behat tests
-        run: vendor/bin/behat --out=std --format=progress --profile=default --no-interaction --tags='~@disableForSymfonyLowest'
 
   phpunit_listeners:
     name: PHPUnit event listeners (PHP ${{ matrix.php }})
@@ -1337,56 +1077,6 @@ jobs:
           composer global require --prefer-dist --no-interaction --no-progress --ansi php-coveralls/php-coveralls
           export PATH="$PATH:$HOME/.composer/vendor/bin"
           php-coveralls --coverage_clover=build/logs/phpunit/clover.xml
-        continue-on-error: true
-
-  behat_listeners:
-    name: Behat event listeners (PHP ${{ matrix.php }})
-    env:
-      USE_SYMFONY_LISTENERS: 1
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    strategy:
-      matrix:
-        php:
-          - '8.5'
-      fail-fast: false
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          tools: pecl, composer:2.9.8
-          extensions: intl, bcmath, curl, openssl, mbstring, pdo_sqlite
-          coverage: pcov
-          ini-values: memory_limit=-1
-      - name: Get composer cache directory
-        id: composercache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-      - name: Cache dependencies
-        uses: actions/cache@v5
-        with:
-          path: ${{ steps.composercache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
-          restore-keys: ${{ runner.os }}-composer-
-      - name: Update project dependencies
-        run: |
-          composer global require soyuka/pmu
-          composer global config allow-plugins.soyuka/pmu true --no-interaction
-          composer global link .
-      - name: Clear test app cache
-        run: tests/Fixtures/app/console cache:clear --ansi
-      - name: Run Behat tests (PHP 8)
-        run: |
-          mkdir -p build/logs/behat
-          vendor/bin/behat --out=std --format=progress --format=junit --out=build/logs/behat/junit --profile=symfony_listeners --no-interaction
-      - name: Upload test artifacts
-        if: always()
-        uses: actions/upload-artifact@v6
-        with:
-          name: behat-logs-php${{ matrix.php }}
-          path: build/logs/behat
         continue-on-error: true
 
   openapi:
