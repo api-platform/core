@@ -86,12 +86,12 @@ final class StrongTypingTest extends ApiTestCase
             ],
         );
 
-        $this->assertResponseStatusCodeSame(400);
+        $this->assertResponseStatusCodeSame(422);
         $this->assertResponseHeaderSame('content-type', 'application/problem+json; charset=utf-8');
         $this->assertJsonContains([
-            '@context' => '/contexts/Error',
-            '@type' => 'hydra:Error',
-            'detail' => 'The type of the "name" attribute must be "string", "NULL" given.',
+            '@context' => '/contexts/ConstraintViolation',
+            '@type' => 'ConstraintViolation',
+            'detail' => 'name: This value should not be blank.',
         ]);
     }
 
@@ -198,12 +198,12 @@ final class StrongTypingTest extends ApiTestCase
             ],
         );
 
-        $this->assertResponseStatusCodeSame(400);
+        $this->assertResponseStatusCodeSame(422);
         $this->assertResponseHeaderSame('content-type', 'application/problem+json; charset=utf-8');
         $this->assertJsonContains([
-            '@context' => '/contexts/Error',
-            '@type' => 'hydra:Error',
-            'detail' => 'The type of the "name" attribute must be "string", "integer" given.',
+            '@context' => '/contexts/ConstraintViolation',
+            '@type' => 'ConstraintViolation',
+            'detail' => 'name: This value should be of type string.',
         ]);
     }
 

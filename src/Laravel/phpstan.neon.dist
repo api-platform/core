@@ -18,3 +18,4 @@ parameters:
 		- Tests
 	ignoreErrors:
 	  - '#Cannot call method expectsQuestion#'
+	  - "#Call to function method_exists\\(\\) with Symfony\\\\Component\\\\Serializer\\\\Exception\\\\PartialDenormalizationException and 'getNotNormalizableV…' will always evaluate to true\\.#"

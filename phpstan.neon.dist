@@ -92,6 +92,7 @@ parameters:
 		- "#Call to function method_exists\\(\\) with 'Symfony\\\\\\\\Component\\\\\\\\Serializer\\\\\\\\Serializer' and 'getSupportedTypes' will always evaluate to true\\.#"
 		- "#Call to function method_exists\\(\\) with Symfony\\\\Component\\\\Serializer\\\\Normalizer\\\\NormalizerInterface and 'getSupportedTypes' will always evaluate to true\\.#"
 		- "#Call to function method_exists\\(\\) with Doctrine\\\\ODM\\\\MongoDB\\\\Mapping\\\\ClassMetadata\\|Doctrine\\\\ORM\\\\Mapping\\\\ClassMetadata and 'isChangeTrackingDef…' will always evaluate to true\\.#"
+		- "#Call to function method_exists\\(\\) with Symfony\\\\Component\\\\Serializer\\\\Exception\\\\PartialDenormalizationException and 'getNotNormalizableV…' will always evaluate to true\\.#"
 
 		# See https://github.com/phpstan/phpstan-symfony/issues/27
 		-
