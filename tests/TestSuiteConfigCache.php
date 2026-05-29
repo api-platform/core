@@ -48,6 +48,8 @@ final class TestSuiteConfigCache implements ConfigCacheInterface
 
     private function getHash(): string
     {
-        return hash_file('xxh3', __DIR__.'/Fixtures/app/var/resources.php');
+        $file = __DIR__.'/Fixtures/app/var/resources.php';
+
+        return is_file($file) ? hash_file('xxh3', $file) : '';
     }
 }

@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\Post;
 
 #[Post]
 #[ApiResource(
+    shortName: 'DummyResourceWithComplexConstructorByCompany',
     uriTemplate: '/companies/{companyId}/employees/{id}',
     uriVariables: [
         'companyId' => ['from_class' => Company::class, 'to_property' => 'company'],
