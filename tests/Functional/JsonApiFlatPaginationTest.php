@@ -70,6 +70,26 @@ final class JsonApiFlatPaginationTest extends ApiTestCase
         $this->assertSame(5, $data['meta']['totalItems'] ?? null);
     }
 
+    // #8216: flat filter param combined with flat page must still drive filtering.
+    public function testFlatCustomParamWithFlatPagePreservesFilter(): void
+    {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('Not tested with mongodb.');
+        }
+
+        $response = self::createClient()->request('GET', '/dummies?name=foo&page=1', [
+            'headers' => ['Accept' => 'application/vnd.api+json'],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json; charset=utf-8');
+
+        $data = $response->toArray();
+
+        $this->assertSame(1, $data['meta']['currentPage'] ?? null);
+        $this->assertSame(5, $data['meta']['totalItems'] ?? null);
+    }
+
     private function loadFixtures(): void
     {
         $manager = $this->getManager();
@@ -79,6 +99,10 @@ final class JsonApiFlatPaginationTest extends ApiTestCase
             $dummy->setName('foo #'.$i);
             $manager->persist($dummy);
         }
+
+        $bar = new Dummy();
+        $bar->setName('bar');
+        $manager->persist($bar);
 
         $manager->flush();
     }
