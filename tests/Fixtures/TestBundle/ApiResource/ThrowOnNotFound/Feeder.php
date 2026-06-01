@@ -33,7 +33,7 @@ final class Feeder
 {
     public ?int $id = null;
 
-    public static function provide(): ?self
+    public static function provide(): null
     {
         return null;
     }
