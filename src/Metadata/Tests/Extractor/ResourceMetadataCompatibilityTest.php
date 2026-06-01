@@ -168,6 +168,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
                 ],
             ],
             'jsonStream' => true,
+            'throwOnNotFound' => true,
             'mercure' => true,
             'stateOptions' => [
                 'elasticsearchOptions' => [
@@ -481,6 +482,7 @@ final class ResourceMetadataCompatibilityTest extends TestCase
         'order',
         'extraProperties',
         'jsonStream',
+        'throwOnNotFound',
     ];
     private const EXTENDED_BASE = [
         'uriTemplate',

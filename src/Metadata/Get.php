@@ -102,6 +102,7 @@ final class Get extends HttpOperation
         ?bool $strictQueryParameterValidation = null,
         protected ?bool $hideHydraOperation = null,
         ?bool $jsonStream = null,
+        ?bool $throwOnNotFound = null,
         array $extraProperties = [],
         ?bool $map = null,
     ) {
@@ -186,6 +187,7 @@ final class Get extends HttpOperation
             strictQueryParameterValidation: $strictQueryParameterValidation,
             hideHydraOperation: $hideHydraOperation,
             jsonStream: $jsonStream,
+            throwOnNotFound: $throwOnNotFound,
             extraProperties: $extraProperties,
             map: $map
         );

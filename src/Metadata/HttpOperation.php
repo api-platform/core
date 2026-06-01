@@ -222,6 +222,7 @@ class HttpOperation extends Operation
         array|string|null $middleware = null,
         ?bool $queryParameterValidationEnabled = null,
         ?bool $jsonStream = null,
+        ?bool $throwOnNotFound = null,
         array $extraProperties = [],
         ?bool $map = null,
     ) {
@@ -283,6 +284,7 @@ class HttpOperation extends Operation
             strictQueryParameterValidation: $strictQueryParameterValidation,
             hideHydraOperation: $hideHydraOperation,
             jsonStream: $jsonStream,
+            throwOnNotFound: $throwOnNotFound,
             extraProperties: $extraProperties,
             map: $map
         );

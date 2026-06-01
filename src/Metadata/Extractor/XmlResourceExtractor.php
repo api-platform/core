@@ -149,6 +149,7 @@ final class XmlResourceExtractor extends AbstractResourceExtractor
             'write' => $this->phpize($resource, 'write', 'bool'),
             'jsonStream' => $this->phpize($resource, 'jsonStream', 'bool'),
             'map' => $this->phpize($resource, 'map', 'bool'),
+            'throwOnNotFound' => $this->phpize($resource, 'throwOnNotFound', 'bool'),
         ];
     }
 

@@ -102,6 +102,7 @@ final class Patch extends HttpOperation
         ?bool $strictQueryParameterValidation = null,
         ?bool $hideHydraOperation = null,
         ?bool $jsonStream = null,
+        ?bool $throwOnNotFound = null,
         array $extraProperties = [],
         ?bool $map = null,
     ) {
@@ -187,6 +188,7 @@ final class Patch extends HttpOperation
             strictQueryParameterValidation: $strictQueryParameterValidation,
             hideHydraOperation: $hideHydraOperation,
             jsonStream: $jsonStream,
+            throwOnNotFound: $throwOnNotFound,
             extraProperties: $extraProperties,
             map: $map
         );

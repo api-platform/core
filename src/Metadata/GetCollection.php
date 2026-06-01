@@ -103,6 +103,7 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
         protected ?bool $hideHydraOperation = null,
         ?bool $jsonStream = null,
         array $extraProperties = [],
+        ?bool $throwOnNotFound = null,
         private ?string $itemUriTemplate = null,
         ?bool $map = null,
     ) {
@@ -181,6 +182,7 @@ final class GetCollection extends HttpOperation implements CollectionOperationIn
             processor: $processor,
             parameters: $parameters,
             jsonStream: $jsonStream,
+            throwOnNotFound: $throwOnNotFound,
             extraProperties: $extraProperties,
             rules: $rules,
             policy: $policy,
