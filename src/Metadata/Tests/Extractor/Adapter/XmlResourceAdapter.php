@@ -66,6 +66,7 @@ final class XmlResourceAdapter implements ResourceAdapterInterface
         'stateOptions',
         'collectDenormalizationErrors',
         'jsonStream',
+        'throwOnNotFound',
         'links',
         'parameters',
     ];
