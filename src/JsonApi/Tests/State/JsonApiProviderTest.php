@@ -77,4 +77,25 @@ class JsonApiProviderTest extends TestCase
         $this->assertSame(['distance' => 'asc'], $filters['order'] ?? null);
         $this->assertSame('1', $filters['page'] ?? null);
     }
+
+    // _api_query_parameters set by an earlier listener / ParameterProvider must be reused.
+    public function testProvideHonoursPrePopulatedApiQueryParameters(): void
+    {
+        $request = Request::create('/sessions?page=1');
+        $request->setRequestFormat('jsonapi');
+        $request->attributes->set('_api_query_parameters', ['custom_override' => 'yes', 'page' => '1']);
+
+        $operation = new Get(class: \stdClass::class, shortName: 'dummy');
+        $context = ['request' => $request];
+        $decorated = $this->createMock(ProviderInterface::class);
+        $decorated->expects($this->once())->method('provide')->with($operation, [], $context);
+
+        $provider = new JsonApiProvider($decorated);
+        $provider->provide($operation, [], $context);
+
+        $filters = $request->attributes->get('_api_filters');
+
+        $this->assertSame('yes', $filters['custom_override'] ?? null);
+        $this->assertSame('1', $filters['page'] ?? null);
+    }
 }

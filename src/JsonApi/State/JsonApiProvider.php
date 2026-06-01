@@ -90,8 +90,12 @@ final class JsonApiProvider implements ProviderInterface
         if ($filters) {
             // ReadProvider skips its raw-query fallback when _api_filters is set,
             // so preserve flat custom params here too. JSON:API transforms win.
-            $queryString = RequestParser::getQueryString($request);
-            $rawParams = $queryString ? RequestParser::parseRequestParams($queryString) : [];
+            $rawParams = $request->attributes->get('_api_query_parameters');
+            if (null === $rawParams) {
+                $queryString = RequestParser::getQueryString($request);
+                $rawParams = $queryString ? RequestParser::parseRequestParams($queryString) : [];
+                $request->attributes->set('_api_query_parameters', $rawParams);
+            }
             $filters = array_replace($rawParams, $filters);
 
             $request->attributes->set('_api_filters', $filters);
