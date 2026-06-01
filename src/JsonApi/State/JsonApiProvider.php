@@ -15,6 +15,7 @@ namespace ApiPlatform\JsonApi\State;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\State\Util\RequestParser;
 
 final class JsonApiProvider implements ProviderInterface
 {
@@ -87,6 +88,12 @@ final class JsonApiProvider implements ProviderInterface
         }
 
         if ($filters) {
+            // ReadProvider skips its raw-query fallback when _api_filters is set,
+            // so preserve flat custom params here too. JSON:API transforms win.
+            $queryString = RequestParser::getQueryString($request);
+            $rawParams = $queryString ? RequestParser::parseRequestParams($queryString) : [];
+            $filters = array_replace($rawParams, $filters);
+
             $request->attributes->set('_api_filters', $filters);
         }
 

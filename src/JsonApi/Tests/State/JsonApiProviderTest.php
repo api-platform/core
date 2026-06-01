@@ -55,4 +55,26 @@ class JsonApiProviderTest extends TestCase
             'pagination' => 'true',
         ], $request->attributes->get('_api_filters'));
     }
+
+    // #8216: flat custom params must survive when _api_filters is pre-set by JSON:API.
+    public function testProvidePreservesFlatCustomQueryParamsWithoutBracketFilter(): void
+    {
+        $request = Request::create('/sessions?city_id=3152&order[distance]=asc&page=1');
+        $request->setRequestFormat('jsonapi');
+
+        $operation = new Get(class: \stdClass::class, shortName: 'dummy');
+        $context = ['request' => $request];
+        $decorated = $this->createMock(ProviderInterface::class);
+        $decorated->expects($this->once())->method('provide')->with($operation, [], $context);
+
+        $provider = new JsonApiProvider($decorated);
+        $provider->provide($operation, [], $context);
+
+        $filters = $request->attributes->get('_api_filters');
+
+        $this->assertIsArray($filters);
+        $this->assertSame('3152', $filters['city_id'] ?? null);
+        $this->assertSame(['distance' => 'asc'], $filters['order'] ?? null);
+        $this->assertSame('1', $filters['page'] ?? null);
+    }
 }
