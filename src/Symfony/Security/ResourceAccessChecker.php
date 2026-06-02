@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Symfony\Security;
 
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\Node\NameNode;
@@ -50,6 +51,14 @@ final class ResourceAccessChecker implements ResourceAccessCheckerInterface, Obj
 
     public function usesObjectVariable(string $expression, array $variables = []): bool
     {
+        if (null === $this->tokenStorage || null === $this->authenticationTrustResolver) {
+            throw new RuntimeException('The "symfony/security" library must be installed to use the "security" attribute.');
+        }
+
+        if (null === $this->expressionLanguage) {
+            throw new RuntimeException('The "symfony/expression-language" library must be installed to use the "security" attribute.');
+        }
+
         return $this->hasObjectVariable($this->expressionLanguage->parse($expression, array_keys($this->getVariables($variables)))->getNodes()->toArray());
     }
 
