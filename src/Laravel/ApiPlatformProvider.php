@@ -977,6 +977,7 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->singleton(JsonApiItemNormalizer::class, static function (Application $app) {
             $config = $app['config'];
             $defaultContext = $config->get('api-platform.serializer', []);
+            $useIriAsId = (bool) $config->get('api-platform.jsonapi.use_iri_as_id', true);
 
             return new JsonApiItemNormalizer(
                 $app->make(PropertyNameCollectionFactoryInterface::class),
@@ -989,7 +990,10 @@ class ApiPlatformProvider extends ServiceProvider
                 $defaultContext,
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(ResourceAccessCheckerInterface::class),
-                // $app->make(TagCollectorInterface::class),
+                tagCollector: null,
+                operationResourceResolver: $app->make(OperationResourceClassResolverInterface::class),
+                identifiersExtractor: $app->make(IdentifiersExtractorInterface::class),
+                useIriAsId: $useIriAsId,
             );
         });
 

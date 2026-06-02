@@ -78,6 +78,13 @@ return [
         'partial_parameter_name' => 'partial',
     ],
 
+    'jsonapi' => [
+        // When false, the JSON:API `data.id` uses the resource scalar identifier
+        // and a `data.links.self` IRI is added. When true (default), `data.id`
+        // is the resource IRI.
+        'use_iri_as_id' => true,
+    ],
+
     'graphql' => [
         'enabled' => false,
         'nesting_separator' => '__',
