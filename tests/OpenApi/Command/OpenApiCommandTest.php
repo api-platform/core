@@ -164,9 +164,12 @@ YAML;
         $this->addToAssertionCount(1);
     }
 
-    #[Group('orm')]
     public function testSpecVersion30EmitsDraft4BooleanExclusiveBounds(): void
     {
+        if ('mongodb' === static::$kernel->getEnvironment()) {
+            $this->markTestSkipped('Resource not loaded with MongoDB.');
+        }
+
         $this->tester->run(['command' => 'api:openapi:export', '--spec-version' => '3.0.0']);
         $result = $this->tester->getDisplay();
         $json = json_decode($result, true, 512, \JSON_THROW_ON_ERROR);
