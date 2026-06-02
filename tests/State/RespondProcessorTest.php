@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\State;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
@@ -160,6 +161,81 @@ class RespondProcessorTest extends TestCase
 
         $this->assertSame('OPTIONS, HEAD, GET, POST', $response->headers->get('Allow'));
         $this->assertSame('application/ld+json', $response->headers->get('Accept-Post'));
+    }
+
+    public function testDoesNotSetContentTypeWhenOutputIsFalse(): void
+    {
+        $operation = new Post(class: Employee::class, output: ['class' => null], status: 204);
+
+        $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolver->isResourceClass(Employee::class)->willReturn(true);
+
+        $respondProcessor = new RespondProcessor(null, $resourceClassResolver->reveal());
+
+        $req = new Request();
+        $req->setMethod('POST');
+        $response = $respondProcessor->process(null, $operation, context: [
+            'request' => $req,
+            'original_data' => new Employee(),
+        ]);
+
+        $this->assertSame(204, $response->getStatusCode());
+        $this->assertFalse($response->headers->has('Content-Type'));
+    }
+
+    public function testDoesNotSetContentTypeWhenOutputIsFalseWithCreatedStatus(): void
+    {
+        $operation = new Post(class: Employee::class, output: ['class' => null], status: 201);
+
+        $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolver->isResourceClass(Employee::class)->willReturn(true);
+
+        $respondProcessor = new RespondProcessor(null, $resourceClassResolver->reveal());
+
+        $req = new Request();
+        $req->setMethod('POST');
+        $response = $respondProcessor->process(null, $operation, context: [
+            'request' => $req,
+            'original_data' => new Employee(),
+        ]);
+
+        $this->assertSame(201, $response->getStatusCode());
+        $this->assertFalse($response->headers->has('Content-Type'));
+    }
+
+    public function testDoesNotSetContentTypeOnBodylessStatusCodes(): void
+    {
+        $operation = new Delete(class: Employee::class);
+
+        $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolver->isResourceClass(Employee::class)->willReturn(true);
+
+        $respondProcessor = new RespondProcessor(null, $resourceClassResolver->reveal());
+
+        $req = new Request();
+        $req->setMethod('DELETE');
+        $response = $respondProcessor->process(null, $operation, context: [
+            'request' => $req,
+        ]);
+
+        $this->assertSame(204, $response->getStatusCode());
+        $this->assertFalse($response->headers->has('Content-Type'));
+    }
+
+    public function testKeepsContentTypeForOperationWithoutOutputAndClass(): void
+    {
+        $operation = new Get(outputFormats: ['jsonld' => ['application/ld+json']], serialize: false, read: true);
+
+        $respondProcessor = new RespondProcessor();
+
+        $req = new Request();
+        $req->setRequestFormat('jsonld');
+        $response = $respondProcessor->process('{"@context":{}}', $operation, context: [
+            'request' => $req,
+        ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('application/ld+json; charset=utf-8', $response->headers->get('Content-Type'));
     }
 
     public function testDoesNotAddLinkedDataPlatformHeadersWithoutFactory(): void
