@@ -56,10 +56,14 @@ final class OpenApiCommand extends Command
     {
         $filesystem = new Filesystem();
         $io = new SymfonyStyle($input, $output);
+        $specVersion = $input->getOption('spec-version');
         $data = $this->normalizer->normalize(
-            $this->openApiFactory->__invoke(['filter_tags' => $input->getOption('filter-tags')]),
+            $this->openApiFactory->__invoke([
+                'filter_tags' => $input->getOption('filter-tags'),
+                'spec_version' => $specVersion,
+            ]),
             'json',
-            ['spec_version' => $input->getOption('spec-version')]
+            ['spec_version' => $specVersion]
         );
 
         if ($input->getOption('yaml') && !class_exists(Yaml::class)) {
