@@ -96,7 +96,9 @@ final class JsonApiProvider implements ProviderInterface
                 $rawParams = $queryString ? RequestParser::parseRequestParams($queryString) : [];
                 $request->attributes->set('_api_query_parameters', $rawParams);
             }
-            $filters = array_replace($rawParams, $filters);
+            // Drop keys already consumed above so the raw bracket variants don't override the hoisted values.
+            $consumed = array_diff_key($rawParams, array_flip(['filter', 'page', 'itemsPerPage', 'pagination', 'partial', 'include', 'fields']));
+            $filters = array_replace($consumed, $filters);
 
             $request->attributes->set('_api_filters', $filters);
         }
