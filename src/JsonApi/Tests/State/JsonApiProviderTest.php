@@ -98,4 +98,23 @@ class JsonApiProviderTest extends TestCase
         $this->assertSame('yes', $filters['custom_override'] ?? null);
         $this->assertSame('1', $filters['page'] ?? null);
     }
+
+    public function testProvideDoesNotReinjectBracketPageAfterHoisting(): void
+    {
+        $request = Request::create('/dummies?page[itemsPerPage]=15');
+        $request->setRequestFormat('jsonapi');
+
+        $operation = new Get(class: \stdClass::class, shortName: 'dummy');
+        $context = ['request' => $request];
+        $decorated = $this->createMock(ProviderInterface::class);
+        $decorated->expects($this->once())->method('provide')->with($operation, [], $context);
+
+        $provider = new JsonApiProvider($decorated);
+        $provider->provide($operation, [], $context);
+
+        $filters = $request->attributes->get('_api_filters');
+
+        $this->assertSame('15', $filters['itemsPerPage'] ?? null);
+        $this->assertArrayNotHasKey('page', $filters);
+    }
 }
