@@ -164,6 +164,7 @@ YAML;
         $this->addToAssertionCount(1);
     }
 
+    #[Group('orm')]
     public function testSpecVersion30EmitsDraft4BooleanExclusiveBounds(): void
     {
         $this->tester->run(['command' => 'api:openapi:export', '--spec-version' => '3.0.0']);
