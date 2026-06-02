@@ -18,6 +18,7 @@ use ApiPlatform\OpenApi\OpenApi;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Crud;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6317\Issue6317;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5625\Currency;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6041\NumericValidated;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -55,6 +56,7 @@ class OpenApiCommandTest extends KernelTestCase
             Issue6317::class,
             Currency::class,
             Crud::class,
+            NumericValidated::class,
         ];
     }
 
@@ -160,6 +162,30 @@ YAML;
             $this->fail('Is not valid YAML: '.$exception->getMessage());
         }
         $this->addToAssertionCount(1);
+    }
+
+    public function testSpecVersion30EmitsDraft4BooleanExclusiveBounds(): void
+    {
+        if ('mongodb' === static::$kernel->getEnvironment()) {
+            $this->markTestSkipped('Resource not loaded with MongoDB.');
+        }
+
+        $this->tester->run(['command' => 'api:openapi:export', '--spec-version' => '3.0.0']);
+        $result = $this->tester->getDisplay();
+        $json = json_decode($result, true, 512, \JSON_THROW_ON_ERROR);
+
+        $this->assertSame('3.0.0', $json['openapi']);
+        $this->assertArrayHasKey('NumericValidated', $json['components']['schemas']);
+        $properties = $json['components']['schemas']['NumericValidated']['properties'];
+
+        $this->assertSame(10, $properties['greaterThanMe']['minimum']);
+        $this->assertTrue($properties['greaterThanMe']['exclusiveMinimum']);
+
+        $this->assertSame(99, $properties['lessThanMe']['maximum']);
+        $this->assertTrue($properties['lessThanMe']['exclusiveMaximum']);
+
+        $this->assertSame(0, $properties['positive']['minimum']);
+        $this->assertTrue($properties['positive']['exclusiveMinimum']);
     }
 
     public function testFilterXApiPlatformTag(): void
