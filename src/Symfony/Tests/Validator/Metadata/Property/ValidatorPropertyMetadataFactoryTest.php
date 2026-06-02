@@ -23,6 +23,7 @@ use ApiPlatform\Symfony\Tests\Fixtures\DummyIriWithValidationEntity;
 use ApiPlatform\Symfony\Tests\Fixtures\DummyNumericValidatedEntity;
 use ApiPlatform\Symfony\Tests\Fixtures\DummyRangeValidatedEntity;
 use ApiPlatform\Symfony\Tests\Fixtures\DummySequentiallyValidatedEntity;
+use ApiPlatform\Symfony\Tests\Fixtures\DummySequentiallyValidatedEntityWithNestedGroups;
 use ApiPlatform\Symfony\Tests\Fixtures\DummyUniqueValidatedEntity;
 use ApiPlatform\Symfony\Tests\Fixtures\DummyValidatedChoiceEntity;
 use ApiPlatform\Symfony\Tests\Fixtures\DummyValidatedEntity;
@@ -448,6 +449,32 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertArrayHasKey('minLength', $schema);
         $this->assertArrayHasKey('maxLength', $schema);
         $this->assertArrayHasKey('pattern', $schema);
+    }
+
+    public function testSequentiallyConstraintDoesNotMarkRequiredFromNestedConstraintWithDifferentGroup(): void
+    {
+        $validatorClassMetadata = new ClassMetadata(DummySequentiallyValidatedEntityWithNestedGroups::class);
+        (new AttributeLoader())->loadClassMetadata($validatorClassMetadata);
+
+        $validatorMetadataFactory = $this->prophesize(MetadataFactoryInterface::class);
+        $validatorMetadataFactory->getMetadataFor(DummySequentiallyValidatedEntityWithNestedGroups::class)
+            ->willReturn($validatorClassMetadata)
+            ->shouldBeCalled();
+
+        $decoratedPropertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $decoratedPropertyMetadataFactory->create(DummySequentiallyValidatedEntityWithNestedGroups::class, 'dummy', [])->willReturn(
+            (new ApiProperty())->withNativeType(Type::string())
+        )->shouldBeCalled();
+
+        $validationPropertyMetadataFactory = new ValidatorPropertyMetadataFactory(
+            $validatorMetadataFactory->reveal(),
+            $decoratedPropertyMetadataFactory->reveal(),
+            []
+        );
+
+        $propertyMetadata = $validationPropertyMetadataFactory->create(DummySequentiallyValidatedEntityWithNestedGroups::class, 'dummy');
+
+        $this->assertFalse($propertyMetadata->isRequired());
     }
 
     public function testCreateWithCompoundConstraint(): void
