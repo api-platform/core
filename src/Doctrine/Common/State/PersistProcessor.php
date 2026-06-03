@@ -81,16 +81,37 @@ final class PersistProcessor implements ProcessorInterface
             // We create a new entity through PUT
             } else {
                 foreach (array_reverse($links) as $link) {
-                    if ($link->getExpandedValue() || !$link->getFromClass()) {
+                    if ($link->getExpandedValue() || !($fromClass = $link->getFromClass())) {
                         continue;
                     }
 
                     $identifierProperties = $link->getIdentifiers();
                     $hasCompositeIdentifiers = 1 < \count($identifierProperties);
+                    $toProperty = $link->getToProperty();
+                    $parentManager = $toProperty ? $this->managerRegistry->getManagerForClass($fromClass) : null;
+
+                    if ($toProperty && $parentManager && isset($reflectionProperties[$toProperty]) && method_exists($parentManager, 'getReference')) {
+                        if ($hasCompositeIdentifiers) {
+                            $referenceIdentifier = [];
+                            foreach ($identifierProperties as $identifierProperty) {
+                                $referenceIdentifier[$identifierProperty] = $this->getIdentifierValue($identifiers, $identifierProperty);
+                            }
+                        } else {
+                            $referenceIdentifier = $this->getIdentifierValue($identifiers);
+                        }
+
+                        $reflectionProperties[$toProperty]->setValue($newData, $parentManager->getReference($fromClass, $referenceIdentifier));
+
+                        continue;
+                    }
 
                     foreach ($identifierProperties as $identifierProperty) {
-                        $reflectionProperty = $reflectionProperties[$identifierProperty];
-                        $reflectionProperty->setValue($newData, $this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null));
+                        if (!isset($reflectionProperties[$identifierProperty])) {
+                            $this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null);
+                            continue;
+                        }
+
+                        $reflectionProperties[$identifierProperty]->setValue($newData, $this->getIdentifierValue($identifiers, $hasCompositeIdentifiers ? $identifierProperty : null));
                     }
                 }
 
