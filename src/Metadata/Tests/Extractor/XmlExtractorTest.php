@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Tests\Extractor;
 
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Extractor\XmlResourceExtractor;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -436,26 +437,17 @@ class XmlExtractorTest extends TestCase
     }
 
     /**
-     * Tests issue #8175: two XML operations sharing an explicit name with different
-     * HTTP methods used to silently overwrite each other. The factory must keep both
-     * by auto-suffixing the colliding entry with its method.
+     * Tests issue #8175: two XML operations sharing an explicit name silently
+     * dropped one another. The factory must reject the duplicate up front.
      */
-    public function testDuplicateOperationNameWithDifferentMethodsFromXmlAreDisambiguated(): void
+    public function testDuplicateOperationNameFromXmlThrows(): void
     {
         $extractor = new XmlResourceExtractor([__DIR__.'/xml/duplicate_operation_name.xml']);
         $factory = new ExtractorResourceMetadataCollectionFactory($extractor);
 
-        $collection = $factory->create(Comment::class);
-        $operations = $collection[0]->getOperations();
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageMatches('/_api_\/forms\/\{id\}\/submit\{\._format\}/');
 
-        $this->assertTrue($operations->has('_api_/forms/{id}/submit{._format}'));
-        $this->assertTrue($operations->has('_api_/forms/{id}/submit{._format}_patch'));
-
-        $methods = [];
-        foreach ($operations as $name => $operation) {
-            $methods[$name] = $operation->getMethod();
-        }
-        $this->assertSame('POST', $methods['_api_/forms/{id}/submit{._format}']);
-        $this->assertSame('PATCH', $methods['_api_/forms/{id}/submit{._format}_patch']);
+        $factory->create(Comment::class);
     }
 }

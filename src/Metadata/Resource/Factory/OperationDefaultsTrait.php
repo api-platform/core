@@ -242,36 +242,4 @@ trait OperationDefaultsTrait
             $operation instanceof CollectionOperationInterface ? '_collection' : ''
         );
     }
-
-    /**
-     * Two operations sharing the same key would silently overwrite each other because the
-     * operation name is the unique collection key (and the Symfony route name). When the
-     * collision is between operations with different HTTP methods (e.g. POST + PATCH on the
-     * same URI template, both declared with the same explicit `name`), suffix the new entry
-     * with its method so both survive. Same key + same method is left untouched: that is the
-     * legitimate "override an earlier declaration" pattern (e.g. a class re-declaring a
-     * default `Get` with custom serialization groups).
-     *
-     * @param array<string, Operation> $operations
-     *
-     * @return array{0: string, 1: Operation}
-     */
-    private function disambiguateOperationName(array $operations, string $key, Operation $operation): array
-    {
-        if (!\array_key_exists($key, $operations) || !$operation instanceof HttpOperation) {
-            return [$key, $operation];
-        }
-
-        $existing = $operations[$key];
-        if (!$existing instanceof HttpOperation || strtoupper($existing->getMethod()) === strtoupper($operation->getMethod())) {
-            return [$key, $operation];
-        }
-
-        $newKey = $key.'_'.strtolower($operation->getMethod());
-        if (\array_key_exists($newKey, $operations)) {
-            return [$key, $operation];
-        }
-
-        return [$newKey, $operation->withName($newKey)];
-    }
 }
