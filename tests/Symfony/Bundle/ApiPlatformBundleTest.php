@@ -19,6 +19,7 @@ use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AttributeResourcePas
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AuthenticatorManagerPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\DataProviderPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ElasticsearchClientPass;
+use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ErrorResourceAttributeLoaderPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlResolverPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlTypePass;
@@ -59,6 +60,7 @@ class ApiPlatformBundleTest extends TestCase
         $this->assertContains(TestMercureHubPass::class, $passClasses);
         $this->assertContains(AuthenticatorManagerPass::class, $passClasses);
         $this->assertContains(SerializerMappingLoaderPass::class, $passClasses);
+        $this->assertContains(ErrorResourceAttributeLoaderPass::class, $passClasses);
         $this->assertContains(MutatorPass::class, $passClasses);
         $this->assertContains(PropertyInfoTagPass::class, $passClasses);
         $this->assertContains(JsonStreamerTransformerPass::class, $passClasses);

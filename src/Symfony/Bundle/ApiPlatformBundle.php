@@ -18,6 +18,7 @@ use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AttributeResourcePas
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\AuthenticatorManagerPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\DataProviderPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ElasticsearchClientPass;
+use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\ErrorResourceAttributeLoaderPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\FilterPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlResolverPass;
 use ApiPlatform\Symfony\Bundle\DependencyInjection\Compiler\GraphQlTypePass;
@@ -60,6 +61,7 @@ final class ApiPlatformBundle extends Bundle
         $container->addCompilerPass(new TestMercureHubPass());
         $container->addCompilerPass(new AuthenticatorManagerPass());
         $container->addCompilerPass(new SerializerMappingLoaderPass());
+        $container->addCompilerPass(new ErrorResourceAttributeLoaderPass());
         $container->addCompilerPass(new MutatorPass());
         $container->addCompilerPass(new PropertyInfoTagPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -100);
         // Must run after Symfony's TransformerPass so we can rely on the value_object_transformer tag being processed.
