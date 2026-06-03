@@ -133,7 +133,7 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
 
             // TODO: remove in 5.x
             if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
-                $types = $propertyMetadata->getBuiltinTypes();
+                $types = $propertyMetadata->internalGetBuiltinTypes();
                 if (null === ($type = $types[0] ?? null)) {
                     continue;
                 }

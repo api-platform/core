@@ -48,7 +48,7 @@ final class PropertyInfoPropertyMetadataFactory implements PropertyMetadataFacto
 
         // TODO: remove in 5.x
         if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
-            if (!$propertyMetadata->getBuiltinTypes()) {
+            if (!$propertyMetadata->internalGetBuiltinTypes()) {
                 $types = $this->propertyInfo->getTypes($resourceClass, $property, $options) ?? []; // @phpstan-ignore-line
 
                 foreach ($types as $i => $type) {
@@ -58,7 +58,7 @@ final class PropertyInfoPropertyMetadataFactory implements PropertyMetadataFacto
                     }
                 }
 
-                $propertyMetadata = $propertyMetadata->withBuiltinTypes($types);
+                $propertyMetadata = $propertyMetadata->internalWithBuiltinTypes($types);
             }
         } else {
             if (!$propertyMetadata->getNativeType()) {

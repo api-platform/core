@@ -132,8 +132,8 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
                         continue;
                     }
 
-                    if ($builtinTypes = $attribute->getBuiltinTypes()) {
-                        $propertyMetadata = $propertyMetadata->withBuiltinTypes($builtinTypes);
+                    if ($builtinTypes = $attribute->internalGetBuiltinTypes()) {
+                        $propertyMetadata = $propertyMetadata->internalWithBuiltinTypes($builtinTypes);
                     }
 
                     continue;

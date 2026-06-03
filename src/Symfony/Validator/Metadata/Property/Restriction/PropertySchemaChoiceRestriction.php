@@ -106,13 +106,13 @@ final class PropertySchemaChoiceRestriction implements PropertySchemaRestriction
             return false;
         }
 
-        $types = array_map(static fn (LegacyType $type) => $type->getBuiltinType(), $propertyMetadata->getBuiltinTypes() ?? []);
+        $types = array_map(static fn (LegacyType $type) => $type->getBuiltinType(), $propertyMetadata->internalGetBuiltinTypes() ?? []);
         if ($propertyMetadata->getExtraProperties()['nested_schema'] ?? false) {
             $types = [LegacyType::BUILTIN_TYPE_STRING];
         }
 
         if (
-            null !== ($builtinType = ($propertyMetadata->getBuiltinTypes()[0] ?? null))
+            null !== ($builtinType = ($propertyMetadata->internalGetBuiltinTypes()[0] ?? null))
             && $builtinType->isCollection()
             && \count($builtinType->getCollectionValueTypes()) > 0
         ) {

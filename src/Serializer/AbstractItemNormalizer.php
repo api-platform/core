@@ -791,7 +791,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         }
 
         if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
-            $types = $propertyMetadata->getBuiltinTypes() ?? [];
+            $types = $propertyMetadata->internalGetBuiltinTypes() ?? [];
 
             foreach ($types as $type) {
                 if (
@@ -1126,7 +1126,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         $type = null;
         if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
-            $types = $propertyMetadata->getBuiltinTypes() ?? [];
+            $types = $propertyMetadata->internalGetBuiltinTypes() ?? [];
         } else {
             $type = $propertyMetadata->getNativeType();
             $types = $type instanceof CompositeTypeInterface ? $type->getTypes() : (null === $type ? [] : [$type]);

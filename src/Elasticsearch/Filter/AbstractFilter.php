@@ -201,7 +201,7 @@ abstract class AbstractFilter implements FilterInterface
                 return $noop;
             }
 
-            $types = $propertyMetadata->getBuiltinTypes();
+            $types = $propertyMetadata->internalGetBuiltinTypes();
 
             if (null === $types) {
                 return $noop;

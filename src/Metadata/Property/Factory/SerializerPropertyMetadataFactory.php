@@ -76,7 +76,7 @@ final class SerializerPropertyMetadataFactory implements PropertyMetadataFactory
 
         // TODO: remove in 5.x
         if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
-            $types = $propertyMetadata->getBuiltinTypes() ?? [];
+            $types = $propertyMetadata->internalGetBuiltinTypes() ?? [];
 
             if (!$this->isResourceClass($resourceClass) && $types) {
                 foreach ($types as $builtinType) {

@@ -192,7 +192,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 /** @var class-string|null $className */
                 $className = null;
             } else {
-                $types = $propertyMetadata->getBuiltinTypes() ?? [];
+                $types = $propertyMetadata->internalGetBuiltinTypes() ?? [];
             }
 
             // prevent declaring $attribute as attribute if it's already declared as relationship

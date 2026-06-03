@@ -534,11 +534,7 @@ final class ApiProperty
     {
         trigger_deprecation('api-platform/metadata', '4.2', 'The "%s()" method is deprecated, use "%s::getNativeType()" instead.', __METHOD__, self::class);
 
-        if (null === $this->builtinTypes && null !== $this->nativeType) {
-            $this->builtinTypes = PropertyInfoToTypeInfoHelper::convertTypeToLegacyTypes($this->nativeType) ?? [];
-        }
-
-        return $this->builtinTypes;
+        return $this->internalGetBuiltinTypes();
     }
 
     /**
@@ -550,6 +546,32 @@ final class ApiProperty
     {
         trigger_deprecation('api-platform/metadata', '4.2', 'The "%s()" method is deprecated, use "%s::withNativeType()" instead.', __METHOD__, self::class);
 
+        return $this->internalWithBuiltinTypes($builtinTypes);
+    }
+
+    /**
+     * @internal Same as {@see getBuiltinTypes()} but without the deprecation; used by API Platform's
+     *           own factories that still need the legacy representation on symfony/property-info < 7.1.
+     *
+     * @return LegacyType[]|null
+     */
+    public function internalGetBuiltinTypes(): ?array
+    {
+        if (null === $this->builtinTypes && null !== $this->nativeType) {
+            $this->builtinTypes = PropertyInfoToTypeInfoHelper::convertTypeToLegacyTypes($this->nativeType) ?? [];
+        }
+
+        return $this->builtinTypes;
+    }
+
+    /**
+     * @internal Same as {@see withBuiltinTypes()} but without the deprecation; used by API Platform's
+     *           own factories that still produce legacy types on symfony/property-info < 7.1.
+     *
+     * @param LegacyType[] $builtinTypes
+     */
+    public function internalWithBuiltinTypes(array $builtinTypes = []): static
+    {
         $self = clone $this;
         $self->builtinTypes = $builtinTypes;
         $self->nativeType = PropertyInfoToTypeInfoHelper::convertLegacyTypesToType($builtinTypes);

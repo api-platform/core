@@ -396,7 +396,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
             $isRelationship = false;
 
             if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
-                $types = $propertyMetadata->getBuiltinTypes() ?? [];
+                $types = $propertyMetadata->internalGetBuiltinTypes() ?? [];
 
                 foreach ($types as $type) {
                     $isOne = $isMany = false;

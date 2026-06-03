@@ -69,7 +69,7 @@ class ResolverFactory implements ResolverFactoryInterface
                         return $body;
                     }
                 } else {
-                    $type = $propertyMetadata?->getBuiltinTypes()[0] ?? null;
+                    $type = $propertyMetadata?->internalGetBuiltinTypes()[0] ?? null;
 
                     // Data already fetched and normalized (field or nested resource)
                     if ($body || null === $resourceClass || ($type && !$type->isCollection())) {

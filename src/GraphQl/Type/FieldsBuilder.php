@@ -222,7 +222,7 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
                 $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property, $context);
 
                 if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
-                    $propertyTypes = $propertyMetadata->getBuiltinTypes();
+                    $propertyTypes = $propertyMetadata->internalGetBuiltinTypes();
 
                     if (
                         !$propertyTypes

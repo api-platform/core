@@ -66,7 +66,7 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
                     continue;
                 }
 
-                $apiProperty = $apiProperty->withBuiltinTypes(array_map(static fn (string $builtinType): LegacyType => new LegacyType($builtinType), $value));
+                $apiProperty = $apiProperty->internalWithBuiltinTypes(array_map(static fn (string $builtinType): LegacyType => new LegacyType($builtinType), $value));
 
                 continue;
             }
@@ -118,6 +118,13 @@ final class ExtractorPropertyMetadataFactory implements PropertyMetadataFactoryI
     {
         foreach (get_class_methods(ApiProperty::class) as $method) {
             if (preg_match('/^(?:get|is)(.*)/', (string) $method, $matches) && null !== ($val = $metadata[lcfirst($matches[1])] ?? null) && method_exists($propertyMetadata, "with{$matches[1]}")) {
+                // BC layer, to remove in 5.0: route the deprecated builtinTypes setter to the internal one.
+                if ('BuiltinTypes' === $matches[1]) {
+                    $propertyMetadata = $propertyMetadata->internalWithBuiltinTypes($val);
+
+                    continue;
+                }
+
                 $propertyMetadata = $propertyMetadata->{"with{$matches[1]}"}($val);
             }
         }

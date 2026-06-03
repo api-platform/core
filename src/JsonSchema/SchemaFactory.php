@@ -194,7 +194,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             return;
         }
 
-        $types = $propertyMetadata->getBuiltinTypes() ?? [];
+        $types = $propertyMetadata->internalGetBuiltinTypes() ?? [];
 
         // never override the following keys if at least one is already set
         // or if property has no type(s) defined
