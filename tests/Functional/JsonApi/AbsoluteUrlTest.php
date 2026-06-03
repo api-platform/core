@@ -37,7 +37,7 @@ final class AbsoluteUrlTest extends ApiTestCase
         ]);
 
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json');
         $body = $response->toArray();
         $this->assertSame('http://example.com/jsonapi_absolute_url_dummies', $body['links']['self']);
         $this->assertSame('http://example.com/jsonapi_absolute_url_dummies/1', $body['data'][0]['id']);

@@ -26,28 +26,28 @@ class DocsTest extends TestCase
     {
         $res = $this->get('/api/docs.jsonopenapi');
         $this->assertArrayHasKey('openapi', $res->json());
-        $this->assertSame('application/vnd.openapi+json; charset=utf-8', $res->headers->get('content-type'));
+        $this->assertSame('application/vnd.openapi+json', $res->headers->get('content-type'));
     }
 
     public function testOpenApiAccept(): void
     {
         $res = $this->get('/api/docs', headers: ['accept' => 'application/vnd.openapi+json']);
         $this->assertArrayHasKey('openapi', $res->json());
-        $this->assertSame('application/vnd.openapi+json; charset=utf-8', $res->headers->get('content-type'));
+        $this->assertSame('application/vnd.openapi+json', $res->headers->get('content-type'));
     }
 
     public function testJsonLd(): void
     {
         $res = $this->get('/api/docs.jsonld');
         $this->assertArrayHasKey('@context', $res->json());
-        $this->assertSame('application/ld+json; charset=utf-8', $res->headers->get('content-type'));
+        $this->assertSame('application/ld+json', $res->headers->get('content-type'));
     }
 
     public function testJsonLdAccept(): void
     {
         $res = $this->get('/api/docs', headers: ['accept' => 'application/ld+json']);
         $this->assertArrayHasKey('@context', $res->json());
-        $this->assertSame('application/ld+json; charset=utf-8', $res->headers->get('content-type'));
+        $this->assertSame('application/ld+json', $res->headers->get('content-type'));
     }
 
     public function testHtmlDocsRendersSwaggerUiByDefault(): void

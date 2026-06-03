@@ -50,7 +50,7 @@ final class ConstructorDeserializationTest extends ApiTestCase
         );
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertJsonContains([
             '@context' => '/contexts/DummyEntityWithConstructor',
             '@id' => '/dummy_entity_with_constructors/1',

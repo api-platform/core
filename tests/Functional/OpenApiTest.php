@@ -285,7 +285,7 @@ class OpenApiTest extends ApiTestCase
     {
         $response = self::createClient()->request('GET', '/docs', ['headers' => ['accept' => 'application/vnd.openapi+json']]);
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+json');
         $json = $response->toArray();
 
         // Context
@@ -477,7 +477,7 @@ class OpenApiTest extends ApiTestCase
 
         $response = self::createClient()->request('GET', '/docs?api_gateway=true', ['headers' => ['accept' => 'application/vnd.openapi+json']]);
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+json');
         $json = $response->toArray();
 
         $this->assertSame('/', $json['basePath']);
@@ -518,7 +518,7 @@ class OpenApiTest extends ApiTestCase
             'headers' => ['Accept' => 'application/vnd.openapi+json'],
         ]);
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+json');
         $json = $response->toArray();
 
         // Context
@@ -554,7 +554,7 @@ class OpenApiTest extends ApiTestCase
             'headers' => ['Accept' => 'application/vnd.openapi+yaml'],
         ]);
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+yaml; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+yaml');
     }
 
     public function testRetrieveTheOpenApiDocumentationHtml(): void
@@ -630,7 +630,7 @@ class OpenApiTest extends ApiTestCase
             'headers' => ['Accept' => 'text/html,*/*;q=0.8'],
         ]);
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+json');
     }
 
     public function testOpenApiUiIsEnabledForDocsEndpointWithDummyObject(): void
@@ -649,7 +649,7 @@ class OpenApiTest extends ApiTestCase
             'headers' => ['Accept' => 'application/vnd.openapi+json'],
         ]);
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+json');
         $this->assertJson($response->getContent());
     }
 
@@ -659,7 +659,7 @@ class OpenApiTest extends ApiTestCase
             'headers' => ['Accept' => 'application/vnd.openapi+json'],
         ]);
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+json');
         $this->assertJson($response->getContent());
     }
 

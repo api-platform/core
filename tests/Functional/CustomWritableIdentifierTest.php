@@ -51,7 +51,7 @@ final class CustomWritableIdentifierTest extends ApiTestCase
         $this->createWithSlug('My Dummy', 'my_slug');
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertResponseHeaderSame('Content-Location', '/custom_writable_identifier_dummies/my_slug.jsonld');
         $this->assertResponseHeaderSame('Location', '/custom_writable_identifier_dummies/my_slug');
         $this->assertJsonEquals([

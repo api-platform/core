@@ -29,7 +29,7 @@ class JsonProblemTest extends TestCase
     {
         $response = $this->get('/api/books/notfound', headers: ['accept' => 'application/ld+json']);
         $response->assertStatus(404);
-        $response->assertHeader('content-type', 'application/problem+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/problem+json');
         $response->assertJsonFragment([
             '@context' => '/api/contexts/Error',
             '@id' => '/api/errors/404',
@@ -89,7 +89,7 @@ class JsonProblemTest extends TestCase
     {
         $response = $this->get('/api/teapot', headers: ['accept' => 'application/json']);
         $response->assertStatus(418);
-        $response->assertHeader('content-type', 'application/problem+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/problem+json');
         $response->assertJsonFragment([
             'type' => '/problem/teapot',
             'title' => 'I\'m a teapot',

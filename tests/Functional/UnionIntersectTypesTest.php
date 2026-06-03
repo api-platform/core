@@ -41,7 +41,7 @@ final class UnionIntersectTypesTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $data = $response->toArray();
         $this->assertSame('Book', $data['@type']);
         $this->assertSame('/contexts/Book', $data['@context']);
@@ -75,7 +75,7 @@ final class UnionIntersectTypesTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $data = $response->toArray();
         $this->assertSame('Book', $data['@type']);
         $this->assertSame(1, $data['number']);
@@ -95,7 +95,7 @@ final class UnionIntersectTypesTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(400);
-        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json');
         $this->assertJsonContains([
             'detail' => 'Could not denormalize object of type "ApiPlatform\\Tests\\Fixtures\\TestBundle\\ApiResource\\Issue5452\\ActivableInterface", no supporting normalizer found.',
         ]);
