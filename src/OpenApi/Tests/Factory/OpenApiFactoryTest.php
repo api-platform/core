@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Error as ErrorOperation;
 use ApiPlatform\Metadata\ErrorResource;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\HeaderParameter;
@@ -33,6 +34,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -1453,7 +1455,7 @@ class OpenApiFactoryTest extends TestCase
                 ->withShortName('Dummy')
                 ->withName('api_dummies_get_collection')
                 ->withUriTemplate('/dummies')
-                ->withOpenapi(new Operation(parameters: [new \ApiPlatform\Metadata\QueryParameter(key: 'bar')])),
+                ->withOpenapi(new Operation(parameters: [new QueryParameter(key: 'bar')])),
         ]))->withClass(Dummy::class)]);
 
         $resourceCollectionMetadataFactory
@@ -1491,7 +1493,7 @@ class OpenApiFactoryTest extends TestCase
             ['json' => ['application/problem+json']]
         );
 
-        $this->expectException(\ApiPlatform\Metadata\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(Parameter::class);
 
         $factory->__invoke();
