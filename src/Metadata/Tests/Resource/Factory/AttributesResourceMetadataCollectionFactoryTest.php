@@ -34,6 +34,7 @@ use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeResource;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeResources;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ExtraPropertiesResource;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\PasswordResource;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\SameNameDifferentMethodOperations;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\WithParameter;
 use ApiPlatform\Metadata\Tests\Fixtures\State\AttributeResourceProcessor;
 use ApiPlatform\Metadata\Tests\Fixtures\State\AttributeResourceProvider;
@@ -311,5 +312,19 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertCount(2, $parameters);
         $parameters = $metadataCollection->getOperation('collection')->getParameters();
         $this->assertCount(3, $parameters);
+    }
+
+    /**
+     * Tests issue #8175: two operations sharing an explicit name silently dropped
+     * one another because they collided on the operations collection key.
+     */
+    public function testDuplicateOperationNameThrows(): void
+    {
+        $factory = new AttributesResourceMetadataCollectionFactory();
+
+        $this->expectException(\ApiPlatform\Metadata\Exception\RuntimeException::class);
+        $this->expectExceptionMessageMatches('/_api_\/forms\/\{id\}\/submit\{\._format\}/');
+
+        $factory->create(SameNameDifferentMethodOperations::class);
     }
 }

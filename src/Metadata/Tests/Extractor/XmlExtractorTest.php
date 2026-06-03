@@ -14,10 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Metadata\Tests\Extractor;
 
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Extractor\XmlResourceExtractor;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\Metadata\Resource\Factory\ExtractorResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\Comment;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\User;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -432,5 +434,20 @@ class XmlExtractorTest extends TestCase
                 "/^Error while parsing .+\/xml\/invalid\/required_class.xml: \[ERROR 1868\] Element '\{https:\/\/api-platform\.com\/schema\/metadata\/resources-3\.0\}resource': The attribute 'class' is required but missing\./",
             ],
         ];
+    }
+
+    /**
+     * Tests issue #8175: two XML operations sharing an explicit name silently
+     * dropped one another. The factory must reject the duplicate up front.
+     */
+    public function testDuplicateOperationNameFromXmlThrows(): void
+    {
+        $extractor = new XmlResourceExtractor([__DIR__.'/xml/duplicate_operation_name.xml']);
+        $factory = new ExtractorResourceMetadataCollectionFactory($extractor);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessageMatches('/_api_\/forms\/\{id\}\/submit\{\._format\}/');
+
+        $factory->create(Comment::class);
     }
 }
