@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Error;
 use ApiPlatform\Metadata\ErrorResource;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\OperationNotFoundException;
 use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
 use ApiPlatform\Metadata\Exception\ResourceClassNotFoundException;
@@ -946,6 +947,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     private function hasParameter(Operation $operation, Parameter $parameter): ?array
     {
         foreach ($operation->getParameters() as $key => $existingParameter) {
+            if (!$existingParameter instanceof Parameter) {
+                throw new InvalidArgumentException(\sprintf('OpenAPI operation parameters must be instances of "%s", "%s" given. Use the resource-level "parameters" option to declare "%s" instances.', Parameter::class, get_debug_type($existingParameter), \ApiPlatform\Metadata\Parameter::class));
+            }
+
             if ($existingParameter->getName() === $parameter->getName() && $existingParameter->getIn() === $parameter->getIn()) {
                 return [$key, $existingParameter];
             }
