@@ -403,6 +403,29 @@ JSON
         $this->assertResponseStatusCodeSame(404);
     }
 
+    public function testDefaultContentTypeMatchesFirstConfiguredFormat(): void
+    {
+        $client = self::createClient();
+        $client->request('POST', '/something/that/does/not/exist/ever', ['json' => ['name' => 'Kevin']]);
+
+        $contentType = $client->getKernelBrowser()->getRequest()->headers->get('Content-Type');
+        $formats = self::getContainer()->getParameter('api_platform.formats');
+        $firstFormatMimeType = reset($formats)[0];
+
+        $this->assertSame($firstFormatMimeType, $contentType);
+    }
+
+    public function testExplicitContentTypeOverridesDefault(): void
+    {
+        $client = self::createClient();
+        $client->request('POST', '/something/that/does/not/exist/ever', [
+            'headers' => ['content-type' => 'application/json'],
+            'body' => '{"name":"Kevin"}',
+        ]);
+
+        $this->assertSame('application/json', $client->getKernelBrowser()->getRequest()->headers->get('Content-Type'));
+    }
+
     public function testDoNotRebootKernelOnCreateClient(): void
     {
         self::$alwaysBootKernel = false;

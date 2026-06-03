@@ -105,12 +105,49 @@ abstract class ApiTestCase extends KernelTestCase
             throw new \LogicException('You cannot create the client used in functional tests if the "framework.test" config is not set to true.');
         }
 
-        $client->setDefaultOptions($defaultOptions);
+        $client->setDefaultOptions(self::withDefaultContentType($defaultOptions));
 
         self::getHttpClient($client);
         self::getClient($client->getKernelBrowser());
 
         return $client;
+    }
+
+    /**
+     * Symfony's HttpClient adds "Content-Type: application/json" automatically when the "json" option is used.
+     * On a default API Platform project, "json" is not part of the configured formats, so such requests fail.
+     * To make tests work out of the box, default the Content-Type to the first configured API Platform format
+     * when the caller did not provide one.
+     */
+    private static function withDefaultContentType(array $defaultOptions): array
+    {
+        $headers = $defaultOptions['headers'] ?? [];
+        foreach (array_keys($headers) as $name) {
+            if (\is_string($name) && 0 === strcasecmp($name, 'content-type')) {
+                return $defaultOptions;
+            }
+        }
+
+        $container = self::getContainer();
+        if (!$container->hasParameter('api_platform.formats')) {
+            return $defaultOptions;
+        }
+
+        $formats = $container->getParameter('api_platform.formats');
+        if (!\is_array($formats) || !$formats) {
+            return $defaultOptions;
+        }
+
+        $firstFormat = reset($formats);
+        $mimeType = \is_array($firstFormat) ? ($firstFormat[0] ?? null) : null;
+        if (!\is_string($mimeType) || '' === $mimeType) {
+            return $defaultOptions;
+        }
+
+        $headers['content-type'] = $mimeType;
+        $defaultOptions['headers'] = $headers;
+
+        return $defaultOptions;
     }
 
     /**
