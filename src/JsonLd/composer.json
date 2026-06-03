@@ -26,7 +26,7 @@
         "php": ">=8.2",
         "api-platform/state": "^4.1.11",
         "api-platform/metadata": "^4.1.11",
-        "api-platform/serializer": "^4.1.11"
+        "api-platform/serializer": "^4.1.30"
     },
     "autoload": {
         "psr-4": {

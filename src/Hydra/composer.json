@@ -30,7 +30,7 @@
         "api-platform/metadata": "^4.1.11",
         "api-platform/jsonld": "^4.1.11",
         "api-platform/json-schema": "^4.1.11",
-        "api-platform/serializer": "^4.1.11",
+        "api-platform/serializer": "^4.1.30",
         "symfony/web-link": "^6.4 || ^7.1"
     },
     "require-dev": {

@@ -227,7 +227,14 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         if (\is_string($data)) {
             try {
-                return $this->iriConverter->getResourceFromIri($data, $context + ['fetch_data' => true]);
+                $item = $this->iriConverter->getResourceFromIri($data, $context + ['fetch_data' => true]);
+
+                // Type-confusion guard: declared resource class must match the IRI's resource.
+                if (!is_a($item, $resourceClass)) {
+                    throw new InvalidArgumentException(\sprintf('The iri "%s" does not reference the correct resource.', $data));
+                }
+
+                return $item;
             } catch (ItemNotFoundException $e) {
                 if (!isset($context['not_normalizable_value_exceptions'])) {
                     throw new UnexpectedValueException($e->getMessage(), $e->getCode(), $e);
@@ -615,7 +622,14 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     {
         if (\is_string($value)) {
             try {
-                return $this->iriConverter->getResourceFromIri($value, $context + ['fetch_data' => true]);
+                $item = $this->iriConverter->getResourceFromIri($value, $context + ['fetch_data' => true]);
+
+                // Type-confusion guard: declared relation class must match the IRI's resource.
+                if (!is_a($item, $className)) {
+                    throw new InvalidArgumentException(\sprintf('The iri "%s" does not reference the correct resource.', $value));
+                }
+
+                return $item;
             } catch (ItemNotFoundException $e) {
                 if (false === ($context['denormalize_throw_on_relation_not_found'] ?? true)) {
                     return null;
