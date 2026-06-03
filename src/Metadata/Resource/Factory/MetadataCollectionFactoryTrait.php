@@ -87,7 +87,7 @@ trait MetadataCollectionFactoryTrait
                 $operations = [];
                 foreach ($resource->getOperations() ?? new Operations() as $operation) {
                     [$key, $operation] = $this->getOperationWithDefaults($resource, $operation);
-                    $this->assertOperationNameIsUnique($operations, $key, $resourceClass);
+                    [$key, $operation] = $this->disambiguateOperationName($operations, $key, $operation);
                     $operations[$key] = $operation;
                 }
                 if ($operations) {
@@ -146,7 +146,7 @@ trait MetadataCollectionFactoryTrait
                 $operation = $operation->withPriority(++$operationPriority);
             }
             $operations = $resources[$index]->getOperations() ?? new Operations();
-            $this->assertOperationNameIsUnique(iterator_to_array($operations), $key, $resourceClass);
+            [$key, $operation] = $this->disambiguateOperationName(iterator_to_array($operations), $key, $operation);
             $resources[$index] = $resources[$index]->withOperations($operations->add($key, $operation));
         }
 
@@ -273,22 +273,6 @@ trait MetadataCollectionFactoryTrait
         }
 
         return $resources;
-    }
-
-    /**
-     * Two operations sharing an explicit name silently overwrite each other because
-     * the operation name is the unique key (and the Symfony route name).
-     * Detect and reject upfront so users get a clear, actionable error.
-     *
-     * @param array<string, mixed> $operations
-     */
-    private function assertOperationNameIsUnique(array $operations, string $key, string $resourceClass): void
-    {
-        if (!\array_key_exists($key, $operations)) {
-            return;
-        }
-
-        throw new RuntimeException(\sprintf('Operation name "%s" is declared twice on resource "%s". Operation names must be unique because they are also used as Symfony route names. Remove the duplicate "name" so the framework can disambiguate by method, or set distinct names.', $key, $resourceClass));
     }
 
     /**

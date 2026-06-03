@@ -315,16 +315,25 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
     }
 
     /**
-     * Tests issue #8175: two operations sharing an explicit name silently dropped
-     * one another because they collided on the operations collection key.
+     * Tests issue #8175: two operations sharing an explicit name with different HTTP
+     * methods used to silently overwrite each other. The factory must keep both by
+     * auto-suffixing the colliding entry with its method.
      */
-    public function testDuplicateOperationNameThrows(): void
+    public function testDuplicateOperationNameWithDifferentMethodsAreDisambiguated(): void
     {
         $factory = new AttributesResourceMetadataCollectionFactory();
 
-        $this->expectException(\ApiPlatform\Metadata\Exception\RuntimeException::class);
-        $this->expectExceptionMessageMatches('/_api_\/forms\/\{id\}\/submit\{\._format\}/');
+        $collection = $factory->create(SameNameDifferentMethodOperations::class);
+        $operations = $collection[0]->getOperations();
 
-        $factory->create(SameNameDifferentMethodOperations::class);
+        $this->assertTrue($operations->has('_api_/forms/{id}/submit{._format}'));
+        $this->assertTrue($operations->has('_api_/forms/{id}/submit{._format}_patch'));
+
+        $names = [];
+        foreach ($operations as $name => $operation) {
+            $names[$name] = $operation->getMethod();
+        }
+        $this->assertSame('POST', $names['_api_/forms/{id}/submit{._format}']);
+        $this->assertSame('PATCH', $names['_api_/forms/{id}/submit{._format}_patch']);
     }
 }
