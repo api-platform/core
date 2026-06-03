@@ -95,7 +95,7 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
         }
 
         if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
-            $type = $propertyMetadata->internalGetBuiltinTypes()[0] ?? null;
+            $type = (method_exists($propertyMetadata, 'internalGetBuiltinTypes') ? $propertyMetadata->internalGetBuiltinTypes() : $propertyMetadata->getBuiltinTypes())[0] ?? null;
             if ($type && null !== $type->getClassName()) {
                 return "data/relationships/$fieldName";
             }

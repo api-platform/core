@@ -419,7 +419,7 @@ final class DocumentationNormalizer implements NormalizerInterface
             }
         // TODO: remove in 5.x
         } else {
-            $builtInTypes = $propertyMetadata->internalGetBuiltinTypes() ?? [];
+            $builtInTypes = (method_exists($propertyMetadata, 'internalGetBuiltinTypes') ? $propertyMetadata->internalGetBuiltinTypes() : $propertyMetadata->getBuiltinTypes()) ?? [];
 
             foreach ($builtInTypes as $type) {
                 if ($type->isCollection() && null !== $collectionType = $type->getCollectionValueTypes()[0] ?? null) {
@@ -501,7 +501,7 @@ final class DocumentationNormalizer implements NormalizerInterface
         }
 
         // TODO: remove in 5.x
-        $builtInTypes = $propertyMetadata->internalGetBuiltinTypes() ?? [];
+        $builtInTypes = (method_exists($propertyMetadata, 'internalGetBuiltinTypes') ? $propertyMetadata->internalGetBuiltinTypes() : $propertyMetadata->getBuiltinTypes()) ?? [];
 
         foreach ($builtInTypes as $type) {
             $className = $type->getClassName();

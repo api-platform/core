@@ -344,7 +344,7 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
 
     private function getLegacyTypeSchema(ApiProperty $propertyMetadata, array $propertySchema, string $resourceClass, string $property, ?bool $link): array
     {
-        $types = $propertyMetadata->internalGetBuiltinTypes() ?? [];
+        $types = (method_exists($propertyMetadata, 'internalGetBuiltinTypes') ? $propertyMetadata->internalGetBuiltinTypes() : $propertyMetadata->getBuiltinTypes()) ?? [];
         $className = ($types[0] ?? null)?->getClassName() ?? null;
 
         if (null !== $propertyMetadata->getUriTemplate() || (!\array_key_exists('readOnly', $propertySchema) && false === $propertyMetadata->isWritable() && !$propertyMetadata->isInitializable()) && !$className) {

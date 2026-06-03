@@ -383,7 +383,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $property, $serializerContext ?? []);
 
         if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
-            $types = $propertyMetadata->internalGetBuiltinTypes() ?? [];
+            $types = (method_exists($propertyMetadata, 'internalGetBuiltinTypes') ? $propertyMetadata->internalGetBuiltinTypes() : $propertyMetadata->getBuiltinTypes()) ?? [];
             $isRelationship = false;
             $isOne = $isMany = false;
             $relatedClasses = [];

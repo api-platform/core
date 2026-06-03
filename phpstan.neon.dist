@@ -191,3 +191,28 @@ parameters:
 			identifier: function.alreadyNarrowedType
 			path: tests/Symfony/Bundle/Command/DebugResourceCommandTest.php
 			reportUnmatched: false
+
+		# Structural assertions that document the ApiProperty internal API surface
+		# (see #8173). PHPStan correctly sees the methods as defined on this branch,
+		# but the assertions guard against accidental removal in future releases.
+		-
+			identifier: function.alreadyNarrowedType
+			path: src/Metadata/Tests/Property/Factory/InternalBuiltinTypesDeprecationTest.php
+			reportUnmatched: false
+
+		# Split-package consumers of ApiPlatform\Metadata guard internal accessors with
+		# method_exists() so the "lowest" dependency builds (api-platform/metadata <= 4.3.7,
+		# which lacks internalGetBuiltinTypes()) still install. PHPStan sees the method
+		# as always-defined when analysing the monorepo, hence the narrowed-type notice.
+		-
+			identifier: function.alreadyNarrowedType
+			paths:
+				- src/Elasticsearch
+				- src/GraphQl
+				- src/Hal
+				- src/Hydra
+				- src/JsonApi
+				- src/JsonSchema
+				- src/Serializer
+				- src/Symfony/Validator
+			reportUnmatched: false

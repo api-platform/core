@@ -55,7 +55,7 @@ final class PropertySchemaLessThanOrEqualRestriction implements PropertySchemaRe
             return $type->isIdentifiedBy(TypeIdentifier::INT, TypeIdentifier::FLOAT);
         }
 
-        $types = array_map(static fn (LegacyType $type) => $type->getBuiltinType(), $propertyMetadata->internalGetBuiltinTypes() ?? []);
+        $types = array_map(static fn (LegacyType $type) => $type->getBuiltinType(), (method_exists($propertyMetadata, 'internalGetBuiltinTypes') ? $propertyMetadata->internalGetBuiltinTypes() : $propertyMetadata->getBuiltinTypes()) ?? []);
         if ($propertyMetadata->getExtraProperties()['nested_schema'] ?? false) {
             $types = [LegacyType::BUILTIN_TYPE_INT];
         }

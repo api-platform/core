@@ -17,10 +17,8 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\AttributePropertyMetadataFactory;
 use ApiPlatform\Metadata\Property\Factory\ExtractorPropertyMetadataFactory;
 use ApiPlatform\Metadata\Property\Factory\PropertyInfoPropertyMetadataFactory;
-use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\DummyWithApiPropertyAttributes;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\Type as LegacyType;
 
 /**
@@ -44,8 +42,13 @@ final class InternalBuiltinTypesDeprecationTest extends TestCase
     protected function setUp(): void
     {
         $this->deprecations = [];
+        // Only record deprecations that target ApiProperty's legacy builtin types accessors:
+        // the surrounding code (e.g. instantiating Symfony's LegacyType on property-info 7.3+)
+        // also emits unrelated deprecations that must not influence this test.
         set_error_handler(function (int $errno, string $errstr): bool {
-            $this->deprecations[] = $errstr;
+            if (str_contains($errstr, 'ApiPlatform\Metadata\ApiProperty::')) {
+                $this->deprecations[] = $errstr;
+            }
 
             return true;
         }, \E_USER_DEPRECATED);
@@ -64,10 +67,6 @@ final class InternalBuiltinTypesDeprecationTest extends TestCase
 
     public function testInternalBuiltinTypesAccessorsDoNotEmitDeprecation(): void
     {
-        if (!method_exists(ApiProperty::class, 'internalWithBuiltinTypes') || !method_exists(ApiProperty::class, 'internalGetBuiltinTypes')) {
-            $this->markTestSkipped('Internal builtin types accessors are not available; covered by the structural test.');
-        }
-
         $types = class_exists(LegacyType::class) ? [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)] : [];
 
         $property = (new ApiProperty())->internalWithBuiltinTypes($types);
