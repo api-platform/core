@@ -17,9 +17,12 @@ use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 use ApiPlatform\Doctrine\Common\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Doctrine\Common\Tests\Fixtures\TestBundle\Entity\DummyWithUninitializedProperties;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\State\ProcessorInterface;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata as ORMClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
@@ -141,4 +144,64 @@ class PersistProcessorTest extends TestCase
         $result = (new PersistProcessor($managerRegistryProphecy->reveal()))->process($dummy, new Post(map: true));
         $this->assertSame($dummy, $result);
     }
+
+    public function testPersistPutCreateResolvesParentLinkViaToProperty(): void
+    {
+        $device = new PersistProcessorTestDeviceStub();
+
+        $userReference = new PersistProcessorTestUserStub();
+        $userReference->id = 'user-uuid';
+
+        $deviceClassMetadata = new ORMClassMetadata(PersistProcessorTestDeviceStub::class);
+        $deviceClassMetadata->identifier = ['id'];
+
+        $deviceManagerProphecy = $this->prophesize(EntityManagerInterface::class);
+        $deviceManagerProphecy->getClassMetadata(PersistProcessorTestDeviceStub::class)->willReturn($deviceClassMetadata);
+        $deviceManagerProphecy->contains($device)->willReturn(false);
+        $deviceManagerProphecy->persist($device)->shouldBeCalled();
+        $deviceManagerProphecy->flush()->shouldBeCalled();
+        $deviceManagerProphecy->refresh($device)->shouldBeCalled();
+
+        $userManagerProphecy = $this->prophesize(EntityManagerInterface::class);
+        $userManagerProphecy->getReference(PersistProcessorTestUserStub::class, 'user-uuid')
+            ->willReturn($userReference)
+            ->shouldBeCalledTimes(1);
+        $userManagerProphecy->contains($userReference)->willReturn(true);
+
+        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
+        $managerRegistryProphecy->getManagerForClass(PersistProcessorTestDeviceStub::class)->willReturn($deviceManagerProphecy->reveal());
+        $managerRegistryProphecy->getManagerForClass(PersistProcessorTestUserStub::class)->willReturn($userManagerProphecy->reveal());
+
+        $operation = new Put(
+            extraProperties: ['standard_put' => true],
+            uriVariables: [
+                'userId' => new Link(toProperty: 'user', fromClass: PersistProcessorTestUserStub::class, identifiers: ['id']),
+                'id' => new Link(fromClass: PersistProcessorTestDeviceStub::class, identifiers: ['id']),
+            ],
+        );
+
+        $result = (new PersistProcessor($managerRegistryProphecy->reveal()))->process(
+            $device,
+            $operation,
+            ['userId' => 'user-uuid', 'id' => 'device-uuid'],
+            ['previous_data' => null],
+        );
+
+        $this->assertSame($device, $result);
+        $this->assertSame($userReference, $device->user);
+        $this->assertSame('device-uuid', $device->id);
+    }
+}
+
+/** @internal */
+class PersistProcessorTestUserStub
+{
+    public ?string $id = null;
+}
+
+/** @internal */
+class PersistProcessorTestDeviceStub
+{
+    public ?string $id = null;
+    public ?PersistProcessorTestUserStub $user = null;
 }
