@@ -52,12 +52,25 @@ trait HttpResponseHeadersTrait
     private function getHeaders(Request $request, HttpOperation $operation, array $context): array
     {
         $status = $this->getStatus($request, $operation, $context);
+        $method = $request->getMethod();
+        $output = $operation->getOutput();
+        $outputMetadata = $output ?? ['class' => $operation->getClass()];
+        $hasOutput = \is_array($outputMetadata) && \array_key_exists('class', $outputMetadata) && null !== $outputMetadata['class'];
+        $outputExplicitlyDisabled = \is_array($output) && \array_key_exists('class', $output) && null === $output['class'];
+        // RFC 7230 §3.3.2 / §3.3.3: 204, 205 and 304 responses MUST NOT include a payload body,
+        // and a sender MUST NOT generate a Content-Type field for a message without a body.
+        $isBodylessStatus = \in_array($status, [Response::HTTP_NO_CONTENT, Response::HTTP_RESET_CONTENT, Response::HTTP_NOT_MODIFIED], true);
+        $hasBody = !$outputExplicitlyDisabled && !$isBodylessStatus;
+
         $headers = [
-            'Content-Type' => \sprintf('%s; charset=utf-8', $request->getMimeType($request->getRequestFormat())),
             'Vary' => 'Accept',
             'X-Content-Type-Options' => 'nosniff',
             'X-Frame-Options' => 'deny',
         ];
+
+        if ($hasBody) {
+            $headers['Content-Type'] = \sprintf('%s; charset=utf-8', $request->getMimeType($request->getRequestFormat()));
+        }
 
         $exception = $request->attributes->get('exception');
         if (($exception instanceof HttpExceptionInterface || $exception instanceof SymfonyHttpExceptionInterface) && $exceptionHeaders = $exception->getHeaders()) {
@@ -76,10 +89,7 @@ trait HttpResponseHeadersTrait
             $headers['Accept-Patch'] = $acceptPatch;
         }
 
-        $method = $request->getMethod();
         $originalData = $context['original_data'] ?? null;
-        $outputMetadata = $operation->getOutput() ?? ['class' => $operation->getClass()];
-        $hasOutput = \is_array($outputMetadata) && \array_key_exists('class', $outputMetadata) && null !== $outputMetadata['class'];
         $hasData = !$hasOutput ? false : ($this->resourceClassResolver && $originalData && \is_object($originalData) && $this->resourceClassResolver->isResourceClass($this->getObjectClass($originalData)));
 
         if ($hasData) {
