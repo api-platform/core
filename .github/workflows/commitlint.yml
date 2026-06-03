@@ -15,6 +15,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          ref: ${{ github.event.pull_request.base.ref }}
       - name: Fetch PR head
         run: git fetch origin pull/${{ github.event.pull_request.number }}/head:pr_head
       - name: Run commitlint
