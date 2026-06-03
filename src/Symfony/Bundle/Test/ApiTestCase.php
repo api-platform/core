@@ -115,9 +115,14 @@ abstract class ApiTestCase extends KernelTestCase
 
     /**
      * Symfony's HttpClient adds "Content-Type: application/json" automatically when the "json" option is used.
-     * On a default API Platform project, "json" is not part of the configured formats, so such requests fail.
-     * To make tests work out of the box, default the Content-Type to the first configured API Platform format
-     * when the caller did not provide one.
+     * On a default API Platform project, "json" is not part of the configured formats, so such requests fail
+     * with 415 Unsupported Media Type. To keep tests working out of the box in that scenario, default the
+     * Content-Type to the first configured API Platform format.
+     *
+     * The default is only applied when "application/json" is NOT one of the configured mime types: when it is
+     * (e.g. a project that explicitly enables the "json" format, or any GraphQL endpoint that accepts
+     * "application/json" regardless of the API Platform formats), Symfony's implicit "application/json"
+     * header already produces a valid request, and overriding it would break per-request "json" usage.
      */
     private static function withDefaultContentType(array $defaultOptions): array
     {
@@ -136,6 +141,12 @@ abstract class ApiTestCase extends KernelTestCase
         $formats = $container->getParameter('api_platform.formats');
         if (!\is_array($formats) || !$formats) {
             return $defaultOptions;
+        }
+
+        foreach ($formats as $mimeTypes) {
+            if (\is_array($mimeTypes) && \in_array('application/json', $mimeTypes, true)) {
+                return $defaultOptions;
+            }
         }
 
         $firstFormat = reset($formats);

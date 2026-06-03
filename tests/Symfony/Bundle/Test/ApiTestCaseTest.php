@@ -403,19 +403,18 @@ JSON
         $this->assertResponseStatusCodeSame(404);
     }
 
-    public function testDefaultContentTypeMatchesFirstConfiguredFormat(): void
+    public function testJsonOptionContentTypePreservedWhenApplicationJsonConfigured(): void
     {
+        // The test fixtures configure "application/json" among the API Platform formats, so Symfony's
+        // implicit "Content-Type: application/json" header (set by the "json" option) must not be overridden.
+        // Overriding it would break callers that legitimately rely on application/json (e.g. /graphql).
         $client = self::createClient();
         $client->request('POST', '/something/that/does/not/exist/ever', ['json' => ['name' => 'Kevin']]);
 
-        $contentType = $client->getKernelBrowser()->getRequest()->headers->get('Content-Type');
-        $formats = self::getContainer()->getParameter('api_platform.formats');
-        $firstFormatMimeType = reset($formats)[0];
-
-        $this->assertSame($firstFormatMimeType, $contentType);
+        $this->assertSame('application/json', $client->getKernelBrowser()->getRequest()->headers->get('Content-Type'));
     }
 
-    public function testExplicitContentTypeOverridesDefault(): void
+    public function testExplicitContentTypeIsPreserved(): void
     {
         $client = self::createClient();
         $client->request('POST', '/something/that/does/not/exist/ever', [
