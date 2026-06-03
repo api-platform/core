@@ -592,14 +592,10 @@ class OpenApiTest extends ApiTestCase
         $json = $response->toArray();
 
         $this->assertSame('3.0.0', $json['openapi']);
-        $this->assertEquals([
-            ['type' => 'integer'],
-            ['type' => 'null'],
-        ], $json['components']['schemas']['DummyBoolean']['properties']['id']['anyOf']);
-        $this->assertEquals([
-            ['type' => 'boolean'],
-            ['type' => 'null'],
-        ], $json['components']['schemas']['DummyBoolean']['properties']['isDummyBoolean']['anyOf']);
+        $this->assertSame('integer', $json['components']['schemas']['DummyBoolean']['properties']['id']['type']);
+        $this->assertTrue($json['components']['schemas']['DummyBoolean']['properties']['id']['nullable']);
+        $this->assertSame('boolean', $json['components']['schemas']['DummyBoolean']['properties']['isDummyBoolean']['type']);
+        $this->assertTrue($json['components']['schemas']['DummyBoolean']['properties']['isDummyBoolean']['nullable']);
         $this->assertArrayNotHasKey('owl:maxCardinality', $json['components']['schemas']['DummyBoolean']['properties']['isDummyBoolean']);
     }
 
