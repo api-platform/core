@@ -948,7 +948,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     {
         foreach ($operation->getParameters() as $key => $existingParameter) {
             if (!$existingParameter instanceof Parameter) {
-                throw new InvalidArgumentException(\sprintf('OpenAPI operation parameters must be instances of "%s", "%s" given. Use the resource-level "parameters" option to declare "%s" instances.', Parameter::class, get_debug_type($existingParameter), \ApiPlatform\Metadata\Parameter::class));
+                throw new InvalidArgumentException(\sprintf('OpenAPI operation parameters must be instances of "%s", "%s" given.', Parameter::class, get_debug_type($existingParameter)));
             }
 
             if ($existingParameter->getName() === $parameter->getName() && $existingParameter->getIn() === $parameter->getIn()) {

@@ -1493,7 +1493,6 @@ class OpenApiFactoryTest extends TestCase
 
         $this->expectException(\ApiPlatform\Metadata\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage(Parameter::class);
-        $this->expectExceptionMessage(\ApiPlatform\Metadata\QueryParameter::class);
 
         $factory->__invoke();
     }
