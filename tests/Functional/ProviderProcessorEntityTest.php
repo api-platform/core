@@ -51,7 +51,7 @@ final class ProviderProcessorEntityTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertResponseHeaderSame('Content-Location', '/processor_entities/1.jsonld');
         $this->assertResponseHeaderSame('Location', '/processor_entities/1');
         $this->assertJsonEquals([
@@ -71,7 +71,7 @@ final class ProviderProcessorEntityTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertResponseHeaderSame('Content-Location', '/provider_entities/1.jsonld');
         $this->assertResponseHeaderSame('Location', '/provider_entities/1');
         $this->assertJsonEquals([
@@ -93,7 +93,7 @@ final class ProviderProcessorEntityTest extends ApiTestCase
         $response = self::createClient()->request('GET', '/provider_entities');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertArrayNotHasKey('content-location', array_change_key_case($response->getHeaders()));
         $this->assertJsonEquals([
             '@context' => '/contexts/ProviderEntity',
@@ -119,7 +119,7 @@ final class ProviderProcessorEntityTest extends ApiTestCase
         $response = self::createClient()->request('GET', '/provider_entities/1');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertArrayNotHasKey('content-location', array_change_key_case($response->getHeaders()));
         $this->assertJsonEquals([
             '@context' => '/contexts/ProviderEntity',

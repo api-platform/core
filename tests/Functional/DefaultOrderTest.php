@@ -67,7 +67,7 @@ final class DefaultOrderTest extends ApiTestCase
         self::createClient()->request('GET', '/foos?itemsPerPage=10');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonEquals([
             '@context' => '/contexts/Foo',
             '@id' => '/foos',
@@ -112,7 +112,7 @@ final class DefaultOrderTest extends ApiTestCase
         $response = self::createClient()->request('GET', '/foo_dummies?itemsPerPage=10');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $data = $response->toArray();
         $names = array_column($data['hydra:member'], 'name');
         $this->assertSame(['Balbo', 'Sthenelus', 'Ephesian', 'Hawsepipe', 'Separativeness'], $names);

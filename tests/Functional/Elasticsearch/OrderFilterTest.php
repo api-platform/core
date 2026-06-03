@@ -41,7 +41,7 @@ final class OrderFilterTest extends ApiTestCase
         $response = self::createClient()->request('GET', '/tweets?order%5Bid%5D=asc', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",
@@ -104,7 +104,7 @@ JSON);
         $response = self::createClient()->request('GET', '/tweets?order%5Bid%5D=desc', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",
@@ -167,7 +167,7 @@ JSON);
         $response = self::createClient()->request('GET', '/tweets?order%5Bauthor.id%5D=asc&order%5Bid%5D=asc', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",
@@ -230,7 +230,7 @@ JSON);
         $response = self::createClient()->request('GET', '/tweets?order%5Bauthor.id%5D=asc&order%5Bid%5D=desc', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",
@@ -293,7 +293,7 @@ JSON);
         $response = self::createClient()->request('GET', '/tweets?order%5Bauthor.id%5D=desc&order%5Bid%5D=asc', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",
@@ -356,7 +356,7 @@ JSON);
         $response = self::createClient()->request('GET', '/tweets?order%5Bauthor.id%5D=desc&order%5Bid%5D=desc', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",
@@ -419,7 +419,7 @@ JSON);
         $response = self::createClient()->request('GET', '/books?order%5Bid%5D=asc', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",
@@ -482,7 +482,7 @@ JSON);
         $response = self::createClient()->request('GET', '/books?order%5Bid%5D=desc', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",
@@ -545,7 +545,7 @@ JSON);
         $response = self::createClient()->request('GET', '/books?order%5Blibrary.id%5D=asc&order%5Bid%5D=asc', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",
@@ -608,7 +608,7 @@ JSON);
         $response = self::createClient()->request('GET', '/books?order%5Blibrary.id%5D=asc&order%5Bid%5D=desc', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",
@@ -671,7 +671,7 @@ JSON);
         $response = self::createClient()->request('GET', '/books?order%5Blibrary.id%5D=desc&order%5Bid%5D=asc', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",
@@ -734,7 +734,7 @@ JSON);
         $response = self::createClient()->request('GET', '/books?order%5Blibrary.id%5D=desc&order%5Bid%5D=desc', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",

@@ -78,7 +78,7 @@ final class CrudTest extends ApiTestCase
         $this->createDummy();
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertResponseHeaderSame('Content-Location', '/dummies/1.jsonld');
         $this->assertResponseHeaderSame('Location', '/dummies/1');
         $this->assertJsonContains(self::DUMMY);
@@ -91,7 +91,7 @@ final class CrudTest extends ApiTestCase
         $response = self::createClient()->request('GET', '/dummies/1');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertArrayNotHasKey('content-location', array_change_key_case($response->getHeaders()));
         $this->assertJsonContains(self::DUMMY);
     }
@@ -121,7 +121,7 @@ final class CrudTest extends ApiTestCase
         $response = self::createClient()->request('GET', '/dummies');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $data = $response->toArray();
         $this->assertSame('/contexts/Dummy', $data['@context']);
         $this->assertSame('/dummies', $data['@id']);

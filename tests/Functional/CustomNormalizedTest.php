@@ -52,7 +52,7 @@ final class CustomNormalizedTest extends ApiTestCase
         $this->createCustom();
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertResponseHeaderSame('Content-Location', '/custom_normalized_dummies/1.jsonld');
         $this->assertResponseHeaderSame('Location', '/custom_normalized_dummies/1');
         $this->assertJsonEquals([
@@ -73,7 +73,7 @@ final class CustomNormalizedTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('Content-Type', 'application/json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
         $this->assertResponseHeaderSame('Content-Location', '/related_normalized_dummies/1.json');
         $this->assertResponseHeaderSame('Location', '/related_normalized_dummies/1');
         $this->assertJsonEquals(['id' => 1, 'name' => 'My Dummy', 'customNormalizedDummy' => []]);
@@ -102,7 +102,7 @@ final class CustomNormalizedTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
         $this->assertResponseHeaderSame('Content-Location', '/related_normalized_dummies/1.json');
         $this->assertJsonEquals([
             'id' => 1,
@@ -118,7 +118,7 @@ final class CustomNormalizedTest extends ApiTestCase
         self::createClient()->request('GET', '/custom_normalized_dummies/1');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonEquals([
             '@context' => '/contexts/CustomNormalizedDummy',
             '@id' => '/custom_normalized_dummies/1',

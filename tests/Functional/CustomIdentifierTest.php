@@ -52,7 +52,7 @@ final class CustomIdentifierTest extends ApiTestCase
         $this->createDummy();
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonEquals([
             '@context' => '/contexts/CustomIdentifierDummy',
             '@id' => '/custom_identifier_dummies/1',
@@ -69,7 +69,7 @@ final class CustomIdentifierTest extends ApiTestCase
         self::createClient()->request('GET', '/custom_identifier_dummies/1');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonEquals([
             '@context' => '/contexts/CustomIdentifierDummy',
             '@id' => '/custom_identifier_dummies/1',
@@ -86,7 +86,7 @@ final class CustomIdentifierTest extends ApiTestCase
         self::createClient()->request('GET', '/custom_identifier_dummies');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonEquals([
             '@context' => '/contexts/CustomIdentifierDummy',
             '@id' => '/custom_identifier_dummies',
@@ -111,7 +111,7 @@ final class CustomIdentifierTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonEquals([
             '@context' => '/contexts/CustomIdentifierDummy',
             '@id' => '/custom_identifier_dummies/1',

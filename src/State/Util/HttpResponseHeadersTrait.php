@@ -69,7 +69,7 @@ trait HttpResponseHeadersTrait
         ];
 
         if ($hasBody) {
-            $headers['Content-Type'] = \sprintf('%s; charset=utf-8', $request->getMimeType($request->getRequestFormat()));
+            $headers['Content-Type'] = $this->formatContentType($request->getMimeType($request->getRequestFormat()));
         }
 
         $exception = $request->attributes->get('exception');
@@ -146,6 +146,29 @@ trait HttpResponseHeadersTrait
         }
 
         return $headers;
+    }
+
+    /**
+     * Appends `; charset=utf-8` only for media types whose IANA registration defines a charset parameter.
+     *
+     * JSON-based media types (RFC 8259, RFC 6839 `+json` suffix) do not define charset and MUST always be UTF-8;
+     * sending the parameter can break strict clients.
+     */
+    private function formatContentType(?string $mimeType): string
+    {
+        if (null === $mimeType || '' === $mimeType) {
+            return '';
+        }
+
+        if (str_starts_with($mimeType, 'text/')) {
+            return $mimeType.'; charset=utf-8';
+        }
+
+        if ('application/xml' === $mimeType) {
+            return $mimeType.'; charset=utf-8';
+        }
+
+        return $mimeType;
     }
 
     private function addLinkedDataPlatformHeaders(array &$headers, HttpOperation $operation): void

@@ -58,7 +58,7 @@ final class InputOutputDtoTest extends ApiTestCase
             'json' => ['foo' => 'test', 'bar' => 1],
         ]);
         $this->assertResponseStatusCodeSame(201);
-        $this->assertSame('application/ld+json; charset=utf-8', $response->getHeaders()['content-type'][0]);
+        $this->assertSame('application/ld+json', $response->getHeaders()['content-type'][0]);
         $this->assertJsonContains([
             '@context' => '/contexts/JsonLdCustomInput',
             '@id' => '/jsonld_custom_inputs/1',
@@ -162,7 +162,7 @@ final class InputOutputDtoTest extends ApiTestCase
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
         $this->assertResponseStatusCodeSame(201);
-        $this->assertSame('application/ld+json; charset=utf-8', $response->getHeaders()['content-type'][0]);
+        $this->assertSame('application/ld+json', $response->getHeaders()['content-type'][0]);
         $body = $response->toArray();
         $this->assertSame('JsonLdNoInput', $body['@type']);
         $this->assertSame(1, $body['id']);
@@ -250,7 +250,7 @@ final class InputOutputDtoTest extends ApiTestCase
             'json' => ['email' => 'user@example.com'],
         ]);
         $this->assertResponseStatusCodeSame(201);
-        $this->assertSame('application/ld+json; charset=utf-8', $response->getHeaders()['content-type'][0]);
+        $this->assertSame('application/ld+json', $response->getHeaders()['content-type'][0]);
         $body = $response->toArray();
         $this->assertSame('user@example.com', $body['email']);
     }

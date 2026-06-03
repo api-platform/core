@@ -36,7 +36,7 @@ final class HalTest extends ApiTestCase
             'headers' => ['Accept' => 'application/hal+json'],
         ]);
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('Content-Type', 'application/hal+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/hal+json');
         $body = $response->toArray();
         $this->assertSame('/', $body['_links']['self']['href']);
         $hrefs = array_column($body['_links'], 'href');
@@ -49,7 +49,7 @@ final class HalTest extends ApiTestCase
             'headers' => ['Accept' => 'application/hal+json'],
         ]);
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('Content-Type', 'application/hal+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/hal+json');
         $body = $response->toArray();
 
         $this->assertSame('/hal_relation_embedders/1', $body['_links']['self']['href']);
@@ -92,7 +92,7 @@ final class HalTest extends ApiTestCase
             'json' => ['krondstadt' => 'Updated'],
         ]);
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/hal+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/hal+json');
         $body = $response->toArray();
         $this->assertSame('/hal_relation_embedders/1', $body['_links']['self']['href']);
         $this->assertSame('/hal_related_resources/1', $body['_links']['related']['href']);
@@ -110,7 +110,7 @@ final class HalTest extends ApiTestCase
             'json' => ['krondstadt' => 'Patched'],
         ]);
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/hal+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/hal+json');
         $body = $response->toArray();
         $this->assertSame('/hal_relation_embedders/1', $body['_links']['self']['href']);
         $this->assertSame('/hal_related_resources/1', $body['_links']['related']['href']);

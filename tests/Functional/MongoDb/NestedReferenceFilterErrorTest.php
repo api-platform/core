@@ -76,7 +76,7 @@ final class NestedReferenceFilterErrorTest extends ApiTestCase
         $response = self::createClient()->request('GET', '/dummies?relatedDummy.thirdLevel.badFourthLevel.level=4', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(500);
-        $this->assertResponseHeaderSame('content-type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/problem+json');
         $body = $response->toArray(false);
         $this->assertSame('/contexts/Error', $body['@context']);
         $this->assertSame('hydra:Error', $body['@type']);
@@ -89,7 +89,7 @@ final class NestedReferenceFilterErrorTest extends ApiTestCase
         $response = self::createClient()->request('GET', '/dummies?relatedDummy.thirdLevel.fourthLevel.badThirdLevel.level=3', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(500);
-        $this->assertResponseHeaderSame('content-type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/problem+json');
         $body = $response->toArray(false);
         $this->assertSame('/contexts/Error', $body['@context']);
         $this->assertSame('hydra:Error', $body['@type']);

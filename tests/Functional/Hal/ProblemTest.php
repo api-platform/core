@@ -39,7 +39,7 @@ final class ProblemTest extends ApiTestCase
             'json' => [],
         ]);
         $this->assertResponseStatusCodeSame(422);
-        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json');
         $body = $response->toArray(false);
         $this->assertSame('/validation_errors/c1051bb4-d103-4f74-8988-acbcafc7fdc3', $body['type']);
         $this->assertSame('An error occurred', $body['title']);
@@ -67,7 +67,7 @@ final class ProblemTest extends ApiTestCase
             ],
         ]);
         $this->assertResponseStatusCodeSame(400);
-        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json');
         $body = $response->toArray(false);
         $this->assertSame('/errors/400', $body['type']);
         $this->assertSame('An error occurred', $body['title']);

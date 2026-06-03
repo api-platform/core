@@ -39,7 +39,7 @@ final class SecurityHeadersTest extends ApiTestCase
     {
         self::createClient()->request('GET', '/dummies', ['headers' => ['Accept' => 'application/ld+json']]);
 
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertResponseHeaderSame('x-content-type-options', 'nosniff');
         $this->assertResponseHeaderSame('x-frame-options', 'deny');
     }
@@ -72,7 +72,7 @@ final class SecurityHeadersTest extends ApiTestCase
         );
 
         $this->assertResponseStatusCodeSame(422);
-        $this->assertResponseHeaderSame('content-type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/problem+json');
         $this->assertResponseHeaderSame('x-content-type-options', 'nosniff');
         $this->assertResponseHeaderSame('x-frame-options', 'deny');
     }

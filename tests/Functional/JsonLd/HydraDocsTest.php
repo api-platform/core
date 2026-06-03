@@ -41,7 +41,7 @@ final class HydraDocsTest extends ApiTestCase
     {
         $response = self::createClient()->request('GET', '/docs.jsonld');
         $this->assertResponseIsSuccessful();
-        $this->assertSame('application/ld+json; charset=utf-8', $response->getHeaders()['content-type'][0]);
+        $this->assertSame('application/ld+json', $response->getHeaders()['content-type'][0]);
         $body = $response->toArray();
 
         $this->assertIsArray($body['@context']);

@@ -56,7 +56,7 @@ final class OverriddenOperationTest extends ApiTestCase
         $this->createDummy();
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonEquals([
             '@context' => '/contexts/OverriddenOperationDummy',
             '@id' => '/overridden_operation_dummies/1',
@@ -74,7 +74,7 @@ final class OverriddenOperationTest extends ApiTestCase
         self::createClient()->request('GET', '/overridden_operation_dummies/1');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonEquals([
             '@context' => '/contexts/OverriddenOperationDummy',
             '@id' => '/overridden_operation_dummies/1',

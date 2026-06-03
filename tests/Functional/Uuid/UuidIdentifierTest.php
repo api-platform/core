@@ -56,7 +56,7 @@ final class UuidIdentifierTest extends ApiTestCase
         $this->createUuidDummy();
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertResponseHeaderSame('Content-Location', '/uuid_identifier_dummies/41b29566-144b-11e6-a148-3e1d05defe78.jsonld');
         $this->assertResponseHeaderSame('Location', '/uuid_identifier_dummies/41b29566-144b-11e6-a148-3e1d05defe78');
     }
@@ -160,7 +160,7 @@ final class UuidIdentifierTest extends ApiTestCase
         self::createClient()->request('GET', '/ramsey_uuid_dummies/41B29566-144B-11E6-A148-3E1D05DEFE78');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
     }
 
     public function testDeleteRamseyUuidDummy(): void
@@ -189,7 +189,7 @@ final class UuidIdentifierTest extends ApiTestCase
         self::createClient()->request('GET', '/ramsey_uuid_dummies/41B29566-144B-E1D05DEFE78');
 
         $this->assertResponseStatusCodeSame(404);
-        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json');
     }
 
     public function testCreateRamseyUuidDummy(): void
@@ -205,7 +205,7 @@ final class UuidIdentifierTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
     }
 
     public function testCreateRamseyUuidDummyWithNonIdField(): void
@@ -221,7 +221,7 @@ final class UuidIdentifierTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
     }
 
     public function testUpdateRamseyUuidNonIdField(): void
@@ -242,7 +242,7 @@ final class UuidIdentifierTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
     }
 
     public function testCreateBadRamseyUuidReturns400(): void
@@ -258,7 +258,7 @@ final class UuidIdentifierTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(400);
-        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json');
     }
 
     public function testUpdateBadRamseyUuidReturns400(): void
@@ -279,7 +279,7 @@ final class UuidIdentifierTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(400);
-        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json');
     }
 
     public function testGetSymfonyUuidDummy(): void
@@ -297,6 +297,6 @@ final class UuidIdentifierTest extends ApiTestCase
         self::createClient()->request('GET', '/symfony_uuid_dummies/cdf8f706-ebe3-4fb6-b0bd-ae7b48028f24');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
     }
 }

@@ -54,7 +54,7 @@ class JsonApiUseIriAsIdTest extends TestCase
         $iri = $this->getIriFromResource($book);
         $response = $this->get($iri, ['accept' => ['application/vnd.api+json']]);
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'application/vnd.api+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/vnd.api+json');
 
         $this->assertJsonContains([
             'data' => [

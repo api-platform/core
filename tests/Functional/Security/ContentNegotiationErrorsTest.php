@@ -47,7 +47,7 @@ final class ContentNegotiationErrorsTest extends ApiTestCase
         );
 
         $this->assertResponseStatusCodeSame(415);
-        $this->assertResponseHeaderSame('content-type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/problem+json');
         $this->assertJsonContains([
             'detail' => 'The content-type "text/plain" is not supported. Supported MIME types are "application/ld+json", "application/hal+json", "application/vnd.api+json", "application/xml", "text/xml", "application/json", "text/html", "application/graphql", "multipart/form-data".',
         ]);
@@ -58,7 +58,7 @@ final class ContentNegotiationErrorsTest extends ApiTestCase
         self::createClient()->request('GET', '/dummies', ['headers' => ['Accept' => 'text/plain']]);
 
         $this->assertResponseStatusCodeSame(406);
-        $this->assertResponseHeaderSame('content-type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/problem+json');
         $this->assertJsonContains([
             'detail' => 'Requested format "text/plain" is not supported. Supported MIME types are "application/ld+json", "application/hal+json", "application/vnd.api+json", "application/xml", "text/xml", "application/json", "text/html", "application/graphql", "multipart/form-data".',
         ]);
@@ -69,7 +69,7 @@ final class ContentNegotiationErrorsTest extends ApiTestCase
         self::createClient()->request('GET', '/dummies/1.json', ['headers' => ['Accept' => 'text/xml']]);
 
         $this->assertResponseStatusCodeSame(406);
-        $this->assertResponseHeaderSame('content-type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/problem+json');
         $this->assertJsonContains([
             'detail' => 'Requested format "text/xml" is not supported. Supported MIME types are "application/json".',
         ]);
@@ -80,7 +80,7 @@ final class ContentNegotiationErrorsTest extends ApiTestCase
         self::createClient()->request('GET', '/dummies/1', ['headers' => ['Accept' => 'invalid']]);
 
         $this->assertResponseStatusCodeSame(406);
-        $this->assertResponseHeaderSame('content-type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/problem+json');
         $this->assertJsonContains([
             'detail' => 'Requested format "invalid" is not supported. Supported MIME types are "application/ld+json", "application/hal+json", "application/vnd.api+json", "application/xml", "text/xml", "application/json", "text/html", "application/graphql", "multipart/form-data".',
         ]);
@@ -91,7 +91,7 @@ final class ContentNegotiationErrorsTest extends ApiTestCase
         self::createClient()->request('GET', '/dummies/1.invalid');
 
         $this->assertResponseStatusCodeSame(404);
-        $this->assertResponseHeaderSame('content-type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/problem+json');
         $this->assertJsonContains([
             'detail' => 'Format "invalid" is not supported',
         ]);
@@ -102,7 +102,7 @@ final class ContentNegotiationErrorsTest extends ApiTestCase
         self::createClient()->request('GET', '/dummies/1.invalid', ['headers' => ['Accept' => 'text/invalid']]);
 
         $this->assertResponseStatusCodeSame(404);
-        $this->assertResponseHeaderSame('content-type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/problem+json');
         $this->assertJsonContains([
             'detail' => 'Format "invalid" is not supported',
         ]);

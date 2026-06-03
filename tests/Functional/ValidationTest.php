@@ -59,7 +59,7 @@ final class ValidationTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(422);
-        $this->assertResponseHeaderSame('content-type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/problem+json');
 
         $this->assertJsonContains([
             '@context' => '/contexts/ConstraintViolation',

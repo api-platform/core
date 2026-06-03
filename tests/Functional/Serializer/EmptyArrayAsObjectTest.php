@@ -33,7 +33,7 @@ final class EmptyArrayAsObjectTest extends ApiTestCase
         self::createClient()->request('GET', '/empty_array_as_objects/5', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertJsonEquals(<<<'JSON'
 {
     "@context": "/contexts/EmptyArrayAsObject",

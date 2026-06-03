@@ -61,7 +61,7 @@ final class TableInheritanceTest extends ApiTestCase
             'json' => ['name' => 'foo', 'nickname' => 'bar'],
         ]);
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('Content-Type', 'application/hal+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/hal+json');
         $body = $response->toArray();
         $this->assertSame([
             '_links' => ['self' => ['href' => '/dummy_table_inheritance_children/1']],

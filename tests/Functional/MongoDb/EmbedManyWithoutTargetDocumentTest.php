@@ -55,7 +55,7 @@ final class EmbedManyWithoutTargetDocumentTest extends ApiTestCase
         );
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertJsonContains([
             '@context' => '/contexts/DummyWithEmbedManyOmittingTargetDocument',
             '@id' => '/dummy_with_embed_many_omitting_target_documents/1',
