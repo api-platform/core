@@ -62,7 +62,7 @@ class SchemaFactoryTest extends TestCase
             definitionNameFactory: $definitionNameFactory,
         );
 
-        $this->schemaFactory = new SchemaFactory($baseSchemaFactory);
+        $this->schemaFactory = new SchemaFactory($baseSchemaFactory, $definitionNameFactory, $resourceMetadataFactory);
     }
 
     public function testBuildSchema(): void
