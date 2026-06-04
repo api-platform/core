@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\GraphQl\Resolver\Factory;
 
 use ApiPlatform\GraphQl\State\Provider\NoopProvider;
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\GraphQl\Mutation;
@@ -49,14 +50,18 @@ class ResolverFactory implements ResolverFactoryInterface
 
                 // special treatment for nested resources without a resolver/provider
                 if ($operation instanceof Query && $operation->getNested() && !$operation->getResolver() && (!$operation->getProvider() || NoopProvider::class === $operation->getProvider())) {
-                    return \is_array($body) ? $this->resolve(
-                        $source,
-                        $args,
-                        $info,
-                        $rootClass,
-                        $operation,
-                        new ArrayPaginator($body, 0, \count($body))
-                    ) : $body;
+                    if ($operation instanceof CollectionOperationInterface && \is_array($body)) {
+                        return $this->resolve(
+                            $source,
+                            $args,
+                            $info,
+                            $rootClass,
+                            $operation,
+                            new ArrayPaginator($body, 0, \count($body))
+                        );
+                    }
+
+                    return $body;
                 }
 
                 $propertyMetadata = $rootClass ? $propertyMetadataFactory?->create($rootClass, $info->fieldName) : null;
