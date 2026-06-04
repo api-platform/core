@@ -172,6 +172,13 @@
 * **LDP-compliant response headers** (#6917): API responses now include `Allow` and `Accept-Post` headers per the Linked Data Platform specification. These are informational headers that help clients discover API capabilities and should not break existing integrations.
 * **Scalar API Reference UI** (#7817): Scalar is now available as an alternative documentation UI alongside Swagger UI. It is enabled by default when TwigBundle is available. Access it via `?ui=scalar`. To disable it, set `enable_scalar: false` in your API Platform configuration.
 
+## v4.2.25
+
+### Bug fixes
+
+* [019fd9012](https://github.com/api-platform/core/commit/019fd901225a969b1903e093a1773f26ee551dfc) fix(serializer): gate cache_key in JsonApi and Hal with isCacheKeySafe
+* [1bfd6eecd](https://github.com/api-platform/core/commit/1bfd6eecd27dbb791901eb092606c3ec4a0963d3) fix(serializer): bump min serializer dep and fix phpstan probe typing
+
 ## v4.2.24
 
 ### Bug fixes
@@ -711,6 +718,15 @@ TypeInfo:
 * [79edced67](https://github.com/api-platform/core/commit/79edced67ccca1a7b80455dd94203501d9c4fa89) !fix(json-schema): share invariable sub-schemas
 * [cff61eab8](https://github.com/api-platform/core/commit/cff61eab8643f8ed08d59c0684e77740d0d81b04) fix(metadata): append php file resource extractor (#7193)
 * [f3d4afe03](https://github.com/api-platform/core/commit/f3d4afe032385f3b665131a365e42706930f0730) fix(symfony): validator type-info
+
+## v4.1.29
+
+### Bug fixes
+
+* [9f5d0e020](https://github.com/api-platform/core/commit/9f5d0e020d94a2966c896c436edac45af4ff5bbf) fix(serializer): gate cache_key in JsonApi and Hal with isCacheKeySafe
+* [3812a3617](https://github.com/api-platform/core/commit/3812a36170ff07180591c1b9d7e9b0e15476e6a3) fix(serializer): adapt tests for 4.1 (createMock for HAL, drop name converter)
+* [8f32ad0e3](https://github.com/api-platform/core/commit/8f32ad0e3c94c08ab7728d87fbadb0828b435116) fix(serializer): bump min serializer dep and fix phpstan probe typing
+* [89ca6f279](https://github.com/api-platform/core/commit/89ca6f27928887bf3d513d36069111dae3f0c075) fix(state): _api_operation_nme to _api_operation_name in ErrorProvider (#7637)
 
 ## v4.1.28
 
