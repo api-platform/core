@@ -1,5 +1,14 @@
 # Changelog
 
+## v4.1.29
+
+### Bug fixes
+
+* [9f5d0e020](https://github.com/api-platform/core/commit/9f5d0e020d94a2966c896c436edac45af4ff5bbf) fix(serializer): gate cache_key in JsonApi and Hal with isCacheKeySafe
+* [3812a3617](https://github.com/api-platform/core/commit/3812a36170ff07180591c1b9d7e9b0e15476e6a3) fix(serializer): adapt tests for 4.1 (createMock for HAL, drop name converter)
+* [8f32ad0e3](https://github.com/api-platform/core/commit/8f32ad0e3c94c08ab7728d87fbadb0828b435116) fix(serializer): bump min serializer dep and fix phpstan probe typing
+* [89ca6f279](https://github.com/api-platform/core/commit/89ca6f27928887bf3d513d36069111dae3f0c075) fix(state): _api_operation_nme to _api_operation_name in ErrorProvider (#7637)
+
 ## v4.1.28
 
 ### Bug fixes
