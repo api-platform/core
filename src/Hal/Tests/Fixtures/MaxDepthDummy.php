@@ -33,5 +33,5 @@ class MaxDepthDummy
     #[ApiProperty(fetchEager: false)]
     #[Groups(['default'])]
     #[MaxDepth(1)]
-    public MaxDepthDummy $child;
+    public ?MaxDepthDummy $child = null;
 }
