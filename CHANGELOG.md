@@ -1,5 +1,29 @@
 # Changelog
 
+## v4.3.8
+
+### Bug fixes
+
+* [cf55c0e7b](https://github.com/api-platform/core/commit/cf55c0e7b34ac373538b6123312ead28af9532e8) fix(serializer): gate cache_key in JsonApi and Hal with isCacheKeySafe
+* [0e0c58b87](https://github.com/api-platform/core/commit/0e0c58b87f6c03a04518fe31d1d51212de0505e2) fix(symfony): filter nested constraint groups in Sequentially/Compound (#8223)
+* [277589de6](https://github.com/api-platform/core/commit/277589de6ab16f103b76a74d6afd5b479257ee58) fix(symfony): keep error serialization mapping when enable_attributes is disabled (#8231)
+* [30f1f977a](https://github.com/api-platform/core/commit/30f1f977a4b4e309fbf85d76d79f8b94a6c3b209) fix(tests): symfony 8.1 compat (#8210)
+* [37e361339](https://github.com/api-platform/core/commit/37e3613395bbb13fb1d7296eeae6150d86f217db) fix(jsonapi): keep flat custom params with flat page (#8216) (#8217)
+* [4059c6303](https://github.com/api-platform/core/commit/4059c63037c28dd4d9cd7ed32743718cfca3ee03) fix(laravel): wire jsonapi.use_iri_as_id in ApiPlatformProvider (#8224)
+* [4378916ac](https://github.com/api-platform/core/commit/4378916acccbac78c05ba96bd0eee3a66bad4041) fix(jsonapi): drop consumed pagination keys before raw-param replace
+* [46c25c7e4](https://github.com/api-platform/core/commit/46c25c7e4399efce10397839da7b70479704aaf5) fix(symfony): reject duplicate operation names instead of silently dropping operations (#8232)
+* [6fc55c27d](https://github.com/api-platform/core/commit/6fc55c27d1bcece80722ed1ec63902fe047608c5) fix(metadata): apply YAML/XML attributes to virtual (method-backed) properties (#8220)
+* [71fcb9314](https://github.com/api-platform/core/commit/71fcb9314b57ff779757d1e369c82d49accfd411) fix(test): default content-type in ApiTestCase matches configured formats (#8227)
+* [7aed9d10c](https://github.com/api-platform/core/commit/7aed9d10c49103aa8113eec7e23c4a7d8a016893) fix(openapi): emit valid 3.0 schemas when downgrading from 3.1 (#8225)
+* [90bcfb09a](https://github.com/api-platform/core/commit/90bcfb09a68f9808197bd0cb743ab69362aee1ae) fix(doctrine): resolve parent link toProperty during PUT create (#8233)
+* [9aca842d4](https://github.com/api-platform/core/commit/9aca842d4bc758ea2da2011416ade4e35b77605b) fix(state): omit Content-Type when response has no body (#8218)
+* [abef010cf](https://github.com/api-platform/core/commit/abef010cfc2497981d47d5823d33f7c7eeb2d04b) fix(openapi): emit Draft 4 boolean exclusive bounds for spec 3.0.0 (#8222)
+* [c83558954](https://github.com/api-platform/core/commit/c83558954dd99250f46cc45b649d444249fd44ca) fix(openapi): disambiguate definition names when input and output share a shortname (#8230)
+* [ef40bcda6](https://github.com/api-platform/core/commit/ef40bcda66c13df1cb4373ef05a1333392576fda) fix(graphiql): migrate to v5 via esm.sh CDN (#8209)
+* [ef79ab337](https://github.com/api-platform/core/commit/ef79ab3375c7131e660a8683c5ffa8473bf2dab8) fix(symfony): guard null ExpressionLanguage in ResourceAccessChecker::usesObjectVariable()
+* [fd08d296a](https://github.com/api-platform/core/commit/fd08d296a25253188e9fbb91cb70d8c0a3a5a95a) fix(openapi): coerce metadata parameters in user-supplied openapi operation (#8229)
+* [fd2518695](https://github.com/api-platform/core/commit/fd25186952493ab2eb9f1d817e769cb9de83b67f) fix(serializer): bump min serializer dep and fix phpstan probe typing
+
 ## v4.3.7
 
 ### Bug fixes
