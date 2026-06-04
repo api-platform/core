@@ -204,6 +204,33 @@ class QueryCheckerTest extends TestCase
         $this->assertTrue(QueryChecker::hasOrderByOnFetchJoinedToManyAssociation($queryBuilder, $managerRegistryProphecy->reveal()));
     }
 
+    public function testHasOrderByOnFetchJoinedToManyAssociationWithSqlFunctionInOrderBy(): void
+    {
+        $dummyMetadata = new ClassMetadata(Dummy::class);
+        $dummyMetadata->mapManyToMany([
+            'fieldName' => 'relatedDummies',
+            'targetEntity' => RelatedDummy::class,
+        ]);
+
+        $relatedDummyMetadata = new ClassMetadata(RelatedDummy::class);
+
+        $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
+        $entityManagerProphecy->getClassMetadata(Dummy::class)->willReturn($dummyMetadata);
+        $entityManagerProphecy->getClassMetadata(RelatedDummy::class)->willReturn($relatedDummyMetadata);
+
+        $queryBuilder = new QueryBuilder($entityManagerProphecy->reveal());
+        $queryBuilder->select('d', 'a_1');
+        $queryBuilder->from(Dummy::class, 'd');
+        $queryBuilder->leftJoin('d.relatedDummies', 'a_1');
+        $queryBuilder->addOrderBy("find_in_set(d.name, 'INTERVIEW')", 'ASC');
+
+        $managerRegistryProphecy = $this->prophesize(ManagerRegistry::class);
+        $managerRegistryProphecy->getManagerForClass(Dummy::class)->willReturn($entityManagerProphecy);
+        $managerRegistryProphecy->getManagerForClass(RelatedDummy::class)->willReturn($entityManagerProphecy);
+
+        $this->assertFalse(QueryChecker::hasOrderByOnFetchJoinedToManyAssociation($queryBuilder, $managerRegistryProphecy->reveal()));
+    }
+
     public function testHasJoinedToManyAssociationWithoutJoin(): void
     {
         $entityManagerProphecy = $this->prophesize(EntityManagerInterface::class);
