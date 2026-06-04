@@ -56,6 +56,22 @@ final class LinksHandler implements LinksHandlerInterface
         }
 
         if (!($linkClass = $context['linkClass'] ?? false)) {
+            // GraphQl root item: walk the identifier-self link to apply WHERE id=X.
+            // Mirror of Doctrine\Common\State\LinksHandlerTrait::getLinks root-mode filter.
+            $resourceClass = $builder->getModel()::class;
+            foreach ($operation->getLinks() ?? [] as $link) {
+                if ($link->getFromProperty() || $link->getToProperty()) {
+                    continue;
+                }
+                if (null !== $link->getToClass() && $resourceClass !== $link->getToClass()) {
+                    continue;
+                }
+                $parameterName = $link->getParameterName() ?? ($link->getIdentifiers()[0] ?? null);
+                if (null !== $parameterName && isset($uriVariables[$parameterName])) {
+                    $builder = $this->buildQuery($builder, $link, $uriVariables[$parameterName]);
+                }
+            }
+
             return $builder;
         }
 
