@@ -1,5 +1,12 @@
 # Changelog
 
+## v4.2.25
+
+### Bug fixes
+
+* [019fd9012](https://github.com/api-platform/core/commit/019fd901225a969b1903e093a1773f26ee551dfc) fix(serializer): gate cache_key in JsonApi and Hal with isCacheKeySafe
+* [1bfd6eecd](https://github.com/api-platform/core/commit/1bfd6eecd27dbb791901eb092606c3ec4a0963d3) fix(serializer): bump min serializer dep and fix phpstan probe typing
+
 ## v4.2.24
 
 ### Bug fixes
