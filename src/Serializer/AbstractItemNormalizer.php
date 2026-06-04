@@ -756,7 +756,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the "%s" attribute must be "array" (nested document) or "string" (IRI), "%s" given.', $attributeName, \gettype($value)), $value, ['array', 'string'], $context['deserialization_path'] ?? null, true);
         }
 
-        throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Nested documents for attribute "%s" are not allowed. Use IRIs instead.', $attributeName), $value, ['array', 'string'], $context['deserialization_path'] ?? null, true);
+        throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Nested documents for attribute "%s" are not allowed. Provide an IRI, or enable nested writes by adding matching denormalization groups on the related resource (and, for to-many relations, define adder/remover methods on the parent class).', $attributeName), $value, ['array', 'string'], $context['deserialization_path'] ?? null, true);
     }
 
     private function getResourceFromIri(string $data, array $context, string $resourceClass): ?object

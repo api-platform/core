@@ -71,7 +71,7 @@ final class ProblemTest extends ApiTestCase
         $body = $response->toArray(false);
         $this->assertSame('/errors/400', $body['type']);
         $this->assertSame('An error occurred', $body['title']);
-        $this->assertSame('Nested documents for attribute "relatedDummy" are not allowed. Use IRIs instead.', $body['detail']);
+        $this->assertSame('Nested documents for attribute "relatedDummy" are not allowed. Provide an IRI, or enable nested writes by adding matching denormalization groups on the related resource (and, for to-many relations, define adder/remover methods on the parent class).', $body['detail']);
         $this->assertArrayHasKey('trace', $body);
     }
 }

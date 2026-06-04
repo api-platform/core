@@ -1422,7 +1422,7 @@ class AbstractItemNormalizerTest extends TestCase
     public function testInnerDocumentNotAllowed(): void
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage('Nested documents for attribute "relatedDummy" are not allowed. Use IRIs instead.');
+        $this->expectExceptionMessage('Nested documents for attribute "relatedDummy" are not allowed. Provide an IRI, or enable nested writes by adding matching denormalization groups on the related resource (and, for to-many relations, define adder/remover methods on the parent class).');
 
         $data = [
             'relatedDummy' => [
