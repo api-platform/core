@@ -157,8 +157,13 @@ final class PartialCollectionViewNormalizer implements NormalizerInterface, Norm
 
             $operator = $direction > 0 ? $forwardRangeOperator : $backwardRangeOperator;
 
+            $value = $this->propertyAccessor->getValue($object, $field['field']);
+            if ($value instanceof \DateTimeInterface) {
+                $value = $value->format(\DateTimeInterface::ATOM);
+            }
+
             $paginationFilters[$field['field']] = [
-                $operator => (string) $this->propertyAccessor->getValue($object, $field['field']),
+                $operator => (string) $value,
             ];
         }
 
