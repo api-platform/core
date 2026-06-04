@@ -1,5 +1,16 @@
 # Changelog
 
+## v4.3.9
+
+### Bug fixes
+
+* [e7968852c](https://github.com/api-platform/core/commit/e7968852c63d590a0ca65203822476410898a23a) fix(serializer): bump api-platform/serializer to ^4.3.8 and cover Hal in CI (#8242)
+* [d59c24490](https://github.com/api-platform/core/commit/d59c24490a54200471a725060a59d4ddcc00c1d0) fix(graphql): return identifier-only node on circular reference (#8239)
+* [b714a4451](https://github.com/api-platform/core/commit/b714a4451971cbe86a7f8b0339cac5a9e7f3be4a) fix(graphql): nested resources without graphqloperations propagate fields (#8236)
+* [ca8fbf9de](https://github.com/api-platform/core/commit/ca8fbf9de073721c60a79dc22b5371bf0bc0b870) fix(hydra): format datetime fields as iso 8601 in cursor pagination urls (#8241)
+* [cfe1bc324](https://github.com/api-platform/core/commit/cfe1bc324c2a5d5845e2b65e4fa248134f178a65) fix(doctrine): extract alias from sql function in orderby parts (#8240)
+* [8567366a7](https://github.com/api-platform/core/commit/8567366a738f0d169626768cb4b1ca3b906db9b0) fix(test): capture streamedresponse body in test client response (#8235)
+
 ## v4.3.8
 
 ### Bug fixes
