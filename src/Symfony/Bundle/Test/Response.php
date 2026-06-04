@@ -51,9 +51,6 @@ final class Response implements ResponseInterface
             }
         }
 
-        // StreamedResponse::getContent() returns false because the body is streamed via a callback.
-        // BrowserKit's HttpKernelBrowser::filterResponse already buffered the streamed output into
-        // the BrowserKit response, so use it as the source of truth to avoid re-streaming.
         $this->content = $httpFoundationResponse instanceof StreamedResponse
             ? $browserKitResponse->getContent()
             : (string) $httpFoundationResponse->getContent();
