@@ -23,6 +23,8 @@ use Symfony\Component\HttpClient\Exception\RedirectionException;
 use Symfony\Component\HttpClient\Exception\ServerException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpFoundation\Response as HttpFoundationResponse;
+use Symfony\Component\HttpFoundation\StreamedJsonResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ResponseTest extends TestCase
 {
@@ -121,5 +123,37 @@ class ResponseTest extends TestCase
         $response->cancel();
 
         $this->assertSame('Response has been canceled.', $response->getInfo('error'));
+    }
+
+    public function testStreamedResponseContentIsCapturedFromBrowserKitResponse(): void
+    {
+        $streamedBody = '{"foo":"bar"}';
+        // BrowserKit's HttpKernelBrowser::filterResponse already buffered the streamed body
+        // into the BrowserKit Response, but the HttpFoundation StreamedResponse::getContent()
+        // still returns false. The Response wrapper must read from the BrowserKit response.
+        $browserKitResponse = new BrowserKitResponse($streamedBody, 200, ['content-type' => 'application/json']);
+        $httpFoundationResponse = new StreamedResponse(static function () use ($streamedBody): void {
+            echo $streamedBody;
+        }, 200, ['content-type' => 'application/json']);
+
+        $response = new Response($httpFoundationResponse, $browserKitResponse, []);
+
+        $this->assertSame($streamedBody, $response->getContent());
+        $this->assertSame(['foo' => 'bar'], $response->toArray());
+    }
+
+    public function testStreamedJsonResponseContentIsCapturedFromBrowserKitResponse(): void
+    {
+        if (!class_exists(StreamedJsonResponse::class)) {
+            $this->markTestSkipped('StreamedJsonResponse is not available.');
+        }
+
+        $streamedBody = '{"items":[1,2,3]}';
+        $browserKitResponse = new BrowserKitResponse($streamedBody, 200, ['content-type' => 'application/json']);
+        $httpFoundationResponse = new StreamedJsonResponse(['items' => [1, 2, 3]]);
+
+        $response = new Response($httpFoundationResponse, $browserKitResponse, []);
+
+        $this->assertSame($streamedBody, $response->getContent());
     }
 }

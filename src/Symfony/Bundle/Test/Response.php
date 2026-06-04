@@ -20,6 +20,7 @@ use Symfony\Component\HttpClient\Exception\RedirectionException;
 use Symfony\Component\HttpClient\Exception\ServerException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpFoundation\Response as HttpFoundationResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
@@ -50,7 +51,12 @@ final class Response implements ResponseInterface
             }
         }
 
-        $this->content = (string) $httpFoundationResponse->getContent();
+        // StreamedResponse::getContent() returns false because the body is streamed via a callback.
+        // BrowserKit's HttpKernelBrowser::filterResponse already buffered the streamed output into
+        // the BrowserKit response, so use it as the source of truth to avoid re-streaming.
+        $this->content = $httpFoundationResponse instanceof StreamedResponse
+            ? $browserKitResponse->getContent()
+            : (string) $httpFoundationResponse->getContent();
         $this->info = [
             'http_code' => $httpFoundationResponse->getStatusCode(),
             'error' => null,
