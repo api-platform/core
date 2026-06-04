@@ -14,20 +14,20 @@ declare(strict_types=1);
 namespace ApiPlatform\Hal\Tests\Serializer;
 
 use ApiPlatform\Hal\Serializer\ItemNormalizer;
+use ApiPlatform\Hal\Tests\Fixtures\ApiResource\Issue5452\ActivableInterface;
+use ApiPlatform\Hal\Tests\Fixtures\ApiResource\Issue5452\Author;
+use ApiPlatform\Hal\Tests\Fixtures\ApiResource\Issue5452\Book;
+use ApiPlatform\Hal\Tests\Fixtures\ApiResource\Issue5452\Library;
+use ApiPlatform\Hal\Tests\Fixtures\ApiResource\Issue5452\TimestampableInterface;
+use ApiPlatform\Hal\Tests\Fixtures\Dummy;
+use ApiPlatform\Hal\Tests\Fixtures\MaxDepthDummy;
+use ApiPlatform\Hal\Tests\Fixtures\RelatedDummy;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\ActivableInterface;
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\Author;
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\Book;
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\Library;
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\TimestampableInterface;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -104,7 +104,7 @@ class ItemNormalizerTest extends TestCase
         $this->assertFalse($normalizer->supportsNormalization($dummy, 'xml'));
         $this->assertFalse($normalizer->supportsNormalization($std, $normalizer::FORMAT));
         $this->assertEmpty($normalizer->getSupportedTypes('xml'));
-        $this->assertSame(['object' => true], $normalizer->getSupportedTypes($normalizer::FORMAT));
+        $this->assertSame(['object' => false], $normalizer->getSupportedTypes($normalizer::FORMAT));
     }
 
     public function testNormalize(): void
