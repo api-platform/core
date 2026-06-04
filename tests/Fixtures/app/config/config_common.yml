@@ -319,6 +319,10 @@ services:
         tags:
             - name: 'api_platform.graphql.resolver'
 
+    ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue8076\ProductProvider:
+        tags:
+            - name: 'api_platform.state_provider'
+
     app.graphql.query_resolver.dummy_custom_item:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\GraphQl\Resolver\DummyCustomQueryItemResolver'
         tags:
