@@ -20,6 +20,7 @@ use Symfony\Component\HttpClient\Exception\RedirectionException;
 use Symfony\Component\HttpClient\Exception\ServerException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpFoundation\Response as HttpFoundationResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
@@ -50,7 +51,9 @@ final class Response implements ResponseInterface
             }
         }
 
-        $this->content = (string) $httpFoundationResponse->getContent();
+        $this->content = $httpFoundationResponse instanceof StreamedResponse
+            ? $browserKitResponse->getContent()
+            : (string) $httpFoundationResponse->getContent();
         $this->info = [
             'http_code' => $httpFoundationResponse->getStatusCode(),
             'error' => null,
