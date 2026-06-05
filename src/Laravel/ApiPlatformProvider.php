@@ -270,7 +270,14 @@ class ApiPlatformProvider extends ServiceProvider
             return new SerializerClassMetadataFactory($app->make(ClassMetadataFactoryInterface::class));
         });
 
-        $this->app->bind(PathSegmentNameGeneratorInterface::class, UnderscorePathSegmentNameGenerator::class);
+        $this->app->bind(PathSegmentNameGeneratorInterface::class, static function (Application $app): PathSegmentNameGeneratorInterface {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+            /** @var class-string<PathSegmentNameGeneratorInterface> $class */
+            $class = $config->get('api-platform.path_segment_name_generator') ?? UnderscorePathSegmentNameGenerator::class;
+
+            return $app->make($class);
+        });
 
         $this->app->singleton(ResourceNameCollectionFactoryInterface::class, static function (Application $app) {
             /** @var ConfigRepository */
