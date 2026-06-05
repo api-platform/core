@@ -78,6 +78,41 @@ final class ErrorResourceAttributeLoaderPassTest extends TestCase
         $this->assertFalse($container->hasDefinition('serializer.mapping.chain_loader'));
     }
 
+    public function testDoesNothingWhenChainAlreadyContainsAnAttributeLoader(): void
+    {
+        $container = new ContainerBuilder();
+        $existing = new Definition(AttributeLoader::class);
+        $container->setDefinition('serializer.mapping.chain_loader', new Definition(LoaderChain::class, [[$existing]]));
+        $container->setDefinition('serializer.mapping.cache_warmer', new Definition(\stdClass::class, [[$existing]]));
+
+        (new ErrorResourceAttributeLoaderPass())->process($container);
+
+        $loaders = $container->getDefinition('serializer.mapping.chain_loader')->getArgument(0);
+        $this->assertCount(1, $loaders, 'pass must not add another AttributeLoader when one is already wired (enable_attributes: true).');
+
+        $warmerLoaders = $container->getDefinition('serializer.mapping.cache_warmer')->getArgument(0);
+        $this->assertCount(1, $warmerLoaders);
+    }
+
+    /**
+     * @see https://github.com/api-platform/core/issues/8244
+     */
+    public function testSkipsOnSymfony64SerializerSignature(): void
+    {
+        if (!class_exists(\Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader::class)) {
+            $this->markTestSkipped('Only relevant when running against symfony/serializer 6.4 (AnnotationLoader still present).');
+        }
+
+        $container = new ContainerBuilder();
+        $container->setDefinition('serializer.mapping.chain_loader', new Definition(LoaderChain::class, [[]]));
+        $container->setDefinition('serializer.mapping.cache_warmer', new Definition(\stdClass::class, [[]]));
+
+        (new ErrorResourceAttributeLoaderPass())->process($container);
+
+        $this->assertSame([], $container->getDefinition('serializer.mapping.chain_loader')->getArgument(0));
+        $this->assertSame([], $container->getDefinition('serializer.mapping.cache_warmer')->getArgument(0));
+    }
+
     /**
      * Mirrors the runtime behavior with `framework.serializer.enable_attributes: false`:
      * Symfony builds the `AttributeLoader` with `allowAnyClass = false` and no mapped classes,

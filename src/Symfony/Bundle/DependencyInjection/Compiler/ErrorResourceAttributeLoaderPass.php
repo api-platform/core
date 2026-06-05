@@ -18,6 +18,7 @@ use ApiPlatform\Validator\Exception\ValidationException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 
 /**
@@ -43,6 +44,25 @@ final class ErrorResourceAttributeLoaderPass implements CompilerPassInterface
             return;
         }
 
+        // Symfony 6.4 ships an AttributeLoader with a different constructor signature
+        // (`?Doctrine\Common\Annotations\Reader`), incompatible with the `allowAnyClass`/`mappedClasses`
+        // arguments below. The `AnnotationLoader` class only exists on the 6.4 branch
+        // (removed in 7.0), so its presence is a reliable marker for that signature. See #8244.
+        if (class_exists(AnnotationLoader::class)) {
+            return;
+        }
+
+        $chainLoader = $container->getDefinition('serializer.mapping.chain_loader');
+        $loaders = $chainLoader->getArgument(0);
+
+        // Skip when Symfony already wired an AttributeLoader (i.e. `enable_attributes: true`).
+        // Adding another one would duplicate work and re-process every class twice.
+        foreach ($loaders as $loader) {
+            if ($loader instanceof Definition && is_a($loader->getClass(), AttributeLoader::class, true)) {
+                return;
+            }
+        }
+
         $mappedClasses = [
             Error::class => [Error::class],
             ValidationException::class => [ValidationException::class],
@@ -50,8 +70,6 @@ final class ErrorResourceAttributeLoaderPass implements CompilerPassInterface
 
         $loaderDefinition = new Definition(AttributeLoader::class, [true, $mappedClasses]);
 
-        $chainLoader = $container->getDefinition('serializer.mapping.chain_loader');
-        $loaders = $chainLoader->getArgument(0);
         $loaders[] = $loaderDefinition;
         $chainLoader->replaceArgument(0, $loaders);
 
