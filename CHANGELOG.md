@@ -1,5 +1,21 @@
 # Changelog
 
+## v4.3.10
+
+### Bug fixes
+
+* [149adf70f](https://github.com/api-platform/core/commit/149adf70f008793004c9a79f62d2df1e3955484e) fix(laravel): register graphql routes before catch-all entrypoint (#8248)
+* [1bc670c72](https://github.com/api-platform/core/commit/1bc670c7241034b6dbc517d3c23f0d75952d351e) fix(jsonapi): allow opt-in client-generated IDs on POST per spec (#7930)
+* [39edcdddd](https://github.com/api-platform/core/commit/39edcdddd1c1e8c17f7002e9cb3f27ce07742ae6) fix(symfony): skip ErrorResourceAttributeLoaderPass on Symfony 6.4 (#8253)
+* [4609a9e5d](https://github.com/api-platform/core/commit/4609a9e5d3f78f432bddda9c848c9c6f4fb1cb32) fix(graphql): dispatch item Query through its own provider (#8237)
+* [5c62c1bd8](https://github.com/api-platform/core/commit/5c62c1bd837b2fd6586422af1182b4b7b632f7f1) fix(jsonapi): do not require id in input schema for post operations (#8252)
+* [7bde11eb9](https://github.com/api-platform/core/commit/7bde11eb932f234fd12da74ad85b3d077b44eef3) fix(swagger): fix SwaggerUI CSS override (#8245)
+* [86a09b3c3](https://github.com/api-platform/core/commit/86a09b3c35d75588c0fa13d4f54805136da186cb) fix(state): guard hex2bin against malformed query parameter keys (#8255)
+* [a6bdf7134](https://github.com/api-platform/core/commit/a6bdf71341db5d5d46e2f2a7433807ddcc3f7b30) fix(laravel): detect enum casts in eloquent property metadata factory (#8247)
+* [b5c41aff5](https://github.com/api-platform/core/commit/b5c41aff5085c82c610177ec6f4b221208ca466a) fix(laravel): honor path_segment_name_generator config for url segments (#8251)
+* [d5d8176f1](https://github.com/api-platform/core/commit/d5d8176f1e7ad2627eaec15c96594429d94611d0) fix(serializer): allow nullable to-many relations to normalize as null (#8254)
+* [f4d2b56c2](https://github.com/api-platform/core/commit/f4d2b56c2a356fed62f126b3cc08b10df7fb07f9) fix(laravel): persist dirty embedded belongsTo relations (#8246)
+
 ## v4.3.9
 
 ### Bug fixes
