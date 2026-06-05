@@ -852,6 +852,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
                     $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
 
+                    if (null === $attributeValue && $type->isNullable()) {
+                        return null;
+                    }
+
                     if (!is_iterable($attributeValue)) {
                         throw new UnexpectedValueException('Unexpected non-iterable value for to-many relation.');
                     }
@@ -982,6 +986,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 }
 
                 $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
+
+                if ($nullable && null === $attributeValue) {
+                    return null;
+                }
 
                 if (!is_iterable($attributeValue)) {
                     throw new UnexpectedValueException('Unexpected non-iterable value for to-many relation.');
