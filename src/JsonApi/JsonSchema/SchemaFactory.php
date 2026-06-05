@@ -20,6 +20,7 @@ use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryAwareInterface;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\JsonSchema\SchemaUriPrefixTrait;
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -369,11 +370,14 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             ];
         }
 
+        // https://jsonapi.org/format/#crud-creating — clients MAY supply an id when creating a resource.
+        $required = $operation instanceof HttpOperation && 'POST' === $operation->getMethod() ? ['type'] : ['type', 'id'];
+
         return [
             'data' => [
                 'type' => 'object',
                 'properties' => $replacement,
-                'required' => ['type', 'id'],
+                'required' => $required,
             ],
         ] + $included;
     }
