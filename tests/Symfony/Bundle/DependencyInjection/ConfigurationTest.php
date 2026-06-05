@@ -251,6 +251,7 @@ class ConfigurationTest extends TestCase
             ],
             'jsonapi' => [
                 'use_iri_as_id' => true,
+                'allow_client_generated_id' => false,
             ],
             'enable_scalar' => true,
         ], $config);

@@ -189,4 +189,14 @@ class SchemaFactoryTest extends TestCase
         $data = $definitions[$rootDefinitionKey]['properties']['data'];
         $this->assertSame(['type', 'id'], $data['required']);
     }
+
+    public function testPostOutputSchemaRequiresId(): void
+    {
+        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonapi', Schema::TYPE_OUTPUT, new Post());
+        $definitions = $resultSchema->getDefinitions();
+        $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
+
+        $data = $definitions[$rootDefinitionKey]['properties']['data'];
+        $this->assertSame(['type', 'id'], $data['required']);
+    }
 }

@@ -283,6 +283,8 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
     private function buildDefinitionPropertiesSchema(string $key, string $className, string $format, string $type, ?Operation $operation, Schema $schema, ?array $serializerContext): array
     {
+        // Capture the resource's operation up front; the relationship loop below reassigns $operation.
+        $resourceOperation = $operation;
         $definitions = $schema->getDefinitions();
         $properties = $definitions[$key]['properties'] ?? [];
 
@@ -371,7 +373,8 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
 
         // https://jsonapi.org/format/#crud-creating — clients MAY supply an id when creating a resource.
-        $required = $operation instanceof HttpOperation && 'POST' === $operation->getMethod() ? ['type'] : ['type', 'id'];
+        // Only relax the requirement on the input schema; responses still always carry an `id`.
+        $required = Schema::TYPE_INPUT === $type && $resourceOperation instanceof HttpOperation && 'POST' === $resourceOperation->getMethod() ? ['type'] : ['type', 'id'];
 
         return [
             'data' => [
