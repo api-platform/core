@@ -37,9 +37,12 @@ final class EloquentAttributePropertyMetadataFactory implements PropertyMetadata
         }
 
         $refl = new \ReflectionClass($resourceClass);
-        $model = $refl->newInstanceWithoutConstructor();
-
         $propertyMetadata = $this->decorated?->create($resourceClass, $property, $options);
+        if ($refl->isEnum() || !is_a($resourceClass, Model::class, true)) {
+            return $propertyMetadata ?? $this->throwNotFound($resourceClass, $property);
+        }
+
+        $model = $refl->newInstanceWithoutConstructor();
         if (!$model instanceof Model) {
             return $propertyMetadata ?? $this->throwNotFound($resourceClass, $property);
         }

@@ -71,9 +71,12 @@ final class EloquentResourceCollectionMetadataFactory implements ResourceMetadat
 
         try {
             $refl = new \ReflectionClass($resourceClass);
+            if ($refl->isEnum()) {
+                return $resourceMetadataCollection;
+            }
             $model = $refl->newInstanceWithoutConstructor();
         } catch (\ReflectionException) {
-            return $this->decorated->create($resourceClass);
+            return $resourceMetadataCollection;
         }
 
         $isModel = $model instanceof Model;
