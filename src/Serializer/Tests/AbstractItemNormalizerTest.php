@@ -168,6 +168,61 @@ class AbstractItemNormalizerTest extends TestCase
         ]));
     }
 
+    public function testNormalizeNullableToManyRelationReturnsNull(): void
+    {
+        $dummy = new Dummy();
+        $dummy->setName('foo');
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::type('array'))->willReturn(new PropertyNameCollection(['name', 'relatedDummies']));
+
+        // BC layer for api-platform/metadata < 4.1
+        if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
+            $relatedDummyType = new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class);
+            $relatedDummiesType = new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, true, ArrayCollection::class, true, new LegacyType(LegacyType::BUILTIN_TYPE_INT), $relatedDummyType);
+
+            $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+            $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])->withDescription('')->withReadable(true));
+            $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummies', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([$relatedDummiesType])->withReadable(true)->withWritable(false)->withReadableLink(false));
+        } else {
+            $relatedDummiesType = Type::nullable(Type::collection(Type::object(ArrayCollection::class), Type::object(RelatedDummy::class), Type::int()));
+
+            $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+            $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType(Type::string())->withDescription('')->withReadable(true));
+            $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummies', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType($relatedDummiesType)->withReadable(true)->withWritable(false)->withReadableLink(false));
+        }
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource($dummy, Argument::cetera())->willReturn('/dummies/1');
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->getValue($dummy, 'name')->willReturn('foo');
+        $propertyAccessorProphecy->getValue($dummy, 'relatedDummies')->willReturn(null);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+        $serializerProphecy->normalize('foo', null, Argument::type('array'))->willReturn('foo');
+        $serializerProphecy->normalize(null, null, Argument::type('array'))->willReturn(null);
+
+        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), null, null, [], null, null) extends AbstractItemNormalizer {};
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $expected = [
+            'name' => 'foo',
+            'relatedDummies' => null,
+        ];
+        $this->assertSame($expected, $normalizer->normalize($dummy, null, [
+            'resources' => [],
+            'skip_null_values' => false,
+        ]));
+    }
+
     public function testNormalizeWithSecuredProperty(): void
     {
         $dummy = new SecuredDummy();
