@@ -42,6 +42,9 @@ class RequestParserTest extends TestCase
 
             // urlencoded [] (square brackets) in query string.
             ['a%5B1%5D=%2525', ['a' => ['1' => '%25']]],
+
+            ['y%5B%C2%9D=', ['79_'."\xC2\x9D" => '']],
+            ['z%5Bg=', ['7a_g' => '']],
         ];
     }
 }
