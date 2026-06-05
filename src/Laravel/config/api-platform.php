@@ -11,6 +11,7 @@
 
 declare(strict_types=1);
 
+use ApiPlatform\Metadata\Operation\UnderscorePathSegmentNameGenerator;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
@@ -154,9 +155,15 @@ return [
 
     // 'openapi' => [
     //     'tags' => [],
-        // ],
+    // ],
 
     'url_generation_strategy' => UrlGeneratorInterface::ABS_PATH,
+
+    // Class implementing PathSegmentNameGeneratorInterface used to derive route
+    // segments from resource short names (e.g. `ProductOrder` -> `product_orders`).
+    // Set to DashPathSegmentNameGenerator::class for dasherized segments
+    // (e.g. `product-orders`).
+    'path_segment_name_generator' => UnderscorePathSegmentNameGenerator::class,
 
     'serializer' => [
         'hydra_prefix' => false,
