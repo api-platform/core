@@ -84,6 +84,11 @@ return [
         // and a `data.links.self` IRI is added. When true (default), `data.id`
         // is the resource IRI.
         'use_iri_as_id' => true,
+
+        // Allow client-generated IDs on JSON:API POST per
+        // https://jsonapi.org/format/#crud-creating-client-ids. Off by default
+        // to avoid id spoofing on public endpoints.
+        'allow_client_generated_id' => false,
     ],
 
     'graphql' => [
