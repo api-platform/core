@@ -5,6 +5,7 @@ parameters:
 	parallel:
 		maximumNumberOfProcesses: 1
 	level: 7
+	treatPhpDocTypesAsCertain: false
 	paths:
 		- ApiResource
 		- config
