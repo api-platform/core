@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Operation as GraphQlOperation;
+use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\IriConverterInterface;
@@ -63,7 +64,11 @@ final class ReadProvider implements ProviderInterface
             }
 
             try {
-                $item = $this->iriConverter->getResourceFromIri($identifier, $context);
+                // For item Query carrying its own provider, dispatch through that provider.
+                // Mutation/Subscription keep the route-matched HTTP op so ReadProvider's class-mismatch
+                // diagnostics below stay accurate.
+                $dispatchOperation = ($operation instanceof Query && null !== $operation->getProvider()) ? $operation : null;
+                $item = $this->iriConverter->getResourceFromIri($identifier, $context, $dispatchOperation);
             } catch (ItemNotFoundException) {
                 $item = null;
             }

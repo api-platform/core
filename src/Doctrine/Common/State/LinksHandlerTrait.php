@@ -35,6 +35,13 @@ trait LinksHandlerTrait
         $links = $this->getOperationLinks($operation);
 
         if (!($linkClass = $context['linkClass'] ?? false)) {
+            // Root item lookup: GraphQl Query.links carries relation links (for nested traversal)
+            // and the identifier-self link. Keep only the identifier-self / self-references so
+            // handleLinks applies WHERE id=X without consuming identifiers via relation joins.
+            if ($operation instanceof GraphQlOperation) {
+                return array_values(array_filter($links, static fn ($l) => null === $l->getToClass() || $l->getToClass() === $resourceClass));
+            }
+
             return $links;
         }
 

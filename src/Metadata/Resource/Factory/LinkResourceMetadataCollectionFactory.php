@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource\Factory;
 
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
@@ -51,6 +52,13 @@ final class LinkResourceMetadataCollectionFactory implements ResourceMetadataCol
                     $links[] = $this->linkFactory->completeLink($link);
                 }
                 $links = $this->mergeLinks($relationLinks, $links);
+
+                // Item Query/Mutation/Subscription need the identifier-self link so Doctrine
+                // LinksHandler can apply `WHERE id = X` when dispatched through the GraphQl op
+                // (see Doctrine\Common\State\LinksHandlerTrait::getLinks root-mode filter).
+                if (!$graphQlOperation instanceof CollectionOperationInterface) {
+                    $links = $this->mergeLinks($this->linkFactory->createLinksFromIdentifiers($graphQlOperation), $links);
+                }
 
                 $graphQlOperations[$graphQlOperation->getName()] = $graphQlOperation->withLinks($links);
             }
