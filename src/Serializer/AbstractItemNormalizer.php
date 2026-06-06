@@ -1060,6 +1060,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             if ($type instanceof CollectionType) {
                 if (($subType = $type->getCollectionValueType()) instanceof ObjectType) {
                     $context = $this->createOperationContext($context, $subType->getClassName(), $propertyMetadata);
+                } elseif (false === $propertyMetadata->isReadableLink()) {
+                    trigger_deprecation('api-platform/core', '4.3', 'Property "%s::$%s" sets "readableLink: false" but its collection element type cannot be resolved. Declare it via PHPDoc "@return list<ClassName>" or "#[ApiProperty(nativeType: ...)]"; otherwise "readableLink: false" cannot be honored and related items will be embedded.', $object::class, $attribute);
                 }
 
                 $childContext = $this->createChildContext($context, $attribute, $format);

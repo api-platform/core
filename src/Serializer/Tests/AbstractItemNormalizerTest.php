@@ -223,6 +223,66 @@ class AbstractItemNormalizerTest extends TestCase
         ]));
     }
 
+    public function testNormalizeArrayBackedRelationWithReadableLinkFalseTriggersDeprecation(): void
+    {
+        if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
+            $this->markTestSkipped('Requires symfony/type-info native types.');
+        }
+
+        $relatedDummy = new RelatedDummy();
+        $relatedDummy->setId(2);
+
+        $dummy = new Dummy();
+        $dummy->setName('foo');
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::type('array'))->willReturn(new PropertyNameCollection(['name', 'relatedDummies']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType(Type::string())->withDescription('')->withReadable(true));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummies', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType(Type::array())->withReadable(true)->withWritable(false)->withReadableLink(false));
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource($dummy, Argument::cetera())->willReturn('/dummies/1');
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->getValue($dummy, 'name')->willReturn('foo');
+        $propertyAccessorProphecy->getValue($dummy, 'relatedDummies')->willReturn([$relatedDummy]);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+        $serializerProphecy->normalize(Argument::any(), null, Argument::type('array'))->willReturn('foo');
+
+        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), null, null, [], null, null) extends AbstractItemNormalizer {};
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $deprecations = [];
+        set_error_handler(static function (int $errno, string $errstr) use (&$deprecations): bool {
+            $deprecations[] = $errstr;
+
+            return true;
+        }, \E_USER_DEPRECATED);
+
+        try {
+            $normalizer->normalize($dummy, null, [
+                'resources' => [],
+            ]);
+        } finally {
+            restore_error_handler();
+        }
+
+        $matched = array_filter($deprecations, static fn (string $m): bool => str_contains($m, 'relatedDummies') && str_contains($m, Dummy::class));
+        $this->assertNotEmpty(
+            $matched,
+            \sprintf("Expected deprecation about relatedDummies. Got:\n  - %s", implode("\n  - ", $deprecations))
+        );
+    }
+
     public function testNormalizeWithSecuredProperty(): void
     {
         $dummy = new SecuredDummy();
