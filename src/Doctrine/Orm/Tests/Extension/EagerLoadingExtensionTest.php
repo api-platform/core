@@ -596,9 +596,11 @@ class EagerLoadingExtensionTest extends TestCase
 
         $dummyAttributeMetadata = new AttributeMetadata('dummy');
         $dummyAttributeMetadata->setMaxDepth(2);
+        $dummyAttributeMetadata->addGroup('foo');
 
         $relatedAttributeMetadata = new AttributeMetadata('relatedDummy');
         $relatedAttributeMetadata->setMaxDepth(4);
+        $relatedAttributeMetadata->addGroup('foo');
 
         $dummyClassMetadataInterfaceProphecy->getAttributesMetadata()->willReturn(['relatedDummy' => $dummyAttributeMetadata]);
         $relatedClassMetadataInterfaceProphecy->getAttributesMetadata()->willReturn(['dummy' => $relatedAttributeMetadata]);
