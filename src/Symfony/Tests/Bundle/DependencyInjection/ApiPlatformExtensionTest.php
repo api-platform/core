@@ -444,4 +444,43 @@ class ApiPlatformExtensionTest extends TestCase
             }
         }
     }
+
+    /**
+     * @see https://github.com/api-platform/core/issues/8095
+     */
+    public function testHttpCachePurgersRegisteredWhenInvalidationDisabled(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['http_cache']['invalidation']['enabled'] = false;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertContainerHasService('api_platform.http_cache.purger.varnish.ban');
+        $this->assertContainerHasService('api_platform.http_cache.purger.varnish.xkey');
+        $this->assertContainerHasService('api_platform.http_cache.purger.souin');
+        $this->assertContainerHasAlias('api_platform.http_cache.purger.varnish');
+
+        $this->assertNotContainerHasService('api_platform.doctrine.listener.http_cache.purge');
+        $this->assertNotContainerHasService('api_platform.http_cache_purger.processor.add_tags');
+        $this->assertFalse($this->container->hasAlias('api_platform.http_cache.purger'));
+    }
+
+    /**
+     * @see https://github.com/api-platform/core/issues/8095
+     */
+    public function testHttpCachePurgersAndListenerRegisteredWhenInvalidationEnabled(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['http_cache']['invalidation']['enabled'] = true;
+        $config['api_platform']['doctrine']['enabled'] = true;
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $this->assertContainerHasService('api_platform.http_cache.purger.varnish.ban');
+        $this->assertContainerHasService('api_platform.http_cache.purger.varnish.xkey');
+        $this->assertContainerHasService('api_platform.http_cache.purger.souin');
+        $this->assertContainerHasAlias('api_platform.http_cache.purger.varnish');
+
+        $this->assertContainerHasService('api_platform.doctrine.listener.http_cache.purge');
+        $this->assertContainerHasService('api_platform.http_cache_purger.processor.add_tags');
+        $this->assertContainerHasAlias('api_platform.http_cache.purger');
+    }
 }
