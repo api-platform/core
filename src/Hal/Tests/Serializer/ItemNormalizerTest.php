@@ -14,20 +14,20 @@ declare(strict_types=1);
 namespace ApiPlatform\Hal\Tests\Serializer;
 
 use ApiPlatform\Hal\Serializer\ItemNormalizer;
+use ApiPlatform\Hal\Tests\Fixtures\ApiResource\Issue5452\ActivableInterface;
+use ApiPlatform\Hal\Tests\Fixtures\ApiResource\Issue5452\Author;
+use ApiPlatform\Hal\Tests\Fixtures\ApiResource\Issue5452\Book;
+use ApiPlatform\Hal\Tests\Fixtures\ApiResource\Issue5452\Library;
+use ApiPlatform\Hal\Tests\Fixtures\ApiResource\Issue5452\TimestampableInterface;
+use ApiPlatform\Hal\Tests\Fixtures\Dummy;
+use ApiPlatform\Hal\Tests\Fixtures\MaxDepthDummy;
+use ApiPlatform\Hal\Tests\Fixtures\RelatedDummy;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\ActivableInterface;
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\Author;
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\Book;
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\Library;
-use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5452\TimestampableInterface;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\MaxDepthDummy;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\RelatedDummy;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -104,7 +104,7 @@ class ItemNormalizerTest extends TestCase
         $this->assertFalse($normalizer->supportsNormalization($dummy, 'xml'));
         $this->assertFalse($normalizer->supportsNormalization($std, $normalizer::FORMAT));
         $this->assertEmpty($normalizer->getSupportedTypes('xml'));
-        $this->assertSame(['object' => true], $normalizer->getSupportedTypes($normalizer::FORMAT));
+        $this->assertSame(['object' => false], $normalizer->getSupportedTypes($normalizer::FORMAT));
     }
 
     public function testNormalize(): void
@@ -168,6 +168,52 @@ class ItemNormalizerTest extends TestCase
             'name' => 'hello',
         ];
         $this->assertEquals($expected, $normalizer->normalize($dummy));
+    }
+
+    public function testCacheKeyIsFalseWhenAPropertyHasSecurity(): void
+    {
+        $dummy = new Dummy();
+        $dummy->setName('hello');
+
+        $propertyNameCollection = new PropertyNameCollection(['name']);
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::type('array'))->willReturn($propertyNameCollection);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::type('array'))->willReturn(
+            (new ApiProperty())->withNativeType(Type::string())->withDescription('')->withReadable(true)->withSecurity('is_granted(\'ROLE_ADMIN\')')
+        );
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource($dummy, Argument::cetera())->willReturn('/dummies/1');
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+        $serializerProphecy->normalize('hello', null, Argument::type('array'))->willReturn('hello');
+
+        $nameConverter = $this->prophesize(NameConverterInterface::class);
+        $nameConverter->normalize('name', Argument::any(), Argument::any(), Argument::any())->willReturn('name');
+
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            null,
+            $nameConverter->reveal()
+        );
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $normalizer->normalize($dummy);
+
+        $componentsCacheRef = new \ReflectionProperty(ItemNormalizer::class, 'componentsCache');
+        $this->assertSame([], $componentsCacheRef->getValue($normalizer), 'componentsCache must not be populated when a property has security set');
     }
 
     public function testNormalizeWithUnionIntersectTypes(): void

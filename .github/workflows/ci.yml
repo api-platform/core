@@ -326,6 +326,7 @@ jobs:
           - api-platform/doctrine-orm
           - api-platform/doctrine-odm
           - api-platform/metadata
+          - api-platform/hal
           - api-platform/hydra
           - api-platform/json-api
           - api-platform/json-schema

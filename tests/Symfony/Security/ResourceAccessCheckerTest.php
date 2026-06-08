@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Symfony\Security;
 
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Symfony\Security\ResourceAccessChecker;
 use ApiPlatform\Tests\Fixtures\Serializable;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
@@ -80,6 +81,32 @@ class ResourceAccessCheckerTest extends TestCase
 
         $checker = new ResourceAccessChecker(null, $authenticationTrustResolverProphecy->reveal(), null, $tokenStorageProphecy->reveal());
         $checker->isGranted(Dummy::class, 'is_granted("ROLE_ADMIN")');
+    }
+
+    public function testUsesObjectVariableThrowsWhenSecurityComponentNotAvailable(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The "symfony/security" library must be installed to use the "security" attribute.');
+
+        $checker = new ResourceAccessChecker($this->prophesize(ExpressionLanguage::class)->reveal());
+        $checker->usesObjectVariable('user == object.owner');
+    }
+
+    public function testUsesObjectVariableThrowsWhenExpressionLanguageNotInstalled(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The "symfony/expression-language" library must be installed to use the "security" attribute.');
+
+        $authenticationTrustResolverProphecy = $this->prophesize(AuthenticationTrustResolverInterface::class);
+        $tokenStorageProphecy = $this->prophesize(TokenStorageInterface::class);
+        $tokenProphecy = $this->prophesize(TokenInterface::class);
+        $tokenProphecy->willImplement(Serializable::class);
+        $tokenProphecy->getUser()->willReturn(null);
+        $tokenProphecy->getRoleNames()->willReturn([]);
+        $tokenStorageProphecy->getToken()->willReturn($tokenProphecy->reveal());
+
+        $checker = new ResourceAccessChecker(null, $authenticationTrustResolverProphecy->reveal(), null, $tokenStorageProphecy->reveal());
+        $checker->usesObjectVariable('user == object.owner');
     }
 
     public function testWithoutAuthenticationToken(): void

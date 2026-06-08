@@ -79,6 +79,25 @@ Route::domain($domain)->middleware($globalMiddlewares)->group(static function ()
     $prefix = config()->get('api-platform.defaults.route_prefix', '');
 
     Route::group(['prefix' => $prefix], static function (): void {
+        if (config()->get('api-platform.graphql.enabled')) {
+            Route::group([
+                'middleware' => config()->get('api-platform.graphql.middleware', []),
+            ], static function (): void {
+                Route::addRoute(['POST', 'GET'], '/graphql', GraphQlEntrypointController::class)
+                    ->name('api_graphql');
+            });
+
+            if (config()->get('api-platform.graphiql.enabled', true)) {
+                Route::group([
+                    'middleware' => config()->get('api-platform.graphiql.middleware', []),
+                    'domain' => config()->get('api-platform.graphiql.domain', ''),
+                ], static function (): void {
+                    Route::get('/graphiql', GraphiQlController::class)
+                        ->name('api_graphiql');
+                });
+            }
+        }
+
         Route::group(['middleware' => ApiPlatformMiddleware::class], static function (): void {
             Route::get('/contexts/{shortName?}{_format?}', static function (Request $request, ContextAction $contextAction, string $shortName = 'Entrypoint') {
                 return $contextAction($shortName, $request);
@@ -98,25 +117,6 @@ Route::domain($domain)->middleware($globalMiddlewares)->group(static function ()
                 ->where('index', 'index')
                 ->name('api_entrypoint');
         });
-
-        if (config()->get('api-platform.graphql.enabled')) {
-            Route::group([
-                'middleware' => config()->get('api-platform.graphql.middleware', []),
-            ], static function (): void {
-                Route::addRoute(['POST', 'GET'], '/graphql', GraphQlEntrypointController::class)
-                    ->name('api_graphql');
-            });
-
-            if (config()->get('api-platform.graphiql.enabled', true)) {
-                Route::group([
-                    'middleware' => config()->get('api-platform.graphiql.middleware', []),
-                    'domain' => config()->get('api-platform.graphiql.domain', ''),
-                ], static function (): void {
-                    Route::get('/graphiql', GraphiQlController::class)
-                        ->name('api_graphiql');
-                });
-            }
-        }
     });
 });
 

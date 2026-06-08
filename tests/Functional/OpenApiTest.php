@@ -35,6 +35,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyCar;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyFriend;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritance;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyTableInheritanceChild;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6041\NumericValidated;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\JsonSchemaResource;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\JsonSchemaResourceRelated;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\NoCollectionDummy;
@@ -99,6 +100,7 @@ class OpenApiTest extends ApiTestCase
             OverrideOpenApiResponses::class,
             DummyAddress::class,
             RamseyUuidDummy::class,
+            NumericValidated::class,
             JsonSchemaResource::class,
             JsonSchemaResourceRelated::class,
             WrappedResponseEntity::class,
@@ -590,15 +592,36 @@ class OpenApiTest extends ApiTestCase
         $json = $response->toArray();
 
         $this->assertSame('3.0.0', $json['openapi']);
-        $this->assertEquals([
-            ['type' => 'integer'],
-            ['type' => 'null'],
-        ], $json['components']['schemas']['DummyBoolean']['properties']['id']['anyOf']);
-        $this->assertEquals([
-            ['type' => 'boolean'],
-            ['type' => 'null'],
-        ], $json['components']['schemas']['DummyBoolean']['properties']['isDummyBoolean']['anyOf']);
+        $this->assertSame('integer', $json['components']['schemas']['DummyBoolean']['properties']['id']['type']);
+        $this->assertTrue($json['components']['schemas']['DummyBoolean']['properties']['id']['nullable']);
+        $this->assertSame('boolean', $json['components']['schemas']['DummyBoolean']['properties']['isDummyBoolean']['type']);
+        $this->assertTrue($json['components']['schemas']['DummyBoolean']['properties']['isDummyBoolean']['nullable']);
         $this->assertArrayNotHasKey('owl:maxCardinality', $json['components']['schemas']['DummyBoolean']['properties']['isDummyBoolean']);
+    }
+
+    public function testOpenApi30EmitsBooleanExclusiveBoundsForNumericConstraints(): void
+    {
+        $kernel = self::bootKernel();
+        if ('mongodb' === $kernel->getEnvironment()) {
+            $this->markTestSkipped('Resource not loaded with MongoDB.');
+        }
+
+        $response = self::createClient()->request('GET', '/docs.jsonopenapi?spec_version=3.0.0', ['headers' => ['Accept' => 'application/vnd.openapi+json']]);
+        $this->assertResponseIsSuccessful();
+        $json = $response->toArray();
+
+        $this->assertSame('3.0.0', $json['openapi']);
+        $this->assertArrayHasKey('NumericValidated', $json['components']['schemas']);
+        $properties = $json['components']['schemas']['NumericValidated']['properties'];
+
+        $this->assertSame(10, $properties['greaterThanMe']['minimum']);
+        $this->assertTrue($properties['greaterThanMe']['exclusiveMinimum']);
+
+        $this->assertSame(99, $properties['lessThanMe']['maximum']);
+        $this->assertTrue($properties['lessThanMe']['exclusiveMaximum']);
+
+        $this->assertSame(0, $properties['positive']['minimum']);
+        $this->assertTrue($properties['positive']['exclusiveMinimum']);
     }
 
     public function testRetrieveTheOpenApiDocumentationInJson(): void

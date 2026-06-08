@@ -10,8 +10,24 @@ html {
   box-sizing: inherit;
 }
 
+:root {
+  --apip-page-background: #f0f0f0;
+  --apip-block-background: #fff;
+  --apip-block-border: #ccc;
+  --apip-block-shadow: 0 1px 3px rgba(0, 0, 0, .12), 0 1px 2px rgba(0, 0, 0, .24);
+  --apip-tag-hover: rgba(0, 0, 0, .1);
+}
+
+html.dark-mode {
+  --apip-page-background: #1c2022;
+  --apip-block-background: #182536;
+  --apip-block-border: #545d61;
+  --apip-block-shadow: 0 0 3px rgba(0, 0, 0, .19);
+  --apip-tag-hover: rgba(255, 255, 255, .06);
+}
+
 body {
-  background: #f0f0f0;
+  background: var(--apip-page-background);
 }
 
 /** HEADER **/
@@ -135,8 +151,8 @@ header #logo img {
   padding: 10px 0 0;
   width: 100%;
   max-width: 100%;
-  background-color: white;
-  border-bottom: 1px solid #ccc;
+  background-color: var(--apip-block-background);
+  border-bottom: 1px solid var(--apip-block-border);
 }
 
 #swagger-ui.api-platform .info .title {
@@ -207,7 +223,7 @@ header #logo img {
 }
 
 #swagger-ui.api-platform .opblock-tag:hover {
-  background-color: rgba(0, 0, 0, .1);
+  background-color: var(--apip-tag-hover);
   transform: scale(1.01);
 }
 
@@ -234,8 +250,8 @@ header #logo img {
 
 #swagger-ui.api-platform .opblock {
   border-radius: 0;
-  background-color: white;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, .12), 0 1px 2px rgba(0, 0, 0, .24);
+  background-color: var(--apip-block-background);
+  box-shadow: var(--apip-block-shadow);
   margin: 0 0 10px;
   padding: 0;
   border: none !important;

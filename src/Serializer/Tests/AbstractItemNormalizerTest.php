@@ -168,6 +168,61 @@ class AbstractItemNormalizerTest extends TestCase
         ]));
     }
 
+    public function testNormalizeNullableToManyRelationReturnsNull(): void
+    {
+        $dummy = new Dummy();
+        $dummy->setName('foo');
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::type('array'))->willReturn(new PropertyNameCollection(['name', 'relatedDummies']));
+
+        // BC layer for api-platform/metadata < 4.1
+        if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
+            $relatedDummyType = new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, RelatedDummy::class);
+            $relatedDummiesType = new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, true, ArrayCollection::class, true, new LegacyType(LegacyType::BUILTIN_TYPE_INT), $relatedDummyType);
+
+            $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+            $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)])->withDescription('')->withReadable(true));
+            $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummies', Argument::type('array'))->willReturn((new ApiProperty())->withBuiltinTypes([$relatedDummiesType])->withReadable(true)->withWritable(false)->withReadableLink(false));
+        } else {
+            $relatedDummiesType = Type::nullable(Type::collection(Type::object(ArrayCollection::class), Type::object(RelatedDummy::class), Type::int()));
+
+            $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+            $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType(Type::string())->withDescription('')->withReadable(true));
+            $propertyMetadataFactoryProphecy->create(Dummy::class, 'relatedDummies', Argument::type('array'))->willReturn((new ApiProperty())->withNativeType($relatedDummiesType)->withReadable(true)->withWritable(false)->withReadableLink(false));
+        }
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource($dummy, Argument::cetera())->willReturn('/dummies/1');
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->getValue($dummy, 'name')->willReturn('foo');
+        $propertyAccessorProphecy->getValue($dummy, 'relatedDummies')->willReturn(null);
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+        $serializerProphecy->normalize('foo', null, Argument::type('array'))->willReturn('foo');
+        $serializerProphecy->normalize(null, null, Argument::type('array'))->willReturn(null);
+
+        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), null, null, [], null, null) extends AbstractItemNormalizer {};
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $expected = [
+            'name' => 'foo',
+            'relatedDummies' => null,
+        ];
+        $this->assertSame($expected, $normalizer->normalize($dummy, null, [
+            'resources' => [],
+            'skip_null_values' => false,
+        ]));
+    }
+
     public function testNormalizeWithSecuredProperty(): void
     {
         $dummy = new SecuredDummy();
@@ -220,6 +275,104 @@ class AbstractItemNormalizerTest extends TestCase
         $this->assertSame($expected, $normalizer->normalize($dummy, null, [
             'resources' => [],
         ]));
+    }
+
+    public function testIsCacheKeySafeReturnsFalseWhenAPropertyHasSecurity(): void
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(SecuredDummy::class, Argument::type('array'))->willReturn(new PropertyNameCollection(['title', 'adminOnlyProperty']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(SecuredDummy::class, 'title', Argument::type('array'))->willReturn((new ApiProperty())->withReadable(true));
+        $propertyMetadataFactoryProphecy->create(SecuredDummy::class, 'adminOnlyProperty', Argument::type('array'))->willReturn((new ApiProperty())->withReadable(true)->withSecurity('is_granted(\'ROLE_ADMIN\')'));
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(SecuredDummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->getResourceClass(null, SecuredDummy::class)->willReturn(SecuredDummy::class);
+
+        $normalizer = $this->createCacheKeySafeProbe(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal()
+        );
+
+        $this->assertFalse($normalizer->probeIsCacheKeySafe(['resource_class' => SecuredDummy::class]));
+    }
+
+    public function testIsCacheKeySafeReturnsTrueWhenNoPropertyHasSecurity(): void
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::type('array'))->willReturn(new PropertyNameCollection(['name', 'alias']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::type('array'))->willReturn((new ApiProperty())->withReadable(true));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'alias', Argument::type('array'))->willReturn((new ApiProperty())->withReadable(true));
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
+
+        $normalizer = $this->createCacheKeySafeProbe(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal()
+        );
+
+        $this->assertTrue($normalizer->probeIsCacheKeySafe(['resource_class' => Dummy::class]));
+    }
+
+    public function testIsCacheKeySafeReturnsFalseWithoutResourceClass(): void
+    {
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(\stdClass::class)->willReturn(false);
+
+        $normalizer = $this->createCacheKeySafeProbe(
+            $this->prophesize(PropertyNameCollectionFactoryInterface::class)->reveal(),
+            $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(),
+            $resourceClassResolverProphecy->reveal()
+        );
+
+        $this->assertFalse($normalizer->probeIsCacheKeySafe([]));
+        $this->assertFalse($normalizer->probeIsCacheKeySafe(['resource_class' => \stdClass::class]));
+    }
+
+    public function testIsCacheKeySafeCachesPerResourceClass(): void
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(SecuredDummy::class, Argument::type('array'))
+            ->shouldBeCalledOnce()
+            ->willReturn(new PropertyNameCollection(['adminOnlyProperty']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(SecuredDummy::class, 'adminOnlyProperty', Argument::type('array'))
+            ->shouldBeCalledOnce()
+            ->willReturn((new ApiProperty())->withReadable(true)->withSecurity('is_granted(\'ROLE_ADMIN\')'));
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->isResourceClass(SecuredDummy::class)->willReturn(true);
+        $resourceClassResolverProphecy->getResourceClass(null, SecuredDummy::class)->willReturn(SecuredDummy::class);
+
+        $normalizer = $this->createCacheKeySafeProbe(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal()
+        );
+
+        $this->assertFalse($normalizer->probeIsCacheKeySafe(['resource_class' => SecuredDummy::class]));
+        $this->assertFalse($normalizer->probeIsCacheKeySafe(['resource_class' => SecuredDummy::class]));
+    }
+
+    private function createCacheKeySafeProbe(
+        PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
+        PropertyMetadataFactoryInterface $propertyMetadataFactory,
+        ResourceClassResolverInterface $resourceClassResolver,
+    ): object {
+        return new class($propertyNameCollectionFactory, $propertyMetadataFactory, $this->prophesize(IriConverterInterface::class)->reveal(), $resourceClassResolver, $this->prophesize(PropertyAccessorInterface::class)->reveal(), null, null, [], null, null) extends AbstractItemNormalizer {
+            public function probeIsCacheKeySafe(array $context): bool
+            {
+                return $this->isCacheKeySafe($context);
+            }
+        };
     }
 
     public function testNormalizePropertyAsIriWithUriTemplate(): void

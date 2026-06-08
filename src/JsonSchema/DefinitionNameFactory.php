@@ -44,9 +44,10 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
         }
 
         if (null !== $inputOrOutputClass && $className !== $inputOrOutputClass) {
-            $parts = explode('\\', $inputOrOutputClass);
-            $shortName = end($parts);
-            $prefix .= self::GLUE.$shortName;
+            // Use createPrefixFromClass so DTOs with identical short names but different
+            // FQCNs (e.g. App\...\Input\ThingCreate and App\...\Output\ThingCreate) get
+            // disambiguated suffixes instead of overwriting each other in the schema map.
+            $prefix .= self::GLUE.$this->createPrefixFromClass($inputOrOutputClass);
         }
 
         // TODO: remove in 5.0

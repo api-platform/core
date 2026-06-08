@@ -15,8 +15,11 @@ namespace ApiPlatform\JsonSchema\Tests;
 
 use ApiPlatform\JsonSchema\DefinitionNameFactory;
 use ApiPlatform\JsonSchema\SchemaFactory;
+use ApiPlatform\JsonSchema\Tests\Fixtures\DefinitionNameFactory\InputOutputCollision\Input\ThingCreate as InputThingCreate;
+use ApiPlatform\JsonSchema\Tests\Fixtures\DefinitionNameFactory\InputOutputCollision\Output\ThingCreate as OutputThingCreate;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DtoOutput;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -143,6 +146,35 @@ final class DefinitionNameFactoryTest extends TestCase
         self::assertEquals(
             'DummyClass.jsonhal',
             $definitionNameFactory->create(Fixtures\DefinitionNameFactory\NamespaceA\Module\DummyClass::class, 'jsonhal')
+        );
+    }
+
+    public function testCreateDistinctDefinitionNamesWhenInputAndOutputShareShortName(): void
+    {
+        $definitionNameFactory = new DefinitionNameFactory();
+
+        $operation = new Post(class: Dummy::class, shortName: 'Thing');
+
+        $inputName = $definitionNameFactory->create(
+            Dummy::class,
+            'jsonld',
+            InputThingCreate::class,
+            $operation,
+            ['schema_type' => \ApiPlatform\JsonSchema\Schema::TYPE_INPUT]
+        );
+
+        $outputName = $definitionNameFactory->create(
+            Dummy::class,
+            'jsonld',
+            OutputThingCreate::class,
+            $operation,
+            ['schema_type' => \ApiPlatform\JsonSchema\Schema::TYPE_OUTPUT]
+        );
+
+        self::assertNotSame(
+            $inputName,
+            $outputName,
+            'Input and Output DTO classes sharing the same short name must produce distinct definition names.'
         );
     }
 

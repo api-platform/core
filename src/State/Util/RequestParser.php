@@ -51,7 +51,12 @@ final class RequestParser
         // parse_str urldecodes both keys and values in resulting array.
         parse_str($source, $params);
 
-        return array_combine(array_map('hex2bin', array_keys($params)), $params);
+        $keys = array_map(
+            static fn (string $key): string => preg_match('/\A(?:[0-9a-f]{2})+\z/', $key) ? hex2bin($key) : $key,
+            array_keys($params),
+        );
+
+        return array_combine($keys, $params);
     }
 
     /**

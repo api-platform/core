@@ -1,5 +1,56 @@
 # Changelog
 
+## v4.3.10
+
+### Bug fixes
+
+* [149adf70f](https://github.com/api-platform/core/commit/149adf70f008793004c9a79f62d2df1e3955484e) fix(laravel): register graphql routes before catch-all entrypoint (#8248)
+* [1bc670c72](https://github.com/api-platform/core/commit/1bc670c7241034b6dbc517d3c23f0d75952d351e) fix(jsonapi): allow opt-in client-generated IDs on POST per spec (#7930)
+* [39edcdddd](https://github.com/api-platform/core/commit/39edcdddd1c1e8c17f7002e9cb3f27ce07742ae6) fix(symfony): skip ErrorResourceAttributeLoaderPass on Symfony 6.4 (#8253)
+* [4609a9e5d](https://github.com/api-platform/core/commit/4609a9e5d3f78f432bddda9c848c9c6f4fb1cb32) fix(graphql): dispatch item Query through its own provider (#8237)
+* [5c62c1bd8](https://github.com/api-platform/core/commit/5c62c1bd837b2fd6586422af1182b4b7b632f7f1) fix(jsonapi): do not require id in input schema for post operations (#8252)
+* [7bde11eb9](https://github.com/api-platform/core/commit/7bde11eb932f234fd12da74ad85b3d077b44eef3) fix(swagger): fix SwaggerUI CSS override (#8245)
+* [86a09b3c3](https://github.com/api-platform/core/commit/86a09b3c35d75588c0fa13d4f54805136da186cb) fix(state): guard hex2bin against malformed query parameter keys (#8255)
+* [a6bdf7134](https://github.com/api-platform/core/commit/a6bdf71341db5d5d46e2f2a7433807ddcc3f7b30) fix(laravel): detect enum casts in eloquent property metadata factory (#8247)
+* [b5c41aff5](https://github.com/api-platform/core/commit/b5c41aff5085c82c610177ec6f4b221208ca466a) fix(laravel): honor path_segment_name_generator config for url segments (#8251)
+* [d5d8176f1](https://github.com/api-platform/core/commit/d5d8176f1e7ad2627eaec15c96594429d94611d0) fix(serializer): allow nullable to-many relations to normalize as null (#8254)
+* [f4d2b56c2](https://github.com/api-platform/core/commit/f4d2b56c2a356fed62f126b3cc08b10df7fb07f9) fix(laravel): persist dirty embedded belongsTo relations (#8246)
+
+## v4.3.9
+
+### Bug fixes
+
+* [e7968852c](https://github.com/api-platform/core/commit/e7968852c63d590a0ca65203822476410898a23a) fix(serializer): bump api-platform/serializer to ^4.3.8 and cover Hal in CI (#8242)
+* [d59c24490](https://github.com/api-platform/core/commit/d59c24490a54200471a725060a59d4ddcc00c1d0) fix(graphql): return identifier-only node on circular reference (#8239)
+* [b714a4451](https://github.com/api-platform/core/commit/b714a4451971cbe86a7f8b0339cac5a9e7f3be4a) fix(graphql): nested resources without graphqloperations propagate fields (#8236)
+* [ca8fbf9de](https://github.com/api-platform/core/commit/ca8fbf9de073721c60a79dc22b5371bf0bc0b870) fix(hydra): format datetime fields as iso 8601 in cursor pagination urls (#8241)
+* [cfe1bc324](https://github.com/api-platform/core/commit/cfe1bc324c2a5d5845e2b65e4fa248134f178a65) fix(doctrine): extract alias from sql function in orderby parts (#8240)
+* [8567366a7](https://github.com/api-platform/core/commit/8567366a738f0d169626768cb4b1ca3b906db9b0) fix(test): capture streamedresponse body in test client response (#8235)
+
+## v4.3.8
+
+### Bug fixes
+
+* [cf55c0e7b](https://github.com/api-platform/core/commit/cf55c0e7b34ac373538b6123312ead28af9532e8) fix(serializer): gate cache_key in JsonApi and Hal with isCacheKeySafe
+* [0e0c58b87](https://github.com/api-platform/core/commit/0e0c58b87f6c03a04518fe31d1d51212de0505e2) fix(symfony): filter nested constraint groups in Sequentially/Compound (#8223)
+* [277589de6](https://github.com/api-platform/core/commit/277589de6ab16f103b76a74d6afd5b479257ee58) fix(symfony): keep error serialization mapping when enable_attributes is disabled (#8231)
+* [30f1f977a](https://github.com/api-platform/core/commit/30f1f977a4b4e309fbf85d76d79f8b94a6c3b209) fix(tests): symfony 8.1 compat (#8210)
+* [37e361339](https://github.com/api-platform/core/commit/37e3613395bbb13fb1d7296eeae6150d86f217db) fix(jsonapi): keep flat custom params with flat page (#8216) (#8217)
+* [4059c6303](https://github.com/api-platform/core/commit/4059c63037c28dd4d9cd7ed32743718cfca3ee03) fix(laravel): wire jsonapi.use_iri_as_id in ApiPlatformProvider (#8224)
+* [4378916ac](https://github.com/api-platform/core/commit/4378916acccbac78c05ba96bd0eee3a66bad4041) fix(jsonapi): drop consumed pagination keys before raw-param replace
+* [46c25c7e4](https://github.com/api-platform/core/commit/46c25c7e4399efce10397839da7b70479704aaf5) fix(symfony): reject duplicate operation names instead of silently dropping operations (#8232)
+* [6fc55c27d](https://github.com/api-platform/core/commit/6fc55c27d1bcece80722ed1ec63902fe047608c5) fix(metadata): apply YAML/XML attributes to virtual (method-backed) properties (#8220)
+* [71fcb9314](https://github.com/api-platform/core/commit/71fcb9314b57ff779757d1e369c82d49accfd411) fix(test): default content-type in ApiTestCase matches configured formats (#8227)
+* [7aed9d10c](https://github.com/api-platform/core/commit/7aed9d10c49103aa8113eec7e23c4a7d8a016893) fix(openapi): emit valid 3.0 schemas when downgrading from 3.1 (#8225)
+* [90bcfb09a](https://github.com/api-platform/core/commit/90bcfb09a68f9808197bd0cb743ab69362aee1ae) fix(doctrine): resolve parent link toProperty during PUT create (#8233)
+* [9aca842d4](https://github.com/api-platform/core/commit/9aca842d4bc758ea2da2011416ade4e35b77605b) fix(state): omit Content-Type when response has no body (#8218)
+* [abef010cf](https://github.com/api-platform/core/commit/abef010cfc2497981d47d5823d33f7c7eeb2d04b) fix(openapi): emit Draft 4 boolean exclusive bounds for spec 3.0.0 (#8222)
+* [c83558954](https://github.com/api-platform/core/commit/c83558954dd99250f46cc45b649d444249fd44ca) fix(openapi): disambiguate definition names when input and output share a shortname (#8230)
+* [ef40bcda6](https://github.com/api-platform/core/commit/ef40bcda66c13df1cb4373ef05a1333392576fda) fix(graphiql): migrate to v5 via esm.sh CDN (#8209)
+* [ef79ab337](https://github.com/api-platform/core/commit/ef79ab3375c7131e660a8683c5ffa8473bf2dab8) fix(symfony): guard null ExpressionLanguage in ResourceAccessChecker::usesObjectVariable()
+* [fd08d296a](https://github.com/api-platform/core/commit/fd08d296a25253188e9fbb91cb70d8c0a3a5a95a) fix(openapi): coerce metadata parameters in user-supplied openapi operation (#8229)
+* [fd2518695](https://github.com/api-platform/core/commit/fd25186952493ab2eb9f1d817e769cb9de83b67f) fix(serializer): bump min serializer dep and fix phpstan probe typing
+
 ## v4.3.7
 
 ### Bug fixes
@@ -171,6 +222,13 @@
 * **`isGranted` evaluated before provider** (#7500): Security expressions are now evaluated before the state provider runs. Expressions that do not reference the `object` variable will be checked earlier (at the `pre_read` stage), improving security by preventing unnecessary database queries on unauthorized requests. Expressions that reference `object` still wait for the provider to resolve the entity. Review any security expressions that relied on provider side-effects running before authorization.
 * **LDP-compliant response headers** (#6917): API responses now include `Allow` and `Accept-Post` headers per the Linked Data Platform specification. These are informational headers that help clients discover API capabilities and should not break existing integrations.
 * **Scalar API Reference UI** (#7817): Scalar is now available as an alternative documentation UI alongside Swagger UI. It is enabled by default when TwigBundle is available. Access it via `?ui=scalar`. To disable it, set `enable_scalar: false` in your API Platform configuration.
+
+## v4.2.25
+
+### Bug fixes
+
+* [019fd9012](https://github.com/api-platform/core/commit/019fd901225a969b1903e093a1773f26ee551dfc) fix(serializer): gate cache_key in JsonApi and Hal with isCacheKeySafe
+* [1bfd6eecd](https://github.com/api-platform/core/commit/1bfd6eecd27dbb791901eb092606c3ec4a0963d3) fix(serializer): bump min serializer dep and fix phpstan probe typing
 
 ## v4.2.24
 
@@ -711,6 +769,15 @@ TypeInfo:
 * [79edced67](https://github.com/api-platform/core/commit/79edced67ccca1a7b80455dd94203501d9c4fa89) !fix(json-schema): share invariable sub-schemas
 * [cff61eab8](https://github.com/api-platform/core/commit/cff61eab8643f8ed08d59c0684e77740d0d81b04) fix(metadata): append php file resource extractor (#7193)
 * [f3d4afe03](https://github.com/api-platform/core/commit/f3d4afe032385f3b665131a365e42706930f0730) fix(symfony): validator type-info
+
+## v4.1.29
+
+### Bug fixes
+
+* [9f5d0e020](https://github.com/api-platform/core/commit/9f5d0e020d94a2966c896c436edac45af4ff5bbf) fix(serializer): gate cache_key in JsonApi and Hal with isCacheKeySafe
+* [3812a3617](https://github.com/api-platform/core/commit/3812a36170ff07180591c1b9d7e9b0e15476e6a3) fix(serializer): adapt tests for 4.1 (createMock for HAL, drop name converter)
+* [8f32ad0e3](https://github.com/api-platform/core/commit/8f32ad0e3c94c08ab7728d87fbadb0828b435116) fix(serializer): bump min serializer dep and fix phpstan probe typing
+* [89ca6f279](https://github.com/api-platform/core/commit/89ca6f27928887bf3d513d36069111dae3f0c075) fix(state): _api_operation_nme to _api_operation_name in ErrorProvider (#7637)
 
 ## v4.1.28
 

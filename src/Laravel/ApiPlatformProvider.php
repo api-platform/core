@@ -276,7 +276,14 @@ class ApiPlatformProvider extends ServiceProvider
             return new SerializerClassMetadataFactory($app->make(ClassMetadataFactoryInterface::class));
         });
 
-        $this->app->bind(PathSegmentNameGeneratorInterface::class, UnderscorePathSegmentNameGenerator::class);
+        $this->app->bind(PathSegmentNameGeneratorInterface::class, static function (Application $app): PathSegmentNameGeneratorInterface {
+            /** @var ConfigRepository */
+            $config = $app['config'];
+            /** @var class-string<PathSegmentNameGeneratorInterface> $class */
+            $class = $config->get('api-platform.path_segment_name_generator') ?? UnderscorePathSegmentNameGenerator::class;
+
+            return $app->make($class);
+        });
 
         $this->app->singleton(ResourceNameCollectionFactoryInterface::class, static function (Application $app) {
             /** @var ConfigRepository */
@@ -1016,6 +1023,8 @@ class ApiPlatformProvider extends ServiceProvider
         $this->app->singleton(JsonApiItemNormalizer::class, static function (Application $app) {
             $config = $app['config'];
             $defaultContext = $config->get('api-platform.serializer', []);
+            $defaultContext[JsonApiItemNormalizer::ALLOW_CLIENT_GENERATED_ID] = (bool) $config->get('api-platform.jsonapi.allow_client_generated_id', false);
+            $useIriAsId = (bool) $config->get('api-platform.jsonapi.use_iri_as_id', true);
 
             return new JsonApiItemNormalizer(
                 $app->make(PropertyNameCollectionFactoryInterface::class),
@@ -1028,7 +1037,10 @@ class ApiPlatformProvider extends ServiceProvider
                 $defaultContext,
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(ResourceAccessCheckerInterface::class),
-                // $app->make(TagCollectorInterface::class),
+                tagCollector: null,
+                operationResourceResolver: $app->make(OperationResourceClassResolverInterface::class),
+                identifiersExtractor: $app->make(IdentifiersExtractorInterface::class),
+                useIriAsId: $useIriAsId,
             );
         });
 

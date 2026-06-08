@@ -84,6 +84,7 @@ class LinkResourceMetadataCollectionFactoryTest extends TestCase
                     class: AttributeResource::class,
                     graphQlOperations: [
                         'item_query' => (new Query(shortName: 'AttributeResource', class: AttributeResource::class))->withLinks([
+                            (new Link())->withFromClass(AttributeResource::class)->withIdentifiers(['id'])->withParameterName('id'),
                             (new Link())->withFromProperty('foo')->withFromClass(AttributeResource::class)->withToClass(Dummy::class)->withIdentifiers(['id']),
                             (new Link())->withFromProperty('foo2')->withFromClass(AttributeResource::class)->withToClass(Dummy::class)->withIdentifiers(['id']),
                             (new Link())->withFromProperty('bar')->withFromClass(AttributeResource::class)->withToClass(RelatedDummy::class)->withIdentifiers(['id']),
@@ -132,6 +133,7 @@ class LinkResourceMetadataCollectionFactoryTest extends TestCase
                     class: AttributeResource::class,
                     graphQlOperations: [
                         'item_query' => (new Query(shortName: 'AttributeResource', class: AttributeResource::class))->withLinks([
+                            (new Link())->withFromClass(AttributeResource::class)->withIdentifiers(['identifier'])->withParameterName('identifier'),
                             (new Link())->withParameterName('dummyId')->withFromProperty('dummy')->withFromClass(AttributeResource::class)->withToClass(Dummy::class)->withIdentifiers(['identifier']),
                         ]),
                     ]

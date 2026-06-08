@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Error as ErrorOperation;
 use ApiPlatform\Metadata\ErrorResource;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\HeaderParameter;
@@ -33,6 +34,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -1437,5 +1439,63 @@ class OpenApiFactoryTest extends TestCase
         );
 
         $openApi = $factory->__invoke();
+    }
+
+    public function testMetadataParameterInOpenApiOperationParametersThrows(): void
+    {
+        $resourceNameCollectionFactory = $this->createMock(ResourceNameCollectionFactoryInterface::class);
+        $resourceCollectionMetadataFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
+        $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
+        $definitionNameFactory = new DefinitionNameFactory([]);
+
+        $resourceCollectionMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource(operations: [
+            (new GetCollection())
+                ->withClass(Dummy::class)
+                ->withShortName('Dummy')
+                ->withName('api_dummies_get_collection')
+                ->withUriTemplate('/dummies')
+                ->withOpenapi(new Operation(parameters: [new QueryParameter(key: 'bar')])),
+        ]))->withClass(Dummy::class)]);
+
+        $resourceCollectionMetadataFactory
+            ->method('create')
+            ->willReturnCallback(static fn (string $resourceClass): ResourceMetadataCollection => match ($resourceClass) {
+                default => new ResourceMetadataCollection($resourceClass, []),
+                Dummy::class => $resourceCollectionMetadata,
+            });
+
+        $resourceNameCollectionFactory->expects($this->once())
+            ->method('create')
+            ->willReturn(new ResourceNameCollection([Dummy::class]));
+
+        $propertyNameCollectionFactory->method('create')->willReturn(new PropertyNameCollection([]));
+
+        $schemaFactory = new SchemaFactory(
+            resourceMetadataFactory: $resourceCollectionMetadataFactory,
+            propertyNameCollectionFactory: $propertyNameCollectionFactory,
+            propertyMetadataFactory: $propertyMetadataFactory,
+            nameConverter: new CamelCaseToSnakeCaseNameConverter(),
+            definitionNameFactory: $definitionNameFactory,
+        );
+
+        $factory = new OpenApiFactory(
+            $resourceNameCollectionFactory,
+            $resourceCollectionMetadataFactory,
+            $propertyNameCollectionFactory,
+            $propertyMetadataFactory,
+            $schemaFactory,
+            null,
+            [],
+            new Options('Test API', 'This is a test API.', '1.2.3'),
+            new PaginationOptions(),
+            null,
+            ['json' => ['application/problem+json']]
+        );
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(Parameter::class);
+
+        $factory->__invoke();
     }
 }

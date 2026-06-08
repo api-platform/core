@@ -52,18 +52,24 @@ trait ItemNormalizerTrait
             return parent::denormalize($data, $type, $format, $context);
         }
 
+        $operation = $context['operation'] ?? null;
+        $isPostOperation = $operation instanceof HttpOperation && 'POST' === $operation->getMethod();
+        $allowClientGeneratedId = true === ($context[ItemNormalizer::ALLOW_CLIENT_GENERATED_ID] ?? $this->defaultContext[ItemNormalizer::ALLOW_CLIENT_GENERATED_ID] ?? false);
+
         // Avoid issues with proxies if we populated the object
         if (!isset($context[AbstractItemNormalizer::OBJECT_TO_POPULATE]) && isset($data['data']['id'])) {
-            if (true !== ($context['api_allow_update'] ?? true)) {
+            if ($isPostOperation) {
+                if (!$allowClientGeneratedId) {
+                    throw new NotNormalizableValueException(\sprintf('Client-generated IDs are not allowed on this operation. Set the "%s" denormalization context flag (or the bundle "allow_client_generated_id" configuration) to enable it.', ItemNormalizer::ALLOW_CLIENT_GENERATED_ID));
+                }
+                // Fall through: client id is merged into the denormalized payload below.
+            } elseif (true !== ($context['api_allow_update'] ?? true)) {
                 throw new NotNormalizableValueException('Update is not allowed for this operation.');
-            }
-
-            $context += ['fetch_data' => false];
-            if ($this->useIriAsId) {
-                $context[AbstractItemNormalizer::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri($data['data']['id'], $context);
             } else {
-                $operation = $context['operation'] ?? null;
-                if ($operation instanceof HttpOperation) {
+                $context += ['fetch_data' => false];
+                if ($this->useIriAsId) {
+                    $context[AbstractItemNormalizer::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri($data['data']['id'], $context);
+                } elseif ($operation instanceof HttpOperation) {
                     $iri = $this->reconstructIri($type, (string) $data['data']['id'], $operation);
                     $context[AbstractItemNormalizer::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri($iri, $context);
                 }
@@ -74,6 +80,11 @@ trait ItemNormalizerTrait
             $data['data']['attributes'] ?? [],
             $data['data']['relationships'] ?? []
         );
+
+        // Surface the client-generated id so the entity setter receives it.
+        if ($isPostOperation && $allowClientGeneratedId && isset($data['data']['id'])) {
+            $dataToDenormalize['id'] = $data['data']['id'];
+        }
 
         return parent::denormalize($dataToDenormalize, $type, $format, $context);
     }

@@ -22,6 +22,8 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operations;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
@@ -49,6 +51,7 @@ class SchemaFactoryTest extends TestCase
         );
         $propertyNameCollectionFactory = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
         $propertyNameCollectionFactory->create(Dummy::class, ['enable_getter_setter_extraction' => true, 'schema_type' => Schema::TYPE_OUTPUT])->willReturn(new PropertyNameCollection());
+        $propertyNameCollectionFactory->create(Dummy::class, ['enable_getter_setter_extraction' => true, 'schema_type' => Schema::TYPE_INPUT])->willReturn(new PropertyNameCollection());
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
 
         $definitionNameFactory = new DefinitionNameFactory(null);
@@ -163,5 +166,37 @@ class SchemaFactoryTest extends TestCase
 
         $forcedCollection = $this->schemaFactory->buildSchema(Dummy::class, 'jsonapi', Schema::TYPE_OUTPUT, forceCollection: true);
         $this->assertEquals($resultSchema['allOf'][0]['$ref'], $forcedCollection['allOf'][0]['$ref']);
+    }
+
+    public function testPostInputSchemaDoesNotRequireId(): void
+    {
+        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonapi', Schema::TYPE_INPUT, new Post());
+        $definitions = $resultSchema->getDefinitions();
+        $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
+
+        $this->assertTrue(isset($definitions[$rootDefinitionKey]['properties']['data']));
+        $data = $definitions[$rootDefinitionKey]['properties']['data'];
+        $this->assertArrayHasKey('required', $data);
+        $this->assertSame(['type'], $data['required']);
+    }
+
+    public function testPatchInputSchemaRequiresId(): void
+    {
+        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonapi', Schema::TYPE_INPUT, new Patch());
+        $definitions = $resultSchema->getDefinitions();
+        $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
+
+        $data = $definitions[$rootDefinitionKey]['properties']['data'];
+        $this->assertSame(['type', 'id'], $data['required']);
+    }
+
+    public function testPostOutputSchemaRequiresId(): void
+    {
+        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonapi', Schema::TYPE_OUTPUT, new Post());
+        $definitions = $resultSchema->getDefinitions();
+        $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
+
+        $data = $definitions[$rootDefinitionKey]['properties']['data'];
+        $this->assertSame(['type', 'id'], $data['required']);
     }
 }

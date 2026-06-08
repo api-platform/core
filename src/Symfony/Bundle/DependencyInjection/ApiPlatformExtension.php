@@ -30,6 +30,7 @@ use ApiPlatform\GraphQl\Resolver\MutationResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryItemResolverInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
+use ApiPlatform\JsonApi\Serializer\ItemNormalizer as JsonApiItemNormalizer;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\AsOperationMutator;
 use ApiPlatform\Metadata\AsResourceMutator;
@@ -706,11 +707,13 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('jsonapi.php');
         $loader->load('state/jsonapi.php');
 
-        $container->getDefinition('api_platform.jsonapi.normalizer.item')
-            ->addArgument($config['jsonapi']['use_iri_as_id']);
+        $itemNormalizer = $container->getDefinition('api_platform.jsonapi.normalizer.item');
+        $itemNormalizer->replaceArgument(7, [JsonApiItemNormalizer::ALLOW_CLIENT_GENERATED_ID => $config['jsonapi']['allow_client_generated_id'] ?? false]);
+        $itemNormalizer->addArgument($config['jsonapi']['use_iri_as_id']);
 
-        $container->getDefinition('api_platform.jsonapi.denormalizer.item')
-            ->addArgument($config['jsonapi']['use_iri_as_id']);
+        $itemDenormalizer = $container->getDefinition('api_platform.jsonapi.denormalizer.item');
+        $itemDenormalizer->replaceArgument(7, [JsonApiItemNormalizer::ALLOW_CLIENT_GENERATED_ID => $config['jsonapi']['allow_client_generated_id'] ?? false]);
+        $itemDenormalizer->addArgument($config['jsonapi']['use_iri_as_id']);
     }
 
     private function registerJsonLdHydraConfiguration(ContainerBuilder $container, array $formats, PhpFileLoader $loader, array $config): void

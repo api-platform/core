@@ -128,6 +128,62 @@ class ItemNormalizerTest extends TestCase
         $this->assertEquals($expected, $normalizer->normalize($dummy, ItemNormalizer::FORMAT));
     }
 
+    public function testCacheKeyIsFalseWhenAPropertyHasSecurity(): void
+    {
+        $dummy = new Dummy();
+        $dummy->setId(11);
+        $dummy->setName('hello');
+
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactoryProphecy->create(Dummy::class, Argument::type('array'))->willReturn(new PropertyNameCollection(['id', 'name']));
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'id', Argument::type('array'))->willReturn((new ApiProperty())->withReadable(true)->withIdentifier(true));
+        $propertyMetadataFactoryProphecy->create(Dummy::class, 'name', Argument::type('array'))->willReturn((new ApiProperty())->withReadable(true)->withSecurity('is_granted(\'ROLE_ADMIN\')'));
+
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getIriFromResource($dummy, Argument::cetera())->willReturn('/dummies/11');
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, null)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass(null, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->getResourceClass($dummy, Dummy::class)->willReturn(Dummy::class);
+        $resourceClassResolverProphecy->isResourceClass(Dummy::class)->willReturn(true);
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+        $propertyAccessorProphecy->getValue($dummy, 'id')->willReturn(11);
+        $propertyAccessorProphecy->getValue($dummy, 'name')->willReturn('hello');
+
+        $resourceMetadataCollectionFactoryProphecy = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactoryProphecy->create(Dummy::class)->willReturn(new ResourceMetadataCollection('Dummy', [
+            (new ApiResource())
+                ->withShortName('Dummy')
+                ->withOperations(new Operations(['get' => (new Get())->withShortName('Dummy')])),
+        ]));
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(NormalizerInterface::class);
+        $serializerProphecy->normalize(Argument::any(), ItemNormalizer::FORMAT, Argument::type('array'))->will(static fn ($args) => $args[0]);
+
+        $normalizer = new ItemNormalizer(
+            $propertyNameCollectionFactoryProphecy->reveal(),
+            $propertyMetadataFactoryProphecy->reveal(),
+            $iriConverterProphecy->reveal(),
+            $resourceClassResolverProphecy->reveal(),
+            $propertyAccessorProphecy->reveal(),
+            new ReservedAttributeNameConverter(),
+            null,
+            [],
+            $resourceMetadataCollectionFactoryProphecy->reveal(),
+        );
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        $normalizer->normalize($dummy, ItemNormalizer::FORMAT);
+
+        $componentsCacheRef = new \ReflectionProperty(ItemNormalizer::class, 'componentsCache');
+        $this->assertSame([], $componentsCacheRef->getValue($normalizer), 'componentsCache must not be populated when a property has security set');
+    }
+
     public function testNormalizeCircularReference(): void
     {
         $circularReferenceEntity = new CircularReference();
@@ -146,7 +202,7 @@ class ItemNormalizerTest extends TestCase
         $resourceMetadataCollectionFactoryProphecy->create(CircularReference::class)->willReturn(new ResourceMetadataCollection('CircularReference'));
 
         $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
-        $propertyNameCollectionFactoryProphecy->create(CircularReference::class, [])->willReturn(new PropertyNameCollection());
+        $propertyNameCollectionFactoryProphecy->create(CircularReference::class, Argument::type('array'))->willReturn(new PropertyNameCollection());
 
         $normalizer = new ItemNormalizer(
             $propertyNameCollectionFactoryProphecy->reveal(),

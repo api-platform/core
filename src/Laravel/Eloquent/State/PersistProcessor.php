@@ -51,7 +51,7 @@ final class PersistProcessor implements ProcessorInterface
             if (BelongsTo::class === $relation['type'] || MorphTo::class === $relation['type']) {
                 $rel = $data->{$relation['name']};
 
-                if (!$rel->exists) {
+                if (!$rel->exists || $rel->isDirty()) {
                     $rel->save();
                 }
 

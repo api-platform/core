@@ -26,7 +26,6 @@ use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\Util\CompositeIdentifierParser;
 use ApiPlatform\Metadata\Util\TypeHelper;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
-use ApiPlatform\Serializer\CacheKeyTrait;
 use ApiPlatform\Serializer\ContextTrait;
 use ApiPlatform\Serializer\OperationResourceClassResolverInterface;
 use ApiPlatform\Serializer\TagCollectorInterface;
@@ -51,7 +50,6 @@ use Symfony\Component\TypeInfo\Type\ObjectType;
  */
 final class ItemNormalizer extends AbstractItemNormalizer
 {
-    use CacheKeyTrait;
     use ClassInfoTrait;
     use ContextTrait;
     use ItemNormalizerTrait {
@@ -59,6 +57,14 @@ final class ItemNormalizer extends AbstractItemNormalizer
     }
 
     public const FORMAT = 'jsonapi';
+
+    /**
+     * Denormalization context flag enabling client-generated IDs on POST per
+     * https://jsonapi.org/format/#crud-creating-client-ids. Off by default to
+     * avoid an id-spoofing footgun on public endpoints. Set in the context or
+     * via the bundle configuration ("api_platform.jsonapi.allow_client_generated_id").
+     */
+    public const ALLOW_CLIENT_GENERATED_ID = 'allow_client_generated_id';
 
     private array $componentsCache = [];
 
@@ -122,7 +128,7 @@ final class ItemNormalizer extends AbstractItemNormalizer
         $context['api_normalize'] = true;
 
         if (!isset($context['cache_key'])) {
-            $context['cache_key'] = $this->getCacheKey($format, $context);
+            $context['cache_key'] = $this->isCacheKeySafe($context) ? $this->getCacheKey($format, $context) : false;
         }
 
         $normalizedData = parent::normalize($data, $format, $context);
@@ -179,9 +185,6 @@ final class ItemNormalizer extends AbstractItemNormalizer
         return $document;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getAttributes(object $object, ?string $format = null, array $context = []): array
     {
         return $this->getComponents($object, $format, $context)['attributes'];

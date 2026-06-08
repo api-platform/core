@@ -11,6 +11,7 @@
 
 declare(strict_types=1);
 
+use ApiPlatform\Metadata\Operation\UnderscorePathSegmentNameGenerator;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
@@ -76,6 +77,18 @@ return [
         'enabled_parameter_name' => 'pagination',
         'items_per_page_parameter_name' => 'itemsPerPage',
         'partial_parameter_name' => 'partial',
+    ],
+
+    'jsonapi' => [
+        // When false, the JSON:API `data.id` uses the resource scalar identifier
+        // and a `data.links.self` IRI is added. When true (default), `data.id`
+        // is the resource IRI.
+        'use_iri_as_id' => true,
+
+        // Allow client-generated IDs on JSON:API POST per
+        // https://jsonapi.org/format/#crud-creating-client-ids. Off by default
+        // to avoid id spoofing on public endpoints.
+        'allow_client_generated_id' => false,
     ],
 
     'graphql' => [
@@ -149,9 +162,15 @@ return [
 
     // 'openapi' => [
     //     'tags' => [],
-        // ],
+    // ],
 
     'url_generation_strategy' => UrlGeneratorInterface::ABS_PATH,
+
+    // Class implementing PathSegmentNameGeneratorInterface used to derive route
+    // segments from resource short names (e.g. `ProductOrder` -> `product_orders`).
+    // Set to DashPathSegmentNameGenerator::class for dasherized segments
+    // (e.g. `product-orders`).
+    'path_segment_name_generator' => UnderscorePathSegmentNameGenerator::class,
 
     'serializer' => [
         'hydra_prefix' => false,
