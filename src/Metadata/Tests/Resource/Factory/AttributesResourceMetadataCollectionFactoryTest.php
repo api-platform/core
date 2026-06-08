@@ -34,6 +34,8 @@ use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeResource;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeResources;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ExtraPropertiesResource;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\PasswordResource;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ResourceClassPropagation;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ResourceClassPropagationTarget;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\SameNameDifferentMethodOperations;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\WithParameter;
 use ApiPlatform\Metadata\Tests\Fixtures\State\AttributeResourceProcessor;
@@ -312,6 +314,29 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertCount(2, $parameters);
         $parameters = $metadataCollection->getOperation('collection')->getParameters();
         $this->assertCount(3, $parameters);
+    }
+
+    /**
+     * Tests issue #7187: a `class` set on the `#[ApiResource]` attribute must propagate
+     * to the resource itself and to every cascaded operation; the factory must not
+     * overwrite the user-provided value with the PHP class name.
+     */
+    public function testCreatePropagatesExplicitResourceClass(): void
+    {
+        $factory = new AttributesResourceMetadataCollectionFactory();
+
+        $collection = $factory->create(ResourceClassPropagation::class);
+
+        $this->assertCount(1, $collection);
+        $resource = $collection[0];
+        $this->assertSame(ResourceClassPropagationTarget::class, $resource->getClass());
+
+        $operations = $resource->getOperations();
+        $this->assertNotNull($operations);
+        $this->assertGreaterThan(0, \count($operations));
+        foreach ($operations as $operation) {
+            $this->assertSame(ResourceClassPropagationTarget::class, $operation->getClass());
+        }
     }
 
     /**
