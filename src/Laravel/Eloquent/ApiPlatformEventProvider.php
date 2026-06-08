@@ -90,7 +90,7 @@ class ApiPlatformEventProvider extends ServiceProvider
             return new PurgeHttpCacheListener(
                 $app->make(PurgerInterface::class),
                 $app->make(IriConverterInterface::class),
-                $app->make(ResourceClassResolverInterface::class)
+                $app->make(ResourceClassResolverInterface::class),
             );
         });
     }
