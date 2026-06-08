@@ -47,6 +47,10 @@ use Doctrine\ORM\Mapping as ORM;
                 ),
                 'autocomplete' => new QueryParameter(filter: new FreeTextQueryFilter(new OrFilter(new ExactFilter())), properties: ['name', 'ean']),
                 'q' => new QueryParameter(filter: new FreeTextQueryFilter(new PartialSearchFilter()), properties: ['name', 'ean']),
+                'qmixed' => new QueryParameter(filter: new FreeTextQueryFilter([
+                    'name' => new OrFilter(new PartialSearchFilter()),
+                    'ean' => new OrFilter(new ExactFilter()),
+                ]), description: 'Partial name match or exact ean match'),
                 'ownerNamePartial' => new QueryParameter(
                     filter: new PartialSearchFilter(),
                     property: 'owner.name',

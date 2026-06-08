@@ -100,6 +100,23 @@ final class FreeTextQueryFilterTest extends ApiTestCase
         $this->assertCount(2, $response['member']);
     }
 
+    public function testFreeTextQueryFilterWithPerPropertyFilterMap(): void
+    {
+        $client = $this->createClient();
+
+        $response = $client->request('GET', '/chickens?qmixed=Henri')->toArray();
+        $this->assertJsonContains(['totalItems' => 1]);
+        $this->assertSame('Henriette', $response['member'][0]['name']);
+
+        $response = $client->request('GET', '/chickens?qmixed=978020137963')->toArray();
+        $this->assertJsonContains(['totalItems' => 1]);
+        $this->assertSame('978020137963', $response['member'][0]['ean']);
+
+        $response = $client->request('GET', '/chickens?qmixed=97802')->toArray();
+        $this->assertJsonContains(['totalItems' => 1]);
+        $this->assertSame('978020137962', $response['member'][0]['name']);
+    }
+
     public function testFreeTextQueryFilterWithTwoLevelTraversalPartialWithPropertyPlaceholder(): void
     {
         $client = $this->createClient();
