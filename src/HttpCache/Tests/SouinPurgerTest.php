@@ -150,4 +150,13 @@ class SouinPurgerTest extends TestCase
         self::assertSame(['Surrogate-Key' => 'first-value/, second'], $purger->getResponseHeaders(['first-value/', 'second']));
         self::assertSame(['Surrogate-Key' => 'C0mplex_Value/, The value with spaces'], $purger->getResponseHeaders(['C0mplex_Value/', 'The value with spaces']));
     }
+
+    public function testPurgeWithCustomHttpMethod(): void
+    {
+        $clientProphecy = $this->prophesize(HttpClientInterface::class);
+        $clientProphecy->request('DELETE', '', ['headers' => ['Surrogate-Key' => '/foo']])->shouldBeCalled();
+
+        $purger = new SouinPurger([$clientProphecy->reveal()], method: Request::METHOD_DELETE);
+        $purger->purge(['/foo']);
+    }
 }
