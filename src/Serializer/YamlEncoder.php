@@ -16,13 +16,14 @@ namespace ApiPlatform\Serializer;
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Encoder\YamlEncoder as BaseYamlEncoder;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * A YAML encoder with appropriate default options to embed the generated document into HTML.
  */
 final class YamlEncoder implements EncoderInterface, DecoderInterface
 {
-    public function __construct(private readonly string $format = 'yamlopenapi', private readonly EncoderInterface&DecoderInterface $yamlEncoder = new BaseYamlEncoder())
+    public function __construct(private readonly string $format = 'yamlopenapi', private readonly EncoderInterface&DecoderInterface $yamlEncoder = new BaseYamlEncoder(defaultContext: [BaseYamlEncoder::YAML_INDENTATION => 2]))
     {
     }
 
@@ -39,6 +40,11 @@ final class YamlEncoder implements EncoderInterface, DecoderInterface
      */
     public function encode($data, $format, array $context = []): string
     {
+        $context += [
+            BaseYamlEncoder::YAML_INLINE => 10,
+            BaseYamlEncoder::YAML_FLAGS => Yaml::DUMP_OBJECT_AS_MAP | Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE | Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK | Yaml::DUMP_NUMERIC_KEY_AS_STRING,
+        ];
+
         return $this->yamlEncoder->encode($data, $format, $context);
     }
 
