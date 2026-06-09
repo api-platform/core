@@ -68,6 +68,7 @@ cp node_modules/swagger-ui/dist/swagger-ui-standalone-preset.js "$dest"
 cp node_modules/swagger-ui/dist/swagger-ui.css "$dest"
 cp node_modules/swagger-ui/dist/swagger-ui.css.map "$dest"
 cp node_modules/swagger-ui/dist/oauth2-redirect.html "$dest"
+cp node_modules/swagger-ui/dist/oauth2-redirect.js "$dest"
 
 dest="${public}redoc/"
 if [[ -d "$dest" ]]; then
