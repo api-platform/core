@@ -56,15 +56,21 @@ final class StructuredContentProcessor implements ProcessorInterface
         $includeStructuredContent = $operation instanceof McpTool || $operation instanceof McpResource ? $operation->getStructuredContent() ?? true : false;
         $structuredContent = null;
 
-        if ($includeStructuredContent && $request && $this->serializer instanceof NormalizerInterface && $this->serializer instanceof EncoderInterface) {
+        if ($request && $this->serializer instanceof NormalizerInterface && $this->serializer instanceof EncoderInterface) {
             $serializerContext = $this->serializerContextBuilder->createFromRequest($request, true, [
                 'resource_class' => $class,
                 'operation' => $operation,
             ]);
             $serializerContext['uri_variables'] = $uriVariables;
             $format = $request->getRequestFormat('') ?: 'jsonld';
-            $structuredContent = $this->serializer->normalize($result, $format, $serializerContext);
-            $result = $this->serializer->encode($structuredContent, $format, $serializerContext);
+            $normalized = $this->serializer->normalize($result, $format, $serializerContext);
+            // The serialized payload is always exposed as the mandatory TextContent;
+            // only the optional structuredContent field depends on the flag.
+            $result = $this->serializer->encode($normalized, $format, $serializerContext);
+
+            if ($includeStructuredContent) {
+                $structuredContent = $normalized;
+            }
         }
 
         return new Response(
