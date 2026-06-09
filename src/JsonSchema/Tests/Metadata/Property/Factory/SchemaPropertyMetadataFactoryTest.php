@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonSchema\Tests\Metadata\Property\Factory;
 
 use ApiPlatform\JsonSchema\Metadata\Property\Factory\SchemaPropertyMetadataFactory;
+use ApiPlatform\JsonSchema\Schema;
+use ApiPlatform\JsonSchema\Tests\Fixtures\ApiResource\Dummy;
 use ApiPlatform\JsonSchema\Tests\Fixtures\DummyWithCustomOpenApiContext;
 use ApiPlatform\JsonSchema\Tests\Fixtures\DummyWithEnum;
 use ApiPlatform\JsonSchema\Tests\Fixtures\DummyWithMixed;
@@ -176,6 +178,39 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
         ];
 
         $this->assertEquals($expectedSchema, $apiProperty->getSchema());
+    }
+
+    /**
+     * A non-nullable relation to a resource class that is not a readable link is normally
+     * typed as an "iri-reference" string. But when the property declares "genId: false",
+     * the serializer embeds the related object instead of emitting an IRI
+     * (see AbstractItemNormalizer::normalizeRelation()). The output schema must reflect that
+     * embedding decision, otherwise the advertised schema (string) disagrees with the
+     * serialized payload (object).
+     *
+     * @see https://github.com/api-platform/core/issues/8271
+     */
+    public function testRelationWithGenIdFalseIsEmbeddedInOutputSchema(): void
+    {
+        if (!method_exists(\Symfony\Component\PropertyInfo\PropertyInfoExtractor::class, 'getType')) {
+            $this->markTestSkipped('This test only supports type-info component');
+        }
+
+        $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturn(true);
+
+        $apiProperty = (new ApiProperty(nativeType: Type::object(Dummy::class)))
+            ->withReadableLink(false)
+            ->withGenId(false);
+        $decorated = $this->createMock(PropertyMetadataFactoryInterface::class);
+        $decorated->expects($this->once())->method('create')->with(DummyWithEnum::class, 'relatedDummy')->willReturn($apiProperty);
+
+        $schemaPropertyMetadataFactory = new SchemaPropertyMetadataFactory($resourceClassResolver, $decorated);
+        $apiProperty = $schemaPropertyMetadataFactory->create(DummyWithEnum::class, 'relatedDummy');
+
+        // The schema must not type the embedded relation as an "iri-reference" string;
+        // it must defer to SchemaFactory so a "$ref" to the embedded subschema is built.
+        $this->assertSame(['type' => Schema::UNKNOWN_TYPE], $apiProperty->getSchema());
     }
 
     public function testMixed(): void

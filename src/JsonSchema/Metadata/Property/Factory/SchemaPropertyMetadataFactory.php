@@ -69,7 +69,17 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
             return $propertyMetadata;
         }
 
-        $link = (($options['schema_type'] ?? null) === Schema::TYPE_INPUT) ? $propertyMetadata->isWritableLink() : $propertyMetadata->isReadableLink();
+        $isInput = ($options['schema_type'] ?? null) === Schema::TYPE_INPUT;
+        $link = $isInput ? $propertyMetadata->isWritableLink() : $propertyMetadata->isReadableLink();
+
+        // On output, the serializer embeds a related resource (instead of emitting an IRI) as soon
+        // as "gen_id" is false, even when the relation is not a readable link (see
+        // AbstractItemNormalizer::normalizeRelation()). Mirror that here so the advertised schema
+        // does not type an embedded object as an "iri-reference" string.
+        if (!$isInput && false === $propertyMetadata->getGenId()) {
+            $link = true;
+        }
+
         $propertySchema = $propertyMetadata->getSchema() ?? [];
 
         if (null !== $propertyMetadata->getUriTemplate() || (!\array_key_exists('readOnly', $propertySchema) && false === $propertyMetadata->isWritable() && !$propertyMetadata->isInitializable())) {
