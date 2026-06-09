@@ -94,7 +94,7 @@ trait OperationDefaultsTrait
     {
         $resource = $resource
             ->withShortName($resource->getShortName() ?? $shortName)
-            ->withClass($resourceClass);
+            ->withClass($resource->getClass() ?? $resourceClass);
 
         return $this->addGlobalDefaults($resource);
     }
