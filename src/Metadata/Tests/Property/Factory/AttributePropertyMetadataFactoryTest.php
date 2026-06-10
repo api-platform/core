@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\Property\Factory\AttributePropertyMetadataFactory;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ConcreteTraitPropertyChild;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\DummyEnum;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\DummyWithApiPropertyAttributes;
 use PHPUnit\Framework\TestCase;
@@ -42,6 +43,15 @@ class AttributePropertyMetadataFactoryTest extends TestCase
 
         $metadata = $factory->create(DummyEnum::class, 'B');
         $this->assertSame('The B.', $metadata->getDescription());
+    }
+
+    public function testPrivateTraitPropertyAttributeIsReadFromAbstractParent(): void
+    {
+        $factory = new AttributePropertyMetadataFactory();
+
+        $metadata = $factory->create(ConcreteTraitPropertyChild::class, 'createdAt');
+
+        $this->assertFalse($metadata->isWritable());
     }
 
     public function testClassNotFound(): void
