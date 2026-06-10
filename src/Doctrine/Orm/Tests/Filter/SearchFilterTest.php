@@ -349,6 +349,11 @@ class SearchFilterTest extends DoctrineOrmFilterTestCase
                     ['name_p1_0' => 'partial'],
                     $filterFactory,
                 ],
+                'partial (case insensitive, with multibyte characters)' => [
+                    \sprintf('SELECT %s FROM %s %1$s WHERE LOWER(%1$s.name) LIKE LOWER(CONCAT(\'%%\', :name_p1_0, \'%%\'))', static::ALIAS, Dummy::class),
+                    ['name_p1_0' => 'biały'],
+                    $filterFactory,
+                ],
                 'partial (multiple values)' => [
                     \sprintf('SELECT %s FROM %s %1$s WHERE %1$s.name LIKE CONCAT(\'%%\', :name_p1_0, \'%%\') OR %1$s.name LIKE CONCAT(\'%%\', :name_p1_1, \'%%\')', static::ALIAS, Dummy::class),
                     [

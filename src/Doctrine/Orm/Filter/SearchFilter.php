@@ -300,7 +300,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 
             $queryBuilder
                 ->andWhere($queryBuilder->expr()->in($wrapCase($aliasedField), $valueParameter))
-                ->setParameter($valueParameter, $caseSensitive ? $values : array_map('strtolower', $values));
+                ->setParameter($valueParameter, $caseSensitive ? $values : array_map('mb_strtolower', $values));
 
             return;
         }
@@ -309,7 +309,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
         $parameters = [];
         foreach ($values as $key => $value) {
             $keyValueParameter = \sprintf('%s_%s', $valueParameter, $key);
-            $parameters[] = [$caseSensitive ? $value : strtolower($value), $keyValueParameter];
+            $parameters[] = [$caseSensitive ? $value : mb_strtolower($value), $keyValueParameter];
 
             $ors[] = match ($strategy) {
                 self::STRATEGY_PARTIAL => $queryBuilder->expr()->like(

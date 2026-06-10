@@ -273,6 +273,15 @@ trait SearchFilterTestTrait
                     'name' => 'partial',
                 ],
             ],
+            'partial (case insensitive, with multibyte characters)' => [
+                [
+                    'id' => null,
+                    'name' => 'ipartial',
+                ],
+                [
+                    'name' => 'BIAŁY',
+                ],
+            ],
             'partial (multiple values)' => [
                 [
                     'id' => null,
