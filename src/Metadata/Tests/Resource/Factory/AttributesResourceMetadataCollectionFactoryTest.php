@@ -33,6 +33,7 @@ use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeOnlyOperation;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeResource;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\AttributeResources;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ExtraPropertiesResource;
+use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\MutationDescription;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\PasswordResource;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ResourceClassPropagation;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\ResourceClassPropagationTarget;
@@ -337,6 +338,20 @@ class AttributesResourceMetadataCollectionFactoryTest extends TestCase
         foreach ($operations as $operation) {
             $this->assertSame(ResourceClassPropagationTarget::class, $operation->getClass());
         }
+    }
+
+    /**
+     * Tests issue #8285: an explicitly set GraphQL mutation description must be preserved;
+     * the generated "{name}s a {shortName}." text is only a fallback when none is provided.
+     */
+    public function testGraphQlMutationDescriptionIsNotOverwritten(): void
+    {
+        $factory = new AttributesResourceMetadataCollectionFactory(graphQlEnabled: true);
+
+        $graphQlOperations = $factory->create(MutationDescription::class)[0]->getGraphQlOperations();
+
+        $this->assertSame('My custom description.', $graphQlOperations['create']->getDescription());
+        $this->assertSame('Updates a MutationDescription.', $graphQlOperations['update']->getDescription());
     }
 
     /**
