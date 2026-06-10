@@ -202,7 +202,7 @@ trait OperationDefaultsTrait
                 throw new RuntimeException('No GraphQL operation name.');
             }
 
-            if ($operation instanceof Mutation) {
+            if ($operation instanceof Mutation && null === $operation->getDescription()) {
                 $operation = $operation->withDescription(ucfirst("{$operation->getName()}s a {$resource->getShortName()}."));
             }
 
