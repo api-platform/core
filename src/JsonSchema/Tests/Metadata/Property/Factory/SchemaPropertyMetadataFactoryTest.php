@@ -26,6 +26,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
 
@@ -181,18 +182,11 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
     }
 
     /**
-     * A non-nullable relation to a resource class that is not a readable link is normally
-     * typed as an "iri-reference" string. But when the property declares "genId: false",
-     * the serializer embeds the related object instead of emitting an IRI
-     * (see AbstractItemNormalizer::normalizeRelation()). The output schema must reflect that
-     * embedding decision, otherwise the advertised schema (string) disagrees with the
-     * serialized payload (object).
-     *
      * @see https://github.com/api-platform/core/issues/8271
      */
     public function testRelationWithGenIdFalseIsEmbeddedInOutputSchema(): void
     {
-        if (!method_exists(\Symfony\Component\PropertyInfo\PropertyInfoExtractor::class, 'getType')) {
+        if (!method_exists(PropertyInfoExtractor::class, 'getType')) { // @phpstan-ignore-line symfony/property-info 6.4 is still allowed and this may be true
             $this->markTestSkipped('This test only supports type-info component');
         }
 
@@ -208,8 +202,7 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
         $schemaPropertyMetadataFactory = new SchemaPropertyMetadataFactory($resourceClassResolver, $decorated);
         $apiProperty = $schemaPropertyMetadataFactory->create(DummyWithEnum::class, 'relatedDummy');
 
-        // The schema must not type the embedded relation as an "iri-reference" string;
-        // it must defer to SchemaFactory so a "$ref" to the embedded subschema is built.
+        // defers to SchemaFactory ($ref to embedded subschema) instead of an iri-reference string
         $this->assertSame(['type' => Schema::UNKNOWN_TYPE], $apiProperty->getSchema());
     }
 

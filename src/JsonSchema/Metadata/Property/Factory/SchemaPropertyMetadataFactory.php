@@ -70,11 +70,8 @@ final class SchemaPropertyMetadataFactory implements PropertyMetadataFactoryInte
         }
 
         $isInput = ($options['schema_type'] ?? null) === Schema::TYPE_INPUT;
-        $link = $isInput ? $propertyMetadata->isWritableLink() : $propertyMetadata->isReadableLink();
-
-        if (!$isInput && false === $propertyMetadata->getGenId()) {
-            $link = true;
-        }
+        // on output the serializer embeds the relation as soon as gen_id is false, even when it is not a readable link (see AbstractItemNormalizer::normalizeRelation())
+        $link = $isInput ? $propertyMetadata->isWritableLink() : ($propertyMetadata->isReadableLink() || false === $propertyMetadata->getGenId());
 
         $propertySchema = $propertyMetadata->getSchema() ?? [];
 
