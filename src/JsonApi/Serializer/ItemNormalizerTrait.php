@@ -62,7 +62,7 @@ trait ItemNormalizerTrait
                 if (!$allowClientGeneratedId) {
                     throw new NotNormalizableValueException(\sprintf('Client-generated IDs are not allowed on this operation. Set the "%s" denormalization context flag (or the bundle "allow_client_generated_id" configuration) to enable it.', ItemNormalizer::ALLOW_CLIENT_GENERATED_ID));
                 }
-                // Fall through: client id is merged into the denormalized payload below.
+            // Fall through: client id is merged into the denormalized payload below.
             } elseif (true !== ($context['api_allow_update'] ?? true)) {
                 throw new NotNormalizableValueException('Update is not allowed for this operation.');
             } else {
