@@ -164,6 +164,8 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                     break;
             }
 
+            $nullableIriDefinition = $nullableStringDefinition + ['format' => 'iri-reference'];
+
             $definitions[self::COLLECTION_BASE_SCHEMA_NAME_NO_PAGINATION] = [
                 'type' => 'object',
                 'properties' => [
@@ -210,22 +212,10 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                                     '@type' => [
                                         'type' => 'string',
                                     ],
-                                    $hydraPrefix.'first' => [
-                                        'type' => 'string',
-                                        'format' => 'iri-reference',
-                                    ],
-                                    $hydraPrefix.'last' => [
-                                        'type' => 'string',
-                                        'format' => 'iri-reference',
-                                    ],
-                                    $hydraPrefix.'previous' => [
-                                        'type' => 'string',
-                                        'format' => 'iri-reference',
-                                    ],
-                                    $hydraPrefix.'next' => [
-                                        'type' => 'string',
-                                        'format' => 'iri-reference',
-                                    ],
+                                    $hydraPrefix.'first' => $nullableIriDefinition,
+                                    $hydraPrefix.'last' => $nullableIriDefinition,
+                                    $hydraPrefix.'previous' => $nullableIriDefinition,
+                                    $hydraPrefix.'next' => $nullableIriDefinition,
                                 ],
                                 'example' => [
                                     '@id' => 'string',

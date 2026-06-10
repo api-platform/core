@@ -146,10 +146,16 @@ class SchemaFactoryTest extends TestCase
 
         $this->assertTrue(isset($properties['hydra:view']));
         $this->assertArrayHasKey('properties', $properties['hydra:view']);
-        $this->assertArrayHasKey('hydra:first', $properties['hydra:view']['properties']);
-        $this->assertArrayHasKey('hydra:last', $properties['hydra:view']['properties']);
-        $this->assertArrayHasKey('hydra:previous', $properties['hydra:view']['properties']);
-        $this->assertArrayHasKey('hydra:next', $properties['hydra:view']['properties']);
+        $viewProperties = $properties['hydra:view']['properties'];
+        $this->assertArrayHasKey('hydra:first', $viewProperties);
+        $this->assertArrayHasKey('hydra:last', $viewProperties);
+        $this->assertArrayHasKey('hydra:previous', $viewProperties);
+        $this->assertArrayHasKey('hydra:next', $viewProperties);
+
+        foreach (['hydra:first', 'hydra:last', 'hydra:previous', 'hydra:next'] as $viewLink) {
+            $this->assertSame(['string', 'null'], $viewProperties[$viewLink]['type'], \sprintf('"%s" must be nullable.', $viewLink));
+            $this->assertSame('iri-reference', $viewProperties[$viewLink]['format']);
+        }
 
         $forcedCollection = $this->schemaFactory->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_OUTPUT, null, null, null, true);
         $this->assertEquals($resultSchema['allOf'][0]['$ref'], $forcedCollection['allOf'][0]['$ref']);
