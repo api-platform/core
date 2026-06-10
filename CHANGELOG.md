@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.3.11
+
+### Notes
+
+* JSON-LD `PATCH`: an embedded `@id` on a nested writable relation now replaces the currently-linked relation when it points to a different resource. A dangling embedded `@id` now returns a 400 instead of being silently ignored (it previously mutated the existing relation in place). See #8274.
+
 ## v4.3.10
 
 ### Bug fixes
