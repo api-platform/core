@@ -24,6 +24,7 @@ use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\SingleFileConfigDummy;
 use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\User;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 
 /**
  * @author Vincent Chalamon <vincentchalamon@gmail.com>
@@ -573,6 +574,32 @@ class YamlExtractorTest extends TestCase
         $this->assertSame('is_granted("ROLE_ADMIN")', $resources[User::class][1]['security']);
         $this->assertArrayHasKey('operations', $resources[User::class][1]);
         $this->assertCount(1, $resources[User::class][1]['operations']);
+    }
+
+    public function testContainerParametersAreResolved(): void
+    {
+        $parameters = [
+            'user.class' => User::class,
+            'user.route_prefix' => '/admin',
+            'user.security' => 'is_granted("ROLE_ADMIN")',
+        ];
+        $container = $this->createStub(ContainerInterface::class);
+        $container->method('get')->willReturnCallback(static fn (string $id): string => $parameters[$id]);
+
+        $extractor = new YamlResourceExtractor([__DIR__.'/yaml/parameters.yaml'], $container);
+        $resources = $extractor->getResources();
+
+        $this->assertArrayHasKey(User::class, $resources);
+
+        // scalar string field: %param% resolved anywhere in the string
+        $this->assertSame('/admin', $resources[User::class][0]['routePrefix']);
+
+        // expression field, whole-string %param%: resolved to the stored expression so it reaches
+        // ExpressionLanguage (the literal #8104 case, which throws if left as "%user.security%")
+        $this->assertSame('is_granted("ROLE_ADMIN")', $resources[User::class][0]['security']);
+
+        // expression field with a real expression (no whole-string param): left untouched
+        $this->assertSame('is_granted("ROLE_USER")', $resources[User::class][0]['operations'][0]['security']);
     }
 
     #[DataProvider('getInvalidPaths')]
