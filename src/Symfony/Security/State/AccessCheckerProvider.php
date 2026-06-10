@@ -73,16 +73,17 @@ final class AccessCheckerProvider implements ProviderInterface
         if ($operation instanceof HttpOperation) {
             $request = $context['request'] ?? null;
 
+            // URI variables are exposed to the expression (e.g. is_granted('VIEW', user_id)); reserved keys below must win on collision.
             $resourceAccessCheckerContext = [
                 'object' => $body,
                 'previous_object' => $request?->attributes->get('previous_data'),
                 'request' => $request,
-            ];
+            ] + $uriVariables;
         } else {
             $resourceAccessCheckerContext = [
                 'object' => $body,
                 'previous_object' => $context['graphql_context']['previous_object'] ?? null,
-            ];
+            ] + $uriVariables;
         }
 
         // Skip pre_read optimization when object is used via granted (or usage is not predicatable)
