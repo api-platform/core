@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace ApiPlatform\JsonSchema\Tests\Metadata\Property\Factory;
 
 use ApiPlatform\JsonSchema\Metadata\Property\Factory\SchemaPropertyMetadataFactory;
+use ApiPlatform\JsonSchema\Schema;
+use ApiPlatform\JsonSchema\Tests\Fixtures\ApiResource\Dummy;
 use ApiPlatform\JsonSchema\Tests\Fixtures\DummyWithCustomOpenApiContext;
 use ApiPlatform\JsonSchema\Tests\Fixtures\DummyWithEnum;
 use ApiPlatform\JsonSchema\Tests\Fixtures\DummyWithMixed;
@@ -24,6 +26,7 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
 
@@ -176,6 +179,31 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
         ];
 
         $this->assertEquals($expectedSchema, $apiProperty->getSchema());
+    }
+
+    /**
+     * @see https://github.com/api-platform/core/issues/8271
+     */
+    public function testRelationWithGenIdFalseIsEmbeddedInOutputSchema(): void
+    {
+        if (!method_exists(PropertyInfoExtractor::class, 'getType')) { // @phpstan-ignore-line symfony/property-info 6.4 is still allowed and this may be true
+            $this->markTestSkipped('This test only supports type-info component');
+        }
+
+        $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturn(true);
+
+        $apiProperty = (new ApiProperty(nativeType: Type::object(Dummy::class)))
+            ->withReadableLink(false)
+            ->withGenId(false);
+        $decorated = $this->createMock(PropertyMetadataFactoryInterface::class);
+        $decorated->expects($this->once())->method('create')->with(DummyWithEnum::class, 'relatedDummy')->willReturn($apiProperty);
+
+        $schemaPropertyMetadataFactory = new SchemaPropertyMetadataFactory($resourceClassResolver, $decorated);
+        $apiProperty = $schemaPropertyMetadataFactory->create(DummyWithEnum::class, 'relatedDummy');
+
+        // defers to SchemaFactory ($ref to embedded subschema) instead of an iri-reference string
+        $this->assertSame(['type' => Schema::UNKNOWN_TYPE], $apiProperty->getSchema());
     }
 
     public function testMixed(): void
