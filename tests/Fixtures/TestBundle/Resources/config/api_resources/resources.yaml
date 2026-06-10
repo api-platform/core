@@ -109,3 +109,12 @@ resources:
             ApiPlatform\Metadata\GetCollection:
                 output: ApiPlatform\Tests\Fixtures\TestBundle\Dto\DummyIdCollectionDtoOutput
                 provider: ApiPlatform\Tests\Fixtures\TestBundle\State\DummyCollectionDtoProvider
+
+    ApiPlatform\Tests\Fixtures\TestBundle\Model\SecurityFromParameter:
+        security: '%app.security.admin_only%'
+        graphQlOperations: [ ]
+        operations:
+            ApiPlatform\Metadata\Get:
+                uriTemplate: /security_from_parameter/{id}
+                uriVariables: [id]
+                provider: 'ApiPlatform\Tests\Fixtures\TestBundle\Model\SecurityFromParameter::provide'

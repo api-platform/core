@@ -46,8 +46,13 @@ trait ResourceExtractorTrait
 
     /**
      * Transforms an attribute's value in a PHP value.
+     *
+     * Container parameters (%param%) found in plain string values are resolved against the
+     * service container. ExpressionLanguage fields (security, conditions, …) must opt out via
+     * $resolve = false so their %param% tokens reach the expression engine untouched, then route
+     * the raw value through resolveExpressionPlaceholder() to recover whole-string %param% refs.
      */
-    private function phpize(\SimpleXMLElement|array|null $resource, string $key, string $type, mixed $default = null): array|bool|int|string|null
+    private function phpize(\SimpleXMLElement|array|null $resource, string $key, string $type, mixed $default = null, bool $resolve = true): array|bool|int|string|null
     {
         if (!isset($resource[$key])) {
             return $default;
@@ -55,9 +60,11 @@ trait ResourceExtractorTrait
 
         switch ($type) {
             case 'bool|string':
-                return \is_bool($resource[$key]) || \in_array((string) $resource[$key], ['1', '0', 'true', 'false'], true) ? $this->phpize($resource, $key, 'bool') : $this->phpize($resource, $key, 'string');
+                return \is_bool($resource[$key]) || \in_array((string) $resource[$key], ['1', '0', 'true', 'false'], true) ? $this->phpize($resource, $key, 'bool') : $this->phpize($resource, $key, 'string', resolve: $resolve);
             case 'string':
-                return (string) $resource[$key];
+                $value = (string) $resource[$key];
+
+                return $resolve ? $this->resolve($value) : $value;
             case 'integer':
                 return (int) $resource[$key];
             case 'bool':
