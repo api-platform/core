@@ -222,7 +222,8 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
         $values = array_map($this->getIdFromValue(...), $values);
 
         $associationResourceClass = $metadata->getAssociationTargetClass($field);
-        $associationFieldIdentifier = $metadata->getIdentifierFieldNames()[0];
+        $associationMetadata = $this->getClassMetadata($associationResourceClass);
+        $associationFieldIdentifier = $associationMetadata->getIdentifierFieldNames()[0];
         $doctrineTypeField = $this->getDoctrineFieldType($associationFieldIdentifier, $associationResourceClass);
 
         if (!$this->hasValidValues($values, $doctrineTypeField)) {

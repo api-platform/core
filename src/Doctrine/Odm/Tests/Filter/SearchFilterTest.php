@@ -17,6 +17,7 @@ use ApiPlatform\Doctrine\Odm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Odm\Tests\DoctrineMongoDbOdmFilterTestCase;
 use ApiPlatform\Doctrine\Odm\Tests\Fixtures\CustomConverter;
 use ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document\Dummy;
+use ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document\DummyWithEmbeddedReference;
 use ApiPlatform\Doctrine\Odm\Tests\Fixtures\Document\RelatedDummy;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\IriConverterInterface;
@@ -35,6 +36,29 @@ class SearchFilterTest extends DoctrineMongoDbOdmFilterTestCase
 
     protected string $filterClass = SearchFilter::class;
     protected string $resourceClass = Dummy::class;
+
+    public function testApplyWithReferenceHeldByEmbeddedDocument(): void
+    {
+        $filter = self::buildSearchFilter($this, $this->managerRegistry, ['embeddedReferenceHolder.relatedDummy' => 'exact']);
+
+        $repository = $this->manager->getRepository(DummyWithEmbeddedReference::class);
+        $aggregationBuilder = $repository->createAggregationBuilder();
+
+        $context = ['filters' => ['embeddedReferenceHolder.relatedDummy' => '1']];
+        $filter->apply($aggregationBuilder, DummyWithEmbeddedReference::class, null, $context);
+
+        $this->assertEquals([
+            [
+                '$match' => [
+                    'embeddedReferenceHolder.relatedDummy' => [
+                        '$in' => [
+                            1,
+                        ],
+                    ],
+                ],
+            ],
+        ], $aggregationBuilder->getPipeline());
+    }
 
     public function testGetDescriptionDefaultFields(): void
     {
