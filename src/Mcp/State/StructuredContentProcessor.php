@@ -64,8 +64,6 @@ final class StructuredContentProcessor implements ProcessorInterface
             $serializerContext['uri_variables'] = $uriVariables;
             $format = $request->getRequestFormat('') ?: 'jsonld';
             $normalized = $this->serializer->normalize($result, $format, $serializerContext);
-            // The serialized payload is always exposed as the mandatory TextContent;
-            // only the optional structuredContent field depends on the flag.
             $result = $this->serializer->encode($normalized, $format, $serializerContext);
 
             if ($includeStructuredContent) {
