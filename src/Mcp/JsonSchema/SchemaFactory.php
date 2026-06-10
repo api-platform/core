@@ -146,6 +146,18 @@ final class SchemaFactory implements SchemaFactoryInterface
             }
         }
 
+        foreach (['oneOf', 'anyOf'] as $combinator) {
+            if (isset($node[$combinator]) && \is_array($node[$combinator])) {
+                foreach ($node[$combinator] as $i => $member) {
+                    $node[$combinator][$i] = self::resolveNode(
+                        $member instanceof \ArrayObject ? $member->getArrayCopy() : $member,
+                        $definitions,
+                        $resolving,
+                    );
+                }
+            }
+        }
+
         return $node;
     }
 }
