@@ -98,6 +98,7 @@ use ApiPlatform\Laravel\GraphQl\Controller\GraphiQlController;
 use ApiPlatform\Laravel\JsonApi\State\JsonApiProvider;
 use ApiPlatform\Laravel\Metadata\CachePropertyMetadataFactory;
 use ApiPlatform\Laravel\Metadata\CachePropertyNameCollectionMetadataFactory;
+use ApiPlatform\Laravel\Metadata\DumpedResourceCollectionMetadataFactory;
 use ApiPlatform\Laravel\Routing\IriConverter;
 use ApiPlatform\Laravel\Routing\Router as UrlGeneratorRouter;
 use ApiPlatform\Laravel\Routing\SkolemIriConverter;
@@ -400,6 +401,20 @@ class ApiPlatformProvider extends ServiceProvider
         // Parameter metadata factory with Laravel Eloquent support
         $this->app->extend(ResourceMetadataCollectionFactoryInterface::class, static function (ResourceMetadataCollectionFactoryInterface $inner, Application $app) {
             return new Metadata\Resource\Factory\ParameterResourceMetadataCollectionFactory($inner, $app->make(ModelMetadata::class), new \Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter());
+        });
+
+        // Outermost: serve the resource metadata from a dumped file so the app can boot without a
+        // live database. Skipped when APP_DEBUG is true so local development always recomputes fresh
+        // metadata (mirroring the 'array' cache choice).
+        $this->app->extend(ResourceMetadataCollectionFactoryInterface::class, static function (ResourceMetadataCollectionFactoryInterface $inner, Application $app) {
+            /** @var ConfigRepository $config */
+            $config = $app['config'];
+
+            if (true === $config->get('app.debug')) {
+                return $inner;
+            }
+
+            return new DumpedResourceCollectionMetadataFactory($inner, $config->get('api-platform.metadata_dump'));
         });
 
         $this->app->singleton(OperationMetadataFactory::class, static function (Application $app) {
@@ -1110,6 +1125,7 @@ class ApiPlatformProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 Console\InstallCommand::class,
+                Console\DumpMetadataCommand::class,
                 Console\Maker\MakeStateProcessorCommand::class,
                 Console\Maker\MakeStateProviderCommand::class,
                 Console\Maker\MakeFilterCommand::class,
