@@ -19,6 +19,8 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Crud;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\CrudOpenApiApiPlatformTag;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DummyWebhook;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6151\OverrideOpenApiResponses;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7064\DeprecatedPutUser;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7064\DeprecatedPutUserAction;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ParentAttribute;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AbstractDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CircularReference;
@@ -106,7 +108,31 @@ class OpenApiTest extends ApiTestCase
             WrappedResponseEntity::class,
             ParentAttribute::class,
             ChildAttribute::class,
+            DeprecatedPutUser::class,
+            DeprecatedPutUserAction::class,
         ];
+    }
+
+    public function testDeprecatedPutDoesNotLeakIntoNestedResourceSchema(): void
+    {
+        $response = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ]);
+
+        $json = $response->toArray();
+        $schemas = $json['components']['schemas'];
+
+        // The POST input schema of DeprecatedPutUserAction embeds DeprecatedPutUser.
+        $postRef = $json['paths']['/deprecated_put_user_actions']['post']['requestBody']['content']['application/ld+json']['schema']['$ref'] ?? null;
+        $this->assertNotNull($postRef, 'POST input schema ref is missing');
+
+        $postName = substr($postRef, \strlen('#/components/schemas/'));
+        $userRef = $schemas[$postName]['properties']['user']['$ref'] ?? null;
+        $this->assertNotNull($userRef, 'Nested user property schema ref is missing');
+
+        $userName = substr($userRef, \strlen('#/components/schemas/'));
+        $this->assertArrayHasKey($userName, $schemas, 'Nested DeprecatedPutUser schema is missing from components');
+        $this->assertArrayNotHasKey('deprecated', $schemas[$userName], 'Nested DeprecatedPutUser schema must not be marked deprecated because of the deprecated PUT operation');
     }
 
     public function testErrorsAreDocumented(): void
