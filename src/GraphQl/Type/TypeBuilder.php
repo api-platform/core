@@ -329,7 +329,8 @@ final class TypeBuilder implements ContextAwareTypeBuilderInterface
             'resolveField' => $this->defaultFieldResolver,
             'fields' => function () use ($resourceClass, $operation, $operationName, $resourceMetadataCollection, $input, $wrapData, $depth, $ioMetadata) {
                 if ($wrapData) {
-                    $queryNormalizationContext = $this->getQueryOperation($resourceMetadataCollection)?->getNormalizationContext() ?? [];
+                    $queryOperation = $this->getQueryOperation($resourceMetadataCollection);
+                    $queryNormalizationContext = $queryOperation?->getNormalizationContext() ?? [];
 
                     try {
                         $mutationNormalizationContext = $operation instanceof Mutation || $operation instanceof Subscription ? ($resourceMetadataCollection->getOperation($operationName)->getNormalizationContext() ?? []) : [];
@@ -339,6 +340,12 @@ final class TypeBuilder implements ContextAwareTypeBuilderInterface
                     // Use a new type for the wrapped object only if there is a specific normalization context for the mutation or the subscription.
                     // If not, use the query type in order to ensure the client cache could be used.
                     $useWrappedType = $queryNormalizationContext !== $mutationNormalizationContext;
+
+                    // The query type can only be reused when both operations produce the same output class.
+                    // A mutation declaring its own output class must expose that class on its payload.
+                    if (!$useWrappedType && ($operation->getOutput()['class'] ?? null) !== ($queryOperation?->getOutput()['class'] ?? null)) {
+                        $useWrappedType = true;
+                    }
 
                     $wrappedOperationName = $operationName;
 
