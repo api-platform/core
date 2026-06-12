@@ -138,6 +138,146 @@ class ItemProviderTest extends TestCase
         $this->assertEquals($returnObject, $dataProvider->provide($operation, ['ida' => 1, 'idb' => 2], $context));
     }
 
+    public function testGetItemWithFetchDataFalseOnSubresourceFiltersParentLink(): void
+    {
+        $reference = new Employee();
+
+        $classMetadataMock = $this->createMock(ClassMetadata::class);
+        $classMetadataMock->method('getIdentifierFieldNames')->willReturn(['id']);
+
+        $managerMock = $this->createMock(EntityManagerInterface::class);
+        $managerMock->method('getClassMetadata')->with(Employee::class)->willReturn($classMetadataMock);
+        $managerMock->expects($this->once())
+            ->method('getReference')
+            ->with(Employee::class, ['id' => 2])
+            ->willReturn($reference);
+
+        $managerRegistryMock = $this->createMock(ManagerRegistry::class);
+        $managerRegistryMock->method('getManagerForClass')->with(Employee::class)->willReturn($managerMock);
+
+        $operation = (new Get())->withUriVariables([
+            'companyId' => (new Link())->withFromClass(Company::class)->withToProperty('company'),
+            'id' => (new Link())->withFromClass(Employee::class)->withIdentifiers(['id']),
+        ])->withName('get')->withClass(Employee::class);
+
+        $dataProvider = new ItemProvider(
+            $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
+            $managerRegistryMock,
+        );
+
+        $this->assertSame($reference, $dataProvider->provide($operation, ['companyId' => 1, 'id' => 2], ['fetch_data' => false]));
+    }
+
+    public function testGetItemWithFetchDataFalseMapsRenamedIdentifierUriVariable(): void
+    {
+        $reference = new Employee();
+
+        $classMetadataMock = $this->createMock(ClassMetadata::class);
+        $classMetadataMock->method('getIdentifierFieldNames')->willReturn(['id']);
+
+        $managerMock = $this->createMock(EntityManagerInterface::class);
+        $managerMock->method('getClassMetadata')->with(Employee::class)->willReturn($classMetadataMock);
+        $managerMock->expects($this->once())
+            ->method('getReference')
+            ->with(Employee::class, ['id' => 2])
+            ->willReturn($reference);
+
+        $managerRegistryMock = $this->createMock(ManagerRegistry::class);
+        $managerRegistryMock->method('getManagerForClass')->with(Employee::class)->willReturn($managerMock);
+
+        // The identifier uriVariable is named "employeeId" while the entity's own identifier field is "id".
+        $operation = (new Get())->withUriVariables([
+            'companyId' => (new Link())->withFromClass(Company::class)->withToProperty('company'),
+            'employeeId' => (new Link())->withFromClass(Employee::class)->withIdentifiers(['id'])->withParameterName('employeeId'),
+        ])->withName('get')->withClass(Employee::class);
+
+        $dataProvider = new ItemProvider(
+            $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
+            $managerRegistryMock,
+        );
+
+        $this->assertSame($reference, $dataProvider->provide($operation, ['companyId' => 1, 'employeeId' => 2], ['fetch_data' => false]));
+    }
+
+    public function testGetItemWithFetchDataFalseFallsBackToQueryWhenOwnIdentifierMissing(): void
+    {
+        $returnObject = new \stdClass();
+
+        $queryMock = $this->createMock($this->getQueryClass());
+        $queryMock->method('getOneOrNullResult')->willReturn($returnObject);
+
+        $queryBuilderMock = $this->createMock(QueryBuilder::class);
+        $queryBuilderMock->method('getQuery')->willReturn($queryMock);
+        $queryBuilderMock->method('getRootAliases')->willReturn(['o']);
+
+        $classMetadataMock = $this->createMock(ClassMetadata::class);
+        $classMetadataMock->method('getIdentifierFieldNames')->willReturn(['id']);
+
+        $repositoryMock = $this->createMock(EntityRepository::class);
+        $repositoryMock->method('createQueryBuilder')->with('o')->willReturn($queryBuilderMock);
+
+        $managerMock = $this->createMock(EntityManagerInterface::class);
+        $managerMock->method('getClassMetadata')->willReturn($classMetadataMock);
+        $managerMock->method('getRepository')->willReturn($repositoryMock);
+        // Only the parent link is provided: the own identifier cannot be resolved to a reference,
+        // so we must fall back to the query that resolves the link instead of calling getReference().
+        $managerMock->expects($this->never())->method('getReference');
+
+        $managerRegistryMock = $this->createMock(ManagerRegistry::class);
+        $managerRegistryMock->method('getManagerForClass')->willReturn($managerMock);
+
+        $operation = (new Get())->withUriVariables([
+            'companyId' => (new Link())->withFromClass(Company::class)->withToProperty('company')->withIdentifiers(['id']),
+            'id' => (new Link())->withFromClass(Employee::class)->withIdentifiers(['id']),
+        ])->withName('get')->withClass(Employee::class);
+
+        $dataProvider = new ItemProvider(
+            $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
+            $managerRegistryMock,
+        );
+
+        $this->assertSame($returnObject, $dataProvider->provide($operation, ['companyId' => 1], ['fetch_data' => false]));
+    }
+
+    public function testGetItemWithFetchDataFalseFallsBackToQueryWhenIdentifierIsNotADoctrineIdentifier(): void
+    {
+        $returnObject = new \stdClass();
+
+        $queryMock = $this->createMock($this->getQueryClass());
+        $queryMock->method('getOneOrNullResult')->willReturn($returnObject);
+
+        $queryBuilderMock = $this->createMock(QueryBuilder::class);
+        $queryBuilderMock->method('getQuery')->willReturn($queryMock);
+        $queryBuilderMock->method('getRootAliases')->willReturn(['o']);
+
+        // The Doctrine identifier is "id" while the resource exposes "uuid" as its API identifier:
+        // getReference() cannot be built from "uuid", so we must fall back to the query.
+        $classMetadataMock = $this->createMock(ClassMetadata::class);
+        $classMetadataMock->method('getIdentifierFieldNames')->willReturn(['id']);
+
+        $repositoryMock = $this->createMock(EntityRepository::class);
+        $repositoryMock->method('createQueryBuilder')->with('o')->willReturn($queryBuilderMock);
+
+        $managerMock = $this->createMock(EntityManagerInterface::class);
+        $managerMock->method('getClassMetadata')->willReturn($classMetadataMock);
+        $managerMock->method('getRepository')->willReturn($repositoryMock);
+        $managerMock->expects($this->never())->method('getReference');
+
+        $managerRegistryMock = $this->createMock(ManagerRegistry::class);
+        $managerRegistryMock->method('getManagerForClass')->willReturn($managerMock);
+
+        $operation = (new Get())->withUriVariables([
+            'uuid' => (new Link())->withFromClass(Employee::class)->withIdentifiers(['uuid'])->withParameterName('uuid'),
+        ])->withName('get')->withClass(Employee::class);
+
+        $dataProvider = new ItemProvider(
+            $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
+            $managerRegistryMock,
+        );
+
+        $this->assertSame($returnObject, $dataProvider->provide($operation, ['uuid' => '61817181-0ecc-42fb-a6e7-d97f2ddcb344'], ['fetch_data' => false]));
+    }
+
     public function testQueryResultExtension(): void
     {
         $returnObject = new \stdClass();
