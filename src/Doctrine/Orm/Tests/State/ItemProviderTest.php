@@ -282,6 +282,7 @@ class ItemProviderTest extends TestCase
         $queryBuilderMock->expects($this->once())->method('setParameter')->with('id_p1', 1, Types::INTEGER);
 
         $employeeClassMetadataMock = $this->createMock(ClassMetadata::class);
+        $employeeClassMetadataMock->method('hasAssociation')->with('company')->willReturn(true);
         $employeeClassMetadataMock->method('getAssociationMapping')->with('company')->willReturn(
             class_exists(ManyToOneAssociationMapping::class) ?
                 new ManyToOneAssociationMapping('company', Employee::class, Company::class) :
