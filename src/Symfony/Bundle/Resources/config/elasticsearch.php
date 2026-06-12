@@ -46,6 +46,7 @@ return function (ContainerConfigurator $container) {
             service('serializer.mapping.class_discriminator_resolver')->ignoreOnInvalid(),
             null,
             '%api_platform.serializer.default_context%',
+            service('api_platform.metadata.property.metadata_factory'),
         ])
         ->tag('serializer.normalizer', ['priority' => -922]);
 
