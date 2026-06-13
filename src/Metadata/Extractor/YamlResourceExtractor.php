@@ -258,6 +258,14 @@ final class YamlResourceExtractor extends AbstractResourceExtractor
         if (\array_key_exists('parameters', $resource['openapi']) && \is_array($openapiParameters = $resource['openapi']['parameters'] ?? [])) {
             $parameters = [];
             foreach ($openapiParameters as $parameter) {
+                if (!isset($parameter['name'])) {
+                    throw new InvalidArgumentException('OpenAPI parameter is missing the required "name" key.');
+                }
+
+                if (!isset($parameter['in'])) {
+                    throw new InvalidArgumentException(\sprintf('OpenAPI parameter "%s" is missing the required "in" key.', $parameter['name']));
+                }
+
                 $parameters[] = new Parameter(
                     name: $parameter['name'],
                     in: $parameter['in'],
