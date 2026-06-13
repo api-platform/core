@@ -178,6 +178,13 @@ return [
     // we recommend using "file" or "acpu"
     'cache' => 'file',
 
+    // Path to a resource metadata file produced by `php artisan api-platform:metadata:dump`.
+    // When set (and APP_DEBUG is false), the metadata is read from this file at boot instead
+    // of being introspected from the database, allowing the app to boot without a live DB
+    // (e.g. during `docker build`, `composer install`, or static analysis in CI). Commit the
+    // file to VCS or bake it into your image. Leave null to disable.
+    'metadata_dump' => null,
+
     // MCP (Model Context Protocol) configuration
     'mcp' => [
         'enabled' => true,
