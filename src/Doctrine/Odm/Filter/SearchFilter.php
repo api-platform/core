@@ -276,6 +276,7 @@ final class SearchFilter extends AbstractFilter implements SearchFilterInterface
             self::STRATEGY_START => new Regex("^$quotedValue", $caseSensitive ? '' : 'i'),
             self::STRATEGY_END => new Regex("$quotedValue$", $caseSensitive ? '' : 'i'),
             self::STRATEGY_WORD_START => new Regex("(^$quotedValue.*|.*\s$quotedValue.*)", $caseSensitive ? '' : 'i'),
+            self::STRATEGY_PATTERN => throw new InvalidArgumentException(\sprintf('strategy %s is not implemented.', $strategy)),
             default => throw new InvalidArgumentException(\sprintf('strategy %s does not exist.', $strategy)),
         };
     }
