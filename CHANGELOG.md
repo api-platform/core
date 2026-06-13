@@ -1,5 +1,13 @@
 # Changelog
 
+## v4.2.26
+
+### Bug fixes
+
+* [6bcbeb2db](https://github.com/api-platform/core/commit/6bcbeb2dbee53db5bb9b4b8e343bffdf7732de1e) fix(serializer): validate IRI target class on relation denormalization
+
+
+
 ## v4.2.25
 
 ### Bug fixes
