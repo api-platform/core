@@ -1,0 +1,20 @@
+{
+  "mappings": {
+    "properties": {
+      "id": {
+        "type": "keyword"
+      },
+      "name": {
+        "type": "keyword"
+      },
+      "price": {
+        "type": "integer"
+      },
+      "releaseDate": {
+        "type": "date",
+        "format": "yyyy-MM-dd"
+      }
+    },
+    "dynamic": "strict"
+  }
+}
