@@ -1,5 +1,13 @@
 # Changelog
 
+## v4.3.12
+
+### Bug fixes
+
+* [6bcbeb2db](https://github.com/api-platform/core/commit/6bcbeb2dbee53db5bb9b4b8e343bffdf7732de1e) fix(serializer): validate IRI target class on relation denormalization
+* [6b1fe1e47](https://github.com/api-platform/core/commit/6b1fe1e472ecab58e50957a4d11000ea714b5364) fix(doctrine): guard unmapped relation links in ORM handleLinks (#8293)
+* [cc021e4fa](https://github.com/api-platform/core/commit/cc021e4fab36315384be23417b73bcf70a77f45c) fix(graphql): honor custom mutation output class in payload type (#8300)
+
 ## v4.3.11
 
 ### Bug fixes
