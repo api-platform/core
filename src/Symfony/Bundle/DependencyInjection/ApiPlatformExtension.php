@@ -61,6 +61,7 @@ use ApiPlatform\State\ApiResource\Error;
 use ApiPlatform\State\ParameterProviderInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\State\ResponseHeaderProviderInterface;
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRestrictionMetadataInterface;
 use ApiPlatform\Symfony\Validator\ValidationGroupsGeneratorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
@@ -229,6 +230,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             ->addTag('api_platform.uri_variables.transformer');
         $container->registerForAutoconfiguration(ParameterProviderInterface::class)
             ->addTag('api_platform.parameter_provider');
+        $container->registerForAutoconfiguration(ResponseHeaderProviderInterface::class)
+            ->addTag('api_platform.response_header_provider');
 
         $container->registerAttributeForAutoconfiguration(
             AsResourceMutator::class,
