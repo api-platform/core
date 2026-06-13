@@ -762,7 +762,14 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     private function getResourceFromIri(string $data, array $context, string $resourceClass): ?object
     {
         try {
-            return $this->iriConverter->getResourceFromIri($data, $context + ['fetch_data' => true]);
+            $item = $this->iriConverter->getResourceFromIri($data, $context + ['fetch_data' => true]);
+
+            // Type-confusion guard: declared relation class must match the IRI's resource.
+            if (!is_a($item, $resourceClass)) {
+                throw new InvalidArgumentException(\sprintf('The iri "%s" does not reference the correct resource.', $data));
+            }
+
+            return $item;
         } catch (ItemNotFoundException $e) {
             if (false === ($context['denormalize_throw_on_relation_not_found'] ?? true)) {
                 return null;
