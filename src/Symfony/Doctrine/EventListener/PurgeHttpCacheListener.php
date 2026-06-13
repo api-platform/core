@@ -80,6 +80,7 @@ final class PurgeHttpCacheListener
 
         foreach ($uow->getScheduledEntityInsertions() as $entity) {
             $this->gatherResourceAndItemTags($entity, false);
+            $this->gatherParentResourceTags($em, $entity);
             $this->gatherRelationTags($em, $entity);
         }
 
@@ -118,6 +119,25 @@ final class PurgeHttpCacheListener
                 $this->addTagForItem($entity);
             }
         } catch (OperationNotFoundException|InvalidArgumentException) {
+        }
+    }
+
+    private function gatherParentResourceTags(EntityManagerInterface $em, object $entity): void
+    {
+        $classMetadata = $em->getClassMetadata($entity::class);
+
+        if ($classMetadata->isInheritanceTypeNone()) {
+            return;
+        }
+
+        foreach ($classMetadata->parentClasses as $parentClass) {
+            if ($this->resourceClassResolver->isResourceClass($parentClass)) {
+                try {
+                    $iri = $this->iriConverter->getIriFromResource($parentClass, UrlGeneratorInterface::ABS_PATH, new GetCollection());
+                    $this->tags[$iri] = $iri;
+                } catch (OperationNotFoundException|InvalidArgumentException) {
+                }
+            }
         }
     }
 
