@@ -206,6 +206,59 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
         $this->assertSame(['type' => Schema::UNKNOWN_TYPE], $apiProperty->getSchema());
     }
 
+    /**
+     * A relation borne by a non-resource object (e.g. a raw Doctrine entity embedded as a readable link)
+     * is serialized by the standard object normalizer, which embeds the related resource regardless of its
+     * readableLink/genId. The output schema must embed it too, otherwise a strict client rejects the payload.
+     */
+    public function testRelationOnNonResourceParentIsEmbeddedInOutputSchema(): void
+    {
+        if (!method_exists(PropertyInfoExtractor::class, 'getType')) { // @phpstan-ignore-line symfony/property-info 6.4 is still allowed and this may be true
+            $this->markTestSkipped('This test only supports type-info component');
+        }
+
+        $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
+        // the parent (DummyWithEnum) is not a resource, the related class (Dummy) is
+        $resourceClassResolver->method('isResourceClass')->willReturnCallback(static fn (string $class): bool => Dummy::class === $class);
+
+        // not a readable link, gen_id left to its default: the relation would normally be an iri-reference string
+        $apiProperty = (new ApiProperty(nativeType: Type::object(Dummy::class)))
+            ->withReadableLink(false);
+        $decorated = $this->createMock(PropertyMetadataFactoryInterface::class);
+        $decorated->expects($this->once())->method('create')->with(DummyWithEnum::class, 'relatedDummy')->willReturn($apiProperty);
+
+        $schemaPropertyMetadataFactory = new SchemaPropertyMetadataFactory($resourceClassResolver, $decorated);
+        $apiProperty = $schemaPropertyMetadataFactory->create(DummyWithEnum::class, 'relatedDummy');
+
+        // defers to SchemaFactory ($ref to embedded subschema) instead of an iri-reference string
+        $this->assertSame(['type' => Schema::UNKNOWN_TYPE], $apiProperty->getSchema());
+    }
+
+    /**
+     * Counterpart to the non-resource case: a non-readable-link relation on a *resource* parent still follows
+     * readableLink and stays an iri-reference string — the non-resource guard must not widen to resources.
+     */
+    public function testRelationOnResourceParentStaysIriReference(): void
+    {
+        if (!method_exists(PropertyInfoExtractor::class, 'getType')) { // @phpstan-ignore-line symfony/property-info 6.4 is still allowed and this may be true
+            $this->markTestSkipped('This test only supports type-info component');
+        }
+
+        $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
+        // both the parent and the related class are resources
+        $resourceClassResolver->method('isResourceClass')->willReturn(true);
+
+        $apiProperty = (new ApiProperty(nativeType: Type::object(Dummy::class)))
+            ->withReadableLink(false);
+        $decorated = $this->createMock(PropertyMetadataFactoryInterface::class);
+        $decorated->expects($this->once())->method('create')->with(Dummy::class, 'relatedDummy')->willReturn($apiProperty);
+
+        $schemaPropertyMetadataFactory = new SchemaPropertyMetadataFactory($resourceClassResolver, $decorated);
+        $apiProperty = $schemaPropertyMetadataFactory->create(Dummy::class, 'relatedDummy');
+
+        $this->assertSame(['type' => 'string', 'format' => 'iri-reference', 'example' => 'https://example.com/'], $apiProperty->getSchema());
+    }
+
     public function testMixed(): void
     {
         if (!method_exists(PropertyInfoExtractor::class, 'getType')) { // @phpstan-ignore-line symfony/property-info 6.4 is still allowed and this may be true
