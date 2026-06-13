@@ -1,5 +1,13 @@
 # Changelog
 
+## v4.3.13
+
+### Bug fixes
+
+* [098d52766](https://github.com/api-platform/core/commit/098d527660a3c631b6639c7cd3c479b722959797) fix(elasticsearch): coerce document _id to declared int identifier type (#8296)
+* [20baa6180](https://github.com/api-platform/core/commit/20baa6180e585b0ca07c7879c474f555d070e20f) fix(openapi): throw clear error for openapi parameter missing name in yaml config (#8297)
+* [9e18fe013](https://github.com/api-platform/core/commit/9e18fe013e217ffafe7d84c1d134135627674f15) fix(jsonschema): embed relations of non-resource objects in output schema (#8294)
+
 ## v4.3.12
 
 ### Bug fixes
