@@ -99,6 +99,7 @@ use ApiPlatform\Laravel\JsonApi\State\JsonApiProvider;
 use ApiPlatform\Laravel\Metadata\CachePropertyMetadataFactory;
 use ApiPlatform\Laravel\Metadata\CachePropertyNameCollectionMetadataFactory;
 use ApiPlatform\Laravel\Metadata\DumpedResourceCollectionMetadataFactory;
+use ApiPlatform\Laravel\Metadata\MetadataDumpFingerprint;
 use ApiPlatform\Laravel\Routing\IriConverter;
 use ApiPlatform\Laravel\Routing\Router as UrlGeneratorRouter;
 use ApiPlatform\Laravel\Routing\SkolemIriConverter;
@@ -175,6 +176,7 @@ use ApiPlatform\State\SerializerContextBuilderInterface;
 use Http\Discovery\Psr17Factory;
 use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Database\Events\MigrationsEnded;
 use Illuminate\Foundation\Http\Events\RequestHandled;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Event;
@@ -414,7 +416,7 @@ class ApiPlatformProvider extends ServiceProvider
                 return $inner;
             }
 
-            return new DumpedResourceCollectionMetadataFactory($inner, $config->get('api-platform.metadata_dump'));
+            return new DumpedResourceCollectionMetadataFactory($inner, $config->get('api-platform.metadata_dump'), $app->make(LoggerInterface::class), $config->get('api-platform.resources') ?? []);
         });
 
         $this->app->singleton(OperationMetadataFactory::class, static function (Application $app) {
@@ -1498,6 +1500,41 @@ class ApiPlatformProvider extends ServiceProvider
             $this->app->make(SkolemIriConverter::class)->reset();
         });
 
+        // The schema can only be fingerprinted while the database is reachable, so detect schema
+        // drift against the dump right after a migration runs (warn-only — the dump is not rewritten).
+        $dumpPath = $config->get('api-platform.metadata_dump');
+        if (\is_string($dumpPath) && '' !== $dumpPath && true !== $config->get('app.debug')) {
+            Event::listen(MigrationsEnded::class, function () use ($dumpPath): void {
+                $this->warnIfDumpedSchemaIsStale($dumpPath);
+            });
+        }
+
         $this->loadRoutesFrom(__DIR__.'/routes/api.php');
+    }
+
+    private function warnIfDumpedSchemaIsStale(string $dumpPath): void
+    {
+        if (!is_file($dumpPath)) {
+            return;
+        }
+
+        $contents = file_get_contents($dumpPath);
+        if (false === $contents) {
+            return;
+        }
+
+        $data = unserialize($contents, ['allowed_classes' => true]);
+        if (!\is_array($data) || !\is_string($data['schema_fingerprint'] ?? null)) {
+            return;
+        }
+
+        $resourceClasses = $this->app->make(ResourceNameCollectionFactoryInterface::class)->create();
+        $current = MetadataDumpFingerprint::schema($resourceClasses, $this->app->make(ModelMetadata::class));
+
+        if ($current === $data['schema_fingerprint']) {
+            return;
+        }
+
+        $this->app->make(LoggerInterface::class)->warning('The API Platform metadata dump at "{path}" is stale: the database schema changed after migration. Run "php artisan api-platform:metadata:dump" to refresh it.', ['path' => $dumpPath]);
     }
 }

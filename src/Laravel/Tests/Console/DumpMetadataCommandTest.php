@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Laravel\Tests\Console;
 
 use ApiPlatform\Laravel\Metadata\DumpedResourceCollectionMetadataFactory;
+use ApiPlatform\Laravel\Metadata\MetadataDumpFingerprint;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
@@ -76,10 +77,15 @@ class DumpMetadataCommandTest extends TestCase
 
         $dumped = $this->readDump();
 
-        $this->assertArrayHasKey($classOne, $dumped);
-        $this->assertArrayHasKey($classTwo, $dumped);
-        $this->assertEquals($collectionOne, $dumped[$classOne]);
-        $this->assertEquals($collectionTwo, $dumped[$classTwo]);
+        $this->assertSame(MetadataDumpFingerprint::VERSION, $dumped['version']);
+        $this->assertIsString($dumped['resources_fingerprint']);
+        $this->assertIsString($dumped['schema_fingerprint']);
+
+        $metadata = $dumped['metadata'];
+        $this->assertArrayHasKey($classOne, $metadata);
+        $this->assertArrayHasKey($classTwo, $metadata);
+        $this->assertEquals($collectionOne, $metadata[$classOne]);
+        $this->assertEquals($collectionTwo, $metadata[$classTwo]);
     }
 
     public function testItRebuildsFromTheLiveSourceEvenWhenTheResolvedFactoryIsTheDumpedDecorator(): void
@@ -110,7 +116,7 @@ class DumpMetadataCommandTest extends TestCase
 
         $dumped = $this->readDump();
 
-        $this->assertEquals($fresh, $dumped[$class]);
+        $this->assertEquals($fresh, $dumped['metadata'][$class]);
     }
 
     private function runDump(): PendingCommand

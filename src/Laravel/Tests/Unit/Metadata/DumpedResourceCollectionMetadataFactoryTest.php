@@ -14,10 +14,12 @@ declare(strict_types=1);
 namespace ApiPlatform\Laravel\Tests\Unit\Metadata;
 
 use ApiPlatform\Laravel\Metadata\DumpedResourceCollectionMetadataFactory;
+use ApiPlatform\Laravel\Metadata\MetadataDumpFingerprint;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Workbench\App\Models\Book;
 
 class DumpedResourceCollectionMetadataFactoryTest extends TestCase
@@ -84,5 +86,70 @@ class DumpedResourceCollectionMetadataFactoryTest extends TestCase
         $factory = new DumpedResourceCollectionMetadataFactory($decorated, '/nonexistent/path/api_platform_metadata.meta');
 
         $this->assertSame($expected, $factory->create(Book::class));
+    }
+
+    public function testItServesABareMapDumpWithoutAnyStalenessWarning(): void
+    {
+        // Old (pre-fingerprint) dump format: a plain map with no envelope.
+        $dumped = new ResourceMetadataCollection(Book::class, [new ApiResource(shortName: 'Book')]);
+        file_put_contents($this->dumpPath, serialize([Book::class => $dumped]));
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->never())->method('warning');
+
+        $decorated = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $decorated->expects($this->never())->method('create');
+
+        $factory = new DumpedResourceCollectionMetadataFactory($decorated, $this->dumpPath, $logger, [__DIR__]);
+
+        $this->assertEquals($dumped, $factory->create(Book::class));
+    }
+
+    public function testItWarnsButStillServesTheDumpWhenResourceFilesChanged(): void
+    {
+        $dumped = new ResourceMetadataCollection(Book::class, [new ApiResource(shortName: 'Book')]);
+        file_put_contents($this->dumpPath, serialize($this->envelope([Book::class => $dumped], 'a-stale-fingerprint')));
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('warning');
+
+        $decorated = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $decorated->expects($this->never())->method('create');
+
+        $factory = new DumpedResourceCollectionMetadataFactory($decorated, $this->dumpPath, $logger, [__DIR__]);
+
+        // Dump is still served despite the staleness warning (no-DB boot must keep working).
+        $this->assertEquals($dumped, $factory->create(Book::class));
+    }
+
+    public function testItDoesNotWarnWhenTheResourceFingerprintMatches(): void
+    {
+        $dumped = new ResourceMetadataCollection(Book::class, [new ApiResource(shortName: 'Book')]);
+        $fingerprint = MetadataDumpFingerprint::resources([__DIR__]);
+        file_put_contents($this->dumpPath, serialize($this->envelope([Book::class => $dumped], $fingerprint)));
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->never())->method('warning');
+
+        $decorated = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+
+        $factory = new DumpedResourceCollectionMetadataFactory($decorated, $this->dumpPath, $logger, [__DIR__]);
+
+        $this->assertEquals($dumped, $factory->create(Book::class));
+    }
+
+    /**
+     * @param array<class-string, ResourceMetadataCollection> $metadata
+     *
+     * @return array{version: int, resources_fingerprint: string, schema_fingerprint: string, metadata: array<class-string, ResourceMetadataCollection>}
+     */
+    private function envelope(array $metadata, string $resourcesFingerprint): array
+    {
+        return [
+            'version' => MetadataDumpFingerprint::VERSION,
+            'resources_fingerprint' => $resourcesFingerprint,
+            'schema_fingerprint' => '',
+            'metadata' => $metadata,
+        ];
     }
 }

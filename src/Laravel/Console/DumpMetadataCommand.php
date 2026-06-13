@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Laravel\Console;
 
+use ApiPlatform\Laravel\Eloquent\Metadata\ModelMetadata;
 use ApiPlatform\Laravel\Metadata\DumpedResourceCollectionMetadataFactory;
+use ApiPlatform\Laravel\Metadata\MetadataDumpFingerprint;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use Illuminate\Console\Command;
@@ -35,6 +37,7 @@ final class DumpMetadataCommand extends Command
     public function __construct(
         private readonly ResourceNameCollectionFactoryInterface $resourceNameCollectionFactory,
         private readonly ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory,
+        private readonly ModelMetadata $modelMetadata,
     ) {
         parent::__construct();
     }
@@ -60,6 +63,16 @@ final class DumpMetadataCommand extends Command
             $metadata[$resourceClass] = $factory->create($resourceClass);
         }
 
+        // Fingerprints let the app detect a stale dump later: resources at boot (no DB),
+        // schema after a migration (DB up). Computed here while the live source is available.
+        $resourcePaths = config('api-platform.resources') ?? [];
+        $envelope = [
+            'version' => MetadataDumpFingerprint::VERSION,
+            'resources_fingerprint' => MetadataDumpFingerprint::resources($resourcePaths),
+            'schema_fingerprint' => MetadataDumpFingerprint::schema(array_keys($metadata), $this->modelMetadata),
+            'metadata' => $metadata,
+        ];
+
         $directory = \dirname($path);
         if (!is_dir($directory) && !mkdir($directory, 0o755, true) && !is_dir($directory)) {
             $this->error(\sprintf('Unable to create directory "%s".', $directory));
@@ -67,7 +80,7 @@ final class DumpMetadataCommand extends Command
             return self::FAILURE;
         }
 
-        if (false === file_put_contents($path, serialize($metadata))) {
+        if (false === file_put_contents($path, serialize($envelope))) {
             $this->error(\sprintf('Unable to write the metadata dump to "%s".', $path));
 
             return self::FAILURE;
