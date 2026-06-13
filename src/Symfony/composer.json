@@ -35,7 +35,7 @@
         "api-platform/jsonld": "^4.2.12",
         "api-platform/hydra": "^4.2.12",
         "api-platform/metadata": "^4.2.12",
-        "api-platform/serializer": "^4.2.12",
+        "api-platform/serializer": "^4.2.26",
         "api-platform/state": "^4.2.12",
         "api-platform/validator": "^4.2.12",
         "api-platform/openapi": "^4.2.12",
