@@ -35,7 +35,7 @@ final class CollectionAttributesTest extends ApiTestCase
         ]);
 
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json');
         $body = $response->toArray();
         $this->assertSame('/jsonapi_circular_references/1', $body['data']['id']);
         $this->assertSame('/jsonapi_circular_references/1', $body['data']['relationships']['parent']['data']['id']);

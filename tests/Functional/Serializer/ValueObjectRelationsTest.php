@@ -60,7 +60,7 @@ final class ValueObjectRelationsTest extends ApiTestCase
         );
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertJsonEquals(<<<'JSON'
 {
     "@context": "/contexts/VoDummyCar",
@@ -182,7 +182,7 @@ JSON);
         );
 
         $this->assertResponseStatusCodeSame(400);
-        $this->assertResponseHeaderSame('content-type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/problem+json');
         $this->assertStringContainsString('<http://www.w3.org/ns/hydra/error>; rel="http://www.w3.org/ns/json-ld#error"', self::getClient()->getResponse()->headers->get('link') ?? '');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
@@ -213,7 +213,7 @@ JSON);
         );
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertJsonEquals(<<<'JSON'
 {
     "@context": "/contexts/VoDummyCar",

@@ -313,7 +313,7 @@ final class RelationTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(400);
-        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json');
     }
 
     public function testPostRelationWithNotExistingIriReturns400(): void
@@ -326,7 +326,7 @@ final class RelationTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(400);
-        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json');
     }
 
     public function testInvalidIriReturns400(): void
@@ -339,7 +339,7 @@ final class RelationTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(400);
-        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json');
         $this->assertJsonContains(['detail' => 'Invalid IRI "certainly not an IRI".']);
     }
 
@@ -353,7 +353,7 @@ final class RelationTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(400);
-        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json');
         $linkHeader = $response->getHeaders(false)['link'][0] ?? '';
         $this->assertStringContainsString('<http://www.w3.org/ns/hydra/error>; rel="http://www.w3.org/ns/json-ld#error"', $linkHeader);
         $data = $response->toArray(false);

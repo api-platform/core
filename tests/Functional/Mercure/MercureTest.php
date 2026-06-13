@@ -81,7 +81,7 @@ final class MercureTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
 
         $updates = $hub->getUpdates();
         $this->assertCount(1, $updates);
@@ -114,7 +114,7 @@ final class MercureTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
 
         $updates = $hub->getUpdates();
         $this->assertCount(1, $updates);

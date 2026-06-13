@@ -85,7 +85,7 @@ final class MaxDepthTest extends ApiTestCase
             ],
         ]);
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/hal+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/hal+json');
         $body = $response->toArray();
         $this->assertArrayHasKey('_embedded', $body);
         $this->assertArrayHasKey('child', $body['_embedded']);

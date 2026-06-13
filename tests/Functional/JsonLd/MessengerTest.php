@@ -39,7 +39,7 @@ final class MessengerTest extends ApiTestCase
             'json' => ['var' => 'test'],
         ]);
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $body = $response->toArray();
         $this->assertSame('/contexts/MessengerWithInput', $body['@context']);
         $this->assertSame('/messenger_with_inputs/1', $body['@id']);

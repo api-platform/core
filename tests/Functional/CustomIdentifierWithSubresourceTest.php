@@ -58,7 +58,7 @@ final class CustomIdentifierWithSubresourceTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonEquals([
             '@context' => '/contexts/SlugParentDummy',
             '@id' => '/slug_parent_dummies/parent-dummy',
@@ -81,7 +81,7 @@ final class CustomIdentifierWithSubresourceTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonEquals([
             '@context' => '/contexts/SlugChildDummy',
             '@id' => '/slug_child_dummies/child-dummy',
@@ -99,7 +99,7 @@ final class CustomIdentifierWithSubresourceTest extends ApiTestCase
         self::createClient()->request('GET', '/slug_parent_dummies/parent-dummy/child_dummies');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonEquals([
             '@context' => '/contexts/SlugChildDummy',
             '@id' => '/slug_parent_dummies/parent-dummy/child_dummies',
@@ -124,7 +124,7 @@ final class CustomIdentifierWithSubresourceTest extends ApiTestCase
         self::createClient()->request('GET', '/slug_child_dummies/child-dummy/parent_dummy');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonEquals([
             '@context' => '/contexts/SlugParentDummy',
             '@id' => '/slug_child_dummies/child-dummy/parent_dummy',

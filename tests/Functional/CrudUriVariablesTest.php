@@ -110,7 +110,7 @@ final class CrudUriVariablesTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonEquals([
             '@context' => '/contexts/Employee',
             '@id' => '/companies/2/employees',
