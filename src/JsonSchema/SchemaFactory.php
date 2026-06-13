@@ -80,6 +80,14 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             return $schema;
         }
 
+        if ('input' === $type && !($operation?->canDeserialize() ?? true)) {
+            return $schema;
+        }
+
+        if ('output' === $type && !($operation?->canSerialize() ?? true)) {
+            return $schema;
+        }
+
         $validationGroups = $operation ? $this->getValidationGroups($operation) : [];
         $version = $schema->getVersion();
         $method = $operation instanceof HttpOperation ? $operation->getMethod() : 'GET';
