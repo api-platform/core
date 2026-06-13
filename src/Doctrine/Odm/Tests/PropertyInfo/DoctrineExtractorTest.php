@@ -271,6 +271,21 @@ class DoctrineExtractorTest extends TestCase
         yield ['notMapped', null];
     }
 
+    /**
+     * In ODM, a Field's `nullable` flag does not mean "may hold null" — it controls whether a null
+     * value is persisted as an explicit null key or the key is omitted from the document. Every ODM
+     * field can therefore receive null, so the extracted TypeInfo Type must permit null even when the
+     * mapping uses the default `nullable=false`. Otherwise PATCH {"field": null} is rejected with
+     * "The type of the ... attribute must be ..., NULL given." (issue #3746).
+     */
+    public function testExtractScalarFieldPermitsNull(): void
+    {
+        $type = $this->createExtractor()->getType(DoctrineDummy::class, 'string');
+
+        $this->assertNotNull($type);
+        $this->assertTrue($type->isNullable(), 'ODM scalar fields are always nullable; the extracted type must permit null.');
+    }
+
     public function testGetPropertiesCatchException(): void
     {
         $this->assertNull($this->createExtractor()->getProperties('Not\Exist'));
