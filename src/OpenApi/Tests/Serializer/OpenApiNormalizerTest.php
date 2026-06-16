@@ -37,6 +37,7 @@ use ApiPlatform\OpenApi\Model\Info;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use ApiPlatform\OpenApi\Model\Paths;
+use ApiPlatform\OpenApi\Model\Reference;
 use ApiPlatform\OpenApi\Model\Schema;
 use ApiPlatform\OpenApi\Model\Server;
 use ApiPlatform\OpenApi\OpenApi;
@@ -51,6 +52,9 @@ use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
+use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\TypeInfo\Type;
@@ -93,6 +97,33 @@ class OpenApiNormalizerTest extends TestCase
 
         $array = $normalizer->normalize($openApi);
         $this->assertCount(0, $array['components']['schemas']);
+    }
+
+    public function testNormalizeReferenceUsesDollarRef(): void
+    {
+        $openApi = new OpenApi(
+            new Info('My API', '1.0.0', 'An amazing API'),
+            [new Server('https://example.com')],
+            new Paths(),
+            new Components(responses: new \ArrayObject([
+                '401' => new Reference(ref: '#/components/responses/401'),
+            ]))
+        );
+
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $encoders = [new JsonEncoder()];
+        $normalizers = [new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory))];
+
+        $serializer = new Serializer($normalizers, $encoders);
+        $normalizers[0]->setSerializer($serializer);
+
+        $normalizer = new OpenApiNormalizer($normalizers[0]);
+
+        $array = $normalizer->normalize($openApi);
+
+        $this->assertArrayHasKey('$ref', $array['components']['responses']['401']);
+        $this->assertSame('#/components/responses/401', $array['components']['responses']['401']['$ref']);
+        $this->assertArrayNotHasKey('ref', $array['components']['responses']['401']);
     }
 
     public function testNormalize(): void

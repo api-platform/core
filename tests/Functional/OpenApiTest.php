@@ -21,6 +21,7 @@ use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DummyWebhook;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6151\OverrideOpenApiResponses;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7064\DeprecatedPutUser;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue7064\DeprecatedPutUserAction;
+use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue8143\ReferenceResponse;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ParentAttribute;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\AbstractDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\CircularReference;
@@ -110,7 +111,23 @@ class OpenApiTest extends ApiTestCase
             ChildAttribute::class,
             DeprecatedPutUser::class,
             DeprecatedPutUserAction::class,
+            ReferenceResponse::class,
         ];
+    }
+
+    public function testOpenApiReferenceInResponsesUsesDollarRef(): void
+    {
+        $response = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $json = $response->toArray();
+
+        $responses = $json['paths']['/issue8143_reference_response']['post']['responses'];
+        $this->assertArrayHasKey('$ref', $responses['401']);
+        $this->assertSame('#/components/responses/401', $responses['401']['$ref']);
+        $this->assertArrayNotHasKey('ref', $responses['401']);
     }
 
     public function testDeprecatedPutDoesNotLeakIntoNestedResourceSchema(): void
