@@ -65,6 +65,8 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
     {
         $schema = $schema ? clone $schema : new Schema();
 
+        $operationWasProvided = null !== $operation;
+
         if (!$this->isResourceClass($className)) {
             $operation = null;
             $inputOrOutputClass = $className;
@@ -130,7 +132,10 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
 
         // see https://github.com/json-schema-org/json-schema-spec/pull/737
-        if (Schema::VERSION_SWAGGER !== $version && $operation && $operation->getDeprecationReason()) {
+        // deprecation belongs to the operation/path, not to a resource shape embedded in another schema:
+        // a guessed operation under FORCE_SUBSCHEMA must not leak `deprecated` onto the sub-schema (see #7064)
+        if (Schema::VERSION_SWAGGER !== $version && $operation && $operation->getDeprecationReason()
+            && ($operationWasProvided || !($serializerContext[self::FORCE_SUBSCHEMA] ?? false))) {
             $definition['deprecated'] = true;
         }
 

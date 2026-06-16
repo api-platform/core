@@ -21,7 +21,7 @@ final class Components
 
     /**
      * @param \ArrayObject<string, Schema>|\ArrayObject<string, Reference>                                 $schemas
-     * @param \ArrayObject<string, Response>|\ArrayObject<string, Reference>                               $responses
+     * @param \ArrayObject<array-key, Response>|\ArrayObject<array-key, Reference>                         $responses
      * @param \ArrayObject<string, Parameter>|\ArrayObject<string, Reference>                              $parameters
      * @param \ArrayObject<string, Example>|\ArrayObject<string, Reference>                                $examples
      * @param \ArrayObject<string, RequestBody>|\ArrayObject<string, Reference>                            $requestBodies

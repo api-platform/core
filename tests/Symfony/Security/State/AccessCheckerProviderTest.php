@@ -38,6 +38,30 @@ class AccessCheckerProviderTest extends TestCase
         $accessChecker->provide($operation, [], []);
     }
 
+    public function testCheckAccessInjectsUriVariables(): void
+    {
+        $obj = new \stdClass();
+        $operation = new Get(class: DummyEntity::class, security: 'is_granted("USER_STATS_VIEW", user_id)');
+        $decorated = $this->createMock(ProviderInterface::class);
+        $decorated->method('provide')->willReturn($obj);
+        $resourceAccessChecker = $this->createMock(ResourceAccessCheckerInterface::class);
+        $resourceAccessChecker->expects($this->once())->method('isGranted')->with(DummyEntity::class, 'is_granted("USER_STATS_VIEW", user_id)', ['object' => $obj, 'previous_object' => null, 'request' => null, 'user_id' => 1])->willReturn(true);
+        $accessChecker = new AccessCheckerProvider($decorated, $resourceAccessChecker);
+        $accessChecker->provide($operation, ['user_id' => 1], []);
+    }
+
+    public function testReservedContextKeysWinOverUriVariables(): void
+    {
+        $obj = new \stdClass();
+        $operation = new Get(class: DummyEntity::class, security: 'object == null');
+        $decorated = $this->createMock(ProviderInterface::class);
+        $decorated->method('provide')->willReturn($obj);
+        $resourceAccessChecker = $this->createMock(ResourceAccessCheckerInterface::class);
+        $resourceAccessChecker->expects($this->once())->method('isGranted')->with(DummyEntity::class, 'object == null', ['object' => $obj, 'previous_object' => null, 'request' => null])->willReturn(true);
+        $accessChecker = new AccessCheckerProvider($decorated, $resourceAccessChecker);
+        $accessChecker->provide($operation, ['object' => 'should-not-shadow'], []);
+    }
+
     public function testCheckAccessWithEvent(): void
     {
         $obj = new \stdClass();

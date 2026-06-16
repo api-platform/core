@@ -46,6 +46,11 @@ parameters:
 		-
 			message: '#Symfony\\Component\\PropertyInfo\\Type#'
 			identifier: class.notFound
+		# mcp/sdk 0.6 renamed Mcp\Schema\Resource to ResourceDefinition; Loader resolves at runtime, only one exists per installed version
+		-
+			message: '#class Mcp\\Schema\\(Resource|ResourceDefinition) not found#'
+			identifier: class.notFound
+			path: src/Mcp/Capability/Registry/Loader.php
 		# False positives
 		-   message: '#Call to an undefined method Negotiation\\AcceptHeader::getType\(\).#'
 		-

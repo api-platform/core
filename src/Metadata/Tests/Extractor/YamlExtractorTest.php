@@ -536,6 +536,14 @@ class YamlExtractorTest extends TestCase
         $this->assertEquals('john-doe', $operation->getParameters()[0]->getExample());
     }
 
+    public function testOpenApiParameterWithoutNameThrowsClearException(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('OpenAPI parameter is missing the required "name" key');
+
+        (new YamlResourceExtractor([__DIR__.'/yaml/openapi-parameter-without-name.yaml']))->getResources();
+    }
+
     public function testInputAndOutputAreBooleans(): void
     {
         $extractor = new YamlResourceExtractor([__DIR__.'/yaml/input-and-output-are-booleans.yaml']);

@@ -70,6 +70,41 @@ class IriHelperTest extends TestCase
         $this->assertSame('//foo:bar@localhost:443/hello.json?foo=bar&bar=3&page=2#foo', IriHelper::createIri($parsed['parts'], $parsed['parameters'], 'page', 2., UrlGeneratorInterface::NET_PATH));
     }
 
+    public function testHelpersPreserveNestedArrayQueryParameters(): void
+    {
+        $parts = [
+            'path' => '/objects',
+            'query' => '',
+        ];
+        $parameters = [
+            'filters' => [
+                0 => ['a' => 'foo', 'b' => 'bar'],
+            ],
+        ];
+
+        $iri = IriHelper::createIri($parts, $parameters, 'page', 2.);
+
+        $this->assertSame('/objects?filters%5B0%5D%5Ba%5D=foo&filters%5B0%5D%5Bb%5D=bar&page=2', $iri);
+
+        $reparsed = IriHelper::parseIri($iri, 'page');
+        $this->assertSame($parameters, $reparsed['parameters']);
+    }
+
+    public function testHelpersCollapseSimpleListQueryParameters(): void
+    {
+        $parts = [
+            'path' => '/objects',
+            'query' => '',
+        ];
+        $parameters = [
+            'foo' => ['a', 'b'],
+        ];
+
+        $iri = IriHelper::createIri($parts, $parameters, 'page', 2.);
+
+        $this->assertSame('/objects?foo%5B%5D=a&foo%5B%5D=b&page=2', $iri);
+    }
+
     public function testParseIriWithInvalidUrl(): void
     {
         $this->expectException(InvalidArgumentException::class);

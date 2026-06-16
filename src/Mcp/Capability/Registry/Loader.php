@@ -24,6 +24,7 @@ use Mcp\Capability\Registry\Loader\LoaderInterface;
 use Mcp\Capability\RegistryInterface;
 use Mcp\Schema\Annotations;
 use Mcp\Schema\Resource;
+use Mcp\Schema\ResourceDefinition;
 use Mcp\Schema\Tool;
 use Mcp\Schema\ToolAnnotations;
 
@@ -77,8 +78,10 @@ final class Loader implements LoaderInterface
                     }
 
                     if ($mcp instanceof McpResource) {
+                        // mcp/sdk 0.6 renamed Mcp\Schema\Resource to ResourceDefinition; support both while symfony/mcp-bundle still pins ^0.5
+                        $resourceClass = class_exists(ResourceDefinition::class) ? ResourceDefinition::class : Resource::class;
                         $registry->registerResource(
-                            new Resource(
+                            new $resourceClass(
                                 uri: $mcp->getUri(),
                                 name: $mcp->getName(),
                                 description: $mcp->getDescription(),

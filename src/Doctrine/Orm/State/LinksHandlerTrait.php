@@ -88,6 +88,13 @@ trait LinksHandlerTrait
             $joinProperties = $doctrineClassMetadata->getIdentifierFieldNames();
 
             if ($link->getFromProperty() && !$link->getToProperty()) {
+                // The link was built from the property's native type (LinkFactory), but the
+                // property may not be a mapped Doctrine association (e.g. a transient,
+                // resource-typed self reference). There is nothing to join on, skip it.
+                if (!$fromClassMetadata->hasAssociation($link->getFromProperty())) {
+                    continue;
+                }
+
                 $joinAlias = $queryNameGenerator->generateJoinAlias('m');
                 $associationMapping = $fromClassMetadata->getAssociationMapping($link->getFromProperty()); // @phpstan-ignore-line
                 $relationType = $associationMapping['type'];

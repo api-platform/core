@@ -77,6 +77,20 @@ final class AttributePropertyMetadataFactory implements PropertyMetadataFactoryI
             }
         }
 
+        // Private properties declared in a trait used by a parent class (e.g. a Doctrine STI parent) are
+        // not exposed on the child's reflection, so walk the hierarchy to read the ApiProperty attribute.
+        $parentReflectionClass = $reflectionClass->getParentClass();
+        while ($parentReflectionClass) {
+            if ($parentReflectionClass->hasProperty($property)) {
+                $reflectionProperty = $parentReflectionClass->getProperty($property);
+                if ($attributes = $reflectionProperty->getAttributes(ApiProperty::class)) {
+                    return $this->createMetadata($attributes[0]->newInstance(), $parentPropertyMetadata);
+                }
+            }
+
+            $parentReflectionClass = $parentReflectionClass->getParentClass();
+        }
+
         foreach (array_merge(Reflection::ACCESSOR_PREFIXES, Reflection::MUTATOR_PREFIXES) as $prefix) {
             $methodName = $prefix.ucfirst($property);
             if (!$reflectionClass->hasMethod($methodName) && !$reflectionEnum?->hasMethod($methodName)) {

@@ -70,6 +70,9 @@ trait ItemNormalizerTrait
                     throw $e;
                 }
             }
+        } elseif (isset($data['@id']) && ($context['deep_object_to_populate'] ?? false)) {
+            // the object to populate is the relation currently linked to the parent, an explicit @id must replace it instead of mutating it in place
+            $context[AbstractItemNormalizer::OBJECT_TO_POPULATE] = $this->iriConverter->getResourceFromIri($data['@id'], $context + ['fetch_data' => true], $context['operation'] ?? null);
         }
 
         return parent::denormalize($data, $type, $format, $context);

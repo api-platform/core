@@ -94,7 +94,7 @@ trait OperationDefaultsTrait
     {
         $resource = $resource
             ->withShortName($resource->getShortName() ?? $shortName)
-            ->withClass($resourceClass);
+            ->withClass($resource->getClass() ?? $resourceClass);
 
         return $this->addGlobalDefaults($resource);
     }
@@ -202,7 +202,7 @@ trait OperationDefaultsTrait
                 throw new RuntimeException('No GraphQL operation name.');
             }
 
-            if ($operation instanceof Mutation) {
+            if ($operation instanceof Mutation && null === $operation->getDescription()) {
                 $operation = $operation->withDescription(ucfirst("{$operation->getName()}s a {$resource->getShortName()}."));
             }
 

@@ -420,6 +420,10 @@ services:
         decorates: api_platform.metadata.resource.metadata_collection_factory
         arguments: ['@ApiPlatform\Tests\Fixtures\TestBundle\Metadata\ProviderResourceMetadatatCollectionFactory.inner']
 
+    ApiPlatform\Tests\Fixtures\TestBundle\OpenApi\Issue8143ResponseComponentFactory:
+        decorates: api_platform.openapi.factory
+        arguments: ['@ApiPlatform\Tests\Fixtures\TestBundle\OpenApi\Issue8143ResponseComponentFactory.inner']
+
     app.related_dummy_resource.complex_sub_query_filter:
         class: ApiPlatform\Tests\Fixtures\TestBundle\Filter\ComplexSubQueryFilter
         arguments: ['@doctrine']
@@ -503,6 +507,11 @@ services:
 
     app.graphql.mutation_resolver.activity_log:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue6354\CreateActivityLogResolver'
+        tags:
+            - name: 'api_platform.graphql.resolver'
+
+    app.graphql.mutation_resolver.issue2754_sum:
+        class: 'ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue2754\SumResolver'
         tags:
             - name: 'api_platform.graphql.resolver'
 

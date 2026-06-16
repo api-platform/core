@@ -15,16 +15,21 @@ namespace ApiPlatform\Elasticsearch\Tests\Serializer;
 
 use ApiPlatform\Elasticsearch\Serializer\DocumentNormalizer;
 use ApiPlatform\Elasticsearch\Tests\Fixtures\Foo;
+use ApiPlatform\Elasticsearch\Tests\Fixtures\IntegerIdentified;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Operations;
+use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\TypeInfo\Type;
 
 final class DocumentNormalizerTest extends TestCase
 {
@@ -83,6 +88,41 @@ final class DocumentNormalizerTest extends TestCase
         $expectedFoo->setBar('Chaverot');
 
         self::assertEquals($expectedFoo, $normalizer->denormalize($document, Foo::class, DocumentNormalizer::FORMAT));
+    }
+
+    public function testDenormalizeCoercesIdentifierToDeclaredType(): void
+    {
+        $document = [
+            '_index' => 'test',
+            '_type' => '_doc',
+            '_id' => '1',
+            '_version' => 1,
+            'found' => true,
+            '_source' => [
+                'name' => 'Caroline',
+            ],
+        ];
+
+        $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactory->create(IntegerIdentified::class)->willReturn(new ResourceMetadataCollection(IntegerIdentified::class, [(new ApiResource())->withOperations(new Operations([new Get()]))]));
+
+        $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->create(IntegerIdentified::class, 'id')->willReturn((new ApiProperty())->withNativeType(Type::nullable(Type::int())));
+
+        // property_info is wired in production (elasticsearch.php), which makes the inner
+        // ObjectNormalizer enforce the declared "int" type on the id property: a raw string
+        // "_id" would be rejected.
+        $normalizer = new DocumentNormalizer(
+            $resourceMetadataFactory->reveal(),
+            propertyTypeExtractor: new ReflectionExtractor(),
+            propertyMetadataFactory: $propertyMetadataFactory->reveal(),
+        );
+
+        $item = $normalizer->denormalize($document, IntegerIdentified::class, DocumentNormalizer::FORMAT);
+
+        self::assertInstanceOf(IntegerIdentified::class, $item);
+        self::assertSame(1, $item->id);
+        self::assertSame('Caroline', $item->name);
     }
 
     public function testSupportsNormalization(): void

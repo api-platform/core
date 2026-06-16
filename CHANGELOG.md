@@ -1,5 +1,46 @@
 # Changelog
 
+## v4.3.13
+
+### Bug fixes
+
+* [098d52766](https://github.com/api-platform/core/commit/098d527660a3c631b6639c7cd3c479b722959797) fix(elasticsearch): coerce document _id to declared int identifier type (#8296)
+* [20baa6180](https://github.com/api-platform/core/commit/20baa6180e585b0ca07c7879c474f555d070e20f) fix(openapi): throw clear error for openapi parameter missing name in yaml config (#8297)
+* [9e18fe013](https://github.com/api-platform/core/commit/9e18fe013e217ffafe7d84c1d134135627674f15) fix(jsonschema): embed relations of non-resource objects in output schema (#8294)
+
+## v4.3.12
+
+### Bug fixes
+
+* [6bcbeb2db](https://github.com/api-platform/core/commit/6bcbeb2dbee53db5bb9b4b8e343bffdf7732de1e) fix(serializer): validate IRI target class on relation denormalization
+* [6b1fe1e47](https://github.com/api-platform/core/commit/6b1fe1e472ecab58e50957a4d11000ea714b5364) fix(doctrine): guard unmapped relation links in ORM handleLinks (#8293)
+* [cc021e4fa](https://github.com/api-platform/core/commit/cc021e4fab36315384be23417b73bcf70a77f45c) fix(graphql): honor custom mutation output class in payload type (#8300)
+
+## v4.3.11
+
+### Bug fixes
+
+* [2726085ae](https://github.com/api-platform/core/commit/2726085ae7fedaf758db89d0c5876d6d6921b222) fix(metadata): keep explicitly set GraphQL mutation description (#8286)
+* [4819b5f9f](https://github.com/api-platform/core/commit/4819b5f9f0a5b076aa4dc73f2f31aa3ed287a4e0) fix(metadata): metadata mutators for resource & operations with lower priority (#8273)
+* [6b8bd0a3d](https://github.com/api-platform/core/commit/6b8bd0a3d5a8660e1711bc7511531c95f3b86817) fix(metadata): read ApiProperty from trait private properties inherited via parent class (#8275)
+* [aced52dd0](https://github.com/api-platform/core/commit/aced52dd0bef5e37369e3f221fcb5a497f545a4c) fix(metadata): preserve nested array query parameters in IriHelper (#8278)
+* [c37e27079](https://github.com/api-platform/core/commit/c37e27079312fcd758f99c4f247726011787345a) fix(metadata): preserve explicit class on ApiResource when propagating defaults (#8262)
+* [c79045718](https://github.com/api-platform/core/commit/c79045718aafdfc282af1b8e29a3ffbff9e8d5e1) fix(jsonschema): embed genId:false relations in output schema (#8272)
+* [ce4f6c210](https://github.com/api-platform/core/commit/ce4f6c210cdf377e46602d236033b38062e89b5e) fix(jsonschema): don't leak operation deprecation onto sub-schemas (#8289)
+* [134bb5cd7](https://github.com/api-platform/core/commit/134bb5cd75dc8b405766f769263a62da606e160c) fix(jsonld): replace already-populated nested relation from embedded @id on patch (#8274)
+* [4b50a4edc](https://github.com/api-platform/core/commit/4b50a4edc3c753043bf824ec21a4a64ccf8c1cbd) fix(hydra): declare hydra:view links as nullable in json schema (#8277)
+* [78538aa90](https://github.com/api-platform/core/commit/78538aa902b4551e52c67f4d07b6ae3cb9fa9706) fix(mcp): resolve $ref inside oneOf/anyOf when flattening tool outputSchema (#8268)
+* [a8d4b00f5](https://github.com/api-platform/core/commit/a8d4b00f5a81b1cf98554c2cf3cd56ec5a04a03e) fix(mcp): always serialize payload into TextContent when structuredContent is disabled (#8270)
+* [1ffe0ada8](https://github.com/api-platform/core/commit/1ffe0ada88abb1f4418d3873258ab7f9314f07bf) fix(symfony): register http cache purgers independently of invalidation flag (#8260)
+* [81a1307fe](https://github.com/api-platform/core/commit/81a1307fee569690c9fb06017330dc3b8efffb7b) fix(symfony): expose uri variables in security expression context (#8279)
+* [d6fd5bfae](https://github.com/api-platform/core/commit/d6fd5bfae855a00dc950fd3465c66f88872b5d6b) fix(httpcache): allow custom http method on SouinPurger and SurrogateKeysPurger (#8259)
+* [b3b376225](https://github.com/api-platform/core/commit/b3b376225a7a091967e7474bda313971774d489e) fix(openapi): ship oauth2-redirect.js with swagger-ui assets (#8261)
+* [fb2062465](https://github.com/api-platform/core/commit/fb20624655f0aee856c4a122a6d5570002a11c5f) fix(swagger): improve dark mode button in swaggerUI (#8265)
+
+### Notes
+
+* JSON-LD `PATCH`: an embedded `@id` on a nested writable relation now replaces the currently-linked relation when it points to a different resource. A dangling embedded `@id` now returns a 400 instead of being silently ignored (it previously mutated the existing relation in place). See #8274.
+
 ## v4.3.10
 
 ### Bug fixes

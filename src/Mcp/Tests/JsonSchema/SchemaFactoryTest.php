@@ -371,4 +371,55 @@ class SchemaFactoryTest extends TestCase
         $this->assertArrayNotHasKey('type', $value);
         $this->assertSame([['type' => 'string'], ['type' => 'integer']], $value['anyOf']);
     }
+
+    /**
+     * @see https://github.com/api-platform/core/issues/8266
+     *
+     * A nullable embedded relation is emitted upstream as
+     * anyOf: [ {$ref: #/definitions/...}, {type: null} ]. The flattener drops the
+     * definitions block, so the $ref nested inside the anyOf must be resolved during
+     * recursion — otherwise it survives as a dangling reference.
+     */
+    public function testRefInsideAnyOfIsResolved(): void
+    {
+        $innerSchema = new Schema(Schema::VERSION_JSON_SCHEMA);
+        unset($innerSchema['$schema']);
+        $definitions = $innerSchema->getDefinitions();
+        $definitions['Root'] = new \ArrayObject([
+            'type' => 'object',
+            'properties' => [
+                'related' => new \ArrayObject([
+                    'anyOf' => [
+                        ['$ref' => '#/definitions/Related.jsonld'],
+                        ['type' => 'null'],
+                    ],
+                ]),
+            ],
+        ]);
+        $definitions['Related.jsonld'] = new \ArrayObject([
+            'type' => 'object',
+            'properties' => [
+                'name' => ['type' => 'string'],
+            ],
+        ]);
+        $innerSchema['$ref'] = '#/definitions/Root';
+
+        $inner = $this->createMock(SchemaFactoryInterface::class);
+        $inner->method('buildSchema')->willReturn($innerSchema);
+
+        $factory = new SchemaFactory($inner);
+        $result = $factory->buildSchema('App\\Dummy', 'jsonld');
+
+        $arr = $result->getArrayCopy();
+        $related = $arr['properties']['related'];
+
+        // The $ref member must be resolved to its target object, leaving no dangling reference.
+        $this->assertArrayNotHasKey('$ref', $related['anyOf'][0]);
+        $this->assertSame('object', $related['anyOf'][0]['type']);
+        $this->assertSame(['name' => ['type' => 'string']], $related['anyOf'][0]['properties']);
+
+        // The nullable member is left untouched and the anyOf keeps no spurious type fallback.
+        $this->assertSame(['type' => 'null'], $related['anyOf'][1]);
+        $this->assertArrayNotHasKey('type', $related);
+    }
 }

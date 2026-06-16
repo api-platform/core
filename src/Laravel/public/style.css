@@ -16,6 +16,9 @@ html {
   --apip-block-border: #ccc;
   --apip-block-shadow: 0 1px 3px rgba(0, 0, 0, .12), 0 1px 2px rgba(0, 0, 0, .24);
   --apip-tag-hover: rgba(0, 0, 0, .1);
+  --apip-btn-background: #f7f7f7;
+  --apip-btn-hover-background: rgba(65, 68, 78, .1);
+  --apip-btn-hover-border: transparent;
 }
 
 html.dark-mode {
@@ -24,6 +27,9 @@ html.dark-mode {
   --apip-block-border: #545d61;
   --apip-block-shadow: 0 0 3px rgba(0, 0, 0, .19);
   --apip-tag-hover: rgba(255, 255, 255, .06);
+  --apip-btn-background: transparent;
+  --apip-btn-hover-background: rgba(255, 255, 255, .08);
+  --apip-btn-hover-border: currentColor;
 }
 
 body {
@@ -308,12 +314,12 @@ header #logo img {
 #swagger-ui.api-platform .btn {
   transition: all ease .2s;
   box-shadow: none;
-  background-color: #f7f7f7
+  background-color: var(--apip-btn-background)
 }
 
 #swagger-ui.api-platform .btn:hover {
-  background-color: rgba(65, 68, 78, .1);
-  border-color: transparent;
+  background-color: var(--apip-btn-hover-background);
+  border-color: var(--apip-btn-hover-border);
 }
 
 #swagger-ui.api-platform .btn.cancel:hover {
@@ -351,6 +357,13 @@ header #logo img {
 #swagger-ui.api-platform textarea:focus,
 #swagger-ui.api-platform button:focus {
   outline: none;
+}
+
+/** KEYBOARD FOCUS RING ON BUTTONS **/
+
+#swagger-ui.api-platform .btn:focus-visible {
+  outline: 2px solid #3caab5;
+  outline-offset: 2px;
 }
 
 /** USE OPEN SANS FONT **/

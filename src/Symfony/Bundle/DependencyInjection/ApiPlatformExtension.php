@@ -30,6 +30,7 @@ use ApiPlatform\GraphQl\Resolver\MutationResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryCollectionResolverInterface;
 use ApiPlatform\GraphQl\Resolver\QueryItemResolverInterface;
 use ApiPlatform\GraphQl\Type\Definition\TypeInterface as GraphQlTypeInterface;
+use ApiPlatform\HttpCache\PurgerInterface;
 use ApiPlatform\JsonApi\Serializer\ItemNormalizer as JsonApiItemNormalizer;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\AsOperationMutator;
@@ -875,6 +876,13 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
     {
         $loader->load('http_cache.php');
 
+        // Concrete purger services are always registered when the http-cache package is present,
+        // so userland can decorate or inject them even when invalidation is disabled (#8095).
+        // The invalidation listener, the AddTagsProcessor and the HTTP-client wiring stay gated below.
+        if (interface_exists(PurgerInterface::class)) {
+            $loader->load('http_cache_purger.php');
+        }
+
         if (!$this->isConfigEnabled($container, $config['http_cache']['invalidation'])) {
             return;
         }
@@ -884,7 +892,6 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         }
 
         $loader->load('state/http_cache_purger.php');
-        $loader->load('http_cache_purger.php');
 
         foreach ($config['http_cache']['invalidation']['scoped_clients'] as $client) {
             $definition = $container->getDefinition($client);

@@ -66,14 +66,6 @@ return function (ContainerConfigurator $container) {
             '%api_platform.defaults%',
         ]);
 
-    $services->set('api_platform.metadata.resource.metadata_collection_factory.mutator', MutatorResourceMetadataCollectionFactory::class)
-        ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 800)
-        ->args([
-            service('api_platform.metadata.mutator_collection.resource'),
-            service('api_platform.metadata.mutator_collection.operation'),
-            service('api_platform.metadata.resource.metadata_collection_factory.mutator.inner'),
-        ]);
-
     $services->set('api_platform.metadata.resource.metadata_collection_factory.concerns', ConcernsResourceMetadataCollectionFactory::class)
         ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 800)
         ->args([
@@ -115,6 +107,14 @@ return function (ContainerConfigurator $container) {
             service('api_platform.metadata.resource.link_factory'),
             service('api_platform.metadata.resource.metadata_collection_factory.link.inner'),
             '%api_platform.graphql.enabled%',
+        ]);
+
+    $services->set('api_platform.metadata.resource.metadata_collection_factory.mutator', MutatorResourceMetadataCollectionFactory::class)
+        ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 400)
+        ->args([
+            service('api_platform.metadata.mutator_collection.resource'),
+            service('api_platform.metadata.mutator_collection.operation'),
+            service('api_platform.metadata.resource.metadata_collection_factory.mutator.inner'),
         ]);
 
     $services->set('api_platform.metadata.resource.metadata_collection_factory.operation_name', OperationNameResourceMetadataCollectionFactory::class)
