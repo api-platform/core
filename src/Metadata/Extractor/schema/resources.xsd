@@ -46,6 +46,7 @@
         <xsd:attribute type="xsd:boolean" name="serialize"/>
         <xsd:attribute type="xsd:boolean" name="openapi"/>
         <xsd:attribute type="xsd:positiveInteger" name="priority"/>
+        <xsd:attribute type="xsd:integer" name="routePriority"/>
         <xsd:attribute type="xsd:string" name="name"/>
         <xsd:attribute type="xsd:string" name="itemUriTemplate"/>
         <xsd:attribute type="xsd:string" name="routeName"/>
