@@ -30,7 +30,7 @@ return function (ContainerConfigurator $container) {
     $services = $container->services();
 
     $services->set('api_platform.openapi.normalizer', OpenApiNormalizer::class)
-        ->args([inline_service(Serializer::class)->arg(0, [inline_service(ObjectNormalizer::class)->arg(0, null)->arg(1, null)->arg(2, service('api_platform.property_accessor'))->arg(3, service('api_platform.property_info'))])->arg(1, [service('serializer.encoder.json')])])
+        ->args([inline_service(Serializer::class)->arg(0, [inline_service(ObjectNormalizer::class)->arg(0, service('serializer.mapping.class_metadata_factory'))->arg(1, service('serializer.name_converter.metadata_aware'))->arg(2, service('api_platform.property_accessor'))->arg(3, service('api_platform.property_info'))])->arg(1, [service('serializer.encoder.json')])])
         ->tag('serializer.normalizer', ['priority' => -795]);
 
     $services->alias(OpenApiNormalizer::class, 'api_platform.openapi.normalizer');

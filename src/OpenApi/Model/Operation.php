@@ -18,8 +18,8 @@ final class Operation
     use ExtensionTrait;
 
     /**
-     * @param ?string[]   $tags
-     * @param ?Response[] $responses
+     * @param ?string[]                                 $tags
+     * @param array<array-key, Response|Reference>|null $responses
      */
     public function __construct(private ?string $operationId = null, private ?array $tags = null, private ?array $responses = null, private ?string $summary = null, private ?string $description = null, private ?ExternalDocumentation $externalDocs = null, private ?array $parameters = null, private ?RequestBody $requestBody = null, private ?\ArrayObject $callbacks = null, private ?bool $deprecated = null, private ?array $security = null, private ?array $servers = null, array $extensionProperties = [])
     {
