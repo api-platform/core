@@ -59,28 +59,19 @@ class JsonApiJsonSchemaTest extends ApiTestCase
     {
         $speciesSchema = $this->schemaFactory->buildSchema(Issue6317::class, 'jsonapi', Schema::TYPE_OUTPUT);
         $this->assertEquals('#/definitions/Issue6317.jsonapi', $speciesSchema['$ref']);
-        $this->assertEquals([
-            'properties' => [
-                'data' => [
-                    'type' => 'object',
-                    'properties' => [
-                        'id' => [
-                            'type' => 'string',
-                        ],
-                        'type' => [
-                            'type' => 'string',
-                        ],
-                        'attributes' => [
-                            '$ref' => '#/definitions/Issue6317',
-                        ],
-                    ],
-                    'required' => [
-                        'type',
-                        'id',
-                    ],
-                ],
-            ],
-        ], $speciesSchema['definitions']['Issue6317.jsonapi']);
+        $data = $speciesSchema['definitions']['Issue6317.jsonapi']['properties']['data'];
+        $this->assertSame('object', $data['type']);
+        $this->assertSame(['type' => 'string'], $data['properties']['id']);
+        $this->assertSame(['type' => 'string'], $data['properties']['type']);
+        $this->assertSame(['type', 'id'], $data['required']);
+
+        $attributes = $data['properties']['attributes'];
+        $this->assertArrayNotHasKey('$ref', $attributes);
+        $this->assertSame('object', $attributes['type']);
+        $this->assertEqualsCanonicalizing(
+            ['name', 'value', '_id', 'ordinal', 'cardinal'],
+            array_keys($attributes['properties'])
+        );
     }
 
     public function testJsonApiIncludesSchemaForQuestion(): void
@@ -150,7 +141,7 @@ class JsonApiJsonSchemaTest extends ApiTestCase
                                             'type' => 'string',
                                         ],
                                         'attributes' => [
-                                            '$ref' => '#/definitions/Species',
+                                            'type' => 'object',
                                         ],
                                     ],
                                     'required' => [
