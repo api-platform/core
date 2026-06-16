@@ -282,6 +282,23 @@ class ApiLoaderTest extends TestCase
         $this->assertNotNull($routeCollection->get('api_genid'));
     }
 
+    public function testApiLoaderRegistersOperationPriorityOnTheRoute(): void
+    {
+        $path = '/dummies/{id}.{_format}';
+
+        $resourceCollection = new ResourceMetadataCollection(Dummy::class, [
+            (new ApiResource())->withShortName('dummy')->withOperations(new Operations([
+                'api_dummies_get_item' => (new Get())->withUriTemplate($path)->withPriority(10),
+                'api_dummies_get_collection' => (new GetCollection())->withUriTemplate('/dummies.{_format}'),
+            ])),
+        ]);
+
+        $routeCollection = $this->getApiLoaderWithResourceMetadataCollection($resourceCollection)->load(null);
+
+        $this->assertSame(10, $routeCollection->getPriority('api_dummies_get_item'));
+        $this->assertNull($routeCollection->getPriority('api_dummies_get_collection'));
+    }
+
     public function testApiLoaderWithUndefinedControllerService(): void
     {
         $this->expectExceptionObject(new \RuntimeException('Operation "api_dummies_my_undefined_controller_method_item" is defining an unknown service as controller "Foo\\Bar\\MyUndefinedController". Make sure it is properly registered in the dependency injection container.'));

@@ -126,7 +126,7 @@ final class ApiLoader extends Loader
                         $operation->getCondition() ?? ''
                     );
 
-                    $routeCollection->add($operationName, $route);
+                    $routeCollection->add($operationName, $route, $operation->getPriority() ?? 0);
                 }
             }
         }
