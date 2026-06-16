@@ -71,7 +71,6 @@ class LoaderTest extends TestCase
                     return true;
                 }),
                 Loader::HANDLER,
-                true,
             );
 
         $loader = new Loader($nameCollectionFactory, $metadataCollectionFactory, $schemaFactory);
@@ -114,7 +113,6 @@ class LoaderTest extends TestCase
                     return true;
                 }),
                 Loader::HANDLER,
-                true,
             );
 
         $loader = new Loader($nameCollectionFactory, $metadataCollectionFactory, $schemaFactory);
@@ -154,7 +152,6 @@ class LoaderTest extends TestCase
                     return true;
                 }),
                 Loader::HANDLER,
-                true,
             );
 
         $loader = new Loader($nameCollectionFactory, $metadataCollectionFactory, $schemaFactory);
