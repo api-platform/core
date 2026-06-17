@@ -23,7 +23,6 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface
 use Mcp\Capability\Registry\Loader\LoaderInterface;
 use Mcp\Capability\RegistryInterface;
 use Mcp\Schema\Annotations;
-use Mcp\Schema\Resource;
 use Mcp\Schema\ResourceDefinition;
 use Mcp\Schema\Tool;
 use Mcp\Schema\ToolAnnotations;
@@ -73,15 +72,12 @@ final class Loader implements LoaderInterface
                                 outputSchema: $outputSchema,
                             ),
                             self::HANDLER,
-                            true,
                         );
                     }
 
                     if ($mcp instanceof McpResource) {
-                        // mcp/sdk 0.6 renamed Mcp\Schema\Resource to ResourceDefinition; support both while symfony/mcp-bundle still pins ^0.5
-                        $resourceClass = class_exists(ResourceDefinition::class) ? ResourceDefinition::class : Resource::class;
                         $registry->registerResource(
-                            new $resourceClass(
+                            new ResourceDefinition(
                                 uri: $mcp->getUri(),
                                 name: $mcp->getName(),
                                 description: $mcp->getDescription(),
@@ -92,7 +88,6 @@ final class Loader implements LoaderInterface
                                 meta: $mcp->getMeta()
                             ),
                             self::HANDLER,
-                            true,
                         );
                     }
                 }

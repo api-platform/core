@@ -142,7 +142,7 @@
         "jangregor/phpstan-prophecy": "^2.1.11",
         "justinrainbow/json-schema": "^6.5.2",
         "laravel/framework": "^11.0 || ^12.0 || ^13.0",
-        "mcp/sdk": ">=0.4 <1.0",
+        "mcp/sdk": "^0.6",
         "orchestra/testbench": "^10.9 || ^11.0",
         "phpspec/prophecy-phpunit": "^2.2",
         "phpstan/extension-installer": "^1.1",
