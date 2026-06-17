@@ -20,6 +20,8 @@ use ApiPlatform\Doctrine\Orm\Filter\FreeTextQueryFilter;
 use ApiPlatform\Doctrine\Orm\Filter\IriFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrFilter;
 use ApiPlatform\Doctrine\Orm\Filter\PartialSearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\StartSearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\WordStartSearchFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -55,6 +57,20 @@ use Doctrine\ORM\Mapping as ORM;
                     filter: new EndSearchFilter(true),
                     property: 'name',
                 ),
+                'nameStart' => new QueryParameter(
+                    filter: new StartSearchFilter(),
+                    property: 'name',
+                ),
+                'nameStartNoProperty' => new QueryParameter(filter: new StartSearchFilter()),
+                'nameStartSensitive' => new QueryParameter(
+                    filter: new StartSearchFilter(true),
+                    property: 'name',
+                ),
+                'nameWordStart' => new QueryParameter(
+                    filter: new WordStartSearchFilter(),
+                    property: 'name',
+                ),
+                'nameWordStartNoProperty' => new QueryParameter(filter: new WordStartSearchFilter()),
                 'autocomplete' => new QueryParameter(filter: new FreeTextQueryFilter(new OrFilter(new ExactFilter())), properties: ['name', 'ean']),
                 'q' => new QueryParameter(filter: new FreeTextQueryFilter(new PartialSearchFilter()), properties: ['name', 'ean']),
                 'qmixed' => new QueryParameter(filter: new FreeTextQueryFilter([
