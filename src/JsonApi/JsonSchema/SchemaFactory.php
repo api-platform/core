@@ -63,6 +63,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
                 'format' => 'iri-reference',
             ],
         ],
+        'required' => ['type', 'id'],
     ];
     private const PROPERTY_PROPS = [
         'id' => [
@@ -321,7 +322,10 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
                     $refs[$this->getSchemaUriPrefix($schema->getVersion()).$definitionName] = '$ref';
                 }
-                $relatedDefinitions[$propertyName] = array_flip($refs);
+                // keep one entry per related definition: a polymorphic relation targets several resource classes, all of which may appear in "included"
+                foreach (array_keys($refs) as $ref) {
+                    $relatedDefinitions[$ref] = ['$ref' => $ref];
+                }
                 if ($isOne) {
                     $relationships[$propertyName]['properties']['data'] = [
                         'oneOf' => [
