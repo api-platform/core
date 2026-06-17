@@ -26,8 +26,6 @@ use Doctrine\ORM\QueryBuilder;
 
 /**
  * @author Vincent Amstoutz <vincent.amstoutz.dev@gmail.com>
- *
- * @experimental
  */
 final class OrFilter implements FilterInterface, OpenApiParameterFilterInterface, ManagerRegistryAwareInterface, LoggerAwareInterface
 {
