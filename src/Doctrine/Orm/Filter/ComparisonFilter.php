@@ -30,8 +30,6 @@ use Doctrine\ORM\QueryBuilder;
 
 /**
  * Decorates an equality filter (ExactFilter, UuidFilter) to add comparison operators (gt, gte, lt, lte).
- *
- * @experimental
  */
 final class ComparisonFilter implements FilterInterface, OpenApiParameterFilterInterface, JsonSchemaFilterInterface, ManagerRegistryAwareInterface, LoggerAwareInterface
 {
