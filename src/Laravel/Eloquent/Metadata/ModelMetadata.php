@@ -28,16 +28,6 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 final class ModelMetadata
 {
     /**
-     * @var array<class-string, array<string, mixed>>
-     */
-    private $attributesLocalCache = [];
-
-    /**
-     * @var array<class-string, array<string, mixed>>
-     */
-    private $relationsLocalCache = [];
-
-    /**
      * The methods that can be called in a model to indicate a relation.
      *
      * @var string[]
@@ -56,8 +46,15 @@ final class ModelMetadata
         'morphedByMany',
     ];
 
-    public function __construct(private NameConverterInterface $relationNameConverter = new CamelCaseToSnakeCaseNameConverter())
-    {
+    /**
+     * @param array<class-string, array<string, mixed>> $attributes seeds the attribute cache, e.g. from a dump produced by api-platform:metadata:dump, so the app can boot without a database
+     * @param array<class-string, array<string, mixed>> $relations  seeds the relation cache for the same reason
+     */
+    public function __construct(
+        private NameConverterInterface $relationNameConverter = new CamelCaseToSnakeCaseNameConverter(),
+        private array $attributes = [],
+        private array $relations = [],
+    ) {
     }
 
     /**
@@ -67,8 +64,8 @@ final class ModelMetadata
      */
     public function getAttributes(Model $model): array
     {
-        if (isset($this->attributesLocalCache[$model::class])) {
-            return $this->attributesLocalCache[$model::class];
+        if (isset($this->attributes[$model::class])) {
+            return $this->attributes[$model::class];
         }
 
         $connection = $model->getConnection();
@@ -112,7 +109,7 @@ final class ModelMetadata
             return $result;
         }
 
-        return $this->attributesLocalCache[$model::class] = $result;
+        return $this->attributes[$model::class] = $result;
     }
 
     /**
@@ -194,8 +191,8 @@ final class ModelMetadata
      */
     public function getRelations(Model $model): array
     {
-        if (isset($this->relationsLocalCache[$model::class])) {
-            return $this->relationsLocalCache[$model::class];
+        if (isset($this->relations[$model::class])) {
+            return $this->relations[$model::class];
         }
 
         $relations = [];
@@ -254,7 +251,7 @@ final class ModelMetadata
             ];
         }
 
-        return $this->relationsLocalCache[$model::class] = $relations;
+        return $this->relations[$model::class] = $relations;
     }
 
     /**
