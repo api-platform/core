@@ -19,7 +19,9 @@ use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterInterface;
 use ApiPlatform\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Doctrine\Orm\PropertyHelperTrait as OrmPropertyHelperTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
 use ApiPlatform\Metadata\Exception\RuntimeException;
+use ApiPlatform\Metadata\FilterInterface as MetadataFilterInterface;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -27,6 +29,9 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
+/**
+ * @deprecated since API Platform 4.4, implement {@see MetadataFilterInterface} directly together with {@see BackwardCompatibleFilterDescriptionTrait} and the canonical QueryParameter-based filters (ExactFilter, PartialSearchFilter, EndSearchFilter, ComparisonFilter, OrFilter, …) instead; this class is removed in 6.0
+ */
 abstract class AbstractFilter implements FilterInterface, PropertyAwareFilterInterface, ManagerRegistryAwareInterface, NameConverterAwareInterface
 {
     use OrmPropertyHelperTrait;
