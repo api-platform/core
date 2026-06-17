@@ -20,6 +20,8 @@ use ApiPlatform\Doctrine\Odm\Filter\FreeTextQueryFilter;
 use ApiPlatform\Doctrine\Odm\Filter\IriFilter;
 use ApiPlatform\Doctrine\Odm\Filter\OrFilter;
 use ApiPlatform\Doctrine\Odm\Filter\PartialSearchFilter;
+use ApiPlatform\Doctrine\Odm\Filter\StartSearchFilter;
+use ApiPlatform\Doctrine\Odm\Filter\WordStartSearchFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -55,6 +57,20 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
                     filter: new EndSearchFilter(true),
                     property: 'name',
                 ),
+                'nameStart' => new QueryParameter(
+                    filter: new StartSearchFilter(false),
+                    property: 'name',
+                ),
+                'nameStartNoProperty' => new QueryParameter(filter: new StartSearchFilter()),
+                'nameStartSensitive' => new QueryParameter(
+                    filter: new StartSearchFilter(true),
+                    property: 'name',
+                ),
+                'nameWordStart' => new QueryParameter(
+                    filter: new WordStartSearchFilter(false),
+                    property: 'name',
+                ),
+                'nameWordStartNoProperty' => new QueryParameter(filter: new WordStartSearchFilter()),
                 'autocomplete' => new QueryParameter(filter: new FreeTextQueryFilter(new OrFilter(new ExactFilter())), properties: ['name', 'ean']),
                 'q' => new QueryParameter(filter: new FreeTextQueryFilter(new PartialSearchFilter()), properties: ['name', 'ean']),
                 'qmixed' => new QueryParameter(filter: new FreeTextQueryFilter([
