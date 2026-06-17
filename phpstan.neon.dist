@@ -83,7 +83,6 @@ parameters:
 			path: src/GraphQl/Tests/Type/TypesContainerTest.php
 
 		# Expected, due to backward compatibility
-		- '#Method GraphQL\\Type\\Definition\\WrappingType::getWrappedType\(\) invoked with 1 parameter, 0 required\.#'
 		- '#Access to an undefined property GraphQL\\Type\\Definition\\NamedType&GraphQL\\Type\\Definition\\Type::\$name\.#'
 		- "#Call to function method_exists\\(\\) with 'Symfony\\\\\\\\Component\\\\\\\\PropertyInfo\\\\\\\\PropertyInfoExtractor' and 'getType' will always evaluate to true\\.#"
 		- "#Call to function method_exists\\(\\) with 'Symfony\\\\\\\\Component\\\\\\\\HttpFoundation\\\\\\\\Request' and 'getContentTypeFormat' will always evaluate to true\\.#"
