@@ -75,12 +75,12 @@ class DumpedMetadataBootTest extends TestCase
     {
         // The canned dump written in setUp() carries no fingerprint, so it never matches the
         // current migrations and must be reported as stale.
-        Log::spy();
+        Log::shouldReceive('warning')
+            ->once()
+            ->withArgs(static fn (string $message): bool => str_contains($message, 'stale'));
         $this->app->forgetInstance(ModelMetadata::class);
 
         $this->app->make(ModelMetadata::class);
-
-        Log::shouldHaveReceived('warning')->withArgs(static fn (string $message): bool => str_contains($message, 'stale'))->once();
     }
 
     public function testItDoesNotWarnWhenTheFingerprintMatches(): void
@@ -91,12 +91,10 @@ class DumpedMetadataBootTest extends TestCase
             'relations' => [Book::class => self::CANNED_RELATIONS],
         ]));
 
-        Log::spy();
+        Log::shouldReceive('warning')->never();
         $this->app->forgetInstance(ModelMetadata::class);
 
         $this->app->make(ModelMetadata::class);
-
-        Log::shouldNotHaveReceived('warning');
     }
 
     public function testItIsNotSeededWhenDebugIsEnabled(): void
