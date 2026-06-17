@@ -98,7 +98,7 @@ final class AccessCheckerProvider implements ProviderInterface
         }
 
         if (!$this->resourceAccessChecker->isGranted($operation->getClass(), $isGranted, $resourceAccessCheckerContext)) {
-            $operation instanceof GraphQlOperation ? throw new AccessDeniedHttpException($message ?? 'Access Denied.') : throw new AccessDeniedException($message ?? 'Access Denied.');
+            $operation instanceof GraphQlOperation ? throw new AccessDeniedHttpException($message ?? 'Access Denied.') : throw new AccessDeniedException($message ?? 'Access Denied.', null, 403, false);
         }
 
         return 'pre_read' === $this->event ? $this->decorated->provide($operation, $uriVariables, $context) : $body;
