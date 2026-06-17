@@ -258,7 +258,6 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         unset($schema['type']);
 
         $properties = $this->buildDefinitionPropertiesSchema($key, $className, $format, $type, $operation, $schema, []);
-        $properties['data']['properties']['attributes']['$ref'] = $prefix.$key;
 
         $properties['data'] = [
             'type' => 'array',
@@ -347,9 +346,8 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
             $attributes[$propertyName] = $property;
         }
 
-        $currentRef = $this->getSchemaUriPrefix($schema->getVersion()).$schema->getRootDefinitionKey();
         $replacement = self::PROPERTY_PROPS;
-        $replacement['attributes'] = ['$ref' => $currentRef];
+        $replacement['attributes']['properties'] = $attributes;
 
         $included = [];
         if (\count($relationships) > 0) {

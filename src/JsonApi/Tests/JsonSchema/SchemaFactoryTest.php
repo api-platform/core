@@ -15,9 +15,11 @@ namespace ApiPlatform\JsonApi\Tests\JsonSchema;
 
 use ApiPlatform\JsonApi\JsonSchema\SchemaFactory;
 use ApiPlatform\JsonApi\Tests\Fixtures\Dummy;
+use ApiPlatform\JsonApi\Tests\Fixtures\RelatedDummy;
 use ApiPlatform\JsonSchema\DefinitionNameFactory;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactory as BaseSchemaFactory;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
@@ -31,7 +33,9 @@ use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInter
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use PHPUnit\Framework\TestCase;
+use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
+use Symfony\Component\TypeInfo\Type;
 
 class SchemaFactoryTest extends TestCase
 {
@@ -112,7 +116,8 @@ class SchemaFactoryTest extends TestCase
                         'type' => 'string',
                     ],
                     'attributes' => [
-                        '$ref' => '#/definitions/Dummy',
+                        'type' => 'object',
+                        'properties' => [],
                     ],
                 ],
                 'required' => [
@@ -155,7 +160,8 @@ class SchemaFactoryTest extends TestCase
         $this->assertArrayHasKey('data', $objectSchema['properties']);
 
         $this->assertArrayHasKey('items', $objectSchema['properties']['data']);
-        $this->assertArrayHasKey('$ref', $objectSchema['properties']['data']['items']['properties']['attributes']);
+        $this->assertArrayNotHasKey('$ref', $objectSchema['properties']['data']['items']['properties']['attributes']);
+        $this->assertSame('object', $objectSchema['properties']['data']['items']['properties']['attributes']['type']);
 
         $properties = $objectSchema['properties'];
         $this->assertArrayHasKey('data', $properties);
@@ -198,5 +204,90 @@ class SchemaFactoryTest extends TestCase
 
         $data = $definitions[$rootDefinitionKey]['properties']['data'];
         $this->assertSame(['type', 'id'], $data['required']);
+    }
+
+    public function testRelationIsExcludedFromAttributes(): void
+    {
+        $schemaFactory = $this->buildSchemaFactoryWithRelation();
+        $resultSchema = $schemaFactory->buildSchema(Dummy::class, 'jsonapi');
+
+        $definitions = $resultSchema->getDefinitions();
+        $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
+        $dataProperties = $definitions[$rootDefinitionKey]['properties']['data']['properties'];
+
+        $this->assertArrayHasKey('attributes', $dataProperties);
+        $this->assertArrayNotHasKey('$ref', $dataProperties['attributes']);
+        $this->assertSame('object', $dataProperties['attributes']['type']);
+
+        $attributes = $dataProperties['attributes']['properties'];
+        $this->assertArrayHasKey('name', $attributes);
+        $this->assertArrayNotHasKey('relatedDummy', $attributes, 'relations must not be documented as attributes');
+
+        $this->assertArrayHasKey('_id', $attributes, 'id is exposed as _id in the JSON:API attributes');
+        $this->assertArrayNotHasKey('id', $attributes);
+
+        $this->assertArrayHasKey('relationships', $dataProperties);
+        $this->assertArrayHasKey('relatedDummy', $dataProperties['relationships']['properties']);
+    }
+
+    private function buildSchemaFactoryWithRelation(): SchemaFactory
+    {
+        $dummyOperation = (new Get())->withName('get')->withShortName('Dummy');
+        $relatedOperation = (new Get())->withName('get')->withShortName('RelatedDummy');
+
+        $resourceMetadataFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataFactory->create(Dummy::class)->willReturn(
+            new ResourceMetadataCollection(Dummy::class, [
+                (new ApiResource())->withOperations(new Operations(['get' => $dummyOperation])),
+            ])
+        );
+        $resourceMetadataFactory->create(RelatedDummy::class)->willReturn(
+            new ResourceMetadataCollection(RelatedDummy::class, [
+                (new ApiResource())->withOperations(new Operations(['get' => $relatedOperation])),
+            ])
+        );
+
+        $propertyNameCollectionFactory = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->create(Dummy::class, Argument::type('array'))->willReturn(new PropertyNameCollection(['id', 'name', 'relatedDummy']));
+        $propertyNameCollectionFactory->create(RelatedDummy::class, Argument::type('array'))->willReturn(new PropertyNameCollection(['id', 'name']));
+
+        $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->create(Dummy::class, 'id', Argument::type('array'))->willReturn(
+            (new ApiProperty())->withNativeType(Type::int())->withReadable(true)->withSchema(['type' => 'integer'])
+        );
+        $propertyMetadataFactory->create(Dummy::class, 'name', Argument::type('array'))->willReturn(
+            (new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withSchema(['type' => 'string'])
+        );
+        $propertyMetadataFactory->create(Dummy::class, 'relatedDummy', Argument::type('array'))->willReturn(
+            (new ApiProperty())->withNativeType(Type::object(RelatedDummy::class))->withReadable(true)->withSchema(['type' => Schema::UNKNOWN_TYPE])
+        );
+        $propertyMetadataFactory->create(RelatedDummy::class, 'id', Argument::type('array'))->willReturn(
+            (new ApiProperty())->withNativeType(Type::int())->withReadable(true)->withSchema(['type' => 'integer'])
+        );
+        $propertyMetadataFactory->create(RelatedDummy::class, 'name', Argument::type('array'))->willReturn(
+            (new ApiProperty())->withNativeType(Type::string())->withReadable(true)->withSchema(['type' => 'string'])
+        );
+
+        $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolver->isResourceClass(Dummy::class)->willReturn(true);
+        $resourceClassResolver->isResourceClass(RelatedDummy::class)->willReturn(true);
+
+        $definitionNameFactory = new DefinitionNameFactory(null);
+
+        $baseSchemaFactory = new BaseSchemaFactory(
+            resourceMetadataFactory: $resourceMetadataFactory->reveal(),
+            propertyNameCollectionFactory: $propertyNameCollectionFactory->reveal(),
+            propertyMetadataFactory: $propertyMetadataFactory->reveal(),
+            resourceClassResolver: $resourceClassResolver->reveal(),
+            definitionNameFactory: $definitionNameFactory,
+        );
+
+        return new SchemaFactory(
+            schemaFactory: $baseSchemaFactory,
+            propertyMetadataFactory: $propertyMetadataFactory->reveal(),
+            resourceClassResolver: $resourceClassResolver->reveal(),
+            resourceMetadataFactory: $resourceMetadataFactory->reveal(),
+            definitionNameFactory: $definitionNameFactory,
+        );
     }
 }
