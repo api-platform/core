@@ -48,9 +48,4 @@
    <issue><![CDATA[Since api-platform/core 4.2: Having multiple "#[ApiResource]" attributes with the same "shortName" "OneToOneSubresourceAnswer" on class "ApiPlatform\Tests\Fixtures\TestBundle\Entity\OneToOneSubresourceAnswer" is deprecated and will result in automatic short name deduplication in API Platform 5.x. Set "defaults.extra_properties.deduplicate_resource_short_names" to "true" in the API Platform configuration to enable it now.]]></issue>
   </line>
  </file>
- <file path="src/Symfony/Security/Exception/AccessDeniedException.php">
-  <line number="27" hash="f581c938821ac6b640a3eb9dbe32c5f4d76785c6">
-   <issue><![CDATA[Since api-platform/core 4.4: The "ApiPlatform\Symfony\Security\Exception\AccessDeniedException" class is deprecated, use "ApiPlatform\Metadata\Exception\AccessDeniedException" instead.]]></issue>
-  </line>
- </file>
 </files>

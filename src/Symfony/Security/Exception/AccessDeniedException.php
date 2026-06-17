@@ -22,9 +22,11 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException as Exception
  */
 final class AccessDeniedException extends ExceptionAccessDeniedException implements HttpExceptionInterface
 {
-    public function __construct(string $message = 'Access Denied.', ?\Throwable $previous = null, int $code = 403)
+    public function __construct(string $message = 'Access Denied.', ?\Throwable $previous = null, int $code = 403, bool $triggerDeprecation = true)
     {
-        trigger_deprecation('api-platform/core', '4.4', 'The "%s" class is deprecated, use "%s" instead.', self::class, MetadataAccessDeniedException::class);
+        if ($triggerDeprecation) {
+            trigger_deprecation('api-platform/core', '4.4', 'The "%s" class is deprecated, use "%s" instead.', self::class, MetadataAccessDeniedException::class);
+        }
 
         parent::__construct($message, $previous, $code);
     }
