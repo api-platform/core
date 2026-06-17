@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Doctrine\Orm\Filter\ComparisonFilter;
+use ApiPlatform\Doctrine\Orm\Filter\EndSearchFilter;
 use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
 use ApiPlatform\Doctrine\Orm\Filter\FreeTextQueryFilter;
 use ApiPlatform\Doctrine\Orm\Filter\IriFilter;
@@ -43,6 +44,15 @@ use Doctrine\ORM\Mapping as ORM;
                 'namePartialNoProperty' => new QueryParameter(filter: new PartialSearchFilter()),
                 'namePartialSensitive' => new QueryParameter(
                     filter: new PartialSearchFilter(true),
+                    property: 'name',
+                ),
+                'nameEnd' => new QueryParameter(
+                    filter: new EndSearchFilter(),
+                    property: 'name',
+                ),
+                'nameEndNoProperty' => new QueryParameter(filter: new EndSearchFilter()),
+                'nameEndSensitive' => new QueryParameter(
+                    filter: new EndSearchFilter(true),
                     property: 'name',
                 ),
                 'autocomplete' => new QueryParameter(filter: new FreeTextQueryFilter(new OrFilter(new ExactFilter())), properties: ['name', 'ean']),
