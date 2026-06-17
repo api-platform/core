@@ -710,6 +710,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $itemNormalizer = $container->getDefinition('api_platform.jsonapi.normalizer.item');
         $itemNormalizer->replaceArgument(7, [JsonApiItemNormalizer::ALLOW_CLIENT_GENERATED_ID => $config['jsonapi']['allow_client_generated_id'] ?? false]);
         $itemNormalizer->addArgument($config['jsonapi']['use_iri_as_id']);
+        $itemNormalizer->addArgument(new Reference('api_platform.jsonapi.resource_linkage_resolver'));
     }
 
     private function registerJsonLdHydraConfiguration(ContainerBuilder $container, array $formats, PhpFileLoader $loader, array $config): void
