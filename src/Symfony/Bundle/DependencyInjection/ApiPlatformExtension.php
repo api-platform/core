@@ -708,13 +708,19 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('jsonapi.php');
         $loader->load('state/jsonapi.php');
 
+        $useIriAsId = $config['jsonapi']['use_iri_as_id'];
+        if (null === $useIriAsId) {
+            trigger_deprecation('api-platform/core', '4.4', 'Not setting "api_platform.jsonapi.use_iri_as_id" explicitly is deprecated. Its default value will change from "true" to "false" in API Platform 5.0. Set it to "true" to keep the current behavior or to "false" to use entity identifiers as the "id" field, and silence this deprecation.');
+            $useIriAsId = true;
+        }
+
         $itemNormalizer = $container->getDefinition('api_platform.jsonapi.normalizer.item');
         $itemNormalizer->replaceArgument(7, [JsonApiItemNormalizer::ALLOW_CLIENT_GENERATED_ID => $config['jsonapi']['allow_client_generated_id'] ?? false]);
-        $itemNormalizer->addArgument($config['jsonapi']['use_iri_as_id']);
+        $itemNormalizer->addArgument($useIriAsId);
 
         $itemDenormalizer = $container->getDefinition('api_platform.jsonapi.denormalizer.item');
         $itemDenormalizer->replaceArgument(7, [JsonApiItemNormalizer::ALLOW_CLIENT_GENERATED_ID => $config['jsonapi']['allow_client_generated_id'] ?? false]);
-        $itemDenormalizer->addArgument($config['jsonapi']['use_iri_as_id']);
+        $itemDenormalizer->addArgument($useIriAsId);
     }
 
     private function registerJsonLdHydraConfiguration(ContainerBuilder $container, array $formats, PhpFileLoader $loader, array $config): void
