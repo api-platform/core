@@ -88,6 +88,7 @@ use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentAttributeProp
 use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentPropertyMetadataFactory;
 use ApiPlatform\Laravel\Eloquent\Metadata\Factory\Property\EloquentPropertyNameCollectionMetadataFactory;
 use ApiPlatform\Laravel\Eloquent\Metadata\IdentifiersExtractor as EloquentIdentifiersExtractor;
+use ApiPlatform\Laravel\Eloquent\Metadata\MetadataDumpFingerprint;
 use ApiPlatform\Laravel\Eloquent\Metadata\ModelMetadata;
 use ApiPlatform\Laravel\Eloquent\Metadata\ResourceClassResolver as EloquentResourceClassResolver;
 use ApiPlatform\Laravel\Eloquent\PropertyAccess\PropertyAccessor as EloquentPropertyAccessor;
@@ -247,9 +248,37 @@ class ApiPlatformProvider extends ServiceProvider
             );
         });
 
-        $this->app->singleton(ModelMetadata::class, static function () {
+        // Serve the Eloquent model metadata from a dumped file so the app can boot without a live
+        // database. Skipped when APP_DEBUG is true so local development always introspects fresh.
+        // The dump holds only attribute/relation arrays (plain scalars and class-strings), so it is
+        // read back with allowed_classes disabled. The dump command gets a live, unseeded instance
+        // (contextual binding below) so it never reads back its own dump.
+        $this->app->singleton(ModelMetadata::class, static function (Application $app) {
+            /** @var ConfigRepository $config */
+            $config = $app['config'];
+            $dumpPath = $config->get('api-platform.metadata_dump');
+
+            if (true !== $config->get('app.debug') && \is_string($dumpPath) && is_file($dumpPath)) {
+                $contents = file_get_contents($dumpPath);
+                if (false !== $contents) {
+                    $data = @unserialize($contents, ['allowed_classes' => false]);
+                    if (\is_array($data) && \is_array($data['attributes'] ?? null) && \is_array($data['relations'] ?? null)) {
+                        $fingerprint = MetadataDumpFingerprint::fromMigrations($app->databasePath('migrations'));
+                        if (($data['fingerprint'] ?? null) !== $fingerprint) {
+                            $app['log']->warning('The API Platform metadata dump is stale: migrations have changed since it was generated. Re-run "php artisan api-platform:metadata:dump".');
+                        }
+
+                        return new ModelMetadata(attributes: $data['attributes'], relations: $data['relations']);
+                    }
+                }
+            }
+
             return new ModelMetadata();
         });
+
+        $this->app->when(Console\DumpMetadataCommand::class)
+            ->needs(ModelMetadata::class)
+            ->give(static fn () => new ModelMetadata());
 
         $this->app->bind(ClassMetadataFactoryInterface::class, ClassMetadataFactory::class);
         $this->app->singleton(ClassMetadataFactory::class, static function (Application $app) {
@@ -1191,6 +1220,7 @@ class ApiPlatformProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 Console\InstallCommand::class,
+                Console\DumpMetadataCommand::class,
                 Console\Maker\MakeStateProcessorCommand::class,
                 Console\Maker\MakeStateProviderCommand::class,
                 Console\Maker\MakeFilterCommand::class,
