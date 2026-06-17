@@ -18,7 +18,9 @@ use ApiPlatform\Doctrine\Common\Filter\NameConverterAwareInterface;
 use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterInterface;
 use ApiPlatform\Doctrine\Common\PropertyHelperTrait;
 use ApiPlatform\Doctrine\Odm\PropertyHelperTrait as MongoDbOdmPropertyHelperTrait;
+use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
 use ApiPlatform\Metadata\Exception\RuntimeException;
+use ApiPlatform\Metadata\FilterInterface as MetadataFilterInterface;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -32,6 +34,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * Abstract class for easing the implementation of a filter.
  *
  * @author Alan Poulain <contact@alanpoulain.eu>
+ *
+ * @deprecated since API Platform 4.4, implement {@see MetadataFilterInterface} directly together with {@see BackwardCompatibleFilterDescriptionTrait} and the canonical QueryParameter-based filters (ExactFilter, PartialSearchFilter, EndSearchFilter, ComparisonFilter, OrFilter, …) instead; this class is removed in 6.0
  */
 abstract class AbstractFilter implements FilterInterface, PropertyAwareFilterInterface, ManagerRegistryAwareInterface, NameConverterAwareInterface
 {
