@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
 use ApiPlatform\Doctrine\Odm\Filter\ComparisonFilter;
+use ApiPlatform\Doctrine\Odm\Filter\EndSearchFilter;
 use ApiPlatform\Doctrine\Odm\Filter\ExactFilter;
 use ApiPlatform\Doctrine\Odm\Filter\FreeTextQueryFilter;
 use ApiPlatform\Doctrine\Odm\Filter\IriFilter;
@@ -43,6 +44,15 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
                 'namePartialNoProperty' => new QueryParameter(filter: new PartialSearchFilter()),
                 'namePartialSensitive' => new QueryParameter(
                     filter: new PartialSearchFilter(true),
+                    property: 'name',
+                ),
+                'nameEnd' => new QueryParameter(
+                    filter: new EndSearchFilter(false),
+                    property: 'name',
+                ),
+                'nameEndNoProperty' => new QueryParameter(filter: new EndSearchFilter()),
+                'nameEndSensitive' => new QueryParameter(
+                    filter: new EndSearchFilter(true),
                     property: 'name',
                 ),
                 'autocomplete' => new QueryParameter(filter: new FreeTextQueryFilter(new OrFilter(new ExactFilter())), properties: ['name', 'ean']),
