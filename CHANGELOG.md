@@ -1,5 +1,22 @@
 # Changelog
 
+## v4.3.14
+
+### Bug fixes
+
+* [0d9bcde6b](https://github.com/api-platform/core/commit/0d9bcde6b21d32b448afa6422ac69fae9aa2e7ab) fix(doctrine): filter parent link from uri variables in fetch_data=false reference (#8295)
+* [2abda532d](https://github.com/api-platform/core/commit/2abda532d0b8703c23cccd355644a192192f20d3) fix(serializer): fix union types denormalization fallback after security mismatch (#8333)
+* [553f6d3c0](https://github.com/api-platform/core/commit/553f6d3c007912761427254097368f43432819a4) fix(openapi): serialize Reference objects with $ref in the generated document (#8306)
+* [75c275cd0](https://github.com/api-platform/core/commit/75c275cd07b03c81cfebd2a419e2f12957e1eb23) fix(jsonapi): exclude relations from openapi attributes schema (#8313)
+* [8586a80e6](https://github.com/api-platform/core/commit/8586a80e6b8004c1d8f1c612e9d01cf658a3ffc5) fix(mcp): support mcp/sdk 0.6 (#8311, #8302)
+* [8999b60ca](https://github.com/api-platform/core/commit/8999b60ca840a5cd3e235a65e77646680c0503a1) fix(jsonapi): correct relationship schemas in generated json schema (#8321)
+* [977714184](https://github.com/api-platform/core/commit/97771418458277dba289eb12ad6f2b1c49ec6a3f) fix(doctrine): exclude self-reference relation links from GraphQL root item lookup (#8314)
+
+
+### Features
+
+* [84e7818d4](https://github.com/api-platform/core/commit/84e7818d4b35ecf4aeb79edc2f0a9746c6474b0f) feat(laravel): boot without a database via dumped metadata (#8290)
+
 ## v4.3.13
 
 ### Bug fixes
