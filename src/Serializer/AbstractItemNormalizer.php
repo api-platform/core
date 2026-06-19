@@ -766,7 +766,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
             // Type-confusion guard: declared relation class must match the IRI's resource.
             if (!is_a($item, $resourceClass)) {
-                throw new InvalidArgumentException(\sprintf('The iri "%s" does not reference the correct resource.', $data));
+                throw new NotNormalizableValueException(\sprintf('The iri "%s" does not reference the correct resource.', $data));
             }
 
             return $item;
