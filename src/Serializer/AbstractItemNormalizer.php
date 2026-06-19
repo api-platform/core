@@ -764,8 +764,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         try {
             $item = $this->iriConverter->getResourceFromIri($data, $context + ['fetch_data' => true]);
 
-            // Type-confusion guard: declared relation class must match the IRI's resource.
-            if (!is_a($item, $resourceClass)) {
+            // Type-confusion guard (CWE-843 / GHSA-9rjg-x2p2-h68h): the resolved
+            // resource must be an instance of the declared class. For union-typed
+            // properties (e.g. Foo[]|Bar[]) every resource class in the union is
+            // accepted; a genuinely foreign type is still rejected.
+            $allowedClasses = $context['_api_union_resource_classes'] ?? [$resourceClass];
+            if (!\array_reduce($allowedClasses, static fn (bool $ok, string $cls): bool => $ok || \is_a($item, $cls), false)) {
                 throw new NotNormalizableValueException(\sprintf('The iri "%s" does not reference the correct resource.', $data));
             }
 
@@ -1190,6 +1194,38 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         $isMultipleTypes = \count($types) > 1;
         $denormalizationException = null;
+
+        // Build the full set of resource classes across all union types so that
+        // getResourceFromIri()'s is_a guard can accept any valid union member.
+        // Without this, a Foo[]|Bar[] property rejects mixed collections because
+        // the guard only sees the single class being tried in each iteration.
+        unset($context['_api_union_resource_classes']);
+        if ($isMultipleTypes) {
+            $unionResourceClasses = [];
+            foreach ($types as $ut) {
+                if ($ut instanceof CollectionType) {
+                    $cvt = $ut->getCollectionValueType();
+                    if ($cvt instanceof ObjectType && $this->resourceClassResolver->isResourceClass($cvt->getClassName())) {
+                        $unionResourceClasses[] = $cvt->getClassName();
+                    }
+                } elseif ($ut instanceof ObjectType && $this->resourceClassResolver->isResourceClass($ut->getClassName())) {
+                    $unionResourceClasses[] = $ut->getClassName();
+                } elseif ($ut instanceof LegacyType) {
+                    if ($ut->isCollection()) {
+                        foreach ($ut->getCollectionValueTypes() as $cvt) {
+                            if (null !== ($cn = $cvt->getClassName()) && $this->resourceClassResolver->isResourceClass($cn)) {
+                                $unionResourceClasses[] = $cn;
+                            }
+                        }
+                    } elseif (null !== ($cn = $ut->getClassName()) && $this->resourceClassResolver->isResourceClass($cn)) {
+                        $unionResourceClasses[] = $cn;
+                    }
+                }
+            }
+            if ($unionResourceClasses) {
+                $context['_api_union_resource_classes'] = array_unique($unionResourceClasses);
+            }
+        }
 
         foreach ($types as $t) {
             if ($type instanceof Type) {
