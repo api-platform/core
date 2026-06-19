@@ -123,7 +123,7 @@ class DumpMetadataCommandTest extends TestCase
     }
 
     /**
-     * @param list<class-string> $classes
+     * @param list<string> $classes
      */
     private function stubResourceClasses(array $classes): void
     {
@@ -144,7 +144,7 @@ class DumpMetadataCommandTest extends TestCase
     }
 
     /**
-     * @return array{fingerprint: string, attributes: array<class-string, mixed>, relations: array<class-string, mixed>}
+     * @return array{fingerprint: string, attributes: array<mixed, mixed>, relations: array<mixed, mixed>}
      */
     private function readDump(): array
     {
@@ -158,6 +158,13 @@ class DumpMetadataCommandTest extends TestCase
             $this->fail('The dump file did not contain an array.');
         }
 
-        return $dumped;
+        $fingerprint = $dumped['fingerprint'] ?? null;
+        $attributes = $dumped['attributes'] ?? null;
+        $relations = $dumped['relations'] ?? null;
+        if (!\is_string($fingerprint) || !\is_array($attributes) || !\is_array($relations)) {
+            $this->fail('The dump file did not contain the expected structure.');
+        }
+
+        return ['fingerprint' => $fingerprint, 'attributes' => $attributes, 'relations' => $relations];
     }
 }
