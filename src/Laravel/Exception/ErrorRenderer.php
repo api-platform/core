@@ -142,7 +142,7 @@ class ErrorRenderer
 
         $dup = $request->duplicate(null, null, []);
         $dup->setMethod('GET');
-        $dup->attributes->set('_api_resource_class', $operation->getClass());
+        $dup->attributes->set('_api_resource_class', $operation->getApiClass());
         $dup->attributes->set('_api_previous_operation', $apiOperation);
         $dup->attributes->set('_api_operation', $operation);
         $dup->attributes->set('_api_operation_name', $operation->getName());

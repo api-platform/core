@@ -47,10 +47,10 @@ class NormalizeProcessorTest extends TestCase
     public function testProcess($body, $operation): void
     {
         $context = ['args' => []];
-        $serializerContext = ['resource_class' => $operation->getClass()];
+        $serializerContext = ['resource_class' => $operation->getApiClass()];
         $normalizer = $this->createMock(NormalizerInterface::class);
         $serializerContextBuilder = $this->createMock(SerializerContextBuilderInterface::class);
-        $serializerContextBuilder->expects($this->once())->method('create')->with($operation->getClass(), $operation, $context, true)->willReturn($serializerContext);
+        $serializerContextBuilder->expects($this->once())->method('create')->with($operation->getApiClass(), $operation, $context, true)->willReturn($serializerContext);
         $normalizer->expects($this->once())->method('normalize')->with($body, 'graphql', $serializerContext);
         $processor = new NormalizeProcessor($normalizer, $serializerContextBuilder, new Pagination());
         $processor->process($body, $operation, [], $context);
@@ -70,11 +70,11 @@ class NormalizeProcessorTest extends TestCase
     {
         $this->resolveInfoProphecy->getFieldSelection(1)->willReturn($getFieldSelection);
         $context = ['args' => $args, 'info' => $this->resolveInfoProphecy->reveal()];
-        $serializerContext = ['resource_class' => $operation->getClass()];
+        $serializerContext = ['resource_class' => $operation->getApiClass()];
         $normalizer = $this->prophesize(NormalizerInterface::class);
 
         $serializerContextBuilder = $this->createMock(SerializerContextBuilderInterface::class);
-        $serializerContextBuilder->expects($this->once())->method('create')->with($operation->getClass(), $operation, $context, true)->willReturn($serializerContext);
+        $serializerContextBuilder->expects($this->once())->method('create')->with($operation->getApiClass(), $operation, $context, true)->willReturn($serializerContext);
         foreach ($collection as $v) {
             $normalizer->normalize($v, 'graphql', $serializerContext)->willReturn(['normalized_item'])->shouldBeCalledOnce();
         }

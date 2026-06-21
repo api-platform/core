@@ -136,7 +136,7 @@ final class ExtractorResourceMetadataCollectionFactory implements ResourceMetada
 
             [$key, $operation] = $this->getOperationWithDefaults($resource, $operation);
             if (\array_key_exists($key, $operations)) {
-                throw new RuntimeException(\sprintf('Operation name "%s" is declared twice on resource "%s". Operation names must be unique because they are also used as Symfony route names. Remove the duplicate "name" so the framework can disambiguate by method, or set distinct names.', $key, $resource->getClass() ?? ''));
+                throw new RuntimeException(\sprintf('Operation name "%s" is declared twice on resource "%s". Operation names must be unique because they are also used as Symfony route names. Remove the duplicate "name" so the framework can disambiguate by method, or set distinct names.', $key, $resource->getApiClass() ?? ''));
             }
             $operations[$key] = $operation;
         }

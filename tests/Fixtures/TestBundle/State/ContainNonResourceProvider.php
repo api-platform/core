@@ -32,7 +32,7 @@ class ContainNonResourceProvider implements ProviderInterface
             throw new \InvalidArgumentException('The id must be a scalar.');
         }
 
-        $resourceClass = $operation->getClass();
+        $resourceClass = $operation->getApiClass();
         // Retrieve the blog post item from somewhere
         $cnr = new $resourceClass();
         $cnr->id = $id;

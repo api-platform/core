@@ -56,7 +56,7 @@ final class MainController
         $uriVariables = [];
         if (!$request->attributes->has('exception')) {
             try {
-                $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $operation->getClass());
+                $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $operation->getApiClass());
                 $request->attributes->set('_api_uri_variables', $uriVariables);
             } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
                 throw new NotFoundHttpException('Invalid uri variables.', $e);
@@ -66,7 +66,7 @@ final class MainController
         $context = [
             'request' => $request,
             'uri_variables' => $uriVariables,
-            'resource_class' => $operation->getClass(),
+            'resource_class' => $operation->getApiClass(),
         ];
 
         if (null === $operation->canValidate()) {
@@ -99,7 +99,7 @@ final class MainController
 
             if (!$request->attributes->has('exception')) {
                 try {
-                    $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $operation->getClass());
+                    $uriVariables = $this->getOperationUriVariables($operation, $request->attributes->all(), $operation->getApiClass());
                 } catch (InvalidIdentifierException|InvalidUriVariableException $e) {
                     // if this occurs with our base operation we throw above so log instead of throw here
                     if ($this->logger) {

@@ -35,7 +35,7 @@ final class DummyDtoInputOutputProvider implements ProviderInterface
         /** @var DummyDtoInputOutput */
         $data = $this->decorated->provide($operation, $uriVariables, $context);
 
-        $outputDto = DummyDtoInputOutputDocument::class === $operation->getClass() ? new OutputDtoDocument() : new OutputDto();
+        $outputDto = DummyDtoInputOutputDocument::class === $operation->getApiClass() ? new OutputDtoDocument() : new OutputDto();
         $outputDto->id = $data->id;
         $outputDto->baz = $data->num;
         $outputDto->bat = $data->str;

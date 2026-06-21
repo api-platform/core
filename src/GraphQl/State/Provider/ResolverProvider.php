@@ -44,7 +44,7 @@ final class ResolverProvider implements ProviderInterface
         $item = $queryResolver($item, $context);
         if (!$operation instanceof CollectionOperationInterface) {
             // The item retrieved can be of another type when using an identifier (see Relay Nodes at query.feature:23)
-            $this->getResourceClass($item, $operation->getOutput()['class'] ?? $operation->getClass(), \sprintf('Custom query resolver "%s"', $queryResolverId).' has to return an item of class %s but returned an item of class %s.');
+            $this->getResourceClass($item, $operation->getOutputClass() , \sprintf('Custom query resolver "%s"', $queryResolverId).' has to return an item of class %s but returned an item of class %s.');
         }
 
         return $item;

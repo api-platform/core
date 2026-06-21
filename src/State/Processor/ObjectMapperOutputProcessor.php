@@ -39,7 +39,7 @@ final class ObjectMapperOutputProcessor implements ProcessorInterface
         if (
             $data instanceof Response
             || !$this->objectMapper
-            || !($operation->canWrite() ?? true)
+            || !($operation->canWrite() ?? false)
             || null === $data
             || !$operation->canMap()
         ) {
@@ -48,7 +48,7 @@ final class ObjectMapperOutputProcessor implements ProcessorInterface
 
         $request = $context['request'] ?? null;
         $request?->attributes->set('persisted_data', $data);
-        $dto = $this->objectMapper->map($data, $operation->getClass());
+        $dto = $this->objectMapper->map($data, $operation->getOutputClass());
 
         return $this->decorated ? $this->decorated->process($dto, $operation, $uriVariables, $context) : $dto;
     }

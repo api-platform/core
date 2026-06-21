@@ -84,7 +84,7 @@ final class IriConverter implements IriConverterInterface
             }
         }
 
-        if ($operation && !is_a($parameters['_api_resource_class'], $operation->getClass(), true)) {
+        if ($operation && !is_a($parameters['_api_resource_class'], $operation->getApiClass(), true)) {
             throw new InvalidArgumentException(\sprintf('The iri "%s" does not reference the correct resource.', $iri));
         }
 
@@ -151,7 +151,7 @@ final class IriConverter implements IriConverterInterface
         }
 
         if ($operation instanceof HttpOperation && 301 === $operation->getStatus()) {
-            $operation = ($operation instanceof CollectionOperationInterface ? new GetCollection() : new Get())->withClass($operation->getClass());
+            $operation = ($operation instanceof CollectionOperationInterface ? new GetCollection() : new Get())->withClass($operation->getApiClass());
             unset($context['uri_variables']);
         }
 
@@ -199,7 +199,7 @@ final class IriConverter implements IriConverterInterface
             } catch (InvalidArgumentException|RuntimeException $e) {
                 // We can try using context uri variables if any
                 if (!$identifiers && ($context['is_resource_class'] ?? false)) {
-                    throw new InvalidArgumentException(\sprintf('Unable to generate an IRI for the item of type "%s"', $operation->getClass()), $e->getCode(), $e);
+                    throw new InvalidArgumentException(\sprintf('Unable to generate an IRI for the item of type "%s"', $operation->getApiClass()), $e->getCode(), $e);
                 }
             }
         }
@@ -209,7 +209,7 @@ final class IriConverter implements IriConverterInterface
 
             return $this->router->generate($routeName, $identifiers, $operation->getUrlGenerationStrategy() ?? $referenceType);
         } catch (RoutingExceptionInterface $e) {
-            throw new InvalidArgumentException(\sprintf('Unable to generate an IRI for the item of type "%s"', $operation->getClass()), $e->getCode(), $e);
+            throw new InvalidArgumentException(\sprintf('Unable to generate an IRI for the item of type "%s"', $operation->getApiClass()), $e->getCode(), $e);
         }
     }
 }

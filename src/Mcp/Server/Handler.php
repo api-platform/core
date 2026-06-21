@@ -99,7 +99,7 @@ final class Handler implements RequestHandlerInterface
             'mcp_request' => $request,
             'mcp_session' => $session,
             'uri_variables' => $uriVariables,
-            'resource_class' => $operation->getClass(),
+            'resource_class' => $operation->getApiClass(),
         ];
 
         if (!$isResource) {

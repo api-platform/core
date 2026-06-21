@@ -71,7 +71,7 @@ final class DeserializeProvider implements ProviderInterface, StopwatchAwareInte
         }
 
         $serializerContext = $this->serializerContextBuilder->createFromRequest($request, false, [
-            'resource_class' => $operation->getClass(),
+            'resource_class' => $operation->getApiClass(),
             'operation' => $operation,
         ]);
 
@@ -100,7 +100,7 @@ final class DeserializeProvider implements ProviderInterface, StopwatchAwareInte
         unset($serializerContext[SerializerContextBuilderInterface::ASSIGN_OBJECT_TO_POPULATE]);
 
         try {
-            $data = $this->serializer->deserialize((string) $request->getContent(), $serializerContext['deserializer_type'] ?? $operation->getClass(), $format, $serializerContext);
+            $data = $this->serializer->deserialize((string) $request->getContent(), $serializerContext['deserializer_type'] ?? $operation->getInputClass(), $format, $serializerContext);
         } catch (PartialDenormalizationException $e) {
             if (!class_exists(ConstraintViolationList::class)) {
                 throw $e;
