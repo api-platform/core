@@ -61,6 +61,8 @@ api_platform:
         jsonapi:                       ['application/vnd.api+json']
         html:                          ['text/html']
         xml:                           ['application/xml', 'text/xml']
+    jsonapi:
+        use_iri_as_id: true
     graphql:
         enabled: true
         nesting_separator: __
