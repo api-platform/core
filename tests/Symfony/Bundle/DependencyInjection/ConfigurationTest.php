@@ -251,7 +251,7 @@ class ConfigurationTest extends TestCase
                 'format' => 'jsonld',
             ],
             'jsonapi' => [
-                'use_iri_as_id' => true,
+                'use_iri_as_id' => null,
                 'allow_client_generated_id' => false,
             ],
             'enable_scalar' => true,
