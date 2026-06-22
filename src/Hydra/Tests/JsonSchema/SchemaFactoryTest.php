@@ -23,8 +23,6 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\McpTool;
-use ApiPlatform\Metadata\McpToolCollection;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
@@ -163,10 +161,10 @@ class SchemaFactoryTest extends TestCase
         $this->assertEquals($resultSchema['allOf'][0]['$ref'], $forcedCollection['allOf'][0]['$ref']);
     }
 
-    // Single-item McpTool: serializer omits `@id`, so the output schema must not require it.
-    public function testSingleItemMcpToolOutputSchemaDoesNotRequireId(): void
+    // gen_id=false output schema must not require `@id` (e.g. an operation whose serializer omits the IRI).
+    public function testGenIdFalseOutputSchemaDoesNotRequireId(): void
     {
-        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_OUTPUT, new McpTool(class: Dummy::class));
+        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_OUTPUT, new Get(), null, ['gen_id' => false]);
 
         $definitions = $resultSchema->getDefinitions();
         $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
@@ -177,14 +175,15 @@ class SchemaFactoryTest extends TestCase
         $this->assertArrayNotHasKey('HydraItemBaseSchema', $definitions);
     }
 
-    // McpToolCollection: members get `@id` (member normalization sets item_uri_template), so it stays required.
-    public function testMcpToolCollectionOutputSchemaStillRequiresIdOnMembers(): void
+    // Default (gen_id left to its true default): the output schema keeps `@id` required.
+    public function testOutputSchemaRequiresIdByDefault(): void
     {
-        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_OUTPUT, new McpToolCollection(class: Dummy::class));
+        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_OUTPUT, new Get());
 
         $definitions = $resultSchema->getDefinitions();
+        $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
 
-        $this->assertSame(['$ref' => '#/definitions/HydraItemBaseSchema'], $definitions['Dummy.jsonld']['allOf'][0]);
+        $this->assertSame(['$ref' => '#/definitions/HydraItemBaseSchema'], $definitions[$rootDefinitionKey]['allOf'][0]);
         $this->assertSame(['@id', '@type'], $definitions['HydraItemBaseSchema']['required']);
         $this->assertArrayNotHasKey('HydraItemBaseSchemaWithoutId', $definitions);
     }
