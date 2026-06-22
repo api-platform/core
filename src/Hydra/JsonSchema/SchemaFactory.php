@@ -22,6 +22,9 @@ use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryAwareInterface;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\JsonSchema\SchemaUriPrefixTrait;
+use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\McpResource;
+use ApiPlatform\Metadata\McpTool;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 
@@ -133,7 +136,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
 
         if (!$collectionKey) {
             $definitionName = $schema->getRootDefinitionKey() ?? $this->definitionNameFactory->create($className, $format, $inputOrOutputClass, $operation, $serializerContext);
-            $this->decorateItemDefinition($definitionName, $definitions, $prefix, $type, $serializerContext);
+            $this->decorateItemDefinition($definitionName, $definitions, $prefix, $type, $serializerContext, $operation);
 
             if (isset($definitions[$definitionName])) {
                 $currentDefinitions = $schema->getDefinitions();
@@ -254,7 +257,7 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         unset($schema['items']);
 
         if (isset($definitions[$collectionKey])) {
-            $this->decorateItemDefinition($collectionKey, $definitions, $prefix, $type, $serializerContext);
+            $this->decorateItemDefinition($collectionKey, $definitions, $prefix, $type, $serializerContext, $operation);
         }
 
         return $schema;
@@ -267,13 +270,16 @@ final class SchemaFactory implements SchemaFactoryInterface, SchemaFactoryAwareI
         }
     }
 
-    private function decorateItemDefinition(string $definitionName, \ArrayObject $definitions, string $prefix, string $type, ?array $serializerContext): void
+    private function decorateItemDefinition(string $definitionName, \ArrayObject $definitions, string $prefix, string $type, ?array $serializerContext, ?Operation $operation = null): void
     {
         if (!isset($definitions[$definitionName])) {
             return;
         }
 
-        $hasNoId = Schema::TYPE_OUTPUT === $type && false === ($serializerContext['gen_id'] ?? true);
+        // A single-item MCP operation has no routed item URI: the serializer omits `@id`, so don't require it.
+        $isMcpItem = ($operation instanceof McpTool || $operation instanceof McpResource) && !$operation instanceof CollectionOperationInterface;
+
+        $hasNoId = Schema::TYPE_OUTPUT === $type && (false === ($serializerContext['gen_id'] ?? true) || $isMcpItem);
         $baseName = self::ITEM_BASE_SCHEMA_NAME;
         if ($hasNoId) {
             $baseName = self::ITEM_WITHOUT_ID_BASE_SCHEMA_NAME;

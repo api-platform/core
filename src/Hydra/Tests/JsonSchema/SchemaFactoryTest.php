@@ -23,6 +23,8 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\McpTool;
+use ApiPlatform\Metadata\McpToolCollection;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
@@ -159,6 +161,32 @@ class SchemaFactoryTest extends TestCase
 
         $forcedCollection = $this->schemaFactory->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_OUTPUT, null, null, null, true);
         $this->assertEquals($resultSchema['allOf'][0]['$ref'], $forcedCollection['allOf'][0]['$ref']);
+    }
+
+    // Single-item McpTool: serializer omits `@id`, so the output schema must not require it.
+    public function testSingleItemMcpToolOutputSchemaDoesNotRequireId(): void
+    {
+        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_OUTPUT, new McpTool(class: Dummy::class));
+
+        $definitions = $resultSchema->getDefinitions();
+        $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
+
+        $this->assertSame(['$ref' => '#/definitions/HydraItemBaseSchemaWithoutId'], $definitions[$rootDefinitionKey]['allOf'][0]);
+        $this->assertArrayHasKey('HydraItemBaseSchemaWithoutId', $definitions);
+        $this->assertSame(['@type'], $definitions['HydraItemBaseSchemaWithoutId']['required']);
+        $this->assertArrayNotHasKey('HydraItemBaseSchema', $definitions);
+    }
+
+    // McpToolCollection: members get `@id` (member normalization sets item_uri_template), so it stays required.
+    public function testMcpToolCollectionOutputSchemaStillRequiresIdOnMembers(): void
+    {
+        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_OUTPUT, new McpToolCollection(class: Dummy::class));
+
+        $definitions = $resultSchema->getDefinitions();
+
+        $this->assertSame(['$ref' => '#/definitions/HydraItemBaseSchema'], $definitions['Dummy.jsonld']['allOf'][0]);
+        $this->assertSame(['@id', '@type'], $definitions['HydraItemBaseSchema']['required']);
+        $this->assertArrayNotHasKey('HydraItemBaseSchemaWithoutId', $definitions);
     }
 
     public function testSchemaTypeBuildSchemaWithoutPrefix(): void
