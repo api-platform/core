@@ -1285,6 +1285,50 @@ class AbstractItemNormalizerTest extends TestCase
         $this->assertInstanceOf(Dummy::class, $actual);
     }
 
+    public function testUnionTypeCollectionDenormalizationAcceptsAnyMember(): void
+    {
+        $data = ['attachments' => ['/related_dummies/1']];
+        $relatedDummy = new RelatedDummy();
+
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->willReturn(new PropertyNameCollection(['attachments']));
+
+        // array<Dummy|RelatedDummy>: the collection value type is a union; the IRI points to the second member.
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturn(
+            (new ApiProperty())
+                ->withNativeType(Type::list(Type::union(Type::object(Dummy::class), Type::object(RelatedDummy::class))))
+                ->withWritable(true)
+        );
+
+        $iriConverter = $this->createStub(IriConverterInterface::class);
+        $iriConverter->method('getResourceFromIri')->willReturn($relatedDummy);
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturnMap([
+            [Dummy::class, true],
+            [RelatedDummy::class, true],
+        ]);
+        $resourceClassResolver->method('getResourceClass')->willReturnMap([
+            [null, Dummy::class, Dummy::class],
+            [null, RelatedDummy::class, RelatedDummy::class],
+        ]);
+
+        $propertyAccessor = $this->createMock(PropertyAccessorInterface::class);
+        $propertyAccessor->expects($this->once())
+            ->method('setValue')
+            ->with($this->isInstanceOf(Dummy::class), 'attachments', [0 => $relatedDummy]);
+
+        $serializer = $this->createStub(SerializerInterface::class);
+
+        $normalizer = new class($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, null, null, [], null, null) extends AbstractItemNormalizer {};
+        $normalizer->setSerializer($serializer);
+
+        $actual = $normalizer->denormalize($data, Dummy::class);
+
+        $this->assertInstanceOf(Dummy::class, $actual);
+    }
+
     public function testDenormalizeRelationNotFoundReturnsNull(): void
     {
         $data = [
