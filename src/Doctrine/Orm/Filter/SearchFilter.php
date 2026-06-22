@@ -132,6 +132,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * </div>
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
+ *
+ * @deprecated since API Platform 4.4: use the per-strategy QueryParameter-based filters instead — {@see ExactFilter} (`exact`), {@see PartialSearchFilter} (`partial`), {@see StartSearchFilter} (`start`), {@see EndSearchFilter} (`end`); for relation properties matched by IRI use {@see IriFilter}. Removed in 6.0.
  */
 final class SearchFilter extends AbstractFilter implements SearchFilterInterface
 {
