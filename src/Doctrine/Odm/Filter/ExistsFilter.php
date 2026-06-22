@@ -110,6 +110,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @author Teoh Han Hui <teohhanhui@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
+ *
+ * @deprecated since API Platform 4.4: extending {@see AbstractFilter} is deprecated. In 5.0 this filter is rewritten as a standalone filter (reading its value from the QueryParameter instead of the legacy `context['filters']` lookup) — same class name, same URL syntax, drop-in. Declare it through a QueryParameter to migrate.
  */
 final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface
 {

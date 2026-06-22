@@ -108,6 +108,8 @@ use Doctrine\ORM\QueryBuilder;
  * Given that the collection endpoint is `/books`, you can filter books with the following query: `/books?price[between]=12.99..15.99`.
  *
  * @author Lee Siong Chan <ahlee2326@me.com>
+ *
+ * @deprecated since API Platform 4.4: extending {@see AbstractFilter} is deprecated. In 5.0 this filter is rewritten as a standalone overlay over {@see ComparisonFilter} (translating `[between]=X..Y` to `[gte]=X` + `[lte]=Y`, passing through `[gt]`/`[gte]`/`[lt]`/`[lte]`) — same class name, same URL syntax, drop-in. Declare it through a QueryParameter to migrate.
  */
 final class RangeFilter extends AbstractFilter implements RangeFilterInterface, OpenApiParameterFilterInterface
 {

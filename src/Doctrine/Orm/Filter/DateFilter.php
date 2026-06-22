@@ -124,6 +124,8 @@ use Doctrine\ORM\QueryBuilder;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo FIDRY <theo.fidry@gmail.com>
+ *
+ * @deprecated since API Platform 4.4: extending {@see AbstractFilter} is deprecated. In 5.0 this filter is rewritten as a standalone overlay over {@see ComparisonFilter} (translating the `[before]`/`[strictly_before]`/`[after]`/`[strictly_after]` syntax) — same class name, same URL syntax, drop-in. Declare it through a QueryParameter to migrate.
  */
 final class DateFilter extends AbstractFilter implements DateFilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface
 {
