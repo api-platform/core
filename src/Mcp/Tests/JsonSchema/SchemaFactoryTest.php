@@ -16,6 +16,9 @@ namespace ApiPlatform\Mcp\Tests\JsonSchema;
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
 use ApiPlatform\Mcp\JsonSchema\SchemaFactory;
+use ApiPlatform\Metadata\McpResource;
+use ApiPlatform\Metadata\McpTool;
+use ApiPlatform\Metadata\McpToolCollection;
 use PHPUnit\Framework\TestCase;
 
 class SchemaFactoryTest extends TestCase
@@ -421,5 +424,69 @@ class SchemaFactoryTest extends TestCase
         // The nullable member is left untouched and the anyOf keeps no spurious type fallback.
         $this->assertSame(['type' => 'null'], $related['anyOf'][1]);
         $this->assertArrayNotHasKey('type', $related);
+    }
+
+    /**
+     * A single-item MCP operation has no routed item URI (Mcp\Routing\IriConverter returns null),
+     * so the output schema must advertise `gen_id` as false to drop the required `@id`.
+     */
+    public function testSingleItemMcpOperationForcesGenIdFalse(): void
+    {
+        foreach ([new McpTool(class: \stdClass::class), new McpResource(uri: 'app://dummy', class: \stdClass::class)] as $operation) {
+            $captured = null;
+            $inner = $this->createMock(SchemaFactoryInterface::class);
+            $inner->method('buildSchema')->willReturnCallback(function (...$args) use (&$captured) {
+                $captured = $args[5] ?? null;
+
+                return $this->emptyObjectSchema();
+            });
+
+            $factory = new SchemaFactory($inner);
+            $factory->buildSchema('App\\Dummy', 'jsonld', Schema::TYPE_OUTPUT, $operation);
+
+            $this->assertFalse($captured['gen_id'] ?? null, $operation::class.' must force gen_id to false');
+        }
+    }
+
+    public function testMcpToolCollectionDoesNotForceGenIdFalse(): void
+    {
+        $captured = 'untouched';
+        $inner = $this->createMock(SchemaFactoryInterface::class);
+        $inner->method('buildSchema')->willReturnCallback(function (...$args) use (&$captured) {
+            $captured = $args[5] ?? null;
+
+            return $this->emptyObjectSchema();
+        });
+
+        $factory = new SchemaFactory($inner);
+        $factory->buildSchema('App\\Dummy', 'jsonld', Schema::TYPE_OUTPUT, new McpToolCollection(class: \stdClass::class));
+
+        $this->assertNull($captured);
+    }
+
+    public function testInputSchemaDoesNotForceGenIdFalse(): void
+    {
+        $captured = 'untouched';
+        $inner = $this->createMock(SchemaFactoryInterface::class);
+        $inner->method('buildSchema')->willReturnCallback(function (...$args) use (&$captured) {
+            $captured = $args[5] ?? null;
+
+            return $this->emptyObjectSchema();
+        });
+
+        $factory = new SchemaFactory($inner);
+        $factory->buildSchema('App\\Dummy', 'json', Schema::TYPE_INPUT, new McpTool(class: \stdClass::class));
+
+        $this->assertNull($captured);
+    }
+
+    private function emptyObjectSchema(): Schema
+    {
+        $schema = new Schema(Schema::VERSION_JSON_SCHEMA);
+        unset($schema['$schema']);
+        $schema->getDefinitions()['Dummy'] = new \ArrayObject(['type' => 'object']);
+        $schema['$ref'] = '#/definitions/Dummy';
+
+        return $schema;
     }
 }

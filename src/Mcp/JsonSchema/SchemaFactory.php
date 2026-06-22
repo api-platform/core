@@ -15,6 +15,9 @@ namespace ApiPlatform\Mcp\JsonSchema;
 
 use ApiPlatform\JsonSchema\Schema;
 use ApiPlatform\JsonSchema\SchemaFactoryInterface;
+use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\McpResource;
+use ApiPlatform\Metadata\McpTool;
 use ApiPlatform\Metadata\Operation;
 
 /**
@@ -32,6 +35,16 @@ final class SchemaFactory implements SchemaFactoryInterface
 
     public function buildSchema(string $className, string $format = 'json', string $type = Schema::TYPE_OUTPUT, ?Operation $operation = null, ?Schema $schema = null, ?array $serializerContext = null, bool $forceCollection = false): Schema
     {
+        // A single-item MCP operation has no routed item URI (Mcp\Routing\IriConverter returns null),
+        // so the serializer omits `@id`: mirror that here so the advertised output schema doesn't require it.
+        if (Schema::TYPE_OUTPUT === $type
+            && ($operation instanceof McpTool || $operation instanceof McpResource)
+            && !$operation instanceof CollectionOperationInterface
+        ) {
+            $serializerContext ??= [];
+            $serializerContext['gen_id'] = false;
+        }
+
         $schema = $this->decorated->buildSchema($className, $format, $type, $operation, $schema, $serializerContext, $forceCollection);
 
         $definitions = [];
