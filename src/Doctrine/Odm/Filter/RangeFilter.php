@@ -107,6 +107,8 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
  *
  * @author Lee Siong Chan <ahlee2326@me.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
+ *
+ * @deprecated since API Platform 4.4: extending {@see AbstractFilter} is deprecated. In 5.0 this filter is rewritten as a standalone overlay over {@see ComparisonFilter} (translating `[between]=X..Y` to `[gte]=X` + `[lte]=Y`, passing through `[gt]`/`[gte]`/`[lt]`/`[lte]`) — same class name, same URL syntax, drop-in. Declare it through a QueryParameter to migrate.
  */
 final class RangeFilter extends AbstractFilter implements RangeFilterInterface, OpenApiParameterFilterInterface
 {
