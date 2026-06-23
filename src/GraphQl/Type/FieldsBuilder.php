@@ -22,10 +22,13 @@ use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\GraphQl\Subscription;
 use ApiPlatform\Metadata\InflectorInterface;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
+use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\SortFilterInterface;
 use ApiPlatform\Metadata\Util\Inflector;
 use ApiPlatform\Metadata\Util\PropertyInfoToTypeInfoHelper;
 use ApiPlatform\Metadata\Util\TypeHelper;
@@ -311,90 +314,6 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
     }
 
     /**
-     * Transform the result of a parse_str to a GraphQL object type.
-     * We should consider merging getFilterArgs and this, `getFilterArgs` uses `convertType` whereas we assume that parameters have only scalar types.
-     * Note that this method has a lower complexity then the `getFilterArgs` one.
-     * TODO: Is there a use case with an argument being a complex type (eg: a Resource, Enum etc.)?
-     *
-     * @param array<array{name: string, required: bool|null, description: string|null, leafs: string|array, type: string}> $flattenFields
-     */
-    private function parameterToObjectType(array $flattenFields, string $name): InputObjectType
-    {
-        $fields = [];
-        foreach ($flattenFields as $field) {
-            $key = $field['name'];
-            $type = \in_array($field['type'], TypeIdentifier::values(), true) ? Type::builtin($field['type']) : Type::object($field['type']);
-            if (!$field['required']) {
-                $type = Type::nullable($type);
-            }
-
-            $type = $this->getParameterType($type);
-            if (\is_array($l = $field['leafs'])) {
-                if (0 === key($l)) {
-                    $key = $key;
-                    $type = GraphQLType::listOf($type);
-                } else {
-                    $n = [];
-                    foreach ($field['leafs'] as $l => $value) {
-                        $n[] = ['required' => null, 'name' => $l, 'leafs' => $value, 'type' => 'string', 'description' => null];
-                    }
-
-                    $type = $this->parameterToObjectType($n, $key);
-                    if (isset($fields[$key]) && ($t = $fields[$key]['type']) instanceof InputObjectType) {
-                        $t = $fields[$key]['type'];
-                        $t->config['fields'] = array_merge($t->config['fields'], $type->config['fields']);
-                        $type = $t;
-                    }
-                }
-            }
-
-            if ($field['required']) {
-                $type = GraphQLType::nonNull($type);
-            }
-
-            if (isset($fields[$key])) {
-                if ($type instanceof ListOfType) {
-                    $key .= '_list';
-                } elseif ($fields[$key]['type'] instanceof InputObjectType && !$type instanceof InputObjectType) {
-                    continue;
-                }
-            }
-
-            $fields[$key] = ['type' => $type, 'name' => $key];
-        }
-
-        return new InputObjectType(['name' => $name, 'fields' => $fields]);
-    }
-
-    /**
-     * A simplified version of convert type that does not support resources.
-     */
-    private function getParameterType(Type $type): GraphQLType
-    {
-        if ($type->isIdentifiedBy(TypeIdentifier::BOOL)) {
-            return GraphQLType::boolean();
-        }
-
-        if ($type->isIdentifiedBy(TypeIdentifier::INT)) {
-            return GraphQLType::int();
-        }
-
-        if ($type->isIdentifiedBy(TypeIdentifier::FLOAT)) {
-            return GraphQLType::float();
-        }
-
-        if ($type->isIdentifiedBy(TypeIdentifier::STRING, TypeIdentifier::OBJECT)) {
-            return GraphQLType::string();
-        }
-
-        if ($type instanceof CollectionType) {
-            return GraphQLType::listOf($this->getParameterType($type->getCollectionValueType()));
-        }
-
-        return GraphQLType::string();
-    }
-
-    /**
      * Get the field configuration of a resource.
      *
      * @see http://webonyx.github.io/graphql-php/type-system/object-types/
@@ -455,16 +374,7 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
                         $args = $this->getGraphQlPaginationArgs($resourceOperation);
                     }
 
-                    $args = $this->getFilterArgs($args, $resourceClass, $rootResource, $resourceOperation, $rootOperation, $property, $depth);
-
-                    // Also register parameter args in the types container
-                    // Note: This is a workaround, for more information read the comment on the parameterToObjectType function.
-                    foreach ($this->getParameterArgs($rootOperation) as $key => $arg) {
-                        if ($arg instanceof InputObjectType || (\is_array($arg) && isset($arg['name']))) {
-                            $this->typesContainer->set(\is_array($arg) ? $arg['name'] : $arg->name(), $arg);
-                        }
-                        $args[$key] = $arg;
-                    }
+                    $args = $this->getCollectionFilterArgs($args, $resourceClass, $rootResource, $resourceOperation, $rootOperation, $property, $depth);
                 }
             }
 
@@ -486,71 +396,6 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
         }
 
         return null;
-    }
-
-    /*
-     * This function is @experimental, read the comment on the parameterToObjectType function for additional information.
-     * @experimental
-     */
-    private function getParameterArgs(Operation $operation, array $args = []): array
-    {
-        $groups = [];
-
-        foreach ($operation->getParameters() ?? [] as $parameter) {
-            $key = $parameter->getKey();
-
-            if (str_contains($key, '[')) {
-                $key = str_replace('.', $this->nestingSeparator, $key);
-                parse_str($key, $values);
-                $rootKey = key($values);
-
-                $leafs = $values[$rootKey];
-                $name = key($leafs);
-
-                $filterLeafs = [];
-                if ($filter = $this->resolveFilter($parameter->getFilter())) {
-                    $property = $parameter->getProperty() ?? $name;
-                    $property = str_replace('.', $this->nestingSeparator, $property);
-                    $description = $filter->getDescription($operation->getClass());
-
-                    foreach ($description as $descKey => $descValue) {
-                        $descKey = str_replace('.', $this->nestingSeparator, $descKey);
-                        parse_str($descKey, $descValues);
-                        if (isset($descValues[$property]) && \is_array($descValues[$property])) {
-                            $filterLeafs = array_merge($filterLeafs, $descValues[$property]);
-                        }
-                    }
-                }
-
-                if ($filterLeafs) {
-                    $leafs[$name] = $filterLeafs;
-                }
-
-                $groups[$rootKey][] = [
-                    'name' => $name,
-                    'leafs' => $leafs[$name],
-                    'required' => $parameter->getRequired(),
-                    'description' => $parameter->getDescription(),
-                    'type' => 'string',
-                ];
-                continue;
-            }
-
-            $args[$key] = ['type' => GraphQLType::string()];
-
-            if ($parameter->getRequired()) {
-                $args[$key]['type'] = GraphQLType::nonNull($args[$key]['type']);
-            }
-        }
-
-        foreach ($groups as $key => $flattenFields) {
-            $name = $key.$operation->getShortName().$operation->getName();
-            $inputObject = $this->parameterToObjectType($flattenFields, $name);
-            $this->typesContainer->set($name, $inputObject);
-            $args[$key] = $inputObject;
-        }
-
-        return $args;
     }
 
     private function getGraphQlPaginationArgs(Operation $queryOperation): array
@@ -597,12 +442,41 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
         return $args;
     }
 
-    private function getFilterArgs(array $args, ?string $resourceClass, string $rootResource, Operation $resourceOperation, Operation $rootOperation, ?string $property, int $depth): array
+    /**
+     * Single entry point for GraphQL collection-field arguments.
+     *
+     * Builds one intermediate "arg tree" from BOTH the legacy `Operation::getFilters()`
+     * descriptions and the canonical `Operation::getParameters()` (#[QueryParameter]),
+     * then materializes it into GraphQL types once via {@see argTreeToGraphQLType()}.
+     *
+     * It is called with the *resource* operation (not the root one): for a nested
+     * relation field, $resourceOperation is the related resource's collection_query,
+     * so its own parameters/filters surface as nested arguments on that sub-field.
+     */
+    private function getCollectionFilterArgs(array $args, ?string $resourceClass, string $rootResource, Operation $resourceOperation, Operation $rootOperation, ?string $property, int $depth): array
     {
         if (null === $resourceClass) {
             return $args;
         }
 
+        $tree = [];
+        $this->buildFilterArgTree($tree, $resourceClass, $rootResource, $resourceOperation, $rootOperation, $property, $depth);
+        $this->buildParameterArgTree($tree, $resourceOperation);
+
+        return $args + $this->argTreeToGraphQLType($tree);
+    }
+
+    /**
+     * Feeds the arg tree from the legacy `Operation::getFilters()` descriptions.
+     *
+     * A leaf is a GraphQLType; a nested node is an array carrying a reserved `#name`
+     * (the generated InputObjectType name). Nested filter nodes are list-wrapped to
+     * preserve the historical GraphQL filter shape (e.g. `order: [..]`, `availableAt: [..]`).
+     *
+     * @param array<string, mixed> $tree
+     */
+    private function buildFilterArgTree(array &$tree, string $resourceClass, string $rootResource, Operation $resourceOperation, Operation $rootOperation, ?string $property, int $depth): void
+    {
         foreach ($resourceOperation->getFilters() ?? [] as $filterId) {
             if (!($filter = $this->resolveFilter($filterId))) {
                 continue;
@@ -631,70 +505,316 @@ final class FieldsBuilder implements FieldsBuilderEnumInterface
                 array_walk_recursive($parsed, static function (&$v) use ($graphqlFilterType): void {
                     $v = $graphqlFilterType;
                 });
-                $args = $this->mergeFilterArgs($args, $parsed, $resourceOperation, $key);
+                $this->mergeArgTree($tree, $parsed, $resourceOperation->getShortName(), $key);
+            }
+        }
+    }
+
+    /**
+     * Feeds the arg tree from the canonical `Operation::getParameters()`.
+     *
+     * Each parameter's shape is derived from its JSON Schema (via
+     * {@see JsonSchemaFilterInterface::getSchema()}, e.g. ComparisonFilter exposing
+     * gt/gte/lt/lte/ne) and falls back to its `getNativeType()` for plain scalars.
+     * Bracketed keys (`order[:property]` → `order[name]`) collapse into a single
+     * list-wrapped input object; dotted keys (`colors.price`) flatten to a nested
+     * key (`colors__price`) so the runtime `__`→`.` contract is preserved.
+     *
+     * @param array<string, mixed> $tree
+     */
+    private function buildParameterArgTree(array &$tree, Operation $operation): void
+    {
+        foreach ($operation->getParameters() ?? [] as $parameter) {
+            $key = $parameter->getKey();
+            if (null === $key) {
+                continue;
+            }
+
+            $filter = $this->resolveFilter($parameter->getFilter());
+            $schema = ($filter instanceof JsonSchemaFilterInterface ? $filter->getSchema($parameter) : null) ?? $parameter->getSchema();
+            $leafType = $this->parameterLeafType($parameter, $schema);
+
+            if (str_contains($key, '[')) {
+                // Bracketed key (order[name], order[:property] expanded). The portion
+                // before the first bracket becomes one input object whose fields are
+                // the bracketed accessors, list-shaped for :property-template filters.
+                $rootKey = substr($key, 0, (int) strpos($key, '['));
+                preg_match_all('/\[([^\[\]]+)\]/', $key, $matches);
+                $accessors = $matches[1];
+
+                $name = $rootKey.$operation->getShortName().$operation->getName();
+                $node = $tree[$rootKey] ?? ['#name' => $name, '#list' => $this->isListParameter($filter)];
+                if (!\is_array($node)) {
+                    // A scalar leaf (written by a filter) already holds this key; a
+                    // bracketed parameter cannot merge into a non-object argument.
+                    continue;
+                }
+                $entityClass = $this->getStateOptionsClass($operation, $operation->getClass() ?? '');
+                $cursor = &$node;
+                foreach ($accessors as $i => $accessor) {
+                    if ($i === \count($accessors) - 1) {
+                        if (!isset($cursor[$accessor])) {
+                            $cursor[$accessor] = $this->bracketLeaf($parameter, $filter, $accessor, $leafType, $name, $entityClass);
+                        }
+                        break;
+                    }
+                    $cursor[$accessor] ??= ['#name' => $name.'_'.$accessor, '#list' => false];
+                    $cursor = &$cursor[$accessor];
+                }
+                unset($cursor);
+                $tree[$rootKey] = $node;
+                continue;
+            }
+
+            // Dotted key: flatten to the nesting-separator form (colors.price -> colors__price)
+            // so it matches the legacy runtime contract (ReadProvider converts __ back to .).
+            $argKey = str_replace('.', $this->nestingSeparator, $key);
+
+            if (\is_array($schema) && 'object' === ($schema['type'] ?? null) && \is_array($schema['properties'] ?? null)) {
+                // Operator form (e.g. ComparisonFilter gt/gte/lt/lte/ne): a non-list input object.
+                $name = $operation->getShortName().$operation->getName().'_'.strtr($argKey, ['.' => '__']);
+                $node = ['#name' => $name, '#list' => false, '#nonNull' => (bool) $parameter->getRequired()];
+                foreach ($schema['properties'] as $prop => $propSchema) {
+                    $propSchema = \is_array($propSchema) ? $propSchema : [];
+                    // The operator's inner schema is often a bare {type:string} placeholder
+                    // (ComparisonFilter wraps an untyped equality filter); prefer the
+                    // parameter's native type so an int property yields GraphQL Int.
+                    $node[$prop] = 'string' === ($propSchema['type'] ?? 'string') ? $leafType : $this->jsonSchemaToGraphQLType($propSchema);
+                }
+                $tree[$argKey] = $node;
+                continue;
+            }
+
+            $type = $leafType;
+            if ($parameter->getRequired()) {
+                $type = GraphQLType::nonNull($type);
+            }
+            $tree[$argKey] = $type;
+        }
+    }
+
+    /**
+     * Whether a bracketed parameter exposes a list-shaped GraphQL argument
+     * (e.g. `order: [{name: "DESC"}, {description: "ASC"}]`) instead of a single
+     * input object.
+     *
+     * Only sort filters are sequence-sensitive: GraphQL input-object fields are
+     * unordered, so multi-key ordering cannot be expressed as one object and must
+     * be a list. Every other bracketed filter (search, comparison, date, exists)
+     * is a single input object. Recognized through the backend-agnostic
+     * {@see SortFilterInterface}, keeping this component free of any persistence
+     * dependency.
+     */
+    private function isListParameter(?FilterInterface $filter): bool
+    {
+        return $filter instanceof SortFilterInterface;
+    }
+
+    /**
+     * Computes the leaf for a bracketed-parameter accessor.
+     *
+     * A scalar by default, but enriched from the filter's `getDescription()`: when the
+     * description for the accessor's property exposes sub-keys it becomes either a
+     * `listOf` (sequential `foo[]` form) or a nested non-list input object (e.g. a date
+     * filter's `createdAt[before]`/`[after]`), preserving the historical shape.
+     *
+     * @return GraphQLType|array<string, mixed>
+     */
+    private function bracketLeaf(Parameter $parameter, ?FilterInterface $filter, string $accessor, GraphQLType $leafType, string $parentName, string $entityClass): GraphQLType|array
+    {
+        if (!$filter instanceof FilterInterface) {
+            return $leafType;
+        }
+
+        $property = $parameter->getProperty() ?? $accessor;
+        $property = str_replace('.', $this->nestingSeparator, $property);
+
+        $descriptionLeafs = [];
+        foreach ($filter->getDescription($entityClass) as $descKey => $descValue) {
+            $descKey = str_replace('.', $this->nestingSeparator, $descKey);
+            parse_str($descKey, $descValues);
+            if (isset($descValues[$property]) && \is_array($descValues[$property])) {
+                $descriptionLeafs = array_merge($descriptionLeafs, $descValues[$property]);
             }
         }
 
-        return $this->convertFilterArgsToTypes($args);
+        if (!$descriptionLeafs) {
+            return $leafType;
+        }
+
+        // Sequential array (e.g. foo[]) => list of the scalar leaf.
+        if (0 === key($descriptionLeafs)) {
+            return GraphQLType::listOf($leafType);
+        }
+
+        // Associative sub-keys (e.g. before/after) => nested non-list input object.
+        $node = ['#name' => $parentName.'_'.$accessor, '#list' => false];
+        foreach (array_keys($descriptionLeafs) as $subKey) {
+            $node[$subKey] = GraphQLType::string();
+        }
+
+        return $node;
     }
 
-    private function mergeFilterArgs(array $args, array $parsed, ?Operation $operation = null, string $original = ''): array
+    /**
+     * Merges a parsed legacy-filter subtree into the shared arg tree, tagging nested
+     * nodes with the generated `#name` used for InputObjectType dedup.
+     *
+     * @param array<string, mixed> $tree
+     * @param array<string, mixed> $parsed
+     */
+    private function mergeArgTree(array &$tree, array $parsed, string $shortName, string $original): void
     {
         foreach ($parsed as $key => $value) {
-            // Never override keys that cannot be merged
-            if (isset($args[$key]) && !\is_array($args[$key])) {
+            // Never override keys that cannot be merged.
+            if (isset($tree[$key]) && !\is_array($tree[$key])) {
                 continue;
             }
 
             if (\is_array($value)) {
-                $value = $this->mergeFilterArgs($args[$key] ?? [], $value);
-                if (!isset($value['#name'])) {
+                $sub = $tree[$key] ?? [];
+                $this->mergeArgTree($sub, $value, $shortName, $original);
+                if (!isset($sub['#name'])) {
                     $name = (false === $pos = strrpos($original, '[')) ? $original : substr($original, 0, (int) $pos);
-                    $value['#name'] = ($operation ? $operation->getShortName() : '').'Filter_'.strtr($name, ['[' => '_', ']' => '', '.' => '__']);
+                    $sub['#name'] = $shortName.'Filter_'.strtr($name, ['[' => '_', ']' => '', '.' => '__']);
+                    $sub['#list'] = true;
                 }
+                $tree[$key] = $sub;
+                continue;
             }
 
-            $args[$key] = $value;
+            $tree[$key] = $value;
+        }
+    }
+
+    /**
+     * Materializes an arg tree into GraphQL argument definitions.
+     *
+     * Leaves are GraphQLType instances. A nested node (array) is converted to an
+     * `InputObjectType` named by its `#name` marker, list-wrapped when `#list` is
+     * true. Generated input objects are registered in the TypesContainer and reused
+     * on name collision (dedup).
+     *
+     * @param array<string, mixed> $tree
+     *
+     * @return array<string, mixed>
+     */
+    private function argTreeToGraphQLType(array $tree): array
+    {
+        $args = [];
+        foreach ($tree as $key => $value) {
+            if ($value instanceof GraphQLType) {
+                $args[$key] = $value;
+                continue;
+            }
+
+            if (\is_array($value) && isset($value['#name'])) {
+                $args[$key] = $this->buildInputObjectType($value);
+            }
         }
 
         return $args;
     }
 
-    private function convertFilterArgsToTypes(array $args): array
+    /**
+     * @param array<string, mixed> $node
+     */
+    private function buildInputObjectType(array $node): GraphQLType
     {
-        foreach ($args as $key => $value) {
-            if (strpos($key, '.')) {
-                // Declare relations/nested fields in a GraphQL compatible syntax.
-                $args[str_replace('.', $this->nestingSeparator, $key)] = $value;
-                unset($args[$key]);
-            }
+        $name = $node['#name'];
+        $list = $node['#list'] ?? true;
+        $nonNull = $node['#nonNull'] ?? false;
+
+        if ($this->typesContainer->has($name)) {
+            return $this->typesContainer->get($name);
         }
 
-        foreach ($args as $key => $value) {
-            if (!\is_array($value) || !isset($value['#name'])) {
+        unset($node['#name'], $node['#list'], $node['#nonNull']);
+
+        $fields = [];
+        foreach ($node as $fieldKey => $fieldValue) {
+            if ($fieldValue instanceof GraphQLType) {
+                $fields[$fieldKey] = $fieldValue;
                 continue;
             }
 
-            $name = $value['#name'];
-
-            if ($this->typesContainer->has($name)) {
-                $args[$key] = $this->typesContainer->get($name);
-                continue;
+            if (\is_array($fieldValue) && isset($fieldValue['#name'])) {
+                $fields[$fieldKey] = $this->buildInputObjectType($fieldValue);
             }
-
-            unset($value['#name']);
-
-            $filterArgType = GraphQLType::listOf(new InputObjectType([
-                'name' => $name,
-                'fields' => $this->convertFilterArgsToTypes($value),
-            ]));
-
-            $this->typesContainer->set($name, $filterArgType);
-
-            $args[$key] = $filterArgType;
         }
 
-        return $args;
+        $inputObject = new InputObjectType(['name' => $name, 'fields' => $fields]);
+        $type = $list ? GraphQLType::listOf($inputObject) : $inputObject;
+        if ($nonNull) {
+            $type = GraphQLType::nonNull($type);
+        }
+
+        $this->typesContainer->set($name, $type);
+
+        return $type;
+    }
+
+    /**
+     * Resolves the scalar GraphQL leaf type for a parameter, from its JSON Schema
+     * scalar type when available, otherwise from its native (PHP) type.
+     *
+     * @param array<string, mixed>|null $schema
+     */
+    private function parameterLeafType(Parameter $parameter, ?array $schema): GraphQLType
+    {
+        if (\is_array($schema) && isset($schema['type']) && \is_string($schema['type']) && 'object' !== $schema['type'] && 'array' !== $schema['type']) {
+            return $this->jsonSchemaToGraphQLType($schema);
+        }
+
+        if ($nativeType = $parameter->getNativeType()) {
+            return $this->nativeTypeToGraphQLType($nativeType);
+        }
+
+        return GraphQLType::string();
+    }
+
+    /**
+     * @param array<string, mixed> $schema
+     */
+    private function jsonSchemaToGraphQLType(array $schema): GraphQLType
+    {
+        if ('array' === ($schema['type'] ?? null)) {
+            $items = \is_array($schema['items'] ?? null) ? $schema['items'] : ['type' => 'string'];
+
+            return GraphQLType::listOf($this->jsonSchemaToGraphQLType($items));
+        }
+
+        return match ($schema['type'] ?? 'string') {
+            'integer' => GraphQLType::int(),
+            'number' => GraphQLType::float(),
+            'boolean' => GraphQLType::boolean(),
+            default => GraphQLType::string(),
+        };
+    }
+
+    private function nativeTypeToGraphQLType(Type $type): GraphQLType
+    {
+        if ($type->isIdentifiedBy(TypeIdentifier::BOOL)) {
+            return GraphQLType::boolean();
+        }
+
+        if ($type->isIdentifiedBy(TypeIdentifier::INT)) {
+            return GraphQLType::int();
+        }
+
+        if ($type->isIdentifiedBy(TypeIdentifier::FLOAT)) {
+            return GraphQLType::float();
+        }
+
+        if ($type->isIdentifiedBy(TypeIdentifier::STRING, TypeIdentifier::OBJECT)) {
+            return GraphQLType::string();
+        }
+
+        if ($type instanceof CollectionType) {
+            return GraphQLType::listOf($this->nativeTypeToGraphQLType($type->getCollectionValueType()));
+        }
+
+        return GraphQLType::string();
     }
 
     /**

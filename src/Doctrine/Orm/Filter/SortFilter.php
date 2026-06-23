@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\JsonSchemaFilterInterface;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
+use ApiPlatform\Metadata\SortFilterInterface;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
@@ -35,7 +36,7 @@ use Doctrine\ORM\QueryBuilder;
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-final class SortFilter implements FilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface
+final class SortFilter implements FilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface, SortFilterInterface
 {
     use BackwardCompatibleFilterDescriptionTrait;
     use NestedPropertyHelperTrait;
