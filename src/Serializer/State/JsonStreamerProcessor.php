@@ -68,6 +68,16 @@ final class JsonStreamerProcessor implements ProcessorInterface
             return $this->processor?->process($data, $operation, $uriVariables, $context);
         }
 
+        if ($request->isMethod('HEAD')) {
+            $response = new Response(
+                null,
+                $this->getStatus($request, $operation, $context),
+                $this->getHeaders($request, $operation, $context)
+            );
+
+            return $this->processor ? $this->processor->process($response, $operation, $uriVariables, $context) : $response;
+        }
+
         if ($operation instanceof CollectionOperationInterface) {
             $data = $this->jsonStreamer->write(
                 $data,
