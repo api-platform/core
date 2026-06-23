@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\State\Processor\CacheableDocumentationProcessor;
 use ApiPlatform\Symfony\Action\DocumentationAction;
 use ApiPlatform\Symfony\Action\EntrypointAction;
 use ApiPlatform\Symfony\Controller\MainController;
@@ -30,12 +31,25 @@ return static function (ContainerConfigurator $container) {
             service('logger')->ignoreOnInvalid(),
         ]);
 
+    $services->alias('api_platform.state_processor.documentation', 'api_platform.state_processor.main');
+
+    $services->set('api_platform.state_processor.documentation.cache', CacheableDocumentationProcessor::class)
+        ->decorate('api_platform.state_processor.documentation', null, 300)
+        ->args([
+            service('api_platform.state_processor.documentation.cache.inner'),
+            '%api_platform.documentation.cache_headers.max_age%',
+            '%api_platform.documentation.cache_headers.shared_max_age%',
+            '%api_platform.documentation.cache_headers.public%',
+            '%api_platform.documentation.cache_headers.must_revalidate%',
+            '%api_platform.documentation.cache_headers.etag%',
+        ]);
+
     $services->set('api_platform.action.entrypoint', EntrypointAction::class)
         ->public()
         ->args([
             service('api_platform.metadata.resource.name_collection_factory'),
             service('api_platform.state_provider.main'),
-            service('api_platform.state_processor.main'),
+            service('api_platform.state_processor.documentation'),
             '%api_platform.docs_formats%',
         ]);
 
@@ -48,7 +62,7 @@ return static function (ContainerConfigurator $container) {
             '%api_platform.version%',
             service('api_platform.openapi.factory')->nullOnInvalid(),
             service('api_platform.state_provider.main'),
-            service('api_platform.state_processor.main'),
+            service('api_platform.state_processor.documentation'),
             service('api_platform.negotiator')->nullOnInvalid(),
             '%api_platform.docs_formats%',
             '%api_platform.enable_swagger_ui%',
