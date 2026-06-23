@@ -71,7 +71,8 @@ final class PropertyMetadataLoader implements LoaderInterface
             if ($attribute instanceof DiscriminatorMap) {
                 $classMetadata->setClassDiscriminatorMapping(new ClassDiscriminatorMapping(
                     method_exists($attribute, 'getTypeProperty') ? $attribute->getTypeProperty() : $attribute->typeProperty,
-                    method_exists($attribute, 'getMapping') ? $attribute->getMapping() : $attribute->mapping
+                    method_exists($attribute, 'getMapping') ? $attribute->getMapping() : $attribute->mapping,
+                    method_exists($attribute, 'getDefaultType') ? $attribute->getDefaultType() : ($attribute->defaultType ?? null),
                 ));
                 continue;
             }

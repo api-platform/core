@@ -16,9 +16,11 @@ namespace ApiPlatform\Serializer\Tests\Mapping\Loader;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Property\PropertyNameCollection;
 use ApiPlatform\Serializer\Mapping\Loader\PropertyMetadataLoader;
+use ApiPlatform\Serializer\Tests\Fixtures\Model\AbstractWithDiscriminator;
 use ApiPlatform\Serializer\Tests\Fixtures\Model\HasRelation;
 use ApiPlatform\Serializer\Tests\Fixtures\Model\Relation;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 
 final class PropertyMetadataLoaderTest extends TestCase
@@ -54,5 +56,22 @@ final class PropertyMetadataLoaderTest extends TestCase
         }
         $this->assertArrayHasKey('name', $attributesMetadata);
         $this->assertEquals(['read'], $attributesMetadata['name']->getGroups());
+    }
+
+    public function testForwardsDiscriminatorDefaultType(): void
+    {
+        if (!method_exists(ClassDiscriminatorMapping::class, 'getDefaultType')) { // @phpstan-ignore-line
+            $this->markTestSkipped('ClassDiscriminatorMapping::getDefaultType() requires symfony/serializer 7.1+.');
+        }
+
+        $coll = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $coll->method('create')->willReturn(new PropertyNameCollection([]));
+        $loader = new PropertyMetadataLoader($coll);
+        $classMetadata = new ClassMetadata(AbstractWithDiscriminator::class);
+        $loader->loadClassMetadata($classMetadata);
+
+        $mapping = $classMetadata->getClassDiscriminatorMapping();
+        $this->assertNotNull($mapping);
+        $this->assertSame('concrete', $mapping->getDefaultType());
     }
 }
