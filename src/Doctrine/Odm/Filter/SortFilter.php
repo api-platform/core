@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\JsonSchemaFilterInterface;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
+use ApiPlatform\Metadata\SortFilterInterface;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 
 /**
@@ -33,7 +34,7 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-final class SortFilter implements FilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface
+final class SortFilter implements FilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface, SortFilterInterface
 {
     use BackwardCompatibleFilterDescriptionTrait;
     use NestedPropertyHelperTrait;
