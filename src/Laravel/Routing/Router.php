@@ -37,6 +37,7 @@ final class Router implements RouterInterface, UrlGeneratorInterface
     ];
 
     private RequestContext $context;
+    private ?RouteCollection $routeCollection = null;
 
     public function __construct(private readonly BaseRouter $router, private readonly int $urlGenerationStrategy = UrlGeneratorInterface::ABS_PATH)
     {
@@ -63,10 +64,14 @@ final class Router implements RouterInterface, UrlGeneratorInterface
      */
     public function getRouteCollection(): RouteCollection
     {
+        if (null !== $this->routeCollection) {
+            return $this->routeCollection;
+        }
+
         /** @var \Illuminate\Routing\RouteCollection $routes */
         $routes = $this->router->getRoutes();
 
-        return $routes->toSymfonyRouteCollection();
+        return $this->routeCollection = $routes->toSymfonyRouteCollection();
     }
 
     /**

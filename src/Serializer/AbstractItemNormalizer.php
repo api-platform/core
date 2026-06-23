@@ -764,9 +764,16 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         try {
             $item = $this->iriConverter->getResourceFromIri($data, $context + ['fetch_data' => true]);
 
-            // Type-confusion guard: declared relation class must match the IRI's resource.
-            if (!is_a($item, $resourceClass)) {
-                throw new InvalidArgumentException(\sprintf('The iri "%s" does not reference the correct resource.', $data));
+            // Type-confusion guard: the IRI's resource must satisfy the declared relation type.
+            // When a union/intersection type is known, validate against it so any member is accepted;
+            // otherwise fall back to the single declared class.
+            $relationType = $context['relation_native_type'] ?? null;
+            $matchesType = $relationType instanceof Type
+                ? $relationType->isSatisfiedBy(static fn (Type $t): bool => $t instanceof ObjectType && is_a($item, $t->getClassName()))
+                : is_a($item, $resourceClass);
+
+            if (!$matchesType) {
+                throw new NotNormalizableValueException(\sprintf('The iri "%s" does not reference the correct resource.', $data));
             }
 
             return $item;
@@ -1227,6 +1234,12 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 $context['resource_class'] = $resourceClass;
                 unset($context['uri_variables']);
 
+                // Validate the IRI target against the declared collection value type so a union
+                // (array<Foo|Bar>) accepts an IRI pointing to any of its members, not just the first.
+                if ($collectionValueType instanceof Type) {
+                    $context['relation_native_type'] = $collectionValueType;
+                }
+
                 try {
                     return $t instanceof Type
                         ? $this->denormalizeObjectCollection($attribute, $propertyMetadata, $t, $resourceClass, $value, $format, $context)
@@ -1249,6 +1262,9 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             ) {
                 $resourceClass = $this->resourceClassResolver->getResourceClass(null, $className);
                 $childContext = $this->createChildContext($this->createOperationContext($context, $resourceClass, $propertyMetadata), $attribute, $format);
+                if ($t instanceof Type) {
+                    $childContext['relation_native_type'] = $t;
+                }
 
                 try {
                     return $this->denormalizeRelation($attribute, $propertyMetadata, $resourceClass, $value, $format, $childContext);

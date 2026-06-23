@@ -161,6 +161,33 @@ class SchemaFactoryTest extends TestCase
         $this->assertEquals($resultSchema['allOf'][0]['$ref'], $forcedCollection['allOf'][0]['$ref']);
     }
 
+    // gen_id=false output schema must not require `@id` (e.g. an operation whose serializer omits the IRI).
+    public function testGenIdFalseOutputSchemaDoesNotRequireId(): void
+    {
+        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_OUTPUT, new Get(), null, ['gen_id' => false]);
+
+        $definitions = $resultSchema->getDefinitions();
+        $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
+
+        $this->assertSame(['$ref' => '#/definitions/HydraItemBaseSchemaWithoutId'], $definitions[$rootDefinitionKey]['allOf'][0]);
+        $this->assertArrayHasKey('HydraItemBaseSchemaWithoutId', $definitions);
+        $this->assertSame(['@type'], $definitions['HydraItemBaseSchemaWithoutId']['required']);
+        $this->assertArrayNotHasKey('HydraItemBaseSchema', $definitions);
+    }
+
+    // Default (gen_id left to its true default): the output schema keeps `@id` required.
+    public function testOutputSchemaRequiresIdByDefault(): void
+    {
+        $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_OUTPUT, new Get());
+
+        $definitions = $resultSchema->getDefinitions();
+        $rootDefinitionKey = $resultSchema->getRootDefinitionKey();
+
+        $this->assertSame(['$ref' => '#/definitions/HydraItemBaseSchema'], $definitions[$rootDefinitionKey]['allOf'][0]);
+        $this->assertSame(['@id', '@type'], $definitions['HydraItemBaseSchema']['required']);
+        $this->assertArrayNotHasKey('HydraItemBaseSchemaWithoutId', $definitions);
+    }
+
     public function testSchemaTypeBuildSchemaWithoutPrefix(): void
     {
         $resultSchema = $this->schemaFactory->buildSchema(Dummy::class, 'jsonld', Schema::TYPE_OUTPUT, new GetCollection(), null, [ContextBuilder::HYDRA_CONTEXT_HAS_PREFIX => false]);

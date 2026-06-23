@@ -22,10 +22,16 @@ use ApiPlatform\JsonApi\Serializer\ItemDenormalizer;
 use ApiPlatform\JsonApi\Serializer\ItemNormalizer;
 use ApiPlatform\JsonApi\Serializer\ObjectNormalizer;
 use ApiPlatform\JsonApi\Serializer\ReservedAttributeNameConverter;
+use ApiPlatform\JsonApi\Util\ResourceLinkageResolver;
 use ApiPlatform\Serializer\JsonEncoder;
 
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
+
+    $services->set('api_platform.jsonapi.resource_linkage_resolver', ResourceLinkageResolver::class)
+        ->args([
+            service('api_platform.resource_class_resolver'),
+        ]);
 
     $services->set('api_platform.jsonapi.json_schema.schema_factory', SchemaFactory::class)
         ->decorate('api_platform.json_schema.schema_factory', null, 0)
@@ -35,6 +41,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.resource_class_resolver'),
             service('api_platform.metadata.resource.metadata_collection_factory')->ignoreOnInvalid(),
             service('api_platform.json_schema.definition_name_factory')->ignoreOnInvalid(),
+            service('api_platform.jsonapi.resource_linkage_resolver'),
         ]);
 
     $services->set('api_platform.jsonapi.encoder', JsonEncoder::class)

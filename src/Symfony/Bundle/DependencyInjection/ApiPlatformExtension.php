@@ -717,6 +717,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $itemNormalizer = $container->getDefinition('api_platform.jsonapi.normalizer.item');
         $itemNormalizer->replaceArgument(7, [JsonApiItemNormalizer::ALLOW_CLIENT_GENERATED_ID => $config['jsonapi']['allow_client_generated_id'] ?? false]);
         $itemNormalizer->addArgument($useIriAsId);
+        $itemNormalizer->addArgument(new Reference('api_platform.jsonapi.resource_linkage_resolver'));
 
         $itemDenormalizer = $container->getDefinition('api_platform.jsonapi.denormalizer.item');
         $itemDenormalizer->replaceArgument(7, [JsonApiItemNormalizer::ALLOW_CLIENT_GENERATED_ID => $config['jsonapi']['allow_client_generated_id'] ?? false]);

@@ -1238,6 +1238,97 @@ class AbstractItemNormalizerTest extends TestCase
         $propertyAccessorProphecy->setValue($actual, 'relatedDummiesWithUnionTypes', [0 => $relatedDummy3, 1 => $relatedDummy4])->shouldHaveBeenCalled();
     }
 
+    public function testUnionTypeDenormalizationFallsThroughAfterTypeConfusionGuardMismatch(): void
+    {
+        $data = ['relatedDummyUnion' => '/related_dummies/1'];
+        $relatedDummy = new RelatedDummy();
+
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->willReturn(new PropertyNameCollection(['relatedDummyUnion']));
+
+        // Dummy is the mismatching member tried first; RelatedDummy is the one that actually matches.
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturn(
+            (new ApiProperty())
+                ->withNativeType(Type::union(Type::object(Dummy::class), Type::object(RelatedDummy::class)))
+                ->withWritable(true)->withWritableLink(true)
+        );
+
+        // Always resolves to a RelatedDummy, no matter which type of the union is being attempted.
+        $iriConverter = $this->createStub(IriConverterInterface::class);
+        $iriConverter->method('getResourceFromIri')->willReturn($relatedDummy);
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturnMap([
+            [Dummy::class, true],
+            [RelatedDummy::class, true],
+        ]);
+        $resourceClassResolver->method('getResourceClass')->willReturnMap([
+            [null, Dummy::class, Dummy::class],
+            [null, RelatedDummy::class, RelatedDummy::class],
+        ]);
+
+        $propertyAccessor = $this->createMock(PropertyAccessorInterface::class);
+        $propertyAccessor->expects($this->once())
+            ->method('setValue')
+            ->with($this->isInstanceOf(Dummy::class), 'relatedDummyUnion', $relatedDummy);
+
+        $serializer = $this->createStub(SerializerInterface::class);
+
+        $normalizer = new class($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, null, null, [], null, null) extends AbstractItemNormalizer {};
+        $normalizer->setSerializer($serializer);
+
+        // The first union member (Dummy) should correctly fail and we expect to fallback to the second
+        // member (RelatedDummy).
+        $actual = $normalizer->denormalize($data, Dummy::class);
+
+        $this->assertInstanceOf(Dummy::class, $actual);
+    }
+
+    public function testUnionTypeCollectionDenormalizationAcceptsAnyMember(): void
+    {
+        $data = ['attachments' => ['/related_dummies/1']];
+        $relatedDummy = new RelatedDummy();
+
+        $propertyNameCollectionFactory = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $propertyNameCollectionFactory->method('create')->willReturn(new PropertyNameCollection(['attachments']));
+
+        // array<Dummy|RelatedDummy>: the collection value type is a union; the IRI points to the second member.
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturn(
+            (new ApiProperty())
+                ->withNativeType(Type::list(Type::union(Type::object(Dummy::class), Type::object(RelatedDummy::class))))
+                ->withWritable(true)
+        );
+
+        $iriConverter = $this->createStub(IriConverterInterface::class);
+        $iriConverter->method('getResourceFromIri')->willReturn($relatedDummy);
+
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturnMap([
+            [Dummy::class, true],
+            [RelatedDummy::class, true],
+        ]);
+        $resourceClassResolver->method('getResourceClass')->willReturnMap([
+            [null, Dummy::class, Dummy::class],
+            [null, RelatedDummy::class, RelatedDummy::class],
+        ]);
+
+        $propertyAccessor = $this->createMock(PropertyAccessorInterface::class);
+        $propertyAccessor->expects($this->once())
+            ->method('setValue')
+            ->with($this->isInstanceOf(Dummy::class), 'attachments', [0 => $relatedDummy]);
+
+        $serializer = $this->createStub(SerializerInterface::class);
+
+        $normalizer = new class($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, null, null, [], null, null) extends AbstractItemNormalizer {};
+        $normalizer->setSerializer($serializer);
+
+        $actual = $normalizer->denormalize($data, Dummy::class);
+
+        $this->assertInstanceOf(Dummy::class, $actual);
+    }
+
     public function testDenormalizeRelationNotFoundReturnsNull(): void
     {
         $data = [

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\JsonApi\Serializer;
 
+use ApiPlatform\JsonApi\Util\ResourceLinkageResolver;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
@@ -24,22 +25,17 @@ use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\Util\CompositeIdentifierParser;
-use ApiPlatform\Metadata\Util\TypeHelper;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use ApiPlatform\Serializer\ContextTrait;
 use ApiPlatform\Serializer\OperationResourceClassResolverInterface;
 use ApiPlatform\Serializer\TagCollectorInterface;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Symfony\Component\TypeInfo\Type;
-use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
-use Symfony\Component\TypeInfo\Type\ObjectType;
 
 /**
  * Converts objects to JSON:API documents (normalization only).
@@ -67,6 +63,8 @@ final class ItemNormalizer extends AbstractItemNormalizer
     public const ALLOW_CLIENT_GENERATED_ID = 'allow_client_generated_id';
 
     private array $componentsCache = [];
+    private bool $useIriAsId;
+    private readonly ResourceLinkageResolver $resourceLinkageResolver;
 
     public function __construct(
         PropertyNameCollectionFactoryInterface $propertyNameCollectionFactory,
@@ -82,9 +80,12 @@ final class ItemNormalizer extends AbstractItemNormalizer
         protected ?TagCollectorInterface $tagCollector = null,
         ?OperationResourceClassResolverInterface $operationResourceResolver = null,
         private readonly ?IdentifiersExtractorInterface $identifiersExtractor = null,
-        private readonly bool $useIriAsId = true,
+        bool $useIriAsId = true,
+        ?ResourceLinkageResolver $resourceLinkageResolver = null,
     ) {
         parent::__construct($propertyNameCollectionFactory, $propertyMetadataFactory, $iriConverter, $resourceClassResolver, $propertyAccessor, $nameConverter, $classMetadataFactory, $defaultContext, $resourceMetadataCollectionFactory, $resourceAccessChecker, $tagCollector, $operationResourceResolver);
+        $this->useIriAsId = $useIriAsId;
+        $this->resourceLinkageResolver = $resourceLinkageResolver ?? new ResourceLinkageResolver($resourceClassResolver);
     }
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
@@ -269,97 +270,36 @@ final class ItemNormalizer extends AbstractItemNormalizer
                 ->propertyMetadataFactory
                 ->create($context['resource_class'], $attribute, $options);
 
-            $isRelationship = false;
+            // Shared with the JSON Schema SchemaFactory so the documented split cannot drift from this output.
+            $relationships = $this->resourceLinkageResolver->getRelationships($propertyMetadata);
 
-            if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
-                $types = $propertyMetadata->getBuiltinTypes() ?? [];
+            foreach ($relationships as [$className, $isCollection]) {
+                $relation = [
+                    'name' => $attribute,
+                    'type' => $this->getResourceShortName($className),
+                    'cardinality' => $isCollection ? 'many' : 'one',
+                ];
 
-                foreach ($types as $type) {
-                    $isOne = $isMany = false;
+                // if we specify the uriTemplate, generates its value for link definition
+                // @see ApiPlatform\Serializer\AbstractItemNormalizer:getAttributeValue logic for intentional duplicate content
+                if ($itemUriTemplate = $propertyMetadata->getUriTemplate()) {
+                    $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
+                    $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
+                    $childContext = $this->createChildContext($context, $attribute, $format);
+                    unset($childContext['iri'], $childContext['uri_variables'], $childContext['resource_class'], $childContext['operation']);
 
-                    if ($type->isCollection()) {
-                        $collectionValueType = $type->getCollectionValueTypes()[0] ?? null;
-                        $isMany = $collectionValueType && ($className = $collectionValueType->getClassName()) && $this->resourceClassResolver->isResourceClass($className);
-                    } else {
-                        $isOne = ($className = $type->getClassName()) && $this->resourceClassResolver->isResourceClass($className);
-                    }
+                    $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation(
+                        operationName: $itemUriTemplate,
+                        httpOperation: true
+                    );
 
-                    if (!isset($className) || !$isOne && !$isMany) {
-                        continue;
-                    }
-
-                    $relation = [
-                        'name' => $attribute,
-                        'type' => $this->getResourceShortName($className),
-                        'cardinality' => $isOne ? 'one' : 'many',
-                    ];
-
-                    if ($itemUriTemplate = $propertyMetadata->getUriTemplate()) {
-                        $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
-                        $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
-                        $childContext = $this->createChildContext($context, $attribute, $format);
-                        unset($childContext['iri'], $childContext['uri_variables'], $childContext['resource_class'], $childContext['operation']);
-
-                        $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation(
-                            operationName: $itemUriTemplate,
-                            httpOperation: true
-                        );
-
-                        $components['links'][$attribute] = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $operation, $childContext);
-                    }
-
-                    $components['relationships'][] = $relation;
-                    $isRelationship = true;
+                    $components['links'][$attribute] = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $operation, $childContext);
                 }
-            } else {
-                if ($type = $propertyMetadata->getNativeType()) {
-                    /** @var class-string|null $className */
-                    $className = null;
 
-                    $typeIsResourceClass = function (Type $type) use (&$className): bool {
-                        return $type instanceof ObjectType && $this->resourceClassResolver->isResourceClass($className = $type->getClassName());
-                    };
-
-                    foreach ($type instanceof CompositeTypeInterface ? $type->getTypes() : [$type] as $t) {
-                        $isOne = $isMany = false;
-
-                        if (TypeHelper::getCollectionValueType($t)?->isSatisfiedBy($typeIsResourceClass)) {
-                            $isMany = true;
-                        } elseif ($t->isSatisfiedBy($typeIsResourceClass)) {
-                            $isOne = true;
-                        }
-
-                        if (!$className || (!$isOne && !$isMany)) {
-                            continue;
-                        }
-
-                        $relation = [
-                            'name' => $attribute,
-                            'type' => $this->getResourceShortName($className),
-                            'cardinality' => $isOne ? 'one' : 'many',
-                        ];
-
-                        if ($itemUriTemplate = $propertyMetadata->getUriTemplate()) {
-                            $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
-                            $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
-                            $childContext = $this->createChildContext($context, $attribute, $format);
-                            unset($childContext['iri'], $childContext['uri_variables'], $childContext['resource_class'], $childContext['operation']);
-
-                            $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation(
-                                operationName: $itemUriTemplate,
-                                httpOperation: true
-                            );
-
-                            $components['links'][$attribute] = $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $operation, $childContext);
-                        }
-
-                        $components['relationships'][] = $relation;
-                        $isRelationship = true;
-                    }
-                }
+                $components['relationships'][] = $relation;
             }
 
-            if (!$isRelationship) {
+            if ([] === $relationships) {
                 $components['attributes'][] = $attribute;
             }
         }
