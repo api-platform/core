@@ -261,6 +261,9 @@ class ApiPlatformExtensionTest extends TestCase
         foreach ($services as $service) {
             $this->assertNotContainerHasService($service);
         }
+
+        $this->assertTrue($this->container->hasParameter('api_platform.enable_head_request_optimization'));
+        $this->assertTrue($this->container->getParameter('api_platform.enable_head_request_optimization'));
     }
 
     public function testSwaggerUiDisabledConfiguration(): void

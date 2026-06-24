@@ -101,6 +101,7 @@ return static function (ContainerConfigurator $container) {
             null,
             service('api_platform.serializer'),
             service('api_platform.serializer.context_builder'),
+            '%api_platform.enable_head_request_optimization%',
         ]);
 
     $services->set('api_platform.state_processor.write', WriteProcessor::class)
@@ -162,6 +163,7 @@ return static function (ContainerConfigurator $container) {
             service('api_platform.state_processor.documentation.serialize.inner'),
             service('api_platform.serializer'),
             service('api_platform.serializer.context_builder'),
+            '%api_platform.enable_head_request_optimization%',
         ]);
 
     $services->set('api_platform.state_processor.documentation.write', WriteProcessor::class)
