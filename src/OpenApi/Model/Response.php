@@ -17,7 +17,7 @@ final class Response
 {
     use ExtensionTrait;
 
-    public function __construct(private ?string $description = null, private ?\ArrayObject $content = null, private ?\ArrayObject $headers = null, private ?\ArrayObject $links = null)
+    public function __construct(private ?string $description = null, private ?\ArrayObject $content = null, private ?\ArrayObject $headers = null, private ?\ArrayObject $links = null, private ?string $summary = null)
     {
     }
 
@@ -39,6 +39,11 @@ final class Response
     public function getLinks(): ?\ArrayObject
     {
         return $this->links;
+    }
+
+    public function getSummary(): ?string
+    {
+        return $this->summary;
     }
 
     public function withDescription(string $description): self
@@ -69,6 +74,14 @@ final class Response
     {
         $clone = clone $this;
         $clone->links = $links;
+
+        return $clone;
+    }
+
+    public function withSummary(string $summary): self
+    {
+        $clone = clone $this;
+        $clone->summary = $summary;
 
         return $clone;
     }

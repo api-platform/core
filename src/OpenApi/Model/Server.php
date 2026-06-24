@@ -17,7 +17,7 @@ final class Server
 {
     use ExtensionTrait;
 
-    public function __construct(private string $url, private string $description = '', private ?\ArrayObject $variables = null)
+    public function __construct(private string $url, private string $description = '', private ?\ArrayObject $variables = null, private ?string $name = null)
     {
     }
 
@@ -34,6 +34,11 @@ final class Server
     public function getVariables(): ?\ArrayObject
     {
         return $this->variables;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
     }
 
     public function withUrl(string $url): self
@@ -56,6 +61,14 @@ final class Server
     {
         $clone = clone $this;
         $clone->variables = $variables;
+
+        return $clone;
+    }
+
+    public function withName(string $name): self
+    {
+        $clone = clone $this;
+        $clone->name = $name;
 
         return $clone;
     }

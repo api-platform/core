@@ -24,7 +24,7 @@ final class LegacyOpenApiNormalizer implements NormalizerInterface
     private const SCHEMA_NESTED_KEYS = ['items', 'additionalProperties', 'not', 'contains', 'propertyNames', 'if', 'then', 'else'];
 
     private array $defaultContext = [
-        self::SPEC_VERSION => '3.1.0',
+        self::SPEC_VERSION => '3.2.0',
     ];
 
     public function __construct(private readonly NormalizerInterface $decorated, array $defaultContext = [])
