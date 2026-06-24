@@ -46,6 +46,7 @@ final class SerializeProcessor implements ProcessorInterface, StopwatchAwareInte
         private readonly ?ProcessorInterface $processor,
         private readonly SerializerInterface $serializer,
         private readonly SerializerContextBuilderInterface $serializerContextBuilder,
+        private readonly bool $enableHeadRequestOptimization = true,
     ) {
     }
 
@@ -60,7 +61,7 @@ final class SerializeProcessor implements ProcessorInterface, StopwatchAwareInte
         // @see ApiPlatform\State\Processor\RespondProcessor
         $context['original_data'] = $data;
 
-        if ($request->isMethod('HEAD')) {
+        if ($this->enableHeadRequestOptimization && $request->isMethod('HEAD')) {
             $this->stopwatch?->stop('api_platform.processor.serialize');
 
             return $this->processor?->process(null, $operation, $uriVariables, $context);

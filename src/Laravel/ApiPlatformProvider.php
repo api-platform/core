@@ -553,7 +553,7 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->singleton(SerializeProcessor::class, static function (Application $app) {
-            return new SerializeProcessor($app->make(RespondProcessor::class), $app->make(Serializer::class), $app->make(SerializerContextBuilderInterface::class));
+            return new SerializeProcessor($app->make(RespondProcessor::class), $app->make(Serializer::class), $app->make(SerializerContextBuilderInterface::class), $app['config']->get('api-platform.enable_head_request_optimization', true));
         });
 
         $this->app->singleton(WriteProcessor::class, static function (Application $app) {

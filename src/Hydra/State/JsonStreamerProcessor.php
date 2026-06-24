@@ -59,6 +59,7 @@ final class JsonStreamerProcessor implements ProcessorInterface
         private readonly string $enabledParameterName = 'pagination',
         private readonly int $urlGenerationStrategy = UrlGeneratorInterface::ABS_PATH,
         ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
+        private readonly bool $enableHeadRequestOptimization = true,
     ) {
         $this->resourceClassResolver = $resourceClassResolver;
         $this->iriConverter = $iriConverter;
@@ -79,7 +80,7 @@ final class JsonStreamerProcessor implements ProcessorInterface
             return $this->processor?->process($data, $operation, $uriVariables, $context);
         }
 
-        if ($request->isMethod('HEAD')) {
+        if ($this->enableHeadRequestOptimization && $request->isMethod('HEAD')) {
             $response = new Response(
                 null,
                 $this->getStatus($request, $operation, $context),

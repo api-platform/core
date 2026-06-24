@@ -41,4 +41,23 @@ class SerializeProcessorTest extends TestCase
 
         $this->assertNull($processor->process(new \stdClass(), $operation, [], ['request' => $request]));
     }
+
+    public function testHeadRequestSerializesWhenOptimizationDisabled(): void
+    {
+        $request = Request::create('/foos', 'HEAD');
+
+        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer->expects($this->once())->method('serialize')->willReturn('');
+
+        $inner = $this->createMock(ProcessorInterface::class);
+        $inner->method('process')->willReturn('forwarded');
+
+        $contextBuilder = $this->createStub(SerializerContextBuilderInterface::class);
+        $contextBuilder->method('createFromRequest')->willReturn([]);
+
+        $processor = new SerializeProcessor($inner, $serializer, $contextBuilder, false);
+        $operation = (new Get())->withSerialize(true);
+
+        $this->assertSame('forwarded', $processor->process(new \stdClass(), $operation, [], ['request' => $request]));
+    }
 }

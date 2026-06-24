@@ -1,5 +1,15 @@
 # Changelog
 
+HEAD requests no longer build the response body: the collection is never
+iterated (no row SELECT) and serialization is skipped. Two observable changes:
+
+- `Content-Length` is no longer set on HEAD (RFC 9110 §9.3.2 permits this).
+- Cache-tag/xkey headers are not emitted on HEAD. Previously HEAD carried the
+  same tags as GET, so cached HEAD responses were tag-purgeable; now they
+  invalidate by TTL only. Body-less, so impact is limited to stale headers.
+
+Restore the previous GET-equivalent behavior with `api_platform.enable_head_request_optimization: false`.
+
 ## v4.3.14
 
 ### Bug fixes
