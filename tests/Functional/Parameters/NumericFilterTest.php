@@ -66,26 +66,23 @@ final class NumericFilterTest extends ApiTestCase
         yield 'amount_alias_int_equal' => ['/filtered_numeric_parameters?amount=20', 2];
     }
 
-    #[DataProvider('nullAndEmptyScenariosProvider')]
-    public function testRangeFilterWithNullAndEmptyValues(string $url, int $expectedCount): void
+    /**
+     * An empty value cannot be cast to the int/float native type, so the caster rejects it with a
+     * Bad Request before the filter runs.
+     */
+    #[DataProvider('emptyScenariosProvider')]
+    public function testRangeFilterWithEmptyValues(string $url): void
     {
-        $response = self::createClient()->request('GET', $url);
-        $this->assertResponseIsSuccessful();
+        self::createClient()->request('GET', $url);
 
-        $responseData = $response->toArray();
-        $filteredItems = $responseData['hydra:member'];
-
-        $this->assertCount($expectedCount, $filteredItems, \sprintf('Expected %d items for URL %s', $expectedCount, $url));
+        $this->assertResponseStatusCodeSame(400);
     }
 
-    public static function nullAndEmptyScenariosProvider(): \Generator
+    public static function emptyScenariosProvider(): \Generator
     {
-        yield 'quantity_int_null_value' => ['/filtered_numeric_parameters?quantity=null', 4];
-        yield 'quantity_int_empty_value' => ['/filtered_numeric_parameters?quantity=', 4];
-        yield 'ratio_float_null_value' => ['/filtered_numeric_parameters?ratio=null', 4];
-        yield 'ratio_float_empty_value' => ['/filtered_numeric_parameters?ratio=', 4];
-        yield 'amount_alias_int_null_value' => ['/filtered_numeric_parameters?amount=null', 4];
-        yield 'amount_alias_int_empty_value' => ['/filtered_numeric_parameters?amount=', 4];
+        yield 'quantity_int_empty_value' => ['/filtered_numeric_parameters?quantity='];
+        yield 'ratio_float_empty_value' => ['/filtered_numeric_parameters?ratio='];
+        yield 'amount_alias_int_empty_value' => ['/filtered_numeric_parameters?amount='];
     }
 
     /**

@@ -15,6 +15,7 @@ namespace ApiPlatform\Laravel\Exception;
 
 use ApiPlatform\Laravel\ApiResource\Error;
 use ApiPlatform\Laravel\Controller\ApiPlatformController;
+use ApiPlatform\Metadata\Exception\HttpExceptionInterface;
 use ApiPlatform\Metadata\Exception\InvalidUriVariableException;
 use ApiPlatform\Metadata\Exception\ProblemExceptionInterface;
 use ApiPlatform\Metadata\Exception\StatusAwareExceptionInterface;
@@ -186,7 +187,7 @@ class ErrorRenderer
             return 403;
         }
 
-        if ($exception instanceof SymfonyHttpExceptionInterface) {
+        if ($exception instanceof SymfonyHttpExceptionInterface || $exception instanceof HttpExceptionInterface) {
             return $exception->getStatusCode();
         }
 
