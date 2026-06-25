@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use ApiPlatform\Symfony\Maker\MakeApiResource;
 use ApiPlatform\Symfony\Maker\MakeFilter;
 use ApiPlatform\Symfony\Maker\MakeStateProcessor;
 use ApiPlatform\Symfony\Maker\MakeStateProvider;
@@ -29,6 +30,10 @@ return static function (ContainerConfigurator $container) {
         ->tag('maker.command');
 
     $services->set('api_platform.maker.command.filter', MakeFilter::class)
+        ->args([param('api_platform.maker.namespace_prefix')])
+        ->tag('maker.command');
+
+    $services->set('api_platform.maker.command.api_resource', MakeApiResource::class)
         ->args([param('api_platform.maker.namespace_prefix')])
         ->tag('maker.command');
 };
