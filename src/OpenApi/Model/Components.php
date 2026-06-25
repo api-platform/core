@@ -30,8 +30,9 @@ final class Components
      * @param \ArrayObject<string, Link>|\ArrayObject<string, Reference>                                   $links
      * @param \ArrayObject<string, array<string, PathItem>>|\ArrayObject<string, array<string, Reference>> $callbacks
      * @param \ArrayObject<string, PathItem>|\ArrayObject<string, Reference>                               $pathItems
+     * @param \ArrayObject<string, MediaType>|\ArrayObject<string, Reference>                              $mediaTypes
      */
-    public function __construct(?\ArrayObject $schemas = null, private ?\ArrayObject $responses = null, private ?\ArrayObject $parameters = null, private ?\ArrayObject $examples = null, private ?\ArrayObject $requestBodies = null, private ?\ArrayObject $headers = null, private ?\ArrayObject $securitySchemes = null, private ?\ArrayObject $links = null, private ?\ArrayObject $callbacks = null, private ?\ArrayObject $pathItems = null)
+    public function __construct(?\ArrayObject $schemas = null, private ?\ArrayObject $responses = null, private ?\ArrayObject $parameters = null, private ?\ArrayObject $examples = null, private ?\ArrayObject $requestBodies = null, private ?\ArrayObject $headers = null, private ?\ArrayObject $securitySchemes = null, private ?\ArrayObject $links = null, private ?\ArrayObject $callbacks = null, private ?\ArrayObject $pathItems = null, private ?\ArrayObject $mediaTypes = null)
     {
         $schemas?->ksort();
 
@@ -86,6 +87,11 @@ final class Components
     public function getPathItems(): ?\ArrayObject
     {
         return $this->pathItems;
+    }
+
+    public function getMediaTypes(): ?\ArrayObject
+    {
+        return $this->mediaTypes;
     }
 
     public function withSchemas(\ArrayObject $schemas): self
@@ -164,6 +170,14 @@ final class Components
     {
         $clone = clone $this;
         $clone->pathItems = $pathItems;
+
+        return $clone;
+    }
+
+    public function withMediaTypes(\ArrayObject $mediaTypes): self
+    {
+        $clone = clone $this;
+        $clone->mediaTypes = $mediaTypes;
 
         return $clone;
     }

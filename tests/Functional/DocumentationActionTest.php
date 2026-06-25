@@ -98,7 +98,7 @@ final class DocumentationActionTest extends ApiTestCase
 
         $client->request('GET', '/docs.jsonopenapi', ['headers' => ['Accept' => 'application/vnd.openapi+json']]);
         $this->assertResponseIsSuccessful();
-        $this->assertJsonContains(['openapi' => '3.1.0']);
+        $this->assertJsonContains(['openapi' => '3.2.0']);
         $this->assertJsonContains(['info' => ['title' => 'My Dummy API']]);
     }
 
@@ -163,7 +163,7 @@ final class DocumentationActionTest extends ApiTestCase
 
         $client->request('GET', '/docs.jsonopenapi', ['headers' => ['Accept' => 'application/vnd.openapi+json']]);
         $this->assertResponseIsSuccessful();
-        $this->assertJsonContains(['openapi' => '3.1.0']);
+        $this->assertJsonContains(['openapi' => '3.2.0']);
         $this->assertJsonContains(['info' => ['title' => 'My Dummy API']]);
     }
 

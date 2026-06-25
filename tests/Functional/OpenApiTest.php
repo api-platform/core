@@ -332,7 +332,7 @@ class OpenApiTest extends ApiTestCase
         $json = $response->toArray();
 
         // Context
-        $this->assertSame('3.1.0', $json['openapi']);
+        $this->assertSame('3.2.0', $json['openapi']);
         // Root properties
         $this->assertSame('My Dummy API', $json['info']['title']);
         $this->assertStringContainsString('This is a test API.', $json['info']['description']);
@@ -565,7 +565,7 @@ class OpenApiTest extends ApiTestCase
         $json = $response->toArray();
 
         // Context
-        $this->assertSame('3.1.0', $json['openapi']);
+        $this->assertSame('3.2.0', $json['openapi']);
         // Root properties
         $this->assertSame('My Dummy API', $json['info']['title']);
         $this->assertStringContainsString('This is a test API.', $json['info']['description']);
