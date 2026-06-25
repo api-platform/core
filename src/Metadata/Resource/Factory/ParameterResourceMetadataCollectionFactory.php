@@ -26,6 +26,7 @@ use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\PropertiesAwareInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\ResourceClassInfoTrait;
@@ -236,6 +237,32 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
     {
         $propertyNames = $properties = [];
         $parameters = $operation->getParameters() ?? new Parameters();
+
+        // Spike (RFC 10008 QUERY): when the operation has a dedicated input DTO, discover the
+        // #[QueryParameter] attributes declared on its properties so the object describes both the
+        // documented body (OpenApiFactory references its input schema) and the filtering criteria.
+        $input = $operation->getInput();
+        $inputClass = \is_array($input) ? ($input['class'] ?? null) : (\is_string($input) ? $input : null);
+        if (null !== $inputClass && $inputClass !== $resourceClass && class_exists($inputClass)) {
+            foreach ((new \ReflectionClass($inputClass))->getProperties() as $reflectionProperty) {
+                foreach ($reflectionProperty->getAttributes(QueryParameter::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+                    $name = $reflectionProperty->getName();
+                    if ($parameters->has($name, QueryParameter::class)) {
+                        continue;
+                    }
+
+                    $parameter = $attribute->newInstance();
+                    if (!$parameter->getKey()) {
+                        $parameter = $parameter->withKey($name);
+                    }
+                    if (!$parameter->getProperty()) {
+                        $parameter = $parameter->withProperty($name);
+                    }
+
+                    $parameters->add($parameter->getKey(), $parameter);
+                }
+            }
+        }
 
         // First loop we look for the :property placeholder and replace its key
         foreach ($parameters as $key => $parameter) {

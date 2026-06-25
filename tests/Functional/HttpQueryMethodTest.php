@@ -132,4 +132,36 @@ final class HttpQueryMethodTest extends ApiTestCase
 
         $this->assertResponseStatusCodeSame(400);
     }
+
+    public function testQueryOperationIsDocumentedInOpenApi(): void
+    {
+        $response = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $json = $response->toArray();
+
+        $this->assertArrayHasKey('query', $json['paths']['/query_method_dummies'], 'The QUERY operation must be emitted under the OpenAPI 3.2 "query" path item field.');
+        $query = $json['paths']['/query_method_dummies']['query'];
+
+        // RFC 10008: parameters are carried in the request body, not the URI query string.
+        $this->assertArrayHasKey('requestBody', $query);
+        $content = $query['requestBody']['content'];
+        $this->assertArrayHasKey('application/x-www-form-urlencoded', $content);
+        $this->assertArrayHasKey('application/json', $content);
+
+        $schema = $content['application/x-www-form-urlencoded']['schema'];
+        $this->assertSame('object', $schema['type']);
+        $this->assertArrayHasKey('name', $schema['properties']);
+        $this->assertSame(['type' => 'string'], $schema['properties']['name']);
+
+        // The filter must not leak into the URI query string as an "in: query" parameter.
+        foreach ($query['parameters'] ?? [] as $parameter) {
+            $this->assertNotSame('name', $parameter['name'] ?? null, 'QUERY filters must live in the request body, not as query parameters.');
+        }
+
+        // It is a safe collection read: a 200 collection response is documented.
+        $this->assertArrayHasKey('200', $query['responses']);
+    }
 }

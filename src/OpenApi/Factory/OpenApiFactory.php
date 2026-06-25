@@ -266,7 +266,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 $pathItem = $paths->getPath($path) ?? new PathItem();
             }
 
-            $forceSchemaCollection = $operation instanceof CollectionOperationInterface && 'GET' === $method;
+            $forceSchemaCollection = $operation instanceof CollectionOperationInterface && \in_array($method, ['GET', 'QUERY'], true);
             $schema = new Schema('openapi');
             $schema->setDefinitions($schemas);
 
@@ -405,6 +405,7 @@ final class OpenApiFactory implements OpenApiFactoryInterface
             }
 
             $openapiOperation = $openapiOperation->withParameters($openapiParameters);
+
             $existingResponses = $openapiOperation->getResponses() ?: [];
             $overrideResponses = $operation->getExtraProperties()[self::OVERRIDE_OPENAPI_RESPONSES] ?? $this->openApiOptions->getOverrideResponses();
             $errors = null;
@@ -424,6 +425,12 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     case 'GET':
                         $successStatus = (string) $operation->getStatus() ?: 200;
                         $openapiOperation = $this->buildOpenApiResponse($existingResponses, $successStatus, \sprintf('%s %s', $resourceShortName, $operation instanceof CollectionOperationInterface ? 'collection' : 'resource'), $openapiOperation, $operation, $responseMimeTypes, $operationOutputSchemas);
+                        break;
+                    case 'QUERY':
+                        // RFC 10008: a safe collection read. It carries its criteria in the request
+                        // body (handled below) but answers with a collection, like GET.
+                        $successStatus = (string) $operation->getStatus() ?: 200;
+                        $openapiOperation = $this->buildOpenApiResponse($existingResponses, $successStatus, \sprintf('%s collection', $resourceShortName), $openapiOperation, $operation, $responseMimeTypes, $operationOutputSchemas);
                         break;
                     case 'POST':
                         $successStatus = (string) $operation->getStatus() ?: 201;
@@ -495,6 +502,13 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                 ));
             }
 
+            // RFC 10008: the HTTP QUERY method carries its criteria in the request body, not the URI
+            // query string. The "in: query" parameters therefore become a request body schema, while
+            // path and header parameters stay where they are.
+            if (HttpOperation::METHOD_QUERY === $method) {
+                $openapiOperation = $this->buildQueryRequestBody($openapiOperation, $operation, $resourceClass, $schema, $schemas, $schemaSerializerContext);
+            }
+
             if ($openapiAttribute instanceof Webhook) {
                 $webhooks[$openapiAttribute->getName()] = $pathItem->{'with'.ucfirst($method)}($openapiOperation);
                 continue;
@@ -555,6 +569,46 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         }
 
         return $content;
+    }
+
+    /**
+     * Builds the request body of a QUERY operation (RFC 10008) and keeps only its path and header
+     * parameters. When the operation has an input class, the body is that object: its input schema
+     * is referenced like POST does. Otherwise the criteria are described as a flat object, one
+     * property per query parameter. Either schema is advertised for the two media types
+     * ParameterProvider negotiates from the body.
+     */
+    private function buildQueryRequestBody(Operation $openapiOperation, HttpOperation $operation, string $resourceClass, Schema $schema, \ArrayObject $schemas, ?array $schemaSerializerContext): Operation
+    {
+        $queryParameters = array_filter($openapiOperation->getParameters() ?? [], static fn (Parameter $p): bool => 'query' === $p->getIn());
+        $keptParameters = array_values(array_filter($openapiOperation->getParameters() ?? [], static fn (Parameter $p): bool => 'query' !== $p->getIn()));
+
+        // A dedicated input DTO (distinct from the resource) describes the query as an object; its
+        // input schema is referenced. The default resource input is not a criteria object, so a
+        // filter-only QUERY falls back to a flat schema built from its query parameters.
+        $input = $operation->getInput();
+        $inputClass = \is_array($input) ? ($input['class'] ?? null) : null;
+        if (null !== $inputClass && $inputClass !== $resourceClass) {
+            $inputSchema = $this->jsonSchemaFactory->buildSchema($resourceClass, 'json', Schema::TYPE_INPUT, $operation, $schema, $schemaSerializerContext);
+            $this->appendSchemaDefinitions($schemas, $inputSchema->getDefinitions());
+            $bodySchema = new \ArrayObject($inputSchema->getArrayCopy(false));
+        } else {
+            $properties = [];
+            foreach ($queryParameters as $parameter) {
+                $properties[$parameter->getName()] = $parameter->getSchema() ?: ['type' => 'string'];
+            }
+
+            $bodySchema = new \ArrayObject(['type' => 'object', 'properties' => $properties]);
+        }
+
+        $content = new \ArrayObject([
+            'application/x-www-form-urlencoded' => new MediaType(schema: $bodySchema),
+            'application/json' => new MediaType(schema: $bodySchema),
+        ]);
+
+        return $openapiOperation
+            ->withParameters($keptParameters)
+            ->withRequestBody(new RequestBody(description: 'Query criteria carried in the request body.', content: $content, required: false));
     }
 
     /**
