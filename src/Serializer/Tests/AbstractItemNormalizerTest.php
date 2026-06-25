@@ -1364,6 +1364,41 @@ class AbstractItemNormalizerTest extends TestCase
         }
     }
 
+    public function testTypeConfusionGuardReportsAllUnionMemberTypes(): void
+    {
+        $propertyNameCollectionFactoryProphecy = $this->prophesize(PropertyNameCollectionFactoryInterface::class);
+
+        $propertyMetadataFactoryProphecy = $this->prophesize(PropertyMetadataFactoryInterface::class);
+
+        // The IRI resolves to a Dummy while the relation is declared as RelatedDummy|SecuredDummy.
+        $iriConverterProphecy = $this->prophesize(IriConverterInterface::class);
+        $iriConverterProphecy->getResourceFromIri(Argument::cetera())->willReturn(new Dummy());
+
+        $resourceClassResolverProphecy = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolverProphecy->getResourceClass(null, RelatedDummy::class)->willReturn(RelatedDummy::class);
+        $resourceClassResolverProphecy->isResourceClass(RelatedDummy::class)->willReturn(true);
+
+        $propertyAccessorProphecy = $this->prophesize(PropertyAccessorInterface::class);
+
+        $serializerProphecy = $this->prophesize(SerializerInterface::class);
+        $serializerProphecy->willImplement(DenormalizerInterface::class);
+
+        $normalizer = new class($propertyNameCollectionFactoryProphecy->reveal(), $propertyMetadataFactoryProphecy->reveal(), $iriConverterProphecy->reveal(), $resourceClassResolverProphecy->reveal(), $propertyAccessorProphecy->reveal(), null, null, [], null, null) extends AbstractItemNormalizer {};
+        $normalizer->setSerializer($serializerProphecy->reveal());
+
+        try {
+            $normalizer->denormalize('/dummies/1', RelatedDummy::class, null, [
+                'not_normalizable_value_exceptions' => [],
+                'deserialization_path' => 'relation',
+                'relation_native_type' => Type::union(Type::object(RelatedDummy::class), Type::object(SecuredDummy::class)),
+            ]);
+            $this->fail('Expected a NotNormalizableValueException to be thrown.');
+        } catch (NotNormalizableValueException $exception) {
+            // A union relation must report every accepted class, not just the first one attempted.
+            $this->assertSame([RelatedDummy::class, SecuredDummy::class], $exception->getExpectedTypes());
+        }
+    }
+
     public function testDenormalizeRelationNotFoundReturnsNull(): void
     {
         $data = [
