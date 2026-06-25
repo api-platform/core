@@ -27,6 +27,9 @@ trait WithResourceTrait
                 && preg_match('/^(?:get|is|can)(.*)/', (string) $method, $matches)
                 && (!$ignoredOptions || !\in_array(lcfirst($matches[1]), $ignoredOptions, true))
                 && null === $self->{$method}()
+                // A null getter can mean "explicitly disabled" (e.g. getOutputClass() when output: false)
+                // rather than "unset" — don't let the resource's value overwrite that explicit choice.
+                && !(method_exists($self, "hasExplicit{$matches[1]}") && $self->{"hasExplicit{$matches[1]}"}())
                 && null !== $val = $resource->{$method}()
             ) {
                 $self = $self->{"with{$matches[1]}"}($val);

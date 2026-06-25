@@ -64,6 +64,48 @@ class ObjectMapperProviderTest extends TestCase
         $this->assertNull($result);
     }
 
+    /**
+     * Regression test: output explicitly disabled (`output: false`, e.g. a NotExposed operation) must
+     * not crash calling `map()` with a null resource class — it falls back to the operation's own class,
+     * since the mapped entity still needs to be represented as a proper resource instance internally
+     * (IRI resolution, relation type-matching), even though no response body will be rendered.
+     */
+    public function testProvideMapsToOwnClassWhenOutputDisabled(): void
+    {
+        $sourceEntity = new SourceEntity();
+        $targetResource = new TargetResource();
+        $operation = new Get(class: TargetResource::class, output: false, map: true);
+        $objectMapper = $this->createMock(ObjectMapperInterface::class);
+        $objectMapper->expects($this->once())
+            ->method('map')
+            ->with($sourceEntity, TargetResource::class)
+            ->willReturn($targetResource);
+        $decorated = $this->createStub(ProviderInterface::class);
+        $decorated->method('provide')->willReturn($sourceEntity);
+        $provider = new ObjectMapperProvider($objectMapper, $decorated);
+
+        $result = $provider->provide($operation);
+        $this->assertSame($targetResource, $result);
+    }
+
+    public function testProvideMapsPaginatorToOwnClassWhenOutputDisabled(): void
+    {
+        $paginator = new ArrayPaginator([new SourceEntity(), new SourceEntity()], 0, 10);
+        $operation = new Get(class: TargetResource::class, output: false, map: true);
+        $objectMapper = $this->createMock(ObjectMapperInterface::class);
+        $objectMapper->expects($this->exactly(2))
+            ->method('map')
+            ->with($this->isInstanceOf(SourceEntity::class), TargetResource::class)
+            ->willReturn(new TargetResource());
+        $decorated = $this->createStub(ProviderInterface::class);
+        $decorated->method('provide')->willReturn($paginator);
+        $provider = new ObjectMapperProvider($objectMapper, $decorated);
+
+        $result = $provider->provide($operation);
+        $this->assertInstanceOf(MappedObjectPaginator::class, $result);
+        $this->assertCount(2, iterator_to_array($result));
+    }
+
     public function testProvideMapsObject(): void
     {
         $sourceEntity = new SourceEntity();

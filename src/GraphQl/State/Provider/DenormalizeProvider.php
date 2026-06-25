@@ -37,7 +37,7 @@ final class DenormalizeProvider implements ProviderInterface
     {
         $data = $this->decorated->provide($operation, $uriVariables, $context);
 
-        if (!($operation->canDeserialize() ?? true) || (!$operation instanceof Mutation)) {
+        if (!($operation->canDeserialize() ?? true) || (!$operation instanceof Mutation) || null === ($inputClass = $operation->getInputClass())) {
             return $data;
         }
 
@@ -47,7 +47,7 @@ final class DenormalizeProvider implements ProviderInterface
             $denormalizationContext[AbstractNormalizer::OBJECT_TO_POPULATE] = $data;
         }
 
-        $item = $this->denormalizer->denormalize($context['args']['input'], $operation->getClass(), ItemDenormalizer::FORMAT, $denormalizationContext);
+        $item = $this->denormalizer->denormalize($context['args']['input'], $inputClass, ItemDenormalizer::FORMAT, $denormalizationContext);
 
         if (!\is_object($item)) {
             throw new \UnexpectedValueException('Expected item to be an object.');

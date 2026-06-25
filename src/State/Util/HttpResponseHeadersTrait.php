@@ -53,10 +53,8 @@ trait HttpResponseHeadersTrait
     {
         $status = $this->getStatus($request, $operation, $context);
         $method = $request->getMethod();
-        $output = $operation->getOutput();
-        $outputMetadata = $output ?? ['class' => $operation->getClass()];
-        $hasOutput = \is_array($outputMetadata) && \array_key_exists('class', $outputMetadata) && null !== $outputMetadata['class'];
-        $outputExplicitlyDisabled = \is_array($output) && \array_key_exists('class', $output) && null === $output['class'];
+        $hasOutput = null !== $operation->getOutputClass();
+        $outputExplicitlyDisabled = !$hasOutput && $operation->hasExplicitOutputClass();
         // RFC 7230 §3.3.2 / §3.3.3: 204, 205 and 304 responses MUST NOT include a payload body,
         // and a sender MUST NOT generate a Content-Type field for a message without a body.
         $isBodylessStatus = \in_array($status, [Response::HTTP_NO_CONTENT, Response::HTTP_RESET_CONTENT, Response::HTTP_NOT_MODIFIED], true);
@@ -90,7 +88,7 @@ trait HttpResponseHeadersTrait
         }
 
         $originalData = $context['original_data'] ?? null;
-        $hasData = !$hasOutput ? false : ($this->resourceClassResolver && $originalData && \is_object($originalData) && $this->resourceClassResolver->isResourceClass($this->getObjectClass($originalData)));
+        $hasData = $hasOutput && $this->resourceClassResolver && $originalData && \is_object($originalData) && $this->resourceClassResolver->isResourceClass($this->getObjectClass($originalData));
 
         if ($hasData) {
             $isAlternateResourceMetadata = $operation->getExtraProperties()['is_alternate_resource_metadata'] ?? false;

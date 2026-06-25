@@ -48,7 +48,10 @@ final class ObjectMapperOutputProcessor implements ProcessorInterface
 
         $request = $context['request'] ?? null;
         $request?->attributes->set('persisted_data', $data);
-        $dto = $this->objectMapper->map($data, $operation->getClass());
+        // Falls back to the resource class itself when there's no distinct output DTO (including when
+        // output is disabled for response-body purposes): the mapped entity still needs to be
+        // represented as a proper instance of the resource class internally.
+        $dto = $this->objectMapper->map($data, $operation->getOutputClass() ?? $operation->getClass());
 
         return $this->decorated ? $this->decorated->process($dto, $operation, $uriVariables, $context) : $dto;
     }

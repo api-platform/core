@@ -594,6 +594,22 @@ XML_WRAP
         $resource->addAttribute('map', $this->parse($value));
     }
 
+    private function buildInputClass(\SimpleXMLElement $resource, ?string $value): void
+    {
+        if (null === $value) {
+            return;
+        }
+        $resource->addAttribute('inputClass', $value);
+    }
+
+    private function buildOutputClass(\SimpleXMLElement $resource, ?string $value): void
+    {
+        if (null === $value) {
+            return;
+        }
+        $resource->addAttribute('outputClass', $value);
+    }
+
     private function parse($value): ?string
     {
         if (null === $value) {

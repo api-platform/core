@@ -49,13 +49,19 @@ final class Loader implements LoaderInterface
             foreach ($metadata as $resource) {
                 foreach ($resource->getMcp() ?? [] as $mcp) {
                     if ($mcp instanceof McpTool) {
-                        $inputClass = $mcp->getInput()['class'] ?? $mcp->getClass();
-                        $inputFormat = array_key_first($mcp->getInputFormats() ?? ['json' => ['application/json']]);
-                        $inputSchema = $this->schemaFactory->buildSchema($inputClass, $inputFormat, Schema::TYPE_INPUT, $mcp, null, [SchemaFactory::FORCE_SUBSCHEMA => true]);
+                        $inputClass = $mcp->getInputClass();
+                        // Input explicitly disabled: the tool takes no arguments, so reflect that
+                        // honestly with an empty object schema instead of describing a structure
+                        // that isn't actually expected.
+                        if (null !== $inputClass) {
+                            $inputFormat = array_key_first($mcp->getInputFormats() ?? ['json' => ['application/json']]);
+                            $inputSchema = $this->schemaFactory->buildSchema($inputClass, $inputFormat, Schema::TYPE_INPUT, $mcp, null, [SchemaFactory::FORCE_SUBSCHEMA => true])->getArrayCopy();
+                        } else {
+                            $inputSchema = ['type' => 'object', 'properties' => new \stdClass()];
+                        }
 
                         $outputSchema = null;
-                        if (false !== $mcp->getStructuredContent()) {
-                            $outputClass = $mcp->getOutput()['class'] ?? $mcp->getClass();
+                        if (false !== $mcp->getStructuredContent() && null !== ($outputClass = $mcp->getOutputClass())) {
                             $outputFormat = array_key_first($mcp->getOutputFormats() ?? ['json' => ['application/json']]);
                             $outputSchema = $this->schemaFactory->buildSchema($outputClass, $outputFormat, Schema::TYPE_OUTPUT, $mcp, null, [SchemaFactory::FORCE_SUBSCHEMA => true])->getArrayCopy();
                         }
@@ -64,7 +70,7 @@ final class Loader implements LoaderInterface
                             new Tool(
                                 name: $mcp->getName(),
                                 title: $mcp->getTitle(),
-                                inputSchema: $inputSchema->getArrayCopy(),
+                                inputSchema: $inputSchema,
                                 description: $mcp->getDescription(),
                                 annotations: $mcp->getAnnotations() ? ToolAnnotations::fromArray($mcp->getAnnotations()) : null,
                                 icons: $mcp->getIcons(),

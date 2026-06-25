@@ -40,19 +40,19 @@ final class ObjectMapperProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $class = $operation->getInput()['class'] ?? $operation->getClass();
+        $class = $operation->getInputClass();
 
         if (
             $data instanceof Response
             || !$this->objectMapper
             || !$operation->canWrite()
             || null === $data
+            || null === $class
             || !is_a($data, $class, true)
             || !$operation->canMap()
         ) {
             return $this->decorated->process($data, $operation, $uriVariables, $context);
         }
-
         $request = $context['request'] ?? null;
 
         // maps the Resource to an Entity
@@ -81,7 +81,7 @@ final class ObjectMapperProcessor implements ProcessorInterface
         return $this->objectMapper->map(
             // persist the entity
             $persisted,
-            $operation->getClass()
+            $operation->getOutputClass() ?? $operation->getClass()
         );
     }
 }

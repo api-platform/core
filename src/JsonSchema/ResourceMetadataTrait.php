@@ -29,11 +29,16 @@ trait ResourceMetadataTrait
 
     private function findOutputClass(string $className, string $type, Operation $operation, ?array $serializerContext): ?string
     {
-        $inputOrOutput = ['class' => $className];
-        $inputOrOutput = Schema::TYPE_OUTPUT === $type ? ($operation->getOutput() ?? $inputOrOutput) : ($operation->getInput() ?? $inputOrOutput);
+        $isOutput = Schema::TYPE_OUTPUT === $type;
+        // Use hasExplicit* to distinguish "explicitly disabled" (null) from "no explicit setting" ($className fallback).
+        if ($isOutput ? $operation->hasExplicitOutputClass() : $operation->hasExplicitInputClass()) {
+            $resourceClass = $isOutput ? $operation->getOutputClass() : $operation->getInputClass();
+        } else {
+            $resourceClass = $className;
+        }
         $forceSubschema = $serializerContext[SchemaFactory::FORCE_SUBSCHEMA] ?? false;
 
-        return $forceSubschema ? ($inputOrOutput['class'] ?? $inputOrOutput->class ?? $operation->getClass()) : ($inputOrOutput['class'] ?? $inputOrOutput->class ?? null);
+        return $forceSubschema ? ($resourceClass ?? $operation->getClass()) : $resourceClass;
     }
 
     private function findOperation(string $className, string $type, ?Operation $operation, ?array $serializerContext, ?string $format = null): Operation

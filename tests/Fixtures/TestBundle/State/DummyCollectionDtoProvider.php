@@ -23,7 +23,7 @@ class DummyCollectionDtoProvider implements ProviderInterface
 {
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
     {
-        $class = $operation->getOutput()['class'];
+        $class = $operation->getOutputClass();
         switch ($class) {
             case DummyCollectionDtoOutput::class:
             case DummyFooCollectionDto::class:

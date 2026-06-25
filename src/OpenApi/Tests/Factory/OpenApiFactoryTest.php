@@ -1298,9 +1298,7 @@ class OpenApiFactoryTest extends TestCase
             [
                 '201' => new Response(
                     'Dummy resource created',
-                    new \ArrayObject([
-                        'application/ld+json' => new MediaType(new \ArrayObject([])),
-                    ]),
+                    null,
                     null,
                     new \ArrayObject(['getDummyItem' => new Model\Link('getDummyItem', new \ArrayObject(['id' => '$response.body#/id']), null, 'This is a dummy')])
                 ),
