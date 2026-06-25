@@ -15,6 +15,13 @@ namespace ApiPlatform\Doctrine\Odm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\DateFilterInterface;
 use ApiPlatform\Doctrine\Common\Filter\DateFilterTrait;
+use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
+use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareTrait;
+use ApiPlatform\Doctrine\Common\Filter\NameConverterAwareInterface;
+use ApiPlatform\Doctrine\Common\Filter\NameConverterAwareTrait;
+use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterInterface;
+use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterTrait;
+use ApiPlatform\Doctrine\Odm\PropertyHelperTrait as MongoDbOdmPropertyHelperTrait;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\JsonSchemaFilterInterface;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
@@ -23,6 +30,10 @@ use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
+use Doctrine\Persistence\ManagerRegistry;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
  * The date filter allows to filter a collection by date intervals.
@@ -120,20 +131,59 @@ use Doctrine\ODM\MongoDB\Aggregation\Builder;
  * @author Kévin Dunglas <dunglas@gmail.com>
  * @author Théo FIDRY <theo.fidry@gmail.com>
  * @author Alan Poulain <contact@alanpoulain.eu>
- *
- * @deprecated since API Platform 4.4: extending {@see AbstractFilter} is deprecated. In 5.0 this filter is rewritten as a standalone overlay over {@see ComparisonFilter} (translating the `[before]`/`[strictly_before]`/`[after]`/`[strictly_after]` syntax) — same class name, same URL syntax, drop-in. Declare it through a QueryParameter to migrate.
  */
-final class DateFilter extends AbstractFilter implements DateFilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface
+final class DateFilter implements DateFilterInterface, FilterInterface, JsonSchemaFilterInterface, ManagerRegistryAwareInterface, NameConverterAwareInterface, OpenApiParameterFilterInterface, PropertyAwareFilterInterface
 {
     use DateFilterTrait;
+    use ManagerRegistryAwareTrait;
+    use MongoDbOdmPropertyHelperTrait;
+    use NameConverterAwareTrait;
+    use PropertyAwareFilterTrait;
 
     public const DOCTRINE_DATE_TYPES = [
         'date' => true,
         'date_immutable' => true,
     ];
 
+    private LoggerInterface $logger;
+
     /**
-     * {@inheritdoc}
+     * @param array<string, mixed>|null $properties
+     */
+    public function __construct(?ManagerRegistry $managerRegistry = null, ?LoggerInterface $logger = null, ?array $properties = null, ?NameConverterInterface $nameConverter = null)
+    {
+        $this->managerRegistry = $managerRegistry;
+        $this->logger = $logger ?? new NullLogger();
+        $this->properties = $properties;
+        $this->nameConverter = $nameConverter;
+    }
+
+    public function apply(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
+    {
+        foreach ($context['filters'] ?? [] as $property => $value) {
+            $this->filterProperty($this->denormalizePropertyName($property), $value, $aggregationBuilder, $resourceClass, $operation, $context);
+        }
+    }
+
+    protected function getLogger(): LoggerInterface
+    {
+        return $this->logger;
+    }
+
+    protected function isPropertyEnabled(string $property, string $resourceClass): bool
+    {
+        if (null === $this->properties) {
+            // to ensure sanity, nested properties must still be explicitly enabled
+            return !$this->isPropertyNested($property, $resourceClass);
+        }
+
+        return \array_key_exists($property, $this->properties);
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     *
+     * @param-out array<string, mixed> $context
      */
     protected function filterProperty(string $property, mixed $value, Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {

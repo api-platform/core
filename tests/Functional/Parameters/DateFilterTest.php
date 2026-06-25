@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Functional\Parameters;
 
+use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\FilteredDateParameter as FilteredDateParameterDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilteredDateParameter;
@@ -34,6 +36,15 @@ final class DateFilterTest extends ApiTestCase
     public static function getResources(): array
     {
         return [FilteredDateParameter::class];
+    }
+
+    public function testDateFilterIsStandalone(): void
+    {
+        self::assertNotContains(
+            AbstractFilter::class,
+            class_parents(DateFilter::class) ?: [],
+            'DateFilter must not extend the deprecated AbstractFilter (5.0 standalone rewrite).'
+        );
     }
 
     /**

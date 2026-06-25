@@ -54,8 +54,9 @@ final class ExistsFilterTest extends ApiTestCase
 
     public function testExistsFilterIsStandalone(): void
     {
-        self::assertFalse(
-            is_subclass_of(ExistsFilter::class, AbstractFilter::class),
+        self::assertNotContains(
+            AbstractFilter::class,
+            class_parents(ExistsFilter::class) ?: [],
             'ExistsFilter must not extend the deprecated AbstractFilter (5.0 standalone rewrite).'
         );
     }

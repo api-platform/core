@@ -18,7 +18,9 @@ use ApiPlatform\Doctrine\Common\Filter\ExistsFilterTrait;
 use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
 use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareTrait;
 use ApiPlatform\Doctrine\Common\Filter\NameConverterAwareInterface;
+use ApiPlatform\Doctrine\Common\Filter\NameConverterAwareTrait;
 use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterInterface;
+use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterTrait;
 use ApiPlatform\Doctrine\Common\Filter\PropertyPlaceholderOpenApiParameterTrait;
 use ApiPlatform\Doctrine\Odm\PropertyHelperTrait as MongoDbOdmPropertyHelperTrait;
 use ApiPlatform\Metadata\JsonSchemaFilterInterface;
@@ -122,6 +124,8 @@ final class ExistsFilter implements ExistsFilterInterface, FilterInterface, Json
     use ExistsFilterTrait;
     use ManagerRegistryAwareTrait;
     use MongoDbOdmPropertyHelperTrait;
+    use NameConverterAwareTrait;
+    use PropertyAwareFilterTrait;
     use PropertyPlaceholderOpenApiParameterTrait;
 
     private LoggerInterface $logger;
@@ -129,38 +133,12 @@ final class ExistsFilter implements ExistsFilterInterface, FilterInterface, Json
     /**
      * @param array<string, mixed>|null $properties
      */
-    public function __construct(?ManagerRegistry $managerRegistry = null, ?LoggerInterface $logger = null, private ?array $properties = null, string $existsParameterName = self::QUERY_PARAMETER_KEY, private ?NameConverterInterface $nameConverter = null)
+    public function __construct(?ManagerRegistry $managerRegistry = null, ?LoggerInterface $logger = null, ?array $properties = null, string $existsParameterName = self::QUERY_PARAMETER_KEY, ?NameConverterInterface $nameConverter = null)
     {
         $this->managerRegistry = $managerRegistry;
         $this->logger = $logger ?? new NullLogger();
         $this->existsParameterName = $existsParameterName;
-    }
-
-    public function getProperties(): ?array
-    {
-        return $this->properties;
-    }
-
-    /**
-     * @param array<string, mixed> $properties
-     */
-    public function setProperties(array $properties): void
-    {
         $this->properties = $properties;
-    }
-
-    public function hasNameConverter(): bool
-    {
-        return $this->nameConverter instanceof NameConverterInterface;
-    }
-
-    public function getNameConverter(): ?NameConverterInterface
-    {
-        return $this->nameConverter;
-    }
-
-    public function setNameConverter(NameConverterInterface $nameConverter): void
-    {
         $this->nameConverter = $nameConverter;
     }
 
@@ -177,24 +155,6 @@ final class ExistsFilter implements ExistsFilterInterface, FilterInterface, Json
         }
 
         return \array_key_exists($property, $this->properties);
-    }
-
-    protected function denormalizePropertyName(string|int $property): string
-    {
-        if (!$this->nameConverter instanceof NameConverterInterface) {
-            return (string) $property;
-        }
-
-        return implode('.', array_map($this->nameConverter->denormalize(...), explode('.', (string) $property)));
-    }
-
-    protected function normalizePropertyName(string $property): string
-    {
-        if (!$this->nameConverter instanceof NameConverterInterface) {
-            return $property;
-        }
-
-        return implode('.', array_map($this->nameConverter->normalize(...), explode('.', $property)));
     }
 
     /**
@@ -215,7 +175,9 @@ final class ExistsFilter implements ExistsFilterInterface, FilterInterface, Json
     }
 
     /**
-     * {@inheritdoc}
+     * @param array<string, mixed> $context
+     *
+     * @param-out array<string, mixed> $context
      */
     protected function filterProperty(string $property, mixed $value, Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
