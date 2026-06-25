@@ -35,7 +35,12 @@ final class ToolProvider implements ProviderInterface
         }
 
         $data = (object) $context['mcp_data'];
-        $class = $operation->getInput()['class'] ?? $operation->getClass();
+        $class = $operation->getInputClass();
+
+        // Input explicitly disabled: there's no target shape to map into, return the raw data.
+        if (null === $class) {
+            return $data;
+        }
 
         return $this->objectMapper->map($data, $class);
     }

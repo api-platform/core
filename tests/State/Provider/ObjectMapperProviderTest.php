@@ -64,6 +64,38 @@ class ObjectMapperProviderTest extends TestCase
         $this->assertNull($result);
     }
 
+    /**
+     * Regression test: output explicitly disabled (`output: false`) must not crash constructing
+     * `MappedObjectPaginator`/calling `map()` with a null resource class — it should bypass.
+     */
+    public function testProvideBypassesWhenOutputDisabled(): void
+    {
+        $data = new SourceEntity();
+        $operation = new Get(class: TargetResource::class, output: false, map: true);
+        $objectMapper = $this->createMock(ObjectMapperInterface::class);
+        $objectMapper->expects($this->never())->method('map');
+        $decorated = $this->createStub(ProviderInterface::class);
+        $decorated->method('provide')->willReturn($data);
+        $provider = new ObjectMapperProvider($objectMapper, $decorated);
+
+        $result = $provider->provide($operation);
+        $this->assertSame($data, $result);
+    }
+
+    public function testProvideBypassesPaginatorWhenOutputDisabled(): void
+    {
+        $paginator = new ArrayPaginator([new SourceEntity(), new SourceEntity()], 0, 10);
+        $operation = new Get(class: TargetResource::class, output: false, map: true);
+        $objectMapper = $this->createMock(ObjectMapperInterface::class);
+        $objectMapper->expects($this->never())->method('map');
+        $decorated = $this->createStub(ProviderInterface::class);
+        $decorated->method('provide')->willReturn($paginator);
+        $provider = new ObjectMapperProvider($objectMapper, $decorated);
+
+        $result = $provider->provide($operation);
+        $this->assertSame($paginator, $result);
+    }
+
     public function testProvideMapsObject(): void
     {
         $sourceEntity = new SourceEntity();

@@ -119,6 +119,54 @@ class LoaderTest extends TestCase
         $loader->load($registry);
     }
 
+    /**
+     * Regression test: input explicitly disabled (`input: false`) must not crash
+     * `buildSchema(null, ...)` — the tool should get an honest empty object input schema instead.
+     */
+    public function testInputDisabledProducesEmptyObjectSchema(): void
+    {
+        $outputSchema = new Schema(Schema::VERSION_JSON_SCHEMA);
+        unset($outputSchema['$schema']);
+        $outputSchema['type'] = 'object';
+        $outputSchema['properties'] = ['id' => ['type' => 'integer']];
+
+        $schemaFactory = $this->createMock(SchemaFactoryInterface::class);
+        $schemaFactory->expects($this->once())->method('buildSchema')->willReturn($outputSchema);
+
+        $mcpTool = new McpTool(
+            name: 'ping',
+            description: 'A tool with no input',
+            input: false,
+            class: \stdClass::class,
+        );
+
+        $resource = (new ApiResource(class: \stdClass::class))->withMcp(['ping' => $mcpTool]);
+
+        $nameCollectionFactory = $this->createMock(ResourceNameCollectionFactoryInterface::class);
+        $nameCollectionFactory->method('create')->willReturn(new ResourceNameCollection([\stdClass::class]));
+
+        $metadataCollectionFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
+        $metadataCollectionFactory->method('create')->willReturn(new ResourceMetadataCollection(\stdClass::class, [$resource]));
+
+        $registry = $this->createMock(RegistryInterface::class);
+        $registry->expects($this->once())
+            ->method('registerTool')
+            ->with(
+                $this->callback(function (Tool $tool): bool {
+                    $this->assertSame('ping', $tool->name);
+                    $this->assertSame('object', $tool->inputSchema['type'] ?? null);
+                    $this->assertInstanceOf(\stdClass::class, $tool->inputSchema['properties']);
+                    $this->assertSame([], (array) $tool->inputSchema['properties']);
+
+                    return true;
+                }),
+                Loader::HANDLER,
+            );
+
+        $loader = new Loader($nameCollectionFactory, $metadataCollectionFactory, $schemaFactory);
+        $loader->load($registry);
+    }
+
     public function testResourceRegistration(): void
     {
         $mcpResource = new McpResource(

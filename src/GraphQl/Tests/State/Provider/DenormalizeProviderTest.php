@@ -71,6 +71,26 @@ class DenormalizeProviderTest extends TestCase
         $provider->provide($operation, [], $context);
     }
 
+    /**
+     * Regression test: input explicitly disabled (`input: false`) combined with an explicit
+     * `deserialize: true` (a contradictory config that doesn't force canDeserialize() to false)
+     * must not crash `denormalize()` with a null target type — it should bail out instead.
+     */
+    public function testProvideNotCalledWhenInputDisabledDespiteDeserializeTrue(): void
+    {
+        $objectToPopulate = new \stdClass();
+        $context = ['args' => ['input' => ['test']]];
+        $operation = new Mutation(class: \stdClass::class, input: false, deserialize: true);
+        $decorated = $this->createMock(ProviderInterface::class);
+        $decorated->expects($this->once())->method('provide')->willReturn($objectToPopulate);
+        $denormalizer = $this->createMock(DenormalizerInterface::class);
+        $serializerContextBuilder = $this->createMock(SerializerContextBuilderInterface::class);
+        $serializerContextBuilder->expects($this->never())->method('create');
+        $denormalizer->expects($this->never())->method('denormalize');
+        $provider = new DenormalizeProvider($decorated, $denormalizer, $serializerContextBuilder);
+        $provider->provide($operation, [], $context);
+    }
+
     public function testProvideNotCalledWithoutDeserialize(): void
     {
         $objectToPopulate = new \stdClass();
