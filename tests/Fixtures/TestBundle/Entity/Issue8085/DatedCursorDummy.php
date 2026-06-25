@@ -14,22 +14,18 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue8085;
 
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ApiResource(
-    operations: [
-        new GetCollection(
-            paginationItemsPerPage: 3,
-            paginationPartial: true,
-            paginationViaCursor: [['field' => 'createdAt', 'direction' => 'DESC']],
-        ),
-    ],
-    graphQlOperations: [],
-)]
-#[ApiFilter(DateFilter::class, properties: ['createdAt'])]
+#[ApiResource(operations: [
+    new GetCollection(
+        paginationItemsPerPage: 3,
+        paginationPartial: true,
+        paginationViaCursor: [['field' => 'createdAt', 'direction' => 'DESC']],
+    ),
+], graphQlOperations: [], parameters: ['createdAt' => new QueryParameter(filter: new DateFilter())])]
 #[ORM\Entity]
 #[ORM\Table(name: 'issue_8085_dated_cursor_dummy')]
 class DatedCursorDummy

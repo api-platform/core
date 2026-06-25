@@ -58,7 +58,12 @@ final class FiltersResourceMetadataCollectionFactory implements ResourceMetadata
 
         foreach ($resourceMetadataCollection as $i => $resource) {
             foreach ($operations = $resource->getOperations() ?? [] as $operationName => $operation) {
-                $operations->add($operationName, $operation->withFilters(array_unique(array_merge($resource->getFilters() ?? [], $operation->getFilters() ?? [], $filters))));
+                $operationFilters = array_unique(array_merge($resource->getFilters() ?? [], $operation->getFilters() ?? [], $filters));
+                if ($operationFilters) {
+                    trigger_deprecation('api-platform/core', '4.4', \sprintf('Declaring filters on the "%s" operation through "Operation::$filters" is deprecated, use the "parameters" argument instead. It will be removed in 6.0.', $operation->getShortName()));
+                }
+
+                $operations->add($operationName, $operation->withFilters($operationFilters));
             }
 
             if ($operations) {

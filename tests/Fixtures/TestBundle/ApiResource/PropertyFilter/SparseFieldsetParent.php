@@ -13,23 +13,20 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\PropertyFilter;
 
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Serializer\Filter\PropertyFilter;
 
-#[ApiResource(
-    operations: [
-        new Get(
-            uriTemplate: '/sparse_fieldset_parents/{id}',
-            uriVariables: ['id'],
-            provider: [self::class, 'provide'],
-        ),
-    ],
-)]
-#[ApiFilter(PropertyFilter::class)]
+#[ApiResource(operations: [
+    new Get(
+        uriTemplate: '/sparse_fieldset_parents/{id}',
+        uriVariables: ['id'],
+        provider: [self::class, 'provide'],
+    ),
+], parameters: ['properties' => new QueryParameter(filter: new PropertyFilter())])]
 final class SparseFieldsetParent
 {
     public function __construct(

@@ -13,15 +13,18 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue7126;
 
-use ApiPlatform\Doctrine\Orm\Filter\BackedEnumFilter;
-use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\ORM\Mapping as ORM;
 
 #[GetCollection(
     uriTemplate: 'backed_enum_filter{._format}',
+    parameters: [
+        'stringBackedEnum' => new QueryParameter(filter: new ExactFilter()),
+        'integerBackedEnum' => new QueryParameter(filter: new ExactFilter()),
+    ],
 )]
-#[ApiFilter(BackedEnumFilter::class, properties: ['stringBackedEnum', 'integerBackedEnum'])]
 #[ORM\Entity]
 class DummyForBackedEnumFilter
 {

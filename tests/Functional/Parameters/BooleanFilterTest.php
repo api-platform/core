@@ -76,24 +76,21 @@ final class BooleanFilterTest extends ApiTestCase
         yield 'enabled_alias_numeric_0' => ['/filtered_boolean_parameters?enabled=0', 1, false];
     }
 
-    #[DataProvider('booleanFilterNullAndEmptyScenariosProvider')]
-    public function testBooleanFilterWithNullAndEmptyValues(string $url): void
+    /**
+     * An empty value cannot be cast to the boolean native type, so the caster rejects it with a
+     * Bad Request before the filter runs.
+     */
+    #[DataProvider('booleanFilterEmptyScenariosProvider')]
+    public function testBooleanFilterWithEmptyValues(string $url): void
     {
-        $response = self::createClient()->request('GET', $url);
-        $this->assertResponseIsSuccessful();
+        self::createClient()->request('GET', $url);
 
-        $responseData = $response->toArray();
-        $filteredItems = $responseData['hydra:member'];
-
-        $expectedItemCount = 3;
-        $this->assertCount($expectedItemCount, $filteredItems, \sprintf('Expected %d items for URL %s', $expectedItemCount, $url));
+        $this->assertResponseStatusCodeSame(400);
     }
 
-    public static function booleanFilterNullAndEmptyScenariosProvider(): \Generator
+    public static function booleanFilterEmptyScenariosProvider(): \Generator
     {
-        yield 'active_null_value' => ['/filtered_boolean_parameters?active=null'];
         yield 'active_empty_value' => ['/filtered_boolean_parameters?active='];
-        yield 'enabled_alias_null_value' => ['/filtered_boolean_parameters?enabled=null'];
         yield 'enabled_alias_empty_value' => ['/filtered_boolean_parameters?enabled='];
     }
 

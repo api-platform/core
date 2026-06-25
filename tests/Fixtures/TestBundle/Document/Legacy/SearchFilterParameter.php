@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document\Legacy;
 
 use ApiPlatform\Doctrine\Odm\Filter\PartialSearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
@@ -23,8 +23,14 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Filter\ODMSearchTextAndDateFilter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Filter\QueryParameterOdmFilter;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
+/**
+ * Legacy regression fixture: keeps the deprecated SearchFilter alive until 6.0 through the custom
+ * ODMSearchFilterValueTransformer / ODMSearchTextAndDateFilter wrappers and the #[ApiFilter]
+ * attribute aliases referenced by QueryParameter. Canonical scalar/search coverage lives on
+ * ProductWithQueryParameter (ExactFilter/PartialSearchFilter). Remove in 6.0.
+ */
 #[GetCollection(
-    uriTemplate: 'search_filter_parameter{._format}',
+    uriTemplate: 'legacy_search_filter_parameter{._format}',
     parameters: [
         'foo' => new QueryParameter(filter: 'app_odm_search_filter_via_parameter'),
         'fooAlias' => new QueryParameter(filter: 'app_odm_search_filter_via_parameter', property: 'foo'),

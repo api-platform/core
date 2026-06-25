@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ApiResource(description: 'Hey PHP 8')]
+#[ApiResource(description: 'Hey PHP 8', parameters: ['filtered' => new QueryParameter(filter: new ExactFilter())])]
 #[ORM\Entity]
 class DummyPhp8
 {
@@ -27,7 +27,6 @@ class DummyPhp8
     #[ORM\Id]
     #[ORM\Column(type: 'integer')]
     public $id;
-    #[ApiFilter(SearchFilter::class)]
     #[ORM\Column]
     public $filtered;
 

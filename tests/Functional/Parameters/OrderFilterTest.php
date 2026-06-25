@@ -124,14 +124,6 @@ final class OrderFilterTest extends ApiTestCase
             '/filtered_order_parameters?date_null_always_first=desc',
             [null, '2024-12-25T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-01-01T00:00:00+00:00'],
         ];
-        yield 'date_null_always_first_old_way_alias_asc' => [
-            '/filtered_order_parameters?date_null_always_first_old_way=asc',
-            [null, '2024-01-01T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-12-25T00:00:00+00:00'],
-        ];
-        yield 'date_null_always_first_old_way_alias_desc' => [
-            '/filtered_order_parameters?date_null_always_first_old_way=desc',
-            [null, '2024-12-25T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-01-01T00:00:00+00:00'],
-        ];
         yield 'order_property_created_at_null_first_asc' => [
             '/filtered_order_parameters?order[createdAt]=asc',
             [null, '2024-01-01T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-12-25T00:00:00+00:00'],

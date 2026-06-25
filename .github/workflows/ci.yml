@@ -122,6 +122,50 @@ jobs:
       - name: Run container lint
         run: tests/Fixtures/app/console lint:container
 
+  upgrade-filter:
+    name: Upgrade Filter Codemod
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      matrix:
+        php:
+          - '8.5'
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: intl, bcmath, curl, openssl, mbstring
+          ini-values: memory_limit=-1
+          tools: composer
+          coverage: none
+      - name: Get composer cache directory
+        id: composercache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      - name: Cache dependencies
+        uses: actions/cache@v5
+        with:
+          path: ${{ steps.composercache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-
+      - name: Update project dependencies
+        run: |
+          composer global require soyuka/pmu
+          composer global config allow-plugins.soyuka/pmu true --no-interaction
+          composer global link .
+      - name: Codemod unit tests
+        run: vendor/bin/phpunit src/Symfony/Tests/Bundle/Command
+      # The #[ApiFilter] fixtures are already migrated in the tree, so --force only re-skips the
+      # special cases (name conversion, service/#[ApiFilter] key overlap); it must not error.
+      - name: Codemod force run
+        run: tests/Fixtures/app/console api:upgrade-filter --force
+      # Guard both paths: the migrated QueryParameter fixtures and the Legacy/ #[ApiFilter] fixtures.
+      - name: Functional suite
+        run: vendor/bin/phpunit tests/Functional
+
   phpstan:
     name: PHPStan (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest

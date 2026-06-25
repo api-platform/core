@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\Legacy;
 
 use ApiPlatform\Doctrine\Orm\Filter\PartialSearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
@@ -24,9 +24,15 @@ use ApiPlatform\Tests\Fixtures\TestBundle\Filter\SearchFilterValueTransformer;
 use ApiPlatform\Tests\Fixtures\TestBundle\Filter\SearchTextAndDateFilter;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * Legacy regression fixture: keeps the deprecated SearchFilter alive until 6.0 through the custom
+ * SearchFilterValueTransformer / SearchTextAndDateFilter wrappers and the #[ApiFilter] attribute
+ * aliases referenced by QueryParameter. Canonical scalar/search coverage lives on
+ * ProductWithQueryParameter (ExactFilter/PartialSearchFilter). Remove in 6.0.
+ */
 #[ApiResource(openapi: false)]
 #[GetCollection(
-    uriTemplate: 'search_filter_parameter{._format}',
+    uriTemplate: 'legacy_search_filter_parameter{._format}',
     parameters: [
         'foo' => new QueryParameter(filter: 'app_search_filter_via_parameter'),
         'fooAlias' => new QueryParameter(filter: 'app_search_filter_via_parameter', property: 'foo'),

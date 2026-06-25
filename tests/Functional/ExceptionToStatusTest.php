@@ -16,7 +16,7 @@ namespace ApiPlatform\Tests\Functional;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\ErrorWithOverridenStatus;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\Issue5924\TooManyRequests;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyExceptionToStatus;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Legacy\DummyExceptionToStatus;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 

@@ -1,0 +1,167 @@
+<?php
+
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
+namespace ApiPlatform\Tests\Functional\Parameters\Legacy;
+
+use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
+use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Legacy\FilteredOrderParameter as FilteredOrderParameterDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Legacy\FilteredOrderParameter;
+use ApiPlatform\Tests\RecreateSchemaTrait;
+use ApiPlatform\Tests\SetupClassResourcesTrait;
+use Doctrine\ODM\MongoDB\MongoDBException;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+
+/**
+ * Regression coverage for the deprecated OrderFilter, including its per-property `properties`
+ * nulls_comparison config form. The canonical equivalent (SortFilter) is covered by
+ * ApiPlatform\Tests\Functional\Parameters\OrderFilterTest.
+ * Remove together with the deprecated filter in 6.0.
+ */
+#[Group('legacy')]
+final class OrderFilterLegacyTest extends ApiTestCase
+{
+    use RecreateSchemaTrait;
+    use SetupClassResourcesTrait;
+
+    protected static ?bool $alwaysBootKernel = false;
+
+    /**
+     * @return class-string[]
+     */
+    public static function getResources(): array
+    {
+        return [FilteredOrderParameter::class];
+    }
+
+    /**
+     * @throws \Throwable
+     */
+    protected function setUp(): void
+    {
+        $entityClass = $this->isMongoDB() ? FilteredOrderParameterDocument::class : FilteredOrderParameter::class;
+
+        $this->recreateSchema([$entityClass]);
+        $this->loadFixtures($entityClass);
+    }
+
+    #[DataProvider('orderFilterScenariosProvider')]
+    public function testOrderFilterResponses(string $url, array $expectedOrder): void
+    {
+        $response = self::createClient()->request('GET', $url);
+        $this->assertResponseIsSuccessful();
+
+        $responseData = $response->toArray();
+        $orderedItems = $responseData['hydra:member'];
+
+        $actualOrder = array_map(static fn ($item) => $item['createdAt'] ?? null, $orderedItems);
+
+        // Default NULL order is different in PostgreSQL.
+        if ($this->isPostgres()) {
+            $actualOrder = array_values(array_filter($actualOrder));
+            $expectedOrder = array_values(array_filter($expectedOrder));
+        }
+
+        $this->assertSame($expectedOrder, $actualOrder, \sprintf('Expected order does not match for URL %s', $url));
+    }
+
+    public static function orderFilterScenariosProvider(): \Generator
+    {
+        yield 'created_at_ordered_asc' => [
+            '/legacy_filtered_order_parameters?createdAt=asc',
+            [null, '2024-01-01T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-12-25T00:00:00+00:00'],
+        ];
+        yield 'created_at_ordered_desc' => [
+            '/legacy_filtered_order_parameters?createdAt=desc',
+            ['2024-12-25T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-01-01T00:00:00+00:00', null],
+        ];
+        yield 'date_alias_ordered_asc' => [
+            '/legacy_filtered_order_parameters?date=asc',
+            [null, '2024-01-01T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-12-25T00:00:00+00:00'],
+        ];
+        yield 'date_alias_ordered_desc' => [
+            '/legacy_filtered_order_parameters?date=desc',
+            ['2024-12-25T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-01-01T00:00:00+00:00', null],
+        ];
+    }
+
+    #[DataProvider('orderFilterNullsComparisonScenariosProvider')]
+    public function testOrderFilterNullsComparisonResponses(string $url, array $expectedOrder): void
+    {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped(\sprintf('Not implemented in %s', OrderFilter::class));
+        }
+
+        $response = self::createClient()->request('GET', $url);
+        $this->assertResponseIsSuccessful();
+
+        $responseData = $response->toArray();
+        $orderedItems = $responseData['hydra:member'];
+
+        $actualOrder = array_map(static fn ($item) => $item['createdAt'] ?? null, $orderedItems);
+
+        $this->assertSame($expectedOrder, $actualOrder, \sprintf('Expected order does not match for URL %s', $url));
+    }
+
+    public static function orderFilterNullsComparisonScenariosProvider(): \Generator
+    {
+        yield 'date_null_always_first_alias_asc' => [
+            '/legacy_filtered_order_parameters?date_null_always_first=asc',
+            [null, '2024-01-01T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-12-25T00:00:00+00:00'],
+        ];
+        yield 'date_null_always_first_alias_desc' => [
+            '/legacy_filtered_order_parameters?date_null_always_first=desc',
+            [null, '2024-12-25T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-01-01T00:00:00+00:00'],
+        ];
+        yield 'date_null_always_first_old_way_alias_asc' => [
+            '/legacy_filtered_order_parameters?date_null_always_first_old_way=asc',
+            [null, '2024-01-01T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-12-25T00:00:00+00:00'],
+        ];
+        yield 'date_null_always_first_old_way_alias_desc' => [
+            '/legacy_filtered_order_parameters?date_null_always_first_old_way=desc',
+            [null, '2024-12-25T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-01-01T00:00:00+00:00'],
+        ];
+        yield 'order_property_created_at_null_first_asc' => [
+            '/legacy_filtered_order_parameters?order[createdAt]=asc',
+            [null, '2024-01-01T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-12-25T00:00:00+00:00'],
+        ];
+        yield 'order_property_created_at_null_first_desc' => [
+            '/legacy_filtered_order_parameters?order[createdAt]=desc',
+            [null, '2024-12-25T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-01-01T00:00:00+00:00'],
+        ];
+    }
+
+    /**
+     * @throws \Throwable
+     * @throws MongoDBException
+     */
+    private function loadFixtures(string $entityClass): void
+    {
+        $manager = $this->getManager();
+
+        $dates = [
+            new \DateTimeImmutable('2024-01-01'),
+            new \DateTimeImmutable('2024-12-25'),
+            null,
+            new \DateTimeImmutable('2024-06-15'),
+        ];
+
+        foreach ($dates as $createdAtValue) {
+            $entity = new $entityClass(createdAt: $createdAtValue);
+            $manager->persist($entity);
+        }
+
+        $manager->flush();
+    }
+}
