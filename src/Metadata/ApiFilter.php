@@ -19,6 +19,8 @@ use ApiPlatform\Metadata\Exception\InvalidArgumentException;
  * Filter attribute.
  *
  * @author Antoine Bluchet <soyuka@gmail.com>
+ *
+ * @deprecated since API Platform 4.4, use the {@see QueryParameter} attribute instead. Will be removed in 6.0.
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class ApiFilter

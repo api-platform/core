@@ -57,6 +57,8 @@ final class AttributeFilterPass implements CompilerPassInterface
                 continue;
             }
 
+            trigger_deprecation('api-platform/core', '4.4', \sprintf('Declaring filters on "%s" with the "#[ApiFilter]" attribute is deprecated, use the "#[QueryParameter]" attribute instead. The "#[ApiFilter]" attribute will be removed in 6.0.', $resourceReflectionClass->getName()));
+
             if (null === $filterReflectionClass = $container->getReflectionClass($filterClass, false)) {
                 throw new InvalidArgumentException(\sprintf('Class "%s" used for service "%s" cannot be found.', $filterClass, $id));
             }

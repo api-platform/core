@@ -701,7 +701,6 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         $parameters = [];
         $resourceFilters = $operation->getFilters();
         $entityClass = $this->getStateOptionsClass($operation, $operation->getClass());
-
         foreach ($resourceFilters ?? [] as $filterId) {
             if (!$this->filterLocator->has($filterId)) {
                 continue;
