@@ -11,51 +11,47 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document\Legacy;
 
-use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
+use ApiPlatform\Doctrine\Odm\Filter\NumericFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
-use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\TypeInfo\Type\BuiltinType;
-use Symfony\Component\TypeInfo\TypeIdentifier;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
+/**
+ * Legacy regression fixture: keeps the deprecated NumericFilter alive until 6.0.
+ * The canonical replacement (ExactFilter + numeric nativeType) lives at
+ * Document\FilteredNumericParameter.
+ */
 #[ApiResource]
 #[GetCollection(
+    uriTemplate: 'legacy_filtered_numeric_parameters{._format}',
     paginationItemsPerPage: 5,
     parameters: [
         'quantity' => new QueryParameter(
-            filter: new ExactFilter(),
-            nativeType: new BuiltinType(TypeIdentifier::INT),
-            castToNativeType: true,
+            filter: new NumericFilter(),
         ),
         'amount' => new QueryParameter(
-            filter: new ExactFilter(),
+            filter: new NumericFilter(),
             property: 'quantity',
-            nativeType: new BuiltinType(TypeIdentifier::INT),
-            castToNativeType: true,
         ),
         'ratio' => new QueryParameter(
-            filter: new ExactFilter(),
-            nativeType: new BuiltinType(TypeIdentifier::FLOAT),
-            castToNativeType: true,
+            filter: new NumericFilter(),
         ),
     ],
 )]
-#[ORM\Entity]
+#[ODM\Document]
 class FilteredNumericParameter
 {
     public function __construct(
-        #[ORM\Column]
-        #[ORM\Id]
-        #[ORM\GeneratedValue(strategy: 'AUTO')]
+        #[ODM\Id(type: 'int', strategy: 'INCREMENT')]
         public ?int $id = null,
 
-        #[ORM\Column(nullable: true)]
+        #[ODM\Field(type: 'int', nullable: true)]
         public ?int $quantity = null,
 
-        #[ORM\Column(nullable: true)]
+        #[ODM\Field(type: 'float', nullable: true)]
         public ?float $ratio = null,
     ) {
     }

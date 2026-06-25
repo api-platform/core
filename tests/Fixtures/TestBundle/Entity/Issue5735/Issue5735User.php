@@ -13,25 +13,21 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue5735;
 
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\IriFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
 
-#[ApiResource(
-    operations: [
-        new Get(),
-        new GetCollection(),
-    ],
-    routePrefix: '/issue5735'
-)]
-#[ApiFilter(SearchFilter::class, properties: ['groups' => 'exact'])]
+#[ApiResource(operations: [
+    new Get(),
+    new GetCollection(),
+], routePrefix: '/issue5735', parameters: ['groups' => new QueryParameter(filter: new IriFilter())])]
 #[ORM\Entity]
 #[ORM\Table(name: 'issue5735_user')]
 class Issue5735User

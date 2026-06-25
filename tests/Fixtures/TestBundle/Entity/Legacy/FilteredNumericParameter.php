@@ -11,35 +11,33 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\Legacy;
 
-use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
+use ApiPlatform\Doctrine\Orm\Filter\NumericFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\TypeInfo\Type\BuiltinType;
-use Symfony\Component\TypeInfo\TypeIdentifier;
 
+/**
+ * Legacy regression fixture: keeps the deprecated NumericFilter alive until 6.0.
+ * The canonical replacement (ExactFilter + numeric nativeType) lives at
+ * Entity\FilteredNumericParameter.
+ */
 #[ApiResource]
 #[GetCollection(
+    uriTemplate: 'legacy_filtered_numeric_parameters{._format}',
     paginationItemsPerPage: 5,
     parameters: [
         'quantity' => new QueryParameter(
-            filter: new ExactFilter(),
-            nativeType: new BuiltinType(TypeIdentifier::INT),
-            castToNativeType: true,
+            filter: new NumericFilter(),
         ),
         'amount' => new QueryParameter(
-            filter: new ExactFilter(),
+            filter: new NumericFilter(),
             property: 'quantity',
-            nativeType: new BuiltinType(TypeIdentifier::INT),
-            castToNativeType: true,
         ),
         'ratio' => new QueryParameter(
-            filter: new ExactFilter(),
-            nativeType: new BuiltinType(TypeIdentifier::FLOAT),
-            castToNativeType: true,
+            filter: new NumericFilter(),
         ),
     ],
 )]

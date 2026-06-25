@@ -13,25 +13,33 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Document;
 
-use ApiPlatform\Doctrine\Odm\Filter\NumericFilter;
+use ApiPlatform\Doctrine\Odm\Filter\ExactFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Symfony\Component\TypeInfo\Type\BuiltinType;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 #[ApiResource]
 #[GetCollection(
     paginationItemsPerPage: 5,
     parameters: [
         'quantity' => new QueryParameter(
-            filter: new NumericFilter(),
+            filter: new ExactFilter(),
+            nativeType: new BuiltinType(TypeIdentifier::INT),
+            castToNativeType: true,
         ),
         'amount' => new QueryParameter(
-            filter: new NumericFilter(),
+            filter: new ExactFilter(),
             property: 'quantity',
+            nativeType: new BuiltinType(TypeIdentifier::INT),
+            castToNativeType: true,
         ),
         'ratio' => new QueryParameter(
-            filter: new NumericFilter(),
+            filter: new ExactFilter(),
+            nativeType: new BuiltinType(TypeIdentifier::FLOAT),
+            castToNativeType: true,
         ),
     ],
 )]

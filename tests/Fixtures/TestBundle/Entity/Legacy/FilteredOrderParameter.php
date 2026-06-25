@@ -11,32 +11,50 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\Legacy;
 
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
-use ApiPlatform\Doctrine\Orm\Filter\SortFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\TypeInfo\Type\BuiltinType;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
+/**
+ * Legacy regression fixture: keeps the deprecated OrderFilter alive until 6.0, including the
+ * per-property `properties` nulls_comparison config form. The canonical replacement (SortFilter)
+ * lives at Entity\FilteredOrderParameter.
+ */
 #[ApiResource]
 #[GetCollection(
+    uriTemplate: 'legacy_filtered_order_parameters{._format}',
     paginationItemsPerPage: 5,
     parameters: [
         'createdAt' => new QueryParameter(
-            filter: new SortFilter(),
+            filter: new OrderFilter(),
+            nativeType: new BuiltinType(TypeIdentifier::STRING)
         ),
         'date' => new QueryParameter(
-            filter: new SortFilter(),
+            filter: new OrderFilter(),
             property: 'createdAt',
+            nativeType: new BuiltinType(TypeIdentifier::STRING)
         ),
         'date_null_always_first' => new QueryParameter(
-            filter: new SortFilter(nullsComparison: OrderFilterInterface::NULLS_ALWAYS_FIRST),
+            filter: new OrderFilter(),
             property: 'createdAt',
+            filterContext: ['nulls_comparison' => OrderFilterInterface::NULLS_ALWAYS_FIRST],
+            nativeType: new BuiltinType(TypeIdentifier::STRING)
+        ),
+        'date_null_always_first_old_way' => new QueryParameter(
+            filter: new OrderFilter(properties: ['createdAt' => ['nulls_comparison' => OrderFilterInterface::NULLS_ALWAYS_FIRST]]),
+            property: 'createdAt',
+            nativeType: new BuiltinType(TypeIdentifier::STRING)
         ),
         'order[:property]' => new QueryParameter(
-            filter: new SortFilter(nullsComparison: OrderFilterInterface::NULLS_ALWAYS_FIRST),
+            filter: new OrderFilter(),
+            filterContext: ['nulls_comparison' => OrderFilterInterface::NULLS_ALWAYS_FIRST],
         ),
     ],
 )]

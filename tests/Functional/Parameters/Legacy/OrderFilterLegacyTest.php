@@ -11,18 +11,26 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Functional\Parameters;
+namespace ApiPlatform\Tests\Functional\Parameters\Legacy;
 
 use ApiPlatform\Doctrine\Odm\Filter\OrderFilter;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
-use ApiPlatform\Tests\Fixtures\TestBundle\Document\FilteredOrderParameter as FilteredOrderParameterDocument;
-use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilteredOrderParameter;
+use ApiPlatform\Tests\Fixtures\TestBundle\Document\Legacy\FilteredOrderParameter as FilteredOrderParameterDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Legacy\FilteredOrderParameter;
 use ApiPlatform\Tests\RecreateSchemaTrait;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
 use Doctrine\ODM\MongoDB\MongoDBException;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
-final class OrderFilterTest extends ApiTestCase
+/**
+ * Regression coverage for the deprecated OrderFilter, including its per-property `properties`
+ * nulls_comparison config form. The canonical equivalent (SortFilter) is covered by
+ * ApiPlatform\Tests\Functional\Parameters\OrderFilterTest.
+ * Remove together with the deprecated filter in 6.0.
+ */
+#[Group('legacy')]
+final class OrderFilterLegacyTest extends ApiTestCase
 {
     use RecreateSchemaTrait;
     use SetupClassResourcesTrait;
@@ -71,27 +79,19 @@ final class OrderFilterTest extends ApiTestCase
     public static function orderFilterScenariosProvider(): \Generator
     {
         yield 'created_at_ordered_asc' => [
-            '/filtered_order_parameters?createdAt=asc',
+            '/legacy_filtered_order_parameters?createdAt=asc',
             [null, '2024-01-01T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-12-25T00:00:00+00:00'],
         ];
         yield 'created_at_ordered_desc' => [
-            '/filtered_order_parameters?createdAt=desc',
-            ['2024-12-25T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-01-01T00:00:00+00:00', null],
-        ];
-        yield 'created_at_ordered_asc_uppercase' => [
-            '/filtered_order_parameters?createdAt=ASC',
-            [null, '2024-01-01T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-12-25T00:00:00+00:00'],
-        ];
-        yield 'created_at_ordered_desc_uppercase' => [
-            '/filtered_order_parameters?createdAt=DESC',
+            '/legacy_filtered_order_parameters?createdAt=desc',
             ['2024-12-25T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-01-01T00:00:00+00:00', null],
         ];
         yield 'date_alias_ordered_asc' => [
-            '/filtered_order_parameters?date=asc',
+            '/legacy_filtered_order_parameters?date=asc',
             [null, '2024-01-01T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-12-25T00:00:00+00:00'],
         ];
         yield 'date_alias_ordered_desc' => [
-            '/filtered_order_parameters?date=desc',
+            '/legacy_filtered_order_parameters?date=desc',
             ['2024-12-25T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-01-01T00:00:00+00:00', null],
         ];
     }
@@ -117,27 +117,27 @@ final class OrderFilterTest extends ApiTestCase
     public static function orderFilterNullsComparisonScenariosProvider(): \Generator
     {
         yield 'date_null_always_first_alias_asc' => [
-            '/filtered_order_parameters?date_null_always_first=asc',
+            '/legacy_filtered_order_parameters?date_null_always_first=asc',
             [null, '2024-01-01T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-12-25T00:00:00+00:00'],
         ];
         yield 'date_null_always_first_alias_desc' => [
-            '/filtered_order_parameters?date_null_always_first=desc',
+            '/legacy_filtered_order_parameters?date_null_always_first=desc',
+            [null, '2024-12-25T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-01-01T00:00:00+00:00'],
+        ];
+        yield 'date_null_always_first_old_way_alias_asc' => [
+            '/legacy_filtered_order_parameters?date_null_always_first_old_way=asc',
+            [null, '2024-01-01T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-12-25T00:00:00+00:00'],
+        ];
+        yield 'date_null_always_first_old_way_alias_desc' => [
+            '/legacy_filtered_order_parameters?date_null_always_first_old_way=desc',
             [null, '2024-12-25T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-01-01T00:00:00+00:00'],
         ];
         yield 'order_property_created_at_null_first_asc' => [
-            '/filtered_order_parameters?order[createdAt]=asc',
+            '/legacy_filtered_order_parameters?order[createdAt]=asc',
             [null, '2024-01-01T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-12-25T00:00:00+00:00'],
         ];
         yield 'order_property_created_at_null_first_desc' => [
-            '/filtered_order_parameters?order[createdAt]=desc',
-            [null, '2024-12-25T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-01-01T00:00:00+00:00'],
-        ];
-        yield 'order_property_created_at_null_first_asc_uppercase' => [
-            '/filtered_order_parameters?order[createdAt]=ASC',
-            [null, '2024-01-01T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-12-25T00:00:00+00:00'],
-        ];
-        yield 'order_property_created_at_null_first_desc_uppercase' => [
-            '/filtered_order_parameters?order[createdAt]=DESC',
+            '/legacy_filtered_order_parameters?order[createdAt]=desc',
             [null, '2024-12-25T00:00:00+00:00', '2024-06-15T00:00:00+00:00', '2024-01-01T00:00:00+00:00'],
         ];
     }

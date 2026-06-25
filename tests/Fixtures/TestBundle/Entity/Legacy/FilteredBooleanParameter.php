@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\Legacy;
 
-use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
+use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
@@ -21,19 +21,23 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
+/**
+ * Legacy regression fixture: keeps the deprecated BooleanFilter alive until 6.0.
+ * The canonical replacement (ExactFilter + boolean nativeType) lives at
+ * Entity\FilteredBooleanParameter.
+ */
 #[ApiResource]
 #[GetCollection(
+    uriTemplate: 'legacy_filtered_boolean_parameters{._format}',
     parameters: [
         'active' => new QueryParameter(
-            filter: new ExactFilter(),
+            filter: new BooleanFilter(),
             nativeType: new BuiltinType(TypeIdentifier::BOOL),
-            castToNativeType: true,
         ),
         'enabled' => new QueryParameter(
-            filter: new ExactFilter(),
+            filter: new BooleanFilter(),
             property: 'active',
             nativeType: new BuiltinType(TypeIdentifier::BOOL),
-            castToNativeType: true,
         ),
     ],
 )]

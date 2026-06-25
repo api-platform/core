@@ -11,42 +11,44 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Document\Legacy;
 
-use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
+use ApiPlatform\Doctrine\Odm\Filter\BooleanFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
-use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
+/**
+ * Legacy regression fixture: keeps the deprecated BooleanFilter alive until 6.0.
+ * The canonical replacement (ExactFilter + boolean nativeType) lives at
+ * Document\FilteredBooleanParameter.
+ */
 #[ApiResource]
 #[GetCollection(
+    uriTemplate: 'legacy_filtered_boolean_parameters{._format}',
     parameters: [
         'active' => new QueryParameter(
-            filter: new ExactFilter(),
+            filter: new BooleanFilter(),
             nativeType: new BuiltinType(TypeIdentifier::BOOL),
-            castToNativeType: true,
         ),
         'enabled' => new QueryParameter(
-            filter: new ExactFilter(),
+            filter: new BooleanFilter(),
             property: 'active',
             nativeType: new BuiltinType(TypeIdentifier::BOOL),
-            castToNativeType: true,
         ),
     ],
 )]
-#[ORM\Entity]
+#[ODM\Document]
 class FilteredBooleanParameter
 {
     public function __construct(
-        #[ORM\Column]
-        #[ORM\Id]
-        #[ORM\GeneratedValue(strategy: 'AUTO')]
+        #[ODM\Id(type: 'int', strategy: 'INCREMENT')]
         public ?int $id = null,
 
-        #[ORM\Column(nullable: true)]
+        #[ODM\Field(type: 'bool', nullable: true)]
         public ?bool $active = null,
     ) {
     }
@@ -61,8 +63,8 @@ class FilteredBooleanParameter
         return $this->active;
     }
 
-    public function setActive(?bool $isActive): void
+    public function setActive(?bool $active): void
     {
-        $this->active = $isActive;
+        $this->active = $active;
     }
 }

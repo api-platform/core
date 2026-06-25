@@ -14,9 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
-use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
@@ -24,6 +22,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\GraphQl\Mutation;
 use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -35,15 +34,10 @@ use Symfony\Component\Validator\Constraints as Assert;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-#[ApiResource(
-    graphQlOperations: [
-        new Query(name: 'item_query'),
-        new Mutation(name: 'update', normalizationContext: ['groups' => ['chicago', 'fakemanytomany']], denormalizationContext: ['groups' => ['friends']]),
-    ],
-    types: ['https://schema.org/Product'],
-    normalizationContext: ['groups' => ['friends']],
-    filters: ['related_dummy.friends', 'related_dummy.complex_sub_query']
-)]
+#[ApiResource(graphQlOperations: [
+    new Query(name: 'item_query'),
+    new Mutation(name: 'update', normalizationContext: ['groups' => ['chicago', 'fakemanytomany']], denormalizationContext: ['groups' => ['friends']]),
+], types: ['https://schema.org/Product'], normalizationContext: ['groups' => ['friends']], filters: ['related_dummy.friends', 'related_dummy.complex_sub_query'], parameters: ['id' => new QueryParameter(filter: new ExactFilter()), 'symfony' => new QueryParameter(filter: new ExactFilter()), 'dummyDate' => new QueryParameter(filter: new DateFilter())])]
 #[ApiResource(uriTemplate: '/dummies/{id}/related_dummies{._format}', uriVariables: ['id' => new Link(fromClass: Dummy::class, identifiers: ['id'], fromProperty: 'relatedDummies')], status: 200, types: ['https://schema.org/Product'], filters: ['related_dummy.friends', 'related_dummy.complex_sub_query'], normalizationContext: ['groups' => ['friends']], operations: [new GetCollection()])]
 #[ApiResource(uriTemplate: '/dummies/{id}/related_dummies/{relatedDummies}{._format}', uriVariables: ['id' => new Link(fromClass: Dummy::class, identifiers: ['id'], fromProperty: 'relatedDummies'), 'relatedDummies' => new Link(fromClass: self::class, identifiers: ['id'])], status: 200, types: ['https://schema.org/Product'], filters: ['related_dummy.friends', 'related_dummy.complex_sub_query'], normalizationContext: ['groups' => ['friends']], operations: [new Get()])]
 #[ApiResource(uriTemplate: '/related_dummies/{id}/id{._format}', uriVariables: ['id' => new Link(fromClass: self::class, identifiers: ['id'])], status: 200, types: ['https://schema.org/Product'], filters: ['related_dummy.friends', 'related_dummy.complex_sub_query'], normalizationContext: ['groups' => ['friends']], operations: [new Get()])]
@@ -51,7 +45,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(uriTemplate: '/related_owned_dummies/{id}/owning_dummy/related_dummies/{relatedDummies}{._format}', uriVariables: ['id' => new Link(fromClass: RelatedOwnedDummy::class, identifiers: ['id'], fromProperty: 'owningDummy'), 'owningDummy' => new Link(fromClass: Dummy::class, identifiers: [], expandedValue: 'owning_dummy', fromProperty: 'relatedDummies'), 'relatedDummies' => new Link(fromClass: self::class, identifiers: ['id'])], status: 200, types: ['https://schema.org/Product'], filters: ['related_dummy.friends', 'related_dummy.complex_sub_query'], normalizationContext: ['groups' => ['friends']], operations: [new Get()])]
 #[ApiResource(uriTemplate: '/related_owning_dummies/{id}/owned_dummy/related_dummies{._format}', uriVariables: ['id' => new Link(fromClass: RelatedOwningDummy::class, identifiers: ['id'], fromProperty: 'ownedDummy'), 'ownedDummy' => new Link(fromClass: Dummy::class, identifiers: [], expandedValue: 'owned_dummy', fromProperty: 'relatedDummies')], status: 200, types: ['https://schema.org/Product'], filters: ['related_dummy.friends', 'related_dummy.complex_sub_query'], normalizationContext: ['groups' => ['friends']], operations: [new GetCollection()])]
 #[ApiResource(uriTemplate: '/related_owning_dummies/{id}/owned_dummy/related_dummies/{relatedDummies}{._format}', uriVariables: ['id' => new Link(fromClass: RelatedOwningDummy::class, identifiers: ['id'], fromProperty: 'ownedDummy'), 'ownedDummy' => new Link(fromClass: Dummy::class, identifiers: [], expandedValue: 'owned_dummy', fromProperty: 'relatedDummies'), 'relatedDummies' => new Link(fromClass: self::class, identifiers: ['id'])], status: 200, types: ['https://schema.org/Product'], filters: ['related_dummy.friends', 'related_dummy.complex_sub_query'], normalizationContext: ['groups' => ['friends']], operations: [new Get()])]
-#[ApiFilter(filterClass: SearchFilter::class, properties: ['id'])]
 #[ORM\Entity]
 class RelatedDummy extends ParentDummy implements \Stringable
 {
@@ -73,8 +66,6 @@ class RelatedDummy extends ParentDummy implements \Stringable
     #[ApiProperty(deprecationReason: 'This property is deprecated for upgrade test')]
     #[ORM\Column]
     #[Groups(['barcelona', 'chicago', 'friends'])]
-    #[ApiFilter(filterClass: SearchFilter::class)]
-    #[ApiFilter(filterClass: ExistsFilter::class)]
     protected $symfony = 'symfony';
 
     /**
@@ -83,7 +74,6 @@ class RelatedDummy extends ParentDummy implements \Stringable
     #[ORM\Column(type: 'datetime', nullable: true)]
     #[Assert\DateTime]
     #[Groups(['friends'])]
-    #[ApiFilter(filterClass: DateFilter::class)]
     public $dummyDate;
 
     #[ORM\ManyToOne(targetEntity: ThirdLevel::class, cascade: ['persist'], inversedBy: 'relatedDummies')]

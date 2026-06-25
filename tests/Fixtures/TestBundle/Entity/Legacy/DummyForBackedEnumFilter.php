@@ -11,26 +11,27 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue7126;
+namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity\Legacy;
 
-use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
+use ApiPlatform\Doctrine\Orm\Filter\BackedEnumFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue7126\IntegerBackedEnum;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue7126\StringBackedEnum;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * Legacy regression fixture: keeps the deprecated #[ApiFilter(BackedEnumFilter)] attribute path
+ * alive until 6.0. The canonical replacement lives at Entity\Issue7126\DummyForBackedEnumFilter
+ * (QueryParameter + ExactFilter).
+ */
 #[GetCollection(
-    uriTemplate: 'backed_enum_filter{._format}',
-    parameters: [
-        'stringBackedEnum' => new QueryParameter(filter: new ExactFilter()),
-        'integerBackedEnum' => new QueryParameter(filter: new ExactFilter()),
-    ],
+    uriTemplate: 'legacy_backed_enum_filter{._format}',
 )]
+#[ApiFilter(BackedEnumFilter::class, properties: ['stringBackedEnum', 'integerBackedEnum'])]
 #[ORM\Entity]
 class DummyForBackedEnumFilter
 {
-    /**
-     * @var int The id
-     */
     #[ORM\Column(type: 'integer')]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
@@ -62,8 +63,8 @@ class DummyForBackedEnumFilter
         return $this->integerBackedEnum;
     }
 
-    public function setIntegerBackedEnum(IntegerBackedEnum $IntegerBackedEnum): void
+    public function setIntegerBackedEnum(IntegerBackedEnum $integerBackedEnum): void
     {
-        $this->integerBackedEnum = $IntegerBackedEnum;
+        $this->integerBackedEnum = $integerBackedEnum;
     }
 }
