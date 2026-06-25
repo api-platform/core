@@ -773,7 +773,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 : is_a($item, $resourceClass);
 
             if (!$matchesType) {
-                throw new NotNormalizableValueException(\sprintf('The iri "%s" does not reference the correct resource.', $data));
+                throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Invalid IRI "%s".', $data), $data, [$resourceClass], $context['deserialization_path'] ?? null, true);
             }
 
             return $item;
