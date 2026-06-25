@@ -109,7 +109,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "4.4.x-dev"
+            "dev-main": "5.0.x-dev"
         },
         "symfony": {
             "require": "^6.4 || ^7.0 || ^8.0"
