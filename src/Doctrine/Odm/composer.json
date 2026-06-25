@@ -25,10 +25,10 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/doctrine-common": "^4.2.23",
-        "api-platform/metadata": "^4.2",
-        "api-platform/serializer": "^4.2.16",
-        "api-platform/state": "^4.2.4",
+        "api-platform/doctrine-common": "^4.4@alpha",
+        "api-platform/metadata": "^4.4@alpha",
+        "api-platform/serializer": "^4.4@alpha",
+        "api-platform/state": "^4.4@alpha",
         "doctrine/mongodb-odm": "^2.10",
         "symfony/property-info": "^6.4 || ^7.1 || ^8.0",
         "symfony/type-info": "^7.3 || ^8.0"
