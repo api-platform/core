@@ -321,6 +321,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $loader->load('api.php');
         $loader->load('filter.php');
 
+        if (class_exists(\PhpParser\ParserFactory::class)) {
+            $loader->load('upgrade.php');
+        }
+
         if (class_exists(UuidDenormalizer::class) && class_exists(Uuid::class)) {
             $loader->load('ramsey_uuid.php');
         }
