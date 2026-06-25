@@ -46,6 +46,24 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
 
         [$alias, $property] = $this->addNestedParameterJoins($property, $alias, $queryBuilder, $queryNameGenerator, $parameter);
 
+        if (ComparisonFilter::OPERATOR_BETWEEN === ($context['operator'] ?? null)) {
+            $whereClause = $context['whereClause'] ?? 'andWhere';
+
+            // equal bounds collapse to an equality so the optimizer skips the range scan
+            if ($value[0] === $value[1]) {
+                $queryBuilder->{$whereClause}(\sprintf('%s.%s = :%s', $alias, $property, $parameterName))
+                    ->setParameter($parameterName, $value[0]);
+
+                return;
+            }
+
+            $queryBuilder->{$whereClause}(\sprintf('%1$s.%2$s BETWEEN :%3$s_1 AND :%3$s_2', $alias, $property, $parameterName))
+                ->setParameter($parameterName.'_1', $value[0])
+                ->setParameter($parameterName.'_2', $value[1]);
+
+            return;
+        }
+
         if (\is_array($value)) {
             $queryBuilder
                 ->{$context['whereClause'] ?? 'andWhere'}(\sprintf('%s.%s IN (:%s)', $alias, $property, $parameterName));

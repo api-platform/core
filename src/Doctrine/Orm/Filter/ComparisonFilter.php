@@ -48,6 +48,12 @@ final class ComparisonFilter implements FilterInterface, OpenApiParameterFilterI
 
     public const ALLOWED_DQL_OPERATORS = ['=', '>', '>=', '<', '<=', '!=', '<>'];
 
+    /**
+     * Friendly range syntax: `?price[between]=10..100`. Translates to a single BETWEEN clause
+     * (or `=` when both bounds are equal), letting the SQL optimizer treat it as a bounded range.
+     */
+    public const OPERATOR_BETWEEN = 'between';
+
     public function __construct(private readonly FilterInterface $filter)
     {
     }
@@ -74,6 +80,12 @@ final class ComparisonFilter implements FilterInterface, OpenApiParameterFilterI
                 continue;
             }
 
+            if (self::OPERATOR_BETWEEN === $operator) {
+                $this->applyBetween($queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context, $parameter, $value);
+
+                continue;
+            }
+
             if (isset(self::OPERATORS[$operator])) {
                 $this->applyOperator($queryBuilder, $queryNameGenerator, $resourceClass, $operation, $context, $parameter, self::OPERATORS[$operator], $value);
             }
@@ -91,6 +103,7 @@ final class ComparisonFilter implements FilterInterface, OpenApiParameterFilterI
             new OpenApiParameter(name: "{$key}[lt]", in: $in),
             new OpenApiParameter(name: "{$key}[lte]", in: $in),
             new OpenApiParameter(name: "{$key}[ne]", in: $in),
+            new OpenApiParameter(name: "{$key}[between]", in: $in),
         ];
     }
 
@@ -109,6 +122,7 @@ final class ComparisonFilter implements FilterInterface, OpenApiParameterFilterI
                 'lt' => $innerSchema,
                 'lte' => $innerSchema,
                 'ne' => $innerSchema,
+                'between' => ['type' => 'string'],
             ],
         ];
     }
@@ -129,6 +143,31 @@ final class ComparisonFilter implements FilterInterface, OpenApiParameterFilterI
             $resourceClass,
             $operation,
             ['operator' => $operator, 'parameter' => $subParameter] + $context
+        );
+    }
+
+    /**
+     * @param array<string,mixed> $context
+     */
+    private function applyBetween(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation, array $context, Parameter $parameter, mixed $value): void
+    {
+        if (!\is_string($value)) {
+            return;
+        }
+
+        $bounds = explode('..', $value, 2);
+        if (2 !== \count($bounds) || !is_numeric($bounds[0]) || !is_numeric($bounds[1])) {
+            return;
+        }
+
+        // coerce to int|float so the bound is bound as a number, not a string
+        $subParameter = (clone $parameter)->setValue([$bounds[0] + 0, $bounds[1] + 0]);
+        $this->filter->apply(
+            $queryBuilder,
+            $queryNameGenerator,
+            $resourceClass,
+            $operation,
+            ['operator' => self::OPERATOR_BETWEEN, 'parameter' => $subParameter] + $context
         );
     }
 }
