@@ -122,17 +122,17 @@ final class ParameterProvider implements ProviderInterface, StopwatchAwareInterf
     private function parseQueryParametersFromBody(Request $request): array
     {
         $content = (string) $request->getContent();
-        if ('' === $content) {
-            return [];
-        }
-
         $mimeType = trim(strtolower(explode(';', (string) $request->headers->get('Content-Type', ''))[0]));
 
         if ('application/x-www-form-urlencoded' === $mimeType) {
-            return RequestParser::parseRequestParams($content);
+            return '' === $content ? [] : RequestParser::parseRequestParams($content);
         }
 
         if (str_contains($mimeType, 'json')) {
+            if ('' === $content) {
+                return [];
+            }
+
             try {
                 $params = json_decode($content, true, flags: \JSON_THROW_ON_ERROR);
             } catch (\JsonException $e) {
