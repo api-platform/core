@@ -1,5 +1,14 @@
 # Changelog
 
+## v4.3.15
+
+### Bug fixes
+
+* [37dfcb397](https://github.com/api-platform/core/commit/37dfcb397583ff1de4e3d87a75aa068a9997364a) fix(serializer): preserve deserialization path and expected type on IRI type-confusion guard (#8353)
+* [7bc11b2fe](https://github.com/api-platform/core/commit/7bc11b2fe29278664ab272964a868ed3a99a2951) fix(serializer): accept union-typed IRI collections on denormalization (#8339)
+* [a5761cc17](https://github.com/api-platform/core/commit/a5761cc1793c979c71d46305196eb157a44b6c2a) fix(jsonschema): don't require @id in single-item MCP output schema (#8343)
+* [be26bbeb3](https://github.com/api-platform/core/commit/be26bbeb369a5fa1eb055ec666b9e00c0590e366) fix(serializer): forward DiscriminatorMap defaultType in PropertyMetadataLoader (#8346)
+
 ## v4.3.14
 
 ### Bug fixes
