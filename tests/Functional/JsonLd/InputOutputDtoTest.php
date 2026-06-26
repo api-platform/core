@@ -158,10 +158,6 @@ final class InputOutputDtoTest extends ApiTestCase
 
     public function testCreateNoInputResource(): void
     {
-        if ($_SERVER['USE_SYMFONY_LISTENERS'] ?? false) {
-            $this->markTestSkipped('PlaceholderAction cannot resolve $data when input:false in event-listener mode.');
-        }
-
         $response = self::createClient()->request('POST', '/jsonld_no_inputs', [
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
