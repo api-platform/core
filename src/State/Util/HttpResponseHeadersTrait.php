@@ -155,7 +155,7 @@ trait HttpResponseHeadersTrait
         }
 
         $acceptPost = null;
-        $allowedMethods = ['OPTIONS', 'HEAD'];
+        $allowedMethods = [];
         $resourceCollection = $this->resourceMetadataCollectionFactory->create($operation->getClass());
         foreach ($resourceCollection as $resource) {
             foreach ($resource->getOperations() as $op) {
@@ -172,6 +172,7 @@ trait HttpResponseHeadersTrait
             $headers['Accept-Post'] = $acceptPost;
         }
 
-        $headers['Allow'] = implode(', ', $allowedMethods);
+        $head = \in_array('GET', $allowedMethods, true) ? ['HEAD'] : [];
+        $headers['Allow'] = implode(', ', array_merge(['OPTIONS'], $head, $allowedMethods));
     }
 }
