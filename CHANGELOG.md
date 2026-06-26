@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.4.0-alpha.2
+
+### Bug fixes
+
+* [b3f02f4e0](https://github.com/api-platform/core/commit/b3f02f4e08edbcb25777815c1f38920ea187a5a9) fix(laravel): require `api-platform/metadata` `^4.4@alpha` so inter-package dependencies resolve to 4.4 (fixes a broken `composer require api-platform/laravel` install where `SortFilterInterface` was missing)
+
 ## v4.4.0-alpha.1
 
 ### Bug fixes
