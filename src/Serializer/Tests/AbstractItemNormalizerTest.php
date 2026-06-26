@@ -1287,6 +1287,12 @@ class AbstractItemNormalizerTest extends TestCase
 
     public function testUnionTypeCollectionDenormalizationAcceptsAnyMember(): void
     {
+        // The union-collection IRI guard relies on the native type; the legacy
+        // property-info path (< 7.1) only keeps the first collection value type.
+        if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
+            $this->markTestSkipped('Requires symfony/property-info >= 7.1 (native types).');
+        }
+
         $data = ['attachments' => ['/related_dummies/1']];
         $relatedDummy = new RelatedDummy();
 
