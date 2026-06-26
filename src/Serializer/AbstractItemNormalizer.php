@@ -773,7 +773,26 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 : is_a($item, $resourceClass);
 
             if (!$matchesType) {
-                throw new NotNormalizableValueException(\sprintf('The iri "%s" does not reference the correct resource.', $data));
+                // Keep this a NotNormalizableValueException so union/intersection denormalization can fall
+                // through to the next member (see testUnionType*), but build it through the factory so the
+                // deserialization path and expected type are preserved on the resulting violation. For a
+                // union/intersection relation, report every accepted class rather than only the one currently
+                // being attempted.
+                $expectedTypes = [$resourceClass];
+                if ($relationType instanceof Type) {
+                    $classNames = [];
+                    foreach ($relationType instanceof CompositeTypeInterface ? $relationType->getTypes() : [$relationType] as $relationMember) {
+                        if ($relationMember instanceof ObjectType) {
+                            $classNames[] = $relationMember->getClassName();
+                        }
+                    }
+
+                    if ($classNames) {
+                        $expectedTypes = $classNames;
+                    }
+                }
+
+                throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Invalid IRI "%s".', $data), $data, $expectedTypes, $context['deserialization_path'] ?? null, true);
             }
 
             return $item;
