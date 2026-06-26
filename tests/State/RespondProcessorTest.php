@@ -163,6 +163,35 @@ class RespondProcessorTest extends TestCase
         $this->assertSame('application/ld+json', $response->headers->get('Accept-Post'));
     }
 
+    public function testDoesNotAdvertiseHeadWithoutGetOperation(): void
+    {
+        $postOperation = new Post(uriTemplate: '/employees', class: Employee::class);
+
+        $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
+        $resourceClassResolver->isResourceClass(Employee::class)->willReturn(true);
+
+        $resourceMetadataCollectionFactory = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
+        $resourceMetadataCollectionFactory->create(Employee::class)->willReturn(new ResourceMetadataCollection(Employee::class, [
+            new ApiResource(operations: [
+                'post' => $postOperation,
+            ]),
+        ]));
+
+        $respondProcessor = new RespondProcessor(
+            null,
+            $resourceClassResolver->reveal(),
+            null,
+            $resourceMetadataCollectionFactory->reveal()
+        );
+
+        $response = $respondProcessor->process('content', $postOperation, context: [
+            'request' => new Request(),
+        ]);
+
+        $this->assertNotNull($response->headers->get('Allow'));
+        $this->assertStringNotContainsString('HEAD', $response->headers->get('Allow'));
+    }
+
     public function testDynamicResponseStatusFromRequestAttribute(): void
     {
         $operation = new Post(class: Employee::class);

@@ -48,6 +48,7 @@ final class JsonStreamerProcessor implements ProcessorInterface
         ?ResourceClassResolverInterface $resourceClassResolver = null,
         ?OperationMetadataFactoryInterface $operationMetadataFactory = null,
         ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
+        private readonly bool $enableHeadRequestOptimization = true,
     ) {
         $this->resourceClassResolver = $resourceClassResolver;
         $this->iriConverter = $iriConverter;
@@ -66,6 +67,16 @@ final class JsonStreamerProcessor implements ProcessorInterface
             || 'json' !== $request->getRequestFormat()
         ) {
             return $this->processor?->process($data, $operation, $uriVariables, $context);
+        }
+
+        if ($this->enableHeadRequestOptimization && $request->isMethod('HEAD')) {
+            $response = new Response(
+                null,
+                $this->getStatus($request, $operation, $context),
+                $this->getHeaders($request, $operation, $context)
+            );
+
+            return $this->processor ? $this->processor->process($response, $operation, $uriVariables, $context) : $response;
         }
 
         if ($operation instanceof CollectionOperationInterface) {

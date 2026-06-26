@@ -359,6 +359,7 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         $container->setParameter('api_platform.enable_entrypoint', $config['enable_entrypoint']);
         $container->setParameter('api_platform.enable_docs', $config['enable_docs']);
+        $container->setParameter('api_platform.enable_head_request_optimization', $config['enable_head_request_optimization']);
         $container->setParameter('api_platform.title', $config['title']);
         $container->setParameter('api_platform.description', $config['description']);
         $container->setParameter('api_platform.version', $config['version']);

@@ -49,6 +49,10 @@ return [
     // on PATCH operations, allowing partial updates without requiring all fields.
     'partial_patch_validation' => false,
 
+    // When true (default), HEAD requests skip response body construction so
+    // collections are not iterated. Set to false to process HEAD like GET.
+    'enable_head_request_optimization' => true,
+
     'docs_formats' => [
         'jsonld' => ['application/ld+json'],
         // 'jsonapi' => ['application/vnd.api+json'],
