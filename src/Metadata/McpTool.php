@@ -28,7 +28,7 @@ class McpTool extends HttpOperation
     /**
      * @param string|null                                    $name              The name of the tool (defaults to the method name)
      * @param string|null                                    $title             Optional human-readable title for display in UI
-     * @param string|null                                    $description       The description of the tool (defaults to the DocBlock/inferred)
+     * @param string|\Stringable|null                        $description       The description of the tool (defaults to the DocBlock/inferred)
      * @param bool|null                                      $structuredContent Whether to include structured content in the response (defaults to true)
      * @param mixed|null                                     $annotations       Optional annotations describing tool behavior
      * @param array|null                                     $icons             Optional list of icon URLs representing the tool
@@ -92,7 +92,7 @@ class McpTool extends HttpOperation
     public function __construct(
         ?string $name = null,
         protected ?string $title = null,
-        ?string $description = null,
+        string|\Stringable|null $description = null,
         protected ?bool $structuredContent = null,
         protected mixed $annotations = null,
         protected ?array $icons = null,

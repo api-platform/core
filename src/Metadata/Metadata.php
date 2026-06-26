@@ -39,7 +39,7 @@ abstract class Metadata
     public function __construct(
         protected ?string $shortName = null,
         protected ?string $class = null,
-        protected ?string $description = null,
+        protected string|\Stringable|null $description = null,
         protected ?int $urlGenerationStrategy = null,
         protected ?string $deprecationReason = null,
         protected ?array $normalizationContext = null,
@@ -139,10 +139,10 @@ abstract class Metadata
 
     public function getDescription(): ?string
     {
-        return $this->description;
+        return $this->description instanceof \Stringable ? (string) $this->description : $this->description;
     }
 
-    public function withDescription(?string $description = null): static
+    public function withDescription(string|\Stringable|null $description = null): static
     {
         $self = clone $this;
         $self->description = $description;
