@@ -29,8 +29,14 @@ use Symfony\Component\Serializer\Serializer;
 return function (ContainerConfigurator $container) {
     $services = $container->services();
 
+    // A name converter built from the class metadata factory only (no globally configured fallback),
+    // so the OpenAPI document is not run through e.g. CamelCaseToSnakeCaseNameConverter while still
+    // honoring #[SerializedName('$ref')] on Reference::getRef(). See #8306/#8360.
+    $services->set('api_platform.openapi.name_converter')
+        ->parent('serializer.name_converter.metadata_aware.abstract');
+
     $services->set('api_platform.openapi.normalizer', OpenApiNormalizer::class)
-        ->args([inline_service(Serializer::class)->arg(0, [inline_service(ObjectNormalizer::class)->arg(0, service('serializer.mapping.class_metadata_factory'))->arg(1, service('serializer.name_converter.metadata_aware'))->arg(2, service('api_platform.property_accessor'))->arg(3, service('api_platform.property_info'))])->arg(1, [service('serializer.encoder.json')])])
+        ->args([inline_service(Serializer::class)->arg(0, [inline_service(ObjectNormalizer::class)->arg(0, service('serializer.mapping.class_metadata_factory'))->arg(1, service('api_platform.openapi.name_converter'))->arg(2, service('api_platform.property_accessor'))->arg(3, service('api_platform.property_info'))])->arg(1, [service('serializer.encoder.json')])])
         ->tag('serializer.normalizer', ['priority' => -795]);
 
     $services->alias(OpenApiNormalizer::class, 'api_platform.openapi.normalizer');
