@@ -207,11 +207,12 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
     }
 
     /**
-     * A relation borne by a non-resource object (e.g. a raw Doctrine entity embedded as a readable link)
-     * is serialized by the standard object normalizer, which embeds the related resource regardless of its
-     * readableLink/genId. The output schema must embed it too, otherwise a strict client rejects the payload.
+     * A resource-typed relation on a non-resource parent with readableLink=false must be an iri-reference in the
+     * output schema. The circular reference handler (see AbstractItemNormalizer::$defaultContext) converts the related
+     * resource to an IRI when a cycle is detected (e.g. A → B[] → A), so isReadableLink must drive the schema
+     * instead of the old "non-resource parents always embed" heuristic.
      */
-    public function testRelationOnNonResourceParentIsEmbeddedInOutputSchema(): void
+    public function testRelationOnNonResourceParentFollowsReadableLinkInOutputSchema(): void
     {
         if (!method_exists(PropertyInfoExtractor::class, 'getType')) { // @phpstan-ignore-line symfony/property-info 6.4 is still allowed and this may be true
             $this->markTestSkipped('This test only supports type-info component');
@@ -221,7 +222,7 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
         // the parent (DummyWithEnum) is not a resource, the related class (Dummy) is
         $resourceClassResolver->method('isResourceClass')->willReturnCallback(static fn (string $class): bool => Dummy::class === $class);
 
-        // not a readable link, gen_id left to its default: the relation would normally be an iri-reference string
+        // readableLink=false: the relation should be an iri-reference string even on a non-resource parent
         $apiProperty = (new ApiProperty(nativeType: Type::object(Dummy::class)))
             ->withReadableLink(false);
         $decorated = $this->createMock(PropertyMetadataFactoryInterface::class);
@@ -230,7 +231,32 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
         $schemaPropertyMetadataFactory = new SchemaPropertyMetadataFactory($resourceClassResolver, $decorated);
         $apiProperty = $schemaPropertyMetadataFactory->create(DummyWithEnum::class, 'relatedDummy');
 
-        // defers to SchemaFactory ($ref to embedded subschema) instead of an iri-reference string
+        $this->assertSame(['type' => 'string', 'format' => 'iri-reference', 'example' => 'https://example.com/'], $apiProperty->getSchema());
+    }
+
+    /**
+     * A relation on a non-resource parent where the property type is also not a resource must still be embedded
+     * (UNKNOWN_TYPE → resolved as $ref by SchemaFactory). The standard object normalizer embeds non-resource
+     * objects and isReadableLink is irrelevant here, so the schema defers to SchemaFactory.
+     */
+    public function testNonResourceRelationOnNonResourceParentIsEmbeddedInOutputSchema(): void
+    {
+        if (!method_exists(PropertyInfoExtractor::class, 'getType')) { // @phpstan-ignore-line symfony/property-info 6.4 is still allowed and this may be true
+            $this->markTestSkipped('This test only supports type-info component');
+        }
+
+        $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
+        // neither the parent nor the property type is a resource
+        $resourceClassResolver->method('isResourceClass')->willReturn(false);
+
+        $apiProperty = (new ApiProperty(nativeType: Type::object(DummyWithEnum::class)))
+            ->withReadableLink(false);
+        $decorated = $this->createMock(PropertyMetadataFactoryInterface::class);
+        $decorated->expects($this->once())->method('create')->with(DummyWithEnum::class, 'nested')->willReturn($apiProperty);
+
+        $schemaPropertyMetadataFactory = new SchemaPropertyMetadataFactory($resourceClassResolver, $decorated);
+        $apiProperty = $schemaPropertyMetadataFactory->create(DummyWithEnum::class, 'nested');
+
         $this->assertSame(['type' => Schema::UNKNOWN_TYPE], $apiProperty->getSchema());
     }
 
