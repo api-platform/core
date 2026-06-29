@@ -29,9 +29,6 @@ use Symfony\Component\Serializer\Serializer;
 return function (ContainerConfigurator $container) {
     $services = $container->services();
 
-    // A name converter built from the class metadata factory only (no globally configured fallback),
-    // so the OpenAPI document is not run through e.g. CamelCaseToSnakeCaseNameConverter while still
-    // honoring #[SerializedName('$ref')] on Reference::getRef(). See #8306/#8360.
     $services->set('api_platform.openapi.name_converter')
         ->parent('serializer.name_converter.metadata_aware.abstract');
 
