@@ -1187,7 +1187,7 @@ jobs:
       - name: Install api-platform/laravel
         run: |
           composer require laravel/framework:"^13.0" --no-update
-          composer global link ../src/Laravel --permanent
+          composer global link ../ --working-directory=$(pwd) --permanent
           composer config minimum-stability dev
           composer config prefer-stable true
           composer require api-platform/laravel:"@dev" -W
