@@ -15,13 +15,21 @@ namespace ApiPlatform\Doctrine\Orm\Filter;
 
 use ApiPlatform\Doctrine\Common\Filter\ExistsFilterInterface;
 use ApiPlatform\Doctrine\Common\Filter\ExistsFilterTrait;
+use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
+use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareTrait;
+use ApiPlatform\Doctrine\Common\Filter\NameConverterAwareInterface;
+use ApiPlatform\Doctrine\Common\Filter\NameConverterAwareTrait;
+use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterInterface;
+use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterTrait;
 use ApiPlatform\Doctrine\Common\Filter\PropertyPlaceholderOpenApiParameterTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryBuilderHelper;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\JsonSchemaFilterInterface;
 use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\AssociationMapping;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ManyToManyOwningSideMapping;
@@ -29,7 +37,9 @@ use Doctrine\ORM\Mapping\ToOneOwningSideMapping;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\Mapping\ClassMetadata as LegacyClassMetadata;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
@@ -116,19 +126,84 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  * Given that the collection endpoint is `/books`, you can filter books with the following query: `/books?exists[comment]=true`.
  *
  * @author Teoh Han Hui <teohhanhui@gmail.com>
- *
- * @deprecated since API Platform 4.4: extending {@see AbstractFilter} is deprecated. In 5.0 this filter is rewritten as a standalone filter (reading its value from the QueryParameter instead of the legacy `context['filters']` lookup) — same class name, same URL syntax, drop-in. Declare it through a QueryParameter to migrate.
  */
-final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface
+final class ExistsFilter implements ExistsFilterInterface, FilterInterface, JsonSchemaFilterInterface, ManagerRegistryAwareInterface, NameConverterAwareInterface, OpenApiParameterFilterInterface, PropertyAwareFilterInterface
 {
     use ExistsFilterTrait;
+    use ManagerRegistryAwareTrait;
+    use NameConverterAwareTrait;
+    use PropertyAwareFilterTrait;
     use PropertyPlaceholderOpenApiParameterTrait;
 
+    private LoggerInterface $logger;
+
+    /**
+     * Resolved from the QueryBuilder in apply(); metadata is read from it so the active filter path
+     * never touches the injected ManagerRegistry (kept only for the deprecated getDescription() and
+     * for BC injection through ManagerRegistryAwareInterface).
+     */
+    private ?EntityManagerInterface $entityManager = null;
+
+    /**
+     * @param array<string, mixed>|null $properties
+     */
     public function __construct(?ManagerRegistry $managerRegistry = null, ?LoggerInterface $logger = null, ?array $properties = null, string $existsParameterName = self::QUERY_PARAMETER_KEY, ?NameConverterInterface $nameConverter = null)
     {
-        parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
-
+        $this->managerRegistry = $managerRegistry;
+        $this->logger = $logger ?? new NullLogger();
         $this->existsParameterName = $existsParameterName;
+        $this->properties = $properties;
+        $this->nameConverter = $nameConverter;
+    }
+
+    protected function getLogger(): LoggerInterface
+    {
+        return $this->logger;
+    }
+
+    protected function isPropertyEnabled(string $property, string $resourceClass): bool
+    {
+        if (null === $this->properties) {
+            // to ensure sanity, nested properties must still be explicitly enabled
+            return !$this->isPropertyNested($property, $resourceClass);
+        }
+
+        return \array_key_exists($property, $this->properties);
+    }
+
+    protected function getClassMetadata(string $resourceClass): LegacyClassMetadata
+    {
+        if ($this->entityManager instanceof EntityManagerInterface) {
+            return $this->entityManager->getClassMetadata($resourceClass);
+        }
+
+        // Legacy getDescription() runs without a QueryBuilder: fall back to the injected registry.
+        if ($this->hasManagerRegistry() && ($manager = $this->getManagerRegistry()->getManagerForClass($resourceClass))) {
+            return $manager->getClassMetadata($resourceClass);
+        }
+
+        return new ClassMetadata($resourceClass);
+    }
+
+    /**
+     * @return array{0: string, 1: string, 2: string[]}
+     */
+    protected function addJoinsForNestedProperty(string $property, string $rootAlias, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $joinType): array
+    {
+        $propertyParts = $this->splitPropertyParts($property, $resourceClass);
+        $parentAlias = $rootAlias;
+        $alias = null;
+
+        foreach ($propertyParts['associations'] as $association) {
+            $alias = QueryBuilderHelper::addJoinOnce($queryBuilder, $queryNameGenerator, $parentAlias, $association, $joinType);
+            $parentAlias = $alias;
+        }
+
+        if (null === $alias) {
+            throw new InvalidArgumentException(\sprintf('Cannot add joins for property "%s" - property is not nested.', $property));
+        }
+
+        return [$alias, $propertyParts['field'], $propertyParts['associations']];
     }
 
     /**
@@ -136,6 +211,7 @@ final class ExistsFilter extends AbstractFilter implements ExistsFilterInterface
      */
     public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
+        $this->entityManager = $queryBuilder->getEntityManager();
         $parameter = $context['parameter'] ?? null;
         $propertyKey = $parameter?->getProperty();
 

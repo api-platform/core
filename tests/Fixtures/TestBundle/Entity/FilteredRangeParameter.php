@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 
-use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
+use ApiPlatform\Doctrine\Orm\Filter\ComparisonFilter;
+use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
@@ -25,11 +26,11 @@ use Doctrine\ORM\Mapping as ORM;
     paginationItemsPerPage: 5,
     parameters: [
         'quantity' => new QueryParameter(
-            filter: new RangeFilter(),
+            filter: new ComparisonFilter(new ExactFilter()),
             openApi: new Parameter('quantity', 'query', allowEmptyValue: true)
         ),
         'amount' => new QueryParameter(
-            filter: new RangeFilter(),
+            filter: new ComparisonFilter(new ExactFilter()),
             property: 'quantity',
             openApi: new Parameter('amount', 'query', allowEmptyValue: true)
         ),
