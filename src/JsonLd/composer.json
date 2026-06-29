@@ -24,9 +24,9 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/state": "^4.4@alpha",
-        "api-platform/metadata": "^4.4@alpha",
-        "api-platform/serializer": "^4.4@alpha"
+        "api-platform/state": "^5.0@alpha",
+        "api-platform/metadata": "^5.0@alpha",
+        "api-platform/serializer": "^5.0@alpha"
     },
     "autoload": {
         "psr-4": {

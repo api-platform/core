@@ -24,10 +24,10 @@
     ],
     "require": {
         "php": ">=8.2",
-        "api-platform/doctrine-common": "^4.4@alpha",
-        "api-platform/metadata": "^4.4@alpha",
-        "api-platform/serializer": "^4.4@alpha",
-        "api-platform/state": "^4.4@alpha",
+        "api-platform/doctrine-common": "^5.0@alpha",
+        "api-platform/metadata": "^5.0@alpha",
+        "api-platform/serializer": "^5.0@alpha",
+        "api-platform/state": "^5.0@alpha",
         "composer/semver": "^3.4",
         "doctrine/orm": "^2.17 || ^3.0.1"
     },
