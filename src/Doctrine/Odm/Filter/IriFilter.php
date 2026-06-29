@@ -25,6 +25,7 @@ use ApiPlatform\Metadata\ParameterProviderFilterInterface;
 use ApiPlatform\State\ParameterProvider\IriConverterParameterProvider;
 use Doctrine\ODM\MongoDB\Aggregation\Builder;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
 use Doctrine\ODM\MongoDB\Mapping\MappingException;
 
 /**
@@ -68,7 +69,23 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
         $leafProperty = $nestedInfo['leaf_property'] ?? $property;
         $classMetadata = $documentManager->getClassMetadata($leafClass);
 
+        // Backed enum exposed as a resource: match the scalar field against the resolved enum.
         if (!$classMetadata->hasReference($leafProperty)) {
+            if (!$this->isEnumField($classMetadata, $leafProperty)) {
+                return;
+            }
+
+            $normalize = static fn (mixed $v): mixed => $v instanceof \BackedEnum ? $v->value : $v;
+
+            if (is_iterable($value)) {
+                $values = \is_array($value) ? $value : iterator_to_array($value);
+                $match->{$operator}($aggregationBuilder->matchExpr()->field($matchField)->in(array_map($normalize, $values)));
+
+                return;
+            }
+
+            $match->{$operator}($aggregationBuilder->matchExpr()->field($matchField)->equals($normalize($value)));
+
             return;
         }
 
@@ -112,5 +129,10 @@ final class IriFilter implements FilterInterface, OpenApiParameterFilterInterfac
     public static function getParameterProvider(): string
     {
         return IriConverterParameterProvider::class;
+    }
+
+    private function isEnumField(ClassMetadata $classMetadata, string $field): bool
+    {
+        return $classMetadata->hasField($field) && null !== ($classMetadata->getFieldMapping($field)['enumType'] ?? null);
     }
 }
