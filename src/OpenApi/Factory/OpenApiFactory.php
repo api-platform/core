@@ -58,8 +58,6 @@ use ApiPlatform\State\Pagination\PaginationOptions;
 use ApiPlatform\State\Util\StateOptionsTrait;
 use ApiPlatform\Validator\Exception\ValidationException;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
-use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\TypeInfo\Type;
@@ -728,28 +726,21 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         if (!isset($description['openapi']) || $description['openapi'] instanceof Parameter) {
             $schema = $description['schema'] ?? [];
 
-            if (method_exists(PropertyInfoExtractor::class, 'getType')) {
-                if (isset($description['type']) && \in_array($description['type'], TypeIdentifier::values(), true) && !isset($schema['type'])) {
-                    $type = Type::builtin($description['type']);
-                    if ($description['is_collection'] ?? false) {
-                        $type = Type::array($type, Type::int());
-                    }
+            if (isset($description['type']) && \in_array($description['type'], TypeIdentifier::values(), true) && !isset($schema['type'])) {
+                $type = Type::builtin($description['type']);
+                if ($description['is_collection'] ?? false) {
+                    $type = Type::array($type, Type::int());
+                }
 
-                    $schema += $this->getType($type);
-                }
-            // TODO: remove in 5.x
-            } else {
-                if (isset($description['type']) && \in_array($description['type'], LegacyType::$builtinTypes, true) && !isset($schema['type'])) {
-                    $schema += $this->getType(new LegacyType($description['type'], false, null, $description['is_collection'] ?? false));
-                }
+                $schema += $this->getType($type);
             }
 
             if (!isset($schema['type'])) {
                 $schema['type'] = 'string';
             }
 
-            $arrayValueType = method_exists(PropertyInfoExtractor::class, 'getType') ? TypeIdentifier::ARRAY->value : LegacyType::BUILTIN_TYPE_ARRAY;
-            $objectValueType = method_exists(PropertyInfoExtractor::class, 'getType') ? TypeIdentifier::OBJECT->value : LegacyType::BUILTIN_TYPE_OBJECT;
+            $arrayValueType = TypeIdentifier::ARRAY->value;
+            $objectValueType = TypeIdentifier::OBJECT->value;
 
             $isArraySchema = 'array' === ($schema['type'] ?? null);
             $style = $isArraySchema && \in_array(
@@ -776,26 +767,19 @@ final class OpenApiFactory implements OpenApiFactoryInterface
         $schema = $description['schema'] ?? null;
 
         if (!$schema) {
-            if (method_exists(PropertyInfoExtractor::class, 'getType')) {
-                if (isset($description['type']) && \in_array($description['type'], TypeIdentifier::values(), true)) {
-                    $type = Type::builtin($description['type']);
-                    if ($description['is_collection'] ?? false) {
-                        $type = Type::array($type, key: Type::int());
-                    }
-                    $schema = $this->getType($type);
-                } else {
-                    $schema = ['type' => 'string'];
+            if (isset($description['type']) && \in_array($description['type'], TypeIdentifier::values(), true)) {
+                $type = Type::builtin($description['type']);
+                if ($description['is_collection'] ?? false) {
+                    $type = Type::array($type, key: Type::int());
                 }
-            // TODO: remove in 5.x
+                $schema = $this->getType($type);
             } else {
-                $schema = isset($description['type']) && \in_array($description['type'], LegacyType::$builtinTypes, true)
-                    ? $this->getType(new LegacyType($description['type'], false, null, $description['is_collection'] ?? false))
-                    : ['type' => 'string'];
+                $schema = ['type' => 'string'];
             }
         }
 
-        $arrayValueType = method_exists(PropertyInfoExtractor::class, 'getType') ? TypeIdentifier::ARRAY->value : LegacyType::BUILTIN_TYPE_ARRAY;
-        $objectValueType = method_exists(PropertyInfoExtractor::class, 'getType') ? TypeIdentifier::OBJECT->value : LegacyType::BUILTIN_TYPE_OBJECT;
+        $arrayValueType = TypeIdentifier::ARRAY->value;
+        $objectValueType = TypeIdentifier::OBJECT->value;
 
         $isArraySchema = 'array' === $schema['type'];
 

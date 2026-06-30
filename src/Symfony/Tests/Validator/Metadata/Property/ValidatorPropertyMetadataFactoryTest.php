@@ -45,10 +45,8 @@ use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaRe
 use ApiPlatform\Symfony\Validator\Metadata\Property\Restriction\PropertySchemaUniqueRestriction;
 use ApiPlatform\Symfony\Validator\Metadata\Property\ValidatorPropertyMetadataFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
-use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\Hostname;
@@ -561,46 +559,6 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         $this->assertEquals(['uniqueItems' => true], $schema);
     }
 
-    #[IgnoreDeprecations]
-    public function testLegacyCreateWithRangeConstraint(): void
-    {
-        if (!class_exists(LegacyType::class)) {
-            $this->markTestSkipped('symfony/property-info is not installed.');
-        }
-
-        $cases = [
-            'min int' => ['type' => new LegacyType(LegacyType::BUILTIN_TYPE_INT), 'property' => 'dummyIntMin', 'expectedSchema' => ['minimum' => 1]],
-            'max int' => ['type' => new LegacyType(LegacyType::BUILTIN_TYPE_INT), 'property' => 'dummyIntMax', 'expectedSchema' => ['maximum' => 10]],
-            'min/max int' => ['type' => new LegacyType(LegacyType::BUILTIN_TYPE_INT), 'property' => 'dummyIntMinMax', 'expectedSchema' => ['minimum' => 1, 'maximum' => 10]],
-            'min float' => ['type' => new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT), 'property' => 'dummyFloatMin', 'expectedSchema' => ['minimum' => 1.5]],
-            'max float' => ['type' => new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT), 'property' => 'dummyFloatMax', 'expectedSchema' => ['maximum' => 10.5]],
-            'min/max float' => ['type' => new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT), 'property' => 'dummyFloatMinMax', 'expectedSchema' => ['minimum' => 1.5, 'maximum' => 10.5]],
-        ];
-
-        foreach ($cases as ['type' => $type, 'property' => $property, 'expectedSchema' => $expectedSchema]) {
-            $validatorClassMetadata = new ClassMetadata(DummyRangeValidatedEntity::class);
-            (new AttributeLoader())->loadClassMetadata($validatorClassMetadata);
-
-            $validatorMetadataFactory = $this->prophesize(MetadataFactoryInterface::class);
-            $validatorMetadataFactory->getMetadataFor(DummyRangeValidatedEntity::class)
-                ->willReturn($validatorClassMetadata)
-                ->shouldBeCalled();
-
-            $decoratedPropertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
-            $decoratedPropertyMetadataFactory->create(DummyRangeValidatedEntity::class, $property, [])->willReturn(
-                (new ApiProperty())->withBuiltinTypes([$type])
-            )->shouldBeCalled();
-            $validationPropertyMetadataFactory = new ValidatorPropertyMetadataFactory(
-                $validatorMetadataFactory->reveal(),
-                $decoratedPropertyMetadataFactory->reveal(),
-                [new PropertySchemaRangeRestriction()]
-            );
-            $schema = $validationPropertyMetadataFactory->create(DummyRangeValidatedEntity::class, $property)->getSchema();
-
-            $this->assertEquals($expectedSchema, $schema);
-        }
-    }
-
     #[DataProvider('provideRangeConstraintCasesWithNativeType')]
     public function testCreateWithRangeConstraintWithNativeType(Type $type, string $property, array $expectedSchema): void // Use new Type
     {
@@ -634,49 +592,6 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
         yield 'native type: min float' => ['type' => Type::float(), 'property' => 'dummyFloatMin', 'expectedSchema' => ['minimum' => 1.5]];
         yield 'native type: max float' => ['type' => Type::float(), 'property' => 'dummyFloatMax', 'expectedSchema' => ['maximum' => 10.5]];
         yield 'native type: min/max float' => ['type' => Type::float(), 'property' => 'dummyFloatMinMax', 'expectedSchema' => ['minimum' => 1.5, 'maximum' => 10.5]];
-    }
-
-    #[IgnoreDeprecations]
-    public function testCreateWithPropertyChoiceRestriction(): void
-    {
-        if (!class_exists(LegacyType::class)) {
-            $this->markTestSkipped('symfony/property-info is not installed.');
-        }
-
-        $cases = [
-            'single choice' => ['propertyMetadata' => (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), 'property' => 'dummySingleChoice', 'expectedSchema' => ['enum' => ['a', 'b']]],
-            'single choice callback' => ['propertyMetadata' => (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), 'property' => 'dummySingleChoiceCallback', 'expectedSchema' => ['enum' => ['a', 'b', 'c', 'd']]],
-            'multi choice' => ['propertyMetadata' => (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), 'property' => 'dummyMultiChoice', 'expectedSchema' => ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b']]]],
-            'multi choice callback' => ['propertyMetadata' => (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), 'property' => 'dummyMultiChoiceCallback', 'expectedSchema' => ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']]]],
-            'multi choice min' => ['propertyMetadata' => (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), 'property' => 'dummyMultiChoiceMin', 'expectedSchema' => ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']], 'minItems' => 2]],
-            'multi choice max' => ['propertyMetadata' => (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), 'property' => 'dummyMultiChoiceMax', 'expectedSchema' => ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']], 'maxItems' => 4]],
-            'multi choice min/max' => ['propertyMetadata' => (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_STRING)]), 'property' => 'dummyMultiChoiceMinMax', 'expectedSchema' => ['type' => 'array', 'items' => ['type' => 'string', 'enum' => ['a', 'b', 'c', 'd']], 'minItems' => 2, 'maxItems' => 4]],
-        ];
-
-        foreach ($cases as ['propertyMetadata' => $propertyMetadata, 'property' => $property, 'expectedSchema' => $expectedSchema]) {
-            $validatorClassMetadata = new ClassMetadata(DummyValidatedChoiceEntity::class);
-            (new AttributeLoader())->loadClassMetadata($validatorClassMetadata);
-
-            $validatorMetadataFactory = $this->prophesize(MetadataFactoryInterface::class);
-            $validatorMetadataFactory->getMetadataFor(DummyValidatedChoiceEntity::class)
-                ->willReturn($validatorClassMetadata)
-                ->shouldBeCalled();
-
-            $decoratedPropertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
-            $decoratedPropertyMetadataFactory->create(DummyValidatedChoiceEntity::class, $property, [])->willReturn(
-                $propertyMetadata
-            )->shouldBeCalled();
-
-            $validationPropertyMetadataFactory = new ValidatorPropertyMetadataFactory(
-                $validatorMetadataFactory->reveal(),
-                $decoratedPropertyMetadataFactory->reveal(),
-                [new PropertySchemaChoiceRestriction()]
-            );
-
-            $schema = $validationPropertyMetadataFactory->create(DummyValidatedChoiceEntity::class, $property)->getSchema();
-
-            $this->assertEquals($expectedSchema, $schema);
-        }
     }
 
     #[DataProvider('provideChoiceConstraintCasesWithNativeType')]
@@ -819,87 +734,6 @@ class ValidatorPropertyMetadataFactoryTest extends TestCase
             'additionalProperties' => true,
             'required' => ['name', 'email', 'social'],
         ], $schema);
-    }
-
-    #[IgnoreDeprecations]
-    public function testCreateWithPropertyNumericRestriction(): void
-    {
-        if (!class_exists(LegacyType::class)) {
-            $this->markTestSkipped('symfony/property-info is not installed.');
-        }
-
-        $cases = [
-            [
-                'propertyMetadata' => (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]),
-                'property' => 'greaterThanMe',
-                'expectedSchema' => ['exclusiveMinimum' => 10, 'minimum' => 10],
-            ],
-            [
-                'propertyMetadata' => (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]),
-                'property' => 'greaterThanOrEqualToMe',
-                'expectedSchema' => ['minimum' => 10.99],
-            ],
-            [
-                'propertyMetadata' => (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]),
-                'property' => 'lessThanMe',
-                'expectedSchema' => ['exclusiveMaximum' => 99, 'maximum' => 99],
-            ],
-            [
-                'propertyMetadata' => (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_FLOAT)]),
-                'property' => 'lessThanOrEqualToMe',
-                'expectedSchema' => ['maximum' => 99.33],
-            ],
-            [
-                'propertyMetadata' => (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]),
-                'property' => 'positive',
-                'expectedSchema' => ['exclusiveMinimum' => 0, 'minimum' => 0],
-            ],
-            [
-                'propertyMetadata' => (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]),
-                'property' => 'positiveOrZero',
-                'expectedSchema' => ['minimum' => 0],
-            ],
-            [
-                'propertyMetadata' => (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]),
-                'property' => 'negative',
-                'expectedSchema' => ['exclusiveMaximum' => 0, 'maximum' => 0],
-            ],
-            [
-                'propertyMetadata' => (new ApiProperty())->withBuiltinTypes([new LegacyType(LegacyType::BUILTIN_TYPE_INT)]),
-                'property' => 'negativeOrZero',
-                'expectedSchema' => ['maximum' => 0],
-            ],
-        ];
-
-        foreach ($cases as ['propertyMetadata' => $propertyMetadata, 'property' => $property, 'expectedSchema' => $expectedSchema]) {
-            $validatorClassMetadata = new ClassMetadata(DummyNumericValidatedEntity::class);
-            (new AttributeLoader())->loadClassMetadata($validatorClassMetadata);
-
-            $validatorMetadataFactory = $this->prophesize(MetadataFactoryInterface::class);
-            $validatorMetadataFactory->getMetadataFor(DummyNumericValidatedEntity::class)
-                ->willReturn($validatorClassMetadata)
-                ->shouldBeCalled();
-
-            $decoratedPropertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
-            $decoratedPropertyMetadataFactory->create(DummyNumericValidatedEntity::class, $property, [])->willReturn(
-                $propertyMetadata
-            )->shouldBeCalled();
-
-            $validationPropertyMetadataFactory = new ValidatorPropertyMetadataFactory(
-                $validatorMetadataFactory->reveal(),
-                $decoratedPropertyMetadataFactory->reveal(),
-                [
-                    new PropertySchemaGreaterThanOrEqualRestriction(),
-                    new PropertySchemaGreaterThanRestriction(),
-                    new PropertySchemaLessThanOrEqualRestriction(),
-                    new PropertySchemaLessThanRestriction(),
-                ]
-            );
-
-            $schema = $validationPropertyMetadataFactory->create(DummyNumericValidatedEntity::class, $property)->getSchema();
-
-            $this->assertEquals($expectedSchema, $schema);
-        }
     }
 
     #[DataProvider('provideNumericConstraintCasesWithNativeType')]

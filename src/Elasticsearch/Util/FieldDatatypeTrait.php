@@ -17,8 +17,6 @@ use ApiPlatform\Metadata\Exception\PropertyNotFoundException;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\Util\TypeHelper;
-use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
-use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 
@@ -65,35 +63,6 @@ trait FieldDatatypeTrait
         try {
             $propertyMetadata = $this->propertyMetadataFactory->create($resourceClass, $currentProperty);
         } catch (PropertyNotFoundException) {
-            return null;
-        }
-
-        if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
-            $types = $propertyMetadata->getBuiltinTypes() ?? [];
-
-            foreach ($types as $type) {
-                if (
-                    LegacyType::BUILTIN_TYPE_OBJECT === $type->getBuiltinType()
-                    && null !== ($nextResourceClass = $type->getClassName())
-                    && $this->resourceClassResolver->isResourceClass($nextResourceClass)
-                ) {
-                    $nestedPath = $this->getNestedFieldPath($nextResourceClass, implode('.', $properties));
-
-                    return null === $nestedPath ? $nestedPath : "$currentProperty.$nestedPath";
-                }
-
-                if (
-                    null !== ($type = $type->getCollectionValueTypes()[0] ?? null)
-                    && LegacyType::BUILTIN_TYPE_OBJECT === $type->getBuiltinType()
-                    && null !== ($className = $type->getClassName())
-                    && $this->resourceClassResolver->isResourceClass($className)
-                ) {
-                    $nestedPath = $this->getNestedFieldPath($className, implode('.', $properties));
-
-                    return null === $nestedPath ? $currentProperty : "$currentProperty.$nestedPath";
-                }
-            }
-
             return null;
         }
 

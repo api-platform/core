@@ -33,7 +33,6 @@ use Symfony\Component\PropertyAccess\Exception\InvalidTypeException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
@@ -859,134 +858,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             return $this->propertyAccessor->getValue($object, $attribute);
         }
 
-        if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
-            $types = $propertyMetadata->getBuiltinTypes() ?? [];
-
-            foreach ($types as $type) {
-                if (
-                    $type->isCollection()
-                    && ($collectionValueType = $type->getCollectionValueTypes()[0] ?? null)
-                    && ($className = $collectionValueType->getClassName())
-                    && $this->resourceClassResolver->isResourceClass($className)
-                ) {
-                    $childContext = $this->createChildContext($this->createOperationContext($context, $className, $propertyMetadata), $attribute, $format);
-
-                    // @see ApiPlatform\Hal\Serializer\ItemNormalizer:getComponents logic for intentional duplicate content
-                    // @see ApiPlatform\JsonApi\Serializer\ItemNormalizer:getComponents logic for intentional duplicate content
-                    if ('jsonld' === $format && $itemUriTemplate = $propertyMetadata->getUriTemplate()) {
-                        $operation = $this->resourceMetadataCollectionFactory->create($className)->getOperation(
-                            operationName: $itemUriTemplate,
-                            forceCollection: true,
-                            httpOperation: true
-                        );
-
-                        return $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $operation, $childContext);
-                    }
-
-                    $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
-
-                    if (null === $attributeValue && $type->isNullable()) {
-                        return null;
-                    }
-
-                    if (!is_iterable($attributeValue)) {
-                        throw new UnexpectedValueException('Unexpected non-iterable value for to-many relation.');
-                    }
-
-                    $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
-
-                    $data = $this->normalizeCollectionOfRelations($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
-                    $context['data'] = $data;
-                    $context['type'] = $type;
-
-                    if ($this->tagCollector) {
-                        $this->tagCollector->collect($context);
-                    }
-
-                    return $data;
-                }
-
-                if (
-                    ($className = $type->getClassName())
-                    && $this->resourceClassResolver->isResourceClass($className)
-                ) {
-                    $childContext = $this->createChildContext($this->createOperationContext($context, $className, $propertyMetadata), $attribute, $format);
-                    unset($childContext['iri'], $childContext['uri_variables'], $childContext['item_uri_template']);
-                    if ('jsonld' === $format && $uriTemplate = $propertyMetadata->getUriTemplate()) {
-                        $operation = $this->resourceMetadataCollectionFactory->create($className)->getOperation(
-                            operationName: $uriTemplate,
-                            httpOperation: true
-                        );
-
-                        return $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $operation, $childContext);
-                    }
-
-                    $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
-
-                    if (!\is_object($attributeValue) && null !== $attributeValue) {
-                        throw new UnexpectedValueException('Unexpected non-object value for to-one relation.');
-                    }
-
-                    $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
-
-                    $data = $this->normalizeRelation($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
-                    $context['data'] = $data;
-                    $context['type'] = $type;
-
-                    if ($this->tagCollector) {
-                        $this->tagCollector->collect($context);
-                    }
-
-                    return $data;
-                }
-
-                if (!$this->serializer instanceof NormalizerInterface) {
-                    throw new LogicException(\sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
-                }
-
-                unset(
-                    $context['resource_class'],
-                    $context['force_resource_class'],
-                    $context['uri_variables'],
-                );
-
-                // Anonymous resources
-                if ($className) {
-                    $childContext = $this->createChildContext($this->createOperationContext($context, $className, $propertyMetadata), $attribute, $format);
-                    $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
-
-                    return $this->serializer->normalize($attributeValue, $format, $childContext);
-                }
-
-                if ('array' === $type->getBuiltinType()) {
-                    if ($className = ($type->getCollectionValueTypes()[0] ?? null)?->getClassName()) {
-                        $context = $this->createOperationContext($context, $className, $propertyMetadata);
-                    }
-
-                    $childContext = $this->createChildContext($context, $attribute, $format);
-                    $childContext['output']['gen_id'] ??= $propertyMetadata->getGenId() ?? true;
-
-                    $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
-
-                    return $this->serializer->normalize($attributeValue, $format, $childContext);
-                }
-            }
-
-            if (!$this->serializer instanceof NormalizerInterface) {
-                throw new LogicException(\sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
-            }
-
-            unset(
-                $context['resource_class'],
-                $context['force_resource_class'],
-                $context['uri_variables']
-            );
-
-            $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
-
-            return $this->serializer->normalize($attributeValue, $format, $context);
-        }
-
         $type = $propertyMetadata->getNativeType();
 
         $nullable = false;
@@ -1201,13 +1072,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     {
         $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $this->getFactoryOptions($context));
 
-        $type = null;
-        if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
-            $types = $propertyMetadata->getBuiltinTypes() ?? [];
-        } else {
-            $type = $propertyMetadata->getNativeType();
-            $types = $type instanceof CompositeTypeInterface ? $type->getTypes() : (null === $type ? [] : [$type]);
-        }
+        $type = $propertyMetadata->getNativeType();
+        $types = $type instanceof CompositeTypeInterface ? $type->getTypes() : (null === $type ? [] : [$type]);
 
         $className = null;
         $typeIsResourceClass = function (Type $type) use (&$className): bool {

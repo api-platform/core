@@ -24,30 +24,12 @@ use ApiPlatform\JsonSchema\Tests\Fixtures\Enum\IntEnumAsIdentifier;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
-use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
 
 class SchemaPropertyMetadataFactoryTest extends TestCase
 {
-    #[IgnoreDeprecations]
-    public function testEnumLegacy(): void
-    {
-        if (!class_exists(LegacyType::class)) {
-            $this->markTestSkipped();
-        }
-        $this->expectUserDeprecationMessage('Since api_platform/metadata 4.2: The "builtinTypes" argument of "ApiPlatform\Metadata\ApiProperty" is deprecated, use "nativeType" instead.');
-        $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
-        $apiProperty = new ApiProperty(builtinTypes: [new LegacyType(builtinType: 'object', nullable: true, class: IntEnumAsIdentifier::class)]);
-        $decorated = $this->createMock(PropertyMetadataFactoryInterface::class);
-        $decorated->expects($this->once())->method('create')->with(DummyWithEnum::class, 'intEnumAsIdentifier')->willReturn($apiProperty);
-        $schemaPropertyMetadataFactory = new SchemaPropertyMetadataFactory($resourceClassResolver, $decorated);
-        $apiProperty = $schemaPropertyMetadataFactory->create(DummyWithEnum::class, 'intEnumAsIdentifier');
-        $this->assertEquals(['type' => ['integer', 'null'], 'enum' => [1, 2, null]], $apiProperty->getSchema());
-    }
-
     public function testEnum(): void
     {
         $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
@@ -57,25 +39,6 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
         $schemaPropertyMetadataFactory = new SchemaPropertyMetadataFactory($resourceClassResolver, $decorated);
         $apiProperty = $schemaPropertyMetadataFactory->create(DummyWithEnum::class, 'intEnumAsIdentifier');
         $this->assertEquals(['type' => ['integer', 'null'], 'enum' => [1, 2, null]], $apiProperty->getSchema());
-    }
-
-    #[IgnoreDeprecations]
-    public function testWithCustomOpenApiContextLegacy(): void
-    {
-        if (!class_exists(LegacyType::class)) {
-            $this->markTestSkipped();
-        }
-        $this->expectUserDeprecationMessage('Since api_platform/metadata 4.2: The "builtinTypes" argument of "ApiPlatform\Metadata\ApiProperty" is deprecated, use "nativeType" instead.');
-        $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
-        $apiProperty = new ApiProperty(
-            builtinTypes: [new LegacyType(builtinType: 'object', nullable: true, class: IntEnumAsIdentifier::class)],
-            openapiContext: ['type' => 'object', 'properties' => ['alpha' => ['type' => 'integer']]],
-        );
-        $decorated = $this->createMock(PropertyMetadataFactoryInterface::class);
-        $decorated->expects($this->once())->method('create')->with(DummyWithCustomOpenApiContext::class, 'acme')->willReturn($apiProperty);
-        $schemaPropertyMetadataFactory = new SchemaPropertyMetadataFactory($resourceClassResolver, $decorated);
-        $apiProperty = $schemaPropertyMetadataFactory->create(DummyWithCustomOpenApiContext::class, 'acme');
-        $this->assertEquals([], $apiProperty->getSchema());
     }
 
     public function testWithCustomOpenApiContext(): void
@@ -90,40 +53,6 @@ class SchemaPropertyMetadataFactoryTest extends TestCase
         $schemaPropertyMetadataFactory = new SchemaPropertyMetadataFactory($resourceClassResolver, $decorated);
         $apiProperty = $schemaPropertyMetadataFactory->create(DummyWithCustomOpenApiContext::class, 'acme');
         $this->assertEquals([], $apiProperty->getSchema());
-    }
-
-    #[IgnoreDeprecations]
-    public function testWithCustomOpenApiContextWithoutTypeDefinitionLegacy(): void
-    {
-        if (!class_exists(LegacyType::class)) {
-            $this->markTestSkipped();
-        }
-        $this->expectUserDeprecationMessage('Since api_platform/metadata 4.2: The "builtinTypes" argument of "ApiPlatform\Metadata\ApiProperty" is deprecated, use "nativeType" instead.');
-        $resourceClassResolver = $this->createMock(ResourceClassResolverInterface::class);
-        $apiProperty = new ApiProperty(
-            openapiContext: ['description' => 'My description'],
-            builtinTypes: [new LegacyType(builtinType: 'bool')],
-        );
-        $decorated = $this->createMock(PropertyMetadataFactoryInterface::class);
-        $decorated->expects($this->once())->method('create')->with(DummyWithCustomOpenApiContext::class, 'foo')->willReturn($apiProperty);
-        $schemaPropertyMetadataFactory = new SchemaPropertyMetadataFactory($resourceClassResolver, $decorated);
-        $apiProperty = $schemaPropertyMetadataFactory->create(DummyWithCustomOpenApiContext::class, 'foo');
-        $this->assertEquals([
-            'type' => 'boolean',
-        ], $apiProperty->getSchema());
-
-        $apiProperty = new ApiProperty(
-            openapiContext: ['iris' => 'https://schema.org/Date'],
-            builtinTypes: [new LegacyType(builtinType: 'object', class: \DateTimeImmutable::class)],
-        );
-        $decorated = $this->createMock(PropertyMetadataFactoryInterface::class);
-        $decorated->expects($this->once())->method('create')->with(DummyWithCustomOpenApiContext::class, 'bar')->willReturn($apiProperty);
-        $schemaPropertyMetadataFactory = new SchemaPropertyMetadataFactory($resourceClassResolver, $decorated);
-        $apiProperty = $schemaPropertyMetadataFactory->create(DummyWithCustomOpenApiContext::class, 'bar');
-        $this->assertEquals([
-            'type' => 'string',
-            'format' => 'date-time',
-        ], $apiProperty->getSchema());
     }
 
     public function testWithCustomOpenApiContextWithoutTypeDefinition(): void
