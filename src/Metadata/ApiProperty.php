@@ -48,7 +48,6 @@ final class ApiProperty
      * @param string|\Stringable|null                                                                                                                     $securityPostDenormalize https://api-platform.com/docs/core/security/#executing-access-control-rules-after-denormalization
      * @param string[]|null                                                                                                                               $types                   the RDF types of this property
      * @param string[]|null                                                                                                                               $iris
-     * @param LegacyType[]|null                                                                                                                           $builtinTypes
      * @param string|null                                                                                                                                 $uriTemplate             whether to return the subRessource collection IRI instead of an iterable of IRI
      * @param string|null                                                                                                                                 $property                The property name
      * @param Context|Groups|Ignore|SerializedName|SerializedPath|MaxDepth|array<array-key, Context|Groups|Ignore|SerializedName|SerializedPath|MaxDepth> $serialize               Serializer attributes

@@ -21,7 +21,6 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
@@ -112,27 +111,8 @@ abstract class AbstractSearchFilter extends AbstractFilter implements ConstantSc
      */
     abstract protected function getQuery(string $property, array $values, ?string $nestedPath): array;
 
-    protected function getPhpType(LegacyType|Type $type): string
+    protected function getPhpType(Type $type): string
     {
-        if ($type instanceof LegacyType) {
-            switch ($builtinType = $type->getBuiltinType()) {
-                case LegacyType::BUILTIN_TYPE_ARRAY:
-                case LegacyType::BUILTIN_TYPE_INT:
-                case LegacyType::BUILTIN_TYPE_FLOAT:
-                case LegacyType::BUILTIN_TYPE_BOOL:
-                case LegacyType::BUILTIN_TYPE_STRING:
-                    return $builtinType;
-                case LegacyType::BUILTIN_TYPE_OBJECT:
-                    if (null !== ($className = $type->getClassName()) && is_a($className, \DateTimeInterface::class, true)) {
-                        return \DateTimeInterface::class;
-                    }
-
-                    // no break
-                default:
-                    return 'string';
-            }
-        }
-
         if ($type->isIdentifiedBy(TypeIdentifier::ARRAY, TypeIdentifier::INT, TypeIdentifier::FLOAT, TypeIdentifier::BOOL, TypeIdentifier::STRING)) {
             while ($type instanceof WrappingTypeInterface) {
                 $type = $type->getWrappedType();
@@ -180,22 +160,8 @@ abstract class AbstractSearchFilter extends AbstractFilter implements ConstantSc
         return $iri;
     }
 
-    protected function hasValidValues(array $values, LegacyType|Type $type): bool
+    protected function hasValidValues(array $values, Type $type): bool
     {
-        if ($type instanceof LegacyType) {
-            foreach ($values as $value) {
-                if (
-                    null !== $value
-                    && LegacyType::BUILTIN_TYPE_INT === $type->getBuiltinType()
-                    && false === filter_var($value, \FILTER_VALIDATE_INT)
-                ) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
         foreach ($values as $value) {
             if (
                 null !== $value

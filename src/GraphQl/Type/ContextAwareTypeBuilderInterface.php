@@ -18,7 +18,6 @@ use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\Type as GraphQLType;
-use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
 
 /**
@@ -55,11 +54,4 @@ interface ContextAwareTypeBuilderInterface
      * Gets the type corresponding to an enum.
      */
     public function getEnumType(Operation $operation): GraphQLType;
-
-    /**
-     * Returns true if a type is a collection.
-     *
-     * @deprecated since 4.2
-     */
-    public function isCollection(LegacyType $type): bool;
 }
