@@ -485,11 +485,6 @@ class FieldsBuilderTest extends TestCase
         });
 
         $typeConverter = new class implements TypeConverterInterface {
-            public function convertType(\Symfony\Component\PropertyInfo\Type $type, bool $input, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth): GraphQLType|string|null
-            {
-                return null;
-            }
-
             public function resolveType(string $type): ?GraphQLType
             {
                 return null;

@@ -1030,7 +1030,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             // Fix a collection that contains the only one element
             // This is special to xml format only
             if ('xml' === $format && null !== $collectionValueType && (!\is_array($value) || !\is_int(key($value)))) {
-                $isMixedType = $collectionValueType instanceof Type && $collectionValueType->isIdentifiedBy(TypeIdentifier::MIXED);
+                $isMixedType = $collectionValueType->isIdentifiedBy(TypeIdentifier::MIXED);
                 if (!$isMixedType) {
                     $value = [$value];
                 }

@@ -18,7 +18,6 @@ use ApiPlatform\Metadata\GraphQl\Operation;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use GraphQL\Type\Definition\Type as GraphQLType;
-use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
 
 /**
@@ -30,22 +29,6 @@ final class TypeConverter implements TypeConverterInterface
 {
     public function __construct(private readonly TypeConverterInterface $defaultTypeConverter)
     {
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function convertType(LegacyType $type, bool $input, Operation $rootOperation, string $resourceClass, string $rootResource, ?string $property, int $depth): GraphQLType|string|null
-    {
-        if ('dummyDate' === $property
-            && \in_array($rootResource, [Dummy::class, DummyDocument::class], true)
-            && LegacyType::BUILTIN_TYPE_OBJECT === $type->getBuiltinType()
-            && is_a($type->getClassName(), \DateTimeInterface::class, true)
-        ) {
-            return \DateTime::class;
-        }
-
-        return $this->defaultTypeConverter->convertType($type, $input, $rootOperation, $resourceClass, $rootResource, $property, $depth);
     }
 
     /**
