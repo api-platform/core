@@ -42,7 +42,7 @@
         "symfony/asset": "^6.4 || ^7.0 || ^8.0",
         "symfony/finder": "^6.4 || ^7.0 || ^8.0",
         "symfony/http-kernel": "^6.4.13 || ^7.0 || ^8.0",
-        "symfony/property-info": "^6.4 || ^7.0 || ^8.0",
+        "symfony/property-info": "^7.1 || ^8.0",
         "symfony/property-access": "^6.4 || ^7.0 || ^8.0",
         "symfony/serializer": "^6.4 || ^7.0 || ^8.0",
         "symfony/security-core": "^6.4 || ^7.0 || ^8.0",

@@ -37,14 +37,11 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type as GraphQLType;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\PropertyInfo\Type as LegacyType;
-use Symfony\Component\TypeInfo\Type;
 
 /**
  * @author Alan Poulain <contact@alanpoulain.eu>
@@ -607,38 +604,5 @@ class TypeBuilderTest extends TestCase
             'description' => $enumDescription,
             'values' => $enumValues,
         ]), $this->typeBuilder->getEnumType($operation));
-    }
-
-    #[IgnoreDeprecations]
-    public function testIsCollectionLegacy(): void
-    {
-        if (!class_exists(LegacyType::class)) {
-            $this->markTestSkipped();
-        }
-
-        $this->expectUserDeprecationMessage('Since api-platform/graphql 4.2: The "ApiPlatform\GraphQl\Type\TypeBuilder::isCollection()" method is deprecated and will be removed.');
-        $this->assertFalse($this->typeBuilder->isCollection(new LegacyType(LegacyType::BUILTIN_TYPE_BOOL)));
-        $this->assertFalse($this->typeBuilder->isCollection(new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT)));
-        $this->assertFalse($this->typeBuilder->isCollection(new LegacyType(LegacyType::BUILTIN_TYPE_RESOURCE, false, null, false)));
-        $this->assertFalse($this->typeBuilder->isCollection(new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, null, true)));
-        $this->assertFalse($this->typeBuilder->isCollection(new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true)));
-        $this->assertFalse($this->typeBuilder->isCollection(new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, null, new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT))));
-        $this->assertFalse($this->typeBuilder->isCollection(new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'className', true)));
-        $this->assertTrue($this->typeBuilder->isCollection(new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, null, true, null, new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'className'))));
-        $this->assertTrue($this->typeBuilder->isCollection(new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, null, new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, 'className'))));
-    }
-
-    public static function typesProvider(): array
-    {
-        return [
-            [Type::bool(), false],
-            [Type::object(), false],
-            [Type::resource(), false],
-            [Type::collection(Type::object(\Stringable::class)), false],
-            [Type::array(), false],
-            [Type::array(Type::object()), false],
-            [Type::collection(Type::object(\Traversable::class), Type::object(\Stringable::class)), true],
-            [Type::array(Type::object(\Stringable::class)), true],
-        ];
     }
 }

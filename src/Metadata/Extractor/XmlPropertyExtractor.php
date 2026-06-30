@@ -66,7 +66,6 @@ final class XmlPropertyExtractor extends AbstractPropertyExtractor
                 'security' => $this->phpize($property, 'security', 'string'),
                 'securityPostDenormalize' => $this->phpize($property, 'securityPostDenormalize', 'string'),
                 'types' => $this->buildArrayValue($property, 'type'),
-                'builtinTypes' => $this->buildArrayValue($property, 'builtinType'),
                 'schema' => isset($property->schema->values) ? $this->buildValues($property->schema->values) : null,
                 'initializable' => $this->phpize($property, 'initializable', 'bool'),
                 'extraProperties' => $this->buildExtraProperties($property, 'extraProperties'),

@@ -33,8 +33,6 @@ use Symfony\Component\PropertyAccess\Exception\InvalidTypeException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
-use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\LogicException;
@@ -598,29 +596,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     }
 
     /**
-     * @deprecated since 4.1, use "validateAttributeType" instead
-     *
-     * Validates the type of the value. Allows using integers as floats for JSON formats.
-     *
-     * @throws NotNormalizableValueException
-     */
-    protected function validateType(string $attribute, LegacyType $type, mixed $value, ?string $format = null, array $context = []): void
-    {
-        trigger_deprecation('api-platform/serializer', '4.1', 'The "%s()" method is deprecated, use "%s::validateAttributeType()" instead.', __METHOD__, self::class);
-
-        $builtinType = $type->getBuiltinType();
-        if (LegacyType::BUILTIN_TYPE_FLOAT === $builtinType && null !== $format && str_contains($format, 'json')) {
-            $isValid = \is_float($value) || \is_int($value);
-        } else {
-            $isValid = \call_user_func('is_'.$builtinType, $value);
-        }
-
-        if (!$isValid) {
-            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the "%s" attribute must be "%s", "%s" given.', $attribute, $builtinType, \gettype($value)), $value, [$builtinType], $context['deserialization_path'] ?? null);
-        }
-    }
-
-    /**
      * Validates the type of the value. Allows using integers as floats for JSON formats.
      *
      * @throws NotNormalizableValueException
@@ -636,52 +611,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         if (!$isValid) {
             throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the "%s" attribute must be "%s", "%s" given.', $attribute, $type, \gettype($value)), $value, [(string) $type], $context['deserialization_path'] ?? null);
         }
-    }
-
-    /**
-     * @deprecated since 4.1, use "denormalizeObjectCollection" instead.
-     *
-     * Denormalizes a collection of objects.
-     *
-     * @throws NotNormalizableValueException
-     */
-    protected function denormalizeCollection(string $attribute, ApiProperty $propertyMetadata, LegacyType $type, string $className, mixed $value, ?string $format, array $context): array
-    {
-        trigger_deprecation('api-platform/serializer', '4.1', 'The "%s()" method is deprecated, use "%s::denormalizeObjectCollection()" instead.', __METHOD__, self::class);
-
-        if (!\is_array($value)) {
-            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the "%s" attribute must be "array", "%s" given.', $attribute, \gettype($value)), $value, ['array'], $context['deserialization_path'] ?? null);
-        }
-
-        $values = [];
-        $childContext = $this->createChildContext($this->createOperationContext($context, $className), $attribute, $format);
-        $collectionKeyTypes = $type->getCollectionKeyTypes();
-        foreach ($value as $index => $obj) {
-            $currentChildContext = $childContext;
-            if (isset($childContext['deserialization_path'])) {
-                $currentChildContext['deserialization_path'] = "{$childContext['deserialization_path']}[{$index}]";
-            }
-
-            // no typehint provided on collection key
-            if (!$collectionKeyTypes) {
-                $values[$index] = $this->denormalizeRelation($attribute, $propertyMetadata, $className, $obj, $format, $currentChildContext);
-                continue;
-            }
-
-            // validate collection key typehint
-            foreach ($collectionKeyTypes as $collectionKeyType) {
-                $collectionKeyBuiltinType = $collectionKeyType->getBuiltinType();
-                if (!\call_user_func('is_'.$collectionKeyBuiltinType, $index)) {
-                    continue;
-                }
-
-                $values[$index] = $this->denormalizeRelation($attribute, $propertyMetadata, $className, $obj, $format, $currentChildContext);
-                continue 2;
-            }
-            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the key "%s" must be "%s", "%s" given.', $index, $collectionKeyTypes[0]->getBuiltinType(), \gettype($index)), $index, [$collectionKeyTypes[0]->getBuiltinType()], ($context['deserialization_path'] ?? false) ? \sprintf('key(%s)', $context['deserialization_path']) : null, true);
-        }
-
-        return $values;
     }
 
     /**
@@ -857,134 +786,6 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         if ($context['api_denormalize'] ?? false) {
             return $this->propertyAccessor->getValue($object, $attribute);
-        }
-
-        if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
-            $types = $propertyMetadata->getBuiltinTypes() ?? [];
-
-            foreach ($types as $type) {
-                if (
-                    $type->isCollection()
-                    && ($collectionValueType = $type->getCollectionValueTypes()[0] ?? null)
-                    && ($className = $collectionValueType->getClassName())
-                    && $this->resourceClassResolver->isResourceClass($className)
-                ) {
-                    $childContext = $this->createChildContext($this->createOperationContext($context, $className, $propertyMetadata), $attribute, $format);
-
-                    // @see ApiPlatform\Hal\Serializer\ItemNormalizer:getComponents logic for intentional duplicate content
-                    // @see ApiPlatform\JsonApi\Serializer\ItemNormalizer:getComponents logic for intentional duplicate content
-                    if ('jsonld' === $format && $itemUriTemplate = $propertyMetadata->getUriTemplate()) {
-                        $operation = $this->resourceMetadataCollectionFactory->create($className)->getOperation(
-                            operationName: $itemUriTemplate,
-                            forceCollection: true,
-                            httpOperation: true
-                        );
-
-                        return $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $operation, $childContext);
-                    }
-
-                    $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
-
-                    if (null === $attributeValue && $type->isNullable()) {
-                        return null;
-                    }
-
-                    if (!is_iterable($attributeValue)) {
-                        throw new UnexpectedValueException('Unexpected non-iterable value for to-many relation.');
-                    }
-
-                    $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
-
-                    $data = $this->normalizeCollectionOfRelations($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
-                    $context['data'] = $data;
-                    $context['type'] = $type;
-
-                    if ($this->tagCollector) {
-                        $this->tagCollector->collect($context);
-                    }
-
-                    return $data;
-                }
-
-                if (
-                    ($className = $type->getClassName())
-                    && $this->resourceClassResolver->isResourceClass($className)
-                ) {
-                    $childContext = $this->createChildContext($this->createOperationContext($context, $className, $propertyMetadata), $attribute, $format);
-                    unset($childContext['iri'], $childContext['uri_variables'], $childContext['item_uri_template']);
-                    if ('jsonld' === $format && $uriTemplate = $propertyMetadata->getUriTemplate()) {
-                        $operation = $this->resourceMetadataCollectionFactory->create($className)->getOperation(
-                            operationName: $uriTemplate,
-                            httpOperation: true
-                        );
-
-                        return $this->iriConverter->getIriFromResource($object, UrlGeneratorInterface::ABS_PATH, $operation, $childContext);
-                    }
-
-                    $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
-
-                    if (!\is_object($attributeValue) && null !== $attributeValue) {
-                        throw new UnexpectedValueException('Unexpected non-object value for to-one relation.');
-                    }
-
-                    $resourceClass = $this->resourceClassResolver->getResourceClass($attributeValue, $className);
-
-                    $data = $this->normalizeRelation($propertyMetadata, $attributeValue, $resourceClass, $format, $childContext);
-                    $context['data'] = $data;
-                    $context['type'] = $type;
-
-                    if ($this->tagCollector) {
-                        $this->tagCollector->collect($context);
-                    }
-
-                    return $data;
-                }
-
-                if (!$this->serializer instanceof NormalizerInterface) {
-                    throw new LogicException(\sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
-                }
-
-                unset(
-                    $context['resource_class'],
-                    $context['force_resource_class'],
-                    $context['uri_variables'],
-                );
-
-                // Anonymous resources
-                if ($className) {
-                    $childContext = $this->createChildContext($this->createOperationContext($context, $className, $propertyMetadata), $attribute, $format);
-                    $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
-
-                    return $this->serializer->normalize($attributeValue, $format, $childContext);
-                }
-
-                if ('array' === $type->getBuiltinType()) {
-                    if ($className = ($type->getCollectionValueTypes()[0] ?? null)?->getClassName()) {
-                        $context = $this->createOperationContext($context, $className, $propertyMetadata);
-                    }
-
-                    $childContext = $this->createChildContext($context, $attribute, $format);
-                    $childContext['output']['gen_id'] ??= $propertyMetadata->getGenId() ?? true;
-
-                    $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
-
-                    return $this->serializer->normalize($attributeValue, $format, $childContext);
-                }
-            }
-
-            if (!$this->serializer instanceof NormalizerInterface) {
-                throw new LogicException(\sprintf('The injected serializer must be an instance of "%s".', NormalizerInterface::class));
-            }
-
-            unset(
-                $context['resource_class'],
-                $context['force_resource_class'],
-                $context['uri_variables']
-            );
-
-            $attributeValue = $this->propertyAccessor->getValue($object, $attribute);
-
-            return $this->serializer->normalize($attributeValue, $format, $context);
         }
 
         $type = $propertyMetadata->getNativeType();
@@ -1201,13 +1002,8 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
     {
         $propertyMetadata = $this->propertyMetadataFactory->create($context['resource_class'], $attribute, $this->getFactoryOptions($context));
 
-        $type = null;
-        if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
-            $types = $propertyMetadata->getBuiltinTypes() ?? [];
-        } else {
-            $type = $propertyMetadata->getNativeType();
-            $types = $type instanceof CompositeTypeInterface ? $type->getTypes() : (null === $type ? [] : [$type]);
-        }
+        $type = $propertyMetadata->getNativeType();
+        $types = $type instanceof CompositeTypeInterface ? $type->getTypes() : (null === $type ? [] : [$type]);
 
         $className = null;
         $typeIsResourceClass = function (Type $type) use (&$className): bool {
@@ -1218,11 +1014,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         $denormalizationException = null;
 
         foreach ($types as $t) {
-            if ($type instanceof Type) {
-                $isNullable = $type->isNullable();
-            } else {
-                $isNullable = $t->isNullable();
-            }
+            $isNullable = $type->isNullable();
 
             if (null === $value && ($isNullable || ($context[static::DISABLE_TYPE_ENFORCEMENT] ?? false))) {
                 return $value;
@@ -1232,37 +1024,29 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
             if ($t instanceof CollectionType) {
                 $collectionValueType = $t->getCollectionValueType();
-            } elseif ($t instanceof LegacyType) {
-                $collectionValueType = $t->getCollectionValueTypes()[0] ?? null;
             }
 
             /* From @see AbstractObjectNormalizer::validateAndDenormalize() */
             // Fix a collection that contains the only one element
             // This is special to xml format only
             if ('xml' === $format && null !== $collectionValueType && (!\is_array($value) || !\is_int(key($value)))) {
-                $isMixedType = $collectionValueType instanceof Type && $collectionValueType->isIdentifiedBy(TypeIdentifier::MIXED);
+                $isMixedType = $collectionValueType->isIdentifiedBy(TypeIdentifier::MIXED);
                 if (!$isMixedType) {
                     $value = [$value];
                 }
             }
 
-            if (($collectionValueType instanceof Type && $collectionValueType->isSatisfiedBy($typeIsResourceClass))
-                || ($t instanceof LegacyType && $t->isCollection() && null !== $collectionValueType && null !== ($className = $collectionValueType->getClassName()) && $this->resourceClassResolver->isResourceClass($className))
-            ) {
+            if ($collectionValueType instanceof Type && $collectionValueType->isSatisfiedBy($typeIsResourceClass)) {
                 $resourceClass = $this->resourceClassResolver->getResourceClass(null, $className);
                 $context['resource_class'] = $resourceClass;
                 unset($context['uri_variables']);
 
                 // Validate the IRI target against the declared collection value type so a union
                 // (array<Foo|Bar>) accepts an IRI pointing to any of its members, not just the first.
-                if ($collectionValueType instanceof Type) {
-                    $context['relation_native_type'] = $collectionValueType;
-                }
+                $context['relation_native_type'] = $collectionValueType;
 
                 try {
-                    return $t instanceof Type
-                        ? $this->denormalizeObjectCollection($attribute, $propertyMetadata, $t, $resourceClass, $value, $format, $context)
-                        : $this->denormalizeCollection($attribute, $propertyMetadata, $t, $resourceClass, $value, $format, $context);
+                    return $this->denormalizeObjectCollection($attribute, $propertyMetadata, $t, $resourceClass, $value, $format, $context);
                 } catch (NotNormalizableValueException $e) {
                     // union/intersect types: try the next type, if not valid, an exception will be thrown at the end
                     if ($isMultipleTypes) {
@@ -1275,15 +1059,10 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 }
             }
 
-            if (
-                ($t instanceof Type && $t->isSatisfiedBy($typeIsResourceClass))
-                || ($t instanceof LegacyType && null !== ($className = $t->getClassName()) && $this->resourceClassResolver->isResourceClass($className))
-            ) {
+            if ($t instanceof Type && $t->isSatisfiedBy($typeIsResourceClass)) {
                 $resourceClass = $this->resourceClassResolver->getResourceClass(null, $className);
                 $childContext = $this->createChildContext($this->createOperationContext($context, $resourceClass, $propertyMetadata), $attribute, $format);
-                if ($t instanceof Type) {
-                    $childContext['relation_native_type'] = $t;
-                }
+                $childContext['relation_native_type'] = $t;
 
                 try {
                     return $this->denormalizeRelation($attribute, $propertyMetadata, $resourceClass, $value, $format, $childContext);
@@ -1299,10 +1078,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 }
             }
 
-            if (
-                ($t instanceof CollectionType && $collectionValueType instanceof ObjectType)
-                || ($t instanceof LegacyType && $t->isCollection() && null !== $collectionValueType && null !== $collectionValueType->getClassName())
-            ) {
+            if ($t instanceof CollectionType && $collectionValueType instanceof ObjectType) {
                 $className = $collectionValueType->getClassName();
                 if (!$this->serializer instanceof DenormalizerInterface) {
                     throw new LogicException(\sprintf('The injected serializer must be an instance of "%s".', DenormalizerInterface::class));
@@ -1328,10 +1104,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 $t = $t->getWrappedType();
             }
 
-            if (
-                $t instanceof ObjectType
-                || ($t instanceof LegacyType && null !== $t->getClassName())
-            ) {
+            if ($t instanceof ObjectType) {
                 if (!$this->serializer instanceof DenormalizerInterface) {
                     throw new LogicException(\sprintf('The injected serializer must be an instance of "%s".', DenormalizerInterface::class));
                 }
@@ -1357,14 +1130,11 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             // if a value is meant to be a string, float, int or a boolean value from the serialized representation.
             // That's why we have to transform the values, if one of these non-string basic datatypes is expected.
             if (\is_string($value) && (XmlEncoder::FORMAT === $format || CsvEncoder::FORMAT === $format)) {
-                if ('' === $value && $isNullable && (
-                    ($t instanceof Type && $t->isIdentifiedBy(TypeIdentifier::BOOL, TypeIdentifier::INT, TypeIdentifier::FLOAT))
-                    || ($t instanceof LegacyType && \in_array($t->getBuiltinType(), [LegacyType::BUILTIN_TYPE_BOOL, LegacyType::BUILTIN_TYPE_INT, LegacyType::BUILTIN_TYPE_FLOAT], true))
-                )) {
+                if ('' === $value && $isNullable && $t instanceof Type && $t->isIdentifiedBy(TypeIdentifier::BOOL, TypeIdentifier::INT, TypeIdentifier::FLOAT)) {
                     return null;
                 }
 
-                $typeIdentifier = $t instanceof BuiltinType ? $t->getTypeIdentifier() : TypeIdentifier::tryFrom($t->getBuiltinType());
+                $typeIdentifier = $t instanceof BuiltinType ? $t->getTypeIdentifier() : null;
 
                 switch ($typeIdentifier) {
                     case TypeIdentifier::BOOL:
@@ -1419,9 +1189,7 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
             }
 
             try {
-                $t instanceof Type
-                    ? $this->validateAttributeType($attribute, $t, $value, $format, $context)
-                    : $this->validateType($attribute, $t, $value, $format, $context);
+                $this->validateAttributeType($attribute, $t, $value, $format, $context);
 
                 $denormalizationException = null;
                 break;

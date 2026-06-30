@@ -21,7 +21,6 @@
             <xsd:element name="jsonSchemaContext" minOccurs="0" type="sequenceWithValues"/>
             <xsd:element name="types" minOccurs="0" type="types"/>
             <xsd:element name="iris" minOccurs="0" type="iris"/>
-            <xsd:element name="builtinTypes" minOccurs="0" type="builtinTypes"/>
             <xsd:element name="schema" minOccurs="0" type="sequenceWithValues"/>
             <xsd:element name="extraProperties" minOccurs="0" type="sequenceWithValues"/>
         </xsd:sequence>
@@ -69,18 +68,6 @@
     </xsd:complexType>
 
     <xsd:simpleType name="iri">
-        <xsd:restriction base="xsd:string">
-            <xsd:minLength value="1"/>
-        </xsd:restriction>
-    </xsd:simpleType>
-
-    <xsd:complexType name="builtinTypes">
-        <xsd:sequence maxOccurs="unbounded">
-            <xsd:element name="builtinType" maxOccurs="unbounded" type="builtinType"/>
-        </xsd:sequence>
-    </xsd:complexType>
-
-    <xsd:simpleType name="builtinType">
         <xsd:restriction base="xsd:string">
             <xsd:minLength value="1"/>
         </xsd:restriction>
