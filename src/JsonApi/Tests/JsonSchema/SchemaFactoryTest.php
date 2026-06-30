@@ -59,7 +59,7 @@ class SchemaFactoryTest extends TestCase
         $propertyNameCollectionFactory->create(Dummy::class, ['enable_getter_setter_extraction' => true, 'schema_type' => Schema::TYPE_INPUT])->willReturn(new PropertyNameCollection());
         $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
 
-        $definitionNameFactory = new DefinitionNameFactory(null);
+        $definitionNameFactory = new DefinitionNameFactory();
 
         $baseSchemaFactory = new BaseSchemaFactory(
             resourceMetadataFactory: $resourceMetadataFactory->reveal(),
@@ -316,7 +316,7 @@ class SchemaFactoryTest extends TestCase
         $resourceClassResolver->isResourceClass(RelatedDummy::class)->willReturn(true);
         $resourceClassResolver->isResourceClass(OtherRelatedDummy::class)->willReturn(true);
 
-        $definitionNameFactory = new DefinitionNameFactory(null);
+        $definitionNameFactory = new DefinitionNameFactory();
 
         $baseSchemaFactory = new BaseSchemaFactory(
             resourceMetadataFactory: $resourceMetadataFactory->reveal(),
@@ -377,7 +377,7 @@ class SchemaFactoryTest extends TestCase
         $resourceClassResolver->isResourceClass(Dummy::class)->willReturn(true);
         $resourceClassResolver->isResourceClass(RelatedDummy::class)->willReturn(true);
 
-        $definitionNameFactory = new DefinitionNameFactory(null);
+        $definitionNameFactory = new DefinitionNameFactory();
 
         $baseSchemaFactory = new BaseSchemaFactory(
             resourceMetadataFactory: $resourceMetadataFactory->reveal(),

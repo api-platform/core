@@ -108,7 +108,7 @@ final class MappingTest extends ApiTestCase
 
     /**
      * When an API resource has multiple #[Map] targets (e.g. MappedEntity + AnotherMappedObject),
-     * the ObjectMapperProcessor must resolve the correct target using stateOptions during POST.
+     * the ObjectMapperInputProcessor must resolve the correct target using stateOptions during POST.
      */
     public function testPostWithMultipleMapTargetsResolvesCorrectEntity(): void
     {

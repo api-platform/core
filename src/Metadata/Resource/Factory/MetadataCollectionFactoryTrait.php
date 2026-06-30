@@ -239,21 +239,12 @@ trait MetadataCollectionFactoryTrait
      */
     private function deduplicateShortNames(array $resources): array
     {
-        $enabled = $this->defaults['extra_properties']['deduplicate_resource_short_names'] ?? false;
         $shortNameCounts = [];
 
         foreach ($resources as $index => $resource) {
             $shortName = $resource->getShortName();
             if (!isset($shortNameCounts[$shortName])) {
                 $shortNameCounts[$shortName] = 1;
-                continue;
-            }
-
-            if (!$enabled) {
-                if (1 === $shortNameCounts[$shortName]) {
-                    trigger_deprecation('api-platform/core', '4.2', 'Having multiple "#[ApiResource]" attributes with the same "shortName" "%s" on class "%s" is deprecated and will result in automatic short name deduplication in API Platform 5.x. Set "defaults.extra_properties.deduplicate_resource_short_names" to "true" in the API Platform configuration to enable it now.', $shortName, $resource->getClass());
-                }
-                ++$shortNameCounts[$shortName];
                 continue;
             }
 

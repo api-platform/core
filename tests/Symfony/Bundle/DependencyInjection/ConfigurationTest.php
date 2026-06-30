@@ -106,7 +106,6 @@ class ConfigurationTest extends TestCase
             'inflector' => 'api_platform.metadata.inflector',
             'validator' => [
                 'serialize_payload_fields' => [],
-                'query_parameter_validation' => true,
             ],
             'name_converter' => null,
             'enable_swagger' => true,
@@ -131,9 +130,6 @@ class ConfigurationTest extends TestCase
                     'pagination' => [
                         'enabled' => true,
                     ],
-                ],
-                'graphql_playground' => [
-                    'enabled' => false,
                 ],
             ],
             'elasticsearch' => [
@@ -189,11 +185,9 @@ class ConfigurationTest extends TestCase
             'http_cache' => [
                 'invalidation' => [
                     'enabled' => false,
-                    'varnish_urls' => [],
                     'request_options' => [],
                     'max_header_length' => 7500,
                     'purger' => 'api_platform.http_cache.purger.varnish',
-                    'xkey' => ['glue' => ' '],
                     'urls' => [],
                     'scoped_clients' => [],
                 ],
@@ -213,7 +207,6 @@ class ConfigurationTest extends TestCase
                 'hub_url' => null,
                 'include_type' => false,
             ],
-            'resource_class_directories' => [],
             'asset_package' => null,
             'openapi' => [
                 'contact' => [
@@ -240,8 +233,6 @@ class ConfigurationTest extends TestCase
             ],
             'use_symfony_listeners' => false,
             'handle_symfony_errors' => false,
-            // TODO: remove in 5.0
-            'enable_link_security' => true,
             'serializer' => [
                 'hydra_prefix' => null,
             ],

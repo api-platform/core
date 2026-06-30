@@ -531,7 +531,7 @@ class OpenApiFactoryTest extends TestCase
 
         $propertyMetadataFactory = $propertyMetadataFactoryProphecy->reveal();
 
-        $definitionNameFactory = new DefinitionNameFactory([]);
+        $definitionNameFactory = new DefinitionNameFactory();
 
         $schemaFactory = new SchemaFactory(
             resourceMetadataFactory: $resourceCollectionMetadataFactory,
@@ -1397,7 +1397,7 @@ class OpenApiFactoryTest extends TestCase
         $resourceCollectionMetadataFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
         $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
-        $definitionNameFactory = new DefinitionNameFactory([]);
+        $definitionNameFactory = new DefinitionNameFactory();
 
         $resourceCollectionMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource(operations: [
             (new Get())->withOpenapi(true)->withShortName('Dummy')->withName('api_dummies_get_collection')->withRouteName('api_dummies_get_collection'),
@@ -1447,7 +1447,7 @@ class OpenApiFactoryTest extends TestCase
         $resourceCollectionMetadataFactory = $this->createMock(ResourceMetadataCollectionFactoryInterface::class);
         $propertyNameCollectionFactory = $this->createMock(PropertyNameCollectionFactoryInterface::class);
         $propertyMetadataFactory = $this->createMock(PropertyMetadataFactoryInterface::class);
-        $definitionNameFactory = new DefinitionNameFactory([]);
+        $definitionNameFactory = new DefinitionNameFactory();
 
         $resourceCollectionMetadata = new ResourceMetadataCollection(Dummy::class, [(new ApiResource(operations: [
             (new GetCollection())
