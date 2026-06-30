@@ -16,8 +16,6 @@ namespace ApiPlatform\Elasticsearch\Exception;
 /**
  * Index not found exception.
  *
- * @experimental
- *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 final class IndexNotFoundException extends \Exception implements ExceptionInterface

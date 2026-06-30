@@ -19,8 +19,6 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 /**
  * Converts inner fields with a inner name converter.
  *
- * @experimental
- *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 final class InnerFieldsNameConverter implements NameConverterInterface

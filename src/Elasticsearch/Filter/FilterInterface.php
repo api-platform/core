@@ -19,8 +19,6 @@ use ApiPlatform\Metadata\Operation;
 /**
  * Elasticsearch filter interface.
  *
- * @experimental
- *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 interface FilterInterface extends BaseFilterInterface

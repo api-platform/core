@@ -20,8 +20,6 @@ use ApiPlatform\Elasticsearch\Filter\ConstantScoreFilterInterface;
  *
  * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-constant-score-query.html
  *
- * @experimental
- *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 final class ConstantScoreFilterExtension extends AbstractFilterExtension

@@ -32,8 +32,6 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
 /**
  * Document denormalizer for Elasticsearch.
  *
- * @experimental
- *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 final class DocumentNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
