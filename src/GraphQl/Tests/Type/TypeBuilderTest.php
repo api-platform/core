@@ -605,5 +605,4 @@ class TypeBuilderTest extends TestCase
             'values' => $enumValues,
         ]), $this->typeBuilder->getEnumType($operation));
     }
-
 }

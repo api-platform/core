@@ -509,7 +509,6 @@ final class ApiProperty
         return $self;
     }
 
-
     public function getNativeType(): ?Type
     {
         return $this->nativeType;
