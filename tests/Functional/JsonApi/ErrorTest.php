@@ -43,8 +43,7 @@ class ErrorTest extends ApiTestCase
         $this->assertJsonContains([
             'errors' => [
                 [
-                    // TODO: change this to '400' in 5.x
-                    'status' => 400,
+                    'status' => '400',
                     'detail' => 'Resource "nonexistent" not found.',
                 ],
             ],
@@ -91,7 +90,7 @@ class ErrorTest extends ApiTestCase
         $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json; charset=utf-8');
         $body = $response->toArray(false);
         $this->assertSame('An error occurred', $body['errors'][0]['title']);
-        $this->assertSame(400, $body['errors'][0]['status']);
+        $this->assertSame('400', $body['errors'][0]['status']);
         $this->assertArrayHasKey('detail', $body['errors'][0]);
         $this->assertArrayHasKey('type', $body['errors'][0]);
     }
@@ -110,7 +109,7 @@ class ErrorTest extends ApiTestCase
         $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json; charset=utf-8');
         $body = $response->toArray(false);
         $this->assertSame('An error occurred', $body['errors'][0]['title']);
-        $this->assertSame(404, $body['errors'][0]['status']);
+        $this->assertSame('404', $body['errors'][0]['status']);
         $this->assertArrayHasKey('detail', $body['errors'][0]);
         $this->assertArrayHasKey('type', $body['errors'][0]);
     }

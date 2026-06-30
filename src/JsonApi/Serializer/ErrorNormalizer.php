@@ -45,10 +45,9 @@ final class ErrorNormalizer implements NormalizerInterface
             $error['code'] = $data->getId();
         }
 
-        // TODO: change this 5.x
-        // if (isset($error['status'])) {
-        //     $error['status'] = (string) $error['status'];
-        // }
+        if (isset($error['status'])) {
+            $error['status'] = (string) $error['status'];
+        }
 
         if (!isset($error['violations'])) {
             return ['errors' => [$error]];

@@ -250,13 +250,13 @@ class JsonApiTest extends TestCase
                 [
                     'detail' => 'The prop field is required.',
                     'title' => 'Validation Error',
-                    'status' => 422,
+                    'status' => '422',
                     'code' => '58350900e0fc6b8e/prop',
                 ],
                 [
                     'detail' => 'The max field must be less than 2.',
                     'title' => 'Validation Error',
-                    'status' => 422,
+                    'status' => '422',
                     'code' => '58350900e0fc6b8e/max',
                 ],
             ],
@@ -294,7 +294,7 @@ class JsonApiTest extends TestCase
         $this->assertJsonContains([
             'links' => ['type' => '/errors/404'],
             'title' => 'An error occurred',
-            'status' => 404,
+            'status' => '404',
             'detail' => 'Not Found',
         ], $response->json()['errors'][0]);
     }
