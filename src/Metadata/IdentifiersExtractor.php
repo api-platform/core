@@ -177,11 +177,6 @@ final class IdentifiersExtractor implements IdentifiersExtractorInterface
         throw new RuntimeException('Not able to retrieve identifiers.');
     }
 
-    /**
-     * TODO: in 3.0 this method just uses $identifierValue instanceof \Stringable and we remove the weird behavior.
-     *
-     * @param mixed|\Stringable $identifierValue
-     */
     private function resolveIdentifierValue(mixed $identifierValue, string $parameterName): float|bool|int|string
     {
         if (null === $identifierValue) {
