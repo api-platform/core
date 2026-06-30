@@ -158,12 +158,9 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         $types = $operation instanceof HttpOperation ? $operation->getTypes() : null;
         if (null === $types) {
-            // TODO: 5.x break on this as this looks wrong, CollectionReferencingItem returns an IRI that point through
-            // ItemReferencedInCollection but it returns a CollectionReferencingItem therefore we should use the current
-            // object's class Type and not rely on operation ?
             if (isset($context['item_uri_template'])) {
-                // When the operation comes from item_uri_template, use its shortName directly
-                // as $resourceClass refers to the collection resource, not the item resource
+                // The members carry the item resource's @type to match their @id, which dereferences
+                // to the item_uri_template operation rather than to the collection's own resource.
                 $types = [$operation->getShortName()];
             } else {
                 // Use resource-level shortName to avoid operation-specific overrides
