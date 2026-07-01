@@ -333,7 +333,7 @@ jobs:
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: build/logs/phpunit
@@ -436,7 +436,7 @@ jobs:
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: /tmp/build/logs/phpunit
@@ -612,7 +612,7 @@ jobs:
           path: build/logs/phpunit
         continue-on-error: true
       - name: Upload coverage results to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: build/logs/phpunit
@@ -692,7 +692,7 @@ jobs:
           path: build/logs/phpunit
         continue-on-error: true
       - name: Upload coverage results to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: build/logs/phpunit
@@ -1068,7 +1068,7 @@ jobs:
         continue-on-error: true
       - name: Upload coverage results to Codecov
         if: matrix.coverage
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: build/logs/phpunit
