@@ -49,13 +49,13 @@ final class InheritanceIriTest extends ApiTestCase
         $this->assertSame([
             [
                 '@id' => '/contractor_5438/1',
-                '@type' => 'Contractor',
+                '@type' => 'Contractor5438',
                 'id' => 1,
                 'name' => 'a',
             ],
             [
                 '@id' => '/employee_5438/2',
-                '@type' => 'Employee',
+                '@type' => 'Employee5438',
                 'id' => 2,
                 'name' => 'b',
             ],

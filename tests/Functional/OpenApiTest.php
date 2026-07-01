@@ -466,7 +466,7 @@ class OpenApiTest extends ApiTestCase
         $this->assertCount(7, $json['paths']['/related_dummies/{id}/related_to_dummy_friends']['get']['parameters']);
 
         // Subcollection - check schema
-        $this->assertSame('#/components/schemas/RelatedToDummyFriend.jsonld-fakemanytomany', $json['paths']['/related_dummies/{id}/related_to_dummy_friends']['get']['responses']['200']['content']['application/ld+json']['schema']['allOf'][1]['properties']['hydra:member']['items']['$ref']);
+        $this->assertSame('#/components/schemas/RelatedToDummyFriend4.jsonld-fakemanytomany', $json['paths']['/related_dummies/{id}/related_to_dummy_friends']['get']['responses']['200']['content']['application/ld+json']['schema']['allOf'][1]['properties']['hydra:member']['items']['$ref']);
 
         // Deprecations
         $this->assertTrue($json['paths']['/deprecated_resources']['get']['deprecated']);
