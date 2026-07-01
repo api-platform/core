@@ -52,7 +52,8 @@ final class ParameterValidatorProvider implements ProviderInterface
         }
 
         $constraintViolationList = new ConstraintViolationList();
-        $parameters = $operation->getParameters() ?? new Parameters();
+        $existingParameters = $operation->getParameters();
+        $parameters = $existingParameters ? clone $existingParameters : new Parameters();
 
         if ($operation instanceof HttpOperation) {
             foreach ($operation->getUriVariables() ?? [] as $key => $uriVariable) {

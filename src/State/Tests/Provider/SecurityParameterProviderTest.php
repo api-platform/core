@@ -15,6 +15,7 @@ namespace ApiPlatform\State\Tests\Provider;
 
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Parameters;
 use ApiPlatform\Metadata\ResourceAccessCheckerInterface;
 use ApiPlatform\State\Provider\SecurityParameterProvider;
 use ApiPlatform\State\ProviderInterface;
@@ -28,9 +29,10 @@ final class SecurityParameterProviderTest extends TestCase
     {
         $obj = new \stdClass();
         $barObj = new \stdClass();
+        $sharedParams = new Parameters();
         $operation = new GetCollection(uriVariables: [
             'barId' => new Link(toProperty: 'bar', fromClass: 'Bar', security: 'is_granted("some_voter", "bar")'),
-        ], class: \stdClass::class);
+        ], class: \stdClass::class, parameters: $sharedParams);
         $decorated = $this->createMock(ProviderInterface::class);
         $decorated->method('provide')->willReturn($obj);
         $request = new Request(attributes: ['bar' => $barObj]);
@@ -38,6 +40,7 @@ final class SecurityParameterProviderTest extends TestCase
         $resourceAccessChecker->expects($this->once())->method('isGranted')->with('Bar', 'is_granted("some_voter", "bar")', ['object' => $obj, 'previous_object' => null, 'request' => $request, 'bar' => $barObj, 'barId' => 1, 'operation' => $operation])->willReturn(true);
         $accessChecker = new SecurityParameterProvider($decorated, $resourceAccessChecker);
         $accessChecker->provide($operation, ['barId' => 1], ['request' => $request]);
+        $this->assertCount(0, $sharedParams, 'provide() must not mutate the Parameters object stored on the cached operation');
     }
 
     public function testIsNotGrantedLink(): void
