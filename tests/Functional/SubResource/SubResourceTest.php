@@ -299,7 +299,7 @@ final class SubResourceTest extends ApiTestCase
         $data = $response->toArray();
         $this->assertSame('/contexts/ThirdLevel2', $data['@context']);
         $this->assertSame('/dummies/1/related_dummies/1/third_level', $data['@id']);
-        $this->assertSame('ThirdLevel', $data['@type']);
+        $this->assertSame('ThirdLevel2', $data['@type']);
         $this->assertSame('/fourth_levels/1', $data['fourthLevel']);
         $this->assertSame(1, $data['id']);
         $this->assertSame(3, $data['level']);
@@ -517,9 +517,9 @@ final class SubResourceTest extends ApiTestCase
 
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
-            '@context' => '/contexts/Dummy2',
+            '@context' => '/contexts/Dummy3',
             '@id' => '/related_owning_dummies/1/owned_dummy',
-            '@type' => 'Dummy2',
+            '@type' => 'Dummy3',
             'name' => 'plop',
             'relatedOwningDummy' => '/related_owning_dummies/1',
             'relatedOwnedDummy' => null,
