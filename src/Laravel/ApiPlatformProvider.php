@@ -935,16 +935,12 @@ class ApiPlatformProvider extends ServiceProvider
         });
 
         $this->app->singleton(SchemaFactory::class, static function (Application $app) {
-            /** @var ConfigRepository */
-            $config = $app['config'];
-
             return new SchemaFactory(
                 $app->make(ResourceMetadataCollectionFactoryInterface::class),
                 $app->make(PropertyNameCollectionFactoryInterface::class),
                 $app->make(PropertyMetadataFactoryInterface::class),
                 $app->make(NameConverterInterface::class),
                 $app->make(ResourceClassResolverInterface::class),
-                $config->get('api-platform.formats'),
                 $app->make(DefinitionNameFactoryInterface::class),
             );
         });

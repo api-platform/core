@@ -158,13 +158,15 @@ final class ItemNormalizer extends AbstractItemNormalizer
 
         $types = $operation instanceof HttpOperation ? $operation->getTypes() : null;
         if (null === $types) {
-            if (isset($context['item_uri_template'])) {
-                // The members carry the item resource's @type to match their @id, which dereferences
-                // to the item_uri_template operation rather than to the collection's own resource.
+            $typeClass = $isResourceClass ? $resourceClass : ($operation->getClass() ?? $resourceClass);
+            if (isset($context['item_uri_template']) || $operation->getClass() === $typeClass) {
+                // The operation serves the class being normalized: use its shortName so @type matches the
+                // (possibly deduplicated) @context. For item_uri_template, $resourceClass is the collection
+                // resource, so the operation remains authoritative for the item type.
                 $types = [$operation->getShortName()];
             } else {
-                // Use resource-level shortName to avoid operation-specific overrides
-                $typeClass = $isResourceClass ? $resourceClass : ($operation->getClass() ?? $resourceClass);
+                // Embedded/related resource: the operation belongs to another class, so fall back to its
+                // resource-level shortName instead of an operation-specific override.
                 try {
                     $types = [$this->resourceMetadataCollectionFactory->create($typeClass)[0]->getShortName()];
                 } catch (\Exception) {

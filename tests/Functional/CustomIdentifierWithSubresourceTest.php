@@ -101,7 +101,7 @@ final class CustomIdentifierWithSubresourceTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
         $this->assertJsonEquals([
-            '@context' => '/contexts/SlugChildDummy',
+            '@context' => '/contexts/SlugChildDummy2',
             '@id' => '/slug_parent_dummies/parent-dummy/child_dummies',
             '@type' => 'hydra:Collection',
             'hydra:member' => [
@@ -126,9 +126,9 @@ final class CustomIdentifierWithSubresourceTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
         $this->assertJsonEquals([
-            '@context' => '/contexts/SlugParentDummy',
+            '@context' => '/contexts/SlugParentDummy3',
             '@id' => '/slug_child_dummies/child-dummy/parent_dummy',
-            '@type' => 'SlugParentDummy',
+            '@type' => 'SlugParentDummy3',
             'id' => 1,
             'slug' => 'parent-dummy',
             'childDummies' => ['/slug_child_dummies/child-dummy'],

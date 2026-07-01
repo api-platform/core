@@ -89,9 +89,9 @@ final class AttributeResourceTest extends ApiTestCase
         $this->assertResponseHeaderSame('Location', '/attribute_resources/2');
         $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
         $this->assertJsonEquals([
-            '@context' => '/contexts/AttributeResource',
+            '@context' => '/contexts/AttributeResource2',
             '@id' => '/attribute_resources/2',
-            '@type' => 'AttributeResource',
+            '@type' => 'AttributeResource2',
             'identifier' => 2,
             'dummy' => '/dummies/1',
             'name' => 'Foo',
@@ -109,9 +109,9 @@ final class AttributeResourceTest extends ApiTestCase
         $this->assertResponseHeaderSame('Location', '/attribute_resources/2');
         $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
         $this->assertJsonEquals([
-            '@context' => '/contexts/AttributeResource',
+            '@context' => '/contexts/AttributeResource2',
             '@id' => '/attribute_resources/2',
-            '@type' => 'AttributeResource',
+            '@type' => 'AttributeResource2',
             'identifier' => 2,
             'dummy' => '/dummies/1',
             'name' => 'Patched',

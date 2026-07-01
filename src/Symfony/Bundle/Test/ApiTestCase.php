@@ -33,13 +33,12 @@ abstract class ApiTestCase extends KernelTestCase
 
     /**
      * If you're using RecreateDatabaseTrait, RefreshDatabaseTrait, ReloadDatabaseTrait from theofidry/AliceBundle, you
-     * probably need to set this property to false in your test class to avoid recreating the database on each client creation.
+     * probably need to keep this property to false in your test class to avoid recreating the database on each client creation.
      *
-     * - `null` triggers a deprecation message and always boots the kernel
      * - `false` does not boot the kernel if it's already booted
-     * - `true` always boots the kernel without any deprecation message
+     * - `true` always boots the kernel
      */
-    protected static ?bool $alwaysBootKernel = null;
+    protected static ?bool $alwaysBootKernel = false;
 
     private bool $symfonyErrorHandlerWasRegistered = false;
 
@@ -80,15 +79,7 @@ abstract class ApiTestCase extends KernelTestCase
      */
     protected static function createClient(array $kernelOptions = [], array $defaultOptions = []): Client
     {
-        if (null === static::$alwaysBootKernel) {
-            trigger_deprecation(
-                'api-platform/symfony',
-                '4.1.0',
-                'Currently, the kernel will always be booted when a new client is created, but in API Platform 5.0, it will not be booted unless you set `static::$alwaysBootKernel` to `true` (the default will be `false`). See https://github.com/api-platform/core/issues/6971 for more information.',
-            );
-        }
-
-        if (static::$alwaysBootKernel || null === static::$alwaysBootKernel) {
+        if (static::$alwaysBootKernel) {
             static::bootKernel($kernelOptions);
         }
 

@@ -112,7 +112,7 @@ final class CrudUriVariablesTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
         $this->assertJsonEquals([
-            '@context' => '/contexts/Employee',
+            '@context' => '/contexts/Employee3',
             '@id' => '/companies/2/employees',
             '@type' => 'hydra:Collection',
             'hydra:member' => [
@@ -143,9 +143,9 @@ final class CrudUriVariablesTest extends ApiTestCase
 
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonEquals([
-            '@context' => '/contexts/Company',
+            '@context' => '/contexts/Company2',
             '@id' => '/employees/1/company',
-            '@type' => 'Company',
+            '@type' => 'Company2',
             'id' => 1,
             'name' => 'Foo Company 1',
             'employees' => [],
@@ -162,9 +162,9 @@ final class CrudUriVariablesTest extends ApiTestCase
 
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonEquals([
-            '@context' => '/contexts/Employee',
+            '@context' => '/contexts/Employee2',
             '@id' => '/companies/1/employees/1',
-            '@type' => 'Employee',
+            '@type' => 'Employee2',
             'id' => 1,
             'name' => 'foo',
             'company' => '/companies/1',

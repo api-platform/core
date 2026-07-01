@@ -164,9 +164,9 @@ final class SubResourceTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
         $this->assertJsonEquals([
-            '@context' => '/contexts/Answer',
+            '@context' => '/contexts/Answer3',
             '@id' => '/questions/1/answer',
-            '@type' => 'Answer',
+            '@type' => 'Answer3',
             'id' => 1,
             'content' => '42',
             'relatedQuestions' => ['/questions/1'],
@@ -188,9 +188,9 @@ final class SubResourceTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
         $this->assertJsonEquals([
-            '@context' => '/contexts/OneToOneSubresourceAnswer',
+            '@context' => '/contexts/OneToOneSubresourceAnswer2',
             '@id' => '/one_to_one_subresource_questions/1/answer',
-            '@type' => 'OneToOneSubresourceAnswer',
+            '@type' => 'OneToOneSubresourceAnswer2',
             'id' => 1,
             'content' => '42',
             'question' => '/one_to_one_subresource_questions/1',
@@ -216,7 +216,7 @@ final class SubResourceTest extends ApiTestCase
 
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonEquals([
-            '@context' => '/contexts/Question',
+            '@context' => '/contexts/Question3',
             '@id' => '/questions/1/answer/related_questions',
             '@type' => 'hydra:Collection',
             'hydra:member' => [[
@@ -268,7 +268,7 @@ final class SubResourceTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
         $this->assertJsonContains([
-            '@context' => '/contexts/RelatedDummy',
+            '@context' => '/contexts/RelatedDummy3',
             '@id' => '/dummies/1/related_dummies/2',
             '@type' => 'https://schema.org/Product',
             'id' => 2,
@@ -297,9 +297,9 @@ final class SubResourceTest extends ApiTestCase
 
         $this->assertResponseStatusCodeSame(200);
         $data = $response->toArray();
-        $this->assertSame('/contexts/ThirdLevel', $data['@context']);
+        $this->assertSame('/contexts/ThirdLevel2', $data['@context']);
         $this->assertSame('/dummies/1/related_dummies/1/third_level', $data['@id']);
-        $this->assertSame('ThirdLevel', $data['@type']);
+        $this->assertSame('ThirdLevel2', $data['@type']);
         $this->assertSame('/fourth_levels/1', $data['fourthLevel']);
         $this->assertSame(1, $data['id']);
         $this->assertSame(3, $data['level']);
@@ -317,9 +317,9 @@ final class SubResourceTest extends ApiTestCase
         $this->assertResponseStatusCodeSame(200);
         $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
         $this->assertJsonEquals([
-            '@context' => '/contexts/FourthLevel',
+            '@context' => '/contexts/FourthLevel2',
             '@id' => '/dummies/1/related_dummies/1/third_level/fourth_level',
-            '@type' => 'FourthLevel',
+            '@type' => 'FourthLevel2',
             'badThirdLevel' => [],
             'id' => 1,
             'level' => 4,
@@ -485,9 +485,9 @@ final class SubResourceTest extends ApiTestCase
 
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
-            '@context' => '/contexts/Dummy',
+            '@context' => '/contexts/Dummy2',
             '@id' => '/related_owned_dummies/1/owning_dummy',
-            '@type' => 'Dummy',
+            '@type' => 'Dummy2',
             'name' => 'plop',
             'relatedOwnedDummy' => '/related_owned_dummies/1',
             'relatedOwningDummy' => null,
@@ -517,9 +517,9 @@ final class SubResourceTest extends ApiTestCase
 
         $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
-            '@context' => '/contexts/Dummy',
+            '@context' => '/contexts/Dummy3',
             '@id' => '/related_owning_dummies/1/owned_dummy',
-            '@type' => 'Dummy',
+            '@type' => 'Dummy3',
             'name' => 'plop',
             'relatedOwningDummy' => '/related_owning_dummies/1',
             'relatedOwnedDummy' => null,

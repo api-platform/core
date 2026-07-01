@@ -14,15 +14,11 @@ declare(strict_types=1);
 namespace ApiPlatform\State\Tests\Provider;
 
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\HttpOperation;
-use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
 use ApiPlatform\State\DenormalizationViolationFactoryInterface;
 use ApiPlatform\State\Provider\DeserializeProvider;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\SerializerContextBuilderInterface;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,10 +30,8 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class DeserializeProviderTest extends TestCase
 {
-    #[IgnoreDeprecations]
     public function testDeserialize(): void
     {
-        $this->expectUserDeprecationMessage('Since api-platform/core 5.0: To assign an object to populate you should set "api_assign_object_to_populate" in your denormalizationContext, not defining it is deprecated.');
         $objectToPopulate = new \stdClass();
         $serializerContext = [];
         $operation = new Post(deserialize: true, class: \stdClass::class);
@@ -47,7 +41,7 @@ class DeserializeProviderTest extends TestCase
         $serializerContextBuilder = $this->createMock(SerializerContextBuilderInterface::class);
         $serializerContextBuilder->expects($this->once())->method('createFromRequest')->willReturn($serializerContext);
         $serializer = $this->createMock(SerializerInterface::class);
-        $serializer->expects($this->once())->method('deserialize')->with('test', \stdClass::class, 'format', ['uri_variables' => ['id' => 1], AbstractNormalizer::OBJECT_TO_POPULATE => $objectToPopulate] + $serializerContext)->willReturn(new \stdClass());
+        $serializer->expects($this->once())->method('deserialize')->with('test', \stdClass::class, 'format', ['uri_variables' => ['id' => 1]] + $serializerContext)->willReturn(new \stdClass());
 
         $provider = new DeserializeProvider($decorated, $serializer, $serializerContextBuilder);
         $request = new Request(content: 'test');
@@ -137,42 +131,6 @@ class DeserializeProviderTest extends TestCase
 
         $this->expectException(UnsupportedMediaTypeHttpException::class);
         $provider->provide($operation, [], $context);
-    }
-
-    #[DataProvider('provideMethodsTriggeringDeprecation')]
-    #[IgnoreDeprecations]
-    public function testDeserializeTriggersDeprecationWhenContextNotSet(HttpOperation $operation): void
-    {
-        $this->expectUserDeprecationMessage('Since api-platform/core 5.0: To assign an object to populate you should set "api_assign_object_to_populate" in your denormalizationContext, not defining it is deprecated.');
-
-        $objectToPopulate = new \stdClass();
-        $serializerContext = [];
-        $decorated = $this->createStub(ProviderInterface::class);
-        $decorated->method('provide')->willReturn($objectToPopulate);
-
-        $serializerContextBuilder = $this->createMock(SerializerContextBuilderInterface::class);
-        $serializerContextBuilder->method('createFromRequest')->willReturn($serializerContext);
-
-        $serializer = $this->createMock(SerializerInterface::class);
-        $serializer->expects($this->once())->method('deserialize')->with(
-            'test',
-            \stdClass::class,
-            'format',
-            ['uri_variables' => ['id' => 1], 'object_to_populate' => $objectToPopulate] + $serializerContext
-        )->willReturn(new \stdClass());
-
-        $provider = new DeserializeProvider($decorated, $serializer, $serializerContextBuilder);
-        $request = new Request(content: 'test');
-        $request->headers->set('CONTENT_TYPE', 'ok');
-        $request->attributes->set('input_format', 'format');
-        $provider->provide($operation, ['id' => 1], ['request' => $request]);
-    }
-
-    public static function provideMethodsTriggeringDeprecation(): iterable
-    {
-        yield 'POST method' => [new Post(deserialize: true, class: \stdClass::class)];
-        yield 'PATCH method' => [new Patch(deserialize: true, class: \stdClass::class)];
-        yield 'PUT method (non-standard)' => [new Put(deserialize: true, class: \stdClass::class, extraProperties: ['standard_put' => false])];
     }
 
     public function testDeserializeSetsObjectToPopulateWhenContextIsTrue(): void

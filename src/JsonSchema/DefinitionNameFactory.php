@@ -26,13 +26,6 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
 
     private array $prefixCache = [];
 
-    public function __construct(private ?array $distinctFormats = null)
-    {
-        if ($distinctFormats) {
-            trigger_deprecation('api-platform/json-schema', '4.2', 'The distinctFormats argument is deprecated and will be removed in 5.0.');
-        }
-    }
-
     public function create(string $className, string $format = 'json', ?string $inputOrOutputClass = null, ?Operation $operation = null, array $serializerContext = []): string
     {
         if ($operation) {
@@ -50,10 +43,7 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
             $prefix .= self::GLUE.$this->createPrefixFromClass($inputOrOutputClass);
         }
 
-        // TODO: remove in 5.0
-        $v = $this->distinctFormats ? ($this->distinctFormats[$format] ?? false) : true;
-
-        if (!\in_array($format, ['json', 'merge-patch+json'], true) && $v) {
+        if (!\in_array($format, ['json', 'merge-patch+json'], true)) {
             // JSON is the default, and so isn't included in the definition name
             // JSON merge patch is postfixed at the end
             $prefix .= self::GLUE.$format;
