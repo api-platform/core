@@ -38,6 +38,7 @@ use Mcp\Server\Session\SessionInterface;
  * Tagged mcp.request_handler, it takes precedence over the SDK's registry-backed list handlers.
  *
  * @experimental
+ * TODO: remove once php-sdk:^0.7 has https://github.com/modelcontextprotocol/php-sdk/pull/389/changes
  *
  * @implements RequestHandlerInterface<ListToolsResult|ListResourcesResult>
  */
