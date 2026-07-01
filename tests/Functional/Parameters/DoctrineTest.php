@@ -470,4 +470,27 @@ final class DoctrineTest extends ApiTestCase
             ],
         ];
     }
+
+    public function testQueryParameterPropertyRemapOpenApiParameterName(): void
+    {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('Not tested with mongodb.');
+        }
+
+        $resource = ProductWithQueryParameter::class;
+        $this->recreateSchema([$resource]);
+
+        $response = self::createClient()->request('GET', '/docs', [
+            'headers' => ['Accept' => 'application/vnd.openapi+json'],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $openApiDoc = $response->toArray();
+
+        $parameters = $openApiDoc['paths']['/product_with_query_parameters']['get']['parameters'];
+        $parameterNames = array_column($parameters, 'name');
+
+        $this->assertContains('order[sort_by]', $parameterNames, 'Parameter order[sort_by] should be present');
+        $this->assertNotContains('order[order[sort_by]]', $parameterNames, 'Parameter name should not be double-wrapped as order[order[sort_by]]');
+    }
 }

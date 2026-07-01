@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\Entity;
 use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\Filter\PartialSearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
@@ -23,6 +24,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
+#[ApiFilter(OrderFilter::class, alias: 'product_order_filter', properties: ['rating'])]
 #[ApiResource(
     operations: [
         new GetCollection(
@@ -45,6 +47,10 @@ use Doctrine\ORM\Mapping as ORM;
                 'order[:property]' => new QueryParameter(
                     filter: new OrderFilter(),
                     properties: ['rating']
+                ),
+                'order[sort_by]' => new QueryParameter(
+                    filter: 'product_order_filter',
+                    property: 'rating',
                 ),
                 'exactBrand' => new QueryParameter(
                     filter: new ExactFilter(),

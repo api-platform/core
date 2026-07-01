@@ -346,7 +346,10 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                     if ($d = $filter->getDescription($entityClass)) {
                         foreach ($d as $name => $description) {
                             if ($prop = $p->getProperty()) {
-                                $name = str_replace($prop, $key, $name);
+                                if (($description['property'] ?? null) !== $prop) {
+                                    continue;
+                                }
+                                $name = $key;
                             }
 
                             $openapiParameters[] = $this->getFilterParameter($name, $description, $operation->getShortName(), $f);
