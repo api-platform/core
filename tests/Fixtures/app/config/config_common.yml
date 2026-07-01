@@ -159,11 +159,6 @@ services:
         tags:
             - name: 'api_platform.state_provider'
 
-    ApiPlatform\Tests\Fixtures\TestBundle\State\SerializableProvider:
-        class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\SerializableProvider'
-        tags:
-            - name: 'api_platform.state_provider'
-
     ApiPlatform\Tests\Fixtures\TestBundle\State\FakeProvider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\FakeProvider'
         tags:
