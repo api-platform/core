@@ -25,7 +25,7 @@ jobs:
       DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
       MAX_ACTIONS_PER_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.max_actions || '25' }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/github-script@v8
         with:
           script: |
