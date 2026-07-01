@@ -93,10 +93,6 @@ parameters:
 		- "#Call to function method_exists\\(\\) with Doctrine\\\\ODM\\\\MongoDB\\\\Mapping\\\\ClassMetadata\\|Doctrine\\\\ORM\\\\Mapping\\\\ClassMetadata and 'isChangeTrackingDef…' will always evaluate to true\\.#"
 		- "#Call to function method_exists\\(\\) with Symfony\\\\Component\\\\Serializer\\\\Exception\\\\PartialDenormalizationException and 'getNotNormalizableV…' will always evaluate to true\\.#"
 
-		# See https://github.com/phpstan/phpstan-symfony/issues/27
-		-
-			message: '#^Service "[^"]+" is private.$#'
-			path: src
 
 
 		# Allow extra assertions in tests: https://github.com/phpstan/phpstan-strict-rules/issues/130
