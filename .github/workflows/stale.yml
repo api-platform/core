@@ -26,7 +26,7 @@ jobs:
       MAX_ACTIONS_PER_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.max_actions || '25' }}
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/github-script@v8
+      - uses: actions/github-script@v9
         with:
           script: |
             const script = require('./.github/scripts/stale.js');
