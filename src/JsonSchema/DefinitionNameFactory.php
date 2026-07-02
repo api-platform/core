@@ -104,12 +104,12 @@ final class DefinitionNameFactory implements DefinitionNameFactoryInterface
         }
 
         if (!isset($this->prefixCache[$name])) {
-            $this->prefixCache[$name] = $operation->getClass();
+            $this->prefixCache[$name] = $operation->getApiClass();
 
             return $name;
         }
 
-        if ($this->prefixCache[$name] === $operation->getClass()) {
+        if ($this->prefixCache[$name] === $operation->getApiClass()) {
             return $name;
         }
 

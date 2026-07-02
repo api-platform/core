@@ -65,7 +65,7 @@ final class SerializeListener
         $serialized = $this->processor->process($controllerResult, $operation, $uriVariables, [
             'request' => $request,
             'uri_variables' => $uriVariables,
-            'resource_class' => $operation->getClass(),
+            'resource_class' => $operation->getApiClass(),
         ]);
 
         $event->setControllerResult($serialized);

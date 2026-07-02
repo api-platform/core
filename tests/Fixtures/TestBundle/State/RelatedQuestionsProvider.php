@@ -27,8 +27,8 @@ class RelatedQuestionsProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): iterable
     {
-        $manager = $this->registry->getManagerForClass($operation->getClass());
-        $repository = $manager->getRepository($operation->getClass());
+        $manager = $this->registry->getManagerForClass($operation->getDataClass());
+        $repository = $manager->getRepository($operation->getDataClass());
         /** @var Question|QuestionDocument */
         $question = $repository->findOneBy(['id' => 1]);
 

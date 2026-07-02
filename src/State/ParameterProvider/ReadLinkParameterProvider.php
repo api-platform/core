@@ -52,7 +52,7 @@ final class ReadLinkParameterProvider implements ParameterProviderInterface
 
         $securityObjectName ??= $parameter->getKey();
 
-        $linkClass ??= $extraProperties['resource_class'] ?? $operation->getClass();
+        $linkClass ??= $extraProperties['resource_class'] ?? $operation->getApiClass();
 
         if (!$linkClass) {
             return $operation;

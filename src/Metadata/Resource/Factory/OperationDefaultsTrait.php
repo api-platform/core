@@ -48,7 +48,7 @@ trait OperationDefaultsTrait
     private function addGlobalDefaults(ApiResource|Operation $operation): ApiResource|Operation
     {
         // Do not add global defaults for internal resources:
-        if (\in_array($operation->getClass(), [Error::class, ValidationException::class], true)) {
+        if (\in_array($operation->getApiClass(), [Error::class, ValidationException::class], true)) {
             return $operation;
         }
 
@@ -94,7 +94,7 @@ trait OperationDefaultsTrait
     {
         $resource = $resource
             ->withShortName($resource->getShortName() ?? $shortName)
-            ->withClass($resource->getClass() ?? $resourceClass);
+            ->withClass($resource->getApiClass() ?? $resourceClass);
 
         return $this->addGlobalDefaults($resource);
     }
@@ -104,7 +104,7 @@ trait OperationDefaultsTrait
      */
     private function getDefaultHttpOperations(ApiResource $resource): iterable
     {
-        if (enum_exists($resource->getClass())) {
+        if (enum_exists($resource->getApiClass())) {
             return new Operations([new GetCollection(paginationEnabled: false), new Get()]);
         }
 
@@ -134,7 +134,7 @@ trait OperationDefaultsTrait
 
     private function addDefaultGraphQlOperations(ApiResource $resource): ApiResource
     {
-        $operations = enum_exists($resource->getClass()) ? [new Query(), new QueryCollection(paginationEnabled: false)] : [new Query(), new QueryCollection(), (new Mutation())->withName('update'), (new DeleteMutation())->withName('delete'), (new Mutation())->withName('create')];
+        $operations = enum_exists($resource->getApiClass()) ? [new Query(), new QueryCollection(paginationEnabled: false)] : [new Query(), new QueryCollection(), (new Mutation())->withName('update'), (new DeleteMutation())->withName('delete'), (new Mutation())->withName('create')];
         $graphQlOperations = [];
         foreach ($operations as $operation) {
             [$key, $operation] = $this->getOperationWithDefaults($resource, $operation);
@@ -218,7 +218,7 @@ trait OperationDefaultsTrait
             $operation = $operation->withName($operation->getRouteName());
         }
 
-        $operationName = $operation->getName() ?? $this->getDefaultOperationName($operation, $resource->getClass());
+        $operationName = $operation->getName() ?? $this->getDefaultOperationName($operation, $resource->getApiClass());
 
         return [
             $operationName,

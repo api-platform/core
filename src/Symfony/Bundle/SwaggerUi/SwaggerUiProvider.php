@@ -37,7 +37,7 @@ final class SwaggerUiProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         // We went through the DocumentationAction
-        if (OpenApi::class === $operation->getClass()) {
+        if (OpenApi::class === $operation->getApiClass()) {
             return $this->decorated->provide($operation, $uriVariables, $context);
         }
 
@@ -58,7 +58,7 @@ final class SwaggerUiProvider implements ProviderInterface
         // when it fails we'll get an Error and we'll fix the status accordingly
         // @see features/main/content_negotiation.feature:119
         // When requesting DocumentationAction or EntrypointAction with Accept: text/html we render SwaggerUi
-        if (!$operation instanceof Error && !\in_array($operation->getClass(), [Documentation::class, Entrypoint::class], true)) {
+        if (!$operation instanceof Error && !\in_array($operation->getApiClass(), [Documentation::class, Entrypoint::class], true)) {
             $this->decorated->provide($operation, $uriVariables, $context);
         }
 

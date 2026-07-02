@@ -39,7 +39,7 @@ final class JsonStreamerProvider implements ProviderInterface
             return $data;
         }
 
-        $data = $this->jsonStreamReader->read($request->getContent(true), Type::object($operation->getClass()));
+        $data = $this->jsonStreamReader->read($request->getContent(true), Type::object($operation->getInputClass()));
         $context['request']->attributes->set('deserialized', true);
 
         if (\PHP_VERSION_ID > 80400) {

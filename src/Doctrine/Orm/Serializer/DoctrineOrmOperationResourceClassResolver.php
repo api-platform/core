@@ -44,7 +44,7 @@ final class DoctrineOrmOperationResourceClassResolver extends OperationResourceC
 
             // Validate object matches the backing entity class
             if ($entityClass && is_a($objectClass, $entityClass, true)) {
-                return $operation->getClass();
+                return $operation->getApiClass();
             }
         }
 
