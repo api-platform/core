@@ -802,6 +802,7 @@ abstract class Operation extends Metadata
          * Sort is ascendant: a lower priority comes first in the list.
          */
         protected ?int $priority = null,
+        protected ?int $routePriority = null,
         protected ?string $name = null,
         protected $provider = null,
         protected $processor = null,
@@ -961,6 +962,19 @@ abstract class Operation extends Metadata
     {
         $self = clone $this;
         $self->priority = $priority;
+
+        return $self;
+    }
+
+    public function getRoutePriority(): ?int
+    {
+        return $this->routePriority;
+    }
+
+    public function withRoutePriority(int $routePriority): static
+    {
+        $self = clone $this;
+        $self->routePriority = $routePriority;
 
         return $self;
     }
