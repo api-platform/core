@@ -31,6 +31,7 @@ use ApiPlatform\Metadata\Resource\Factory\ParameterResourceMetadataCollectionFac
 use ApiPlatform\Metadata\Resource\Factory\PhpFileResourceMetadataCollectionFactory;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\UriTemplateResourceMetadataCollectionFactory;
+use ApiPlatform\Symfony\Metadata\Resource\Factory\ContainerParameterResourceMetadataCollectionFactory;
 
 return function (ContainerConfigurator $container) {
     $services = $container->services();
@@ -73,6 +74,13 @@ return function (ContainerConfigurator $container) {
             service('logger')->nullOnInvalid(),
             '%api_platform.defaults%',
             '%api_platform.graphql.enabled%',
+        ]);
+
+    $services->set('api_platform.metadata.resource.metadata_collection_factory.container_parameter', ContainerParameterResourceMetadataCollectionFactory::class)
+        ->decorate('api_platform.metadata.resource.metadata_collection_factory', null, 900)
+        ->args([
+            service('service_container'),
+            service('api_platform.metadata.resource.metadata_collection_factory.container_parameter.inner'),
         ]);
 
     $services->set('api_platform.metadata.resource.metadata_collection_factory.not_exposed_operation', NotExposedOperationResourceMetadataCollectionFactory::class)
