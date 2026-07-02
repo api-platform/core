@@ -16,8 +16,10 @@ namespace ApiPlatform\Symfony\Doctrine\EventListener;
 use ApiPlatform\HttpCache\PurgerInterface;
 use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Exception\OperationNotFoundException;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
@@ -35,6 +37,11 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 /**
  * Purges responses containing modified entities from the proxy cache.
  *
+ * Sub-resource collection operations (those whose URI depends on parent
+ * `uriVariables` such as `/parents/{parentId}/children`) are not invalidated
+ * here: the listener has no parent context available. Decorate this service
+ * or register an additional Doctrine event listener to invalidate such tags.
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 final class PurgeHttpCacheListener
@@ -50,7 +57,8 @@ final class PurgeHttpCacheListener
         private readonly ResourceClassResolverInterface $resourceClassResolver,
         ?PropertyAccessorInterface $propertyAccessor = null,
         private readonly ?ObjectMapperInterface $objectMapper = null,
-        private readonly ?ObjectMapperMetadataFactoryInterface $objectMapperMetadata = null)
+        private readonly ?ObjectMapperMetadataFactoryInterface $objectMapperMetadata = null,
+        private readonly ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null)
     {
         $this->propertyAccessor = $propertyAccessor ?? PropertyAccess::createPropertyAccessor();
     }
@@ -127,14 +135,71 @@ final class PurgeHttpCacheListener
         $resources = $this->getResourcesForEntity($entity);
 
         foreach ($resources as $resource) {
-            try {
-                $iri = $this->iriConverter->getIriFromResource($resource, UrlGeneratorInterface::ABS_PATH, new GetCollection());
+            foreach ($this->getCollectionIris($resource) as $iri) {
                 $this->tags[$iri] = $iri;
+            }
 
-                if ($purgeItem) {
-                    $this->addTagForItem($entity);
-                }
+            if ($purgeItem) {
+                $this->addTagForItem($entity);
+            }
+        }
+    }
+
+    /**
+     * @return iterable<string>
+     */
+    private function getCollectionIris(object|string $resource): iterable
+    {
+        if (!$this->resourceMetadataCollectionFactory) {
+            // BC: fall back to the default GetCollection resolution.
+            try {
+                yield $this->iriConverter->getIriFromResource($resource, UrlGeneratorInterface::ABS_PATH, new GetCollection());
             } catch (OperationNotFoundException|InvalidArgumentException) {
+            }
+
+            return;
+        }
+
+        $resourceClass = $this->resourceClassResolver->getResourceClass($resource);
+        foreach ($this->resourceMetadataCollectionFactory->create($resourceClass) as $resourceMetadata) {
+            foreach ($resourceMetadata->getOperations() as $operation) {
+                if (!$operation instanceof GetCollection) {
+                    continue;
+                }
+                try {
+                    yield $this->iriConverter->getIriFromResource($resource, UrlGeneratorInterface::ABS_PATH, $operation);
+                } catch (OperationNotFoundException|InvalidArgumentException) {
+                    // Sub-resource collections (needing parent uri_variables) cannot
+                    // be resolved here and are intentionally skipped.
+                }
+            }
+        }
+    }
+
+    /**
+     * @return iterable<string>
+     */
+    private function getItemIris(object|string $resource): iterable
+    {
+        if (!$this->resourceMetadataCollectionFactory) {
+            try {
+                yield $this->iriConverter->getIriFromResource($resource);
+            } catch (OperationNotFoundException|InvalidArgumentException) {
+            }
+
+            return;
+        }
+
+        $resourceClass = $this->resourceClassResolver->getResourceClass($resource);
+        foreach ($this->resourceMetadataCollectionFactory->create($resourceClass) as $resourceMetadata) {
+            foreach ($resourceMetadata->getOperations() as $operation) {
+                if (!$operation instanceof Get) {
+                    continue;
+                }
+                try {
+                    yield $this->iriConverter->getIriFromResource($resource, UrlGeneratorInterface::ABS_PATH, $operation);
+                } catch (OperationNotFoundException|InvalidArgumentException) {
+                }
             }
         }
     }
@@ -202,10 +267,8 @@ final class PurgeHttpCacheListener
         $resources = $this->getResourcesForEntity($value);
 
         foreach ($resources as $resource) {
-            try {
-                $iri = $this->iriConverter->getIriFromResource($resource);
+            foreach ($this->getItemIris($resource) as $iri) {
                 $this->tags[$iri] = $iri;
-            } catch (OperationNotFoundException|InvalidArgumentException) {
             }
         }
     }
