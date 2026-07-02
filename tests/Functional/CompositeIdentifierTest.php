@@ -75,7 +75,7 @@ final class CompositeIdentifierTest extends ApiTestCase
         self::createClient()->request('GET', '/composite_items');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonEquals([
             '@context' => '/contexts/CompositeItem',
             '@id' => '/composite_items',
@@ -103,7 +103,7 @@ final class CompositeIdentifierTest extends ApiTestCase
         self::createClient()->request('GET', '/composite_relations');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonContains([
             '@context' => '/contexts/CompositeRelation',
             '@id' => '/composite_relations',
@@ -124,7 +124,7 @@ final class CompositeIdentifierTest extends ApiTestCase
         self::createClient()->request('GET', '/composite_relations/compositeItem=1;compositeLabel=1');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonEquals([
             '@context' => '/contexts/CompositeRelation',
             '@id' => '/composite_relations/compositeItem=1;compositeLabel=1',
@@ -158,7 +158,7 @@ final class CompositeIdentifierTest extends ApiTestCase
         self::createClient()->request('GET', '/composite_items/1');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
     }
 
     public function testCompositeIdentifierWithDifferentTypes(): void

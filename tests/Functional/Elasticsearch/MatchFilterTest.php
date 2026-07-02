@@ -41,7 +41,7 @@ final class MatchFilterTest extends ApiTestCase
         $response = self::createClient()->request('GET', '/tweets?message=Good%20job', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",
@@ -95,7 +95,7 @@ JSON);
         $response = self::createClient()->request('GET', '/tweets?message%5B%5D=Good%20job&message%5B%5D=run', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",
@@ -162,7 +162,7 @@ JSON);
         $response = self::createClient()->request('GET', '/tweets?author.firstName=Caroline', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",
@@ -216,7 +216,7 @@ JSON);
         $response = self::createClient()->request('GET', '/tweets?message%5B%5D=Good%20job&message%5B%5D=run&author.firstName=Caroline', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",
@@ -270,7 +270,7 @@ JSON);
         $response = self::createClient()->request('GET', '/books?message=Good%20job', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",
@@ -324,7 +324,7 @@ JSON);
         $response = self::createClient()->request('GET', '/books?message%5B%5D=Good%20job&message%5B%5D=run', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",
@@ -391,7 +391,7 @@ JSON);
         $response = self::createClient()->request('GET', '/books?library.firstName=Caroline', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",
@@ -445,7 +445,7 @@ JSON);
         $response = self::createClient()->request('GET', '/books?message%5B%5D=Good%20job&message%5B%5D=run&library.firstName=Caroline', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",
@@ -499,7 +499,7 @@ JSON);
         $response = self::createClient()->request('GET', '/books?library.relatedGenres.name=Fiction', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",

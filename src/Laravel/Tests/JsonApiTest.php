@@ -61,7 +61,7 @@ class JsonApiTest extends TestCase
     {
         $response = $this->get('/api/', ['accept' => ['application/vnd.api+json']]);
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'application/vnd.api+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/vnd.api+json');
         $this->assertJsonContains(
             [
                 'links' => [
@@ -78,7 +78,7 @@ class JsonApiTest extends TestCase
         BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $response = $this->get('/api/books', ['accept' => ['application/vnd.api+json']]);
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'application/vnd.api+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/vnd.api+json');
         $response->assertJsonFragment([
             'links' => [
                 'self' => '/api/books?page=1',
@@ -98,7 +98,7 @@ class JsonApiTest extends TestCase
         $iri = $this->getIriFromResource($book);
         $response = $this->get($iri, ['accept' => ['application/vnd.api+json']]);
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'application/vnd.api+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/vnd.api+json');
 
         $this->assertJsonContains([
             'data' => [
@@ -141,7 +141,7 @@ class JsonApiTest extends TestCase
         );
 
         $response->assertStatus(201);
-        $response->assertHeader('content-type', 'application/vnd.api+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/vnd.api+json');
         $this->assertJsonContains([
             'data' => [
                 'type' => 'Book',
@@ -243,7 +243,7 @@ class JsonApiTest extends TestCase
         );
 
         $response->assertStatus(422);
-        $response->assertHeader('content-type', 'application/vnd.api+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/vnd.api+json');
         $json = $response->json();
         $this->assertJsonContains([
             'errors' => [
@@ -289,7 +289,7 @@ class JsonApiTest extends TestCase
     {
         $response = $this->get('/api/books/notfound', headers: ['accept' => 'application/vnd.api+json']);
         $response->assertStatus(404);
-        $response->assertHeader('content-type', 'application/vnd.api+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/vnd.api+json');
 
         $this->assertJsonContains([
             'links' => ['type' => '/errors/404'],

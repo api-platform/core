@@ -46,7 +46,7 @@ final class MultipleFilterTest extends ApiTestCase
         ]);
 
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
 
         $data = $response->toArray();
         $this->assertSame('/contexts/Dummy', $data['@context']);

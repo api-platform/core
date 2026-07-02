@@ -36,7 +36,7 @@ final class EntrypointTest extends ApiTestCase
         ]);
 
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json');
         $body = $response->toArray();
         $this->assertSame('http://example.com/', $body['links']['self']);
         $this->assertSame('http://example.com/jsonapi_entrypoint_dummies', $body['links']['jsonApiEntrypointDummy']);
@@ -49,7 +49,7 @@ final class EntrypointTest extends ApiTestCase
         ]);
 
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json');
         $body = $response->toArray();
         $this->assertSame([], $body['data']);
     }

@@ -33,7 +33,7 @@ final class ContextTest extends ApiTestCase
     {
         $response = self::createClient()->request('GET', '/contexts/Entrypoint');
         $this->assertResponseIsSuccessful();
-        $this->assertSame('application/ld+json; charset=utf-8', $response->getHeaders()['content-type'][0]);
+        $this->assertSame('application/ld+json', $response->getHeaders()['content-type'][0]);
         $body = $response->toArray();
         $this->assertSame('http://localhost/docs.jsonld#', $body['@context']['@vocab']);
         $this->assertSame('http://www.w3.org/ns/hydra/core#', $body['@context']['hydra']);

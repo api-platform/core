@@ -45,7 +45,7 @@ final class ValidationGroupsTest extends \ApiPlatform\Symfony\Bundle\Test\ApiTes
         ]);
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
     }
 
     public function testValidationGroupsTriggerFailure(): void
@@ -56,7 +56,7 @@ final class ValidationGroupsTest extends \ApiPlatform\Symfony\Bundle\Test\ApiTes
         ]);
 
         $this->assertResponseStatusCodeSame(422);
-        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json');
         $this->assertJsonContains([
             '@context' => '/contexts/ConstraintViolation',
             '@type' => 'ConstraintViolation',
@@ -77,7 +77,7 @@ final class ValidationGroupsTest extends \ApiPlatform\Symfony\Bundle\Test\ApiTes
         ]);
 
         $this->assertResponseStatusCodeSame(422);
-        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json');
         $this->assertJsonContains([
             'detail' => 'title: This value should not be null.',
             'violations' => [[
@@ -96,7 +96,7 @@ final class ValidationGroupsTest extends \ApiPlatform\Symfony\Bundle\Test\ApiTes
         ]);
 
         $this->assertResponseStatusCodeSame(422);
-        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json');
         $data = $response->toArray(false);
         $this->assertSame('test: This value should not be null.', $data['detail']);
         $this->assertSame('test', $data['violations'][0]['propertyPath']);
@@ -115,7 +115,7 @@ final class ValidationGroupsTest extends \ApiPlatform\Symfony\Bundle\Test\ApiTes
         ]);
 
         $this->assertResponseStatusCodeSame(422);
-        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json');
         $this->assertJsonEquals([
             'status' => 422,
             'violations' => [[

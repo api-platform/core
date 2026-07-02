@@ -75,7 +75,7 @@ final class CrudTest extends ApiTestCase
             'headers' => ['Accept' => 'application/vnd.api+json'],
         ]);
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json');
         $body = $response->toArray();
         $this->assertCount(1, $body['data']);
     }
