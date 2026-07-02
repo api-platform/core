@@ -70,7 +70,8 @@ class HttpOperation extends Operation
      *     no_transform?: bool,
      *     immutable?: bool,
      * }|null $cacheHeaders {@see https://api-platform.com/docs/core/performance/#setting-custom-http-cache-headers}
-     * @param array<string, string>|null $headers
+     * @param array<string, string>|null         $headers
+     * @param array<string, ResponseHeader>|null $responseHeaders
      * @param list<array{
      *     field: string,
      *     direction: string,
@@ -161,6 +162,7 @@ class HttpOperation extends Operation
         protected ?string $condition = null,
         protected ?string $controller = null,
         protected ?array $headers = null,
+        protected ?array $responseHeaders = null,
         protected ?array $cacheHeaders = null,
         protected ?array $paginationViaCursor = null,
         protected ?array $hydraContext = null,
@@ -583,6 +585,25 @@ class HttpOperation extends Operation
     public function getHeaders(): ?array
     {
         return $this->headers;
+    }
+
+    /**
+     * @return array<string, ResponseHeader>|null
+     */
+    public function getResponseHeaders(): ?array
+    {
+        return $this->responseHeaders;
+    }
+
+    /**
+     * @param array<string, ResponseHeader> $responseHeaders
+     */
+    public function withResponseHeaders(array $responseHeaders): static
+    {
+        $self = clone $this;
+        $self->responseHeaders = $responseHeaders;
+
+        return $self;
     }
 
     public function withHeaders(array $headers): static
