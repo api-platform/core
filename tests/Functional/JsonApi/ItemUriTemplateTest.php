@@ -34,7 +34,7 @@ final class ItemUriTemplateTest extends ApiTestCase
             'headers' => ['Accept' => 'application/vnd.api+json'],
         ]);
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json');
         $body = $response->toArray();
         $this->assertSame('/jsonapi_uri_template_cars', $body['links']['self']);
         $this->assertCount(2, $body['data']);

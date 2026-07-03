@@ -97,7 +97,7 @@ final class ContentNegotiationTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
         $data = $response->toArray();
         $this->assertIsArray($data);
         $this->assertCount(1, $data);
@@ -141,7 +141,7 @@ final class ContentNegotiationTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
     }
 
     public function testWildcardAcceptDefaultsToUrlFormat(): void
@@ -165,7 +165,7 @@ final class ContentNegotiationTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(406);
-        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json');
     }
 
     public function testHtmlAcceptReturnsHtmlError(): void
@@ -186,7 +186,7 @@ final class ContentNegotiationTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(406);
-        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json');
     }
 
     public function testPostCsvBodyOnCustomFormatResource(): void

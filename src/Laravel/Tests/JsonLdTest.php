@@ -50,7 +50,7 @@ class JsonLdTest extends TestCase
         BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $response = $this->get('/api/books', ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/ld+json');
         $response->assertJsonFragment([
             '@context' => '/api/contexts/Book',
             '@id' => '/api/books',
@@ -66,7 +66,7 @@ class JsonLdTest extends TestCase
         $book = Book::first();
         $response = $this->get($this->getIriFromResource($book), ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/ld+json');
         $response->assertJsonFragment([
             '@context' => '/api/contexts/Book',
             '@id' => $this->getIriFromResource($book),
@@ -94,7 +94,7 @@ class JsonLdTest extends TestCase
         );
 
         $response->assertStatus(201);
-        $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/ld+json');
         $response->assertJsonFragment([
             '@context' => '/api/contexts/Book',
             '@type' => 'Book',
@@ -184,7 +184,7 @@ class JsonLdTest extends TestCase
     {
         $response = $this->get('/api/outputs', ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/ld+json');
         $response->assertJsonFragment([
             '@type' => 'NotAResource',
             'name' => 'test',
@@ -198,7 +198,7 @@ class JsonLdTest extends TestCase
         PostFactory::new()->has(CommentFactory::new()->count(10))->count(10)->create();
         $response = $this->get('/api/posts', ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/ld+json');
 
         $response->assertJsonFragment([
             '@context' => '/api/contexts/Post',
@@ -244,7 +244,7 @@ class JsonLdTest extends TestCase
         );
 
         $response->assertStatus(422);
-        $response->assertHeader('content-type', 'application/problem+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/problem+json');
         $response->assertJsonFragment([
             '@context' => '/api/contexts/ValidationError',
             '@type' => 'ValidationError',
@@ -269,7 +269,7 @@ class JsonLdTest extends TestCase
         );
 
         $response->assertStatus(422);
-        $response->assertHeader('content-type', 'application/problem+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/problem+json');
         $response->assertJsonFragment([
             '@context' => '/api/contexts/ValidationError',
             '@type' => 'ValidationError',
@@ -286,7 +286,7 @@ class JsonLdTest extends TestCase
         SluggableFactory::new()->count(10)->create();
         $response = $this->get('/api/sluggables', ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/ld+json');
         $response->assertJsonFragment([
             '@context' => '/api/contexts/Sluggable',
             '@id' => '/api/sluggables',
@@ -308,7 +308,7 @@ class JsonLdTest extends TestCase
     {
         $response = $this->get('/api/contexts/Entrypoint', ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/ld+json');
         $this->assertArrayHasKey('@context', $response->json());
     }
 
@@ -316,7 +316,7 @@ class JsonLdTest extends TestCase
     {
         $response = $this->get('/api/contexts/Book', ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/ld+json');
         $this->assertArrayHasKey('@context', $response->json());
     }
 
@@ -324,7 +324,7 @@ class JsonLdTest extends TestCase
     {
         $response = $this->get('/api/contexts/', ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/ld+json');
         $this->assertArrayHasKey('@context', $response->json());
     }
 
@@ -333,7 +333,7 @@ class JsonLdTest extends TestCase
         PostFactory::new()->has(CommentFactory::new()->count(10))->count(10)->create();
         $response = $this->get('/api/posts/1/comments/1', ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/ld+json');
         $response->assertJsonMissingPath('internalNote');
     }
 
@@ -342,7 +342,7 @@ class JsonLdTest extends TestCase
         BookFactory::new()->has(AuthorFactory::new())->count(10)->create();
         $response = $this->get('/api/books', ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/ld+json');
         $this->assertStringNotContainsString('internalNote', (string) $response->getContent());
     }
 
@@ -386,7 +386,7 @@ class JsonLdTest extends TestCase
     {
         $response = $this->get('/api/resource_with_models?page=1', ['accept' => 'application/ld+json']);
         $response->assertStatus(200);
-        $response->assertHeader('content-type', 'application/ld+json; charset=utf-8');
+        $response->assertHeader('content-type', 'application/ld+json');
         $response->assertJsonFragment([
             '@context' => '/api/contexts/ResourceWithModel',
             '@id' => '/api/resource_with_models',

@@ -57,7 +57,7 @@ final class EnumDenormalizationValidationTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(422);
-        $this->assertResponseHeaderSame('content-type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/problem+json');
 
         $content = $response->toArray(false);
         $this->assertArrayHasKey('violations', $content);

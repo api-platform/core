@@ -87,7 +87,7 @@ class ObjectMapperValidationTest extends ApiTestCase
 
         // Should return 422 validation error, NOT 500 database error
         $this->assertResponseStatusCodeSame(422);
-        $this->assertResponseHeaderSame('content-type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/problem+json');
 
         // Verify we got the UniqueEntity validation error
         $this->assertJsonContains([

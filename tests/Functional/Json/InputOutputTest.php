@@ -46,7 +46,7 @@ final class InputOutputTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('Content-Type', 'application/json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
         $this->assertJsonEquals(['emailSentAt' => '2019-07-05T15:44:00+00:00']);
     }
 
@@ -61,7 +61,7 @@ final class InputOutputTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(404);
-        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json');
         $this->assertJsonContains(['detail' => 'User does not exist.']);
     }
 }

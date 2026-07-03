@@ -58,7 +58,7 @@ final class ConfigurableTest extends ApiTestCase
         self::createClient()->request('GET', '/fileconfigdummies');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonEquals([
             '@context' => '/contexts/fileconfigdummy',
             '@id' => '/fileconfigdummies',
@@ -83,7 +83,7 @@ final class ConfigurableTest extends ApiTestCase
         self::createClient()->request('GET', '/single_file_configs');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonEquals([
             '@context' => '/contexts/single_file_config',
             '@id' => '/single_file_configs',
@@ -100,7 +100,7 @@ final class ConfigurableTest extends ApiTestCase
         self::createClient()->request('GET', '/fileconfigdummies/1');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonEquals([
             '@context' => '/contexts/fileconfigdummy',
             '@id' => '/fileconfigdummies/1',

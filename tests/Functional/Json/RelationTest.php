@@ -61,7 +61,7 @@ final class RelationTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonContains([
             '@context' => '/contexts/ThirdLevel',
             '@id' => '/third_levels/1',
@@ -83,7 +83,7 @@ final class RelationTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonContains([
             '@context' => '/contexts/RelationEmbedder',
             '@id' => '/relation_embedders/1',
@@ -113,7 +113,7 @@ final class RelationTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonContains([
             '@id' => '/relation_embedders/1',
             'anotherRelated' => [

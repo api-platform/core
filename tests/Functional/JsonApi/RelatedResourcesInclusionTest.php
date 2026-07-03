@@ -64,7 +64,7 @@ final class RelatedResourcesInclusionTest extends ApiTestCase
         ]);
 
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json');
         $this->assertJsonEquals([
             'data' => [
                 'id' => '/dummy_properties/1',

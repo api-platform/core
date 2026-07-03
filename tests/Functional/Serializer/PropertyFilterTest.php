@@ -83,7 +83,7 @@ final class PropertyFilterTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",
@@ -133,7 +133,7 @@ JSON);
         ]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",
@@ -190,7 +190,7 @@ JSON);
         ]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",
@@ -237,7 +237,7 @@ JSON);
         ]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",
@@ -293,7 +293,7 @@ JSON);
         ]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",
@@ -338,7 +338,7 @@ JSON);
         ]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",
@@ -392,7 +392,7 @@ JSON);
         ]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",
@@ -421,7 +421,7 @@ JSON);
         ]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",
@@ -459,7 +459,7 @@ JSON);
         ]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertMatchesJsonSchema(<<<'JSON'
 {
       "type": "object",
@@ -499,7 +499,7 @@ JSON);
         ]);
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertJsonEquals(<<<'JSON'
 {
       "@context": "/contexts/DummyProperty",
@@ -532,7 +532,7 @@ JSON);
         ]);
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertJsonEquals(<<<'JSON'
 {
       "@context": "/contexts/DummyProperty",

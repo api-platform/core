@@ -51,7 +51,7 @@ final class OperationTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonEquals([
             '@context' => '/contexts/ReadableOnlyProperty',
             '@id' => '/readable_only_properties/1',
@@ -66,7 +66,7 @@ final class OperationTest extends ApiTestCase
         $response = self::createClient()->request('GET', '/relation_embedders/42/custom');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertSame('"This is a custom action for 42."', $response->getContent());
     }
 
@@ -88,7 +88,7 @@ final class OperationTest extends ApiTestCase
         self::createClient()->request('GET', '/embedded_dummies_groups/1');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonContains([
             '@context' => '/contexts/EmbeddedDummy',
             '@id' => '/embedded_dummies_groups/1',
@@ -131,7 +131,7 @@ final class OperationTest extends ApiTestCase
         self::createClient()->request('GET', '/books/by_isbn/9780451524935');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonEquals([
             '@context' => '/contexts/Book',
             '@id' => '/books/by_isbn/9780451524935',

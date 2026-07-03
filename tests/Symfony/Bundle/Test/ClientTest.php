@@ -122,7 +122,7 @@ class ClientTest extends ApiTestCase
         $this->recreateSchema([SecuredDummy::class, RelatedDummy::class]);
         self::createClient()->request('GET', '/secured_dummies', ['auth_basic' => ['dunglas', 'kevin']]);
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
 
         $this->assertJsonEquals([
             '@context' => '/contexts/SecuredDummy',

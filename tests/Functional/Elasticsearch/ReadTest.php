@@ -41,7 +41,7 @@ final class ReadTest extends ApiTestCase
         $response = self::createClient()->request('GET', '/users/116b83f8-6c32-48d8-8e28-c5c247532d3f', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertJsonEquals(<<<'JSON'
 {
       "@context": "/contexts/User",
@@ -98,7 +98,7 @@ JSON);
         $response = self::createClient()->request('GET', '/tweets', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertJsonEquals(<<<'JSON'
 {
       "@context": "/contexts/Tweet",
@@ -217,7 +217,7 @@ JSON);
         $response = self::createClient()->request('GET', '/tweets?page=3', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertJsonEquals(<<<'JSON'
 {
       "@context": "/contexts/Tweet",
@@ -337,7 +337,7 @@ JSON);
         $response = self::createClient()->request('GET', '/tweets?page=7', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertJsonEquals(<<<'JSON'
 {
       "@context": "/contexts/Tweet",
@@ -440,7 +440,7 @@ JSON);
         $response = self::createClient()->request('GET', '/libraries/116b83f8-6c32-48d8-8e28-c5c247532d3f', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertJsonEquals(<<<'JSON'
 {
       "@context": "/contexts/Library",
@@ -497,7 +497,7 @@ JSON);
         $response = self::createClient()->request('GET', '/books', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertJsonEquals(<<<'JSON'
 {
       "@context": "/contexts/Book",
@@ -628,7 +628,7 @@ JSON);
         $response = self::createClient()->request('GET', '/books?page=3', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertJsonEquals(<<<'JSON'
 {
       "@context": "/contexts/Book",
@@ -760,7 +760,7 @@ JSON);
         $response = self::createClient()->request('GET', '/books?page=7', ['headers' => ['Accept' => 'application/ld+json']]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/ld+json');
         $this->assertJsonEquals(<<<'JSON'
 {
       "@context": "/contexts/Book",

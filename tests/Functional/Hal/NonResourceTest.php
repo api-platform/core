@@ -34,7 +34,7 @@ final class NonResourceTest extends ApiTestCase
             'headers' => ['Accept' => 'application/hal+json'],
         ]);
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('Content-Type', 'application/hal+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/hal+json');
         $body = $response->toArray();
 
         $this->assertSame('/hal_non_resource_containers/1', $body['_links']['self']['href']);

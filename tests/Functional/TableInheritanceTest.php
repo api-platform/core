@@ -84,7 +84,7 @@ final class TableInheritanceTest extends ApiTestCase
         $data = $this->createChild();
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertSame('DummyTableInheritanceChild', $data['@type']);
         $this->assertSame('/contexts/DummyTableInheritanceChild', $data['@context']);
         $this->assertSame('/dummy_table_inheritance_children/1', $data['@id']);
@@ -99,7 +99,7 @@ final class TableInheritanceTest extends ApiTestCase
         $response = self::createClient()->request('GET', '/dummy_table_inheritances');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $data = $response->toArray();
         $this->assertCount(1, $data['hydra:member']);
         $this->assertSame('DummyTableInheritanceChild', $data['hydra:member'][0]['@type']);
@@ -134,7 +134,7 @@ final class TableInheritanceTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $data = $response->toArray();
         $this->assertSame('DummyTableInheritanceDifferentChild', $data['@type']);
         $this->assertSame('/contexts/DummyTableInheritanceDifferentChild', $data['@context']);
@@ -156,7 +156,7 @@ final class TableInheritanceTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $data = $response->toArray();
         $this->assertSame('DummyTableInheritanceRelated', $data['@type']);
         $this->assertSame('/dummy_table_inheritance_relateds/1', $data['@id']);
@@ -197,7 +197,7 @@ final class TableInheritanceTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $data = $response->toArray();
         $members = $data['hydra:member'];
         $this->assertCount(2, $members);
@@ -218,7 +218,7 @@ final class TableInheritanceTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $data = $response->toArray();
         $this->assertSame('/contexts/ResourceInterface', $data['@context']);
         $this->assertSame('/resource_interfaces/single%20item', $data['@id']);
@@ -253,7 +253,7 @@ final class TableInheritanceTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $data = $response->toArray();
         $this->assertCount(3, $data['hydra:member']);
         foreach ($data['hydra:member'] as $i => $member) {

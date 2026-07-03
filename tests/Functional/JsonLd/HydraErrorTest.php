@@ -39,7 +39,7 @@ final class HydraErrorTest extends ApiTestCase
         ]);
         $this->assertResponseStatusCodeSame(400);
         $headers = $response->getHeaders(false);
-        $this->assertSame('application/problem+json; charset=utf-8', $headers['content-type'][0]);
+        $this->assertSame('application/problem+json', $headers['content-type'][0]);
         $this->assertStringContainsString(
             '<http://www.w3.org/ns/hydra/error>; rel="http://www.w3.org/ns/json-ld#error"',
             implode(',', $headers['link']),
@@ -66,7 +66,7 @@ final class HydraErrorTest extends ApiTestCase
             'json' => new \stdClass(),
         ]);
         $this->assertResponseStatusCodeSame(422);
-        $this->assertSame('application/problem+json; charset=utf-8', $response->getHeaders(false)['content-type'][0]);
+        $this->assertSame('application/problem+json', $response->getHeaders(false)['content-type'][0]);
         $this->assertJsonContains([
             '@context' => '/contexts/ConstraintViolation',
             '@id' => '/validation_errors/c1051bb4-d103-4f74-8988-acbcafc7fdc3',
@@ -93,7 +93,7 @@ final class HydraErrorTest extends ApiTestCase
         ]);
         $this->assertResponseStatusCodeSame(404);
         $headers = $response->getHeaders(false);
-        $this->assertSame('application/problem+json; charset=utf-8', $headers['content-type'][0]);
+        $this->assertSame('application/problem+json', $headers['content-type'][0]);
         $this->assertStringContainsString(
             '<http://www.w3.org/ns/hydra/error>; rel="http://www.w3.org/ns/json-ld#error"',
             implode(',', $headers['link']),
@@ -117,7 +117,7 @@ final class HydraErrorTest extends ApiTestCase
         ]);
         $this->assertResponseStatusCodeSame(405);
         $headers = $response->getHeaders(false);
-        $this->assertSame('application/problem+json; charset=utf-8', $headers['content-type'][0]);
+        $this->assertSame('application/problem+json', $headers['content-type'][0]);
         $this->assertStringContainsString(
             '<http://www.w3.org/ns/hydra/error>; rel="http://www.w3.org/ns/json-ld#error"',
             implode(',', $headers['link']),
@@ -141,7 +141,7 @@ final class HydraErrorTest extends ApiTestCase
         ]);
         $this->assertResponseStatusCodeSame(400);
         $headers = $response->getHeaders(false);
-        $this->assertSame('application/problem+json; charset=utf-8', $headers['content-type'][0]);
+        $this->assertSame('application/problem+json', $headers['content-type'][0]);
         $this->assertStringContainsString(
             '<http://www.w3.org/ns/hydra/error>; rel="http://www.w3.org/ns/json-ld#error"',
             implode(',', $headers['link']),

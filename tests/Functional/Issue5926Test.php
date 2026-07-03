@@ -34,10 +34,10 @@ final class Issue5926Test extends ApiTestCase
 
     public static function formats(): iterable
     {
-        yield ['application/json', 'application/json; charset=utf-8'];
-        yield ['application/vnd.api+json', 'application/vnd.api+json; charset=utf-8'];
-        yield ['application/ld+json', 'application/ld+json; charset=utf-8'];
-        yield ['application/hal+json', 'application/hal+json; charset=utf-8'];
+        yield ['application/json', 'application/json'];
+        yield ['application/vnd.api+json', 'application/vnd.api+json'];
+        yield ['application/ld+json', 'application/ld+json'];
+        yield ['application/hal+json', 'application/hal+json'];
     }
 
     #[DataProvider('formats')]

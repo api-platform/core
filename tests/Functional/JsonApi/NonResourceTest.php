@@ -36,7 +36,7 @@ final class NonResourceTest extends ApiTestCase
             'headers' => ['Accept' => 'application/vnd.api+json'],
         ]);
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json');
         $this->assertJsonContains([
             'data' => [
                 'id' => '/jsonapi_non_resource_containers/1',
@@ -82,7 +82,7 @@ final class NonResourceTest extends ApiTestCase
             ],
         ]);
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/vnd.api+json');
         $this->assertJsonContains([
             'data' => [
                 'id' => '/jsonapi_non_relation_resources/1',

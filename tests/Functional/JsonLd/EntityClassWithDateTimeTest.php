@@ -49,7 +49,7 @@ final class EntityClassWithDateTimeTest extends ApiTestCase
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
         $this->assertResponseIsSuccessful();
-        $this->assertSame('application/ld+json; charset=utf-8', $response->getHeaders()['content-type'][0]);
+        $this->assertSame('application/ld+json', $response->getHeaders()['content-type'][0]);
         $body = $response->toArray();
         $this->assertSame('/EntityClassWithDateTime/1', $body['@id']);
         $this->assertSame('EntityClassWithDateTime', $body['@type']);

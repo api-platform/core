@@ -130,7 +130,7 @@ final class ErrorTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(400);
-        $this->assertResponseHeaderSame('content-type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/problem+json');
 
         $responseData = $response->toArray(false);
 

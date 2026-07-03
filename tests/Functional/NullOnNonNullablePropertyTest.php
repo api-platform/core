@@ -43,7 +43,7 @@ final class NullOnNonNullablePropertyTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(400);
-        $this->assertResponseHeaderSame('content-type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/problem+json');
         $body = $response->toArray(false);
         $this->assertStringContainsString('Expected argument of type "string", "null" given at property path "name"', $body['hydra:description'] ?? $body['detail'] ?? '');
     }
@@ -61,7 +61,7 @@ final class NullOnNonNullablePropertyTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(422);
-        $this->assertResponseHeaderSame('content-type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('content-type', 'application/problem+json');
 
         $content = $response->toArray(false);
         $this->assertArrayHasKey('violations', $content);

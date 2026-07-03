@@ -52,7 +52,7 @@ final class CrudAbstractTest extends ApiTestCase
         $this->createConcrete();
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertResponseHeaderSame('Content-Location', '/concrete_dummies/1.jsonld');
         $this->assertResponseHeaderSame('Location', '/concrete_dummies/1');
         $this->assertJsonEquals([
@@ -72,7 +72,7 @@ final class CrudAbstractTest extends ApiTestCase
         $response = self::createClient()->request('GET', '/abstract_dummies/1');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertArrayNotHasKey('content-location', array_change_key_case($response->getHeaders()));
         $this->assertJsonEquals([
             '@context' => '/contexts/ConcreteDummy',
@@ -91,7 +91,7 @@ final class CrudAbstractTest extends ApiTestCase
         $response = self::createClient()->request('GET', '/abstract_dummies');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $data = $response->toArray();
         $this->assertGreaterThanOrEqual(1, \count($data['hydra:member']));
         $this->assertSame('ConcreteDummy', $data['hydra:member'][0]['@type']);

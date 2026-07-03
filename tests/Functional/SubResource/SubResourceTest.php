@@ -162,7 +162,7 @@ final class SubResourceTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonEquals([
             '@context' => '/contexts/Answer',
             '@id' => '/questions/1/answer',
@@ -186,7 +186,7 @@ final class SubResourceTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonEquals([
             '@context' => '/contexts/OneToOneSubresourceAnswer',
             '@id' => '/one_to_one_subresource_questions/1/answer',
@@ -237,7 +237,7 @@ final class SubResourceTest extends ApiTestCase
         $response = self::createClient()->request('GET', '/dummies/1/related_dummies');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $data = $response->toArray();
         $this->assertSame('/dummies/1/related_dummies', $data['@id']);
         $this->assertSame(2, $data['hydra:totalItems']);
@@ -266,7 +266,7 @@ final class SubResourceTest extends ApiTestCase
         self::createClient()->request('GET', '/dummies/1/related_dummies/2');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonContains([
             '@context' => '/contexts/RelatedDummy',
             '@id' => '/dummies/1/related_dummies/2',
@@ -286,7 +286,7 @@ final class SubResourceTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(201);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
     }
 
     public function testGetEmbeddedRelationAtThirdLevel(): void
@@ -315,7 +315,7 @@ final class SubResourceTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonEquals([
             '@context' => '/contexts/FourthLevel',
             '@id' => '/dummies/1/related_dummies/1/third_level/fourth_level',
@@ -446,7 +446,7 @@ final class SubResourceTest extends ApiTestCase
         self::createClient()->request('GET', '/people/1/sent_greetings');
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonEquals([
             '@context' => '/contexts/GreetingBySender',
             '@id' => '/people/1/sent_greetings',

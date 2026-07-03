@@ -51,7 +51,7 @@ final class AttributeResourceTest extends ApiTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(200);
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonEquals([
             '@context' => '/contexts/AttributeResources',
             '@id' => '/attribute_resources',
@@ -87,7 +87,7 @@ final class AttributeResourceTest extends ApiTestCase
 
         $this->assertResponseStatusCodeSame(301);
         $this->assertResponseHeaderSame('Location', '/attribute_resources/2');
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonEquals([
             '@context' => '/contexts/AttributeResource',
             '@id' => '/attribute_resources/2',
@@ -107,7 +107,7 @@ final class AttributeResourceTest extends ApiTestCase
 
         $this->assertResponseStatusCodeSame(301);
         $this->assertResponseHeaderSame('Location', '/attribute_resources/2');
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $this->assertJsonEquals([
             '@context' => '/contexts/AttributeResource',
             '@id' => '/attribute_resources/2',
@@ -123,7 +123,7 @@ final class AttributeResourceTest extends ApiTestCase
         $response = self::createClient()->request('GET', '/photos/1/resize/300/100');
 
         $this->assertResponseStatusCodeSame(400);
-        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/problem+json');
         $linkHeader = $response->getHeaders(false)['link'][0] ?? '';
         $this->assertStringContainsString('<http://www.w3.org/ns/hydra/error>; rel="http://www.w3.org/ns/json-ld#error"', $linkHeader);
         $this->assertJsonContains(['detail' => 'Unable to generate an IRI for the item of type "ApiPlatform\\Tests\\Fixtures\\TestBundle\\Entity\\IncompleteUriVariableConfigured"']);

@@ -53,7 +53,7 @@ final class ExistsFilterTest extends ApiTestCase
         ]);
 
         $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json; charset=utf-8');
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
         $data = $response->toArray();
         $this->assertSame(0, $data['hydra:totalItems']);
         $this->assertSame([], $data['hydra:member']);

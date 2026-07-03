@@ -35,7 +35,7 @@ final class EntrypointTest extends ApiTestCase
             'headers' => ['Accept' => 'application/ld+json'],
         ]);
         $this->assertResponseIsSuccessful();
-        $this->assertSame('application/ld+json; charset=utf-8', $response->getHeaders()['content-type'][0]);
+        $this->assertSame('application/ld+json', $response->getHeaders()['content-type'][0]);
         $body = $response->toArray();
         $this->assertSame('/contexts/Entrypoint', $body['@context']);
         $this->assertSame('/', $body['@id']);
