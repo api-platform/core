@@ -365,6 +365,11 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setParameter('api_platform.patch_formats', $patchFormats);
         $container->setParameter('api_platform.error_formats', $errorFormats);
         $container->setParameter('api_platform.docs_formats', $docsFormats);
+        // The entrypoint only has normalizers for hypermedia formats (jsonld, jsonhal, jsonapi) and a
+        // dedicated Swagger UI code path for html. Other documentation formats (e.g. openapi, yamlopenapi)
+        // have no Entrypoint normalizer and must not be advertised, otherwise content negotiation lets them
+        // through and the Symfony ObjectNormalizer fallback leaks the internal ResourceNameCollection FQCNs.
+        $container->setParameter('api_platform.entrypoint_formats', array_intersect_key($docsFormats, array_flip(['jsonld', 'jsonhal', 'jsonapi', 'html'])));
         $container->setParameter('api_platform.jsonschema_formats', []);
         $container->setParameter('api_platform.eager_loading.enabled', $this->isConfigEnabled($container, $config['eager_loading']));
         $container->setParameter('api_platform.eager_loading.max_joins', $config['eager_loading']['max_joins']);

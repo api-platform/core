@@ -686,24 +686,30 @@ class OpenApiTest extends ApiTestCase
         $this->assertResponseIsSuccessful();
     }
 
-    public function testRetrieveTheEntrypoint(): void
+    /**
+     * @see https://github.com/api-platform/core/issues/8361
+     */
+    public function testEntrypointRejectsOpenApiFormat(): void
     {
         $response = self::createClient()->request('GET', '/', [
             'headers' => ['Accept' => 'application/vnd.openapi+json'],
         ]);
-        $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+json; charset=utf-8');
-        $this->assertJson($response->getContent());
+        $this->assertResponseStatusCodeSame(406);
     }
 
-    public function testRetrieveTheEntrypointWithUrlFormat(): void
+    /**
+     * The ".jsonopenapi" URL suffix is resolved by routing before content negotiation
+     * runs, so an unsupported route format yields a 404 (consistent with any other
+     * resource requested with an unsupported format suffix), not a 406.
+     *
+     * @see https://github.com/api-platform/core/issues/8361
+     */
+    public function testEntrypointRejectsOpenApiFormatWithUrlFormat(): void
     {
         $response = self::createClient()->request('GET', '/index.jsonopenapi', [
             'headers' => ['Accept' => 'application/vnd.openapi+json'],
         ]);
-        $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/vnd.openapi+json; charset=utf-8');
-        $this->assertJson($response->getContent());
+        $this->assertResponseStatusCodeSame(404);
     }
 
     public function testOpenApiSchemaWithNormalizationAttributes(): void

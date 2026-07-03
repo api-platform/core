@@ -119,12 +119,12 @@ trait ContentNegotiationTrait
         if (null !== $requestFormat) {
             $mimeType = $request->getMimeType($requestFormat);
 
-            if (isset($flattenedMimeTypes[$mimeType])) {
+            if (null !== $mimeType && isset($flattenedMimeTypes[$mimeType])) {
                 return $requestFormat;
             }
 
             if ($throw) {
-                throw $this->getNotAcceptableHttpException($mimeType, $flattenedMimeTypes);
+                throw $this->getNotAcceptableHttpException($mimeType ?? $requestFormat, $flattenedMimeTypes);
             }
         }
 
