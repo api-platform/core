@@ -1299,11 +1299,19 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
                 }
             }
 
+            // A nullable collection value type (e.g. an array of a nullable BackedEnum/object) is represented
+            // as a NullableType wrapping the real ObjectType, so it must be unwrapped before the instanceof
+            // check below; nested CollectionType wrapping is left untouched to keep union/collection detection intact.
+            $unwrappedCollectionValueType = $collectionValueType;
+            while ($unwrappedCollectionValueType instanceof WrappingTypeInterface && !$unwrappedCollectionValueType instanceof CollectionType) {
+                $unwrappedCollectionValueType = $unwrappedCollectionValueType->getWrappedType();
+            }
+
             if (
-                ($t instanceof CollectionType && $collectionValueType instanceof ObjectType)
+                ($t instanceof CollectionType && $unwrappedCollectionValueType instanceof ObjectType)
                 || ($t instanceof LegacyType && $t->isCollection() && null !== $collectionValueType && null !== $collectionValueType->getClassName())
             ) {
-                $className = $collectionValueType->getClassName();
+                $className = $unwrappedCollectionValueType instanceof ObjectType ? $unwrappedCollectionValueType->getClassName() : $collectionValueType->getClassName();
                 if (!$this->serializer instanceof DenormalizerInterface) {
                     throw new LogicException(\sprintf('The injected serializer must be an instance of "%s".', DenormalizerInterface::class));
                 }
