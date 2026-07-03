@@ -125,8 +125,8 @@ class CollectionNormalizerTest extends TestCase
         $paginator->method('current')->willReturn('foo'); // @phpstan-ignore-line
 
         if (!$partial) {
-            $paginator->method('getLastPage')->willReturn(7.); // @phpstan-ignore-line
-            $paginator->method('getTotalItems')->willReturn(1312.); // @phpstan-ignore-line
+            $paginator->method('getLastPage')->willReturn(7.);
+            $paginator->method('getTotalItems')->willReturn(1312.);
         } else {
             $paginator->method('count')->willReturn(12);
         }
