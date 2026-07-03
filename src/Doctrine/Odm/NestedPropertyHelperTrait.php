@@ -39,7 +39,7 @@ trait NestedPropertyHelperTrait
         $nestedInfo = ($extraProperties['nested_properties_info'] ?? []) ? reset($extraProperties['nested_properties_info']) : null;
 
         if (!$nestedInfo) {
-            return $property;
+            return $extraProperties['query_property'] ?? $property;
         }
 
         $odmSegments = $nestedInfo['odm_segments'] ?? [];

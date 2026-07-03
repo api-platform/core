@@ -43,7 +43,7 @@ trait NestedPropertyHelperTrait
         $nestedInfo = ($extraProperties['nested_properties_info'] ?? []) ? reset($extraProperties['nested_properties_info']) : null;
 
         if (!$nestedInfo) {
-            return [$alias, $property];
+            return [$alias, $extraProperties['query_property'] ?? $property];
         }
 
         $relationClasses = $nestedInfo['relation_classes'] ?? [];

@@ -405,7 +405,10 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             // Skip name conversion if we already have nested property info
             $paramExtraProps = $parameter->getExtraProperties();
             if (!isset($paramExtraProps['nested_properties_info'])) {
-                $parameter = $parameter->withProperty($this->nameConverter->normalize($property));
+                // Keep the original (non name-converted) property to build the query while the public property matches the API naming convention.
+                $parameter = $parameter
+                    ->withExtraProperties([...$paramExtraProps, 'query_property' => $property])
+                    ->withProperty($this->nameConverter->normalize($property));
             }
         }
 
