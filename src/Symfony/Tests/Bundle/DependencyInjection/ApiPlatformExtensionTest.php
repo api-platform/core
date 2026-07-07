@@ -32,9 +32,11 @@ use Doctrine\ORM\OptimisticLockException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 
 class ApiPlatformExtensionTest extends TestCase
 {
@@ -299,6 +301,19 @@ class ApiPlatformExtensionTest extends TestCase
         ];
 
         $this->assertContainerHas($services);
+    }
+
+    public function testOpenApiNameConverterDoesNotDependOnMissingSymfonyParent(): void
+    {
+        $config = self::DEFAULT_CONFIG;
+        $config['api_platform']['enable_swagger'] = true;
+
+        (new ApiPlatformExtension())->load($config, $this->container);
+
+        $definition = $this->container->getDefinition('api_platform.openapi.name_converter');
+
+        $this->assertNotInstanceOf(ChildDefinition::class, $definition, 'The OpenAPI name converter must not depend on Symfony\'s "serializer.name_converter.metadata_aware.abstract" parent, which does not exist when no name converter is configured.');
+        $this->assertSame(MetadataAwareNameConverter::class, $definition->getClass());
     }
 
     public function testReDocEnabledWithSwaggerUiDisabledConfiguration(): void
