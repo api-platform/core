@@ -131,6 +131,10 @@ services:
         tags:
             - name: 'api_platform.state_provider'
 
+    ApiPlatform\Tests\Fixtures\TestBundle\Doctrine\Orm\FetchDataFalseStateOptionsItemExtension:
+        tags:
+            - name: 'api_platform.doctrine.orm.query_extension.item'
+
     ApiPlatform\Tests\Fixtures\TestBundle\State\DummyCollectionDtoProvider:
         class: 'ApiPlatform\Tests\Fixtures\TestBundle\State\DummyCollectionDtoProvider'
         public: false

@@ -20,6 +20,7 @@ use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity\Company;
 use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity\Employee;
 use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Entity\OperationResource;
+use ApiPlatform\Doctrine\Orm\Tests\Fixtures\Model\EmployeeApi;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
@@ -269,6 +270,84 @@ class ItemProviderTest extends TestCase
         $operation = (new Get())->withUriVariables([
             'uuid' => (new Link())->withFromClass(Employee::class)->withIdentifiers(['uuid'])->withParameterName('uuid'),
         ])->withName('get')->withClass(Employee::class);
+
+        $dataProvider = new ItemProvider(
+            $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
+            $managerRegistryMock,
+        );
+
+        $this->assertSame($returnObject, $dataProvider->provide($operation, ['uuid' => '61817181-0ecc-42fb-a6e7-d97f2ddcb344'], ['fetch_data' => false]));
+    }
+
+    public function testGetItemWithFetchDataFalseReturnsReferenceForStateOptionsResource(): void
+    {
+        $reference = new Employee();
+
+        $classMetadataMock = $this->createMock(ClassMetadata::class);
+        $classMetadataMock->method('getIdentifierFieldNames')->willReturn(['id']);
+
+        $managerMock = $this->createMock(EntityManagerInterface::class);
+        $managerMock->method('getClassMetadata')->with(Employee::class)->willReturn($classMetadataMock);
+        $managerMock->expects($this->once())
+            ->method('getReference')
+            ->with(Employee::class, ['id' => 2])
+            ->willReturn($reference);
+
+        $managerRegistryMock = $this->createMock(ManagerRegistry::class);
+        $managerRegistryMock->method('getManagerForClass')->with(Employee::class)->willReturn($managerMock);
+
+        // DTO resource: the operation class (EmployeeApi) differs from the stateOptions entity class (Employee),
+        // so the identifier-self link's fromClass is the resource class, not the entity class.
+        $operation = (new Get())->withUriVariables([
+            'id' => (new Link())->withFromClass(EmployeeApi::class)->withIdentifiers(['id']),
+        ])->withStateOptions(new Options(entityClass: Employee::class))->withName('get')->withClass(EmployeeApi::class);
+
+        // The reference fast-path must return before the item query is built, so item extensions never run.
+        $extensionMock = $this->createMock(QueryItemExtensionInterface::class);
+        $extensionMock->expects($this->never())->method('applyToItem');
+
+        $dataProvider = new ItemProvider(
+            $this->createStub(ResourceMetadataCollectionFactoryInterface::class),
+            $managerRegistryMock,
+            [$extensionMock]
+        );
+
+        $this->assertSame($reference, $dataProvider->provide($operation, ['id' => 2], ['fetch_data' => false]));
+    }
+
+    public function testGetItemWithFetchDataFalseFallsBackToQueryForStateOptionsResourceWhenIdentifierIsNotADoctrineIdentifier(): void
+    {
+        $returnObject = new \stdClass();
+
+        $queryMock = $this->createMock($this->getQueryClass());
+        $queryMock->method('getOneOrNullResult')->willReturn($returnObject);
+
+        $queryBuilderMock = $this->createMock(QueryBuilder::class);
+        $queryBuilderMock->method('getQuery')->willReturn($queryMock);
+        $queryBuilderMock->method('getRootAliases')->willReturn(['o']);
+
+        // Even for a DTO resource, the entity-identifier guard holds: the resource exposes "uuid" as its
+        // API identifier while the Doctrine identifier is "id", so getReference() cannot be built and we
+        // must fall back to the link-resolving query.
+        $classMetadataMock = $this->createMock(ClassMetadata::class);
+        $classMetadataMock->method('getIdentifierFieldNames')->willReturn(['id']);
+
+        $repositoryMock = $this->createMock(EntityRepository::class);
+        $repositoryMock->method('createQueryBuilder')->with('o')->willReturn($queryBuilderMock);
+
+        $managerMock = $this->createMock(EntityManagerInterface::class);
+        $managerMock->method('getClassMetadata')->willReturn($classMetadataMock);
+        $managerMock->method('getRepository')->willReturn($repositoryMock);
+        $managerMock->expects($this->never())->method('getReference');
+
+        $managerRegistryMock = $this->createMock(ManagerRegistry::class);
+        $managerRegistryMock->method('getManagerForClass')->willReturn($managerMock);
+
+        // A no-op handleLinks mirrors what DoctrineOrmResourceCollectionMetadataFactory injects for a
+        // stateOptions resource in production; the unit test bypasses that factory (see CollectionProviderTest).
+        $operation = (new Get())->withUriVariables([
+            'uuid' => (new Link())->withFromClass(EmployeeApi::class)->withIdentifiers(['uuid'])->withParameterName('uuid'),
+        ])->withStateOptions(new Options(entityClass: Employee::class, handleLinks: static fn () => null))->withName('get')->withClass(EmployeeApi::class);
 
         $dataProvider = new ItemProvider(
             $this->createStub(ResourceMetadataCollectionFactoryInterface::class),

@@ -109,8 +109,10 @@ final class ItemProvider implements ProviderInterface
 
         $identifiers = [];
         foreach ($this->getLinks($entityClass, $operation, $context) as $parameterName => $link) {
-            // Mirrors LinksHandlerTrait: the identifier-self link has no relation property and points to the entity itself.
-            if ($entityClass !== $link->getFromClass() || $link->getFromProperty() || $link->getToProperty()) {
+            // Mirrors LinksHandlerTrait: the identifier-self link has no relation property and points to the resource itself.
+            // Links are expressed in resource terms, so the identifier-self link's fromClass is the resource class
+            // ($operation->getClass()), which differs from $entityClass for a DTO/stateOptions resource.
+            if ($operation->getClass() !== $link->getFromClass() || $link->getFromProperty() || $link->getToProperty()) {
                 continue;
             }
 
