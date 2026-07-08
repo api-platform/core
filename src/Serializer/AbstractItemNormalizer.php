@@ -51,6 +51,7 @@ use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\CompositeTypeInterface;
+use Symfony\Component\TypeInfo\Type\EnumType;
 use Symfony\Component\TypeInfo\Type\NullableType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
@@ -1445,6 +1446,32 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         if ($denormalizationException) {
             if ($type instanceof Type && $type->isSatisfiedBy(static fn ($type) => $type instanceof BuiltinType) && !$type->isSatisfiedBy($typeIsResourceClass)) {
+                // When the union contains an object member that is not a resource class (e.g. a nullable
+                // Uuid), the exception stashed while denormalizing it comes from its dedicated normalizer
+                // and carries the expected types actually accepted on the wire (e.g. ["string"]) plus a
+                // hint that is safe to expose to the user. Rebuilding the error from the PHP type union
+                // would report unactionable expected types such as "Uuid|null" instead, so re-throw it,
+                // only extending its expected types with "null" when the property also accepts null.
+                // Enum members are deliberately not re-thrown here: their violations are rendered from
+                // the rebuilt exception below, whose expected types are mapped to the enum backing type
+                // downstream (see DeserializeProvider).
+                foreach ($types as $memberType) {
+                    while ($memberType instanceof WrappingTypeInterface && !$memberType instanceof CollectionType) {
+                        $memberType = $memberType->getWrappedType();
+                    }
+
+                    if (!$memberType instanceof ObjectType || $memberType instanceof EnumType || $this->resourceClassResolver->isResourceClass($memberType->getClassName())) {
+                        continue;
+                    }
+
+                    $expectedTypes = $denormalizationException->getExpectedTypes();
+                    if ($type->isNullable() && $expectedTypes && !\in_array('null', $expectedTypes, true)) {
+                        throw NotNormalizableValueException::createForUnexpectedDataType($denormalizationException->getMessage(), $value, [...$expectedTypes, 'null'], $denormalizationException->getPath() ?? $context['deserialization_path'] ?? null, $denormalizationException->canUseMessageForUser(), $denormalizationException->getCode(), $denormalizationException);
+                    }
+
+                    throw $denormalizationException;
+                }
+
                 // If the exception came from object denormalization (e.g. BackedEnumNormalizer for a
                 // nullable backed enum), preserve its more specific message and its user-facing hint flag;
                 // the expected types still carry the object/enum class so the failure stays recognizable
