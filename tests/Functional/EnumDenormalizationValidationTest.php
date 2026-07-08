@@ -84,6 +84,34 @@ final class EnumDenormalizationValidationTest extends ApiTestCase
         $this->assertNotNull($this->findViolation($content['violations'] ?? [], 'gender'));
     }
 
+    /**
+     * @see https://github.com/api-platform/core/issues/8388
+     */
+    #[IgnoreDeprecations]
+    public function testWrongTypeForBackedEnumReportsAcceptedScalarTypes(): void
+    {
+        if (InstalledVersions::satisfies(new VersionParser(), 'symfony/serializer', '>=8.1')) {
+            $this->expectUserDeprecationMessage('Since symfony/serializer 8.1: The "Symfony\Component\Serializer\Exception\PartialDenormalizationException::getErrors()" method is deprecated, use "Symfony\Component\Serializer\Exception\PartialDenormalizationException::getNotNormalizableValueErrors()" instead.');
+        }
+
+        $response = static::createClient()->request('POST', '/enum_validation_resources_collect', [
+            'headers' => ['Content-Type' => 'application/ld+json'],
+            'json' => ['gender' => true],
+        ]);
+
+        $this->assertResponseStatusCodeSame(422);
+
+        $content = $response->toArray(false);
+        $genderViolation = $this->findViolation($content['violations'] ?? [], 'gender');
+        $this->assertNotNull($genderViolation);
+        // The message must name what a JSON consumer can actually send: the enum's backing scalar
+        // ("string") and, since the property is nullable, "null" — never the internal PHP type
+        // "GenderTypeEnum|null", which appears nowhere in the OpenAPI schema.
+        $this->assertSame('This value should be of type string|null.', $genderViolation['message']);
+        $this->assertStringNotContainsString('GenderTypeEnum', $genderViolation['message']);
+        $this->assertStringContainsString('enumeration case of type', $genderViolation['hint'] ?? '');
+    }
+
     private function findViolation(array $violations, string $propertyPath): ?array
     {
         foreach ($violations as $violation) {

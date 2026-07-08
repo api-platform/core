@@ -1445,12 +1445,16 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
 
         if ($denormalizationException) {
             if ($type instanceof Type && $type->isSatisfiedBy(static fn ($type) => $type instanceof BuiltinType) && !$type->isSatisfiedBy($typeIsResourceClass)) {
-                // If the exception came from object denormalization, preserve its message as it's more specific
-                $message = $type->isSatisfiedBy(static fn ($type) => $type instanceof ObjectType)
+                // If the exception came from object denormalization (e.g. BackedEnumNormalizer for a
+                // nullable backed enum), preserve its more specific message and its user-facing hint flag;
+                // the expected types still carry the object/enum class so the failure stays recognizable
+                // downstream (see DeserializeProvider).
+                $isObject = $type->isSatisfiedBy(static fn ($type) => $type instanceof ObjectType);
+                $message = $isObject
                     ? $denormalizationException->getMessage()
                     : \sprintf('The type of the "%s" attribute must be "%s", "%s" given.', $attribute, $type, \gettype($value));
 
-                throw NotNormalizableValueException::createForUnexpectedDataType($message, $value, array_map(strval(...), $types), $context['deserialization_path'] ?? null, false, 0, $denormalizationException);
+                throw NotNormalizableValueException::createForUnexpectedDataType($message, $value, array_map(strval(...), $types), $context['deserialization_path'] ?? null, $isObject && $denormalizationException->canUseMessageForUser(), 0, $denormalizationException);
             }
 
             throw $denormalizationException;

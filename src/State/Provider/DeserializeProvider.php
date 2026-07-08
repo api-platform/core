@@ -143,14 +143,19 @@ final class DeserializeProvider implements ProviderInterface, StopwatchAwareInte
             $normalizedType = $expectedType;
 
             if (class_exists($expectedType) || interface_exists($expectedType)) {
-                $classReflection = new \ReflectionClass($expectedType);
-                $normalizedType = $classReflection->getShortName();
+                // A backed enum is sent over the wire as its backing scalar (e.g. "string"), not as the
+                // PHP enum class, so report the JSON-visible type rather than the internal FQCN (#8388).
+                if (is_subclass_of($expectedType, \BackedEnum::class) && ($backingType = (new \ReflectionEnum($expectedType))->getBackingType())) {
+                    $normalizedType = (string) $backingType;
+                } else {
+                    $normalizedType = (new \ReflectionClass($expectedType))->getShortName();
+                }
             }
 
             $normalizedTypes[] = $normalizedType;
         }
 
-        return $normalizedTypes;
+        return array_values(array_unique($normalizedTypes));
     }
 
     private function createViolationFromException(NotNormalizableValueException $exception): ConstraintViolation
