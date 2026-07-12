@@ -24,6 +24,7 @@ use ApiPlatform\State\StopwatchAwareInterface;
 use ApiPlatform\State\StopwatchAwareTrait;
 use ApiPlatform\State\Util\HttpResponseHeadersTrait;
 use ApiPlatform\State\Util\HttpResponseStatusTrait;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -42,11 +43,13 @@ final class RespondProcessor implements ProcessorInterface, StopwatchAwareInterf
         ?ResourceClassResolverInterface $resourceClassResolver = null,
         ?OperationMetadataFactoryInterface $operationMetadataFactory = null,
         ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null,
+        ?ContainerInterface $responseHeaderProviderLocator = null,
     ) {
         $this->iriConverter = $iriConverter;
         $this->resourceClassResolver = $resourceClassResolver;
         $this->operationMetadataFactory = $operationMetadataFactory;
         $this->resourceMetadataCollectionFactory = $resourceMetadataCollectionFactory;
+        $this->responseHeaderProviderLocator = $responseHeaderProviderLocator;
     }
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])

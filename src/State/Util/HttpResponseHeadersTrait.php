@@ -23,9 +23,12 @@ use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation\Factory\OperationMetadataFactoryInterface;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
+use ApiPlatform\Metadata\ResponseHeader;
 use ApiPlatform\Metadata\UrlGeneratorInterface;
 use ApiPlatform\Metadata\Util\ClassInfoTrait;
 use ApiPlatform\Metadata\Util\CloneTrait;
+use ApiPlatform\State\ResponseHeaderProviderInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface as SymfonyHttpExceptionInterface;
@@ -43,6 +46,7 @@ trait HttpResponseHeadersTrait
     private ?OperationMetadataFactoryInterface $operationMetadataFactory;
     private ?ResourceClassResolverInterface $resourceClassResolver;
     private ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory;
+    private ?ContainerInterface $responseHeaderProviderLocator = null;
 
     /**
      * @param array<string, mixed> $context
@@ -145,7 +149,54 @@ trait HttpResponseHeadersTrait
             $this->addLinkedDataPlatformHeaders($headers, $operation);
         }
 
+        foreach ($operation->getResponseHeaders() ?? [] as $name => $responseHeader) {
+            if (null === $responseHeader->getKey()) {
+                $responseHeader = $responseHeader->withKey($name);
+            }
+
+            $resolved = $this->resolveResponseHeader($responseHeader, $operation, $context);
+            if (null === $resolved) {
+                unset($headers[$name]);
+                continue;
+            }
+
+            $headers[$name] = $resolved;
+        }
+
         return $headers;
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     *
+     * @return string|array<int, string>|null
+     */
+    private function resolveResponseHeader(ResponseHeader $header, HttpOperation $operation, array $context): string|array|null
+    {
+        $provider = $header->getProvider();
+
+        if (null === $provider) {
+            return $header->getValue();
+        }
+
+        if (\is_string($provider) && $this->responseHeaderProviderLocator?->has($provider)) {
+            $service = $this->responseHeaderProviderLocator->get($provider);
+            if (!$service instanceof ResponseHeaderProviderInterface) {
+                throw new RuntimeException(\sprintf('Service "%s" must implement "%s".', $provider, ResponseHeaderProviderInterface::class));
+            }
+
+            return $service->provide($header, $operation, $context);
+        }
+
+        if ($provider instanceof ResponseHeaderProviderInterface) {
+            return $provider->provide($header, $operation, $context);
+        }
+
+        if (\is_callable($provider)) {
+            return $provider($header, $operation, $context);
+        }
+
+        throw new RuntimeException(\sprintf('Response header "%s" provider is not callable nor a registered "%s" service.', $header->getKey() ?? '', ResponseHeaderProviderInterface::class));
     }
 
     private function addLinkedDataPlatformHeaders(array &$headers, HttpOperation $operation): void
