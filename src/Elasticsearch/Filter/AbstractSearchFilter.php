@@ -30,8 +30,6 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
 /**
  * Abstract class with helpers for easing the implementation of a search filter like a term filter or a match filter.
  *
- * @experimental
- *
  * @internal
  *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>

@@ -19,8 +19,6 @@ use Psr\Container\ContainerInterface;
 /**
  * Abstract class for easing the implementation of a filter extension.
  *
- * @experimental
- *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 abstract class AbstractFilterExtension implements RequestBodySearchCollectionExtensionInterface

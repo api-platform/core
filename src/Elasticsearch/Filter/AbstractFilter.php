@@ -31,8 +31,6 @@ use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 /**
  * Abstract class with helpers for easing the implementation of a filter.
  *
- * @experimental
- *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 abstract class AbstractFilter implements FilterInterface

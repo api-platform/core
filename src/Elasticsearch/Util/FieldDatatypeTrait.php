@@ -27,8 +27,6 @@ use Symfony\Component\TypeInfo\Type\ObjectType;
  *
  * @internal
  *
- * @experimental
- *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 trait FieldDatatypeTrait

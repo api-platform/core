@@ -19,8 +19,6 @@ namespace ApiPlatform\Doctrine\Common\Filter;
  * @author Antoine Bluchet <soyuka@gmail.com>
  *
  * @method array<string>|null getProperties()
- *
- * @experimental
  */
 interface PropertyAwareFilterInterface
 {

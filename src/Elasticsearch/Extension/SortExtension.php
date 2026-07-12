@@ -25,8 +25,6 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  *
  * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html
  *
- * @experimental
- *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 final class SortExtension implements RequestBodySearchCollectionExtensionInterface

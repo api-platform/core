@@ -22,8 +22,6 @@ use Symfony\Component\Serializer\SerializerInterface;
 /**
  * Item normalizer decorator that prevents {@see \ApiPlatform\Serializer\ItemNormalizer}
  * from taking over for the {@see DocumentNormalizer::FORMAT} format because of priorities.
- *
- * @experimental
  */
 final class ItemNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
 {

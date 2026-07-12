@@ -23,8 +23,6 @@ use ApiPlatform\State\ParameterProviderInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * @experimental
- *
  * @author Vincent Amstoutz <vincent.amstoutz.dev@gmail.com>
  */
 final readonly class IriConverterParameterProvider implements ParameterProviderInterface

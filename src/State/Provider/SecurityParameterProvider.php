@@ -30,8 +30,6 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  * Loops over parameters to check parameter security.
  * Throws an exception if security is not granted.
  *
- * @experimental
- *
  * @implements ProviderInterface<object>
  */
 final class SecurityParameterProvider implements ProviderInterface

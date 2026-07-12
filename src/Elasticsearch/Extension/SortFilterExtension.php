@@ -20,8 +20,6 @@ use ApiPlatform\Elasticsearch\Filter\SortFilterInterface;
  *
  * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-sort.html
  *
- * @experimental
- *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 final class SortFilterExtension extends AbstractFilterExtension

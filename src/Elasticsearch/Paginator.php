@@ -21,8 +21,6 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 /**
  * Paginator for Elasticsearch.
  *
- * @experimental
- *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 final class Paginator implements \IteratorAggregate, PaginatorInterface

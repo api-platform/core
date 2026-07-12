@@ -98,8 +98,6 @@ namespace ApiPlatform\Elasticsearch\Filter;
  * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html
  * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html
  *
- * @experimental
- *
  * @author Baptiste Meyer <baptiste.meyer@gmail.com>
  */
 final class TermFilter extends AbstractSearchFilter

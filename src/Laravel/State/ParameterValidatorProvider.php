@@ -25,8 +25,6 @@ use Symfony\Component\HttpFoundation\Request;
  * Validates parameters using the Laravel validator.
  *
  * @implements ProviderInterface<object>
- *
- * @experimental
  */
 final class ParameterValidatorProvider implements ProviderInterface
 {
