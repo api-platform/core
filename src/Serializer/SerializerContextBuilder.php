@@ -76,15 +76,6 @@ final class SerializerContextBuilder implements SerializerContextBuilderInterfac
             $context['types'] = $types;
         }
 
-        // TODO: remove this as uri variables are available in the SerializerProcessor but correctly parsed
-        if ($operation->getUriVariables()) {
-            $context['uri_variables'] = [];
-
-            foreach (array_keys($operation->getUriVariables()) as $parameterName) {
-                $context['uri_variables'][$parameterName] = $request->attributes->get($parameterName);
-            }
-        }
-
         if (null === $context['output'] && $this->getStateOptionsClass($operation)) {
             $context['force_resource_class'] = $operation->getClass();
         }
