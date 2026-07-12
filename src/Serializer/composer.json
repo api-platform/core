@@ -25,10 +25,10 @@
         "php": ">=8.2",
         "api-platform/metadata": "^4.4@alpha",
         "api-platform/state": "^4.4@alpha",
-        "symfony/property-access": "^6.4 || ^7.0 || ^8.0",
-        "symfony/property-info": "^6.4 || ^7.1 || ^8.0",
-        "symfony/serializer": "^6.4.37 || ^7.4.9 || ^8.0.9",
-        "symfony/validator": "^6.4.11 || ^7.0 || ^8.0"
+        "symfony/property-access": "^7.4 || ^8.0",
+        "symfony/property-info": "^7.4 || ^8.0",
+        "symfony/serializer": "^7.4.9 || ^8.0.9",
+        "symfony/validator": "^7.4 || ^8.0"
     },
     "require-dev": {
         "api-platform/doctrine-common": "^4.4@alpha",
@@ -41,9 +41,9 @@
         "phpunit/phpunit": "^11.5 || ^12.2",
         "sebastian/exporter": "^6.3.2 || ^7.0.2",
         "symfony/mercure-bundle": "*",
-        "symfony/var-dumper": "^6.4 || ^7.0 || ^8.0",
-        "symfony/yaml": "^6.4 || ^7.0 || ^8.0",
-        "symfony/type-info": "^7.3 || ^8.0"
+        "symfony/var-dumper": "^7.4 || ^8.0",
+        "symfony/yaml": "^7.4 || ^8.0",
+        "symfony/type-info": "^7.4 || ^8.0"
     },
     "suggest": {
         "api-platform/doctrine-orm": "To support Doctrine ORM state options.",
@@ -75,7 +75,7 @@
             "dev-4.1": "4.1.x-dev"
         },
         "symfony": {
-            "require": "^6.4 || ^7.0 || ^8.0"
+            "require": "^7.4 || ^8.0"
         },
         "thanks": {
             "name": "api-platform/api-platform",

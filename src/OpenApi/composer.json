@@ -31,11 +31,11 @@
         "api-platform/json-schema": "^4.4@alpha",
         "api-platform/metadata": "^4.4@alpha",
         "api-platform/state": "^4.4@alpha",
-        "symfony/console": "^6.4 || ^7.0 || ^8.0",
-        "symfony/filesystem": "^6.4 || ^7.0 || ^8.0",
-        "symfony/property-access": "^6.4 || ^7.0 || ^8.0",
-        "symfony/serializer": "^6.4 || ^7.0 || ^8.0",
-        "symfony/type-info": "^7.3 || ^8.0"
+        "symfony/console": "^7.4 || ^8.0",
+        "symfony/filesystem": "^7.4 || ^8.0",
+        "symfony/property-access": "^7.4 || ^8.0",
+        "symfony/serializer": "^7.4 || ^8.0",
+        "symfony/type-info": "^7.4 || ^8.0"
     },
     "require-dev": {
         "phpspec/prophecy-phpunit": "^2.2",
@@ -44,7 +44,7 @@
         "api-platform/doctrine-orm": "^4.4@alpha",
         "api-platform/doctrine-odm": "^4.4@alpha",
         "api-platform/serializer": "^4.4@alpha",
-        "symfony/type-info": "^7.3 || ^8.0"
+        "symfony/type-info": "^7.4 || ^8.0"
     },
     "autoload": {
         "psr-4": {
@@ -72,7 +72,7 @@
             "dev-4.1": "4.1.x-dev"
         },
         "symfony": {
-            "require": "^6.4 || ^7.0 || ^8.0"
+            "require": "^7.4 || ^8.0"
         },
         "thanks": {
             "name": "api-platform/api-platform",

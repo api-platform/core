@@ -24,9 +24,6 @@ trait OperationRequestInitiatorTrait
 {
     private ?ResourceMetadataCollectionFactoryInterface $resourceMetadataCollectionFactory = null;
 
-    /**
-     * TODO: Kernel terminate remove the _api_operation attribute?
-     */
     private function initializeOperation(Request $request): ?HttpOperation
     {
         if ($request->attributes->get('_api_operation')) {
