@@ -1,5 +1,15 @@
 # Changelog
 
+## v4.4.0-alpha.3
+
+### Bug fixes
+
+* [f8c217283](https://github.com/api-platform/core/commit/f8c217283659dc80985e85c5570e113e1eba6482) fix(state): correct composer "conflicts" key to "conflict" (#8400)
+
+### Dependencies
+
+* Require `symfony/*` `^7.4 || ^8.0` across all components; drop support for Symfony 6.4 and 7.0–7.3 (#8397)
+
 ## v4.4.0-alpha.2
 
 ### Bug fixes
