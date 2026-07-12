@@ -45,7 +45,7 @@
         "symfony/web-link": "^7.4 || ^8.0",
         "willdurand/negotiation": "^3.1"
     },
-    "conflicts": {
+    "conflict": {
         "symfony/object-mapper": "<7.3.4"
     },
     "autoload": {
