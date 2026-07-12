@@ -121,4 +121,22 @@ final class ContextTest extends ApiTestCase
         $this->assertSame('http://purl.org/dc/terms/', $body['@context']['dct']);
         $this->assertSame('dct:title', $body['@context']['title']);
     }
+
+    public function testErrorContextIsResolvedThroughItsResource(): void
+    {
+        $response = self::createClient()->request('GET', '/contexts/Error');
+        $this->assertResponseIsSuccessful();
+        $body = $response->toArray();
+        $this->assertArrayHasKey('@context', $body);
+        $this->assertSame('http://www.w3.org/ns/hydra/core#', $body['@context']['hydra']);
+    }
+
+    public function testConstraintViolationContextIsResolvedThroughItsResource(): void
+    {
+        $response = self::createClient()->request('GET', '/contexts/ConstraintViolation');
+        $this->assertResponseIsSuccessful();
+        $body = $response->toArray();
+        $this->assertArrayHasKey('@context', $body);
+        $this->assertSame('http://www.w3.org/ns/hydra/core#', $body['@context']['hydra']);
+    }
 }
