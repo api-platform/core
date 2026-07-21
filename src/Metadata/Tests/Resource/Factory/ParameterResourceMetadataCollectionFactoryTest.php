@@ -13,8 +13,11 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Tests\Resource\Factory;
 
+use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
+use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareTrait;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Parameters;
@@ -29,6 +32,7 @@ use ApiPlatform\Metadata\Tests\Fixtures\ApiResource\WithParameter;
 use ApiPlatform\OpenApi\Model\Parameter;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\TypeInfo\Type;
 
@@ -460,6 +464,120 @@ class ParameterResourceMetadataCollectionFactoryTest extends TestCase
         $this->assertNotNull($param);
         $this->assertArrayNotHasKey('nested_properties_info', $param->getExtraProperties());
     }
+
+    /**
+     * An inline filter instance (e.g. `new NumericFilter()`) passed to a QueryParameter is never wired
+     * with a ManagerRegistry. Its getDescription() then throws during cache warmup: this is expected and
+     * recoverable, so it must be logged at debug level rather than the alarming ALERT (see issue #7361).
+     */
+    public function testInlineRegistryAwareFilterFailureIsLoggedAtDebug(): void
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'name']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(new ApiProperty(readable: true));
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->never())->method('alert');
+        $logger->expects($this->once())->method('debug');
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator,
+            null,
+            $logger,
+        );
+
+        $parameterFactory->create(HasInlineRegistryAwareFilterParameter::class);
+    }
+
+    /**
+     * A filter that is not ManagerRegistry-aware (or is already wired) but still throws during
+     * getDescription() reflects an unexpected condition and must keep the ALERT level.
+     */
+    public function testNonRegistryAwareFilterFailureIsLoggedAtAlert(): void
+    {
+        $nameCollection = $this->createStub(PropertyNameCollectionFactoryInterface::class);
+        $nameCollection->method('create')->willReturn(new PropertyNameCollection(['id', 'name']));
+
+        $propertyMetadata = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadata->method('create')->willReturn(new ApiProperty(readable: true));
+
+        $filterLocator = $this->createStub(ContainerInterface::class);
+        $filterLocator->method('has')->willReturn(false);
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('alert');
+        $logger->expects($this->never())->method('debug');
+
+        $parameterFactory = new ParameterResourceMetadataCollectionFactory(
+            $nameCollection,
+            $propertyMetadata,
+            new AttributesResourceMetadataCollectionFactory(),
+            $filterLocator,
+            null,
+            $logger,
+        );
+
+        $parameterFactory->create(HasThrowingFilterParameter::class);
+    }
+}
+
+class InlineRegistryAwareThrowingFilter implements FilterInterface, ManagerRegistryAwareInterface
+{
+    use ManagerRegistryAwareTrait;
+
+    public function getDescription(string $resourceClass): array
+    {
+        // Mimics an unwired Doctrine AbstractFilter reaching the metadata during cache warmup.
+        $this->getManagerRegistry();
+
+        return [];
+    }
+}
+
+class ThrowingFilter implements FilterInterface
+{
+    public function getDescription(string $resourceClass): array
+    {
+        throw new RuntimeException('boom');
+    }
+}
+
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            parameters: [
+                'name' => new QueryParameter(filter: new InlineRegistryAwareThrowingFilter()),
+            ]
+        ),
+    ]
+)]
+class HasInlineRegistryAwareFilterParameter
+{
+    public $id;
+    public $name;
+}
+
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            parameters: [
+                'name' => new QueryParameter(filter: new ThrowingFilter()),
+            ]
+        ),
+    ]
+)]
+class HasThrowingFilterParameter
+{
+    public $id;
+    public $name;
 }
 
 class RepeatedPlaceholderExactFilter implements FilterInterface

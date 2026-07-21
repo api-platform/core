@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Metadata\Resource\Factory;
 
+use ApiPlatform\Doctrine\Common\Filter\ManagerRegistryAwareInterface;
 use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterInterface;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Exception\RuntimeException;
@@ -422,7 +423,16 @@ final class ParameterResourceMetadataCollectionFactory implements ResourceMetada
             try {
                 return $this->getLegacyFilterMetadata($parameter, $operation, $filter);
             } catch (RuntimeException $exception) {
-                $this->logger?->alert($exception->getMessage(), ['exception' => $exception]);
+                // An inline filter instance (e.g. `new NumericFilter()`) passed to a QueryParameter is
+                // never wired with a ManagerRegistry, unlike a filter resolved through the filter locator
+                // as a service. Its getDescription() then fails on the Doctrine metadata lookup. This is
+                // expected and recoverable during cache warmup, so log it at debug level instead of the
+                // alarming ALERT reserved for genuinely unexpected registry failures.
+                if ($filter instanceof ManagerRegistryAwareInterface && !$filter->hasManagerRegistry()) {
+                    $this->logger?->debug($exception->getMessage(), ['exception' => $exception]);
+                } else {
+                    $this->logger?->alert($exception->getMessage(), ['exception' => $exception]);
+                }
 
                 return $parameter;
             }
