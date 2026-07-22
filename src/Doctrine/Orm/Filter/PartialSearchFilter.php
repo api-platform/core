@@ -49,6 +49,11 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
         $field = $alias.'.'.$property;
         $values = $parameter->getValue();
 
+        if (\is_array($values) && !array_is_list($values)) {
+            // associative arrays are operator-maps owned by ComparisonFilter/DateFilter, not equality
+            return;
+        }
+
         if (!is_iterable($values)) {
             $parameterName = $queryNameGenerator->generateParameterName($property);
             $queryBuilder->setParameter($parameterName, $this->formatLikeValue($values));
