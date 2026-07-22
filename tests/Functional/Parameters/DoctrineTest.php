@@ -17,6 +17,7 @@ use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\FilterWithStateOptions;
 use ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\FilterWithStateOptionsAndNoApiFilter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\SearchFilterParameter as SearchFilterParameterDocument;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ExactAndComparisonParameter;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilterWithStateOptionsAndNoApiFilterEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\FilterWithStateOptionsEntity;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\ProductWithQueryParameter;
@@ -42,7 +43,44 @@ final class DoctrineTest extends ApiTestCase
             FilterWithStateOptions::class,
             FilterWithStateOptionsAndNoApiFilter::class,
             ProductWithQueryParameter::class,
+            ExactAndComparisonParameter::class,
         ];
+    }
+
+    public function testExactFilterIgnoresOperatorMap(): void
+    {
+        if ($this->isMongoDB()) {
+            $this->markTestSkipped('Not tested with mongodb.');
+        }
+
+        $resource = ExactAndComparisonParameter::class;
+        $this->recreateSchema([$resource]);
+
+        $container = static::$kernel->getContainer();
+        $manager = $container->get('doctrine')->getManager();
+        foreach ([5, 8, 10, 15] as $q) {
+            $e = new ExactAndComparisonParameter();
+            $e->setQuantity($q);
+            $manager->persist($e);
+        }
+        $manager->flush();
+
+        $route = 'exact_and_comparison_parameter';
+
+        // Exact match: ?quantity=10 must return only the row with quantity = 10.
+        $response = self::createClient()->request('GET', $route.'?quantity=10');
+        $this->assertResponseIsSuccessful();
+        $members = $response->toArray()['hydra:member'];
+        $this->assertCount(1, $members);
+        $this->assertSame(10, $members[0]['quantity']);
+
+        // Operator map: ?quantity[lt]=10 must apply only the comparison (< 10),
+        // the exact filter must NOT also inject `quantity IN ('lt' => ...)`.
+        $response = self::createClient()->request('GET', $route.'?quantity[lt]=10');
+        $this->assertResponseIsSuccessful();
+        $quantities = array_map(static fn ($m) => $m['quantity'], $response->toArray()['hydra:member']);
+        sort($quantities);
+        $this->assertSame([5, 8], $quantities);
     }
 
     public function testDoctrineEntitySearchFilter(): void
