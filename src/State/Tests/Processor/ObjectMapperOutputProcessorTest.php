@@ -107,6 +107,67 @@ class ObjectMapperOutputProcessorTest extends TestCase
         $this->assertSame($result, $processor->process($entity, $operation));
     }
 
+    public function testProcessMapsEntityToDefinedOutputClass(): void
+    {
+        $entity = new \stdClass();
+        $entity->id = 1;
+        $dto = new \stdClass();
+        $dto->id = 1;
+        $result = new \stdClass();
+        $operation = new Post(class: ObjectMapperOutputDummy::class, output: ['class' => ObjectMapperOutputDtoDummy::class], map: true);
+
+        $objectMapper = $this->createMock(ObjectMapperInterface::class);
+        $objectMapper->expects($this->once())
+            ->method('map')
+            ->with($entity, ObjectMapperOutputDtoDummy::class)
+            ->willReturn($dto);
+
+        $decorated = $this->createMock(ProcessorInterface::class);
+        $decorated->expects($this->once())
+            ->method('process')
+            ->with($dto, $operation, [], $this->anything())
+            ->willReturn($result);
+
+        $processor = new ObjectMapperOutputProcessor($objectMapper, $decorated);
+        $this->assertSame($result, $processor->process($entity, $operation));
+    }
+
+    public function testProcessSetsMappedResourceOnRequestWhenOutputDiffers(): void
+    {
+        $entity = new \stdClass();
+        $resource = new ObjectMapperOutputDummy();
+        $dto = new ObjectMapperOutputDtoDummy();
+        $operation = new Post(class: ObjectMapperOutputDummy::class, output: ['class' => ObjectMapperOutputDtoDummy::class], map: true);
+        $request = new Request();
+
+        $objectMapper = $this->createMock(ObjectMapperInterface::class);
+        $objectMapper->expects($this->exactly(2))
+            ->method('map')
+            ->willReturnMap([
+                [$entity, ObjectMapperOutputDummy::class, $resource],
+                [$entity, ObjectMapperOutputDtoDummy::class, $dto],
+            ]);
+
+        $processor = new ObjectMapperOutputProcessor($objectMapper);
+
+        $this->assertSame($dto, $processor->process($entity, $operation, [], ['request' => $request]));
+        $this->assertSame($resource, $request->attributes->get('mapped_resource'));
+        $this->assertSame($entity, $request->attributes->get('persisted_data'));
+    }
+
+    public function testProcessDoesNotMapDataThatAlreadyIsTheOutputClass(): void
+    {
+        $dto = new ObjectMapperOutputDtoDummy();
+        $operation = new Post(class: ObjectMapperOutputDummy::class, output: ['class' => ObjectMapperOutputDtoDummy::class], map: true);
+
+        $objectMapper = $this->createMock(ObjectMapperInterface::class);
+        $objectMapper->expects($this->never())->method('map');
+
+        $processor = new ObjectMapperOutputProcessor($objectMapper);
+
+        $this->assertSame($dto, $processor->process($dto, $operation));
+    }
+
     public function testProcessSetsPersistedDataOnRequest(): void
     {
         $entity = new \stdClass();
@@ -134,5 +195,9 @@ class ObjectMapperOutputProcessorTest extends TestCase
 }
 
 class ObjectMapperOutputDummy
+{
+}
+
+class ObjectMapperOutputDtoDummy
 {
 }
