@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\State\Provider;
 
+use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Util\CloneTrait;
 use ApiPlatform\State\Pagination\MappedObjectPaginator;
@@ -41,7 +42,12 @@ final class ObjectMapperProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         $data = $this->decorated->provide($operation, $uriVariables, $context);
-        $class = $operation->getOutput()['class'] ?? $operation->getClass();
+
+        // On write operations the provided data is the deserialization target (object to populate),
+        // it must stay an instance of the resource class; the output class is mapped to after
+        // persistence by the ObjectMapperOutputProcessor.
+        $isWrite = $operation instanceof HttpOperation && !\in_array($operation->getMethod(), ['GET', 'HEAD', 'OPTIONS'], true);
+        $class = $isWrite ? $operation->getClass() : ($operation->getOutput()['class'] ?? $operation->getClass());
 
         if (!$this->objectMapper || !$operation->canMap()) {
             return $data;
