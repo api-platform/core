@@ -49,6 +49,10 @@ trait HttpResponseStatusTrait
         $originalData = $context['original_data'] ?? null;
         $hasData = !$hasOutput ? false : ($this->resourceClassResolver && $originalData && \is_object($originalData) && $this->resourceClassResolver->isResourceClass($this->getObjectClass($originalData)));
 
+        if (!$hasData && $hasOutput && \is_object($request->attributes->get('mapped_resource'))) {
+            $hasData = true;
+        }
+
         if ($hasData) {
             if ('PUT' === $method && !$request->attributes->get('previous_data') && null === $status && ($operation instanceof Put && ($operation->getAllowCreate() ?? false))) {
                 $status = Response::HTTP_CREATED;
