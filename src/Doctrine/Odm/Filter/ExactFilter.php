@@ -43,13 +43,18 @@ final class ExactFilter implements FilterInterface, OpenApiParameterFilterInterf
     public function apply(Builder $aggregationBuilder, string $resourceClass, ?Operation $operation = null, array &$context = []): void
     {
         $parameter = $context['parameter'];
+        $value = $parameter->getValue();
+
+        if (\is_array($value) && !array_is_list($value)) {
+            // associative arrays are operator-maps owned by ComparisonFilter/DateFilter, not equality
+            return;
+        }
 
         if (null === $parameter->getProperty()) {
             throw new InvalidArgumentException(\sprintf('The filter parameter with key "%s" must specify a property. Please provide the property explicitly.', $parameter->getKey()));
         }
 
         $property = $parameter->getProperty();
-        $value = $parameter->getValue();
         $operator = $context['operator'] ?? 'addAnd';
         $match = $context['match'] = $context['match'] ??
             $aggregationBuilder

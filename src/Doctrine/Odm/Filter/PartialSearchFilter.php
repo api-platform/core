@@ -45,6 +45,12 @@ final class PartialSearchFilter implements FilterInterface, OpenApiParameterFilt
 
         $property = $parameter->getProperty();
         $values = $parameter->getValue();
+
+        if (\is_array($values) && !array_is_list($values)) {
+            // associative arrays are operator-maps owned by ComparisonFilter/DateFilter, not equality
+            return;
+        }
+
         $match = $context['match'] = $context['match'] ??
             $aggregationBuilder
             ->matchExpr();
