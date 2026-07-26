@@ -273,6 +273,13 @@ abstract class AbstractItemNormalizer extends AbstractObjectNormalizer
         if ($this->resourceClassResolver->isResourceClass($type)) {
             $resourceClass = $this->resourceClassResolver->getResourceClass($objectToPopulate, $type);
             $context['resource_class'] = $resourceClass;
+        } elseif (($context['api_platform_input'] ?? false) && isset($context['resource_class']) && $context['resource_class'] !== $type) {
+            // A discriminated input DTO base (not itself a resource) resolves to a concrete
+            // subclass here: pin the resource class to that concrete class so constructor and
+            // setter argument metadata is read from the subclass and not the abstract base,
+            // which lacks subclass-only properties (and thus their types).
+            $resourceClass = $type;
+            $context['resource_class'] = $type;
         }
 
         if (\is_string($data)) {
