@@ -16,6 +16,7 @@ namespace ApiPlatform\Tests\Functional\JsonLd;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Model\SerializableResource;
 use ApiPlatform\Tests\SetupClassResourcesTrait;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 final class SerializableItemDataProviderTest extends ApiTestCase
 {
@@ -31,8 +32,11 @@ final class SerializableItemDataProviderTest extends ApiTestCase
         return [SerializableResource::class];
     }
 
+    #[IgnoreDeprecations]
     public function testGetSerializableResource(): void
     {
+        $this->expectUserDeprecationMessage('Since api-platform/core 4.2: The "ApiPlatform\State\SerializerAwareProviderInterface" interface is deprecated and will be removed in 5.0. It violates the dependency injection principle.');
+
         self::createClient()->request('GET', '/serializable_resources/1');
 
         $this->assertResponseStatusCodeSame(200);
