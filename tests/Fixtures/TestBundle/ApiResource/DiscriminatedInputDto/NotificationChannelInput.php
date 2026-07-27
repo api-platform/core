@@ -17,6 +17,7 @@ use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
 
 #[DiscriminatorMap(typeProperty: 'type', mapping: [
     'webhook' => WebhookChannelInput::class,
+    'webhook_patch' => WebhookChannelPatchInput::class,
 ])]
 abstract class NotificationChannelInput
 {

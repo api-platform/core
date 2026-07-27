@@ -48,4 +48,22 @@ final class DiscriminatedInputDtoTest extends ApiTestCase
             'retries' => 5,
         ]);
     }
+
+    public function testObjectTypedSubclassOnlyPropertyIsDenormalizedOnPatch(): void
+    {
+        self::createClient()->request('PATCH', '/discriminated_notification_channels/1', [
+            'headers' => ['Content-Type' => 'application/merge-patch+json'],
+            'json' => [
+                'type' => 'webhook_patch',
+                'config' => ['url' => 'https://example.com/hook', 'retries' => 5],
+            ],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains([
+            'type' => 'webhook_patch',
+            'url' => 'https://example.com/hook',
+            'retries' => 5,
+        ]);
+    }
 }

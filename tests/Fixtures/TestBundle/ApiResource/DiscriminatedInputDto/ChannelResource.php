@@ -15,6 +15,7 @@ namespace ApiPlatform\Tests\Fixtures\TestBundle\ApiResource\DiscriminatedInputDt
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 
 #[ApiResource(
@@ -23,6 +24,13 @@ use ApiPlatform\Metadata\Post;
             uriTemplate: '/discriminated_notification_channels',
             input: NotificationChannelInput::class,
             processor: [self::class, 'process'],
+        ),
+        new Patch(
+            uriTemplate: '/discriminated_notification_channels/{id}',
+            input: NotificationChannelInput::class,
+            output: NotificationChannelInput::class,
+            provider: [self::class, 'provide'],
+            processor: [self::class, 'processPatch'],
         ),
     ]
 )]
@@ -46,6 +54,25 @@ final class ChannelResource
         $resource->type = $data->type;
         $resource->url = $data->config->url;
         $resource->retries = $data->config->retries;
+
+        return $resource;
+    }
+
+    public static function provide(Operation $operation, array $uriVariables = [], array $context = []): NotificationChannelInput
+    {
+        return new WebhookChannelPatchInput('webhook_patch', null);
+    }
+
+    public static function processPatch(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): self
+    {
+        if (!$data instanceof WebhookChannelPatchInput) {
+            throw new \InvalidArgumentException(\sprintf('Expected "%s", got "%s".', WebhookChannelPatchInput::class, get_debug_type($data)));
+        }
+
+        $resource = new self();
+        $resource->type = $data->getType();
+        $resource->url = $data->getConfig()?->url;
+        $resource->retries = $data->getConfig()?->retries;
 
         return $resource;
     }
