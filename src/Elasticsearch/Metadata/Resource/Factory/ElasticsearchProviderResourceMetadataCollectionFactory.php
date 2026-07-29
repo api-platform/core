@@ -13,17 +13,25 @@ declare(strict_types=1);
 
 namespace ApiPlatform\Elasticsearch\Metadata\Resource\Factory;
 
+use ApiPlatform\Elasticsearch\Esql\State\CollectionProvider as EsqlCollectionProvider;
 use ApiPlatform\Elasticsearch\State\CollectionProvider;
 use ApiPlatform\Elasticsearch\State\ItemProvider;
 use ApiPlatform\Elasticsearch\State\Options;
+use ApiPlatform\Elasticsearch\State\QueryLanguage;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
 
 final class ElasticsearchProviderResourceMetadataCollectionFactory implements ResourceMetadataCollectionFactoryInterface
 {
-    public function __construct(private readonly ResourceMetadataCollectionFactoryInterface $decorated)
-    {
+    private readonly QueryLanguage $defaultQueryLanguage;
+
+    public function __construct(
+        private readonly ResourceMetadataCollectionFactoryInterface $decorated,
+        QueryLanguage|string $defaultQueryLanguage = QueryLanguage::Dsl,
+    ) {
+        $this->defaultQueryLanguage = \is_string($defaultQueryLanguage) ? QueryLanguage::from($defaultQueryLanguage) : $defaultQueryLanguage;
     }
 
     /**
@@ -46,7 +54,7 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
                         continue;
                     }
 
-                    $operations->add($operationName, $operation->withProvider($operation instanceof CollectionOperationInterface ? CollectionProvider::class : ItemProvider::class));
+                    $operations->add($operationName, $operation->withProvider($this->getProvider($operation)));
                 }
 
                 $resourceMetadata = $resourceMetadata->withOperations($operations);
@@ -64,7 +72,7 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
                         continue;
                     }
 
-                    $graphQlOperations[$operationName] = $graphQlOperation->withProvider($graphQlOperation instanceof CollectionOperationInterface ? CollectionProvider::class : ItemProvider::class);
+                    $graphQlOperations[$operationName] = $graphQlOperation->withProvider($this->getProvider($graphQlOperation));
                 }
 
                 $resourceMetadata = $resourceMetadata->withGraphQlOperations($graphQlOperations);
@@ -74,5 +82,18 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
         }
 
         return $resourceMetadataCollection;
+    }
+
+    private function getProvider(Operation $operation): string
+    {
+        if (!$operation instanceof CollectionOperationInterface) {
+            // items are always fetched through the document GET API, whatever the query language
+            return ItemProvider::class;
+        }
+
+        /** @var Options $options */
+        $options = $operation->getStateOptions();
+
+        return QueryLanguage::Esql === ($options->getQueryLanguage() ?? $this->defaultQueryLanguage) ? EsqlCollectionProvider::class : CollectionProvider::class;
     }
 }

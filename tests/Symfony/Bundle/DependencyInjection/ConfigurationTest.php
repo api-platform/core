@@ -138,6 +138,7 @@ class ConfigurationTest extends TestCase
                 'ssl_ca_bundle' => null,
                 'ssl_verification' => true,
                 'client' => 'elasticsearch',
+                'query_language' => 'dsl',
             ],
             'oauth' => [
                 'enabled' => false,

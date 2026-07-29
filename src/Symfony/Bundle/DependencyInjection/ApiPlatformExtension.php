@@ -23,6 +23,7 @@ use ApiPlatform\Doctrine\Orm\Extension\QueryCollectionExtensionInterface as Doct
 use ApiPlatform\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter as DoctrineOrmAbstractFilter;
 use ApiPlatform\Doctrine\Orm\State\LinksHandlerInterface as OrmLinksHandlerInterface;
+use ApiPlatform\Elasticsearch\Esql\Extension\CollectionExtensionInterface as EsqlCollectionExtensionInterface;
 use ApiPlatform\Elasticsearch\Extension\RequestBodySearchCollectionExtensionInterface;
 use ApiPlatform\GraphQl\Error\ErrorHandlerInterface;
 use ApiPlatform\GraphQl\Executor;
@@ -1039,7 +1040,10 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         $container->setDefinition('api_platform.elasticsearch.client', $clientDefinition);
         $container->registerForAutoconfiguration(RequestBodySearchCollectionExtensionInterface::class)
             ->addTag('api_platform.elasticsearch.request_body_search_extension.collection');
+        $container->registerForAutoconfiguration(EsqlCollectionExtensionInterface::class)
+            ->addTag('api_platform.elasticsearch.esql_extension.collection');
         $container->setParameter('api_platform.elasticsearch.client', $config['elasticsearch']['client']);
+        $container->setParameter('api_platform.elasticsearch.query_language', $config['elasticsearch']['query_language']);
         $container->setParameter('api_platform.elasticsearch.hosts', $config['elasticsearch']['hosts']);
         $container->setParameter('api_platform.elasticsearch.ssl_ca_bundle', $config['elasticsearch']['ssl_ca_bundle']);
         $container->setParameter('api_platform.elasticsearch.ssl_verification', $config['elasticsearch']['ssl_verification']);
