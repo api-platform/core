@@ -18,7 +18,6 @@ use ApiPlatform\Metadata\BackwardCompatibleFilterDescriptionTrait;
 use ApiPlatform\Metadata\JsonSchemaFilterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Parameter;
-use ApiPlatform\Metadata\SortFilterInterface;
 
 /**
  * Sorts the collection by a property.
@@ -26,11 +25,17 @@ use ApiPlatform\Metadata\SortFilterInterface;
  * Usage: `new QueryParameter(filter: new SortFilter(), property: 'rating')`
  * with a key like `sort[:property]`, then `?sort[rating]=desc`.
  *
+ * Note: this filter intentionally does not implement the
+ * {@see \ApiPlatform\Metadata\SortFilterInterface} marker yet: it only drives
+ * the GraphQL sort arguments, and GraphQL operations never use the ES|QL
+ * providers. Implementing it would also require api-platform/metadata 5.0,
+ * which the component test suites cannot guarantee yet.
+ *
  * @experimental
  *
  * @author Julien Lary <julien.lary@les-tilleuls.coop>
  */
-final class SortFilter implements FilterInterface, JsonSchemaFilterInterface, SortFilterInterface
+final class SortFilter implements FilterInterface, JsonSchemaFilterInterface
 {
     use BackwardCompatibleFilterDescriptionTrait;
 
