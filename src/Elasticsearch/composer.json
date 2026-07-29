@@ -81,5 +81,8 @@
         "test": "./vendor/bin/phpunit"
     },
     "minimum-stability": "beta",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "conflict": {
+        "psr/http-factory": "<1.0.2"
+    }
 }
