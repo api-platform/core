@@ -88,7 +88,7 @@ final class ErrorListener extends SymfonyErrorListener
         }
 
         if ($this->debug) {
-            $this->logger?->error('An exception occured, transforming to an Error resource.', ['exception' => $exception, 'operation' => $apiOperation]);
+            $this->logger?->debug('An exception occured, transforming to an Error resource.', ['exception' => $exception, 'operation' => $apiOperation]);
         }
 
         $dup = parent::duplicateRequest($exception, $request);
