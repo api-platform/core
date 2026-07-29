@@ -16,17 +16,19 @@ namespace ApiPlatform\Elasticsearch\Tests\Esql\Extension;
 use ApiPlatform\Elasticsearch\Esql\EsqlQuery;
 use ApiPlatform\Elasticsearch\Esql\Extension\PaginationExtension;
 use ApiPlatform\Elasticsearch\Tests\Fixtures\Foo;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\State\Pagination\Pagination;
 use Elastic\Elasticsearch\ClientBuilder;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class PaginationExtensionTest extends TestCase
 {
     public function testApplyToCollectionFetchesOneExtraRow(): void
     {
         $query = new EsqlQuery('foo');
-        $extension = new PaginationExtension(ClientBuilder::create()->build(), null, new Pagination(['items_per_page' => 20]));
+        $extension = $this->createExtension(new Pagination(['items_per_page' => 20]));
 
         $extension->applyToCollection($query, Foo::class, new GetCollection());
 
@@ -36,24 +38,63 @@ class PaginationExtensionTest extends TestCase
     public function testApplyToCollectionWithPaginationDisabled(): void
     {
         $query = new EsqlQuery('foo');
-        $extension = new PaginationExtension(ClientBuilder::create()->build(), null, new Pagination(['enabled' => false]));
+        $extension = $this->createExtension(new Pagination(['enabled' => false]));
 
         $extension->applyToCollection($query, Foo::class, new GetCollection());
 
         self::assertNull($query->getLimit());
     }
 
+    public function testApplyToCollectionWithPageGreaterThanOne(): void
+    {
+        $query = new EsqlQuery('foo');
+        $extension = $this->createExtension(new Pagination(['items_per_page' => 20]));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('ES|QL supports partial pagination only: the "page" parameter is not supported.');
+
+        $extension->applyToCollection($query, Foo::class, new GetCollection(), ['filters' => ['page' => 3]]);
+    }
+
+    public function testGetResultWithPageGreaterThanOne(): void
+    {
+        $extension = $this->createExtension(new Pagination(['items_per_page' => 20]));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('ES|QL supports partial pagination only: the "page" parameter is not supported.');
+
+        $extension->getResult(new EsqlQuery('foo'), Foo::class, new GetCollection(), ['filters' => ['page' => 2]]);
+    }
+
+    public function testGetResultWithoutPagination(): void
+    {
+        $extension = $this->createExtension();
+
+        $this->expectException(\LogicException::class);
+
+        $extension->getResult(new EsqlQuery('foo'), Foo::class, new GetCollection());
+    }
+
     public function testSupportsResult(): void
     {
-        $extension = new PaginationExtension(ClientBuilder::create()->build(), null, new Pagination());
+        $extension = $this->createExtension(new Pagination());
 
         self::assertTrue($extension->supportsResult(Foo::class, new GetCollection()));
     }
 
     public function testSupportsResultWithPaginationDisabled(): void
     {
-        $extension = new PaginationExtension(ClientBuilder::create()->build(), null, new Pagination(['enabled' => false]));
+        $extension = $this->createExtension(new Pagination(['enabled' => false]));
 
         self::assertFalse($extension->supportsResult(Foo::class, new GetCollection()));
+    }
+
+    private function createExtension(?Pagination $pagination = null): PaginationExtension
+    {
+        return new PaginationExtension(
+            ClientBuilder::create()->build(),
+            $this->createStub(DenormalizerInterface::class),
+            $pagination,
+        );
     }
 }

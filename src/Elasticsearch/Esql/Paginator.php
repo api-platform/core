@@ -40,6 +40,11 @@ final class Paginator implements \IteratorAggregate, PartialPaginatorInterface, 
     private readonly bool $hasNextPage;
 
     /**
+     * @var array<string, object>
+     */
+    private array $cachedDenormalizedDocuments = [];
+
+    /**
      * @param array{columns?: list<array{name: string, type: string}>, values?: list<list<mixed>>} $response the raw (row-oriented) ES|QL response
      */
     public function __construct(
@@ -96,8 +101,18 @@ final class Paginator implements \IteratorAggregate, PartialPaginatorInterface, 
     {
         $denormalizationContext = array_merge([AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => true], $this->denormalizationContext);
 
-        foreach ($this->documents as $document) {
-            yield $this->denormalizer->denormalize(
+        foreach ($this->documents as $i => $document) {
+            // ES|QL rows carry no index name, unlike search hits: the document "_id" alone
+            // identifies a row, falling back to its position when the query does not select it.
+            $cacheKey = isset($document['_id']) ? hash('xxh3', (string) $document['_id']) : "#$i";
+
+            if (\array_key_exists($cacheKey, $this->cachedDenormalizedDocuments)) {
+                yield $this->cachedDenormalizedDocuments[$cacheKey];
+
+                continue;
+            }
+
+            yield $this->cachedDenormalizedDocuments[$cacheKey] = $this->denormalizer->denormalize(
                 $document,
                 $this->resourceClass,
                 DocumentNormalizer::FORMAT,
@@ -128,11 +143,32 @@ final class Paginator implements \IteratorAggregate, PartialPaginatorInterface, 
                 continue;
             }
 
+            $segments = explode('.', $name);
+            $leaf = array_pop($segments);
             $target = &$document['_source'];
-            foreach (explode('.', $name) as $segment) {
+            $skip = false;
+
+            foreach ($segments as $segment) {
+                if (!\array_key_exists($segment, $target)) {
+                    $target[$segment] = [];
+                } elseif (!\is_array($target[$segment])) {
+                    // A "text" field mapped with a sub-field is returned by ES|QL as several
+                    // columns sharing the same prefix (e.g. "title" and "title.keyword"),
+                    // sorted alphabetically so the scalar parent always comes first. Sub-field
+                    // columns only duplicate the parent value, so the already written scalar
+                    // wins and the sub-column is skipped rather than descended into.
+                    $skip = true;
+                    break;
+                }
+
                 $target = &$target[$segment];
             }
-            $target = $value;
+
+            // First write wins: keeps the scalar value of a duplicated or multi-field column.
+            if (!$skip && !\array_key_exists($leaf, $target)) {
+                $target[$leaf] = $value;
+            }
+
             unset($target);
         }
 

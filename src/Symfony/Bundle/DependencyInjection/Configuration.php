@@ -523,7 +523,7 @@ final class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                     ->validate()
-                        ->ifTrue(static fn (array $v): bool => 'opensearch' === $v['client'] && 'esql' === $v['query_language'])
+                        ->ifTrue(static fn (array $v): bool => ($v['enabled'] ?? false) && 'opensearch' === $v['client'] && 'esql' === $v['query_language'])
                         ->thenInvalid('ES|QL (api_platform.elasticsearch.query_language: "esql") is not supported by OpenSearch.')
                     ->end()
                 ->end()

@@ -1030,24 +1030,34 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
             throw new \LogicException('Elasticsearch support cannot be enabled as the Elasticsearch component is not installed. Try running "composer require api-platform/elasticsearch".');
         }
 
-        if ('opensearch' === $config['elasticsearch']['client']) {
-            $clientClass = \OpenSearch\Client::class; // @phpstan-ignore class.notFound
-        } else {
+        // ES|QL is an Elasticsearch-only API, the OpenSearch client does not provide it
+        $esqlSupported = 'opensearch' !== $config['elasticsearch']['client'];
+
+        if ($esqlSupported) {
             $clientClass = \Elastic\Elasticsearch\Client::class;
+        } else {
+            $clientClass = \OpenSearch\Client::class; // @phpstan-ignore class.notFound
         }
 
         $clientDefinition = new Definition($clientClass);
         $container->setDefinition('api_platform.elasticsearch.client', $clientDefinition);
         $container->registerForAutoconfiguration(RequestBodySearchCollectionExtensionInterface::class)
             ->addTag('api_platform.elasticsearch.request_body_search_extension.collection');
-        $container->registerForAutoconfiguration(EsqlCollectionExtensionInterface::class)
-            ->addTag('api_platform.elasticsearch.esql_extension.collection');
         $container->setParameter('api_platform.elasticsearch.client', $config['elasticsearch']['client']);
+        $container->setParameter('api_platform.elasticsearch.esql', $esqlSupported);
         $container->setParameter('api_platform.elasticsearch.query_language', $config['elasticsearch']['query_language']);
         $container->setParameter('api_platform.elasticsearch.hosts', $config['elasticsearch']['hosts']);
         $container->setParameter('api_platform.elasticsearch.ssl_ca_bundle', $config['elasticsearch']['ssl_ca_bundle']);
         $container->setParameter('api_platform.elasticsearch.ssl_verification', $config['elasticsearch']['ssl_verification']);
         $loader->load('elasticsearch.php');
+
+        if (!$esqlSupported) {
+            return;
+        }
+
+        $container->registerForAutoconfiguration(EsqlCollectionExtensionInterface::class)
+            ->addTag('api_platform.elasticsearch.esql_extension.collection');
+        $loader->load('elasticsearch_esql.php');
     }
 
     private function registerSecurityConfiguration(ContainerBuilder $container, array $config, PhpFileLoader $loader): void

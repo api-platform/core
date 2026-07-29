@@ -24,25 +24,22 @@ use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\Metadata\ResourceClassResolverInterface;
 use PHPUnit\Framework\TestCase;
-use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\TypeInfo\Type;
 
 class ParameterExtensionTest extends TestCase
 {
-    use ProphecyTrait;
-
     public function testAppliesParameterFilters(): void
     {
         $query = new EsqlQuery('foo', []);
         $parameter = (new QueryParameter(key: 'genre', property: 'genre', filter: new ExactFilter()))->setValue('fantasy');
         $operation = (new GetCollection())->withParameters(['genre' => $parameter]);
 
-        $nameConverter = $this->prophesize(NameConverterInterface::class);
-        $nameConverter->normalize('genre', Foo::class, null, [])->willReturn('genre_field')->shouldBeCalled();
+        $nameConverter = $this->createMock(NameConverterInterface::class);
+        $nameConverter->expects($this->once())->method('normalize')->with('genre', Foo::class, null, [])->willReturn('genre_field');
 
-        $this->createExtension(nameConverter: $nameConverter->reveal())->applyToCollection($query, Foo::class, $operation);
+        $this->createExtension(nameConverter: $nameConverter)->applyToCollection($query, Foo::class, $operation);
 
         self::assertSame([
             'query' => 'FROM foo | WHERE ??f1 == ?p2',
@@ -72,13 +69,13 @@ class ParameterExtensionTest extends TestCase
         $parameter = (new QueryParameter(key: 'bar.baz', property: 'bar.baz', filter: new ExactFilter()))->setValue('x');
         $operation = (new GetCollection())->withParameters(['bar.baz' => $parameter]);
 
-        $propertyMetadataFactory = $this->prophesize(PropertyMetadataFactoryInterface::class);
-        $propertyMetadataFactory->create(Foo::class, 'bar')->willReturn((new ApiProperty())->withNativeType(Type::list(Type::object(Foo::class))));
+        $propertyMetadataFactory = $this->createStub(PropertyMetadataFactoryInterface::class);
+        $propertyMetadataFactory->method('create')->willReturn((new ApiProperty())->withNativeType(Type::list(Type::object(Foo::class))));
 
-        $resourceClassResolver = $this->prophesize(ResourceClassResolverInterface::class);
-        $resourceClassResolver->isResourceClass(Foo::class)->willReturn(true);
+        $resourceClassResolver = $this->createStub(ResourceClassResolverInterface::class);
+        $resourceClassResolver->method('isResourceClass')->willReturn(true);
 
-        $this->createExtension($propertyMetadataFactory->reveal(), $resourceClassResolver->reveal())->applyToCollection($query, Foo::class, $operation);
+        $this->createExtension($propertyMetadataFactory, $resourceClassResolver)->applyToCollection($query, Foo::class, $operation);
     }
 
     private function createExtension(
@@ -87,9 +84,9 @@ class ParameterExtensionTest extends TestCase
         ?NameConverterInterface $nameConverter = null,
     ): ParameterExtension {
         return new ParameterExtension(
-            $this->prophesize(ContainerInterface::class)->reveal(),
-            $propertyMetadataFactory ?? $this->prophesize(PropertyMetadataFactoryInterface::class)->reveal(),
-            $resourceClassResolver ?? $this->prophesize(ResourceClassResolverInterface::class)->reveal(),
+            $this->createStub(ContainerInterface::class),
+            $propertyMetadataFactory ?? $this->createStub(PropertyMetadataFactoryInterface::class),
+            $resourceClassResolver ?? $this->createStub(ResourceClassResolverInterface::class),
             $nameConverter,
         );
     }

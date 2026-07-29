@@ -19,6 +19,7 @@ use ApiPlatform\Elasticsearch\State\ItemProvider;
 use ApiPlatform\Elasticsearch\State\Options;
 use ApiPlatform\Elasticsearch\State\QueryLanguage;
 use ApiPlatform\Metadata\CollectionOperationInterface;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -30,6 +31,7 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
     public function __construct(
         private readonly ResourceMetadataCollectionFactoryInterface $decorated,
         QueryLanguage|string $defaultQueryLanguage = QueryLanguage::Dsl,
+        private readonly bool $esqlAvailable = true,
     ) {
         $this->defaultQueryLanguage = \is_string($defaultQueryLanguage) ? QueryLanguage::from($defaultQueryLanguage) : $defaultQueryLanguage;
     }
@@ -72,7 +74,8 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
                         continue;
                     }
 
-                    $graphQlOperations[$operationName] = $graphQlOperation->withProvider($this->getProvider($graphQlOperation));
+                    // ES|QL paginator implements partial pagination only, incompatible with GraphQL connections (totalCount/cursors)
+                    $graphQlOperations[$operationName] = $graphQlOperation->withProvider($this->getProvider($graphQlOperation, esqlAllowed: false));
                 }
 
                 $resourceMetadata = $resourceMetadata->withGraphQlOperations($graphQlOperations);
@@ -84,7 +87,10 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
         return $resourceMetadataCollection;
     }
 
-    private function getProvider(Operation $operation): string
+    /**
+     * @param bool $esqlAllowed whether the operation may be served by the ES|QL provider
+     */
+    private function getProvider(Operation $operation, bool $esqlAllowed = true): string
     {
         if (!$operation instanceof CollectionOperationInterface) {
             // items are always fetched through the document GET API, whatever the query language
@@ -94,6 +100,14 @@ final class ElasticsearchProviderResourceMetadataCollectionFactory implements Re
         /** @var Options $options */
         $options = $operation->getStateOptions();
 
-        return QueryLanguage::Esql === ($options->getQueryLanguage() ?? $this->defaultQueryLanguage) ? EsqlCollectionProvider::class : CollectionProvider::class;
+        if (!$esqlAllowed || QueryLanguage::Esql !== ($options->getQueryLanguage() ?? $this->defaultQueryLanguage)) {
+            return CollectionProvider::class;
+        }
+
+        if (!$this->esqlAvailable) {
+            throw new RuntimeException(\sprintf('ES|QL is not supported by the OpenSearch client, remove the "queryLanguage" state option of the operation "%s" or use the Elasticsearch client.', $operation->getName() ?? $operation->getShortName()));
+        }
+
+        return EsqlCollectionProvider::class;
     }
 }

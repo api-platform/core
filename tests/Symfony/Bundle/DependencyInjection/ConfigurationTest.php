@@ -507,6 +507,25 @@ class ConfigurationTest extends TestCase
         ]);
     }
 
+    public function testElasticsearchEsqlWithOpenSearchIsNotValidatedWhenDisabled(): void
+    {
+        if (!class_exists(\OpenSearch\Client::class)) {
+            self::markTestSkipped('opensearch-project/opensearch-php is not installed.');
+        }
+
+        $config = $this->processor->processConfiguration($this->configuration, [
+            'api_platform' => [
+                'elasticsearch' => [
+                    'enabled' => false,
+                    'client' => 'opensearch',
+                    'query_language' => 'esql',
+                ],
+            ],
+        ]);
+
+        $this->assertFalse($config['elasticsearch']['enabled']);
+    }
+
     public function testElasticsearchSslCaBundleAndVerificationDisabledMutuallyExclusive(): void
     {
         $this->expectException(InvalidConfigurationException::class);

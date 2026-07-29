@@ -15,6 +15,7 @@ namespace ApiPlatform\Elasticsearch\Esql\Extension;
 
 use ApiPlatform\Elasticsearch\Esql\EsqlQuery;
 use ApiPlatform\Elasticsearch\Esql\Paginator;
+use ApiPlatform\Metadata\Exception\InvalidArgumentException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ApiResource\Error;
 use ApiPlatform\State\Pagination\Pagination;
@@ -30,7 +31,8 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  * available. One extra row is fetched (LIMIT itemsPerPage + 1) to detect
  * whether a next page exists; combine with a sorted unique field and a
  * ComparisonFilter (keyset pagination) or the "paginationViaCursor"
- * operation attribute to navigate pages.
+ * operation attribute to navigate pages. Requesting a "page" greater than 1
+ * is rejected with a 400 response rather than silently ignored.
  *
  * @experimental
  *
@@ -40,7 +42,7 @@ final class PaginationExtension implements ResultCollectionExtensionInterface
 {
     public function __construct(
         private readonly Client $client,
-        private readonly ?DenormalizerInterface $denormalizer = null,
+        private readonly DenormalizerInterface $denormalizer,
         private readonly ?Pagination $pagination = null,
     ) {
     }
@@ -53,6 +55,8 @@ final class PaginationExtension implements ResultCollectionExtensionInterface
         if (null === $this->pagination || !$this->pagination->isEnabled($operation, $context)) {
             return;
         }
+
+        $this->assertPageIsNotRequested($context);
 
         $limit = $this->pagination->getLimit($operation, $context);
 
@@ -73,6 +77,14 @@ final class PaginationExtension implements ResultCollectionExtensionInterface
      */
     public function getResult(EsqlQuery $query, string $resourceClass, ?Operation $operation = null, array $context = []): iterable
     {
+        if (null === $this->pagination) {
+            throw new \LogicException(\sprintf('The pagination service is required to compute the result, did you forget to pass it to "%s"?', self::class));
+        }
+
+        $this->assertPageIsNotRequested($context);
+
+        self::assertEsqlIsSupported($this->client);
+
         try {
             $response = $this->client->esql()->query(['body' => $query->compile()]);
         } catch (ClientResponseException $e) {
@@ -91,8 +103,31 @@ final class PaginationExtension implements ResultCollectionExtensionInterface
             $response,
             $resourceClass,
             $limit,
-            $this->pagination->getPage($context),
+            1,
             $context,
         );
+    }
+
+    /**
+     * ES|QL has no offset command: the "page" parameter cannot be honored and must not be silently ignored.
+     *
+     * @param array<string, mixed> $context
+     */
+    private function assertPageIsNotRequested(array $context): void
+    {
+        if (null !== $this->pagination && 1 < $this->pagination->getPage($context)) {
+            throw new InvalidArgumentException('ES|QL supports partial pagination only: the "page" parameter is not supported. Use keyset pagination instead, by sorting on a unique field and filtering it with a ComparisonFilter.');
+        }
+    }
+
+    /**
+     * The "esql" endpoint has been added in elasticsearch/elasticsearch 8.11, while
+     * this component supports 8.4 and later for the Query DSL.
+     */
+    private static function assertEsqlIsSupported(object $client): void
+    {
+        if (!method_exists($client, 'esql')) {
+            throw new \RuntimeException(\sprintf('ES|QL support requires elasticsearch/elasticsearch >= 8.11, but "%s" does not provide the "esql" endpoint.', $client::class));
+        }
     }
 }

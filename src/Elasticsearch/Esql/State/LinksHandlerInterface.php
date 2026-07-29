@@ -19,8 +19,9 @@ use ApiPlatform\Elasticsearch\Esql\EsqlQuery;
  * Alters the ES|QL query according to the operation links (e.g. a subresource
  * URI template such as "/users/{userId}/books" adding `WHERE user_id == ?id`).
  *
- * Set a callable (or a service implementing this interface) on the
- * "handleLinks" Elasticsearch state option to enable it.
+ * Set an instance of this interface, or any callable, on the "handleLinks"
+ * Elasticsearch state option to enable it. Service identifiers are not
+ * supported: pass the instance itself.
  *
  * @experimental
  *

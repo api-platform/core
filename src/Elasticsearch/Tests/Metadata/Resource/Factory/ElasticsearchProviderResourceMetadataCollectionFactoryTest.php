@@ -21,8 +21,11 @@ use ApiPlatform\Elasticsearch\State\Options;
 use ApiPlatform\Elasticsearch\State\QueryLanguage;
 use ApiPlatform\Elasticsearch\Tests\Fixtures\Foo;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\GraphQl\Query;
+use ApiPlatform\Metadata\GraphQl\QueryCollection;
 use ApiPlatform\Metadata\Operations;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -79,18 +82,49 @@ class ElasticsearchProviderResourceMetadataCollectionFactoryTest extends TestCas
         self::assertSame(CollectionProvider::class, $operations['get_collection']->getProvider());
     }
 
-    private function createFactory(?Options $options = null, QueryLanguage|string $defaultQueryLanguage = QueryLanguage::Dsl): ElasticsearchProviderResourceMetadataCollectionFactory
+    public function testEsqlStateOptionsThrowWhenEsqlIsNotAvailable(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('ES|QL is not supported by the OpenSearch client');
+
+        $this->createFactory(new Options(queryLanguage: QueryLanguage::Esql), esqlAvailable: false)->create(Foo::class);
+    }
+
+    public function testEsqlGlobalDefaultThrowsWhenEsqlIsNotAvailable(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('ES|QL is not supported by the OpenSearch client');
+
+        $this->createFactory(defaultQueryLanguage: 'esql', esqlAvailable: false)->create(Foo::class);
+    }
+
+    public function testGraphQlOperationsAlwaysUseTheDslProviders(): void
+    {
+        // the ES|QL paginator implements partial pagination only, which is incompatible with GraphQL connections
+        $resourceMetadataCollection = $this->createFactory(new Options(queryLanguage: QueryLanguage::Esql), 'esql')->create(Foo::class);
+        $graphQlOperations = $resourceMetadataCollection[0]->getGraphQlOperations();
+
+        self::assertSame(CollectionProvider::class, $graphQlOperations['collection_query']->getProvider());
+        self::assertSame(ItemProvider::class, $graphQlOperations['item_query']->getProvider());
+    }
+
+    private function createFactory(?Options $options = null, QueryLanguage|string $defaultQueryLanguage = QueryLanguage::Dsl, bool $esqlAvailable = true): ElasticsearchProviderResourceMetadataCollectionFactory
     {
         $options ??= new Options();
 
-        $resource = (new ApiResource(shortName: 'Foo'))->withOperations(new Operations([
-            'get_collection' => (new GetCollection())->withStateOptions($options),
-            'get' => (new Get())->withStateOptions($options),
-        ]));
+        $resource = (new ApiResource(shortName: 'Foo'))
+            ->withOperations(new Operations([
+                'get_collection' => (new GetCollection())->withStateOptions($options),
+                'get' => (new Get())->withStateOptions($options),
+            ]))
+            ->withGraphQlOperations([
+                'collection_query' => (new QueryCollection())->withStateOptions($options),
+                'item_query' => (new Query())->withStateOptions($options),
+            ]);
 
-        $decorated = $this->prophesize(ResourceMetadataCollectionFactoryInterface::class);
-        $decorated->create(Foo::class)->willReturn(new ResourceMetadataCollection(Foo::class, [$resource]));
+        $decorated = $this->createStub(ResourceMetadataCollectionFactoryInterface::class);
+        $decorated->method('create')->willReturn(new ResourceMetadataCollection(Foo::class, [$resource]));
 
-        return new ElasticsearchProviderResourceMetadataCollectionFactory($decorated->reveal(), $defaultQueryLanguage);
+        return new ElasticsearchProviderResourceMetadataCollectionFactory($decorated, $defaultQueryLanguage, $esqlAvailable);
     }
 }

@@ -18,6 +18,7 @@ use ApiPlatform\Elasticsearch\Esql\Extension\CollectionExtensionInterface;
 use ApiPlatform\Elasticsearch\Esql\Extension\ResultCollectionExtensionInterface;
 use ApiPlatform\Elasticsearch\Esql\Paginator;
 use ApiPlatform\Elasticsearch\State\Options;
+use ApiPlatform\Metadata\Exception\RuntimeException;
 use ApiPlatform\Metadata\InflectorInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Util\Inflector;
@@ -46,7 +47,7 @@ final class CollectionProvider implements ProviderInterface
      */
     public function __construct(
         private readonly Client $client,
-        private readonly ?DenormalizerInterface $denormalizer = null,
+        private readonly DenormalizerInterface $denormalizer,
         private readonly iterable $collectionExtensions = [],
         private readonly ?InflectorInterface $inflector = new Inflector(),
     ) {
@@ -60,10 +61,18 @@ final class CollectionProvider implements ProviderInterface
         $resourceClass = $operation->getClass();
         $options = $operation->getStateOptions() instanceof Options ? $operation->getStateOptions() : new Options();
 
-        $query = new EsqlQuery($options->getIndex() ?? $this->inflector->tableize($operation->getShortName()));
+        $query = new EsqlQuery($options->getIndex() ?? ($this->inflector ?? new Inflector())->tableize((string) $operation->getShortName()));
 
-        if (\is_callable($handleLinks = $options->getHandleLinks())) {
-            $handleLinks($query, $uriVariables, ['operation' => $operation, 'resourceClass' => $resourceClass] + $context);
+        if (null !== ($handleLinks = $options->getHandleLinks())) {
+            $linksContext = ['operation' => $operation, 'resourceClass' => $resourceClass] + $context;
+
+            if ($handleLinks instanceof LinksHandlerInterface) {
+                $handleLinks->handleLinks($query, $uriVariables, $linksContext);
+            } elseif (\is_callable($handleLinks)) {
+                $handleLinks($query, $uriVariables, $linksContext);
+            } else {
+                throw new RuntimeException(\sprintf('Could not resolve the handleLinks option of the operation "%s": expected a callable or an instance of "%s", but got "%s".', $operation->getName() ?? $resourceClass, LinksHandlerInterface::class, get_debug_type($handleLinks)));
+            }
         }
 
         foreach ($this->collectionExtensions as $extension) {
@@ -73,6 +82,8 @@ final class CollectionProvider implements ProviderInterface
                 return $extension->getResult($query, $resourceClass, $operation, $context);
             }
         }
+
+        self::assertEsqlIsSupported($this->client);
 
         try {
             $response = $this->client->esql()->query(['body' => $query->compile()]);
@@ -93,5 +104,16 @@ final class CollectionProvider implements ProviderInterface
             1,
             $context,
         );
+    }
+
+    /**
+     * The "esql" endpoint has been added in elasticsearch/elasticsearch 8.11, while
+     * this component supports 8.4 and later for the Query DSL.
+     */
+    private static function assertEsqlIsSupported(object $client): void
+    {
+        if (!method_exists($client, 'esql')) {
+            throw new \RuntimeException(\sprintf('ES|QL support requires elasticsearch/elasticsearch >= 8.11, but "%s" does not provide the "esql" endpoint.', $client::class));
+        }
     }
 }
