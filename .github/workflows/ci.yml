@@ -725,7 +725,7 @@ jobs:
             elasticsearch-package: 'elasticsearch/elasticsearch:^8.4'
             extensions: 'intl, bcmath, curl, openssl, mbstring'
           - php: '8.3'
-            elasticsearch-version: '7.17.0'
+            elasticsearch-version: '8.4.0'
             elasticsearch-package: 'elasticsearch/elasticsearch:prefer-lowest'
             extensions: 'intl, bcmath, curl, openssl, mbstring'
       fail-fast: false

@@ -1031,12 +1031,8 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
 
         if ('opensearch' === $config['elasticsearch']['client']) {
             $clientClass = \OpenSearch\Client::class; // @phpstan-ignore class.notFound
-        } elseif (!class_exists(\Elasticsearch\Client::class)) {
-            // ES v8 and up
-            $clientClass = \Elastic\Elasticsearch\Client::class;
         } else {
-            // ES v7
-            $clientClass = \Elasticsearch\Client::class;
+            $clientClass = \Elastic\Elasticsearch\Client::class;
         }
 
         $clientDefinition = new Definition($clientClass);

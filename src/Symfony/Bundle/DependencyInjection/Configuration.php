@@ -476,10 +476,8 @@ final class Configuration implements ConfigurationInterface
                                 ->ifTrue()
                                 ->then(static function (bool $v): bool {
                                     if (
-                                        // ES v7
-                                        !class_exists(\Elasticsearch\Client::class)
                                         // ES v8 and up
-                                        && !class_exists(\Elastic\Elasticsearch\Client::class)
+                                        !class_exists(\Elastic\Elasticsearch\Client::class)
                                         // OpenSearch
                                         && !class_exists(\OpenSearch\Client::class)
                                     ) {
