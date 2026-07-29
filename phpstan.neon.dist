@@ -35,7 +35,7 @@ parameters:
 		- src/*/vendor/*
 		# Symfony 6 support
 		- src/Symfony/Bundle/ArgumentResolver/CompatibleValueResolverInterface.php
-		- tests/Fixtures/app/config/reference.php
+		- tests/Fixtures/app/config/reference.php (?)
 	earlyTerminatingMethodCalls:
 		PHPUnit\Framework\Constraint\Constraint:
 			- fail
