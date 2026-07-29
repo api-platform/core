@@ -60,12 +60,14 @@ final class UriVariablesConverter implements UriVariablesConverterInterface
             }
 
             foreach ($this->uriVariableTransformers as $uriVariableTransformer) {
-                if (!$uriVariableTransformer->supportsTransformation($value, $types, $context)) {
+                $paramContext = $context;
+                $paramContext['parameterName'] = $parameterName;
+                if (!$uriVariableTransformer->supportsTransformation($value, $types, $paramContext)) {
                     continue;
                 }
 
                 try {
-                    $uriVariables[$parameterName] = $uriVariableTransformer->transform($value, $types, $context);
+                    $uriVariables[$parameterName] = $uriVariableTransformer->transform($value, $types, $paramContext);
                     break;
                 } catch (InvalidUriVariableException $e) {
                     throw new InvalidUriVariableException(\sprintf('Identifier "%s" could not be transformed.', $parameterName), $e->getCode(), $e);
