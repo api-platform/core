@@ -217,7 +217,31 @@ final class ApiPlatformExtension extends Extension implements PrependExtensionIn
         // McpToolProvider requires Symfony's object_mapper service; mirror FrameworkBundle's gate so we don't try to wire it when object-mapper is dev-only.
         if (($config['mcp']['enabled'] ?? false) && class_exists(McpBundle::class) && ContainerBuilder::willBeAvailable('symfony/object-mapper', ObjectMapperInterface::class, ['symfony/framework-bundle'])) {
             $loader->load('mcp/mcp.php');
-            $loader->load($config['use_symfony_listeners'] ? 'mcp/events.php' : 'mcp/state.php');
+
+            if ($config['use_symfony_listeners']) {
+                // In this mode the state pipeline is driven by kernel listeners, which never run for
+                // a JSON-RPC tool call, so MCP needs its own provider chain to keep enforcing
+                // security, parameters and validation.
+                $loader->load('mcp/events.php');
+
+                /** @var string[] $bundles */
+                $bundles = $container->getParameter('kernel.bundles');
+                $hasValidator = interface_exists(ValidatorInterface::class);
+
+                if ($hasValidator) {
+                    $loader->load('mcp/validator.php');
+                }
+
+                if (isset($bundles['SecurityBundle'])) {
+                    $loader->load('mcp/security.php');
+
+                    if ($hasValidator) {
+                        $loader->load('mcp/security_validator.php');
+                    }
+                }
+            } else {
+                $loader->load('mcp/state.php');
+            }
         }
 
         $container->registerForAutoconfiguration(FilterInterface::class)

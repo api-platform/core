@@ -20,6 +20,10 @@ use ApiPlatform\State\Processor\WriteProcessor;
 return static function (ContainerConfigurator $container) {
     $services = $container->services();
 
+    // The main provider chain already carries read, deserialize, validate, parameters and the
+    // access checkers, so MCP reuses it as-is.
+    $services->alias('api_platform.mcp.state_provider', 'api_platform.state_provider.main');
+
     $services->set('api_platform.mcp.state_processor.write', WriteProcessor::class)
         ->args([
             null,
@@ -36,7 +40,7 @@ return static function (ContainerConfigurator $container) {
     $services->set('api_platform.mcp.handler', Handler::class)
         ->args([
             service('api_platform.mcp.metadata.operation.mcp_factory'),
-            service('api_platform.state_provider.main'),
+            service('api_platform.mcp.state_provider'),
             service('api_platform.mcp.state_processor'),
             service('request_stack'),
             service('logger')->ignoreOnInvalid(),
