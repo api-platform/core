@@ -19,6 +19,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 env:
   COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   COMPOSER_ROOT_VERSION: "4.3.x-dev"
