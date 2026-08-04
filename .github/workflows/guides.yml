@@ -37,7 +37,8 @@ jobs:
                     cd $(composer -n config --global home)
                     echo "{\"repositories\":[{\"type\":\"vcs\",\"url\":\"https://github.com/php-documentation-generator/php-documentation-generator\"}]}" > composer.json
                     composer global config --no-plugins allow-plugins.symfony/runtime true
-                    composer global require php-documentation-generator/php-documentation-generator:dev-main
+                    # pdg has no usable tag, so the branch is pinned to a commit
+                    composer global require "php-documentation-generator/php-documentation-generator:dev-main#0d8dd6222ef14338d502294016a3a263437d6b7a"
             -   name: Cache dependencies
                 uses: actions/cache@v5
                 with:
@@ -47,7 +48,7 @@ jobs:
             -   name: Install project dependencies
                 working-directory: docs
                 run: |
-                    composer global require soyuka/pmu
+                    composer global require soyuka/pmu:0.3.0
                     composer global config allow-plugins.soyuka/pmu true --no-interaction
                     composer global link ..
             -   name: Test guides
