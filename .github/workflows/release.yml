@@ -14,12 +14,13 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   split:
     name: Subtree Split
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - name: Generate App Token
         id: generate_token
